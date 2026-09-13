@@ -40,8 +40,17 @@ Page {
 
     // Hides the page until we know whether an account exists.
     property bool probing: true
-    /// The page is on its way out. Two answers can send it there.
+    /// The chat list has actually been opened.
+    ///
+    /// Set from what the stack did, never from having asked it: Silica
+    /// drops an operation asked for while a transition is running, and
+    /// the first thing this page does is ask, from inside the push that
+    /// puts it up. A page that recorded the asking would hide itself for
+    /// a hand-over that never happened and sit there blank.
     property bool leaving: false
+    /// IO has been asked for. Once, however many times the hand-over is
+    /// tried.
+    property bool askedForIo: false
     /// The probe has taken long enough to be worth saying so. A phone
     /// with a profile is gone from here in the time dconf takes, and a
     /// spinner that appears on the way out is the flash it was put there
@@ -58,10 +67,33 @@ Page {
         if (page.leaving || !(Settings.lastAccountId > 0)) {
             return
         }
-        page.leaving = true
-        core.start_all_account_io()
-        pageStack.replaceAbove(null, Qt.resolvedUrl("ChatListPage.qml"),
-                               { accountId: Settings.lastAccountId })
+        if (!page.askedForIo) {
+            page.askedForIo = true
+            core.start_all_account_io()
+        }
+        page.leaving = page.openChatList(Settings.lastAccountId)
+    }
+
+    /// Hand over to the chat list, and say whether the stack took it.
+    function openChatList(accountId) {
+        var opened = pageStack.replaceAbove(null,
+                                            Qt.resolvedUrl("ChatListPage.qml"),
+                                            { accountId: accountId })
+        return opened ? true : false
+    }
+
+    // Until the stack takes it. The first attempt is made from inside
+    // the push that puts this page up, which is the one moment a stack
+    // will not take anything; asking again a frame later costs nothing
+    // and is the difference between a fast start and a blank screen.
+    Timer {
+        id: handOver
+        objectName: "handOver"
+        interval: 50
+        repeat: true
+        triggeredOnStart: true
+        running: !page.leaving && Settings.lastAccountId > 0
+        onTriggered: page.resumeRemembered()
     }
 
     Timer {
@@ -72,19 +104,12 @@ Page {
         onTriggered: page.slow = true
     }
 
-    // dconf answers a moment after the page is up, so the shortcut is
-    // taken from here as well as on completion.
-    Connections {
-        target: Settings
-        onLastAccountIdChanged: page.resumeRemembered()
-    }
-
-    // The core may be ready before the handler below exists.
+    // The core may be ready before the handler below exists. Asked for
+    // whether or not the shortcut above is going to work: the core's
+    // answer is the authority, and it is what rescues this page if the
+    // hand-over never lands.
     Component.onCompleted: {
         page.resumeRemembered()
-        if (page.leaving) {
-            return
-        }
         if (core.status === "ready") {
             core.refresh_accounts()
         } else if (core.status.indexOf("error") === 0) {
@@ -105,19 +130,26 @@ Page {
             }
         }
 
+        // Not gated on `leaving`: a page that had really handed over is
+        // gone and hears nothing, so being here to hear this means the
+        // hand-over did not land, whatever it reported.
         onAccounts_refreshed: {
-            if (page.leaving) {
-                return
-            }
             if (configured_count > 0) {
-                page.leaving = true
-                // Every profile, not only the one shown: each of them is
-                // one people write to, and the cover counts them all.
-                core.start_all_account_io()
+                if (!page.askedForIo) {
+                    page.askedForIo = true
+                    // Every profile, not only the one shown: each of them
+                    // is one people write to, and the cover counts them
+                    // all.
+                    core.start_all_account_io()
+                }
                 // The profile the app was closed on, which the core
                 // remembers; the chat list tells it which on every open.
-                pageStack.replaceAbove(null, Qt.resolvedUrl("ChatListPage.qml"),
-                                       { accountId: resume_account_id })
+                page.leaving = page.openChatList(resume_account_id)
+                // Nothing took it and there is nothing else coming.
+                // Better the first screen than a blank one.
+                if (!page.leaving) {
+                    page.probing = false
+                }
             } else {
                 page.probing = false
             }

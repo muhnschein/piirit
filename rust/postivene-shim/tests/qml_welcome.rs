@@ -81,6 +81,16 @@ const PROBE_QML: &str = r"
         function pageProperty(property) {
             return loader.item ? '' + loader.item[property] : 'no-page'
         }
+        // Whether the stack takes what it is handed.
+        function refuseNavigation(on) {
+            pageStack.refusing = (on === 'true')
+            return 'ok'
+        }
+        // What the core saying there is a profile to resume does.
+        function coreFoundProfiles(count) {
+            core.accounts_refreshed(parseInt(count, 10), 4)
+            return 'ok'
+        }
         // The mask's file name, without the checkout path.
         function maskFile() {
             var mask = findIn(loader.item, 'faceMask')
@@ -267,17 +277,35 @@ fn the_welcome_page_draws_the_field_and_turns_with_the_phone() {
         r("sideways", call!("maskFile"));
     });
 
-    // 3s: the same page on a phone that remembers being on a profile.
+    // 3s: a stack that refuses, which is what the real one does while
+    // the push that puts this page up is still running. The page must
+    // not hide itself for a hand-over that did not happen, and the
+    // core's answer has to still reach it.
+    let r = record.clone();
+    single_shot(Duration::from_secs(3), move || {
+        r("refuse", call!("refuseNavigation", "true"));
+        r("remember", call!("rememberProfile", "7"));
+        r(
+            "reload-refused",
+            call!("load", common::page_url("WelcomePage.qml")),
+        );
+        r("refused-left", call!("pageProperty", "leaving"));
+        r("refused-core", call!("coreFoundProfiles", "2"));
+        r("refused-after-core", call!("pageProperty", "probing"));
+    });
+
+    // 4s: the same page on a phone that remembers being on a profile.
     // Nothing has told it the core is ready, and it should not wait to
     // be told: what it knows from dconf is enough to leave on.
     let r = record.clone();
-    single_shot(Duration::from_secs(3), move || {
+    single_shot(Duration::from_secs(4), move || {
+        r("accept", call!("refuseNavigation", "false"));
         r("remember", call!("rememberProfile", "7"));
         r("reload", call!("load", common::page_url("WelcomePage.qml")));
         r("left", call!("pageProperty", "leaving"));
     });
 
-    single_shot(Duration::from_secs(4), move || unsafe {
+    single_shot(Duration::from_secs(6), move || unsafe {
         (*engine_ptr).quit();
     });
 
@@ -286,6 +314,51 @@ fn the_welcome_page_draws_the_field_and_turns_with_the_phone() {
     let navigation = stack_box.pinned().borrow().log.to_string();
     assert_field_drawn(&steps.borrow(), &navigation);
     assert_remembered_profile_opens(&steps.borrow(), &navigation);
+    assert_a_refused_hand_over_is_survived(&steps.borrow(), &navigation);
+}
+
+/// A hand-over the stack refuses must leave the page working.
+///
+/// Silica drops a stack operation asked for while a transition is
+/// running, and the first thing this page does is ask, from inside the
+/// push that puts it up. Recording that as having left hid the page for
+/// a hand-over that never happened, and gated away everything that could
+/// have rescued it: a blank screen, for good.
+fn assert_a_refused_hand_over_is_survived(steps: &[(String, String)], navigation: &str) {
+    let value = |label: &str| -> &str {
+        steps
+            .iter()
+            .find(|(name, _)| name == label)
+            .map_or("<step did not run>", |(_, value)| value.as_str())
+    };
+    let context = format!("steps: {steps:?}\nnavigation: {navigation}");
+    assert_eq!(
+        value("reload-refused"),
+        "ok",
+        "the page did not load against a refusing stack. {context}"
+    );
+    assert_eq!(
+        value("refused-left"),
+        "false",
+        "the page recorded a hand-over the stack refused, which hides it \
+         for good. {context}"
+    );
+    assert!(
+        navigation.contains("refused:ChatListPage.qml"),
+        "the page did not even try to hand over. {context}"
+    );
+    assert_eq!(
+        value("refused-core"),
+        "ok",
+        "the core's answer could not be delivered. {context}"
+    );
+    assert_eq!(
+        value("refused-after-core"),
+        "false",
+        "the page is still hiding itself after the core answered, so a \
+         reader whose hand-over was refused is left on a blank screen \
+         with nothing coming. {context}"
+    );
 }
 
 /// A phone that remembers a profile leaves for it without waiting to be
@@ -391,7 +464,9 @@ fn assert_field_drawn(steps: &[(String, String)], navigation: &str) {
     );
 }
 
-/// A page stack that records where the page sent the reader.
+/// A page stack that records where the page sent the reader, and can
+/// refuse -- which is what Silica's own does while a transition is
+/// running, including the push that puts the first page up.
 #[allow(non_snake_case)]
 #[derive(QObject, Default)]
 struct NoStack {
@@ -399,18 +474,38 @@ struct NoStack {
     /// `replaceAbove:ChatListPage.qml|`
     log: qt_property!(QString; NOTIFY log_changed),
     log_changed: qt_signal!(),
+    /// Drop what is asked for and hand back nothing, as a busy stack
+    /// does. Every refusal is still counted in `log`.
+    refusing: qt_property!(bool),
 
-    replaceAbove:
-        qt_method!(fn(&mut self, target: QVariant, page: QString, properties: QVariantMap)),
+    replaceAbove: qt_method!(
+        fn(&mut self, target: QVariant, page: QString, properties: QVariantMap) -> QVariant
+    ),
 }
 
 #[allow(non_snake_case)]
 impl NoStack {
-    fn replaceAbove(&mut self, _target: QVariant, page: QString, _properties: QVariantMap) {
+    fn replaceAbove(
+        &mut self,
+        _target: QVariant,
+        page: QString,
+        _properties: QVariantMap,
+    ) -> QVariant {
         let page = page.to_string();
         let name = page.rsplit('/').next().unwrap_or(&page).to_string();
         let current = self.log.to_string();
-        self.log = format!("{current}replaceAbove:{name}|").into();
+        let verb = if self.refusing {
+            "refused"
+        } else {
+            "replaceAbove"
+        };
+        self.log = format!("{current}{verb}:{name}|").into();
         self.log_changed();
+        if self.refusing {
+            QVariant::default()
+        } else {
+            // Any object will do: the page only asks whether it got one.
+            QString::from(name).to_qvariant()
+        }
     }
 }
