@@ -112,6 +112,34 @@
     </message>
 </context>
 <context>
+    <name>BackupPage</name>
+    <message>
+        <source>Back up profile</source>
+        <translation>ಪ್ರೊಫೈಲ್ ಬ್ಯಾಕಪ್</translation>
+    </message>
+    <message>
+        <source>Write the backup</source>
+        <translation>ಬ್ಯಾಕಪ್ ಬರೆಯಿರಿ</translation>
+    </message>
+    <message>
+        <source>Writing the backup...</source>
+        <translation>ಬ್ಯಾಕಪ್ ಬರೆಯಲಾಗುತ್ತಿದೆ...</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>ರದ್ದುಮಾಡಿ</translation>
+    </message>
+    <message>
+        <source>Saved to %1</source>
+        <extracomment>Said once the backup is written. %1 is the full path of the file.</extracomment>
+        <translation>%1 ನಲ್ಲಿ ಉಳಿಸಲಾಗಿದೆ</translation>
+    </message>
+    <message>
+        <source>This profile&apos;s messages, contacts and key in one file, saved to Documents. Whoever has that file has the profile, so keep it somewhere safe. Your other profiles are not in it: each one is backed up from its own page.</source>
+        <translation>ಈ ಪ್ರೊಫೈಲ್‌ನ ಸಂದೇಶಗಳು, ಸಂಪರ್ಕಗಳು ಮತ್ತು ಕೀ ಒಂದೇ ಫೈಲ್‌ನಲ್ಲಿ, ದಾಖಲೆಗಳಲ್ಲಿ ಉಳಿಯುತ್ತವೆ. ಆ ಫೈಲ್ ಇರುವವರಿಗೆ ಪ್ರೊಫೈಲ್ ಕೂಡ ಸಿಗುತ್ತದೆ, ಆದ್ದರಿಂದ ಅದನ್ನು ಸುರಕ್ಷಿತ ಸ್ಥಳದಲ್ಲಿ ಇಡಿ. ನಿಮ್ಮ ಇತರ ಪ್ರೊಫೈಲ್‌ಗಳು ಇದರಲ್ಲಿ ಇಲ್ಲ: ಪ್ರತಿಯೊಂದನ್ನೂ ಅದರ ಸ್ವಂತ ಪುಟದಿಂದ ಬ್ಯಾಕಪ್ ಮಾಡಲಾಗುತ್ತದೆ.</translation>
+    </message>
+</context>
+<context>
     <name>CapturePage</name>
     <message>
         <source>The video could not be saved</source>
@@ -402,6 +430,14 @@
     <message>
         <source>Saved to Downloads</source>
         <translation>ಡೌನ್‌ಲೋಡ್‌ಗಳಲ್ಲಿ ಉಳಿಸಲಾಗಿದೆ</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n member(s)</source>
+        <extracomment>Under a group&apos;s name, over its messages. %n is how many people are in the group.</extracomment>
+        <translation>
+            <numerusform>%n ಸದಸ್ಯ</numerusform>
+            <numerusform>%n ಸದಸ್ಯರು</numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -908,6 +944,14 @@
     <message>
         <source>The name on every message you send</source>
         <translation>ನೀವು ಕಳುಹಿಸುವ ಪ್ರತಿ ಸಂದೇಶದ ಮೇಲಿನ ಹೆಸರು</translation>
+    </message>
+    <message>
+        <source>Backup</source>
+        <translation>ಬ್ಯಾಕಪ್</translation>
+    </message>
+    <message>
+        <source>Back up this profile</source>
+        <translation>ಈ ಪ್ರೊಫೈಲ್ ಬ್ಯಾಕಪ್ ಮಾಡಿ</translation>
     </message>
 </context>
 <context>

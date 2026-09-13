@@ -8,9 +8,14 @@ import Postivene 1.0
  * One profile, as everyone else sees it and as this device holds it: the
  * picture, the name on every message, the line under it, the address it
  * writes from, whether the other end is told when something has been
- * read, and how the relay and the phone are doing by it. Reached from the
+ * read, the way to write the profile out to a backup file, and how the
+ * relay and the phone are doing by it. Reached from the
  * profile's row on the profiles page. The settings that belong to no
  * profile are on the settings page instead (SettingsPage.qml).
+ *
+ * The backup is here rather than there because the core's export is per
+ * profile: it takes an account id and writes that account. See
+ * BackupPage.qml, which does the writing.
  *
  * The editable parts are core config keys rather than a record of their
  * own, so this page owns a Profile object over get_config/set_config
@@ -339,6 +344,26 @@ Page {
                 checked: profile.read_receipts
                 enabled: profile.loaded
                 onClicked: profile.set_read_receipts(!checked)
+            }
+
+            // A backup is one profile's, because the core's export is:
+            // it takes an account and writes that account. So it belongs
+            // here, on the page about this profile, rather than among
+            // the settings that belong to no profile -- a phone with
+            // three profiles on it makes three backups. What the file is
+            // and where it goes is said on the page itself.
+            SectionHeader {
+                text: qsTr("Backup")
+            }
+
+            Button {
+                objectName: "backupButton"
+                anchors.horizontalCenter: parent.horizontalCenter
+                text: qsTr("Back up this profile")
+                onClicked: pageStack.push(Qt.resolvedUrl("BackupPage.qml"), {
+                    accountId: page.accountId,
+                    address: profile.address
+                })
             }
 
             SectionHeader {

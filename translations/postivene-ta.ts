@@ -112,6 +112,34 @@
     </message>
 </context>
 <context>
+    <name>BackupPage</name>
+    <message>
+        <source>Back up profile</source>
+        <translation>சுயவிவரக் காப்புப் பிரதி</translation>
+    </message>
+    <message>
+        <source>Write the backup</source>
+        <translation>காப்புப் பிரதியை எழுது</translation>
+    </message>
+    <message>
+        <source>Writing the backup...</source>
+        <translation>காப்புப் பிரதி எழுதப்படுகிறது...</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>ரத்துசெய்</translation>
+    </message>
+    <message>
+        <source>Saved to %1</source>
+        <extracomment>Said once the backup is written. %1 is the full path of the file.</extracomment>
+        <translation>%1 இல் சேமிக்கப்பட்டது</translation>
+    </message>
+    <message>
+        <source>This profile&apos;s messages, contacts and key in one file, saved to Documents. Whoever has that file has the profile, so keep it somewhere safe. Your other profiles are not in it: each one is backed up from its own page.</source>
+        <translation>இந்தச் சுயவிவரத்தின் செய்திகள், தொடர்புகள், சாவி ஆகியவை ஒரே கோப்பில், ஆவணங்களில் சேமிக்கப்படும். அந்தக் கோப்பு யாரிடம் உள்ளதோ அவரிடம் சுயவிவரமும் உள்ளது, எனவே அதைப் பாதுகாப்பான இடத்தில் வைக்கவும். உங்கள் மற்ற சுயவிவரங்கள் இதில் இல்லை: ஒவ்வொன்றுக்கும் அதன் சொந்தப் பக்கத்திலிருந்து காப்புப் பிரதி எடுக்கப்படுகிறது.</translation>
+    </message>
+</context>
+<context>
     <name>CapturePage</name>
     <message>
         <source>The video could not be saved</source>
@@ -402,6 +430,14 @@
     <message>
         <source>Saved to Downloads</source>
         <translation>பதிவிறக்கங்களில் சேமிக்கப்பட்டது</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n member(s)</source>
+        <extracomment>Under a group&apos;s name, over its messages. %n is how many people are in the group.</extracomment>
+        <translation>
+            <numerusform>%n உறுப்பினர்</numerusform>
+            <numerusform>%n உறுப்பினர்கள்</numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -908,6 +944,14 @@
     <message>
         <source>The name on every message you send</source>
         <translation>நீங்கள் அனுப்பும் ஒவ்வொரு செய்தியிலும் உள்ள பெயர்</translation>
+    </message>
+    <message>
+        <source>Backup</source>
+        <translation>காப்புப் பிரதி</translation>
+    </message>
+    <message>
+        <source>Back up this profile</source>
+        <translation>இந்தச் சுயவிவரத்தைக் காப்புப் பிரதி எடு</translation>
     </message>
 </context>
 <context>

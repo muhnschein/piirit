@@ -114,6 +114,34 @@
     </message>
 </context>
 <context>
+    <name>BackupPage</name>
+    <message>
+        <source>Back up profile</source>
+        <translation>Varnostna kopija profila</translation>
+    </message>
+    <message>
+        <source>Write the backup</source>
+        <translation>Zapiši varnostno kopijo</translation>
+    </message>
+    <message>
+        <source>Writing the backup...</source>
+        <translation>Zapisovanje varnostne kopije...</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Prekliči</translation>
+    </message>
+    <message>
+        <source>Saved to %1</source>
+        <extracomment>Said once the backup is written. %1 is the full path of the file.</extracomment>
+        <translation>Shranjeno v %1</translation>
+    </message>
+    <message>
+        <source>This profile&apos;s messages, contacts and key in one file, saved to Documents. Whoever has that file has the profile, so keep it somewhere safe. Your other profiles are not in it: each one is backed up from its own page.</source>
+        <translation>Sporočila, stiki in ključ tega profila v eni datoteki, shranjeni v Dokumente. Kdor ima to datoteko, ima tudi profil, zato jo hranite na varnem. Vaših drugih profilov v njej ni: vsakega se varnostno kopira z njegove lastne strani.</translation>
+    </message>
+</context>
+<context>
     <name>CapturePage</name>
     <message>
         <source>The video could not be saved</source>
@@ -404,6 +432,16 @@
     <message>
         <source>Saved to Downloads</source>
         <translation>Shranjeno v Prenose</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n member(s)</source>
+        <extracomment>Under a group&apos;s name, over its messages. %n is how many people are in the group.</extracomment>
+        <translation>
+            <numerusform>%n član</numerusform>
+            <numerusform>%n člana</numerusform>
+            <numerusform>%n člani</numerusform>
+            <numerusform>%n članov</numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -918,6 +956,14 @@
     <message>
         <source>The name on every message you send</source>
         <translation>Ime na vsakem sporočilu, ki ga pošljete</translation>
+    </message>
+    <message>
+        <source>Backup</source>
+        <translation>Varnostna kopija</translation>
+    </message>
+    <message>
+        <source>Back up this profile</source>
+        <translation>Varnostno kopiraj ta profil</translation>
     </message>
 </context>
 <context>

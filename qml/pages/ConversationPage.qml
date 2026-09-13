@@ -388,6 +388,17 @@ Page {
         id: conversationHeader
         objectName: "conversationHeader"
         title: page.chatName
+        // Under a group's name, where PageHeader puts a description:
+        // how many people are in it. Nothing under a one-to-one chat's
+        // name, where the count would say "2" about a conversation with
+        // one other person, and nothing until the chat's shape has
+        // arrived -- a "0 members" that turns into seven reads as the
+        // group having been empty a moment ago.
+        //: Under a group's name, over its messages. %n is how many
+        //: people are in the group.
+        subtitle: messages.is_group && messages.member_count > 0
+                  ? qsTr("%n member(s)", "", messages.member_count)
+                  : ""
         // White once the info page is attached, as a PageHeader is on a
         // page that can navigate forward.
         interactive: page.canNavigateForward

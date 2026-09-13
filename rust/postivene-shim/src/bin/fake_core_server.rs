@@ -750,6 +750,52 @@ async fn import_into(state: &Arc<Mutex<State>>, id: &Value, account: u32, from: 
     ok(id, &Value::Null)
 }
 
+/// Write a profile out, the way the real core's `export_backup` does:
+/// `ImexProgress` events while it runs, and a `.tar` in the folder it was
+/// handed, which the core names itself.
+///
+/// Keyed on the folder, like the import above: `fail` refuses, `slow`
+/// waits (and answers a `stop_ongoing_process` that arrives meanwhile,
+/// unless it is `deaf`).
+async fn export_into(state: &Arc<Mutex<State>>, id: &Value, account: u32, folder: &str) -> Value {
+    if should_fail(folder) {
+        return err(id, "backup could not be written");
+    }
+    if !state.lock().await.configuring.insert(account) {
+        return err(id, "There is already another ongoing process running.");
+    }
+    state.lock().await.imex(account, 300);
+    let stopped = if folder.contains("slow") {
+        tokio::time::sleep(delay_or("POSTIVENE_FAKE_SLOW_MS", 3000)).await;
+        !folder.contains("deaf") && state.lock().await.stopped.contains(&account)
+    } else {
+        false
+    };
+    let mut state = state.lock().await;
+    state.configuring.remove(&account);
+    state.stopped.remove(&account);
+    if stopped {
+        state.imex(account, 0);
+        return err(id, "Export was stopped");
+    }
+    // The name the real core builds: the date, a number and the address.
+    // A page finds the file by what appeared in the folder, so what
+    // matters is that exactly one did.
+    let written = std::path::Path::new(folder).join(format!("delta-chat-2026-01-01-{account}.tar"));
+    if let Err(problem) =
+        std::fs::create_dir_all(folder).and_then(|()| std::fs::write(&written, b"backup"))
+    {
+        state.imex(account, 0);
+        return err(id, &format!("backup could not be written: {problem}"));
+    }
+    state.events.push_back(json!({
+        "contextId": account,
+        "event": {"kind": "ImexFileWritten", "path": written.to_string_lossy()},
+    }));
+    state.imex(account, 1000);
+    ok(id, &Value::Null)
+}
+
 /// A reply delay in milliseconds, from `var`, or `default` when unset.
 fn delay_or(var: &str, default: u64) -> std::time::Duration {
     std::time::Duration::from_millis(
@@ -1041,6 +1087,11 @@ async fn serve() {
                     let from = positional(1).as_str().unwrap_or_default().to_string();
                     import_into(&state, &id, account_id(), &from).await
                 }
+                // The other direction: one profile written to a folder.
+                "export_backup" => {
+                    let folder = positional(1).as_str().unwrap_or_default().to_string();
+                    export_into(&state, &id, account_id(), &folder).await
+                }
                 "add_or_update_transport" => {
                     let param = positional(1);
                     let addr = param
@@ -1286,6 +1337,22 @@ async fn serve() {
                             "ephemeralTimer": state.timers.get(&chat).copied().unwrap_or(0),
                         }),
                     )
+                }
+                // Who is in a chat, ids only: what a conversation header
+                // counts. The same members `get_full_chat_by_id` names.
+                "get_chat_contacts" => {
+                    let chat = positional(1)
+                        .as_u64()
+                        .and_then(|value| u32::try_from(value).ok())
+                        .unwrap_or_default();
+                    let mut state = state.lock().await;
+                    state.seed_chats();
+                    let members = if state.is_group(chat) {
+                        state.group_members.get(&chat).cloned().unwrap_or_default()
+                    } else {
+                        vec![10]
+                    };
+                    ok(&id, &json!(members))
                 }
                 "get_contacts_by_ids" => {
                     let ids: Vec<u32> = positional(1)

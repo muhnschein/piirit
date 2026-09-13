@@ -112,6 +112,34 @@
     </message>
 </context>
 <context>
+    <name>BackupPage</name>
+    <message>
+        <source>Back up profile</source>
+        <translation>പ്രൊഫൈൽ ബാക്കപ്പ്</translation>
+    </message>
+    <message>
+        <source>Write the backup</source>
+        <translation>ബാക്കപ്പ് എഴുതുക</translation>
+    </message>
+    <message>
+        <source>Writing the backup...</source>
+        <translation>ബാക്കപ്പ് എഴുതുന്നു...</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>റദ്ദാക്കുക</translation>
+    </message>
+    <message>
+        <source>Saved to %1</source>
+        <extracomment>Said once the backup is written. %1 is the full path of the file.</extracomment>
+        <translation>%1 എന്നതിൽ സൂക്ഷിച്ചു</translation>
+    </message>
+    <message>
+        <source>This profile&apos;s messages, contacts and key in one file, saved to Documents. Whoever has that file has the profile, so keep it somewhere safe. Your other profiles are not in it: each one is backed up from its own page.</source>
+        <translation>ഈ പ്രൊഫൈലിന്റെ സന്ദേശങ്ങളും ബന്ധങ്ങളും കീയും ഒരൊറ്റ ഫയലിൽ, ഡോക്യുമെന്റ്സിൽ സൂക്ഷിക്കുന്നു. ആ ഫയൽ ഉള്ളവർക്ക് പ്രൊഫൈലും ഉണ്ട്, അതിനാൽ അത് സുരക്ഷിതമായ ഇടത്ത് സൂക്ഷിക്കുക. നിങ്ങളുടെ മറ്റ് പ്രൊഫൈലുകൾ ഇതിൽ ഇല്ല: ഓരോന്നിനും അതിന്റെ സ്വന്തം താളിൽനിന്ന് ബാക്കപ്പ് എടുക്കണം.</translation>
+    </message>
+</context>
+<context>
     <name>CapturePage</name>
     <message>
         <source>The video could not be saved</source>
@@ -402,6 +430,14 @@
     <message>
         <source>Saved to Downloads</source>
         <translation>ഡൗൺലോഡുകളിൽ സൂക്ഷിച്ചു</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n member(s)</source>
+        <extracomment>Under a group&apos;s name, over its messages. %n is how many people are in the group.</extracomment>
+        <translation>
+            <numerusform>%n അംഗം</numerusform>
+            <numerusform>%n അംഗങ്ങൾ</numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -908,6 +944,14 @@
     <message>
         <source>The name on every message you send</source>
         <translation>നിങ്ങൾ അയയ്ക്കുന്ന ഓരോ സന്ദേശത്തിലുമുള്ള പേര്</translation>
+    </message>
+    <message>
+        <source>Backup</source>
+        <translation>ബാക്കപ്പ്</translation>
+    </message>
+    <message>
+        <source>Back up this profile</source>
+        <translation>ഈ പ്രൊഫൈൽ ബാക്കപ്പ് ചെയ്യുക</translation>
     </message>
 </context>
 <context>

@@ -112,6 +112,34 @@
     </message>
 </context>
 <context>
+    <name>BackupPage</name>
+    <message>
+        <source>Back up profile</source>
+        <translation>Profil sichern</translation>
+    </message>
+    <message>
+        <source>Write the backup</source>
+        <translation>Backup schreiben</translation>
+    </message>
+    <message>
+        <source>Writing the backup...</source>
+        <translation>Backup wird geschrieben...</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Abbrechen</translation>
+    </message>
+    <message>
+        <source>Saved to %1</source>
+        <extracomment>Said once the backup is written. %1 is the full path of the file.</extracomment>
+        <translation>Gespeichert unter %1</translation>
+    </message>
+    <message>
+        <source>This profile&apos;s messages, contacts and key in one file, saved to Documents. Whoever has that file has the profile, so keep it somewhere safe. Your other profiles are not in it: each one is backed up from its own page.</source>
+        <translation>Die Nachrichten, die Kontakte und der Schlüssel dieses Profils in einer Datei, gespeichert unter Dokumente. Wer diese Datei hat, hat das Profil – bewahre sie also sicher auf. Deine anderen Profile sind nicht darin: jedes wird von seiner eigenen Seite aus gesichert.</translation>
+    </message>
+</context>
+<context>
     <name>CapturePage</name>
     <message>
         <source>The video could not be saved</source>
@@ -402,6 +430,14 @@
     <message>
         <source>Saved to Downloads</source>
         <translation>In Downloads gespeichert</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n member(s)</source>
+        <extracomment>Under a group&apos;s name, over its messages. %n is how many people are in the group.</extracomment>
+        <translation>
+            <numerusform>%n Mitglied</numerusform>
+            <numerusform>%n Mitglieder</numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -908,6 +944,14 @@
     <message>
         <source>The name on every message you send</source>
         <translation>Der Name auf jeder Nachricht, die du sendest</translation>
+    </message>
+    <message>
+        <source>Backup</source>
+        <translation>Backup</translation>
+    </message>
+    <message>
+        <source>Back up this profile</source>
+        <translation>Dieses Profil sichern</translation>
     </message>
 </context>
 <context>

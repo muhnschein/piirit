@@ -113,6 +113,34 @@
     </message>
 </context>
 <context>
+    <name>BackupPage</name>
+    <message>
+        <source>Back up profile</source>
+        <translation>Profilio atsarginė kopija</translation>
+    </message>
+    <message>
+        <source>Write the backup</source>
+        <translation>Įrašyti atsarginę kopiją</translation>
+    </message>
+    <message>
+        <source>Writing the backup...</source>
+        <translation>Įrašoma atsarginė kopija...</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Atšaukti</translation>
+    </message>
+    <message>
+        <source>Saved to %1</source>
+        <extracomment>Said once the backup is written. %1 is the full path of the file.</extracomment>
+        <translation>Įrašyta į %1</translation>
+    </message>
+    <message>
+        <source>This profile&apos;s messages, contacts and key in one file, saved to Documents. Whoever has that file has the profile, so keep it somewhere safe. Your other profiles are not in it: each one is backed up from its own page.</source>
+        <translation>Šio profilio žinutės, adresatai ir raktas viename faile, įrašytame į Dokumentus. Kas turi tą failą, tas turi ir profilį, todėl laikykite jį saugioje vietoje. Kitų jūsų profilių jame nėra: kiekvieno atsarginė kopija daroma iš jo paties puslapio.</translation>
+    </message>
+</context>
+<context>
     <name>CapturePage</name>
     <message>
         <source>The video could not be saved</source>
@@ -403,6 +431,15 @@
     <message>
         <source>Saved to Downloads</source>
         <translation>Įrašyta į Atsisiuntimus</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n member(s)</source>
+        <extracomment>Under a group&apos;s name, over its messages. %n is how many people are in the group.</extracomment>
+        <translation>
+            <numerusform>%n narys</numerusform>
+            <numerusform>%n nariai</numerusform>
+            <numerusform>%n narių</numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -913,6 +950,14 @@
     <message>
         <source>The name on every message you send</source>
         <translation>Vardas ant kiekvienos jūsų siunčiamos žinutės</translation>
+    </message>
+    <message>
+        <source>Backup</source>
+        <translation>Atsarginė kopija</translation>
+    </message>
+    <message>
+        <source>Back up this profile</source>
+        <translation>Daryti šio profilio atsarginę kopiją</translation>
     </message>
 </context>
 <context>

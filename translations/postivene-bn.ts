@@ -112,6 +112,34 @@
     </message>
 </context>
 <context>
+    <name>BackupPage</name>
+    <message>
+        <source>Back up profile</source>
+        <translation>প্রোফাইলের ব্যাকআপ</translation>
+    </message>
+    <message>
+        <source>Write the backup</source>
+        <translation>ব্যাকআপ লিখুন</translation>
+    </message>
+    <message>
+        <source>Writing the backup...</source>
+        <translation>ব্যাকআপ লেখা হচ্ছে...</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>বাতিল</translation>
+    </message>
+    <message>
+        <source>Saved to %1</source>
+        <extracomment>Said once the backup is written. %1 is the full path of the file.</extracomment>
+        <translation>সংরক্ষিত: %1</translation>
+    </message>
+    <message>
+        <source>This profile&apos;s messages, contacts and key in one file, saved to Documents. Whoever has that file has the profile, so keep it somewhere safe. Your other profiles are not in it: each one is backed up from its own page.</source>
+        <translation>এই প্রোফাইলের বার্তা, পরিচিতি ও চাবি একটি ফাইলে, ডকুমেন্টসে সংরক্ষিত হয়। যার কাছে সেই ফাইল আছে, প্রোফাইলও তার — তাই এটি নিরাপদ জায়গায় রাখুন। আপনার অন্য প্রোফাইলগুলি এতে নেই: প্রতিটির ব্যাকআপ তার নিজের পাতা থেকে নিতে হয়।</translation>
+    </message>
+</context>
+<context>
     <name>CapturePage</name>
     <message>
         <source>The video could not be saved</source>
@@ -402,6 +430,14 @@
     <message>
         <source>Saved to Downloads</source>
         <translation>ডাউনলোডে সংরক্ষিত</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n member(s)</source>
+        <extracomment>Under a group&apos;s name, over its messages. %n is how many people are in the group.</extracomment>
+        <translation>
+            <numerusform>%n জন সদস্য</numerusform>
+            <numerusform>%n জন সদস্য</numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -908,6 +944,14 @@
     <message>
         <source>The name on every message you send</source>
         <translation>আপনার পাঠানো প্রতিটি বার্তায় যে নাম থাকে</translation>
+    </message>
+    <message>
+        <source>Backup</source>
+        <translation>ব্যাকআপ</translation>
+    </message>
+    <message>
+        <source>Back up this profile</source>
+        <translation>এই প্রোফাইলের ব্যাকআপ নিন</translation>
     </message>
 </context>
 <context>

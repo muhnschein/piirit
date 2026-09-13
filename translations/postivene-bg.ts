@@ -112,6 +112,34 @@
     </message>
 </context>
 <context>
+    <name>BackupPage</name>
+    <message>
+        <source>Back up profile</source>
+        <translation>Резервно копие на профила</translation>
+    </message>
+    <message>
+        <source>Write the backup</source>
+        <translation>Записване на резервното копие</translation>
+    </message>
+    <message>
+        <source>Writing the backup...</source>
+        <translation>Резервното копие се записва...</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Отказ</translation>
+    </message>
+    <message>
+        <source>Saved to %1</source>
+        <extracomment>Said once the backup is written. %1 is the full path of the file.</extracomment>
+        <translation>Запазено в %1</translation>
+    </message>
+    <message>
+        <source>This profile&apos;s messages, contacts and key in one file, saved to Documents. Whoever has that file has the profile, so keep it somewhere safe. Your other profiles are not in it: each one is backed up from its own page.</source>
+        <translation>Съобщенията, контактите и ключът на този профил в един файл, запазен в „Документи“. Който има този файл, има и профила — пазете го на сигурно място. Другите ви профили не са в него: всеки се архивира от собствената си страница.</translation>
+    </message>
+</context>
+<context>
     <name>CapturePage</name>
     <message>
         <source>The video could not be saved</source>
@@ -402,6 +430,14 @@
     <message>
         <source>Saved to Downloads</source>
         <translation>Запазено в „Изтегляния“</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n member(s)</source>
+        <extracomment>Under a group&apos;s name, over its messages. %n is how many people are in the group.</extracomment>
+        <translation>
+            <numerusform>%n член</numerusform>
+            <numerusform>%n членове</numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -908,6 +944,14 @@
     <message>
         <source>The name on every message you send</source>
         <translation>Името върху всяко съобщение, което изпращате</translation>
+    </message>
+    <message>
+        <source>Backup</source>
+        <translation>Резервно копие</translation>
+    </message>
+    <message>
+        <source>Back up this profile</source>
+        <translation>Резервно копие на този профил</translation>
     </message>
 </context>
 <context>

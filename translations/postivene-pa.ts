@@ -112,6 +112,34 @@
     </message>
 </context>
 <context>
+    <name>BackupPage</name>
+    <message>
+        <source>Back up profile</source>
+        <translation>ਪ੍ਰੋਫ਼ਾਈਲ ਦਾ ਬੈਕਅੱਪ</translation>
+    </message>
+    <message>
+        <source>Write the backup</source>
+        <translation>ਬੈਕਅੱਪ ਲਿਖੋ</translation>
+    </message>
+    <message>
+        <source>Writing the backup...</source>
+        <translation>ਬੈਕਅੱਪ ਲਿਖਿਆ ਜਾ ਰਿਹਾ ਹੈ...</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>ਰੱਦ ਕਰੋ</translation>
+    </message>
+    <message>
+        <source>Saved to %1</source>
+        <extracomment>Said once the backup is written. %1 is the full path of the file.</extracomment>
+        <translation>%1 ਵਿੱਚ ਸੰਭਾਲਿਆ</translation>
+    </message>
+    <message>
+        <source>This profile&apos;s messages, contacts and key in one file, saved to Documents. Whoever has that file has the profile, so keep it somewhere safe. Your other profiles are not in it: each one is backed up from its own page.</source>
+        <translation>ਇਸ ਪ੍ਰੋਫ਼ਾਈਲ ਦੇ ਸੁਨੇਹੇ, ਸੰਪਰਕ ਅਤੇ ਕੁੰਜੀ ਇੱਕੋ ਫ਼ਾਈਲ ਵਿੱਚ, ਦਸਤਾਵੇਜ਼ਾਂ ਵਿੱਚ ਸੰਭਾਲੇ ਜਾਂਦੇ ਹਨ। ਜਿਸ ਕੋਲ ਉਹ ਫ਼ਾਈਲ ਹੈ, ਉਸ ਕੋਲ ਪ੍ਰੋਫ਼ਾਈਲ ਵੀ ਹੈ, ਇਸ ਲਈ ਇਸਨੂੰ ਸੁਰੱਖਿਅਤ ਥਾਂ ਰੱਖੋ। ਤੁਹਾਡੀਆਂ ਹੋਰ ਪ੍ਰੋਫ਼ਾਈਲਾਂ ਇਸ ਵਿੱਚ ਨਹੀਂ ਹਨ: ਹਰੇਕ ਦਾ ਬੈਕਅੱਪ ਉਸਦੇ ਆਪਣੇ ਸਫ਼ੇ ਤੋਂ ਲਿਆ ਜਾਂਦਾ ਹੈ।</translation>
+    </message>
+</context>
+<context>
     <name>CapturePage</name>
     <message>
         <source>The video could not be saved</source>
@@ -402,6 +430,14 @@
     <message>
         <source>Saved to Downloads</source>
         <translation>ਡਾਊਨਲੋਡ ਵਿੱਚ ਸੰਭਾਲਿਆ</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n member(s)</source>
+        <extracomment>Under a group&apos;s name, over its messages. %n is how many people are in the group.</extracomment>
+        <translation>
+            <numerusform>%n ਮੈਂਬਰ</numerusform>
+            <numerusform>%n ਮੈਂਬਰ</numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -908,6 +944,14 @@
     <message>
         <source>The name on every message you send</source>
         <translation>ਤੁਹਾਡੇ ਭੇਜੇ ਹਰ ਸੁਨੇਹੇ ਉੱਤੇ ਦਿਸਣ ਵਾਲਾ ਨਾਂ</translation>
+    </message>
+    <message>
+        <source>Backup</source>
+        <translation>ਬੈਕਅੱਪ</translation>
+    </message>
+    <message>
+        <source>Back up this profile</source>
+        <translation>ਇਸ ਪ੍ਰੋਫ਼ਾਈਲ ਦਾ ਬੈਕਅੱਪ ਲਵੋ</translation>
     </message>
 </context>
 <context>

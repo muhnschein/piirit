@@ -154,6 +154,24 @@ deltachat-rpc-server (bundled binary, subprocess) = the entire core
   the screen. The banner clears itself after a few seconds, which is
   right for something that happened and wrong for a view that never drew
   anything.
+- **The header over a conversation is the app's own, and a group's says
+  how many are in it.** Silica's `PageHeader` draws its title in a label
+  of its own and offers no `textFormat`, so a chat named
+  `<img src="https://tracker/p.gif">` would be markup to it and drawing
+  the header would fetch the image -- from an app whose whole point is
+  that the network cannot watch. `ConversationHeader.qml` is the same
+  header laid out by hand, with its one label pinned to plain text.
+  Under the name, where `PageHeader` puts a description, a group carries
+  its member count: the conversation model reads it with the chat's
+  shape (`get_chat_contacts`) so a group opens with the count already on
+  it, and re-reads it on the events somebody could have joined or left
+  on -- the same ones the name follows. A one-to-one chat carries
+  nothing there, because the number would say "2" about a conversation
+  with one other person. The header keeps `PageHeader`'s height whatever
+  is in it, since what sits below starts where it starts, so the second
+  line is drawn only while both fit inside that height: a reader whose
+  fonts fill it with the name alone keeps the name rather than getting a
+  header over the first message.
 - **A bubble holds a remark; anything longer gets a page.** A message
   over a dozen lines is folded in the conversation, with View full
   message under it: drawn whole, somebody's to-do document fills the
@@ -407,6 +425,25 @@ deltachat-rpc-server (bundled binary, subprocess) = the entire core
   the accounts an attempt still holds are remembered, a retry takes a
   fresh one, and a profile the first relay makes after all is removed
   rather than found on the next start.
+- **A backup is one profile's, because the core's export is.**
+  `export_backup` takes an account id and writes that account --
+  its messages, its contacts, its key -- into the one `.tar` that
+  `import_backup` reads back. So the way to it is the profile's own page
+  and not the settings that belong to no profile: a phone with three
+  profiles on it makes three backups, and the page says whose it is
+  writing. The file goes to Documents under the name the core chooses; a
+  reader who has to type a path on a phone is a reader who does not make
+  a backup, and where it landed is said in full afterwards, because the
+  next thing to do with it is to copy it off the phone. Two things the
+  core leaves to the caller are in `backup.rs`. The core answers the
+  export with nothing, so the file is found by what appeared in the
+  folder: the event carrying its name (`ImexFileWritten`) is polled on a
+  call of its own, so one emitted before the export answers can arrive
+  after it, and a page waiting for it would sometimes wait for ever.
+  And the export reports itself in the same `ImexProgress` events an
+  import does, with nothing in them to say which -- so the page feeds
+  the core's events in and the object takes them only while it is the
+  one that asked.
 
 ## Platform baseline
 

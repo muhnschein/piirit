@@ -4,6 +4,11 @@
 //! The title on the line the page indicator sits on, right-aligned, as
 //! wide as its text and no wider than the page less its margins, and in
 //! the page's own colour once the header leads somewhere.
+//!
+//! And the second line under it, where `PageHeader` puts its description:
+//! what a group's header says about itself. The header keeps its height
+//! whatever is in it, so the line is drawn only while both fit inside
+//! that height -- otherwise it would reach over the first message.
 
 // Qt harness: see qml_chat_list.rs.
 #![allow(
@@ -52,6 +57,31 @@ const PROBE_QML: &str = r"
         function setInteractive(on) {
             loader.item.interactive = on
             return 'ok'
+        }
+        function setSubtitle(text) {
+            loader.item.subtitle = text
+            return 'ok'
+        }
+        // The header made too short for two lines. A binding broken on
+        // purpose: the header is PageHeader-tall in the app, and this is
+        // the reader whose fonts fill that with the name alone.
+        function setHeight(height) {
+            loader.item.height = height
+            return 'ok'
+        }
+        // Whether the second line is drawn, its width and left edge, the
+        // gap between it and the title, and the room left above the
+        // title and below the line -- which are equal when the pair is
+        // centred where the title alone would be.
+        function secondLine() {
+            var title = findIn(loader.item, 'headerTitle')
+            var line = findIn(loader.item, 'headerSubtitle')
+            if (!title || !line) { return 'missing:headerSubtitle' }
+            return (line.visible ? 'shown' : 'hidden') + ',' + line.width + ','
+                + line.x + ',' + (line.y - (title.y + title.height)) + ','
+                + title.y + ','
+                + (loader.item.height - (line.y + line.height)) + ','
+                + (line.color == Theme.secondaryColor ? 'secondary' : 'other')
         }
     }
 ";
@@ -106,6 +136,12 @@ fn the_header_is_laid_out_as_a_page_header() {
         record!("short", call!("layout"));
         call!("setInteractive", true);
         record!("leads", call!("layout"));
+        // The line a group's header carries under its name.
+        record!("subtitle", call!("setSubtitle", QString::from("7 members")));
+        record!("second-line", call!("secondLine"));
+        // And the same header with no room for it.
+        record!("shrink", call!("setHeight", 20));
+        record!("no-room", call!("secondLine"));
         (*engine_ptr).quit();
     });
 
@@ -166,5 +202,31 @@ fn assert_layout(steps: &[(&str, String)]) {
     assert_eq!(
         colour, "primary",
         "a header that leads somewhere is not drawn in the page's colour. {context}"
+    );
+    assert_second_line(&value("second-line"), &value("no-room"), context.as_str());
+}
+
+/// The second line: right-aligned at its own width under the title, with
+/// no gap, the pair centred where the title alone sat, and in the
+/// quieter of the two colours the title is drawn from. Gone entirely
+/// from a header with no room for both.
+fn assert_second_line(shown: &str, cramped: &str, context: &str) {
+    let parts: Vec<&str> = shown.split(',').collect();
+    assert_eq!(parts.len(), 7, "unexpected second line. {context}");
+    let number = |at: usize| -> f64 { parts[at].parse().unwrap_or(-1.0) };
+    let close = |a: f64, b: f64| (a - b).abs() < 1.5;
+    let (width, x, gap, above, below) = (number(1), number(2), number(3), number(4), number(5));
+    assert!(
+        parts[0] == "shown"
+            && width < 200.0
+            && close(x + width, 1080.0 - 24.0)
+            && close(gap, 0.0)
+            && close(above, below)
+            && parts[6] == "secondary",
+        "the line under the title is not laid out as a header's second          line: {shown}. {context}"
+    );
+    assert!(
+        cramped.starts_with("hidden"),
+        "a header with no room for two lines still draws the second one,          so it reaches over what sits below it: {cramped}. {context}"
     );
 }

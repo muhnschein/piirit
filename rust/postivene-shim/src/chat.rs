@@ -150,6 +150,13 @@ pub struct ChatMessages {
     pub is_group: qt_property!(bool; NOTIFY is_group_changed),
     /// Emitted once the chat's kind is known.
     pub is_group_changed: qt_signal!(),
+    /// How many people are in the chat, the reader among them: what the
+    /// header over a group says under its name. 0 until the chat's shape
+    /// has arrived, and in a one-to-one chat, where the number would say
+    /// nothing the name does not.
+    pub member_count: qt_property!(u32; NOTIFY member_count_changed),
+    /// Emitted when the member count is read and differs.
+    pub member_count_changed: qt_signal!(),
     /// Whether the account can write into this chat: false for a group it
     /// has left and for a contact request not yet accepted. What decides
     /// whether a message of its own is offered for editing -- the core
@@ -634,9 +641,11 @@ impl ChatMessages {
         self.is_group = shape.is_group;
         self.can_send = shape.can_send;
         self.is_encrypted = shape.is_encrypted;
+        self.member_count = shape.member_count;
         self.is_group_changed();
         self.can_send_changed();
         self.is_encrypted_changed();
+        self.member_count_changed();
     }
 
     /// Say where `message_id` is, so the view can go there.
@@ -813,7 +822,12 @@ impl ChatMessages {
             }
             // A rename, of the group or of the contact behind a one-to-one
             // chat; the core does not say whose contact changed.
-            "ChatModified" | "ContactsChanged" => self.refresh_name(),
+            "ChatModified" | "ContactsChanged" => {
+                self.refresh_name();
+                // Somebody joined or left, which is the other half of
+                // what the header says.
+                self.refresh_member_count();
+            }
             _ => {}
         }
     }
@@ -849,6 +863,37 @@ impl ChatMessages {
                 .ok()
                 .map(|info| json::str_at(&info, "name").to_string());
             done(name);
+        });
+    }
+
+    /// Re-read how many people are in the group.
+    ///
+    /// Only for a chat already known to be one: a one-to-one chat has no
+    /// count worth a round trip, and a chat cannot become a group. Read
+    /// on the events a member could have arrived or left on, beside the
+    /// name, since the two sit on the same header.
+    fn refresh_member_count(&mut self) {
+        let (account_id, chat_id) = (self.account_id, self.chat_id);
+        if account_id == 0 || chat_id == 0 || !self.is_group {
+            return;
+        }
+        let Some((rpc, runtime)) = connection() else {
+            return;
+        };
+        let ptr: QPointer<Self> = QPointer::from(&*self);
+        let done = queued_callback(move |count: u32| {
+            let Some(this) = ptr.as_pinned() else { return };
+            // Answered for a chat this model has moved on from.
+            if this.borrow().chat_id != chat_id {
+                return;
+            }
+            if this.borrow().member_count != count {
+                this.borrow_mut().member_count = count;
+                this.borrow().member_count_changed();
+            }
+        });
+        runtime.spawn(async move {
+            done(member_count(&rpc, account_id, chat_id).await);
         });
     }
 
@@ -1850,6 +1895,11 @@ pub(crate) struct ChatShape {
     pub can_send: bool,
     /// End-to-end encrypted, which every chatmail chat is.
     pub is_encrypted: bool,
+    /// How many people are in the chat, the reader among them. Asked for
+    /// only where it is worth saying -- a group's header carries it, a
+    /// one-to-one chat's would say "2" about a chat with one other person
+    /// -- so it is 0 everywhere else.
+    pub member_count: u32,
 }
 
 /// Read the chat's shape off the core: `get_basic_chat_info` for the kind
@@ -1864,11 +1914,29 @@ pub(crate) async fn chat_shape(rpc: &RpcClient, account_id: u32, chat_id: u32) -
         .call::<_, bool>("can_send", (account_id, chat_id))
         .await
         .unwrap_or(false);
+    let is_group = is_group_info(&info);
     ChatShape {
-        is_group: is_group_info(&info),
+        is_group,
         can_send,
         is_encrypted: json::flag(&info, "isEncrypted"),
+        member_count: if is_group {
+            member_count(rpc, account_id, chat_id).await
+        } else {
+            0
+        },
     }
+}
+
+/// How many people are in the chat, or 0 for a chat the core would not
+/// list. `get_chat_contacts` answers with the ids alone, which is all a
+/// count needs -- the members themselves are the group page's business
+/// (`chat_info.rs`).
+pub(crate) async fn member_count(rpc: &RpcClient, account_id: u32, chat_id: u32) -> u32 {
+    rpc.call::<_, Vec<u32>>("get_chat_contacts", (account_id, chat_id))
+        .await
+        .ok()
+        .and_then(|ids| u32::try_from(ids.len()).ok())
+        .unwrap_or(0)
 }
 
 /// Days since the Unix epoch on which this instant fell, in the viewer's
