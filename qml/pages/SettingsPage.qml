@@ -9,8 +9,10 @@ import "../components"
  * notification gives away and whether a muted group can still raise one,
  * and whether webxdc apps are offered at all. Reached from the chat
  * list's pull-down. A profile's own
- * settings -- picture, name, address, read receipts, what the relay says
- * -- are on the profile's page, reached from its row on the profiles page.
+ * settings -- picture, name, address, read receipts, what the relay says,
+ * and writing the profile out to a backup file, which the core's export
+ * does one account at a time -- are on the profile's page, reached from
+ * its row on the profiles page.
  *
  * The values live in dconf, behind the `Settings` singleton every page
  * reads (qml/components/Settings.qml); this page writes the same object,

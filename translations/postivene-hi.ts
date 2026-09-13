@@ -112,6 +112,34 @@
     </message>
 </context>
 <context>
+    <name>BackupPage</name>
+    <message>
+        <source>Back up profile</source>
+        <translation>प्रोफ़ाइल का बैकअप</translation>
+    </message>
+    <message>
+        <source>Write the backup</source>
+        <translation>बैकअप लिखें</translation>
+    </message>
+    <message>
+        <source>Writing the backup...</source>
+        <translation>बैकअप लिखा जा रहा है...</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>रद्द करें</translation>
+    </message>
+    <message>
+        <source>Saved to %1</source>
+        <extracomment>Said once the backup is written. %1 is the full path of the file.</extracomment>
+        <translation>%1 में सहेजा गया</translation>
+    </message>
+    <message>
+        <source>This profile&apos;s messages, contacts and key in one file, saved to Documents. Whoever has that file has the profile, so keep it somewhere safe. Your other profiles are not in it: each one is backed up from its own page.</source>
+        <translation>इस प्रोफ़ाइल के संदेश, संपर्क और कुंजी एक ही फ़ाइल में, दस्तावेज़ में सहेजे जाते हैं। जिसके पास वह फ़ाइल है उसके पास प्रोफ़ाइल भी है, इसलिए उसे सुरक्षित जगह रखें। आपकी दूसरी प्रोफ़ाइलें इसमें नहीं हैं: हर एक का बैकअप उसके अपने पृष्ठ से लिया जाता है।</translation>
+    </message>
+</context>
+<context>
     <name>CapturePage</name>
     <message>
         <source>The video could not be saved</source>
@@ -402,6 +430,14 @@
     <message>
         <source>Saved to Downloads</source>
         <translation>डाउनलोड में सहेजा गया</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n member(s)</source>
+        <extracomment>Under a group&apos;s name, over its messages. %n is how many people are in the group.</extracomment>
+        <translation>
+            <numerusform>%n सदस्य</numerusform>
+            <numerusform>%n सदस्य</numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -908,6 +944,14 @@
     <message>
         <source>The name on every message you send</source>
         <translation>आपके भेजे हर संदेश पर दिखने वाला नाम</translation>
+    </message>
+    <message>
+        <source>Backup</source>
+        <translation>बैकअप</translation>
+    </message>
+    <message>
+        <source>Back up this profile</source>
+        <translation>इस प्रोफ़ाइल का बैकअप लें</translation>
     </message>
 </context>
 <context>

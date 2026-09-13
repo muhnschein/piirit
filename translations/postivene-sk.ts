@@ -113,6 +113,34 @@
     </message>
 </context>
 <context>
+    <name>BackupPage</name>
+    <message>
+        <source>Back up profile</source>
+        <translation>Záloha profilu</translation>
+    </message>
+    <message>
+        <source>Write the backup</source>
+        <translation>Zapísať zálohu</translation>
+    </message>
+    <message>
+        <source>Writing the backup...</source>
+        <translation>Zapisuje sa záloha...</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Zrušiť</translation>
+    </message>
+    <message>
+        <source>Saved to %1</source>
+        <extracomment>Said once the backup is written. %1 is the full path of the file.</extracomment>
+        <translation>Uložené do %1</translation>
+    </message>
+    <message>
+        <source>This profile&apos;s messages, contacts and key in one file, saved to Documents. Whoever has that file has the profile, so keep it somewhere safe. Your other profiles are not in it: each one is backed up from its own page.</source>
+        <translation>Správy, kontakty a kľúč tohto profilu v jednom súbore, uloženom do Dokumentov. Kto má ten súbor, má profil – uchovajte ho teda na bezpečnom mieste. Vaše ostatné profily v ňom nie sú: každý sa zálohuje zo svojej vlastnej stránky.</translation>
+    </message>
+</context>
+<context>
     <name>CapturePage</name>
     <message>
         <source>The video could not be saved</source>
@@ -403,6 +431,15 @@
     <message>
         <source>Saved to Downloads</source>
         <translation>Uložené do Stiahnutých</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n member(s)</source>
+        <extracomment>Under a group&apos;s name, over its messages. %n is how many people are in the group.</extracomment>
+        <translation>
+            <numerusform>%n člen</numerusform>
+            <numerusform>%n členovia</numerusform>
+            <numerusform>%n členov</numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -913,6 +950,14 @@
     <message>
         <source>The name on every message you send</source>
         <translation>Meno na každej správe, ktorú pošlete</translation>
+    </message>
+    <message>
+        <source>Backup</source>
+        <translation>Záloha</translation>
+    </message>
+    <message>
+        <source>Back up this profile</source>
+        <translation>Zálohovať tento profil</translation>
     </message>
 </context>
 <context>

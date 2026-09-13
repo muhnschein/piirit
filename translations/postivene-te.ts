@@ -112,6 +112,34 @@
     </message>
 </context>
 <context>
+    <name>BackupPage</name>
+    <message>
+        <source>Back up profile</source>
+        <translation>ప్రొఫైల్ బ్యాకప్</translation>
+    </message>
+    <message>
+        <source>Write the backup</source>
+        <translation>బ్యాకప్ రాయి</translation>
+    </message>
+    <message>
+        <source>Writing the backup...</source>
+        <translation>బ్యాకప్ రాయబడుతోంది...</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>రద్దు చేయి</translation>
+    </message>
+    <message>
+        <source>Saved to %1</source>
+        <extracomment>Said once the backup is written. %1 is the full path of the file.</extracomment>
+        <translation>%1 లో భద్రపరచబడింది</translation>
+    </message>
+    <message>
+        <source>This profile&apos;s messages, contacts and key in one file, saved to Documents. Whoever has that file has the profile, so keep it somewhere safe. Your other profiles are not in it: each one is backed up from its own page.</source>
+        <translation>ఈ ప్రొఫైల్ సందేశాలు, పరిచయాలు, కీ ఒకే ఫైల్‌లో, పత్రాలలో భద్రపరచబడతాయి. ఆ ఫైల్ ఎవరి దగ్గర ఉంటే ప్రొఫైల్ కూడా వారిదే, కాబట్టి దానిని సురక్షితమైన చోట ఉంచండి. మీ ఇతర ప్రొఫైల్‌లు ఇందులో లేవు: ప్రతిదానికీ దాని సొంత పేజీ నుండి బ్యాకప్ తీసుకోవాలి.</translation>
+    </message>
+</context>
+<context>
     <name>CapturePage</name>
     <message>
         <source>The video could not be saved</source>
@@ -402,6 +430,14 @@
     <message>
         <source>Saved to Downloads</source>
         <translation>డౌన్‌లోడ్‌లలో భద్రపరచబడింది</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n member(s)</source>
+        <extracomment>Under a group&apos;s name, over its messages. %n is how many people are in the group.</extracomment>
+        <translation>
+            <numerusform>%n సభ్యుడు</numerusform>
+            <numerusform>%n సభ్యులు</numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -908,6 +944,14 @@
     <message>
         <source>The name on every message you send</source>
         <translation>మీరు పంపే ప్రతి సందేశంపై ఉండే పేరు</translation>
+    </message>
+    <message>
+        <source>Backup</source>
+        <translation>బ్యాకప్</translation>
+    </message>
+    <message>
+        <source>Back up this profile</source>
+        <translation>ఈ ప్రొఫైల్‌ను బ్యాకప్ చేయి</translation>
     </message>
 </context>
 <context>

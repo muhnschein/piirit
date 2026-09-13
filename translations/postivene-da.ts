@@ -112,6 +112,34 @@
     </message>
 </context>
 <context>
+    <name>BackupPage</name>
+    <message>
+        <source>Back up profile</source>
+        <translation>Sikkerhedskopiér profil</translation>
+    </message>
+    <message>
+        <source>Write the backup</source>
+        <translation>Skriv sikkerhedskopien</translation>
+    </message>
+    <message>
+        <source>Writing the backup...</source>
+        <translation>Skriver sikkerhedskopien...</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Annullér</translation>
+    </message>
+    <message>
+        <source>Saved to %1</source>
+        <extracomment>Said once the backup is written. %1 is the full path of the file.</extracomment>
+        <translation>Gemt i %1</translation>
+    </message>
+    <message>
+        <source>This profile&apos;s messages, contacts and key in one file, saved to Documents. Whoever has that file has the profile, so keep it somewhere safe. Your other profiles are not in it: each one is backed up from its own page.</source>
+        <translation>Denne profils beskeder, kontakter og nøgle i én fil, gemt i Dokumenter. Den, der har filen, har profilen – så gem den et sikkert sted. Dine andre profiler er ikke med: hver enkelt sikkerhedskopieres fra sin egen side.</translation>
+    </message>
+</context>
+<context>
     <name>CapturePage</name>
     <message>
         <source>The video could not be saved</source>
@@ -402,6 +430,14 @@
     <message>
         <source>Saved to Downloads</source>
         <translation>Gemt i Downloads</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n member(s)</source>
+        <extracomment>Under a group&apos;s name, over its messages. %n is how many people are in the group.</extracomment>
+        <translation>
+            <numerusform>%n medlem</numerusform>
+            <numerusform>%n medlemmer</numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -908,6 +944,14 @@
     <message>
         <source>The name on every message you send</source>
         <translation>Navnet på hver besked, du sender</translation>
+    </message>
+    <message>
+        <source>Backup</source>
+        <translation>Sikkerhedskopi</translation>
+    </message>
+    <message>
+        <source>Back up this profile</source>
+        <translation>Sikkerhedskopiér denne profil</translation>
     </message>
 </context>
 <context>

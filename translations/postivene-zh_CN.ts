@@ -111,6 +111,34 @@
     </message>
 </context>
 <context>
+    <name>BackupPage</name>
+    <message>
+        <source>Back up profile</source>
+        <translation>备份个人资料</translation>
+    </message>
+    <message>
+        <source>Write the backup</source>
+        <translation>写入备份</translation>
+    </message>
+    <message>
+        <source>Writing the backup...</source>
+        <translation>正在写入备份...</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>取消</translation>
+    </message>
+    <message>
+        <source>Saved to %1</source>
+        <extracomment>Said once the backup is written. %1 is the full path of the file.</extracomment>
+        <translation>已保存到 %1</translation>
+    </message>
+    <message>
+        <source>This profile&apos;s messages, contacts and key in one file, saved to Documents. Whoever has that file has the profile, so keep it somewhere safe. Your other profiles are not in it: each one is backed up from its own page.</source>
+        <translation>这个个人资料的消息、联系人和密钥会写进一个文件，保存到“文档”。谁拿到这个文件就等于拿到这个个人资料，请妥善保管。你的其他个人资料不在里面：每个都要从它自己的页面备份。</translation>
+    </message>
+</context>
+<context>
     <name>CapturePage</name>
     <message>
         <source>The video could not be saved</source>
@@ -401,6 +429,13 @@
     <message>
         <source>Saved to Downloads</source>
         <translation>已保存到下载</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n member(s)</source>
+        <extracomment>Under a group&apos;s name, over its messages. %n is how many people are in the group.</extracomment>
+        <translation>
+            <numerusform>%n 位成员</numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -903,6 +938,14 @@
     <message>
         <source>The name on every message you send</source>
         <translation>你发送的每条消息上显示的名字</translation>
+    </message>
+    <message>
+        <source>Backup</source>
+        <translation>备份</translation>
+    </message>
+    <message>
+        <source>Back up this profile</source>
+        <translation>备份这个个人资料</translation>
     </message>
 </context>
 <context>

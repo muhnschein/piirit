@@ -113,6 +113,34 @@
     </message>
 </context>
 <context>
+    <name>BackupPage</name>
+    <message>
+        <source>Back up profile</source>
+        <translation>Резервна копія профілю</translation>
+    </message>
+    <message>
+        <source>Write the backup</source>
+        <translation>Створити резервну копію</translation>
+    </message>
+    <message>
+        <source>Writing the backup...</source>
+        <translation>Створення резервної копії...</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Скасувати</translation>
+    </message>
+    <message>
+        <source>Saved to %1</source>
+        <extracomment>Said once the backup is written. %1 is the full path of the file.</extracomment>
+        <translation>Збережено в %1</translation>
+    </message>
+    <message>
+        <source>This profile&apos;s messages, contacts and key in one file, saved to Documents. Whoever has that file has the profile, so keep it somewhere safe. Your other profiles are not in it: each one is backed up from its own page.</source>
+        <translation>Повідомлення, контакти та ключ цього профілю в одному файлі, збереженому в «Документи». У кого є цей файл, у того є й профіль, — тримайте його в безпечному місці. Інших ваших профілів у ньому немає: кожен копіюється зі своєї сторінки.</translation>
+    </message>
+</context>
+<context>
     <name>CapturePage</name>
     <message>
         <source>The video could not be saved</source>
@@ -403,6 +431,15 @@
     <message>
         <source>Saved to Downloads</source>
         <translation>Збережено в «Завантаження»</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n member(s)</source>
+        <extracomment>Under a group&apos;s name, over its messages. %n is how many people are in the group.</extracomment>
+        <translation>
+            <numerusform>%n учасник</numerusform>
+            <numerusform>%n учасники</numerusform>
+            <numerusform>%n учасників</numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -913,6 +950,14 @@
     <message>
         <source>The name on every message you send</source>
         <translation>Ім&apos;я на кожному повідомленні, яке ви надсилаєте</translation>
+    </message>
+    <message>
+        <source>Backup</source>
+        <translation>Резервна копія</translation>
+    </message>
+    <message>
+        <source>Back up this profile</source>
+        <translation>Створити копію цього профілю</translation>
     </message>
 </context>
 <context>

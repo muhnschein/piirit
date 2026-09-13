@@ -113,6 +113,34 @@
     </message>
 </context>
 <context>
+    <name>BackupPage</name>
+    <message>
+        <source>Back up profile</source>
+        <translation>Profila rezerves kopija</translation>
+    </message>
+    <message>
+        <source>Write the backup</source>
+        <translation>Rakstīt rezerves kopiju</translation>
+    </message>
+    <message>
+        <source>Writing the backup...</source>
+        <translation>Raksta rezerves kopiju...</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Atcelt</translation>
+    </message>
+    <message>
+        <source>Saved to %1</source>
+        <extracomment>Said once the backup is written. %1 is the full path of the file.</extracomment>
+        <translation>Saglabāts: %1</translation>
+    </message>
+    <message>
+        <source>This profile&apos;s messages, contacts and key in one file, saved to Documents. Whoever has that file has the profile, so keep it somewhere safe. Your other profiles are not in it: each one is backed up from its own page.</source>
+        <translation>Šī profila ziņas, kontakti un atslēga vienā datnē, saglabātā mapē Dokumenti. Kam ir šī datne, tam ir arī profils, tāpēc glabājiet to drošā vietā. Pārējo profilu tajā nav: katrs tiek kopēts no savas lapas.</translation>
+    </message>
+</context>
+<context>
     <name>CapturePage</name>
     <message>
         <source>The video could not be saved</source>
@@ -403,6 +431,15 @@
     <message>
         <source>Saved to Downloads</source>
         <translation>Saglabāts lejupielādēs</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n member(s)</source>
+        <extracomment>Under a group&apos;s name, over its messages. %n is how many people are in the group.</extracomment>
+        <translation>
+            <numerusform>%n dalībnieks</numerusform>
+            <numerusform>%n dalībnieki</numerusform>
+            <numerusform>%n dalībnieku</numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -913,6 +950,14 @@
     <message>
         <source>The name on every message you send</source>
         <translation>Vārds uz katras jūsu sūtītās ziņas</translation>
+    </message>
+    <message>
+        <source>Backup</source>
+        <translation>Rezerves kopija</translation>
+    </message>
+    <message>
+        <source>Back up this profile</source>
+        <translation>Veidot šī profila rezerves kopiju</translation>
     </message>
 </context>
 <context>

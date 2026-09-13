@@ -111,6 +111,34 @@
     </message>
 </context>
 <context>
+    <name>BackupPage</name>
+    <message>
+        <source>Back up profile</source>
+        <translation>Sao lưu hồ sơ</translation>
+    </message>
+    <message>
+        <source>Write the backup</source>
+        <translation>Ghi bản sao lưu</translation>
+    </message>
+    <message>
+        <source>Writing the backup...</source>
+        <translation>Đang ghi bản sao lưu...</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Hủy</translation>
+    </message>
+    <message>
+        <source>Saved to %1</source>
+        <extracomment>Said once the backup is written. %1 is the full path of the file.</extracomment>
+        <translation>Đã lưu vào %1</translation>
+    </message>
+    <message>
+        <source>This profile&apos;s messages, contacts and key in one file, saved to Documents. Whoever has that file has the profile, so keep it somewhere safe. Your other profiles are not in it: each one is backed up from its own page.</source>
+        <translation>Tin nhắn, danh bạ và khoá của hồ sơ này trong một tệp duy nhất, lưu vào Tài liệu. Ai có tệp đó thì có hồ sơ, vì vậy hãy giữ nó ở nơi an toàn. Các hồ sơ khác của bạn không nằm trong đó: mỗi hồ sơ được sao lưu từ trang của riêng nó.</translation>
+    </message>
+</context>
+<context>
     <name>CapturePage</name>
     <message>
         <source>The video could not be saved</source>
@@ -401,6 +429,13 @@
     <message>
         <source>Saved to Downloads</source>
         <translation>Đã lưu vào Tải xuống</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n member(s)</source>
+        <extracomment>Under a group&apos;s name, over its messages. %n is how many people are in the group.</extracomment>
+        <translation>
+            <numerusform>%n thành viên</numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -903,6 +938,14 @@
     <message>
         <source>The name on every message you send</source>
         <translation>Tên trên mỗi tin nhắn bạn gửi</translation>
+    </message>
+    <message>
+        <source>Backup</source>
+        <translation>Sao lưu</translation>
+    </message>
+    <message>
+        <source>Back up this profile</source>
+        <translation>Sao lưu hồ sơ này</translation>
     </message>
 </context>
 <context>

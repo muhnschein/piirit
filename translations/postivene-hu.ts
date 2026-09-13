@@ -111,6 +111,34 @@
     </message>
 </context>
 <context>
+    <name>BackupPage</name>
+    <message>
+        <source>Back up profile</source>
+        <translation>Profil mentése</translation>
+    </message>
+    <message>
+        <source>Write the backup</source>
+        <translation>Mentés írása</translation>
+    </message>
+    <message>
+        <source>Writing the backup...</source>
+        <translation>Mentés írása folyamatban...</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Mégse</translation>
+    </message>
+    <message>
+        <source>Saved to %1</source>
+        <extracomment>Said once the backup is written. %1 is the full path of the file.</extracomment>
+        <translation>Mentve ide: %1</translation>
+    </message>
+    <message>
+        <source>This profile&apos;s messages, contacts and key in one file, saved to Documents. Whoever has that file has the profile, so keep it somewhere safe. Your other profiles are not in it: each one is backed up from its own page.</source>
+        <translation>Ennek a profilnak az üzenetei, névjegyei és kulcsa egyetlen fájlban, a Dokumentumok közé mentve. Akinél a fájl van, annál a profil is van – tartsd biztonságos helyen. A többi profilod nincs benne: mindegyiket a saját oldaláról kell menteni.</translation>
+    </message>
+</context>
+<context>
     <name>CapturePage</name>
     <message>
         <source>The video could not be saved</source>
@@ -401,6 +429,13 @@
     <message>
         <source>Saved to Downloads</source>
         <translation>Mentve a Letöltésekbe</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n member(s)</source>
+        <extracomment>Under a group&apos;s name, over its messages. %n is how many people are in the group.</extracomment>
+        <translation>
+            <numerusform>%n tag</numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -903,6 +938,14 @@
     <message>
         <source>The name on every message you send</source>
         <translation>A név minden elküldött üzenetén</translation>
+    </message>
+    <message>
+        <source>Backup</source>
+        <translation>Mentés</translation>
+    </message>
+    <message>
+        <source>Back up this profile</source>
+        <translation>Ennek a profilnak a mentése</translation>
     </message>
 </context>
 <context>
