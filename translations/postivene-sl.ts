@@ -993,6 +993,10 @@
         <source>Add as second device</source>
         <translation>Dodaj kot drugo napravo</translation>
     </message>
+    <message>
+        <source>Restore profile from backup</source>
+        <translation>Obnovi profil iz varnostne kopije</translation>
+    </message>
 </context>
 <context>
     <name>QrPage</name>

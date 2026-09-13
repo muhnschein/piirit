@@ -248,10 +248,12 @@ Page {
         //
         // The first makes one, through the welcome page's own flow,
         // which replaces the stack with the new profile's chat list once
-        // the core has it. The second takes one over from a device that
-        // has it already -- the same transfer the first screen offers a
-        // reader with no profile at all, which is exactly what somebody
-        // holding their old phone wants from here.
+        // the core has it. The other two take one over from somewhere it
+        // already is -- a backup file, or a device holding it right now
+        // -- which are the same two transfers the first screen offers a
+        // reader with no profile at all, and are exactly what somebody
+        // holding their old phone wants from here. In that order: the
+        // file is the one that works without the other device to hand.
         footer: Column {
             width: listView.width
 
@@ -278,6 +280,32 @@ Page {
                 }
 
                 onClicked: pageStack.push(Qt.resolvedUrl("AddProfileDialog.qml"), {})
+            }
+
+            ListItem {
+                id: backupFileRow
+                objectName: "backupFileButton"
+                width: parent.width
+                contentHeight: Theme.itemSizeSmall + 2 * Theme.paddingMedium
+
+                PlusMark {
+                    id: backupPlus
+                    x: Theme.horizontalPageMargin
+                    y: Theme.paddingMedium
+                }
+
+                Label {
+                    x: backupPlus.x + backupPlus.width + Theme.paddingMedium
+                    width: parent.width - x - Theme.horizontalPageMargin
+                    anchors.verticalCenter: backupPlus.verticalCenter
+                    wrapMode: Text.Wrap
+                    color: backupFileRow.highlighted ? Theme.highlightColor
+                                                     : Theme.primaryColor
+                    text: qsTr("Restore profile from backup")
+                }
+
+                onClicked: pageStack.push(Qt.resolvedUrl("RestoreProfilePage.qml"),
+                                          { from: "file" })
             }
 
             ListItem {

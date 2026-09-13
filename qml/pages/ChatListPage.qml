@@ -115,9 +115,21 @@ Page {
         onOpenRequested: page.showChat(chatId)
     }
 
+    /// The core has said what is in this profile, whatever that was.
+    ///
+    /// An empty model means one of two things and they are opposite: no
+    /// chats, or no answer yet. On a phone that resumes onto this page
+    /// the second is what is true for the first moment, and saying "No
+    /// chats yet" over a list that is about to fill is the app telling
+    /// the reader something it does not know.
+    property bool chatsLoaded: false
+
     Connections {
         target: chats
         onMessage_arrived: notifier.arrived(chat_id, chat_name, sender, preview)
+        // Emitted once the rows have been set, whether there turned out
+        // to be any or none.
+        onRows_changed: page.chatsLoaded = true
     }
 
     /// Open a chat from outside the app: a notification was tapped. The
@@ -556,7 +568,8 @@ Page {
 
             ViewPlaceholder {
                 objectName: "chatListPlaceholder"
-                enabled: chats.count === 0
+                // Not until the core has answered: see `chatsLoaded`.
+                enabled: page.chatsLoaded && chats.count === 0
                 text: page.archived ? qsTr("No archived chats")
                                     : qsTr("No chats yet")
                 // Nothing here makes an archived chat: a chat is archived

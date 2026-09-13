@@ -988,6 +988,10 @@
         <source>Add as second device</source>
         <translation>Adaugă ca al doilea dispozitiv</translation>
     </message>
+    <message>
+        <source>Restore profile from backup</source>
+        <translation>Restaurează profilul dintr-o copie de siguranță</translation>
+    </message>
 </context>
 <context>
     <name>QrPage</name>

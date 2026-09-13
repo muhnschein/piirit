@@ -983,6 +983,10 @@
         <source>Add as second device</source>
         <translation>Tilføj som anden enhed</translation>
     </message>
+    <message>
+        <source>Restore profile from backup</source>
+        <translation>Gendan profil fra en sikkerhedskopi</translation>
+    </message>
 </context>
 <context>
     <name>QrPage</name>

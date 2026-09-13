@@ -988,6 +988,10 @@
         <source>Add as second device</source>
         <translation>Добавить как второе устройство</translation>
     </message>
+    <message>
+        <source>Restore profile from backup</source>
+        <translation>Восстановить профиль из резервной копии</translation>
+    </message>
 </context>
 <context>
     <name>QrPage</name>

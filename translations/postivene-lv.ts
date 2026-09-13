@@ -988,6 +988,10 @@
         <source>Add as second device</source>
         <translation>Pievienot kā otru ierīci</translation>
     </message>
+    <message>
+        <source>Restore profile from backup</source>
+        <translation>Atjaunot profilu no rezerves kopijas</translation>
+    </message>
 </context>
 <context>
     <name>QrPage</name>

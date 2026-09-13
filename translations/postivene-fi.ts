@@ -983,6 +983,10 @@
         <source>Add as second device</source>
         <translation>Lisää toisena laitteena</translation>
     </message>
+    <message>
+        <source>Restore profile from backup</source>
+        <translation>Palauta profiili varmuuskopiosta</translation>
+    </message>
 </context>
 <context>
     <name>QrPage</name>

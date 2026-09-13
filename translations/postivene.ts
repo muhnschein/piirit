@@ -978,6 +978,10 @@
         <source>Add as second device</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Restore profile from backup</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QrPage</name>

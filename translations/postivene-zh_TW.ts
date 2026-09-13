@@ -978,6 +978,10 @@
         <source>Add as second device</source>
         <translation>新增為第二台裝置</translation>
     </message>
+    <message>
+        <source>Restore profile from backup</source>
+        <translation>從備份還原個人檔案</translation>
+    </message>
 </context>
 <context>
     <name>QrPage</name>

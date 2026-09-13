@@ -978,6 +978,10 @@
         <source>Add as second device</source>
         <translation>İkinci cihaz olarak ekle</translation>
     </message>
+    <message>
+        <source>Restore profile from backup</source>
+        <translation>Yedekten profil geri yükle</translation>
+    </message>
 </context>
 <context>
     <name>QrPage</name>

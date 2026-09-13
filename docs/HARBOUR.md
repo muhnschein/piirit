@@ -418,6 +418,12 @@ removed from the store even after approval. Not an option.
    Worth checking with the app killed rather than backgrounded, and
    worth checking the other way too: delete every profile, and the app
    should go back to the first screen rather than sit on an empty list.
+   What the list looks like in its first moment is a device check as
+   well: it must not say "No chats yet" on the way to being filled, and
+   the rows must arrive whole -- a chat whose picture has not loaded yet
+   shows the disc and the initial, so the column is faces rather than
+   holes that fill in one by one. Pictures are read off the phone's own
+   disk, which is the part a headless test cannot have.
    The first screen is a device path because the phone's own colours
    are: on a fresh install, before a profile, it is a field of faces
    filling the screen with the words in a cleared box in the middle,

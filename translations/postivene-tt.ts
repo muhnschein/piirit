@@ -978,6 +978,10 @@
         <source>Add as second device</source>
         <translation>Икенче җиһаз итеп өстәргә</translation>
     </message>
+    <message>
+        <source>Restore profile from backup</source>
+        <translation>Резерв күчермәдән профильне торгызырга</translation>
+    </message>
 </context>
 <context>
     <name>QrPage</name>

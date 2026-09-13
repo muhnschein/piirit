@@ -983,6 +983,10 @@
         <source>Add as second device</source>
         <translation>இரண்டாவது சாதனமாகச் சேர்</translation>
     </message>
+    <message>
+        <source>Restore profile from backup</source>
+        <translation>காப்புப் பிரதியிலிருந்து சுயவிவரத்தை மீட்டெடு</translation>
+    </message>
 </context>
 <context>
     <name>QrPage</name>

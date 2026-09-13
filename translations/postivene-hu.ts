@@ -978,6 +978,10 @@
         <source>Add as second device</source>
         <translation>Hozzáadás második eszközként</translation>
     </message>
+    <message>
+        <source>Restore profile from backup</source>
+        <translation>Profil visszaállítása mentésből</translation>
+    </message>
 </context>
 <context>
     <name>QrPage</name>

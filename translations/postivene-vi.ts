@@ -978,6 +978,10 @@
         <source>Add as second device</source>
         <translation>Thêm làm thiết bị thứ hai</translation>
     </message>
+    <message>
+        <source>Restore profile from backup</source>
+        <translation>Khôi phục hồ sơ từ bản sao lưu</translation>
+    </message>
 </context>
 <context>
     <name>QrPage</name>

@@ -54,6 +54,19 @@ const PROBE_QML: &str = r"
     }
 ";
 
+/// A picture that really is one, so the image can reach `Ready`: an
+/// avatar draws a picture only once it has loaded, and until then it is
+/// the disc and the initial. Any committed PNG would do; this is the
+/// one that is certainly there.
+fn a_real_picture() -> String {
+    std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+        .join("../../qml/art/faces-portrait.png")
+        .canonicalize()
+        .expect("the committed art is there")
+        .display()
+        .to_string()
+}
+
 fn component_url(name: &str) -> String {
     format!(
         "file://{}",
@@ -120,12 +133,16 @@ fn an_avatar_with_news_wears_the_ambiences_colour_rather_than_its_own() {
         record!("lit", call!("root", QString::from("color")));
 
         // A picture goes through the same colour rather than showing its
-        // own.
+        // own. Set here and read a second later: it is loaded off the
+        // main thread, and an avatar draws the disc until it is there.
         call!(
             "set",
             QString::from("picturePath"),
-            QString::from("/tmp/ada.png")
+            QString::from(a_real_picture())
         );
+    });
+
+    single_shot(Duration::from_secs(2), move || unsafe {
         record!(
             "lit-masked",
             call!(
@@ -167,6 +184,10 @@ fn an_avatar_with_news_wears_the_ambiences_colour_rather_than_its_own() {
                 QString::from("avatarTinted"),
                 QString::from("visible")
             )
+        );
+        record!(
+            "picture-status",
+            call!("get", QString::from("avatarImage"), QString::from("status"))
         );
 
         (*engine_ptr).quit();
@@ -229,5 +250,14 @@ fn an_avatar_with_news_wears_the_ambiences_colour_rather_than_its_own() {
         "false",
         "a picture with nothing new is still put through the ambience's \
          colour. {context}"
+    );
+    // Image.Ready is 1. Without it the three above would all be false
+    // for the honest reason that there is no picture yet, and would say
+    // nothing about the colour it is drawn in.
+    assert_eq!(
+        value("picture-status"),
+        "1",
+        "the picture never loaded, so nothing here was read off a drawn \
+         face. {context}"
     );
 }

@@ -983,6 +983,10 @@
         <source>Add as second device</source>
         <translation>రెండో పరికరంగా చేర్చు</translation>
     </message>
+    <message>
+        <source>Restore profile from backup</source>
+        <translation>బ్యాకప్ నుండి ప్రొఫైల్‌ను పునరుద్ధరించు</translation>
+    </message>
 </context>
 <context>
     <name>QrPage</name>

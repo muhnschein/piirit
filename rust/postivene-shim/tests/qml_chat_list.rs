@@ -51,7 +51,10 @@ const PROBE_QML: &str = r"
         function findIn(node, name) {
             if (!node) { return null }
             if (node.objectName === name) { return node }
-            var kids = node.children
+            // `data` rather than `children`: the chat model is a child of
+            // the page but not a visual one, and `children` holds only
+            // what is drawn.
+            var kids = node.data !== undefined ? node.data : node.children
             for (var i = 0; kids && i < kids.length; i++) {
                 var hit = findIn(kids[i], name)
                 if (hit) { return hit }
@@ -62,6 +65,14 @@ const PROBE_QML: &str = r"
             var item = findIn(loader.item, name)
             if (!item) { return 'missing:' + name }
             return '' + item[property]
+        }
+        // A search the profile cannot answer, so the list really is
+        // empty and the placeholder is the only thing left to draw.
+        function searchForNothing() {
+            var model = findIn(loader.item, 'chats')
+            if (!model) { return 'missing:chats' }
+            model.query = 'zzqq-no-chat-is-called-this'
+            return 'ok'
         }
         // What the next launch reads to know where to open.
         function remembered() { return '' + Settings.lastAccountId }
@@ -126,6 +137,16 @@ fn the_chat_list_shows_what_the_core_reports() {
         // The profile the next launch opens on, written here because
         // every way to a profile ends on this page.
         (*steps_ptr).push(("after", call!("remembered")));
+        // Nothing has been read yet. An empty model means "no answer"
+        // this early and "no chats" later, and the two are opposite.
+        (*steps_ptr).push((
+            "placeholder-fresh",
+            call!(
+                "get",
+                QString::from("chatListPlaceholder"),
+                QString::from("enabled")
+            ),
+        ));
     });
 
     single_shot(Duration::from_secs(2), move || unsafe {
@@ -133,6 +154,7 @@ fn the_chat_list_shows_what_the_core_reports() {
     });
 
     single_shot(Duration::from_secs(3), move || unsafe {
+        (*steps_ptr).push(("search", call!("searchForNothing")));
         (*steps_ptr).push((
             "error-shown",
             call!("get", QString::from("errorLabel"), QString::from("text")),
@@ -143,6 +165,19 @@ fn the_chat_list_shows_what_the_core_reports() {
                 "get",
                 QString::from("errorBanner"),
                 QString::from("timeout")
+            ),
+        ));
+    });
+
+    // The core has answered and there is nothing to show: now the
+    // placeholder is the one thing that should be on the page.
+    single_shot(Duration::from_secs(4), move || unsafe {
+        (*steps_ptr).push((
+            "placeholder-empty",
+            call!(
+                "get",
+                QString::from("chatListPlaceholder"),
+                QString::from("enabled")
             ),
         ));
     });
@@ -190,5 +225,25 @@ fn assert_outcome(steps: &[(&str, String)]) {
         "1",
         "the page did not remember the profile it is on, so the next \
          launch has nothing to open on and waits for the core. {context}"
+    );
+
+    assert_eq!(
+        value("placeholder-fresh"),
+        "false",
+        "\"No chats yet\" is up before the core has said whether there \
+         are any, so a phone that resumes onto this page is told it has \
+         no chats and then handed a list of them. {context}"
+    );
+    assert_eq!(
+        value("search"),
+        "ok",
+        "the chat model could not be reached, so the other half of this \
+         proves nothing. {context}"
+    );
+    assert_eq!(
+        value("placeholder-empty"),
+        "true",
+        "a profile with nothing in it says nothing at all, which reads \
+         as a list that has not loaded. {context}"
     );
 }

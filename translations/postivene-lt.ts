@@ -988,6 +988,10 @@
         <source>Add as second device</source>
         <translation>Pridėti kaip antrą įrenginį</translation>
     </message>
+    <message>
+        <source>Restore profile from backup</source>
+        <translation>Atkurti profilį iš atsarginės kopijos</translation>
+    </message>
 </context>
 <context>
     <name>QrPage</name>

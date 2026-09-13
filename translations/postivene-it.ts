@@ -983,6 +983,10 @@
         <source>Add as second device</source>
         <translation>Aggiungi come secondo dispositivo</translation>
     </message>
+    <message>
+        <source>Restore profile from backup</source>
+        <translation>Ripristina profilo da un backup</translation>
+    </message>
 </context>
 <context>
     <name>QrPage</name>

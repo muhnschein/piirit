@@ -983,6 +983,10 @@
         <source>Add as second device</source>
         <translation>दुसरे उपकरण म्हणून जोडा</translation>
     </message>
+    <message>
+        <source>Restore profile from backup</source>
+        <translation>बॅकअपमधून प्रोफाइल पुनर्संचयित करा</translation>
+    </message>
 </context>
 <context>
     <name>QrPage</name>

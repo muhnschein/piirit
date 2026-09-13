@@ -33,6 +33,24 @@ Rectangle {
     /// -- rather than as one more photograph among grey ones.
     property bool highlight: false
 
+    /// The picture is what is on screen: there is one, and it has
+    /// loaded. Everything that draws a picture and everything that
+    /// stands in for one turns on this one fact, so the two never both
+    /// stand down.
+    ///
+    /// A picture is loaded off the main thread, which is what keeps a
+    /// list smooth while it is scrolled -- and what it costs is that a
+    /// row is on screen before its picture is. Reading "there is a path"
+    /// as "there is a picture" left the disc transparent and the initial
+    /// hidden for that time, so a chat list arrived as a column of holes
+    /// that filled in one by one. It arrives as a column of faces now:
+    /// the subject's colour and their initial until their picture is
+    /// ready, and their picture from then on. It is also what a picture
+    /// that never loads -- a blob deleted under the app, a file that is
+    /// not an image -- falls back to, instead of a hole for good.
+    readonly property bool showsPicture: avatar.picturePath.length > 0
+                                         && picture.status === Image.Ready
+
     width: Theme.itemSizeSmall
     height: width
     radius: width / 2
@@ -41,7 +59,7 @@ Rectangle {
     // softened, and as a full tinted disc whenever the masked picture
     // was not drawn for a frame -- a row highlighted under its context
     // menu was where that was noticed.
-    color: avatar.picturePath.length > 0 ? "transparent"
+    color: avatar.showsPicture ? "transparent"
            : avatar.highlight ? Theme.highlightColor
            : avatar.monochrome ? Theme.rgba(Theme.primaryColor, 0.25)
            : ownColor.length > 0 ? ownColor : Theme.highlightColor
@@ -49,7 +67,7 @@ Rectangle {
     Label {
         objectName: "avatarInitial"
         anchors.centerIn: parent
-        visible: avatar.picturePath.length === 0
+        visible: !avatar.showsPicture
         color: Theme.primaryColor
         font.pixelSize: Theme.fontSizeLarge
         textFormat: Text.PlainText
@@ -85,7 +103,7 @@ Rectangle {
         // Hidden while it is what the tint below is drawn from: an
         // effect draws its source itself, and both on screen would be
         // the same face twice.
-        visible: avatar.picturePath.length > 0 && !avatar.highlight
+        visible: avatar.showsPicture && !avatar.highlight
         source: picture
         maskSource: mask
         // An effect re-runs its shader whenever what it draws is redrawn,
@@ -111,7 +129,7 @@ Rectangle {
     ColorOverlay {
         objectName: "avatarTinted"
         anchors.fill: parent
-        visible: avatar.picturePath.length > 0 && avatar.highlight
+        visible: avatar.showsPicture && avatar.highlight
         source: masked
         color: Theme.rgba(Theme.highlightColor, 0.75)
         cached: true
