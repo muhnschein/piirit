@@ -28,7 +28,8 @@ itself *never* touches a mail server or a key.
 
 - No protocol or crypto reimplementation — ever. We never roll our own crypto.
 - Chats via regular email or any non-chatmail servers.
-- Voice and video calling, for the time being.
+- Voice and video calling, for the time being — see
+  [`docs/CALLS.md`](docs/CALLS.md) for what it would take.
 - No OpenRepos/Chum.
 
 See the non-goals in [`docs/PROJECT.md`](docs/PROJECT.md) for more information.
@@ -41,6 +42,8 @@ See the non-goals in [`docs/PROJECT.md`](docs/PROJECT.md) for more information.
 how a device RPM is built
 - [`docs/HARBOUR.md`](docs/HARBOUR.md) — our understanding of Jolla's store 
 rules, how CI tries to gate them, and the two that still block submission
+- [`docs/CALLS.md`](docs/CALLS.md) — whether voice and video calls are
+possible here, what the bundled core already does, and what is unproven
 
 ## Building
 
