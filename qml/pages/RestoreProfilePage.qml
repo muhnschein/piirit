@@ -1,6 +1,5 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
-import "../components"
 
 /*
  * A profile that exists already, brought onto this phone. Both ways the
@@ -39,6 +38,13 @@ Page {
     /// How far it has got, in permille, as the core counts it.
     property int permille: 0
     property string errorMessage: ""
+    /// Something went wrong and the reader has not put it away yet.
+    ///
+    /// A state of the page rather than a strip along the bottom of it: a
+    /// transfer that fails after a minute of a progress bar is the thing
+    /// the reader most needs to read, and dropping them straight back to
+    /// a live viewfinder reads as the app having simply carried on.
+    readonly property bool failed: page.errorMessage.length > 0
 
     // Nothing to go back to mid-transfer: leaving would drop the page
     // that is listening for the answer, and the core would carry on.
@@ -54,6 +60,21 @@ Page {
             core.restore_from_device(text)
         } else {
             core.restore_from_file(text)
+        }
+    }
+
+    /// Put the scanner back on its feet after a failure.
+    ///
+    /// The view stops itself on the code it read and stays stopped, so
+    /// that a second frame already in flight cannot report the same code
+    /// twice. Clearing the failure alone would bring back a viewfinder
+    /// with the camera off behind it, so this goes first and the failure
+    /// is cleared after: the view starts its camera when it is made
+    /// active, and only if it is not still holding a code.
+    function rescan() {
+        if (scanLoader.item) {
+            scanLoader.item.framesTried = 0
+            scanLoader.item.done = false
         }
     }
 
@@ -124,7 +145,7 @@ Page {
         id: scanArea
         objectName: "scanArea"
         anchors.fill: parent
-        visible: page.fromDevice && !page.busy
+        visible: page.fromDevice && !page.busy && !page.failed
 
         // Loaded by URL, as the QR page loads it: a phone without a
         // camera should lose the scanner rather than the page.
@@ -158,7 +179,15 @@ Page {
             target: scanLoader.item
             property: "active"
             value: page.status === PageStatus.Active && page.fromDevice
-                   && !page.busy
+                   && !page.busy && !page.failed
+        }
+
+        // The view puts its own line at the top; this is what it has to
+        // clear to sit under the words rather than behind them.
+        Binding {
+            target: scanLoader.item
+            property: "hintTopMargin"
+            value: deviceChrome.height
         }
 
         Label {
@@ -241,7 +270,7 @@ Page {
 
             Label {
                 objectName: "fileInstructions"
-                visible: !page.fromDevice && !page.busy
+                visible: !page.fromDevice && !page.busy && !page.failed
                 x: Theme.horizontalPageMargin
                 width: parent.width - 2 * Theme.horizontalPageMargin
                 wrapMode: Text.Wrap
@@ -254,7 +283,7 @@ Page {
             Button {
                 objectName: "chooseFileButton"
                 anchors.horizontalCenter: parent.horizontalCenter
-                visible: !page.fromDevice && !page.busy
+                visible: !page.fromDevice && !page.busy && !page.failed
                 text: qsTr("Choose a backup file")
                 onClicked: page.chooseFile()
             }
@@ -280,22 +309,55 @@ Page {
                     pageStack.pop()
                 }
             }
-        }
-    }
 
-    // Over the foot of the page, above the camera, and it stays until
-    // the reader puts it away: a transfer that failed after a minute of
-    // a progress bar is the thing they most need to read, and eight
-    // seconds of it is easy to miss while looking at the other phone.
-    Banner {
-        objectName: "errorBanner"
-        anchors {
-            left: parent.left
-            right: parent.right
-            bottom: parent.bottom
+            // Where the progress bar was, and at its size: what went
+            // wrong, and the way to have another go.
+            Column {
+                objectName: "failureBlock"
+                visible: page.failed
+                width: parent.width
+                spacing: Theme.paddingLarge
+
+                Label {
+                    objectName: "failureTitle"
+                    x: Theme.horizontalPageMargin
+                    width: parent.width - 2 * Theme.horizontalPageMargin
+                    horizontalAlignment: Text.AlignHCenter
+                    wrapMode: Text.Wrap
+                    textFormat: Text.PlainText
+                    font.family: Theme.fontFamilyHeading
+                    font.pixelSize: Theme.fontSizeLarge
+                    color: Theme.errorColor
+                    text: qsTr("That did not work")
+                }
+
+                Label {
+                    objectName: "errorLabel"
+                    x: Theme.horizontalPageMargin
+                    width: parent.width - 2 * Theme.horizontalPageMargin
+                    horizontalAlignment: Text.AlignHCenter
+                    wrapMode: Text.Wrap
+                    textFormat: Text.PlainText
+                    color: Theme.highlightColor
+                    text: page.errorMessage
+                }
+
+                Button {
+                    objectName: "retryButton"
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    text: page.fromDevice ? qsTr("Try the code again")
+                                          : qsTr("Choose another file")
+                    onClicked: {
+                        if (page.fromDevice) {
+                            page.rescan()
+                            page.errorMessage = ""
+                        } else {
+                            page.errorMessage = ""
+                            page.chooseFile()
+                        }
+                    }
+                }
+            }
         }
-        timeout: 0
-        text: page.errorMessage
-        onDismissed: page.errorMessage = ""
     }
 }

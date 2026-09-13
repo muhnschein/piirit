@@ -1093,6 +1093,18 @@
         <source>Take the profile over</source>
         <translation>Traer el perfil</translation>
     </message>
+    <message>
+        <source>That did not work</source>
+        <translation>Eso no ha funcionado</translation>
+    </message>
+    <message>
+        <source>Try the code again</source>
+        <translation>Volver a intentar el código</translation>
+    </message>
+    <message>
+        <source>Choose another file</source>
+        <translation>Elegir otro archivo</translation>
+    </message>
 </context>
 <context>
     <name>ScanView</name>
@@ -1177,10 +1189,6 @@
     <message>
         <source>Messages</source>
         <translation>Mensajes</translation>
-    </message>
-    <message>
-        <source>Markdown</source>
-        <translation>Markdown</translation>
     </message>
     <message>
         <source>Auto-download attachments</source>
@@ -1282,11 +1290,15 @@
         <translation>Intro envía el mensaje</translation>
     </message>
     <message>
-        <source>Off, the return key starts a new line, the message field grows with what is written, and the send button sends.</source>
-        <translation>Desactivado, la tecla Intro empieza una línea nueva, el campo de mensaje crece con lo escrito y el botón de enviar envía.</translation>
+        <source>When on, the return key sends. When off, it starts a new line, the message field grows with what is written, and the send button sends.</source>
+        <translation>Activado, la tecla Intro envía. Desactivado, empieza una línea nueva, el campo de mensaje crece con lo escrito y el botón de enviar envía.</translation>
     </message>
     <message>
-        <source>On, a message written with *stars* and `backticks` is shown with the bold, the italics and the links drawn. Off, it is shown exactly as it was written.</source>
+        <source>Use Markdown formatting</source>
+        <translation>Usar formato Markdown</translation>
+    </message>
+    <message>
+        <source>When on, a message written with *stars* and `backticks` is shown with the bold, the italics and the links drawn. When off, it is shown exactly as it was written.</source>
         <translation>Activado, un mensaje escrito con *asteriscos* y `comillas invertidas` se muestra con la negrita, la cursiva y los enlaces dibujados. Desactivado, se muestra tal como se escribió.</translation>
     </message>
 </context>

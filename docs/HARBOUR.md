@@ -407,6 +407,11 @@ removed from the store even after approval. Not an option.
    the cell and the picture goes when the count ends, and that Show in
    chat lands on the message in the conversation, lit, rather than at
    the newest one or wherever the chat was left.
+   Opening the app on a phone that already has a profile is its own
+   check: nothing of the welcome should be drawn at all, and the chat
+   list is what comes up. A flash of the field of faces on the way
+   reads as the app opening in the wrong place and then correcting
+   itself, which is the bug this had.
    The first screen is a device path because the phone's own colours
    are: on a fresh install, before a profile, it is a field of faces
    filling the screen with the words in a cleared box in the middle,
@@ -443,13 +448,16 @@ removed from the store even after approval. Not an option.
    the string a device shows while offering its profile carries an
    address and a one-time secret, so it is a dense symbol, and it is
    the dense ones that ran out of pixels when the camera was smaller
-   and its frames coarser. A spinner beside the line at the foot says
+   and its frames coarser. A spinner beside the line at the top says
    the app is reading frames, so a code that takes a moment does not
-   look like a dead view. Under it, "Enter the code instead" takes the
-   same string typed or pasted, which is the way through when a camera
-   will not read at all. A failure stays on screen until it is tapped
-   away, rather than fading while the reader is looking at the other
-   phone. Worth trying on a phone without a camera too, or with the
+   look like a dead view -- both sit under the strip of words, where
+   the eye already is, rather than down by the hand. At the foot,
+   "Enter the code instead" takes the same string typed or pasted,
+   which is the way through when a camera will not read at all. A
+   failure replaces the whole page rather than fading along the bottom
+   of a viewfinder that has carried on without it: "That did not work",
+   what went wrong, and a button to have another go, which puts the
+   camera back on its feet. Worth trying on a phone without a camera too, or with the
    camera denied: the page has to fall back to saying so rather than
    showing a dead viewfinder, and the backup half has to work
    regardless.

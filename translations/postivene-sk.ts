@@ -1098,6 +1098,18 @@
         <source>Take the profile over</source>
         <translation>Prevziať profil</translation>
     </message>
+    <message>
+        <source>That did not work</source>
+        <translation>To sa nepodarilo</translation>
+    </message>
+    <message>
+        <source>Try the code again</source>
+        <translation>Skúsiť kód znova</translation>
+    </message>
+    <message>
+        <source>Choose another file</source>
+        <translation>Vybrať iný súbor</translation>
+    </message>
 </context>
 <context>
     <name>ScanView</name>
@@ -1182,10 +1194,6 @@
     <message>
         <source>Messages</source>
         <translation>Správy</translation>
-    </message>
-    <message>
-        <source>Markdown</source>
-        <translation>Markdown</translation>
     </message>
     <message>
         <source>Auto-download attachments</source>
@@ -1287,11 +1295,15 @@
         <translation>Enter odošle správu</translation>
     </message>
     <message>
-        <source>Off, the return key starts a new line, the message field grows with what is written, and the send button sends.</source>
-        <translation>Ak je vypnuté, kláves Enter začne nový riadok, pole správy rastie s napísaným a odosiela tlačidlo Odoslať.</translation>
+        <source>When on, the return key sends. When off, it starts a new line, the message field grows with what is written, and the send button sends.</source>
+        <translation>Zapnuté kláves Enter odosiela. Vypnuté začne nový riadok, pole správy rastie s napísaným a odosiela tlačidlo odoslania.</translation>
     </message>
     <message>
-        <source>On, a message written with *stars* and `backticks` is shown with the bold, the italics and the links drawn. Off, it is shown exactly as it was written.</source>
+        <source>Use Markdown formatting</source>
+        <translation>Používať formátovanie Markdown</translation>
+    </message>
+    <message>
+        <source>When on, a message written with *stars* and `backticks` is shown with the bold, the italics and the links drawn. When off, it is shown exactly as it was written.</source>
         <translation>Zapnuté sa správa písaná s *hviezdičkami* a `spätnými apostrofmi` zobrazí s vykresleným tučným písmom, kurzívou a odkazmi. Vypnuté sa zobrazí presne tak, ako bola napísaná.</translation>
     </message>
 </context>

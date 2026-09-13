@@ -1093,6 +1093,18 @@
         <source>Take the profile over</source>
         <translation>Поемане на профила</translation>
     </message>
+    <message>
+        <source>That did not work</source>
+        <translation>Това не се получи</translation>
+    </message>
+    <message>
+        <source>Try the code again</source>
+        <translation>Нов опит с кода</translation>
+    </message>
+    <message>
+        <source>Choose another file</source>
+        <translation>Избор на друг файл</translation>
+    </message>
 </context>
 <context>
     <name>ScanView</name>
@@ -1177,10 +1189,6 @@
     <message>
         <source>Messages</source>
         <translation>Съобщения</translation>
-    </message>
-    <message>
-        <source>Markdown</source>
-        <translation>Markdown</translation>
     </message>
     <message>
         <source>Auto-download attachments</source>
@@ -1282,11 +1290,15 @@
         <translation>Enter изпраща съобщението</translation>
     </message>
     <message>
-        <source>Off, the return key starts a new line, the message field grows with what is written, and the send button sends.</source>
-        <translation>Изключено: клавишът Enter започва нов ред, полето за съобщение расте с написаното, а бутонът за изпращане изпраща.</translation>
+        <source>When on, the return key sends. When off, it starts a new line, the message field grows with what is written, and the send button sends.</source>
+        <translation>Включено, клавишът Enter изпраща. Изключено, той започва нов ред, полето за съобщение расте с написаното, а изпраща бутонът за изпращане.</translation>
     </message>
     <message>
-        <source>On, a message written with *stars* and `backticks` is shown with the bold, the italics and the links drawn. Off, it is shown exactly as it was written.</source>
+        <source>Use Markdown formatting</source>
+        <translation>Използване на форматиране с Markdown</translation>
+    </message>
+    <message>
+        <source>When on, a message written with *stars* and `backticks` is shown with the bold, the italics and the links drawn. When off, it is shown exactly as it was written.</source>
         <translation>Включено, съобщение, написано със *звездички* и `обратни апострофи`, се показва с оформени удебелен текст, курсив и връзки. Изключено, показва се точно както е написано.</translation>
     </message>
 </context>

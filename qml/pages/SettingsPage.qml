@@ -184,7 +184,7 @@ Page {
                 objectName: "enterSendsSwitch"
                 //: The return key on the keyboard.
                 text: qsTr("Enter sends the message")
-                description: qsTr("Off, the return key starts a new line, the message field grows with what is written, and the send button sends.")
+                description: qsTr("When on, the return key sends. When off, it starts a new line, the message field grows with what is written, and the send button sends.")
                 automaticCheck: false
                 checked: Settings.enterSends === true
                 onClicked: Settings.enterSends = !checked
@@ -192,8 +192,8 @@ Page {
 
             TextSwitch {
                 objectName: "markdownSwitch"
-                text: qsTr("Markdown")
-                description: qsTr("On, a message written with *stars* and `backticks` is shown with the bold, the italics and the links drawn. Off, it is shown exactly as it was written.")
+                text: qsTr("Use Markdown formatting")
+                description: qsTr("When on, a message written with *stars* and `backticks` is shown with the bold, the italics and the links drawn. When off, it is shown exactly as it was written.")
                 // Checked follows the setting, so the tap writes the
                 // setting and the setting moves the switch -- the way
                 // the switch above it works.

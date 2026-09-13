@@ -1093,6 +1093,18 @@
         <source>Take the profile over</source>
         <translation>પ્રોફાઇલ લો</translation>
     </message>
+    <message>
+        <source>That did not work</source>
+        <translation>એ કામ ન કર્યું</translation>
+    </message>
+    <message>
+        <source>Try the code again</source>
+        <translation>કોડ ફરી અજમાવો</translation>
+    </message>
+    <message>
+        <source>Choose another file</source>
+        <translation>બીજી ફાઇલ પસંદ કરો</translation>
+    </message>
 </context>
 <context>
     <name>ScanView</name>
@@ -1177,10 +1189,6 @@
     <message>
         <source>Messages</source>
         <translation>સંદેશ</translation>
-    </message>
-    <message>
-        <source>Markdown</source>
-        <translation>Markdown</translation>
     </message>
     <message>
         <source>Auto-download attachments</source>
@@ -1282,11 +1290,15 @@
         <translation>Enter સંદેશ મોકલે છે</translation>
     </message>
     <message>
-        <source>Off, the return key starts a new line, the message field grows with what is written, and the send button sends.</source>
-        <translation>બંધ હોય ત્યારે Enter કી નવી લાઇન શરૂ કરે છે, સંદેશ ક્ષેત્ર લખાણ સાથે વધે છે અને મોકલો બટન મોકલે છે.</translation>
+        <source>When on, the return key sends. When off, it starts a new line, the message field grows with what is written, and the send button sends.</source>
+        <translation>ચાલુ હોય તો એન્ટર કી મોકલે છે. બંધ હોય તો તે નવી લીટી શરૂ કરે છે, સંદેશનું ખાનું લખાણ સાથે વધે છે, અને મોકલવાનું બટન મોકલે છે.</translation>
     </message>
     <message>
-        <source>On, a message written with *stars* and `backticks` is shown with the bold, the italics and the links drawn. Off, it is shown exactly as it was written.</source>
+        <source>Use Markdown formatting</source>
+        <translation>માર્કડાઉન બંધારણ વાપરો</translation>
+    </message>
+    <message>
+        <source>When on, a message written with *stars* and `backticks` is shown with the bold, the italics and the links drawn. When off, it is shown exactly as it was written.</source>
         <translation>ચાલુ હોય તો *તારાંકિત* અને `બેકટિક` સાથે લખાયેલ સંદેશ બોલ્ડ, ત્રાંસુ અને લિંક સજાવીને બતાવાય છે. બંધ હોય તો જેમ લખ્યું તેમ જ બતાવાય છે.</translation>
     </message>
 </context>

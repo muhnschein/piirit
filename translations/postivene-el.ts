@@ -1093,6 +1093,18 @@
         <source>Take the profile over</source>
         <translation>Μεταφορά του προφίλ</translation>
     </message>
+    <message>
+        <source>That did not work</source>
+        <translation>Αυτό δεν πέτυχε</translation>
+    </message>
+    <message>
+        <source>Try the code again</source>
+        <translation>Δοκιμή του κωδικού ξανά</translation>
+    </message>
+    <message>
+        <source>Choose another file</source>
+        <translation>Επιλογή άλλου αρχείου</translation>
+    </message>
 </context>
 <context>
     <name>ScanView</name>
@@ -1177,10 +1189,6 @@
     <message>
         <source>Messages</source>
         <translation>Μηνύματα</translation>
-    </message>
-    <message>
-        <source>Markdown</source>
-        <translation>Markdown</translation>
     </message>
     <message>
         <source>Auto-download attachments</source>
@@ -1282,11 +1290,15 @@
         <translation>Το Enter στέλνει το μήνυμα</translation>
     </message>
     <message>
-        <source>Off, the return key starts a new line, the message field grows with what is written, and the send button sends.</source>
-        <translation>Απενεργοποιημένο: το πλήκτρο Enter ξεκινά νέα γραμμή, το πεδίο μηνύματος μεγαλώνει με όσα γράφετε και η αποστολή γίνεται από το κουμπί.</translation>
+        <source>When on, the return key sends. When off, it starts a new line, the message field grows with what is written, and the send button sends.</source>
+        <translation>Ενεργό, το πλήκτρο Enter στέλνει. Ανενεργό, ξεκινά νέα γραμμή, το πεδίο μηνύματος μεγαλώνει με όσα γράφονται και στέλνει το κουμπί αποστολής.</translation>
     </message>
     <message>
-        <source>On, a message written with *stars* and `backticks` is shown with the bold, the italics and the links drawn. Off, it is shown exactly as it was written.</source>
+        <source>Use Markdown formatting</source>
+        <translation>Χρήση μορφοποίησης Markdown</translation>
+    </message>
+    <message>
+        <source>When on, a message written with *stars* and `backticks` is shown with the bold, the italics and the links drawn. When off, it is shown exactly as it was written.</source>
         <translation>Ενεργό, ένα μήνυμα γραμμένο με *αστερίσκους* και `ανάστροφα εισαγωγικά` εμφανίζεται με μορφοποιημένα έντονα, πλάγια και συνδέσμους. Ανενεργό, εμφανίζεται ακριβώς όπως γράφτηκε.</translation>
     </message>
 </context>

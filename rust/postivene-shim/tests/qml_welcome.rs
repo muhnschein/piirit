@@ -75,6 +75,12 @@ const PROBE_QML: &str = r"
             return url.substring(url.lastIndexOf('/') + 1)
         }
         // Whether the cleared box is the column of words.
+        // What the core answering with no profiles does.
+        function endProbe() {
+            if (!loader.item) { return 'no-page' }
+            loader.item.probing = false
+            return 'ok'
+        }
         function clearsTheWords() {
             var field = findIn(loader.item, 'faceField')
             var title = findIn(loader.item, 'title')
@@ -222,6 +228,12 @@ fn the_welcome_page_draws_the_field_and_turns_with_the_phone() {
     single_shot(Duration::from_secs(1), move || {
         r("load", call!("load", common::page_url("WelcomePage.qml")));
         r("upright", call!("maskFile"));
+        // Nothing is drawn until the core has said whether there is a
+        // profile to resume: a phone that has one goes straight to the
+        // chat list, and a screenful of faces on the way reads as the
+        // app opening in the wrong place.
+        r("probing-field", call!("get", "faceField", "visible"));
+        r("probed", call!("endProbe"));
     });
 
     // The mask loads off the main thread; a second is plenty.
@@ -271,6 +283,18 @@ fn assert_field_drawn(steps: &[(String, String)]) {
         value("mask"),
         "1",
         "the mask never loaded, so the field is not drawn. {context}"
+    );
+    assert_eq!(
+        value("probing-field"),
+        "false",
+        "the field is drawn before the core has said whether there is a \
+         profile, so a phone with one flashes the welcome on its way to \
+         the chat list. {context}"
+    );
+    assert_eq!(
+        value("probed"),
+        "ok",
+        "the probe could not be ended. {context}"
     );
     assert_eq!(
         value("shader"),

@@ -78,6 +78,11 @@ Page {
         id: field
         objectName: "faceField"
         anchors.fill: parent
+        // Down until the core has answered. A phone with profiles on it
+        // is going straight to the chat list, and a screenful of faces
+        // drawn for the half second that takes reads as the app opening
+        // in the wrong place and then correcting itself.
+        visible: !page.probing
         source: page.width > page.height ? "../art/faces-landscape.png"
                                          : "../art/faces-portrait.png"
         // Fainter than the component's own default. The field is the

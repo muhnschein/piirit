@@ -1093,6 +1093,18 @@
         <source>Take the profile over</source>
         <translation>Ta över profilen</translation>
     </message>
+    <message>
+        <source>That did not work</source>
+        <translation>Det gick inte</translation>
+    </message>
+    <message>
+        <source>Try the code again</source>
+        <translation>Försök med koden igen</translation>
+    </message>
+    <message>
+        <source>Choose another file</source>
+        <translation>Välj en annan fil</translation>
+    </message>
 </context>
 <context>
     <name>ScanView</name>
@@ -1177,10 +1189,6 @@
     <message>
         <source>Messages</source>
         <translation>Meddelanden</translation>
-    </message>
-    <message>
-        <source>Markdown</source>
-        <translation>Markdown</translation>
     </message>
     <message>
         <source>Auto-download attachments</source>
@@ -1282,11 +1290,15 @@
         <translation>Enter skickar meddelandet</translation>
     </message>
     <message>
-        <source>Off, the return key starts a new line, the message field grows with what is written, and the send button sends.</source>
-        <translation>Avstängt börjar Enter-tangenten en ny rad, meddelandefältet växer med det skrivna och skicka-knappen skickar.</translation>
+        <source>When on, the return key sends. When off, it starts a new line, the message field grows with what is written, and the send button sends.</source>
+        <translation>På skickar Enter-tangenten. Av börjar den en ny rad, meddelandefältet växer med det skrivna och skicka-knappen skickar.</translation>
     </message>
     <message>
-        <source>On, a message written with *stars* and `backticks` is shown with the bold, the italics and the links drawn. Off, it is shown exactly as it was written.</source>
+        <source>Use Markdown formatting</source>
+        <translation>Använd Markdown-formatering</translation>
+    </message>
+    <message>
+        <source>When on, a message written with *stars* and `backticks` is shown with the bold, the italics and the links drawn. When off, it is shown exactly as it was written.</source>
         <translation>På visas ett meddelande skrivet med *stjärnor* och `bakåtcitattecken` med fet stil, kursiv och länkar ritade. Av visas det precis som det skrevs.</translation>
     </message>
 </context>

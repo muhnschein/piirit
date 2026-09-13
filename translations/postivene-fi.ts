@@ -1093,6 +1093,18 @@
         <source>Take the profile over</source>
         <translation>Ota profiili vastaan</translation>
     </message>
+    <message>
+        <source>That did not work</source>
+        <translation>Se ei onnistunut</translation>
+    </message>
+    <message>
+        <source>Try the code again</source>
+        <translation>Yritä koodia uudelleen</translation>
+    </message>
+    <message>
+        <source>Choose another file</source>
+        <translation>Valitse toinen tiedosto</translation>
+    </message>
 </context>
 <context>
     <name>ScanView</name>
@@ -1177,10 +1189,6 @@
     <message>
         <source>Messages</source>
         <translation>Viestit</translation>
-    </message>
-    <message>
-        <source>Markdown</source>
-        <translation>Markdown</translation>
     </message>
     <message>
         <source>Auto-download attachments</source>
@@ -1282,11 +1290,15 @@
         <translation>Enter lähettää viestin</translation>
     </message>
     <message>
-        <source>Off, the return key starts a new line, the message field grows with what is written, and the send button sends.</source>
-        <translation>Pois päältä Enter aloittaa uuden rivin, viestikenttä kasvaa kirjoitetun mukana ja lähetyspainike lähettää.</translation>
+        <source>When on, the return key sends. When off, it starts a new line, the message field grows with what is written, and the send button sends.</source>
+        <translation>Päällä Enter-näppäin lähettää. Pois päältä se aloittaa uuden rivin, viestikenttä kasvaa kirjoitetun mukana ja lähettää lähetyspainike.</translation>
     </message>
     <message>
-        <source>On, a message written with *stars* and `backticks` is shown with the bold, the italics and the links drawn. Off, it is shown exactly as it was written.</source>
+        <source>Use Markdown formatting</source>
+        <translation>Käytä Markdown-muotoilua</translation>
+    </message>
+    <message>
+        <source>When on, a message written with *stars* and `backticks` is shown with the bold, the italics and the links drawn. When off, it is shown exactly as it was written.</source>
         <translation>Päällä *tähdillä* ja `gravismerkeillä` kirjoitettu viesti näytetään lihavointi, kursiivi ja linkit muotoiltuina. Pois päältä se näytetään täsmälleen kuten se kirjoitettiin.</translation>
     </message>
 </context>

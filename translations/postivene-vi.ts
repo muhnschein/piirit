@@ -1088,6 +1088,18 @@
         <source>Take the profile over</source>
         <translation>Nhận hồ sơ</translation>
     </message>
+    <message>
+        <source>That did not work</source>
+        <translation>Cách đó không được</translation>
+    </message>
+    <message>
+        <source>Try the code again</source>
+        <translation>Thử lại mã</translation>
+    </message>
+    <message>
+        <source>Choose another file</source>
+        <translation>Chọn tệp khác</translation>
+    </message>
 </context>
 <context>
     <name>ScanView</name>
@@ -1172,10 +1184,6 @@
     <message>
         <source>Messages</source>
         <translation>Tin nhắn</translation>
-    </message>
-    <message>
-        <source>Markdown</source>
-        <translation>Markdown</translation>
     </message>
     <message>
         <source>Auto-download attachments</source>
@@ -1277,11 +1285,15 @@
         <translation>Enter gửi tin nhắn</translation>
     </message>
     <message>
-        <source>Off, the return key starts a new line, the message field grows with what is written, and the send button sends.</source>
-        <translation>Khi tắt, phím Enter xuống dòng, ô tin nhắn lớn dần theo nội dung, và nút gửi sẽ gửi.</translation>
+        <source>When on, the return key sends. When off, it starts a new line, the message field grows with what is written, and the send button sends.</source>
+        <translation>Bật thì phím Enter gửi. Tắt thì phím này xuống dòng, ô tin nhắn giãn ra theo nội dung, và nút gửi mới gửi.</translation>
     </message>
     <message>
-        <source>On, a message written with *stars* and `backticks` is shown with the bold, the italics and the links drawn. Off, it is shown exactly as it was written.</source>
+        <source>Use Markdown formatting</source>
+        <translation>Dùng định dạng Markdown</translation>
+    </message>
+    <message>
+        <source>When on, a message written with *stars* and `backticks` is shown with the bold, the italics and the links drawn. When off, it is shown exactly as it was written.</source>
         <translation>Bật thì tin nhắn viết bằng *dấu sao* và `dấu huyền ngược` được hiện với chữ đậm, chữ nghiêng và liên kết đã định dạng. Tắt thì hiện đúng như đã viết.</translation>
     </message>
 </context>

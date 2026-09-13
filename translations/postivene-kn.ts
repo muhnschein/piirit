@@ -1093,6 +1093,18 @@
         <source>Take the profile over</source>
         <translation>ಪ್ರೊಫೈಲ್ ಪಡೆಯಿರಿ</translation>
     </message>
+    <message>
+        <source>That did not work</source>
+        <translation>ಅದು ಕೆಲಸ ಮಾಡಲಿಲ್ಲ</translation>
+    </message>
+    <message>
+        <source>Try the code again</source>
+        <translation>ಕೋಡ್ ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ</translation>
+    </message>
+    <message>
+        <source>Choose another file</source>
+        <translation>ಬೇರೆ ಕಡತ ಆರಿಸಿ</translation>
+    </message>
 </context>
 <context>
     <name>ScanView</name>
@@ -1177,10 +1189,6 @@
     <message>
         <source>Messages</source>
         <translation>ಸಂದೇಶಗಳು</translation>
-    </message>
-    <message>
-        <source>Markdown</source>
-        <translation>Markdown</translation>
     </message>
     <message>
         <source>Auto-download attachments</source>
@@ -1282,11 +1290,15 @@
         <translation>Enter ಸಂದೇಶವನ್ನು ಕಳುಹಿಸುತ್ತದೆ</translation>
     </message>
     <message>
-        <source>Off, the return key starts a new line, the message field grows with what is written, and the send button sends.</source>
-        <translation>ಆಫ್ ಆಗಿದ್ದಾಗ Enter ಕೀ ಹೊಸ ಸಾಲನ್ನು ಪ್ರಾರಂಭಿಸುತ್ತದೆ, ಸಂದೇಶ ಕ್ಷೇತ್ರ ಬರೆದಂತೆ ಬೆಳೆಯುತ್ತದೆ ಮತ್ತು ಕಳುಹಿಸು ಬಟನ್ ಕಳುಹಿಸುತ್ತದೆ.</translation>
+        <source>When on, the return key sends. When off, it starts a new line, the message field grows with what is written, and the send button sends.</source>
+        <translation>ಆನ್ ಆಗಿದ್ದರೆ ಎಂಟರ್ ಕೀ ಕಳುಹಿಸುತ್ತದೆ. ಆಫ್ ಆಗಿದ್ದರೆ ಅದು ಹೊಸ ಸಾಲು ಪ್ರಾರಂಭಿಸುತ್ತದೆ, ಸಂದೇಶದ ಕ್ಷೇತ್ರ ಬರೆದಂತೆ ಬೆಳೆಯುತ್ತದೆ, ಮತ್ತು ಕಳುಹಿಸುವ ಗುಂಡಿ ಕಳುಹಿಸುತ್ತದೆ.</translation>
     </message>
     <message>
-        <source>On, a message written with *stars* and `backticks` is shown with the bold, the italics and the links drawn. Off, it is shown exactly as it was written.</source>
+        <source>Use Markdown formatting</source>
+        <translation>ಮಾರ್ಕ್‌ಡೌನ್ ಸ್ವರೂಪ ಬಳಸಿ</translation>
+    </message>
+    <message>
+        <source>When on, a message written with *stars* and `backticks` is shown with the bold, the italics and the links drawn. When off, it is shown exactly as it was written.</source>
         <translation>ಆನ್ ಆಗಿದ್ದರೆ *ನಕ್ಷತ್ರ* ಮತ್ತು `ಬ್ಯಾಕ್‌ಟಿಕ್` ಬಳಸಿ ಬರೆದ ಸಂದೇಶವನ್ನು ದಪ್ಪ, ಓರೆ ಮತ್ತು ಲಿಂಕ್‌ಗಳನ್ನು ಅಲಂಕರಿಸಿ ತೋರಿಸಲಾಗುತ್ತದೆ. ಆಫ್ ಆಗಿದ್ದರೆ ಬರೆದಂತೆಯೇ ತೋರಿಸಲಾಗುತ್ತದೆ.</translation>
     </message>
 </context>

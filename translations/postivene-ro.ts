@@ -1098,6 +1098,18 @@
         <source>Take the profile over</source>
         <translation>Preia profilul</translation>
     </message>
+    <message>
+        <source>That did not work</source>
+        <translation>Nu a mers</translation>
+    </message>
+    <message>
+        <source>Try the code again</source>
+        <translation>Încearcă din nou codul</translation>
+    </message>
+    <message>
+        <source>Choose another file</source>
+        <translation>Alege alt fișier</translation>
+    </message>
 </context>
 <context>
     <name>ScanView</name>
@@ -1182,10 +1194,6 @@
     <message>
         <source>Messages</source>
         <translation>Mesaje</translation>
-    </message>
-    <message>
-        <source>Markdown</source>
-        <translation>Markdown</translation>
     </message>
     <message>
         <source>Auto-download attachments</source>
@@ -1287,11 +1295,15 @@
         <translation>Enter trimite mesajul</translation>
     </message>
     <message>
-        <source>Off, the return key starts a new line, the message field grows with what is written, and the send button sends.</source>
-        <translation>Dezactivat, tasta Enter începe un rând nou, câmpul mesajului crește cu ce se scrie, iar butonul de trimitere trimite.</translation>
+        <source>When on, the return key sends. When off, it starts a new line, the message field grows with what is written, and the send button sends.</source>
+        <translation>Pornit, tasta Enter trimite. Oprit, începe un rând nou, câmpul mesajului crește cu ce se scrie, iar butonul de trimitere trimite.</translation>
     </message>
     <message>
-        <source>On, a message written with *stars* and `backticks` is shown with the bold, the italics and the links drawn. Off, it is shown exactly as it was written.</source>
+        <source>Use Markdown formatting</source>
+        <translation>Folosește formatarea Markdown</translation>
+    </message>
+    <message>
+        <source>When on, a message written with *stars* and `backticks` is shown with the bold, the italics and the links drawn. When off, it is shown exactly as it was written.</source>
         <translation>Pornit, un mesaj scris cu *asteriscuri* și `accente grave` este afișat cu aldinele, cursivele și linkurile formatate. Oprit, este afișat exact așa cum a fost scris.</translation>
     </message>
 </context>

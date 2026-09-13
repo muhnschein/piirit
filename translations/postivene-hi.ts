@@ -1093,6 +1093,18 @@
         <source>Take the profile over</source>
         <translation>प्रोफ़ाइल लें</translation>
     </message>
+    <message>
+        <source>That did not work</source>
+        <translation>यह काम नहीं आया</translation>
+    </message>
+    <message>
+        <source>Try the code again</source>
+        <translation>कोड फिर से आज़माएँ</translation>
+    </message>
+    <message>
+        <source>Choose another file</source>
+        <translation>दूसरी फ़ाइल चुनें</translation>
+    </message>
 </context>
 <context>
     <name>ScanView</name>
@@ -1177,10 +1189,6 @@
     <message>
         <source>Messages</source>
         <translation>संदेश</translation>
-    </message>
-    <message>
-        <source>Markdown</source>
-        <translation>Markdown</translation>
     </message>
     <message>
         <source>Auto-download attachments</source>
@@ -1282,11 +1290,15 @@
         <translation>Enter संदेश भेजता है</translation>
     </message>
     <message>
-        <source>Off, the return key starts a new line, the message field grows with what is written, and the send button sends.</source>
-        <translation>बंद होने पर Enter कुंजी नई पंक्ति शुरू करती है, संदेश क्षेत्र लिखे हुए के साथ बढ़ता है और भेजें बटन भेजता है।</translation>
+        <source>When on, the return key sends. When off, it starts a new line, the message field grows with what is written, and the send button sends.</source>
+        <translation>चालू रहने पर एंटर कुंजी भेजती है। बंद रहने पर वह नई पंक्ति शुरू करती है, संदेश का खाना लिखे के साथ बढ़ता है, और भेजने का बटन भेजता है।</translation>
     </message>
     <message>
-        <source>On, a message written with *stars* and `backticks` is shown with the bold, the italics and the links drawn. Off, it is shown exactly as it was written.</source>
+        <source>Use Markdown formatting</source>
+        <translation>मार्कडाउन स्वरूपण का उपयोग करें</translation>
+    </message>
+    <message>
+        <source>When on, a message written with *stars* and `backticks` is shown with the bold, the italics and the links drawn. When off, it is shown exactly as it was written.</source>
         <translation>चालू रहने पर *तारांकन* और `बैकटिक` से लिखा संदेश बोल्ड, तिरछे और लिंक सजाकर दिखाया जाता है। बंद रहने पर वह जैसा लिखा गया वैसा ही दिखता है।</translation>
     </message>
 </context>

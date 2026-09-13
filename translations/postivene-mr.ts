@@ -1093,6 +1093,18 @@
         <source>Take the profile over</source>
         <translation>प्रोफाइल घ्या</translation>
     </message>
+    <message>
+        <source>That did not work</source>
+        <translation>ते जमले नाही</translation>
+    </message>
+    <message>
+        <source>Try the code again</source>
+        <translation>कोड पुन्हा वापरून पहा</translation>
+    </message>
+    <message>
+        <source>Choose another file</source>
+        <translation>दुसरी फाइल निवडा</translation>
+    </message>
 </context>
 <context>
     <name>ScanView</name>
@@ -1177,10 +1189,6 @@
     <message>
         <source>Messages</source>
         <translation>संदेश</translation>
-    </message>
-    <message>
-        <source>Markdown</source>
-        <translation>Markdown</translation>
     </message>
     <message>
         <source>Auto-download attachments</source>
@@ -1282,11 +1290,15 @@
         <translation>Enter संदेश पाठवते</translation>
     </message>
     <message>
-        <source>Off, the return key starts a new line, the message field grows with what is written, and the send button sends.</source>
-        <translation>बंद असताना Enter कळ नवीन ओळ सुरू करते, संदेश क्षेत्र लिहिल्याप्रमाणे वाढते आणि पाठवा बटण पाठवते.</translation>
+        <source>When on, the return key sends. When off, it starts a new line, the message field grows with what is written, and the send button sends.</source>
+        <translation>चालू असल्यास एंटर कळ पाठवते. बंद असल्यास ती नवीन ओळ सुरू करते, संदेशाचे क्षेत्र लिहिल्यानुसार वाढते, आणि पाठवण्याचे बटण पाठवते.</translation>
     </message>
     <message>
-        <source>On, a message written with *stars* and `backticks` is shown with the bold, the italics and the links drawn. Off, it is shown exactly as it was written.</source>
+        <source>Use Markdown formatting</source>
+        <translation>मार्कडाउन स्वरूपण वापरा</translation>
+    </message>
+    <message>
+        <source>When on, a message written with *stars* and `backticks` is shown with the bold, the italics and the links drawn. When off, it is shown exactly as it was written.</source>
         <translation>चालू असल्यास *तारका* आणि `बॅकटिक` वापरून लिहिलेला संदेश ठळक, तिरका आणि दुवे सजवून दाखवला जातो. बंद असल्यास तो जसा लिहिला तसाच दाखवला जातो.</translation>
     </message>
 </context>

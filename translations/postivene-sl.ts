@@ -1103,6 +1103,18 @@
         <source>Take the profile over</source>
         <translation>Prevzemi profil</translation>
     </message>
+    <message>
+        <source>That did not work</source>
+        <translation>To ni uspelo</translation>
+    </message>
+    <message>
+        <source>Try the code again</source>
+        <translation>Poskusi kodo znova</translation>
+    </message>
+    <message>
+        <source>Choose another file</source>
+        <translation>Izberi drugo datoteko</translation>
+    </message>
 </context>
 <context>
     <name>ScanView</name>
@@ -1187,10 +1199,6 @@
     <message>
         <source>Messages</source>
         <translation>Sporočila</translation>
-    </message>
-    <message>
-        <source>Markdown</source>
-        <translation>Markdown</translation>
     </message>
     <message>
         <source>Auto-download attachments</source>
@@ -1292,11 +1300,15 @@
         <translation>Enter pošlje sporočilo</translation>
     </message>
     <message>
-        <source>Off, the return key starts a new line, the message field grows with what is written, and the send button sends.</source>
-        <translation>Izklopljeno: tipka Enter začne novo vrstico, polje sporočila raste z napisanim, pošlje pa gumb za pošiljanje.</translation>
+        <source>When on, the return key sends. When off, it starts a new line, the message field grows with what is written, and the send button sends.</source>
+        <translation>Vklopljeno tipka Enter pošlje. Izklopljeno začne novo vrstico, polje sporočila raste z napisanim, pošlje pa gumb za pošiljanje.</translation>
     </message>
     <message>
-        <source>On, a message written with *stars* and `backticks` is shown with the bold, the italics and the links drawn. Off, it is shown exactly as it was written.</source>
+        <source>Use Markdown formatting</source>
+        <translation>Uporabi oblikovanje Markdown</translation>
+    </message>
+    <message>
+        <source>When on, a message written with *stars* and `backticks` is shown with the bold, the italics and the links drawn. When off, it is shown exactly as it was written.</source>
         <translation>Vklopljeno se sporočilo, napisano z *zvezdicami* in `krativci`, prikaže z izrisano krepko pisavo, ležečo pisavo in povezavami. Izklopljeno se prikaže natanko tako, kot je bilo napisano.</translation>
     </message>
 </context>

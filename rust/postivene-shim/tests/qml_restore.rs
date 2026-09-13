@@ -141,10 +141,20 @@ const PROBE_QML: &str = r"
             if (!host.item) { return 'no-view:' + host.status }
             return '' + host.item[property]
         }
-        // What the camera or the file browser hands the page.
+        // What the file browser hands the page.
         function begin(text) {
             if (!loader.item) { return 'no-page' }
             loader.item.begin(text)
+            return 'ok'
+        }
+        // What the camera does: the view reports the code it read and
+        // stops itself, and the page hears it through the connection
+        // the page made. Not the same as calling begin() -- stopping
+        // itself is the state a retry has to undo.
+        function scan(text) {
+            var host = findIn(loader.item, 'scanLoader')
+            if (!host || !host.item) { return 'no-view' }
+            host.item.found(text)
             return 'ok'
         }
     }
@@ -305,7 +315,7 @@ fn a_profile_that_exists_already_is_asked_after_and_brought_over() {
         record(
             &s,
             "device-begin",
-            call!("begin", "DCBACKUP2:toonew.example"),
+            call!("scan", "DCBACKUP2:toonew.example"),
         );
     });
 
@@ -313,9 +323,23 @@ fn a_profile_that_exists_already_is_asked_after_and_brought_over() {
     single_shot(Duration::from_secs(8), move || {
         record(&s, "device-busy", call!("pageProperty", "busy"));
         record(&s, "device-said", call!("pageProperty", "errorMessage"));
+        // A failure is the page, not a strip along the bottom of a
+        // viewfinder that has carried on without it.
+        record(&s, "failed-block", call!("get", "failureBlock", "visible"));
+        record(&s, "failed-scanner", call!("get", "scanArea", "visible"));
+        record(&s, "failed-retry", call!("click", "retryButton"));
     });
 
-    single_shot(Duration::from_secs(9), move || unsafe {
+    // 9s: after the retry the camera is back, and reading again rather
+    // than still holding the code it stopped itself on.
+    let s = steps.clone();
+    single_shot(Duration::from_secs(9), move || {
+        record(&s, "retried-scanner", call!("get", "scanArea", "visible"));
+        record(&s, "retried-holding", call!("viewProperty", "done"));
+        record(&s, "retried-camera", call!("get", "camera", "running"));
+    });
+
+    single_shot(Duration::from_secs(10), move || unsafe {
         (*engine_ptr).quit();
     });
 
@@ -431,6 +455,41 @@ fn assert_device_half(steps: &[(String, String)], context: &str) {
         "DCBACKUP2:...",
         "the field does not show what it is waiting for. {context}"
     );
+    assert_eq!(
+        value_of(steps, "failed-block"),
+        "true",
+        "a failed transfer is not said anywhere the reader will see it. \
+         {context}"
+    );
+    assert_eq!(
+        value_of(steps, "failed-scanner"),
+        "false",
+        "the camera came straight back over the failure, which reads as \
+         the app having carried on. {context}"
+    );
+    assert_eq!(
+        value_of(steps, "failed-retry"),
+        "ok",
+        "there is no way to have another go. {context}"
+    );
+    assert_eq!(
+        value_of(steps, "retried-scanner"),
+        "true",
+        "the retry did not bring the camera back. {context}"
+    );
+    assert_eq!(
+        value_of(steps, "retried-holding"),
+        "false",
+        "the view is still holding the code it stopped itself on, so it \
+         will never read another. {context}"
+    );
+    assert_eq!(
+        value_of(steps, "retried-camera"),
+        "true",
+        "the retry brought back a viewfinder with the camera off behind \
+         it. {context}"
+    );
+
     let hint = value_of(steps, "device-hint");
     assert!(
         hint.contains("code it shows"),

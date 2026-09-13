@@ -1098,6 +1098,18 @@
         <source>Take the profile over</source>
         <translation>Perimti profilį</translation>
     </message>
+    <message>
+        <source>That did not work</source>
+        <translation>Nepavyko</translation>
+    </message>
+    <message>
+        <source>Try the code again</source>
+        <translation>Bandyti kodą dar kartą</translation>
+    </message>
+    <message>
+        <source>Choose another file</source>
+        <translation>Pasirinkti kitą failą</translation>
+    </message>
 </context>
 <context>
     <name>ScanView</name>
@@ -1182,10 +1194,6 @@
     <message>
         <source>Messages</source>
         <translation>Žinutės</translation>
-    </message>
-    <message>
-        <source>Markdown</source>
-        <translation>Markdown</translation>
     </message>
     <message>
         <source>Auto-download attachments</source>
@@ -1287,11 +1295,15 @@
         <translation>„Enter“ siunčia žinutę</translation>
     </message>
     <message>
-        <source>Off, the return key starts a new line, the message field grows with what is written, and the send button sends.</source>
-        <translation>Išjungus „Enter“ pradeda naują eilutę, žinutės laukas auga su tuo, kas rašoma, o siunčia siuntimo mygtukas.</translation>
+        <source>When on, the return key sends. When off, it starts a new line, the message field grows with what is written, and the send button sends.</source>
+        <translation>Įjungus Enter klavišas siunčia. Išjungus jis pradeda naują eilutę, žinutės laukas auga su tekstu, o siunčia siuntimo mygtukas.</translation>
     </message>
     <message>
-        <source>On, a message written with *stars* and `backticks` is shown with the bold, the italics and the links drawn. Off, it is shown exactly as it was written.</source>
+        <source>Use Markdown formatting</source>
+        <translation>Naudoti Markdown formatavimą</translation>
+    </message>
+    <message>
+        <source>When on, a message written with *stars* and `backticks` is shown with the bold, the italics and the links drawn. When off, it is shown exactly as it was written.</source>
         <translation>Įjungus žinutė, parašyta su *žvaigždutėmis* ir `atbuliniais kableliais`, rodoma su suformatuotu pusjuodžiu, kursyvu ir nuorodomis. Išjungus rodoma lygiai taip, kaip parašyta.</translation>
     </message>
 </context>

@@ -1093,6 +1093,18 @@
         <source>Take the profile over</source>
         <translation>Trazer o perfil</translation>
     </message>
+    <message>
+        <source>That did not work</source>
+        <translation>Isso não funcionou</translation>
+    </message>
+    <message>
+        <source>Try the code again</source>
+        <translation>Tentar o código outra vez</translation>
+    </message>
+    <message>
+        <source>Choose another file</source>
+        <translation>Escolher outro ficheiro</translation>
+    </message>
 </context>
 <context>
     <name>ScanView</name>
@@ -1177,10 +1189,6 @@
     <message>
         <source>Messages</source>
         <translation>Mensagens</translation>
-    </message>
-    <message>
-        <source>Markdown</source>
-        <translation>Markdown</translation>
     </message>
     <message>
         <source>Auto-download attachments</source>
@@ -1282,11 +1290,15 @@
         <translation>Enter envia a mensagem</translation>
     </message>
     <message>
-        <source>Off, the return key starts a new line, the message field grows with what is written, and the send button sends.</source>
-        <translation>Desligado, a tecla Enter começa uma nova linha, o campo da mensagem cresce com o que é escrito e é o botão de enviar que envia.</translation>
+        <source>When on, the return key sends. When off, it starts a new line, the message field grows with what is written, and the send button sends.</source>
+        <translation>Ligado, a tecla Enter envia. Desligado, começa uma nova linha, o campo da mensagem cresce com o que é escrito e é o botão de enviar que envia.</translation>
     </message>
     <message>
-        <source>On, a message written with *stars* and `backticks` is shown with the bold, the italics and the links drawn. Off, it is shown exactly as it was written.</source>
+        <source>Use Markdown formatting</source>
+        <translation>Usar formatação Markdown</translation>
+    </message>
+    <message>
+        <source>When on, a message written with *stars* and `backticks` is shown with the bold, the italics and the links drawn. When off, it is shown exactly as it was written.</source>
         <translation>Ligado, uma mensagem escrita com *asteriscos* e `plicas invertidas` é mostrada com o negrito, o itálico e as ligações formatados. Desligado, é mostrada tal como foi escrita.</translation>
     </message>
 </context>

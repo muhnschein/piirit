@@ -1098,6 +1098,18 @@
         <source>Take the profile over</source>
         <translation>Przejmij profil</translation>
     </message>
+    <message>
+        <source>That did not work</source>
+        <translation>Nie udało się</translation>
+    </message>
+    <message>
+        <source>Try the code again</source>
+        <translation>Spróbuj kodu ponownie</translation>
+    </message>
+    <message>
+        <source>Choose another file</source>
+        <translation>Wybierz inny plik</translation>
+    </message>
 </context>
 <context>
     <name>ScanView</name>
@@ -1182,10 +1194,6 @@
     <message>
         <source>Messages</source>
         <translation>Wiadomości</translation>
-    </message>
-    <message>
-        <source>Markdown</source>
-        <translation>Markdown</translation>
     </message>
     <message>
         <source>Auto-download attachments</source>
@@ -1287,11 +1295,15 @@
         <translation>Enter wysyła wiadomość</translation>
     </message>
     <message>
-        <source>Off, the return key starts a new line, the message field grows with what is written, and the send button sends.</source>
-        <translation>Gdy wyłączone, klawisz Enter zaczyna nowy wiersz, pole wiadomości rośnie wraz z tekstem, a wysyła przycisk wysyłania.</translation>
+        <source>When on, the return key sends. When off, it starts a new line, the message field grows with what is written, and the send button sends.</source>
+        <translation>Gdy włączone, klawisz Enter wysyła. Gdy wyłączone, zaczyna nowy wiersz, pole wiadomości rośnie wraz z tekstem, a wysyła przycisk wysyłania.</translation>
     </message>
     <message>
-        <source>On, a message written with *stars* and `backticks` is shown with the bold, the italics and the links drawn. Off, it is shown exactly as it was written.</source>
+        <source>Use Markdown formatting</source>
+        <translation>Używaj formatowania Markdown</translation>
+    </message>
+    <message>
+        <source>When on, a message written with *stars* and `backticks` is shown with the bold, the italics and the links drawn. When off, it is shown exactly as it was written.</source>
         <translation>Włączone, wiadomość napisana *gwiazdkami* i `grawisami` jest pokazywana ze sformatowanym pogrubieniem, kursywą i linkami. Wyłączone, jest pokazywana dokładnie tak, jak ją napisano.</translation>
     </message>
 </context>

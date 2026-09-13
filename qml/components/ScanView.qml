@@ -60,7 +60,11 @@ Item {
     /// hold the phone up to it.
     property bool typing: false
 
-    /// The line under the viewfinder saying what to point it at. The
+    /// How far below the top of the view the line sits, for a host that
+    /// has its own words up there already.
+    property real hintTopMargin: 0
+
+    /// The line saying what to point the camera at. The
     /// host's words, because what a code means is the host's: an invite
     /// on the QR page, the other phone's offer of a profile on the
     /// take-over page.
@@ -324,15 +328,15 @@ Item {
     /// that the app is looking, not how hard.
     property int framesTried: 0
 
-    // Beside the line at the foot, so a reader holding the phone still
-    // can see that something is happening. A code that reads at once
-    // never gives it time to matter; one that does not is exactly when
-    // it does.
+    // Beside the line, inside the page margin rather than anchored off
+    // the end of it: anchored to the line's own left edge, it hung half
+    // off the side of the screen.
     BusyIndicator {
+        id: looking
         objectName: "looking"
         anchors {
-            right: hint.left
-            rightMargin: Theme.paddingMedium
+            left: parent.left
+            leftMargin: Theme.horizontalPageMargin
             verticalCenter: hint.verticalCenter
         }
         running: root.active && !root.done && root.framesTried > 0
@@ -348,8 +352,8 @@ Item {
         visible: root.offerLink && !root.typing && !root.done
         anchors {
             horizontalCenter: parent.horizontalCenter
-            bottom: hint.top
-            bottomMargin: Theme.paddingMedium
+            bottom: parent.bottom
+            bottomMargin: Theme.paddingLarge
         }
         text: root.linkButtonText
         onClicked: root.typeLink()
@@ -362,7 +366,8 @@ Item {
         anchors {
             left: parent.left
             right: parent.right
-            bottom: hint.top
+            bottom: parent.bottom
+            bottomMargin: Theme.paddingLarge
         }
         spacing: Theme.paddingSmall
 
@@ -399,16 +404,20 @@ Item {
         }
     }
 
+    // At the top rather than the foot: the phone is held up, the code
+    // is in the middle of the picture, and the words about it belong
+    // where the eye already is rather than down by the hand.
     Label {
         id: hint
         objectName: "hint"
         anchors {
-            left: parent.left
+            left: looking.right
+            leftMargin: Theme.paddingMedium
             right: parent.right
-            bottom: parent.bottom
-            margins: Theme.horizontalPageMargin
+            rightMargin: Theme.horizontalPageMargin
+            top: parent.top
+            topMargin: root.hintTopMargin + Theme.paddingMedium
         }
-        horizontalAlignment: Text.AlignHCenter
         wrapMode: Text.Wrap
         color: Theme.secondaryHighlightColor
         visible: !root.done

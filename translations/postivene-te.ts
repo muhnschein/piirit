@@ -1093,6 +1093,18 @@
         <source>Take the profile over</source>
         <translation>ప్రొఫైల్ తీసుకో</translation>
     </message>
+    <message>
+        <source>That did not work</source>
+        <translation>అది పని చేయలేదు</translation>
+    </message>
+    <message>
+        <source>Try the code again</source>
+        <translation>కోడ్‌ను మళ్ళీ ప్రయత్నించు</translation>
+    </message>
+    <message>
+        <source>Choose another file</source>
+        <translation>మరో ఫైల్‌ను ఎంచుకో</translation>
+    </message>
 </context>
 <context>
     <name>ScanView</name>
@@ -1177,10 +1189,6 @@
     <message>
         <source>Messages</source>
         <translation>సందేశాలు</translation>
-    </message>
-    <message>
-        <source>Markdown</source>
-        <translation>Markdown</translation>
     </message>
     <message>
         <source>Auto-download attachments</source>
@@ -1282,11 +1290,15 @@
         <translation>Enter సందేశాన్ని పంపుతుంది</translation>
     </message>
     <message>
-        <source>Off, the return key starts a new line, the message field grows with what is written, and the send button sends.</source>
-        <translation>ఆఫ్‌లో ఉంటే Enter కీ కొత్త పంక్తిని మొదలుపెడుతుంది, సందేశ ఫీల్డ్ రాసినదానితో పెరుగుతుంది, పంపు బటన్ పంపుతుంది.</translation>
+        <source>When on, the return key sends. When off, it starts a new line, the message field grows with what is written, and the send button sends.</source>
+        <translation>ఆన్ ఉంటే ఎంటర్ కీ పంపుతుంది. ఆఫ్ ఉంటే అది కొత్త పంక్తిని మొదలుపెడుతుంది, సందేశ క్షేత్రం రాసినదానితో పెరుగుతుంది, పంపే బొత్తాం పంపుతుంది.</translation>
     </message>
     <message>
-        <source>On, a message written with *stars* and `backticks` is shown with the bold, the italics and the links drawn. Off, it is shown exactly as it was written.</source>
+        <source>Use Markdown formatting</source>
+        <translation>మార్క్‌డౌన్ ఆకృతీకరణ వాడు</translation>
+    </message>
+    <message>
+        <source>When on, a message written with *stars* and `backticks` is shown with the bold, the italics and the links drawn. When off, it is shown exactly as it was written.</source>
         <translation>ఆన్ ఉంటే *నక్షత్రాలు* మరియు `బ్యాక్‌టిక్‌`లతో రాసిన సందేశం బోల్డ్, ఇటాలిక్, లింక్‌లు అలంకరించి చూపబడుతుంది. ఆఫ్ ఉంటే రాసినట్లుగానే చూపబడుతుంది.</translation>
     </message>
 </context>

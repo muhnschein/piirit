@@ -1093,6 +1093,18 @@
         <source>Take the profile over</source>
         <translation>Võta profiil üle</translation>
     </message>
+    <message>
+        <source>That did not work</source>
+        <translation>See ei õnnestunud</translation>
+    </message>
+    <message>
+        <source>Try the code again</source>
+        <translation>Proovi koodi uuesti</translation>
+    </message>
+    <message>
+        <source>Choose another file</source>
+        <translation>Vali teine fail</translation>
+    </message>
 </context>
 <context>
     <name>ScanView</name>
@@ -1177,10 +1189,6 @@
     <message>
         <source>Messages</source>
         <translation>Sõnumid</translation>
-    </message>
-    <message>
-        <source>Markdown</source>
-        <translation>Markdown</translation>
     </message>
     <message>
         <source>Auto-download attachments</source>
@@ -1282,11 +1290,15 @@
         <translation>Enter saadab sõnumi</translation>
     </message>
     <message>
-        <source>Off, the return key starts a new line, the message field grows with what is written, and the send button sends.</source>
-        <translation>Väljalülitatuna alustab Enter uue rea, sõnumiväli kasvab kirjutatuga ja saadab saatmisnupp.</translation>
+        <source>When on, the return key sends. When off, it starts a new line, the message field grows with what is written, and the send button sends.</source>
+        <translation>Sees saadab Enter-klahv. Väljas alustab see uut rida, sõnumiväli kasvab kirjutatuga ja saadab saatmisnupp.</translation>
     </message>
     <message>
-        <source>On, a message written with *stars* and `backticks` is shown with the bold, the italics and the links drawn. Off, it is shown exactly as it was written.</source>
+        <source>Use Markdown formatting</source>
+        <translation>Kasuta Markdowni vormindust</translation>
+    </message>
+    <message>
+        <source>When on, a message written with *stars* and `backticks` is shown with the bold, the italics and the links drawn. When off, it is shown exactly as it was written.</source>
         <translation>Sees kuvatakse *tärnide* ja `tagurpidi ülakomadega` kirjutatud sõnum vormindatud rasvase kirja, kaldkirja ja linkidega. Väljas kuvatakse see täpselt nii, nagu see kirjutati.</translation>
     </message>
 </context>

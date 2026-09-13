@@ -1093,6 +1093,18 @@
         <source>Take the profile over</source>
         <translation>Profiel overnemen</translation>
     </message>
+    <message>
+        <source>That did not work</source>
+        <translation>Dat is niet gelukt</translation>
+    </message>
+    <message>
+        <source>Try the code again</source>
+        <translation>Code opnieuw proberen</translation>
+    </message>
+    <message>
+        <source>Choose another file</source>
+        <translation>Ander bestand kiezen</translation>
+    </message>
 </context>
 <context>
     <name>ScanView</name>
@@ -1177,10 +1189,6 @@
     <message>
         <source>Messages</source>
         <translation>Berichten</translation>
-    </message>
-    <message>
-        <source>Markdown</source>
-        <translation>Markdown</translation>
     </message>
     <message>
         <source>Auto-download attachments</source>
@@ -1282,11 +1290,15 @@
         <translation>Enter verstuurt het bericht</translation>
     </message>
     <message>
-        <source>Off, the return key starts a new line, the message field grows with what is written, and the send button sends.</source>
-        <translation>Uit: de Enter-toets begint een nieuwe regel, het berichtveld groeit met wat er staat, en de verzendknop verstuurt.</translation>
+        <source>When on, the return key sends. When off, it starts a new line, the message field grows with what is written, and the send button sends.</source>
+        <translation>Aan verstuurt de Enter-toets. Uit begint die een nieuwe regel, het berichtveld groeit met wat er staat, en de verzendknop verstuurt.</translation>
     </message>
     <message>
-        <source>On, a message written with *stars* and `backticks` is shown with the bold, the italics and the links drawn. Off, it is shown exactly as it was written.</source>
+        <source>Use Markdown formatting</source>
+        <translation>Markdown-opmaak gebruiken</translation>
+    </message>
+    <message>
+        <source>When on, a message written with *stars* and `backticks` is shown with the bold, the italics and the links drawn. When off, it is shown exactly as it was written.</source>
         <translation>Aan wordt een bericht geschreven met *sterretjes* en `backticks` getoond met vet, cursief en links opgemaakt. Uit wordt het precies zo getoond als het geschreven is.</translation>
     </message>
 </context>

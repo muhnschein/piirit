@@ -1088,6 +1088,18 @@
         <source>Take the profile over</source>
         <translation>接收個人檔案</translation>
     </message>
+    <message>
+        <source>That did not work</source>
+        <translation>今次不成功</translation>
+    </message>
+    <message>
+        <source>Try the code again</source>
+        <translation>再試一次代碼</translation>
+    </message>
+    <message>
+        <source>Choose another file</source>
+        <translation>選擇另一個檔案</translation>
+    </message>
 </context>
 <context>
     <name>ScanView</name>
@@ -1172,10 +1184,6 @@
     <message>
         <source>Messages</source>
         <translation>訊息</translation>
-    </message>
-    <message>
-        <source>Markdown</source>
-        <translation>Markdown</translation>
     </message>
     <message>
         <source>Auto-download attachments</source>
@@ -1277,11 +1285,15 @@
         <translation>Enter 鍵傳送訊息</translation>
     </message>
     <message>
-        <source>Off, the return key starts a new line, the message field grows with what is written, and the send button sends.</source>
-        <translation>關閉時，Enter 鍵換行，訊息輸入框隨內容加高，由傳送按鈕傳送。</translation>
+        <source>When on, the return key sends. When off, it starts a new line, the message field grows with what is written, and the send button sends.</source>
+        <translation>開啟時，Enter 鍵傳送。關閉時，Enter 換行，訊息框隨內容變高，由傳送按鈕傳送。</translation>
     </message>
     <message>
-        <source>On, a message written with *stars* and `backticks` is shown with the bold, the italics and the links drawn. Off, it is shown exactly as it was written.</source>
+        <source>Use Markdown formatting</source>
+        <translation>使用 Markdown 格式</translation>
+    </message>
+    <message>
+        <source>When on, a message written with *stars* and `backticks` is shown with the bold, the italics and the links drawn. When off, it is shown exactly as it was written.</source>
         <translation>開啟時，用 *星號* 和 `反引號` 寫的訊息會呈現粗體、斜體和連結。關閉時，完全照原樣顯示。</translation>
     </message>
 </context>

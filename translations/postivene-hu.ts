@@ -1088,6 +1088,18 @@
         <source>Take the profile over</source>
         <translation>A profil átvétele</translation>
     </message>
+    <message>
+        <source>That did not work</source>
+        <translation>Ez nem sikerült</translation>
+    </message>
+    <message>
+        <source>Try the code again</source>
+        <translation>A kód újbóli megkísérlése</translation>
+    </message>
+    <message>
+        <source>Choose another file</source>
+        <translation>Másik fájl választása</translation>
+    </message>
 </context>
 <context>
     <name>ScanView</name>
@@ -1172,10 +1184,6 @@
     <message>
         <source>Messages</source>
         <translation>Üzenetek</translation>
-    </message>
-    <message>
-        <source>Markdown</source>
-        <translation>Markdown</translation>
     </message>
     <message>
         <source>Auto-download attachments</source>
@@ -1277,11 +1285,15 @@
         <translation>Az Enter elküldi az üzenetet</translation>
     </message>
     <message>
-        <source>Off, the return key starts a new line, the message field grows with what is written, and the send button sends.</source>
-        <translation>Kikapcsolva az Enter új sort kezd, az üzenetmező a beírt szöveggel nő, és a küldés gomb küld.</translation>
+        <source>When on, the return key sends. When off, it starts a new line, the message field grows with what is written, and the send button sends.</source>
+        <translation>Bekapcsolva az Enter billentyű küld. Kikapcsolva új sort kezd, az üzenetmező a leírtakkal nő, és a küldés gomb küld.</translation>
     </message>
     <message>
-        <source>On, a message written with *stars* and `backticks` is shown with the bold, the italics and the links drawn. Off, it is shown exactly as it was written.</source>
+        <source>Use Markdown formatting</source>
+        <translation>Markdown-formázás használata</translation>
+    </message>
+    <message>
+        <source>When on, a message written with *stars* and `backticks` is shown with the bold, the italics and the links drawn. When off, it is shown exactly as it was written.</source>
         <translation>Bekapcsolva a *csillagokkal* és `visszafelé dőlő idézőjelekkel` írt üzenet félkövéren, dőlten és hivatkozásokkal megjelenítve látszik. Kikapcsolva pontosan úgy, ahogy írták.</translation>
     </message>
 </context>

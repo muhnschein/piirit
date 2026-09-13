@@ -1098,6 +1098,18 @@
         <source>Take the profile over</source>
         <translation>Перенести профіль</translation>
     </message>
+    <message>
+        <source>That did not work</source>
+        <translation>Не вийшло</translation>
+    </message>
+    <message>
+        <source>Try the code again</source>
+        <translation>Спробувати код ще раз</translation>
+    </message>
+    <message>
+        <source>Choose another file</source>
+        <translation>Вибрати інший файл</translation>
+    </message>
 </context>
 <context>
     <name>ScanView</name>
@@ -1182,10 +1194,6 @@
     <message>
         <source>Messages</source>
         <translation>Повідомлення</translation>
-    </message>
-    <message>
-        <source>Markdown</source>
-        <translation>Markdown</translation>
     </message>
     <message>
         <source>Auto-download attachments</source>
@@ -1287,11 +1295,15 @@
         <translation>Enter надсилає повідомлення</translation>
     </message>
     <message>
-        <source>Off, the return key starts a new line, the message field grows with what is written, and the send button sends.</source>
-        <translation>Вимкнено: клавіша Enter починає новий рядок, поле повідомлення росте з написаним, а надсилає кнопка надсилання.</translation>
+        <source>When on, the return key sends. When off, it starts a new line, the message field grows with what is written, and the send button sends.</source>
+        <translation>Увімкнено — клавіша Enter надсилає. Вимкнено — вона починає новий рядок, поле повідомлення росте з написаним, а надсилає кнопка надсилання.</translation>
     </message>
     <message>
-        <source>On, a message written with *stars* and `backticks` is shown with the bold, the italics and the links drawn. Off, it is shown exactly as it was written.</source>
+        <source>Use Markdown formatting</source>
+        <translation>Використовувати розмітку Markdown</translation>
+    </message>
+    <message>
+        <source>When on, a message written with *stars* and `backticks` is shown with the bold, the italics and the links drawn. When off, it is shown exactly as it was written.</source>
         <translation>Увімкнено — повідомлення, написане *зірочками* та `зворотними апострофами`, показується з оформленим жирним, курсивом і посиланнями. Вимкнено — показується точно так, як написано.</translation>
     </message>
 </context>

@@ -1093,6 +1093,18 @@
         <source>Take the profile over</source>
         <translation>ਪ੍ਰੋਫ਼ਾਈਲ ਲਵੋ</translation>
     </message>
+    <message>
+        <source>That did not work</source>
+        <translation>ਇਹ ਕੰਮ ਨਹੀਂ ਆਇਆ</translation>
+    </message>
+    <message>
+        <source>Try the code again</source>
+        <translation>ਕੋਡ ਮੁੜ ਅਜ਼ਮਾਓ</translation>
+    </message>
+    <message>
+        <source>Choose another file</source>
+        <translation>ਹੋਰ ਫ਼ਾਈਲ ਚੁਣੋ</translation>
+    </message>
 </context>
 <context>
     <name>ScanView</name>
@@ -1177,10 +1189,6 @@
     <message>
         <source>Messages</source>
         <translation>ਸੁਨੇਹੇ</translation>
-    </message>
-    <message>
-        <source>Markdown</source>
-        <translation>Markdown</translation>
     </message>
     <message>
         <source>Auto-download attachments</source>
@@ -1282,11 +1290,15 @@
         <translation>Enter ਸੁਨੇਹਾ ਭੇਜਦਾ ਹੈ</translation>
     </message>
     <message>
-        <source>Off, the return key starts a new line, the message field grows with what is written, and the send button sends.</source>
-        <translation>ਬੰਦ ਹੋਣ &apos;ਤੇ Enter ਕੁੰਜੀ ਨਵੀਂ ਲਾਈਨ ਸ਼ੁਰੂ ਕਰਦੀ ਹੈ, ਸੁਨੇਹਾ ਖੇਤਰ ਲਿਖੇ ਨਾਲ ਵਧਦਾ ਹੈ ਅਤੇ ਭੇਜੋ ਬਟਨ ਭੇਜਦਾ ਹੈ।</translation>
+        <source>When on, the return key sends. When off, it starts a new line, the message field grows with what is written, and the send button sends.</source>
+        <translation>ਚਾਲੂ ਹੋਵੇ ਤਾਂ ਐਂਟਰ ਸਵਿੱਚ ਭੇਜਦੀ ਹੈ। ਬੰਦ ਹੋਵੇ ਤਾਂ ਉਹ ਨਵੀਂ ਲਾਈਨ ਸ਼ੁਰੂ ਕਰਦੀ ਹੈ, ਸੁਨੇਹੇ ਦਾ ਖਾਨਾ ਲਿਖੇ ਨਾਲ ਵਧਦਾ ਹੈ, ਅਤੇ ਭੇਜਣ ਵਾਲਾ ਬਟਨ ਭੇਜਦਾ ਹੈ।</translation>
     </message>
     <message>
-        <source>On, a message written with *stars* and `backticks` is shown with the bold, the italics and the links drawn. Off, it is shown exactly as it was written.</source>
+        <source>Use Markdown formatting</source>
+        <translation>ਮਾਰਕਡਾਊਨ ਫਾਰਮੈਟਿੰਗ ਵਰਤੋ</translation>
+    </message>
+    <message>
+        <source>When on, a message written with *stars* and `backticks` is shown with the bold, the italics and the links drawn. When off, it is shown exactly as it was written.</source>
         <translation>ਚਾਲੂ ਹੋਵੇ ਤਾਂ *ਤਾਰਿਆਂ* ਅਤੇ `ਬੈਕਟਿਕ` ਨਾਲ ਲਿਖਿਆ ਸੁਨੇਹਾ ਗੂੜ੍ਹਾ, ਤਿਰਛਾ ਅਤੇ ਲਿੰਕ ਸਜਾ ਕੇ ਦਿਸਦਾ ਹੈ। ਬੰਦ ਹੋਵੇ ਤਾਂ ਜਿਵੇਂ ਲਿਖਿਆ ਹੈ ਉਵੇਂ ਹੀ ਦਿਸਦਾ ਹੈ।</translation>
     </message>
 </context>

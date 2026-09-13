@@ -1093,6 +1093,18 @@
         <source>Take the profile over</source>
         <translation>പ്രൊഫൈൽ ഏറ്റെടുക്കുക</translation>
     </message>
+    <message>
+        <source>That did not work</source>
+        <translation>അത് വിജയിച്ചില്ല</translation>
+    </message>
+    <message>
+        <source>Try the code again</source>
+        <translation>കോഡ് വീണ്ടും ശ്രമിക്കുക</translation>
+    </message>
+    <message>
+        <source>Choose another file</source>
+        <translation>മറ്റൊരു ഫയൽ തിരഞ്ഞെടുക്കുക</translation>
+    </message>
 </context>
 <context>
     <name>ScanView</name>
@@ -1177,10 +1189,6 @@
     <message>
         <source>Messages</source>
         <translation>സന്ദേശങ്ങൾ</translation>
-    </message>
-    <message>
-        <source>Markdown</source>
-        <translation>Markdown</translation>
     </message>
     <message>
         <source>Auto-download attachments</source>
@@ -1282,11 +1290,15 @@
         <translation>Enter സന്ദേശം അയയ്ക്കുന്നു</translation>
     </message>
     <message>
-        <source>Off, the return key starts a new line, the message field grows with what is written, and the send button sends.</source>
-        <translation>ഓഫായിരിക്കുമ്പോൾ Enter കീ പുതിയ വരി തുടങ്ങുന്നു, സന്ദേശ ഫീൽഡ് എഴുതുന്നതിനൊപ്പം വളരുന്നു, അയയ്ക്കുന്നത് അയയ്ക്കുക ബട്ടണാണ്.</translation>
+        <source>When on, the return key sends. When off, it starts a new line, the message field grows with what is written, and the send button sends.</source>
+        <translation>ഓൺ ആണെങ്കിൽ എന്റർ കീ അയയ്ക്കും. ഓഫ് ആണെങ്കിൽ അത് പുതിയ വരി തുടങ്ങും, സന്ദേശ കളം എഴുതുന്നതിനൊപ്പം വളരും, അയയ്ക്കൽ ബട്ടൺ അയയ്ക്കും.</translation>
     </message>
     <message>
-        <source>On, a message written with *stars* and `backticks` is shown with the bold, the italics and the links drawn. Off, it is shown exactly as it was written.</source>
+        <source>Use Markdown formatting</source>
+        <translation>മാർക്ക്ഡൗൺ രൂപപ്പെടുത്തൽ ഉപയോഗിക്കുക</translation>
+    </message>
+    <message>
+        <source>When on, a message written with *stars* and `backticks` is shown with the bold, the italics and the links drawn. When off, it is shown exactly as it was written.</source>
         <translation>ഓൺ ആണെങ്കിൽ *നക്ഷത്രചിഹ്നങ്ങളും* `ബാക്ക്ടിക്കും` ഉപയോഗിച്ച് എഴുതിയ സന്ദേശം ബോൾഡ്, ഇറ്റാലിക്, ലിങ്കുകൾ എന്നിവ അലങ്കരിച്ച് കാണിക്കും. ഓഫ് ആണെങ്കിൽ എഴുതിയതുപോലെ തന്നെ കാണിക്കും.</translation>
     </message>
 </context>

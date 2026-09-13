@@ -1088,6 +1088,18 @@
         <source>Take the profile over</source>
         <translation>Profili al</translation>
     </message>
+    <message>
+        <source>That did not work</source>
+        <translation>Bu işe yaramadı</translation>
+    </message>
+    <message>
+        <source>Try the code again</source>
+        <translation>Kodu yeniden dene</translation>
+    </message>
+    <message>
+        <source>Choose another file</source>
+        <translation>Başka bir dosya seç</translation>
+    </message>
 </context>
 <context>
     <name>ScanView</name>
@@ -1172,10 +1184,6 @@
     <message>
         <source>Messages</source>
         <translation>Mesajlar</translation>
-    </message>
-    <message>
-        <source>Markdown</source>
-        <translation>Markdown</translation>
     </message>
     <message>
         <source>Auto-download attachments</source>
@@ -1277,11 +1285,15 @@
         <translation>Enter mesajı gönderir</translation>
     </message>
     <message>
-        <source>Off, the return key starts a new line, the message field grows with what is written, and the send button sends.</source>
-        <translation>Kapalıyken Enter tuşu yeni satıra geçer, mesaj alanı yazılanla büyür ve gönder düğmesi gönderir.</translation>
+        <source>When on, the return key sends. When off, it starts a new line, the message field grows with what is written, and the send button sends.</source>
+        <translation>Açıkken Enter tuşu gönderir. Kapalıyken yeni satır başlatır, ileti alanı yazılanla büyür ve gönderme düğmesi gönderir.</translation>
     </message>
     <message>
-        <source>On, a message written with *stars* and `backticks` is shown with the bold, the italics and the links drawn. Off, it is shown exactly as it was written.</source>
+        <source>Use Markdown formatting</source>
+        <translation>Markdown biçimlendirmesini kullan</translation>
+    </message>
+    <message>
+        <source>When on, a message written with *stars* and `backticks` is shown with the bold, the italics and the links drawn. When off, it is shown exactly as it was written.</source>
         <translation>Açıkken *yıldızlar* ve `ters tırnaklar` ile yazılmış bir ileti kalın, italik ve bağlantılar biçimlenmiş olarak gösterilir. Kapalıyken tam olarak yazıldığı gibi gösterilir.</translation>
     </message>
 </context>

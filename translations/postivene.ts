@@ -1088,6 +1088,18 @@
         <source>Take the profile over</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>That did not work</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Try the code again</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Choose another file</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ScanView</name>
@@ -1171,10 +1183,6 @@
     </message>
     <message>
         <source>Messages</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Markdown</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1277,11 +1285,15 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Off, the return key starts a new line, the message field grows with what is written, and the send button sends.</source>
+        <source>When on, the return key sends. When off, it starts a new line, the message field grows with what is written, and the send button sends.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>On, a message written with *stars* and `backticks` is shown with the bold, the italics and the links drawn. Off, it is shown exactly as it was written.</source>
+        <source>Use Markdown formatting</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>When on, a message written with *stars* and `backticks` is shown with the bold, the italics and the links drawn. When off, it is shown exactly as it was written.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

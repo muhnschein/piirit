@@ -1093,6 +1093,18 @@
         <source>Take the profile over</source>
         <translation>சுயவிவரத்தைப் பெறு</translation>
     </message>
+    <message>
+        <source>That did not work</source>
+        <translation>அது வேலை செய்யவில்லை</translation>
+    </message>
+    <message>
+        <source>Try the code again</source>
+        <translation>குறியீட்டை மீண்டும் முயற்சி செய்</translation>
+    </message>
+    <message>
+        <source>Choose another file</source>
+        <translation>வேறு கோப்பைத் தேர்ந்தெடு</translation>
+    </message>
 </context>
 <context>
     <name>ScanView</name>
@@ -1177,10 +1189,6 @@
     <message>
         <source>Messages</source>
         <translation>செய்திகள்</translation>
-    </message>
-    <message>
-        <source>Markdown</source>
-        <translation>Markdown</translation>
     </message>
     <message>
         <source>Auto-download attachments</source>
@@ -1282,11 +1290,15 @@
         <translation>Enter செய்தியை அனுப்பும்</translation>
     </message>
     <message>
-        <source>Off, the return key starts a new line, the message field grows with what is written, and the send button sends.</source>
-        <translation>அணைக்கப்பட்டிருந்தால் Enter விசை புதிய வரியைத் தொடங்கும், செய்திப் புலம் எழுதியதற்கேற்ப வளரும், அனுப்பு பொத்தான் அனுப்பும்.</translation>
+        <source>When on, the return key sends. When off, it starts a new line, the message field grows with what is written, and the send button sends.</source>
+        <translation>இயக்கத்தில் இருந்தால் எண்டர் விசை அனுப்பும். அணைத்தால் அது புதிய வரியைத் தொடங்கும், செய்திப் புலம் எழுதுவதற்கேற்ப வளரும், அனுப்பும் பொத்தான் அனுப்பும்.</translation>
     </message>
     <message>
-        <source>On, a message written with *stars* and `backticks` is shown with the bold, the italics and the links drawn. Off, it is shown exactly as it was written.</source>
+        <source>Use Markdown formatting</source>
+        <translation>மார்க்டௌன் வடிவமைப்பைப் பயன்படுத்து</translation>
+    </message>
+    <message>
+        <source>When on, a message written with *stars* and `backticks` is shown with the bold, the italics and the links drawn. When off, it is shown exactly as it was written.</source>
         <translation>இயக்கத்தில் இருந்தால் *விண்மீன்கள்* மற்றும் `பின்நோக்கு மேற்கோள்` கொண்டு எழுதிய செய்தி தடித்த, சாய்ந்த எழுத்துகளும் இணைப்புகளும் வடிவமைக்கப்பட்டு காட்டப்படும். அணைத்தால் எழுதியபடியே காட்டப்படும்.</translation>
     </message>
 </context>

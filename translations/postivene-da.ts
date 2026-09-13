@@ -1093,6 +1093,18 @@
         <source>Take the profile over</source>
         <translation>Overtag profilen</translation>
     </message>
+    <message>
+        <source>That did not work</source>
+        <translation>Det virkede ikke</translation>
+    </message>
+    <message>
+        <source>Try the code again</source>
+        <translation>Prøv koden igen</translation>
+    </message>
+    <message>
+        <source>Choose another file</source>
+        <translation>Vælg en anden fil</translation>
+    </message>
 </context>
 <context>
     <name>ScanView</name>
@@ -1177,10 +1189,6 @@
     <message>
         <source>Messages</source>
         <translation>Beskeder</translation>
-    </message>
-    <message>
-        <source>Markdown</source>
-        <translation>Markdown</translation>
     </message>
     <message>
         <source>Auto-download attachments</source>
@@ -1282,11 +1290,15 @@
         <translation>Enter sender beskeden</translation>
     </message>
     <message>
-        <source>Off, the return key starts a new line, the message field grows with what is written, and the send button sends.</source>
-        <translation>Slået fra begynder Enter-tasten en ny linje, beskedfeltet vokser med det skrevne, og send-knappen sender.</translation>
+        <source>When on, the return key sends. When off, it starts a new line, the message field grows with what is written, and the send button sends.</source>
+        <translation>Til sender Enter-tasten. Fra begynder den en ny linje, beskedfeltet vokser med det skrevne, og send-knappen sender.</translation>
     </message>
     <message>
-        <source>On, a message written with *stars* and `backticks` is shown with the bold, the italics and the links drawn. Off, it is shown exactly as it was written.</source>
+        <source>Use Markdown formatting</source>
+        <translation>Brug Markdown-formatering</translation>
+    </message>
+    <message>
+        <source>When on, a message written with *stars* and `backticks` is shown with the bold, the italics and the links drawn. When off, it is shown exactly as it was written.</source>
         <translation>Til vises en besked skrevet med *stjerner* og `backticks` med fed, kursiv og links vist. Fra vises den præcis som den blev skrevet.</translation>
     </message>
 </context>

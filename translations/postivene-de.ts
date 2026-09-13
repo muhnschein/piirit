@@ -1093,6 +1093,18 @@
         <source>Take the profile over</source>
         <translation>Profil übernehmen</translation>
     </message>
+    <message>
+        <source>That did not work</source>
+        <translation>Das hat nicht geklappt</translation>
+    </message>
+    <message>
+        <source>Try the code again</source>
+        <translation>Den Code noch einmal versuchen</translation>
+    </message>
+    <message>
+        <source>Choose another file</source>
+        <translation>Eine andere Datei wählen</translation>
+    </message>
 </context>
 <context>
     <name>ScanView</name>
@@ -1177,10 +1189,6 @@
     <message>
         <source>Messages</source>
         <translation>Nachrichten</translation>
-    </message>
-    <message>
-        <source>Markdown</source>
-        <translation>Markdown</translation>
     </message>
     <message>
         <source>Auto-download attachments</source>
@@ -1282,11 +1290,15 @@
         <translation>Enter sendet die Nachricht</translation>
     </message>
     <message>
-        <source>Off, the return key starts a new line, the message field grows with what is written, and the send button sends.</source>
-        <translation>Aus: Die Eingabetaste beginnt eine neue Zeile, das Nachrichtenfeld wächst mit dem Geschriebenen, und der Senden-Knopf sendet.</translation>
+        <source>When on, the return key sends. When off, it starts a new line, the message field grows with what is written, and the send button sends.</source>
+        <translation>Wenn an, sendet die Eingabetaste. Wenn aus, beginnt sie eine neue Zeile, das Nachrichtenfeld wächst mit dem Geschriebenen, und der Senden-Knopf sendet.</translation>
     </message>
     <message>
-        <source>On, a message written with *stars* and `backticks` is shown with the bold, the italics and the links drawn. Off, it is shown exactly as it was written.</source>
+        <source>Use Markdown formatting</source>
+        <translation>Markdown-Formatierung verwenden</translation>
+    </message>
+    <message>
+        <source>When on, a message written with *stars* and `backticks` is shown with the bold, the italics and the links drawn. When off, it is shown exactly as it was written.</source>
         <translation>An wird eine Nachricht mit *Sternchen* und `Backticks` mit dargestelltem Fettdruck, Kursiv und Links gezeigt. Aus wird sie genau so gezeigt, wie sie geschrieben wurde.</translation>
     </message>
 </context>

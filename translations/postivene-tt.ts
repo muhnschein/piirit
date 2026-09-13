@@ -1088,6 +1088,18 @@
         <source>Take the profile over</source>
         <translation>Профильне алырга</translation>
     </message>
+    <message>
+        <source>That did not work</source>
+        <translation>Бу барып чыкмады</translation>
+    </message>
+    <message>
+        <source>Try the code again</source>
+        <translation>Кодны яңадан сынап карарга</translation>
+    </message>
+    <message>
+        <source>Choose another file</source>
+        <translation>Башка файл сайларга</translation>
+    </message>
 </context>
 <context>
     <name>ScanView</name>
@@ -1172,10 +1184,6 @@
     <message>
         <source>Messages</source>
         <translation>Хәбәрләр</translation>
-    </message>
-    <message>
-        <source>Markdown</source>
-        <translation>Markdown</translation>
     </message>
     <message>
         <source>Auto-download attachments</source>
@@ -1277,11 +1285,15 @@
         <translation>Enter хәбәрне җибәрә</translation>
     </message>
     <message>
-        <source>Off, the return key starts a new line, the message field grows with what is written, and the send button sends.</source>
-        <translation>Сүндерелгәндә Enter төймәсе яңа юл башлый, хәбәр кыры язылган белән үсә, ә җибәрү төймәсе җибәрә.</translation>
+        <source>When on, the return key sends. When off, it starts a new line, the message field grows with what is written, and the send button sends.</source>
+        <translation>Кабызылганда Enter төймәсе җибәрә. Сүндерелгәндә ул яңа юл башлый, хат кыры язылганга карап үсә, ә җибәрү төймәсе җибәрә.</translation>
     </message>
     <message>
-        <source>On, a message written with *stars* and `backticks` is shown with the bold, the italics and the links drawn. Off, it is shown exactly as it was written.</source>
+        <source>Use Markdown formatting</source>
+        <translation>Markdown форматлавын кулланырга</translation>
+    </message>
+    <message>
+        <source>When on, a message written with *stars* and `backticks` is shown with the bold, the italics and the links drawn. When off, it is shown exactly as it was written.</source>
         <translation>Кабызылганда *йолдызчыклар* һәм `кире өтерләр` белән язылган хат калын, курсив һәм сылтамалар бизәлеп күрсәтелә. Сүндерелгәндә язылганча гына күрсәтелә.</translation>
     </message>
 </context>
