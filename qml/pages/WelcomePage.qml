@@ -5,18 +5,23 @@ import "../components"
 /*
  * The first screen: no address, no password -- a new Delta Chat user has
  * neither (docs/PROJECT.md), so the one thing to do here is add a
- * profile. Also the resume path: with a configured account it hands
- * straight over to the chat list, on the profile the app was last
- * closed on.
+ * profile.
  *
- * That hand-over happens twice over, and the quick way is the one that
- * usually wins. `Settings.lastAccountId` is dconf, read in the time it
- * takes to open a file, so a phone that has a profile is on its chat
- * list before the core has finished starting. The core's own answer
- * (`accounts_refreshed`) is the authority and arrives later: it is what
- * a phone with no profile waits for, and what corrects a remembered
- * profile that has since been deleted. Whichever comes first wins, and
- * `leaving` stops the other one.
+ * Also the way back onto a chat list, for a phone the window could not
+ * send there itself. The window reads `Settings.lastAccountId` before it
+ * puts anything up and opens on the chat list directly when it names a
+ * profile (postivene.qml), so this page is not even made on an ordinary
+ * launch. What is left to it is the phone whose key was never written --
+ * a profile made before the key existed, or one restored into a fresh
+ * install -- where the core's own answer (`accounts_refreshed`) is the
+ * only thing that knows there is a profile at all.
+ *
+ * Whichever of the two names a profile, the hand-over is offered until
+ * the stack takes it. Silica drops an operation asked for while a
+ * transition is running, and the first offer is made from inside the
+ * push that puts this page up: giving up after one refusal drew the
+ * whole first screen for the half second before the chat list arrived,
+ * and recording the refusal as a departure left a blank screen for good.
  *
  * What it looks like is what the cover looks like once there are
  * people: a field of faces in the ambience's colours, a few of them lit,
@@ -38,40 +43,43 @@ Page {
     // Both ways up: the field has a master for each.
     allowedOrientations: Orientation.All
 
-    // Hides the page until we know whether an account exists.
+    /// Nothing is drawn yet, because it is not yet known whether this
+    /// phone has a chat list to be on. Drawing the first screen and
+    /// taking it away again is the thing this page must not do.
     property bool probing: true
+    /// The profile to hand over to, or 0 while none is known of. What
+    /// dconf remembers, until the core says otherwise: its answer is the
+    /// authority, and the only one a phone whose key was never written
+    /// has.
+    property int resumeAccountId: Settings.lastAccountId > 0
+                                  ? Settings.lastAccountId : 0
     /// The chat list has actually been opened.
     ///
-    /// Set from what the stack did, never from having asked it: Silica
-    /// drops an operation asked for while a transition is running, and
-    /// the first thing this page does is ask, from inside the push that
-    /// puts it up. A page that recorded the asking would hide itself for
-    /// a hand-over that never happened and sit there blank.
+    /// Set from what the stack did, never from having asked it: a page
+    /// that recorded the asking would hide itself for a hand-over that
+    /// never happened and sit there blank.
     property bool leaving: false
-    /// IO has been asked for. Once, however many times the hand-over is
-    /// tried.
-    property bool askedForIo: false
     /// The probe has taken long enough to be worth saying so. A phone
     /// with a profile is gone from here in the time dconf takes, and a
     /// spinner that appears on the way out is the flash it was put there
     /// to prevent.
     property bool slow: false
+    /// How long to go on waiting before drawing this page anyway, in
+    /// milliseconds. A stack that has refused for this long is not going
+    /// to take it and a core that has not answered is not going to, and
+    /// a first screen the reader can use beats a blank one they cannot.
+    /// Nothing sets it; a test turns it down rather than waiting.
+    property int handOverDeadline: 4000
 
-    /// Go to the chat list if this phone remembers being on one.
+    /// Go to the chat list, if a profile to open it on is known of.
     ///
-    /// IO is asked for here rather than left to the chat list: the core
-    /// may not have started yet, and the shim keeps the request until it
-    /// has. Every profile, not only the one shown -- each of them is one
-    /// people write to, and the cover counts them all.
+    /// IO is not asked for here: the window asks for it as soon as the
+    /// core is ready, whichever page is up (postivene.qml).
     function resumeRemembered() {
-        if (page.leaving || !(Settings.lastAccountId > 0)) {
+        if (page.leaving || !(page.resumeAccountId > 0)) {
             return
         }
-        if (!page.askedForIo) {
-            page.askedForIo = true
-            core.start_all_account_io()
-        }
-        page.leaving = page.openChatList(Settings.lastAccountId)
+        page.leaving = page.openChatList(page.resumeAccountId)
     }
 
     /// Hand over to the chat list, and say whether the stack took it.
@@ -82,17 +90,18 @@ Page {
         return opened ? true : false
     }
 
-    // Until the stack takes it. The first attempt is made from inside
-    // the push that puts this page up, which is the one moment a stack
-    // will not take anything; asking again a frame later costs nothing
-    // and is the difference between a fast start and a blank screen.
+    // Offered until the stack takes it, every frame or so. The offer
+    // costs nothing when it is refused, and one refusal says nothing
+    // about the next: the stack is busy putting this very page up.
+    // `triggeredOnStart` makes the first offer the moment a profile is
+    // known of, which on a phone that has one is straight away.
     Timer {
         id: handOver
         objectName: "handOver"
         interval: 50
         repeat: true
         triggeredOnStart: true
-        running: !page.leaving && Settings.lastAccountId > 0
+        running: page.probing && !page.leaving && page.resumeAccountId > 0
         onTriggered: page.resumeRemembered()
     }
 
@@ -104,12 +113,22 @@ Page {
         onTriggered: page.slow = true
     }
 
-    // The core may be ready before the handler below exists. Asked for
-    // whether or not the shortcut above is going to work: the core's
-    // answer is the authority, and it is what rescues this page if the
-    // hand-over never lands.
+    // The long stop, and the end of the offering. Whatever it is that
+    // has not happened by now -- the core has not answered, the stack
+    // will not take the hand-over -- waiting longer for it is worse than
+    // showing the reader a screen they can do something with. It also
+    // stops the timer above, so a reader who has gone on to read about
+    // Delta Chat is not yanked out of it a moment later.
+    Timer {
+        id: handOverStop
+        objectName: "handOverStop"
+        interval: page.handOverDeadline
+        running: page.probing && !page.leaving
+        onTriggered: page.probing = false
+    }
+
+    // The core may be ready before the handler below exists.
     Component.onCompleted: {
-        page.resumeRemembered()
         if (core.status === "ready") {
             core.refresh_accounts()
         } else if (core.status.indexOf("error") === 0) {
@@ -135,22 +154,18 @@ Page {
         // hand-over did not land, whatever it reported.
         onAccounts_refreshed: {
             if (configured_count > 0) {
-                if (!page.askedForIo) {
-                    page.askedForIo = true
-                    // Every profile, not only the one shown: each of them
-                    // is one people write to, and the cover counts them
-                    // all.
-                    core.start_all_account_io()
-                }
                 // The profile the app was closed on, which the core
                 // remembers; the chat list tells it which on every open.
-                page.leaving = page.openChatList(resume_account_id)
-                // Nothing took it and there is nothing else coming.
-                // Better the first screen than a blank one.
-                if (!page.leaving) {
-                    page.probing = false
-                }
+                // Assigned rather than handed to one attempt: the answer
+                // is what the offering runs on from here, and a stack
+                // that is busy this instant will not be next time.
+                page.resumeAccountId = resume_account_id
+                page.resumeRemembered()
             } else {
+                // No profile anywhere, so there is nothing to open and
+                // nothing for the next launch to open either.
+                page.resumeAccountId = 0
+                Settings.lastAccountId = 0
                 page.probing = false
             }
         }
@@ -165,10 +180,10 @@ Page {
         id: field
         objectName: "faceField"
         anchors.fill: parent
-        // Down until the core has answered. A phone with profiles on it
-        // is going straight to the chat list, and a screenful of faces
-        // drawn for the half second that takes reads as the app opening
-        // in the wrong place and then correcting itself.
+        // Down until it is known there is no chat list to be on. A
+        // screenful of faces drawn for the half second a hand-over takes
+        // reads as the app opening in the wrong place and then
+        // correcting itself.
         visible: !page.probing
         source: page.width > page.height ? "../art/faces-landscape.png"
                                          : "../art/faces-portrait.png"

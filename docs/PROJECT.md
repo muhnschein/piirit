@@ -341,6 +341,23 @@ deltachat-rpc-server (bundled binary, subprocess) = the entire core
   The painter is standard-library Python and deterministic, so the
   masks change only when it does, and a build needs neither it nor a
   display.
+- **A phone that has been used opens on its chat list, and the first
+  screen is never made.** Which page the app puts up first is decided
+  before anything is drawn, by the window rather than by a page
+  (`qml/postivene.qml`): the chat list writes the profile it is on to
+  dconf, and the next launch reads that key back -- a file read, done
+  while the core is still spawning its process -- and opens the chat
+  list on it directly. The list is on screen before there is anything
+  to put in it, which is the right way round: it fills in behind itself
+  the way it already does when the core reconnects. Deciding it on the
+  welcome page instead cost the welcome page: put up, asked to hand
+  over, animated out, all of it on screen, and every way of reading a
+  stack that refuses the hand-over mid-transition was wrong in its own
+  way -- a blank screen for good one way, the whole first screen drawn
+  and taken away again the other. The welcome page still has that path,
+  because a phone whose key was never written has only the core's
+  answer to go on, and there it offers the hand-over until the stack
+  takes it rather than reading one refusal as an answer.
 - **A newcomer is told what Delta Chat is before being asked to pick a
   server.** The first screen offers two ways on rather than one, because
   a reader who has never heard of Delta Chat and a reader who came for

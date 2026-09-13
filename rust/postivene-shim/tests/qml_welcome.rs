@@ -103,6 +103,13 @@ const PROBE_QML: &str = r"
             Settings.lastAccountId = parseInt(id, 10)
             return 'ok'
         }
+        // The long stop, turned down: a test that waited the real four
+        // seconds out would be four seconds of waiting.
+        function hurry(ms) {
+            if (!loader.item) { return 'no-page' }
+            loader.item.handOverDeadline = parseInt(ms, 10)
+            return 'ok'
+        }
         // What the core answering with no profiles does.
         function endProbe() {
             if (!loader.item) { return 'no-page' }
@@ -255,6 +262,9 @@ fn the_welcome_page_draws_the_field_and_turns_with_the_phone() {
 
     let r = record.clone();
     single_shot(Duration::from_secs(1), move || {
+        // dconf outlives the test binary, so what a previous run left
+        // behind would otherwise decide what this page does.
+        r("fresh", call!("rememberProfile", "0"));
         r("load", call!("load", common::page_url("WelcomePage.qml")));
         r("upright", call!("maskFile"));
         // Nothing is drawn until the core has said whether there is a
@@ -279,8 +289,8 @@ fn the_welcome_page_draws_the_field_and_turns_with_the_phone() {
 
     // 3s: a stack that refuses, which is what the real one does while
     // the push that puts this page up is still running. The page must
-    // not hide itself for a hand-over that did not happen, and the
-    // core's answer has to still reach it.
+    // neither record a hand-over that did not happen nor draw itself
+    // because one was refused, and the core's answer has to reach it.
     let r = record.clone();
     single_shot(Duration::from_secs(3), move || {
         r("refuse", call!("refuseNavigation", "true"));
@@ -289,19 +299,35 @@ fn the_welcome_page_draws_the_field_and_turns_with_the_phone() {
             "reload-refused",
             call!("load", common::page_url("WelcomePage.qml")),
         );
+        r("hurry", call!("hurry", "300"));
         r("refused-left", call!("pageProperty", "leaving"));
+        r("refused-probing", call!("pageProperty", "probing"));
         r("refused-core", call!("coreFoundProfiles", "2"));
         r("refused-after-core", call!("pageProperty", "probing"));
     });
 
-    // 4s: the same page on a phone that remembers being on a profile.
-    // Nothing has told it the core is ready, and it should not wait to
-    // be told: what it knows from dconf is enough to leave on.
+    // 4s: the long stop has passed. A stack that has refused for that
+    // long is not going to take it, and a reader is better off on a
+    // screen they can use than on a blank one.
+    //
+    // Then the same page on a phone that remembers being on a profile,
+    // over a stack that takes what it is handed. Nothing has told this
+    // page the core is ready, and it should not wait to be told: what
+    // it knows from dconf is enough to leave on.
     let r = record.clone();
     single_shot(Duration::from_secs(4), move || {
+        r("refused-gave-up", call!("pageProperty", "probing"));
         r("accept", call!("refuseNavigation", "false"));
         r("remember", call!("rememberProfile", "7"));
         r("reload", call!("load", common::page_url("WelcomePage.qml")));
+    });
+
+    // 5s: whether it left. Read a beat later rather than in the same
+    // breath as the load: the offer is made from a timer, so that it can
+    // be made again, and a timer's first turn comes after the one the
+    // page was built in.
+    let r = record.clone();
+    single_shot(Duration::from_secs(5), move || {
         r("left", call!("pageProperty", "leaving"));
     });
 
@@ -321,9 +347,12 @@ fn the_welcome_page_draws_the_field_and_turns_with_the_phone() {
 ///
 /// Silica drops a stack operation asked for while a transition is
 /// running, and the first thing this page does is ask, from inside the
-/// push that puts it up. Recording that as having left hid the page for
-/// a hand-over that never happened, and gated away everything that could
-/// have rescued it: a blank screen, for good.
+/// push that puts it up. Both ways of reading that one refusal were
+/// wrong and both were shipped: recording it as having left hid the page
+/// for a hand-over that never happened -- a blank screen, for good --
+/// and taking it as the end of the attempt drew the whole first screen,
+/// buttons and all, for the half second before the chat list arrived.
+/// It is neither. It is one refusal, and the offer is made again.
 fn assert_a_refused_hand_over_is_survived(steps: &[(String, String)], navigation: &str) {
     let value = |label: &str| -> &str {
         steps
@@ -348,16 +377,36 @@ fn assert_a_refused_hand_over_is_survived(steps: &[(String, String)], navigation
         "the page did not even try to hand over. {context}"
     );
     assert_eq!(
+        value("refused-probing"),
+        "true",
+        "the page drew itself the moment one hand-over was refused, so a \
+         phone with a profile shows the whole first screen -- field, \
+         name, buttons -- on its way to the chat list. {context}"
+    );
+    assert_eq!(
         value("refused-core"),
         "ok",
         "the core's answer could not be delivered. {context}"
     );
     assert_eq!(
         value("refused-after-core"),
+        "true",
+        "the core naming a profile ended the attempt instead of feeding \
+         it: the stack refusing this instant says nothing about the \
+         next, and the page drew itself rather than ask again. {context}"
+    );
+    assert!(
+        navigation.matches("refused:ChatListPage.qml").count() > 1,
+        "the page offered the hand-over once and gave up. The one moment \
+         a stack will not take anything is the push that puts this page \
+         up, which is exactly when the first offer is made. {context}"
+    );
+    assert_eq!(
+        value("refused-gave-up"),
         "false",
-        "the page is still hiding itself after the core answered, so a \
-         reader whose hand-over was refused is left on a blank screen \
-         with nothing coming. {context}"
+        "the page is still hiding itself long after the stack stopped \
+         taking anything, which leaves the reader on a blank screen with \
+         nothing coming. {context}"
     );
 }
 

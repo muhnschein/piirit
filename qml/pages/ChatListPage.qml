@@ -180,6 +180,15 @@ Page {
         onCore_event: chats.handle_event(context_id, kind, payload_json)
         onStatus_changed: {
             if (core.status === "ready") {
+                // On a phone that resumes onto its chat list, this page
+                // is the first one made and the core was not up when it
+                // was: what it asked for then reached nobody, so it is
+                // asked again here. Idempotent, which is what makes it
+                // safe on a later reconnection too.
+                core.refresh_accounts()
+                if (!page.archived) {
+                    core.select_account(page.accountId)
+                }
                 chats.reload()
                 // A search typed before the core was up found nothing and
                 // had nothing to answer with; this is when it can.
