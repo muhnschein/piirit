@@ -782,9 +782,19 @@ async fn export_into(state: &Arc<Mutex<State>>, id: &Value, account: u32, folder
     // A page finds the file by what appeared in the folder, so what
     // matters is that exactly one did.
     let written = std::path::Path::new(folder).join(format!("delta-chat-2026-01-01-{account}.tar"));
-    if let Err(problem) =
-        std::fs::create_dir_all(folder).and_then(|()| std::fs::write(&written, b"backup"))
-    {
+    // Off the runtime's threads, as the shim does its own filesystem
+    // work: `std::fs` stops the thread it is called on, and this double
+    // is a server that goes on answering while it writes.
+    let made = {
+        let (folder, target) = (folder.to_string(), written.clone());
+        tokio::task::spawn_blocking(move || {
+            std::fs::create_dir_all(&folder).and_then(|()| std::fs::write(&target, b"backup"))
+        })
+        .await
+        .map_err(|joined| joined.to_string())
+        .and_then(|wrote| wrote.map_err(|problem| problem.to_string()))
+    };
+    if let Err(problem) = made {
         state.imex(account, 0);
         return err(id, &format!("backup could not be written: {problem}"));
     }

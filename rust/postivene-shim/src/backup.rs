@@ -198,18 +198,23 @@ impl Backup {
 /// the same folder -- answers with the folder, which is still where the
 /// reader has to go looking.
 async fn export(rpc: &RpcClient, account_id: u32, folder: &str) -> Result<String, String> {
+    let path = folder.to_string();
     // The core makes the folder itself, but only once it has got that
     // far: a folder that cannot be made should be said here rather than
     // after a minute of writing.
-    std::fs::create_dir_all(folder).map_err(|err| format!("cannot use {folder}: {err}"))?;
-    let before = tars_in(folder);
+    let before = off_the_runtime(move || {
+        std::fs::create_dir_all(&path).map_err(|err| format!("cannot use {path}: {err}"))?;
+        Ok(tars_in(&path))
+    })
+    .await?;
     rpc.call::<_, ()>(
         "export_backup",
         (account_id, folder, Option::<String>::None),
     )
     .await
     .map_err(|err| err.to_string())?;
-    let mut written = tars_in(folder);
+    let path = folder.to_string();
+    let mut written = off_the_runtime(move || Ok(tars_in(&path))).await?;
     for existing in &before {
         written.remove(existing);
     }
@@ -217,6 +222,26 @@ async fn export(rpc: &RpcClient, account_id: u32, folder: &str) -> Result<String
     match (written.next(), written.next()) {
         (Some(one), None) => Ok(one.to_string_lossy().into_owned()),
         _ => Ok(folder.to_string()),
+    }
+}
+
+/// Run one piece of blocking filesystem work somewhere it can block.
+///
+/// `std::fs` stops the thread it is called on, and the threads this
+/// future runs on are the runtime's: the same ones carrying the core's
+/// connection and draining its events. `spawn_blocking` has a pool kept
+/// for exactly this. A folder with a thousand files in it is not a long
+/// wait, but it is not the core's wait to take.
+async fn off_the_runtime<T, F>(work: F) -> Result<T, String>
+where
+    F: FnOnce() -> Result<T, String> + Send + 'static,
+    T: Send + 'static,
+{
+    match tokio::task::spawn_blocking(work).await {
+        Ok(result) => result,
+        // The pool dropped the work, which on this runtime means it is
+        // shutting down: the app is on its way out.
+        Err(err) => Err(err.to_string()),
     }
 }
 
