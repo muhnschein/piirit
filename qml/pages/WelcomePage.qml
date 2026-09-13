@@ -9,6 +9,15 @@ import "../components"
  * straight over to the chat list, on the profile the app was last
  * closed on.
  *
+ * That hand-over happens twice over, and the quick way is the one that
+ * usually wins. `Settings.lastAccountId` is dconf, read in the time it
+ * takes to open a file, so a phone that has a profile is on its chat
+ * list before the core has finished starting. The core's own answer
+ * (`accounts_refreshed`) is the authority and arrives later: it is what
+ * a phone with no profile waits for, and what corrects a remembered
+ * profile that has since been deleted. Whichever comes first wins, and
+ * `leaving` stops the other one.
+ *
  * What it looks like is what the cover looks like once there are
  * people: a field of faces in the ambience's colours, a few of them lit,
  * filling the screen either way up -- and in the middle, where the
@@ -29,11 +38,53 @@ Page {
     // Both ways up: the field has a master for each.
     allowedOrientations: Orientation.All
 
-    // Hides the buttons until we know whether an account exists.
+    // Hides the page until we know whether an account exists.
     property bool probing: true
+    /// The page is on its way out. Two answers can send it there.
+    property bool leaving: false
+    /// The probe has taken long enough to be worth saying so. A phone
+    /// with a profile is gone from here in the time dconf takes, and a
+    /// spinner that appears on the way out is the flash it was put there
+    /// to prevent.
+    property bool slow: false
+
+    /// Go to the chat list if this phone remembers being on one.
+    ///
+    /// IO is asked for here rather than left to the chat list: the core
+    /// may not have started yet, and the shim keeps the request until it
+    /// has. Every profile, not only the one shown -- each of them is one
+    /// people write to, and the cover counts them all.
+    function resumeRemembered() {
+        if (page.leaving || !(Settings.lastAccountId > 0)) {
+            return
+        }
+        page.leaving = true
+        core.start_all_account_io()
+        pageStack.replaceAbove(null, Qt.resolvedUrl("ChatListPage.qml"),
+                               { accountId: Settings.lastAccountId })
+    }
+
+    Timer {
+        id: slowProbe
+        objectName: "slowProbe"
+        interval: 400
+        running: page.probing && !page.leaving
+        onTriggered: page.slow = true
+    }
+
+    // dconf answers a moment after the page is up, so the shortcut is
+    // taken from here as well as on completion.
+    Connections {
+        target: Settings
+        onLastAccountIdChanged: page.resumeRemembered()
+    }
 
     // The core may be ready before the handler below exists.
     Component.onCompleted: {
+        page.resumeRemembered()
+        if (page.leaving) {
+            return
+        }
         if (core.status === "ready") {
             core.refresh_accounts()
         } else if (core.status.indexOf("error") === 0) {
@@ -55,7 +106,11 @@ Page {
         }
 
         onAccounts_refreshed: {
+            if (page.leaving) {
+                return
+            }
             if (configured_count > 0) {
+                page.leaving = true
                 // Every profile, not only the one shown: each of them is
                 // one people write to, and the cover counts them all.
                 core.start_all_account_io()
@@ -178,8 +233,9 @@ Page {
     }
 
     BusyIndicator {
+        objectName: "probeSpinner"
         anchors.centerIn: parent
-        running: page.probing
+        running: page.probing && page.slow && !page.leaving
         size: BusyIndicatorSize.Large
     }
 }

@@ -187,7 +187,18 @@ Page {
             }
         }
         // Failures that used to reach no one.
-        onAccounts_refreshed: page.accountCount = configured_count
+        onAccounts_refreshed: {
+            page.accountCount = configured_count
+            // The profile this page was opened on is gone -- deleted on
+            // this phone, or the app's data cleared under it. Nothing
+            // here can be read or written, so hand the reader back to
+            // the first screen rather than leave them on an empty list.
+            if (configured_count === 0) {
+                Settings.lastAccountId = 0
+                pageStack.replaceAbove(null, Qt.resolvedUrl("WelcomePage.qml"),
+                                       {})
+            }
+        }
         onCore_error: page.errorMessage = message
         onIo_started: {
             if (!success) {
@@ -205,6 +216,9 @@ Page {
         // this page. The archived list is the same profile's.
         if (!page.archived) {
             core.select_account(page.accountId)
+            // And on this side of the core, where the next launch can
+            // read it without waiting for the core to start.
+            Settings.lastAccountId = page.accountId
             // And the window, which is where a share arrives: it has no
             // page of its own to read the profile off. Behind the check
             // this page already needs for `appWindow`, which a page

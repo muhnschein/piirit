@@ -408,10 +408,14 @@ removed from the store even after approval. Not an option.
    chat lands on the message in the conversation, lit, rather than at
    the newest one or wherever the chat was left.
    Opening the app on a phone that already has a profile is its own
-   check: nothing of the welcome should be drawn at all, and the chat
-   list is what comes up. A flash of the field of faces on the way
-   reads as the app opening in the wrong place and then correcting
-   itself, which is the bug this had.
+   check: the chat list is what comes up, and nothing else on the way --
+   no field of faces, and no empty screen with a spinner either. The
+   profile it opens on is read from dconf, which answers in the time it
+   takes to open a file, while the core is still starting behind it, so
+   the list is on screen before there is anything to put in it. Worth
+   checking with the app killed rather than backgrounded, and worth
+   checking the other way too: delete every profile, and the app should
+   go back to the first screen rather than sit on an empty list.
    The first screen is a device path because the phone's own colours
    are: on a fresh install, before a profile, it is a field of faces
    filling the screen with the words in a cleared box in the middle,

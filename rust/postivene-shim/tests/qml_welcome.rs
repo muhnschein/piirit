@@ -17,7 +17,10 @@
     unused_unsafe,
     clippy::borrow_as_ptr,
     clippy::disallowed_methods,
-    clippy::expect_used
+    clippy::expect_used,
+    // qt_method! declarations must match the generated dispatcher's
+    // by-value parameters; see postivene-shim/src/lib.rs.
+    clippy::needless_pass_by_value
 )]
 
 use std::ffi::CString;
@@ -38,9 +41,17 @@ enum BusyIndicatorSize {
     Large = 2,
 }
 
-/// Loads the page at a phone's size and reads it back.
+/// The probe that loads the page at a phone's size and reads it back,
+/// with the components directory filled in. Substituted rather than
+/// formatted, so the QML's own braces need no escaping.
+fn probe_qml() -> String {
+    let components = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../qml/components");
+    PROBE_QML.replace("__COMPONENTS__", &components.display().to_string())
+}
+
 const PROBE_QML: &str = r"
     import QtQuick 2.0
+    import 'file://__COMPONENTS__'
     Item {
         Loader { id: loader }
         function load(url) {
@@ -67,6 +78,9 @@ const PROBE_QML: &str = r"
             if (!item) { return 'missing:' + name }
             return '' + item[property]
         }
+        function pageProperty(property) {
+            return loader.item ? '' + loader.item[property] : 'no-page'
+        }
         // The mask's file name, without the checkout path.
         function maskFile() {
             var mask = findIn(loader.item, 'faceMask')
@@ -74,13 +88,18 @@ const PROBE_QML: &str = r"
             var url = '' + mask.source
             return url.substring(url.lastIndexOf('/') + 1)
         }
-        // Whether the cleared box is the column of words.
+        // What this phone remembers about the profile it was last on.
+        function rememberProfile(id) {
+            Settings.lastAccountId = parseInt(id, 10)
+            return 'ok'
+        }
         // What the core answering with no profiles does.
         function endProbe() {
             if (!loader.item) { return 'no-page' }
             loader.item.probing = false
             return 'ok'
         }
+        // Whether the cleared box is the column of words.
         function clearsTheWords() {
             var field = findIn(loader.item, 'faceField')
             var title = findIn(loader.item, 'title')
@@ -197,7 +216,7 @@ fn the_welcome_page_draws_the_field_and_turns_with_the_phone() {
     );
     engine.set_object_property("core".into(), core_box.pinned());
     engine.set_object_property("pageStack".into(), stack_box.pinned());
-    engine.load_data(QByteArray::from(PROBE_QML));
+    engine.load_data(QByteArray::from(probe_qml().as_str()));
 
     let engine_ptr = std::ptr::addr_of_mut!(engine);
     // SAFETY: these callbacks fire only while `exec()` is running on this
@@ -233,6 +252,7 @@ fn the_welcome_page_draws_the_field_and_turns_with_the_phone() {
         // chat list, and a screenful of faces on the way reads as the
         // app opening in the wrong place.
         r("probing-field", call!("get", "faceField", "visible"));
+        r("probing-spinner", call!("get", "probeSpinner", "running"));
         r("probed", call!("endProbe"));
     });
 
@@ -247,26 +267,72 @@ fn the_welcome_page_draws_the_field_and_turns_with_the_phone() {
         r("sideways", call!("maskFile"));
     });
 
-    single_shot(Duration::from_secs(3), move || unsafe {
+    // 3s: the same page on a phone that remembers being on a profile.
+    // Nothing has told it the core is ready, and it should not wait to
+    // be told: what it knows from dconf is enough to leave on.
+    let r = record.clone();
+    single_shot(Duration::from_secs(3), move || {
+        r("remember", call!("rememberProfile", "7"));
+        r("reload", call!("load", common::page_url("WelcomePage.qml")));
+        r("left", call!("pageProperty", "leaving"));
+    });
+
+    single_shot(Duration::from_secs(4), move || unsafe {
         (*engine_ptr).quit();
     });
 
     engine.exec();
 
-    assert_field_drawn(&steps.borrow());
+    let navigation = stack_box.pinned().borrow().log.to_string();
+    assert_field_drawn(&steps.borrow(), &navigation);
+    assert_remembered_profile_opens(&steps.borrow(), &navigation);
 }
 
-/// The page upright draws the portrait master, the mask loads and the
-/// shader shows over it, the box is cleared where the words are, the
-/// name leads, and the page on its side swaps to the landscape master.
-fn assert_field_drawn(steps: &[(String, String)]) {
+/// A phone that remembers a profile leaves for it without waiting to be
+/// told the core is ready: that wait is a process spawn and a round
+/// trip, and it showed as an empty screen before the chat list.
+fn assert_remembered_profile_opens(steps: &[(String, String)], navigation: &str) {
     let value = |label: &str| -> &str {
         steps
             .iter()
             .find(|(name, _)| name == label)
             .map_or("<step did not run>", |(_, value)| value.as_str())
     };
-    let context = format!("steps: {steps:?}");
+    let context = format!("steps: {steps:?}\nnavigation: {navigation}");
+    assert_eq!(
+        value("remember"),
+        "ok",
+        "the remembered profile could not be written. {context}"
+    );
+    assert_eq!(
+        value("reload"),
+        "ok",
+        "the page did not load a second time. {context}"
+    );
+    assert_eq!(
+        value("left"),
+        "true",
+        "the page stayed put on a phone that remembers a profile, which \
+         leaves the reader on an empty screen until the core answers. \
+         {context}"
+    );
+    assert!(
+        navigation.contains("replaceAbove:ChatListPage.qml"),
+        "the page did not open the chat list it remembered. {context}"
+    );
+}
+
+/// The page upright draws the portrait master, the mask loads and the
+/// shader shows over it, the box is cleared where the words are, the
+/// name leads, and the page on its side swaps to the landscape master.
+fn assert_field_drawn(steps: &[(String, String)], navigation: &str) {
+    let value = |label: &str| -> &str {
+        steps
+            .iter()
+            .find(|(name, _)| name == label)
+            .map_or("<step did not run>", |(_, value)| value.as_str())
+    };
+    let context = format!("steps: {steps:?}\nnavigation: {navigation}");
 
     assert_eq!(
         value("load"),
@@ -290,6 +356,13 @@ fn assert_field_drawn(steps: &[(String, String)]) {
         "the field is drawn before the core has said whether there is a \
          profile, so a phone with one flashes the welcome on its way to \
          the chat list. {context}"
+    );
+    assert_eq!(
+        value("probing-spinner"),
+        "false",
+        "the spinner is up the moment the page appears, so a phone that \
+         is about to leave for its chat list flashes one on the way out. \
+         {context}"
     );
     assert_eq!(
         value("probed"),
@@ -318,8 +391,26 @@ fn assert_field_drawn(steps: &[(String, String)]) {
     );
 }
 
-/// A page stack nothing here navigates on.
+/// A page stack that records where the page sent the reader.
+#[allow(non_snake_case)]
 #[derive(QObject, Default)]
 struct NoStack {
     base: qt_base_class!(trait QObject),
+    /// `replaceAbove:ChatListPage.qml|`
+    log: qt_property!(QString; NOTIFY log_changed),
+    log_changed: qt_signal!(),
+
+    replaceAbove:
+        qt_method!(fn(&mut self, target: QVariant, page: QString, properties: QVariantMap)),
+}
+
+#[allow(non_snake_case)]
+impl NoStack {
+    fn replaceAbove(&mut self, _target: QVariant, page: QString, _properties: QVariantMap) {
+        let page = page.to_string();
+        let name = page.rsplit('/').next().unwrap_or(&page).to_string();
+        let current = self.log.to_string();
+        self.log = format!("{current}replaceAbove:{name}|").into();
+        self.log_changed();
+    }
 }
