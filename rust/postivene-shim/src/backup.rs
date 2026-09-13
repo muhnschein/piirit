@@ -199,14 +199,7 @@ impl Backup {
 /// reader has to go looking.
 async fn export(rpc: &RpcClient, account_id: u32, folder: &str) -> Result<String, String> {
     let path = folder.to_string();
-    // The core makes the folder itself, but only once it has got that
-    // far: a folder that cannot be made should be said here rather than
-    // after a minute of writing.
-    let before = off_the_runtime(move || {
-        std::fs::create_dir_all(&path).map_err(|err| format!("cannot use {path}: {err}"))?;
-        Ok(tars_in(&path))
-    })
-    .await?;
+    let before = off_the_runtime(move || prepare(&path)).await?;
     rpc.call::<_, ()>(
         "export_backup",
         (account_id, folder, Option::<String>::None),
@@ -243,6 +236,19 @@ where
         // shutting down: the app is on its way out.
         Err(err) => Err(err.to_string()),
     }
+}
+
+/// Make the folder if it is not there, and answer with the `.tar` files
+/// already in it.
+///
+/// The core makes the folder itself, but only once it has got that far:
+/// a folder that cannot be made is worth saying before a minute of
+/// writing rather than after it. A plain function, like `tars_in` below
+/// and for the same reason: what blocks belongs where it can be handed
+/// to `off_the_runtime` whole.
+fn prepare(folder: &str) -> Result<BTreeSet<PathBuf>, String> {
+    std::fs::create_dir_all(folder).map_err(|err| format!("cannot use {folder}: {err}"))?;
+    Ok(tars_in(folder))
 }
 
 /// The `.tar` files in a folder, or nothing at all for a folder that
