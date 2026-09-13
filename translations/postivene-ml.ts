@@ -35,10 +35,6 @@
         <translation>സൃഷ്ടിക്കുക</translation>
     </message>
     <message>
-        <source>Pick a chatmail relay or enter a custom server. The server assigns the address; the encryption keys are made on this device.</source>
-        <translation>ഒരു chatmail റിലേ തിരഞ്ഞെടുക്കുക അല്ലെങ്കിൽ സ്വന്തം സെർവർ നൽകുക. വിലാസം സെർവർ നൽകുന്നു; എൻക്രിപ്ഷൻ കീകൾ ഈ ഉപകരണത്തിൽ തന്നെ ഉണ്ടാക്കുന്നു.</translation>
-    </message>
-    <message>
         <source>Your name</source>
         <translation>നിങ്ങളുടെ പേര്</translation>
     </message>
@@ -53,6 +49,41 @@
     <message>
         <source>See &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; for the full list.</source>
         <translation>മുഴുവൻ പട്ടിക &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; ൽ കാണുക.</translation>
+    </message>
+    <message>
+        <source>The relay gives you an address. The keys are made on this phone.</source>
+        <translation>റിലേ നിങ്ങൾക്ക് ഒരു വിലാസം നൽകുന്നു. താക്കോലുകൾ ഈ ഫോണിൽത്തന്നെ ഉണ്ടാകുന്നു.</translation>
+    </message>
+</context>
+<context>
+    <name>AddProfilePage</name>
+    <message>
+        <source>Add profile</source>
+        <translation>പ്രൊഫൈൽ ചേർക്കുക</translation>
+    </message>
+    <message>
+        <source>Create a profile</source>
+        <translation>പ്രൊഫൈൽ ഉണ്ടാക്കുക</translation>
+    </message>
+    <message>
+        <source>A new address on a chatmail relay.</source>
+        <translation>ഏതെങ്കിലും chatmail റിലേയിൽ ഒരു പുതിയ വിലാസം.</translation>
+    </message>
+    <message>
+        <source>Restore from a backup</source>
+        <translation>ബാക്കപ്പിൽനിന്ന് വീണ്ടെടുക്കുക</translation>
+    </message>
+    <message>
+        <source>A backup file copied onto this phone.</source>
+        <translation>ഈ ഫോണിലേക്ക് പകർത്തിയ ഒരു ബാക്കപ്പ് ഫയൽ.</translation>
+    </message>
+    <message>
+        <source>Add as second device</source>
+        <translation>രണ്ടാമത്തെ ഉപകരണമായി ചേർക്കുക</translation>
+    </message>
+    <message>
+        <source>The other device keeps it. Both get everything new.</source>
+        <translation>മറ്റേ ഉപകരണം അത് സൂക്ഷിക്കും. രണ്ടിനും പുതിയതെല്ലാം കിട്ടും.</translation>
     </message>
 </context>
 <context>
@@ -135,8 +166,12 @@
         <translation>%1 എന്നതിൽ സൂക്ഷിച്ചു</translation>
     </message>
     <message>
-        <source>This profile&apos;s messages, contacts and key in one file, saved to Documents. Whoever has that file has the profile, so keep it somewhere safe. Your other profiles are not in it: each one is backed up from its own page.</source>
-        <translation>ഈ പ്രൊഫൈലിന്റെ സന്ദേശങ്ങളും ബന്ധങ്ങളും കീയും ഒരൊറ്റ ഫയലിൽ, ഡോക്യുമെന്റ്സിൽ സൂക്ഷിക്കുന്നു. ആ ഫയൽ ഉള്ളവർക്ക് പ്രൊഫൈലും ഉണ്ട്, അതിനാൽ അത് സുരക്ഷിതമായ ഇടത്ത് സൂക്ഷിക്കുക. നിങ്ങളുടെ മറ്റ് പ്രൊഫൈലുകൾ ഇതിൽ ഇല്ല: ഓരോന്നിനും അതിന്റെ സ്വന്തം താളിൽനിന്ന് ബാക്കപ്പ് എടുക്കണം.</translation>
+        <source>Messages, contacts and key in one file, saved to Documents. Whoever has the file has the profile.</source>
+        <translation>സന്ദേശങ്ങളും വിലാസങ്ങളും താക്കോലും ഒറ്റ ഫയലിൽ, രേഖകളിൽ സൂക്ഷിക്കുന്നു. ഫയൽ ആരുടെ കൈയിലാണോ പ്രൊഫൈലും അവരുടേതാണ്.</translation>
+    </message>
+    <message>
+        <source>Swipe on for your chats.</source>
+        <translation>മുന്നോട്ട് നീക്കി നിങ്ങളുടെ സംഭാഷണങ്ങളിലേക്കു പോകുക.</translation>
     </message>
 </context>
 <context>
@@ -478,10 +513,6 @@
         <translation>അപ്രത്യക്ഷമാകുന്ന സന്ദേശങ്ങൾ</translation>
     </message>
     <message>
-        <source>Applies to all members of this chat, they can still copy, save, and forward messages.</source>
-        <translation>ഈ ചാറ്റിലെ എല്ലാ അംഗങ്ങൾക്കും ബാധകം; അവർക്ക് ഇപ്പോഴും സന്ദേശങ്ങൾ പകർത്താനും സംരക്ഷിക്കാനും ഫോർവേഡ് ചെയ്യാനും കഴിയും.</translation>
-    </message>
-    <message>
         <source>After 1 year</source>
         <translation>1 വർഷത്തിനു ശേഷം</translation>
     </message>
@@ -513,6 +544,10 @@
         <source>After %1 seconds</source>
         <translation>%1 സെക്കൻഡിനു ശേഷം</translation>
     </message>
+    <message>
+        <source>Applies to everyone in the chat. They can still copy and forward.</source>
+        <translation>സംഭാഷണത്തിലെ എല്ലാവർക്കും ബാധകം. അവർക്ക് ഇപ്പോഴും പകർത്താനും കൈമാറാനും കഴിയും.</translation>
+    </message>
 </context>
 <context>
     <name>ExistingProfilePage</name>
@@ -525,16 +560,16 @@
         <translation>രണ്ടാമത്തെ ഉപകരണമായി ചേർക്കുക</translation>
     </message>
     <message>
-        <source>The device that has it keeps it. This one joins, over the same network.</source>
-        <translation>അത് ഉള്ള ഉപകരണം അത് സൂക്ഷിക്കും. ഇത് അതേ ശൃംഖലയിലൂടെ ചേരുന്നു.</translation>
-    </message>
-    <message>
         <source>Restore from a backup</source>
         <translation>ബാക്കപ്പിൽനിന്ന് വീണ്ടെടുക്കുക</translation>
     </message>
     <message>
-        <source>A backup file the other device wrote, copied onto this phone.</source>
-        <translation>മറ്റേ ഉപകരണം എഴുതിയ ബാക്കപ്പ് ഫയൽ, ഈ ഫോണിലേക്ക് പകർത്തിയത്.</translation>
+        <source>The other device keeps it. Both get everything new.</source>
+        <translation>മറ്റേ ഉപകരണം അത് സൂക്ഷിക്കും. രണ്ടിനും പുതിയതെല്ലാം കിട്ടും.</translation>
+    </message>
+    <message>
+        <source>A backup file copied onto this phone.</source>
+        <translation>ഈ ഫോണിലേക്ക് പകർത്തിയ ഒരു ബാക്കപ്പ് ഫയൽ.</translation>
     </message>
 </context>
 <context>
@@ -615,24 +650,12 @@
         <translation>സൈൻ-അപ്പ് വേണ്ട, ഫോൺ നമ്പർ വേണ്ട</translation>
     </message>
     <message>
-        <source>Your profile is made here on your phone. No phone number, no account with a company, nothing to sign.</source>
-        <translation>നിങ്ങളുടെ പ്രൊഫൈൽ ഇവിടെ, നിങ്ങളുടെ ഫോണിൽത്തന്നെ ഉണ്ടാകുന്നു. ഫോൺ നമ്പർ വേണ്ട, ഒരു കമ്പനിയിലും അക്കൗണ്ട് വേണ്ട, ഒപ്പിടാനും ഒന്നുമില്ല.</translation>
-    </message>
-    <message>
         <source>You choose who can reach you</source>
         <translation>ആർക്കു നിങ്ങളെ ബന്ധപ്പെടാമെന്ന് നിങ്ങൾ തീരുമാനിക്കുന്നു</translation>
     </message>
     <message>
-        <source>There is no directory to be found in. Show a friend a code to scan, or send them a link, and the two of you can write.</source>
-        <translation>നിങ്ങളെ കണ്ടെത്താൻ ഒരു പട്ടികയുമില്ല. സുഹൃത്തിന് സ്കാൻ ചെയ്യാൻ ഒരു കോഡ് കാണിക്കുക അല്ലെങ്കിൽ ഒരു ലിങ്ക് അയയ്ക്കുക, പിന്നെ നിങ്ങൾക്ക് പരസ്പരം എഴുതാം.</translation>
-    </message>
-    <message>
         <source>Groups of equals</source>
         <translation>തുല്യരുടെ കൂട്ടങ്ങൾ</translation>
-    </message>
-    <message>
-        <source>Everyone in a group has the same rights: anyone can add a friend, rename it or leave. Nobody is in charge.</source>
-        <translation>ഒരു കൂട്ടത്തിൽ എല്ലാവർക്കും ഒരേ അവകാശം: ആർക്കും ഒരു സുഹൃത്തിനെ ചേർക്കാം, പേരു മാറ്റാം, ഇറങ്ങിപ്പോകാം. ആരും മേലാളനല്ല.</translation>
     </message>
     <message>
         <source>The server only passes it on</source>
@@ -647,12 +670,24 @@
         <translation>ഓരോ സന്ദേശവും എൻക്രിപ്റ്റ് ചെയ്തിരിക്കുന്നു</translation>
     </message>
     <message>
-        <source>Messages are encrypted the whole way, always. Servers that transport them cannot read a word.</source>
-        <translation>സന്ദേശങ്ങൾ എപ്പോഴും വഴി മുഴുവൻ എൻക്രിപ്റ്റ് ചെയ്തിരിക്കും. അവ എത്തിക്കുന്ന സെർവറുകൾക്ക് ഒരു വാക്കുപോലും വായിക്കാനാവില്ല.</translation>
+        <source>Made here on your phone. No phone number, no account, nothing to sign.</source>
+        <translation>ഇവിടെത്തന്നെ, നിങ്ങളുടെ ഫോണിൽ ഉണ്ടാകുന്നു. ഫോൺ നമ്പറില്ല, അക്കൗണ്ടില്ല, ഒപ്പിടാൻ ഒന്നുമില്ല.</translation>
     </message>
     <message>
-        <source>A server holds a message until the other phone is online, and that is all it does. Your chats stay on your device.</source>
-        <translation>മറ്റേ ഫോൺ ഓൺലൈനാകുന്നതുവരെ സെർവർ സന്ദേശം സൂക്ഷിക്കുന്നു, അത്രമാത്രം. നിങ്ങളുടെ സംഭാഷണങ്ങൾ നിങ്ങളുടെ ഉപകരണത്തിൽത്തന്നെ നിൽക്കും.</translation>
+        <source>There is no directory to be found in. Show a friend a code, or send a link.</source>
+        <translation>നിങ്ങളെ കണ്ടെത്താൻ ഒരു പട്ടികയുമില്ല. ഒരു സുഹൃത്തിന് കോഡ് കാണിക്കുക, അല്ലെങ്കിൽ കണ്ണി അയയ്ക്കുക.</translation>
+    </message>
+    <message>
+        <source>Encrypted the whole way, always. The servers cannot read a word.</source>
+        <translation>എപ്പോഴും വഴിനീളെ എൻക്രിപ്റ്റ് ചെയ്തത്. സെർവറുകൾ ഒരു വാക്കുപോലും വായിക്കില്ല.</translation>
+    </message>
+    <message>
+        <source>Anyone can add a friend, rename the group or leave. Nobody is in charge.</source>
+        <translation>ആർക്കും ഒരു സുഹൃത്തിനെ ചേർക്കാം, കൂട്ടത്തിന്റെ പേര് മാറ്റാം അല്ലെങ്കിൽ പോകാം. ആരും മേലാളനല്ല.</translation>
+    </message>
+    <message>
+        <source>It holds a message until the other phone is online, and nothing more.</source>
+        <translation>മറ്റേ ഫോൺ ഓൺലൈനാകുന്നതുവരെ അത് സന്ദേശം സൂക്ഷിക്കും, അതിൽ കൂടുതലൊന്നുമില്ല.</translation>
     </message>
 </context>
 <context>
@@ -670,9 +705,9 @@
         <translation>റദ്ദാക്കുക</translation>
     </message>
     <message>
-        <source>Leave %1? You will stop receiving its messages, and only a member can add you back.</source>
+        <source>Leave %1? Only a member can add you back.</source>
         <extracomment>%1 is the group&apos;s name.</extracomment>
-        <translation>%1 വിടണോ? അതിന്റെ സന്ദേശങ്ങൾ നിങ്ങൾക്ക് ലഭിക്കാതാകും, ഒരു അംഗത്തിനു മാത്രമേ നിങ്ങളെ തിരികെ ചേർക്കാനാകൂ.</translation>
+        <translation>%1 വിട്ടുപോകണോ? നിങ്ങളെ തിരികെ ചേർക്കാൻ ഒരു അംഗത്തിനു മാത്രമേ കഴിയൂ.</translation>
     </message>
 </context>
 <context>
@@ -896,16 +931,8 @@
         <translation>വിലാസം</translation>
     </message>
     <message>
-        <source>Show invite code</source>
-        <translation>ക്ഷണ കോഡ് കാണിക്കുക</translation>
-    </message>
-    <message>
         <source>Send read receipts</source>
         <translation>വായിച്ചതിന്റെ രസീതുകൾ അയയ്ക്കുക</translation>
-    </message>
-    <message>
-        <source>Tells the people you write to when you have read their messages, and asks the same of them. With this off you send none and see none.</source>
-        <translation>നിങ്ങൾ എഴുതുന്നവരോട് അവരുടെ സന്ദേശങ്ങൾ എപ്പോൾ വായിച്ചെന്ന് പറയുന്നു, അവരോടും അതുതന്നെ ആവശ്യപ്പെടുന്നു. ഓഫ് ആണെങ്കിൽ നിങ്ങൾ ഒന്നും അയയ്ക്കുകയോ കാണുകയോ ചെയ്യില്ല.</translation>
     </message>
     <message>
         <source>Storage and connectivity</source>
@@ -946,12 +973,8 @@
         <translation>നിങ്ങൾ അയയ്ക്കുന്ന ഓരോ സന്ദേശത്തിലുമുള്ള പേര്</translation>
     </message>
     <message>
-        <source>Backup</source>
-        <translation>ബാക്കപ്പ്</translation>
-    </message>
-    <message>
-        <source>Back up this profile</source>
-        <translation>ഈ പ്രൊഫൈൽ ബാക്കപ്പ് ചെയ്യുക</translation>
+        <source>Both ways: with this off you send none and see none.</source>
+        <translation>രണ്ടു വഴിക്കും: ഓഫാണെങ്കിൽ നിങ്ങൾ ഒന്നും അയയ്ക്കുന്നില്ല, ഒന്നും കാണുന്നുമില്ല.</translation>
     </message>
 </context>
 <context>
@@ -977,8 +1000,8 @@
         <translation>%1 %2 സെക്കൻഡിനുള്ളിൽ മറുപടി നൽകിയില്ല.</translation>
     </message>
     <message>
-        <source>Chatmail relays are run by volunteers in their spare time. If this one does not seem to work, go back and try another one.</source>
-        <translation>Chatmail റിലേകൾ സന്നദ്ധപ്രവർത്തകർ അവരുടെ ഒഴിവുസമയത്ത് നടത്തുന്നവയാണ്. ഇത് പ്രവർത്തിക്കുന്നില്ലെന്ന് തോന്നിയാൽ, തിരികെ പോയി മറ്റൊന്ന് പരീക്ഷിക്കുക.</translation>
+        <source>Relays are run by volunteers. Go back and try another one.</source>
+        <translation>റിലേകൾ നടത്തുന്നത് സന്നദ്ധപ്രവർത്തകരാണ്. തിരികെ പോയി മറ്റൊന്ന് പരീക്ഷിക്കുക.</translation>
     </message>
 </context>
 <context>
@@ -1024,12 +1047,12 @@
         <translation>പ്രൊഫൈലുകളില്ല</translation>
     </message>
     <message>
-        <source>Add as second device</source>
-        <translation>രണ്ടാമത്തെ ഉപകരണമായി ചേർക്കുക</translation>
+        <source>Invite code</source>
+        <translation>ക്ഷണക്കോഡ്</translation>
     </message>
     <message>
-        <source>Restore profile from backup</source>
-        <translation>ബാക്കപ്പിൽനിന്ന് പ്രൊഫൈൽ വീണ്ടെടുക്കുക</translation>
+        <source>Back up profile</source>
+        <translation>പ്രൊഫൈൽ ബാക്കപ്പ്</translation>
     </message>
 </context>
 <context>
@@ -1082,14 +1105,6 @@
 <context>
     <name>RestoreProfilePage</name>
     <message>
-        <source>The other device runs a newer Delta Chat than this app can take a profile from.</source>
-        <translation>മറ്റേ ഉപകരണത്തിൽ ഈ ആപ്പിന് പ്രൊഫൈൽ ഏറ്റെടുക്കാനാവുന്നതിലും പുതിയ Delta Chat ആണുള്ളത്.</translation>
-    </message>
-    <message>
-        <source>The transfer stopped before it finished. Both devices have to stay on the same network, with this page open.</source>
-        <translation>കൈമാറ്റം തീരുംമുമ്പ് നിന്നു. രണ്ട് ഉപകരണങ്ങളും ഒരേ ശൃംഖലയിൽ തുടരണം, ഈ താൾ തുറന്നുവെച്ച്.</translation>
-    </message>
-    <message>
         <source>That is not the code a device shows while it is offering its profile.</source>
         <translation>ഒരു ഉപകരണം തന്റെ പ്രൊഫൈൽ നൽകുമ്പോൾ കാണിക്കുന്ന കോഡ് ഇതല്ല.</translation>
     </message>
@@ -1102,10 +1117,6 @@
         <translation>ബാക്കപ്പിൽനിന്ന് വീണ്ടെടുക്കുക</translation>
     </message>
     <message>
-        <source>On the device that has your profile, make a backup and copy the file onto this phone. Then choose it here.</source>
-        <translation>നിങ്ങളുടെ പ്രൊഫൈൽ ഉള്ള ഉപകരണത്തിൽ ഒരു ബാക്കപ്പ് ഉണ്ടാക്കി ഫയൽ ഈ ഫോണിലേക്ക് പകർത്തുക. പിന്നെ അത് ഇവിടെ തിരഞ്ഞെടുക്കുക.</translation>
-    </message>
-    <message>
         <source>Choose a backup file</source>
         <translation>ബാക്കപ്പ് ഫയൽ തിരഞ്ഞെടുക്കുക</translation>
     </message>
@@ -1116,14 +1127,6 @@
     <message>
         <source>Cancel</source>
         <translation>റദ്ദാക്കുക</translation>
-    </message>
-    <message>
-        <source>The camera is not available on this device. A backup file works without one.</source>
-        <translation>ഈ ഉപകരണത്തിൽ ക്യാമറയില്ല. ബാക്കപ്പ് ഫയലുണ്ടെങ്കിൽ ക്യാമറ വേണ്ട.</translation>
-    </message>
-    <message>
-        <source>On your other device, open Settings and choose to add a second device. Both phones have to be on the same network.</source>
-        <translation>നിങ്ങളുടെ പ്രൊഫൈൽ ഉള്ള ഉപകരണത്തിൽ ക്രമീകരണങ്ങൾ തുറന്ന് രണ്ടാമത്തെ ഉപകരണം ചേർക്കുക എന്നത് തിരഞ്ഞെടുക്കുക. രണ്ടും ഒരേ ശൃംഖലയിൽ വേണം.</translation>
     </message>
     <message>
         <source>Hold the phone up to the code it shows</source>
@@ -1152,6 +1155,26 @@
     <message>
         <source>Choose another file</source>
         <translation>മറ്റൊരു ഫയൽ തിരഞ്ഞെടുക്കുക</translation>
+    </message>
+    <message>
+        <source>The other device runs a newer Delta Chat than this app can read.</source>
+        <translation>മറ്റേ ഉപകരണത്തിലെ Delta Chat ഈ ആപ്പിന് വായിക്കാനാവുന്നതിലും പുതിയതാണ്.</translation>
+    </message>
+    <message>
+        <source>The transfer stopped. Both devices have to stay on one network, with this page open.</source>
+        <translation>കൈമാറ്റം നിന്നു. രണ്ട് ഉപകരണങ്ങളും ഒരേ ശൃംഖലയിൽ തുടരണം, ഈ താൾ തുറന്നിരിക്കണം.</translation>
+    </message>
+    <message>
+        <source>No camera on this device. A backup file works without one.</source>
+        <translation>ഈ ഉപകരണത്തിൽ ക്യാമറയില്ല. ബാക്കപ്പ് ഫയൽ അതില്ലാതെയും പ്രവർത്തിക്കും.</translation>
+    </message>
+    <message>
+        <source>On the other device: Settings, then add a second device. Both on one network.</source>
+        <translation>മറ്റേ ഉപകരണത്തിൽ: ക്രമീകരണങ്ങൾ, പിന്നെ രണ്ടാമത്തെ ഉപകരണമായി ചേർക്കുക. രണ്ടും ഒരേ ശൃംഖലയിൽ.</translation>
+    </message>
+    <message>
+        <source>Make a backup on the other device, copy the file here, then choose it.</source>
+        <translation>മറ്റേ ഉപകരണത്തിൽ ഒരു ബാക്കപ്പ് എടുക്കുക, ഫയൽ ഇവിടേക്കു പകർത്തുക, പിന്നെ അത് തിരഞ്ഞെടുക്കുക.</translation>
     </message>
 </context>
 <context>
@@ -1243,10 +1266,6 @@
         <translation>അറ്റാച്ച്‌മെന്റുകൾ സ്വയമേവ ഡൗൺലോഡ് ചെയ്യുക</translation>
     </message>
     <message>
-        <source>Bigger ones wait until you ask for them. Applies to every profile and to messages that arrive from now on.</source>
-        <translation>വലുതായവ നിങ്ങൾ ആവശ്യപ്പെടുന്നതുവരെ കാത്തിരിക്കും. എല്ലാ പ്രൊഫൈലുകൾക്കും ഇനി മുതൽ വരുന്ന സന്ദേശങ്ങൾക്കും ബാധകം.</translation>
-    </message>
-    <message>
         <source>Links</source>
         <translation>ലിങ്കുകൾ</translation>
     </message>
@@ -1255,16 +1274,8 @@
         <translation>ലിങ്കുകളിൽ നിന്ന് ട്രാക്കിംഗ് നീക്കുക</translation>
     </message>
     <message>
-        <source>Known tracking parameters -- click ids, campaign tags, the sharer&apos;s account -- are taken out of the links in the messages you send. The rest of the link is left as it was.</source>
-        <translation>അറിയപ്പെടുന്ന ട്രാക്കിംഗ് പാരാമീറ്ററുകൾ – ക്ലിക്ക് ഐഡികൾ, കാമ്പെയ്ൻ ടാഗുകൾ, പങ്കിടുന്നയാളുടെ അക്കൗണ്ട് – നിങ്ങൾ അയയ്ക്കുന്ന സന്ദേശങ്ങളിലെ ലിങ്കുകളിൽ നിന്ന് നീക്കം ചെയ്യുന്നു. ലിങ്കിന്റെ ബാക്കി ഭാഗം അതേപടി നിലനിൽക്കും.</translation>
-    </message>
-    <message>
         <source>Notifications</source>
         <translation>അറിയിപ്പുകൾ</translation>
-    </message>
-    <message>
-        <source>On the lock screen and in the notification area. The chat it is from opens on a tap either way.</source>
-        <translation>ലോക്ക് സ്ക്രീനിലും അറിയിപ്പ് മേഖലയിലും. അത് വന്ന ചാറ്റ് ടാപ്പ് ചെയ്താൽ എന്തായാലും തുറക്കും.</translation>
     </message>
     <message>
         <source>Who wrote, and what</source>
@@ -1286,10 +1297,6 @@
         <source>Enable webxdc apps (experimental)</source>
         <extracomment>A webxdc app is a small program somebody sends into a chat and everyone in it plays with. Keep the name: it is what every other Delta Chat client calls them.</extracomment>
         <translation>webxdc ആപ്പുകൾ പ്രവർത്തനക്ഷമമാക്കുക (പരീക്ഷണാത്മകം)</translation>
-    </message>
-    <message>
-        <source>Apps somebody sends run inside the chat, and the attach tray offers a store to take new ones from. An app is somebody else&apos;s code, and this part is not yet as tested as the rest.</source>
-        <translation>ആരെങ്കിലും അയയ്ക്കുന്ന ആപ്പുകൾ ചാറ്റിനുള്ളിൽ തന്നെ പ്രവർത്തിക്കും, കൂടാതെ അറ്റാച്ച്മെന്റ് ട്രേ പുതിയവ എടുക്കാൻ ഒരു സ്റ്റോർ നൽകുന്നു. ആപ്പ് മറ്റൊരാളുടെ കോഡ് ആണ്, ഈ ഭാഗം മറ്റുള്ളവയോളം പരീക്ഷിക്കപ്പെട്ടിട്ടില്ല.</translation>
     </message>
     <message>
         <source>After 1 hour</source>
@@ -1316,10 +1323,6 @@
         <translation>ഉപകരണത്തിൽ നിന്ന് സന്ദേശങ്ങൾ ഇല്ലാതാക്കുക</translation>
     </message>
     <message>
-        <source>Older messages go from this phone, in every chat of every profile, whatever a chat&apos;s own disappearing messages setting says. &quot;Saved messages&quot; are kept.</source>
-        <translation>പഴയ സന്ദേശങ്ങൾ ഈ ഫോണിൽ നിന്ന് പോകും, ഓരോ പ്രൊഫൈലിന്റെയും ഓരോ ചാറ്റിലും, ചാറ്റിന്റെ സ്വന്തം അപ്രത്യക്ഷമാകുന്ന സന്ദേശങ്ങളുടെ ക്രമീകരണം എന്തു പറഞ്ഞാലും. &quot;സംരക്ഷിച്ച സന്ദേശങ്ങൾ&quot; നിലനിർത്തും.</translation>
-    </message>
-    <message>
         <source>A new notification shows</source>
         <translation>പുതിയ അറിയിപ്പ് കാണിക്കുന്നത്</translation>
     </message>
@@ -1329,25 +1332,45 @@
         <translation>പരാമർശങ്ങൾ</translation>
     </message>
     <message>
-        <source>In a muted group, a reply to one of your messages still notifies you.</source>
-        <translation>മ്യൂട്ട് ചെയ്ത ഗ്രൂപ്പിൽ, നിങ്ങളുടെ സന്ദേശത്തിനുള്ള മറുപടി എന്നാലും നിങ്ങളെ അറിയിക്കും.</translation>
-    </message>
-    <message>
         <source>Enter sends the message</source>
         <extracomment>The return key on the keyboard.</extracomment>
         <translation>Enter സന്ദേശം അയയ്ക്കുന്നു</translation>
-    </message>
-    <message>
-        <source>When on, the return key sends. When off, it starts a new line, the message field grows with what is written, and the send button sends.</source>
-        <translation>ഓൺ ആണെങ്കിൽ എന്റർ കീ അയയ്ക്കും. ഓഫ് ആണെങ്കിൽ അത് പുതിയ വരി തുടങ്ങും, സന്ദേശ കളം എഴുതുന്നതിനൊപ്പം വളരും, അയയ്ക്കൽ ബട്ടൺ അയയ്ക്കും.</translation>
     </message>
     <message>
         <source>Use Markdown formatting</source>
         <translation>മാർക്ക്ഡൗൺ രൂപപ്പെടുത്തൽ ഉപയോഗിക്കുക</translation>
     </message>
     <message>
-        <source>When on, a message written with *stars* and `backticks` is shown with the bold, the italics and the links drawn. When off, it is shown exactly as it was written.</source>
-        <translation>ഓൺ ആണെങ്കിൽ *നക്ഷത്രചിഹ്നങ്ങളും* `ബാക്ക്ടിക്കും` ഉപയോഗിച്ച് എഴുതിയ സന്ദേശം ബോൾഡ്, ഇറ്റാലിക്, ലിങ്കുകൾ എന്നിവ അലങ്കരിച്ച് കാണിക്കും. ഓഫ് ആണെങ്കിൽ എഴുതിയതുപോലെ തന്നെ കാണിക്കും.</translation>
+        <source>Otherwise it starts a new line, and the button sends.</source>
+        <translation>അല്ലെങ്കിൽ അത് പുതിയ വരി തുടങ്ങും, അയയ്ക്കുന്നത് ബട്ടണാണ്.</translation>
+    </message>
+    <message>
+        <source>Draws *stars* and `backticks` rather than showing them.</source>
+        <translation>*നക്ഷത്രങ്ങളും* `ബാക്ക്ടിക്കുകളും` കാണിക്കുന്നതിനു പകരം വരയ്ക്കുന്നു.</translation>
+    </message>
+    <message>
+        <source>Bigger ones wait until you ask for them. Every profile, from now on.</source>
+        <translation>വലുതായവ നിങ്ങൾ ചോദിക്കുന്നതുവരെ കാത്തിരിക്കും. എല്ലാ പ്രൊഫൈലുകളും, ഇനി മുതൽ.</translation>
+    </message>
+    <message>
+        <source>Every chat of every profile. &quot;Saved messages&quot; are kept.</source>
+        <translation>ഓരോ പ്രൊഫൈലിന്റെയും ഓരോ സംഭാഷണവും. “സൂക്ഷിച്ച സന്ദേശങ്ങൾ” നിലനിൽക്കും.</translation>
+    </message>
+    <message>
+        <source>On the lock screen and in the notification area.</source>
+        <translation>പൂട്ടിയ സ്ക്രീനിലും അറിയിപ്പ് ഭാഗത്തും.</translation>
+    </message>
+    <message>
+        <source>A reply to you gets through a muted group.</source>
+        <translation>നിങ്ങൾക്കുള്ള മറുപടി നിശ്ശബ്ദമാക്കിയ കൂട്ടത്തിൽനിന്നും എത്തും.</translation>
+    </message>
+    <message>
+        <source>Click ids and campaign tags come out of the links you send.</source>
+        <translation>ക്ലിക്ക് ഐഡികളും പ്രചാരണ ടാഗുകളും നിങ്ങൾ അയയ്ക്കുന്ന കണ്ണികളിൽനിന്ന് ഒഴിവാകും.</translation>
+    </message>
+    <message>
+        <source>Small apps run inside the chat. Somebody else&apos;s code, and less tested than the rest.</source>
+        <translation>ചെറിയ ആപ്പുകൾ സംഭാഷണത്തിനുള്ളിൽത്തന്നെ പ്രവർത്തിക്കുന്നു. മറ്റൊരാളുടെ കോഡ്, ബാക്കിയുള്ളതിനെക്കാൾ കുറവ് പരീക്ഷിച്ചത്.</translation>
     </message>
 </context>
 <context>

@@ -64,7 +64,7 @@ Page {
             textFormat: Text.PlainText
             font.pixelSize: Theme.fontSizeExtraSmall
             color: Theme.secondaryHighlightColor
-            text: qsTr("The device that has it keeps it. This one joins, over the same network.")
+            text: qsTr("The other device keeps it. Both get everything new.")
         }
 
         Item { width: 1; height: Theme.paddingLarge }
@@ -84,7 +84,7 @@ Page {
             textFormat: Text.PlainText
             font.pixelSize: Theme.fontSizeExtraSmall
             color: Theme.secondaryHighlightColor
-            text: qsTr("A backup file the other device wrote, copied onto this phone.")
+            text: qsTr("A backup file copied onto this phone.")
         }
     }
 }

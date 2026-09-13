@@ -35,10 +35,6 @@
         <translation>तयार करा</translation>
     </message>
     <message>
-        <source>Pick a chatmail relay or enter a custom server. The server assigns the address; the encryption keys are made on this device.</source>
-        <translation>एक chatmail रिले निवडा किंवा स्वतःचा सर्व्हर टाका. पत्ता सर्व्हर देतो; एन्क्रिप्शन की याच डिव्हाइसवर तयार होतात.</translation>
-    </message>
-    <message>
         <source>Your name</source>
         <translation>तुमचे नाव</translation>
     </message>
@@ -53,6 +49,41 @@
     <message>
         <source>See &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; for the full list.</source>
         <translation>संपूर्ण यादी &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; येथे पाहा.</translation>
+    </message>
+    <message>
+        <source>The relay gives you an address. The keys are made on this phone.</source>
+        <translation>रिले तुम्हाला पत्ता देतो. किल्ल्या याच फोनवर तयार होतात.</translation>
+    </message>
+</context>
+<context>
+    <name>AddProfilePage</name>
+    <message>
+        <source>Add profile</source>
+        <translation>प्रोफाइल जोडा</translation>
+    </message>
+    <message>
+        <source>Create a profile</source>
+        <translation>प्रोफाइल तयार करा</translation>
+    </message>
+    <message>
+        <source>A new address on a chatmail relay.</source>
+        <translation>एखाद्या चॅटमेल रिलेवर नवा पत्ता.</translation>
+    </message>
+    <message>
+        <source>Restore from a backup</source>
+        <translation>बॅकअपमधून पुनर्संचयित करा</translation>
+    </message>
+    <message>
+        <source>A backup file copied onto this phone.</source>
+        <translation>या फोनवर कॉपी केलेली बॅकअप फाइल.</translation>
+    </message>
+    <message>
+        <source>Add as second device</source>
+        <translation>दुसरे उपकरण म्हणून जोडा</translation>
+    </message>
+    <message>
+        <source>The other device keeps it. Both get everything new.</source>
+        <translation>दुसरे उपकरण ते ठेवते. दोघांनाही सगळे नवे मिळते.</translation>
     </message>
 </context>
 <context>
@@ -135,8 +166,12 @@
         <translation>%1 मध्ये जतन केले</translation>
     </message>
     <message>
-        <source>This profile&apos;s messages, contacts and key in one file, saved to Documents. Whoever has that file has the profile, so keep it somewhere safe. Your other profiles are not in it: each one is backed up from its own page.</source>
-        <translation>या प्रोफाइलचे संदेश, संपर्क आणि किल्ली एकाच फाइलमध्ये, दस्तऐवजांमध्ये जतन केली जाते. ज्याच्याकडे ती फाइल आहे त्याच्याकडे प्रोफाइलही आहे, म्हणून ती सुरक्षित ठिकाणी ठेवा. तुमची इतर प्रोफाइल यात नाहीत: प्रत्येकाचा बॅकअप त्याच्या स्वतःच्या पानावरून घेतला जातो.</translation>
+        <source>Messages, contacts and key in one file, saved to Documents. Whoever has the file has the profile.</source>
+        <translation>संदेश, संपर्क आणि किल्ली एकाच फाइलमध्ये, दस्तऐवजांत जतन केलेली. ज्याच्याकडे फाइल, त्याच्याकडे प्रोफाइल.</translation>
+    </message>
+    <message>
+        <source>Swipe on for your chats.</source>
+        <translation>पुढे सरकवून तुमच्या गप्पांकडे जा.</translation>
     </message>
 </context>
 <context>
@@ -478,10 +513,6 @@
         <translation>नाहीसे होणारे संदेश</translation>
     </message>
     <message>
-        <source>Applies to all members of this chat, they can still copy, save, and forward messages.</source>
-        <translation>या चॅटच्या सर्व सदस्यांना लागू; ते अजूनही संदेश कॉपी, जतन आणि फॉरवर्ड करू शकतात.</translation>
-    </message>
-    <message>
         <source>After 1 year</source>
         <translation>1 वर्षानंतर</translation>
     </message>
@@ -513,6 +544,10 @@
         <source>After %1 seconds</source>
         <translation>%1 सेकंदांनंतर</translation>
     </message>
+    <message>
+        <source>Applies to everyone in the chat. They can still copy and forward.</source>
+        <translation>गप्पांतील सर्वांना लागू. तरीही ते कॉपी आणि फॉरवर्ड करू शकतात.</translation>
+    </message>
 </context>
 <context>
     <name>ExistingProfilePage</name>
@@ -525,16 +560,16 @@
         <translation>दुसरे उपकरण म्हणून जोडा</translation>
     </message>
     <message>
-        <source>The device that has it keeps it. This one joins, over the same network.</source>
-        <translation>ज्या उपकरणावर ते आहे ते तिथेच राहते. हे उपकरण त्याच नेटवर्कवरून जोडले जाते.</translation>
-    </message>
-    <message>
         <source>Restore from a backup</source>
         <translation>बॅकअपमधून पुनर्संचयित करा</translation>
     </message>
     <message>
-        <source>A backup file the other device wrote, copied onto this phone.</source>
-        <translation>दुसऱ्या उपकरणाने तयार केलेली बॅकअप फाइल, या फोनवर कॉपी केलेली.</translation>
+        <source>The other device keeps it. Both get everything new.</source>
+        <translation>दुसरे उपकरण ते ठेवते. दोघांनाही सगळे नवे मिळते.</translation>
+    </message>
+    <message>
+        <source>A backup file copied onto this phone.</source>
+        <translation>या फोनवर कॉपी केलेली बॅकअप फाइल.</translation>
     </message>
 </context>
 <context>
@@ -615,24 +650,12 @@
         <translation>नोंदणी नाही, फोन नंबर नाही</translation>
     </message>
     <message>
-        <source>Your profile is made here on your phone. No phone number, no account with a company, nothing to sign.</source>
-        <translation>तुमचे प्रोफाइल इथेच, तुमच्या फोनवर तयार होते. फोन नंबर नको, कोणत्याही कंपनीचे खाते नको, सही करायलाही काही नाही.</translation>
-    </message>
-    <message>
         <source>You choose who can reach you</source>
         <translation>तुमच्याशी कोण संपर्क करू शकेल हे तुम्ही ठरवता</translation>
     </message>
     <message>
-        <source>There is no directory to be found in. Show a friend a code to scan, or send them a link, and the two of you can write.</source>
-        <translation>तुम्हाला शोधता येईल अशी कोणतीही यादी नाही. मित्राला स्कॅन करण्यासाठी कोड दाखवा किंवा दुवा पाठवा, मग तुम्ही दोघे लिहू शकता.</translation>
-    </message>
-    <message>
         <source>Groups of equals</source>
         <translation>समान हक्कांचे गट</translation>
-    </message>
-    <message>
-        <source>Everyone in a group has the same rights: anyone can add a friend, rename it or leave. Nobody is in charge.</source>
-        <translation>गटात सर्वांचे हक्क समान: कोणीही मित्र जोडू शकतो, नाव बदलू शकतो किंवा बाहेर पडू शकतो. कोणी प्रमुख नसतो.</translation>
     </message>
     <message>
         <source>The server only passes it on</source>
@@ -647,12 +670,24 @@
         <translation>प्रत्येक संदेश एन्क्रिप्ट केलेला असतो</translation>
     </message>
     <message>
-        <source>Messages are encrypted the whole way, always. Servers that transport them cannot read a word.</source>
-        <translation>संदेश नेहमी संपूर्ण वाटेत एन्क्रिप्ट केलेले असतात. ते वाहून नेणाऱ्या सर्व्हरना एक शब्दही वाचता येत नाही.</translation>
+        <source>Made here on your phone. No phone number, no account, nothing to sign.</source>
+        <translation>इथेच, तुमच्या फोनवर तयार होते. फोन नंबर नाही, खाते नाही, सही करायला काही नाही.</translation>
     </message>
     <message>
-        <source>A server holds a message until the other phone is online, and that is all it does. Your chats stay on your device.</source>
-        <translation>दुसरा फोन ऑनलाइन येईपर्यंत सर्व्हर संदेश ठेवतो, एवढेच. तुमच्या गप्पा तुमच्याच उपकरणावर राहतात.</translation>
+        <source>There is no directory to be found in. Show a friend a code, or send a link.</source>
+        <translation>तुम्हाला सापडण्यासाठी अशी कोणतीही यादी नाही. मित्राला कोड दाखवा, किंवा दुवा पाठवा.</translation>
+    </message>
+    <message>
+        <source>Encrypted the whole way, always. The servers cannot read a word.</source>
+        <translation>नेहमी संपूर्ण मार्गावर एन्क्रिप्टेड. सर्व्हर एक शब्दही वाचत नाहीत.</translation>
+    </message>
+    <message>
+        <source>Anyone can add a friend, rename the group or leave. Nobody is in charge.</source>
+        <translation>कोणीही मित्र जोडू शकतो, गटाचे नाव बदलू शकतो किंवा बाहेर पडू शकतो. कोणी मालक नाही.</translation>
+    </message>
+    <message>
+        <source>It holds a message until the other phone is online, and nothing more.</source>
+        <translation>दुसरा फोन ऑनलाइन येईपर्यंत तो संदेश धरून ठेवतो, त्यापेक्षा काही नाही.</translation>
     </message>
 </context>
 <context>
@@ -670,9 +705,9 @@
         <translation>रद्द करा</translation>
     </message>
     <message>
-        <source>Leave %1? You will stop receiving its messages, and only a member can add you back.</source>
+        <source>Leave %1? Only a member can add you back.</source>
         <extracomment>%1 is the group&apos;s name.</extracomment>
-        <translation>%1 सोडायचा? तुम्हाला त्याचे संदेश मिळणे थांबेल, आणि फक्त एखादा सदस्यच तुम्हाला परत जोडू शकेल.</translation>
+        <translation>%1 सोडायचे? तुम्हाला परत फक्त सदस्यच जोडू शकतो.</translation>
     </message>
 </context>
 <context>
@@ -896,16 +931,8 @@
         <translation>पत्ता</translation>
     </message>
     <message>
-        <source>Show invite code</source>
-        <translation>आमंत्रण कोड दाखवा</translation>
-    </message>
-    <message>
         <source>Send read receipts</source>
         <translation>वाचल्याच्या पावत्या पाठवा</translation>
-    </message>
-    <message>
-        <source>Tells the people you write to when you have read their messages, and asks the same of them. With this off you send none and see none.</source>
-        <translation>तुम्ही ज्यांना लिहिता त्यांना तुम्ही त्यांचे संदेश कधी वाचले हे सांगते, आणि त्यांच्याकडूनही तेच मागते. बंद असताना तुम्ही काहीही पाठवत नाही आणि पाहत नाही.</translation>
     </message>
     <message>
         <source>Storage and connectivity</source>
@@ -946,12 +973,8 @@
         <translation>तुम्ही पाठवलेल्या प्रत्येक संदेशावरील नाव</translation>
     </message>
     <message>
-        <source>Backup</source>
-        <translation>बॅकअप</translation>
-    </message>
-    <message>
-        <source>Back up this profile</source>
-        <translation>या प्रोफाइलचा बॅकअप घ्या</translation>
+        <source>Both ways: with this off you send none and see none.</source>
+        <translation>दोन्ही बाजूंनी: बंद असल्यास तुम्ही एकही पाठवत नाही आणि एकही पाहत नाही.</translation>
     </message>
 </context>
 <context>
@@ -977,8 +1000,8 @@
         <translation>%1 ने %2 सेकंदांत उत्तर दिले नाही.</translation>
     </message>
     <message>
-        <source>Chatmail relays are run by volunteers in their spare time. If this one does not seem to work, go back and try another one.</source>
-        <translation>Chatmail रिले स्वयंसेवक आपल्या फावल्या वेळात चालवतात. हे चालत नसल्यासारखे वाटल्यास, मागे जाऊन दुसरे वापरून पाहा.</translation>
+        <source>Relays are run by volunteers. Go back and try another one.</source>
+        <translation>रिले स्वयंसेवक चालवतात. मागे जाऊन दुसरा वापरून पाहा.</translation>
     </message>
 </context>
 <context>
@@ -1024,12 +1047,12 @@
         <translation>प्रोफाइल नाहीत</translation>
     </message>
     <message>
-        <source>Add as second device</source>
-        <translation>दुसरे उपकरण म्हणून जोडा</translation>
+        <source>Invite code</source>
+        <translation>आमंत्रण कोड</translation>
     </message>
     <message>
-        <source>Restore profile from backup</source>
-        <translation>बॅकअपमधून प्रोफाइल पुनर्संचयित करा</translation>
+        <source>Back up profile</source>
+        <translation>प्रोफाइलचा बॅकअप</translation>
     </message>
 </context>
 <context>
@@ -1082,14 +1105,6 @@
 <context>
     <name>RestoreProfilePage</name>
     <message>
-        <source>The other device runs a newer Delta Chat than this app can take a profile from.</source>
-        <translation>दुसऱ्या उपकरणावर या अ‍ॅपला प्रोफाइल घेता येईल त्याहून नवीन Delta Chat आहे.</translation>
-    </message>
-    <message>
-        <source>The transfer stopped before it finished. Both devices have to stay on the same network, with this page open.</source>
-        <translation>हस्तांतरण पूर्ण होण्याआधीच थांबले. दोन्ही उपकरणे एकाच नेटवर्कवर राहायला हवीत, हे पान उघडे ठेवून.</translation>
-    </message>
-    <message>
         <source>That is not the code a device shows while it is offering its profile.</source>
         <translation>एखादे उपकरण आपले प्रोफाइल देताना जो कोड दाखवते, हा तो नाही.</translation>
     </message>
@@ -1102,10 +1117,6 @@
         <translation>बॅकअपमधून पुनर्संचयित करा</translation>
     </message>
     <message>
-        <source>On the device that has your profile, make a backup and copy the file onto this phone. Then choose it here.</source>
-        <translation>ज्या उपकरणावर तुमचे प्रोफाइल आहे तिथे बॅकअप तयार करा आणि फाइल या फोनवर कॉपी करा. मग ती इथे निवडा.</translation>
-    </message>
-    <message>
         <source>Choose a backup file</source>
         <translation>बॅकअप फाइल निवडा</translation>
     </message>
@@ -1116,14 +1127,6 @@
     <message>
         <source>Cancel</source>
         <translation>रद्द करा</translation>
-    </message>
-    <message>
-        <source>The camera is not available on this device. A backup file works without one.</source>
-        <translation>या उपकरणावर कॅमेरा नाही. बॅकअप फाइलने कॅमेऱ्याशिवायही होते.</translation>
-    </message>
-    <message>
-        <source>On your other device, open Settings and choose to add a second device. Both phones have to be on the same network.</source>
-        <translation>ज्या उपकरणावर तुमचे प्रोफाइल आहे तिथे सेटिंग्ज उघडा आणि दुसरे उपकरण जोडणे निवडा. दोन्ही एकाच नेटवर्कवर हवीत.</translation>
     </message>
     <message>
         <source>Hold the phone up to the code it shows</source>
@@ -1152,6 +1155,26 @@
     <message>
         <source>Choose another file</source>
         <translation>दुसरी फाइल निवडा</translation>
+    </message>
+    <message>
+        <source>The other device runs a newer Delta Chat than this app can read.</source>
+        <translation>दुसऱ्या उपकरणावरील Delta Chat हे ॲप वाचू शकेल त्यापेक्षा नवे आहे.</translation>
+    </message>
+    <message>
+        <source>The transfer stopped. Both devices have to stay on one network, with this page open.</source>
+        <translation>हस्तांतरण थांबले. दोन्ही उपकरणे एकाच नेटवर्कवर राहायला हवीत, हे पान उघडे ठेवून.</translation>
+    </message>
+    <message>
+        <source>No camera on this device. A backup file works without one.</source>
+        <translation>या उपकरणावर कॅमेरा नाही. बॅकअप फाइल कॅमेऱ्याशिवायही चालते.</translation>
+    </message>
+    <message>
+        <source>On the other device: Settings, then add a second device. Both on one network.</source>
+        <translation>दुसऱ्या उपकरणावर: सेटिंग्ज, मग दुसरे उपकरण जोडा. दोन्ही एकाच नेटवर्कवर.</translation>
+    </message>
+    <message>
+        <source>Make a backup on the other device, copy the file here, then choose it.</source>
+        <translation>दुसऱ्या उपकरणावर बॅकअप घ्या, फाइल इथे कॉपी करा, मग ती निवडा.</translation>
     </message>
 </context>
 <context>
@@ -1243,10 +1266,6 @@
         <translation>संलग्नके आपोआप डाउनलोड करा</translation>
     </message>
     <message>
-        <source>Bigger ones wait until you ask for them. Applies to every profile and to messages that arrive from now on.</source>
-        <translation>मोठी संलग्नके तुम्ही मागेपर्यंत थांबतात. प्रत्येक प्रोफाइलला आणि आतापासून येणाऱ्या संदेशांना लागू.</translation>
-    </message>
-    <message>
         <source>Links</source>
         <translation>दुवे</translation>
     </message>
@@ -1255,16 +1274,8 @@
         <translation>दुव्यांमधून ट्रॅकिंग काढा</translation>
     </message>
     <message>
-        <source>Known tracking parameters -- click ids, campaign tags, the sharer&apos;s account -- are taken out of the links in the messages you send. The rest of the link is left as it was.</source>
-        <translation>ज्ञात ट्रॅकिंग पॅरामीटर – क्लिक आयडी, मोहीम टॅग, शेअर करणाऱ्याचे खाते – तुम्ही पाठवलेल्या संदेशांमधील दुव्यांमधून काढले जातात. उरलेला दुवा जसा होता तसा राहतो.</translation>
-    </message>
-    <message>
         <source>Notifications</source>
         <translation>सूचना</translation>
-    </message>
-    <message>
-        <source>On the lock screen and in the notification area. The chat it is from opens on a tap either way.</source>
-        <translation>लॉक स्क्रीनवर आणि सूचना क्षेत्रात. तो ज्या चॅटमधून आला आहे ती टॅप केल्यावर कशीही उघडते.</translation>
     </message>
     <message>
         <source>Who wrote, and what</source>
@@ -1286,10 +1297,6 @@
         <source>Enable webxdc apps (experimental)</source>
         <extracomment>A webxdc app is a small program somebody sends into a chat and everyone in it plays with. Keep the name: it is what every other Delta Chat client calls them.</extracomment>
         <translation>webxdc अ‍ॅप्स सक्षम करा (प्रायोगिक)</translation>
-    </message>
-    <message>
-        <source>Apps somebody sends run inside the chat, and the attach tray offers a store to take new ones from. An app is somebody else&apos;s code, and this part is not yet as tested as the rest.</source>
-        <translation>कोणी पाठवलेले अ‍ॅप संभाषणातच चालते, आणि जोडणी ट्रे नवीन घेण्यासाठी एक स्टोअर देते. अ‍ॅप दुसऱ्याचा कोड आहे, आणि हा भाग बाकीच्यांइतका तपासलेला नाही.</translation>
     </message>
     <message>
         <source>After 1 hour</source>
@@ -1316,10 +1323,6 @@
         <translation>डिव्हाइसवरून संदेश हटवा</translation>
     </message>
     <message>
-        <source>Older messages go from this phone, in every chat of every profile, whatever a chat&apos;s own disappearing messages setting says. &quot;Saved messages&quot; are kept.</source>
-        <translation>जुने संदेश या फोनवरून जातात, प्रत्येक प्रोफाइलच्या प्रत्येक चॅटमध्ये, चॅटची स्वतःची नाहीसे होणारे संदेश सेटिंग काहीही म्हणो. &quot;जतन केलेले संदेश&quot; ठेवले जातात.</translation>
-    </message>
-    <message>
         <source>A new notification shows</source>
         <translation>नवीन सूचना दाखवते</translation>
     </message>
@@ -1329,25 +1332,45 @@
         <translation>उल्लेख</translation>
     </message>
     <message>
-        <source>In a muted group, a reply to one of your messages still notifies you.</source>
-        <translation>म्यूट केलेल्या गटात, तुमच्या संदेशाला आलेले उत्तर तरीही तुम्हाला सूचित करते.</translation>
-    </message>
-    <message>
         <source>Enter sends the message</source>
         <extracomment>The return key on the keyboard.</extracomment>
         <translation>Enter संदेश पाठवते</translation>
-    </message>
-    <message>
-        <source>When on, the return key sends. When off, it starts a new line, the message field grows with what is written, and the send button sends.</source>
-        <translation>चालू असल्यास एंटर कळ पाठवते. बंद असल्यास ती नवीन ओळ सुरू करते, संदेशाचे क्षेत्र लिहिल्यानुसार वाढते, आणि पाठवण्याचे बटण पाठवते.</translation>
     </message>
     <message>
         <source>Use Markdown formatting</source>
         <translation>मार्कडाउन स्वरूपण वापरा</translation>
     </message>
     <message>
-        <source>When on, a message written with *stars* and `backticks` is shown with the bold, the italics and the links drawn. When off, it is shown exactly as it was written.</source>
-        <translation>चालू असल्यास *तारका* आणि `बॅकटिक` वापरून लिहिलेला संदेश ठळक, तिरका आणि दुवे सजवून दाखवला जातो. बंद असल्यास तो जसा लिहिला तसाच दाखवला जातो.</translation>
+        <source>Otherwise it starts a new line, and the button sends.</source>
+        <translation>अन्यथा ती नवी ओळ सुरू करते, आणि बटण पाठवते.</translation>
+    </message>
+    <message>
+        <source>Draws *stars* and `backticks` rather than showing them.</source>
+        <translation>*तारे* आणि `बॅकटिक` दाखवण्याऐवजी रेखाटतो.</translation>
+    </message>
+    <message>
+        <source>Bigger ones wait until you ask for them. Every profile, from now on.</source>
+        <translation>मोठ्या फाइल तुम्ही मागेपर्यंत थांबतात. प्रत्येक प्रोफाइल, आतापासून.</translation>
+    </message>
+    <message>
+        <source>Every chat of every profile. &quot;Saved messages&quot; are kept.</source>
+        <translation>प्रत्येक प्रोफाइलच्या प्रत्येक गप्पा. “जतन केलेले संदेश” राहतात.</translation>
+    </message>
+    <message>
+        <source>On the lock screen and in the notification area.</source>
+        <translation>लॉक स्क्रीनवर आणि सूचना क्षेत्रात.</translation>
+    </message>
+    <message>
+        <source>A reply to you gets through a muted group.</source>
+        <translation>तुम्हाला दिलेले उत्तर शांत केलेल्या गटातूनही पोहोचते.</translation>
+    </message>
+    <message>
+        <source>Click ids and campaign tags come out of the links you send.</source>
+        <translation>क्लिक आयडी आणि मोहिमेच्या खुणा तुम्ही पाठवलेल्या दुव्यांतून निघून जातात.</translation>
+    </message>
+    <message>
+        <source>Small apps run inside the chat. Somebody else&apos;s code, and less tested than the rest.</source>
+        <translation>छोटी ॲप्स गप्पांच्या आतच चालतात. दुसऱ्याचा कोड, आणि बाकीच्यापेक्षा कमी तपासलेला.</translation>
     </message>
 </context>
 <context>

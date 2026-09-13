@@ -35,10 +35,6 @@
         <translation>创建</translation>
     </message>
     <message>
-        <source>Pick a chatmail relay or enter a custom server. The server assigns the address; the encryption keys are made on this device.</source>
-        <translation>选择一个 chatmail 中继，或输入自定义服务器。地址由服务器分配；加密密钥在本设备上生成。</translation>
-    </message>
-    <message>
         <source>Your name</source>
         <translation>你的名字</translation>
     </message>
@@ -53,6 +49,41 @@
     <message>
         <source>See &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; for the full list.</source>
         <translation>完整列表见 &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;。</translation>
+    </message>
+    <message>
+        <source>The relay gives you an address. The keys are made on this phone.</source>
+        <translation>中继给你一个地址。密钥在这台手机上生成。</translation>
+    </message>
+</context>
+<context>
+    <name>AddProfilePage</name>
+    <message>
+        <source>Add profile</source>
+        <translation>添加个人资料</translation>
+    </message>
+    <message>
+        <source>Create a profile</source>
+        <translation>创建个人资料</translation>
+    </message>
+    <message>
+        <source>A new address on a chatmail relay.</source>
+        <translation>chatmail 中继上的一个新地址。</translation>
+    </message>
+    <message>
+        <source>Restore from a backup</source>
+        <translation>从备份恢复</translation>
+    </message>
+    <message>
+        <source>A backup file copied onto this phone.</source>
+        <translation>已复制到这台手机上的备份文件。</translation>
+    </message>
+    <message>
+        <source>Add as second device</source>
+        <translation>添加为第二台设备</translation>
+    </message>
+    <message>
+        <source>The other device keeps it. Both get everything new.</source>
+        <translation>另一台设备仍然留着它。两台都会收到所有新消息。</translation>
     </message>
 </context>
 <context>
@@ -134,8 +165,12 @@
         <translation>已保存到 %1</translation>
     </message>
     <message>
-        <source>This profile&apos;s messages, contacts and key in one file, saved to Documents. Whoever has that file has the profile, so keep it somewhere safe. Your other profiles are not in it: each one is backed up from its own page.</source>
-        <translation>这个个人资料的消息、联系人和密钥会写进一个文件，保存到“文档”。谁拿到这个文件就等于拿到这个个人资料，请妥善保管。你的其他个人资料不在里面：每个都要从它自己的页面备份。</translation>
+        <source>Messages, contacts and key in one file, saved to Documents. Whoever has the file has the profile.</source>
+        <translation>消息、联系人和密钥在一个文件里，保存到“文档”。谁拿到文件，谁就拿到这个个人资料。</translation>
+    </message>
+    <message>
+        <source>Swipe on for your chats.</source>
+        <translation>向前滑动去看你的聊天。</translation>
     </message>
 </context>
 <context>
@@ -476,10 +511,6 @@
         <translation>阅后即焚消息</translation>
     </message>
     <message>
-        <source>Applies to all members of this chat, they can still copy, save, and forward messages.</source>
-        <translation>对本聊天的所有成员生效；他们仍可复制、保存和转发消息。</translation>
-    </message>
-    <message>
         <source>After 1 year</source>
         <translation>1 年后</translation>
     </message>
@@ -511,6 +542,10 @@
         <source>After %1 seconds</source>
         <translation>%1 秒后</translation>
     </message>
+    <message>
+        <source>Applies to everyone in the chat. They can still copy and forward.</source>
+        <translation>对聊天中的所有人生效。他们仍然可以复制和转发。</translation>
+    </message>
 </context>
 <context>
     <name>ExistingProfilePage</name>
@@ -523,16 +558,16 @@
         <translation>添加为第二台设备</translation>
     </message>
     <message>
-        <source>The device that has it keeps it. This one joins, over the same network.</source>
-        <translation>拥有它的那台设备仍然保留它。这台通过同一个网络加入。</translation>
-    </message>
-    <message>
         <source>Restore from a backup</source>
         <translation>从备份恢复</translation>
     </message>
     <message>
-        <source>A backup file the other device wrote, copied onto this phone.</source>
-        <translation>另一台设备写出的备份文件，复制到这部手机上。</translation>
+        <source>The other device keeps it. Both get everything new.</source>
+        <translation>另一台设备仍然留着它。两台都会收到所有新消息。</translation>
+    </message>
+    <message>
+        <source>A backup file copied onto this phone.</source>
+        <translation>已复制到这台手机上的备份文件。</translation>
     </message>
 </context>
 <context>
@@ -611,24 +646,12 @@
         <translation>无需注册，无需手机号</translation>
     </message>
     <message>
-        <source>Your profile is made here on your phone. No phone number, no account with a company, nothing to sign.</source>
-        <translation>你的个人资料就在这部手机上生成。不需要手机号，不需要在任何公司开户，也没有什么要签的。</translation>
-    </message>
-    <message>
         <source>You choose who can reach you</source>
         <translation>谁能联系你，由你决定</translation>
     </message>
     <message>
-        <source>There is no directory to be found in. Show a friend a code to scan, or send them a link, and the two of you can write.</source>
-        <translation>没有可以查到你的名录。给朋友看一个二维码，或者发给对方一个链接，你们就能互相写信了。</translation>
-    </message>
-    <message>
         <source>Groups of equals</source>
         <translation>人人平等的群组</translation>
-    </message>
-    <message>
-        <source>Everyone in a group has the same rights: anyone can add a friend, rename it or leave. Nobody is in charge.</source>
-        <translation>群组里所有人的权限相同：谁都可以添加朋友、改名或离开。没有谁说了算。</translation>
     </message>
     <message>
         <source>The server only passes it on</source>
@@ -643,12 +666,24 @@
         <translation>每条消息都是加密的</translation>
     </message>
     <message>
-        <source>Messages are encrypted the whole way, always. Servers that transport them cannot read a word.</source>
-        <translation>消息始终全程加密。传输它们的服务器一个字也读不到。</translation>
+        <source>Made here on your phone. No phone number, no account, nothing to sign.</source>
+        <translation>就在你的手机上创建。不用电话号码，不用账户，没什么要签。</translation>
     </message>
     <message>
-        <source>A server holds a message until the other phone is online, and that is all it does. Your chats stay on your device.</source>
-        <translation>服务器会把消息存着，直到对方手机上线，它只做这一件事。你的聊天留在你自己的设备上。</translation>
+        <source>There is no directory to be found in. Show a friend a code, or send a link.</source>
+        <translation>没有可以被找到的名录。给朋友看个码，或者发个链接。</translation>
+    </message>
+    <message>
+        <source>Encrypted the whole way, always. The servers cannot read a word.</source>
+        <translation>始终全程加密。服务器一个字也读不到。</translation>
+    </message>
+    <message>
+        <source>Anyone can add a friend, rename the group or leave. Nobody is in charge.</source>
+        <translation>谁都可以添加朋友、改名或离开。没有人说了算。</translation>
+    </message>
+    <message>
+        <source>It holds a message until the other phone is online, and nothing more.</source>
+        <translation>它只是把消息留着，直到对方手机上线，仅此而已。</translation>
     </message>
 </context>
 <context>
@@ -666,9 +701,9 @@
         <translation>取消</translation>
     </message>
     <message>
-        <source>Leave %1? You will stop receiving its messages, and only a member can add you back.</source>
+        <source>Leave %1? Only a member can add you back.</source>
         <extracomment>%1 is the group&apos;s name.</extracomment>
-        <translation>退出 %1？你将不再收到它的消息，并且只有成员才能把你重新加回来。</translation>
+        <translation>离开 %1？只有成员才能把你加回来。</translation>
     </message>
 </context>
 <context>
@@ -890,16 +925,8 @@
         <translation>地址</translation>
     </message>
     <message>
-        <source>Show invite code</source>
-        <translation>显示邀请码</translation>
-    </message>
-    <message>
         <source>Send read receipts</source>
         <translation>发送已读回执</translation>
-    </message>
-    <message>
-        <source>Tells the people you write to when you have read their messages, and asks the same of them. With this off you send none and see none.</source>
-        <translation>让你写信的人知道你何时读了他们的消息，并请求他们也这样做。关闭后，你既不发送也看不到已读回执。</translation>
     </message>
     <message>
         <source>Storage and connectivity</source>
@@ -940,12 +967,8 @@
         <translation>你发送的每条消息上显示的名字</translation>
     </message>
     <message>
-        <source>Backup</source>
-        <translation>备份</translation>
-    </message>
-    <message>
-        <source>Back up this profile</source>
-        <translation>备份这个个人资料</translation>
+        <source>Both ways: with this off you send none and see none.</source>
+        <translation>两个方向：关掉后你不发送，也看不到。</translation>
     </message>
 </context>
 <context>
@@ -971,8 +994,8 @@
         <translation>%1 在 %2 秒内没有回应。</translation>
     </message>
     <message>
-        <source>Chatmail relays are run by volunteers in their spare time. If this one does not seem to work, go back and try another one.</source>
-        <translation>Chatmail 中继由志愿者利用业余时间运营。如果这个似乎不可用，请返回并尝试另一个。</translation>
+        <source>Relays are run by volunteers. Go back and try another one.</source>
+        <translation>中继由志愿者运行。返回再试一个别的。</translation>
     </message>
 </context>
 <context>
@@ -1018,12 +1041,12 @@
         <translation>没有个人资料</translation>
     </message>
     <message>
-        <source>Add as second device</source>
-        <translation>添加为第二台设备</translation>
+        <source>Invite code</source>
+        <translation>邀请码</translation>
     </message>
     <message>
-        <source>Restore profile from backup</source>
-        <translation>从备份恢复个人资料</translation>
+        <source>Back up profile</source>
+        <translation>备份个人资料</translation>
     </message>
 </context>
 <context>
@@ -1076,14 +1099,6 @@
 <context>
     <name>RestoreProfilePage</name>
     <message>
-        <source>The other device runs a newer Delta Chat than this app can take a profile from.</source>
-        <translation>另一台设备上的 Delta Chat 比本应用能接收个人资料的版本更新。</translation>
-    </message>
-    <message>
-        <source>The transfer stopped before it finished. Both devices have to stay on the same network, with this page open.</source>
-        <translation>传输在完成前停止了。两台设备要留在同一个网络里，并保持此页面打开。</translation>
-    </message>
-    <message>
         <source>That is not the code a device shows while it is offering its profile.</source>
         <translation>这不是设备在提供个人资料时显示的那个码。</translation>
     </message>
@@ -1096,10 +1111,6 @@
         <translation>从备份恢复</translation>
     </message>
     <message>
-        <source>On the device that has your profile, make a backup and copy the file onto this phone. Then choose it here.</source>
-        <translation>在有你个人资料的设备上创建备份，把文件复制到这部手机，然后在这里选择它。</translation>
-    </message>
-    <message>
         <source>Choose a backup file</source>
         <translation>选择备份文件</translation>
     </message>
@@ -1110,14 +1121,6 @@
     <message>
         <source>Cancel</source>
         <translation>取消</translation>
-    </message>
-    <message>
-        <source>The camera is not available on this device. A backup file works without one.</source>
-        <translation>这台设备没有摄像头。用备份文件也可以，不需要摄像头。</translation>
-    </message>
-    <message>
-        <source>On your other device, open Settings and choose to add a second device. Both phones have to be on the same network.</source>
-        <translation>在有你个人资料的设备上打开设置，选择添加第二台设备。两台设备要在同一个网络里。</translation>
     </message>
     <message>
         <source>Hold the phone up to the code it shows</source>
@@ -1146,6 +1149,26 @@
     <message>
         <source>Choose another file</source>
         <translation>选择另一个文件</translation>
+    </message>
+    <message>
+        <source>The other device runs a newer Delta Chat than this app can read.</source>
+        <translation>另一台设备上的 Delta Chat 比这个应用能读的还新。</translation>
+    </message>
+    <message>
+        <source>The transfer stopped. Both devices have to stay on one network, with this page open.</source>
+        <translation>传输停止了。两台设备要留在同一个网络里，并让这一页开着。</translation>
+    </message>
+    <message>
+        <source>No camera on this device. A backup file works without one.</source>
+        <translation>这台设备没有相机。备份文件不用相机也行。</translation>
+    </message>
+    <message>
+        <source>On the other device: Settings, then add a second device. Both on one network.</source>
+        <translation>在另一台设备上：设置，然后添加第二台设备。两台在同一个网络里。</translation>
+    </message>
+    <message>
+        <source>Make a backup on the other device, copy the file here, then choose it.</source>
+        <translation>在另一台设备上做备份，把文件复制到这里，然后选它。</translation>
     </message>
 </context>
 <context>
@@ -1237,10 +1260,6 @@
         <translation>自动下载附件</translation>
     </message>
     <message>
-        <source>Bigger ones wait until you ask for them. Applies to every profile and to messages that arrive from now on.</source>
-        <translation>更大的附件会等到你请求时再下载。适用于所有个人资料以及从现在起收到的消息。</translation>
-    </message>
-    <message>
         <source>Links</source>
         <translation>链接</translation>
     </message>
@@ -1249,16 +1268,8 @@
         <translation>去除链接中的跟踪参数</translation>
     </message>
     <message>
-        <source>Known tracking parameters -- click ids, campaign tags, the sharer&apos;s account -- are taken out of the links in the messages you send. The rest of the link is left as it was.</source>
-        <translation>已知的跟踪参数（点击 ID、营销活动标签、分享者账号）会从你发送的消息的链接中去除。链接的其余部分保持原样。</translation>
-    </message>
-    <message>
         <source>Notifications</source>
         <translation>通知</translation>
-    </message>
-    <message>
-        <source>On the lock screen and in the notification area. The chat it is from opens on a tap either way.</source>
-        <translation>在锁屏和通知区域中。无论如何，点按都会打开它所在的聊天。</translation>
     </message>
     <message>
         <source>Who wrote, and what</source>
@@ -1280,10 +1291,6 @@
         <source>Enable webxdc apps (experimental)</source>
         <extracomment>A webxdc app is a small program somebody sends into a chat and everyone in it plays with. Keep the name: it is what every other Delta Chat client calls them.</extracomment>
         <translation>启用 webxdc 应用（实验性）</translation>
-    </message>
-    <message>
-        <source>Apps somebody sends run inside the chat, and the attach tray offers a store to take new ones from. An app is somebody else&apos;s code, and this part is not yet as tested as the rest.</source>
-        <translation>别人发来的应用会直接在聊天里运行，附件托盘还会提供一个商店，可以从那里获取新的应用。应用是别人的代码，这部分还没有其余部分那样经过充分测试。</translation>
     </message>
     <message>
         <source>After 1 hour</source>
@@ -1310,10 +1317,6 @@
         <translation>从设备删除消息</translation>
     </message>
     <message>
-        <source>Older messages go from this phone, in every chat of every profile, whatever a chat&apos;s own disappearing messages setting says. &quot;Saved messages&quot; are kept.</source>
-        <translation>较旧的消息会从本机删除，涵盖每个个人资料的每个聊天，无论聊天自身的阅后即焚设置如何。“已保存的消息”会保留。</translation>
-    </message>
-    <message>
         <source>A new notification shows</source>
         <translation>新通知显示</translation>
     </message>
@@ -1323,25 +1326,45 @@
         <translation>提及</translation>
     </message>
     <message>
-        <source>In a muted group, a reply to one of your messages still notifies you.</source>
-        <translation>在已静音的群组中，对你消息的回复仍会通知你。</translation>
-    </message>
-    <message>
         <source>Enter sends the message</source>
         <extracomment>The return key on the keyboard.</extracomment>
         <translation>回车键发送消息</translation>
-    </message>
-    <message>
-        <source>When on, the return key sends. When off, it starts a new line, the message field grows with what is written, and the send button sends.</source>
-        <translation>开启时，回车键发送。关闭时，回车换行，消息框随内容变高，由发送按钮发送。</translation>
     </message>
     <message>
         <source>Use Markdown formatting</source>
         <translation>使用 Markdown 格式</translation>
     </message>
     <message>
-        <source>When on, a message written with *stars* and `backticks` is shown with the bold, the italics and the links drawn. When off, it is shown exactly as it was written.</source>
-        <translation>开启时，用 *星号* 和 `反引号` 写的消息会渲染出粗体、斜体和链接。关闭时，完全按原样显示。</translation>
+        <source>Otherwise it starts a new line, and the button sends.</source>
+        <translation>否则它换行，由按钮发送。</translation>
+    </message>
+    <message>
+        <source>Draws *stars* and `backticks` rather than showing them.</source>
+        <translation>把 *星号* 和 `反引号` 画出来，而不是照原样显示。</translation>
+    </message>
+    <message>
+        <source>Bigger ones wait until you ask for them. Every profile, from now on.</source>
+        <translation>更大的会等你主动要。所有个人资料，从现在起。</translation>
+    </message>
+    <message>
+        <source>Every chat of every profile. &quot;Saved messages&quot; are kept.</source>
+        <translation>每个个人资料的每个聊天。“已保存的消息”会保留。</translation>
+    </message>
+    <message>
+        <source>On the lock screen and in the notification area.</source>
+        <translation>在锁屏和通知区域里。</translation>
+    </message>
+    <message>
+        <source>A reply to you gets through a muted group.</source>
+        <translation>发给你的回复，在静音群组里也会通知你。</translation>
+    </message>
+    <message>
+        <source>Click ids and campaign tags come out of the links you send.</source>
+        <translation>点击标识和广告活动标签会从你发出的链接里去掉。</translation>
+    </message>
+    <message>
+        <source>Small apps run inside the chat. Somebody else&apos;s code, and less tested than the rest.</source>
+        <translation>小应用在聊天里运行。别人的代码，也比其余部分少经检验。</translation>
     </message>
 </context>
 <context>

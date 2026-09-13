@@ -35,10 +35,6 @@
         <translation>Ustvari</translation>
     </message>
     <message>
-        <source>Pick a chatmail relay or enter a custom server. The server assigns the address; the encryption keys are made on this device.</source>
-        <translation>Izberite chatmail posrednik ali vnesite lasten strežnik. Strežnik dodeli naslov; šifrirni ključi se ustvarijo na tej napravi.</translation>
-    </message>
-    <message>
         <source>Your name</source>
         <translation>Vaše ime</translation>
     </message>
@@ -53,6 +49,41 @@
     <message>
         <source>See &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; for the full list.</source>
         <translation>Celoten seznam je na &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
+    </message>
+    <message>
+        <source>The relay gives you an address. The keys are made on this phone.</source>
+        <translation>Posrednik ti da naslov. Ključi nastanejo na tem telefonu.</translation>
+    </message>
+</context>
+<context>
+    <name>AddProfilePage</name>
+    <message>
+        <source>Add profile</source>
+        <translation>Dodaj profil</translation>
+    </message>
+    <message>
+        <source>Create a profile</source>
+        <translation>Ustvari profil</translation>
+    </message>
+    <message>
+        <source>A new address on a chatmail relay.</source>
+        <translation>Nov naslov na posredniku chatmail.</translation>
+    </message>
+    <message>
+        <source>Restore from a backup</source>
+        <translation>Obnovi iz varnostne kopije</translation>
+    </message>
+    <message>
+        <source>A backup file copied onto this phone.</source>
+        <translation>Datoteka varnostne kopije, prekopirana na ta telefon.</translation>
+    </message>
+    <message>
+        <source>Add as second device</source>
+        <translation>Dodaj kot drugo napravo</translation>
+    </message>
+    <message>
+        <source>The other device keeps it. Both get everything new.</source>
+        <translation>Druga naprava ga obdrži. Obe dobita vse novo.</translation>
     </message>
 </context>
 <context>
@@ -137,8 +168,12 @@
         <translation>Shranjeno v %1</translation>
     </message>
     <message>
-        <source>This profile&apos;s messages, contacts and key in one file, saved to Documents. Whoever has that file has the profile, so keep it somewhere safe. Your other profiles are not in it: each one is backed up from its own page.</source>
-        <translation>Sporočila, stiki in ključ tega profila v eni datoteki, shranjeni v Dokumente. Kdor ima to datoteko, ima tudi profil, zato jo hranite na varnem. Vaših drugih profilov v njej ni: vsakega se varnostno kopira z njegove lastne strani.</translation>
+        <source>Messages, contacts and key in one file, saved to Documents. Whoever has the file has the profile.</source>
+        <translation>Sporočila, stiki in ključ v eni datoteki, shranjeni v Dokumente. Kdor ima datoteko, ima profil.</translation>
+    </message>
+    <message>
+        <source>Swipe on for your chats.</source>
+        <translation>Podrsaj naprej do svojih klepetov.</translation>
     </message>
 </context>
 <context>
@@ -482,10 +517,6 @@
         <translation>Izginjajoča sporočila</translation>
     </message>
     <message>
-        <source>Applies to all members of this chat, they can still copy, save, and forward messages.</source>
-        <translation>Velja za vse člane tega klepeta; sporočila lahko še vedno kopirajo, shranjujejo in posredujejo.</translation>
-    </message>
-    <message>
         <source>After 1 year</source>
         <translation>Po 1 letu</translation>
     </message>
@@ -517,6 +548,10 @@
         <source>After %1 seconds</source>
         <translation>Po %1 sekundah</translation>
     </message>
+    <message>
+        <source>Applies to everyone in the chat. They can still copy and forward.</source>
+        <translation>Velja za vse v klepetu. Kopirati in posredovati še vedno lahko.</translation>
+    </message>
 </context>
 <context>
     <name>ExistingProfilePage</name>
@@ -529,16 +564,16 @@
         <translation>Dodaj kot drugo napravo</translation>
     </message>
     <message>
-        <source>The device that has it keeps it. This one joins, over the same network.</source>
-        <translation>Naprava, ki ga ima, ga obdrži. Ta se pridruži prek istega omrežja.</translation>
-    </message>
-    <message>
         <source>Restore from a backup</source>
         <translation>Obnovi iz varnostne kopije</translation>
     </message>
     <message>
-        <source>A backup file the other device wrote, copied onto this phone.</source>
-        <translation>Datoteka varnostne kopije, ki jo je zapisala druga naprava, prekopirana na ta telefon.</translation>
+        <source>The other device keeps it. Both get everything new.</source>
+        <translation>Druga naprava ga obdrži. Obe dobita vse novo.</translation>
+    </message>
+    <message>
+        <source>A backup file copied onto this phone.</source>
+        <translation>Datoteka varnostne kopije, prekopirana na ta telefon.</translation>
     </message>
 </context>
 <context>
@@ -623,24 +658,12 @@
         <translation>Brez registracije, brez telefonske številke</translation>
     </message>
     <message>
-        <source>Your profile is made here on your phone. No phone number, no account with a company, nothing to sign.</source>
-        <translation>Vaš profil nastane tu, v telefonu. Brez telefonske številke, brez računa pri podjetju, nič ni treba podpisati.</translation>
-    </message>
-    <message>
         <source>You choose who can reach you</source>
         <translation>Vi določite, kdo vas lahko doseže</translation>
     </message>
     <message>
-        <source>There is no directory to be found in. Show a friend a code to scan, or send them a link, and the two of you can write.</source>
-        <translation>Ni imenika, v katerem bi vas našli. Prijatelju pokažite kodo za optično branje ali mu pošljite povezavo, pa si lahko pišeta.</translation>
-    </message>
-    <message>
         <source>Groups of equals</source>
         <translation>Skupine enakih</translation>
-    </message>
-    <message>
-        <source>Everyone in a group has the same rights: anyone can add a friend, rename it or leave. Nobody is in charge.</source>
-        <translation>V skupini imajo vsi enake pravice: vsak lahko doda prijatelja, jo preimenuje ali jo zapusti. Nihče ni glavni.</translation>
     </message>
     <message>
         <source>The server only passes it on</source>
@@ -655,12 +678,24 @@
         <translation>Vsako sporočilo je šifrirano</translation>
     </message>
     <message>
-        <source>Messages are encrypted the whole way, always. Servers that transport them cannot read a word.</source>
-        <translation>Sporočila so vedno šifrirana vso pot. Strežniki, ki jih prenašajo, ne preberejo niti besede.</translation>
+        <source>Made here on your phone. No phone number, no account, nothing to sign.</source>
+        <translation>Nastane tu, na tvojem telefonu. Brez številke, brez računa, nič za podpisati.</translation>
     </message>
     <message>
-        <source>A server holds a message until the other phone is online, and that is all it does. Your chats stay on your device.</source>
-        <translation>Strežnik zadrži sporočilo, dokler drugi telefon ni na zvezi, in nič drugega. Vaši pogovori ostanejo v vaši napravi.</translation>
+        <source>There is no directory to be found in. Show a friend a code, or send a link.</source>
+        <translation>Ni imenika, v katerem bi te našli. Prijatelju pokaži kodo ali mu pošlji povezavo.</translation>
+    </message>
+    <message>
+        <source>Encrypted the whole way, always. The servers cannot read a word.</source>
+        <translation>Vedno šifrirano vso pot. Strežniki ne preberejo besede.</translation>
+    </message>
+    <message>
+        <source>Anyone can add a friend, rename the group or leave. Nobody is in charge.</source>
+        <translation>Kdorkoli lahko doda prijatelja, preimenuje skupino ali odide. Nihče ne ukazuje.</translation>
+    </message>
+    <message>
+        <source>It holds a message until the other phone is online, and nothing more.</source>
+        <translation>Sporočilo zadrži, dokler drugi telefon ni na zvezi, in nič več.</translation>
     </message>
 </context>
 <context>
@@ -678,9 +713,9 @@
         <translation>Prekliči</translation>
     </message>
     <message>
-        <source>Leave %1? You will stop receiving its messages, and only a member can add you back.</source>
+        <source>Leave %1? Only a member can add you back.</source>
         <extracomment>%1 is the group&apos;s name.</extracomment>
-        <translation>Zapustim %1? Njenih sporočil ne boste več prejemali, nazaj pa vas lahko doda le član.</translation>
+        <translation>Zapustiti %1? Nazaj te lahko doda le član.</translation>
     </message>
 </context>
 <context>
@@ -908,16 +943,8 @@
         <translation>Naslov</translation>
     </message>
     <message>
-        <source>Show invite code</source>
-        <translation>Pokaži kodo povabila</translation>
-    </message>
-    <message>
         <source>Send read receipts</source>
         <translation>Pošiljaj potrdila o branju</translation>
-    </message>
-    <message>
-        <source>Tells the people you write to when you have read their messages, and asks the same of them. With this off you send none and see none.</source>
-        <translation>Ljudem, ki jim pišete, sporoča, kdaj ste prebrali njihova sporočila, in od njih zahteva enako. Izklopljeno ne pošiljate in ne vidite nobenih.</translation>
     </message>
     <message>
         <source>Storage and connectivity</source>
@@ -958,12 +985,8 @@
         <translation>Ime na vsakem sporočilu, ki ga pošljete</translation>
     </message>
     <message>
-        <source>Backup</source>
-        <translation>Varnostna kopija</translation>
-    </message>
-    <message>
-        <source>Back up this profile</source>
-        <translation>Varnostno kopiraj ta profil</translation>
+        <source>Both ways: with this off you send none and see none.</source>
+        <translation>V obe smeri: izklopljeno jih ne pošiljaš in jih ne vidiš.</translation>
     </message>
 </context>
 <context>
@@ -989,8 +1012,8 @@
         <translation>%1 ni odgovoril v %2 sekundah.</translation>
     </message>
     <message>
-        <source>Chatmail relays are run by volunteers in their spare time. If this one does not seem to work, go back and try another one.</source>
-        <translation>Releje chatmail vzdržujejo prostovoljci v prostem času. Če se zdi, da ta ne deluje, se vrnite in poskusite z drugim.</translation>
+        <source>Relays are run by volunteers. Go back and try another one.</source>
+        <translation>Posrednike vodijo prostovoljci. Pojdi nazaj in poskusi drugega.</translation>
     </message>
 </context>
 <context>
@@ -1036,12 +1059,12 @@
         <translation>Ni profilov</translation>
     </message>
     <message>
-        <source>Add as second device</source>
-        <translation>Dodaj kot drugo napravo</translation>
+        <source>Invite code</source>
+        <translation>Koda povabila</translation>
     </message>
     <message>
-        <source>Restore profile from backup</source>
-        <translation>Obnovi profil iz varnostne kopije</translation>
+        <source>Back up profile</source>
+        <translation>Varnostna kopija profila</translation>
     </message>
 </context>
 <context>
@@ -1094,14 +1117,6 @@
 <context>
     <name>RestoreProfilePage</name>
     <message>
-        <source>The other device runs a newer Delta Chat than this app can take a profile from.</source>
-        <translation>Na drugi napravi teče novejši Delta Chat, kot ga ta aplikacija zna prevzeti.</translation>
-    </message>
-    <message>
-        <source>The transfer stopped before it finished. Both devices have to stay on the same network, with this page open.</source>
-        <translation>Prenos se je ustavil, preden je bil končan. Obe napravi morata ostati v istem omrežju, ta stran pa odprta.</translation>
-    </message>
-    <message>
         <source>That is not the code a device shows while it is offering its profile.</source>
         <translation>To ni koda, ki jo naprava pokaže, medtem ko ponuja svoj profil.</translation>
     </message>
@@ -1114,10 +1129,6 @@
         <translation>Obnovi iz varnostne kopije</translation>
     </message>
     <message>
-        <source>On the device that has your profile, make a backup and copy the file onto this phone. Then choose it here.</source>
-        <translation>Na napravi, ki ima vaš profil, naredite varnostno kopijo in datoteko prekopirajte na ta telefon. Nato jo izberite tukaj.</translation>
-    </message>
-    <message>
         <source>Choose a backup file</source>
         <translation>Izberi datoteko varnostne kopije</translation>
     </message>
@@ -1128,14 +1139,6 @@
     <message>
         <source>Cancel</source>
         <translation>Prekliči</translation>
-    </message>
-    <message>
-        <source>The camera is not available on this device. A backup file works without one.</source>
-        <translation>Na tej napravi ni kamere. Z datoteko varnostne kopije gre tudi brez nje.</translation>
-    </message>
-    <message>
-        <source>On your other device, open Settings and choose to add a second device. Both phones have to be on the same network.</source>
-        <translation>Na napravi, ki ima vaš profil, odprite nastavitve in izberite dodajanje druge naprave. Obe morata biti v istem omrežju.</translation>
     </message>
     <message>
         <source>Hold the phone up to the code it shows</source>
@@ -1164,6 +1167,26 @@
     <message>
         <source>Choose another file</source>
         <translation>Izberi drugo datoteko</translation>
+    </message>
+    <message>
+        <source>The other device runs a newer Delta Chat than this app can read.</source>
+        <translation>Druga naprava ima novejši Delta Chat, kot ga zna ta aplikacija prebrati.</translation>
+    </message>
+    <message>
+        <source>The transfer stopped. Both devices have to stay on one network, with this page open.</source>
+        <translation>Prenos se je ustavil. Obe napravi morata ostati v istem omrežju, s to stranjo odprto.</translation>
+    </message>
+    <message>
+        <source>No camera on this device. A backup file works without one.</source>
+        <translation>Ta naprava nima kamere. Datoteka varnostne kopije deluje tudi brez nje.</translation>
+    </message>
+    <message>
+        <source>On the other device: Settings, then add a second device. Both on one network.</source>
+        <translation>Na drugi napravi: Nastavitve, nato dodaj drugo napravo. Obe v istem omrežju.</translation>
+    </message>
+    <message>
+        <source>Make a backup on the other device, copy the file here, then choose it.</source>
+        <translation>Naredi varnostno kopijo na drugi napravi, prekopiraj datoteko sem in jo nato izberi.</translation>
     </message>
 </context>
 <context>
@@ -1255,10 +1278,6 @@
         <translation>Samodejno prenesi priloge</translation>
     </message>
     <message>
-        <source>Bigger ones wait until you ask for them. Applies to every profile and to messages that arrive from now on.</source>
-        <translation>Večje počakajo, dokler jih ne zahtevate. Velja za vsak profil in za sporočila, ki prispejo od zdaj naprej.</translation>
-    </message>
-    <message>
         <source>Links</source>
         <translation>Povezave</translation>
     </message>
@@ -1267,16 +1286,8 @@
         <translation>Odstrani sledenje iz povezav</translation>
     </message>
     <message>
-        <source>Known tracking parameters -- click ids, campaign tags, the sharer&apos;s account -- are taken out of the links in the messages you send. The rest of the link is left as it was.</source>
-        <translation>Znani parametri sledenja – ID-ji klikov, oznake kampanj, račun tistega, ki deli – se odstranijo iz povezav v sporočilih, ki jih pošljete. Preostanek povezave ostane, kot je bil.</translation>
-    </message>
-    <message>
         <source>Notifications</source>
         <translation>Obvestila</translation>
-    </message>
-    <message>
-        <source>On the lock screen and in the notification area. The chat it is from opens on a tap either way.</source>
-        <translation>Na zaklenjenem zaslonu in v območju obvestil. Klepet, iz katerega je, se z dotikom odpre v vsakem primeru.</translation>
     </message>
     <message>
         <source>Who wrote, and what</source>
@@ -1298,10 +1309,6 @@
         <source>Enable webxdc apps (experimental)</source>
         <extracomment>A webxdc app is a small program somebody sends into a chat and everyone in it plays with. Keep the name: it is what every other Delta Chat client calls them.</extracomment>
         <translation>Omogoči aplikacije webxdc (poskusno)</translation>
-    </message>
-    <message>
-        <source>Apps somebody sends run inside the chat, and the attach tray offers a store to take new ones from. An app is somebody else&apos;s code, and this part is not yet as tested as the rest.</source>
-        <translation>Aplikacije, ki jih kdo pošlje, tečejo znotraj pogovora, pladenj prilog pa ponuja trgovino za nove. Aplikacija je koda nekoga drugega in ta del še ni tako preizkušen kot ostalo.</translation>
     </message>
     <message>
         <source>After 1 hour</source>
@@ -1328,10 +1335,6 @@
         <translation>Briši sporočila z naprave</translation>
     </message>
     <message>
-        <source>Older messages go from this phone, in every chat of every profile, whatever a chat&apos;s own disappearing messages setting says. &quot;Saved messages&quot; are kept.</source>
-        <translation>Starejša sporočila izginejo s tega telefona, v vsakem klepetu vsakega profila, ne glede na nastavitev izginjajočih sporočil samega klepeta. »Shranjena sporočila« ostanejo.</translation>
-    </message>
-    <message>
         <source>A new notification shows</source>
         <translation>Novo obvestilo pokaže</translation>
     </message>
@@ -1341,25 +1344,45 @@
         <translation>Omembe</translation>
     </message>
     <message>
-        <source>In a muted group, a reply to one of your messages still notifies you.</source>
-        <translation>V utišani skupini vas odgovor na vaše sporočilo vseeno obvesti.</translation>
-    </message>
-    <message>
         <source>Enter sends the message</source>
         <extracomment>The return key on the keyboard.</extracomment>
         <translation>Enter pošlje sporočilo</translation>
-    </message>
-    <message>
-        <source>When on, the return key sends. When off, it starts a new line, the message field grows with what is written, and the send button sends.</source>
-        <translation>Vklopljeno tipka Enter pošlje. Izklopljeno začne novo vrstico, polje sporočila raste z napisanim, pošlje pa gumb za pošiljanje.</translation>
     </message>
     <message>
         <source>Use Markdown formatting</source>
         <translation>Uporabi oblikovanje Markdown</translation>
     </message>
     <message>
-        <source>When on, a message written with *stars* and `backticks` is shown with the bold, the italics and the links drawn. When off, it is shown exactly as it was written.</source>
-        <translation>Vklopljeno se sporočilo, napisano z *zvezdicami* in `krativci`, prikaže z izrisano krepko pisavo, ležečo pisavo in povezavami. Izklopljeno se prikaže natanko tako, kot je bilo napisano.</translation>
+        <source>Otherwise it starts a new line, and the button sends.</source>
+        <translation>Sicer začne novo vrstico, pošlje pa gumb.</translation>
+    </message>
+    <message>
+        <source>Draws *stars* and `backticks` rather than showing them.</source>
+        <translation>Izriše *zvezdice* in `krativce`, namesto da bi jih pokazal.</translation>
+    </message>
+    <message>
+        <source>Bigger ones wait until you ask for them. Every profile, from now on.</source>
+        <translation>Večje počakajo, dokler jih ne zahtevaš. Vsi profili, odslej.</translation>
+    </message>
+    <message>
+        <source>Every chat of every profile. &quot;Saved messages&quot; are kept.</source>
+        <translation>Vsak klepet vsakega profila. »Shranjena sporočila« ostanejo.</translation>
+    </message>
+    <message>
+        <source>On the lock screen and in the notification area.</source>
+        <translation>Na zaklenjenem zaslonu in v območju obvestil.</translation>
+    </message>
+    <message>
+        <source>A reply to you gets through a muted group.</source>
+        <translation>Odgovor tebi pride skozi tudi v utišani skupini.</translation>
+    </message>
+    <message>
+        <source>Click ids and campaign tags come out of the links you send.</source>
+        <translation>Identifikatorji klikov in oznake kampanj izpadejo iz povezav, ki jih pošlješ.</translation>
+    </message>
+    <message>
+        <source>Small apps run inside the chat. Somebody else&apos;s code, and less tested than the rest.</source>
+        <translation>Male aplikacije tečejo znotraj klepeta. Tuja koda, in manj preizkušena kot ostalo.</translation>
     </message>
 </context>
 <context>

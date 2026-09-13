@@ -10,12 +10,18 @@ import "../components"
  * on all of them, so switching is a matter of pointing the chat list at a
  * different one rather than starting anything up; the chat list tells the
  * core which it is on, and that is the profile the app opens on next
- * time. Picking the profile already shown does nothing. A row's
- * menu leads to the profile's page -- picture, name, address, the rest --
- * and to deleting it. Another profile is made from the plus under the
- * last row, where the group pages put "add members", and a profile this
- * reader already has on another device is taken over from the plus
- * under that one.
+ * time. Picking the profile already shown does nothing. A row's menu is
+ * everything to do with that profile: its own page -- picture, name,
+ * address, the rest -- its invite code, writing it out to a backup file,
+ * and deleting it. Two of those used to be buttons on the profile's page
+ * and are here instead, where the profile is picked: a reader who wants
+ * to show their code does not want to read a settings page first.
+ *
+ * Another profile is added from the plus under the last row, where the
+ * group pages put "add members". One plus, not three: the three ways in
+ * -- a new profile, a backup file, another device -- are the question the
+ * page behind it asks (AddProfilePage.qml), and three pluses under a
+ * list of profiles read as three more profiles.
  *
  * Deleting counts down beside the list rather than on the row
  * (PendingRemoval): the row goes whenever the list reloads, and it used
@@ -134,6 +140,28 @@ Page {
                     onClicked: pageStack.push(Qt.resolvedUrl("ProfilePage.qml"),
                                               { accountId: model.account_id })
                 }
+                // The invite code and the backup are about this
+                // profile and nothing else, so they are on the profile
+                // rather than a page deeper in. Both take the row's own
+                // account: the core's export and the core's invite are
+                // each per account.
+                MenuItem {
+                    objectName: "inviteItem"
+                    text: qsTr("Invite code")
+                    onClicked: pageStack.push(Qt.resolvedUrl("QrPage.qml"),
+                                              { accountId: model.account_id })
+                }
+                MenuItem {
+                    objectName: "backupItem"
+                    text: qsTr("Back up profile")
+                    onClicked: pageStack.push(Qt.resolvedUrl("BackupPage.qml"), {
+                        accountId: model.account_id,
+                        // Where the forward swipe goes once the backup
+                        // is written: the chats the app is on, which is
+                        // not necessarily the profile being backed up.
+                        currentAccountId: page.currentAccountId
+                    })
+                }
                 MenuItem {
                     objectName: "deleteProfileItem"
                     text: qsTr("Delete profile")
@@ -240,99 +268,39 @@ Page {
             }
         }
 
-        // The ways to another profile, where the next one would be
-        // listed: rows shaped like a profile's, with a plus for a
+        // The way to another profile, where the next one would be
+        // listed: a row shaped like a profile's, with a plus for a
         // picture, as the group pages offer another member. Under the
         // last row rather than in the pulley, which is where a reader
         // who has just read the list is already looking.
         //
-        // The first makes one, through the welcome page's own flow,
-        // which replaces the stack with the new profile's chat list once
-        // the core has it. The other two take one over from somewhere it
-        // already is -- a backup file, or a device holding it right now
-        // -- which are the same two transfers the first screen offers a
-        // reader with no profile at all, and are exactly what somebody
-        // holding their old phone wants from here. In that order: the
-        // file is the one that works without the other device to hand.
-        footer: Column {
+        // One row, and the three ways in are behind it. They used to be
+        // three pluses in a column -- make one, read a backup file, join
+        // from another device -- which put three answers under a list of
+        // profiles before the reader had been asked anything.
+        footer: ListItem {
+            id: addProfileRow
+            objectName: "addProfileButton"
             width: listView.width
+            contentHeight: Theme.itemSizeSmall + 2 * Theme.paddingMedium
 
-            ListItem {
-                id: addProfileRow
-                objectName: "addProfileButton"
-                width: parent.width
-                contentHeight: Theme.itemSizeSmall + 2 * Theme.paddingMedium
-
-                PlusMark {
-                    id: plus
-                    x: Theme.horizontalPageMargin
-                    y: Theme.paddingMedium
-                }
-
-                Label {
-                    x: plus.x + plus.width + Theme.paddingMedium
-                    width: parent.width - x - Theme.horizontalPageMargin
-                    anchors.verticalCenter: plus.verticalCenter
-                    wrapMode: Text.Wrap
-                    color: addProfileRow.highlighted ? Theme.highlightColor
-                                                     : Theme.primaryColor
-                    text: qsTr("Add profile")
-                }
-
-                onClicked: pageStack.push(Qt.resolvedUrl("AddProfileDialog.qml"), {})
+            PlusMark {
+                id: plus
+                x: Theme.horizontalPageMargin
+                y: Theme.paddingMedium
             }
 
-            ListItem {
-                id: backupFileRow
-                objectName: "backupFileButton"
-                width: parent.width
-                contentHeight: Theme.itemSizeSmall + 2 * Theme.paddingMedium
-
-                PlusMark {
-                    id: backupPlus
-                    x: Theme.horizontalPageMargin
-                    y: Theme.paddingMedium
-                }
-
-                Label {
-                    x: backupPlus.x + backupPlus.width + Theme.paddingMedium
-                    width: parent.width - x - Theme.horizontalPageMargin
-                    anchors.verticalCenter: backupPlus.verticalCenter
-                    wrapMode: Text.Wrap
-                    color: backupFileRow.highlighted ? Theme.highlightColor
-                                                     : Theme.primaryColor
-                    text: qsTr("Restore profile from backup")
-                }
-
-                onClicked: pageStack.push(Qt.resolvedUrl("RestoreProfilePage.qml"),
-                                          { from: "file" })
+            Label {
+                x: plus.x + plus.width + Theme.paddingMedium
+                width: parent.width - x - Theme.horizontalPageMargin
+                anchors.verticalCenter: plus.verticalCenter
+                wrapMode: Text.Wrap
+                color: addProfileRow.highlighted ? Theme.highlightColor
+                                                 : Theme.primaryColor
+                text: qsTr("Add profile")
             }
 
-            ListItem {
-                id: secondDeviceRow
-                objectName: "secondDeviceButton"
-                width: parent.width
-                contentHeight: Theme.itemSizeSmall + 2 * Theme.paddingMedium
-
-                PlusMark {
-                    id: secondPlus
-                    x: Theme.horizontalPageMargin
-                    y: Theme.paddingMedium
-                }
-
-                Label {
-                    x: secondPlus.x + secondPlus.width + Theme.paddingMedium
-                    width: parent.width - x - Theme.horizontalPageMargin
-                    anchors.verticalCenter: secondPlus.verticalCenter
-                    wrapMode: Text.Wrap
-                    color: secondDeviceRow.highlighted ? Theme.highlightColor
-                                                       : Theme.primaryColor
-                    text: qsTr("Add as second device")
-                }
-
-                onClicked: pageStack.push(Qt.resolvedUrl("RestoreProfilePage.qml"),
-                                          { from: "device" })
-            }
+            onClicked: pageStack.push(Qt.resolvedUrl("AddProfilePage.qml"), {})
         }
 
         // Counted off the model, not off what is drawn: the plus is the

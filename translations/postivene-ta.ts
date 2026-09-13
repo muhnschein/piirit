@@ -35,10 +35,6 @@
         <translation>உருவாக்கு</translation>
     </message>
     <message>
-        <source>Pick a chatmail relay or enter a custom server. The server assigns the address; the encryption keys are made on this device.</source>
-        <translation>ஒரு chatmail ரிலேயைத் தேர்வுசெய்யவும் அல்லது உங்கள் சொந்த சேவையகத்தை உள்ளிடவும். முகவரியை சேவையகம் வழங்கும்; குறியாக்க விசைகள் இந்தச் சாதனத்திலேயே உருவாக்கப்படும்.</translation>
-    </message>
-    <message>
         <source>Your name</source>
         <translation>உங்கள் பெயர்</translation>
     </message>
@@ -53,6 +49,41 @@
     <message>
         <source>See &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; for the full list.</source>
         <translation>முழுப் பட்டியலை &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; இல் காணலாம்.</translation>
+    </message>
+    <message>
+        <source>The relay gives you an address. The keys are made on this phone.</source>
+        <translation>ரிலே உங்களுக்கு ஒரு முகவரியைத் தரும். சாவிகள் இந்தத் தொலைபேசியிலேயே உருவாகும்.</translation>
+    </message>
+</context>
+<context>
+    <name>AddProfilePage</name>
+    <message>
+        <source>Add profile</source>
+        <translation>சுயவிவரத்தைச் சேர்</translation>
+    </message>
+    <message>
+        <source>Create a profile</source>
+        <translation>சுயவிவரத்தை உருவாக்கு</translation>
+    </message>
+    <message>
+        <source>A new address on a chatmail relay.</source>
+        <translation>ஒரு chatmail ரிலேயில் புதிய முகவரி.</translation>
+    </message>
+    <message>
+        <source>Restore from a backup</source>
+        <translation>காப்புப் பிரதியிலிருந்து மீட்டெடு</translation>
+    </message>
+    <message>
+        <source>A backup file copied onto this phone.</source>
+        <translation>இந்தத் தொலைபேசிக்கு நகலெடுக்கப்பட்ட ஒரு காப்புப் பிரதிக் கோப்பு.</translation>
+    </message>
+    <message>
+        <source>Add as second device</source>
+        <translation>இரண்டாவது சாதனமாகச் சேர்</translation>
+    </message>
+    <message>
+        <source>The other device keeps it. Both get everything new.</source>
+        <translation>மறு சாதனம் அதை வைத்திருக்கும். இரண்டும் புதியதெல்லாம் பெறும்.</translation>
     </message>
 </context>
 <context>
@@ -135,8 +166,12 @@
         <translation>%1 இல் சேமிக்கப்பட்டது</translation>
     </message>
     <message>
-        <source>This profile&apos;s messages, contacts and key in one file, saved to Documents. Whoever has that file has the profile, so keep it somewhere safe. Your other profiles are not in it: each one is backed up from its own page.</source>
-        <translation>இந்தச் சுயவிவரத்தின் செய்திகள், தொடர்புகள், சாவி ஆகியவை ஒரே கோப்பில், ஆவணங்களில் சேமிக்கப்படும். அந்தக் கோப்பு யாரிடம் உள்ளதோ அவரிடம் சுயவிவரமும் உள்ளது, எனவே அதைப் பாதுகாப்பான இடத்தில் வைக்கவும். உங்கள் மற்ற சுயவிவரங்கள் இதில் இல்லை: ஒவ்வொன்றுக்கும் அதன் சொந்தப் பக்கத்திலிருந்து காப்புப் பிரதி எடுக்கப்படுகிறது.</translation>
+        <source>Messages, contacts and key in one file, saved to Documents. Whoever has the file has the profile.</source>
+        <translation>செய்திகள், தொடர்புகள், சாவி ஆகியவை ஒரே கோப்பில், ஆவணங்களில் சேமிக்கப்படும். கோப்பு யாரிடம் உள்ளதோ சுயவிவரமும் அவரிடமே.</translation>
+    </message>
+    <message>
+        <source>Swipe on for your chats.</source>
+        <translation>முன்னோக்கி இழுத்து உங்கள் உரையாடல்களுக்குச் செல்லுங்கள்.</translation>
     </message>
 </context>
 <context>
@@ -478,10 +513,6 @@
         <translation>மறையும் செய்திகள்</translation>
     </message>
     <message>
-        <source>Applies to all members of this chat, they can still copy, save, and forward messages.</source>
-        <translation>இந்த அரட்டையின் எல்லா உறுப்பினர்களுக்கும் பொருந்தும்; அவர்கள் இன்னும் செய்திகளை நகலெடுக்கவும், சேமிக்கவும், முன்னனுப்பவும் முடியும்.</translation>
-    </message>
-    <message>
         <source>After 1 year</source>
         <translation>1 ஆண்டுக்குப் பிறகு</translation>
     </message>
@@ -513,6 +544,10 @@
         <source>After %1 seconds</source>
         <translation>%1 வினாடிகளுக்குப் பிறகு</translation>
     </message>
+    <message>
+        <source>Applies to everyone in the chat. They can still copy and forward.</source>
+        <translation>உரையாடலில் உள்ள அனைவருக்கும் பொருந்தும். அவர்கள் இன்னும் நகலெடுக்கவும் அனுப்பவும் முடியும்.</translation>
+    </message>
 </context>
 <context>
     <name>ExistingProfilePage</name>
@@ -525,16 +560,16 @@
         <translation>இரண்டாவது சாதனமாகச் சேர்</translation>
     </message>
     <message>
-        <source>The device that has it keeps it. This one joins, over the same network.</source>
-        <translation>அது உள்ள சாதனம் அதை வைத்திருக்கும். இது அதே வலையமைப்பின் வழியாகச் சேர்ந்துகொள்ளும்.</translation>
-    </message>
-    <message>
         <source>Restore from a backup</source>
         <translation>காப்புப் பிரதியிலிருந்து மீட்டெடு</translation>
     </message>
     <message>
-        <source>A backup file the other device wrote, copied onto this phone.</source>
-        <translation>மற்ற சாதனம் உருவாக்கிய காப்புக் கோப்பு, இந்தத் தொலைபேசிக்கு நகலெடுக்கப்பட்டது.</translation>
+        <source>The other device keeps it. Both get everything new.</source>
+        <translation>மறு சாதனம் அதை வைத்திருக்கும். இரண்டும் புதியதெல்லாம் பெறும்.</translation>
+    </message>
+    <message>
+        <source>A backup file copied onto this phone.</source>
+        <translation>இந்தத் தொலைபேசிக்கு நகலெடுக்கப்பட்ட ஒரு காப்புப் பிரதிக் கோப்பு.</translation>
     </message>
 </context>
 <context>
@@ -615,24 +650,12 @@
         <translation>பதிவு இல்லை, தொலைபேசி எண் இல்லை</translation>
     </message>
     <message>
-        <source>Your profile is made here on your phone. No phone number, no account with a company, nothing to sign.</source>
-        <translation>உங்கள் சுயவிவரம் இங்கேயே, உங்கள் தொலைபேசியிலேயே உருவாகிறது. தொலைபேசி எண் வேண்டாம், எந்த நிறுவனத்திலும் கணக்கு வேண்டாம், கையொப்பமிட ஒன்றுமில்லை.</translation>
-    </message>
-    <message>
         <source>You choose who can reach you</source>
         <translation>உங்களை யார் தொடர்பு கொள்ளலாம் என்பதை நீங்களே தேர்வு செய்கிறீர்கள்</translation>
     </message>
     <message>
-        <source>There is no directory to be found in. Show a friend a code to scan, or send them a link, and the two of you can write.</source>
-        <translation>உங்களைத் தேடிக் கண்டுபிடிக்க எந்தப் பட்டியலும் இல்லை. நண்பருக்கு ஸ்கேன் செய்யக் குறியீட்டைக் காட்டுங்கள் அல்லது இணைப்பை அனுப்புங்கள், பிறகு இருவரும் எழுதலாம்.</translation>
-    </message>
-    <message>
         <source>Groups of equals</source>
         <translation>சமமானவர்களின் குழுக்கள்</translation>
-    </message>
-    <message>
-        <source>Everyone in a group has the same rights: anyone can add a friend, rename it or leave. Nobody is in charge.</source>
-        <translation>குழுவில் அனைவருக்கும் ஒரே உரிமை: யார் வேண்டுமானாலும் நண்பரைச் சேர்க்கலாம், பெயரை மாற்றலாம் அல்லது வெளியேறலாம். யாரும் தலைவர் அல்ல.</translation>
     </message>
     <message>
         <source>The server only passes it on</source>
@@ -647,12 +670,24 @@
         <translation>ஒவ்வொரு செய்தியும் மறையாக்கம் செய்யப்படுகிறது</translation>
     </message>
     <message>
-        <source>Messages are encrypted the whole way, always. Servers that transport them cannot read a word.</source>
-        <translation>செய்திகள் எப்போதும் முழு வழியிலும் மறையாக்கம் செய்யப்பட்டிருக்கும். அவற்றைக் கொண்டு செல்லும் சேவையகங்களால் ஒரு சொல்லும் படிக்க முடியாது.</translation>
+        <source>Made here on your phone. No phone number, no account, nothing to sign.</source>
+        <translation>இங்கேயே, உங்கள் தொலைபேசியில் உருவாகிறது. தொலைபேசி எண் இல்லை, கணக்கு இல்லை, கையொப்பமிட ஒன்றுமில்லை.</translation>
     </message>
     <message>
-        <source>A server holds a message until the other phone is online, and that is all it does. Your chats stay on your device.</source>
-        <translation>மற்ற தொலைபேசி இணையத்தில் வரும் வரை சேவையகம் செய்தியை வைத்திருக்கும், அவ்வளவுதான். உங்கள் உரையாடல்கள் உங்கள் சாதனத்திலேயே இருக்கும்.</translation>
+        <source>There is no directory to be found in. Show a friend a code, or send a link.</source>
+        <translation>உங்களைக் கண்டறியும் பட்டியல் எதுவும் இல்லை. நண்பருக்குக் குறியீட்டைக் காட்டுங்கள், அல்லது இணைப்பை அனுப்புங்கள்.</translation>
+    </message>
+    <message>
+        <source>Encrypted the whole way, always. The servers cannot read a word.</source>
+        <translation>எப்போதும் முழுவழியும் மறைகுறியாக்கம். சேவையகங்கள் ஒரு சொல்லும் படிக்காது.</translation>
+    </message>
+    <message>
+        <source>Anyone can add a friend, rename the group or leave. Nobody is in charge.</source>
+        <translation>யார் வேண்டுமானாலும் நண்பரைச் சேர்க்கலாம், குழுவின் பெயரை மாற்றலாம் அல்லது விலகலாம். யாரும் தலைவர் இல்லை.</translation>
+    </message>
+    <message>
+        <source>It holds a message until the other phone is online, and nothing more.</source>
+        <translation>மறு தொலைபேசி இணையும் வரை செய்தியை வைத்திருக்கும், அவ்வளவுதான்.</translation>
     </message>
 </context>
 <context>
@@ -670,9 +705,9 @@
         <translation>ரத்துசெய்</translation>
     </message>
     <message>
-        <source>Leave %1? You will stop receiving its messages, and only a member can add you back.</source>
+        <source>Leave %1? Only a member can add you back.</source>
         <extracomment>%1 is the group&apos;s name.</extracomment>
-        <translation>%1 குழுவிலிருந்து வெளியேறவா? அதன் செய்திகள் இனி உங்களுக்கு வராது, ஒரு உறுப்பினர் மட்டுமே உங்களை மீண்டும் சேர்க்க முடியும்.</translation>
+        <translation>%1 விட்டு விலகவா? உங்களை மீண்டும் சேர்க்க உறுப்பினரால் மட்டுமே முடியும்.</translation>
     </message>
 </context>
 <context>
@@ -896,16 +931,8 @@
         <translation>முகவரி</translation>
     </message>
     <message>
-        <source>Show invite code</source>
-        <translation>அழைப்புக் குறியீட்டைக் காட்டு</translation>
-    </message>
-    <message>
         <source>Send read receipts</source>
         <translation>படித்ததற்கான ரசீதுகளை அனுப்பு</translation>
-    </message>
-    <message>
-        <source>Tells the people you write to when you have read their messages, and asks the same of them. With this off you send none and see none.</source>
-        <translation>நீங்கள் எழுதுபவர்களுக்கு அவர்களின் செய்திகளை எப்போது படித்தீர்கள் என்று தெரிவிக்கும், அவர்களிடமும் அதையே கேட்கும். அணைத்தால் நீங்கள் எதையும் அனுப்பவும் பார்க்கவும் மாட்டீர்கள்.</translation>
     </message>
     <message>
         <source>Storage and connectivity</source>
@@ -946,12 +973,8 @@
         <translation>நீங்கள் அனுப்பும் ஒவ்வொரு செய்தியிலும் உள்ள பெயர்</translation>
     </message>
     <message>
-        <source>Backup</source>
-        <translation>காப்புப் பிரதி</translation>
-    </message>
-    <message>
-        <source>Back up this profile</source>
-        <translation>இந்தச் சுயவிவரத்தைக் காப்புப் பிரதி எடு</translation>
+        <source>Both ways: with this off you send none and see none.</source>
+        <translation>இரு பக்கமும்: அணைத்திருந்தால் நீங்கள் ஒன்றும் அனுப்புவதில்லை, ஒன்றும் காண்பதில்லை.</translation>
     </message>
 </context>
 <context>
@@ -977,8 +1000,8 @@
         <translation>%1 %2 வினாடிகளுக்குள் பதிலளிக்கவில்லை.</translation>
     </message>
     <message>
-        <source>Chatmail relays are run by volunteers in their spare time. If this one does not seem to work, go back and try another one.</source>
-        <translation>Chatmail ரிலேக்களை தன்னார்வலர்கள் தங்கள் ஓய்வு நேரத்தில் இயக்குகிறார்கள். இது வேலை செய்யவில்லை எனத் தோன்றினால், பின்னால் சென்று வேறொன்றை முயற்சிக்கவும்.</translation>
+        <source>Relays are run by volunteers. Go back and try another one.</source>
+        <translation>ரிலேக்களைத் தன்னார்வலர்கள் நடத்துகிறார்கள். பின்செல்லுங்கள், வேறொன்றை முயலுங்கள்.</translation>
     </message>
 </context>
 <context>
@@ -1024,12 +1047,12 @@
         <translation>சுயவிவரங்கள் இல்லை</translation>
     </message>
     <message>
-        <source>Add as second device</source>
-        <translation>இரண்டாவது சாதனமாகச் சேர்</translation>
+        <source>Invite code</source>
+        <translation>அழைப்புக் குறியீடு</translation>
     </message>
     <message>
-        <source>Restore profile from backup</source>
-        <translation>காப்புப் பிரதியிலிருந்து சுயவிவரத்தை மீட்டெடு</translation>
+        <source>Back up profile</source>
+        <translation>சுயவிவரக் காப்புப் பிரதி</translation>
     </message>
 </context>
 <context>
@@ -1082,14 +1105,6 @@
 <context>
     <name>RestoreProfilePage</name>
     <message>
-        <source>The other device runs a newer Delta Chat than this app can take a profile from.</source>
-        <translation>இந்தச் செயலி சுயவிவரத்தைப் பெறக்கூடியதை விட மற்ற சாதனத்தில் புதிய Delta Chat உள்ளது.</translation>
-    </message>
-    <message>
-        <source>The transfer stopped before it finished. Both devices have to stay on the same network, with this page open.</source>
-        <translation>இடமாற்றம் முடிவதற்கு முன்பே நின்றுவிட்டது. இரு சாதனங்களும் ஒரே வலையமைப்பில் இருக்க வேண்டும், இந்தப் பக்கம் திறந்திருக்க வேண்டும்.</translation>
-    </message>
-    <message>
         <source>That is not the code a device shows while it is offering its profile.</source>
         <translation>ஒரு சாதனம் தன் சுயவிவரத்தை வழங்கும்போது காட்டும் குறியீடு இதுவல்ல.</translation>
     </message>
@@ -1102,10 +1117,6 @@
         <translation>காப்புப் பிரதியிலிருந்து மீட்டெடு</translation>
     </message>
     <message>
-        <source>On the device that has your profile, make a backup and copy the file onto this phone. Then choose it here.</source>
-        <translation>உங்கள் சுயவிவரம் உள்ள சாதனத்தில் ஒரு காப்புப் பிரதி எடுத்து, கோப்பை இந்தத் தொலைபேசிக்கு நகலெடுக்கவும். பிறகு அதை இங்கே தேர்ந்தெடுக்கவும்.</translation>
-    </message>
-    <message>
         <source>Choose a backup file</source>
         <translation>காப்புக் கோப்பைத் தேர்ந்தெடு</translation>
     </message>
@@ -1116,14 +1127,6 @@
     <message>
         <source>Cancel</source>
         <translation>ரத்துசெய்</translation>
-    </message>
-    <message>
-        <source>The camera is not available on this device. A backup file works without one.</source>
-        <translation>இந்தச் சாதனத்தில் கேமரா இல்லை. காப்புக் கோப்பு இருந்தால் கேமரா தேவையில்லை.</translation>
-    </message>
-    <message>
-        <source>On your other device, open Settings and choose to add a second device. Both phones have to be on the same network.</source>
-        <translation>உங்கள் சுயவிவரம் உள்ள சாதனத்தில் அமைப்புகளைத் திறந்து இரண்டாவது சாதனத்தைச் சேர்ப்பதைத் தேர்ந்தெடுக்கவும். இரண்டும் ஒரே வலையமைப்பில் இருக்க வேண்டும்.</translation>
     </message>
     <message>
         <source>Hold the phone up to the code it shows</source>
@@ -1152,6 +1155,26 @@
     <message>
         <source>Choose another file</source>
         <translation>வேறு கோப்பைத் தேர்ந்தெடு</translation>
+    </message>
+    <message>
+        <source>The other device runs a newer Delta Chat than this app can read.</source>
+        <translation>மறு சாதனத்தில் உள்ள Delta Chat, இந்தச் செயலியால் படிக்க முடியாத அளவுக்குப் புதியது.</translation>
+    </message>
+    <message>
+        <source>The transfer stopped. Both devices have to stay on one network, with this page open.</source>
+        <translation>இடமாற்றம் நின்றுவிட்டது. இரு சாதனங்களும் ஒரே வலையமைப்பில் இருக்க வேண்டும், இந்தப் பக்கம் திறந்திருக்க வேண்டும்.</translation>
+    </message>
+    <message>
+        <source>No camera on this device. A backup file works without one.</source>
+        <translation>இந்தச் சாதனத்தில் கேமரா இல்லை. காப்புப் பிரதிக் கோப்பு அது இல்லாமலும் வேலை செய்யும்.</translation>
+    </message>
+    <message>
+        <source>On the other device: Settings, then add a second device. Both on one network.</source>
+        <translation>மறு சாதனத்தில்: அமைப்புகள், பிறகு இரண்டாவது சாதனத்தைச் சேர்க்கவும். இரண்டும் ஒரே வலையமைப்பில்.</translation>
+    </message>
+    <message>
+        <source>Make a backup on the other device, copy the file here, then choose it.</source>
+        <translation>மறு சாதனத்தில் காப்புப் பிரதி எடுத்து, கோப்பை இங்கே நகலெடுத்து, பிறகு அதைத் தேர்ந்தெடுங்கள்.</translation>
     </message>
 </context>
 <context>
@@ -1243,10 +1266,6 @@
         <translation>இணைப்புகளைத் தானாகப் பதிவிறக்கு</translation>
     </message>
     <message>
-        <source>Bigger ones wait until you ask for them. Applies to every profile and to messages that arrive from now on.</source>
-        <translation>பெரியவை நீங்கள் கேட்கும் வரை காத்திருக்கும். ஒவ்வொரு சுயவிவரத்திற்கும், இனி வரும் செய்திகளுக்கும் பொருந்தும்.</translation>
-    </message>
-    <message>
         <source>Links</source>
         <translation>இணைப்புகள்</translation>
     </message>
@@ -1255,16 +1274,8 @@
         <translation>இணைப்புகளிலிருந்து கண்காணிப்பை நீக்கு</translation>
     </message>
     <message>
-        <source>Known tracking parameters -- click ids, campaign tags, the sharer&apos;s account -- are taken out of the links in the messages you send. The rest of the link is left as it was.</source>
-        <translation>அறியப்பட்ட கண்காணிப்பு அளவுருக்கள் – கிளிக் ஐடிகள், பிரச்சாரக் குறிச்சொற்கள், பகிர்ந்தவரின் கணக்கு – நீங்கள் அனுப்பும் செய்திகளின் இணைப்புகளிலிருந்து நீக்கப்படும். இணைப்பின் மீதி இருந்தபடியே விடப்படும்.</translation>
-    </message>
-    <message>
         <source>Notifications</source>
         <translation>அறிவிப்புகள்</translation>
-    </message>
-    <message>
-        <source>On the lock screen and in the notification area. The chat it is from opens on a tap either way.</source>
-        <translation>பூட்டுத் திரையிலும் அறிவிப்புப் பகுதியிலும். அது வந்த அரட்டை தட்டினால் எப்படியும் திறக்கும்.</translation>
     </message>
     <message>
         <source>Who wrote, and what</source>
@@ -1286,10 +1297,6 @@
         <source>Enable webxdc apps (experimental)</source>
         <extracomment>A webxdc app is a small program somebody sends into a chat and everyone in it plays with. Keep the name: it is what every other Delta Chat client calls them.</extracomment>
         <translation>webxdc செயலிகளை இயக்கு (சோதனை முறை)</translation>
-    </message>
-    <message>
-        <source>Apps somebody sends run inside the chat, and the attach tray offers a store to take new ones from. An app is somebody else&apos;s code, and this part is not yet as tested as the rest.</source>
-        <translation>யாராவது அனுப்பும் செயலிகள் உரையாடலுக்குள்ளேயே இயங்கும், மேலும் இணைப்புத் தட்டு புதியவற்றை எடுக்க ஒரு கடையை வழங்குகிறது. செயலி என்பது வேறு ஒருவரின் நிரல், இந்தப் பகுதி மற்றவற்றைப் போல் இன்னும் சோதிக்கப்படவில்லை.</translation>
     </message>
     <message>
         <source>After 1 hour</source>
@@ -1316,10 +1323,6 @@
         <translation>சாதனத்திலிருந்து செய்திகளை நீக்கு</translation>
     </message>
     <message>
-        <source>Older messages go from this phone, in every chat of every profile, whatever a chat&apos;s own disappearing messages setting says. &quot;Saved messages&quot; are kept.</source>
-        <translation>பழைய செய்திகள் இந்த ஃபோனிலிருந்து நீங்கும், ஒவ்வொரு சுயவிவரத்தின் ஒவ்வொரு அரட்டையிலும், அரட்டையின் சொந்த மறையும் செய்திகள் அமைப்பு என்ன சொன்னாலும். &quot;சேமித்த செய்திகள்&quot; வைக்கப்படும்.</translation>
-    </message>
-    <message>
         <source>A new notification shows</source>
         <translation>புதிய அறிவிப்பு காட்டுவது</translation>
     </message>
@@ -1329,25 +1332,45 @@
         <translation>குறிப்பிடல்கள்</translation>
     </message>
     <message>
-        <source>In a muted group, a reply to one of your messages still notifies you.</source>
-        <translation>ஒலியடக்கிய குழுவில், உங்கள் செய்திக்கான பதில் இருந்தாலும் உங்களுக்கு அறிவிக்கும்.</translation>
-    </message>
-    <message>
         <source>Enter sends the message</source>
         <extracomment>The return key on the keyboard.</extracomment>
         <translation>Enter செய்தியை அனுப்பும்</translation>
-    </message>
-    <message>
-        <source>When on, the return key sends. When off, it starts a new line, the message field grows with what is written, and the send button sends.</source>
-        <translation>இயக்கத்தில் இருந்தால் எண்டர் விசை அனுப்பும். அணைத்தால் அது புதிய வரியைத் தொடங்கும், செய்திப் புலம் எழுதுவதற்கேற்ப வளரும், அனுப்பும் பொத்தான் அனுப்பும்.</translation>
     </message>
     <message>
         <source>Use Markdown formatting</source>
         <translation>மார்க்டௌன் வடிவமைப்பைப் பயன்படுத்து</translation>
     </message>
     <message>
-        <source>When on, a message written with *stars* and `backticks` is shown with the bold, the italics and the links drawn. When off, it is shown exactly as it was written.</source>
-        <translation>இயக்கத்தில் இருந்தால் *விண்மீன்கள்* மற்றும் `பின்நோக்கு மேற்கோள்` கொண்டு எழுதிய செய்தி தடித்த, சாய்ந்த எழுத்துகளும் இணைப்புகளும் வடிவமைக்கப்பட்டு காட்டப்படும். அணைத்தால் எழுதியபடியே காட்டப்படும்.</translation>
+        <source>Otherwise it starts a new line, and the button sends.</source>
+        <translation>இல்லையெனில் அது புதிய வரியைத் தொடங்கும், பொத்தான் அனுப்பும்.</translation>
+    </message>
+    <message>
+        <source>Draws *stars* and `backticks` rather than showing them.</source>
+        <translation>*நட்சத்திரங்களையும்* `பின்மேற்கோள்களையும்` காட்டாமல் வடிவமாக வரையும்.</translation>
+    </message>
+    <message>
+        <source>Bigger ones wait until you ask for them. Every profile, from now on.</source>
+        <translation>பெரியவை நீங்கள் கேட்கும் வரை காத்திருக்கும். எல்லாச் சுயவிவரங்களும், இனிமேல்.</translation>
+    </message>
+    <message>
+        <source>Every chat of every profile. &quot;Saved messages&quot; are kept.</source>
+        <translation>ஒவ்வொரு சுயவிவரத்தின் ஒவ்வொரு உரையாடலும். “சேமித்த செய்திகள்” இருக்கும்.</translation>
+    </message>
+    <message>
+        <source>On the lock screen and in the notification area.</source>
+        <translation>பூட்டுத் திரையிலும் அறிவிப்புப் பகுதியிலும்.</translation>
+    </message>
+    <message>
+        <source>A reply to you gets through a muted group.</source>
+        <translation>உங்களுக்கான பதில் அமைதியாக்கிய குழுவிலிருந்தும் வந்து சேரும்.</translation>
+    </message>
+    <message>
+        <source>Click ids and campaign tags come out of the links you send.</source>
+        <translation>கிளிக் அடையாளங்களும் பிரச்சாரக் குறிச்சொற்களும் நீங்கள் அனுப்பும் இணைப்புகளிலிருந்து விலகும்.</translation>
+    </message>
+    <message>
+        <source>Small apps run inside the chat. Somebody else&apos;s code, and less tested than the rest.</source>
+        <translation>சிறு செயலிகள் உரையாடலுக்குள்ளேயே இயங்கும். பிறரின் நிரல், மற்றவற்றை விடச் சோதிக்கப்படாதது.</translation>
     </message>
 </context>
 <context>

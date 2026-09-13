@@ -35,10 +35,6 @@
         <translation>Creează</translation>
     </message>
     <message>
-        <source>Pick a chatmail relay or enter a custom server. The server assigns the address; the encryption keys are made on this device.</source>
-        <translation>Alege un releu chatmail sau introdu un server propriu. Serverul atribuie adresa; cheile de criptare sunt create pe acest dispozitiv.</translation>
-    </message>
-    <message>
         <source>Your name</source>
         <translation>Numele tău</translation>
     </message>
@@ -53,6 +49,41 @@
     <message>
         <source>See &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; for the full list.</source>
         <translation>Lista completă se află la &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
+    </message>
+    <message>
+        <source>The relay gives you an address. The keys are made on this phone.</source>
+        <translation>Releul îți dă o adresă. Cheile se fac pe acest telefon.</translation>
+    </message>
+</context>
+<context>
+    <name>AddProfilePage</name>
+    <message>
+        <source>Add profile</source>
+        <translation>Adaugă profil</translation>
+    </message>
+    <message>
+        <source>Create a profile</source>
+        <translation>Creează un profil</translation>
+    </message>
+    <message>
+        <source>A new address on a chatmail relay.</source>
+        <translation>O adresă nouă pe un releu chatmail.</translation>
+    </message>
+    <message>
+        <source>Restore from a backup</source>
+        <translation>Restaurează dintr-o copie de siguranță</translation>
+    </message>
+    <message>
+        <source>A backup file copied onto this phone.</source>
+        <translation>Un fișier de copie, copiat pe acest telefon.</translation>
+    </message>
+    <message>
+        <source>Add as second device</source>
+        <translation>Adaugă ca al doilea dispozitiv</translation>
+    </message>
+    <message>
+        <source>The other device keeps it. Both get everything new.</source>
+        <translation>Celălalt dispozitiv îl păstrează. Amândouă primesc tot ce e nou.</translation>
     </message>
 </context>
 <context>
@@ -136,8 +167,12 @@
         <translation>Salvat în %1</translation>
     </message>
     <message>
-        <source>This profile&apos;s messages, contacts and key in one file, saved to Documents. Whoever has that file has the profile, so keep it somewhere safe. Your other profiles are not in it: each one is backed up from its own page.</source>
-        <translation>Mesajele, contactele și cheia acestui profil într-un singur fișier, salvat în Documente. Cine are acel fișier are și profilul, așa că păstrează-l într-un loc sigur. Celelalte profiluri ale tale nu sunt în el: fiecare se copiază din pagina lui.</translation>
+        <source>Messages, contacts and key in one file, saved to Documents. Whoever has the file has the profile.</source>
+        <translation>Mesaje, contacte și cheie într-un singur fișier, salvat în Documente. Cine are fișierul are profilul.</translation>
+    </message>
+    <message>
+        <source>Swipe on for your chats.</source>
+        <translation>Glisează mai departe spre conversațiile tale.</translation>
     </message>
 </context>
 <context>
@@ -480,10 +515,6 @@
         <translation>Mesaje care dispar</translation>
     </message>
     <message>
-        <source>Applies to all members of this chat, they can still copy, save, and forward messages.</source>
-        <translation>Se aplică tuturor membrilor acestei conversații; ei pot în continuare să copieze, să salveze și să redirecționeze mesaje.</translation>
-    </message>
-    <message>
         <source>After 1 year</source>
         <translation>După 1 an</translation>
     </message>
@@ -515,6 +546,10 @@
         <source>After %1 seconds</source>
         <translation>După %1 de secunde</translation>
     </message>
+    <message>
+        <source>Applies to everyone in the chat. They can still copy and forward.</source>
+        <translation>Se aplică tuturor din conversație. Tot pot copia și redirecționa.</translation>
+    </message>
 </context>
 <context>
     <name>ExistingProfilePage</name>
@@ -527,16 +562,16 @@
         <translation>Adaugă ca al doilea dispozitiv</translation>
     </message>
     <message>
-        <source>The device that has it keeps it. This one joins, over the same network.</source>
-        <translation>Dispozitivul care îl are îl păstrează. Acesta se alătură, prin aceeași rețea.</translation>
-    </message>
-    <message>
         <source>Restore from a backup</source>
         <translation>Restaurează dintr-o copie de siguranță</translation>
     </message>
     <message>
-        <source>A backup file the other device wrote, copied onto this phone.</source>
-        <translation>Un fișier de copie scris de celălalt dispozitiv, copiat pe acest telefon.</translation>
+        <source>The other device keeps it. Both get everything new.</source>
+        <translation>Celălalt dispozitiv îl păstrează. Amândouă primesc tot ce e nou.</translation>
+    </message>
+    <message>
+        <source>A backup file copied onto this phone.</source>
+        <translation>Un fișier de copie, copiat pe acest telefon.</translation>
     </message>
 </context>
 <context>
@@ -619,24 +654,12 @@
         <translation>Fără înregistrare, fără număr de telefon</translation>
     </message>
     <message>
-        <source>Your profile is made here on your phone. No phone number, no account with a company, nothing to sign.</source>
-        <translation>Profilul dumneavoastră se creează aici, pe telefon. Fără număr de telefon, fără cont la vreo companie, fără nimic de semnat.</translation>
-    </message>
-    <message>
         <source>You choose who can reach you</source>
         <translation>Dumneavoastră alegeți cine vă poate scrie</translation>
     </message>
     <message>
-        <source>There is no directory to be found in. Show a friend a code to scan, or send them a link, and the two of you can write.</source>
-        <translation>Nu există niciun catalog în care să fiți găsit. Arătați-i unui prieten un cod de scanat sau trimiteți-i o legătură, și veți putea să vă scrieți.</translation>
-    </message>
-    <message>
         <source>Groups of equals</source>
         <translation>Grupuri între egali</translation>
-    </message>
-    <message>
-        <source>Everyone in a group has the same rights: anyone can add a friend, rename it or leave. Nobody is in charge.</source>
-        <translation>Într-un grup toți au aceleași drepturi: oricine poate adăuga pe cineva, îl poate redenumi sau îl poate părăsi. Nimeni nu comandă.</translation>
     </message>
     <message>
         <source>The server only passes it on</source>
@@ -651,12 +674,24 @@
         <translation>Fiecare mesaj este criptat</translation>
     </message>
     <message>
-        <source>Messages are encrypted the whole way, always. Servers that transport them cannot read a word.</source>
-        <translation>Mesajele sunt criptate pe tot drumul, întotdeauna. Serverele care le transportă nu citesc niciun cuvânt.</translation>
+        <source>Made here on your phone. No phone number, no account, nothing to sign.</source>
+        <translation>Se face aici, pe telefonul tău. Fără număr, fără cont, nimic de semnat.</translation>
     </message>
     <message>
-        <source>A server holds a message until the other phone is online, and that is all it does. Your chats stay on your device.</source>
-        <translation>Un server ține mesajul până când celălalt telefon este online, și atât. Conversațiile rămân pe dispozitivul dumneavoastră.</translation>
+        <source>There is no directory to be found in. Show a friend a code, or send a link.</source>
+        <translation>Nu există un director în care să fii găsit. Arată-i unui prieten un cod, sau trimite-i un link.</translation>
+    </message>
+    <message>
+        <source>Encrypted the whole way, always. The servers cannot read a word.</source>
+        <translation>Mereu criptat pe tot drumul. Serverele nu citesc un cuvânt.</translation>
+    </message>
+    <message>
+        <source>Anyone can add a friend, rename the group or leave. Nobody is in charge.</source>
+        <translation>Oricine poate adăuga un prieten, redenumi grupul sau pleca. Nimeni nu comandă.</translation>
+    </message>
+    <message>
+        <source>It holds a message until the other phone is online, and nothing more.</source>
+        <translation>Ține un mesaj până când celălalt telefon e online, și nimic mai mult.</translation>
     </message>
 </context>
 <context>
@@ -674,9 +709,9 @@
         <translation>Anulează</translation>
     </message>
     <message>
-        <source>Leave %1? You will stop receiving its messages, and only a member can add you back.</source>
+        <source>Leave %1? Only a member can add you back.</source>
         <extracomment>%1 is the group&apos;s name.</extracomment>
-        <translation>Părăsești %1? Nu vei mai primi mesajele sale, iar doar un membru te poate adăuga înapoi.</translation>
+        <translation>Părăsești %1? Doar un membru te poate adăuga înapoi.</translation>
     </message>
 </context>
 <context>
@@ -902,16 +937,8 @@
         <translation>Adresă</translation>
     </message>
     <message>
-        <source>Show invite code</source>
-        <translation>Arată codul de invitație</translation>
-    </message>
-    <message>
         <source>Send read receipts</source>
         <translation>Trimite confirmări de citire</translation>
-    </message>
-    <message>
-        <source>Tells the people you write to when you have read their messages, and asks the same of them. With this off you send none and see none.</source>
-        <translation>Le spune celor cărora le scrii când le-ai citit mesajele și le cere același lucru. Dezactivat, nu trimiți niciuna și nu vezi niciuna.</translation>
     </message>
     <message>
         <source>Storage and connectivity</source>
@@ -952,12 +979,8 @@
         <translation>Numele de pe fiecare mesaj pe care îl trimiți</translation>
     </message>
     <message>
-        <source>Backup</source>
-        <translation>Copie de siguranță</translation>
-    </message>
-    <message>
-        <source>Back up this profile</source>
-        <translation>Fă o copie a acestui profil</translation>
+        <source>Both ways: with this off you send none and see none.</source>
+        <translation>În ambele sensuri: oprit, nu trimiți niciuna și nu vezi niciuna.</translation>
     </message>
 </context>
 <context>
@@ -983,8 +1006,8 @@
         <translation>%1 nu a răspuns în %2 secunde.</translation>
     </message>
     <message>
-        <source>Chatmail relays are run by volunteers in their spare time. If this one does not seem to work, go back and try another one.</source>
-        <translation>Releele chatmail sunt întreținute de voluntari în timpul lor liber. Dacă acesta nu pare să funcționeze, întoarceți-vă și încercați altul.</translation>
+        <source>Relays are run by volunteers. Go back and try another one.</source>
+        <translation>Releele sunt ținute de voluntari. Întoarce-te și încearcă altul.</translation>
     </message>
 </context>
 <context>
@@ -1030,12 +1053,12 @@
         <translation>Niciun profil</translation>
     </message>
     <message>
-        <source>Add as second device</source>
-        <translation>Adaugă ca al doilea dispozitiv</translation>
+        <source>Invite code</source>
+        <translation>Cod de invitație</translation>
     </message>
     <message>
-        <source>Restore profile from backup</source>
-        <translation>Restaurează profilul dintr-o copie de siguranță</translation>
+        <source>Back up profile</source>
+        <translation>Copie de siguranță a profilului</translation>
     </message>
 </context>
 <context>
@@ -1088,14 +1111,6 @@
 <context>
     <name>RestoreProfilePage</name>
     <message>
-        <source>The other device runs a newer Delta Chat than this app can take a profile from.</source>
-        <translation>Celălalt dispozitiv are un Delta Chat mai nou decât cel de la care aplicația poate prelua un profil.</translation>
-    </message>
-    <message>
-        <source>The transfer stopped before it finished. Both devices have to stay on the same network, with this page open.</source>
-        <translation>Transferul s-a oprit înainte de final. Ambele dispozitive trebuie să rămână în aceeași rețea, cu această pagină deschisă.</translation>
-    </message>
-    <message>
         <source>That is not the code a device shows while it is offering its profile.</source>
         <translation>Acesta nu este codul pe care un dispozitiv îl arată cât timp își oferă profilul.</translation>
     </message>
@@ -1108,10 +1123,6 @@
         <translation>Restaurează dintr-o copie de siguranță</translation>
     </message>
     <message>
-        <source>On the device that has your profile, make a backup and copy the file onto this phone. Then choose it here.</source>
-        <translation>Pe dispozitivul care are profilul, faceți o copie de siguranță și copiați fișierul pe acest telefon. Apoi alegeți-l aici.</translation>
-    </message>
-    <message>
         <source>Choose a backup file</source>
         <translation>Alege un fișier de copie</translation>
     </message>
@@ -1122,14 +1133,6 @@
     <message>
         <source>Cancel</source>
         <translation>Anulează</translation>
-    </message>
-    <message>
-        <source>The camera is not available on this device. A backup file works without one.</source>
-        <translation>Pe acest dispozitiv nu există cameră. Cu un fișier de copie se poate și fără.</translation>
-    </message>
-    <message>
-        <source>On your other device, open Settings and choose to add a second device. Both phones have to be on the same network.</source>
-        <translation>Pe dispozitivul care are profilul, deschideți setările și alegeți adăugarea unui al doilea dispozitiv. Ambele trebuie să fie în aceeași rețea.</translation>
     </message>
     <message>
         <source>Hold the phone up to the code it shows</source>
@@ -1158,6 +1161,26 @@
     <message>
         <source>Choose another file</source>
         <translation>Alege alt fișier</translation>
+    </message>
+    <message>
+        <source>The other device runs a newer Delta Chat than this app can read.</source>
+        <translation>Celălalt dispozitiv are un Delta Chat mai nou decât poate citi această aplicație.</translation>
+    </message>
+    <message>
+        <source>The transfer stopped. Both devices have to stay on one network, with this page open.</source>
+        <translation>Transferul s-a oprit. Ambele dispozitive trebuie să rămână în aceeași rețea, cu această pagină deschisă.</translation>
+    </message>
+    <message>
+        <source>No camera on this device. A backup file works without one.</source>
+        <translation>Acest dispozitiv nu are cameră. Un fișier de copie merge și fără.</translation>
+    </message>
+    <message>
+        <source>On the other device: Settings, then add a second device. Both on one network.</source>
+        <translation>Pe celălalt dispozitiv: Setări, apoi adaugă un al doilea dispozitiv. Ambele în aceeași rețea.</translation>
+    </message>
+    <message>
+        <source>Make a backup on the other device, copy the file here, then choose it.</source>
+        <translation>Fă o copie pe celălalt dispozitiv, copiază fișierul aici, apoi alege-l.</translation>
     </message>
 </context>
 <context>
@@ -1249,10 +1272,6 @@
         <translation>Descarcă atașamentele automat</translation>
     </message>
     <message>
-        <source>Bigger ones wait until you ask for them. Applies to every profile and to messages that arrive from now on.</source>
-        <translation>Cele mai mari așteaptă până le ceri. Se aplică fiecărui profil și mesajelor care sosesc de acum înainte.</translation>
-    </message>
-    <message>
         <source>Links</source>
         <translation>Linkuri</translation>
     </message>
@@ -1261,16 +1280,8 @@
         <translation>Elimină urmărirea din linkuri</translation>
     </message>
     <message>
-        <source>Known tracking parameters -- click ids, campaign tags, the sharer&apos;s account -- are taken out of the links in the messages you send. The rest of the link is left as it was.</source>
-        <translation>Parametrii de urmărire cunoscuți – ID-uri de clic, etichete de campanie, contul celui care distribuie – sunt eliminați din linkurile din mesajele pe care le trimiți. Restul linkului rămâne așa cum era.</translation>
-    </message>
-    <message>
         <source>Notifications</source>
         <translation>Notificări</translation>
-    </message>
-    <message>
-        <source>On the lock screen and in the notification area. The chat it is from opens on a tap either way.</source>
-        <translation>Pe ecranul de blocare și în zona de notificări. Conversația din care vine se deschide oricum la o atingere.</translation>
     </message>
     <message>
         <source>Who wrote, and what</source>
@@ -1292,10 +1303,6 @@
         <source>Enable webxdc apps (experimental)</source>
         <extracomment>A webxdc app is a small program somebody sends into a chat and everyone in it plays with. Keep the name: it is what every other Delta Chat client calls them.</extracomment>
         <translation>Activează aplicațiile webxdc (experimental)</translation>
-    </message>
-    <message>
-        <source>Apps somebody sends run inside the chat, and the attach tray offers a store to take new ones from. An app is somebody else&apos;s code, and this part is not yet as tested as the rest.</source>
-        <translation>Aplicațiile trimise de cineva rulează în conversație, iar tava de atașamente oferă un magazin din care poți lua altele noi. O aplicație este codul altcuiva, iar această parte nu este încă atât de testată ca restul.</translation>
     </message>
     <message>
         <source>After 1 hour</source>
@@ -1322,10 +1329,6 @@
         <translation>Șterge mesajele de pe dispozitiv</translation>
     </message>
     <message>
-        <source>Older messages go from this phone, in every chat of every profile, whatever a chat&apos;s own disappearing messages setting says. &quot;Saved messages&quot; are kept.</source>
-        <translation>Mesajele mai vechi dispar de pe acest telefon, din fiecare conversație a fiecărui profil, orice ar spune setarea conversației pentru mesajele care dispar. „Mesaje salvate” se păstrează.</translation>
-    </message>
-    <message>
         <source>A new notification shows</source>
         <translation>O notificare nouă arată</translation>
     </message>
@@ -1335,25 +1338,45 @@
         <translation>Mențiuni</translation>
     </message>
     <message>
-        <source>In a muted group, a reply to one of your messages still notifies you.</source>
-        <translation>Într-un grup cu sunetul dezactivat, un răspuns la unul dintre mesajele tale te notifică totuși.</translation>
-    </message>
-    <message>
         <source>Enter sends the message</source>
         <extracomment>The return key on the keyboard.</extracomment>
         <translation>Enter trimite mesajul</translation>
-    </message>
-    <message>
-        <source>When on, the return key sends. When off, it starts a new line, the message field grows with what is written, and the send button sends.</source>
-        <translation>Pornit, tasta Enter trimite. Oprit, începe un rând nou, câmpul mesajului crește cu ce se scrie, iar butonul de trimitere trimite.</translation>
     </message>
     <message>
         <source>Use Markdown formatting</source>
         <translation>Folosește formatarea Markdown</translation>
     </message>
     <message>
-        <source>When on, a message written with *stars* and `backticks` is shown with the bold, the italics and the links drawn. When off, it is shown exactly as it was written.</source>
-        <translation>Pornit, un mesaj scris cu *asteriscuri* și `accente grave` este afișat cu aldinele, cursivele și linkurile formatate. Oprit, este afișat exact așa cum a fost scris.</translation>
+        <source>Otherwise it starts a new line, and the button sends.</source>
+        <translation>Altfel începe un rând nou, iar butonul trimite.</translation>
+    </message>
+    <message>
+        <source>Draws *stars* and `backticks` rather than showing them.</source>
+        <translation>Desenează *asteriscurile* și `accentele grave` în loc să le arate.</translation>
+    </message>
+    <message>
+        <source>Bigger ones wait until you ask for them. Every profile, from now on.</source>
+        <translation>Cele mai mari așteaptă să le ceri. Toate profilurile, de acum înainte.</translation>
+    </message>
+    <message>
+        <source>Every chat of every profile. &quot;Saved messages&quot; are kept.</source>
+        <translation>Fiecare conversație a fiecărui profil. „Mesajele salvate” rămân.</translation>
+    </message>
+    <message>
+        <source>On the lock screen and in the notification area.</source>
+        <translation>Pe ecranul de blocare și în zona de notificări.</translation>
+    </message>
+    <message>
+        <source>A reply to you gets through a muted group.</source>
+        <translation>Un răspuns către tine trece și printr-un grup amuțit.</translation>
+    </message>
+    <message>
+        <source>Click ids and campaign tags come out of the links you send.</source>
+        <translation>Identificatorii de clic și etichetele de campanie ies din linkurile pe care le trimiți.</translation>
+    </message>
+    <message>
+        <source>Small apps run inside the chat. Somebody else&apos;s code, and less tested than the rest.</source>
+        <translation>Aplicații mici rulează în conversație. Cod străin, și mai puțin încercat decât restul.</translation>
     </message>
 </context>
 <context>

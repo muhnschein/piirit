@@ -5,6 +5,12 @@
 //! account the reader thought they had left. `replaceAbove(null, ...)`
 //! replaces the whole stack, which is what the onboarding pages already do
 //! when they hand over to the chat list.
+//!
+//! The rest of the page's navigation is here too, since the stack is
+//! already being modelled: the one plus under the list, which asks which
+//! of the three ways in the reader wants, and the two things a row's
+//! menu offers about the profile itself -- its invite code and its
+//! backup.
 
 // Qt harness: see qml_pages.rs.
 #![allow(
@@ -148,26 +154,21 @@ const PROBE_QML: &str = r"
             row.clicked()
             return 'ok'
         }
-        // The plus under the last row: the way to another profile.
+        // The plus under the last row: the one way to another profile,
+        // whichever of the three ways in the reader wants. The three
+        // used to be three pluses here; they are the question the page
+        // behind this one asks now.
         function addProfile() {
             var item = findIn(loader.item, 'addProfileButton')
             if (!item) { return 'missing:addProfileButton' }
             item.clicked()
             return 'ok'
         }
-        // The plus between them: a profile this reader has as a backup
-        // file, which is the way that needs nothing else to hand.
-        function restoreFromBackup() {
-            var item = findIn(loader.item, 'backupFileButton')
-            if (!item) { return 'missing:backupFileButton' }
-            item.clicked()
-            return 'ok'
-        }
-        // And the last plus: a profile this reader already has on
-        // another device.
-        function addSecondDevice() {
-            var item = findIn(loader.item, 'secondDeviceButton')
-            if (!item) { return 'missing:secondDeviceButton' }
+        // An entry on the first row's menu, for the things that are
+        // about one profile: its invite code, and its backup.
+        function clickOnFirstRow(name) {
+            var item = findIn(loader.item, name)
+            if (!item) { return 'missing:' + name }
             item.clicked()
             return 'ok'
         }
@@ -248,15 +249,20 @@ fn switching_profile_leaves_one_chat_list_on_the_stack() {
         // of this page.
         (*steps_ptr).push(("add", call!("addProfile")));
         (*steps_ptr).push(("added", (*stack_ptr).pinned().borrow().stack.to_string()));
-        // The plus under that, for a profile that exists already as a
-        // file on this phone.
-        (*steps_ptr).push(("backup", call!("restoreFromBackup")));
-        (*steps_ptr).push(("restored", (*stack_ptr).pinned().borrow().stack.to_string()));
-        // And the last plus, for one that exists already on the phone in
-        // the reader's other hand.
-        (*steps_ptr).push(("second", call!("addSecondDevice")));
+        // The two things a row's menu offers besides the profile's own
+        // page: they are about this profile and nothing else, so they
+        // are where the profile is picked.
         (*steps_ptr).push((
-            "took-over",
+            "invite",
+            call!("clickOnFirstRow", QString::from("inviteItem")),
+        ));
+        (*steps_ptr).push(("invited", (*stack_ptr).pinned().borrow().stack.to_string()));
+        (*steps_ptr).push((
+            "backup",
+            call!("clickOnFirstRow", QString::from("backupItem")),
+        ));
+        (*steps_ptr).push((
+            "backing-up",
             (*stack_ptr).pinned().borrow().stack.to_string(),
         ));
         (*steps_ptr).push(("tap", call!("tapFirstRow")));
@@ -309,35 +315,33 @@ fn switching_profile_leaves_one_chat_list_on_the_stack() {
         "no plus under the profile list, so no way to add a profile. {context}"
     );
     assert!(
-        value("added").ends_with(",AddProfileDialog.qml"),
-        "adding a profile did not open the add-profile dialog on top: \
-         {}. {context}",
+        value("added").ends_with(",AddProfilePage.qml"),
+        "the plus did not ask which of the three ways in the reader \
+         wants: {}. {context}",
         value("added")
+    );
+    assert_eq!(
+        value("invite"),
+        "ok",
+        "a profile's row does not offer its invite code, which is the \
+         one thing anybody else needs from it. {context}"
+    );
+    assert!(
+        value("invited").ends_with(",QrPage.qml"),
+        "the row's invite entry did not open the code: {}. {context}",
+        value("invited")
     );
     assert_eq!(
         value("backup"),
         "ok",
-        "no plus for a backup file under the profile list, so a profile \
-         that exists only as a file cannot be restored from here. \
-         {context}"
+        "a profile's row does not offer to back it up, and the core's \
+         export is per profile. {context}"
     );
     assert!(
-        value("restored").ends_with(",RestoreProfilePage.qml:file"),
-        "the backup plus did not open the take-over page on its file \
-         half: {}. {context}",
-        value("restored")
-    );
-    assert_eq!(
-        value("second"),
-        "ok",
-        "no second plus under the profile list, so a profile on another \
-         device cannot be taken over from here. {context}"
-    );
-    assert!(
-        value("took-over").ends_with(",RestoreProfilePage.qml:device"),
-        "the second-device plus did not open the take-over page on its \
-         device half: {}. {context}",
-        value("took-over")
+        value("backing-up").ends_with(",BackupPage.qml"),
+        "the row's backup entry did not open the backup page: {}. \
+         {context}",
+        value("backing-up")
     );
     // Also the guard that the list really had rows: with no accounts there
     // is no row to tap and nothing here would be under test.

@@ -125,7 +125,7 @@ fn delegates_bind_only_roles_their_models_have() {
     }
 
     let root = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../..");
-    let cases: [(&str, Vec<String>); 12] = [
+    let cases: [(&str, Vec<String>); 11] = [
         (
             "qml/components/ConversationList.qml",
             names_of::<postivene_shim::MessageListItem>(),
@@ -156,10 +156,6 @@ fn delegates_bind_only_roles_their_models_have() {
         ),
         (
             "qml/pages/NewChatPage.qml",
-            names_of::<postivene_shim::ContactItem>(),
-        ),
-        (
-            "qml/pages/NewGroupPage.qml",
             names_of::<postivene_shim::ContactItem>(),
         ),
         (
@@ -195,6 +191,56 @@ fn delegates_bind_only_roles_their_models_have() {
             );
         }
     }
+}
+
+/// The rows a group being made draws come from `ContactList.picked_rows`
+/// rather than from the model, so they are `modelData.<name>` -- and the
+/// names still have to be a contact's.
+///
+/// The page is not in the case list above for that reason: it binds no
+/// roles at all any more. Without this it would bind whatever it liked.
+#[test]
+fn the_new_group_page_reads_only_what_a_contact_row_carries() {
+    let path = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../qml/pages/NewGroupPage.qml");
+    let text = fs::read_to_string(&path).expect("read NewGroupPage.qml");
+    let names = names_of::<postivene_shim::ContactItem>();
+    let bound: Vec<String> = text
+        .split("modelData.")
+        .skip(1)
+        .map(|tail| {
+            tail.chars()
+                .take_while(|c| c.is_ascii_alphanumeric() || *c == '_')
+                .collect::<String>()
+        })
+        .filter(|name| !name.is_empty())
+        .collect();
+    assert!(
+        !bound.is_empty(),
+        "the new group page draws no member rows any more"
+    );
+    for name in &bound {
+        assert!(
+            names.contains(name),
+            "NewGroupPage.qml reads modelData.{name}, which a contact does \
+             not carry: {names:?}"
+        );
+    }
+}
+
+/// The contact list on the new chat page clips.
+///
+/// It is anchored under the search field rather than inside a view
+/// header, so without clipping its rows are drawn over the field the
+/// moment the list is flicked.
+#[test]
+fn the_new_chat_list_clips_away_from_its_search_field() {
+    let path = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../qml/pages/NewChatPage.qml");
+    let text = fs::read_to_string(&path).expect("read NewChatPage.qml");
+    assert!(
+        block_of(&text, "id: listView").contains("clip: true"),
+        "NewChatPage.qml's contact list does not clip, so its rows run \
+         over the search field above it"
+    );
 }
 
 /// A row's time label must position itself off the row, never off the

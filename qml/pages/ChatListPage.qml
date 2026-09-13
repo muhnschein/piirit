@@ -267,6 +267,23 @@ Page {
         contentWidth: width
         contentHeight: height
 
+        // Silica builds a pushed page before it starts the transition
+        // to it, so the tap sits on a still screen for however long the
+        // page and everything it imports take to compile -- which on the
+        // group page, with its avatar, its field and its rows, is long
+        // enough to read as the app having missed the tap. `animatorPush`
+        // is Silica's own answer: the transition starts first and the
+        // page is built behind it. Asked for rather than assumed, with
+        // the plain push as the fallback, so a Silica without it still
+        // opens the page.
+        function openPage(url, properties) {
+            if (pageStack.animatorPush) {
+                pageStack.animatorPush(url, properties)
+            } else {
+                pageStack.push(url, properties)
+            }
+        }
+
         PullDownMenu {
             objectName: "chatListPulley"
             visible: !page.archived
@@ -280,7 +297,7 @@ Page {
                 objectName: "settingsMenuItem"
                 visible: !page.archived
                 text: qsTr("Settings")
-                onClicked: pageStack.push(Qt.resolvedUrl("SettingsPage.qml"), {})
+                onClicked: pulleyHost.openPage(Qt.resolvedUrl("SettingsPage.qml"), {})
             }
             MenuItem {
                 objectName: "profilesMenuItem"
@@ -289,7 +306,7 @@ Page {
                 // there are two leaves no way to make one.
                 visible: !page.archived
                 text: qsTr("Profiles")
-                onClicked: pageStack.push(Qt.resolvedUrl("ProfilesPage.qml"),
+                onClicked: pulleyHost.openPage(Qt.resolvedUrl("ProfilesPage.qml"),
                                           { currentAccountId: page.accountId })
             }
             MenuItem {
@@ -299,7 +316,7 @@ Page {
                 objectName: "archivedMenuItem"
                 visible: !page.archived
                 text: qsTr("Archived chats")
-                onClicked: pageStack.push(Qt.resolvedUrl("ChatListPage.qml"), {
+                onClicked: pulleyHost.openPage(Qt.resolvedUrl("ChatListPage.qml"), {
                     accountId: page.accountId,
                     archived: true
                 })
@@ -312,21 +329,21 @@ Page {
                 objectName: "qrMenuItem"
                 visible: !page.archived
                 text: qsTr("QR code")
-                onClicked: pageStack.push(Qt.resolvedUrl("QrPage.qml"),
+                onClicked: pulleyHost.openPage(Qt.resolvedUrl("QrPage.qml"),
                                           { accountId: page.accountId })
             }
             MenuItem {
                 objectName: "newGroupMenuItem"
                 visible: !page.archived
                 text: qsTr("New group")
-                onClicked: pageStack.push(Qt.resolvedUrl("NewGroupPage.qml"),
+                onClicked: pulleyHost.openPage(Qt.resolvedUrl("NewGroupPage.qml"),
                                           { accountId: page.accountId })
             }
             MenuItem {
                 objectName: "newChatMenuItem"
                 visible: !page.archived
                 text: qsTr("New chat")
-                onClicked: pageStack.push(Qt.resolvedUrl("NewChatPage.qml"),
+                onClicked: pulleyHost.openPage(Qt.resolvedUrl("NewChatPage.qml"),
                                           { accountId: page.accountId })
             }
         }

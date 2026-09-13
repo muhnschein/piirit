@@ -35,10 +35,6 @@
         <translation>Skapa</translation>
     </message>
     <message>
-        <source>Pick a chatmail relay or enter a custom server. The server assigns the address; the encryption keys are made on this device.</source>
-        <translation>Välj ett chatmail-relä eller ange en egen server. Servern tilldelar adressen; krypteringsnycklarna skapas på den här enheten.</translation>
-    </message>
-    <message>
         <source>Your name</source>
         <translation>Ditt namn</translation>
     </message>
@@ -53,6 +49,41 @@
     <message>
         <source>See &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; for the full list.</source>
         <translation>Hela listan finns på &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
+    </message>
+    <message>
+        <source>The relay gives you an address. The keys are made on this phone.</source>
+        <translation>Reläet ger dig en adress. Nycklarna skapas på den här telefonen.</translation>
+    </message>
+</context>
+<context>
+    <name>AddProfilePage</name>
+    <message>
+        <source>Add profile</source>
+        <translation>Lägg till profil</translation>
+    </message>
+    <message>
+        <source>Create a profile</source>
+        <translation>Skapa en profil</translation>
+    </message>
+    <message>
+        <source>A new address on a chatmail relay.</source>
+        <translation>En ny adress på ett chatmail-relä.</translation>
+    </message>
+    <message>
+        <source>Restore from a backup</source>
+        <translation>Återställ från en säkerhetskopia</translation>
+    </message>
+    <message>
+        <source>A backup file copied onto this phone.</source>
+        <translation>En säkerhetskopiefil, kopierad till den här telefonen.</translation>
+    </message>
+    <message>
+        <source>Add as second device</source>
+        <translation>Lägg till som andra enhet</translation>
+    </message>
+    <message>
+        <source>The other device keeps it. Both get everything new.</source>
+        <translation>Den andra enheten behåller den. Båda får allt nytt.</translation>
     </message>
 </context>
 <context>
@@ -135,8 +166,12 @@
         <translation>Sparat i %1</translation>
     </message>
     <message>
-        <source>This profile&apos;s messages, contacts and key in one file, saved to Documents. Whoever has that file has the profile, so keep it somewhere safe. Your other profiles are not in it: each one is backed up from its own page.</source>
-        <translation>Den här profilens meddelanden, kontakter och nyckel i en enda fil, sparad i Dokument. Den som har filen har profilen – förvara den därför på ett säkert ställe. Dina andra profiler finns inte med: var och en säkerhetskopieras från sin egen sida.</translation>
+        <source>Messages, contacts and key in one file, saved to Documents. Whoever has the file has the profile.</source>
+        <translation>Meddelanden, kontakter och nyckel i en fil, sparad i Dokument. Den som har filen har profilen.</translation>
+    </message>
+    <message>
+        <source>Swipe on for your chats.</source>
+        <translation>Svep vidare till dina chattar.</translation>
     </message>
 </context>
 <context>
@@ -478,10 +513,6 @@
         <translation>Försvinnande meddelanden</translation>
     </message>
     <message>
-        <source>Applies to all members of this chat, they can still copy, save, and forward messages.</source>
-        <translation>Gäller alla medlemmar i den här chatten; de kan fortfarande kopiera, spara och vidarebefordra meddelanden.</translation>
-    </message>
-    <message>
         <source>After 1 year</source>
         <translation>Efter 1 år</translation>
     </message>
@@ -513,6 +544,10 @@
         <source>After %1 seconds</source>
         <translation>Efter %1 sekunder</translation>
     </message>
+    <message>
+        <source>Applies to everyone in the chat. They can still copy and forward.</source>
+        <translation>Gäller alla i chatten. De kan fortfarande kopiera och vidarebefordra.</translation>
+    </message>
 </context>
 <context>
     <name>ExistingProfilePage</name>
@@ -525,16 +560,16 @@
         <translation>Lägg till som andra enhet</translation>
     </message>
     <message>
-        <source>The device that has it keeps it. This one joins, over the same network.</source>
-        <translation>Enheten som har den behåller den. Den här ansluter, över samma nätverk.</translation>
-    </message>
-    <message>
         <source>Restore from a backup</source>
         <translation>Återställ från en säkerhetskopia</translation>
     </message>
     <message>
-        <source>A backup file the other device wrote, copied onto this phone.</source>
-        <translation>En säkerhetskopia som den andra enheten skrev, kopierad till den här telefonen.</translation>
+        <source>The other device keeps it. Both get everything new.</source>
+        <translation>Den andra enheten behåller den. Båda får allt nytt.</translation>
+    </message>
+    <message>
+        <source>A backup file copied onto this phone.</source>
+        <translation>En säkerhetskopiefil, kopierad till den här telefonen.</translation>
     </message>
 </context>
 <context>
@@ -615,24 +650,12 @@
         <translation>Ingen registrering, inget telefonnummer</translation>
     </message>
     <message>
-        <source>Your profile is made here on your phone. No phone number, no account with a company, nothing to sign.</source>
-        <translation>Din profil skapas här i telefonen. Inget telefonnummer, inget konto hos ett företag, inget att skriva under.</translation>
-    </message>
-    <message>
         <source>You choose who can reach you</source>
         <translation>Du väljer vem som kan nå dig</translation>
     </message>
     <message>
-        <source>There is no directory to be found in. Show a friend a code to scan, or send them a link, and the two of you can write.</source>
-        <translation>Det finns ingen katalog att hittas i. Visa en vän en kod att skanna, eller skicka en länk, så kan ni skriva till varandra.</translation>
-    </message>
-    <message>
         <source>Groups of equals</source>
         <translation>Grupper mellan likar</translation>
-    </message>
-    <message>
-        <source>Everyone in a group has the same rights: anyone can add a friend, rename it or leave. Nobody is in charge.</source>
-        <translation>Alla i en grupp har samma rättigheter: vem som helst kan lägga till en vän, byta namn eller lämna den. Ingen bestämmer.</translation>
     </message>
     <message>
         <source>The server only passes it on</source>
@@ -647,12 +670,24 @@
         <translation>Varje meddelande är krypterat</translation>
     </message>
     <message>
-        <source>Messages are encrypted the whole way, always. Servers that transport them cannot read a word.</source>
-        <translation>Meddelanden är alltid krypterade hela vägen. Servrarna som transporterar dem kan inte läsa ett ord.</translation>
+        <source>Made here on your phone. No phone number, no account, nothing to sign.</source>
+        <translation>Skapad här på din telefon. Inget telefonnummer, inget konto, inget att skriva under.</translation>
     </message>
     <message>
-        <source>A server holds a message until the other phone is online, and that is all it does. Your chats stay on your device.</source>
-        <translation>En server håller meddelandet tills den andra telefonen är uppkopplad, och mer gör den inte. Dina samtal stannar på din enhet.</translation>
+        <source>There is no directory to be found in. Show a friend a code, or send a link.</source>
+        <translation>Det finns ingen katalog att hittas i. Visa en vän en kod, eller skicka en länk.</translation>
+    </message>
+    <message>
+        <source>Encrypted the whole way, always. The servers cannot read a word.</source>
+        <translation>Alltid krypterat hela vägen. Servrarna läser inte ett ord.</translation>
+    </message>
+    <message>
+        <source>Anyone can add a friend, rename the group or leave. Nobody is in charge.</source>
+        <translation>Vem som helst kan lägga till en vän, byta namn på gruppen eller gå. Ingen bestämmer.</translation>
+    </message>
+    <message>
+        <source>It holds a message until the other phone is online, and nothing more.</source>
+        <translation>Den håller ett meddelande tills den andra telefonen är uppkopplad, inget mer.</translation>
     </message>
 </context>
 <context>
@@ -670,9 +705,9 @@
         <translation>Avbryt</translation>
     </message>
     <message>
-        <source>Leave %1? You will stop receiving its messages, and only a member can add you back.</source>
+        <source>Leave %1? Only a member can add you back.</source>
         <extracomment>%1 is the group&apos;s name.</extracomment>
-        <translation>Lämna %1? Du slutar få dess meddelanden, och bara en medlem kan lägga till dig igen.</translation>
+        <translation>Lämna %1? Bara en medlem kan lägga till dig igen.</translation>
     </message>
 </context>
 <context>
@@ -896,16 +931,8 @@
         <translation>Adress</translation>
     </message>
     <message>
-        <source>Show invite code</source>
-        <translation>Visa inbjudningskod</translation>
-    </message>
-    <message>
         <source>Send read receipts</source>
         <translation>Skicka läskvitton</translation>
-    </message>
-    <message>
-        <source>Tells the people you write to when you have read their messages, and asks the same of them. With this off you send none and see none.</source>
-        <translation>Talar om för dem du skriver till när du har läst deras meddelanden, och ber dem om detsamma. Avstängt skickar du inga och ser inga.</translation>
     </message>
     <message>
         <source>Storage and connectivity</source>
@@ -946,12 +973,8 @@
         <translation>Namnet på varje meddelande du skickar</translation>
     </message>
     <message>
-        <source>Backup</source>
-        <translation>Säkerhetskopia</translation>
-    </message>
-    <message>
-        <source>Back up this profile</source>
-        <translation>Säkerhetskopiera den här profilen</translation>
+        <source>Both ways: with this off you send none and see none.</source>
+        <translation>Åt båda hållen: med detta av skickar du inga och ser inga.</translation>
     </message>
 </context>
 <context>
@@ -977,8 +1000,8 @@
         <translation>%1 svarade inte inom %2 sekunder.</translation>
     </message>
     <message>
-        <source>Chatmail relays are run by volunteers in their spare time. If this one does not seem to work, go back and try another one.</source>
-        <translation>Chatmail-reläer drivs av frivilliga på deras fritid. Om det här inte verkar fungera, gå tillbaka och prova ett annat.</translation>
+        <source>Relays are run by volunteers. Go back and try another one.</source>
+        <translation>Reläer drivs av frivilliga. Gå tillbaka och prova ett annat.</translation>
     </message>
 </context>
 <context>
@@ -1024,12 +1047,12 @@
         <translation>Inga profiler</translation>
     </message>
     <message>
-        <source>Add as second device</source>
-        <translation>Lägg till som andra enhet</translation>
+        <source>Invite code</source>
+        <translation>Inbjudningskod</translation>
     </message>
     <message>
-        <source>Restore profile from backup</source>
-        <translation>Återställ profil från en säkerhetskopia</translation>
+        <source>Back up profile</source>
+        <translation>Säkerhetskopiera profil</translation>
     </message>
 </context>
 <context>
@@ -1082,14 +1105,6 @@
 <context>
     <name>RestoreProfilePage</name>
     <message>
-        <source>The other device runs a newer Delta Chat than this app can take a profile from.</source>
-        <translation>Den andra enheten kör en nyare Delta Chat än vad den här appen kan ta över en profil från.</translation>
-    </message>
-    <message>
-        <source>The transfer stopped before it finished. Both devices have to stay on the same network, with this page open.</source>
-        <translation>Överföringen stannade innan den blev klar. Båda enheterna måste vara kvar på samma nätverk, med den här sidan öppen.</translation>
-    </message>
-    <message>
         <source>That is not the code a device shows while it is offering its profile.</source>
         <translation>Det är inte koden en enhet visar medan den erbjuder sin profil.</translation>
     </message>
@@ -1102,10 +1117,6 @@
         <translation>Återställ från en säkerhetskopia</translation>
     </message>
     <message>
-        <source>On the device that has your profile, make a backup and copy the file onto this phone. Then choose it here.</source>
-        <translation>På enheten som har din profil: gör en säkerhetskopia och kopiera filen till den här telefonen. Välj den sedan här.</translation>
-    </message>
-    <message>
         <source>Choose a backup file</source>
         <translation>Välj en säkerhetskopia</translation>
     </message>
@@ -1116,14 +1127,6 @@
     <message>
         <source>Cancel</source>
         <translation>Avbryt</translation>
-    </message>
-    <message>
-        <source>The camera is not available on this device. A backup file works without one.</source>
-        <translation>Det finns ingen kamera på den här enheten. Med en säkerhetskopia går det utan.</translation>
-    </message>
-    <message>
-        <source>On your other device, open Settings and choose to add a second device. Both phones have to be on the same network.</source>
-        <translation>På enheten som har din profil: öppna inställningarna och välj att lägga till en andra enhet. Båda måste vara på samma nätverk.</translation>
     </message>
     <message>
         <source>Hold the phone up to the code it shows</source>
@@ -1152,6 +1155,26 @@
     <message>
         <source>Choose another file</source>
         <translation>Välj en annan fil</translation>
+    </message>
+    <message>
+        <source>The other device runs a newer Delta Chat than this app can read.</source>
+        <translation>Den andra enheten kör en nyare Delta Chat än den här appen kan läsa.</translation>
+    </message>
+    <message>
+        <source>The transfer stopped. Both devices have to stay on one network, with this page open.</source>
+        <translation>Överföringen stannade. Båda enheterna måste stanna på samma nätverk, med den här sidan öppen.</translation>
+    </message>
+    <message>
+        <source>No camera on this device. A backup file works without one.</source>
+        <translation>Ingen kamera på den här enheten. En säkerhetskopiefil fungerar utan.</translation>
+    </message>
+    <message>
+        <source>On the other device: Settings, then add a second device. Both on one network.</source>
+        <translation>På den andra enheten: Inställningar, och lägg sedan till en andra enhet. Båda på samma nätverk.</translation>
+    </message>
+    <message>
+        <source>Make a backup on the other device, copy the file here, then choose it.</source>
+        <translation>Gör en säkerhetskopia på den andra enheten, kopiera filen hit och välj den sedan.</translation>
     </message>
 </context>
 <context>
@@ -1243,10 +1266,6 @@
         <translation>Hämta bilagor automatiskt</translation>
     </message>
     <message>
-        <source>Bigger ones wait until you ask for them. Applies to every profile and to messages that arrive from now on.</source>
-        <translation>Större väntar tills du ber om dem. Gäller varje profil och meddelanden som kommer från och med nu.</translation>
-    </message>
-    <message>
         <source>Links</source>
         <translation>Länkar</translation>
     </message>
@@ -1255,16 +1274,8 @@
         <translation>Ta bort spårning från länkar</translation>
     </message>
     <message>
-        <source>Known tracking parameters -- click ids, campaign tags, the sharer&apos;s account -- are taken out of the links in the messages you send. The rest of the link is left as it was.</source>
-        <translation>Kända spårningsparametrar – klick-id:n, kampanjtaggar, delarens konto – tas bort från länkarna i meddelandena du skickar. Resten av länken lämnas som den var.</translation>
-    </message>
-    <message>
         <source>Notifications</source>
         <translation>Aviseringar</translation>
-    </message>
-    <message>
-        <source>On the lock screen and in the notification area. The chat it is from opens on a tap either way.</source>
-        <translation>På låsskärmen och i aviseringsområdet. Chatten det kommer från öppnas ändå med ett tryck.</translation>
     </message>
     <message>
         <source>Who wrote, and what</source>
@@ -1286,10 +1297,6 @@
         <source>Enable webxdc apps (experimental)</source>
         <extracomment>A webxdc app is a small program somebody sends into a chat and everyone in it plays with. Keep the name: it is what every other Delta Chat client calls them.</extracomment>
         <translation>Aktivera webxdc-appar (experimentellt)</translation>
-    </message>
-    <message>
-        <source>Apps somebody sends run inside the chat, and the attach tray offers a store to take new ones from. An app is somebody else&apos;s code, and this part is not yet as tested as the rest.</source>
-        <translation>Appar som någon skickar körs inne i samtalet, och bilagefältet erbjuder en butik att hämta nya från. En app är någon annans kod, och den här delen är ännu inte lika testad som resten.</translation>
     </message>
     <message>
         <source>After 1 hour</source>
@@ -1316,10 +1323,6 @@
         <translation>Ta bort meddelanden från enheten</translation>
     </message>
     <message>
-        <source>Older messages go from this phone, in every chat of every profile, whatever a chat&apos;s own disappearing messages setting says. &quot;Saved messages&quot; are kept.</source>
-        <translation>Äldre meddelanden försvinner från den här telefonen, i varje chatt i varje profil, oavsett vad chattens egen inställning för försvinnande meddelanden säger. &quot;Sparade meddelanden&quot; behålls.</translation>
-    </message>
-    <message>
         <source>A new notification shows</source>
         <translation>En ny avisering visar</translation>
     </message>
@@ -1329,25 +1332,45 @@
         <translation>Omnämnanden</translation>
     </message>
     <message>
-        <source>In a muted group, a reply to one of your messages still notifies you.</source>
-        <translation>I en tystad grupp aviserar ett svar på ett av dina meddelanden ändå.</translation>
-    </message>
-    <message>
         <source>Enter sends the message</source>
         <extracomment>The return key on the keyboard.</extracomment>
         <translation>Enter skickar meddelandet</translation>
-    </message>
-    <message>
-        <source>When on, the return key sends. When off, it starts a new line, the message field grows with what is written, and the send button sends.</source>
-        <translation>På skickar Enter-tangenten. Av börjar den en ny rad, meddelandefältet växer med det skrivna och skicka-knappen skickar.</translation>
     </message>
     <message>
         <source>Use Markdown formatting</source>
         <translation>Använd Markdown-formatering</translation>
     </message>
     <message>
-        <source>When on, a message written with *stars* and `backticks` is shown with the bold, the italics and the links drawn. When off, it is shown exactly as it was written.</source>
-        <translation>På visas ett meddelande skrivet med *stjärnor* och `bakåtcitattecken` med fet stil, kursiv och länkar ritade. Av visas det precis som det skrevs.</translation>
+        <source>Otherwise it starts a new line, and the button sends.</source>
+        <translation>Annars börjar den en ny rad, och knappen skickar.</translation>
+    </message>
+    <message>
+        <source>Draws *stars* and `backticks` rather than showing them.</source>
+        <translation>Ritar *stjärnor* och `bakåtfnuttar` i stället för att visa dem.</translation>
+    </message>
+    <message>
+        <source>Bigger ones wait until you ask for them. Every profile, from now on.</source>
+        <translation>Större väntar tills du ber om dem. Alla profiler, från och med nu.</translation>
+    </message>
+    <message>
+        <source>Every chat of every profile. &quot;Saved messages&quot; are kept.</source>
+        <translation>Varje chatt i varje profil. ”Sparade meddelanden” behålls.</translation>
+    </message>
+    <message>
+        <source>On the lock screen and in the notification area.</source>
+        <translation>På låsskärmen och i aviseringsområdet.</translation>
+    </message>
+    <message>
+        <source>A reply to you gets through a muted group.</source>
+        <translation>Ett svar till dig tar sig igenom en tystad grupp.</translation>
+    </message>
+    <message>
+        <source>Click ids and campaign tags come out of the links you send.</source>
+        <translation>Klick-id:n och kampanjtaggar åker ut ur länkarna du skickar.</translation>
+    </message>
+    <message>
+        <source>Small apps run inside the chat. Somebody else&apos;s code, and less tested than the rest.</source>
+        <translation>Små appar körs inne i chatten. Någon annans kod, och mindre beprövad än resten.</translation>
     </message>
 </context>
 <context>

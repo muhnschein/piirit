@@ -94,7 +94,7 @@ Dialog {
                 wrapMode: Text.Wrap
                 font.pixelSize: Theme.fontSizeSmall
                 color: Theme.secondaryHighlightColor
-                text: qsTr("Pick a chatmail relay or enter a custom server. The server assigns the address; the encryption keys are made on this device.")
+                text: qsTr("The relay gives you an address. The keys are made on this phone.")
             }
 
             TextField {

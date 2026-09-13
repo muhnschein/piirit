@@ -35,10 +35,6 @@
         <translation>Loo</translation>
     </message>
     <message>
-        <source>Pick a chatmail relay or enter a custom server. The server assigns the address; the encryption keys are made on this device.</source>
-        <translation>Vali chatmail-relee või sisesta oma server. Server määrab aadressi; krüpteerimisvõtmed luuakse selles seadmes.</translation>
-    </message>
-    <message>
         <source>Your name</source>
         <translation>Sinu nimi</translation>
     </message>
@@ -53,6 +49,41 @@
     <message>
         <source>See &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; for the full list.</source>
         <translation>Täielik loend on aadressil &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
+    </message>
+    <message>
+        <source>The relay gives you an address. The keys are made on this phone.</source>
+        <translation>Relee annab sulle aadressi. Võtmed tehakse selles telefonis.</translation>
+    </message>
+</context>
+<context>
+    <name>AddProfilePage</name>
+    <message>
+        <source>Add profile</source>
+        <translation>Lisa profiil</translation>
+    </message>
+    <message>
+        <source>Create a profile</source>
+        <translation>Loo profiil</translation>
+    </message>
+    <message>
+        <source>A new address on a chatmail relay.</source>
+        <translation>Uus aadress chatmail-relees.</translation>
+    </message>
+    <message>
+        <source>Restore from a backup</source>
+        <translation>Taasta varukoopiast</translation>
+    </message>
+    <message>
+        <source>A backup file copied onto this phone.</source>
+        <translation>Varukoopia fail, kopeeritud sellesse telefoni.</translation>
+    </message>
+    <message>
+        <source>Add as second device</source>
+        <translation>Lisa teise seadmena</translation>
+    </message>
+    <message>
+        <source>The other device keeps it. Both get everything new.</source>
+        <translation>Teine seade jätab selle endale. Mõlemad saavad kõik uue.</translation>
     </message>
 </context>
 <context>
@@ -135,8 +166,12 @@
         <translation>Salvestatud: %1</translation>
     </message>
     <message>
-        <source>This profile&apos;s messages, contacts and key in one file, saved to Documents. Whoever has that file has the profile, so keep it somewhere safe. Your other profiles are not in it: each one is backed up from its own page.</source>
-        <translation>Selle profiili sõnumid, kontaktid ja võti ühes failis, salvestatud Dokumentidesse. Kellel on see fail, sellel on ka profiil – hoia seda turvalises kohas. Sinu teisi profiile selles ei ole: igaüht varundatakse oma lehelt.</translation>
+        <source>Messages, contacts and key in one file, saved to Documents. Whoever has the file has the profile.</source>
+        <translation>Sõnumid, kontaktid ja võti ühes failis, salvestatud kausta Dokumendid. Kellel on fail, sellel on profiil.</translation>
+    </message>
+    <message>
+        <source>Swipe on for your chats.</source>
+        <translation>Libista edasi oma vestlustesse.</translation>
     </message>
 </context>
 <context>
@@ -478,10 +513,6 @@
         <translation>Kaduvad sõnumid</translation>
     </message>
     <message>
-        <source>Applies to all members of this chat, they can still copy, save, and forward messages.</source>
-        <translation>Kehtib kõigile selle vestluse liikmetele; nad saavad sõnumeid endiselt kopeerida, salvestada ja edastada.</translation>
-    </message>
-    <message>
         <source>After 1 year</source>
         <translation>1 aasta pärast</translation>
     </message>
@@ -513,6 +544,10 @@
         <source>After %1 seconds</source>
         <translation>%1 sekundi pärast</translation>
     </message>
+    <message>
+        <source>Applies to everyone in the chat. They can still copy and forward.</source>
+        <translation>Kehtib kõigile vestluses. Kopeerida ja edastada saavad nad ikka.</translation>
+    </message>
 </context>
 <context>
     <name>ExistingProfilePage</name>
@@ -525,16 +560,16 @@
         <translation>Lisa teise seadmena</translation>
     </message>
     <message>
-        <source>The device that has it keeps it. This one joins, over the same network.</source>
-        <translation>Seade, kus see on, jätab selle endale. See siin liitub, sama võrgu kaudu.</translation>
-    </message>
-    <message>
         <source>Restore from a backup</source>
         <translation>Taasta varukoopiast</translation>
     </message>
     <message>
-        <source>A backup file the other device wrote, copied onto this phone.</source>
-        <translation>Varukoopia fail, mille teine seade kirjutas, sellesse telefoni kopeerituna.</translation>
+        <source>The other device keeps it. Both get everything new.</source>
+        <translation>Teine seade jätab selle endale. Mõlemad saavad kõik uue.</translation>
+    </message>
+    <message>
+        <source>A backup file copied onto this phone.</source>
+        <translation>Varukoopia fail, kopeeritud sellesse telefoni.</translation>
     </message>
 </context>
 <context>
@@ -615,24 +650,12 @@
         <translation>Ei mingit registreerimist ega telefoninumbrit</translation>
     </message>
     <message>
-        <source>Your profile is made here on your phone. No phone number, no account with a company, nothing to sign.</source>
-        <translation>Sinu profiil sünnib siinsamas telefonis. Telefoninumbrit pole vaja, ettevõtte kontot samuti mitte, allkirjastada pole midagi.</translation>
-    </message>
-    <message>
         <source>You choose who can reach you</source>
         <translation>Sina otsustad, kes saab sulle kirjutada</translation>
     </message>
     <message>
-        <source>There is no directory to be found in. Show a friend a code to scan, or send them a link, and the two of you can write.</source>
-        <translation>Pole kataloogi, kust sind üles leitaks. Näita sõbrale skannitavat koodi või saada talle link, ja siis saate kirjutada.</translation>
-    </message>
-    <message>
         <source>Groups of equals</source>
         <translation>Võrdsete grupid</translation>
-    </message>
-    <message>
-        <source>Everyone in a group has the same rights: anyone can add a friend, rename it or leave. Nobody is in charge.</source>
-        <translation>Grupis on kõigil samad õigused: igaüks võib lisada sõbra, grupi ümber nimetada või sealt lahkuda. Ülemust pole.</translation>
     </message>
     <message>
         <source>The server only passes it on</source>
@@ -647,12 +670,24 @@
         <translation>Iga sõnum on krüptitud</translation>
     </message>
     <message>
-        <source>Messages are encrypted the whole way, always. Servers that transport them cannot read a word.</source>
-        <translation>Sõnumid on alati kogu tee krüptitud. Serverid, mis neid edasi toimetavad, ei loe neist sõnagi.</translation>
+        <source>Made here on your phone. No phone number, no account, nothing to sign.</source>
+        <translation>Tehtud siin, sinu telefonis. Ei telefoninumbrit, ei kontot, ei midagi allkirjastada.</translation>
     </message>
     <message>
-        <source>A server holds a message until the other phone is online, and that is all it does. Your chats stay on your device.</source>
-        <translation>Server hoiab sõnumit, kuni teine telefon on võrgus, ja rohkem ta ei teegi. Sinu vestlused jäävad sinu seadmesse.</translation>
+        <source>There is no directory to be found in. Show a friend a code, or send a link.</source>
+        <translation>Pole kataloogi, kust sind leitaks. Näita sõbrale koodi või saada link.</translation>
+    </message>
+    <message>
+        <source>Encrypted the whole way, always. The servers cannot read a word.</source>
+        <translation>Alati otsast otsani krüptitud. Serverid ei loe sõnagi.</translation>
+    </message>
+    <message>
+        <source>Anyone can add a friend, rename the group or leave. Nobody is in charge.</source>
+        <translation>Igaüks võib lisada sõbra, rühma ümber nimetada või lahkuda. Keegi ei käsuta.</translation>
+    </message>
+    <message>
+        <source>It holds a message until the other phone is online, and nothing more.</source>
+        <translation>See hoiab sõnumit, kuni teine telefon on võrgus, ja ei midagi enamat.</translation>
     </message>
 </context>
 <context>
@@ -670,9 +705,9 @@
         <translation>Loobu</translation>
     </message>
     <message>
-        <source>Leave %1? You will stop receiving its messages, and only a member can add you back.</source>
+        <source>Leave %1? Only a member can add you back.</source>
         <extracomment>%1 is the group&apos;s name.</extracomment>
-        <translation>Kas lahkuda grupist %1? Sa ei saa enam selle sõnumeid ja tagasi saab sind lisada ainult liige.</translation>
+        <translation>Kas lahkuda rühmast %1? Ainult liige saab su tagasi lisada.</translation>
     </message>
 </context>
 <context>
@@ -896,16 +931,8 @@
         <translation>Aadress</translation>
     </message>
     <message>
-        <source>Show invite code</source>
-        <translation>Näita kutsekoodi</translation>
-    </message>
-    <message>
         <source>Send read receipts</source>
         <translation>Saada lugemiskinnitusi</translation>
-    </message>
-    <message>
-        <source>Tells the people you write to when you have read their messages, and asks the same of them. With this off you send none and see none.</source>
-        <translation>Annab neile, kellele kirjutad, teada, millal oled nende sõnumeid lugenud, ja palub neilt sama. Väljalülitatuna sa ei saada ega näe ühtegi.</translation>
     </message>
     <message>
         <source>Storage and connectivity</source>
@@ -946,12 +973,8 @@
         <translation>Nimi igal sõnumil, mille saadad</translation>
     </message>
     <message>
-        <source>Backup</source>
-        <translation>Varukoopia</translation>
-    </message>
-    <message>
-        <source>Back up this profile</source>
-        <translation>Varunda see profiil</translation>
+        <source>Both ways: with this off you send none and see none.</source>
+        <translation>Mõlemat pidi: välja lülitatuna ei saada sa ühtegi ega näe ühtegi.</translation>
     </message>
 </context>
 <context>
@@ -977,8 +1000,8 @@
         <translation>%1 ei vastanud %2 sekundi jooksul.</translation>
     </message>
     <message>
-        <source>Chatmail relays are run by volunteers in their spare time. If this one does not seem to work, go back and try another one.</source>
-        <translation>Chatmaili releesid peavad vabatahtlikud oma vabal ajal. Kui see ei paista töötavat, mine tagasi ja proovi mõnda teist.</translation>
+        <source>Relays are run by volunteers. Go back and try another one.</source>
+        <translation>Releesid peavad vabatahtlikud. Mine tagasi ja proovi teist.</translation>
     </message>
 </context>
 <context>
@@ -1024,12 +1047,12 @@
         <translation>Profiile pole</translation>
     </message>
     <message>
-        <source>Add as second device</source>
-        <translation>Lisa teise seadmena</translation>
+        <source>Invite code</source>
+        <translation>Kutsekood</translation>
     </message>
     <message>
-        <source>Restore profile from backup</source>
-        <translation>Taasta profiil varukoopiast</translation>
+        <source>Back up profile</source>
+        <translation>Profiili varundamine</translation>
     </message>
 </context>
 <context>
@@ -1082,14 +1105,6 @@
 <context>
     <name>RestoreProfilePage</name>
     <message>
-        <source>The other device runs a newer Delta Chat than this app can take a profile from.</source>
-        <translation>Teises seadmes on uuem Delta Chat, kui see rakendus profiili üle võtta oskab.</translation>
-    </message>
-    <message>
-        <source>The transfer stopped before it finished. Both devices have to stay on the same network, with this page open.</source>
-        <translation>Ülekanne katkes enne lõppu. Mõlemad seadmed peavad jääma samasse võrku ja see leht lahti.</translation>
-    </message>
-    <message>
         <source>That is not the code a device shows while it is offering its profile.</source>
         <translation>See ei ole kood, mida seade näitab, kui ta oma profiili pakub.</translation>
     </message>
@@ -1102,10 +1117,6 @@
         <translation>Taasta varukoopiast</translation>
     </message>
     <message>
-        <source>On the device that has your profile, make a backup and copy the file onto this phone. Then choose it here.</source>
-        <translation>Tee profiiliga seadmes varukoopia ja kopeeri fail sellesse telefoni. Vali see siis siit.</translation>
-    </message>
-    <message>
         <source>Choose a backup file</source>
         <translation>Vali varukoopia fail</translation>
     </message>
@@ -1116,14 +1127,6 @@
     <message>
         <source>Cancel</source>
         <translation>Loobu</translation>
-    </message>
-    <message>
-        <source>The camera is not available on this device. A backup file works without one.</source>
-        <translation>Selles seadmes pole kaamerat. Varukoopia failiga saab ka ilma.</translation>
-    </message>
-    <message>
-        <source>On your other device, open Settings and choose to add a second device. Both phones have to be on the same network.</source>
-        <translation>Ava profiiliga seadmes seaded ja vali teise seadme lisamine. Mõlemad seadmed peavad olema samas võrgus.</translation>
     </message>
     <message>
         <source>Hold the phone up to the code it shows</source>
@@ -1152,6 +1155,26 @@
     <message>
         <source>Choose another file</source>
         <translation>Vali teine fail</translation>
+    </message>
+    <message>
+        <source>The other device runs a newer Delta Chat than this app can read.</source>
+        <translation>Teises seadmes on uuem Delta Chat, kui see rakendus lugeda oskab.</translation>
+    </message>
+    <message>
+        <source>The transfer stopped. Both devices have to stay on one network, with this page open.</source>
+        <translation>Ülekanne peatus. Mõlemad seadmed peavad jääma samasse võrku, see leht lahti.</translation>
+    </message>
+    <message>
+        <source>No camera on this device. A backup file works without one.</source>
+        <translation>Selles seadmes pole kaamerat. Varukoopia fail toimib ka ilma.</translation>
+    </message>
+    <message>
+        <source>On the other device: Settings, then add a second device. Both on one network.</source>
+        <translation>Teises seadmes: Seaded, seejärel lisa teine seade. Mõlemad samas võrgus.</translation>
+    </message>
+    <message>
+        <source>Make a backup on the other device, copy the file here, then choose it.</source>
+        <translation>Tee teises seadmes varukoopia, kopeeri fail siia ja vali see.</translation>
     </message>
 </context>
 <context>
@@ -1243,10 +1266,6 @@
         <translation>Laadi manused automaatselt alla</translation>
     </message>
     <message>
-        <source>Bigger ones wait until you ask for them. Applies to every profile and to messages that arrive from now on.</source>
-        <translation>Suuremad ootavad, kuni sa neid küsid. Kehtib igale profiilile ja nüüdsest saabuvatele sõnumitele.</translation>
-    </message>
-    <message>
         <source>Links</source>
         <translation>Lingid</translation>
     </message>
@@ -1255,16 +1274,8 @@
         <translation>Eemalda linkidest jälgimine</translation>
     </message>
     <message>
-        <source>Known tracking parameters -- click ids, campaign tags, the sharer&apos;s account -- are taken out of the links in the messages you send. The rest of the link is left as it was.</source>
-        <translation>Teadaolevad jälgimisparameetrid – klõpsu ID-d, kampaaniasildid, jagaja konto – eemaldatakse sinu saadetud sõnumite linkidest. Ülejäänud link jääb nii, nagu oli.</translation>
-    </message>
-    <message>
         <source>Notifications</source>
         <translation>Teavitused</translation>
-    </message>
-    <message>
-        <source>On the lock screen and in the notification area. The chat it is from opens on a tap either way.</source>
-        <translation>Lukustuskuval ja teavituste alal. Vestlus, kust see tuli, avaneb puudutusel igal juhul.</translation>
     </message>
     <message>
         <source>Who wrote, and what</source>
@@ -1286,10 +1297,6 @@
         <source>Enable webxdc apps (experimental)</source>
         <extracomment>A webxdc app is a small program somebody sends into a chat and everyone in it plays with. Keep the name: it is what every other Delta Chat client calls them.</extracomment>
         <translation>Luba webxdc rakendused (katseline)</translation>
-    </message>
-    <message>
-        <source>Apps somebody sends run inside the chat, and the attach tray offers a store to take new ones from. An app is somebody else&apos;s code, and this part is not yet as tested as the rest.</source>
-        <translation>Rakendused, mille keegi saadab, töötavad vestluse sees ja manuste sahtel pakub poodi, kust uusi võtta. Rakendus on kellegi teise kood ja see osa pole veel nii läbi katsetatud kui ülejäänu.</translation>
     </message>
     <message>
         <source>After 1 hour</source>
@@ -1316,10 +1323,6 @@
         <translation>Kustuta sõnumid seadmest</translation>
     </message>
     <message>
-        <source>Older messages go from this phone, in every chat of every profile, whatever a chat&apos;s own disappearing messages setting says. &quot;Saved messages&quot; are kept.</source>
-        <translation>Vanemad sõnumid kaovad sellest telefonist, iga profiili igast vestlusest, ükskõik mida vestluse enda kaduvate sõnumite säte ütleb. „Salvestatud sõnumid“ jäävad alles.</translation>
-    </message>
-    <message>
         <source>A new notification shows</source>
         <translation>Uus teavitus näitab</translation>
     </message>
@@ -1329,25 +1332,45 @@
         <translation>Mainimised</translation>
     </message>
     <message>
-        <source>In a muted group, a reply to one of your messages still notifies you.</source>
-        <translation>Vaigistatud grupis teavitab vastus sinu sõnumile sind ikkagi.</translation>
-    </message>
-    <message>
         <source>Enter sends the message</source>
         <extracomment>The return key on the keyboard.</extracomment>
         <translation>Enter saadab sõnumi</translation>
-    </message>
-    <message>
-        <source>When on, the return key sends. When off, it starts a new line, the message field grows with what is written, and the send button sends.</source>
-        <translation>Sees saadab Enter-klahv. Väljas alustab see uut rida, sõnumiväli kasvab kirjutatuga ja saadab saatmisnupp.</translation>
     </message>
     <message>
         <source>Use Markdown formatting</source>
         <translation>Kasuta Markdowni vormindust</translation>
     </message>
     <message>
-        <source>When on, a message written with *stars* and `backticks` is shown with the bold, the italics and the links drawn. When off, it is shown exactly as it was written.</source>
-        <translation>Sees kuvatakse *tärnide* ja `tagurpidi ülakomadega` kirjutatud sõnum vormindatud rasvase kirja, kaldkirja ja linkidega. Väljas kuvatakse see täpselt nii, nagu see kirjutati.</translation>
+        <source>Otherwise it starts a new line, and the button sends.</source>
+        <translation>Muidu alustab see uut rida ja nupp saadab.</translation>
+    </message>
+    <message>
+        <source>Draws *stars* and `backticks` rather than showing them.</source>
+        <translation>Joonistab *tärnid* ja `ülakomad` selle asemel, et neid näidata.</translation>
+    </message>
+    <message>
+        <source>Bigger ones wait until you ask for them. Every profile, from now on.</source>
+        <translation>Suuremad ootavad, kuni neid küsid. Kõik profiilid, siit edasi.</translation>
+    </message>
+    <message>
+        <source>Every chat of every profile. &quot;Saved messages&quot; are kept.</source>
+        <translation>Iga vestlus igas profiilis. „Salvestatud sõnumid“ jäävad alles.</translation>
+    </message>
+    <message>
+        <source>On the lock screen and in the notification area.</source>
+        <translation>Lukustuskuval ja teavitusalal.</translation>
+    </message>
+    <message>
+        <source>A reply to you gets through a muted group.</source>
+        <translation>Sulle mõeldud vastus pääseb ka vaigistatud rühmast läbi.</translation>
+    </message>
+    <message>
+        <source>Click ids and campaign tags come out of the links you send.</source>
+        <translation>Klikitunnused ja kampaaniasildid kaovad sinu saadetud linkidest.</translation>
+    </message>
+    <message>
+        <source>Small apps run inside the chat. Somebody else&apos;s code, and less tested than the rest.</source>
+        <translation>Väikesed rakendused töötavad vestluse sees. Kellegi teise kood, ja vähem läbi proovitud kui muu.</translation>
     </message>
 </context>
 <context>

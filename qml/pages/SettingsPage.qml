@@ -8,11 +8,11 @@ import "../components"
  * attachment arrives unasked, how long a message is kept, how much a
  * notification gives away and whether a muted group can still raise one,
  * and whether webxdc apps are offered at all. Reached from the chat
- * list's pull-down. A profile's own
- * settings -- picture, name, address, read receipts, what the relay says,
- * and writing the profile out to a backup file, which the core's export
- * does one account at a time -- are on the profile's page, reached from
- * its row on the profiles page.
+ * list's pull-down. A profile's own settings -- picture, name, address,
+ * read receipts, what the relay says -- are on the profile's page,
+ * reached from its row on the profiles page; that row also carries the
+ * two things about a profile that are not settings, its invite code and
+ * its backup, since the core's export does one account at a time.
  *
  * The values live in dconf, behind the `Settings` singleton every page
  * reads (qml/components/Settings.qml); this page writes the same object,
@@ -186,7 +186,7 @@ Page {
                 objectName: "enterSendsSwitch"
                 //: The return key on the keyboard.
                 text: qsTr("Enter sends the message")
-                description: qsTr("When on, the return key sends. When off, it starts a new line, the message field grows with what is written, and the send button sends.")
+                description: qsTr("Otherwise it starts a new line, and the button sends.")
                 automaticCheck: false
                 checked: Settings.enterSends === true
                 onClicked: Settings.enterSends = !checked
@@ -195,7 +195,7 @@ Page {
             TextSwitch {
                 objectName: "markdownSwitch"
                 text: qsTr("Use Markdown formatting")
-                description: qsTr("When on, a message written with *stars* and `backticks` is shown with the bold, the italics and the links drawn. When off, it is shown exactly as it was written.")
+                description: qsTr("Draws *stars* and `backticks` rather than showing them.")
                 // Checked follows the setting, so the tap writes the
                 // setting and the setting moves the switch -- the way
                 // the switch above it works.
@@ -209,7 +209,7 @@ Page {
                 objectName: "downloadCombo"
                 width: parent.width
                 label: qsTr("Auto-download attachments")
-                description: qsTr("Bigger ones wait until you ask for them. Applies to every profile and to messages that arrive from now on.")
+                description: qsTr("Bigger ones wait until you ask for them. Every profile, from now on.")
 
                 menu: ContextMenu {
                     Repeater {
@@ -235,7 +235,7 @@ Page {
                 objectName: "deletionCombo"
                 width: parent.width
                 label: qsTr("Delete messages from device")
-                description: qsTr("Older messages go from this phone, in every chat of every profile, whatever a chat's own disappearing messages setting says. \"Saved messages\" are kept.")
+                description: qsTr("Every chat of every profile. \"Saved messages\" are kept.")
 
                 menu: ContextMenu {
                     Repeater {
@@ -261,7 +261,7 @@ Page {
                 objectName: "notificationCombo"
                 width: parent.width
                 label: qsTr("A new notification shows")
-                description: qsTr("On the lock screen and in the notification area. The chat it is from opens on a tap either way.")
+                description: qsTr("On the lock screen and in the notification area.")
 
                 menu: ContextMenu {
                     MenuItem {
@@ -290,7 +290,7 @@ Page {
                 //: A reply to one of the reader's own messages, arriving
                 //: in a group they have muted.
                 text: qsTr("Mentions")
-                description: qsTr("In a muted group, a reply to one of your messages still notifies you.")
+                description: qsTr("A reply to you gets through a muted group.")
                 automaticCheck: false
                 checked: Settings.mentionNotifications === true
                 onClicked: Settings.mentionNotifications = !checked
@@ -303,7 +303,7 @@ Page {
             TextSwitch {
                 objectName: "cleanLinksSwitch"
                 text: qsTr("Remove tracking from links")
-                description: qsTr("Known tracking parameters -- click ids, campaign tags, the sharer's account -- are taken out of the links in the messages you send. The rest of the link is left as it was.")
+                description: qsTr("Click ids and campaign tags come out of the links you send.")
                 // Bound to the setting, not held here, so the switch cannot
                 // drift from what the app will read.
                 automaticCheck: false
@@ -327,7 +327,7 @@ Page {
                 //: chat and everyone in it plays with. Keep the name:
                 //: it is what every other Delta Chat client calls them.
                 text: qsTr("Enable webxdc apps (experimental)")
-                description: qsTr("Apps somebody sends run inside the chat, and the attach tray offers a store to take new ones from. An app is somebody else's code, and this part is not yet as tested as the rest.")
+                description: qsTr("Small apps run inside the chat. Somebody else's code, and less tested than the rest.")
                 automaticCheck: false
                 checked: Settings.webxdcEnabled === true
                 onClicked: Settings.webxdcEnabled = !checked

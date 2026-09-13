@@ -15,12 +15,21 @@
 //!   button still there to try again;
 //! - a write the reader stops reports nothing: the core refuses the
 //!   export it was told to stop, and that refusal is the reader's own
-//!   doing rather than news.
+//!   doing rather than news;
+//! - a backup that was written ends the page: the button goes, and the
+//!   chats are attached to the right so the way on is a swipe rather
+//!   than an offer to write the same profile out again.
+//!
+//! The three writes run in that order -- refused, stopped, written --
+//! because the last one is the end of the page: after it there is no
+//! button left to start another with, which is the point.
 
 // Qt harness: see qml_chat_list.rs.
 #![allow(
     unsafe_code,
     unused_unsafe,
+    // `pushAttached` is Silica's own name; the probe has to answer to it.
+    non_snake_case,
     clippy::borrow_as_ptr,
     clippy::disallowed_methods,
     clippy::expect_used,
@@ -47,6 +56,8 @@ struct PageStackProbe {
     log: qt_property!(QString; NOTIFY log_changed),
     log_changed: qt_signal!(),
     push: qt_method!(fn(&mut self, page: QString, properties: QVariantMap)),
+    /// Silica's own name for putting a page to the right of this one.
+    pushAttached: qt_method!(fn(&mut self, page: QString, properties: QVariantMap)),
     pop: qt_method!(fn(&mut self)),
 }
 
@@ -55,6 +66,14 @@ impl PageStackProbe {
         let page = page.to_string();
         let name = page.rsplit('/').next().unwrap_or(&page).to_string();
         self.note(&format!("push:{name}"));
+    }
+
+    fn pushAttached(&mut self, page: QString, properties: QVariantMap) {
+        let page = page.to_string();
+        let name = page.rsplit('/').next().unwrap_or(&page).to_string();
+        let account = properties.value(QString::from("accountId"), QVariant::default());
+        let account = i32::from_qvariant(account).unwrap_or_default();
+        self.note(&format!("attach:{name}:{account}"));
     }
 
     fn pop(&mut self) {
@@ -73,10 +92,27 @@ const PROBE_QML: &str = r"
     import Sailfish.Silica 1.0
     Item {
         Loader { id: loader }
-        function load(url, accountId) {
+        // `currentAccountId` is the profile the chats are on, which is
+        // not the one being backed up: the page attaches that chat list
+        // to the right once it has written something.
+        function load(url, accountId, currentAccountId) {
             loader.setSource('', {})
-            loader.setSource(url, { accountId: accountId, address: 'ada@nine.example' })
+            loader.setSource(url, {
+                accountId: accountId,
+                currentAccountId: currentAccountId
+            })
             return loader.status === Loader.Ready ? 'ok' : 'load-failed'
+        }
+        // Whose backup, off the row at the top: the profile drawn the
+        // way the invite code's page draws it.
+        function profileShows(property) {
+            var row = findIn(loader.item, 'profileRow')
+            if (!row) { return 'missing:profileRow' }
+            if (property === 'ownColor') {
+                var avatar = findIn(row, 'contactAvatar')
+                return avatar ? '' + avatar.ownColor : 'missing:contactAvatar'
+            }
+            return '' + row[property]
         }
         // Where the platform puts documents, which is where the backup
         // goes. Writable on the stub, so the test can hand the page a
@@ -182,49 +218,26 @@ fn the_backup_page_writes_one_profile_out_and_says_where() {
         };
     }
 
-    let good_path = good.to_string_lossy().into_owned();
+    // Refused first, then stopped, then written: the written one is the
+    // end of the page, so anything asked of a button has to be asked
+    // before it.
+    let refused_path = refused.to_string_lossy().into_owned();
     single_shot(Duration::from_secs(1), move || unsafe {
         record!(
-            "documents",
-            call!("setDocuments", QString::from(good_path.clone()))
-        );
-        record!(
             "load",
-            call!("load", QString::from(common::page_url("BackupPage.qml")), 1)
+            call!(
+                "load",
+                QString::from(common::page_url("BackupPage.qml")),
+                1,
+                // The chats are on another profile: backing this one up
+                // is not switching to it.
+                2
+            )
         );
-        record!("address", get!("addressLabel", "text"));
         record!(
             "leavable",
             call!("pageProperty", QString::from("backNavigation"))
         );
-    });
-
-    single_shot(Duration::from_secs(2), move || unsafe {
-        record!("write", call!("click", QString::from("writeButton")));
-        // Mid-write: the bar is up, the button is gone, and there is no
-        // way off the page.
-        record!("running", get!("backup", "running"));
-        record!("bar", get!("writeProgress", "visible"));
-        record!("button", get!("writeButton", "visible"));
-        record!(
-            "pinned",
-            call!("pageProperty", QString::from("backNavigation"))
-        );
-    });
-
-    let refused_path = refused.to_string_lossy().into_owned();
-    single_shot(Duration::from_secs(4), move || unsafe {
-        record!(
-            "written",
-            call!("pageProperty", QString::from("writtenPath"))
-        );
-        record!("shown", get!("writtenLabel", "visible"));
-        record!("said", get!("writtenLabel", "text"));
-        record!(
-            "leavable-after",
-            call!("pageProperty", QString::from("backNavigation"))
-        );
-        // A folder the core will not write into.
         record!(
             "documents-refused",
             call!("setDocuments", QString::from(refused_path.clone()))
@@ -236,7 +249,12 @@ fn the_backup_page_writes_one_profile_out_and_says_where() {
     });
 
     let slow_path = slow.to_string_lossy().into_owned();
-    single_shot(Duration::from_secs(6), move || unsafe {
+    single_shot(Duration::from_secs(3), move || unsafe {
+        // Whose backup: the profile itself, drawn the way the invite
+        // code's page draws it, in the colour the core gives it. The
+        // address is not asked for -- an account the fake core has not
+        // configured has none, the same as on the profile page.
+        record!("colour", call!("profileShows", QString::from("ownColor")));
         record!("failure", get!("errorLabel", "text"));
         record!(
             "nothing-written",
@@ -251,20 +269,54 @@ fn the_backup_page_writes_one_profile_out_and_says_where() {
         record!("write-slow", call!("click", QString::from("writeButton")));
     });
 
-    single_shot(Duration::from_secs(7), move || unsafe {
-        // Mid-write, which is the only moment a bar is worth anything:
-        // the core reports an export as it goes, and the page is fed
-        // those events. A write that is over before the first event has
-        // been polled for says nothing, which is why this is asked of
-        // the slow one.
+    single_shot(Duration::from_secs(4), move || unsafe {
+        // Mid-write: the bar is up, the button is gone, and there is no
+        // way off the page. Asked of the slow write because it is the
+        // only one with a middle -- the core reports an export as it
+        // goes, and a write that is over before the first event has been
+        // polled for says nothing.
+        record!("running", get!("backup", "running"));
+        record!("bar", get!("writeProgress", "visible"));
+        record!("button", get!("writeButton", "visible"));
+        record!(
+            "pinned",
+            call!("pageProperty", QString::from("backNavigation"))
+        );
         record!("reported", get!("backup", "permille"));
         record!("cancel", call!("click", QString::from("cancelButton")));
     });
 
     // Past the slow write's own answer, which arrives after the cancel.
-    single_shot(Duration::from_secs(11), move || unsafe {
+    let good_path = good.to_string_lossy().into_owned();
+    single_shot(Duration::from_secs(8), move || unsafe {
         record!("after-cancel", get!("errorLabel", "text"));
         record!("idle", get!("backup", "running"));
+        record!(
+            "still-nothing",
+            call!("pageProperty", QString::from("writtenPath"))
+        );
+        record!(
+            "documents",
+            call!("setDocuments", QString::from(good_path.clone()))
+        );
+        record!("write", call!("click", QString::from("writeButton")));
+    });
+
+    single_shot(Duration::from_secs(10), move || unsafe {
+        record!(
+            "written",
+            call!("pageProperty", QString::from("writtenPath"))
+        );
+        record!("shown", get!("writtenLabel", "visible"));
+        record!("said", get!("writtenLabel", "text"));
+        record!(
+            "leavable-after",
+            call!("pageProperty", QString::from("backNavigation"))
+        );
+        // Nothing left to do here: the button is gone and the way on is
+        // a swipe to the chats.
+        record!("button-after", get!("writeButton", "visible"));
+        record!("onward", get!("onwardHint", "visible"));
         (*engine_ptr).quit();
     });
 
@@ -282,9 +334,12 @@ fn the_backup_page_writes_one_profile_out_and_says_where() {
     };
 
     assert_eq!(value("load"), "ok", "the page did not load. {context}");
+    // The profile itself at the top, not a line of address: drawn in the
+    // colour the core gives this account, which is what says the row is
+    // really bound to the profile.
     assert_eq!(
-        value("address"),
-        "ada@nine.example",
+        value("colour"),
+        "#00875a",
         "the page does not say whose backup it is. {context}"
     );
     assert_eq!(
@@ -310,6 +365,25 @@ fn the_backup_page_writes_one_profile_out_and_says_where() {
         value("leavable-after"),
         "true",
         "the page is still pinned once the write is done. {context}"
+    );
+    // The end of the page: nothing to write again with, and the chats
+    // are to the right -- the ones the app is on, not the profile that
+    // was just backed up.
+    assert_eq!(
+        value("button-after"),
+        "false",
+        "a written backup still offers to write the same profile out \
+         again. {context}"
+    );
+    assert_eq!(
+        value("onward"),
+        "true",
+        "nothing says there is anywhere to swipe on to. {context}"
+    );
+    assert!(
+        popped.contains("attach:ChatListPage.qml:2|"),
+        "the chats were not attached to the right of the written \
+         backup, so the swipe the page offers goes nowhere. {context}"
     );
 
     assert!(
@@ -344,6 +418,12 @@ fn the_backup_page_writes_one_profile_out_and_says_where() {
         "",
         "the export the reader stopped was reported back to them as a \
          failure. {context}"
+    );
+    assert_eq!(
+        value("still-nothing"),
+        "",
+        "a write the reader stopped left a path on the page as if it \
+         had been written. {context}"
     );
     assert_eq!(
         value("idle"),
@@ -403,9 +483,9 @@ fn assert_exports(
     assert_eq!(
         exports,
         vec![
-            (1, good.to_string_lossy().into_owned()),
             (1, refused.to_string_lossy().into_owned()),
             (1, slow.to_string_lossy().into_owned()),
+            (1, good.to_string_lossy().into_owned()),
         ],
         "the exports, in order, each on the profile the page was given. \
          {context}"
