@@ -115,9 +115,21 @@ Page {
         onOpenRequested: page.showChat(chatId)
     }
 
+    /// The core has said what is in this profile, whatever that was.
+    ///
+    /// An empty model means one of two things and they are opposite: no
+    /// chats, or no answer yet. On a phone that resumes onto this page
+    /// the second is what is true for the first moment, and saying "No
+    /// chats yet" over a list that is about to fill is the app telling
+    /// the reader something it does not know.
+    property bool chatsLoaded: false
+
     Connections {
         target: chats
         onMessage_arrived: notifier.arrived(chat_id, chat_name, sender, preview)
+        // Emitted once the rows have been set, whether there turned out
+        // to be any or none.
+        onRows_changed: page.chatsLoaded = true
     }
 
     /// Open a chat from outside the app: a notification was tapped. The
@@ -180,6 +192,15 @@ Page {
         onCore_event: chats.handle_event(context_id, kind, payload_json)
         onStatus_changed: {
             if (core.status === "ready") {
+                // On a phone that resumes onto its chat list, this page
+                // is the first one made and the core was not up when it
+                // was: what it asked for then reached nobody, so it is
+                // asked again here. Idempotent, which is what makes it
+                // safe on a later reconnection too.
+                core.refresh_accounts()
+                if (!page.archived) {
+                    core.select_account(page.accountId)
+                }
                 chats.reload()
                 // A search typed before the core was up found nothing and
                 // had nothing to answer with; this is when it can.
@@ -187,7 +208,18 @@ Page {
             }
         }
         // Failures that used to reach no one.
-        onAccounts_refreshed: page.accountCount = configured_count
+        onAccounts_refreshed: {
+            page.accountCount = configured_count
+            // The profile this page was opened on is gone -- deleted on
+            // this phone, or the app's data cleared under it. Nothing
+            // here can be read or written, so hand the reader back to
+            // the first screen rather than leave them on an empty list.
+            if (configured_count === 0) {
+                Settings.lastAccountId = 0
+                pageStack.replaceAbove(null, Qt.resolvedUrl("WelcomePage.qml"),
+                                       {})
+            }
+        }
         onCore_error: page.errorMessage = message
         onIo_started: {
             if (!success) {
@@ -205,6 +237,9 @@ Page {
         // this page. The archived list is the same profile's.
         if (!page.archived) {
             core.select_account(page.accountId)
+            // And on this side of the core, where the next launch can
+            // read it without waiting for the core to start.
+            Settings.lastAccountId = page.accountId
             // And the window, which is where a share arrives: it has no
             // page of its own to read the profile off. Behind the check
             // this page already needs for `appWindow`, which a page
@@ -533,7 +568,8 @@ Page {
 
             ViewPlaceholder {
                 objectName: "chatListPlaceholder"
-                enabled: chats.count === 0
+                // Not until the core has answered: see `chatsLoaded`.
+                enabled: page.chatsLoaded && chats.count === 0
                 text: page.archived ? qsTr("No archived chats")
                                     : qsTr("No chats yet")
                 // Nothing here makes an archived chat: a chat is archived

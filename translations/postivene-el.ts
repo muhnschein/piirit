@@ -479,6 +479,29 @@
     </message>
 </context>
 <context>
+    <name>ExistingProfilePage</name>
+    <message>
+        <source>Where is your profile now?</source>
+        <translation>Πού βρίσκεται τώρα το προφίλ σας;</translation>
+    </message>
+    <message>
+        <source>Add as second device</source>
+        <translation>Προσθήκη ως δεύτερη συσκευή</translation>
+    </message>
+    <message>
+        <source>The device that has it keeps it. This one joins, over the same network.</source>
+        <translation>Η συσκευή που το έχει το κρατά. Αυτή προστίθεται, μέσω του ίδιου δικτύου.</translation>
+    </message>
+    <message>
+        <source>Restore from a backup</source>
+        <translation>Επαναφορά από αντίγραφο ασφαλείας</translation>
+    </message>
+    <message>
+        <source>A backup file the other device wrote, copied onto this phone.</source>
+        <translation>Ένα αρχείο αντιγράφου που έγραψε η άλλη συσκευή, αντιγραμμένο σε αυτό το τηλέφωνο.</translation>
+    </message>
+</context>
+<context>
     <name>Format</name>
     <message>
         <source>now</source>
@@ -547,6 +570,53 @@
     <message>
         <source>Everyone in the group sees the name</source>
         <translation>Όλοι στην ομάδα βλέπουν το όνομα</translation>
+    </message>
+</context>
+<context>
+    <name>IntroPage</name>
+    <message>
+        <source>No sign-up, no phone number</source>
+        <translation>Χωρίς εγγραφή, χωρίς αριθμό τηλεφώνου</translation>
+    </message>
+    <message>
+        <source>Your profile is made here on your phone. No phone number, no account with a company, nothing to sign.</source>
+        <translation>Το προφίλ σας δημιουργείται εδώ, στο τηλέφωνό σας. Χωρίς αριθμό τηλεφώνου, χωρίς λογαριασμό σε εταιρεία, χωρίς υπογραφές.</translation>
+    </message>
+    <message>
+        <source>You choose who can reach you</source>
+        <translation>Εσείς επιλέγετε ποιος μπορεί να σας γράψει</translation>
+    </message>
+    <message>
+        <source>There is no directory to be found in. Show a friend a code to scan, or send them a link, and the two of you can write.</source>
+        <translation>Δεν υπάρχει κατάλογος για να σας βρουν. Δείξτε σε έναν φίλο έναν κωδικό για σάρωση ή στείλτε του έναν σύνδεσμο, και μπορείτε να γράφετε οι δυο σας.</translation>
+    </message>
+    <message>
+        <source>Groups of equals</source>
+        <translation>Ομάδες ίσων</translation>
+    </message>
+    <message>
+        <source>Everyone in a group has the same rights: anyone can add a friend, rename it or leave. Nobody is in charge.</source>
+        <translation>Όλοι σε μια ομάδα έχουν τα ίδια δικαιώματα: ο καθένας μπορεί να προσθέσει κάποιον, να τη μετονομάσει ή να φύγει. Κανείς δεν είναι αφεντικό.</translation>
+    </message>
+    <message>
+        <source>The server only passes it on</source>
+        <translation>Ο διακομιστής απλώς το προωθεί</translation>
+    </message>
+    <message>
+        <source>Keep swiping to set up your profile.</source>
+        <translation>Συνεχίστε να σύρετε για να ρυθμίσετε το προφίλ σας.</translation>
+    </message>
+    <message>
+        <source>Every message is encrypted</source>
+        <translation>Κάθε μήνυμα είναι κρυπτογραφημένο</translation>
+    </message>
+    <message>
+        <source>Messages are encrypted the whole way, always. Servers that transport them cannot read a word.</source>
+        <translation>Τα μηνύματα είναι πάντα κρυπτογραφημένα σε όλη τη διαδρομή. Οι διακομιστές που τα μεταφέρουν δεν διαβάζουν ούτε λέξη.</translation>
+    </message>
+    <message>
+        <source>A server holds a message until the other phone is online, and that is all it does. Your chats stay on your device.</source>
+        <translation>Ο διακομιστής κρατά ένα μήνυμα ώσπου να συνδεθεί το άλλο τηλέφωνο, και τίποτα άλλο. Οι συνομιλίες σας μένουν στη συσκευή σας.</translation>
     </message>
 </context>
 <context>
@@ -868,6 +938,21 @@
     </message>
 </context>
 <context>
+    <name>ProfileStartPage</name>
+    <message>
+        <source>Alright, let&apos;s get you set up.</source>
+        <translation>Ωραία, ας ετοιμάσουμε το προφίλ σας.</translation>
+    </message>
+    <message>
+        <source>I already have a profile</source>
+        <translation>Έχω ήδη προφίλ</translation>
+    </message>
+    <message>
+        <source>Create a profile</source>
+        <translation>Δημιουργία προφίλ</translation>
+    </message>
+</context>
+<context>
     <name>ProfilesPage</name>
     <message>
         <source>Add profile</source>
@@ -893,6 +978,14 @@
     <message>
         <source>No profiles</source>
         <translation>Δεν υπάρχουν προφίλ</translation>
+    </message>
+    <message>
+        <source>Add as second device</source>
+        <translation>Προσθήκη ως δεύτερη συσκευή</translation>
+    </message>
+    <message>
+        <source>Restore profile from backup</source>
+        <translation>Επαναφορά προφίλ από αντίγραφο ασφαλείας</translation>
     </message>
 </context>
 <context>
@@ -940,6 +1033,81 @@
         <source>Editing message</source>
         <extracomment>Above the message field while a sent message&apos;s text is being changed; the message&apos;s text follows.</extracomment>
         <translation>Επεξεργασία μηνύματος</translation>
+    </message>
+</context>
+<context>
+    <name>RestoreProfilePage</name>
+    <message>
+        <source>The other device runs a newer Delta Chat than this app can take a profile from.</source>
+        <translation>Η άλλη συσκευή έχει νεότερο Delta Chat από αυτό που μπορεί να διαβάσει αυτή η εφαρμογή.</translation>
+    </message>
+    <message>
+        <source>The transfer stopped before it finished. Both devices have to stay on the same network, with this page open.</source>
+        <translation>Η μεταφορά σταμάτησε πριν ολοκληρωθεί. Και οι δύο συσκευές πρέπει να μείνουν στο ίδιο δίκτυο, με αυτή τη σελίδα ανοιχτή.</translation>
+    </message>
+    <message>
+        <source>That is not the code a device shows while it is offering its profile.</source>
+        <translation>Αυτός δεν είναι ο κωδικός που δείχνει μια συσκευή όσο προσφέρει το προφίλ της.</translation>
+    </message>
+    <message>
+        <source>Add as second device</source>
+        <translation>Προσθήκη ως δεύτερη συσκευή</translation>
+    </message>
+    <message>
+        <source>Restore from a backup</source>
+        <translation>Επαναφορά από αντίγραφο ασφαλείας</translation>
+    </message>
+    <message>
+        <source>On the device that has your profile, make a backup and copy the file onto this phone. Then choose it here.</source>
+        <translation>Στη συσκευή που έχει το προφίλ σας, φτιάξτε ένα αντίγραφο ασφαλείας και αντιγράψτε το αρχείο σε αυτό το τηλέφωνο. Μετά επιλέξτε το εδώ.</translation>
+    </message>
+    <message>
+        <source>Choose a backup file</source>
+        <translation>Επιλογή αρχείου αντιγράφου</translation>
+    </message>
+    <message>
+        <source>Taking the profile over...</source>
+        <translation>Το προφίλ μεταφέρεται...</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Ακύρωση</translation>
+    </message>
+    <message>
+        <source>The camera is not available on this device. A backup file works without one.</source>
+        <translation>Δεν υπάρχει κάμερα σε αυτή τη συσκευή. Με ένα αρχείο αντιγράφου γίνεται και χωρίς.</translation>
+    </message>
+    <message>
+        <source>On your other device, open Settings and choose to add a second device. Both phones have to be on the same network.</source>
+        <translation>Στη συσκευή που έχει το προφίλ σας, ανοίξτε τις ρυθμίσεις και επιλέξτε την προσθήκη δεύτερης συσκευής. Και οι δύο συσκευές πρέπει να είναι στο ίδιο δίκτυο.</translation>
+    </message>
+    <message>
+        <source>Hold the phone up to the code it shows</source>
+        <translation>Στρέψτε αυτό το τηλέφωνο στον κωδικό που εμφανίζει</translation>
+    </message>
+    <message>
+        <source>Enter the code instead</source>
+        <translation>Εισαγωγή του κωδικού</translation>
+    </message>
+    <message>
+        <source>Code from the other device</source>
+        <translation>Κωδικός από την άλλη συσκευή</translation>
+    </message>
+    <message>
+        <source>Take the profile over</source>
+        <translation>Μεταφορά του προφίλ</translation>
+    </message>
+    <message>
+        <source>That did not work</source>
+        <translation>Αυτό δεν πέτυχε</translation>
+    </message>
+    <message>
+        <source>Try the code again</source>
+        <translation>Δοκιμή του κωδικού ξανά</translation>
+    </message>
+    <message>
+        <source>Choose another file</source>
+        <translation>Επιλογή άλλου αρχείου</translation>
     </message>
 </context>
 <context>
@@ -1025,22 +1193,6 @@
     <message>
         <source>Messages</source>
         <translation>Μηνύματα</translation>
-    </message>
-    <message>
-        <source>Markdown</source>
-        <translation>Markdown</translation>
-    </message>
-    <message>
-        <source>How a message written with *stars* and `backticks` is shown.</source>
-        <translation>Πώς εμφανίζεται ένα μήνυμα γραμμένο με *αστερίσκους* και `ανάποδους τόνους`.</translation>
-    </message>
-    <message>
-        <source>Drawn: bold, italics, links</source>
-        <translation>Μορφοποιημένο: έντονα, πλάγια, σύνδεσμοι</translation>
-    </message>
-    <message>
-        <source>As written</source>
-        <translation>Όπως γράφτηκε</translation>
     </message>
     <message>
         <source>Auto-download attachments</source>
@@ -1142,8 +1294,16 @@
         <translation>Το Enter στέλνει το μήνυμα</translation>
     </message>
     <message>
-        <source>Off, the return key starts a new line, the message field grows with what is written, and the send button sends.</source>
-        <translation>Απενεργοποιημένο: το πλήκτρο Enter ξεκινά νέα γραμμή, το πεδίο μηνύματος μεγαλώνει με όσα γράφετε και η αποστολή γίνεται από το κουμπί.</translation>
+        <source>When on, the return key sends. When off, it starts a new line, the message field grows with what is written, and the send button sends.</source>
+        <translation>Ενεργό, το πλήκτρο Enter στέλνει. Ανενεργό, ξεκινά νέα γραμμή, το πεδίο μηνύματος μεγαλώνει με όσα γράφονται και στέλνει το κουμπί αποστολής.</translation>
+    </message>
+    <message>
+        <source>Use Markdown formatting</source>
+        <translation>Χρήση μορφοποίησης Markdown</translation>
+    </message>
+    <message>
+        <source>When on, a message written with *stars* and `backticks` is shown with the bold, the italics and the links drawn. When off, it is shown exactly as it was written.</source>
+        <translation>Ενεργό, ένα μήνυμα γραμμένο με *αστερίσκους* και `ανάστροφα εισαγωγικά` εμφανίζεται με μορφοποιημένα έντονα, πλάγια και συνδέσμους. Ανενεργό, εμφανίζεται ακριβώς όπως γράφτηκε.</translation>
     </message>
 </context>
 <context>
@@ -1216,16 +1376,16 @@
 <context>
     <name>WelcomePage</name>
     <message>
-        <source>Secure decentralized chat</source>
-        <translation>Ασφαλής αποκεντρωμένη συνομιλία</translation>
+        <source>Tell me about Delta Chat</source>
+        <translation>Τι είναι το Delta Chat;</translation>
     </message>
     <message>
-        <source>No phone number, no account with us: your profile lives on a mail server of your choosing.</source>
-        <translation>Χωρίς αριθμό τηλεφώνου, χωρίς λογαριασμό σε εμάς: το προφίλ σας ζει σε έναν διακομιστή αλληλογραφίας της επιλογής σας.</translation>
+        <source>Set up my profile</source>
+        <translation>Ρύθμιση του προφίλ μου</translation>
     </message>
     <message>
-        <source>Add profile</source>
-        <translation>Προσθήκη προφίλ</translation>
+        <source>Secure decentralised chat based on Delta Chat</source>
+        <translation>Ασφαλής αποκεντρωμένη συνομιλία βασισμένη στο Delta Chat</translation>
     </message>
 </context>
 </TS>

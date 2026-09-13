@@ -5,5 +5,6 @@ CameraCapture 5.6 CameraCapture.qml
 CameraFocus 5.6 CameraFocus.qml
 CameraMetaData 5.6 CameraMetaData.qml
 CameraRecorder 5.6 CameraRecorder.qml
+CameraViewfinder 5.6 CameraViewfinder.qml
 MediaPlayer 5.6 MediaPlayer.qml
 VideoOutput 5.6 VideoOutput.qml

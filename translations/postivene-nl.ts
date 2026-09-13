@@ -479,6 +479,29 @@
     </message>
 </context>
 <context>
+    <name>ExistingProfilePage</name>
+    <message>
+        <source>Where is your profile now?</source>
+        <translation>Waar staat je profiel nu?</translation>
+    </message>
+    <message>
+        <source>Add as second device</source>
+        <translation>Toevoegen als tweede apparaat</translation>
+    </message>
+    <message>
+        <source>The device that has it keeps it. This one joins, over the same network.</source>
+        <translation>Het apparaat dat het heeft, houdt het. Dit apparaat komt erbij, via hetzelfde netwerk.</translation>
+    </message>
+    <message>
+        <source>Restore from a backup</source>
+        <translation>Herstellen uit een back-up</translation>
+    </message>
+    <message>
+        <source>A backup file the other device wrote, copied onto this phone.</source>
+        <translation>Een back-upbestand dat het andere apparaat schreef, gekopieerd naar deze telefoon.</translation>
+    </message>
+</context>
+<context>
     <name>Format</name>
     <message>
         <source>now</source>
@@ -547,6 +570,53 @@
     <message>
         <source>Everyone in the group sees the name</source>
         <translation>Iedereen in de groep ziet de naam</translation>
+    </message>
+</context>
+<context>
+    <name>IntroPage</name>
+    <message>
+        <source>No sign-up, no phone number</source>
+        <translation>Geen aanmelding, geen telefoonnummer</translation>
+    </message>
+    <message>
+        <source>Your profile is made here on your phone. No phone number, no account with a company, nothing to sign.</source>
+        <translation>Je profiel ontstaat hier op je telefoon. Geen telefoonnummer, geen account bij een bedrijf, niets te ondertekenen.</translation>
+    </message>
+    <message>
+        <source>You choose who can reach you</source>
+        <translation>Jij bepaalt wie je kan bereiken</translation>
+    </message>
+    <message>
+        <source>There is no directory to be found in. Show a friend a code to scan, or send them a link, and the two of you can write.</source>
+        <translation>Er is geen gids waarin je gevonden wordt. Laat een vriend een code zien om te scannen of stuur een link, en dan kunnen jullie schrijven.</translation>
+    </message>
+    <message>
+        <source>Groups of equals</source>
+        <translation>Groepen van gelijken</translation>
+    </message>
+    <message>
+        <source>Everyone in a group has the same rights: anyone can add a friend, rename it or leave. Nobody is in charge.</source>
+        <translation>In een groep heeft iedereen dezelfde rechten: iedereen kan iemand toevoegen, de naam wijzigen of vertrekken. Niemand is de baas.</translation>
+    </message>
+    <message>
+        <source>The server only passes it on</source>
+        <translation>De server geeft het alleen maar door</translation>
+    </message>
+    <message>
+        <source>Keep swiping to set up your profile.</source>
+        <translation>Blijf vegen om je profiel in te stellen.</translation>
+    </message>
+    <message>
+        <source>Every message is encrypted</source>
+        <translation>Elk bericht is versleuteld</translation>
+    </message>
+    <message>
+        <source>Messages are encrypted the whole way, always. Servers that transport them cannot read a word.</source>
+        <translation>Berichten zijn altijd de hele weg versleuteld. Servers die ze vervoeren, lezen er geen woord van.</translation>
+    </message>
+    <message>
+        <source>A server holds a message until the other phone is online, and that is all it does. Your chats stay on your device.</source>
+        <translation>Een server houdt een bericht vast tot de andere telefoon online is, meer doet hij niet. Je gesprekken blijven op je apparaat.</translation>
     </message>
 </context>
 <context>
@@ -868,6 +938,21 @@
     </message>
 </context>
 <context>
+    <name>ProfileStartPage</name>
+    <message>
+        <source>Alright, let&apos;s get you set up.</source>
+        <translation>Goed, laten we je profiel instellen.</translation>
+    </message>
+    <message>
+        <source>I already have a profile</source>
+        <translation>Ik heb al een profiel</translation>
+    </message>
+    <message>
+        <source>Create a profile</source>
+        <translation>Een profiel aanmaken</translation>
+    </message>
+</context>
+<context>
     <name>ProfilesPage</name>
     <message>
         <source>Add profile</source>
@@ -893,6 +978,14 @@
     <message>
         <source>No profiles</source>
         <translation>Geen profielen</translation>
+    </message>
+    <message>
+        <source>Add as second device</source>
+        <translation>Toevoegen als tweede apparaat</translation>
+    </message>
+    <message>
+        <source>Restore profile from backup</source>
+        <translation>Profiel herstellen uit een back-up</translation>
     </message>
 </context>
 <context>
@@ -940,6 +1033,81 @@
         <source>Editing message</source>
         <extracomment>Above the message field while a sent message&apos;s text is being changed; the message&apos;s text follows.</extracomment>
         <translation>Bericht bewerken</translation>
+    </message>
+</context>
+<context>
+    <name>RestoreProfilePage</name>
+    <message>
+        <source>The other device runs a newer Delta Chat than this app can take a profile from.</source>
+        <translation>Op het andere apparaat draait een nieuwere Delta Chat dan waar deze app een profiel van kan overnemen.</translation>
+    </message>
+    <message>
+        <source>The transfer stopped before it finished. Both devices have to stay on the same network, with this page open.</source>
+        <translation>De overdracht stopte voordat hij klaar was. Beide apparaten moeten op hetzelfde netwerk blijven, met deze pagina open.</translation>
+    </message>
+    <message>
+        <source>That is not the code a device shows while it is offering its profile.</source>
+        <translation>Dat is niet de code die een apparaat toont terwijl het zijn profiel aanbiedt.</translation>
+    </message>
+    <message>
+        <source>Add as second device</source>
+        <translation>Toevoegen als tweede apparaat</translation>
+    </message>
+    <message>
+        <source>Restore from a backup</source>
+        <translation>Herstellen uit een back-up</translation>
+    </message>
+    <message>
+        <source>On the device that has your profile, make a backup and copy the file onto this phone. Then choose it here.</source>
+        <translation>Maak op het apparaat met je profiel een back-up en kopieer het bestand naar deze telefoon. Kies het daarna hier.</translation>
+    </message>
+    <message>
+        <source>Choose a backup file</source>
+        <translation>Kies een back-upbestand</translation>
+    </message>
+    <message>
+        <source>Taking the profile over...</source>
+        <translation>Profiel wordt overgenomen...</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Annuleren</translation>
+    </message>
+    <message>
+        <source>The camera is not available on this device. A backup file works without one.</source>
+        <translation>Er is geen camera op dit apparaat. Met een back-upbestand kan het ook zonder.</translation>
+    </message>
+    <message>
+        <source>On your other device, open Settings and choose to add a second device. Both phones have to be on the same network.</source>
+        <translation>Open op het apparaat met je profiel de instellingen en kies om een tweede apparaat toe te voegen. Beide moeten op hetzelfde netwerk zitten.</translation>
+    </message>
+    <message>
+        <source>Hold the phone up to the code it shows</source>
+        <translation>Houd deze telefoon voor de code die het toont</translation>
+    </message>
+    <message>
+        <source>Enter the code instead</source>
+        <translation>Voer in plaats daarvan de code in</translation>
+    </message>
+    <message>
+        <source>Code from the other device</source>
+        <translation>Code van het andere apparaat</translation>
+    </message>
+    <message>
+        <source>Take the profile over</source>
+        <translation>Profiel overnemen</translation>
+    </message>
+    <message>
+        <source>That did not work</source>
+        <translation>Dat is niet gelukt</translation>
+    </message>
+    <message>
+        <source>Try the code again</source>
+        <translation>Code opnieuw proberen</translation>
+    </message>
+    <message>
+        <source>Choose another file</source>
+        <translation>Ander bestand kiezen</translation>
     </message>
 </context>
 <context>
@@ -1025,22 +1193,6 @@
     <message>
         <source>Messages</source>
         <translation>Berichten</translation>
-    </message>
-    <message>
-        <source>Markdown</source>
-        <translation>Markdown</translation>
-    </message>
-    <message>
-        <source>How a message written with *stars* and `backticks` is shown.</source>
-        <translation>Hoe een bericht met *sterretjes* en `backticks` wordt getoond.</translation>
-    </message>
-    <message>
-        <source>Drawn: bold, italics, links</source>
-        <translation>Opgemaakt: vet, cursief, links</translation>
-    </message>
-    <message>
-        <source>As written</source>
-        <translation>Zoals geschreven</translation>
     </message>
     <message>
         <source>Auto-download attachments</source>
@@ -1142,8 +1294,16 @@
         <translation>Enter verstuurt het bericht</translation>
     </message>
     <message>
-        <source>Off, the return key starts a new line, the message field grows with what is written, and the send button sends.</source>
-        <translation>Uit: de Enter-toets begint een nieuwe regel, het berichtveld groeit met wat er staat, en de verzendknop verstuurt.</translation>
+        <source>When on, the return key sends. When off, it starts a new line, the message field grows with what is written, and the send button sends.</source>
+        <translation>Aan verstuurt de Enter-toets. Uit begint die een nieuwe regel, het berichtveld groeit met wat er staat, en de verzendknop verstuurt.</translation>
+    </message>
+    <message>
+        <source>Use Markdown formatting</source>
+        <translation>Markdown-opmaak gebruiken</translation>
+    </message>
+    <message>
+        <source>When on, a message written with *stars* and `backticks` is shown with the bold, the italics and the links drawn. When off, it is shown exactly as it was written.</source>
+        <translation>Aan wordt een bericht geschreven met *sterretjes* en `backticks` getoond met vet, cursief en links opgemaakt. Uit wordt het precies zo getoond als het geschreven is.</translation>
     </message>
 </context>
 <context>
@@ -1216,16 +1376,16 @@
 <context>
     <name>WelcomePage</name>
     <message>
-        <source>Secure decentralized chat</source>
-        <translation>Veilige gedecentraliseerde chat</translation>
+        <source>Tell me about Delta Chat</source>
+        <translation>Wat is Delta Chat?</translation>
     </message>
     <message>
-        <source>No phone number, no account with us: your profile lives on a mail server of your choosing.</source>
-        <translation>Geen telefoonnummer, geen account bij ons: je profiel staat op een mailserver naar keuze.</translation>
+        <source>Set up my profile</source>
+        <translation>Mijn profiel instellen</translation>
     </message>
     <message>
-        <source>Add profile</source>
-        <translation>Profiel toevoegen</translation>
+        <source>Secure decentralised chat based on Delta Chat</source>
+        <translation>Veilig, gedecentraliseerd chatten op basis van Delta Chat</translation>
     </message>
 </context>
 </TS>

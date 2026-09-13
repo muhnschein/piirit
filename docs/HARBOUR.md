@@ -407,6 +407,23 @@ removed from the store even after approval. Not an option.
    the cell and the picture goes when the count ends, and that Show in
    chat lands on the message in the conversation, lit, rather than at
    the newest one or wherever the chat was left.
+   Opening the app on a phone that already has a profile is its own
+   check: the chat list is what comes up, and nothing else on the way --
+   no field of faces, no buttons, and no empty screen with a spinner
+   either. The profile it opens on is read from dconf, which answers in
+   the time it takes to open a file, and it is the window that reads it,
+   before it puts anything up: the welcome page is not drawn and then
+   replaced, it is never made. The core is still starting behind all
+   that, so the list is on screen before there is anything to put in it.
+   Worth checking with the app killed rather than backgrounded, and
+   worth checking the other way too: delete every profile, and the app
+   should go back to the first screen rather than sit on an empty list.
+   What the list looks like in its first moment is a device check as
+   well: it must not say "No chats yet" on the way to being filled, and
+   the rows must arrive whole -- a chat whose picture has not loaded yet
+   shows the disc and the initial, so the column is faces rather than
+   holes that fill in one by one. Pictures are read off the phone's own
+   disk, which is the part a headless test cannot have.
    The first screen is a device path because the phone's own colours
    are: on a fresh install, before a profile, it is a field of faces
    filling the screen with the words in a cleared box in the middle,
@@ -419,6 +436,43 @@ removed from the store even after approval. Not an option.
    nothing stutters on the way in: the field is one picture and one
    shader (`components/FaceField.qml`), and the headless tests can load
    it but cannot see it drawn.
+   The two ways on from that screen are worth walking once each, and
+   neither draws the field behind it. "Tell me about Delta Chat" is
+   five facts swiped through one at a time (`pages/IntroPage.qml`):
+   check that each picture is in the ambience's colours, with its
+   accents in the highlight, that the dots below follow the swipe, and
+   that swiping past the last fact lands in the setup screen rather
+   than rubber banding back. Then turn the phone on that last fact and
+   check it stays put: the view moves when the screen does, and that
+   used to carry the reader off the page with no finger on it. "Set up
+   my profile" is that same setup screen. "I already have a profile"
+   asks where it is, and both answers want two devices to check
+   properly: with another Delta Chat holding a profile, open its
+   settings, offer it as a second device and read the code here -- the
+   bar should move and the app should land in that profile's chat list,
+   fetching -- and with a backup file copied onto the phone, the file
+   browser should list it (it filters to .tar) and import it the same
+   way. The device half is a camera and nothing else: the picture
+   fills the page edge to edge, with the title and the one line of
+   instructions on a strip over the top of it, and it should read a
+   code held up to it at arm's length within a second or two. Check it
+   against a code from another Delta Chat rather than a made-up one:
+   the string a device shows while offering its profile carries an
+   address and a one-time secret, so it is a dense symbol, and it is
+   the dense ones that ran out of pixels when the camera was smaller
+   and its frames coarser. A spinner beside the line at the top says
+   the app is reading frames, so a code that takes a moment does not
+   look like a dead view -- both sit under the strip of words, where
+   the eye already is, rather than down by the hand. At the foot,
+   "Enter the code instead" takes the same string typed or pasted,
+   which is the way through when a camera will not read at all. A
+   failure replaces the whole page rather than fading along the bottom
+   of a viewfinder that has carried on without it: "That did not work",
+   what went wrong, and a button to have another go, which puts the
+   camera back on its feet. Worth trying on a phone without a camera too, or with the
+   camera denied: the page has to fall back to saying so rather than
+   showing a dead viewfinder, and the backup half has to work
+   regardless.
    Adding a profile is the other half of that screen, and a relay that
    does not answer is the case worth trying, since a public relay is
    somebody's spare-time server. Type a custom server that does not

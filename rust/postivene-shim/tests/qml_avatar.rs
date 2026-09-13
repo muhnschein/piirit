@@ -7,7 +7,9 @@
 //! is on screen.
 //!
 //! And what an avatar is drawn *in*: its own colour on a page, the
-//! ambience's where the cover lights up whoever has written.
+//! ambience's where the cover lights up whoever has written -- and what
+//! it is drawn as in the moment before the picture has loaded, which is
+//! a moment every row of a chat list spends.
 
 // Qt harness: see qml_chat_row.rs.
 #![allow(
@@ -55,6 +57,17 @@ const PROBE_QML: &str = r"
         function root(property) { return '' + loader.item[property] }
     }
 ";
+
+/// A picture that really is one, so the image can reach `Ready`. Any
+/// committed PNG would do; this is the one that is certainly there.
+fn a_real_picture() -> String {
+    std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+        .join("../../qml/art/faces-portrait.png")
+        .canonicalize()
+        .expect("the committed art is there")
+        .display()
+        .to_string()
+}
 
 fn component_url(name: &str) -> String {
     format!(
@@ -117,14 +130,30 @@ fn a_picture_avatar_is_drawn_through_a_round_mask() {
 
         // No picture: the initial stands in, and nothing is masked.
         record!("plain-masked", get!("avatarMasked", "visible"));
+        record!("plain-initial", get!("avatarInitial", "visible"));
 
-        call!(
-            "set",
-            QString::from("avatarPath"),
-            QString::from("/tmp/ada.png")
+        // A picture, from the frame the path arrives in. It is loaded
+        // off the main thread, so this frame is the one where there is
+        // a path and no picture -- which is the frame a chat list is
+        // built in.
+        record!(
+            "set-picture",
+            call!(
+                "set",
+                QString::from("avatarPath"),
+                QString::from(a_real_picture())
+            )
         );
+        record!("loading-initial", get!("avatarInitial", "visible"));
+        record!("loading-masked", get!("avatarMasked", "visible"));
+    });
+
+    // A second later the picture has loaded, and it is what is drawn.
+    single_shot(Duration::from_secs(2), move || unsafe {
+        record!("picture-status", get!("avatarImage", "status"));
         record!("picture-masked", get!("avatarMasked", "visible"));
         record!("picture-raw", get!("avatarImage", "visible"));
+        record!("picture-initial", get!("avatarInitial", "visible"));
         record!("mask-radius", get!("avatarMask", "radius"));
         record!("mask-width", get!("avatarMask", "width"));
 
@@ -133,6 +162,11 @@ fn a_picture_avatar_is_drawn_through_a_round_mask() {
 
     engine.exec();
 
+    assert_avatar(&steps);
+}
+
+/// What was read off the avatar, before its picture and after it.
+fn assert_avatar(steps: &[(&str, String)]) {
     let value = |label: &str| {
         steps
             .iter()
@@ -147,6 +181,42 @@ fn a_picture_avatar_is_drawn_through_a_round_mask() {
         value("plain-masked"),
         "false",
         "a chat with no picture still drew a masked image. {context}"
+    );
+    assert_eq!(
+        value("plain-initial"),
+        "true",
+        "a chat with no picture drew no initial either, so the avatar is \
+         an empty disc. {context}"
+    );
+    assert_eq!(
+        value("set-picture"),
+        "ok",
+        "the picture could not be set. {context}"
+    );
+    // Image.Ready is 1.
+    assert_eq!(
+        value("picture-status"),
+        "1",
+        "the picture never loaded, so what follows proves nothing about \
+         what is drawn once it has. {context}"
+    );
+    assert_eq!(
+        value("loading-initial"),
+        "true",
+        "the initial stood down the moment a path arrived, before the \
+         picture behind it had loaded: a chat list arrives as a column of \
+         holes that fill in one by one. {context}"
+    );
+    assert_eq!(
+        value("loading-masked"),
+        "false",
+        "a picture that has not loaded is on screen, which is nothing. \
+         {context}"
+    );
+    assert_eq!(
+        value("picture-initial"),
+        "false",
+        "the initial is still drawn under the loaded picture. {context}"
     );
     assert_eq!(
         value("picture-masked"),

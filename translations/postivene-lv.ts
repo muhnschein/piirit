@@ -480,6 +480,29 @@
     </message>
 </context>
 <context>
+    <name>ExistingProfilePage</name>
+    <message>
+        <source>Where is your profile now?</source>
+        <translation>Kur pašlaik ir jūsu profils?</translation>
+    </message>
+    <message>
+        <source>Add as second device</source>
+        <translation>Pievienot kā otru ierīci</translation>
+    </message>
+    <message>
+        <source>The device that has it keeps it. This one joins, over the same network.</source>
+        <translation>Ierīce, kurā tas ir, to patur. Šī pievienojas tajā pašā tīklā.</translation>
+    </message>
+    <message>
+        <source>Restore from a backup</source>
+        <translation>Atjaunot no rezerves kopijas</translation>
+    </message>
+    <message>
+        <source>A backup file the other device wrote, copied onto this phone.</source>
+        <translation>Rezerves kopijas datne, ko uzrakstīja otra ierīce un kas nokopēta uz šo tālruni.</translation>
+    </message>
+</context>
+<context>
     <name>Format</name>
     <message>
         <source>now</source>
@@ -550,6 +573,53 @@
     <message>
         <source>Everyone in the group sees the name</source>
         <translation>Nosaukumu redz visi grupā</translation>
+    </message>
+</context>
+<context>
+    <name>IntroPage</name>
+    <message>
+        <source>No sign-up, no phone number</source>
+        <translation>Bez reģistrācijas, bez tālruņa numura</translation>
+    </message>
+    <message>
+        <source>Your profile is made here on your phone. No phone number, no account with a company, nothing to sign.</source>
+        <translation>Jūsu profils tiek izveidots šeit, tālrunī. Nav vajadzīgs ne tālruņa numurs, ne konts kādā uzņēmumā, nekas nav jāparaksta.</translation>
+    </message>
+    <message>
+        <source>You choose who can reach you</source>
+        <translation>Jūs izlemjat, kurš var jums rakstīt</translation>
+    </message>
+    <message>
+        <source>There is no directory to be found in. Show a friend a code to scan, or send them a link, and the two of you can write.</source>
+        <translation>Nav nekāda saraksta, kurā jūs atrast. Parādiet draugam skenējamu kodu vai nosūtiet saiti, un jūs abi varēsiet rakstīties.</translation>
+    </message>
+    <message>
+        <source>Groups of equals</source>
+        <translation>Vienlīdzīgo grupas</translation>
+    </message>
+    <message>
+        <source>Everyone in a group has the same rights: anyone can add a friend, rename it or leave. Nobody is in charge.</source>
+        <translation>Grupā visiem ir vienādas tiesības: ikviens var pievienot draugu, pārdēvēt to vai aiziet. Neviens nav priekšnieks.</translation>
+    </message>
+    <message>
+        <source>The server only passes it on</source>
+        <translation>Serveris to tikai nodod tālāk</translation>
+    </message>
+    <message>
+        <source>Keep swiping to set up your profile.</source>
+        <translation>Velciet tālāk, lai izveidotu profilu.</translation>
+    </message>
+    <message>
+        <source>Every message is encrypted</source>
+        <translation>Katra ziņa ir šifrēta</translation>
+    </message>
+    <message>
+        <source>Messages are encrypted the whole way, always. Servers that transport them cannot read a word.</source>
+        <translation>Ziņas vienmēr ir šifrētas visā ceļā. Serveri, kas tās pārvadā, nenolasa ne vārda.</translation>
+    </message>
+    <message>
+        <source>A server holds a message until the other phone is online, and that is all it does. Your chats stay on your device.</source>
+        <translation>Serveris patur ziņu, līdz otrs tālrunis ir tiešsaistē, un neko vairāk nedara. Jūsu sarunas paliek jūsu ierīcē.</translation>
     </message>
 </context>
 <context>
@@ -873,6 +943,21 @@
     </message>
 </context>
 <context>
+    <name>ProfileStartPage</name>
+    <message>
+        <source>Alright, let&apos;s get you set up.</source>
+        <translation>Labi, izveidosim jums profilu.</translation>
+    </message>
+    <message>
+        <source>I already have a profile</source>
+        <translation>Man jau ir profils</translation>
+    </message>
+    <message>
+        <source>Create a profile</source>
+        <translation>Izveidot profilu</translation>
+    </message>
+</context>
+<context>
     <name>ProfilesPage</name>
     <message>
         <source>Add profile</source>
@@ -898,6 +983,14 @@
     <message>
         <source>No profiles</source>
         <translation>Nav profilu</translation>
+    </message>
+    <message>
+        <source>Add as second device</source>
+        <translation>Pievienot kā otru ierīci</translation>
+    </message>
+    <message>
+        <source>Restore profile from backup</source>
+        <translation>Atjaunot profilu no rezerves kopijas</translation>
     </message>
 </context>
 <context>
@@ -945,6 +1038,81 @@
         <source>Editing message</source>
         <extracomment>Above the message field while a sent message&apos;s text is being changed; the message&apos;s text follows.</extracomment>
         <translation>Ziņas rediģēšana</translation>
+    </message>
+</context>
+<context>
+    <name>RestoreProfilePage</name>
+    <message>
+        <source>The other device runs a newer Delta Chat than this app can take a profile from.</source>
+        <translation>Otrā ierīcē darbojas jaunāks Delta Chat, nekā šī lietotne spēj pārņemt profilu.</translation>
+    </message>
+    <message>
+        <source>The transfer stopped before it finished. Both devices have to stay on the same network, with this page open.</source>
+        <translation>Pārsūtīšana apstājās pirms beigām. Abām ierīcēm jāpaliek vienā tīklā, ar šo lapu atvērtu.</translation>
+    </message>
+    <message>
+        <source>That is not the code a device shows while it is offering its profile.</source>
+        <translation>Šis nav tas kods, ko ierīce rāda, kamēr piedāvā savu profilu.</translation>
+    </message>
+    <message>
+        <source>Add as second device</source>
+        <translation>Pievienot kā otru ierīci</translation>
+    </message>
+    <message>
+        <source>Restore from a backup</source>
+        <translation>Atjaunot no rezerves kopijas</translation>
+    </message>
+    <message>
+        <source>On the device that has your profile, make a backup and copy the file onto this phone. Then choose it here.</source>
+        <translation>Ierīcē, kurā ir jūsu profils, izveidojiet rezerves kopiju un nokopējiet datni uz šo tālruni. Tad izvēlieties to šeit.</translation>
+    </message>
+    <message>
+        <source>Choose a backup file</source>
+        <translation>Izvēlēties rezerves kopijas datni</translation>
+    </message>
+    <message>
+        <source>Taking the profile over...</source>
+        <translation>Profils tiek pārņemts...</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Atcelt</translation>
+    </message>
+    <message>
+        <source>The camera is not available on this device. A backup file works without one.</source>
+        <translation>Šajā ierīcē nav kameras. Ar rezerves kopijas datni iztiek arī bez tās.</translation>
+    </message>
+    <message>
+        <source>On your other device, open Settings and choose to add a second device. Both phones have to be on the same network.</source>
+        <translation>Ierīcē, kurā ir jūsu profils, atveriet iestatījumus un izvēlieties pievienot otru ierīci. Abām jābūt vienā tīklā.</translation>
+    </message>
+    <message>
+        <source>Hold the phone up to the code it shows</source>
+        <translation>Pavērsiet šo tālruni pret parādīto kodu</translation>
+    </message>
+    <message>
+        <source>Enter the code instead</source>
+        <translation>Tā vietā ievadīt kodu</translation>
+    </message>
+    <message>
+        <source>Code from the other device</source>
+        <translation>Kods no otras ierīces</translation>
+    </message>
+    <message>
+        <source>Take the profile over</source>
+        <translation>Pārņemt profilu</translation>
+    </message>
+    <message>
+        <source>That did not work</source>
+        <translation>Tas neizdevās</translation>
+    </message>
+    <message>
+        <source>Try the code again</source>
+        <translation>Mēģināt kodu vēlreiz</translation>
+    </message>
+    <message>
+        <source>Choose another file</source>
+        <translation>Izvēlēties citu datni</translation>
     </message>
 </context>
 <context>
@@ -1030,22 +1198,6 @@
     <message>
         <source>Messages</source>
         <translation>Ziņas</translation>
-    </message>
-    <message>
-        <source>Markdown</source>
-        <translation>Markdown</translation>
-    </message>
-    <message>
-        <source>How a message written with *stars* and `backticks` is shown.</source>
-        <translation>Kā tiek rādīta ziņa, kas rakstīta ar *zvaigznītēm* un `gravjiem`.</translation>
-    </message>
-    <message>
-        <source>Drawn: bold, italics, links</source>
-        <translation>Noformēts: treknraksts, slīpraksts, saites</translation>
-    </message>
-    <message>
-        <source>As written</source>
-        <translation>Kā rakstīts</translation>
     </message>
     <message>
         <source>Auto-download attachments</source>
@@ -1147,8 +1299,16 @@
         <translation>Enter nosūta ziņu</translation>
     </message>
     <message>
-        <source>Off, the return key starts a new line, the message field grows with what is written, and the send button sends.</source>
-        <translation>Izslēgts: Enter sāk jaunu rindu, ziņas lauks aug līdz ar rakstīto, un sūta sūtīšanas poga.</translation>
+        <source>When on, the return key sends. When off, it starts a new line, the message field grows with what is written, and the send button sends.</source>
+        <translation>Ieslēgts Enter taustiņš nosūta. Izslēgts tas sāk jaunu rindu, ziņas lauks aug līdzi rakstītajam, un nosūta sūtīšanas poga.</translation>
+    </message>
+    <message>
+        <source>Use Markdown formatting</source>
+        <translation>Lietot Markdown noformējumu</translation>
+    </message>
+    <message>
+        <source>When on, a message written with *stars* and `backticks` is shown with the bold, the italics and the links drawn. When off, it is shown exactly as it was written.</source>
+        <translation>Ieslēgts ziņa, kas rakstīta ar *zvaigznītēm* un `atpakaļvērstiem apostrofiem`, tiek rādīta ar noformētu treknrakstu, slīprakstu un saitēm. Izslēgts tā tiek rādīta tieši tā, kā rakstīts.</translation>
     </message>
 </context>
 <context>
@@ -1221,16 +1381,16 @@
 <context>
     <name>WelcomePage</name>
     <message>
-        <source>Secure decentralized chat</source>
-        <translation>Droša decentralizēta saziņa</translation>
+        <source>Tell me about Delta Chat</source>
+        <translation>Kas ir Delta Chat?</translation>
     </message>
     <message>
-        <source>No phone number, no account with us: your profile lives on a mail server of your choosing.</source>
-        <translation>Bez tālruņa numura, bez konta pie mums: jūsu profils dzīvo jūsu izvēlētā pasta serverī.</translation>
+        <source>Set up my profile</source>
+        <translation>Iestatīt manu profilu</translation>
     </message>
     <message>
-        <source>Add profile</source>
-        <translation>Pievienot profilu</translation>
+        <source>Secure decentralised chat based on Delta Chat</source>
+        <translation>Droša decentralizēta tērzēšana, kuras pamatā ir Delta Chat</translation>
     </message>
 </context>
 </TS>

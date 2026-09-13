@@ -479,6 +479,29 @@
     </message>
 </context>
 <context>
+    <name>ExistingProfilePage</name>
+    <message>
+        <source>Where is your profile now?</source>
+        <translation>നിങ്ങളുടെ പ്രൊഫൈൽ ഇപ്പോൾ എവിടെയാണ്?</translation>
+    </message>
+    <message>
+        <source>Add as second device</source>
+        <translation>രണ്ടാമത്തെ ഉപകരണമായി ചേർക്കുക</translation>
+    </message>
+    <message>
+        <source>The device that has it keeps it. This one joins, over the same network.</source>
+        <translation>അത് ഉള്ള ഉപകരണം അത് സൂക്ഷിക്കും. ഇത് അതേ ശൃംഖലയിലൂടെ ചേരുന്നു.</translation>
+    </message>
+    <message>
+        <source>Restore from a backup</source>
+        <translation>ബാക്കപ്പിൽനിന്ന് വീണ്ടെടുക്കുക</translation>
+    </message>
+    <message>
+        <source>A backup file the other device wrote, copied onto this phone.</source>
+        <translation>മറ്റേ ഉപകരണം എഴുതിയ ബാക്കപ്പ് ഫയൽ, ഈ ഫോണിലേക്ക് പകർത്തിയത്.</translation>
+    </message>
+</context>
+<context>
     <name>Format</name>
     <message>
         <source>now</source>
@@ -547,6 +570,53 @@
     <message>
         <source>Everyone in the group sees the name</source>
         <translation>ഗ്രൂപ്പിലുള്ള എല്ലാവരും പേര് കാണുന്നു</translation>
+    </message>
+</context>
+<context>
+    <name>IntroPage</name>
+    <message>
+        <source>No sign-up, no phone number</source>
+        <translation>സൈൻ-അപ്പ് വേണ്ട, ഫോൺ നമ്പർ വേണ്ട</translation>
+    </message>
+    <message>
+        <source>Your profile is made here on your phone. No phone number, no account with a company, nothing to sign.</source>
+        <translation>നിങ്ങളുടെ പ്രൊഫൈൽ ഇവിടെ, നിങ്ങളുടെ ഫോണിൽത്തന്നെ ഉണ്ടാകുന്നു. ഫോൺ നമ്പർ വേണ്ട, ഒരു കമ്പനിയിലും അക്കൗണ്ട് വേണ്ട, ഒപ്പിടാനും ഒന്നുമില്ല.</translation>
+    </message>
+    <message>
+        <source>You choose who can reach you</source>
+        <translation>ആർക്കു നിങ്ങളെ ബന്ധപ്പെടാമെന്ന് നിങ്ങൾ തീരുമാനിക്കുന്നു</translation>
+    </message>
+    <message>
+        <source>There is no directory to be found in. Show a friend a code to scan, or send them a link, and the two of you can write.</source>
+        <translation>നിങ്ങളെ കണ്ടെത്താൻ ഒരു പട്ടികയുമില്ല. സുഹൃത്തിന് സ്കാൻ ചെയ്യാൻ ഒരു കോഡ് കാണിക്കുക അല്ലെങ്കിൽ ഒരു ലിങ്ക് അയയ്ക്കുക, പിന്നെ നിങ്ങൾക്ക് പരസ്പരം എഴുതാം.</translation>
+    </message>
+    <message>
+        <source>Groups of equals</source>
+        <translation>തുല്യരുടെ കൂട്ടങ്ങൾ</translation>
+    </message>
+    <message>
+        <source>Everyone in a group has the same rights: anyone can add a friend, rename it or leave. Nobody is in charge.</source>
+        <translation>ഒരു കൂട്ടത്തിൽ എല്ലാവർക്കും ഒരേ അവകാശം: ആർക്കും ഒരു സുഹൃത്തിനെ ചേർക്കാം, പേരു മാറ്റാം, ഇറങ്ങിപ്പോകാം. ആരും മേലാളനല്ല.</translation>
+    </message>
+    <message>
+        <source>The server only passes it on</source>
+        <translation>സെർവർ അത് കൈമാറുക മാത്രം ചെയ്യുന്നു</translation>
+    </message>
+    <message>
+        <source>Keep swiping to set up your profile.</source>
+        <translation>പ്രൊഫൈൽ ഒരുക്കാൻ സ്വൈപ്പ് ചെയ്തുകൊണ്ടിരിക്കുക.</translation>
+    </message>
+    <message>
+        <source>Every message is encrypted</source>
+        <translation>ഓരോ സന്ദേശവും എൻക്രിപ്റ്റ് ചെയ്തിരിക്കുന്നു</translation>
+    </message>
+    <message>
+        <source>Messages are encrypted the whole way, always. Servers that transport them cannot read a word.</source>
+        <translation>സന്ദേശങ്ങൾ എപ്പോഴും വഴി മുഴുവൻ എൻക്രിപ്റ്റ് ചെയ്തിരിക്കും. അവ എത്തിക്കുന്ന സെർവറുകൾക്ക് ഒരു വാക്കുപോലും വായിക്കാനാവില്ല.</translation>
+    </message>
+    <message>
+        <source>A server holds a message until the other phone is online, and that is all it does. Your chats stay on your device.</source>
+        <translation>മറ്റേ ഫോൺ ഓൺലൈനാകുന്നതുവരെ സെർവർ സന്ദേശം സൂക്ഷിക്കുന്നു, അത്രമാത്രം. നിങ്ങളുടെ സംഭാഷണങ്ങൾ നിങ്ങളുടെ ഉപകരണത്തിൽത്തന്നെ നിൽക്കും.</translation>
     </message>
 </context>
 <context>
@@ -868,6 +938,21 @@
     </message>
 </context>
 <context>
+    <name>ProfileStartPage</name>
+    <message>
+        <source>Alright, let&apos;s get you set up.</source>
+        <translation>ശരി, നിങ്ങളുടെ പ്രൊഫൈൽ ഒരുക്കാം.</translation>
+    </message>
+    <message>
+        <source>I already have a profile</source>
+        <translation>എനിക്ക് ഇതിനകം പ്രൊഫൈൽ ഉണ്ട്</translation>
+    </message>
+    <message>
+        <source>Create a profile</source>
+        <translation>പ്രൊഫൈൽ ഉണ്ടാക്കുക</translation>
+    </message>
+</context>
+<context>
     <name>ProfilesPage</name>
     <message>
         <source>Add profile</source>
@@ -893,6 +978,14 @@
     <message>
         <source>No profiles</source>
         <translation>പ്രൊഫൈലുകളില്ല</translation>
+    </message>
+    <message>
+        <source>Add as second device</source>
+        <translation>രണ്ടാമത്തെ ഉപകരണമായി ചേർക്കുക</translation>
+    </message>
+    <message>
+        <source>Restore profile from backup</source>
+        <translation>ബാക്കപ്പിൽനിന്ന് പ്രൊഫൈൽ വീണ്ടെടുക്കുക</translation>
     </message>
 </context>
 <context>
@@ -940,6 +1033,81 @@
         <source>Editing message</source>
         <extracomment>Above the message field while a sent message&apos;s text is being changed; the message&apos;s text follows.</extracomment>
         <translation>സന്ദേശം തിരുത്തുന്നു</translation>
+    </message>
+</context>
+<context>
+    <name>RestoreProfilePage</name>
+    <message>
+        <source>The other device runs a newer Delta Chat than this app can take a profile from.</source>
+        <translation>മറ്റേ ഉപകരണത്തിൽ ഈ ആപ്പിന് പ്രൊഫൈൽ ഏറ്റെടുക്കാനാവുന്നതിലും പുതിയ Delta Chat ആണുള്ളത്.</translation>
+    </message>
+    <message>
+        <source>The transfer stopped before it finished. Both devices have to stay on the same network, with this page open.</source>
+        <translation>കൈമാറ്റം തീരുംമുമ്പ് നിന്നു. രണ്ട് ഉപകരണങ്ങളും ഒരേ ശൃംഖലയിൽ തുടരണം, ഈ താൾ തുറന്നുവെച്ച്.</translation>
+    </message>
+    <message>
+        <source>That is not the code a device shows while it is offering its profile.</source>
+        <translation>ഒരു ഉപകരണം തന്റെ പ്രൊഫൈൽ നൽകുമ്പോൾ കാണിക്കുന്ന കോഡ് ഇതല്ല.</translation>
+    </message>
+    <message>
+        <source>Add as second device</source>
+        <translation>രണ്ടാമത്തെ ഉപകരണമായി ചേർക്കുക</translation>
+    </message>
+    <message>
+        <source>Restore from a backup</source>
+        <translation>ബാക്കപ്പിൽനിന്ന് വീണ്ടെടുക്കുക</translation>
+    </message>
+    <message>
+        <source>On the device that has your profile, make a backup and copy the file onto this phone. Then choose it here.</source>
+        <translation>നിങ്ങളുടെ പ്രൊഫൈൽ ഉള്ള ഉപകരണത്തിൽ ഒരു ബാക്കപ്പ് ഉണ്ടാക്കി ഫയൽ ഈ ഫോണിലേക്ക് പകർത്തുക. പിന്നെ അത് ഇവിടെ തിരഞ്ഞെടുക്കുക.</translation>
+    </message>
+    <message>
+        <source>Choose a backup file</source>
+        <translation>ബാക്കപ്പ് ഫയൽ തിരഞ്ഞെടുക്കുക</translation>
+    </message>
+    <message>
+        <source>Taking the profile over...</source>
+        <translation>പ്രൊഫൈൽ ഏറ്റെടുക്കുന്നു...</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>റദ്ദാക്കുക</translation>
+    </message>
+    <message>
+        <source>The camera is not available on this device. A backup file works without one.</source>
+        <translation>ഈ ഉപകരണത്തിൽ ക്യാമറയില്ല. ബാക്കപ്പ് ഫയലുണ്ടെങ്കിൽ ക്യാമറ വേണ്ട.</translation>
+    </message>
+    <message>
+        <source>On your other device, open Settings and choose to add a second device. Both phones have to be on the same network.</source>
+        <translation>നിങ്ങളുടെ പ്രൊഫൈൽ ഉള്ള ഉപകരണത്തിൽ ക്രമീകരണങ്ങൾ തുറന്ന് രണ്ടാമത്തെ ഉപകരണം ചേർക്കുക എന്നത് തിരഞ്ഞെടുക്കുക. രണ്ടും ഒരേ ശൃംഖലയിൽ വേണം.</translation>
+    </message>
+    <message>
+        <source>Hold the phone up to the code it shows</source>
+        <translation>അത് കാണിക്കുന്ന കോഡിന് നേരെ ഈ ഫോൺ പിടിക്കുക</translation>
+    </message>
+    <message>
+        <source>Enter the code instead</source>
+        <translation>പകരം കോഡ് നൽകുക</translation>
+    </message>
+    <message>
+        <source>Code from the other device</source>
+        <translation>മറ്റേ ഉപകരണത്തിലെ കോഡ്</translation>
+    </message>
+    <message>
+        <source>Take the profile over</source>
+        <translation>പ്രൊഫൈൽ ഏറ്റെടുക്കുക</translation>
+    </message>
+    <message>
+        <source>That did not work</source>
+        <translation>അത് വിജയിച്ചില്ല</translation>
+    </message>
+    <message>
+        <source>Try the code again</source>
+        <translation>കോഡ് വീണ്ടും ശ്രമിക്കുക</translation>
+    </message>
+    <message>
+        <source>Choose another file</source>
+        <translation>മറ്റൊരു ഫയൽ തിരഞ്ഞെടുക്കുക</translation>
     </message>
 </context>
 <context>
@@ -1025,22 +1193,6 @@
     <message>
         <source>Messages</source>
         <translation>സന്ദേശങ്ങൾ</translation>
-    </message>
-    <message>
-        <source>Markdown</source>
-        <translation>Markdown</translation>
-    </message>
-    <message>
-        <source>How a message written with *stars* and `backticks` is shown.</source>
-        <translation>*നക്ഷത്രങ്ങളും* `ബാക്ക്ടിക്കുകളും` ഉപയോഗിച്ച് എഴുതിയ സന്ദേശം എങ്ങനെ കാണിക്കണം.</translation>
-    </message>
-    <message>
-        <source>Drawn: bold, italics, links</source>
-        <translation>അലങ്കരിച്ചത്: ബോൾഡ്, ഇറ്റാലിക്, ലിങ്കുകൾ</translation>
-    </message>
-    <message>
-        <source>As written</source>
-        <translation>എഴുതിയതുപോലെ</translation>
     </message>
     <message>
         <source>Auto-download attachments</source>
@@ -1142,8 +1294,16 @@
         <translation>Enter സന്ദേശം അയയ്ക്കുന്നു</translation>
     </message>
     <message>
-        <source>Off, the return key starts a new line, the message field grows with what is written, and the send button sends.</source>
-        <translation>ഓഫായിരിക്കുമ്പോൾ Enter കീ പുതിയ വരി തുടങ്ങുന്നു, സന്ദേശ ഫീൽഡ് എഴുതുന്നതിനൊപ്പം വളരുന്നു, അയയ്ക്കുന്നത് അയയ്ക്കുക ബട്ടണാണ്.</translation>
+        <source>When on, the return key sends. When off, it starts a new line, the message field grows with what is written, and the send button sends.</source>
+        <translation>ഓൺ ആണെങ്കിൽ എന്റർ കീ അയയ്ക്കും. ഓഫ് ആണെങ്കിൽ അത് പുതിയ വരി തുടങ്ങും, സന്ദേശ കളം എഴുതുന്നതിനൊപ്പം വളരും, അയയ്ക്കൽ ബട്ടൺ അയയ്ക്കും.</translation>
+    </message>
+    <message>
+        <source>Use Markdown formatting</source>
+        <translation>മാർക്ക്ഡൗൺ രൂപപ്പെടുത്തൽ ഉപയോഗിക്കുക</translation>
+    </message>
+    <message>
+        <source>When on, a message written with *stars* and `backticks` is shown with the bold, the italics and the links drawn. When off, it is shown exactly as it was written.</source>
+        <translation>ഓൺ ആണെങ്കിൽ *നക്ഷത്രചിഹ്നങ്ങളും* `ബാക്ക്ടിക്കും` ഉപയോഗിച്ച് എഴുതിയ സന്ദേശം ബോൾഡ്, ഇറ്റാലിക്, ലിങ്കുകൾ എന്നിവ അലങ്കരിച്ച് കാണിക്കും. ഓഫ് ആണെങ്കിൽ എഴുതിയതുപോലെ തന്നെ കാണിക്കും.</translation>
     </message>
 </context>
 <context>
@@ -1216,16 +1376,16 @@
 <context>
     <name>WelcomePage</name>
     <message>
-        <source>Secure decentralized chat</source>
-        <translation>സുരക്ഷിതമായ വികേന്ദ്രീകൃത ചാറ്റ്</translation>
+        <source>Tell me about Delta Chat</source>
+        <translation>Delta Chat എന്താണ്?</translation>
     </message>
     <message>
-        <source>No phone number, no account with us: your profile lives on a mail server of your choosing.</source>
-        <translation>ഫോൺ നമ്പർ വേണ്ട, ഞങ്ങളുടെ പക്കൽ അക്കൗണ്ട് വേണ്ട: നിങ്ങളുടെ പ്രൊഫൈൽ നിങ്ങൾ തിരഞ്ഞെടുത്ത മെയിൽ സെർവറിൽ ഇരിക്കുന്നു.</translation>
+        <source>Set up my profile</source>
+        <translation>എന്റെ പ്രൊഫൈൽ ഒരുക്കുക</translation>
     </message>
     <message>
-        <source>Add profile</source>
-        <translation>പ്രൊഫൈൽ ചേർക്കുക</translation>
+        <source>Secure decentralised chat based on Delta Chat</source>
+        <translation>Delta Chat അടിസ്ഥാനമാക്കിയ സുരക്ഷിതവും വികേന്ദ്രീകൃതവുമായ ചാറ്റ്</translation>
     </message>
 </context>
 </TS>

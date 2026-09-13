@@ -481,6 +481,29 @@
     </message>
 </context>
 <context>
+    <name>ExistingProfilePage</name>
+    <message>
+        <source>Where is your profile now?</source>
+        <translation>Kje je zdaj vaš profil?</translation>
+    </message>
+    <message>
+        <source>Add as second device</source>
+        <translation>Dodaj kot drugo napravo</translation>
+    </message>
+    <message>
+        <source>The device that has it keeps it. This one joins, over the same network.</source>
+        <translation>Naprava, ki ga ima, ga obdrži. Ta se pridruži prek istega omrežja.</translation>
+    </message>
+    <message>
+        <source>Restore from a backup</source>
+        <translation>Obnovi iz varnostne kopije</translation>
+    </message>
+    <message>
+        <source>A backup file the other device wrote, copied onto this phone.</source>
+        <translation>Datoteka varnostne kopije, ki jo je zapisala druga naprava, prekopirana na ta telefon.</translation>
+    </message>
+</context>
+<context>
     <name>Format</name>
     <message>
         <source>now</source>
@@ -553,6 +576,53 @@
     <message>
         <source>Everyone in the group sees the name</source>
         <translation>Ime vidijo vsi v skupini</translation>
+    </message>
+</context>
+<context>
+    <name>IntroPage</name>
+    <message>
+        <source>No sign-up, no phone number</source>
+        <translation>Brez registracije, brez telefonske številke</translation>
+    </message>
+    <message>
+        <source>Your profile is made here on your phone. No phone number, no account with a company, nothing to sign.</source>
+        <translation>Vaš profil nastane tu, v telefonu. Brez telefonske številke, brez računa pri podjetju, nič ni treba podpisati.</translation>
+    </message>
+    <message>
+        <source>You choose who can reach you</source>
+        <translation>Vi določite, kdo vas lahko doseže</translation>
+    </message>
+    <message>
+        <source>There is no directory to be found in. Show a friend a code to scan, or send them a link, and the two of you can write.</source>
+        <translation>Ni imenika, v katerem bi vas našli. Prijatelju pokažite kodo za optično branje ali mu pošljite povezavo, pa si lahko pišeta.</translation>
+    </message>
+    <message>
+        <source>Groups of equals</source>
+        <translation>Skupine enakih</translation>
+    </message>
+    <message>
+        <source>Everyone in a group has the same rights: anyone can add a friend, rename it or leave. Nobody is in charge.</source>
+        <translation>V skupini imajo vsi enake pravice: vsak lahko doda prijatelja, jo preimenuje ali jo zapusti. Nihče ni glavni.</translation>
+    </message>
+    <message>
+        <source>The server only passes it on</source>
+        <translation>Strežnik ga samo poda naprej</translation>
+    </message>
+    <message>
+        <source>Keep swiping to set up your profile.</source>
+        <translation>Podrsajte naprej in ustvarite profil.</translation>
+    </message>
+    <message>
+        <source>Every message is encrypted</source>
+        <translation>Vsako sporočilo je šifrirano</translation>
+    </message>
+    <message>
+        <source>Messages are encrypted the whole way, always. Servers that transport them cannot read a word.</source>
+        <translation>Sporočila so vedno šifrirana vso pot. Strežniki, ki jih prenašajo, ne preberejo niti besede.</translation>
+    </message>
+    <message>
+        <source>A server holds a message until the other phone is online, and that is all it does. Your chats stay on your device.</source>
+        <translation>Strežnik zadrži sporočilo, dokler drugi telefon ni na zvezi, in nič drugega. Vaši pogovori ostanejo v vaši napravi.</translation>
     </message>
 </context>
 <context>
@@ -878,6 +948,21 @@
     </message>
 </context>
 <context>
+    <name>ProfileStartPage</name>
+    <message>
+        <source>Alright, let&apos;s get you set up.</source>
+        <translation>Dobro, ustvarimo vaš profil.</translation>
+    </message>
+    <message>
+        <source>I already have a profile</source>
+        <translation>Profil že imam</translation>
+    </message>
+    <message>
+        <source>Create a profile</source>
+        <translation>Ustvari profil</translation>
+    </message>
+</context>
+<context>
     <name>ProfilesPage</name>
     <message>
         <source>Add profile</source>
@@ -903,6 +988,14 @@
     <message>
         <source>No profiles</source>
         <translation>Ni profilov</translation>
+    </message>
+    <message>
+        <source>Add as second device</source>
+        <translation>Dodaj kot drugo napravo</translation>
+    </message>
+    <message>
+        <source>Restore profile from backup</source>
+        <translation>Obnovi profil iz varnostne kopije</translation>
     </message>
 </context>
 <context>
@@ -950,6 +1043,81 @@
         <source>Editing message</source>
         <extracomment>Above the message field while a sent message&apos;s text is being changed; the message&apos;s text follows.</extracomment>
         <translation>Urejanje sporočila</translation>
+    </message>
+</context>
+<context>
+    <name>RestoreProfilePage</name>
+    <message>
+        <source>The other device runs a newer Delta Chat than this app can take a profile from.</source>
+        <translation>Na drugi napravi teče novejši Delta Chat, kot ga ta aplikacija zna prevzeti.</translation>
+    </message>
+    <message>
+        <source>The transfer stopped before it finished. Both devices have to stay on the same network, with this page open.</source>
+        <translation>Prenos se je ustavil, preden je bil končan. Obe napravi morata ostati v istem omrežju, ta stran pa odprta.</translation>
+    </message>
+    <message>
+        <source>That is not the code a device shows while it is offering its profile.</source>
+        <translation>To ni koda, ki jo naprava pokaže, medtem ko ponuja svoj profil.</translation>
+    </message>
+    <message>
+        <source>Add as second device</source>
+        <translation>Dodaj kot drugo napravo</translation>
+    </message>
+    <message>
+        <source>Restore from a backup</source>
+        <translation>Obnovi iz varnostne kopije</translation>
+    </message>
+    <message>
+        <source>On the device that has your profile, make a backup and copy the file onto this phone. Then choose it here.</source>
+        <translation>Na napravi, ki ima vaš profil, naredite varnostno kopijo in datoteko prekopirajte na ta telefon. Nato jo izberite tukaj.</translation>
+    </message>
+    <message>
+        <source>Choose a backup file</source>
+        <translation>Izberi datoteko varnostne kopije</translation>
+    </message>
+    <message>
+        <source>Taking the profile over...</source>
+        <translation>Prevzemanje profila...</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Prekliči</translation>
+    </message>
+    <message>
+        <source>The camera is not available on this device. A backup file works without one.</source>
+        <translation>Na tej napravi ni kamere. Z datoteko varnostne kopije gre tudi brez nje.</translation>
+    </message>
+    <message>
+        <source>On your other device, open Settings and choose to add a second device. Both phones have to be on the same network.</source>
+        <translation>Na napravi, ki ima vaš profil, odprite nastavitve in izberite dodajanje druge naprave. Obe morata biti v istem omrežju.</translation>
+    </message>
+    <message>
+        <source>Hold the phone up to the code it shows</source>
+        <translation>Ta telefon usmerite v prikazano kodo</translation>
+    </message>
+    <message>
+        <source>Enter the code instead</source>
+        <translation>Namesto tega vnesite kodo</translation>
+    </message>
+    <message>
+        <source>Code from the other device</source>
+        <translation>Koda z druge naprave</translation>
+    </message>
+    <message>
+        <source>Take the profile over</source>
+        <translation>Prevzemi profil</translation>
+    </message>
+    <message>
+        <source>That did not work</source>
+        <translation>To ni uspelo</translation>
+    </message>
+    <message>
+        <source>Try the code again</source>
+        <translation>Poskusi kodo znova</translation>
+    </message>
+    <message>
+        <source>Choose another file</source>
+        <translation>Izberi drugo datoteko</translation>
     </message>
 </context>
 <context>
@@ -1035,22 +1203,6 @@
     <message>
         <source>Messages</source>
         <translation>Sporočila</translation>
-    </message>
-    <message>
-        <source>Markdown</source>
-        <translation>Markdown</translation>
-    </message>
-    <message>
-        <source>How a message written with *stars* and `backticks` is shown.</source>
-        <translation>Kako je prikazano sporočilo, napisano z *zvezdicami* in `krativci`.</translation>
-    </message>
-    <message>
-        <source>Drawn: bold, italics, links</source>
-        <translation>Izrisano: krepko, ležeče, povezave</translation>
-    </message>
-    <message>
-        <source>As written</source>
-        <translation>Kot je napisano</translation>
     </message>
     <message>
         <source>Auto-download attachments</source>
@@ -1152,8 +1304,16 @@
         <translation>Enter pošlje sporočilo</translation>
     </message>
     <message>
-        <source>Off, the return key starts a new line, the message field grows with what is written, and the send button sends.</source>
-        <translation>Izklopljeno: tipka Enter začne novo vrstico, polje sporočila raste z napisanim, pošlje pa gumb za pošiljanje.</translation>
+        <source>When on, the return key sends. When off, it starts a new line, the message field grows with what is written, and the send button sends.</source>
+        <translation>Vklopljeno tipka Enter pošlje. Izklopljeno začne novo vrstico, polje sporočila raste z napisanim, pošlje pa gumb za pošiljanje.</translation>
+    </message>
+    <message>
+        <source>Use Markdown formatting</source>
+        <translation>Uporabi oblikovanje Markdown</translation>
+    </message>
+    <message>
+        <source>When on, a message written with *stars* and `backticks` is shown with the bold, the italics and the links drawn. When off, it is shown exactly as it was written.</source>
+        <translation>Vklopljeno se sporočilo, napisano z *zvezdicami* in `krativci`, prikaže z izrisano krepko pisavo, ležečo pisavo in povezavami. Izklopljeno se prikaže natanko tako, kot je bilo napisano.</translation>
     </message>
 </context>
 <context>
@@ -1226,16 +1386,16 @@
 <context>
     <name>WelcomePage</name>
     <message>
-        <source>Secure decentralized chat</source>
-        <translation>Varen decentraliziran klepet</translation>
+        <source>Tell me about Delta Chat</source>
+        <translation>Kaj je Delta Chat?</translation>
     </message>
     <message>
-        <source>No phone number, no account with us: your profile lives on a mail server of your choosing.</source>
-        <translation>Brez telefonske številke, brez računa pri nas: vaš profil živi na poštnem strežniku po vaši izbiri.</translation>
+        <source>Set up my profile</source>
+        <translation>Nastavi moj profil</translation>
     </message>
     <message>
-        <source>Add profile</source>
-        <translation>Dodaj profil</translation>
+        <source>Secure decentralised chat based on Delta Chat</source>
+        <translation>Varno decentralizirano klepetanje, zgrajeno na Delta Chatu</translation>
     </message>
 </context>
 </TS>

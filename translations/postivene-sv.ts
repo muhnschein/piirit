@@ -479,6 +479,29 @@
     </message>
 </context>
 <context>
+    <name>ExistingProfilePage</name>
+    <message>
+        <source>Where is your profile now?</source>
+        <translation>Var finns din profil nu?</translation>
+    </message>
+    <message>
+        <source>Add as second device</source>
+        <translation>Lägg till som andra enhet</translation>
+    </message>
+    <message>
+        <source>The device that has it keeps it. This one joins, over the same network.</source>
+        <translation>Enheten som har den behåller den. Den här ansluter, över samma nätverk.</translation>
+    </message>
+    <message>
+        <source>Restore from a backup</source>
+        <translation>Återställ från en säkerhetskopia</translation>
+    </message>
+    <message>
+        <source>A backup file the other device wrote, copied onto this phone.</source>
+        <translation>En säkerhetskopia som den andra enheten skrev, kopierad till den här telefonen.</translation>
+    </message>
+</context>
+<context>
     <name>Format</name>
     <message>
         <source>now</source>
@@ -547,6 +570,53 @@
     <message>
         <source>Everyone in the group sees the name</source>
         <translation>Alla i gruppen ser namnet</translation>
+    </message>
+</context>
+<context>
+    <name>IntroPage</name>
+    <message>
+        <source>No sign-up, no phone number</source>
+        <translation>Ingen registrering, inget telefonnummer</translation>
+    </message>
+    <message>
+        <source>Your profile is made here on your phone. No phone number, no account with a company, nothing to sign.</source>
+        <translation>Din profil skapas här i telefonen. Inget telefonnummer, inget konto hos ett företag, inget att skriva under.</translation>
+    </message>
+    <message>
+        <source>You choose who can reach you</source>
+        <translation>Du väljer vem som kan nå dig</translation>
+    </message>
+    <message>
+        <source>There is no directory to be found in. Show a friend a code to scan, or send them a link, and the two of you can write.</source>
+        <translation>Det finns ingen katalog att hittas i. Visa en vän en kod att skanna, eller skicka en länk, så kan ni skriva till varandra.</translation>
+    </message>
+    <message>
+        <source>Groups of equals</source>
+        <translation>Grupper mellan likar</translation>
+    </message>
+    <message>
+        <source>Everyone in a group has the same rights: anyone can add a friend, rename it or leave. Nobody is in charge.</source>
+        <translation>Alla i en grupp har samma rättigheter: vem som helst kan lägga till en vän, byta namn eller lämna den. Ingen bestämmer.</translation>
+    </message>
+    <message>
+        <source>The server only passes it on</source>
+        <translation>Servern skickar bara vidare</translation>
+    </message>
+    <message>
+        <source>Keep swiping to set up your profile.</source>
+        <translation>Fortsätt svepa för att skapa din profil.</translation>
+    </message>
+    <message>
+        <source>Every message is encrypted</source>
+        <translation>Varje meddelande är krypterat</translation>
+    </message>
+    <message>
+        <source>Messages are encrypted the whole way, always. Servers that transport them cannot read a word.</source>
+        <translation>Meddelanden är alltid krypterade hela vägen. Servrarna som transporterar dem kan inte läsa ett ord.</translation>
+    </message>
+    <message>
+        <source>A server holds a message until the other phone is online, and that is all it does. Your chats stay on your device.</source>
+        <translation>En server håller meddelandet tills den andra telefonen är uppkopplad, och mer gör den inte. Dina samtal stannar på din enhet.</translation>
     </message>
 </context>
 <context>
@@ -868,6 +938,21 @@
     </message>
 </context>
 <context>
+    <name>ProfileStartPage</name>
+    <message>
+        <source>Alright, let&apos;s get you set up.</source>
+        <translation>Okej, då skapar vi din profil.</translation>
+    </message>
+    <message>
+        <source>I already have a profile</source>
+        <translation>Jag har redan en profil</translation>
+    </message>
+    <message>
+        <source>Create a profile</source>
+        <translation>Skapa en profil</translation>
+    </message>
+</context>
+<context>
     <name>ProfilesPage</name>
     <message>
         <source>Add profile</source>
@@ -893,6 +978,14 @@
     <message>
         <source>No profiles</source>
         <translation>Inga profiler</translation>
+    </message>
+    <message>
+        <source>Add as second device</source>
+        <translation>Lägg till som andra enhet</translation>
+    </message>
+    <message>
+        <source>Restore profile from backup</source>
+        <translation>Återställ profil från en säkerhetskopia</translation>
     </message>
 </context>
 <context>
@@ -940,6 +1033,81 @@
         <source>Editing message</source>
         <extracomment>Above the message field while a sent message&apos;s text is being changed; the message&apos;s text follows.</extracomment>
         <translation>Redigerar meddelande</translation>
+    </message>
+</context>
+<context>
+    <name>RestoreProfilePage</name>
+    <message>
+        <source>The other device runs a newer Delta Chat than this app can take a profile from.</source>
+        <translation>Den andra enheten kör en nyare Delta Chat än vad den här appen kan ta över en profil från.</translation>
+    </message>
+    <message>
+        <source>The transfer stopped before it finished. Both devices have to stay on the same network, with this page open.</source>
+        <translation>Överföringen stannade innan den blev klar. Båda enheterna måste vara kvar på samma nätverk, med den här sidan öppen.</translation>
+    </message>
+    <message>
+        <source>That is not the code a device shows while it is offering its profile.</source>
+        <translation>Det är inte koden en enhet visar medan den erbjuder sin profil.</translation>
+    </message>
+    <message>
+        <source>Add as second device</source>
+        <translation>Lägg till som andra enhet</translation>
+    </message>
+    <message>
+        <source>Restore from a backup</source>
+        <translation>Återställ från en säkerhetskopia</translation>
+    </message>
+    <message>
+        <source>On the device that has your profile, make a backup and copy the file onto this phone. Then choose it here.</source>
+        <translation>På enheten som har din profil: gör en säkerhetskopia och kopiera filen till den här telefonen. Välj den sedan här.</translation>
+    </message>
+    <message>
+        <source>Choose a backup file</source>
+        <translation>Välj en säkerhetskopia</translation>
+    </message>
+    <message>
+        <source>Taking the profile over...</source>
+        <translation>Tar över profilen...</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Avbryt</translation>
+    </message>
+    <message>
+        <source>The camera is not available on this device. A backup file works without one.</source>
+        <translation>Det finns ingen kamera på den här enheten. Med en säkerhetskopia går det utan.</translation>
+    </message>
+    <message>
+        <source>On your other device, open Settings and choose to add a second device. Both phones have to be on the same network.</source>
+        <translation>På enheten som har din profil: öppna inställningarna och välj att lägga till en andra enhet. Båda måste vara på samma nätverk.</translation>
+    </message>
+    <message>
+        <source>Hold the phone up to the code it shows</source>
+        <translation>Håll den här telefonen mot koden som visas</translation>
+    </message>
+    <message>
+        <source>Enter the code instead</source>
+        <translation>Ange koden i stället</translation>
+    </message>
+    <message>
+        <source>Code from the other device</source>
+        <translation>Kod från den andra enheten</translation>
+    </message>
+    <message>
+        <source>Take the profile over</source>
+        <translation>Ta över profilen</translation>
+    </message>
+    <message>
+        <source>That did not work</source>
+        <translation>Det gick inte</translation>
+    </message>
+    <message>
+        <source>Try the code again</source>
+        <translation>Försök med koden igen</translation>
+    </message>
+    <message>
+        <source>Choose another file</source>
+        <translation>Välj en annan fil</translation>
     </message>
 </context>
 <context>
@@ -1025,22 +1193,6 @@
     <message>
         <source>Messages</source>
         <translation>Meddelanden</translation>
-    </message>
-    <message>
-        <source>Markdown</source>
-        <translation>Markdown</translation>
-    </message>
-    <message>
-        <source>How a message written with *stars* and `backticks` is shown.</source>
-        <translation>Hur ett meddelande skrivet med *stjärnor* och `grava accenter` visas.</translation>
-    </message>
-    <message>
-        <source>Drawn: bold, italics, links</source>
-        <translation>Ritat: fet, kursiv, länkar</translation>
-    </message>
-    <message>
-        <source>As written</source>
-        <translation>Som skrivet</translation>
     </message>
     <message>
         <source>Auto-download attachments</source>
@@ -1142,8 +1294,16 @@
         <translation>Enter skickar meddelandet</translation>
     </message>
     <message>
-        <source>Off, the return key starts a new line, the message field grows with what is written, and the send button sends.</source>
-        <translation>Avstängt börjar Enter-tangenten en ny rad, meddelandefältet växer med det skrivna och skicka-knappen skickar.</translation>
+        <source>When on, the return key sends. When off, it starts a new line, the message field grows with what is written, and the send button sends.</source>
+        <translation>På skickar Enter-tangenten. Av börjar den en ny rad, meddelandefältet växer med det skrivna och skicka-knappen skickar.</translation>
+    </message>
+    <message>
+        <source>Use Markdown formatting</source>
+        <translation>Använd Markdown-formatering</translation>
+    </message>
+    <message>
+        <source>When on, a message written with *stars* and `backticks` is shown with the bold, the italics and the links drawn. When off, it is shown exactly as it was written.</source>
+        <translation>På visas ett meddelande skrivet med *stjärnor* och `bakåtcitattecken` med fet stil, kursiv och länkar ritade. Av visas det precis som det skrevs.</translation>
     </message>
 </context>
 <context>
@@ -1216,16 +1376,16 @@
 <context>
     <name>WelcomePage</name>
     <message>
-        <source>Secure decentralized chat</source>
-        <translation>Säker decentraliserad chatt</translation>
+        <source>Tell me about Delta Chat</source>
+        <translation>Vad är Delta Chat?</translation>
     </message>
     <message>
-        <source>No phone number, no account with us: your profile lives on a mail server of your choosing.</source>
-        <translation>Inget telefonnummer, inget konto hos oss: din profil bor på en e-postserver du själv väljer.</translation>
+        <source>Set up my profile</source>
+        <translation>Skapa min profil</translation>
     </message>
     <message>
-        <source>Add profile</source>
-        <translation>Lägg till profil</translation>
+        <source>Secure decentralised chat based on Delta Chat</source>
+        <translation>Säker decentraliserad chatt byggd på Delta Chat</translation>
     </message>
 </context>
 </TS>

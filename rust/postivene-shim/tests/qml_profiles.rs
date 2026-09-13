@@ -43,9 +43,19 @@ struct StackProbe {
 }
 
 impl StackProbe {
-    fn name_of(page: &QString) -> String {
+    /// The page's file name, and for a page that is two flows in one
+    /// file, which of them was asked for. The take-over page is opened
+    /// from two rows here and the name alone cannot tell them apart, so
+    /// a row that opened the wrong half would go unnoticed.
+    fn name_of(page: &QString, properties: &QVariantMap) -> String {
         let page = page.to_string();
-        page.rsplit('/').next().unwrap_or(&page).to_string()
+        let name = page.rsplit('/').next().unwrap_or(&page).to_string();
+        // `QVariantMap` in qttypes 0.2 can be queried but not iterated.
+        let half = properties.value(QString::from("from"), QVariant::default());
+        match QString::from_qvariant(half).map(|text| text.to_string()) {
+            Some(half) if !half.is_empty() => format!("{name}:{half}"),
+            _ => name,
+        }
     }
 
     fn publish(&mut self) {
@@ -53,21 +63,21 @@ impl StackProbe {
         self.stack_changed();
     }
 
-    fn push(&mut self, page: QString, _properties: QVariantMap) {
-        let name = Self::name_of(&page);
+    fn push(&mut self, page: QString, properties: QVariantMap) {
+        let name = Self::name_of(&page, &properties);
         self.pages.push(name);
         self.publish();
     }
 
-    fn replace(&mut self, page: QString, _properties: QVariantMap) {
-        let name = Self::name_of(&page);
+    fn replace(&mut self, page: QString, properties: QVariantMap) {
+        let name = Self::name_of(&page, &properties);
         self.pages.pop();
         self.pages.push(name);
         self.publish();
     }
 
-    fn replaceAbove(&mut self, _target: QVariant, page: QString, _properties: QVariantMap) {
-        let name = Self::name_of(&page);
+    fn replaceAbove(&mut self, _target: QVariant, page: QString, properties: QVariantMap) {
+        let name = Self::name_of(&page, &properties);
         self.pages.clear();
         self.pages.push(name);
         self.publish();
@@ -142,6 +152,22 @@ const PROBE_QML: &str = r"
         function addProfile() {
             var item = findIn(loader.item, 'addProfileButton')
             if (!item) { return 'missing:addProfileButton' }
+            item.clicked()
+            return 'ok'
+        }
+        // The plus between them: a profile this reader has as a backup
+        // file, which is the way that needs nothing else to hand.
+        function restoreFromBackup() {
+            var item = findIn(loader.item, 'backupFileButton')
+            if (!item) { return 'missing:backupFileButton' }
+            item.clicked()
+            return 'ok'
+        }
+        // And the last plus: a profile this reader already has on
+        // another device.
+        function addSecondDevice() {
+            var item = findIn(loader.item, 'secondDeviceButton')
+            if (!item) { return 'missing:secondDeviceButton' }
             item.clicked()
             return 'ok'
         }
@@ -222,6 +248,17 @@ fn switching_profile_leaves_one_chat_list_on_the_stack() {
         // of this page.
         (*steps_ptr).push(("add", call!("addProfile")));
         (*steps_ptr).push(("added", (*stack_ptr).pinned().borrow().stack.to_string()));
+        // The plus under that, for a profile that exists already as a
+        // file on this phone.
+        (*steps_ptr).push(("backup", call!("restoreFromBackup")));
+        (*steps_ptr).push(("restored", (*stack_ptr).pinned().borrow().stack.to_string()));
+        // And the last plus, for one that exists already on the phone in
+        // the reader's other hand.
+        (*steps_ptr).push(("second", call!("addSecondDevice")));
+        (*steps_ptr).push((
+            "took-over",
+            (*stack_ptr).pinned().borrow().stack.to_string(),
+        ));
         (*steps_ptr).push(("tap", call!("tapFirstRow")));
     });
 
@@ -276,6 +313,31 @@ fn switching_profile_leaves_one_chat_list_on_the_stack() {
         "adding a profile did not open the add-profile dialog on top: \
          {}. {context}",
         value("added")
+    );
+    assert_eq!(
+        value("backup"),
+        "ok",
+        "no plus for a backup file under the profile list, so a profile \
+         that exists only as a file cannot be restored from here. \
+         {context}"
+    );
+    assert!(
+        value("restored").ends_with(",RestoreProfilePage.qml:file"),
+        "the backup plus did not open the take-over page on its file \
+         half: {}. {context}",
+        value("restored")
+    );
+    assert_eq!(
+        value("second"),
+        "ok",
+        "no second plus under the profile list, so a profile on another \
+         device cannot be taken over from here. {context}"
+    );
+    assert!(
+        value("took-over").ends_with(",RestoreProfilePage.qml:device"),
+        "the second-device plus did not open the take-over page on its \
+         device half: {}. {context}",
+        value("took-over")
     );
     // Also the guard that the list really had rows: with no accounts there
     // is no row to tap and nothing here would be under test.

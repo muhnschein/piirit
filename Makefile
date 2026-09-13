@@ -16,7 +16,7 @@
 
 .PHONY: check test lint fmt qml-lint packaging-lint lockfile-lint doc-lint \
         msrv deny integration harbour vendor-check fetch-server \
-        sonar-report-test apt-install-test sonar-reports translations faces \
+        sonar-report-test apt-install-test sonar-reports translations \
         clean
 
 CARGO ?= cargo
@@ -124,13 +124,6 @@ fetch-server:
 ## of the app finds them. The RPM does the same in %%build.
 translations:
 	./scripts/release-translations.sh
-
-## Repaint the field of faces the first screen draws (qml/art/) from
-## tools/faces/. Python 3 and nothing else; the results are committed,
-## so a build needs neither this nor a display. Run it when the painter
-## changes, and look at what it made.
-faces:
-	python3 tools/faces/faces.py
 
 ## Prove scripts/sonar-report.sh still reports what it claims to, against a
 ## stub server. The real service is unreachable from CI's network and from a

@@ -54,12 +54,6 @@ Page {
         return 3
     }
 
-    /// 0 draws Markdown; anything else -- including the 1 that once took
-    /// the markers out and kept the words -- shows a message as written.
-    function markdownIndex(mode) {
-        return mode === 0 ? 0 : 1
-    }
-
     /// The deletion periods offered, in seconds, as deltachat-android
     /// offers them: never, an hour, a day, a week, five weeks, a year.
     readonly property var periods: [0, 3600, 86400, 604800, 3024000, 31536000]
@@ -95,7 +89,6 @@ Page {
     /// choice is put back from the setting each time it changes -- the
     /// arrangement DisappearingMessages uses.
     function refresh() {
-        markdownCombo.currentIndex = page.markdownIndex(Settings.markdownMode)
         downloadCombo.currentIndex = page.limitIndex(Settings.downloadLimit)
         deletionCombo.currentIndex = page.periodIndex(Settings.deleteDeviceAfter)
         notificationCombo.currentIndex =
@@ -104,7 +97,6 @@ Page {
 
     Connections {
         target: Settings
-        onMarkdownModeChanged: page.refresh()
         onDownloadLimitChanged: page.refresh()
         onDeleteDeviceAfterChanged: page.refresh()
         onNotificationDetailChanged: page.refresh()
@@ -192,31 +184,22 @@ Page {
                 objectName: "enterSendsSwitch"
                 //: The return key on the keyboard.
                 text: qsTr("Enter sends the message")
-                description: qsTr("Off, the return key starts a new line, the message field grows with what is written, and the send button sends.")
+                description: qsTr("When on, the return key sends. When off, it starts a new line, the message field grows with what is written, and the send button sends.")
                 automaticCheck: false
                 checked: Settings.enterSends === true
                 onClicked: Settings.enterSends = !checked
             }
 
-            ComboBox {
-                id: markdownCombo
-                objectName: "markdownCombo"
-                width: parent.width
-                label: qsTr("Markdown")
-                description: qsTr("How a message written with *stars* and `backticks` is shown.")
-
-                menu: ContextMenu {
-                    MenuItem {
-                        objectName: "markdownOption0"
-                        text: qsTr("Drawn: bold, italics, links")
-                        onClicked: Settings.markdownMode = 0
-                    }
-                    MenuItem {
-                        objectName: "markdownOption1"
-                        text: qsTr("As written")
-                        onClicked: Settings.markdownMode = 1
-                    }
-                }
+            TextSwitch {
+                objectName: "markdownSwitch"
+                text: qsTr("Use Markdown formatting")
+                description: qsTr("When on, a message written with *stars* and `backticks` is shown with the bold, the italics and the links drawn. When off, it is shown exactly as it was written.")
+                // Checked follows the setting, so the tap writes the
+                // setting and the setting moves the switch -- the way
+                // the switch above it works.
+                automaticCheck: false
+                checked: Settings.markdownMode === 0
+                onClicked: Settings.markdownMode = checked ? 1 : 0
             }
 
             ComboBox {

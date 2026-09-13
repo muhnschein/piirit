@@ -5,17 +5,37 @@ import "../components"
 /*
  * The first screen: no address, no password -- a new Delta Chat user has
  * neither (docs/PROJECT.md), so the one thing to do here is add a
- * profile. Also the resume path: with a configured account it hands
- * straight over to the chat list, on the profile the app was last
- * closed on.
+ * profile.
+ *
+ * Also the way back onto a chat list, for a phone the window could not
+ * send there itself. The window reads `Settings.lastAccountId` before it
+ * puts anything up and opens on the chat list directly when it names a
+ * profile (postivene.qml), so this page is not even made on an ordinary
+ * launch. What is left to it is the phone whose key was never written --
+ * a profile made before the key existed, or one restored into a fresh
+ * install -- where the core's own answer (`accounts_refreshed`) is the
+ * only thing that knows there is a profile at all.
+ *
+ * Whichever of the two names a profile, the hand-over is offered until
+ * the stack takes it. Silica drops an operation asked for while a
+ * transition is running, and the first offer is made from inside the
+ * push that puts this page up: giving up after one refusal drew the
+ * whole first screen for the half second before the chat list arrived,
+ * and recording the refusal as a departure left a blank screen for good.
  *
  * What it looks like is what the cover looks like once there are
  * people: a field of faces in the ambience's colours, a few of them lit,
  * filling the screen either way up -- and in the middle, where the
- * field clears for them, the app's name, what it is, and the button.
+ * field clears for them, the app's name, what it is, and the way on.
  * There is no second chance at a first impression, so the field is a
  * picture (components/FaceField.qml): one texture, one pass, drawn the
  * frame the page is.
+ *
+ * Two ways on rather than one. A reader who has never heard of Delta
+ * Chat is a swipe away from being told (IntroPage.qml); a reader who
+ * knows what they came for goes straight to the setup path
+ * (ProfileStartPage.qml). Neither is the relay dialog: picking a server
+ * is a question for somebody who has already decided.
  */
 Page {
     id: page
@@ -23,8 +43,89 @@ Page {
     // Both ways up: the field has a master for each.
     allowedOrientations: Orientation.All
 
-    // Hides the buttons until we know whether an account exists.
+    /// Nothing is drawn yet, because it is not yet known whether this
+    /// phone has a chat list to be on. Drawing the first screen and
+    /// taking it away again is the thing this page must not do.
     property bool probing: true
+    /// The profile to hand over to, or 0 while none is known of. What
+    /// dconf remembers, until the core says otherwise: its answer is the
+    /// authority, and the only one a phone whose key was never written
+    /// has.
+    property int resumeAccountId: Settings.lastAccountId > 0
+                                  ? Settings.lastAccountId : 0
+    /// The chat list has actually been opened.
+    ///
+    /// Set from what the stack did, never from having asked it: a page
+    /// that recorded the asking would hide itself for a hand-over that
+    /// never happened and sit there blank.
+    property bool leaving: false
+    /// The probe has taken long enough to be worth saying so. A phone
+    /// with a profile is gone from here in the time dconf takes, and a
+    /// spinner that appears on the way out is the flash it was put there
+    /// to prevent.
+    property bool slow: false
+    /// How long to go on waiting before drawing this page anyway, in
+    /// milliseconds. A stack that has refused for this long is not going
+    /// to take it and a core that has not answered is not going to, and
+    /// a first screen the reader can use beats a blank one they cannot.
+    /// Nothing sets it; a test turns it down rather than waiting.
+    property int handOverDeadline: 4000
+
+    /// Go to the chat list, if a profile to open it on is known of.
+    ///
+    /// IO is not asked for here: the window asks for it as soon as the
+    /// core is ready, whichever page is up (postivene.qml).
+    function resumeRemembered() {
+        if (page.leaving || !(page.resumeAccountId > 0)) {
+            return
+        }
+        page.leaving = page.openChatList(page.resumeAccountId)
+    }
+
+    /// Hand over to the chat list, and say whether the stack took it.
+    function openChatList(accountId) {
+        var opened = pageStack.replaceAbove(null,
+                                            Qt.resolvedUrl("ChatListPage.qml"),
+                                            { accountId: accountId })
+        return opened ? true : false
+    }
+
+    // Offered until the stack takes it, every frame or so. The offer
+    // costs nothing when it is refused, and one refusal says nothing
+    // about the next: the stack is busy putting this very page up.
+    // `triggeredOnStart` makes the first offer the moment a profile is
+    // known of, which on a phone that has one is straight away.
+    Timer {
+        id: handOver
+        objectName: "handOver"
+        interval: 50
+        repeat: true
+        triggeredOnStart: true
+        running: page.probing && !page.leaving && page.resumeAccountId > 0
+        onTriggered: page.resumeRemembered()
+    }
+
+    Timer {
+        id: slowProbe
+        objectName: "slowProbe"
+        interval: 400
+        running: page.probing && !page.leaving
+        onTriggered: page.slow = true
+    }
+
+    // The long stop, and the end of the offering. Whatever it is that
+    // has not happened by now -- the core has not answered, the stack
+    // will not take the hand-over -- waiting longer for it is worse than
+    // showing the reader a screen they can do something with. It also
+    // stops the timer above, so a reader who has gone on to read about
+    // Delta Chat is not yanked out of it a moment later.
+    Timer {
+        id: handOverStop
+        objectName: "handOverStop"
+        interval: page.handOverDeadline
+        running: page.probing && !page.leaving
+        onTriggered: page.probing = false
+    }
 
     // The core may be ready before the handler below exists.
     Component.onCompleted: {
@@ -48,16 +149,23 @@ Page {
             }
         }
 
+        // Not gated on `leaving`: a page that had really handed over is
+        // gone and hears nothing, so being here to hear this means the
+        // hand-over did not land, whatever it reported.
         onAccounts_refreshed: {
             if (configured_count > 0) {
-                // Every profile, not only the one shown: each of them is
-                // one people write to, and the cover counts them all.
-                core.start_all_account_io()
                 // The profile the app was closed on, which the core
                 // remembers; the chat list tells it which on every open.
-                pageStack.replaceAbove(null, Qt.resolvedUrl("ChatListPage.qml"),
-                                       { accountId: resume_account_id })
+                // Assigned rather than handed to one attempt: the answer
+                // is what the offering runs on from here, and a stack
+                // that is busy this instant will not be next time.
+                page.resumeAccountId = resume_account_id
+                page.resumeRemembered()
             } else {
+                // No profile anywhere, so there is nothing to open and
+                // nothing for the next launch to open either.
+                page.resumeAccountId = 0
+                Settings.lastAccountId = 0
                 page.probing = false
             }
         }
@@ -72,13 +180,28 @@ Page {
         id: field
         objectName: "faceField"
         anchors.fill: parent
+        // Down until it is known there is no chat list to be on. A
+        // screenful of faces drawn for the half second a hand-over takes
+        // reads as the app opening in the wrong place and then
+        // correcting itself.
+        visible: !page.probing
         source: page.width > page.height ? "../art/faces-landscape.png"
                                          : "../art/faces-portrait.png"
+        // Fainter than the component's own default. The field is the
+        // welcome, not the reading matter, and what it is painted from
+        // carries more ink than the flat masks it started as: both
+        // channels scale the colour and its alpha together, so less ink
+        // is more of the ambience showing through.
+        ink: 0.45
+        litInk: 0.8
         clearX: words.x + words.width / 2
         clearY: words.y + words.height / 2
         clearWidth: words.width
         clearHeight: words.height
-        clearRadius: Theme.paddingLarge
+        // Room around the words rather than up against them: the field
+        // is cleared this far out from the column before it begins to
+        // fade back in.
+        clearRadius: Theme.itemSizeExtraSmall
         clearFeather: Theme.itemSizeLarge
     }
 
@@ -110,45 +233,56 @@ Page {
             color: Theme.highlightColor
         }
 
+        // One line under the name, and only one: what the app is, in
+        // the words its own site uses.
         Label {
             objectName: "tagline"
             width: parent.width
             horizontalAlignment: Text.AlignHCenter
             wrapMode: Text.Wrap
             textFormat: Text.PlainText
-            text: qsTr("Secure decentralized chat")
+            text: qsTr("Secure decentralised chat based on Delta Chat")
             font.pixelSize: Theme.fontSizeLarge
             color: Theme.primaryColor
-        }
-
-        Item { width: 1; height: Theme.paddingMedium }
-
-        Label {
-            objectName: "intro"
-            width: parent.width
-            horizontalAlignment: Text.AlignHCenter
-            wrapMode: Text.Wrap
-            color: Theme.secondaryHighlightColor
-            font.pixelSize: Theme.fontSizeSmall
-            text: core.status.indexOf("error") === 0
-                  ? core.status
-                  : qsTr("No phone number, no account with us: your profile lives on a mail server of your choosing.")
         }
 
         Item { width: 1; height: Theme.paddingLarge }
 
         Button {
-            objectName: "createProfileButton"
+            objectName: "aboutButton"
             anchors.horizontalCenter: parent.horizontalCenter
-            text: qsTr("Add profile")
+            text: qsTr("Tell me about Delta Chat")
+            onClicked: pageStack.push(Qt.resolvedUrl("IntroPage.qml"), {})
+        }
+
+        Button {
+            objectName: "setupButton"
+            anchors.horizontalCenter: parent.horizontalCenter
+            text: qsTr("Set up my profile")
             enabled: core.status === "ready"
-            onClicked: pageStack.push(Qt.resolvedUrl("AddProfileDialog.qml"), {})
+            onClicked: pageStack.push(Qt.resolvedUrl("ProfileStartPage.qml"), {})
+        }
+
+        // The one thing that can go wrong before anything has been
+        // asked for: the core did not start. Said here, where the
+        // buttons that it stops are.
+        Label {
+            objectName: "coreError"
+            width: parent.width
+            visible: core.status.indexOf("error") === 0
+            horizontalAlignment: Text.AlignHCenter
+            wrapMode: Text.Wrap
+            textFormat: Text.PlainText
+            font.pixelSize: Theme.fontSizeSmall
+            color: Theme.errorColor
+            text: core.status
         }
     }
 
     BusyIndicator {
+        objectName: "probeSpinner"
         anchors.centerIn: parent
-        running: page.probing
+        running: page.probing && page.slow && !page.leaving
         size: BusyIndicatorSize.Large
     }
 }

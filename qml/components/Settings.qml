@@ -51,6 +51,17 @@ QtObject {
     /// even from a muted group. What the reference clients call mention
     /// notifications, and on by default as they have it.
     property alias mentionNotifications: mentionNotificationsValue.value
+    /// The profile the chat list was last on, or 0 for a phone that has
+    /// never had one.
+    ///
+    /// The core remembers this as well, and better -- it is the one that
+    /// knows whether the profile still exists. But it only answers once
+    /// it has started, and starting it is a process spawn and a round
+    /// trip: long enough that a phone with a profile sat on a blank
+    /// first screen waiting to be told what it already knew. This is
+    /// read from dconf before any of that, so the app opens where it
+    /// belongs and the core catches up behind it.
+    property alias lastAccountId: lastAccountValue.value
     /// Whether webxdc apps are offered: the tray's app entry, the store
     /// behind it, and running one somebody sent. Off until it is asked
     /// for, and every one of those three reads this rather than deciding
@@ -106,6 +117,13 @@ QtObject {
         id: mentionNotificationsValue
         key: "/apps/harbour-postivene/mention_notifications"
         defaultValue: true
+    }
+
+    property ConfigurationValue lastAccountConfig: ConfigurationValue {
+        id: lastAccountValue
+        key: "/apps/harbour-postivene/last_account"
+        // No profile until a chat list has been on one.
+        defaultValue: 0
     }
 
     property ConfigurationValue webxdcEnabledConfig: ConfigurationValue {
