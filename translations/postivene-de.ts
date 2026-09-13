@@ -1081,6 +1081,18 @@
         <source>Hold the phone up to the code it shows</source>
         <translation>Halte dieses Telefon vor den Code, den es zeigt</translation>
     </message>
+    <message>
+        <source>Enter the code instead</source>
+        <translation>Stattdessen den Code eingeben</translation>
+    </message>
+    <message>
+        <source>Code from the other device</source>
+        <translation>Code vom anderen Gerät</translation>
+    </message>
+    <message>
+        <source>Take the profile over</source>
+        <translation>Profil übernehmen</translation>
+    </message>
 </context>
 <context>
     <name>ScanView</name>
@@ -1169,18 +1181,6 @@
     <message>
         <source>Markdown</source>
         <translation>Markdown</translation>
-    </message>
-    <message>
-        <source>How a message written with *stars* and `backticks` is shown.</source>
-        <translation>Wie eine mit *Sternchen* und `Backticks` geschriebene Nachricht angezeigt wird.</translation>
-    </message>
-    <message>
-        <source>Drawn: bold, italics, links</source>
-        <translation>Dargestellt: fett, kursiv, Links</translation>
-    </message>
-    <message>
-        <source>As written</source>
-        <translation>Wie geschrieben</translation>
     </message>
     <message>
         <source>Auto-download attachments</source>
@@ -1284,6 +1284,10 @@
     <message>
         <source>Off, the return key starts a new line, the message field grows with what is written, and the send button sends.</source>
         <translation>Aus: Die Eingabetaste beginnt eine neue Zeile, das Nachrichtenfeld wächst mit dem Geschriebenen, und der Senden-Knopf sendet.</translation>
+    </message>
+    <message>
+        <source>On, a message written with *stars* and `backticks` is shown with the bold, the italics and the links drawn. Off, it is shown exactly as it was written.</source>
+        <translation>An wird eine Nachricht mit *Sternchen* und `Backticks` mit dargestelltem Fettdruck, Kursiv und Links gezeigt. Aus wird sie genau so gezeigt, wie sie geschrieben wurde.</translation>
     </message>
 </context>
 <context>

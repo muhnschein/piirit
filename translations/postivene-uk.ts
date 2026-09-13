@@ -1086,6 +1086,18 @@
         <source>Hold the phone up to the code it shows</source>
         <translation>Наведіть цей телефон на показаний код</translation>
     </message>
+    <message>
+        <source>Enter the code instead</source>
+        <translation>Ввести код натомість</translation>
+    </message>
+    <message>
+        <source>Code from the other device</source>
+        <translation>Код з іншого пристрою</translation>
+    </message>
+    <message>
+        <source>Take the profile over</source>
+        <translation>Перенести профіль</translation>
+    </message>
 </context>
 <context>
     <name>ScanView</name>
@@ -1174,18 +1186,6 @@
     <message>
         <source>Markdown</source>
         <translation>Markdown</translation>
-    </message>
-    <message>
-        <source>How a message written with *stars* and `backticks` is shown.</source>
-        <translation>Як показувати повідомлення, написане із *зірочками* та `зворотними лапками`.</translation>
-    </message>
-    <message>
-        <source>Drawn: bold, italics, links</source>
-        <translation>Оформлено: жирний, курсив, посилання</translation>
-    </message>
-    <message>
-        <source>As written</source>
-        <translation>Як написано</translation>
     </message>
     <message>
         <source>Auto-download attachments</source>
@@ -1289,6 +1289,10 @@
     <message>
         <source>Off, the return key starts a new line, the message field grows with what is written, and the send button sends.</source>
         <translation>Вимкнено: клавіша Enter починає новий рядок, поле повідомлення росте з написаним, а надсилає кнопка надсилання.</translation>
+    </message>
+    <message>
+        <source>On, a message written with *stars* and `backticks` is shown with the bold, the italics and the links drawn. Off, it is shown exactly as it was written.</source>
+        <translation>Увімкнено — повідомлення, написане *зірочками* та `зворотними апострофами`, показується з оформленим жирним, курсивом і посиланнями. Вимкнено — показується точно так, як написано.</translation>
     </message>
 </context>
 <context>

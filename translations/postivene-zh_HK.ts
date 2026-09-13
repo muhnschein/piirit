@@ -1076,6 +1076,18 @@
         <source>Hold the phone up to the code it shows</source>
         <translation>把這部電話對準它顯示的碼</translation>
     </message>
+    <message>
+        <source>Enter the code instead</source>
+        <translation>改為輸入代碼</translation>
+    </message>
+    <message>
+        <source>Code from the other device</source>
+        <translation>另一部裝置上的代碼</translation>
+    </message>
+    <message>
+        <source>Take the profile over</source>
+        <translation>接收個人檔案</translation>
+    </message>
 </context>
 <context>
     <name>ScanView</name>
@@ -1164,18 +1176,6 @@
     <message>
         <source>Markdown</source>
         <translation>Markdown</translation>
-    </message>
-    <message>
-        <source>How a message written with *stars* and `backticks` is shown.</source>
-        <translation>用*星號*和`反引號`寫的訊息如何顯示。</translation>
-    </message>
-    <message>
-        <source>Drawn: bold, italics, links</source>
-        <translation>呈現：粗體、斜體、連結</translation>
-    </message>
-    <message>
-        <source>As written</source>
-        <translation>照原樣</translation>
     </message>
     <message>
         <source>Auto-download attachments</source>
@@ -1279,6 +1279,10 @@
     <message>
         <source>Off, the return key starts a new line, the message field grows with what is written, and the send button sends.</source>
         <translation>關閉時，Enter 鍵換行，訊息輸入框隨內容加高，由傳送按鈕傳送。</translation>
+    </message>
+    <message>
+        <source>On, a message written with *stars* and `backticks` is shown with the bold, the italics and the links drawn. Off, it is shown exactly as it was written.</source>
+        <translation>開啟時，用 *星號* 和 `反引號` 寫的訊息會呈現粗體、斜體和連結。關閉時，完全照原樣顯示。</translation>
     </message>
 </context>
 <context>

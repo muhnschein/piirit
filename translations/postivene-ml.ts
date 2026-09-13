@@ -1081,6 +1081,18 @@
         <source>Hold the phone up to the code it shows</source>
         <translation>അത് കാണിക്കുന്ന കോഡിന് നേരെ ഈ ഫോൺ പിടിക്കുക</translation>
     </message>
+    <message>
+        <source>Enter the code instead</source>
+        <translation>പകരം കോഡ് നൽകുക</translation>
+    </message>
+    <message>
+        <source>Code from the other device</source>
+        <translation>മറ്റേ ഉപകരണത്തിലെ കോഡ്</translation>
+    </message>
+    <message>
+        <source>Take the profile over</source>
+        <translation>പ്രൊഫൈൽ ഏറ്റെടുക്കുക</translation>
+    </message>
 </context>
 <context>
     <name>ScanView</name>
@@ -1169,18 +1181,6 @@
     <message>
         <source>Markdown</source>
         <translation>Markdown</translation>
-    </message>
-    <message>
-        <source>How a message written with *stars* and `backticks` is shown.</source>
-        <translation>*നക്ഷത്രങ്ങളും* `ബാക്ക്ടിക്കുകളും` ഉപയോഗിച്ച് എഴുതിയ സന്ദേശം എങ്ങനെ കാണിക്കണം.</translation>
-    </message>
-    <message>
-        <source>Drawn: bold, italics, links</source>
-        <translation>അലങ്കരിച്ചത്: ബോൾഡ്, ഇറ്റാലിക്, ലിങ്കുകൾ</translation>
-    </message>
-    <message>
-        <source>As written</source>
-        <translation>എഴുതിയതുപോലെ</translation>
     </message>
     <message>
         <source>Auto-download attachments</source>
@@ -1284,6 +1284,10 @@
     <message>
         <source>Off, the return key starts a new line, the message field grows with what is written, and the send button sends.</source>
         <translation>ഓഫായിരിക്കുമ്പോൾ Enter കീ പുതിയ വരി തുടങ്ങുന്നു, സന്ദേശ ഫീൽഡ് എഴുതുന്നതിനൊപ്പം വളരുന്നു, അയയ്ക്കുന്നത് അയയ്ക്കുക ബട്ടണാണ്.</translation>
+    </message>
+    <message>
+        <source>On, a message written with *stars* and `backticks` is shown with the bold, the italics and the links drawn. Off, it is shown exactly as it was written.</source>
+        <translation>ഓൺ ആണെങ്കിൽ *നക്ഷത്രചിഹ്നങ്ങളും* `ബാക്ക്ടിക്കും` ഉപയോഗിച്ച് എഴുതിയ സന്ദേശം ബോൾഡ്, ഇറ്റാലിക്, ലിങ്കുകൾ എന്നിവ അലങ്കരിച്ച് കാണിക്കും. ഓഫ് ആണെങ്കിൽ എഴുതിയതുപോലെ തന്നെ കാണിക്കും.</translation>
     </message>
 </context>
 <context>

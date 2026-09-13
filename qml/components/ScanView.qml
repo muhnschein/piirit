@@ -66,11 +66,29 @@ Item {
     /// take-over page.
     property string hintText: qsTr("Point the camera at someone's invite code")
 
-    /// Whether the link behind the code can be typed instead. An invite
-    /// is a link someone can send, so it can be; the code a device shows
-    /// while offering a profile carries an address and a one-time
-    /// secret, which nobody reads off a screen and types.
+    /// Whether what the code carries can be typed or pasted instead.
+    /// Worth having wherever the reader can get at the text another way,
+    /// which is every camera in this app: a camera that will not read is
+    /// otherwise a dead end.
     property bool offerLink: true
+
+    /// What the typed half is called, since what the code carries
+    /// differs by host: an invite someone sent, or the string a device
+    /// shows beside the code it is offering its profile behind.
+    property string linkButtonText: qsTr("Enter invite link")
+    property string linkLabel: qsTr("Invite link")
+    property string linkPlaceholder: "https://i.delta.chat/..."
+    property string linkActionText: qsTr("Connect")
+
+    /// The starts of the things this host's code carries, lower case.
+    /// Only used to decide whether the clipboard is worth pasting into
+    /// the field; what the payload means is the core's call.
+    property var linkPrefixes: [
+        "https://i.delta.chat/",
+        "openpgp4fpr:",
+        "dcaccount:",
+        "dclogin:"
+    ]
 
     /// What was read or typed, once it is worth acting on.
     function found(text) {
@@ -93,15 +111,17 @@ Item {
         }
     }
 
-    /// Whether some text is one of the things a code carries, so the
-    /// clipboard is not pasted into the field when it holds a shopping
-    /// list. Only the prefixes: what the payload is is the core's call.
+    /// Whether some text is one of the things this host's code carries,
+    /// so the clipboard is not pasted into the field when it holds a
+    /// shopping list.
     function looksLikeInvite(text) {
         var trimmed = text.trim().toLowerCase()
-        return trimmed.indexOf("https://i.delta.chat/") === 0
-            || trimmed.indexOf("openpgp4fpr:") === 0
-            || trimmed.indexOf("dcaccount:") === 0
-            || trimmed.indexOf("dclogin:") === 0
+        for (var i = 0; i < root.linkPrefixes.length; i++) {
+            if (trimmed.indexOf(root.linkPrefixes[i].toLowerCase()) === 0) {
+                return true
+            }
+        }
+        return false
     }
 
     function useLink() {
@@ -128,6 +148,67 @@ Item {
             focusMode: Camera.FocusContinuous
             focusPointMode: Camera.FocusPointAuto
         }
+        // The resolution is picked as soon as the camera can say what it
+        // has, which is before it goes active.
+        onCameraStatusChanged: root.chooseViewfinder()
+    }
+
+    /// The long side this view wants from the camera and from a grab.
+    ///
+    /// A decoder reads a symbol out of the pixels each module lands in,
+    /// and wants three or four of them across a module to tell one from
+    /// its neighbour. The code a device shows while offering a profile
+    /// carries an address and a one-time secret, so it is a dense symbol
+    /// -- around seventy modules across with its quiet zone. At 640 a
+    /// code filling half the frame put under three pixels in a module
+    /// and would not read at all; the room here is what makes that
+    /// closer to six.
+    readonly property int wantedLongSide: 1280
+
+    /// Set once the camera has been asked for a resolution, so a status
+    /// change later does not ask again.
+    property bool viewfinderChosen: false
+
+    /// Ask the camera for the smallest viewfinder that is still big
+    /// enough, or the biggest it has when none of them are.
+    ///
+    /// Asked for rather than assumed: the platform's own default is
+    /// whatever is cheapest to run, and no grab can put back detail the
+    /// camera never captured. Guarded all the way down, because a
+    /// camera that cannot answer should leave the view working on
+    /// whatever it does give.
+    function chooseViewfinder() {
+        if (root.viewfinderChosen
+                || typeof camera.supportedViewfinderResolutions !== "function") {
+            return
+        }
+        var offered = camera.supportedViewfinderResolutions()
+        if (!offered || offered.length === 0) {
+            return
+        }
+        var enough = null
+        var largest = null
+        for (var i = 0; i < offered.length; i++) {
+            var size = offered[i]
+            var longest = Math.max(size.width, size.height)
+            if (longest <= 0) {
+                continue
+            }
+            if (!largest || longest > Math.max(largest.width, largest.height)) {
+                largest = size
+            }
+            if (longest >= root.wantedLongSide
+                    && (!enough
+                        || longest < Math.max(enough.width, enough.height))) {
+                enough = size
+            }
+        }
+        var pick = enough || largest
+        if (!pick) {
+            return
+        }
+        camera.viewfinder.resolution = Qt.size(pick.width, pick.height)
+        root.viewfinderChosen = true
     }
 
     // An autofocus run, for a camera that does not run one on its own.
@@ -150,20 +231,27 @@ Item {
     }
 
     // The camera runs only while this view is the one on screen.
+    //
+    // The resolution is asked for here as well as on a status change: a
+    // camera that is already loaded has nothing left to change, and one
+    // that is not answers with nothing until it is. Whichever comes
+    // first settles it.
     onActiveChanged: {
         if (root.active && !root.done) {
+            root.chooseViewfinder()
             camera.start()
         } else {
             camera.stop()
         }
     }
 
-    /// The long side of a grabbed frame, in pixels.
+    /// The long side of a grabbed frame: the same as the viewfinder's,
+    /// since grabbing smaller throws away the detail just asked for.
     ///
-    /// Grabbed small because a code fills a good part of the frame when
-    /// someone is holding a phone up to it, and a third of the pixels
-    /// decode in a ninth of the time.
-    readonly property int grabLongSide: 640
+    /// It costs decode time, which the grabber already handles: the next
+    /// frame is taken only once the last has been read, so a slower
+    /// decode scans a little less often rather than queueing up.
+    readonly property int grabLongSide: root.wantedLongSide
 
     /// That long side, in the viewfinder's own shape. A grab to a fixed
     /// square stretches the modules by whatever the viewfinder is not
@@ -193,6 +281,7 @@ Item {
             }
             viewfinder.grabToImage(function(result) {
                 if (result.saveToFile(path)) {
+                    root.framesTried += 1
                     scanner.decode(path)
                 }
             }, root.grabSize())
@@ -204,6 +293,11 @@ Item {
         objectName: "viewfinder"
         anchors.fill: parent
         source: camera
+        // Filled rather than fitted. Fitted leaves bars down the sides
+        // of a tall view, and those bars are grabbed and decoded along
+        // with the picture -- pixels the code does not get. It also
+        // means what the reader sees is what is being read.
+        fillMode: VideoOutput.PreserveAspectCrop
 
         // Tap to focus on what is under the finger.
         MouseArea {
@@ -225,6 +319,26 @@ Item {
         size: BusyIndicatorSize.Large
     }
 
+    /// How many frames have been read and found nothing. Shown as a
+    /// spinner rather than a number: what the reader needs to know is
+    /// that the app is looking, not how hard.
+    property int framesTried: 0
+
+    // Beside the line at the foot, so a reader holding the phone still
+    // can see that something is happening. A code that reads at once
+    // never gives it time to matter; one that does not is exactly when
+    // it does.
+    BusyIndicator {
+        objectName: "looking"
+        anchors {
+            right: hint.left
+            rightMargin: Theme.paddingMedium
+            verticalCenter: hint.verticalCenter
+        }
+        running: root.active && !root.done && root.framesTried > 0
+        size: BusyIndicatorSize.Small
+    }
+
     // The other way in, where a thumb finds it: a button under the
     // viewfinder that opens the panel for the link the code would carry,
     // typed or pasted. Over the viewfinder rather than instead of it.
@@ -237,7 +351,7 @@ Item {
             bottom: hint.top
             bottomMargin: Theme.paddingMedium
         }
-        text: qsTr("Enter invite link")
+        text: root.linkButtonText
         onClicked: root.typeLink()
     }
 
@@ -266,8 +380,8 @@ Item {
                     top: parent.top
                     topMargin: Theme.paddingMedium
                 }
-                label: qsTr("Invite link")
-                placeholderText: "https://i.delta.chat/..."
+                label: root.linkLabel
+                placeholderText: root.linkPlaceholder
                 inputMethodHints: Qt.ImhNoAutoUppercase | Qt.ImhNoPredictiveText
             }
 
@@ -278,7 +392,7 @@ Item {
                     horizontalCenter: parent.horizontalCenter
                     top: linkField.bottom
                 }
-                text: qsTr("Connect")
+                text: root.linkActionText
                 enabled: linkField.text.trim().length > 0
                 onClicked: root.useLink()
             }

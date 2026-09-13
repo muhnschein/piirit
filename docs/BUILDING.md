@@ -220,17 +220,14 @@ two-hundred-line log the summary is what anyone reads.
 
 The onboarding screens draw pictures rather than laying out avatars
 (`docs/PROJECT.md`), and the pictures live in `qml/art/`: two masks for
-the field of faces, one per orientation, painted by
-`tools/faces/faces.py`, and one per fact of the introduction, painted by
-`tools/faces/scenes.py` with the same rasteriser. All of them are
-**committed**: like the compiled catalogs they are generated but tracked,
-so a build needs neither the painters nor a display. `make faces`
-repaints them all -- Python 3 and its standard library, nothing to
-install -- and both painters are deterministic, so the art changes only
-when they do. Run it when a painter changes, look at what it wrote (the
-masks are red and green on black; the app tints them), and commit the
-result. `tests/qml_welcome.rs` and `tests/qml_intro.rs` check that they
-are there in the shape the shaders read.
+the field of faces, one per orientation, and one per fact of the
+introduction. They are **committed**, so a build needs no painter and no
+display, and they are edited as pictures: each is two channels of an
+8-bit RGB PNG, red for what the primary colour draws and green for what
+the highlight draws, which the shaders tint against the ambience.
+`tests/qml_welcome.rs` and `tests/qml_intro.rs` check that they are
+there in the shape the shaders read, by shape rather than by exact size,
+so the art can be redrawn without editing a test.
 
 ## Translations
 

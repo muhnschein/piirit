@@ -296,10 +296,11 @@ fn a_profile_that_exists_already_is_asked_after_and_brought_over() {
         record(&s, "device-page", call!("pageProperty", "height"));
         record(&s, "device-link", call!("viewProperty", "offerLink"));
         record(&s, "device-hint", call!("get", "hint", "text"));
+        record(&s, "device-typed", call!("get", "typeLinkButton", "text"));
         record(
             &s,
-            "device-typed",
-            call!("get", "typeLinkButton", "visible"),
+            "device-field",
+            call!("get", "linkField", "placeholderText"),
         );
         record(
             &s,
@@ -388,6 +389,14 @@ fn assert_pages(steps: &[(String, String)], navigation: &str) {
         "the device half offers the file browser as well. {context}"
     );
 
+    assert_device_half(steps, &context);
+}
+
+/// The half that reads a code: the camera has the page down to its
+/// foot, the view is worded for what it is actually looking for, the
+/// same string can be typed when a camera will not read it, and a code
+/// the shim refuses comes back as a sentence.
+fn assert_device_half(steps: &[(String, String)], context: &str) {
     // The camera runs to the foot of the page, as it does on the QR
     // page. Asked of where the viewfinder ends rather than of how tall
     // it is: a page laid out on a phone puts a header and a line of
@@ -403,17 +412,24 @@ fn assert_pages(steps: &[(String, String)], navigation: &str) {
         page - foot
     );
 
+    // A camera that will not read is a dead end without this, and the
+    // other device shows the same string as text beside its code.
     assert_eq!(
         value_of(steps, "device-link"),
-        "false",
-        "the take-over scanner offers to have the code typed, which \
-         nobody does: it carries an address and a one-time secret. \
+        "true",
+        "the take-over scanner gives a reader no way past a camera that \
+         will not read the code. {context}"
+    );
+    let typed = value_of(steps, "device-typed");
+    assert!(
+        !typed.to_lowercase().contains("invite"),
+        "the typed half is still worded for an invite: {typed:?}. \
          {context}"
     );
     assert_eq!(
-        value_of(steps, "device-typed"),
-        "false",
-        "the button for typing the link is up anyway. {context}"
+        value_of(steps, "device-field"),
+        "DCBACKUP2:...",
+        "the field does not show what it is waiting for. {context}"
     );
     let hint = value_of(steps, "device-hint");
     assert!(

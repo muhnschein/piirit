@@ -330,9 +330,8 @@ deltachat-rpc-server (bundled binary, subprocess) = the entire core
   on, in a box the field clears for them. Nobody is known yet, so the
   faces are made up
   -- busts in discs and initials on discs, the two kinds of avatar the
-  app draws -- and they are painted ahead of time by `tools/faces/`
-  (`make faces`) into two masks in `qml/art/`, one per orientation,
-  rather than laid out on the phone: a screenful of the cover's avatars
+  app draws -- and they are drawn ahead of time into two masks in
+  `qml/art/`, one per orientation, rather than laid out on the phone: a screenful of the cover's avatars
   is a hundred masked, desaturated, tinted textures, and a first
   impression cannot afford a frame of that, while a picture is one
   texture and one pass. The masks carry no colour: red is a grey face's
@@ -350,8 +349,8 @@ deltachat-rpc-server (bundled binary, subprocess) = the entire core
   profile made on the device, no directory to be found in, encryption
   that is simply always on, groups without an owner, a relay that only
   carries messages. They follow delta.chat's own FAQ with the technical
-  half left out, each over a drawing painted the way the faces are
-  (`tools/faces/scenes.py`, `components/InkArt.qml`), and a drag past
+  half left out, each over a drawing made the way the faces are
+  (`components/InkArt.qml`), and a drag past
   the last one goes on to the setup path rather than stopping -- a drag
   and nothing else, since turning the phone moves the view too and is
   not a reader asking for anything. "Set up my profile" goes there

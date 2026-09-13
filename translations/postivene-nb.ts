@@ -1081,6 +1081,18 @@
         <source>Hold the phone up to the code it shows</source>
         <translation>Hold denne telefonen mot koden den viser</translation>
     </message>
+    <message>
+        <source>Enter the code instead</source>
+        <translation>Skriv inn koden i stedet</translation>
+    </message>
+    <message>
+        <source>Code from the other device</source>
+        <translation>Kode fra den andre enheten</translation>
+    </message>
+    <message>
+        <source>Take the profile over</source>
+        <translation>Overta profilen</translation>
+    </message>
 </context>
 <context>
     <name>ScanView</name>
@@ -1169,18 +1181,6 @@
     <message>
         <source>Markdown</source>
         <translation>Markdown</translation>
-    </message>
-    <message>
-        <source>How a message written with *stars* and `backticks` is shown.</source>
-        <translation>Hvordan en melding skrevet med *stjerner* og `backticks` vises.</translation>
-    </message>
-    <message>
-        <source>Drawn: bold, italics, links</source>
-        <translation>Vist: fet, kursiv, lenker</translation>
-    </message>
-    <message>
-        <source>As written</source>
-        <translation>Som skrevet</translation>
     </message>
     <message>
         <source>Auto-download attachments</source>
@@ -1284,6 +1284,10 @@
     <message>
         <source>Off, the return key starts a new line, the message field grows with what is written, and the send button sends.</source>
         <translation>Avslått begynner Enter-tasten en ny linje, meldingsfeltet vokser med det som skrives, og send-knappen sender.</translation>
+    </message>
+    <message>
+        <source>On, a message written with *stars* and `backticks` is shown with the bold, the italics and the links drawn. Off, it is shown exactly as it was written.</source>
+        <translation>På vises en melding skrevet med *stjerner* og `bakoverfnutter` med fet, kursiv og lenker vist. Av vises den nøyaktig som den ble skrevet.</translation>
     </message>
 </context>
 <context>

@@ -1086,6 +1086,18 @@
         <source>Hold the phone up to the code it shows</source>
         <translation>Namiřte tento telefon na kód, který ukáže</translation>
     </message>
+    <message>
+        <source>Enter the code instead</source>
+        <translation>Zadat místo toho kód</translation>
+    </message>
+    <message>
+        <source>Code from the other device</source>
+        <translation>Kód z druhého zařízení</translation>
+    </message>
+    <message>
+        <source>Take the profile over</source>
+        <translation>Převzít profil</translation>
+    </message>
 </context>
 <context>
     <name>ScanView</name>
@@ -1174,18 +1186,6 @@
     <message>
         <source>Markdown</source>
         <translation>Markdown</translation>
-    </message>
-    <message>
-        <source>How a message written with *stars* and `backticks` is shown.</source>
-        <translation>Jak se zobrazí zpráva napsaná s *hvězdičkami* a `zpětnými apostrofy`.</translation>
-    </message>
-    <message>
-        <source>Drawn: bold, italics, links</source>
-        <translation>Vykreslené: tučně, kurzíva, odkazy</translation>
-    </message>
-    <message>
-        <source>As written</source>
-        <translation>Jak bylo napsáno</translation>
     </message>
     <message>
         <source>Auto-download attachments</source>
@@ -1289,6 +1289,10 @@
     <message>
         <source>Off, the return key starts a new line, the message field grows with what is written, and the send button sends.</source>
         <translation>Když je vypnuto, klávesa Enter začne nový řádek, pole zprávy roste s tím, co píšete, a odesílá tlačítko Odeslat.</translation>
+    </message>
+    <message>
+        <source>On, a message written with *stars* and `backticks` is shown with the bold, the italics and the links drawn. Off, it is shown exactly as it was written.</source>
+        <translation>Zapnuto se zpráva psaná s *hvězdičkami* a `zpětnými apostrofy` zobrazí s vykresleným tučným písmem, kurzívou a odkazy. Vypnuto se zobrazí přesně tak, jak byla napsána.</translation>
     </message>
 </context>
 <context>

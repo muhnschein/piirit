@@ -1076,6 +1076,18 @@
         <source>Hold the phone up to the code it shows</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Enter the code instead</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Code from the other device</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Take the profile over</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ScanView</name>
@@ -1163,18 +1175,6 @@
     </message>
     <message>
         <source>Markdown</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>How a message written with *stars* and `backticks` is shown.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Drawn: bold, italics, links</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>As written</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1278,6 +1278,10 @@
     </message>
     <message>
         <source>Off, the return key starts a new line, the message field grows with what is written, and the send button sends.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>On, a message written with *stars* and `backticks` is shown with the bold, the italics and the links drawn. Off, it is shown exactly as it was written.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

@@ -1081,6 +1081,18 @@
         <source>Hold the phone up to the code it shows</source>
         <translation>ಅದು ತೋರಿಸುವ ಕೋಡ್‌ಗೆ ಈ ಫೋನನ್ನು ಹಿಡಿಯಿರಿ</translation>
     </message>
+    <message>
+        <source>Enter the code instead</source>
+        <translation>ಬದಲಿಗೆ ಕೋಡ್ ನಮೂದಿಸಿ</translation>
+    </message>
+    <message>
+        <source>Code from the other device</source>
+        <translation>ಇನ್ನೊಂದು ಸಾಧನದ ಕೋಡ್</translation>
+    </message>
+    <message>
+        <source>Take the profile over</source>
+        <translation>ಪ್ರೊಫೈಲ್ ಪಡೆಯಿರಿ</translation>
+    </message>
 </context>
 <context>
     <name>ScanView</name>
@@ -1169,18 +1181,6 @@
     <message>
         <source>Markdown</source>
         <translation>Markdown</translation>
-    </message>
-    <message>
-        <source>How a message written with *stars* and `backticks` is shown.</source>
-        <translation>*ನಕ್ಷತ್ರಗಳು* ಮತ್ತು `ಬ್ಯಾಕ್‌ಟಿಕ್‌ಗಳಿಂದ` ಬರೆದ ಸಂದೇಶವನ್ನು ಹೇಗೆ ತೋರಿಸಬೇಕು.</translation>
-    </message>
-    <message>
-        <source>Drawn: bold, italics, links</source>
-        <translation>ಅಲಂಕರಿಸಿದ: ದಪ್ಪ, ಓರೆ, ಲಿಂಕ್‌ಗಳು</translation>
-    </message>
-    <message>
-        <source>As written</source>
-        <translation>ಬರೆದಂತೆಯೇ</translation>
     </message>
     <message>
         <source>Auto-download attachments</source>
@@ -1284,6 +1284,10 @@
     <message>
         <source>Off, the return key starts a new line, the message field grows with what is written, and the send button sends.</source>
         <translation>ಆಫ್ ಆಗಿದ್ದಾಗ Enter ಕೀ ಹೊಸ ಸಾಲನ್ನು ಪ್ರಾರಂಭಿಸುತ್ತದೆ, ಸಂದೇಶ ಕ್ಷೇತ್ರ ಬರೆದಂತೆ ಬೆಳೆಯುತ್ತದೆ ಮತ್ತು ಕಳುಹಿಸು ಬಟನ್ ಕಳುಹಿಸುತ್ತದೆ.</translation>
+    </message>
+    <message>
+        <source>On, a message written with *stars* and `backticks` is shown with the bold, the italics and the links drawn. Off, it is shown exactly as it was written.</source>
+        <translation>ಆನ್ ಆಗಿದ್ದರೆ *ನಕ್ಷತ್ರ* ಮತ್ತು `ಬ್ಯಾಕ್‌ಟಿಕ್` ಬಳಸಿ ಬರೆದ ಸಂದೇಶವನ್ನು ದಪ್ಪ, ಓರೆ ಮತ್ತು ಲಿಂಕ್‌ಗಳನ್ನು ಅಲಂಕರಿಸಿ ತೋರಿಸಲಾಗುತ್ತದೆ. ಆಫ್ ಆಗಿದ್ದರೆ ಬರೆದಂತೆಯೇ ತೋರಿಸಲಾಗುತ್ತದೆ.</translation>
     </message>
 </context>
 <context>

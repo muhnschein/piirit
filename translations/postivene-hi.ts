@@ -1081,6 +1081,18 @@
         <source>Hold the phone up to the code it shows</source>
         <translation>वह जो कोड दिखाए, उसके सामने यह फ़ोन रखिए</translation>
     </message>
+    <message>
+        <source>Enter the code instead</source>
+        <translation>इसके बजाय कोड दर्ज करें</translation>
+    </message>
+    <message>
+        <source>Code from the other device</source>
+        <translation>दूसरे उपकरण का कोड</translation>
+    </message>
+    <message>
+        <source>Take the profile over</source>
+        <translation>प्रोफ़ाइल लें</translation>
+    </message>
 </context>
 <context>
     <name>ScanView</name>
@@ -1169,18 +1181,6 @@
     <message>
         <source>Markdown</source>
         <translation>Markdown</translation>
-    </message>
-    <message>
-        <source>How a message written with *stars* and `backticks` is shown.</source>
-        <translation>*तारों* और `बैकटिक` से लिखा संदेश कैसे दिखाया जाए।</translation>
-    </message>
-    <message>
-        <source>Drawn: bold, italics, links</source>
-        <translation>सजाया हुआ: बोल्ड, तिरछा, लिंक</translation>
-    </message>
-    <message>
-        <source>As written</source>
-        <translation>जैसा लिखा गया</translation>
     </message>
     <message>
         <source>Auto-download attachments</source>
@@ -1284,6 +1284,10 @@
     <message>
         <source>Off, the return key starts a new line, the message field grows with what is written, and the send button sends.</source>
         <translation>बंद होने पर Enter कुंजी नई पंक्ति शुरू करती है, संदेश क्षेत्र लिखे हुए के साथ बढ़ता है और भेजें बटन भेजता है।</translation>
+    </message>
+    <message>
+        <source>On, a message written with *stars* and `backticks` is shown with the bold, the italics and the links drawn. Off, it is shown exactly as it was written.</source>
+        <translation>चालू रहने पर *तारांकन* और `बैकटिक` से लिखा संदेश बोल्ड, तिरछे और लिंक सजाकर दिखाया जाता है। बंद रहने पर वह जैसा लिखा गया वैसा ही दिखता है।</translation>
     </message>
 </context>
 <context>

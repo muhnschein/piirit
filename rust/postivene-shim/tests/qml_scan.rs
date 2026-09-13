@@ -98,6 +98,26 @@ const PROBE_QML: &str = r"
             var size = loader.item.grabSize()
             return size.width + 'x' + size.height
         }
+        function cameraOf() {
+            return loader.item ? findIn(loader.item, 'camera') : null
+        }
+        // What the view asked the camera to run its viewfinder at.
+        function askedResolution() {
+            var camera = cameraOf()
+            if (!camera) { return 'no-camera' }
+            return camera.viewfinder.resolution.width + 'x'
+                 + camera.viewfinder.resolution.height
+        }
+        // A camera that cannot say what it has: the view must leave it
+        // alone rather than ask for a size it never offered.
+        function offerNothing() {
+            var camera = cameraOf()
+            if (!camera) { return 'no-camera' }
+            camera.viewfinderResolutions = []
+            loader.item.viewfinderChosen = false
+            loader.item.chooseViewfinder()
+            return 'ok'
+        }
         function decode(path) {
             var scanner = findIn(loader.item, 'scanner')
             if (!scanner) { return 'missing:scanner' }
@@ -261,12 +281,17 @@ fn a_code_held_up_to_the_page_comes_back_as_its_text() {
         // A frame is grabbed in the viewfinder's own shape, with its
         // long side capped, and a viewfinder smaller than the cap is
         // taken as it is rather than blown up.
-        call!("sizeView", QString::from("540"), QString::from("800"));
+        call!("sizeView", QString::from("1080"), QString::from("1920"));
         record!("grab-tall", call!("grabShape"));
-        call!("sizeView", QString::from("800"), QString::from("540"));
+        call!("sizeView", QString::from("1920"), QString::from("1080"));
         record!("grab-wide", call!("grabShape"));
-        call!("sizeView", QString::from("300"), QString::from("200"));
+        call!("sizeView", QString::from("540"), QString::from("800"));
         record!("grab-small", call!("grabShape"));
+        // The camera was asked for a viewfinder big enough to read a
+        // dense code out of, and is left alone when it offers nothing.
+        record!("asked", call!("askedResolution"));
+        record!("offer-nothing", call!("offerNothing"));
+        record!("asked-after", call!("askedResolution"));
         (*engine_ptr).quit();
     });
 
@@ -318,25 +343,46 @@ fn assert_typed(steps: &[(&str, String)]) {
         TYPED,
         "the typed link was not handed back the way a scanned code is. {context}"
     );
-    // 640 on the long side, the short one in proportion. A square grab
+    // 1280 on the long side, the short one in proportion. A square grab
     // of an oblong viewfinder stretches the modules, and a decoder
     // reading a square symbol as an oblong one has that much less to
     // work with.
     assert_eq!(
         value("grab-tall"),
-        "432x640",
+        "720x1280",
         "a tall viewfinder was not grabbed in its own shape. {context}"
     );
     assert_eq!(
         value("grab-wide"),
-        "640x432",
+        "1280x720",
         "a wide viewfinder was not grabbed in its own shape. {context}"
     );
     assert_eq!(
         value("grab-small"),
-        "300x200",
+        "540x800",
         "a viewfinder smaller than the cap was blown up, which invents \
          no detail. {context}"
+    );
+
+    // The smallest the camera offers that is still big enough. 640x480
+    // is the kind of default a platform hands out and is too coarse for
+    // a dense code; 1920x1440 is more frames than are needed.
+    assert_eq!(
+        value("asked"),
+        "1280x960",
+        "the view did not ask the camera for a viewfinder big enough to \
+         read a dense code out of. {context}"
+    );
+    assert_eq!(
+        value("offer-nothing"),
+        "ok",
+        "the camera could not be emptied of resolutions. {context}"
+    );
+    assert_eq!(
+        value("asked-after"),
+        "1280x960",
+        "a camera that offers no resolutions was asked for one anyway, \
+         which leaves the view running on a size it never had. {context}"
     );
     assert_eq!(
         value("typed-camera"),

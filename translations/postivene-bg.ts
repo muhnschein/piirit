@@ -1081,6 +1081,18 @@
         <source>Hold the phone up to the code it shows</source>
         <translation>Насочете този телефон към кода, който се показва</translation>
     </message>
+    <message>
+        <source>Enter the code instead</source>
+        <translation>Въвеждане на кода вместо това</translation>
+    </message>
+    <message>
+        <source>Code from the other device</source>
+        <translation>Код от другото устройство</translation>
+    </message>
+    <message>
+        <source>Take the profile over</source>
+        <translation>Поемане на профила</translation>
+    </message>
 </context>
 <context>
     <name>ScanView</name>
@@ -1169,18 +1181,6 @@
     <message>
         <source>Markdown</source>
         <translation>Markdown</translation>
-    </message>
-    <message>
-        <source>How a message written with *stars* and `backticks` is shown.</source>
-        <translation>Как се показва съобщение, написано със *звездички* и `обратни кавички`.</translation>
-    </message>
-    <message>
-        <source>Drawn: bold, italics, links</source>
-        <translation>Оформено: удебелен, курсив, връзки</translation>
-    </message>
-    <message>
-        <source>As written</source>
-        <translation>Както е написано</translation>
     </message>
     <message>
         <source>Auto-download attachments</source>
@@ -1284,6 +1284,10 @@
     <message>
         <source>Off, the return key starts a new line, the message field grows with what is written, and the send button sends.</source>
         <translation>Изключено: клавишът Enter започва нов ред, полето за съобщение расте с написаното, а бутонът за изпращане изпраща.</translation>
+    </message>
+    <message>
+        <source>On, a message written with *stars* and `backticks` is shown with the bold, the italics and the links drawn. Off, it is shown exactly as it was written.</source>
+        <translation>Включено, съобщение, написано със *звездички* и `обратни апострофи`, се показва с оформени удебелен текст, курсив и връзки. Изключено, показва се точно както е написано.</translation>
     </message>
 </context>
 <context>

@@ -204,10 +204,7 @@ fn the_settings_page_writes_what_the_app_reads() {
             "markdown-default",
             call!("appReads", QString::from("markdownMode"))
         );
-        record!("markdown-index", get!("markdownCombo", "currentIndex"));
-        // Two choices, drawn or as written: the one that took the
-        // markers out is gone.
-        record!("markdown-third", get!("markdownOption2", "text"));
+        record!("markdown-switch", get!("markdownSwitch", "checked"));
         record!(
             "download-default",
             call!("appReads", QString::from("downloadLimit"))
@@ -257,13 +254,13 @@ fn the_settings_page_writes_what_the_app_reads() {
         record!("enter-off", call!("appReads", QString::from("enterSends")));
         record!(
             "pick-markdown",
-            call!("click", QString::from("markdownOption1"))
+            call!("click", QString::from("markdownSwitch"))
         );
         record!(
             "markdown-picked",
             call!("appReads", QString::from("markdownMode"))
         );
-        record!("markdown-shown", get!("markdownCombo", "currentIndex"));
+        record!("markdown-shown", get!("markdownSwitch", "checked"));
         record!(
             "pick-download",
             call!("click", QString::from("downloadOption32768"))
@@ -357,7 +354,7 @@ fn the_settings_page_writes_what_the_app_reads() {
             "app-write",
             call!("appWrites", QString::from("markdownMode"), 2)
         );
-        record!("page-follows", get!("markdownCombo", "currentIndex"));
+        record!("page-follows", get!("markdownSwitch", "checked"));
         record!(
             "app-write-deletion",
             call!("appWrites", QString::from("deleteDeviceAfter"), 604_800)
@@ -397,8 +394,7 @@ fn the_settings_page_writes_what_the_app_reads() {
         ("flip-enter-back", "ok"),
         ("enter-off", "false"),
         ("markdown-default", "0"),
-        ("markdown-index", "0"),
-        ("markdown-third", "missing:markdownOption2"),
+        ("markdown-switch", "true"),
         ("download-default", "1048576"),
         ("download-index", "3"),
         ("deletion-default", "0"),
@@ -408,7 +404,7 @@ fn the_settings_page_writes_what_the_app_reads() {
         ("links-switch", "false"),
         ("pick-markdown", "ok"),
         ("markdown-picked", "1"),
-        ("markdown-shown", "1"),
+        ("markdown-shown", "false"),
         ("pick-download", "ok"),
         ("download-picked", "32768"),
         ("download-shown", "0"),
@@ -461,7 +457,7 @@ fn the_settings_page_writes_what_the_app_reads() {
         ("deletion-unwritten", "0"),
         ("deletion-shown", "0"),
         ("app-write", "ok"),
-        ("page-follows", "1"),
+        ("page-follows", "false"),
         ("app-write-deletion", "ok"),
         ("deletion-follows", "3"),
     ] {

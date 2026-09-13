@@ -1081,6 +1081,18 @@
         <source>Hold the phone up to the code it shows</source>
         <translation>అది చూపే కోడ్‌కు ఈ ఫోన్‌ను చూపండి</translation>
     </message>
+    <message>
+        <source>Enter the code instead</source>
+        <translation>బదులుగా కోడ్ నమోదు చేయి</translation>
+    </message>
+    <message>
+        <source>Code from the other device</source>
+        <translation>మరో పరికరం నుండి కోడ్</translation>
+    </message>
+    <message>
+        <source>Take the profile over</source>
+        <translation>ప్రొఫైల్ తీసుకో</translation>
+    </message>
 </context>
 <context>
     <name>ScanView</name>
@@ -1169,18 +1181,6 @@
     <message>
         <source>Markdown</source>
         <translation>Markdown</translation>
-    </message>
-    <message>
-        <source>How a message written with *stars* and `backticks` is shown.</source>
-        <translation>*నక్షత్రాలు* మరియు `బ్యాక్‌టిక్‌లు`తో రాసిన సందేశం ఎలా చూపబడుతుంది.</translation>
-    </message>
-    <message>
-        <source>Drawn: bold, italics, links</source>
-        <translation>అలంకరించినది: బోల్డ్, ఇటాలిక్, లింక్‌లు</translation>
-    </message>
-    <message>
-        <source>As written</source>
-        <translation>రాసినట్లుగానే</translation>
     </message>
     <message>
         <source>Auto-download attachments</source>
@@ -1284,6 +1284,10 @@
     <message>
         <source>Off, the return key starts a new line, the message field grows with what is written, and the send button sends.</source>
         <translation>ఆఫ్‌లో ఉంటే Enter కీ కొత్త పంక్తిని మొదలుపెడుతుంది, సందేశ ఫీల్డ్ రాసినదానితో పెరుగుతుంది, పంపు బటన్ పంపుతుంది.</translation>
+    </message>
+    <message>
+        <source>On, a message written with *stars* and `backticks` is shown with the bold, the italics and the links drawn. Off, it is shown exactly as it was written.</source>
+        <translation>ఆన్ ఉంటే *నక్షత్రాలు* మరియు `బ్యాక్‌టిక్‌`లతో రాసిన సందేశం బోల్డ్, ఇటాలిక్, లింక్‌లు అలంకరించి చూపబడుతుంది. ఆఫ్ ఉంటే రాసినట్లుగానే చూపబడుతుంది.</translation>
     </message>
 </context>
 <context>

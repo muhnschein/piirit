@@ -1081,6 +1081,18 @@
         <source>Hold the phone up to the code it shows</source>
         <translation>Houd deze telefoon voor de code die het toont</translation>
     </message>
+    <message>
+        <source>Enter the code instead</source>
+        <translation>Voer in plaats daarvan de code in</translation>
+    </message>
+    <message>
+        <source>Code from the other device</source>
+        <translation>Code van het andere apparaat</translation>
+    </message>
+    <message>
+        <source>Take the profile over</source>
+        <translation>Profiel overnemen</translation>
+    </message>
 </context>
 <context>
     <name>ScanView</name>
@@ -1169,18 +1181,6 @@
     <message>
         <source>Markdown</source>
         <translation>Markdown</translation>
-    </message>
-    <message>
-        <source>How a message written with *stars* and `backticks` is shown.</source>
-        <translation>Hoe een bericht met *sterretjes* en `backticks` wordt getoond.</translation>
-    </message>
-    <message>
-        <source>Drawn: bold, italics, links</source>
-        <translation>Opgemaakt: vet, cursief, links</translation>
-    </message>
-    <message>
-        <source>As written</source>
-        <translation>Zoals geschreven</translation>
     </message>
     <message>
         <source>Auto-download attachments</source>
@@ -1284,6 +1284,10 @@
     <message>
         <source>Off, the return key starts a new line, the message field grows with what is written, and the send button sends.</source>
         <translation>Uit: de Enter-toets begint een nieuwe regel, het berichtveld groeit met wat er staat, en de verzendknop verstuurt.</translation>
+    </message>
+    <message>
+        <source>On, a message written with *stars* and `backticks` is shown with the bold, the italics and the links drawn. Off, it is shown exactly as it was written.</source>
+        <translation>Aan wordt een bericht geschreven met *sterretjes* en `backticks` getoond met vet, cursief en links opgemaakt. Uit wordt het precies zo getoond als het geschreven is.</translation>
     </message>
 </context>
 <context>

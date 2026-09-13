@@ -1081,6 +1081,18 @@
         <source>Hold the phone up to the code it shows</source>
         <translation>Aponte este telefone ao código que aparecer</translation>
     </message>
+    <message>
+        <source>Enter the code instead</source>
+        <translation>Introduzir antes o código</translation>
+    </message>
+    <message>
+        <source>Code from the other device</source>
+        <translation>Código do outro dispositivo</translation>
+    </message>
+    <message>
+        <source>Take the profile over</source>
+        <translation>Trazer o perfil</translation>
+    </message>
 </context>
 <context>
     <name>ScanView</name>
@@ -1169,18 +1181,6 @@
     <message>
         <source>Markdown</source>
         <translation>Markdown</translation>
-    </message>
-    <message>
-        <source>How a message written with *stars* and `backticks` is shown.</source>
-        <translation>Como é mostrada uma mensagem escrita com *asteriscos* e `acentos graves`.</translation>
-    </message>
-    <message>
-        <source>Drawn: bold, italics, links</source>
-        <translation>Formatado: negrito, itálico, ligações</translation>
-    </message>
-    <message>
-        <source>As written</source>
-        <translation>Tal como escrito</translation>
     </message>
     <message>
         <source>Auto-download attachments</source>
@@ -1284,6 +1284,10 @@
     <message>
         <source>Off, the return key starts a new line, the message field grows with what is written, and the send button sends.</source>
         <translation>Desligado, a tecla Enter começa uma nova linha, o campo da mensagem cresce com o que é escrito e é o botão de enviar que envia.</translation>
+    </message>
+    <message>
+        <source>On, a message written with *stars* and `backticks` is shown with the bold, the italics and the links drawn. Off, it is shown exactly as it was written.</source>
+        <translation>Ligado, uma mensagem escrita com *asteriscos* e `plicas invertidas` é mostrada com o negrito, o itálico e as ligações formatados. Desligado, é mostrada tal como foi escrita.</translation>
     </message>
 </context>
 <context>

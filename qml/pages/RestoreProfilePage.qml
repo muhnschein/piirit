@@ -116,9 +116,116 @@ Page {
         }
     }
 
+    // The device half is a camera and nothing else: a code is read out
+    // of the pixels it lands in, so the picture gets the page and the
+    // words go over it. The file half has nothing to look at and keeps
+    // an ordinary page, below.
+    Item {
+        id: scanArea
+        objectName: "scanArea"
+        anchors.fill: parent
+        visible: page.fromDevice && !page.busy
+
+        // Loaded by URL, as the QR page loads it: a phone without a
+        // camera should lose the scanner rather than the page.
+        Loader {
+            id: scanLoader
+            objectName: "scanLoader"
+            anchors.fill: parent
+            active: page.fromDevice
+            source: Qt.resolvedUrl("../components/ScanView.qml")
+            onLoaded: {
+                scanLoader.item.hintText =
+                    qsTr("Hold the phone up to the code it shows")
+                // The same string the code carries, for a reader whose
+                // camera will not read it -- the other device shows it
+                // as text beside the code, and it can be sent over.
+                scanLoader.item.linkButtonText = qsTr("Enter the code instead")
+                scanLoader.item.linkLabel = qsTr("Code from the other device")
+                scanLoader.item.linkPlaceholder = "DCBACKUP2:..."
+                scanLoader.item.linkActionText = qsTr("Take the profile over")
+                scanLoader.item.linkPrefixes = ["dcbackup:", "dcbackup2:"]
+                scanLoader.item.scanned.connect(page.begin)
+                scanLoader.item.failed.connect(function(message) {
+                    page.errorMessage = message
+                })
+            }
+        }
+
+        // The camera runs while this page is on screen and there is
+        // nothing to read any more once a transfer is under way.
+        Binding {
+            target: scanLoader.item
+            property: "active"
+            value: page.status === PageStatus.Active && page.fromDevice
+                   && !page.busy
+        }
+
+        Label {
+            objectName: "noCamera"
+            visible: scanLoader.status === Loader.Error
+            anchors.centerIn: parent
+            width: parent.width - 2 * Theme.horizontalPageMargin
+            horizontalAlignment: Text.AlignHCenter
+            wrapMode: Text.Wrap
+            color: Theme.secondaryHighlightColor
+            text: qsTr("The camera is not available on this device. A backup file works without one.")
+        }
+
+        // Over the picture rather than above it. A reader still has to
+        // be told what to do on the other device, and this is the only
+        // thing worth taking room from the code for -- so it is a strip
+        // the video runs behind, not a block the video starts under.
+        Rectangle {
+            id: deviceChrome
+            objectName: "deviceChrome"
+            anchors {
+                left: parent.left
+                right: parent.right
+                top: parent.top
+            }
+            height: deviceWords.height + 2 * Theme.paddingLarge
+            color: Theme.rgba(Theme.highlightDimmerColor, 0.8)
+
+            Column {
+                id: deviceWords
+                anchors {
+                    left: parent.left
+                    right: parent.right
+                    verticalCenter: parent.verticalCenter
+                    leftMargin: Theme.horizontalPageMargin
+                    rightMargin: Theme.horizontalPageMargin
+                }
+                spacing: Theme.paddingSmall
+
+                Label {
+                    objectName: "deviceTitle"
+                    width: parent.width
+                    textFormat: Text.PlainText
+                    font.family: Theme.fontFamilyHeading
+                    font.pixelSize: Theme.fontSizeLarge
+                    color: Theme.highlightColor
+                    text: qsTr("Add as second device")
+                }
+
+                Label {
+                    objectName: "instructions"
+                    width: parent.width
+                    wrapMode: Text.Wrap
+                    textFormat: Text.PlainText
+                    font.pixelSize: Theme.fontSizeSmall
+                    color: Theme.secondaryHighlightColor
+                    text: qsTr("On your other device, open Settings and choose to add a second device. Both phones have to be on the same network.")
+                }
+            }
+        }
+    }
+
+    // The file half, and the transfer both halves end in.
     SilicaFlickable {
         id: flickable
         anchors.fill: parent
+        visible: !scanArea.visible
         contentHeight: Math.max(height, column.height + Theme.paddingLarge)
 
         Column {
@@ -133,20 +240,17 @@ Page {
             }
 
             Label {
-                objectName: "instructions"
+                objectName: "fileInstructions"
+                visible: !page.fromDevice && !page.busy
                 x: Theme.horizontalPageMargin
                 width: parent.width - 2 * Theme.horizontalPageMargin
                 wrapMode: Text.Wrap
                 textFormat: Text.PlainText
                 font.pixelSize: Theme.fontSizeSmall
                 color: Theme.secondaryHighlightColor
-                text: page.fromDevice
-                      ? qsTr("On your other device, open Settings and choose to add a second device. Both phones have to be on the same network.")
-                      : qsTr("On the device that has your profile, make a backup and copy the file onto this phone. Then choose it here.")
+                text: qsTr("On the device that has your profile, make a backup and copy the file onto this phone. Then choose it here.")
             }
 
-            // The file half of the first step. The camera half is last
-            // in the column, because it takes the rest of the page.
             Button {
                 objectName: "chooseFileButton"
                 anchors.horizontalCenter: parent.horizontalCenter
@@ -176,70 +280,13 @@ Page {
                     pageStack.pop()
                 }
             }
-
-            // The camera, when that is the way the profile is coming.
-            // Loaded by URL, as the QR page loads it: a phone without
-            // one should lose the scanner rather than the page.
-            Item {
-                id: scanArea
-                objectName: "scanArea"
-                visible: page.fromDevice && !page.busy
-                width: parent.width
-                // The rest of the page, down to the bottom, the way the
-                // QR page gives it: a code is read from the pixels it
-                // lands in, and a viewfinder sharing the page with a
-                // paragraph gives it too few of them.
-                height: visible
-                        ? Math.max(Theme.itemSizeLarge,
-                                   flickable.height - y - Theme.paddingLarge)
-                        : 0
-
-                Loader {
-                    id: scanLoader
-                    objectName: "scanLoader"
-                    anchors.fill: parent
-                    active: page.fromDevice
-                    source: Qt.resolvedUrl("../components/ScanView.qml")
-                    onLoaded: {
-                        scanLoader.item.hintText =
-                            qsTr("Hold the phone up to the code it shows")
-                        // The code carries the other phone's address and
-                        // a one-time secret. Nobody types that.
-                        scanLoader.item.offerLink = false
-                        scanLoader.item.scanned.connect(page.begin)
-                        scanLoader.item.failed.connect(function(message) {
-                            page.errorMessage = message
-                        })
-                    }
-                }
-
-                // The camera runs while this page is on screen and there
-                // is nothing to read any more once a transfer is under
-                // way.
-                Binding {
-                    target: scanLoader.item
-                    property: "active"
-                    value: page.status === PageStatus.Active && page.fromDevice
-                           && !page.busy
-                }
-
-                Label {
-                    objectName: "noCamera"
-                    visible: scanLoader.status === Loader.Error
-                    anchors.centerIn: parent
-                    width: parent.width - 2 * Theme.horizontalPageMargin
-                    horizontalAlignment: Text.AlignHCenter
-                    wrapMode: Text.Wrap
-                    color: Theme.secondaryHighlightColor
-                    text: qsTr("The camera is not available on this device. A backup file works without one.")
-                }
-            }
         }
     }
 
-    // Over the foot of the page rather than in the column: a message
-    // that lands mid-scan would otherwise shorten the viewfinder under
-    // the hand holding the phone up to a code.
+    // Over the foot of the page, above the camera, and it stays until
+    // the reader puts it away: a transfer that failed after a minute of
+    // a progress bar is the thing they most need to read, and eight
+    // seconds of it is easy to miss while looking at the other phone.
     Banner {
         objectName: "errorBanner"
         anchors {
@@ -247,6 +294,7 @@ Page {
             right: parent.right
             bottom: parent.bottom
         }
+        timeout: 0
         text: page.errorMessage
         onDismissed: page.errorMessage = ""
     }

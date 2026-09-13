@@ -1081,6 +1081,18 @@
         <source>Hold the phone up to the code it shows</source>
         <translation>Apunta este teléfono al código que muestre</translation>
     </message>
+    <message>
+        <source>Enter the code instead</source>
+        <translation>Introducir el código en su lugar</translation>
+    </message>
+    <message>
+        <source>Code from the other device</source>
+        <translation>Código del otro dispositivo</translation>
+    </message>
+    <message>
+        <source>Take the profile over</source>
+        <translation>Traer el perfil</translation>
+    </message>
 </context>
 <context>
     <name>ScanView</name>
@@ -1169,18 +1181,6 @@
     <message>
         <source>Markdown</source>
         <translation>Markdown</translation>
-    </message>
-    <message>
-        <source>How a message written with *stars* and `backticks` is shown.</source>
-        <translation>Cómo se muestra un mensaje escrito con *asteriscos* y `acentos graves`.</translation>
-    </message>
-    <message>
-        <source>Drawn: bold, italics, links</source>
-        <translation>Dibujado: negrita, cursiva, enlaces</translation>
-    </message>
-    <message>
-        <source>As written</source>
-        <translation>Tal como se escribió</translation>
     </message>
     <message>
         <source>Auto-download attachments</source>
@@ -1284,6 +1284,10 @@
     <message>
         <source>Off, the return key starts a new line, the message field grows with what is written, and the send button sends.</source>
         <translation>Desactivado, la tecla Intro empieza una línea nueva, el campo de mensaje crece con lo escrito y el botón de enviar envía.</translation>
+    </message>
+    <message>
+        <source>On, a message written with *stars* and `backticks` is shown with the bold, the italics and the links drawn. Off, it is shown exactly as it was written.</source>
+        <translation>Activado, un mensaje escrito con *asteriscos* y `comillas invertidas` se muestra con la negrita, la cursiva y los enlaces dibujados. Desactivado, se muestra tal como se escribió.</translation>
     </message>
 </context>
 <context>

@@ -1086,6 +1086,18 @@
         <source>Hold the phone up to the code it shows</source>
         <translation>Pavērsiet šo tālruni pret parādīto kodu</translation>
     </message>
+    <message>
+        <source>Enter the code instead</source>
+        <translation>Tā vietā ievadīt kodu</translation>
+    </message>
+    <message>
+        <source>Code from the other device</source>
+        <translation>Kods no otras ierīces</translation>
+    </message>
+    <message>
+        <source>Take the profile over</source>
+        <translation>Pārņemt profilu</translation>
+    </message>
 </context>
 <context>
     <name>ScanView</name>
@@ -1174,18 +1186,6 @@
     <message>
         <source>Markdown</source>
         <translation>Markdown</translation>
-    </message>
-    <message>
-        <source>How a message written with *stars* and `backticks` is shown.</source>
-        <translation>Kā tiek rādīta ziņa, kas rakstīta ar *zvaigznītēm* un `gravjiem`.</translation>
-    </message>
-    <message>
-        <source>Drawn: bold, italics, links</source>
-        <translation>Noformēts: treknraksts, slīpraksts, saites</translation>
-    </message>
-    <message>
-        <source>As written</source>
-        <translation>Kā rakstīts</translation>
     </message>
     <message>
         <source>Auto-download attachments</source>
@@ -1289,6 +1289,10 @@
     <message>
         <source>Off, the return key starts a new line, the message field grows with what is written, and the send button sends.</source>
         <translation>Izslēgts: Enter sāk jaunu rindu, ziņas lauks aug līdz ar rakstīto, un sūta sūtīšanas poga.</translation>
+    </message>
+    <message>
+        <source>On, a message written with *stars* and `backticks` is shown with the bold, the italics and the links drawn. Off, it is shown exactly as it was written.</source>
+        <translation>Ieslēgts ziņa, kas rakstīta ar *zvaigznītēm* un `atpakaļvērstiem apostrofiem`, tiek rādīta ar noformētu treknrakstu, slīprakstu un saitēm. Izslēgts tā tiek rādīta tieši tā, kā rakstīts.</translation>
     </message>
 </context>
 <context>

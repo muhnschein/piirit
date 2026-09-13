@@ -1081,6 +1081,18 @@
         <source>Hold the phone up to the code it shows</source>
         <translation>সেটি যে কোড দেখাবে তার দিকে এই ফোনটি ধরুন</translation>
     </message>
+    <message>
+        <source>Enter the code instead</source>
+        <translation>বদলে কোডটি লিখুন</translation>
+    </message>
+    <message>
+        <source>Code from the other device</source>
+        <translation>অন্য যন্ত্রের কোড</translation>
+    </message>
+    <message>
+        <source>Take the profile over</source>
+        <translation>প্রোফাইল নিন</translation>
+    </message>
 </context>
 <context>
     <name>ScanView</name>
@@ -1169,18 +1181,6 @@
     <message>
         <source>Markdown</source>
         <translation>Markdown</translation>
-    </message>
-    <message>
-        <source>How a message written with *stars* and `backticks` is shown.</source>
-        <translation>*তারকা* ও `ব্যাকটিক` দিয়ে লেখা বার্তা কীভাবে দেখানো হবে।</translation>
-    </message>
-    <message>
-        <source>Drawn: bold, italics, links</source>
-        <translation>সাজানো: বোল্ড, ইটালিক, লিংক</translation>
-    </message>
-    <message>
-        <source>As written</source>
-        <translation>যেমন লেখা হয়েছে</translation>
     </message>
     <message>
         <source>Auto-download attachments</source>
@@ -1284,6 +1284,10 @@
     <message>
         <source>Off, the return key starts a new line, the message field grows with what is written, and the send button sends.</source>
         <translation>বন্ধ থাকলে Enter কী নতুন লাইন শুরু করে, বার্তার ঘর লেখার সাথে বড় হয়, আর পাঠান বোতাম পাঠায়।</translation>
+    </message>
+    <message>
+        <source>On, a message written with *stars* and `backticks` is shown with the bold, the italics and the links drawn. Off, it is shown exactly as it was written.</source>
+        <translation>চালু থাকলে *তারা* আর `ব্যাককোট` দিয়ে লেখা বার্তা বোল্ড, ইটালিক আর লিংক সাজিয়ে দেখানো হয়। বন্ধ থাকলে যেমন লেখা হয়েছে ঠিক তেমনই দেখানো হয়।</translation>
     </message>
 </context>
 <context>

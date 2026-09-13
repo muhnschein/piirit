@@ -1076,6 +1076,18 @@
         <source>Hold the phone up to the code it shows</source>
         <translation>Ул күрсәткән кодка бу телефонны тотыгыз</translation>
     </message>
+    <message>
+        <source>Enter the code instead</source>
+        <translation>Аның урынына кодны кертергә</translation>
+    </message>
+    <message>
+        <source>Code from the other device</source>
+        <translation>Икенче җиһаздагы код</translation>
+    </message>
+    <message>
+        <source>Take the profile over</source>
+        <translation>Профильне алырга</translation>
+    </message>
 </context>
 <context>
     <name>ScanView</name>
@@ -1164,18 +1176,6 @@
     <message>
         <source>Markdown</source>
         <translation>Markdown</translation>
-    </message>
-    <message>
-        <source>How a message written with *stars* and `backticks` is shown.</source>
-        <translation>*Йолдызчыклар* һәм `кире куштырнаклар` белән язылган хәбәр ничек күрсәтелә.</translation>
-    </message>
-    <message>
-        <source>Drawn: bold, italics, links</source>
-        <translation>Бизәлгән: калын, курсив, сылтамалар</translation>
-    </message>
-    <message>
-        <source>As written</source>
-        <translation>Язылганча</translation>
     </message>
     <message>
         <source>Auto-download attachments</source>
@@ -1279,6 +1279,10 @@
     <message>
         <source>Off, the return key starts a new line, the message field grows with what is written, and the send button sends.</source>
         <translation>Сүндерелгәндә Enter төймәсе яңа юл башлый, хәбәр кыры язылган белән үсә, ә җибәрү төймәсе җибәрә.</translation>
+    </message>
+    <message>
+        <source>On, a message written with *stars* and `backticks` is shown with the bold, the italics and the links drawn. Off, it is shown exactly as it was written.</source>
+        <translation>Кабызылганда *йолдызчыклар* һәм `кире өтерләр` белән язылган хат калын, курсив һәм сылтамалар бизәлеп күрсәтелә. Сүндерелгәндә язылганча гына күрсәтелә.</translation>
     </message>
 </context>
 <context>

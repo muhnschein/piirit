@@ -97,7 +97,7 @@ fn art_dir() -> PathBuf {
 /// header chunk every PNG starts with.
 fn png_header(file: &str) -> (u32, u32, u8, u8, u8) {
     let bytes = std::fs::read(art_dir().join(file))
-        .unwrap_or_else(|err| panic!("qml/art/{file} is missing ({err}); run `make faces`"));
+        .unwrap_or_else(|err| panic!("qml/art/{file} is missing ({err}); it is committed art"));
     assert_eq!(
         &bytes[..8],
         b"\x89PNG\r\n\x1a\n",

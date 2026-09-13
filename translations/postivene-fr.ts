@@ -1081,6 +1081,18 @@
         <source>Hold the phone up to the code it shows</source>
         <translation>Dirigez ce téléphone vers le code affiché</translation>
     </message>
+    <message>
+        <source>Enter the code instead</source>
+        <translation>Saisir le code à la place</translation>
+    </message>
+    <message>
+        <source>Code from the other device</source>
+        <translation>Code de l&apos;autre appareil</translation>
+    </message>
+    <message>
+        <source>Take the profile over</source>
+        <translation>Reprendre le profil</translation>
+    </message>
 </context>
 <context>
     <name>ScanView</name>
@@ -1169,18 +1181,6 @@
     <message>
         <source>Markdown</source>
         <translation>Markdown</translation>
-    </message>
-    <message>
-        <source>How a message written with *stars* and `backticks` is shown.</source>
-        <translation>Comment un message écrit avec des *astérisques* et des `accents graves` est affiché.</translation>
-    </message>
-    <message>
-        <source>Drawn: bold, italics, links</source>
-        <translation>Rendu : gras, italique, liens</translation>
-    </message>
-    <message>
-        <source>As written</source>
-        <translation>Tel qu&apos;écrit</translation>
     </message>
     <message>
         <source>Auto-download attachments</source>
@@ -1284,6 +1284,10 @@
     <message>
         <source>Off, the return key starts a new line, the message field grows with what is written, and the send button sends.</source>
         <translation>Désactivé, la touche Entrée passe à la ligne, le champ de message grandit avec ce qui est écrit, et c&apos;est le bouton d&apos;envoi qui envoie.</translation>
+    </message>
+    <message>
+        <source>On, a message written with *stars* and `backticks` is shown with the bold, the italics and the links drawn. Off, it is shown exactly as it was written.</source>
+        <translation>Activé, un message écrit avec des *astérisques* et des `accents graves` s&apos;affiche avec le gras, l&apos;italique et les liens rendus. Désactivé, il s&apos;affiche tel qu&apos;il a été écrit.</translation>
     </message>
 </context>
 <context>

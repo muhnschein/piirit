@@ -1081,6 +1081,18 @@
         <source>Hold the phone up to the code it shows</source>
         <translation>Suuna see telefon koodile, mida ta näitab</translation>
     </message>
+    <message>
+        <source>Enter the code instead</source>
+        <translation>Sisesta selle asemel kood</translation>
+    </message>
+    <message>
+        <source>Code from the other device</source>
+        <translation>Kood teisest seadmest</translation>
+    </message>
+    <message>
+        <source>Take the profile over</source>
+        <translation>Võta profiil üle</translation>
+    </message>
 </context>
 <context>
     <name>ScanView</name>
@@ -1169,18 +1181,6 @@
     <message>
         <source>Markdown</source>
         <translation>Markdown</translation>
-    </message>
-    <message>
-        <source>How a message written with *stars* and `backticks` is shown.</source>
-        <translation>Kuidas näidatakse sõnumit, mis on kirjutatud *tärnide* ja `graavistega`.</translation>
-    </message>
-    <message>
-        <source>Drawn: bold, italics, links</source>
-        <translation>Vormindatult: rasvane, kaldkiri, lingid</translation>
-    </message>
-    <message>
-        <source>As written</source>
-        <translation>Nagu kirjutatud</translation>
     </message>
     <message>
         <source>Auto-download attachments</source>
@@ -1284,6 +1284,10 @@
     <message>
         <source>Off, the return key starts a new line, the message field grows with what is written, and the send button sends.</source>
         <translation>Väljalülitatuna alustab Enter uue rea, sõnumiväli kasvab kirjutatuga ja saadab saatmisnupp.</translation>
+    </message>
+    <message>
+        <source>On, a message written with *stars* and `backticks` is shown with the bold, the italics and the links drawn. Off, it is shown exactly as it was written.</source>
+        <translation>Sees kuvatakse *tärnide* ja `tagurpidi ülakomadega` kirjutatud sõnum vormindatud rasvase kirja, kaldkirja ja linkidega. Väljas kuvatakse see täpselt nii, nagu see kirjutati.</translation>
     </message>
 </context>
 <context>

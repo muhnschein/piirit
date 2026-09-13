@@ -1081,6 +1081,18 @@
         <source>Hold the phone up to the code it shows</source>
         <translation>Hold denne telefon op mod koden, den viser</translation>
     </message>
+    <message>
+        <source>Enter the code instead</source>
+        <translation>Indtast koden i stedet</translation>
+    </message>
+    <message>
+        <source>Code from the other device</source>
+        <translation>Kode fra den anden enhed</translation>
+    </message>
+    <message>
+        <source>Take the profile over</source>
+        <translation>Overtag profilen</translation>
+    </message>
 </context>
 <context>
     <name>ScanView</name>
@@ -1169,18 +1181,6 @@
     <message>
         <source>Markdown</source>
         <translation>Markdown</translation>
-    </message>
-    <message>
-        <source>How a message written with *stars* and `backticks` is shown.</source>
-        <translation>Hvordan en besked skrevet med *stjerner* og `backticks` vises.</translation>
-    </message>
-    <message>
-        <source>Drawn: bold, italics, links</source>
-        <translation>Vist: fed, kursiv, links</translation>
-    </message>
-    <message>
-        <source>As written</source>
-        <translation>Som skrevet</translation>
     </message>
     <message>
         <source>Auto-download attachments</source>
@@ -1284,6 +1284,10 @@
     <message>
         <source>Off, the return key starts a new line, the message field grows with what is written, and the send button sends.</source>
         <translation>Slået fra begynder Enter-tasten en ny linje, beskedfeltet vokser med det skrevne, og send-knappen sender.</translation>
+    </message>
+    <message>
+        <source>On, a message written with *stars* and `backticks` is shown with the bold, the italics and the links drawn. Off, it is shown exactly as it was written.</source>
+        <translation>Til vises en besked skrevet med *stjerner* og `backticks` med fed, kursiv og links vist. Fra vises den præcis som den blev skrevet.</translation>
     </message>
 </context>
 <context>

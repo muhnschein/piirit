@@ -1076,6 +1076,18 @@
         <source>Hold the phone up to the code it shows</source>
         <translation>把这部手机对准它显示的码</translation>
     </message>
+    <message>
+        <source>Enter the code instead</source>
+        <translation>改为输入代码</translation>
+    </message>
+    <message>
+        <source>Code from the other device</source>
+        <translation>另一台设备上的代码</translation>
+    </message>
+    <message>
+        <source>Take the profile over</source>
+        <translation>接收个人资料</translation>
+    </message>
 </context>
 <context>
     <name>ScanView</name>
@@ -1164,18 +1176,6 @@
     <message>
         <source>Markdown</source>
         <translation>Markdown</translation>
-    </message>
-    <message>
-        <source>How a message written with *stars* and `backticks` is shown.</source>
-        <translation>用*星号*和`反引号`写的消息如何显示。</translation>
-    </message>
-    <message>
-        <source>Drawn: bold, italics, links</source>
-        <translation>渲染：粗体、斜体、链接</translation>
-    </message>
-    <message>
-        <source>As written</source>
-        <translation>按原样</translation>
     </message>
     <message>
         <source>Auto-download attachments</source>
@@ -1279,6 +1279,10 @@
     <message>
         <source>Off, the return key starts a new line, the message field grows with what is written, and the send button sends.</source>
         <translation>关闭时，回车键换行，消息输入框随内容增高，由发送按钮发送。</translation>
+    </message>
+    <message>
+        <source>On, a message written with *stars* and `backticks` is shown with the bold, the italics and the links drawn. Off, it is shown exactly as it was written.</source>
+        <translation>开启时，用 *星号* 和 `反引号` 写的消息会渲染出粗体、斜体和链接。关闭时，完全按原样显示。</translation>
     </message>
 </context>
 <context>

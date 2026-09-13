@@ -1081,6 +1081,18 @@
         <source>Hold the phone up to the code it shows</source>
         <translation>Punta questo telefono sul codice che mostra</translation>
     </message>
+    <message>
+        <source>Enter the code instead</source>
+        <translation>Inserisci invece il codice</translation>
+    </message>
+    <message>
+        <source>Code from the other device</source>
+        <translation>Codice dall&apos;altro dispositivo</translation>
+    </message>
+    <message>
+        <source>Take the profile over</source>
+        <translation>Riprendi il profilo</translation>
+    </message>
 </context>
 <context>
     <name>ScanView</name>
@@ -1169,18 +1181,6 @@
     <message>
         <source>Markdown</source>
         <translation>Markdown</translation>
-    </message>
-    <message>
-        <source>How a message written with *stars* and `backticks` is shown.</source>
-        <translation>Come viene mostrato un messaggio scritto con *asterischi* e `accenti gravi`.</translation>
-    </message>
-    <message>
-        <source>Drawn: bold, italics, links</source>
-        <translation>Resi: grassetto, corsivo, link</translation>
-    </message>
-    <message>
-        <source>As written</source>
-        <translation>Come scritto</translation>
     </message>
     <message>
         <source>Auto-download attachments</source>
@@ -1284,6 +1284,10 @@
     <message>
         <source>Off, the return key starts a new line, the message field grows with what is written, and the send button sends.</source>
         <translation>Disattivato, il tasto Invio va a capo, il campo del messaggio cresce con ciò che si scrive e a inviare è il pulsante.</translation>
+    </message>
+    <message>
+        <source>On, a message written with *stars* and `backticks` is shown with the bold, the italics and the links drawn. Off, it is shown exactly as it was written.</source>
+        <translation>Attivo, un messaggio scritto con *asterischi* e `apici inversi` viene mostrato con grassetto, corsivo e link resi. Disattivo, viene mostrato esattamente come è stato scritto.</translation>
     </message>
 </context>
 <context>

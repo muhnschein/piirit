@@ -1091,6 +1091,18 @@
         <source>Hold the phone up to the code it shows</source>
         <translation>Ta telefon usmerite v prikazano kodo</translation>
     </message>
+    <message>
+        <source>Enter the code instead</source>
+        <translation>Namesto tega vnesite kodo</translation>
+    </message>
+    <message>
+        <source>Code from the other device</source>
+        <translation>Koda z druge naprave</translation>
+    </message>
+    <message>
+        <source>Take the profile over</source>
+        <translation>Prevzemi profil</translation>
+    </message>
 </context>
 <context>
     <name>ScanView</name>
@@ -1179,18 +1191,6 @@
     <message>
         <source>Markdown</source>
         <translation>Markdown</translation>
-    </message>
-    <message>
-        <source>How a message written with *stars* and `backticks` is shown.</source>
-        <translation>Kako je prikazano sporočilo, napisano z *zvezdicami* in `krativci`.</translation>
-    </message>
-    <message>
-        <source>Drawn: bold, italics, links</source>
-        <translation>Izrisano: krepko, ležeče, povezave</translation>
-    </message>
-    <message>
-        <source>As written</source>
-        <translation>Kot je napisano</translation>
     </message>
     <message>
         <source>Auto-download attachments</source>
@@ -1294,6 +1294,10 @@
     <message>
         <source>Off, the return key starts a new line, the message field grows with what is written, and the send button sends.</source>
         <translation>Izklopljeno: tipka Enter začne novo vrstico, polje sporočila raste z napisanim, pošlje pa gumb za pošiljanje.</translation>
+    </message>
+    <message>
+        <source>On, a message written with *stars* and `backticks` is shown with the bold, the italics and the links drawn. Off, it is shown exactly as it was written.</source>
+        <translation>Vklopljeno se sporočilo, napisano z *zvezdicami* in `krativci`, prikaže z izrisano krepko pisavo, ležečo pisavo in povezavami. Izklopljeno se prikaže natanko tako, kot je bilo napisano.</translation>
     </message>
 </context>
 <context>

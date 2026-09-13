@@ -1081,6 +1081,18 @@
         <source>Hold the phone up to the code it shows</source>
         <translation>அது காட்டும் குறியீட்டை நோக்கி இந்தத் தொலைபேசியைப் பிடிக்கவும்</translation>
     </message>
+    <message>
+        <source>Enter the code instead</source>
+        <translation>அதற்குப் பதிலாக குறியீட்டை உள்ளிடு</translation>
+    </message>
+    <message>
+        <source>Code from the other device</source>
+        <translation>மற்ற சாதனத்தின் குறியீடு</translation>
+    </message>
+    <message>
+        <source>Take the profile over</source>
+        <translation>சுயவிவரத்தைப் பெறு</translation>
+    </message>
 </context>
 <context>
     <name>ScanView</name>
@@ -1169,18 +1181,6 @@
     <message>
         <source>Markdown</source>
         <translation>Markdown</translation>
-    </message>
-    <message>
-        <source>How a message written with *stars* and `backticks` is shown.</source>
-        <translation>*நட்சத்திரங்கள்* மற்றும் `பின்சாய்வுக் குறிகள்` கொண்டு எழுதப்பட்ட செய்தி எப்படிக் காட்டப்படும்.</translation>
-    </message>
-    <message>
-        <source>Drawn: bold, italics, links</source>
-        <translation>வடிவமைக்கப்பட்டது: தடித்த, சாய்ந்த, இணைப்புகள்</translation>
-    </message>
-    <message>
-        <source>As written</source>
-        <translation>எழுதியபடியே</translation>
     </message>
     <message>
         <source>Auto-download attachments</source>
@@ -1284,6 +1284,10 @@
     <message>
         <source>Off, the return key starts a new line, the message field grows with what is written, and the send button sends.</source>
         <translation>அணைக்கப்பட்டிருந்தால் Enter விசை புதிய வரியைத் தொடங்கும், செய்திப் புலம் எழுதியதற்கேற்ப வளரும், அனுப்பு பொத்தான் அனுப்பும்.</translation>
+    </message>
+    <message>
+        <source>On, a message written with *stars* and `backticks` is shown with the bold, the italics and the links drawn. Off, it is shown exactly as it was written.</source>
+        <translation>இயக்கத்தில் இருந்தால் *விண்மீன்கள்* மற்றும் `பின்நோக்கு மேற்கோள்` கொண்டு எழுதிய செய்தி தடித்த, சாய்ந்த எழுத்துகளும் இணைப்புகளும் வடிவமைக்கப்பட்டு காட்டப்படும். அணைத்தால் எழுதியபடியே காட்டப்படும்.</translation>
     </message>
 </context>
 <context>

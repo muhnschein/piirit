@@ -435,15 +435,21 @@ removed from the store even after approval. Not an option.
    bar should move and the app should land in that profile's chat list,
    fetching -- and with a backup file copied onto the phone, the file
    browser should list it (it filters to .tar) and import it the same
-   way. The viewfinder on the device half has to run from under the
-   line of instructions down to the foot of the page, the way the QR
-   page's does, and it should read a code held up to it at arm's
-   length within a second or two. A viewfinder that is a strip with the
-   page scrolling under it is the bug this had: a code is read out of
-   the pixels it lands in, and half a page of camera did not give it
-   enough of them. There is no "enter the link" button on this one --
-   the code carries an address and a one-time secret, which nobody
-   types. Worth trying on a phone without a camera too, or with the
+   way. The device half is a camera and nothing else: the picture
+   fills the page edge to edge, with the title and the one line of
+   instructions on a strip over the top of it, and it should read a
+   code held up to it at arm's length within a second or two. Check it
+   against a code from another Delta Chat rather than a made-up one:
+   the string a device shows while offering its profile carries an
+   address and a one-time secret, so it is a dense symbol, and it is
+   the dense ones that ran out of pixels when the camera was smaller
+   and its frames coarser. A spinner beside the line at the foot says
+   the app is reading frames, so a code that takes a moment does not
+   look like a dead view. Under it, "Enter the code instead" takes the
+   same string typed or pasted, which is the way through when a camera
+   will not read at all. A failure stays on screen until it is tapped
+   away, rather than fading while the reader is looking at the other
+   phone. Worth trying on a phone without a camera too, or with the
    camera denied: the page has to fall back to saying so rather than
    showing a dead viewfinder, and the backup half has to work
    regardless.

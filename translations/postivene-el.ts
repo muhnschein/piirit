@@ -1081,6 +1081,18 @@
         <source>Hold the phone up to the code it shows</source>
         <translation>Στρέψτε αυτό το τηλέφωνο στον κωδικό που εμφανίζει</translation>
     </message>
+    <message>
+        <source>Enter the code instead</source>
+        <translation>Εισαγωγή του κωδικού</translation>
+    </message>
+    <message>
+        <source>Code from the other device</source>
+        <translation>Κωδικός από την άλλη συσκευή</translation>
+    </message>
+    <message>
+        <source>Take the profile over</source>
+        <translation>Μεταφορά του προφίλ</translation>
+    </message>
 </context>
 <context>
     <name>ScanView</name>
@@ -1169,18 +1181,6 @@
     <message>
         <source>Markdown</source>
         <translation>Markdown</translation>
-    </message>
-    <message>
-        <source>How a message written with *stars* and `backticks` is shown.</source>
-        <translation>Πώς εμφανίζεται ένα μήνυμα γραμμένο με *αστερίσκους* και `ανάποδους τόνους`.</translation>
-    </message>
-    <message>
-        <source>Drawn: bold, italics, links</source>
-        <translation>Μορφοποιημένο: έντονα, πλάγια, σύνδεσμοι</translation>
-    </message>
-    <message>
-        <source>As written</source>
-        <translation>Όπως γράφτηκε</translation>
     </message>
     <message>
         <source>Auto-download attachments</source>
@@ -1284,6 +1284,10 @@
     <message>
         <source>Off, the return key starts a new line, the message field grows with what is written, and the send button sends.</source>
         <translation>Απενεργοποιημένο: το πλήκτρο Enter ξεκινά νέα γραμμή, το πεδίο μηνύματος μεγαλώνει με όσα γράφετε και η αποστολή γίνεται από το κουμπί.</translation>
+    </message>
+    <message>
+        <source>On, a message written with *stars* and `backticks` is shown with the bold, the italics and the links drawn. Off, it is shown exactly as it was written.</source>
+        <translation>Ενεργό, ένα μήνυμα γραμμένο με *αστερίσκους* και `ανάστροφα εισαγωγικά` εμφανίζεται με μορφοποιημένα έντονα, πλάγια και συνδέσμους. Ανενεργό, εμφανίζεται ακριβώς όπως γράφτηκε.</translation>
     </message>
 </context>
 <context>

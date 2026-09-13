@@ -1076,6 +1076,18 @@
         <source>Hold the phone up to the code it shows</source>
         <translation>Tartsa ezt a telefont a megjelenő kód elé</translation>
     </message>
+    <message>
+        <source>Enter the code instead</source>
+        <translation>Inkább a kód megadása</translation>
+    </message>
+    <message>
+        <source>Code from the other device</source>
+        <translation>Kód a másik eszközről</translation>
+    </message>
+    <message>
+        <source>Take the profile over</source>
+        <translation>A profil átvétele</translation>
+    </message>
 </context>
 <context>
     <name>ScanView</name>
@@ -1164,18 +1176,6 @@
     <message>
         <source>Markdown</source>
         <translation>Markdown</translation>
-    </message>
-    <message>
-        <source>How a message written with *stars* and `backticks` is shown.</source>
-        <translation>Hogyan jelenjen meg a *csillagokkal* és `visszaperjelekkel` írt üzenet.</translation>
-    </message>
-    <message>
-        <source>Drawn: bold, italics, links</source>
-        <translation>Megjelenítve: félkövér, dőlt, hivatkozások</translation>
-    </message>
-    <message>
-        <source>As written</source>
-        <translation>Ahogy írták</translation>
     </message>
     <message>
         <source>Auto-download attachments</source>
@@ -1279,6 +1279,10 @@
     <message>
         <source>Off, the return key starts a new line, the message field grows with what is written, and the send button sends.</source>
         <translation>Kikapcsolva az Enter új sort kezd, az üzenetmező a beírt szöveggel nő, és a küldés gomb küld.</translation>
+    </message>
+    <message>
+        <source>On, a message written with *stars* and `backticks` is shown with the bold, the italics and the links drawn. Off, it is shown exactly as it was written.</source>
+        <translation>Bekapcsolva a *csillagokkal* és `visszafelé dőlő idézőjelekkel` írt üzenet félkövéren, dőlten és hivatkozásokkal megjelenítve látszik. Kikapcsolva pontosan úgy, ahogy írták.</translation>
     </message>
 </context>
 <context>

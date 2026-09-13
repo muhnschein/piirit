@@ -1081,6 +1081,18 @@
         <source>Hold the phone up to the code it shows</source>
         <translation>Suuntaa tämä puhelin sen näyttämään koodiin</translation>
     </message>
+    <message>
+        <source>Enter the code instead</source>
+        <translation>Anna koodi sen sijaan</translation>
+    </message>
+    <message>
+        <source>Code from the other device</source>
+        <translation>Koodi toisesta laitteesta</translation>
+    </message>
+    <message>
+        <source>Take the profile over</source>
+        <translation>Ota profiili vastaan</translation>
+    </message>
 </context>
 <context>
     <name>ScanView</name>
@@ -1169,18 +1181,6 @@
     <message>
         <source>Markdown</source>
         <translation>Markdown</translation>
-    </message>
-    <message>
-        <source>How a message written with *stars* and `backticks` is shown.</source>
-        <translation>Miten *tähdillä* ja `gravis-merkeillä` kirjoitettu viesti näytetään.</translation>
-    </message>
-    <message>
-        <source>Drawn: bold, italics, links</source>
-        <translation>Muotoiltuna: lihavointi, kursiivi, linkit</translation>
-    </message>
-    <message>
-        <source>As written</source>
-        <translation>Kuten kirjoitettu</translation>
     </message>
     <message>
         <source>Auto-download attachments</source>
@@ -1284,6 +1284,10 @@
     <message>
         <source>Off, the return key starts a new line, the message field grows with what is written, and the send button sends.</source>
         <translation>Pois päältä Enter aloittaa uuden rivin, viestikenttä kasvaa kirjoitetun mukana ja lähetyspainike lähettää.</translation>
+    </message>
+    <message>
+        <source>On, a message written with *stars* and `backticks` is shown with the bold, the italics and the links drawn. Off, it is shown exactly as it was written.</source>
+        <translation>Päällä *tähdillä* ja `gravismerkeillä` kirjoitettu viesti näytetään lihavointi, kursiivi ja linkit muotoiltuina. Pois päältä se näytetään täsmälleen kuten se kirjoitettiin.</translation>
     </message>
 </context>
 <context>

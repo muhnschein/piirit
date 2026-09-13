@@ -1081,6 +1081,18 @@
         <source>Hold the phone up to the code it shows</source>
         <translation>Håll den här telefonen mot koden som visas</translation>
     </message>
+    <message>
+        <source>Enter the code instead</source>
+        <translation>Ange koden i stället</translation>
+    </message>
+    <message>
+        <source>Code from the other device</source>
+        <translation>Kod från den andra enheten</translation>
+    </message>
+    <message>
+        <source>Take the profile over</source>
+        <translation>Ta över profilen</translation>
+    </message>
 </context>
 <context>
     <name>ScanView</name>
@@ -1169,18 +1181,6 @@
     <message>
         <source>Markdown</source>
         <translation>Markdown</translation>
-    </message>
-    <message>
-        <source>How a message written with *stars* and `backticks` is shown.</source>
-        <translation>Hur ett meddelande skrivet med *stjärnor* och `grava accenter` visas.</translation>
-    </message>
-    <message>
-        <source>Drawn: bold, italics, links</source>
-        <translation>Ritat: fet, kursiv, länkar</translation>
-    </message>
-    <message>
-        <source>As written</source>
-        <translation>Som skrivet</translation>
     </message>
     <message>
         <source>Auto-download attachments</source>
@@ -1284,6 +1284,10 @@
     <message>
         <source>Off, the return key starts a new line, the message field grows with what is written, and the send button sends.</source>
         <translation>Avstängt börjar Enter-tangenten en ny rad, meddelandefältet växer med det skrivna och skicka-knappen skickar.</translation>
+    </message>
+    <message>
+        <source>On, a message written with *stars* and `backticks` is shown with the bold, the italics and the links drawn. Off, it is shown exactly as it was written.</source>
+        <translation>På visas ett meddelande skrivet med *stjärnor* och `bakåtcitattecken` med fet stil, kursiv och länkar ritade. Av visas det precis som det skrevs.</translation>
     </message>
 </context>
 <context>

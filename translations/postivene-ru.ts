@@ -1086,6 +1086,18 @@
         <source>Hold the phone up to the code it shows</source>
         <translation>Наведите этот телефон на показанный код</translation>
     </message>
+    <message>
+        <source>Enter the code instead</source>
+        <translation>Ввести код вместо этого</translation>
+    </message>
+    <message>
+        <source>Code from the other device</source>
+        <translation>Код с другого устройства</translation>
+    </message>
+    <message>
+        <source>Take the profile over</source>
+        <translation>Перенести профиль</translation>
+    </message>
 </context>
 <context>
     <name>ScanView</name>
@@ -1174,18 +1186,6 @@
     <message>
         <source>Markdown</source>
         <translation>Markdown</translation>
-    </message>
-    <message>
-        <source>How a message written with *stars* and `backticks` is shown.</source>
-        <translation>Как показывать сообщение, написанное со *звёздочками* и `обратными кавычками`.</translation>
-    </message>
-    <message>
-        <source>Drawn: bold, italics, links</source>
-        <translation>Оформлено: жирный, курсив, ссылки</translation>
-    </message>
-    <message>
-        <source>As written</source>
-        <translation>Как написано</translation>
     </message>
     <message>
         <source>Auto-download attachments</source>
@@ -1289,6 +1289,10 @@
     <message>
         <source>Off, the return key starts a new line, the message field grows with what is written, and the send button sends.</source>
         <translation>Выключено: клавиша Enter начинает новую строку, поле сообщения растёт с написанным, а отправляет кнопка отправки.</translation>
+    </message>
+    <message>
+        <source>On, a message written with *stars* and `backticks` is shown with the bold, the italics and the links drawn. Off, it is shown exactly as it was written.</source>
+        <translation>Включено — сообщение, написанное со *звёздочками* и `обратными апострофами`, показывается с оформленным жирным, курсивом и ссылками. Выключено — показывается ровно так, как написано.</translation>
     </message>
 </context>
 <context>
