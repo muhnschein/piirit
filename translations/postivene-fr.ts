@@ -175,6 +175,72 @@
     </message>
 </context>
 <context>
+    <name>BlockContactDialog</name>
+    <message>
+        <source>Block contact</source>
+        <translation>Bloquer ce contact</translation>
+    </message>
+    <message>
+        <source>Unblock contact</source>
+        <translation>Débloquer ce contact</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Annuler</translation>
+    </message>
+    <message>
+        <source>Block this contact?
+
+Direct messages or groups created by blocked contacts will not show up.
+
+Other groups with blocked contacts will still show their messages.</source>
+        <translation>Bloquer ce contact&#xa0;?
+
+Vous ne verrez plus les messages directs ou les groupes créés par un contact bloqué.
+
+Vous continuerez à voir les messages des contacts bloqués dans les autres groupes.</translation>
+    </message>
+    <message>
+        <source>Unblock this contact?</source>
+        <translation>Débloquer ce contact ?</translation>
+    </message>
+</context>
+<context>
+    <name>BlockContactPage</name>
+    <message>
+        <source>Block contact</source>
+        <translation>Bloquer ce contact</translation>
+    </message>
+    <message>
+        <source>Search</source>
+        <translation>Rechercher</translation>
+    </message>
+    <message>
+        <source>Nobody matches</source>
+        <translation>Personne ne correspond</translation>
+    </message>
+    <message>
+        <source>No contacts yet</source>
+        <translation>Aucun contact pour l&apos;instant</translation>
+    </message>
+</context>
+<context>
+    <name>BlockedContactsPage</name>
+    <message>
+        <source>Block contact</source>
+        <extracomment>Opens the contacts, to pick one to block.</extracomment>
+        <translation>Bloquer ce contact</translation>
+    </message>
+    <message>
+        <source>Blocked contacts</source>
+        <translation>Contacts bloqués</translation>
+    </message>
+    <message>
+        <source>Blocked contacts will appear here.</source>
+        <translation>Si vous bloquez des contacts, ils seront affichés ici.</translation>
+    </message>
+</context>
+<context>
     <name>CapturePage</name>
     <message>
         <source>The video could not be saved</source>
@@ -1371,6 +1437,14 @@
     <message>
         <source>Small apps run inside the chat. Somebody else&apos;s code, and less tested than the rest.</source>
         <translation>De petites applications tournent dans la discussion. Du code d&apos;autrui, et moins éprouvé que le reste.</translation>
+    </message>
+    <message>
+        <source>Privacy</source>
+        <translation>Vie privée</translation>
+    </message>
+    <message>
+        <source>Blocked contacts</source>
+        <translation>Contacts bloqués</translation>
     </message>
 </context>
 <context>

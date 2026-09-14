@@ -174,6 +174,68 @@
     </message>
 </context>
 <context>
+    <name>BlockContactDialog</name>
+    <message>
+        <source>Block contact</source>
+        <translation>Névjegy letiltása</translation>
+    </message>
+    <message>
+        <source>Unblock contact</source>
+        <translation>Letiltás visszavonása</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Mégse</translation>
+    </message>
+    <message>
+        <source>Block this contact?
+
+Direct messages or groups created by blocked contacts will not show up.
+
+Other groups with blocked contacts will still show their messages.</source>
+        <translation>Letiltja ezt a partnerét? Többé nem fog üzeneteket kapni tőle.</translation>
+    </message>
+    <message>
+        <source>Unblock this contact?</source>
+        <translation>Feloldja ennek a partnerének a letiltását? Ezután képes lesz üzeneteket fogadni tőle.</translation>
+    </message>
+</context>
+<context>
+    <name>BlockContactPage</name>
+    <message>
+        <source>Block contact</source>
+        <translation>Névjegy letiltása</translation>
+    </message>
+    <message>
+        <source>Search</source>
+        <translation>Keresés</translation>
+    </message>
+    <message>
+        <source>Nobody matches</source>
+        <translation>Senki sem felel meg</translation>
+    </message>
+    <message>
+        <source>No contacts yet</source>
+        <translation>Még nincs névjegy</translation>
+    </message>
+</context>
+<context>
+    <name>BlockedContactsPage</name>
+    <message>
+        <source>Block contact</source>
+        <extracomment>Opens the contacts, to pick one to block.</extracomment>
+        <translation>Névjegy letiltása</translation>
+    </message>
+    <message>
+        <source>Blocked contacts</source>
+        <translation>Letiltott névjegyek</translation>
+    </message>
+    <message>
+        <source>Blocked contacts will appear here.</source>
+        <translation>A letiltott névjegyek itt fognak megjelenni</translation>
+    </message>
+</context>
+<context>
     <name>CapturePage</name>
     <message>
         <source>The video could not be saved</source>
@@ -1365,6 +1427,14 @@
     <message>
         <source>Small apps run inside the chat. Somebody else&apos;s code, and less tested than the rest.</source>
         <translation>Kis alkalmazások futnak a csevegésen belül. Más kódja, és a többinél kevésbé kipróbált.</translation>
+    </message>
+    <message>
+        <source>Privacy</source>
+        <translation>Adatvédelem</translation>
+    </message>
+    <message>
+        <source>Blocked contacts</source>
+        <translation>Letiltott névjegyek</translation>
     </message>
 </context>
 <context>

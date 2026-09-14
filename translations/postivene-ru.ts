@@ -176,6 +176,72 @@
     </message>
 </context>
 <context>
+    <name>BlockContactDialog</name>
+    <message>
+        <source>Block contact</source>
+        <translation>Заблокировать контакт</translation>
+    </message>
+    <message>
+        <source>Unblock contact</source>
+        <translation>Разблокировать контакт</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Отмена</translation>
+    </message>
+    <message>
+        <source>Block this contact?
+
+Direct messages or groups created by blocked contacts will not show up.
+
+Other groups with blocked contacts will still show their messages.</source>
+        <translation>Заблокировать этот контакт?
+
+Заблокированные контакты не будут показаны в личных сообщениях или группах, созданных ими.
+
+В других группах сообщения заблокированных контактов, по-прежнему будут видны.</translation>
+    </message>
+    <message>
+        <source>Unblock this contact?</source>
+        <translation>Разблокировать этот контакт?</translation>
+    </message>
+</context>
+<context>
+    <name>BlockContactPage</name>
+    <message>
+        <source>Block contact</source>
+        <translation>Заблокировать контакт</translation>
+    </message>
+    <message>
+        <source>Search</source>
+        <translation>Поиск</translation>
+    </message>
+    <message>
+        <source>Nobody matches</source>
+        <translation>Никто не подходит</translation>
+    </message>
+    <message>
+        <source>No contacts yet</source>
+        <translation>Контактов пока нет</translation>
+    </message>
+</context>
+<context>
+    <name>BlockedContactsPage</name>
+    <message>
+        <source>Block contact</source>
+        <extracomment>Opens the contacts, to pick one to block.</extracomment>
+        <translation>Заблокировать контакт</translation>
+    </message>
+    <message>
+        <source>Blocked contacts</source>
+        <translation>Заблокированные контакты</translation>
+    </message>
+    <message>
+        <source>Blocked contacts will appear here.</source>
+        <translation>Здесь можно просмотреть заблокированные контакты.</translation>
+    </message>
+</context>
+<context>
     <name>CapturePage</name>
     <message>
         <source>The video could not be saved</source>
@@ -1377,6 +1443,14 @@
     <message>
         <source>Small apps run inside the chat. Somebody else&apos;s code, and less tested than the rest.</source>
         <translation>Небольшие приложения работают внутри чата. Чужой код, и проверен меньше остального.</translation>
+    </message>
+    <message>
+        <source>Privacy</source>
+        <translation>Конфиденциальность</translation>
+    </message>
+    <message>
+        <source>Blocked contacts</source>
+        <translation>Заблокированные контакты</translation>
     </message>
 </context>
 <context>

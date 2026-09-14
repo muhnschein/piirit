@@ -175,6 +175,68 @@
     </message>
 </context>
 <context>
+    <name>BlockContactDialog</name>
+    <message>
+        <source>Block contact</source>
+        <translation>Contactpersoon blokkeren</translation>
+    </message>
+    <message>
+        <source>Unblock contact</source>
+        <translation>Contactpersoon deblokkeren</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Annuleren</translation>
+    </message>
+    <message>
+        <source>Block this contact?
+
+Direct messages or groups created by blocked contacts will not show up.
+
+Other groups with blocked contacts will still show their messages.</source>
+        <translation>Wil je deze contactpersoon blokkeren? Hij/zij kan je geen berichten meer sturen.</translation>
+    </message>
+    <message>
+        <source>Unblock this contact?</source>
+        <translation>Wil je deze contactpersoon deblokkeren? Hij/zij kan je wederom berichten sturen.</translation>
+    </message>
+</context>
+<context>
+    <name>BlockContactPage</name>
+    <message>
+        <source>Block contact</source>
+        <translation>Contactpersoon blokkeren</translation>
+    </message>
+    <message>
+        <source>Search</source>
+        <translation>Zoeken</translation>
+    </message>
+    <message>
+        <source>Nobody matches</source>
+        <translation>Niemand komt overeen</translation>
+    </message>
+    <message>
+        <source>No contacts yet</source>
+        <translation>Nog geen contacten</translation>
+    </message>
+</context>
+<context>
+    <name>BlockedContactsPage</name>
+    <message>
+        <source>Block contact</source>
+        <extracomment>Opens the contacts, to pick one to block.</extracomment>
+        <translation>Contactpersoon blokkeren</translation>
+    </message>
+    <message>
+        <source>Blocked contacts</source>
+        <translation>Geblokkeerde contactpersonen</translation>
+    </message>
+    <message>
+        <source>Blocked contacts will appear here.</source>
+        <translation>Geblokkeerde contactpersonen worden hier getoond.</translation>
+    </message>
+</context>
+<context>
     <name>CapturePage</name>
     <message>
         <source>The video could not be saved</source>
@@ -1371,6 +1433,14 @@
     <message>
         <source>Small apps run inside the chat. Somebody else&apos;s code, and less tested than the rest.</source>
         <translation>Kleine apps draaien in de chat. Andermans code, en minder beproefd dan de rest.</translation>
+    </message>
+    <message>
+        <source>Privacy</source>
+        <translation>Privacy</translation>
+    </message>
+    <message>
+        <source>Blocked contacts</source>
+        <translation>Geblokkeerde contactpersonen</translation>
     </message>
 </context>
 <context>

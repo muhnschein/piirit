@@ -174,6 +174,72 @@
     </message>
 </context>
 <context>
+    <name>BlockContactDialog</name>
+    <message>
+        <source>Block contact</source>
+        <translation>Kişiyi Engelle</translation>
+    </message>
+    <message>
+        <source>Unblock contact</source>
+        <translation>Kişiyi Engelleme</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>İptal</translation>
+    </message>
+    <message>
+        <source>Block this contact?
+
+Direct messages or groups created by blocked contacts will not show up.
+
+Other groups with blocked contacts will still show their messages.</source>
+        <translation>Bu kişi engellensin mi?
+
+Engellenen kişiler tarafından oluşturulan doğrudan iletiler ya da gruplar gösterilmeyecek.
+
+Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</translation>
+    </message>
+    <message>
+        <source>Unblock this contact?</source>
+        <translation>Bu kişi engellenmesin mi?</translation>
+    </message>
+</context>
+<context>
+    <name>BlockContactPage</name>
+    <message>
+        <source>Block contact</source>
+        <translation>Kişiyi Engelle</translation>
+    </message>
+    <message>
+        <source>Search</source>
+        <translation>Ara</translation>
+    </message>
+    <message>
+        <source>Nobody matches</source>
+        <translation>Kimse eşleşmiyor</translation>
+    </message>
+    <message>
+        <source>No contacts yet</source>
+        <translation>Henüz kişi yok</translation>
+    </message>
+</context>
+<context>
+    <name>BlockedContactsPage</name>
+    <message>
+        <source>Block contact</source>
+        <extracomment>Opens the contacts, to pick one to block.</extracomment>
+        <translation>Kişiyi Engelle</translation>
+    </message>
+    <message>
+        <source>Blocked contacts</source>
+        <translation>Engellenen Kişiler</translation>
+    </message>
+    <message>
+        <source>Blocked contacts will appear here.</source>
+        <translation>Engellenen kişiler burada görünecek.</translation>
+    </message>
+</context>
+<context>
     <name>CapturePage</name>
     <message>
         <source>The video could not be saved</source>
@@ -1365,6 +1431,14 @@
     <message>
         <source>Small apps run inside the chat. Somebody else&apos;s code, and less tested than the rest.</source>
         <translation>Küçük uygulamalar sohbetin içinde çalışır. Başkasının kodu ve geri kalanı kadar denenmemiş.</translation>
+    </message>
+    <message>
+        <source>Privacy</source>
+        <translation>Gizlilik</translation>
+    </message>
+    <message>
+        <source>Blocked contacts</source>
+        <translation>Engellenen Kişiler</translation>
     </message>
 </context>
 <context>

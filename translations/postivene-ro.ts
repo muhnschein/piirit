@@ -176,6 +176,68 @@
     </message>
 </context>
 <context>
+    <name>BlockContactDialog</name>
+    <message>
+        <source>Block contact</source>
+        <translation>Blocare Contact</translation>
+    </message>
+    <message>
+        <source>Unblock contact</source>
+        <translation>Deblocare Contact</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Anulează</translation>
+    </message>
+    <message>
+        <source>Block this contact?
+
+Direct messages or groups created by blocked contacts will not show up.
+
+Other groups with blocked contacts will still show their messages.</source>
+        <translation>Să blochez acest contact? Nu veți mai primi mesaje de la această persoană.</translation>
+    </message>
+    <message>
+        <source>Unblock this contact?</source>
+        <translation>Deblocați acest contact? Astfel, veți putea primi mesaje de la această persoană.</translation>
+    </message>
+</context>
+<context>
+    <name>BlockContactPage</name>
+    <message>
+        <source>Block contact</source>
+        <translation>Blocare Contact</translation>
+    </message>
+    <message>
+        <source>Search</source>
+        <translation>Caută</translation>
+    </message>
+    <message>
+        <source>Nobody matches</source>
+        <translation>Nimeni nu se potrivește</translation>
+    </message>
+    <message>
+        <source>No contacts yet</source>
+        <translation>Niciun contact încă</translation>
+    </message>
+</context>
+<context>
+    <name>BlockedContactsPage</name>
+    <message>
+        <source>Block contact</source>
+        <extracomment>Opens the contacts, to pick one to block.</extracomment>
+        <translation>Blocare Contact</translation>
+    </message>
+    <message>
+        <source>Blocked contacts</source>
+        <translation>Contacte blocate</translation>
+    </message>
+    <message>
+        <source>Blocked contacts will appear here.</source>
+        <translation>Contactele blocate vor apărea aici.</translation>
+    </message>
+</context>
+<context>
     <name>CapturePage</name>
     <message>
         <source>The video could not be saved</source>
@@ -1377,6 +1439,14 @@
     <message>
         <source>Small apps run inside the chat. Somebody else&apos;s code, and less tested than the rest.</source>
         <translation>Aplicații mici rulează în conversație. Cod străin, și mai puțin încercat decât restul.</translation>
+    </message>
+    <message>
+        <source>Privacy</source>
+        <translation>Confidențialitate</translation>
+    </message>
+    <message>
+        <source>Blocked contacts</source>
+        <translation>Contacte blocate</translation>
     </message>
 </context>
 <context>

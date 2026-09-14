@@ -125,7 +125,7 @@ fn delegates_bind_only_roles_their_models_have() {
     }
 
     let root = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../..");
-    let cases: [(&str, Vec<String>); 11] = [
+    let cases: [(&str, Vec<String>); 13] = [
         (
             "qml/components/ConversationList.qml",
             names_of::<postivene_shim::MessageListItem>(),
@@ -168,6 +168,16 @@ fn delegates_bind_only_roles_their_models_have() {
         ),
         (
             "qml/pages/ContactPage.qml",
+            names_of::<postivene_shim::ContactItem>(),
+        ),
+        // The block list and the picker in front of it: contacts either
+        // way, the blocked ones and the ones that can still be written to.
+        (
+            "qml/pages/BlockedContactsPage.qml",
+            names_of::<postivene_shim::ContactItem>(),
+        ),
+        (
+            "qml/pages/BlockContactPage.qml",
             names_of::<postivene_shim::ContactItem>(),
         ),
         (

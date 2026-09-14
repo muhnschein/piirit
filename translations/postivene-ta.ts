@@ -175,6 +175,68 @@
     </message>
 </context>
 <context>
+    <name>BlockContactDialog</name>
+    <message>
+        <source>Block contact</source>
+        <translation>தொடர்பை தடுக்கவும்</translation>
+    </message>
+    <message>
+        <source>Unblock contact</source>
+        <translation>தொடர்பு தடுப்பினை நீக்கவும்</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>ரத்துசெய்</translation>
+    </message>
+    <message>
+        <source>Block this contact?
+
+Direct messages or groups created by blocked contacts will not show up.
+
+Other groups with blocked contacts will still show their messages.</source>
+        <translation>இந்த தொடர்பை முடக்கவா ?</translation>
+    </message>
+    <message>
+        <source>Unblock this contact?</source>
+        <translation>இந்தத் தொடர்பின் தடையை நீக்கவா?</translation>
+    </message>
+</context>
+<context>
+    <name>BlockContactPage</name>
+    <message>
+        <source>Block contact</source>
+        <translation>தொடர்பை தடுக்கவும்</translation>
+    </message>
+    <message>
+        <source>Search</source>
+        <translation>தேடு</translation>
+    </message>
+    <message>
+        <source>Nobody matches</source>
+        <translation>யாரும் பொருந்தவில்லை</translation>
+    </message>
+    <message>
+        <source>No contacts yet</source>
+        <translation>இன்னும் தொடர்புகள் இல்லை</translation>
+    </message>
+</context>
+<context>
+    <name>BlockedContactsPage</name>
+    <message>
+        <source>Block contact</source>
+        <extracomment>Opens the contacts, to pick one to block.</extracomment>
+        <translation>தொடர்பை தடுக்கவும்</translation>
+    </message>
+    <message>
+        <source>Blocked contacts</source>
+        <translation>தடுக்கபட்ட தொடர்புகள்</translation>
+    </message>
+    <message>
+        <source>Blocked contacts will appear here.</source>
+        <translation>தடுக்கப்பட்ட தொடர்புகள் இங்கே தோன்றும்.</translation>
+    </message>
+</context>
+<context>
     <name>CapturePage</name>
     <message>
         <source>The video could not be saved</source>
@@ -1371,6 +1433,14 @@
     <message>
         <source>Small apps run inside the chat. Somebody else&apos;s code, and less tested than the rest.</source>
         <translation>சிறு செயலிகள் உரையாடலுக்குள்ளேயே இயங்கும். பிறரின் நிரல், மற்றவற்றை விடச் சோதிக்கப்படாதது.</translation>
+    </message>
+    <message>
+        <source>Privacy</source>
+        <translation>தனியுரிமை</translation>
+    </message>
+    <message>
+        <source>Blocked contacts</source>
+        <translation>தடுக்கபட்ட தொடர்புகள்</translation>
     </message>
 </context>
 <context>

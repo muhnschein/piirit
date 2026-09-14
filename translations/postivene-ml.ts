@@ -175,6 +175,72 @@
     </message>
 </context>
 <context>
+    <name>BlockContactDialog</name>
+    <message>
+        <source>Block contact</source>
+        <translation>കോൺടാക്റ്റ് ബ്ലോക്ക് ചെയ്യുക</translation>
+    </message>
+    <message>
+        <source>Unblock contact</source>
+        <translation>കോൺടാക്റ്റ് അൺബ്ലോക്ക് ചെയ്യുക</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>റദ്ദാക്കുക</translation>
+    </message>
+    <message>
+        <source>Block this contact?
+
+Direct messages or groups created by blocked contacts will not show up.
+
+Other groups with blocked contacts will still show their messages.</source>
+        <translation>ഈ കോൺടാക്റ്റിനെ ബ്ലോക്ക് ചെയ്യണോ?
+
+ബ്ലോക്ക് ചെയ്ത കോൺടാക്റ്റുകളുടെ നേരിട്ടുള്ള സന്ദേശങ്ങളോ അവർ ഉണ്ടാക്കിയ ഗ്രൂപ്പുകളോ കാണില്ല.
+
+ബ്ലോക്ക് ചെയ്ത കോൺടാക്റ്റുകൾ ഉള്ള മറ്റ് ഗ്രൂപ്പുകളിൽ അവരുടെ സന്ദേശങ്ങൾ ഇപ്പോഴും കാണാം.</translation>
+    </message>
+    <message>
+        <source>Unblock this contact?</source>
+        <translation>ഈ കോൺടാക്റ്റിനെ അൺബ്ലോക്ക് ചെയ്യണോ?</translation>
+    </message>
+</context>
+<context>
+    <name>BlockContactPage</name>
+    <message>
+        <source>Block contact</source>
+        <translation>കോൺടാക്റ്റ് ബ്ലോക്ക് ചെയ്യുക</translation>
+    </message>
+    <message>
+        <source>Search</source>
+        <translation>തിരയുക</translation>
+    </message>
+    <message>
+        <source>Nobody matches</source>
+        <translation>ആരും പൊരുത്തപ്പെടുന്നില്ല</translation>
+    </message>
+    <message>
+        <source>No contacts yet</source>
+        <translation>ഇതുവരെ കോൺടാക്റ്റുകളില്ല</translation>
+    </message>
+</context>
+<context>
+    <name>BlockedContactsPage</name>
+    <message>
+        <source>Block contact</source>
+        <extracomment>Opens the contacts, to pick one to block.</extracomment>
+        <translation>കോൺടാക്റ്റ് ബ്ലോക്ക് ചെയ്യുക</translation>
+    </message>
+    <message>
+        <source>Blocked contacts</source>
+        <translation>ബ്ലോക്ക് ചെയ്ത കോൺടാക്റ്റുകൾ</translation>
+    </message>
+    <message>
+        <source>Blocked contacts will appear here.</source>
+        <translation>ബ്ലോക്ക് ചെയ്ത കോൺടാക്റ്റുകൾ ഇവിടെ കാണാം.</translation>
+    </message>
+</context>
+<context>
     <name>CapturePage</name>
     <message>
         <source>The video could not be saved</source>
@@ -1371,6 +1437,14 @@
     <message>
         <source>Small apps run inside the chat. Somebody else&apos;s code, and less tested than the rest.</source>
         <translation>ചെറിയ ആപ്പുകൾ സംഭാഷണത്തിനുള്ളിൽത്തന്നെ പ്രവർത്തിക്കുന്നു. മറ്റൊരാളുടെ കോഡ്, ബാക്കിയുള്ളതിനെക്കാൾ കുറവ് പരീക്ഷിച്ചത്.</translation>
+    </message>
+    <message>
+        <source>Privacy</source>
+        <translation>സ്വകാര്യത</translation>
+    </message>
+    <message>
+        <source>Blocked contacts</source>
+        <translation>ബ്ലോക്ക് ചെയ്ത കോൺടാക്റ്റുകൾ</translation>
     </message>
 </context>
 <context>

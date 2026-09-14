@@ -1324,6 +1324,62 @@ async fn offline_round_trip_against_real_core() {
         "a query still lists the account's own contact: {contacts_searched:?}"
     );
 
+    // Blocking, which the core keeps a list of its own for: a blocked
+    // contact leaves `get_contacts` whatever flags it is given, and
+    // `get_blocked_contacts` -- which takes the account and nothing else
+    // -- is the only way back to them. That is what the blocked contacts
+    // page is built on, and what the picker in front of it relies on to
+    // offer nobody who is blocked already. Put back at the end, so the
+    // rest of this test meets the contact it expects.
+    client
+        .call::<_, ()>("block_contact", (sender_id, ada))
+        .await
+        .expect("block_contact");
+    let blocked: Vec<Value> = client
+        .call("get_blocked_contacts", (sender_id,))
+        .await
+        .expect("get_blocked_contacts");
+    assert!(
+        blocked
+            .iter()
+            .any(|contact| contact.get("id").and_then(Value::as_u64) == Some(u64::from(ada))),
+        "a blocked contact is not on the core's blocked list: {blocked:?}"
+    );
+    let contacts_blocked: Vec<Value> = client
+        .call("get_contacts", (sender_id, 2, Option::<String>::None))
+        .await
+        .expect("get_contacts with a blocked contact");
+    assert!(
+        !contacts_blocked
+            .iter()
+            .any(|contact| contact.get("id").and_then(Value::as_u64) == Some(u64::from(ada))),
+        "get_contacts still lists a blocked contact: {contacts_blocked:?}"
+    );
+    client
+        .call::<_, ()>("unblock_contact", (sender_id, ada))
+        .await
+        .expect("unblock_contact");
+    let blocked_after: Vec<Value> = client
+        .call("get_blocked_contacts", (sender_id,))
+        .await
+        .expect("get_blocked_contacts after unblocking");
+    assert!(
+        !blocked_after
+            .iter()
+            .any(|contact| contact.get("id").and_then(Value::as_u64) == Some(u64::from(ada))),
+        "an unblocked contact is still on the blocked list: {blocked_after:?}"
+    );
+    let contacts_unblocked: Vec<Value> = client
+        .call("get_contacts", (sender_id, 2, Option::<String>::None))
+        .await
+        .expect("get_contacts after unblocking");
+    assert!(
+        contacts_unblocked
+            .iter()
+            .any(|contact| contact.get("id").and_then(Value::as_u64) == Some(u64::from(ada))),
+        "an unblocked contact did not come back to get_contacts: {contacts_unblocked:?}"
+    );
+
     // What the row's context menu does. Visibility is one method with the
     // core's own variant names, and muting takes a tagged duration.
     for visibility in ["Pinned", "Archived", "Normal"] {

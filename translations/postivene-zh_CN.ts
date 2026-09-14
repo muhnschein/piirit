@@ -174,6 +174,72 @@
     </message>
 </context>
 <context>
+    <name>BlockContactDialog</name>
+    <message>
+        <source>Block contact</source>
+        <translation>屏蔽联系人</translation>
+    </message>
+    <message>
+        <source>Unblock contact</source>
+        <translation>取消屏蔽联系人</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>取消</translation>
+    </message>
+    <message>
+        <source>Block this contact?
+
+Direct messages or groups created by blocked contacts will not show up.
+
+Other groups with blocked contacts will still show their messages.</source>
+        <translation>屏蔽此联系人？
+
+被屏蔽的联系人所创建的直接消息或群组将不会显示。
+
+被屏蔽的联系人所创建的其他群组仍将显示他们的消息。</translation>
+    </message>
+    <message>
+        <source>Unblock this contact?</source>
+        <translation>取消屏蔽此联系人？</translation>
+    </message>
+</context>
+<context>
+    <name>BlockContactPage</name>
+    <message>
+        <source>Block contact</source>
+        <translation>屏蔽联系人</translation>
+    </message>
+    <message>
+        <source>Search</source>
+        <translation>搜索</translation>
+    </message>
+    <message>
+        <source>Nobody matches</source>
+        <translation>没有匹配的联系人</translation>
+    </message>
+    <message>
+        <source>No contacts yet</source>
+        <translation>还没有联系人</translation>
+    </message>
+</context>
+<context>
+    <name>BlockedContactsPage</name>
+    <message>
+        <source>Block contact</source>
+        <extracomment>Opens the contacts, to pick one to block.</extracomment>
+        <translation>屏蔽联系人</translation>
+    </message>
+    <message>
+        <source>Blocked contacts</source>
+        <translation>已屏蔽联系人</translation>
+    </message>
+    <message>
+        <source>Blocked contacts will appear here.</source>
+        <translation>已屏蔽的联系人将显示在此处。</translation>
+    </message>
+</context>
+<context>
     <name>CapturePage</name>
     <message>
         <source>The video could not be saved</source>
@@ -1365,6 +1431,14 @@
     <message>
         <source>Small apps run inside the chat. Somebody else&apos;s code, and less tested than the rest.</source>
         <translation>小应用在聊天里运行。别人的代码，也比其余部分少经检验。</translation>
+    </message>
+    <message>
+        <source>Privacy</source>
+        <translation>隐私</translation>
+    </message>
+    <message>
+        <source>Blocked contacts</source>
+        <translation>已屏蔽联系人</translation>
     </message>
 </context>
 <context>

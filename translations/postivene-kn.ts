@@ -175,6 +175,72 @@
     </message>
 </context>
 <context>
+    <name>BlockContactDialog</name>
+    <message>
+        <source>Block contact</source>
+        <translation>ಸಂಪರ್ಕವನ್ನು ನಿರ್ಬಂಧಿಸಿ</translation>
+    </message>
+    <message>
+        <source>Unblock contact</source>
+        <translation>ಸಂಪರ್ಕದ ನಿರ್ಬಂಧ ತೆಗೆಯಿರಿ</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>ರದ್ದುಮಾಡಿ</translation>
+    </message>
+    <message>
+        <source>Block this contact?
+
+Direct messages or groups created by blocked contacts will not show up.
+
+Other groups with blocked contacts will still show their messages.</source>
+        <translation>ಈ ಸಂಪರ್ಕವನ್ನು ನಿರ್ಬಂಧಿಸಬೇಕೇ?
+
+ನಿರ್ಬಂಧಿಸಿದ ಸಂಪರ್ಕಗಳ ನೇರ ಸಂದೇಶಗಳು ಅಥವಾ ಅವರು ರಚಿಸಿದ ಗುಂಪುಗಳು ಕಾಣಿಸುವುದಿಲ್ಲ.
+
+ನಿರ್ಬಂಧಿಸಿದ ಸಂಪರ್ಕಗಳಿರುವ ಇತರ ಗುಂಪುಗಳಲ್ಲಿ ಅವರ ಸಂದೇಶಗಳು ಇನ್ನೂ ಕಾಣಿಸುತ್ತವೆ.</translation>
+    </message>
+    <message>
+        <source>Unblock this contact?</source>
+        <translation>ಈ ಸಂಪರ್ಕದ ನಿರ್ಬಂಧ ತೆಗೆಯಬೇಕೇ?</translation>
+    </message>
+</context>
+<context>
+    <name>BlockContactPage</name>
+    <message>
+        <source>Block contact</source>
+        <translation>ಸಂಪರ್ಕವನ್ನು ನಿರ್ಬಂಧಿಸಿ</translation>
+    </message>
+    <message>
+        <source>Search</source>
+        <translation>ಹುಡುಕಿ</translation>
+    </message>
+    <message>
+        <source>Nobody matches</source>
+        <translation>ಯಾರೂ ಹೊಂದಿಕೆಯಾಗುತ್ತಿಲ್ಲ</translation>
+    </message>
+    <message>
+        <source>No contacts yet</source>
+        <translation>ಇನ್ನೂ ಸಂಪರ್ಕಗಳಿಲ್ಲ</translation>
+    </message>
+</context>
+<context>
+    <name>BlockedContactsPage</name>
+    <message>
+        <source>Block contact</source>
+        <extracomment>Opens the contacts, to pick one to block.</extracomment>
+        <translation>ಸಂಪರ್ಕವನ್ನು ನಿರ್ಬಂಧಿಸಿ</translation>
+    </message>
+    <message>
+        <source>Blocked contacts</source>
+        <translation>ನಿರ್ಬಂಧಿಸಿದ ಸಂಪರ್ಕಗಳು</translation>
+    </message>
+    <message>
+        <source>Blocked contacts will appear here.</source>
+        <translation>ನಿರ್ಬಂಧಿಸಿದ ಸಂಪರ್ಕಗಳು ಇಲ್ಲಿ ಕಾಣಿಸುತ್ತವೆ.</translation>
+    </message>
+</context>
+<context>
     <name>CapturePage</name>
     <message>
         <source>The video could not be saved</source>
@@ -1371,6 +1437,14 @@
     <message>
         <source>Small apps run inside the chat. Somebody else&apos;s code, and less tested than the rest.</source>
         <translation>ಚಿಕ್ಕ ಆ್ಯಪ್‌ಗಳು ಚಾಟ್‌ನ ಒಳಗೇ ಓಡುತ್ತವೆ. ಬೇರೊಬ್ಬರ ಕೋಡ್, ಮತ್ತು ಉಳಿದವುಗಳಿಗಿಂತ ಕಡಿಮೆ ಪರೀಕ್ಷಿಸಿದ್ದು.</translation>
+    </message>
+    <message>
+        <source>Privacy</source>
+        <translation>ಗೌಪ್ಯತೆ</translation>
+    </message>
+    <message>
+        <source>Blocked contacts</source>
+        <translation>ನಿರ್ಬಂಧಿಸಿದ ಸಂಪರ್ಕಗಳು</translation>
     </message>
 </context>
 <context>

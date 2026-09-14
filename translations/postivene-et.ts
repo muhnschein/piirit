@@ -175,6 +175,72 @@
     </message>
 </context>
 <context>
+    <name>BlockContactDialog</name>
+    <message>
+        <source>Block contact</source>
+        <translation>Blokeeri kontakt</translation>
+    </message>
+    <message>
+        <source>Unblock contact</source>
+        <translation>Lõpeta kontakti blokeerimine</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Loobu</translation>
+    </message>
+    <message>
+        <source>Block this contact?
+
+Direct messages or groups created by blocked contacts will not show up.
+
+Other groups with blocked contacts will still show their messages.</source>
+        <translation>Kas soovid selle kontakti blokeerida?
+
+Blokeeritud kontaktide otsesõnumid ja loodud grupid ei saa enam olema nähtavad.
+
+Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt olema nähtavad.</translation>
+    </message>
+    <message>
+        <source>Unblock this contact?</source>
+        <translation>Kas lõpetad kontakti blokeerimise?</translation>
+    </message>
+</context>
+<context>
+    <name>BlockContactPage</name>
+    <message>
+        <source>Block contact</source>
+        <translation>Blokeeri kontakt</translation>
+    </message>
+    <message>
+        <source>Search</source>
+        <translation>Otsi</translation>
+    </message>
+    <message>
+        <source>Nobody matches</source>
+        <translation>Keegi ei sobi</translation>
+    </message>
+    <message>
+        <source>No contacts yet</source>
+        <translation>Kontakte pole veel</translation>
+    </message>
+</context>
+<context>
+    <name>BlockedContactsPage</name>
+    <message>
+        <source>Block contact</source>
+        <extracomment>Opens the contacts, to pick one to block.</extracomment>
+        <translation>Blokeeri kontakt</translation>
+    </message>
+    <message>
+        <source>Blocked contacts</source>
+        <translation>Blokeeritud kontaktid</translation>
+    </message>
+    <message>
+        <source>Blocked contacts will appear here.</source>
+        <translation>Blokeeritud kontaktid saavad olema leitavad siin.</translation>
+    </message>
+</context>
+<context>
     <name>CapturePage</name>
     <message>
         <source>The video could not be saved</source>
@@ -1371,6 +1437,14 @@
     <message>
         <source>Small apps run inside the chat. Somebody else&apos;s code, and less tested than the rest.</source>
         <translation>Väikesed rakendused töötavad vestluse sees. Kellegi teise kood, ja vähem läbi proovitud kui muu.</translation>
+    </message>
+    <message>
+        <source>Privacy</source>
+        <translation>Privaatsus</translation>
+    </message>
+    <message>
+        <source>Blocked contacts</source>
+        <translation>Blokeeritud kontaktid</translation>
     </message>
 </context>
 <context>

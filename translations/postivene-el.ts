@@ -175,6 +175,68 @@
     </message>
 </context>
 <context>
+    <name>BlockContactDialog</name>
+    <message>
+        <source>Block contact</source>
+        <translation>Αποκλεισμός Επαφής</translation>
+    </message>
+    <message>
+        <source>Unblock contact</source>
+        <translation>Ξεμπλοκάρισμα Επαφής</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Ακύρωση</translation>
+    </message>
+    <message>
+        <source>Block this contact?
+
+Direct messages or groups created by blocked contacts will not show up.
+
+Other groups with blocked contacts will still show their messages.</source>
+        <translation>Αποκλεισμός αυτής της επαφής; Δεν θα λαμβάνετε πλέον μηνύματα από αυτούς.</translation>
+    </message>
+    <message>
+        <source>Unblock this contact?</source>
+        <translation>Κατάργηση αποκλεισμού αυτής της επαφής; Θα μπορείτε να λαμβάνετε μηνύματα από αυτούς.</translation>
+    </message>
+</context>
+<context>
+    <name>BlockContactPage</name>
+    <message>
+        <source>Block contact</source>
+        <translation>Αποκλεισμός Επαφής</translation>
+    </message>
+    <message>
+        <source>Search</source>
+        <translation>Αναζήτηση</translation>
+    </message>
+    <message>
+        <source>Nobody matches</source>
+        <translation>Κανείς δεν ταιριάζει</translation>
+    </message>
+    <message>
+        <source>No contacts yet</source>
+        <translation>Δεν υπάρχουν ακόμη επαφές</translation>
+    </message>
+</context>
+<context>
+    <name>BlockedContactsPage</name>
+    <message>
+        <source>Block contact</source>
+        <extracomment>Opens the contacts, to pick one to block.</extracomment>
+        <translation>Αποκλεισμός Επαφής</translation>
+    </message>
+    <message>
+        <source>Blocked contacts</source>
+        <translation>Αποκλεισμένες Επαφές</translation>
+    </message>
+    <message>
+        <source>Blocked contacts will appear here.</source>
+        <translation>Οι αποκλεισμένες επαφές θα εμφανίζονται εδώ.</translation>
+    </message>
+</context>
+<context>
     <name>CapturePage</name>
     <message>
         <source>The video could not be saved</source>
@@ -1371,6 +1433,14 @@
     <message>
         <source>Small apps run inside the chat. Somebody else&apos;s code, and less tested than the rest.</source>
         <translation>Μικρές εφαρμογές τρέχουν μέσα στη συνομιλία. Κώδικας άλλου, και λιγότερο δοκιμασμένος από τα υπόλοιπα.</translation>
+    </message>
+    <message>
+        <source>Privacy</source>
+        <translation>Ιδιωτικότητα</translation>
+    </message>
+    <message>
+        <source>Blocked contacts</source>
+        <translation>Αποκλεισμένες Επαφές</translation>
     </message>
 </context>
 <context>

@@ -177,6 +177,72 @@
     </message>
 </context>
 <context>
+    <name>BlockContactDialog</name>
+    <message>
+        <source>Block contact</source>
+        <translation>Blokiraj stik</translation>
+    </message>
+    <message>
+        <source>Unblock contact</source>
+        <translation>Odblokiraj stik</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Prekliči</translation>
+    </message>
+    <message>
+        <source>Block this contact?
+
+Direct messages or groups created by blocked contacts will not show up.
+
+Other groups with blocked contacts will still show their messages.</source>
+        <translation>Ali želite blokirati ta stik?
+
+Neposredna sporočila blokiranih stikov in skupine, ki so jih ustvarili, ne bodo prikazana.
+
+V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazana.</translation>
+    </message>
+    <message>
+        <source>Unblock this contact?</source>
+        <translation>Ali želite odblokirati ta stik?</translation>
+    </message>
+</context>
+<context>
+    <name>BlockContactPage</name>
+    <message>
+        <source>Block contact</source>
+        <translation>Blokiraj stik</translation>
+    </message>
+    <message>
+        <source>Search</source>
+        <translation>Išči</translation>
+    </message>
+    <message>
+        <source>Nobody matches</source>
+        <translation>Nihče ne ustreza</translation>
+    </message>
+    <message>
+        <source>No contacts yet</source>
+        <translation>Ni še stikov</translation>
+    </message>
+</context>
+<context>
+    <name>BlockedContactsPage</name>
+    <message>
+        <source>Block contact</source>
+        <extracomment>Opens the contacts, to pick one to block.</extracomment>
+        <translation>Blokiraj stik</translation>
+    </message>
+    <message>
+        <source>Blocked contacts</source>
+        <translation>Blokirani stiki</translation>
+    </message>
+    <message>
+        <source>Blocked contacts will appear here.</source>
+        <translation>Blokirani stiki bodo prikazani tukaj.</translation>
+    </message>
+</context>
+<context>
     <name>CapturePage</name>
     <message>
         <source>The video could not be saved</source>
@@ -1383,6 +1449,14 @@
     <message>
         <source>Small apps run inside the chat. Somebody else&apos;s code, and less tested than the rest.</source>
         <translation>Male aplikacije tečejo znotraj klepeta. Tuja koda, in manj preizkušena kot ostalo.</translation>
+    </message>
+    <message>
+        <source>Privacy</source>
+        <translation>Zasebnost</translation>
+    </message>
+    <message>
+        <source>Blocked contacts</source>
+        <translation>Blokirani stiki</translation>
     </message>
 </context>
 <context>
