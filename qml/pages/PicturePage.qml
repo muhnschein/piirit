@@ -7,10 +7,10 @@ import Postivene 1.0
 /*
  * One picture, as big as the screen will show it.
  *
- * Tapping an image used to hand it to whatever the system thought handled
- * the type, which left Postivene and, on a device, failed there. Showing it
- * here is a page and a Flickable; the way out to another app stays in the
- * pull-down for the cases this cannot do anything with.
+ * Shown here rather than handed to whatever the system thinks handles the
+ * type, which leaves Postivene and fails on a device. A page and a
+ * Flickable; the way out to another app stays in the pull-down for the
+ * cases this cannot do anything with.
  *
  * The picture is fitted at zoom 1 and multiplied from there, and the
  * flickable's content is the larger of the picture and the view -- so

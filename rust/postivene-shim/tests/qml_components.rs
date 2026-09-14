@@ -344,7 +344,7 @@ fn assert_outcome(steps: &[(&str, String)]) {
         "the jump button did not load. {context}"
     );
     // Half, deliberately: the theme's own highlight brings transparency of
-    // its own, which is what made it unreadable at first. Compared loosely
+    // its own, and the two together are unreadable. Compared loosely
     // because a colour's alpha is stored in eight bits.
     let alpha: f64 = value("jump-opaque").parse().unwrap_or_default();
     assert!(

@@ -90,12 +90,11 @@ fn opens(text: &str, name: &str) -> bool {
 ///
 /// A newline in the markup is *not* a line break: in HTML it is
 /// whitespace like a space, and the break is the tag. The core's own
-/// long-message part is written `line<br/>` with a newline after the
-/// tag, so counting both put a blank line between every line of every
-/// message that had been cut -- a to-do list arrived double-spaced. So
-/// whitespace between the markup is collapsed the way a browser collapses
-/// it: to one space in the middle of a line, and to nothing at either end
-/// of one.
+/// long-message part is written `line<br/>` with a newline after the tag,
+/// so counting both would put a blank line between every line of a message
+/// the core had cut. Whitespace between the markup is collapsed the way a
+/// browser collapses it: to one space in the middle of a line, and to
+/// nothing at either end of one.
 ///
 /// Every break is worth one line break and no more, `</p>` included. Two
 /// in a row is still two, so a blank line the reader typed -- which the

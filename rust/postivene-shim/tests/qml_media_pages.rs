@@ -460,9 +460,8 @@ fn assert_outcome(steps: &[(&str, String)], navigation: &str) {
     );
     // Image, Gif and Sticker to the picture page, Video to the video
     // page -- and nothing for File or Vcard, which are the system's to
-    // open. A page here for a file was tried and taken out again: what
-    // an attachment needs and a tap cannot give is a copy, and that is
-    // on the row's menu.
+    // open. No page here for a file: what an attachment needs and a tap
+    // cannot give is a copy, and that is on the row's menu.
     assert_eq!(
         navigation,
         "push:PicturePage.qml|push:PicturePage.qml|push:PicturePage.qml|\

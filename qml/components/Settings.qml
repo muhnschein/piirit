@@ -27,9 +27,8 @@ QtObject {
     /// key that would break a line sends instead, so a message written
     /// here is one line by construction.
     property alias enterSends: enterSendsValue.value
-    /// 0 draws Markdown; anything else shows a message as written. A 1
-    /// used to take the markers out and keep the words, and a phone that
-    /// chose that reads as written now, which is the nearer of the two.
+    /// 0 draws Markdown; anything else shows a message as written, the 1
+    /// an older install may still hold included.
     property alias markdownMode: markdownValue.value
     /// Take known tracking parameters out of links before sending.
     property alias cleanLinks: cleanLinksValue.value

@@ -11,15 +11,14 @@
 //! What it emits is `Text.StyledText`, and what makes that safe is that
 //! it emits *only* what it chose to: every character of the message goes
 //! out escaped, and the handful of tags are the ones this file writes. A
-//! message body of `<img src="https://tracker/p.gif">` was the reason
-//! every label in the app is pinned to plain text (`tests/qml_syntax.rs`),
-//! and it stays a string of angle brackets here. Links are the one thing
+//! message body of `<img src="https://tracker/p.gif">` is why every label
+//! in the app is pinned to plain text (`tests/qml_syntax.rs`); here it
+//! stays a string of angle brackets. Links are the one thing
 //! that can reach the network, and only on a tap.
 //!
 //! Rendered or off, and nothing between: a third mode that took the
-//! markers out and kept the words was offered once and was a second way
-//! to not see the formatting, so the setting is the two the reader can
-//! tell apart.
+//! markers out and kept the words would be a second way to not see the
+//! formatting, so the setting offers the two a reader can tell apart.
 
 use crate::links::url_spans;
 

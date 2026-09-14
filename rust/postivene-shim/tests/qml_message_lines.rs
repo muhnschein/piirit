@@ -128,7 +128,7 @@ fn the_renderings_line_breaks_are_line_breaks_on_the_screen() {
     let long = a_long_styled_body();
 
     single_shot(Duration::from_secs(1), move || unsafe {
-        // What the renderer used to emit, and what it emits now.
+        // A body joined with newlines, and the same body joined with `<br>`.
         record!("newlines", call!("lines", QString::from("one\ntwo\nthree")));
         record!(
             "breaks",

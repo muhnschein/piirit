@@ -1,15 +1,12 @@
 //! Opening a chat at a search result.
 //!
-//! Tapping a result used to show today's messages for a moment before
-//! yanking the reader up to the one they had asked for, because the chat
-//! opened on its newest messages and then went looking. The prefetch now
-//! fills in the page the found message is on, so the page is built already
-//! showing it.
+//! The prefetch fills in the page the found message is on, so the page is
+//! built already showing it. Opening the chat on its newest messages and
+//! then going looking would show today's messages for a moment before
+//! yanking the reader up to the one they asked for.
 //!
-//! The other half of what this file used to cover -- reaching the beginning
-//! of a chat -- is `qml_paging`'s now. There is no control for it any more
-//! and nothing to move: every message has a row, so the first one is row 0
-//! and scrolling to the top arrives at it.
+//! Reaching the beginning of a chat is `qml_paging`'s: every message has a
+//! row, so the first one is row 0 and scrolling to the top arrives at it.
 
 // Qt harness: see qml_conversation_open.rs.
 #![allow(

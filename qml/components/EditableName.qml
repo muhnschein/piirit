@@ -4,12 +4,10 @@ import Sailfish.Silica 1.0
 /*
  * A name under a picture: a field, always.
  *
- * It used to be a label with an edit badge at the corner of the text,
- * which turned it into a field and back. Two states, a badge that had to
- * be found, and a tap before anything could be typed -- for a page whose
- * whole purpose is the name. It is a field now: centred under the
- * picture, in the same size and colour the name was drawn in, with the
- * line under it a field has.
+ * A field rather than a label that turns into one on a tap: on a page
+ * whose whole purpose is the name, a second state and a badge to find
+ * buy nothing. Centred under the picture, in the size and colour the
+ * name is drawn in, with the line under it a field has.
  *
  * `text` is what was given here, which is what the page reads and
  * writes. An empty field shows `fallbackText` -- the name a contact

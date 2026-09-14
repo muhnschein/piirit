@@ -1,13 +1,13 @@
 //! A conversation hidden under another page keeps its rows as they were.
 //!
 //! The platform hides a page while another is over it, and `visible` on
-//! everything in it reads the *effective* visibility -- false. Every part
-//! of a message row used to measure itself as `visible ? implicitHeight :
-//! 0`, so the moment a page was covered every row collapsed to nothing,
-//! the list found its content gone and built a hundred rows to fill the
-//! void, and on the way back undid all of it: a stall of a few hundred
-//! milliseconds right as the reader began to swipe, read off a phone.
-//! Pictures, posters and sound players did the same with their files.
+//! everything in it reads the *effective* visibility -- false. A part of a
+//! message row measuring itself as `visible ? implicitHeight : 0` would
+//! therefore collapse to nothing the moment a page covered it, leaving the
+//! list to build a hundred rows to fill the void and undo all of it on the
+//! way back: a stall of a few hundred milliseconds right as the reader
+//! begins to swipe. The same goes for pictures, posters and sound players
+//! loading their files.
 //!
 //! What is pinned here is that hiding the list changes neither what its
 //! content measures nor how many rows it holds, and showing it again

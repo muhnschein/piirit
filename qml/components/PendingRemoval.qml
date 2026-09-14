@@ -18,13 +18,11 @@ import QtQuick 2.0
  * actually acts when a wait is up.
  *
  * Every id carries its own deadline, and the timer is armed for
- * whichever is soonest. One countdown shared between them was tried and
- * was wrong on a phone: it had to be restarted whenever another delete
- * was asked for, so the first message's countdown ran out, the platform
- * put the message back as though nothing had happened, and everything
- * went together when the last countdown ended. One delete on its own
- * looked right, which is why it took a phone to see. `qml_delete_clocks`
- * is that shape, pinned.
+ * whichever is soonest. One countdown shared between them would have to
+ * be restarted on each new delete, so the first message's countdown would
+ * run out, the platform would put that message back, and everything would
+ * go together at the last countdown's end -- which a single delete never
+ * shows. `qml_delete_clocks` pins that shape.
  *
  * Whoever holds one of these draws the waiting row -- `pending(id)` says
  * which, `remaining(id)` says how much of the wait is left, for a row

@@ -7,9 +7,9 @@ import Postivene 1.0
 /*
  * One video, played here.
  *
- * Tapping a video used to hand it to whatever the system thought played
- * video, which left Postivene and, on a device, failed there. QtMultimedia
- * is already how a voice message plays in its own row; this is the same
+ * Played here rather than handed to whatever the system thinks plays
+ * video, which leaves Postivene and fails on a device. QtMultimedia is
+ * already how a voice message plays in its own row; this is the same
  * player with a picture. The way out to another app stays in the pull-down,
  * and so does a copy into the Videos folder, where the gallery finds it.
  */

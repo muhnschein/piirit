@@ -646,9 +646,9 @@ const LONG_MESSAGE_HEAD: &str = "# Groceries";
 /// The newlines matter and are why they are here. The core's own
 /// template puts its head on lines of its own, and turns each newline of
 /// the message into `<br/>` *followed by a newline* -- so a reader that
-/// counts both gets a blank line between every line of the message. This
-/// fixture used to be one unbroken line, and a to-do list arrived on the
-/// phone double-spaced with nothing here to notice.
+/// counts both gets a blank line between every line of the message. Written
+/// out on one line here, that double-spacing would reach the phone with
+/// nothing in the suite to notice it.
 const LONG_MESSAGE_HTML: &str = "<!DOCTYPE html>\n\
      <html><head>\n\
      <meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" />\n\

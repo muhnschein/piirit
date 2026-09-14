@@ -417,7 +417,7 @@ fn a_conversation_opens_at_the_newest_message_and_stays_where_it_is_left() {
     single_shot(Duration::from_secs(17), move || unsafe {
         // Back from a picture, held on a row up in the history, and the
         // jump button tapped before the hold has run out. A row measured
-        // after the jump used to put the reader straight back.
+        // after the jump would put the reader straight back.
         call!("holdAt", 20);
         call!("jump");
         call!("append", 1);

@@ -207,7 +207,7 @@ Page {
                 searchModel.reload()
             }
         }
-        // Failures that used to reach no one.
+        // Failures that would otherwise reach no one.
         onAccounts_refreshed: {
             page.accountCount = configured_count
             // The profile this page was opened on is gone -- deleted on

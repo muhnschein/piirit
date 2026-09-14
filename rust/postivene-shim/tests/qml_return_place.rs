@@ -1,13 +1,11 @@
 //! Coming back to a conversation puts the reader exactly where they were.
 //!
 //! The place is remembered as a row when the page goes under another and
-//! held while it is away, because the list used to be torn down under a
-//! pushed page and come back at the top of whatever it had loaded. The
-//! hold put the row in the *centre* of the view, which is not where it was:
-//! it was wherever the reader had stopped, half a row above the centre or
-//! a line below it. So every return ended with the rows moving that far,
-//! up or down depending on the row -- a jump the moment the swipe back had
-//! finished, felt on a phone once the rest of the return was smooth.
+//! held while it is away, because a list torn down under a pushed page
+//! comes back at the top of whatever it had loaded. Holding the row to the
+//! *centre* of the view is not enough: the reader had stopped wherever they
+//! stopped, half a row above the centre or a line below it, so every return
+//! would move the rows that far the moment the swipe back finished.
 //!
 //! Pinned here: a view that has not moved while away does not move on the
 //! way back, and one that lost its place while away is put back to the
@@ -106,7 +104,7 @@ const PROBE_QML: &str = r"
             holder.visible = false
             return 'ok'
         }
-        /// The list losing its place under the other page, as it used to.
+        /// The list losing its place under the other page.
         function lose() {
             var view = loader.item
             view.contentY = view.originY
@@ -290,8 +288,8 @@ fn coming_back_puts_the_view_where_it_was_to_the_pixel() {
          back where they were, to the pixel. {context}"
     );
 
-    // A reader a line short of the end is following, and coming back
-    // used to send them to the end: the same jump, always downwards.
+    // A reader a line short of the end is following, and must not be sent
+    // to the end on the way back: that is the same jump, always downwards.
     assert_eq!(
         (value("following").as_str(), value("short-ended").as_str()),
         ("true", "false"),

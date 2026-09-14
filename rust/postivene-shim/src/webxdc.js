@@ -191,10 +191,9 @@
          * A file arrives in one of three shapes and leaves as the
          * request body itself: base64 and text are turned into a Blob
          * here, and a Blob is sent as it is. Nothing is encoded on the
-         * way out -- an exported file used to be read into a base64
-         * string, wrapped in JSON and held whole at both ends, and a
-         * file worth exporting is exactly the size that cannot afford
-         * that.
+         * way out: reading the file into a base64 string and wrapping it
+         * in JSON would hold the whole of it at both ends, and a file
+         * worth exporting is exactly the size that cannot afford that.
          */
         sendToChat: function (message) {
             return new Promise(function (resolve, reject) {

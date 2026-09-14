@@ -103,9 +103,9 @@ fi
 # So wherever nextest runs the suite, `cargo test --doc` runs beside it.
 #
 # Comment lines are stripped before either half is looked for, and that is
-# not tidiness: the first version of this check read the whole file, and the
-# Makefile comment explaining the rule -- which says "--doc" -- satisfied
-# it. Deleting the actual command passed the lint.
+# not tidiness: the Makefile comment explaining this rule says "--doc"
+# itself, so reading the whole file would let the comment satisfy the check
+# with the actual command deleted.
 ran=$((ran + 1))
 doc_missing=""
 for file in .github/workflows/ci.yml Makefile; do

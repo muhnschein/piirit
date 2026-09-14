@@ -155,9 +155,8 @@ const PROBE_QML: &str = r"
             return 'ok'
         }
         // The plus under the last row: the one way to another profile,
-        // whichever of the three ways in the reader wants. The three
-        // used to be three pluses here; they are the question the page
-        // behind this one asks now.
+        // whichever of the three ways in the reader wants. The three are
+        // the question the page behind this one asks.
         function addProfile() {
             var item = findIn(loader.item, 'addProfileButton')
             if (!item) { return 'missing:addProfileButton' }

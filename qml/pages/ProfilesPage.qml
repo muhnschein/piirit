@@ -13,9 +13,9 @@ import "../components"
  * time. Picking the profile already shown does nothing. A row's menu is
  * everything to do with that profile: its own page -- picture, name,
  * address, the rest -- its invite code, writing it out to a backup file,
- * and deleting it. Two of those used to be buttons on the profile's page
- * and are here instead, where the profile is picked: a reader who wants
- * to show their code does not want to read a settings page first.
+ * and deleting it. The code and the backup are here, where the profile is
+ * picked, rather than on the profile's own page: a reader who wants to
+ * show their code does not want to read a settings page first.
  *
  * Another profile is added from the plus under the last row, where the
  * group pages put "add members". One plus, not three: the three ways in
@@ -274,10 +274,10 @@ Page {
         // last row rather than in the pulley, which is where a reader
         // who has just read the list is already looking.
         //
-        // One row, and the three ways in are behind it. They used to be
-        // three pluses in a column -- make one, read a backup file, join
-        // from another device -- which put three answers under a list of
-        // profiles before the reader had been asked anything.
+        // One row, and the three ways in are behind it. Three pluses in a
+        // column -- make one, read a backup file, join from another device
+        // -- would put three answers under a list of profiles before the
+        // reader had been asked anything.
         footer: ListItem {
             id: addProfileRow
             objectName: "addProfileButton"

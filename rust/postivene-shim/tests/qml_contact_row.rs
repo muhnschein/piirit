@@ -1,6 +1,6 @@
 //! What a contact row shows. The contact lists sit one tap from the chat
-//! list and used to look like a different application; this pins the marks
-//! they now share.
+//! list, so this pins the marks the two share rather than letting them
+//! drift into looking like different applications.
 
 // Qt harness: see qml_chat_row.rs.
 #![allow(

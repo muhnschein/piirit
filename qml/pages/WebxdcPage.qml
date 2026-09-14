@@ -100,8 +100,8 @@ Page {
     ///
     /// Saved rather than asked about. The button an app draws over this
     /// is a download, and a download does not ask -- a chooser between
-    /// opening and keeping was tried here and was two taps in front of
-    /// the one thing the reader had already asked for. The copy goes to
+    /// opening and keeping is two taps in front of the one thing the
+    /// reader has already asked for. The copy goes to
     /// Downloads, where the file manager looks, and the notice says so.
     ///
     /// Text with no file has nowhere to be saved, so it goes on the
@@ -176,12 +176,10 @@ Page {
 
     // Leaving stops the app; being covered by another page does not.
     //
-    // This used to stop on Deactivating, which fires for both -- and
-    // `sendToChat` opens the chat picker *over* the app, at the app's own
-    // request. So asking to send a file stopped the host in the middle of
-    // the very request that asked, the app's fetch was answered by a
-    // closed socket, and the app reported that it could not reach its
-    // host. Nothing was ever sent.
+    // Not `Deactivating`, which fires for both: `sendToChat` opens the
+    // chat picker *over* the app at the app's own request, so stopping
+    // there would kill the host in the middle of the request that asked,
+    // and the app's fetch would be answered by a closed socket.
     //
     // Destruction is the honest signal for leaving: a popped page is
     // destroyed, and a stack that is replaced takes the page with it.

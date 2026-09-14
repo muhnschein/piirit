@@ -598,8 +598,8 @@ enum Refresh {
 fn reconcile(rows: &mut ChatListModel, target: Vec<ChatListItem>) {
     // The ids as they stand, kept in step with the model rather than read
     // back out of it each time round: rebuilding this per row, and reaching
-    // into the model with `nth`, is what made a no-op refresh cost a scan
-    // of the whole list for every chat in it.
+    // into the model with `nth`, would cost a no-op refresh a scan of the
+    // whole list for every chat in it.
     let mut current: Vec<u32> = rows.iter().map(|row| row.chat_id).collect();
     let keep: HashSet<u32> = target.iter().map(|row| row.chat_id).collect();
 

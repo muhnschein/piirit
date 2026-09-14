@@ -1,10 +1,10 @@
 //! The conversation model's name follows a rename.
 //!
 //! The header over the messages is named from the chat list when the
-//! page opens, and used to be told of a rename only by the group page
-//! beside it -- so a contact given a name, or a group renamed from
-//! another device, left it showing the old name until the chat was
-//! reopened. The model re-reads the name on the events that can change
+//! page opens. Left to hear of a rename only from the group page beside
+//! it, a contact given a name -- or a group renamed from another device --
+//! would show the old name until the chat was reopened. The model re-reads
+//! the name on the events that can change
 //! it, and says so only when it did.
 
 // Qt harness: needs `unsafe` for `env::set_var` before Qt starts

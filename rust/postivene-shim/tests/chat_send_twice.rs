@@ -5,8 +5,7 @@
 //! they chose. That leaves a window in which the field still holds the text
 //! and the bar still holds the file -- seconds wide for a large video the
 //! core has to copy into its blob directory -- and a second tap in that
-//! window used to send the whole thing again. Found on a device, by
-//! tapping.
+//! window must not send the whole thing again.
 //!
 //! The fake server is told to take its time answering, which is what makes
 //! that window reproducible rather than a race.

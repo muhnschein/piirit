@@ -1,14 +1,13 @@
 //! Deleting several messages, one after another.
 //!
-//! Each one waits a moment before it goes, so the reader can say they
-//! did not mean it. That wait used to belong to the row --
-//! `ListItem.remorseAction` puts it there -- and deleting a handful in a
-//! row lost most of them on a phone. Why is not established: Silica's
+//! Each one waits a moment before it goes, so the reader can say they did
+//! not mean it. That wait belongs beside the list, not to the row, where
+//! `ListItem.remorseAction` would put it: deleting out of a list destroys
+//! rows, and a wait beside the list cannot be lost that way. (Silica's
 //! `RemorseItem` runs its callback rather than dropping it when the
-//! countdown is cut short, so "the row went and took the wait with it"
-//! is not the mechanism. What is certain is that deleting out of a list
-//! destroys rows, and that a wait beside the list cannot be lost that
-//! way at all.
+//! countdown is cut short, so "the row went and took the wait with it" is
+//! not the mechanism -- but a wait living somewhere that volatile has to
+//! be proved every release.)
 //!
 //! So the wait belongs to the list, which outlives every row in it, and
 //! what this pins is that nothing happening to the rows can lose a

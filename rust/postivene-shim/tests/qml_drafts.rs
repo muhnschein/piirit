@@ -1,9 +1,9 @@
 //! Unsent text is kept.
 //!
-//! Typing into a chat, going back to the list and opening it again used to
-//! lose what was typed. The core keeps drafts itself, so the answer is to
-//! put it there rather than to hold it in the page: it then survives the
-//! app being closed, and the chat list says which chats are holding one
+//! What is typed survives going back to the list and opening the chat
+//! again. The core keeps drafts itself, so the draft goes there rather
+//! than being held in the page: it then survives the app being closed,
+//! and the chat list says which chats are holding one
 //! without anything here building that text -- a chat with a draft comes
 //! back with `summaryText1` "Draft", which the row already shows in front
 //! of the preview. `deltachat-jsonrpc/tests/real_server.rs` pins both

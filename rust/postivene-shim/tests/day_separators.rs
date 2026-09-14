@@ -1,10 +1,10 @@
 //! Which day a message belongs to, across a daylight-saving change.
 //!
-//! The separators used to be counted by adding the offset in force *now*
-//! to every timestamp. That is right for most of the year and wrong on the
-//! other side of a DST boundary, where the zone was an hour off what it is
-//! today -- so a message within an hour of local midnight sat under the
-//! wrong heading, and moved as the year turned.
+//! Each timestamp is read in the offset that was in force at its own
+//! instant. Adding the offset in force *now* to every timestamp is right
+//! for most of the year and wrong across a DST boundary, where a message
+//! within an hour of local midnight sits under the wrong heading and moves
+//! as the year turns.
 
 // `set_var` before the first timezone lookup; only unsafe from edition
 // 2024 on, hence `unused_unsafe`.

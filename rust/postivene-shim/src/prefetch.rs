@@ -1,14 +1,10 @@
 //! Loading a conversation before the page that shows it exists.
 //!
-//! Opening a chat used to fetch it while the page was still transitioning
-//! in, which is what made the transition stutter. Deferring the fetch to
-//! the end of the transition stopped the stutter and replaced it with a
-//! wait: the page arrives empty and fills a moment later.
-//!
-//! So the fetch moves earlier instead -- before the push, while the
-//! reader is still looking at the chat list. What it finds is left here
-//! for the model that the page then builds, which takes it without going
-//! near the core, and the page arrives with its rows already in it.
+//! The fetch runs before the push, while the reader is still looking at
+//! the chat list: during the page transition it stutters the transition,
+//! and after it the page arrives empty and fills a moment later. What it
+//! finds is left here for the model the page then builds, which takes it
+//! without going near the core, so the page arrives with its rows in it.
 //!
 //! One chat is kept, the one most recently asked for. It is taken rather
 //! than read, so a second page built from the same account and chat --

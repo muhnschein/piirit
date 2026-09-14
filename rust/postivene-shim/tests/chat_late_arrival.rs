@@ -6,11 +6,10 @@
 //! a busy group, or an older one synced from another device, goes in among
 //! the unread ones rather than after them.
 //!
-//! The model used to answer that by starting over: the rows were replaced,
-//! the view lost its place, and the rows the reader had filled in around
-//! them went back to being blank. What is pinned here is that an arrival
-//! anywhere in the chat is one more row where it belongs, and that nothing
-//! else moves or empties.
+//! Answering that by starting the model over would replace the rows, lose
+//! the view's place, and blank the rows the reader had filled in. What is
+//! pinned here is that an arrival anywhere in the chat is one more row
+//! where it belongs, and that nothing else moves or empties.
 
 // Qt harness: see qml_chat_list.rs.
 #![allow(

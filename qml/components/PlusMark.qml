@@ -6,11 +6,10 @@ import Sailfish.Silica 1.0
  * profile -- standing where the picture of the thing itself stands on
  * the rows above it.
  *
- * The theme's own plus, and nothing behind it. It used to sit on a disc
- * of the highlight colour, avatar-shaped, so the row would line up: the
- * theme draws that icon with a ring of its own, and the two together
- * read as a circle inside a circle. The space is still an avatar's, so
- * the text beside it still lines up with the names above.
+ * The theme's own plus, and nothing behind it: that icon carries a ring
+ * of its own, so an avatar-shaped disc behind it reads as a circle
+ * inside a circle. The space is still an avatar's, so the text beside it
+ * lines up with the names above.
  */
 Item {
     id: mark

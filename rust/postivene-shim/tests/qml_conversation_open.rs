@@ -1,15 +1,13 @@
 //! Opening a chat puts the messages on the page before it arrives.
 //!
-//! This one has been round the houses. A binding from `page.chatId` to the
-//! model used to start the fetch the moment the page was created, while it
-//! was still transitioning in, and building every row of a whole history on
-//! the Qt thread froze the transition. So the handover moved to
-//! `PageStatus.Active` -- which traded the stutter for a wait: the page
-//! arrived empty and filled in behind itself, which is what a reader
-//! actually sees and complains about.
+//! Two failure modes bound this. Starting the fetch as the page is created
+//! builds rows on the Qt thread while the page is still transitioning in,
+//! which stutters the transition; deferring the handover to
+//! `PageStatus.Active` trades that stutter for a wait, with the page
+//! arriving empty and filling in behind itself.
 //!
-//! Both halves of the reason are now gone. A chat opens on one page of
-//! fifty rather than on all of it, and `ChatPrefetch` has usually built
+//! Neither applies now. A chat opens on one page of fifty rather than on
+//! all of it, and `ChatPrefetch` has usually built
 //! those rows before the push. So the handover goes back to the page's own
 //! construction, where a prefetch hit makes it a move rather than a fetch,
 //! and the page comes in already full.
