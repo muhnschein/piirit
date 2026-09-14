@@ -26,13 +26,9 @@
 #![allow(
     unsafe_code,
     unused_unsafe,
-    non_snake_case,
     clippy::borrow_as_ptr,
     clippy::disallowed_methods,
-    clippy::expect_used,
-    // qt_method! declarations must match the generated dispatcher's
-    // by-value parameters; see postivene-shim/src/lib.rs.
-    clippy::needless_pass_by_value
+    clippy::expect_used
 )]
 
 use std::time::Duration;
@@ -41,56 +37,6 @@ use postivene_shim::DeltaChatCore;
 use qmetaobject::*;
 
 mod common;
-
-/// A page stack that refuses a move while a transition is running, as
-/// Silica's does.
-#[derive(QObject, Default)]
-struct PageStackProbe {
-    base: qt_base_class!(trait QObject),
-    log: qt_property!(QString; NOTIFY log_changed),
-    log_changed: qt_signal!(),
-    busy: qt_property!(bool; NOTIFY busy_changed),
-    busy_changed: qt_signal!(),
-
-    push: qt_method!(fn(&mut self, page: QString, properties: QVariantMap)),
-    replaceAbove:
-        qt_method!(fn(&mut self, target: QVariant, page: QString, properties: QVariantMap)),
-    replace: qt_method!(fn(&mut self, page: QString, properties: QVariantMap)),
-    pop: qt_method!(fn(&mut self)),
-}
-
-#[allow(non_snake_case)]
-impl PageStackProbe {
-    fn record(&mut self, entry: &str) {
-        if self.busy {
-            return;
-        }
-        let current = self.log.to_string();
-        self.log = format!("{current}{entry}|").into();
-        self.log_changed();
-    }
-
-    fn name(page: &QString) -> String {
-        let page = page.to_string();
-        page.rsplit('/').next().unwrap_or(&page).to_string()
-    }
-
-    fn push(&mut self, page: QString, _properties: QVariantMap) {
-        self.record(&format!("push:{}", Self::name(&page)));
-    }
-
-    fn replaceAbove(&mut self, _target: QVariant, page: QString, _properties: QVariantMap) {
-        self.record(&format!("replaceAbove:{}", Self::name(&page)));
-    }
-
-    fn replace(&mut self, page: QString, _properties: QVariantMap) {
-        self.record(&format!("replace:{}", Self::name(&page)));
-    }
-
-    fn pop(&mut self) {
-        self.record("pop");
-    }
-}
 
 /// The window, loaded the way `qml_startup` loads it: from a copy of the
 /// tree, with the components directory imported so the probe can reach
@@ -103,6 +49,35 @@ const PROBE_QML: &str = r"
     import QtQuick 2.0
     import 'file://__COMPONENTS__'
     Item {
+        id: probe
+
+        // The page stack, in QML rather than as a QObject on the Rust
+        // side: the window is loaded by the Loader below and reads
+        // `pageStack` off this file. It refuses a move while a
+        // transition is running, as Silica's does -- on stderr, and
+        // nowhere a reader will see.
+        property QtObject pageStack: QtObject {
+            property bool busy: false
+            property string log: ''
+            function name(page) { return ('' + page).split('/').pop() }
+            function push(page, properties) {
+                if (busy) { return }
+                log += 'push:' + name(page) + '|'
+            }
+            function replaceAbove(target, page, properties) {
+                if (busy) { return }
+                log += 'replaceAbove:' + name(page) + '|'
+            }
+            function replace(page, properties) {
+                if (busy) { return }
+                log += 'replace:' + name(page) + '|'
+            }
+            function pop() {
+                if (busy) { return }
+                log += 'pop|'
+            }
+        }
+
         Loader { id: loader }
         function remember(id) {
             Settings.lastAccountId = parseInt(id, 10)
@@ -123,6 +98,12 @@ const PROBE_QML: &str = r"
             core.remove_account(parseInt(id, 10))
             return 'ok'
         }
+        // A page transition starting and ending.
+        function transition(running) {
+            probe.pageStack.busy = (running === 'true')
+            return 'ok'
+        }
+        function stackLog() { return '' + probe.pageStack.log }
     }
 ";
 
@@ -144,13 +125,11 @@ fn the_app_goes_back_to_the_first_screen_when_the_last_profile_is_gone() {
     postivene_shim::register_qml_types();
 
     let core_box = QObjectBox::new(DeltaChatCore::default());
-    let stack_box = QObjectBox::new(PageStackProbe::default());
     let mut engine = QmlEngine::new();
     engine.add_import_path(QString::from(
         common::stubs_dir().to_string_lossy().into_owned(),
     ));
     engine.set_object_property("core".into(), core_box.pinned());
-    engine.set_object_property("pageStack".into(), stack_box.pinned());
     // The real one is handed in by main.rs; the value is never read here.
     engine.set_property(
         "rpcServerPath".into(),
@@ -166,7 +145,6 @@ fn the_app_goes_back_to_the_first_screen_when_the_last_profile_is_gone() {
         .start(QString::from(env!("CARGO_BIN_EXE_fake-core-server")));
 
     let engine_ptr = std::ptr::addr_of_mut!(engine);
-    let stack_ptr = std::ptr::addr_of!(stack_box);
     let mut steps: Vec<(&str, String)> = Vec::new();
     let steps_ptr: *mut Vec<(&str, String)> = std::ptr::addr_of_mut!(steps);
 
@@ -180,18 +158,6 @@ fn the_app_goes_back_to_the_first_screen_when_the_last_profile_is_gone() {
                 .map(|value| value.to_string())
                 .unwrap_or_default()
         }};
-    }
-    macro_rules! transition {
-        ($running:expr) => {{
-            let stack = (*stack_ptr).pinned();
-            stack.borrow_mut().busy = $running;
-            stack.borrow().busy_changed();
-        }};
-    }
-    macro_rules! log {
-        () => {
-            (*stack_ptr).pinned().borrow().log.to_string()
-        };
     }
 
     let root = format!("file://{}", tree.join("postivene.qml").display());
@@ -208,7 +174,7 @@ fn the_app_goes_back_to_the_first_screen_when_the_last_profile_is_gone() {
     // 3s: nothing was moved for the empty list it started with, and a
     // profile is made.
     single_shot(Duration::from_secs(3), move || unsafe {
-        (*steps_ptr).push(("fresh", log!()));
+        (*steps_ptr).push(("fresh", call!("stackLog")));
         (*steps_ptr).push(("make", call!("makeProfile")));
     });
 
@@ -221,19 +187,19 @@ fn the_app_goes_back_to_the_first_screen_when_the_last_profile_is_gone() {
     // 6s: it is deleted with the stack busy, which is what a swipe back
     // off the profiles page leaves behind.
     single_shot(Duration::from_secs(6), move || unsafe {
-        (*steps_ptr).push(("before", log!()));
-        transition!(true);
+        (*steps_ptr).push(("before", call!("stackLog")));
+        (*steps_ptr).push(("transition", call!("transition", "true")));
         (*steps_ptr).push(("delete", call!("deleteProfile", "1")));
     });
 
     // 8s: the move has not been made -- and is not lost either.
     single_shot(Duration::from_secs(8), move || unsafe {
-        (*steps_ptr).push(("held", log!()));
-        transition!(false);
+        (*steps_ptr).push(("held", call!("stackLog")));
+        (*steps_ptr).push(("settled", call!("transition", "false")));
     });
 
     single_shot(Duration::from_secs(9), move || unsafe {
-        (*steps_ptr).push(("landed", log!()));
+        (*steps_ptr).push(("landed", call!("stackLog")));
         (*steps_ptr).push(("remembered", call!("remembered")));
         (*engine_ptr).quit();
     });

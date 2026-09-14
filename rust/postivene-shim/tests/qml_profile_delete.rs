@@ -18,16 +18,9 @@
 #![allow(
     unsafe_code,
     unused_unsafe,
-    non_snake_case,
     clippy::borrow_as_ptr,
     clippy::disallowed_methods,
-    clippy::expect_used,
-    // A qt_method is dispatched through the object, so a stack method
-    // that records nothing still takes `&mut self`.
-    clippy::unused_self,
-    // qt_method! declarations must match the generated dispatcher's
-    // by-value parameters; see postivene-shim/src/lib.rs.
-    clippy::needless_pass_by_value
+    clippy::expect_used
 )]
 
 use std::time::Duration;
@@ -38,29 +31,21 @@ use serde_json::Value;
 
 mod common;
 
-/// Takes the page's navigation and does nothing with it: what is under
-/// test here is what reaches the core.
-#[derive(QObject, Default)]
-struct PageStackProbe {
-    base: qt_base_class!(trait QObject),
-    busy: qt_property!(bool; NOTIFY busy_changed),
-    busy_changed: qt_signal!(),
-    push: qt_method!(fn(&mut self, page: QString, properties: QVariantMap)),
-    replaceAbove:
-        qt_method!(fn(&mut self, target: QVariant, page: QString, properties: QVariantMap)),
-    pop: qt_method!(fn(&mut self)),
-}
-
-#[allow(non_snake_case)]
-impl PageStackProbe {
-    fn push(&mut self, _page: QString, _properties: QVariantMap) {}
-    fn replaceAbove(&mut self, _target: QVariant, _page: QString, _properties: QVariantMap) {}
-    fn pop(&mut self) {}
-}
-
 const PROBE_QML: &str = r"
     import QtQuick 2.0
     Item {
+        id: probe
+
+        // Takes the page's navigation and does nothing with it: what is
+        // under test here is what reaches the core. In QML rather than
+        // as a QObject on the Rust side, since the page reads it off
+        // the file the Loader below was declared in.
+        property QtObject pageStack: QtObject {
+            function push(page, properties) {}
+            function replaceAbove(target, page, properties) {}
+            function pop() {}
+        }
+
         Loader { id: loader }
 
         function load(url) {
@@ -125,13 +110,11 @@ fn a_deletion_asked_for_on_the_way_out_still_goes() {
     postivene_shim::register_qml_types();
 
     let core_box = QObjectBox::new(DeltaChatCore::default());
-    let stack_box = QObjectBox::new(PageStackProbe::default());
     let mut engine = QmlEngine::new();
     engine.add_import_path(QString::from(
         common::stubs_dir().to_string_lossy().into_owned(),
     ));
     engine.set_object_property("core".into(), core_box.pinned());
-    engine.set_object_property("pageStack".into(), stack_box.pinned());
     engine.load_data(QByteArray::from(PROBE_QML));
 
     core_box

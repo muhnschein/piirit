@@ -26,13 +26,9 @@
 #![allow(
     unsafe_code,
     unused_unsafe,
-    non_snake_case,
     clippy::borrow_as_ptr,
     clippy::disallowed_methods,
-    clippy::expect_used,
-    // qt_method! declarations must match the generated dispatcher's
-    // by-value parameters; see postivene-shim/src/lib.rs.
-    clippy::needless_pass_by_value
+    clippy::expect_used
 )]
 
 use std::cell::RefCell;
@@ -44,65 +40,35 @@ use qmetaobject::*;
 
 mod common;
 
-/// A page stack that behaves the way Silica's does about transitions: a
-/// move asked for while one is running is not made, and is not reported
-/// either.
-#[derive(QObject, Default)]
-struct PageStackProbe {
-    base: qt_base_class!(trait QObject),
-    /// `replaceAbove:ChatListPage.qml|`
-    log: qt_property!(QString; NOTIFY log_changed),
-    log_changed: qt_signal!(),
-
-    /// Silica's own: true while a page transition is running.
-    busy: qt_property!(bool; NOTIFY busy_changed),
-    busy_changed: qt_signal!(),
-
-    push: qt_method!(fn(&mut self, page: QString, properties: QVariantMap)),
-    replaceAbove:
-        qt_method!(fn(&mut self, target: QVariant, page: QString, properties: QVariantMap)),
-    pop: qt_method!(fn(&mut self)),
-}
-
-#[allow(non_snake_case)]
-impl PageStackProbe {
-    fn record(&mut self, entry: &str) {
-        let current = self.log.to_string();
-        self.log = format!("{current}{entry}|").into();
-        self.log_changed();
-    }
-
-    fn name(page: &QString) -> String {
-        let page = page.to_string();
-        page.rsplit('/').next().unwrap_or(&page).to_string()
-    }
-
-    fn push(&mut self, page: QString, _properties: QVariantMap) {
-        if self.busy {
-            return;
-        }
-        let name = Self::name(&page);
-        self.record(&format!("push:{name}"));
-    }
-
-    fn replaceAbove(&mut self, _target: QVariant, page: QString, _properties: QVariantMap) {
-        if self.busy {
-            return;
-        }
-        self.record(&format!("replaceAbove:{}", Self::name(&page)));
-    }
-
-    fn pop(&mut self) {
-        if self.busy {
-            return;
-        }
-        self.record("pop");
-    }
-}
-
 const PROBE_QML: &str = r"
     import QtQuick 2.0
     Item {
+        id: probe
+
+        // The page stack, written here rather than as a QObject on the
+        // Rust side: a page loaded by a Loader reads `pageStack` off the
+        // file the Loader was declared in, and a stack that behaves like
+        // Silica's is three lines of QML. It behaves like Silica's in the
+        // one way this test is about -- a move asked for while a
+        // transition is running is not made, and is not reported either.
+        property QtObject pageStack: QtObject {
+            property bool busy: false
+            property string log: ''
+            function name(page) { return ('' + page).split('/').pop() }
+            function push(page, properties) {
+                if (busy) { return }
+                log += 'push:' + name(page) + '|'
+            }
+            function replaceAbove(target, page, properties) {
+                if (busy) { return }
+                log += 'replaceAbove:' + name(page) + '|'
+            }
+            function pop() {
+                if (busy) { return }
+                log += 'pop|'
+            }
+        }
+
         Loader { id: loader }
 
         function loadWith(url, json) {
@@ -119,6 +85,12 @@ const PROBE_QML: &str = r"
             loader.item.begin(text)
             return 'ok'
         }
+        // A page transition starting and ending.
+        function transition(running) {
+            probe.pageStack.busy = (running === 'true')
+            return 'ok'
+        }
+        function stackLog() { return '' + probe.pageStack.log }
     }
 ";
 
@@ -141,14 +113,12 @@ fn the_profile_that_arrived_is_handed_over_once_the_stack_is_free() {
     postivene_shim::register_qml_types();
 
     let core_box = QObjectBox::new(DeltaChatCore::default());
-    let stack_box = QObjectBox::new(PageStackProbe::default());
 
     let mut engine = QmlEngine::new();
     engine.add_import_path(QString::from(
         common::stubs_dir().to_string_lossy().into_owned(),
     ));
     engine.set_object_property("core".into(), core_box.pinned());
-    engine.set_object_property("pageStack".into(), stack_box.pinned());
     engine.load_data(QByteArray::from(PROBE_QML));
 
     core_box
@@ -157,9 +127,8 @@ fn the_profile_that_arrived_is_handed_over_once_the_stack_is_free() {
         .start(QString::from(env!("CARGO_BIN_EXE_fake-core-server")));
 
     let engine_ptr = std::ptr::addr_of_mut!(engine);
-    let stack_ptr = std::ptr::addr_of!(stack_box);
     // SAFETY: these callbacks fire only while `exec()` is running on this
-    // thread, and everything they touch outlives it.
+    // thread, and `engine` outlives it.
     macro_rules! call {
         ($name:expr $(, $arg:expr)*) => {{
             let result = unsafe {
@@ -169,15 +138,6 @@ fn the_profile_that_arrived_is_handed_over_once_the_stack_is_free() {
                 )
             };
             QString::from_qvariant(result).unwrap_or_default()
-        }};
-    }
-    /// Set the stack's `busy` the way a transition starting and ending
-    /// would.
-    macro_rules! transition {
-        ($running:expr) => {{
-            let stack = unsafe { (*stack_ptr).pinned() };
-            stack.borrow_mut().busy = $running;
-            stack.borrow().busy_changed();
         }};
     }
 
@@ -197,7 +157,7 @@ fn the_profile_that_arrived_is_handed_over_once_the_stack_is_free() {
                 r#"{"from":"file","status":2}"#
             ),
         );
-        transition!(true);
+        common::record(&s, "transition", call!("transition", "true"));
         common::record(&s, "first", call!("begin", "/tmp/holiday-backup.tar"));
         common::record(&s, "second", call!("begin", "/tmp/holiday-backup.tar"));
         common::record(&s, "busy", call!("pageProperty", "busy"));
@@ -209,23 +169,19 @@ fn the_profile_that_arrived_is_handed_over_once_the_stack_is_free() {
     single_shot(Duration::from_secs(3), move || {
         common::record(&s, "transferring", call!("pageProperty", "busy"));
         common::record(&s, "said", call!("pageProperty", "errorMessage"));
-        common::record(&s, "held", unsafe {
-            (*stack_ptr).pinned().borrow().log.clone()
-        });
+        common::record(&s, "held", call!("stackLog"));
         common::record(
             &s,
             "backNavigation",
             call!("pageProperty", "backNavigation"),
         );
-        transition!(false);
+        common::record(&s, "settled", call!("transition", "false"));
     });
 
     // 4s: the stack is free, so the move it was holding is made.
     let s = steps.clone();
     single_shot(Duration::from_secs(4), move || {
-        common::record(&s, "landed", unsafe {
-            (*stack_ptr).pinned().borrow().log.clone()
-        });
+        common::record(&s, "landed", call!("stackLog"));
         common::record(&s, "backAgain", call!("pageProperty", "backNavigation"));
     });
 
