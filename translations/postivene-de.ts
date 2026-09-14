@@ -1242,6 +1242,10 @@ In anderen Gruppen mit blockierten Kontakten werden deren Nachrichten weiterhin 
         <source>Make a backup on the other device, copy the file here, then choose it.</source>
         <translation>Mach auf dem anderen Gerät ein Backup, kopiere die Datei hierher und wähle sie dann aus.</translation>
     </message>
+    <message>
+        <source>That profile is already on this phone. Open it from the profiles list.</source>
+        <translation>Dieses Profil ist schon auf diesem Telefon. Öffne es in der Profilliste.</translation>
+    </message>
 </context>
 <context>
     <name>ScanView</name>

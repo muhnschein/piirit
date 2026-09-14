@@ -1238,6 +1238,10 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Make a backup on the other device, copy the file here, then choose it.</source>
         <translation>Lag en sikkerhetskopi på den andre enheten, kopier filen hit, og velg den så.</translation>
     </message>
+    <message>
+        <source>That profile is already on this phone. Open it from the profiles list.</source>
+        <translation>Denne profilen er allerede på denne telefonen. Åpne den fra profillisten.</translation>
+    </message>
 </context>
 <context>
     <name>ScanView</name>

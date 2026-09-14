@@ -1236,6 +1236,10 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Make a backup on the other device, copy the file here, then choose it.</source>
         <translation>Икенче җиһазда резерв күчермә ясагыз, файлны монда күчерегез, аннары аны сайлагыз.</translation>
     </message>
+    <message>
+        <source>That profile is already on this phone. Open it from the profiles list.</source>
+        <translation>Бу профиль бу телефонда инде бар. Аны профильләр исемлегеннән ачыгыз.</translation>
+    </message>
 </context>
 <context>
     <name>ScanView</name>

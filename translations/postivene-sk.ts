@@ -1248,6 +1248,10 @@ Správy od zablokovaných kontaktov v ostatných skupinách sa budú naďalej zo
         <source>Make a backup on the other device, copy the file here, then choose it.</source>
         <translation>Urob na druhom zariadení zálohu, skopíruj súbor sem a potom ho vyber.</translation>
     </message>
+    <message>
+        <source>That profile is already on this phone. Open it from the profiles list.</source>
+        <translation>Tento profil už v tomto telefóne je. Otvor ho v zozname profilov.</translation>
+    </message>
 </context>
 <context>
     <name>ScanView</name>

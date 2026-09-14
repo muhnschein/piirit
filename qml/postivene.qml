@@ -110,6 +110,52 @@ ApplicationWindow {
     /// IO has been asked for. Once, however long the app runs.
     property bool askedForIo: false
 
+    /// Whether this run has ever had a profile to show.
+    ///
+    /// What tells the two empty account lists apart. A phone with no
+    /// profile yet is already looking at the welcome page and must not
+    /// be sent there again; a phone whose last profile has just gone --
+    /// deleted, or the app's data cleared under it -- has a chat list
+    /// open on an account the core no longer has, which is a page that
+    /// cannot read or write anything and answers a tap on a chat with
+    /// "account not found".
+    property bool hadProfile: false
+
+    /// The way back to the welcome page, held until the stack can make
+    /// it. The last profile goes as the profiles page is leaving, so
+    /// this move is asked for mid-pop -- which a stack in the middle of
+    /// a transition refuses.
+    PendingNavigation {
+        id: welcomeAgain
+        stack: pageStack
+    }
+
+    // Where the app goes when the last profile is gone. Here rather
+    // than on the pages, which is where it used to be: the profiles
+    // page is destroyed by the same swipe that deletes from it, the
+    // chat list underneath it is mid-transition, and between them the
+    // move was made twice or not at all. The window is neither.
+    Connections {
+        target: core
+        // Qt 5.6 handler syntax; see WelcomePage.qml.
+        onAccounts_refreshed: {
+            if (configured_count > 0) {
+                appWindow.hadProfile = true
+                return
+            }
+            if (!appWindow.hadProfile) {
+                return
+            }
+            appWindow.hadProfile = false
+            // Nothing to share into, and nothing to come back to.
+            appWindow.accountId = 0
+            Settings.lastAccountId = 0
+            welcomeAgain.replaceAbove(null,
+                                      Qt.resolvedUrl("pages/WelcomePage.qml"),
+                                      {})
+        }
+    }
+
     // IO belongs to the window rather than to whichever page happens to
     // be up: a phone that resumes onto its chat list never sees the
     // welcome page at all. Every profile, not only the one on screen --
@@ -129,6 +175,9 @@ ApplicationWindow {
         // Takes the binding off `resumeAccountId`: the window has its
         // answer, and from here the key belongs to the chat list.
         appWindow.resumeAccountId = appWindow.rememberedProfile()
+        // A resumed phone had a profile last time it was looked at, so
+        // an account list that comes back empty is one that has lost it.
+        appWindow.hadProfile = appWindow.resumeAccountId > 0
         core.start(rpcServerPath)
     }
 }

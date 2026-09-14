@@ -1248,6 +1248,10 @@ Citās grupās, kurās ir bloķēti kontakti, viņu ziņas joprojām būs redzam
         <source>Make a backup on the other device, copy the file here, then choose it.</source>
         <translation>Izveido rezerves kopiju otrā ierīcē, iekopē failu šeit un tad izvēlies to.</translation>
     </message>
+    <message>
+        <source>That profile is already on this phone. Open it from the profiles list.</source>
+        <translation>Šis profils jau ir šajā tālrunī. Atver to profilu sarakstā.</translation>
+    </message>
 </context>
 <context>
     <name>ScanView</name>

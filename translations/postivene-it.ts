@@ -1242,6 +1242,10 @@ Gli altri gruppi con contatti bloccati continueranno a visualizzare i loro messa
         <source>Make a backup on the other device, copy the file here, then choose it.</source>
         <translation>Fai un backup sull&apos;altro dispositivo, copia il file qui, poi scegli quello.</translation>
     </message>
+    <message>
+        <source>That profile is already on this phone. Open it from the profiles list.</source>
+        <translation>Questo profilo è già su questo telefono. Aprilo dall&apos;elenco dei profili.</translation>
+    </message>
 </context>
 <context>
     <name>ScanView</name>

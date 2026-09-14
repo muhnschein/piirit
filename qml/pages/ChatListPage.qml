@@ -207,19 +207,14 @@ Page {
                 searchModel.reload()
             }
         }
+        // How many profiles there are, which is what decides whether
+        // this page offers switching at all. An account list with none
+        // left in it is the window's business rather than this page's:
+        // it comes in while this page is being replaced or the one above
+        // it popped, and a page in the middle of a transition is the one
+        // thing on the phone that cannot move the stack. postivene.qml.
+        onAccounts_refreshed: page.accountCount = configured_count
         // Failures that would otherwise reach no one.
-        onAccounts_refreshed: {
-            page.accountCount = configured_count
-            // The profile this page was opened on is gone -- deleted on
-            // this phone, or the app's data cleared under it. Nothing
-            // here can be read or written, so hand the reader back to
-            // the first screen rather than leave them on an empty list.
-            if (configured_count === 0) {
-                Settings.lastAccountId = 0
-                pageStack.replaceAbove(null, Qt.resolvedUrl("WelcomePage.qml"),
-                                       {})
-            }
-        }
         onCore_error: page.errorMessage = message
         onIo_started: {
             if (!success) {

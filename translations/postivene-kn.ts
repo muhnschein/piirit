@@ -1242,6 +1242,10 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Make a backup on the other device, copy the file here, then choose it.</source>
         <translation>ಇನ್ನೊಂದು ಸಾಧನದಲ್ಲಿ ಬ್ಯಾಕಪ್ ಮಾಡಿ, ಫೈಲನ್ನು ಇಲ್ಲಿಗೆ ನಕಲಿಸಿ, ನಂತರ ಅದನ್ನು ಆರಿಸಿ.</translation>
     </message>
+    <message>
+        <source>That profile is already on this phone. Open it from the profiles list.</source>
+        <translation>ಈ ಪ್ರೊಫೈಲ್ ಈಗಾಗಲೇ ಈ ಫೋನ್‌ನಲ್ಲಿದೆ. ಅದನ್ನು ಪ್ರೊಫೈಲ್‌ಗಳ ಪಟ್ಟಿಯಿಂದ ತೆರೆಯಿರಿ.</translation>
+    </message>
 </context>
 <context>
     <name>ScanView</name>

@@ -37,29 +37,13 @@ Page {
     /// The profile the chat list is currently on.
     property int currentAccountId: 0
 
-    /// True once a deletion has been asked for, so the empty list that
-    /// follows is read as "the last profile is gone" rather than as the
-    /// list simply not having loaded yet.
-    property bool deleting: false
-
+    // Deleting the last profile leaves the app with nothing to show, and
+    // the way back to where a first profile is made belongs to the window
+    // (postivene.qml) rather than to this page: this page is destroyed by
+    // the same swipe that asks for the deletion, so a move made from here
+    // would be a move by a page that is no longer there.
     Connections {
         target: core
-        // Deleting the last profile leaves the app with nothing to show,
-        // so it goes back to where a first profile is made. Replacing the
-        // whole stack, not pushing: there is no chat list to return to.
-        onAccounts_refreshed: {
-            if (page.deleting && configured_count === 0) {
-                page.deleting = false
-                // The empty properties are passed rather than left
-                // out: Silica's own replaceAbove takes them, and the
-                // two-argument form errors out under a stack that
-                // declares all three -- which is what the test harness
-                // does, so the branch was never actually run there.
-                pageStack.replaceAbove(null,
-                                       Qt.resolvedUrl("WelcomePage.qml"),
-                                       {})
-            }
-        }
         onAccount_error: page.errorMessage = message
     }
 
@@ -73,10 +57,7 @@ Page {
     /// moment in which they can say they did not mean it.
     PendingRemoval {
         id: doomedProfiles
-        onRemove: {
-            page.deleting = true
-            core.remove_account(id)
-        }
+        onRemove: core.remove_account(id)
     }
 
     // A profile page pushed over this one, or a swipe back to the chats:
@@ -87,6 +68,15 @@ Page {
             doomedProfiles.flush()
         }
     }
+
+    // And again as the page is actually destroyed, because "leaving" and
+    // "told it is leaving" are not the same moment. A profile tapped for
+    // deletion while the back gesture is already under way is asked for
+    // after this page has had its `Deactivating`, and the wait it armed
+    // then dies with the page and the timer on it: the reader asked for
+    // a profile to go and it quietly stayed. Flushing twice costs
+    // nothing -- the first one leaves nothing behind.
+    Component.onDestruction: doomedProfiles.flush()
 
     SilicaListView {
         id: listView

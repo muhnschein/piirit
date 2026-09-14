@@ -1254,6 +1254,10 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
         <source>Make a backup on the other device, copy the file here, then choose it.</source>
         <translation>Naredi varnostno kopijo na drugi napravi, prekopiraj datoteko sem in jo nato izberi.</translation>
     </message>
+    <message>
+        <source>That profile is already on this phone. Open it from the profiles list.</source>
+        <translation>Ta profil je že v tem telefonu. Odpri ga na seznamu profilov.</translation>
+    </message>
 </context>
 <context>
     <name>ScanView</name>

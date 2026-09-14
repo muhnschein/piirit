@@ -1232,6 +1232,10 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Make a backup on the other device, copy the file here, then choose it.</source>
         <translation>Készíts mentést a másik eszközön, másold ide a fájlt, majd válaszd ki.</translation>
     </message>
+    <message>
+        <source>That profile is already on this phone. Open it from the profiles list.</source>
+        <translation>Ez a profil már rajta van ezen a telefonon. Nyisd meg a profilok listájából.</translation>
+    </message>
 </context>
 <context>
     <name>ScanView</name>

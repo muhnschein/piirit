@@ -750,8 +750,35 @@ async fn import_into(state: &Arc<Mutex<State>>, id: &Value, account: u32, from: 
         return err(id, "Transfer was stopped");
     }
     state.imex(account, 1000);
+    // A backup carries the profile it was written from, address and
+    // all, so the same backup imported twice is the same address twice.
+    // Keyed on what the import was handed, which is the one thing two
+    // imports of the same profile have in common here.
+    state
+        .config
+        .insert((account, "configured_addr".to_string()), backup_addr(from));
     state.configure(account);
     ok(id, &Value::Null)
+}
+
+/// The address a backup carries, made up from what names it: the file
+/// path or the code the other device showed. Two imports of the same
+/// thing get the same address, which is what a duplicate is.
+fn backup_addr(from: &str) -> String {
+    let name: String = from
+        .rsplit('/')
+        .next()
+        .unwrap_or(from)
+        .chars()
+        .map(|letter| {
+            if letter.is_ascii_alphanumeric() {
+                letter
+            } else {
+                '-'
+            }
+        })
+        .collect();
+    format!("{}@example.org", name.trim_matches('-'))
 }
 
 /// Write a profile out, the way the real core's `export_backup` does:

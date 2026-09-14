@@ -1,5 +1,6 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
+import "../components"
 
 /*
  * A profile that exists already, brought onto this phone. Both ways the
@@ -22,7 +23,17 @@ import Sailfish.Silica 1.0
  * A code that is not a device offering a profile is this app's own
  * finding rather than the core's, so the shim names the reason and this
  * page puts it into the reader's language -- the core's own words for it
- * are about protocols, and the reader is holding a camera.
+ * are about protocols, and the reader is holding a camera. A profile
+ * this phone already has is refused the same way: two accounts on one
+ * address are two copies of one mailbox, each fetching it.
+ *
+ * Handing over to the profile that arrived goes through
+ * PendingNavigation rather than straight to the stack. A file browser
+ * that has just chosen a backup is still animating away while the import
+ * runs, and a small backup is imported before it has finished -- so the
+ * move was asked for mid-transition, refused, and the reader was left
+ * looking at "Restore from a backup" with the profile already on the
+ * phone behind it.
  */
 Page {
     id: page
@@ -48,11 +59,30 @@ Page {
 
     // Nothing to go back to mid-transfer: leaving would drop the page
     // that is listening for the answer, and the core would carry on.
-    backNavigation: !page.busy
+    // Nor with the hand-over to the new profile still waiting on the
+    // stack: swiping away would take this page, and the move with it.
+    backNavigation: !page.busy && !navigation.pending
+
+    /// The hand-over to the profile that arrives, held until the stack
+    /// can make it.
+    PendingNavigation {
+        id: navigation
+        stack: pageStack
+        // A page with the file browser over it, or one still animating,
+        // is not a page Silica will move from.
+        ready: page.status === PageStatus.Active
+    }
 
     /// Start the transfer with whatever the first step produced: a code
     /// from the camera, or a path from the file browser.
     function begin(text) {
+        // The file browser reports what was chosen by property change,
+        // which it can do more than once for one choice -- and a second
+        // import started over the first is a second account holding a
+        // second copy of the same profile.
+        if (page.busy) {
+            return
+        }
         page.errorMessage = ""
         page.permille = 0
         page.busy = true
@@ -95,6 +125,9 @@ Page {
         if (reason === "stalled") {
             return qsTr("The transfer stopped. Both devices have to stay on one network, with this page open.")
         }
+        if (reason === "already-here") {
+            return qsTr("That profile is already on this phone. Open it from the profiles list.")
+        }
         return qsTr("That is not the code a device shows while it is offering its profile.")
     }
 
@@ -116,8 +149,8 @@ Page {
                 return
             }
             page.busy = false
-            pageStack.replaceAbove(null, Qt.resolvedUrl("ChatListPage.qml"),
-                                   { accountId: account_id })
+            navigation.replaceAbove(null, Qt.resolvedUrl("ChatListPage.qml"),
+                                    { accountId: account_id })
         }
 
         onRestore_refused: {

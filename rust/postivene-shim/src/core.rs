@@ -1320,6 +1320,12 @@ impl DeltaChatCore {
     /// IO is started here rather than left to the page. An imported
     /// account has none running -- the import writes the database and
     /// stops -- and a profile that does not fetch is not a profile.
+    ///
+    /// The account list is repopulated here for the same reason. The
+    /// profile is on the phone whether or not the page that asked for
+    /// it is still up to hear about it, and a list that does not know
+    /// about it is a profiles page with the new profile missing from it
+    /// until the app is next started.
     fn restore_callback(&self, attempt: u64) -> impl Fn(Taken) {
         let ptr: QPointer<Self> = QPointer::from(self);
         queued_callback(move |taken: Taken| {
@@ -1332,6 +1338,7 @@ impl DeltaChatCore {
                             let _ = start_io(&rpc, Some(account_id)).await;
                         });
                     }
+                    this.borrow_mut().refresh_accounts();
                     this.borrow().profile_restored(account_id);
                 }
                 Taken::Done(account_id) => {

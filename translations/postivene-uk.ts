@@ -1248,6 +1248,10 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Make a backup on the other device, copy the file here, then choose it.</source>
         <translation>Зробіть резервну копію на іншому пристрої, скопіюйте файл сюди, тоді оберіть його.</translation>
     </message>
+    <message>
+        <source>That profile is already on this phone. Open it from the profiles list.</source>
+        <translation>Цей профіль уже є на цьому телефоні. Відкрийте його у списку профілів.</translation>
+    </message>
 </context>
 <context>
     <name>ScanView</name>
