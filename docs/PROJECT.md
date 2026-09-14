@@ -426,8 +426,11 @@ deltachat-rpc-server (bundled binary, subprocess) = the entire core
   rather than missing. Two tiles share a screen; three do not -- side by
   side each of them had a third of a phone, which is not room for a line
   of words with a second line under it -- so Add profile stacks its
-  three the full width of the page, centred in what its header leaves.
-  A stack piled under the header reads as a list that ran out.
+  three instead, and stacked a tile is a row rather than a tile: the
+  icon at the left where a contact's picture would be, the words beside
+  it and ranged left, the way every other row in the app reads
+  (`components/ContactRow.qml`). The stack starts under the header, not
+  in the middle of the page: a list is read from the top.
 - **A newcomer is told what Delta Chat is before being asked to pick a
   server.** The first screen offers two ways on rather than one, because
   a reader who has never heard of Delta Chat and a reader who came for

@@ -52,6 +52,11 @@ Item {
     /// them a third of it, which is not room for a line of words with a
     /// second line under it, so the page that asks three things at once
     /// stacks them instead.
+    ///
+    /// Stacked, a tile is a row rather than a tile: the icon at the left
+    /// where an avatar would be, the words beside it and ranged left,
+    /// which is how every other row in this app reads
+    /// (components/ContactRow.qml).
     property bool stacked: false
 
     /// What is kept between stacked tiles, so that two of them read as
@@ -111,12 +116,16 @@ Item {
             // every choice that is always on.
             enabled: modelData.enabled === undefined || modelData.enabled
 
-            /// What this tile's own contents come to, top to bottom.
-            /// Read by the row, which draws every tile at the largest.
+            /// The bottom of the words, whichever of them is the last.
+            readonly property real wordsEnd: hint.visible
+                ? hint.y + hint.height : caption.y + caption.height
+
+            /// What this tile's own contents come to, top to bottom: the
+            /// words under the icon side by side, and whichever of the
+            /// two runs lower when they are beside each other. Read by
+            /// the row, which draws every tile at the largest.
             readonly property real needed:
-                caption.y + caption.height
-                + (hint.visible ? Theme.paddingSmall + hint.height : 0)
-                + Theme.paddingMedium
+                Math.max(icon.y + icon.height, tile.wordsEnd) + Theme.paddingMedium
             onNeededChanged: root.measure()
 
             // Lit under a thumb, the way an IconButton is; grey where the
@@ -125,14 +134,18 @@ Item {
                 ? Theme.secondaryColor
                 : tile.highlighted ? Theme.highlightColor : Theme.primaryColor
 
+            // Placed rather than anchored: the two ways a tile is laid
+            // out want different edges, and a binding reads better than
+            // two sets of anchors that undo each other.
             Image {
                 id: icon
                 objectName: "tileIcon"
-                anchors {
-                    top: parent.top
-                    topMargin: Theme.paddingMedium
-                    horizontalCenter: parent.horizontalCenter
-                }
+                // At the left of the row it is the mark on, the way an
+                // avatar is on a contact's row; over the words when the
+                // tiles stand side by side.
+                x: root.stacked ? Theme.paddingMedium
+                                : (tile.width - icon.width) / 2
+                y: Theme.paddingMedium
                 width: Theme.iconSizeMedium
                 height: width
                 source: "image://theme/" + modelData.icon + "?" + tile.tint
@@ -141,15 +154,20 @@ Item {
             Label {
                 id: caption
                 objectName: "tileLabel"
-                anchors {
-                    top: icon.bottom
-                    topMargin: Theme.paddingSmall
-                    left: parent.left
-                    right: parent.right
-                    leftMargin: Theme.paddingSmall
-                    rightMargin: Theme.paddingSmall
-                }
-                horizontalAlignment: Text.AlignHCenter
+                x: root.stacked ? icon.x + icon.width + Theme.paddingMedium
+                                : Theme.paddingSmall
+                // Beside the icon: at the top when there is a second
+                // line to come, and level with the middle of the icon
+                // when the one line is all there is (ContactRow.qml does
+                // the same with a name and an address).
+                y: root.stacked
+                   ? (hint.visible ? Theme.paddingMedium
+                                   : icon.y + (icon.height - caption.height) / 2)
+                   : icon.y + icon.height + Theme.paddingSmall
+                width: tile.width - caption.x
+                       - (root.stacked ? Theme.paddingMedium : Theme.paddingSmall)
+                horizontalAlignment: root.stacked ? Text.AlignLeft
+                                                  : Text.AlignHCenter
                 wrapMode: Text.Wrap
                 textFormat: Text.PlainText
                 font.pixelSize: Theme.fontSizeSmall
@@ -161,15 +179,14 @@ Item {
                 id: hint
                 objectName: "tileHint"
                 visible: hint.text.length > 0
-                anchors {
-                    top: caption.bottom
-                    topMargin: Theme.paddingSmall
-                    left: parent.left
-                    right: parent.right
-                    leftMargin: Theme.paddingSmall
-                    rightMargin: Theme.paddingSmall
-                }
-                horizontalAlignment: Text.AlignHCenter
+                x: caption.x
+                // Straight under the line above it where the two are a
+                // block beside an icon, and a gap below the words where
+                // they are a column under one.
+                y: caption.y + caption.height
+                   + (root.stacked ? 0 : Theme.paddingSmall)
+                width: caption.width
+                horizontalAlignment: caption.horizontalAlignment
                 wrapMode: Text.Wrap
                 textFormat: Text.PlainText
                 font.pixelSize: Theme.fontSizeExtraSmall

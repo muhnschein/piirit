@@ -419,16 +419,16 @@ fn assert_pages(steps: &[(String, String)], navigation: &str) {
         "true",
         "the three ways in are crowded into one row. {context}"
     );
-    // And the stack sits in the middle of what the header leaves rather
-    // than piled under it, which on a long screen read as a list that
-    // had run out.
+    // And the stack starts under the header rather than sitting in the
+    // middle of the page: a list is read from the top, which is where
+    // every other list on the phone starts.
     let measure = |label: &str| -> f64 { value_of(steps, label).parse().unwrap_or_default() };
     let above = measure("add-ways-y") - measure("add-header");
     let below = measure("add-page-height") - measure("add-ways-y") - measure("add-ways-height");
     assert!(
-        above > 0.0 && (above - below).abs() < 2.0,
-        "the three ways are not centred in what the header leaves: \
-         {above} above, {below} below. {context}"
+        above > 0.0 && above * 4.0 < below,
+        "the three ways do not start under the header: {above} above, \
+         {below} below. {context}"
     );
     assert!(
         navigation.contains("push:AddProfileDialog.qml"),

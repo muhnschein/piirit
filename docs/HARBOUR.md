@@ -449,8 +449,9 @@ removed from the store even after approval. Not an option.
    here, `icon-m-transfer` and `icon-m-add` on the setup screen,
    `icon-m-device` and `icon-m-backup` where the profile is asked
    after, and those three again on Add profile, where they stand one
-   under another -- full width, centred in what the header leaves --
-   rather than three to a row. A name this phone's
+   under another under the header rather than three to a row -- each of
+   them a row with its icon at the left and its two lines beside it,
+   ranged left. A name this phone's
    theme does not have draws nothing at all, and a tile with no icon is
    the one thing a headless test cannot see, so check that every one of
    them is there, in the ambience's colours, and that the tile lights

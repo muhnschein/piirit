@@ -126,6 +126,10 @@ const THREE: &str = r#"[
 
 type Steps = Rc<RefCell<Vec<(String, String)>>>;
 
+// A script of timed steps, in the order they happen, the way
+// qml_components.rs runs its own: splitting it would hide that order for
+// no gain -- what each tick reads depends on what the tick before it set.
+#[allow(clippy::too_many_lines)]
 #[test]
 fn a_row_of_tiles_is_named_drawn_and_answered_for() {
     // SAFETY: single-threaded test binary; set before Qt starts.
@@ -197,6 +201,10 @@ fn a_row_of_tiles_is_named_drawn_and_answered_for() {
             "setup-hint",
             call!("partOf", "setupTile", "tileHint", "visible"),
         );
+        r(
+            "about-align",
+            call!("partOf", "aboutTile", "tileLabel", "horizontalAlignment"),
+        );
         r("about-box", call!("boxOf", "aboutTile"));
         r("setup-box", call!("boxOf", "setupTile"));
         r("row-height", call!("own", "height"));
@@ -223,6 +231,31 @@ fn a_row_of_tiles_is_named_drawn_and_answered_for() {
         r("third-box", call!("boxOf", "secondDeviceTile"));
         r("stacked-height", call!("own", "height"));
         r("gap", call!("own", "gap"));
+        r(
+            "row-icon-x",
+            call!("partOf", "backupFileTile", "tileIcon", "x"),
+        );
+        r(
+            "row-icon-width",
+            call!("partOf", "backupFileTile", "tileIcon", "width"),
+        );
+        r(
+            "row-label-x",
+            call!("partOf", "backupFileTile", "tileLabel", "x"),
+        );
+        r(
+            "row-label-align",
+            call!(
+                "partOf",
+                "backupFileTile",
+                "tileLabel",
+                "horizontalAlignment"
+            ),
+        );
+        r(
+            "row-hint-x",
+            call!("partOf", "backupFileTile", "tileHint", "x"),
+        );
     });
 
     single_shot(Duration::from_secs(5), move || unsafe {
@@ -297,6 +330,35 @@ fn assert_stack(steps: &[(String, String)]) {
         "the stack is not as tall as the tiles and the room between \
          them. {context}"
     );
+
+    // And a stacked tile is a row: the icon at the left where an avatar
+    // would be, the words beside it rather than under it and ranged
+    // left (Text.AlignLeft is 1), with the quiet line squared up to the
+    // one above it.
+    let number = |label: &str| -> f64 { value(label).parse().unwrap_or_default() };
+    assert!(
+        number("row-icon-x") > 0.0 && number("row-icon-x") < 1032.0 / 4.0,
+        "the icon in a stacked tile is not at its left: {}. {context}",
+        value("row-icon-x")
+    );
+    assert!(
+        number("row-label-x") >= number("row-icon-x") + number("row-icon-width")
+            && number("row-icon-width") > 0.0,
+        "the words in a stacked tile are not beside the icon: the label \
+         starts at {} and the icon ends at {}. {context}",
+        number("row-label-x"),
+        number("row-icon-x") + number("row-icon-width")
+    );
+    assert_eq!(
+        value("row-label-align"),
+        "1",
+        "the words in a stacked tile are not ranged left. {context}"
+    );
+    assert!(
+        (number("row-hint-x") - number("row-label-x")).abs() < 1.0,
+        "the second line of a stacked tile does not start where the \
+         first one does. {context}"
+    );
 }
 
 fn assert_row(steps: &[(String, String)]) {
@@ -324,6 +386,14 @@ fn assert_row(steps: &[(String, String)]) {
         value("about-text"),
         "Tell me about Delta Chat",
         "the tile does not say what it was given to say. {context}"
+    );
+
+    // Side by side, the words are centred under the icon, which is
+    // Text.AlignHCenter -- 4.
+    assert_eq!(
+        value("about-align"),
+        "4",
+        "the words under a side-by-side tile's icon are not centred. {context}"
     );
 
     // The quiet line is there for a choice that has one and gone for a

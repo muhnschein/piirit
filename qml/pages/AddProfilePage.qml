@@ -26,9 +26,8 @@ Page {
 
     SilicaFlickable {
         anchors.fill: parent
-        // Long enough to hold the tiles where they are put, and never
-        // shorter than the page: the stack is placed against the page's
-        // own height rather than against this, which would be a loop.
+        // Long enough to hold the tiles, and never shorter than the
+        // page itself.
         contentHeight: Math.max(height, ways.y + ways.height + Theme.paddingLarge)
 
         PageHeader {
@@ -37,21 +36,19 @@ Page {
             title: qsTr("Add profile")
         }
 
-        // The three ways, one under another and centred in what the
-        // header leaves. Three tiles in a row left each of them a third
-        // of the screen, which is not room for a line of words and the
-        // line under it; stacked, each gets the width and the eye goes
-        // down them one at a time. Centred rather than stacked up under
-        // the header: three tall tiles at the top of a long screen read
-        // as a list that ran out.
+        // The three ways, one under another under the header. Three
+        // tiles in a row left each of them a third of the screen, which
+        // is not room for a line of words and the line under it;
+        // stacked, each is a row with its icon at the left and its two
+        // lines beside it, and the eye goes down them one at a time --
+        // which is the reading order everything else on the phone has,
+        // and it starts at the top.
         ChoiceTiles {
             id: ways
             objectName: "addWays"
             stacked: true
             width: page.width
-            y: header.height + Math.max(Theme.paddingLarge,
-                                        (page.height - header.height
-                                         - ways.height) / 2)
+            y: header.height + Theme.paddingLarge
             choices: [
                 {
                     name: "createProfile",
