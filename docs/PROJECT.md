@@ -372,7 +372,16 @@ deltachat-rpc-server (bundled binary, subprocess) = the entire core
   every ambience and the room for the words is cut where the words are.
   The painter is standard-library Python and deterministic, so the
   masks change only when it does, and a build needs neither it nor a
-  display.
+  display. The field is the screen's rather than the page's: a Silica
+  page is centred in what holds it and turned inside it, and on a phone
+  that keeps a band of its screen for the camera the page is handed that
+  band short of the screen -- a strip across the top upright, a strip
+  down one edge on its side. A field anchored to the page left that
+  strip bare, which on a screen made of faces is the first thing the eye
+  finds, so the page measures what it is in, through its own coordinates
+  so that one sum serves both ways up, and lays the field over all of
+  it. The shader crops the mask rather than stretching it, so a wider
+  field is more field, not wider faces.
 - **A phone that has been used opens on its chat list, and the first
   screen is never made.** Which page the app puts up first is decided
   before anything is drawn, by the window rather than by a page
@@ -390,6 +399,38 @@ deltachat-rpc-server (bundled binary, subprocess) = the entire core
   because a phone whose key was never written has only the core's
   answer to go on, and there it offers the hand-over until the stack
   takes it rather than reading one refusal as an answer.
+- **A question with two answers is asked with tiles, not with a stack of
+  buttons.** The onboarding pages each ask one thing -- what do you want
+  to do, do you have a profile already, where is it -- and every answer
+  is a place to go rather than something to do to what is on screen.
+  That is what the row on a contact's page already is, so it is what
+  these are: one tile per answer, side by side, an icon over the words
+  and a quieter line under them where there is more to say
+  (`components/ChoiceTiles.qml`, built the way `MediaKinds.qml` is,
+  bindings rather than a positioner). Two buttons of the same size, one
+  above the other, say only that there are two of something; an icon
+  says which is which before the words are read, and the reader who
+  needs that most is the one on the first screen of an app they have
+  never opened. The icons are the theme's own, so they wear the phone's
+  ambience: `icon-m-about` and `icon-m-person` on the first screen,
+  `icon-m-transfer` and `icon-m-add` on the setup screen,
+  `icon-m-device` and `icon-m-backup` where the profile is asked after,
+  and the same three on Add profile, which asks all of it at once. Each
+  of those names is one other Sailfish apps on the same phone draw, and
+  the first screen is a device check (docs/HARBOUR.md) partly for that
+  reason: a name this theme does not have draws nothing at all, and a
+  tile with no icon on it is the one thing the headless tests cannot
+  see (`components/AppMark.qml` says the same about webxdc). The row is
+  as tall as the tile that needs most room, so it reads as a row rather
+  than as blocks, and a choice the core is not up for yet is greyed
+  rather than missing. Two tiles share a screen; three do not -- side by
+  side each of them had a third of a phone, which is not room for a line
+  of words with a second line under it -- so Add profile stacks its
+  three instead, and stacked a tile is a row rather than a tile: the
+  icon at the left where a contact's picture would be, the words beside
+  it and ranged left, the way every other row in the app reads
+  (`components/ContactRow.qml`). The stack starts under the header, not
+  in the middle of the page: a list is read from the top.
 - **A newcomer is told what Delta Chat is before being asked to pick a
   server.** The first screen offers two ways on rather than one, because
   a reader who has never heard of Delta Chat and a reader who came for

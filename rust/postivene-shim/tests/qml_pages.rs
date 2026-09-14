@@ -345,7 +345,7 @@ fn onboarding_pages_drive_the_core_and_navigate() {
     let s = steps.clone();
     single_shot(Duration::from_secs(2), move || {
         record(&s, "welcome-probing", call!("pageProperty", "probing"));
-        record(&s, "welcome-click", call!("click", "setupButton"));
+        record(&s, "welcome-click", call!("click", "setupTile"));
     });
 
     // Where that lands: the two ways into a profile. One asks where the
@@ -358,12 +358,8 @@ fn onboarding_pages_drive_the_core_and_navigate() {
             "start-load",
             call!("load", page_url("ProfileStartPage.qml")),
         );
-        record(
-            &s,
-            "start-existing",
-            call!("click", "existingProfileButton"),
-        );
-        record(&s, "start-create", call!("click", "createProfileButton"));
+        record(&s, "start-existing", call!("click", "existingProfileTile"));
+        record(&s, "start-create", call!("click", "createProfileTile"));
     });
 
     // The dialog: nothing to accept until there is a name; the first
