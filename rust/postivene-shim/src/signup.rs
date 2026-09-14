@@ -81,7 +81,7 @@ pub(crate) enum Taken {
     /// The profile is on this device, as `account_id`.
     Done(u32),
     /// A reason of this app's own, for the page to put into the reader's
-    /// language: `not-a-backup`, `too-new` or `stalled`.
+    /// language: `not-a-backup`, `too-new`, `stalled` or `already-here`.
     Refused(&'static str),
     /// The core refused, in its own words.
     Failed(String),
@@ -229,7 +229,9 @@ impl Attempt {
     /// A failed import leaves the account behind, so it is removed
     /// rather than released: unlike a refused signup, which leaves a
     /// clean unconfigured account for the next attempt to reuse, a
-    /// half-written one is good for nothing.
+    /// half-written one is good for nothing. So is a second copy of a
+    /// profile this phone already has (`already_here`), which is undone
+    /// the same way.
     pub(crate) async fn restore(
         &self,
         runtime: &CoreRuntime,
@@ -256,7 +258,21 @@ impl Attempt {
             source,
         ));
         match tokio::time::timeout(self.deadline, call).await {
-            Ok(Ok(Ok(()))) => Taken::Done(account_id),
+            Ok(Ok(Ok(()))) => {
+                // A profile already on this phone must not arrive a
+                // second time. Two accounts on one address are two
+                // copies of the same mailbox, each fetching it: every
+                // message counted twice on the profiles page, notified
+                // twice, and answered from whichever copy the reader
+                // happened to open. The import is undone rather than
+                // kept, as a failed one is -- the copy already here is
+                // the profile, and it is untouched.
+                if already_here(&rpc, account_id).await {
+                    discard(&rpc, account_id).await;
+                    return Taken::Refused("already-here");
+                }
+                Taken::Done(account_id)
+            }
             Ok(Ok(Err(err))) => {
                 discard(&rpc, account_id).await;
                 Taken::Failed(err)
@@ -359,6 +375,40 @@ async fn import_call(
         discard(&rpc, account_id).await;
     }
     result
+}
+
+/// Whether some other account is already configured on the address the
+/// profile just taken over sends from.
+///
+/// Asked of the core's own account list rather than remembered here: a
+/// copy added by an earlier run of the app is as much a duplicate as one
+/// added a moment ago, and the list is where both show up. An account
+/// whose address cannot be read is let through -- refusing a profile on
+/// a question that could not be answered is the worse of the two
+/// mistakes.
+async fn already_here(rpc: &RpcClient, account_id: u32) -> bool {
+    let Ok(accounts) = rpc
+        .call_unit::<Vec<serde_json::Value>>("get_all_accounts")
+        .await
+    else {
+        return false;
+    };
+    let addr = accounts
+        .iter()
+        .find(|account| json::u32_opt(account, "id") == Some(account_id))
+        .map(|account| json::str_at(account, "addr").to_string())
+        .unwrap_or_default();
+    if addr.is_empty() {
+        return false;
+    }
+    accounts.iter().any(|account| {
+        json::u32_opt(account, "id") != Some(account_id)
+            && json::str_at(account, "kind") == "Configured"
+            // The same mailbox written two ways is the same mailbox:
+            // the core lowercases what it configures, but a backup
+            // written by another client need not have.
+            && json::str_at(account, "addr").eq_ignore_ascii_case(&addr)
+    })
 }
 
 /// Whether the code read is one another device is offering a profile

@@ -1248,6 +1248,10 @@ Wiadomości innych grup z zablokowanymi kontaktami nadal będą wyświetlane.</t
         <source>Make a backup on the other device, copy the file here, then choose it.</source>
         <translation>Zrób kopię zapasową na drugim urządzeniu, skopiuj plik tutaj i wtedy go wybierz.</translation>
     </message>
+    <message>
+        <source>That profile is already on this phone. Open it from the profiles list.</source>
+        <translation>Ten profil jest już na tym telefonie. Otwórz go z listy profili.</translation>
+    </message>
 </context>
 <context>
     <name>ScanView</name>

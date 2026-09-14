@@ -1236,6 +1236,10 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
         <source>Make a backup on the other device, copy the file here, then choose it.</source>
         <translation>Diğer cihazda bir yedek al, dosyayı buraya kopyala, sonra onu seç.</translation>
     </message>
+    <message>
+        <source>That profile is already on this phone. Open it from the profiles list.</source>
+        <translation>Bu profil bu telefonda zaten var. Onu profiller listesinden aç.</translation>
+    </message>
 </context>
 <context>
     <name>ScanView</name>

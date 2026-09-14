@@ -1244,6 +1244,10 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Make a backup on the other device, copy the file here, then choose it.</source>
         <translation>Padaryk atsarginę kopiją kitame įrenginyje, nukopijuok failą čia ir tada jį pasirink.</translation>
     </message>
+    <message>
+        <source>That profile is already on this phone. Open it from the profiles list.</source>
+        <translation>Šis profilis jau yra šiame telefone. Atverk jį profilių sąraše.</translation>
+    </message>
 </context>
 <context>
     <name>ScanView</name>

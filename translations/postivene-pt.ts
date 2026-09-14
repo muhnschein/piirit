@@ -1242,6 +1242,10 @@ Mensagens de contactos bloqueados não serão ocultadas noutros grupos.</transla
         <source>Make a backup on the other device, copy the file here, then choose it.</source>
         <translation>Faça uma cópia no outro dispositivo, copie o ficheiro para aqui e escolha-o.</translation>
     </message>
+    <message>
+        <source>That profile is already on this phone. Open it from the profiles list.</source>
+        <translation>Esse perfil já está neste telefone. Abra-o na lista de perfis.</translation>
+    </message>
 </context>
 <context>
     <name>ScanView</name>

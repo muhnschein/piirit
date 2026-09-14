@@ -1242,6 +1242,10 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
         <source>Make a backup on the other device, copy the file here, then choose it.</source>
         <translation>Tee teises seadmes varukoopia, kopeeri fail siia ja vali see.</translation>
     </message>
+    <message>
+        <source>That profile is already on this phone. Open it from the profiles list.</source>
+        <translation>See profiil on juba selles telefonis. Ava see profiilide loendist.</translation>
+    </message>
 </context>
 <context>
     <name>ScanView</name>

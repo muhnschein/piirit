@@ -1248,6 +1248,10 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
         <source>Make a backup on the other device, copy the file here, then choose it.</source>
         <translation>Udělej na druhém zařízení zálohu, zkopíruj soubor sem a pak ho vyber.</translation>
     </message>
+    <message>
+        <source>That profile is already on this phone. Open it from the profiles list.</source>
+        <translation>Tento profil už v tomto telefonu je. Otevři ho v seznamu profilů.</translation>
+    </message>
 </context>
 <context>
     <name>ScanView</name>

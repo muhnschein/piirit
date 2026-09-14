@@ -1236,6 +1236,10 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Make a backup on the other device, copy the file here, then choose it.</source>
         <translation>在另一台设备上做备份，把文件复制到这里，然后选它。</translation>
     </message>
+    <message>
+        <source>That profile is already on this phone. Open it from the profiles list.</source>
+        <translation>这个个人资料已经在这台手机上了。请从个人资料列表中打开它。</translation>
+    </message>
 </context>
 <context>
     <name>ScanView</name>

@@ -1242,6 +1242,10 @@ Vous continuerez à voir les messages des contacts bloqués dans les autres grou
         <source>Make a backup on the other device, copy the file here, then choose it.</source>
         <translation>Faites une sauvegarde sur l&apos;autre appareil, copiez le fichier ici, puis choisissez-le.</translation>
     </message>
+    <message>
+        <source>That profile is already on this phone. Open it from the profiles list.</source>
+        <translation>Ce profil est déjà sur ce téléphone. Ouvrez-le dans la liste des profils.</translation>
+    </message>
 </context>
 <context>
     <name>ScanView</name>
