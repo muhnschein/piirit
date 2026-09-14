@@ -212,19 +212,6 @@ off, because CI is asked once and should report everything it knows; and
 failures are printed where they happen and again at the end, because in a
 two-hundred-line log the summary is what anyone reads.
 
-## The art the first screens draw
-
-The onboarding screens draw pictures rather than laying out avatars
-(`docs/PROJECT.md`), and the pictures live in `qml/art/`: two masks for
-the field of faces, one per orientation, and one per fact of the
-introduction. They are **committed**, so a build needs no painter and no
-display, and they are edited as pictures: each is two channels of an
-8-bit RGB PNG, red for what the primary colour draws and green for what
-the highlight draws, which the shaders tint against the ambience.
-`tests/qml_welcome.rs` and `tests/qml_intro.rs` check that they are
-there in the shape the shaders read, by shape rather than by exact size,
-so the art can be redrawn without editing a test.
-
 ## Translations
 
 The strings are the `qsTr()` calls in `qml/`; `translations/postivene.ts`
@@ -337,49 +324,24 @@ Environment requirements, each of which cost an attempt:
 
 ## What a device build costs
 
-Seven and a quarter minutes before this, and a little over three now. The
-before column is run 89, the last one built the old way; the two after it
-are runs 98 and 99, both against a published SDK image and a warm cache.
-
-| Step | Before | One job | Four jobs |
+| Step | One job | Four jobs |
 |---|---|---|---|
-| Pull the SDK image | 144 s | 105 s | 80 s |
-| Build the RPM | 270 s | 142 s | 82 s |
-| Validate against Harbour | 12 s | 10 s | 10 s |
-| **The whole run** | **437 s** | **284 s** | **190 s** |
+| Pull the SDK image | 105 s | 80 s |
+| Build the RPM |142 s | 82 s |
+| Validate against Harbour | 10 s | 10 s |
+| **The whole run** | **284 s** | **190 s** |
 
 Three changes, in the order they pay:
 
-**The SDK image is derived, not upstream's.** `ci/build-sdk-image.sh` takes
+- **The SDK image is derived, not upstream's.** `ci/build-sdk-image.sh` takes
 `coderus/sailfishos-platform-sdk` by digest and produces an image with one
 architecture instead of three, this package's `BuildRequires` already
 installed, and the i686 rustlib already at `/usr/lib/rustlib`. It has to
 flatten the result rather than layer it, because files deleted in a new
 layer still weigh what they weighed. 5.04 GB of pull becomes about 2.3 GB,
-and `zypper` leaves the critical path: `build-init` and `build-requires`
-together took 30 s and now take 3.
-
-A target here is two rootfs -- the pristine one, and the `<target>.default`
-snapshot that mb2 actually builds in and that `build-requires` installs
-into. Both are kept: deleting the snapshot as a redundant copy leaves the
-image with no rust in it.
-
-`sdk-image.yml` publishes the image to the repository's registry; `rpm.yml`
-derives and publishes one itself when it finds none, so a new SDK version
-needs a pinned digest in `ci/build-sdk-image.sh` and nothing else. That
-first run pays for it: about 850 s, of which 576 is deriving and pushing.
-
-**`rust/target` and the crates are carried between runs.** Keyed on the
-lockfile and on the image, because they are artifacts for one target triple
-built by the rust that image ships. It is worth 103 s: the same build cold
-took 245 s and warm 142 s. Of the 56 crates, 52 come from the lockfile and
-change only when it does. A fresh `actions/checkout` gives every file a new
-mtime and does *not* defeat this -- cargo fingerprints registry crates by
-content, so only the path crates rebuild. The two caches are small, 112 MB
-and 12 MB.
-
-**cargo runs four jobs inside scratchbox2**, which is worth another 60 s.
-See the job count under "Spec constraints" below for what that setting is.
+and `zypper` leaves the critical path.
+- `rust/target` and the crates are carried between runs.
+- cargo runs four jobs inside scratchbox2.
 
 ## Spec constraints
 
@@ -393,18 +355,8 @@ Constraints encoded in `rpm/harbour-postivene.spec`:
   sb2; a native OBS worker lets cargo pick. The same spec also keeps the
   build's temporaries in the build directory, because a parallel link
   through the shared `/tmp` under sb2 can lose an object file it has just
-  written -- Whisperfish's spec does the same.
-
-  It defaults to **4**, which device builds have run green on the 5.2 SDK
-  (runs 99 and 100) and which takes the `Build the RPM` step from 142 s to
-  82 s. `--define "jobs 1"` is the way back if one ever hangs.
-
-  Why it is worth so much: CPU time equals wall time at `-j1`, because
-  cargo hands rustc its codegen threads from the same jobserver, so one
-  job is one thread through the entire build. On a host, against the same
-  crate graph and the same rustc 1.75 the SDK ships, a cold build takes
-  144 s at `-j1` and 39 s at `-j4`; one file changed in the shim takes
-  72 s at `-j1`, 41 s at `-j2` and 27 s at `-j4`.
+  written. It defaults to **4**. `--define "jobs 1"` is the way back if
+  one ever hangs.
 - **No `--target` for cargo.** Jolla's cargo pins build scripts to the
   tooling's host triple; `--target` on top makes cargo treat the whole build
   as a cross build. `SB2_RUST_TARGET_TRIPLE` already tells the accelerated
