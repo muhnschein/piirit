@@ -112,6 +112,6 @@ Column {
         wrapMode: Text.Wrap
         font.pixelSize: Theme.fontSizeExtraSmall
         color: Theme.secondaryColor
-        text: qsTr("Applies to all members of this chat, they can still copy, save, and forward messages.")
+        text: qsTr("Applies to everyone in the chat. They can still copy and forward.")
     }
 }

@@ -35,10 +35,6 @@
         <translation>Tạo</translation>
     </message>
     <message>
-        <source>Pick a chatmail relay or enter a custom server. The server assigns the address; the encryption keys are made on this device.</source>
-        <translation>Chọn một máy chuyển tiếp chatmail hoặc nhập máy chủ tùy chỉnh. Máy chủ cấp địa chỉ; các khóa mã hóa được tạo trên thiết bị này.</translation>
-    </message>
-    <message>
         <source>Your name</source>
         <translation>Tên của bạn</translation>
     </message>
@@ -53,6 +49,41 @@
     <message>
         <source>See &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; for the full list.</source>
         <translation>Xem danh sách đầy đủ tại &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
+    </message>
+    <message>
+        <source>The relay gives you an address. The keys are made on this phone.</source>
+        <translation>Máy chuyển tiếp cấp cho bạn một địa chỉ. Khoá được tạo trên điện thoại này.</translation>
+    </message>
+</context>
+<context>
+    <name>AddProfilePage</name>
+    <message>
+        <source>Add profile</source>
+        <translation>Thêm hồ sơ</translation>
+    </message>
+    <message>
+        <source>Create a profile</source>
+        <translation>Tạo hồ sơ</translation>
+    </message>
+    <message>
+        <source>A new address on a chatmail relay.</source>
+        <translation>Một địa chỉ mới trên máy chuyển tiếp chatmail.</translation>
+    </message>
+    <message>
+        <source>Restore from a backup</source>
+        <translation>Khôi phục từ bản sao lưu</translation>
+    </message>
+    <message>
+        <source>A backup file copied onto this phone.</source>
+        <translation>Một tệp sao lưu đã chép sang điện thoại này.</translation>
+    </message>
+    <message>
+        <source>Add as second device</source>
+        <translation>Thêm làm thiết bị thứ hai</translation>
+    </message>
+    <message>
+        <source>The other device keeps it. Both get everything new.</source>
+        <translation>Thiết bị kia vẫn giữ. Cả hai đều nhận mọi thứ mới.</translation>
     </message>
 </context>
 <context>
@@ -134,8 +165,12 @@
         <translation>Đã lưu vào %1</translation>
     </message>
     <message>
-        <source>This profile&apos;s messages, contacts and key in one file, saved to Documents. Whoever has that file has the profile, so keep it somewhere safe. Your other profiles are not in it: each one is backed up from its own page.</source>
-        <translation>Tin nhắn, danh bạ và khoá của hồ sơ này trong một tệp duy nhất, lưu vào Tài liệu. Ai có tệp đó thì có hồ sơ, vì vậy hãy giữ nó ở nơi an toàn. Các hồ sơ khác của bạn không nằm trong đó: mỗi hồ sơ được sao lưu từ trang của riêng nó.</translation>
+        <source>Messages, contacts and key in one file, saved to Documents. Whoever has the file has the profile.</source>
+        <translation>Tin nhắn, danh bạ và khoá trong một tệp, lưu vào Tài liệu. Ai có tệp thì có hồ sơ.</translation>
+    </message>
+    <message>
+        <source>Swipe on for your chats.</source>
+        <translation>Vuốt tiếp để đến các cuộc trò chuyện.</translation>
     </message>
 </context>
 <context>
@@ -476,10 +511,6 @@
         <translation>Tin nhắn tự hủy</translation>
     </message>
     <message>
-        <source>Applies to all members of this chat, they can still copy, save, and forward messages.</source>
-        <translation>Áp dụng cho mọi thành viên của cuộc trò chuyện này; họ vẫn có thể sao chép, lưu và chuyển tiếp tin nhắn.</translation>
-    </message>
-    <message>
         <source>After 1 year</source>
         <translation>Sau 1 năm</translation>
     </message>
@@ -511,6 +542,10 @@
         <source>After %1 seconds</source>
         <translation>Sau %1 giây</translation>
     </message>
+    <message>
+        <source>Applies to everyone in the chat. They can still copy and forward.</source>
+        <translation>Áp dụng cho mọi người trong cuộc trò chuyện. Họ vẫn có thể sao chép và chuyển tiếp.</translation>
+    </message>
 </context>
 <context>
     <name>ExistingProfilePage</name>
@@ -523,16 +558,16 @@
         <translation>Thêm làm thiết bị thứ hai</translation>
     </message>
     <message>
-        <source>The device that has it keeps it. This one joins, over the same network.</source>
-        <translation>Thiết bị đang có hồ sơ vẫn giữ nó. Máy này tham gia cùng, qua cùng một mạng.</translation>
-    </message>
-    <message>
         <source>Restore from a backup</source>
         <translation>Khôi phục từ bản sao lưu</translation>
     </message>
     <message>
-        <source>A backup file the other device wrote, copied onto this phone.</source>
-        <translation>Một tệp sao lưu do thiết bị kia tạo, đã chép sang điện thoại này.</translation>
+        <source>The other device keeps it. Both get everything new.</source>
+        <translation>Thiết bị kia vẫn giữ. Cả hai đều nhận mọi thứ mới.</translation>
+    </message>
+    <message>
+        <source>A backup file copied onto this phone.</source>
+        <translation>Một tệp sao lưu đã chép sang điện thoại này.</translation>
     </message>
 </context>
 <context>
@@ -611,24 +646,12 @@
         <translation>Không đăng ký, không số điện thoại</translation>
     </message>
     <message>
-        <source>Your profile is made here on your phone. No phone number, no account with a company, nothing to sign.</source>
-        <translation>Hồ sơ của bạn được tạo ngay tại đây, trên điện thoại. Không cần số điện thoại, không cần tài khoản ở công ty nào, không phải ký gì cả.</translation>
-    </message>
-    <message>
         <source>You choose who can reach you</source>
         <translation>Bạn chọn ai có thể liên lạc với mình</translation>
     </message>
     <message>
-        <source>There is no directory to be found in. Show a friend a code to scan, or send them a link, and the two of you can write.</source>
-        <translation>Không có danh bạ nào để người khác tìm ra bạn. Hãy cho bạn bè quét một mã hoặc gửi cho họ một liên kết, rồi hai người có thể nhắn cho nhau.</translation>
-    </message>
-    <message>
         <source>Groups of equals</source>
         <translation>Nhóm của những người ngang hàng</translation>
-    </message>
-    <message>
-        <source>Everyone in a group has the same rights: anyone can add a friend, rename it or leave. Nobody is in charge.</source>
-        <translation>Trong nhóm, mọi người có quyền như nhau: ai cũng có thể thêm bạn bè, đổi tên nhóm hoặc rời đi. Không ai là chủ.</translation>
     </message>
     <message>
         <source>The server only passes it on</source>
@@ -643,12 +666,24 @@
         <translation>Mọi tin nhắn đều được mã hoá</translation>
     </message>
     <message>
-        <source>Messages are encrypted the whole way, always. Servers that transport them cannot read a word.</source>
-        <translation>Tin nhắn luôn được mã hoá suốt chặng đường. Các máy chủ vận chuyển chúng không đọc được một chữ nào.</translation>
+        <source>Made here on your phone. No phone number, no account, nothing to sign.</source>
+        <translation>Tạo ngay tại đây, trên điện thoại của bạn. Không số điện thoại, không tài khoản, không gì để ký.</translation>
     </message>
     <message>
-        <source>A server holds a message until the other phone is online, and that is all it does. Your chats stay on your device.</source>
-        <translation>Máy chủ giữ tin nhắn cho đến khi điện thoại kia trực tuyến, chỉ vậy thôi. Các cuộc trò chuyện của bạn ở lại trên máy bạn.</translation>
+        <source>There is no directory to be found in. Show a friend a code, or send a link.</source>
+        <translation>Không có danh bạ nào để người khác tìm ra bạn. Cho bạn bè xem mã, hoặc gửi liên kết.</translation>
+    </message>
+    <message>
+        <source>Encrypted the whole way, always. The servers cannot read a word.</source>
+        <translation>Luôn mã hoá suốt chặng. Máy chủ không đọc được một chữ.</translation>
+    </message>
+    <message>
+        <source>Anyone can add a friend, rename the group or leave. Nobody is in charge.</source>
+        <translation>Ai cũng có thể thêm bạn bè, đổi tên nhóm hoặc rời đi. Không ai làm chủ.</translation>
+    </message>
+    <message>
+        <source>It holds a message until the other phone is online, and nothing more.</source>
+        <translation>Nó giữ tin nhắn cho đến khi điện thoại kia lên mạng, chỉ vậy thôi.</translation>
     </message>
 </context>
 <context>
@@ -666,9 +701,9 @@
         <translation>Hủy</translation>
     </message>
     <message>
-        <source>Leave %1? You will stop receiving its messages, and only a member can add you back.</source>
+        <source>Leave %1? Only a member can add you back.</source>
         <extracomment>%1 is the group&apos;s name.</extracomment>
-        <translation>Rời %1? Bạn sẽ không nhận tin nhắn của nhóm nữa, và chỉ một thành viên mới có thể thêm bạn lại.</translation>
+        <translation>Rời %1? Chỉ thành viên mới thêm bạn lại được.</translation>
     </message>
 </context>
 <context>
@@ -890,16 +925,8 @@
         <translation>Địa chỉ</translation>
     </message>
     <message>
-        <source>Show invite code</source>
-        <translation>Hiện mã mời</translation>
-    </message>
-    <message>
         <source>Send read receipts</source>
         <translation>Gửi xác nhận đã đọc</translation>
-    </message>
-    <message>
-        <source>Tells the people you write to when you have read their messages, and asks the same of them. With this off you send none and see none.</source>
-        <translation>Cho những người bạn nhắn tin biết khi bạn đã đọc tin nhắn của họ, và yêu cầu họ làm điều tương tự. Khi tắt, bạn không gửi và không thấy xác nhận nào.</translation>
     </message>
     <message>
         <source>Storage and connectivity</source>
@@ -940,12 +967,8 @@
         <translation>Tên trên mỗi tin nhắn bạn gửi</translation>
     </message>
     <message>
-        <source>Backup</source>
-        <translation>Sao lưu</translation>
-    </message>
-    <message>
-        <source>Back up this profile</source>
-        <translation>Sao lưu hồ sơ này</translation>
+        <source>Both ways: with this off you send none and see none.</source>
+        <translation>Cả hai chiều: tắt thì bạn không gửi và cũng không thấy cái nào.</translation>
     </message>
 </context>
 <context>
@@ -971,8 +994,8 @@
         <translation>%1 không trả lời trong %2 giây.</translation>
     </message>
     <message>
-        <source>Chatmail relays are run by volunteers in their spare time. If this one does not seem to work, go back and try another one.</source>
-        <translation>Các máy chủ chuyển tiếp chatmail do tình nguyện viên vận hành trong thời gian rảnh. Nếu máy chủ này có vẻ không hoạt động, hãy quay lại và thử một máy chủ khác.</translation>
+        <source>Relays are run by volunteers. Go back and try another one.</source>
+        <translation>Máy chuyển tiếp do tình nguyện viên vận hành. Quay lại và thử máy khác.</translation>
     </message>
 </context>
 <context>
@@ -1018,12 +1041,12 @@
         <translation>Không có hồ sơ</translation>
     </message>
     <message>
-        <source>Add as second device</source>
-        <translation>Thêm làm thiết bị thứ hai</translation>
+        <source>Invite code</source>
+        <translation>Mã mời</translation>
     </message>
     <message>
-        <source>Restore profile from backup</source>
-        <translation>Khôi phục hồ sơ từ bản sao lưu</translation>
+        <source>Back up profile</source>
+        <translation>Sao lưu hồ sơ</translation>
     </message>
 </context>
 <context>
@@ -1076,14 +1099,6 @@
 <context>
     <name>RestoreProfilePage</name>
     <message>
-        <source>The other device runs a newer Delta Chat than this app can take a profile from.</source>
-        <translation>Thiết bị kia chạy Delta Chat mới hơn mức ứng dụng này có thể nhận hồ sơ.</translation>
-    </message>
-    <message>
-        <source>The transfer stopped before it finished. Both devices have to stay on the same network, with this page open.</source>
-        <translation>Việc chuyển đã dừng trước khi xong. Cả hai thiết bị phải ở cùng một mạng, với trang này đang mở.</translation>
-    </message>
-    <message>
         <source>That is not the code a device shows while it is offering its profile.</source>
         <translation>Đó không phải mã mà một thiết bị hiện ra khi đang chia sẻ hồ sơ của nó.</translation>
     </message>
@@ -1096,10 +1111,6 @@
         <translation>Khôi phục từ bản sao lưu</translation>
     </message>
     <message>
-        <source>On the device that has your profile, make a backup and copy the file onto this phone. Then choose it here.</source>
-        <translation>Trên thiết bị đang có hồ sơ, hãy tạo bản sao lưu và chép tệp sang điện thoại này. Rồi chọn tệp đó ở đây.</translation>
-    </message>
-    <message>
         <source>Choose a backup file</source>
         <translation>Chọn một tệp sao lưu</translation>
     </message>
@@ -1110,14 +1121,6 @@
     <message>
         <source>Cancel</source>
         <translation>Hủy</translation>
-    </message>
-    <message>
-        <source>The camera is not available on this device. A backup file works without one.</source>
-        <translation>Máy này không có camera. Dùng tệp sao lưu thì không cần camera.</translation>
-    </message>
-    <message>
-        <source>On your other device, open Settings and choose to add a second device. Both phones have to be on the same network.</source>
-        <translation>Trên thiết bị đang có hồ sơ, mở cài đặt và chọn thêm thiết bị thứ hai. Cả hai phải ở cùng một mạng.</translation>
     </message>
     <message>
         <source>Hold the phone up to the code it shows</source>
@@ -1146,6 +1149,26 @@
     <message>
         <source>Choose another file</source>
         <translation>Chọn tệp khác</translation>
+    </message>
+    <message>
+        <source>The other device runs a newer Delta Chat than this app can read.</source>
+        <translation>Thiết bị kia chạy Delta Chat mới hơn mức ứng dụng này đọc được.</translation>
+    </message>
+    <message>
+        <source>The transfer stopped. Both devices have to stay on one network, with this page open.</source>
+        <translation>Việc chuyển đã dừng. Cả hai thiết bị phải ở cùng một mạng, với trang này đang mở.</translation>
+    </message>
+    <message>
+        <source>No camera on this device. A backup file works without one.</source>
+        <translation>Thiết bị này không có máy ảnh. Tệp sao lưu vẫn dùng được.</translation>
+    </message>
+    <message>
+        <source>On the other device: Settings, then add a second device. Both on one network.</source>
+        <translation>Trên thiết bị kia: Cài đặt, rồi thêm thiết bị thứ hai. Cả hai trên cùng một mạng.</translation>
+    </message>
+    <message>
+        <source>Make a backup on the other device, copy the file here, then choose it.</source>
+        <translation>Sao lưu trên thiết bị kia, chép tệp sang đây rồi chọn nó.</translation>
     </message>
 </context>
 <context>
@@ -1237,10 +1260,6 @@
         <translation>Tự động tải tệp đính kèm</translation>
     </message>
     <message>
-        <source>Bigger ones wait until you ask for them. Applies to every profile and to messages that arrive from now on.</source>
-        <translation>Tệp lớn hơn sẽ chờ đến khi bạn yêu cầu. Áp dụng cho mọi hồ sơ và các tin nhắn đến từ bây giờ.</translation>
-    </message>
-    <message>
         <source>Links</source>
         <translation>Liên kết</translation>
     </message>
@@ -1249,16 +1268,8 @@
         <translation>Gỡ theo dõi khỏi liên kết</translation>
     </message>
     <message>
-        <source>Known tracking parameters -- click ids, campaign tags, the sharer&apos;s account -- are taken out of the links in the messages you send. The rest of the link is left as it was.</source>
-        <translation>Các tham số theo dõi đã biết – mã nhấp chuột, thẻ chiến dịch, tài khoản người chia sẻ – được gỡ khỏi các liên kết trong tin nhắn bạn gửi. Phần còn lại của liên kết được giữ nguyên.</translation>
-    </message>
-    <message>
         <source>Notifications</source>
         <translation>Thông báo</translation>
-    </message>
-    <message>
-        <source>On the lock screen and in the notification area. The chat it is from opens on a tap either way.</source>
-        <translation>Trên màn hình khóa và trong vùng thông báo. Cuộc trò chuyện nó đến từ sẽ mở khi chạm, dù thế nào.</translation>
     </message>
     <message>
         <source>Who wrote, and what</source>
@@ -1280,10 +1291,6 @@
         <source>Enable webxdc apps (experimental)</source>
         <extracomment>A webxdc app is a small program somebody sends into a chat and everyone in it plays with. Keep the name: it is what every other Delta Chat client calls them.</extracomment>
         <translation>Bật ứng dụng webxdc (thử nghiệm)</translation>
-    </message>
-    <message>
-        <source>Apps somebody sends run inside the chat, and the attach tray offers a store to take new ones from. An app is somebody else&apos;s code, and this part is not yet as tested as the rest.</source>
-        <translation>Ứng dụng do người khác gửi sẽ chạy ngay trong cuộc trò chuyện, và khay tệp đính kèm cung cấp một cửa hàng để lấy ứng dụng mới. Ứng dụng là mã của người khác, và phần này chưa được kiểm thử nhiều như phần còn lại.</translation>
     </message>
     <message>
         <source>After 1 hour</source>
@@ -1310,10 +1317,6 @@
         <translation>Xóa tin nhắn khỏi thiết bị</translation>
     </message>
     <message>
-        <source>Older messages go from this phone, in every chat of every profile, whatever a chat&apos;s own disappearing messages setting says. &quot;Saved messages&quot; are kept.</source>
-        <translation>Tin nhắn cũ hơn sẽ bị xóa khỏi điện thoại này, trong mọi cuộc trò chuyện của mọi hồ sơ, bất kể cài đặt tin nhắn tự hủy của chính cuộc trò chuyện. &quot;Tin nhắn đã lưu&quot; được giữ lại.</translation>
-    </message>
-    <message>
         <source>A new notification shows</source>
         <translation>Thông báo mới hiển thị</translation>
     </message>
@@ -1323,25 +1326,45 @@
         <translation>Nhắc đến</translation>
     </message>
     <message>
-        <source>In a muted group, a reply to one of your messages still notifies you.</source>
-        <translation>Trong nhóm đã tắt thông báo, trả lời cho một tin nhắn của bạn vẫn thông báo cho bạn.</translation>
-    </message>
-    <message>
         <source>Enter sends the message</source>
         <extracomment>The return key on the keyboard.</extracomment>
         <translation>Enter gửi tin nhắn</translation>
-    </message>
-    <message>
-        <source>When on, the return key sends. When off, it starts a new line, the message field grows with what is written, and the send button sends.</source>
-        <translation>Bật thì phím Enter gửi. Tắt thì phím này xuống dòng, ô tin nhắn giãn ra theo nội dung, và nút gửi mới gửi.</translation>
     </message>
     <message>
         <source>Use Markdown formatting</source>
         <translation>Dùng định dạng Markdown</translation>
     </message>
     <message>
-        <source>When on, a message written with *stars* and `backticks` is shown with the bold, the italics and the links drawn. When off, it is shown exactly as it was written.</source>
-        <translation>Bật thì tin nhắn viết bằng *dấu sao* và `dấu huyền ngược` được hiện với chữ đậm, chữ nghiêng và liên kết đã định dạng. Tắt thì hiện đúng như đã viết.</translation>
+        <source>Otherwise it starts a new line, and the button sends.</source>
+        <translation>Nếu không, nó xuống dòng, và nút gửi.</translation>
+    </message>
+    <message>
+        <source>Draws *stars* and `backticks` rather than showing them.</source>
+        <translation>Vẽ *dấu sao* và `dấu huyền ngược` thay vì hiển thị chúng.</translation>
+    </message>
+    <message>
+        <source>Bigger ones wait until you ask for them. Every profile, from now on.</source>
+        <translation>Tệp lớn hơn chờ đến khi bạn yêu cầu. Mọi hồ sơ, từ giờ trở đi.</translation>
+    </message>
+    <message>
+        <source>Every chat of every profile. &quot;Saved messages&quot; are kept.</source>
+        <translation>Mọi cuộc trò chuyện của mọi hồ sơ. “Tin nhắn đã lưu” được giữ lại.</translation>
+    </message>
+    <message>
+        <source>On the lock screen and in the notification area.</source>
+        <translation>Trên màn hình khoá và trong khu vực thông báo.</translation>
+    </message>
+    <message>
+        <source>A reply to you gets through a muted group.</source>
+        <translation>Trả lời dành cho bạn vẫn lọt qua nhóm đã tắt tiếng.</translation>
+    </message>
+    <message>
+        <source>Click ids and campaign tags come out of the links you send.</source>
+        <translation>Mã nhấp chuột và thẻ chiến dịch bị bỏ khỏi các liên kết bạn gửi.</translation>
+    </message>
+    <message>
+        <source>Small apps run inside the chat. Somebody else&apos;s code, and less tested than the rest.</source>
+        <translation>Ứng dụng nhỏ chạy ngay trong cuộc trò chuyện. Mã của người khác, và ít được thử hơn phần còn lại.</translation>
     </message>
 </context>
 <context>

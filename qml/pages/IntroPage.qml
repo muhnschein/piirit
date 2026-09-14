@@ -40,27 +40,27 @@ Page {
         {
             picture: "../art/intro-profile.png",
             title: qsTr("No sign-up, no phone number"),
-            body: qsTr("Your profile is made here on your phone. No phone number, no account with a company, nothing to sign.")
+            body: qsTr("Made here on your phone. No phone number, no account, nothing to sign.")
         },
         {
             picture: "../art/intro-invite.png",
             title: qsTr("You choose who can reach you"),
-            body: qsTr("There is no directory to be found in. Show a friend a code to scan, or send them a link, and the two of you can write.")
+            body: qsTr("There is no directory to be found in. Show a friend a code, or send a link.")
         },
         {
             picture: "../art/intro-lock.png",
             title: qsTr("Every message is encrypted"),
-            body: qsTr("Messages are encrypted the whole way, always. Servers that transport them cannot read a word.")
+            body: qsTr("Encrypted the whole way, always. The servers cannot read a word.")
         },
         {
             picture: "../art/intro-group.png",
             title: qsTr("Groups of equals"),
-            body: qsTr("Everyone in a group has the same rights: anyone can add a friend, rename it or leave. Nobody is in charge.")
+            body: qsTr("Anyone can add a friend, rename the group or leave. Nobody is in charge.")
         },
         {
             picture: "../art/intro-relay.png",
             title: qsTr("The server only passes it on"),
-            body: qsTr("A server holds a message until the other phone is online, and that is all it does. Your chats stay on your device.")
+            body: qsTr("It holds a message until the other phone is online, and nothing more.")
         }
     ]
 

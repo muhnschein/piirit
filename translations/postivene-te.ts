@@ -35,10 +35,6 @@
         <translation>సృష్టించు</translation>
     </message>
     <message>
-        <source>Pick a chatmail relay or enter a custom server. The server assigns the address; the encryption keys are made on this device.</source>
-        <translation>ఒక chatmail రిలేను ఎంచుకోండి లేదా మీ సొంత సర్వర్‌ను నమోదు చేయండి. చిరునామాను సర్వర్ కేటాయిస్తుంది; ఎన్‌క్రిప్షన్ కీలు ఈ పరికరంలోనే తయారవుతాయి.</translation>
-    </message>
-    <message>
         <source>Your name</source>
         <translation>మీ పేరు</translation>
     </message>
@@ -53,6 +49,41 @@
     <message>
         <source>See &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; for the full list.</source>
         <translation>పూర్తి జాబితా &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; లో చూడండి.</translation>
+    </message>
+    <message>
+        <source>The relay gives you an address. The keys are made on this phone.</source>
+        <translation>రిలే మీకు ఒక చిరునామా ఇస్తుంది. తాళాలు ఈ ఫోన్‌లోనే తయారవుతాయి.</translation>
+    </message>
+</context>
+<context>
+    <name>AddProfilePage</name>
+    <message>
+        <source>Add profile</source>
+        <translation>ప్రొఫైల్ చేర్చు</translation>
+    </message>
+    <message>
+        <source>Create a profile</source>
+        <translation>ప్రొఫైల్ సృష్టించు</translation>
+    </message>
+    <message>
+        <source>A new address on a chatmail relay.</source>
+        <translation>ఏదో ఒక chatmail రిలేలో కొత్త చిరునామా.</translation>
+    </message>
+    <message>
+        <source>Restore from a backup</source>
+        <translation>బ్యాకప్ నుండి పునరుద్ధరించు</translation>
+    </message>
+    <message>
+        <source>A backup file copied onto this phone.</source>
+        <translation>ఈ ఫోన్‌కు కాపీ చేసిన బ్యాకప్ ఫైలు.</translation>
+    </message>
+    <message>
+        <source>Add as second device</source>
+        <translation>రెండో పరికరంగా చేర్చు</translation>
+    </message>
+    <message>
+        <source>The other device keeps it. Both get everything new.</source>
+        <translation>రెండో పరికరం దాన్ని ఉంచుకుంటుంది. రెండింటికీ కొత్తదంతా వస్తుంది.</translation>
     </message>
 </context>
 <context>
@@ -135,8 +166,12 @@
         <translation>%1 లో భద్రపరచబడింది</translation>
     </message>
     <message>
-        <source>This profile&apos;s messages, contacts and key in one file, saved to Documents. Whoever has that file has the profile, so keep it somewhere safe. Your other profiles are not in it: each one is backed up from its own page.</source>
-        <translation>ఈ ప్రొఫైల్ సందేశాలు, పరిచయాలు, కీ ఒకే ఫైల్‌లో, పత్రాలలో భద్రపరచబడతాయి. ఆ ఫైల్ ఎవరి దగ్గర ఉంటే ప్రొఫైల్ కూడా వారిదే, కాబట్టి దానిని సురక్షితమైన చోట ఉంచండి. మీ ఇతర ప్రొఫైల్‌లు ఇందులో లేవు: ప్రతిదానికీ దాని సొంత పేజీ నుండి బ్యాకప్ తీసుకోవాలి.</translation>
+        <source>Messages, contacts and key in one file, saved to Documents. Whoever has the file has the profile.</source>
+        <translation>సందేశాలు, పరిచయాలు, తాళం ఒకే ఫైలులో, పత్రాలలో భద్రపరచబడతాయి. ఫైలు ఎవరి దగ్గరుంటే ప్రొఫైలూ వారిదే.</translation>
+    </message>
+    <message>
+        <source>Swipe on for your chats.</source>
+        <translation>ముందుకు జరిపి మీ సంభాషణలకు వెళ్ళండి.</translation>
     </message>
 </context>
 <context>
@@ -478,10 +513,6 @@
         <translation>అదృశ్యమయ్యే సందేశాలు</translation>
     </message>
     <message>
-        <source>Applies to all members of this chat, they can still copy, save, and forward messages.</source>
-        <translation>ఈ చాట్‌లోని సభ్యులందరికీ వర్తిస్తుంది; వారు ఇప్పటికీ సందేశాలను కాపీ చేయవచ్చు, సేవ్ చేయవచ్చు, ఫార్వర్డ్ చేయవచ్చు.</translation>
-    </message>
-    <message>
         <source>After 1 year</source>
         <translation>1 సంవత్సరం తర్వాత</translation>
     </message>
@@ -513,6 +544,10 @@
         <source>After %1 seconds</source>
         <translation>%1 సెకన్ల తర్వాత</translation>
     </message>
+    <message>
+        <source>Applies to everyone in the chat. They can still copy and forward.</source>
+        <translation>సంభాషణలోని అందరికీ వర్తిస్తుంది. వాళ్ళు ఇంకా కాపీ చేయగలరు, ముందుకు పంపగలరు.</translation>
+    </message>
 </context>
 <context>
     <name>ExistingProfilePage</name>
@@ -525,16 +560,16 @@
         <translation>రెండో పరికరంగా చేర్చు</translation>
     </message>
     <message>
-        <source>The device that has it keeps it. This one joins, over the same network.</source>
-        <translation>అది ఉన్న పరికరం దాన్ని ఉంచుకుంటుంది. ఇది అదే నెట్‌వర్క్ ద్వారా చేరుతుంది.</translation>
-    </message>
-    <message>
         <source>Restore from a backup</source>
         <translation>బ్యాకప్ నుండి పునరుద్ధరించు</translation>
     </message>
     <message>
-        <source>A backup file the other device wrote, copied onto this phone.</source>
-        <translation>మరో పరికరం రాసిన బ్యాకప్ ఫైల్, ఈ ఫోన్‌కు కాపీ చేసినది.</translation>
+        <source>The other device keeps it. Both get everything new.</source>
+        <translation>రెండో పరికరం దాన్ని ఉంచుకుంటుంది. రెండింటికీ కొత్తదంతా వస్తుంది.</translation>
+    </message>
+    <message>
+        <source>A backup file copied onto this phone.</source>
+        <translation>ఈ ఫోన్‌కు కాపీ చేసిన బ్యాకప్ ఫైలు.</translation>
     </message>
 </context>
 <context>
@@ -615,24 +650,12 @@
         <translation>సైన్-అప్ లేదు, ఫోన్ నంబర్ లేదు</translation>
     </message>
     <message>
-        <source>Your profile is made here on your phone. No phone number, no account with a company, nothing to sign.</source>
-        <translation>మీ ప్రొఫైల్ ఇక్కడే, మీ ఫోన్‌లోనే తయారవుతుంది. ఫోన్ నంబర్ అక్కర్లేదు, ఏ కంపెనీలోనూ ఖాతా అక్కర్లేదు, సంతకం చేయాల్సిందీ ఏమీ లేదు.</translation>
-    </message>
-    <message>
         <source>You choose who can reach you</source>
         <translation>మిమ్మల్ని ఎవరు చేరుకోవచ్చో మీరే నిర్ణయిస్తారు</translation>
     </message>
     <message>
-        <source>There is no directory to be found in. Show a friend a code to scan, or send them a link, and the two of you can write.</source>
-        <translation>మిమ్మల్ని వెతికి పట్టుకునేందుకు ఏ జాబితా లేదు. స్నేహితుడికి స్కాన్ చేసే కోడ్ చూపండి లేదా లింక్ పంపండి, ఆ తర్వాత మీరిద్దరూ రాసుకోవచ్చు.</translation>
-    </message>
-    <message>
         <source>Groups of equals</source>
         <translation>సమానుల గుంపులు</translation>
-    </message>
-    <message>
-        <source>Everyone in a group has the same rights: anyone can add a friend, rename it or leave. Nobody is in charge.</source>
-        <translation>గుంపులో అందరికీ ఒకే హక్కులు: ఎవరైనా స్నేహితుడిని చేర్చవచ్చు, పేరు మార్చవచ్చు లేదా వెళ్లిపోవచ్చు. ఎవరూ పెద్ద కాదు.</translation>
     </message>
     <message>
         <source>The server only passes it on</source>
@@ -647,12 +670,24 @@
         <translation>ప్రతి సందేశమూ గుప్తీకరించబడుతుంది</translation>
     </message>
     <message>
-        <source>Messages are encrypted the whole way, always. Servers that transport them cannot read a word.</source>
-        <translation>సందేశాలు ఎప్పుడూ దారి పొడవునా గుప్తీకరించి ఉంటాయి. వాటిని చేరవేసే సర్వర్లు ఒక్క పదం కూడా చదవలేవు.</translation>
+        <source>Made here on your phone. No phone number, no account, nothing to sign.</source>
+        <translation>ఇక్కడే, మీ ఫోన్‌లో తయారవుతుంది. ఫోన్ నంబరు లేదు, ఖాతా లేదు, సంతకం చేయాల్సినదీ లేదు.</translation>
     </message>
     <message>
-        <source>A server holds a message until the other phone is online, and that is all it does. Your chats stay on your device.</source>
-        <translation>రెండో ఫోన్ ఆన్‌లైన్‌కు వచ్చే వరకు సర్వర్ సందేశాన్ని ఉంచుతుంది, అంతే. మీ సంభాషణలు మీ పరికరంలోనే ఉంటాయి.</translation>
+        <source>There is no directory to be found in. Show a friend a code, or send a link.</source>
+        <translation>మిమ్మల్ని కనుగొనేందుకు ఏ జాబితా లేదు. స్నేహితుడికి కోడ్ చూపండి, లేదా లింక్ పంపండి.</translation>
+    </message>
+    <message>
+        <source>Encrypted the whole way, always. The servers cannot read a word.</source>
+        <translation>ఎప్పుడూ దారంతా గుప్తీకరించి ఉంటుంది. సర్వర్లు ఒక్క మాటా చదవవు.</translation>
+    </message>
+    <message>
+        <source>Anyone can add a friend, rename the group or leave. Nobody is in charge.</source>
+        <translation>ఎవరైనా స్నేహితుడిని చేర్చవచ్చు, బృందం పేరు మార్చవచ్చు లేదా వెళ్ళిపోవచ్చు. ఎవరూ పెద్ద కాదు.</translation>
+    </message>
+    <message>
+        <source>It holds a message until the other phone is online, and nothing more.</source>
+        <translation>రెండో ఫోన్ ఆన్‌లైన్ అయ్యే వరకు అది సందేశాన్ని ఉంచుతుంది, అంతకు మించి ఏమీ లేదు.</translation>
     </message>
 </context>
 <context>
@@ -670,9 +705,9 @@
         <translation>రద్దు చేయి</translation>
     </message>
     <message>
-        <source>Leave %1? You will stop receiving its messages, and only a member can add you back.</source>
+        <source>Leave %1? Only a member can add you back.</source>
         <extracomment>%1 is the group&apos;s name.</extracomment>
-        <translation>%1 నుండి నిష్క్రమించాలా? దాని సందేశాలు మీకు ఇక రావు, మరియు ఒక సభ్యుడు మాత్రమే మిమ్మల్ని తిరిగి చేర్చగలరు.</translation>
+        <translation>%1 నుంచి వెళ్ళాలా? మిమ్మల్ని తిరిగి చేర్చగలిగేది సభ్యుడు మాత్రమే.</translation>
     </message>
 </context>
 <context>
@@ -896,16 +931,8 @@
         <translation>చిరునామా</translation>
     </message>
     <message>
-        <source>Show invite code</source>
-        <translation>ఆహ్వాన కోడ్ చూపు</translation>
-    </message>
-    <message>
         <source>Send read receipts</source>
         <translation>చదివిన రసీదులు పంపు</translation>
-    </message>
-    <message>
-        <source>Tells the people you write to when you have read their messages, and asks the same of them. With this off you send none and see none.</source>
-        <translation>మీరు రాసేవారికి వారి సందేశాలను మీరు ఎప్పుడు చదివారో తెలియజేస్తుంది, వారి నుండి కూడా అదే కోరుతుంది. ఆఫ్ చేస్తే మీరు ఏవీ పంపరు, చూడరు.</translation>
     </message>
     <message>
         <source>Storage and connectivity</source>
@@ -946,12 +973,8 @@
         <translation>మీరు పంపే ప్రతి సందేశంపై ఉండే పేరు</translation>
     </message>
     <message>
-        <source>Backup</source>
-        <translation>బ్యాకప్</translation>
-    </message>
-    <message>
-        <source>Back up this profile</source>
-        <translation>ఈ ప్రొఫైల్‌ను బ్యాకప్ చేయి</translation>
+        <source>Both ways: with this off you send none and see none.</source>
+        <translation>రెండు వైపులా: ఆపి ఉంచితే మీరు ఒక్కటీ పంపరు, ఒక్కటీ చూడరు.</translation>
     </message>
 </context>
 <context>
@@ -977,8 +1000,8 @@
         <translation>%1 %2 సెకన్లలో స్పందించలేదు.</translation>
     </message>
     <message>
-        <source>Chatmail relays are run by volunteers in their spare time. If this one does not seem to work, go back and try another one.</source>
-        <translation>Chatmail రిలేలను స్వచ్ఛంద సేవకులు తమ ఖాళీ సమయంలో నడుపుతారు. ఇది పని చేయనట్లు అనిపిస్తే, వెనక్కి వెళ్లి మరొకటి ప్రయత్నించండి.</translation>
+        <source>Relays are run by volunteers. Go back and try another one.</source>
+        <translation>రిలేలను స్వచ్ఛంద సేవకులు నడుపుతారు. వెనక్కి వెళ్ళి మరొకటి చూడండి.</translation>
     </message>
 </context>
 <context>
@@ -1024,12 +1047,12 @@
         <translation>ప్రొఫైల్‌లు లేవు</translation>
     </message>
     <message>
-        <source>Add as second device</source>
-        <translation>రెండో పరికరంగా చేర్చు</translation>
+        <source>Invite code</source>
+        <translation>ఆహ్వాన కోడ్</translation>
     </message>
     <message>
-        <source>Restore profile from backup</source>
-        <translation>బ్యాకప్ నుండి ప్రొఫైల్‌ను పునరుద్ధరించు</translation>
+        <source>Back up profile</source>
+        <translation>ప్రొఫైల్ బ్యాకప్</translation>
     </message>
 </context>
 <context>
@@ -1082,14 +1105,6 @@
 <context>
     <name>RestoreProfilePage</name>
     <message>
-        <source>The other device runs a newer Delta Chat than this app can take a profile from.</source>
-        <translation>ఈ యాప్ ప్రొఫైల్ తీసుకోగలిగిన దానికంటే కొత్త Delta Chat మరో పరికరంలో ఉంది.</translation>
-    </message>
-    <message>
-        <source>The transfer stopped before it finished. Both devices have to stay on the same network, with this page open.</source>
-        <translation>బదిలీ పూర్తయ్యేలోపే ఆగిపోయింది. రెండు పరికరాలూ ఒకే నెట్‌వర్క్‌లో ఉండాలి, ఈ పేజీ తెరిచి ఉంచాలి.</translation>
-    </message>
-    <message>
         <source>That is not the code a device shows while it is offering its profile.</source>
         <translation>ఒక పరికరం తన ప్రొఫైల్ ఇస్తున్నప్పుడు చూపే కోడ్ ఇది కాదు.</translation>
     </message>
@@ -1102,10 +1117,6 @@
         <translation>బ్యాకప్ నుండి పునరుద్ధరించు</translation>
     </message>
     <message>
-        <source>On the device that has your profile, make a backup and copy the file onto this phone. Then choose it here.</source>
-        <translation>మీ ప్రొఫైల్ ఉన్న పరికరంలో బ్యాకప్ చేసి ఫైల్‌ను ఈ ఫోన్‌కు కాపీ చేయండి. తర్వాత దాన్ని ఇక్కడ ఎంచుకోండి.</translation>
-    </message>
-    <message>
         <source>Choose a backup file</source>
         <translation>బ్యాకప్ ఫైల్ ఎంచుకో</translation>
     </message>
@@ -1116,14 +1127,6 @@
     <message>
         <source>Cancel</source>
         <translation>రద్దు చేయి</translation>
-    </message>
-    <message>
-        <source>The camera is not available on this device. A backup file works without one.</source>
-        <translation>ఈ పరికరంలో కెమెరా లేదు. బ్యాకప్ ఫైల్‌తో కెమెరా లేకుండానే అవుతుంది.</translation>
-    </message>
-    <message>
-        <source>On your other device, open Settings and choose to add a second device. Both phones have to be on the same network.</source>
-        <translation>మీ ప్రొఫైల్ ఉన్న పరికరంలో సెట్టింగ్‌లు తెరిచి రెండో పరికరాన్ని చేర్చడాన్ని ఎంచుకోండి. రెండూ ఒకే నెట్‌వర్క్‌లో ఉండాలి.</translation>
     </message>
     <message>
         <source>Hold the phone up to the code it shows</source>
@@ -1152,6 +1155,26 @@
     <message>
         <source>Choose another file</source>
         <translation>మరో ఫైల్‌ను ఎంచుకో</translation>
+    </message>
+    <message>
+        <source>The other device runs a newer Delta Chat than this app can read.</source>
+        <translation>రెండో పరికరంలోని Delta Chat ఈ యాప్ చదవగలిగేదాని కంటే కొత్తది.</translation>
+    </message>
+    <message>
+        <source>The transfer stopped. Both devices have to stay on one network, with this page open.</source>
+        <translation>బదిలీ ఆగిపోయింది. రెండు పరికరాలూ ఒకే నెట్‌వర్క్‌లో ఉండాలి, ఈ పుట తెరిచి ఉంచాలి.</translation>
+    </message>
+    <message>
+        <source>No camera on this device. A backup file works without one.</source>
+        <translation>ఈ పరికరంలో కెమెరా లేదు. బ్యాకప్ ఫైలు అది లేకుండానూ పని చేస్తుంది.</translation>
+    </message>
+    <message>
+        <source>On the other device: Settings, then add a second device. Both on one network.</source>
+        <translation>రెండో పరికరంలో: అమరికలు, ఆపై రెండో పరికరంగా చేర్చండి. రెండూ ఒకే నెట్‌వర్క్‌లో.</translation>
+    </message>
+    <message>
+        <source>Make a backup on the other device, copy the file here, then choose it.</source>
+        <translation>రెండో పరికరంలో బ్యాకప్ తీసి, ఫైలును ఇక్కడికి కాపీ చేసి, ఆపై దాన్ని ఎంచుకోండి.</translation>
     </message>
 </context>
 <context>
@@ -1243,10 +1266,6 @@
         <translation>జోడింపులను ఆటోమేటిక్‌గా డౌన్‌లోడ్ చేయి</translation>
     </message>
     <message>
-        <source>Bigger ones wait until you ask for them. Applies to every profile and to messages that arrive from now on.</source>
-        <translation>పెద్దవి మీరు అడిగే వరకు వేచి ఉంటాయి. ప్రతి ప్రొఫైల్‌కు, ఇప్పటి నుండి వచ్చే సందేశాలకు వర్తిస్తుంది.</translation>
-    </message>
-    <message>
         <source>Links</source>
         <translation>లింక్‌లు</translation>
     </message>
@@ -1255,16 +1274,8 @@
         <translation>లింక్‌ల నుండి ట్రాకింగ్ తీసివేయి</translation>
     </message>
     <message>
-        <source>Known tracking parameters -- click ids, campaign tags, the sharer&apos;s account -- are taken out of the links in the messages you send. The rest of the link is left as it was.</source>
-        <translation>తెలిసిన ట్రాకింగ్ పారామితులు – క్లిక్ ఐడీలు, ప్రచార ట్యాగ్‌లు, పంచుకున్నవారి ఖాతా – మీరు పంపే సందేశాల్లోని లింక్‌ల నుండి తీసివేయబడతాయి. లింక్‌లోని మిగిలిన భాగం ఉన్నట్లే ఉంటుంది.</translation>
-    </message>
-    <message>
         <source>Notifications</source>
         <translation>నోటిఫికేషన్‌లు</translation>
-    </message>
-    <message>
-        <source>On the lock screen and in the notification area. The chat it is from opens on a tap either way.</source>
-        <translation>లాక్ స్క్రీన్‌పై మరియు నోటిఫికేషన్ ప్రాంతంలో. అది వచ్చిన చాట్ నొక్కితే ఎలాగైనా తెరుచుకుంటుంది.</translation>
     </message>
     <message>
         <source>Who wrote, and what</source>
@@ -1286,10 +1297,6 @@
         <source>Enable webxdc apps (experimental)</source>
         <extracomment>A webxdc app is a small program somebody sends into a chat and everyone in it plays with. Keep the name: it is what every other Delta Chat client calls them.</extracomment>
         <translation>webxdc యాప్‌లను ప్రారంభించు (ప్రయోగాత్మకం)</translation>
-    </message>
-    <message>
-        <source>Apps somebody sends run inside the chat, and the attach tray offers a store to take new ones from. An app is somebody else&apos;s code, and this part is not yet as tested as the rest.</source>
-        <translation>ఎవరైనా పంపిన యాప్‌లు సంభాషణలోనే నడుస్తాయి, మరియు అటాచ్‌మెంట్ ట్రే కొత్తవి తీసుకోవడానికి ఒక స్టోర్‌ను చూపుతుంది. యాప్ అంటే వేరొకరి కోడ్, ఈ భాగం మిగిలినవాటి అంత పరీక్షించబడలేదు.</translation>
     </message>
     <message>
         <source>After 1 hour</source>
@@ -1316,10 +1323,6 @@
         <translation>పరికరం నుండి సందేశాలను తొలగించు</translation>
     </message>
     <message>
-        <source>Older messages go from this phone, in every chat of every profile, whatever a chat&apos;s own disappearing messages setting says. &quot;Saved messages&quot; are kept.</source>
-        <translation>పాత సందేశాలు ఈ ఫోన్ నుండి పోతాయి, ప్రతి ప్రొఫైల్‌లోని ప్రతి చాట్‌లో, చాట్ యొక్క సొంత అదృశ్యమయ్యే సందేశాల సెట్టింగ్ ఏమి చెప్పినా. &quot;సేవ్ చేసిన సందేశాలు&quot; ఉంచబడతాయి.</translation>
-    </message>
-    <message>
         <source>A new notification shows</source>
         <translation>కొత్త నోటిఫికేషన్ చూపేది</translation>
     </message>
@@ -1329,25 +1332,45 @@
         <translation>ప్రస్తావనలు</translation>
     </message>
     <message>
-        <source>In a muted group, a reply to one of your messages still notifies you.</source>
-        <translation>మ్యూట్ చేసిన గుంపులో, మీ సందేశానికి వచ్చిన ప్రత్యుత్తరం అయినా మీకు తెలియజేస్తుంది.</translation>
-    </message>
-    <message>
         <source>Enter sends the message</source>
         <extracomment>The return key on the keyboard.</extracomment>
         <translation>Enter సందేశాన్ని పంపుతుంది</translation>
-    </message>
-    <message>
-        <source>When on, the return key sends. When off, it starts a new line, the message field grows with what is written, and the send button sends.</source>
-        <translation>ఆన్ ఉంటే ఎంటర్ కీ పంపుతుంది. ఆఫ్ ఉంటే అది కొత్త పంక్తిని మొదలుపెడుతుంది, సందేశ క్షేత్రం రాసినదానితో పెరుగుతుంది, పంపే బొత్తాం పంపుతుంది.</translation>
     </message>
     <message>
         <source>Use Markdown formatting</source>
         <translation>మార్క్‌డౌన్ ఆకృతీకరణ వాడు</translation>
     </message>
     <message>
-        <source>When on, a message written with *stars* and `backticks` is shown with the bold, the italics and the links drawn. When off, it is shown exactly as it was written.</source>
-        <translation>ఆన్ ఉంటే *నక్షత్రాలు* మరియు `బ్యాక్‌టిక్‌`లతో రాసిన సందేశం బోల్డ్, ఇటాలిక్, లింక్‌లు అలంకరించి చూపబడుతుంది. ఆఫ్ ఉంటే రాసినట్లుగానే చూపబడుతుంది.</translation>
+        <source>Otherwise it starts a new line, and the button sends.</source>
+        <translation>లేకపోతే అది కొత్త వరుసను మొదలుపెడుతుంది, పంపేది బటన్.</translation>
+    </message>
+    <message>
+        <source>Draws *stars* and `backticks` rather than showing them.</source>
+        <translation>*నక్షత్రాలు*, `బ్యాక్‌టిక్‌లు` చూపించే బదులు తీర్చిదిద్ది గీస్తుంది.</translation>
+    </message>
+    <message>
+        <source>Bigger ones wait until you ask for them. Every profile, from now on.</source>
+        <translation>పెద్దవి మీరు అడిగే వరకు ఆగుతాయి. ప్రతి ప్రొఫైల్, ఇప్పటి నుంచి.</translation>
+    </message>
+    <message>
+        <source>Every chat of every profile. &quot;Saved messages&quot; are kept.</source>
+        <translation>ప్రతి ప్రొఫైల్ యొక్క ప్రతి సంభాషణ. “భద్రపరిచిన సందేశాలు” మిగులుతాయి.</translation>
+    </message>
+    <message>
+        <source>On the lock screen and in the notification area.</source>
+        <translation>లాక్ స్క్రీన్‌పై, ప్రకటనల ప్రాంతంలో.</translation>
+    </message>
+    <message>
+        <source>A reply to you gets through a muted group.</source>
+        <translation>మీకు వచ్చిన జవాబు నిశ్శబ్దం చేసిన బృందం నుంచీ చేరుతుంది.</translation>
+    </message>
+    <message>
+        <source>Click ids and campaign tags come out of the links you send.</source>
+        <translation>క్లిక్ గుర్తులు, ప్రచార ట్యాగులు మీరు పంపే లింకుల నుంచి తొలగిపోతాయి.</translation>
+    </message>
+    <message>
+        <source>Small apps run inside the chat. Somebody else&apos;s code, and less tested than the rest.</source>
+        <translation>చిన్న యాప్‌లు సంభాషణ లోపలే నడుస్తాయి. ఇతరుల కోడ్, మిగతా వాటికంటే తక్కువ పరీక్షించినది.</translation>
     </message>
 </context>
 <context>

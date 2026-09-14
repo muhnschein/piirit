@@ -210,6 +210,20 @@ deltachat-rpc-server (bundled binary, subprocess) = the entire core
   enough to fold. Both went unnoticed until a phone drew a to-do list as
   a sentence; `qml_message_lines.rs` now measures what Qt makes of each
   shape rather than trusting a reading of it.
+- **A page is built before its transition starts, so a page is cheap to
+  build.** Silica's `push` loads the QML, instantiates the page and only
+  then begins the animation, so everything the page imports is paid for
+  in the moment between the tap and anything moving. The chat list's
+  pulley therefore asks for `animatorPush` where Silica has it, which
+  starts the transition and builds the page behind it, and falls back to
+  `push` where it does not. The other half is the page itself: the new
+  group page used to draw its members by building a row for every
+  contact the reader has -- twice over, since the reader's own row is
+  drawn apart from the picked ones -- and hiding all but the members, so
+  the cost of opening it was the size of an address book that had
+  nothing to do with the group, paid as the page arrived. It asks the
+  contact list for the rows it means instead (`ContactList.picked_rows`).
+
 - **A wait before something is destroyed belongs to the list, not the
   row.** `ListItem.remorseAction` is Silica's shortcut: it makes a
   `RemorseItem` in the row and hands it the action. Deleting a handful of
@@ -409,9 +423,11 @@ deltachat-rpc-server (bundled binary, subprocess) = the entire core
   second device's code" said in protocol terms is no use to somebody
   holding a camera; and IO is started on what arrives, because an
   imported account has none running and a profile that does not fetch is
-  not a profile. The same take-over is reachable from the profiles list,
-  under the plus that makes a new one, for the reader whose old phone is
-  in their other hand.
+  not a profile. The same take-over is reachable from the profiles
+  list, behind the one plus under it, for the reader whose old phone is
+  in their other hand: that plus asks which of the three ways in they
+  want (`AddProfilePage.qml`) rather than putting three answers under a
+  list of profiles before anybody has been asked anything.
   Adding a profile is the other half of that screen, and the relay is
   the part of it nobody here controls: a public relay is somebody's
   spare-time server, and one that is down holds the core's transport
@@ -428,10 +444,15 @@ deltachat-rpc-server (bundled binary, subprocess) = the entire core
 - **A backup is one profile's, because the core's export is.**
   `export_backup` takes an account id and writes that account --
   its messages, its contacts, its key -- into the one `.tar` that
-  `import_backup` reads back. So the way to it is the profile's own page
-  and not the settings that belong to no profile: a phone with three
-  profiles on it makes three backups, and the page says whose it is
-  writing. The file goes to Documents under the name the core chooses; a
+  `import_backup` reads back. So the way to it is the profile's own row
+  on the profiles page and not the settings that belong to no profile: a
+  phone with three profiles on it makes three backups, and the page
+  draws the profile at the top the way the invite code's page does. The
+  invite code is on that row too, for the same reason: both are about
+  one profile, and neither is a setting, so neither belongs a page
+  deeper in. Once a backup has been written the page is done -- the
+  button goes, and the chats are attached to the right, so what is left
+  is a swipe rather than an offer to write the same profile out again. The file goes to Documents under the name the core chooses; a
   reader who has to type a path on a phone is a reader who does not make
   a backup, and where it landed is said in full afterwards, because the
   next thing to do with it is to copy it off the phone. Two things the

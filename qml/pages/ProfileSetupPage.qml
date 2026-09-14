@@ -163,7 +163,7 @@ Page {
             horizontalAlignment: Text.AlignHCenter
             font.pixelSize: Theme.fontSizeSmall
             color: Theme.secondaryHighlightColor
-            text: qsTr("Chatmail relays are run by volunteers in their spare time. If this one does not seem to work, go back and try another one.")
+            text: qsTr("Relays are run by volunteers. Go back and try another one.")
         }
 
         Banner {

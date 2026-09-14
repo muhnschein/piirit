@@ -7,6 +7,10 @@
 //! refused until there is a name. The regression this file began as is
 //! still here: `nameField` used to live inside the list's header, its own
 //! scope, so typing a name never enabled the Create button.
+//!
+//! "Drawn as a member" is asked as `shown`, not as `visible`: the rows
+//! are the ones `picked_rows` hands back, so a contact nobody picked has
+//! no row at all rather than a hidden one.
 
 // Qt harness: needs `unsafe` for `env::set_var` before Qt starts
 // (`unused_unsafe` because it is only unsafe from edition 2024 on),
@@ -87,6 +91,14 @@ const PROBE_QML: &str = r"
             if (!item) { return 'missing:' + name }
             item.clicked()
             return 'ok'
+        }
+        // Drawn as a member, or not drawn at all: the page asks the
+        // contact list for the rows it wants rather than building one
+        // per contact and hiding all but the members, so a contact
+        // nobody picked has no row rather than a hidden one.
+        function shown(name) {
+            var item = findIn(loader.item, name)
+            return item ? '' + item.visible : 'false'
         }
         // What the picker page does with the stand-in it was handed: the
         // page's own answer for a group that does not exist yet.
@@ -179,8 +191,8 @@ fn the_new_group_page_makes_the_group_it_shows() {
         // Nothing typed: creating must be refused.
         record!("empty", get!("createButton", "enabled"));
         // The reader is a member from the start; nobody else is yet.
-        record!("self-row", get!("memberRow1", "visible"));
-        record!("ada-before", get!("memberRow10", "visible"));
+        record!("self-row", call!("shown", QString::from("memberRow1")));
+        record!("ada-before", call!("shown", QString::from("memberRow10")));
         record!("heading-before", get!("membersHeader", "text"));
         record!("badge", get!("editBadge", "visible"));
         record!("no-picture-yet", get!("removePicture", "visible"));
@@ -195,12 +207,12 @@ fn the_new_group_page_makes_the_group_it_shows() {
         // The picker hands Ada back; the same again is not twice.
         record!("pick-ada", call!("pick", 10));
         record!("pick-ada-again", call!("pick", 10));
-        record!("ada-after", get!("memberRow10", "visible"));
+        record!("ada-after", call!("shown", QString::from("memberRow10")));
         record!("heading-after", get!("membersHeader", "text"));
         // Grace comes and goes again.
         record!("pick-grace", call!("pick", 11));
         record!("unpick-grace", call!("unpick", 11));
-        record!("grace-after", get!("memberRow11", "visible"));
+        record!("grace-after", call!("shown", QString::from("memberRow11")));
         record!(
             "picture",
             call!("choosePicture", QString::from("/tmp/hikers.png"))

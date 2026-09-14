@@ -219,7 +219,6 @@ fn the_profile_page_round_trips_the_profile() {
         record!("quota-words", get!("quotaBar", "label"));
         record!("quota-value", get!("quotaBar", "value"));
         record!("storage", get!("storageLabel", "text"));
-        record!("invite", call!("click", QString::from("inviteButton")));
         // The name: a name with a badge, and a field with a hint once
         // the badge is tapped.
         record!("hint-before", get!("nameHint", "visible"));
@@ -322,7 +321,7 @@ fn the_profile_page_round_trips_the_profile() {
         "ok",
         "the profile page did not load. {context}"
     );
-    assert_page_says_what_the_relay_said(&steps, &navigation, &context);
+    assert_page_says_what_the_relay_said(&steps, &context);
     assert_eq!(
         value("edited-after-typing"),
         "true",
@@ -416,9 +415,12 @@ fn the_profile_page_round_trips_the_profile() {
     );
 }
 
-/// The address, the way to the invite, and the connection and the
-/// mailbox as the fake relay reports them.
-fn assert_page_says_what_the_relay_said(steps: &[(&str, String)], navigation: &str, context: &str) {
+/// The address, and the connection and the mailbox as the fake relay
+/// reports them.
+///
+/// The invite is not here any more: it is on the profile's row on the
+/// profiles page, with the backup, and is checked there.
+fn assert_page_says_what_the_relay_said(steps: &[(&str, String)], context: &str) {
     let value = |label: &str| {
         steps
             .iter()
@@ -430,15 +432,6 @@ fn assert_page_says_what_the_relay_said(steps: &[(&str, String)], navigation: &s
         value("address"),
         "",
         "an unconfigured account has no address, and the page showed one. {context}"
-    );
-    assert_eq!(
-        value("invite"),
-        "ok",
-        "the page offers no way to the invite. {context}"
-    );
-    assert!(
-        navigation.contains("push:QrPage.qml|"),
-        "the invite button did not open the QR code page. {context}"
     );
     assert_eq!(
         value("connection"),

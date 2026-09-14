@@ -35,10 +35,6 @@
         <translation>Булдырырга</translation>
     </message>
     <message>
-        <source>Pick a chatmail relay or enter a custom server. The server assigns the address; the encryption keys are made on this device.</source>
-        <translation>Chatmail релесын сайлагыз яки үз серверыгызны кертегез. Адресны сервер бирә; шифрлау ачкычлары бу җайланмада ясала.</translation>
-    </message>
-    <message>
         <source>Your name</source>
         <translation>Исемегез</translation>
     </message>
@@ -53,6 +49,41 @@
     <message>
         <source>See &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; for the full list.</source>
         <translation>Тулы исемлек: &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
+    </message>
+    <message>
+        <source>The relay gives you an address. The keys are made on this phone.</source>
+        <translation>Реле сезгә адрес бирә. Ачкычлар бу телефонда ясала.</translation>
+    </message>
+</context>
+<context>
+    <name>AddProfilePage</name>
+    <message>
+        <source>Add profile</source>
+        <translation>Профиль өстәргә</translation>
+    </message>
+    <message>
+        <source>Create a profile</source>
+        <translation>Профиль ясарга</translation>
+    </message>
+    <message>
+        <source>A new address on a chatmail relay.</source>
+        <translation>Chatmail реледа яңа адрес.</translation>
+    </message>
+    <message>
+        <source>Restore from a backup</source>
+        <translation>Резерв күчермәдән торгызырга</translation>
+    </message>
+    <message>
+        <source>A backup file copied onto this phone.</source>
+        <translation>Бу телефонга күчерелгән резерв күчермә файлы.</translation>
+    </message>
+    <message>
+        <source>Add as second device</source>
+        <translation>Икенче җиһаз итеп өстәргә</translation>
+    </message>
+    <message>
+        <source>The other device keeps it. Both get everything new.</source>
+        <translation>Икенче җиһаз аны саклый. Икесе дә барлык яңалыкны ала.</translation>
     </message>
 </context>
 <context>
@@ -134,8 +165,12 @@
         <translation>%1 эченә сакланды</translation>
     </message>
     <message>
-        <source>This profile&apos;s messages, contacts and key in one file, saved to Documents. Whoever has that file has the profile, so keep it somewhere safe. Your other profiles are not in it: each one is backed up from its own page.</source>
-        <translation>Бу профильнең хатлары, контактлары һәм ачкычы бер файлда, Документларга саклана. Бу файл кемдә булса, профиль дә шунда — аны куркынычсыз урында тотыгыз. Сезнең башка профильләрегез анда юк: һәрберсенең резерв күчермәсе үз битеннән алына.</translation>
+        <source>Messages, contacts and key in one file, saved to Documents. Whoever has the file has the profile.</source>
+        <translation>Хатлар, контактлар һәм ачкыч бер файлда, «Документлар»га сакланган. Файл кемдә — профиль дә шунда.</translation>
+    </message>
+    <message>
+        <source>Swipe on for your chats.</source>
+        <translation>Сөйләшүләрегезгә таба сыпырыгыз.</translation>
     </message>
 </context>
 <context>
@@ -476,10 +511,6 @@
         <translation>Юкка чыга торган хәбәрләр</translation>
     </message>
     <message>
-        <source>Applies to all members of this chat, they can still copy, save, and forward messages.</source>
-        <translation>Бу чатның барлык әгъзаларына кагыла; алар хәбәрләрне барыбер күчерә, саклый һәм җибәрә ала.</translation>
-    </message>
-    <message>
         <source>After 1 year</source>
         <translation>1 елдан соң</translation>
     </message>
@@ -511,6 +542,10 @@
         <source>After %1 seconds</source>
         <translation>%1 секундтан соң</translation>
     </message>
+    <message>
+        <source>Applies to everyone in the chat. They can still copy and forward.</source>
+        <translation>Сөйләшүдәге барысына да кагыла. Алар барыбер күчерә һәм җибәрә ала.</translation>
+    </message>
 </context>
 <context>
     <name>ExistingProfilePage</name>
@@ -523,16 +558,16 @@
         <translation>Икенче җиһаз итеп өстәргә</translation>
     </message>
     <message>
-        <source>The device that has it keeps it. This one joins, over the same network.</source>
-        <translation>Ул булган җиһаз аны саклый. Бусы шул ук челтәр аша кушыла.</translation>
-    </message>
-    <message>
         <source>Restore from a backup</source>
         <translation>Резерв күчермәдән торгызырга</translation>
     </message>
     <message>
-        <source>A backup file the other device wrote, copied onto this phone.</source>
-        <translation>Икенче җиһаз язган резерв күчермә файлы, шушы телефонга күчерелгән.</translation>
+        <source>The other device keeps it. Both get everything new.</source>
+        <translation>Икенче җиһаз аны саклый. Икесе дә барлык яңалыкны ала.</translation>
+    </message>
+    <message>
+        <source>A backup file copied onto this phone.</source>
+        <translation>Бу телефонга күчерелгән резерв күчермә файлы.</translation>
     </message>
 </context>
 <context>
@@ -611,24 +646,12 @@
         <translation>Теркәлү юк, телефон номеры юк</translation>
     </message>
     <message>
-        <source>Your profile is made here on your phone. No phone number, no account with a company, nothing to sign.</source>
-        <translation>Профилегез шушында, телефоныгызда языла. Телефон номеры да, компания хисабы да, имза куяр нәрсә дә кирәкми.</translation>
-    </message>
-    <message>
         <source>You choose who can reach you</source>
         <translation>Сезгә кем яза ала, шуны сез хәл итәсез</translation>
     </message>
     <message>
-        <source>There is no directory to be found in. Show a friend a code to scan, or send them a link, and the two of you can write.</source>
-        <translation>Сезне табарлык бернинди исемлек тә юк. Дустыгызга сканерлау өчен код күрсәтегез яки сылтама җибәрегез, аннары икегез дә яза аласыз.</translation>
-    </message>
-    <message>
         <source>Groups of equals</source>
         <translation>Тигезләр төркеме</translation>
-    </message>
-    <message>
-        <source>Everyone in a group has the same rights: anyone can add a friend, rename it or leave. Nobody is in charge.</source>
-        <translation>Төркемдә барысының да хокуклары бертигез: теләсә кем дус өсти ала, исемен үзгәртә ала яки чыгып китә ала. Беркем дә баш түгел.</translation>
     </message>
     <message>
         <source>The server only passes it on</source>
@@ -643,12 +666,24 @@
         <translation>Һәр хәбәр шифрлана</translation>
     </message>
     <message>
-        <source>Messages are encrypted the whole way, always. Servers that transport them cannot read a word.</source>
-        <translation>Хәбәрләр һәрвакыт бөтен юл буена шифрлана. Аларны ташучы серверлар бер сүз дә укый алмый.</translation>
+        <source>Made here on your phone. No phone number, no account, nothing to sign.</source>
+        <translation>Монда, сезнең телефонда ясала. Телефон номеры юк, хисап юк, имзаларга бернәрсә дә юк.</translation>
     </message>
     <message>
-        <source>A server holds a message until the other phone is online, and that is all it does. Your chats stay on your device.</source>
-        <translation>Икенче телефон челтәргә чыкканчы сервер хәбәрне саклый, шул гына. Сөйләшүләрегез үз җиһазыгызда кала.</translation>
+        <source>There is no directory to be found in. Show a friend a code, or send a link.</source>
+        <translation>Сезне табар өчен белешмәлек юк. Дустыгызга код күрсәтегез яки сылтама җибәрегез.</translation>
+    </message>
+    <message>
+        <source>Encrypted the whole way, always. The servers cannot read a word.</source>
+        <translation>Һәрвакыт башыннан ахырына кадәр шифрлы. Серверлар бер сүз дә укымый.</translation>
+    </message>
+    <message>
+        <source>Anyone can add a friend, rename the group or leave. Nobody is in charge.</source>
+        <translation>Теләсә кем дус өсти, төркемне яңадан атый яки китә ала. Беркем дә баш түгел.</translation>
+    </message>
+    <message>
+        <source>It holds a message until the other phone is online, and nothing more.</source>
+        <translation>Ул хатны икенче телефон эләккәнче саклый, башка бернәрсә дә түгел.</translation>
     </message>
 </context>
 <context>
@@ -666,9 +701,9 @@
         <translation>Баш тартырга</translation>
     </message>
     <message>
-        <source>Leave %1? You will stop receiving its messages, and only a member can add you back.</source>
+        <source>Leave %1? Only a member can add you back.</source>
         <extracomment>%1 is the group&apos;s name.</extracomment>
-        <translation>%1 төркеменнән чыгаргамы? Аның хәбәрләрен башка алмаячаксыз, һәм сезне кире бары тик әгъза гына өсти ала.</translation>
+        <translation>%1 төркемен калдырыргамы? Сезне кире өсти алучы — фәкать әгъза.</translation>
     </message>
 </context>
 <context>
@@ -890,16 +925,8 @@
         <translation>Адрес</translation>
     </message>
     <message>
-        <source>Show invite code</source>
-        <translation>Чакыру кодын күрсәтергә</translation>
-    </message>
-    <message>
         <source>Send read receipts</source>
         <translation>Уку турында белдерүләр җибәрергә</translation>
-    </message>
-    <message>
-        <source>Tells the people you write to when you have read their messages, and asks the same of them. With this off you send none and see none.</source>
-        <translation>Сез язган кешеләргә аларның хәбәрләрен кайчан укыганыгызны хәбәр итә һәм алардан да шуны сорый. Сүнгән булса, сез берсен дә җибәрмисез һәм күрмисез.</translation>
     </message>
     <message>
         <source>Storage and connectivity</source>
@@ -940,12 +967,8 @@
         <translation>Сез җибәргән һәр хәбәрдәге исем</translation>
     </message>
     <message>
-        <source>Backup</source>
-        <translation>Резерв күчермә</translation>
-    </message>
-    <message>
-        <source>Back up this profile</source>
-        <translation>Бу профильнең резерв күчермәсен ясарга</translation>
+        <source>Both ways: with this off you send none and see none.</source>
+        <translation>Ике якка да: сүндерелгәндә сез бернәрсә җибәрмисез һәм күрмисез.</translation>
     </message>
 </context>
 <context>
@@ -971,8 +994,8 @@
         <translation>%1 %2 секунд эчендә җавап бирмәде.</translation>
     </message>
     <message>
-        <source>Chatmail relays are run by volunteers in their spare time. If this one does not seem to work, go back and try another one.</source>
-        <translation>Chatmail релеларын ирекле ярдәмчеләр буш вакытларында тоталар. Әгәр бусы эшләми кебек тоелса, кире кайтып башкасын сынап карагыз.</translation>
+        <source>Relays are run by volunteers. Go back and try another one.</source>
+        <translation>Релеларны ирекле кешеләр тота. Кире кайтыгыз да башкасын сынап карагыз.</translation>
     </message>
 </context>
 <context>
@@ -1018,12 +1041,12 @@
         <translation>Профильләр юк</translation>
     </message>
     <message>
-        <source>Add as second device</source>
-        <translation>Икенче җиһаз итеп өстәргә</translation>
+        <source>Invite code</source>
+        <translation>Чакыру коды</translation>
     </message>
     <message>
-        <source>Restore profile from backup</source>
-        <translation>Резерв күчермәдән профильне торгызырга</translation>
+        <source>Back up profile</source>
+        <translation>Профильнең резерв күчермәсе</translation>
     </message>
 </context>
 <context>
@@ -1076,14 +1099,6 @@
 <context>
     <name>RestoreProfilePage</name>
     <message>
-        <source>The other device runs a newer Delta Chat than this app can take a profile from.</source>
-        <translation>Икенче җиһазда бу кушымта профильне ала алганнан да яңарак Delta Chat бар.</translation>
-    </message>
-    <message>
-        <source>The transfer stopped before it finished. Both devices have to stay on the same network, with this page open.</source>
-        <translation>Күчерү тәмамланганчы туктады. Ике җиһаз да бер үк челтәрдә калырга тиеш, бу бит ачык килеш.</translation>
-    </message>
-    <message>
         <source>That is not the code a device shows while it is offering its profile.</source>
         <translation>Җиһаз үз профилен тәкъдим иткәндә күрсәтә торган код түгел бу.</translation>
     </message>
@@ -1096,10 +1111,6 @@
         <translation>Резерв күчермәдән торгызырга</translation>
     </message>
     <message>
-        <source>On the device that has your profile, make a backup and copy the file onto this phone. Then choose it here.</source>
-        <translation>Профилегез булган җиһазда резерв күчермә ясагыз һәм файлны бу телефонга күчерегез. Аннары аны шушында сайлагыз.</translation>
-    </message>
-    <message>
         <source>Choose a backup file</source>
         <translation>Резерв күчермә файлын сайларга</translation>
     </message>
@@ -1110,14 +1121,6 @@
     <message>
         <source>Cancel</source>
         <translation>Баш тартырга</translation>
-    </message>
-    <message>
-        <source>The camera is not available on this device. A backup file works without one.</source>
-        <translation>Бу җиһазда камера юк. Резерв күчермә файлы белән камерасыз да була.</translation>
-    </message>
-    <message>
-        <source>On your other device, open Settings and choose to add a second device. Both phones have to be on the same network.</source>
-        <translation>Профилегез булган җиһазда көйләүләрне ачыгыз һәм икенче җиһаз өстәүне сайлагыз. Икесе дә бер үк челтәрдә булырга тиеш.</translation>
     </message>
     <message>
         <source>Hold the phone up to the code it shows</source>
@@ -1146,6 +1149,26 @@
     <message>
         <source>Choose another file</source>
         <translation>Башка файл сайларга</translation>
+    </message>
+    <message>
+        <source>The other device runs a newer Delta Chat than this app can read.</source>
+        <translation>Икенче җиһазда Delta Chat бу кушымта укый алганнан яңарак.</translation>
+    </message>
+    <message>
+        <source>The transfer stopped. Both devices have to stay on one network, with this page open.</source>
+        <translation>Күчерү туктады. Ике җиһаз да бер челтәрдә калырга тиеш, бу бит ачык килеш.</translation>
+    </message>
+    <message>
+        <source>No camera on this device. A backup file works without one.</source>
+        <translation>Бу җиһазда камера юк. Резерв күчермә файлы аннан башка да эшли.</translation>
+    </message>
+    <message>
+        <source>On the other device: Settings, then add a second device. Both on one network.</source>
+        <translation>Икенче җиһазда: Көйләүләр, аннары икенче җиһаз итеп өстәү. Икесе дә бер челтәрдә.</translation>
+    </message>
+    <message>
+        <source>Make a backup on the other device, copy the file here, then choose it.</source>
+        <translation>Икенче җиһазда резерв күчермә ясагыз, файлны монда күчерегез, аннары аны сайлагыз.</translation>
     </message>
 </context>
 <context>
@@ -1237,10 +1260,6 @@
         <translation>Кушымталарны автоматик йөкләргә</translation>
     </message>
     <message>
-        <source>Bigger ones wait until you ask for them. Applies to every profile and to messages that arrive from now on.</source>
-        <translation>Зуррак файллар сез сорагангача көтә. Һәр профильгә һәм моннан соң килгән хәбәрләргә кагыла.</translation>
-    </message>
-    <message>
         <source>Links</source>
         <translation>Сылтамалар</translation>
     </message>
@@ -1249,16 +1268,8 @@
         <translation>Сылтамалардан күзәтүне алырга</translation>
     </message>
     <message>
-        <source>Known tracking parameters -- click ids, campaign tags, the sharer&apos;s account -- are taken out of the links in the messages you send. The rest of the link is left as it was.</source>
-        <translation>Билгеле күзәтү параметрлары — басу идентификаторлары, кампания тамгалары, уртаклашучының хисабы — сез җибәргән хәбәрләрдәге сылтамалардан алына. Сылтаманың калган өлеше булганча кала.</translation>
-    </message>
-    <message>
         <source>Notifications</source>
         <translation>Белдерүләр</translation>
-    </message>
-    <message>
-        <source>On the lock screen and in the notification area. The chat it is from opens on a tap either way.</source>
-        <translation>Йозак экранында һәм белдерүләр өлкәсендә. Ул килгән чат барыбер басу белән ачыла.</translation>
     </message>
     <message>
         <source>Who wrote, and what</source>
@@ -1280,10 +1291,6 @@
         <source>Enable webxdc apps (experimental)</source>
         <extracomment>A webxdc app is a small program somebody sends into a chat and everyone in it plays with. Keep the name: it is what every other Delta Chat client calls them.</extracomment>
         <translation>webxdc кушымталарын кабызу (сынау режимы)</translation>
-    </message>
-    <message>
-        <source>Apps somebody sends run inside the chat, and the attach tray offers a store to take new ones from. An app is somebody else&apos;s code, and this part is not yet as tested as the rest.</source>
-        <translation>Кемдер җибәргән кушымталар сөйләшү эчендә эшли, ә беркетмә тартмасы яңаларын алу өчен кибет тәкъдим итә. Кушымта — бүтән кешенең коды, һәм бу өлеш калганнары кебек әле сынап бетерелмәгән.</translation>
     </message>
     <message>
         <source>After 1 hour</source>
@@ -1310,10 +1317,6 @@
         <translation>Хәбәрләрне җайланмадан бетерергә</translation>
     </message>
     <message>
-        <source>Older messages go from this phone, in every chat of every profile, whatever a chat&apos;s own disappearing messages setting says. &quot;Saved messages&quot; are kept.</source>
-        <translation>Искерәк хәбәрләр бу телефоннан бетерелә, һәр профильнең һәр чатында, чатның үз юкка чыга торган хәбәрләр көйләве нәрсә дисә дә. «Сакланган хәбәрләр» кала.</translation>
-    </message>
-    <message>
         <source>A new notification shows</source>
         <translation>Яңа белдерү күрсәтә</translation>
     </message>
@@ -1323,25 +1326,45 @@
         <translation>Искә алулар</translation>
     </message>
     <message>
-        <source>In a muted group, a reply to one of your messages still notifies you.</source>
-        <translation>Тавышсыз ителгән төркемдә сезнең хәбәргә җавап барыбер сезгә белдерә.</translation>
-    </message>
-    <message>
         <source>Enter sends the message</source>
         <extracomment>The return key on the keyboard.</extracomment>
         <translation>Enter хәбәрне җибәрә</translation>
-    </message>
-    <message>
-        <source>When on, the return key sends. When off, it starts a new line, the message field grows with what is written, and the send button sends.</source>
-        <translation>Кабызылганда Enter төймәсе җибәрә. Сүндерелгәндә ул яңа юл башлый, хат кыры язылганга карап үсә, ә җибәрү төймәсе җибәрә.</translation>
     </message>
     <message>
         <source>Use Markdown formatting</source>
         <translation>Markdown форматлавын кулланырга</translation>
     </message>
     <message>
-        <source>When on, a message written with *stars* and `backticks` is shown with the bold, the italics and the links drawn. When off, it is shown exactly as it was written.</source>
-        <translation>Кабызылганда *йолдызчыклар* һәм `кире өтерләр` белән язылган хат калын, курсив һәм сылтамалар бизәлеп күрсәтелә. Сүндерелгәндә язылганча гына күрсәтелә.</translation>
+        <source>Otherwise it starts a new line, and the button sends.</source>
+        <translation>Юкса ул яңа юл башлый, ә төймә җибәрә.</translation>
+    </message>
+    <message>
+        <source>Draws *stars* and `backticks` rather than showing them.</source>
+        <translation>*Йолдызчыкларны* һәм `кире тырнакларны` күрсәтү урынына сыза.</translation>
+    </message>
+    <message>
+        <source>Bigger ones wait until you ask for them. Every profile, from now on.</source>
+        <translation>Зурраклары сез сорагангача көтә. Барлык профильләр, хәзердән башлап.</translation>
+    </message>
+    <message>
+        <source>Every chat of every profile. &quot;Saved messages&quot; are kept.</source>
+        <translation>Һәр профильнең һәр сөйләшүе. «Сакланган хатлар» кала.</translation>
+    </message>
+    <message>
+        <source>On the lock screen and in the notification area.</source>
+        <translation>Бикле экранда һәм хәбәрләр өлкәсендә.</translation>
+    </message>
+    <message>
+        <source>A reply to you gets through a muted group.</source>
+        <translation>Сезгә җавап тавышсыз төркемнән дә үтә.</translation>
+    </message>
+    <message>
+        <source>Click ids and campaign tags come out of the links you send.</source>
+        <translation>Басу идентификаторлары һәм кампания билгеләре сез җибәргән сылтамалардан чыга.</translation>
+    </message>
+    <message>
+        <source>Small apps run inside the chat. Somebody else&apos;s code, and less tested than the rest.</source>
+        <translation>Кечкенә кушымталар сөйләшү эчендә эшли. Кеше коды, һәм калганнарга караганда азрак сыналган.</translation>
     </message>
 </context>
 <context>

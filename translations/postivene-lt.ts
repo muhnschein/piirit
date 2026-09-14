@@ -35,10 +35,6 @@
         <translation>Sukurti</translation>
     </message>
     <message>
-        <source>Pick a chatmail relay or enter a custom server. The server assigns the address; the encryption keys are made on this device.</source>
-        <translation>Pasirinkite chatmail retransliatorių arba įveskite savo serverį. Serveris priskiria adresą; šifravimo raktai kuriami šiame įrenginyje.</translation>
-    </message>
-    <message>
         <source>Your name</source>
         <translation>Jūsų vardas</translation>
     </message>
@@ -53,6 +49,41 @@
     <message>
         <source>See &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; for the full list.</source>
         <translation>Visas sąrašas yra &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
+    </message>
+    <message>
+        <source>The relay gives you an address. The keys are made on this phone.</source>
+        <translation>Retransliatorius duoda tau adresą. Raktai sukuriami šiame telefone.</translation>
+    </message>
+</context>
+<context>
+    <name>AddProfilePage</name>
+    <message>
+        <source>Add profile</source>
+        <translation>Pridėti profilį</translation>
+    </message>
+    <message>
+        <source>Create a profile</source>
+        <translation>Sukurti profilį</translation>
+    </message>
+    <message>
+        <source>A new address on a chatmail relay.</source>
+        <translation>Naujas adresas chatmail retransliatoriuje.</translation>
+    </message>
+    <message>
+        <source>Restore from a backup</source>
+        <translation>Atkurti iš atsarginės kopijos</translation>
+    </message>
+    <message>
+        <source>A backup file copied onto this phone.</source>
+        <translation>Atsarginės kopijos failas, nukopijuotas į šį telefoną.</translation>
+    </message>
+    <message>
+        <source>Add as second device</source>
+        <translation>Pridėti kaip antrą įrenginį</translation>
+    </message>
+    <message>
+        <source>The other device keeps it. Both get everything new.</source>
+        <translation>Kitas įrenginys jį pasilieka. Abu gauna viską, kas nauja.</translation>
     </message>
 </context>
 <context>
@@ -136,8 +167,12 @@
         <translation>Įrašyta į %1</translation>
     </message>
     <message>
-        <source>This profile&apos;s messages, contacts and key in one file, saved to Documents. Whoever has that file has the profile, so keep it somewhere safe. Your other profiles are not in it: each one is backed up from its own page.</source>
-        <translation>Šio profilio žinutės, adresatai ir raktas viename faile, įrašytame į Dokumentus. Kas turi tą failą, tas turi ir profilį, todėl laikykite jį saugioje vietoje. Kitų jūsų profilių jame nėra: kiekvieno atsarginė kopija daroma iš jo paties puslapio.</translation>
+        <source>Messages, contacts and key in one file, saved to Documents. Whoever has the file has the profile.</source>
+        <translation>Žinutės, adresatai ir raktas viename faile, įrašytame į Dokumentus. Kas turi failą, tas turi profilį.</translation>
+    </message>
+    <message>
+        <source>Swipe on for your chats.</source>
+        <translation>Braukite pirmyn į savo pokalbius.</translation>
     </message>
 </context>
 <context>
@@ -480,10 +515,6 @@
         <translation>Išnykstančios žinutės</translation>
     </message>
     <message>
-        <source>Applies to all members of this chat, they can still copy, save, and forward messages.</source>
-        <translation>Taikoma visiems šio pokalbio nariams; jie vis tiek gali kopijuoti, išsaugoti ir persiųsti žinutes.</translation>
-    </message>
-    <message>
         <source>After 1 year</source>
         <translation>Po 1 metų</translation>
     </message>
@@ -515,6 +546,10 @@
         <source>After %1 seconds</source>
         <translation>Po %1 sekundžių</translation>
     </message>
+    <message>
+        <source>Applies to everyone in the chat. They can still copy and forward.</source>
+        <translation>Galioja visiems pokalbyje. Kopijuoti ir persiųsti jie vis tiek gali.</translation>
+    </message>
 </context>
 <context>
     <name>ExistingProfilePage</name>
@@ -527,16 +562,16 @@
         <translation>Pridėti kaip antrą įrenginį</translation>
     </message>
     <message>
-        <source>The device that has it keeps it. This one joins, over the same network.</source>
-        <translation>Įrenginys, kuriame jis yra, jį pasilieka. Šis prisijungia tuo pačiu tinklu.</translation>
-    </message>
-    <message>
         <source>Restore from a backup</source>
         <translation>Atkurti iš atsarginės kopijos</translation>
     </message>
     <message>
-        <source>A backup file the other device wrote, copied onto this phone.</source>
-        <translation>Atsarginės kopijos failas, kurį įrašė kitas įrenginys, nukopijuotas į šį telefoną.</translation>
+        <source>The other device keeps it. Both get everything new.</source>
+        <translation>Kitas įrenginys jį pasilieka. Abu gauna viską, kas nauja.</translation>
+    </message>
+    <message>
+        <source>A backup file copied onto this phone.</source>
+        <translation>Atsarginės kopijos failas, nukopijuotas į šį telefoną.</translation>
     </message>
 </context>
 <context>
@@ -619,24 +654,12 @@
         <translation>Jokios registracijos, jokio telefono numerio</translation>
     </message>
     <message>
-        <source>Your profile is made here on your phone. No phone number, no account with a company, nothing to sign.</source>
-        <translation>Jūsų profilis sukuriamas čia pat, telefone. Nereikia nei telefono numerio, nei įmonės paskyros, nieko nereikia pasirašyti.</translation>
-    </message>
-    <message>
         <source>You choose who can reach you</source>
         <translation>Jūs nusprendžiate, kas gali jums parašyti</translation>
     </message>
     <message>
-        <source>There is no directory to be found in. Show a friend a code to scan, or send them a link, and the two of you can write.</source>
-        <translation>Nėra jokio sąrašo, kuriame jus rastų. Parodykite draugui nuskaitomą kodą arba nusiųskite nuorodą, ir galėsite susirašinėti.</translation>
-    </message>
-    <message>
         <source>Groups of equals</source>
         <translation>Lygiųjų grupės</translation>
-    </message>
-    <message>
-        <source>Everyone in a group has the same rights: anyone can add a friend, rename it or leave. Nobody is in charge.</source>
-        <translation>Grupėje visi turi vienodas teises: bet kas gali pridėti draugą, pervadinti ją ar iš jos išeiti. Niekas čia nevadovauja.</translation>
     </message>
     <message>
         <source>The server only passes it on</source>
@@ -651,12 +674,24 @@
         <translation>Kiekviena žinutė užšifruota</translation>
     </message>
     <message>
-        <source>Messages are encrypted the whole way, always. Servers that transport them cannot read a word.</source>
-        <translation>Žinutės visada šifruojamos visą kelią. Serveriai, kurie jas gabena, neperskaito nė žodžio.</translation>
+        <source>Made here on your phone. No phone number, no account, nothing to sign.</source>
+        <translation>Sukurta čia, tavo telefone. Jokio numerio, jokios paskyros, nieko pasirašyti.</translation>
     </message>
     <message>
-        <source>A server holds a message until the other phone is online, and that is all it does. Your chats stay on your device.</source>
-        <translation>Serveris laiko žinutę, kol kitas telefonas prisijungs, ir daugiau nieko nedaro. Jūsų pokalbiai lieka jūsų įrenginyje.</translation>
+        <source>There is no directory to be found in. Show a friend a code, or send a link.</source>
+        <translation>Nėra katalogo, kuriame tave rastų. Parodyk draugui kodą arba nusiųsk nuorodą.</translation>
+    </message>
+    <message>
+        <source>Encrypted the whole way, always. The servers cannot read a word.</source>
+        <translation>Visada šifruota visu keliu. Serveriai neperskaito nė žodžio.</translation>
+    </message>
+    <message>
+        <source>Anyone can add a friend, rename the group or leave. Nobody is in charge.</source>
+        <translation>Bet kas gali pridėti draugą, pervadinti grupę ar išeiti. Niekas nevadovauja.</translation>
+    </message>
+    <message>
+        <source>It holds a message until the other phone is online, and nothing more.</source>
+        <translation>Jis laiko žinutę, kol kitas telefonas prisijungs, ir nieko daugiau.</translation>
     </message>
 </context>
 <context>
@@ -674,9 +709,9 @@
         <translation>Atšaukti</translation>
     </message>
     <message>
-        <source>Leave %1? You will stop receiving its messages, and only a member can add you back.</source>
+        <source>Leave %1? Only a member can add you back.</source>
         <extracomment>%1 is the group&apos;s name.</extracomment>
-        <translation>Palikti %1? Nebegausite jos žinučių, o grąžinti jus galės tik narys.</translation>
+        <translation>Išeiti iš %1? Tik narys gali tave vėl pridėti.</translation>
     </message>
 </context>
 <context>
@@ -902,16 +937,8 @@
         <translation>Adresas</translation>
     </message>
     <message>
-        <source>Show invite code</source>
-        <translation>Rodyti kvietimo kodą</translation>
-    </message>
-    <message>
         <source>Send read receipts</source>
         <translation>Siųsti perskaitymo patvirtinimus</translation>
-    </message>
-    <message>
-        <source>Tells the people you write to when you have read their messages, and asks the same of them. With this off you send none and see none.</source>
-        <translation>Praneša tiems, kam rašote, kada perskaitėte jų žinutes, ir prašo to paties iš jų. Išjungus nei siunčiate, nei matote.</translation>
     </message>
     <message>
         <source>Storage and connectivity</source>
@@ -952,12 +979,8 @@
         <translation>Vardas ant kiekvienos jūsų siunčiamos žinutės</translation>
     </message>
     <message>
-        <source>Backup</source>
-        <translation>Atsarginė kopija</translation>
-    </message>
-    <message>
-        <source>Back up this profile</source>
-        <translation>Daryti šio profilio atsarginę kopiją</translation>
+        <source>Both ways: with this off you send none and see none.</source>
+        <translation>Abiem kryptimis: išjungus nesiunti nė vieno ir nematai nė vieno.</translation>
     </message>
 </context>
 <context>
@@ -983,8 +1006,8 @@
         <translation>%1 neatsakė per %2 sek.</translation>
     </message>
     <message>
-        <source>Chatmail relays are run by volunteers in their spare time. If this one does not seem to work, go back and try another one.</source>
-        <translation>Chatmail retransliatorius savanoriai prižiūri laisvalaikiu. Jei šis, regis, neveikia, grįžkite ir pabandykite kitą.</translation>
+        <source>Relays are run by volunteers. Go back and try another one.</source>
+        <translation>Retransliatorius prižiūri savanoriai. Grįžk atgal ir pabandyk kitą.</translation>
     </message>
 </context>
 <context>
@@ -1030,12 +1053,12 @@
         <translation>Profilių nėra</translation>
     </message>
     <message>
-        <source>Add as second device</source>
-        <translation>Pridėti kaip antrą įrenginį</translation>
+        <source>Invite code</source>
+        <translation>Kvietimo kodas</translation>
     </message>
     <message>
-        <source>Restore profile from backup</source>
-        <translation>Atkurti profilį iš atsarginės kopijos</translation>
+        <source>Back up profile</source>
+        <translation>Profilio atsarginė kopija</translation>
     </message>
 </context>
 <context>
@@ -1088,14 +1111,6 @@
 <context>
     <name>RestoreProfilePage</name>
     <message>
-        <source>The other device runs a newer Delta Chat than this app can take a profile from.</source>
-        <translation>Kitame įrenginyje veikia naujesnis Delta Chat, nei iš kurio ši programa gali perimti profilį.</translation>
-    </message>
-    <message>
-        <source>The transfer stopped before it finished. Both devices have to stay on the same network, with this page open.</source>
-        <translation>Perkėlimas sustojo nebaigtas. Abu įrenginiai turi likti tame pačiame tinkle, o šis puslapis – atvertas.</translation>
-    </message>
-    <message>
         <source>That is not the code a device shows while it is offering its profile.</source>
         <translation>Tai ne tas kodas, kurį įrenginys rodo siūlydamas savo profilį.</translation>
     </message>
@@ -1108,10 +1123,6 @@
         <translation>Atkurti iš atsarginės kopijos</translation>
     </message>
     <message>
-        <source>On the device that has your profile, make a backup and copy the file onto this phone. Then choose it here.</source>
-        <translation>Įrenginyje, kuriame yra jūsų profilis, sukurkite atsarginę kopiją ir nukopijuokite failą į šį telefoną. Tada pasirinkite jį čia.</translation>
-    </message>
-    <message>
         <source>Choose a backup file</source>
         <translation>Pasirinkti atsarginės kopijos failą</translation>
     </message>
@@ -1122,14 +1133,6 @@
     <message>
         <source>Cancel</source>
         <translation>Atšaukti</translation>
-    </message>
-    <message>
-        <source>The camera is not available on this device. A backup file works without one.</source>
-        <translation>Šiame įrenginyje kameros nėra. Su atsarginės kopijos failu jos ir nereikia.</translation>
-    </message>
-    <message>
-        <source>On your other device, open Settings and choose to add a second device. Both phones have to be on the same network.</source>
-        <translation>Įrenginyje, kuriame yra jūsų profilis, atverkite nustatymus ir pasirinkite pridėti antrą įrenginį. Abu turi būti tame pačiame tinkle.</translation>
     </message>
     <message>
         <source>Hold the phone up to the code it shows</source>
@@ -1158,6 +1161,26 @@
     <message>
         <source>Choose another file</source>
         <translation>Pasirinkti kitą failą</translation>
+    </message>
+    <message>
+        <source>The other device runs a newer Delta Chat than this app can read.</source>
+        <translation>Kitame įrenginyje yra naujesnis Delta Chat, nei ši programa gali perskaityti.</translation>
+    </message>
+    <message>
+        <source>The transfer stopped. Both devices have to stay on one network, with this page open.</source>
+        <translation>Perdavimas sustojo. Abu įrenginiai turi likti viename tinkle, su atvertu šiuo puslapiu.</translation>
+    </message>
+    <message>
+        <source>No camera on this device. A backup file works without one.</source>
+        <translation>Šiame įrenginyje nėra kameros. Atsarginės kopijos failas veikia ir be jos.</translation>
+    </message>
+    <message>
+        <source>On the other device: Settings, then add a second device. Both on one network.</source>
+        <translation>Kitame įrenginyje: Nustatymai, tada pridėti antrą įrenginį. Abu viename tinkle.</translation>
+    </message>
+    <message>
+        <source>Make a backup on the other device, copy the file here, then choose it.</source>
+        <translation>Padaryk atsarginę kopiją kitame įrenginyje, nukopijuok failą čia ir tada jį pasirink.</translation>
     </message>
 </context>
 <context>
@@ -1249,10 +1272,6 @@
         <translation>Automatiškai atsisiųsti priedus</translation>
     </message>
     <message>
-        <source>Bigger ones wait until you ask for them. Applies to every profile and to messages that arrive from now on.</source>
-        <translation>Didesni laukia, kol jų paprašysite. Taikoma kiekvienam profiliui ir nuo šiol gaunamoms žinutėms.</translation>
-    </message>
-    <message>
         <source>Links</source>
         <translation>Nuorodos</translation>
     </message>
@@ -1261,16 +1280,8 @@
         <translation>Šalinti sekimą iš nuorodų</translation>
     </message>
     <message>
-        <source>Known tracking parameters -- click ids, campaign tags, the sharer&apos;s account -- are taken out of the links in the messages you send. The rest of the link is left as it was.</source>
-        <translation>Žinomi sekimo parametrai – paspaudimų ID, kampanijų žymos, besidalijančiojo paskyra – pašalinami iš nuorodų jūsų siunčiamose žinutėse. Likusi nuorodos dalis paliekama tokia, kokia buvo.</translation>
-    </message>
-    <message>
         <source>Notifications</source>
         <translation>Pranešimai</translation>
-    </message>
-    <message>
-        <source>On the lock screen and in the notification area. The chat it is from opens on a tap either way.</source>
-        <translation>Užrakinimo ekrane ir pranešimų srityje. Pokalbis, iš kurio ji, palietus atsidaro bet kuriuo atveju.</translation>
     </message>
     <message>
         <source>Who wrote, and what</source>
@@ -1292,10 +1303,6 @@
         <source>Enable webxdc apps (experimental)</source>
         <extracomment>A webxdc app is a small program somebody sends into a chat and everyone in it plays with. Keep the name: it is what every other Delta Chat client calls them.</extracomment>
         <translation>Įjungti webxdc programėles (eksperimentinė)</translation>
-    </message>
-    <message>
-        <source>Apps somebody sends run inside the chat, and the attach tray offers a store to take new ones from. An app is somebody else&apos;s code, and this part is not yet as tested as the rest.</source>
-        <translation>Kažkieno atsiųstos programėlės veikia pačiame pokalbyje, o priedų dėklas siūlo parduotuvę naujoms pasiimti. Programėlė yra kito žmogaus kodas, ir ši dalis dar nėra taip išbandyta kaip likusios.</translation>
     </message>
     <message>
         <source>After 1 hour</source>
@@ -1322,10 +1329,6 @@
         <translation>Ištrinti žinutes iš įrenginio</translation>
     </message>
     <message>
-        <source>Older messages go from this phone, in every chat of every profile, whatever a chat&apos;s own disappearing messages setting says. &quot;Saved messages&quot; are kept.</source>
-        <translation>Senesnės žinutės dingsta iš šio telefono, kiekviename kiekvieno profilio pokalbyje, kad ir ką sakytų paties pokalbio išnykstančių žinučių nustatymas. „Išsaugotos žinutės“ paliekamos.</translation>
-    </message>
-    <message>
         <source>A new notification shows</source>
         <translation>Naujas pranešimas rodo</translation>
     </message>
@@ -1335,25 +1338,45 @@
         <translation>Paminėjimai</translation>
     </message>
     <message>
-        <source>In a muted group, a reply to one of your messages still notifies you.</source>
-        <translation>Nutildytoje grupėje atsakymas į jūsų žinutę vis tiek jus įspėja.</translation>
-    </message>
-    <message>
         <source>Enter sends the message</source>
         <extracomment>The return key on the keyboard.</extracomment>
         <translation>„Enter“ siunčia žinutę</translation>
-    </message>
-    <message>
-        <source>When on, the return key sends. When off, it starts a new line, the message field grows with what is written, and the send button sends.</source>
-        <translation>Įjungus Enter klavišas siunčia. Išjungus jis pradeda naują eilutę, žinutės laukas auga su tekstu, o siunčia siuntimo mygtukas.</translation>
     </message>
     <message>
         <source>Use Markdown formatting</source>
         <translation>Naudoti Markdown formatavimą</translation>
     </message>
     <message>
-        <source>When on, a message written with *stars* and `backticks` is shown with the bold, the italics and the links drawn. When off, it is shown exactly as it was written.</source>
-        <translation>Įjungus žinutė, parašyta su *žvaigždutėmis* ir `atbuliniais kableliais`, rodoma su suformatuotu pusjuodžiu, kursyvu ir nuorodomis. Išjungus rodoma lygiai taip, kaip parašyta.</translation>
+        <source>Otherwise it starts a new line, and the button sends.</source>
+        <translation>Kitaip jis pradeda naują eilutę, o mygtukas išsiunčia.</translation>
+    </message>
+    <message>
+        <source>Draws *stars* and `backticks` rather than showing them.</source>
+        <translation>Piešia *žvaigždutes* ir `atbulines kabutes`, o ne jas rodo.</translation>
+    </message>
+    <message>
+        <source>Bigger ones wait until you ask for them. Every profile, from now on.</source>
+        <translation>Didesni laukia, kol jų paprašysi. Visi profiliai, nuo dabar.</translation>
+    </message>
+    <message>
+        <source>Every chat of every profile. &quot;Saved messages&quot; are kept.</source>
+        <translation>Kiekvienas kiekvieno profilio pokalbis. „Įrašytos žinutės“ lieka.</translation>
+    </message>
+    <message>
+        <source>On the lock screen and in the notification area.</source>
+        <translation>Užrakto ekrane ir pranešimų srityje.</translation>
+    </message>
+    <message>
+        <source>A reply to you gets through a muted group.</source>
+        <translation>Atsakymas tau prasiskverbia ir pro nutildytą grupę.</translation>
+    </message>
+    <message>
+        <source>Click ids and campaign tags come out of the links you send.</source>
+        <translation>Paspaudimų identifikatoriai ir kampanijų žymos iškrinta iš siunčiamų nuorodų.</translation>
+    </message>
+    <message>
+        <source>Small apps run inside the chat. Somebody else&apos;s code, and less tested than the rest.</source>
+        <translation>Mažos programėlės veikia pokalbio viduje. Kito žmogaus kodas, ir mažiau išbandytas nei visa kita.</translation>
     </message>
 </context>
 <context>

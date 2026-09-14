@@ -70,6 +70,19 @@ pub struct ContactList {
     /// cannot be encrypted to (docs/PROJECT.md). Answers on `chat_ready`.
     pub join_by_invite: qt_method!(fn(&mut self, qr_content: QString)),
 
+    /// The rows a group being put together draws: this account's own
+    /// contact first, when the list holds it, then the contacts named
+    /// by `contact_ids`, in the order they were picked. An id the list
+    /// does not hold is left out.
+    ///
+    /// A list of maps rather than a filter over the model: a page that
+    /// drew the members by hiding everybody else built a row -- and an
+    /// avatar, and the two effects behind it -- for every contact the
+    /// reader has, twice over, and built them again on every pick. What
+    /// it cost to open that page was the size of an address book that
+    /// had nothing to do with the group.
+    pub picked_rows: qt_method!(fn(&self, contact_ids: QVariantList) -> QVariantList),
+
     /// Fetch this account's own invite, the one to hand out. Answers on
     /// `invite_ready`.
     pub fetch_invite: qt_method!(fn(&mut self)),
@@ -161,6 +174,30 @@ impl ContactList {
                 .map_err(|err| err.to_string());
             done(result);
         });
+    }
+
+    /// The reader's own row, then the picked ones. See the declaration.
+    pub fn picked_rows(&self, contact_ids: QVariantList) -> QVariantList {
+        let rows = self.rows.borrow();
+        let mut picked = QVariantList::default();
+        if let Some(own) = rows.iter().find(|item| item.is_self) {
+            picked.push(QVariant::from(row_map(own)));
+        }
+        // Read back the way `create_group` reads the same list: what
+        // QML hands over is a list of variants, not of numbers.
+        let wanted = contact_ids
+            .into_iter()
+            .filter_map(|value| i32::from_qvariant(value.clone()))
+            .filter_map(|value| u32::try_from(value).ok());
+        for contact_id in wanted {
+            if let Some(item) = rows
+                .iter()
+                .find(|item| item.contact_id == contact_id && !item.is_self)
+            {
+                picked.push(QVariant::from(row_map(item)));
+            }
+        }
+        picked
     }
 
     /// Open the one-to-one chat with a contact.
@@ -350,6 +387,22 @@ impl ContactList {
 pub(crate) const SELF_CONTACT_ID: u32 = 1;
 
 /// One row from the core's contact object.
+/// One contact as a map QML reads properties off, with the same names
+/// the model's roles have -- so a row drawn from this and a row drawn
+/// from the model are written the same way.
+fn row_map(item: &ContactItem) -> QVariantMap {
+    let mut row = QVariantMap::default();
+    row.insert("contact_id".into(), QVariant::from(item.contact_id));
+    row.insert("display_name".into(), QVariant::from(&item.display_name));
+    row.insert("address".into(), QVariant::from(&item.address));
+    row.insert("is_verified".into(), QVariant::from(item.is_verified));
+    row.insert("is_key_contact".into(), QVariant::from(item.is_key_contact));
+    row.insert("is_self".into(), QVariant::from(item.is_self));
+    row.insert("color".into(), QVariant::from(&item.color));
+    row.insert("avatar_path".into(), QVariant::from(&item.avatar_path));
+    row
+}
+
 pub(crate) fn contact_row(contact: &serde_json::Value) -> ContactItem {
     let address = json::str_at(contact, "address");
     let display_name = match json::str_at(contact, "displayName") {

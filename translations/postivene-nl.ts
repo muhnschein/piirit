@@ -35,10 +35,6 @@
         <translation>Aanmaken</translation>
     </message>
     <message>
-        <source>Pick a chatmail relay or enter a custom server. The server assigns the address; the encryption keys are made on this device.</source>
-        <translation>Kies een chatmail-relay of voer een eigen server in. De server wijst het adres toe; de versleutelingssleutels worden op dit apparaat gemaakt.</translation>
-    </message>
-    <message>
         <source>Your name</source>
         <translation>Je naam</translation>
     </message>
@@ -53,6 +49,41 @@
     <message>
         <source>See &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; for the full list.</source>
         <translation>De volledige lijst staat op &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
+    </message>
+    <message>
+        <source>The relay gives you an address. The keys are made on this phone.</source>
+        <translation>De relay geeft je een adres. De sleutels worden op deze telefoon gemaakt.</translation>
+    </message>
+</context>
+<context>
+    <name>AddProfilePage</name>
+    <message>
+        <source>Add profile</source>
+        <translation>Profiel toevoegen</translation>
+    </message>
+    <message>
+        <source>Create a profile</source>
+        <translation>Een profiel aanmaken</translation>
+    </message>
+    <message>
+        <source>A new address on a chatmail relay.</source>
+        <translation>Een nieuw adres op een chatmail-relay.</translation>
+    </message>
+    <message>
+        <source>Restore from a backup</source>
+        <translation>Herstellen uit een back-up</translation>
+    </message>
+    <message>
+        <source>A backup file copied onto this phone.</source>
+        <translation>Een back-upbestand, naar deze telefoon gekopieerd.</translation>
+    </message>
+    <message>
+        <source>Add as second device</source>
+        <translation>Toevoegen als tweede apparaat</translation>
+    </message>
+    <message>
+        <source>The other device keeps it. Both get everything new.</source>
+        <translation>Het andere apparaat houdt het. Allebei krijgen ze alles wat nieuw is.</translation>
     </message>
 </context>
 <context>
@@ -135,8 +166,12 @@
         <translation>Opgeslagen in %1</translation>
     </message>
     <message>
-        <source>This profile&apos;s messages, contacts and key in one file, saved to Documents. Whoever has that file has the profile, so keep it somewhere safe. Your other profiles are not in it: each one is backed up from its own page.</source>
-        <translation>De berichten, contacten en sleutel van dit profiel in één bestand, opgeslagen in Documenten. Wie dat bestand heeft, heeft het profiel – bewaar het dus op een veilige plek. Je andere profielen zitten er niet in: elk profiel krijgt zijn back-up vanaf zijn eigen pagina.</translation>
+        <source>Messages, contacts and key in one file, saved to Documents. Whoever has the file has the profile.</source>
+        <translation>Berichten, contacten en sleutel in één bestand, opgeslagen in Documenten. Wie het bestand heeft, heeft het profiel.</translation>
+    </message>
+    <message>
+        <source>Swipe on for your chats.</source>
+        <translation>Veeg door naar je chats.</translation>
     </message>
 </context>
 <context>
@@ -478,10 +513,6 @@
         <translation>Verdwijnende berichten</translation>
     </message>
     <message>
-        <source>Applies to all members of this chat, they can still copy, save, and forward messages.</source>
-        <translation>Geldt voor alle leden van deze chat; ze kunnen berichten nog steeds kopiëren, opslaan en doorsturen.</translation>
-    </message>
-    <message>
         <source>After 1 year</source>
         <translation>Na 1 jaar</translation>
     </message>
@@ -513,6 +544,10 @@
         <source>After %1 seconds</source>
         <translation>Na %1 seconden</translation>
     </message>
+    <message>
+        <source>Applies to everyone in the chat. They can still copy and forward.</source>
+        <translation>Geldt voor iedereen in de chat. Kopiëren en doorsturen kan nog steeds.</translation>
+    </message>
 </context>
 <context>
     <name>ExistingProfilePage</name>
@@ -525,16 +560,16 @@
         <translation>Toevoegen als tweede apparaat</translation>
     </message>
     <message>
-        <source>The device that has it keeps it. This one joins, over the same network.</source>
-        <translation>Het apparaat dat het heeft, houdt het. Dit apparaat komt erbij, via hetzelfde netwerk.</translation>
-    </message>
-    <message>
         <source>Restore from a backup</source>
         <translation>Herstellen uit een back-up</translation>
     </message>
     <message>
-        <source>A backup file the other device wrote, copied onto this phone.</source>
-        <translation>Een back-upbestand dat het andere apparaat schreef, gekopieerd naar deze telefoon.</translation>
+        <source>The other device keeps it. Both get everything new.</source>
+        <translation>Het andere apparaat houdt het. Allebei krijgen ze alles wat nieuw is.</translation>
+    </message>
+    <message>
+        <source>A backup file copied onto this phone.</source>
+        <translation>Een back-upbestand, naar deze telefoon gekopieerd.</translation>
     </message>
 </context>
 <context>
@@ -615,24 +650,12 @@
         <translation>Geen aanmelding, geen telefoonnummer</translation>
     </message>
     <message>
-        <source>Your profile is made here on your phone. No phone number, no account with a company, nothing to sign.</source>
-        <translation>Je profiel ontstaat hier op je telefoon. Geen telefoonnummer, geen account bij een bedrijf, niets te ondertekenen.</translation>
-    </message>
-    <message>
         <source>You choose who can reach you</source>
         <translation>Jij bepaalt wie je kan bereiken</translation>
     </message>
     <message>
-        <source>There is no directory to be found in. Show a friend a code to scan, or send them a link, and the two of you can write.</source>
-        <translation>Er is geen gids waarin je gevonden wordt. Laat een vriend een code zien om te scannen of stuur een link, en dan kunnen jullie schrijven.</translation>
-    </message>
-    <message>
         <source>Groups of equals</source>
         <translation>Groepen van gelijken</translation>
-    </message>
-    <message>
-        <source>Everyone in a group has the same rights: anyone can add a friend, rename it or leave. Nobody is in charge.</source>
-        <translation>In een groep heeft iedereen dezelfde rechten: iedereen kan iemand toevoegen, de naam wijzigen of vertrekken. Niemand is de baas.</translation>
     </message>
     <message>
         <source>The server only passes it on</source>
@@ -647,12 +670,24 @@
         <translation>Elk bericht is versleuteld</translation>
     </message>
     <message>
-        <source>Messages are encrypted the whole way, always. Servers that transport them cannot read a word.</source>
-        <translation>Berichten zijn altijd de hele weg versleuteld. Servers die ze vervoeren, lezen er geen woord van.</translation>
+        <source>Made here on your phone. No phone number, no account, nothing to sign.</source>
+        <translation>Hier op je telefoon gemaakt. Geen telefoonnummer, geen account, niets te tekenen.</translation>
     </message>
     <message>
-        <source>A server holds a message until the other phone is online, and that is all it does. Your chats stay on your device.</source>
-        <translation>Een server houdt een bericht vast tot de andere telefoon online is, meer doet hij niet. Je gesprekken blijven op je apparaat.</translation>
+        <source>There is no directory to be found in. Show a friend a code, or send a link.</source>
+        <translation>Er is geen gids om in gevonden te worden. Laat een vriend een code zien, of stuur een link.</translation>
+    </message>
+    <message>
+        <source>Encrypted the whole way, always. The servers cannot read a word.</source>
+        <translation>Altijd end-to-end versleuteld. De servers lezen er geen woord van.</translation>
+    </message>
+    <message>
+        <source>Anyone can add a friend, rename the group or leave. Nobody is in charge.</source>
+        <translation>Iedereen kan een vriend toevoegen, de groep hernoemen of vertrekken. Niemand heeft de leiding.</translation>
+    </message>
+    <message>
+        <source>It holds a message until the other phone is online, and nothing more.</source>
+        <translation>Hij bewaart een bericht tot de andere telefoon online is, meer niet.</translation>
     </message>
 </context>
 <context>
@@ -670,9 +705,9 @@
         <translation>Annuleren</translation>
     </message>
     <message>
-        <source>Leave %1? You will stop receiving its messages, and only a member can add you back.</source>
+        <source>Leave %1? Only a member can add you back.</source>
         <extracomment>%1 is the group&apos;s name.</extracomment>
-        <translation>%1 verlaten? Je ontvangt de berichten ervan niet meer, en alleen een lid kan je weer toevoegen.</translation>
+        <translation>%1 verlaten? Alleen een lid kan je weer toevoegen.</translation>
     </message>
 </context>
 <context>
@@ -896,16 +931,8 @@
         <translation>Adres</translation>
     </message>
     <message>
-        <source>Show invite code</source>
-        <translation>Uitnodigingscode tonen</translation>
-    </message>
-    <message>
         <source>Send read receipts</source>
         <translation>Leesbevestigingen sturen</translation>
-    </message>
-    <message>
-        <source>Tells the people you write to when you have read their messages, and asks the same of them. With this off you send none and see none.</source>
-        <translation>Laat de mensen aan wie je schrijft weten wanneer je hun berichten hebt gelezen, en vraagt hetzelfde van hen. Uitgeschakeld stuur je er geen en zie je er geen.</translation>
     </message>
     <message>
         <source>Storage and connectivity</source>
@@ -946,12 +973,8 @@
         <translation>De naam op elk bericht dat je verstuurt</translation>
     </message>
     <message>
-        <source>Backup</source>
-        <translation>Back-up</translation>
-    </message>
-    <message>
-        <source>Back up this profile</source>
-        <translation>Dit profiel back-uppen</translation>
+        <source>Both ways: with this off you send none and see none.</source>
+        <translation>Beide kanten op: uit stuur je er geen en zie je er geen.</translation>
     </message>
 </context>
 <context>
@@ -977,8 +1000,8 @@
         <translation>%1 heeft niet binnen %2 seconden geantwoord.</translation>
     </message>
     <message>
-        <source>Chatmail relays are run by volunteers in their spare time. If this one does not seem to work, go back and try another one.</source>
-        <translation>Chatmail-relays worden door vrijwilligers in hun vrije tijd beheerd. Als deze niet lijkt te werken, ga dan terug en probeer een andere.</translation>
+        <source>Relays are run by volunteers. Go back and try another one.</source>
+        <translation>Relays worden door vrijwilligers gedraaid. Ga terug en probeer een andere.</translation>
     </message>
 </context>
 <context>
@@ -1024,12 +1047,12 @@
         <translation>Geen profielen</translation>
     </message>
     <message>
-        <source>Add as second device</source>
-        <translation>Toevoegen als tweede apparaat</translation>
+        <source>Invite code</source>
+        <translation>Uitnodigingscode</translation>
     </message>
     <message>
-        <source>Restore profile from backup</source>
-        <translation>Profiel herstellen uit een back-up</translation>
+        <source>Back up profile</source>
+        <translation>Profiel back-uppen</translation>
     </message>
 </context>
 <context>
@@ -1082,14 +1105,6 @@
 <context>
     <name>RestoreProfilePage</name>
     <message>
-        <source>The other device runs a newer Delta Chat than this app can take a profile from.</source>
-        <translation>Op het andere apparaat draait een nieuwere Delta Chat dan waar deze app een profiel van kan overnemen.</translation>
-    </message>
-    <message>
-        <source>The transfer stopped before it finished. Both devices have to stay on the same network, with this page open.</source>
-        <translation>De overdracht stopte voordat hij klaar was. Beide apparaten moeten op hetzelfde netwerk blijven, met deze pagina open.</translation>
-    </message>
-    <message>
         <source>That is not the code a device shows while it is offering its profile.</source>
         <translation>Dat is niet de code die een apparaat toont terwijl het zijn profiel aanbiedt.</translation>
     </message>
@@ -1102,10 +1117,6 @@
         <translation>Herstellen uit een back-up</translation>
     </message>
     <message>
-        <source>On the device that has your profile, make a backup and copy the file onto this phone. Then choose it here.</source>
-        <translation>Maak op het apparaat met je profiel een back-up en kopieer het bestand naar deze telefoon. Kies het daarna hier.</translation>
-    </message>
-    <message>
         <source>Choose a backup file</source>
         <translation>Kies een back-upbestand</translation>
     </message>
@@ -1116,14 +1127,6 @@
     <message>
         <source>Cancel</source>
         <translation>Annuleren</translation>
-    </message>
-    <message>
-        <source>The camera is not available on this device. A backup file works without one.</source>
-        <translation>Er is geen camera op dit apparaat. Met een back-upbestand kan het ook zonder.</translation>
-    </message>
-    <message>
-        <source>On your other device, open Settings and choose to add a second device. Both phones have to be on the same network.</source>
-        <translation>Open op het apparaat met je profiel de instellingen en kies om een tweede apparaat toe te voegen. Beide moeten op hetzelfde netwerk zitten.</translation>
     </message>
     <message>
         <source>Hold the phone up to the code it shows</source>
@@ -1152,6 +1155,26 @@
     <message>
         <source>Choose another file</source>
         <translation>Ander bestand kiezen</translation>
+    </message>
+    <message>
+        <source>The other device runs a newer Delta Chat than this app can read.</source>
+        <translation>Het andere apparaat draait een nieuwere Delta Chat dan deze app kan lezen.</translation>
+    </message>
+    <message>
+        <source>The transfer stopped. Both devices have to stay on one network, with this page open.</source>
+        <translation>De overdracht is gestopt. Beide apparaten moeten op hetzelfde netwerk blijven, met deze pagina open.</translation>
+    </message>
+    <message>
+        <source>No camera on this device. A backup file works without one.</source>
+        <translation>Geen camera op dit apparaat. Een back-upbestand werkt ook zonder.</translation>
+    </message>
+    <message>
+        <source>On the other device: Settings, then add a second device. Both on one network.</source>
+        <translation>Op het andere apparaat: Instellingen, dan een tweede apparaat toevoegen. Allebei op hetzelfde netwerk.</translation>
+    </message>
+    <message>
+        <source>Make a backup on the other device, copy the file here, then choose it.</source>
+        <translation>Maak een back-up op het andere apparaat, kopieer het bestand hierheen en kies het dan.</translation>
     </message>
 </context>
 <context>
@@ -1243,10 +1266,6 @@
         <translation>Bijlagen automatisch downloaden</translation>
     </message>
     <message>
-        <source>Bigger ones wait until you ask for them. Applies to every profile and to messages that arrive from now on.</source>
-        <translation>Grotere wachten tot je erom vraagt. Geldt voor elk profiel en voor berichten die vanaf nu binnenkomen.</translation>
-    </message>
-    <message>
         <source>Links</source>
         <translation>Links</translation>
     </message>
@@ -1255,16 +1274,8 @@
         <translation>Tracking uit links verwijderen</translation>
     </message>
     <message>
-        <source>Known tracking parameters -- click ids, campaign tags, the sharer&apos;s account -- are taken out of the links in the messages you send. The rest of the link is left as it was.</source>
-        <translation>Bekende trackingparameters – klik-id&apos;s, campagnetags, het account van de deler – worden uit de links in je verzonden berichten gehaald. De rest van de link blijft zoals hij was.</translation>
-    </message>
-    <message>
         <source>Notifications</source>
         <translation>Meldingen</translation>
-    </message>
-    <message>
-        <source>On the lock screen and in the notification area. The chat it is from opens on a tap either way.</source>
-        <translation>Op het vergrendelscherm en in het meldingengebied. De chat waar het vandaan komt, opent hoe dan ook met een tik.</translation>
     </message>
     <message>
         <source>Who wrote, and what</source>
@@ -1286,10 +1297,6 @@
         <source>Enable webxdc apps (experimental)</source>
         <extracomment>A webxdc app is a small program somebody sends into a chat and everyone in it plays with. Keep the name: it is what every other Delta Chat client calls them.</extracomment>
         <translation>webxdc-apps inschakelen (experimenteel)</translation>
-    </message>
-    <message>
-        <source>Apps somebody sends run inside the chat, and the attach tray offers a store to take new ones from. An app is somebody else&apos;s code, and this part is not yet as tested as the rest.</source>
-        <translation>Apps die iemand stuurt draaien in het gesprek zelf, en het bijlagevak biedt een winkel om nieuwe te halen. Een app is code van iemand anders, en dit deel is nog niet zo goed getest als de rest.</translation>
     </message>
     <message>
         <source>After 1 hour</source>
@@ -1316,10 +1323,6 @@
         <translation>Berichten van apparaat verwijderen</translation>
     </message>
     <message>
-        <source>Older messages go from this phone, in every chat of every profile, whatever a chat&apos;s own disappearing messages setting says. &quot;Saved messages&quot; are kept.</source>
-        <translation>Oudere berichten verdwijnen van deze telefoon, in elke chat van elk profiel, wat de instelling voor verdwijnende berichten van de chat zelf ook zegt. &quot;Opgeslagen berichten&quot; blijft bewaard.</translation>
-    </message>
-    <message>
         <source>A new notification shows</source>
         <translation>Een nieuwe melding toont</translation>
     </message>
@@ -1329,25 +1332,45 @@
         <translation>Vermeldingen</translation>
     </message>
     <message>
-        <source>In a muted group, a reply to one of your messages still notifies you.</source>
-        <translation>In een gedempte groep meldt een antwoord op een van je berichten zich toch.</translation>
-    </message>
-    <message>
         <source>Enter sends the message</source>
         <extracomment>The return key on the keyboard.</extracomment>
         <translation>Enter verstuurt het bericht</translation>
-    </message>
-    <message>
-        <source>When on, the return key sends. When off, it starts a new line, the message field grows with what is written, and the send button sends.</source>
-        <translation>Aan verstuurt de Enter-toets. Uit begint die een nieuwe regel, het berichtveld groeit met wat er staat, en de verzendknop verstuurt.</translation>
     </message>
     <message>
         <source>Use Markdown formatting</source>
         <translation>Markdown-opmaak gebruiken</translation>
     </message>
     <message>
-        <source>When on, a message written with *stars* and `backticks` is shown with the bold, the italics and the links drawn. When off, it is shown exactly as it was written.</source>
-        <translation>Aan wordt een bericht geschreven met *sterretjes* en `backticks` getoond met vet, cursief en links opgemaakt. Uit wordt het precies zo getoond als het geschreven is.</translation>
+        <source>Otherwise it starts a new line, and the button sends.</source>
+        <translation>Anders begint hij een nieuwe regel, en de knop verstuurt.</translation>
+    </message>
+    <message>
+        <source>Draws *stars* and `backticks` rather than showing them.</source>
+        <translation>Tekent *sterretjes* en `backticks` in plaats van ze te tonen.</translation>
+    </message>
+    <message>
+        <source>Bigger ones wait until you ask for them. Every profile, from now on.</source>
+        <translation>Grotere wachten tot je erom vraagt. Alle profielen, vanaf nu.</translation>
+    </message>
+    <message>
+        <source>Every chat of every profile. &quot;Saved messages&quot; are kept.</source>
+        <translation>Elke chat van elk profiel. „Opgeslagen berichten” blijven.</translation>
+    </message>
+    <message>
+        <source>On the lock screen and in the notification area.</source>
+        <translation>Op het vergrendelscherm en in het meldingengebied.</translation>
+    </message>
+    <message>
+        <source>A reply to you gets through a muted group.</source>
+        <translation>Een antwoord aan jou komt ook door een gedempte groep.</translation>
+    </message>
+    <message>
+        <source>Click ids and campaign tags come out of the links you send.</source>
+        <translation>Klik-id&apos;s en campagnetags gaan uit de links die je stuurt.</translation>
+    </message>
+    <message>
+        <source>Small apps run inside the chat. Somebody else&apos;s code, and less tested than the rest.</source>
+        <translation>Kleine apps draaien in de chat. Andermans code, en minder beproefd dan de rest.</translation>
     </message>
 </context>
 <context>

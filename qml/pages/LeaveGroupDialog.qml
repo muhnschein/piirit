@@ -33,7 +33,7 @@ Dialog {
             // The group's name is whatever its members chose.
             textFormat: Text.PlainText
             //: %1 is the group's name.
-            text: qsTr("Leave %1? You will stop receiving its messages, and only a member can add you back.").arg(dialog.groupName)
+            text: qsTr("Leave %1? Only a member can add you back.").arg(dialog.groupName)
         }
     }
 }

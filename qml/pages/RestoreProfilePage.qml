@@ -90,10 +90,10 @@ Page {
     /// What the shim's reason for refusing means, in words for a reader.
     function reasonText(reason) {
         if (reason === "too-new") {
-            return qsTr("The other device runs a newer Delta Chat than this app can take a profile from.")
+            return qsTr("The other device runs a newer Delta Chat than this app can read.")
         }
         if (reason === "stalled") {
-            return qsTr("The transfer stopped before it finished. Both devices have to stay on the same network, with this page open.")
+            return qsTr("The transfer stopped. Both devices have to stay on one network, with this page open.")
         }
         return qsTr("That is not the code a device shows while it is offering its profile.")
     }
@@ -198,7 +198,7 @@ Page {
             horizontalAlignment: Text.AlignHCenter
             wrapMode: Text.Wrap
             color: Theme.secondaryHighlightColor
-            text: qsTr("The camera is not available on this device. A backup file works without one.")
+            text: qsTr("No camera on this device. A backup file works without one.")
         }
 
         // Over the picture rather than above it. A reader still has to
@@ -244,7 +244,7 @@ Page {
                     textFormat: Text.PlainText
                     font.pixelSize: Theme.fontSizeSmall
                     color: Theme.secondaryHighlightColor
-                    text: qsTr("On your other device, open Settings and choose to add a second device. Both phones have to be on the same network.")
+                    text: qsTr("On the other device: Settings, then add a second device. Both on one network.")
                 }
             }
         }
@@ -277,7 +277,7 @@ Page {
                 textFormat: Text.PlainText
                 font.pixelSize: Theme.fontSizeSmall
                 color: Theme.secondaryHighlightColor
-                text: qsTr("On the device that has your profile, make a backup and copy the file onto this phone. Then choose it here.")
+                text: qsTr("Make a backup on the other device, copy the file here, then choose it.")
             }
 
             Button {

@@ -97,8 +97,11 @@ Page {
                 right: parent.right
                 bottom: parent.bottom
             }
+            // Rows draw outside the list's own box otherwise, and the
+            // box starts under the search field: without this a flick
+            // ran the contacts up over the field.
+            clip: true
             model: contacts.rows
-
 
             // No context menu: picking a contact is the only thing to do
             // with one here.

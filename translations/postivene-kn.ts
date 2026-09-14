@@ -35,10 +35,6 @@
         <translation>ರಚಿಸಿ</translation>
     </message>
     <message>
-        <source>Pick a chatmail relay or enter a custom server. The server assigns the address; the encryption keys are made on this device.</source>
-        <translation>ಒಂದು chatmail ರಿಲೇ ಆಯ್ಕೆಮಾಡಿ ಅಥವಾ ನಿಮ್ಮ ಸ್ವಂತ ಸರ್ವರ್ ನಮೂದಿಸಿ. ವಿಳಾಸವನ್ನು ಸರ್ವರ್ ನೀಡುತ್ತದೆ; ಎನ್‌ಕ್ರಿಪ್ಶನ್ ಕೀಗಳು ಈ ಸಾಧನದಲ್ಲೇ ರಚನೆಯಾಗುತ್ತವೆ.</translation>
-    </message>
-    <message>
         <source>Your name</source>
         <translation>ನಿಮ್ಮ ಹೆಸರು</translation>
     </message>
@@ -53,6 +49,41 @@
     <message>
         <source>See &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; for the full list.</source>
         <translation>ಪೂರ್ಣ ಪಟ್ಟಿಯನ್ನು &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; ನಲ್ಲಿ ನೋಡಿ.</translation>
+    </message>
+    <message>
+        <source>The relay gives you an address. The keys are made on this phone.</source>
+        <translation>ರಿಲೇ ನಿಮಗೆ ಒಂದು ವಿಳಾಸ ಕೊಡುತ್ತದೆ. ಕೀಲಿಗಳು ಈ ಫೋನ್‌ನಲ್ಲೇ ತಯಾರಾಗುತ್ತವೆ.</translation>
+    </message>
+</context>
+<context>
+    <name>AddProfilePage</name>
+    <message>
+        <source>Add profile</source>
+        <translation>ಪ್ರೊಫೈಲ್ ಸೇರಿಸಿ</translation>
+    </message>
+    <message>
+        <source>Create a profile</source>
+        <translation>ಪ್ರೊಫೈಲ್ ರಚಿಸಿ</translation>
+    </message>
+    <message>
+        <source>A new address on a chatmail relay.</source>
+        <translation>ಯಾವುದೋ chatmail ರಿಲೇಯಲ್ಲಿ ಹೊಸ ವಿಳಾಸ.</translation>
+    </message>
+    <message>
+        <source>Restore from a backup</source>
+        <translation>ಬ್ಯಾಕಪ್‌ನಿಂದ ಮರಳಿ ಪಡೆಯಿರಿ</translation>
+    </message>
+    <message>
+        <source>A backup file copied onto this phone.</source>
+        <translation>ಈ ಫೋನ್‌ಗೆ ನಕಲಿಸಿದ ಬ್ಯಾಕಪ್ ಫೈಲ್.</translation>
+    </message>
+    <message>
+        <source>Add as second device</source>
+        <translation>ಎರಡನೇ ಸಾಧನವಾಗಿ ಸೇರಿಸಿ</translation>
+    </message>
+    <message>
+        <source>The other device keeps it. Both get everything new.</source>
+        <translation>ಇನ್ನೊಂದು ಸಾಧನ ಅದನ್ನು ಇಟ್ಟುಕೊಳ್ಳುತ್ತದೆ. ಎರಡಕ್ಕೂ ಹೊಸದೆಲ್ಲ ಸಿಗುತ್ತದೆ.</translation>
     </message>
 </context>
 <context>
@@ -135,8 +166,12 @@
         <translation>%1 ನಲ್ಲಿ ಉಳಿಸಲಾಗಿದೆ</translation>
     </message>
     <message>
-        <source>This profile&apos;s messages, contacts and key in one file, saved to Documents. Whoever has that file has the profile, so keep it somewhere safe. Your other profiles are not in it: each one is backed up from its own page.</source>
-        <translation>ಈ ಪ್ರೊಫೈಲ್‌ನ ಸಂದೇಶಗಳು, ಸಂಪರ್ಕಗಳು ಮತ್ತು ಕೀ ಒಂದೇ ಫೈಲ್‌ನಲ್ಲಿ, ದಾಖಲೆಗಳಲ್ಲಿ ಉಳಿಯುತ್ತವೆ. ಆ ಫೈಲ್ ಇರುವವರಿಗೆ ಪ್ರೊಫೈಲ್ ಕೂಡ ಸಿಗುತ್ತದೆ, ಆದ್ದರಿಂದ ಅದನ್ನು ಸುರಕ್ಷಿತ ಸ್ಥಳದಲ್ಲಿ ಇಡಿ. ನಿಮ್ಮ ಇತರ ಪ್ರೊಫೈಲ್‌ಗಳು ಇದರಲ್ಲಿ ಇಲ್ಲ: ಪ್ರತಿಯೊಂದನ್ನೂ ಅದರ ಸ್ವಂತ ಪುಟದಿಂದ ಬ್ಯಾಕಪ್ ಮಾಡಲಾಗುತ್ತದೆ.</translation>
+        <source>Messages, contacts and key in one file, saved to Documents. Whoever has the file has the profile.</source>
+        <translation>ಸಂದೇಶಗಳು, ಸಂಪರ್ಕಗಳು ಮತ್ತು ಕೀಲಿ ಒಂದೇ ಫೈಲ್‌ನಲ್ಲಿ, ದಾಖಲೆಗಳಲ್ಲಿ ಉಳಿಸಲಾಗುತ್ತದೆ. ಫೈಲ್ ಯಾರ ಬಳಿ ಇದೆಯೋ ಪ್ರೊಫೈಲ್ ಕೂಡ ಅವರದೇ.</translation>
+    </message>
+    <message>
+        <source>Swipe on for your chats.</source>
+        <translation>ಮುಂದಕ್ಕೆ ಸರಿಸಿ ನಿಮ್ಮ ಚಾಟ್‌ಗಳಿಗೆ ಹೋಗಿ.</translation>
     </message>
 </context>
 <context>
@@ -478,10 +513,6 @@
         <translation>ಮಾಯವಾಗುವ ಸಂದೇಶಗಳು</translation>
     </message>
     <message>
-        <source>Applies to all members of this chat, they can still copy, save, and forward messages.</source>
-        <translation>ಈ ಚಾಟ್‌ನ ಎಲ್ಲ ಸದಸ್ಯರಿಗೂ ಅನ್ವಯಿಸುತ್ತದೆ; ಅವರು ಈಗಲೂ ಸಂದೇಶಗಳನ್ನು ನಕಲಿಸಬಹುದು, ಉಳಿಸಬಹುದು ಮತ್ತು ಫಾರ್ವರ್ಡ್ ಮಾಡಬಹುದು.</translation>
-    </message>
-    <message>
         <source>After 1 year</source>
         <translation>1 ವರ್ಷದ ನಂತರ</translation>
     </message>
@@ -513,6 +544,10 @@
         <source>After %1 seconds</source>
         <translation>%1 ಸೆಕೆಂಡುಗಳ ನಂತರ</translation>
     </message>
+    <message>
+        <source>Applies to everyone in the chat. They can still copy and forward.</source>
+        <translation>ಚಾಟ್‌ನಲ್ಲಿರುವ ಎಲ್ಲರಿಗೂ ಅನ್ವಯ. ಅವರು ಇನ್ನೂ ನಕಲಿಸಬಹುದು ಮತ್ತು ಮುಂದೆ ಕಳುಹಿಸಬಹುದು.</translation>
+    </message>
 </context>
 <context>
     <name>ExistingProfilePage</name>
@@ -525,16 +560,16 @@
         <translation>ಎರಡನೇ ಸಾಧನವಾಗಿ ಸೇರಿಸಿ</translation>
     </message>
     <message>
-        <source>The device that has it keeps it. This one joins, over the same network.</source>
-        <translation>ಅದು ಇರುವ ಸಾಧನ ಅದನ್ನೇ ಇಟ್ಟುಕೊಳ್ಳುತ್ತದೆ. ಇದು ಅದೇ ಜಾಲದ ಮೂಲಕ ಸೇರಿಕೊಳ್ಳುತ್ತದೆ.</translation>
-    </message>
-    <message>
         <source>Restore from a backup</source>
         <translation>ಬ್ಯಾಕಪ್‌ನಿಂದ ಮರಳಿ ಪಡೆಯಿರಿ</translation>
     </message>
     <message>
-        <source>A backup file the other device wrote, copied onto this phone.</source>
-        <translation>ಇನ್ನೊಂದು ಸಾಧನ ಬರೆದ ಬ್ಯಾಕಪ್ ಫೈಲ್, ಈ ಫೋನಿಗೆ ನಕಲಿಸಿದ್ದು.</translation>
+        <source>The other device keeps it. Both get everything new.</source>
+        <translation>ಇನ್ನೊಂದು ಸಾಧನ ಅದನ್ನು ಇಟ್ಟುಕೊಳ್ಳುತ್ತದೆ. ಎರಡಕ್ಕೂ ಹೊಸದೆಲ್ಲ ಸಿಗುತ್ತದೆ.</translation>
+    </message>
+    <message>
+        <source>A backup file copied onto this phone.</source>
+        <translation>ಈ ಫೋನ್‌ಗೆ ನಕಲಿಸಿದ ಬ್ಯಾಕಪ್ ಫೈಲ್.</translation>
     </message>
 </context>
 <context>
@@ -615,24 +650,12 @@
         <translation>ಸೈನ್-ಅಪ್ ಇಲ್ಲ, ಫೋನ್ ಸಂಖ್ಯೆ ಇಲ್ಲ</translation>
     </message>
     <message>
-        <source>Your profile is made here on your phone. No phone number, no account with a company, nothing to sign.</source>
-        <translation>ನಿಮ್ಮ ಪ್ರೊಫೈಲ್ ಇಲ್ಲಿಯೇ, ನಿಮ್ಮ ಫೋನಿನಲ್ಲಿಯೇ ಸಿದ್ಧವಾಗುತ್ತದೆ. ಫೋನ್ ಸಂಖ್ಯೆ ಬೇಡ, ಯಾವುದೇ ಕಂಪನಿಯ ಖಾತೆ ಬೇಡ, ಸಹಿ ಮಾಡುವುದೂ ಬೇಡ.</translation>
-    </message>
-    <message>
         <source>You choose who can reach you</source>
         <translation>ನಿಮ್ಮನ್ನು ಯಾರು ತಲುಪಬಹುದು ಎಂಬುದನ್ನು ನೀವೇ ನಿರ್ಧರಿಸುತ್ತೀರಿ</translation>
     </message>
     <message>
-        <source>There is no directory to be found in. Show a friend a code to scan, or send them a link, and the two of you can write.</source>
-        <translation>ನಿಮ್ಮನ್ನು ಹುಡುಕಲು ಯಾವುದೇ ಪಟ್ಟಿ ಇಲ್ಲ. ಸ್ನೇಹಿತರಿಗೆ ಸ್ಕ್ಯಾನ್ ಮಾಡಲು ಕೋಡ್ ತೋರಿಸಿ ಅಥವಾ ಕೊಂಡಿ ಕಳುಹಿಸಿ, ಆಮೇಲೆ ಇಬ್ಬರೂ ಬರೆಯಬಹುದು.</translation>
-    </message>
-    <message>
         <source>Groups of equals</source>
         <translation>ಸಮಾನರ ಗುಂಪುಗಳು</translation>
-    </message>
-    <message>
-        <source>Everyone in a group has the same rights: anyone can add a friend, rename it or leave. Nobody is in charge.</source>
-        <translation>ಗುಂಪಿನಲ್ಲಿ ಎಲ್ಲರಿಗೂ ಸಮಾನ ಹಕ್ಕು: ಯಾರು ಬೇಕಾದರೂ ಸ್ನೇಹಿತರನ್ನು ಸೇರಿಸಬಹುದು, ಹೆಸರು ಬದಲಿಸಬಹುದು ಅಥವಾ ಹೊರಹೋಗಬಹುದು. ಯಾರೂ ಮುಖ್ಯಸ್ಥರಲ್ಲ.</translation>
     </message>
     <message>
         <source>The server only passes it on</source>
@@ -647,12 +670,24 @@
         <translation>ಪ್ರತಿ ಸಂದೇಶವೂ ಗೂಢಲಿಪೀಕರಣಗೊಂಡಿದೆ</translation>
     </message>
     <message>
-        <source>Messages are encrypted the whole way, always. Servers that transport them cannot read a word.</source>
-        <translation>ಸಂದೇಶಗಳು ಯಾವಾಗಲೂ ಪೂರ್ತಿ ದಾರಿಯುದ್ದಕ್ಕೂ ಗೂಢಲಿಪೀಕರಣಗೊಂಡಿರುತ್ತವೆ. ಅವನ್ನು ಸಾಗಿಸುವ ಸರ್ವರ್‌ಗಳಿಗೆ ಒಂದು ಪದವೂ ಓದಲಾಗದು.</translation>
+        <source>Made here on your phone. No phone number, no account, nothing to sign.</source>
+        <translation>ಇಲ್ಲೇ, ನಿಮ್ಮ ಫೋನ್‌ನಲ್ಲಿ ರೂಪುಗೊಳ್ಳುತ್ತದೆ. ಫೋನ್ ಸಂಖ್ಯೆ ಇಲ್ಲ, ಖಾತೆ ಇಲ್ಲ, ಸಹಿ ಮಾಡಲು ಏನೂ ಇಲ್ಲ.</translation>
     </message>
     <message>
-        <source>A server holds a message until the other phone is online, and that is all it does. Your chats stay on your device.</source>
-        <translation>ಇನ್ನೊಂದು ಫೋನ್ ಆನ್‌ಲೈನ್ ಆಗುವವರೆಗೆ ಸರ್ವರ್ ಸಂದೇಶವನ್ನು ಇಟ್ಟುಕೊಳ್ಳುತ್ತದೆ, ಅಷ್ಟೇ. ನಿಮ್ಮ ಸಂಭಾಷಣೆಗಳು ನಿಮ್ಮ ಸಾಧನದಲ್ಲಿಯೇ ಉಳಿಯುತ್ತವೆ.</translation>
+        <source>There is no directory to be found in. Show a friend a code, or send a link.</source>
+        <translation>ನಿಮ್ಮನ್ನು ಹುಡುಕಲು ಯಾವ ಪಟ್ಟಿಯೂ ಇಲ್ಲ. ಗೆಳೆಯರಿಗೆ ಕೋಡ್ ತೋರಿಸಿ, ಅಥವಾ ಕೊಂಡಿ ಕಳುಹಿಸಿ.</translation>
+    </message>
+    <message>
+        <source>Encrypted the whole way, always. The servers cannot read a word.</source>
+        <translation>ಯಾವಾಗಲೂ ಪೂರ್ಣ ದಾರಿಯುದ್ದಕ್ಕೂ ಗೂಢಲಿಪೀಕರಣ. ಸರ್ವರ್‌ಗಳು ಒಂದು ಪದವನ್ನೂ ಓದುವುದಿಲ್ಲ.</translation>
+    </message>
+    <message>
+        <source>Anyone can add a friend, rename the group or leave. Nobody is in charge.</source>
+        <translation>ಯಾರು ಬೇಕಾದರೂ ಗೆಳೆಯನನ್ನು ಸೇರಿಸಬಹುದು, ಗುಂಪಿನ ಹೆಸರು ಬದಲಿಸಬಹುದು ಅಥವಾ ಹೊರಡಬಹುದು. ಯಾರೂ ಒಡೆಯರಲ್ಲ.</translation>
+    </message>
+    <message>
+        <source>It holds a message until the other phone is online, and nothing more.</source>
+        <translation>ಇನ್ನೊಂದು ಫೋನ್ ಆನ್‌ಲೈನ್ ಆಗುವವರೆಗೆ ಅದು ಸಂದೇಶವನ್ನು ಇಟ್ಟುಕೊಳ್ಳುತ್ತದೆ, ಅಷ್ಟೇ.</translation>
     </message>
 </context>
 <context>
@@ -670,9 +705,9 @@
         <translation>ರದ್ದುಮಾಡಿ</translation>
     </message>
     <message>
-        <source>Leave %1? You will stop receiving its messages, and only a member can add you back.</source>
+        <source>Leave %1? Only a member can add you back.</source>
         <extracomment>%1 is the group&apos;s name.</extracomment>
-        <translation>%1 ಗುಂಪಿನಿಂದ ಹೊರಹೋಗಬೇಕೇ? ಅದರ ಸಂದೇಶಗಳು ನಿಮಗೆ ಬರುವುದು ನಿಲ್ಲುತ್ತದೆ, ಮತ್ತು ಸದಸ್ಯರೊಬ್ಬರು ಮಾತ್ರ ನಿಮ್ಮನ್ನು ಮತ್ತೆ ಸೇರಿಸಬಹುದು.</translation>
+        <translation>%1 ಬಿಟ್ಟು ಹೋಗಬೇಕೆ? ನಿಮ್ಮನ್ನು ಮರಳಿ ಸೇರಿಸಬಲ್ಲವರು ಸದಸ್ಯರು ಮಾತ್ರ.</translation>
     </message>
 </context>
 <context>
@@ -896,16 +931,8 @@
         <translation>ವಿಳಾಸ</translation>
     </message>
     <message>
-        <source>Show invite code</source>
-        <translation>ಆಹ್ವಾನ ಕೋಡ್ ತೋರಿಸಿ</translation>
-    </message>
-    <message>
         <source>Send read receipts</source>
         <translation>ಓದಿದ ರಸೀದಿಗಳನ್ನು ಕಳುಹಿಸಿ</translation>
-    </message>
-    <message>
-        <source>Tells the people you write to when you have read their messages, and asks the same of them. With this off you send none and see none.</source>
-        <translation>ನೀವು ಬರೆಯುವವರಿಗೆ ಅವರ ಸಂದೇಶಗಳನ್ನು ನೀವು ಯಾವಾಗ ಓದಿದಿರಿ ಎಂದು ತಿಳಿಸುತ್ತದೆ, ಮತ್ತು ಅವರಿಂದಲೂ ಅದನ್ನೇ ಕೇಳುತ್ತದೆ. ಆಫ್ ಮಾಡಿದರೆ ನೀವು ಯಾವುದನ್ನೂ ಕಳುಹಿಸುವುದಿಲ್ಲ, ನೋಡುವುದಿಲ್ಲ.</translation>
     </message>
     <message>
         <source>Storage and connectivity</source>
@@ -946,12 +973,8 @@
         <translation>ನೀವು ಕಳುಹಿಸುವ ಪ್ರತಿ ಸಂದೇಶದ ಮೇಲಿನ ಹೆಸರು</translation>
     </message>
     <message>
-        <source>Backup</source>
-        <translation>ಬ್ಯಾಕಪ್</translation>
-    </message>
-    <message>
-        <source>Back up this profile</source>
-        <translation>ಈ ಪ್ರೊಫೈಲ್ ಬ್ಯಾಕಪ್ ಮಾಡಿ</translation>
+        <source>Both ways: with this off you send none and see none.</source>
+        <translation>ಎರಡೂ ಕಡೆ: ಆಫ್ ಇದ್ದರೆ ನೀವು ಒಂದನ್ನೂ ಕಳುಹಿಸುವುದಿಲ್ಲ, ಒಂದನ್ನೂ ಕಾಣುವುದಿಲ್ಲ.</translation>
     </message>
 </context>
 <context>
@@ -977,8 +1000,8 @@
         <translation>%1 %2 ಸೆಕೆಂಡುಗಳಲ್ಲಿ ಉತ್ತರಿಸಲಿಲ್ಲ.</translation>
     </message>
     <message>
-        <source>Chatmail relays are run by volunteers in their spare time. If this one does not seem to work, go back and try another one.</source>
-        <translation>Chatmail ರಿಲೇಗಳನ್ನು ಸ್ವಯಂಸೇವಕರು ತಮ್ಮ ಬಿಡುವಿನ ವೇಳೆಯಲ್ಲಿ ನಡೆಸುತ್ತಾರೆ. ಇದು ಕೆಲಸ ಮಾಡುತ್ತಿಲ್ಲವೆನಿಸಿದರೆ, ಹಿಂದಕ್ಕೆ ಹೋಗಿ ಇನ್ನೊಂದನ್ನು ಪ್ರಯತ್ನಿಸಿ.</translation>
+        <source>Relays are run by volunteers. Go back and try another one.</source>
+        <translation>ರಿಲೇಗಳನ್ನು ಸ್ವಯಂಸೇವಕರು ನಡೆಸುತ್ತಾರೆ. ಹಿಂದೆ ಹೋಗಿ ಬೇರೊಂದನ್ನು ಪ್ರಯತ್ನಿಸಿ.</translation>
     </message>
 </context>
 <context>
@@ -1024,12 +1047,12 @@
         <translation>ಪ್ರೊಫೈಲ್‌ಗಳಿಲ್ಲ</translation>
     </message>
     <message>
-        <source>Add as second device</source>
-        <translation>ಎರಡನೇ ಸಾಧನವಾಗಿ ಸೇರಿಸಿ</translation>
+        <source>Invite code</source>
+        <translation>ಆಹ್ವಾನ ಕೋಡ್</translation>
     </message>
     <message>
-        <source>Restore profile from backup</source>
-        <translation>ಬ್ಯಾಕಪ್‌ನಿಂದ ಪ್ರೊಫೈಲ್ ಮರಳಿ ಪಡೆಯಿರಿ</translation>
+        <source>Back up profile</source>
+        <translation>ಪ್ರೊಫೈಲ್ ಬ್ಯಾಕಪ್</translation>
     </message>
 </context>
 <context>
@@ -1082,14 +1105,6 @@
 <context>
     <name>RestoreProfilePage</name>
     <message>
-        <source>The other device runs a newer Delta Chat than this app can take a profile from.</source>
-        <translation>ಇನ್ನೊಂದು ಸಾಧನದಲ್ಲಿ ಈ ಅಪ್ಲಿಕೇಶನ್ ಪ್ರೊಫೈಲ್ ಪಡೆಯಬಲ್ಲದಕ್ಕಿಂತ ಹೊಸ Delta Chat ಇದೆ.</translation>
-    </message>
-    <message>
-        <source>The transfer stopped before it finished. Both devices have to stay on the same network, with this page open.</source>
-        <translation>ವರ್ಗಾವಣೆ ಮುಗಿಯುವ ಮೊದಲೇ ನಿಂತಿತು. ಎರಡೂ ಸಾಧನಗಳು ಒಂದೇ ಜಾಲದಲ್ಲಿ ಉಳಿಯಬೇಕು, ಈ ಪುಟ ತೆರೆದಿರಬೇಕು.</translation>
-    </message>
-    <message>
         <source>That is not the code a device shows while it is offering its profile.</source>
         <translation>ಸಾಧನವೊಂದು ತನ್ನ ಪ್ರೊಫೈಲ್ ನೀಡುವಾಗ ತೋರಿಸುವ ಕೋಡ್ ಇದಲ್ಲ.</translation>
     </message>
@@ -1102,10 +1117,6 @@
         <translation>ಬ್ಯಾಕಪ್‌ನಿಂದ ಮರಳಿ ಪಡೆಯಿರಿ</translation>
     </message>
     <message>
-        <source>On the device that has your profile, make a backup and copy the file onto this phone. Then choose it here.</source>
-        <translation>ನಿಮ್ಮ ಪ್ರೊಫೈಲ್ ಇರುವ ಸಾಧನದಲ್ಲಿ ಬ್ಯಾಕಪ್ ಮಾಡಿ ಫೈಲನ್ನು ಈ ಫೋನಿಗೆ ನಕಲಿಸಿ. ಆಮೇಲೆ ಅದನ್ನು ಇಲ್ಲಿ ಆರಿಸಿ.</translation>
-    </message>
-    <message>
         <source>Choose a backup file</source>
         <translation>ಬ್ಯಾಕಪ್ ಫೈಲ್ ಆರಿಸಿ</translation>
     </message>
@@ -1116,14 +1127,6 @@
     <message>
         <source>Cancel</source>
         <translation>ರದ್ದುಮಾಡಿ</translation>
-    </message>
-    <message>
-        <source>The camera is not available on this device. A backup file works without one.</source>
-        <translation>ಈ ಸಾಧನದಲ್ಲಿ ಕ್ಯಾಮೆರಾ ಇಲ್ಲ. ಬ್ಯಾಕಪ್ ಫೈಲ್‌ನಿಂದ ಕ್ಯಾಮೆರಾ ಇಲ್ಲದೆಯೂ ಆಗುತ್ತದೆ.</translation>
-    </message>
-    <message>
-        <source>On your other device, open Settings and choose to add a second device. Both phones have to be on the same network.</source>
-        <translation>ನಿಮ್ಮ ಪ್ರೊಫೈಲ್ ಇರುವ ಸಾಧನದಲ್ಲಿ ಸೆಟ್ಟಿಂಗ್‌ಗಳನ್ನು ತೆರೆದು ಎರಡನೇ ಸಾಧನ ಸೇರಿಸುವುದನ್ನು ಆರಿಸಿ. ಎರಡೂ ಒಂದೇ ಜಾಲದಲ್ಲಿರಬೇಕು.</translation>
     </message>
     <message>
         <source>Hold the phone up to the code it shows</source>
@@ -1152,6 +1155,26 @@
     <message>
         <source>Choose another file</source>
         <translation>ಬೇರೆ ಕಡತ ಆರಿಸಿ</translation>
+    </message>
+    <message>
+        <source>The other device runs a newer Delta Chat than this app can read.</source>
+        <translation>ಇನ್ನೊಂದು ಸಾಧನದಲ್ಲಿನ Delta Chat ಈ ಆ್ಯಪ್ ಓದಬಲ್ಲದ್ದಕ್ಕಿಂತ ಹೊಸದು.</translation>
+    </message>
+    <message>
+        <source>The transfer stopped. Both devices have to stay on one network, with this page open.</source>
+        <translation>ವರ್ಗಾವಣೆ ನಿಂತಿತು. ಎರಡೂ ಸಾಧನಗಳು ಒಂದೇ ಜಾಲದಲ್ಲಿ ಉಳಿಯಬೇಕು, ಈ ಪುಟ ತೆರೆದಿರಬೇಕು.</translation>
+    </message>
+    <message>
+        <source>No camera on this device. A backup file works without one.</source>
+        <translation>ಈ ಸಾಧನದಲ್ಲಿ ಕ್ಯಾಮೆರಾ ಇಲ್ಲ. ಬ್ಯಾಕಪ್ ಫೈಲ್ ಅದಿಲ್ಲದೆಯೂ ಕೆಲಸ ಮಾಡುತ್ತದೆ.</translation>
+    </message>
+    <message>
+        <source>On the other device: Settings, then add a second device. Both on one network.</source>
+        <translation>ಇನ್ನೊಂದು ಸಾಧನದಲ್ಲಿ: ಸಿದ್ಧತೆಗಳು, ನಂತರ ಎರಡನೇ ಸಾಧನವಾಗಿ ಸೇರಿಸಿ. ಎರಡೂ ಒಂದೇ ಜಾಲದಲ್ಲಿ.</translation>
+    </message>
+    <message>
+        <source>Make a backup on the other device, copy the file here, then choose it.</source>
+        <translation>ಇನ್ನೊಂದು ಸಾಧನದಲ್ಲಿ ಬ್ಯಾಕಪ್ ಮಾಡಿ, ಫೈಲನ್ನು ಇಲ್ಲಿಗೆ ನಕಲಿಸಿ, ನಂತರ ಅದನ್ನು ಆರಿಸಿ.</translation>
     </message>
 </context>
 <context>
@@ -1243,10 +1266,6 @@
         <translation>ಲಗತ್ತುಗಳನ್ನು ಸ್ವಯಂಚಾಲಿತವಾಗಿ ಡೌನ್‌ಲೋಡ್ ಮಾಡಿ</translation>
     </message>
     <message>
-        <source>Bigger ones wait until you ask for them. Applies to every profile and to messages that arrive from now on.</source>
-        <translation>ದೊಡ್ಡವು ನೀವು ಕೇಳುವವರೆಗೆ ಕಾಯುತ್ತವೆ. ಪ್ರತಿ ಪ್ರೊಫೈಲ್‌ಗೂ ಮತ್ತು ಇನ್ನು ಮುಂದೆ ಬರುವ ಸಂದೇಶಗಳಿಗೂ ಅನ್ವಯಿಸುತ್ತದೆ.</translation>
-    </message>
-    <message>
         <source>Links</source>
         <translation>ಲಿಂಕ್‌ಗಳು</translation>
     </message>
@@ -1255,16 +1274,8 @@
         <translation>ಲಿಂಕ್‌ಗಳಿಂದ ಟ್ರ್ಯಾಕಿಂಗ್ ತೆಗೆದುಹಾಕಿ</translation>
     </message>
     <message>
-        <source>Known tracking parameters -- click ids, campaign tags, the sharer&apos;s account -- are taken out of the links in the messages you send. The rest of the link is left as it was.</source>
-        <translation>ತಿಳಿದಿರುವ ಟ್ರ್ಯಾಕಿಂಗ್ ಪ್ಯಾರಾಮೀಟರ್‌ಗಳು – ಕ್ಲಿಕ್ ಐಡಿಗಳು, ಅಭಿಯಾನ ಟ್ಯಾಗ್‌ಗಳು, ಹಂಚಿಕೊಂಡವರ ಖಾತೆ – ನೀವು ಕಳುಹಿಸುವ ಸಂದೇಶಗಳ ಲಿಂಕ್‌ಗಳಿಂದ ತೆಗೆದುಹಾಕಲಾಗುತ್ತದೆ. ಲಿಂಕ್‌ನ ಉಳಿದ ಭಾಗ ಇದ್ದಂತೆಯೇ ಇರುತ್ತದೆ.</translation>
-    </message>
-    <message>
         <source>Notifications</source>
         <translation>ಅಧಿಸೂಚನೆಗಳು</translation>
-    </message>
-    <message>
-        <source>On the lock screen and in the notification area. The chat it is from opens on a tap either way.</source>
-        <translation>ಲಾಕ್ ಪರದೆಯಲ್ಲಿ ಮತ್ತು ಅಧಿಸೂಚನೆ ಪ್ರದೇಶದಲ್ಲಿ. ಅದು ಬಂದ ಚಾಟ್ ಟ್ಯಾಪ್ ಮಾಡಿದಾಗ ಹೇಗಿದ್ದರೂ ತೆರೆಯುತ್ತದೆ.</translation>
     </message>
     <message>
         <source>Who wrote, and what</source>
@@ -1286,10 +1297,6 @@
         <source>Enable webxdc apps (experimental)</source>
         <extracomment>A webxdc app is a small program somebody sends into a chat and everyone in it plays with. Keep the name: it is what every other Delta Chat client calls them.</extracomment>
         <translation>webxdc ಅಪ್ಲಿಕೇಶನ್‌ಗಳನ್ನು ಸಕ್ರಿಯಗೊಳಿಸಿ (ಪ್ರಯೋಗಾತ್ಮಕ)</translation>
-    </message>
-    <message>
-        <source>Apps somebody sends run inside the chat, and the attach tray offers a store to take new ones from. An app is somebody else&apos;s code, and this part is not yet as tested as the rest.</source>
-        <translation>ಯಾರಾದರೂ ಕಳುಹಿಸಿದ ಅಪ್ಲಿಕೇಶನ್‌ಗಳು ಸಂಭಾಷಣೆಯ ಒಳಗೇ ಚಲಿಸುತ್ತವೆ, ಮತ್ತು ಲಗತ್ತು ಟ್ರೇ ಹೊಸದನ್ನು ಪಡೆಯಲು ಒಂದು ಸ್ಟೋರ್ ನೀಡುತ್ತದೆ. ಅಪ್ಲಿಕೇಶನ್ ಬೇರೊಬ್ಬರ ಕೋಡ್, ಮತ್ತು ಈ ಭಾಗ ಉಳಿದಷ್ಟು ಪರೀಕ್ಷಿಸಲಾಗಿಲ್ಲ.</translation>
     </message>
     <message>
         <source>After 1 hour</source>
@@ -1316,10 +1323,6 @@
         <translation>ಸಾಧನದಿಂದ ಸಂದೇಶಗಳನ್ನು ಅಳಿಸಿ</translation>
     </message>
     <message>
-        <source>Older messages go from this phone, in every chat of every profile, whatever a chat&apos;s own disappearing messages setting says. &quot;Saved messages&quot; are kept.</source>
-        <translation>ಹಳೆಯ ಸಂದೇಶಗಳು ಈ ಫೋನ್‌ನಿಂದ ಹೋಗುತ್ತವೆ, ಪ್ರತಿ ಪ್ರೊಫೈಲ್‌ನ ಪ್ರತಿ ಚಾಟ್‌ನಲ್ಲಿ, ಚಾಟ್‌ನ ಸ್ವಂತ ಮಾಯವಾಗುವ ಸಂದೇಶಗಳ ಸೆಟ್ಟಿಂಗ್ ಏನೇ ಹೇಳಿದರೂ. &quot;ಉಳಿಸಿದ ಸಂದೇಶಗಳು&quot; ಉಳಿಯುತ್ತವೆ.</translation>
-    </message>
-    <message>
         <source>A new notification shows</source>
         <translation>ಹೊಸ ಅಧಿಸೂಚನೆ ತೋರಿಸುವುದು</translation>
     </message>
@@ -1329,25 +1332,45 @@
         <translation>ಉಲ್ಲೇಖಗಳು</translation>
     </message>
     <message>
-        <source>In a muted group, a reply to one of your messages still notifies you.</source>
-        <translation>ಮ್ಯೂಟ್ ಮಾಡಿದ ಗುಂಪಿನಲ್ಲಿ, ನಿಮ್ಮ ಸಂದೇಶಕ್ಕೆ ಬಂದ ಉತ್ತರ ನಿಮಗೆ ಆದರೂ ತಿಳಿಸುತ್ತದೆ.</translation>
-    </message>
-    <message>
         <source>Enter sends the message</source>
         <extracomment>The return key on the keyboard.</extracomment>
         <translation>Enter ಸಂದೇಶವನ್ನು ಕಳುಹಿಸುತ್ತದೆ</translation>
-    </message>
-    <message>
-        <source>When on, the return key sends. When off, it starts a new line, the message field grows with what is written, and the send button sends.</source>
-        <translation>ಆನ್ ಆಗಿದ್ದರೆ ಎಂಟರ್ ಕೀ ಕಳುಹಿಸುತ್ತದೆ. ಆಫ್ ಆಗಿದ್ದರೆ ಅದು ಹೊಸ ಸಾಲು ಪ್ರಾರಂಭಿಸುತ್ತದೆ, ಸಂದೇಶದ ಕ್ಷೇತ್ರ ಬರೆದಂತೆ ಬೆಳೆಯುತ್ತದೆ, ಮತ್ತು ಕಳುಹಿಸುವ ಗುಂಡಿ ಕಳುಹಿಸುತ್ತದೆ.</translation>
     </message>
     <message>
         <source>Use Markdown formatting</source>
         <translation>ಮಾರ್ಕ್‌ಡೌನ್ ಸ್ವರೂಪ ಬಳಸಿ</translation>
     </message>
     <message>
-        <source>When on, a message written with *stars* and `backticks` is shown with the bold, the italics and the links drawn. When off, it is shown exactly as it was written.</source>
-        <translation>ಆನ್ ಆಗಿದ್ದರೆ *ನಕ್ಷತ್ರ* ಮತ್ತು `ಬ್ಯಾಕ್‌ಟಿಕ್` ಬಳಸಿ ಬರೆದ ಸಂದೇಶವನ್ನು ದಪ್ಪ, ಓರೆ ಮತ್ತು ಲಿಂಕ್‌ಗಳನ್ನು ಅಲಂಕರಿಸಿ ತೋರಿಸಲಾಗುತ್ತದೆ. ಆಫ್ ಆಗಿದ್ದರೆ ಬರೆದಂತೆಯೇ ತೋರಿಸಲಾಗುತ್ತದೆ.</translation>
+        <source>Otherwise it starts a new line, and the button sends.</source>
+        <translation>ಇಲ್ಲದಿದ್ದರೆ ಅದು ಹೊಸ ಸಾಲು ಆರಂಭಿಸುತ್ತದೆ, ಕಳುಹಿಸುವುದು ಗುಂಡಿ.</translation>
+    </message>
+    <message>
+        <source>Draws *stars* and `backticks` rather than showing them.</source>
+        <translation>*ನಕ್ಷತ್ರಗಳನ್ನು* ಮತ್ತು `ಬ್ಯಾಕ್‌ಟಿಕ್‌ಗಳನ್ನು` ತೋರಿಸುವ ಬದಲು ಚಿತ್ರಿಸುತ್ತದೆ.</translation>
+    </message>
+    <message>
+        <source>Bigger ones wait until you ask for them. Every profile, from now on.</source>
+        <translation>ದೊಡ್ಡವು ನೀವು ಕೇಳುವವರೆಗೆ ಕಾಯುತ್ತವೆ. ಪ್ರತಿ ಪ್ರೊಫೈಲ್, ಇಂದಿನಿಂದ.</translation>
+    </message>
+    <message>
+        <source>Every chat of every profile. &quot;Saved messages&quot; are kept.</source>
+        <translation>ಪ್ರತಿ ಪ್ರೊಫೈಲ್‌ನ ಪ್ರತಿ ಚಾಟ್. “ಉಳಿಸಿದ ಸಂದೇಶಗಳು” ಉಳಿಯುತ್ತವೆ.</translation>
+    </message>
+    <message>
+        <source>On the lock screen and in the notification area.</source>
+        <translation>ಲಾಕ್ ಪರದೆಯಲ್ಲಿ ಮತ್ತು ಸೂಚನಾ ಪ್ರದೇಶದಲ್ಲಿ.</translation>
+    </message>
+    <message>
+        <source>A reply to you gets through a muted group.</source>
+        <translation>ನಿಮಗೆ ಬಂದ ಉತ್ತರ ಮೌನಗೊಳಿಸಿದ ಗುಂಪಿನಿಂದಲೂ ತಲುಪುತ್ತದೆ.</translation>
+    </message>
+    <message>
+        <source>Click ids and campaign tags come out of the links you send.</source>
+        <translation>ಕ್ಲಿಕ್ ಗುರುತುಗಳು ಮತ್ತು ಪ್ರಚಾರದ ಟ್ಯಾಗ್‌ಗಳು ನೀವು ಕಳುಹಿಸುವ ಕೊಂಡಿಗಳಿಂದ ಹೊರಬೀಳುತ್ತವೆ.</translation>
+    </message>
+    <message>
+        <source>Small apps run inside the chat. Somebody else&apos;s code, and less tested than the rest.</source>
+        <translation>ಚಿಕ್ಕ ಆ್ಯಪ್‌ಗಳು ಚಾಟ್‌ನ ಒಳಗೇ ಓಡುತ್ತವೆ. ಬೇರೊಬ್ಬರ ಕೋಡ್, ಮತ್ತು ಉಳಿದವುಗಳಿಗಿಂತ ಕಡಿಮೆ ಪರೀಕ್ಷಿಸಿದ್ದು.</translation>
     </message>
 </context>
 <context>

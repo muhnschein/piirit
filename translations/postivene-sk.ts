@@ -35,10 +35,6 @@
         <translation>Vytvoriť</translation>
     </message>
     <message>
-        <source>Pick a chatmail relay or enter a custom server. The server assigns the address; the encryption keys are made on this device.</source>
-        <translation>Vyberte chatmail relay alebo zadajte vlastný server. Server pridelí adresu; šifrovacie kľúče sa vytvoria na tomto zariadení.</translation>
-    </message>
-    <message>
         <source>Your name</source>
         <translation>Vaše meno</translation>
     </message>
@@ -53,6 +49,41 @@
     <message>
         <source>See &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; for the full list.</source>
         <translation>Úplný zoznam je na &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
+    </message>
+    <message>
+        <source>The relay gives you an address. The keys are made on this phone.</source>
+        <translation>Relay ti dá adresu. Kľúče vznikajú v tomto telefóne.</translation>
+    </message>
+</context>
+<context>
+    <name>AddProfilePage</name>
+    <message>
+        <source>Add profile</source>
+        <translation>Pridať profil</translation>
+    </message>
+    <message>
+        <source>Create a profile</source>
+        <translation>Vytvoriť profil</translation>
+    </message>
+    <message>
+        <source>A new address on a chatmail relay.</source>
+        <translation>Nová adresa na chatmail relay.</translation>
+    </message>
+    <message>
+        <source>Restore from a backup</source>
+        <translation>Obnoviť zo zálohy</translation>
+    </message>
+    <message>
+        <source>A backup file copied onto this phone.</source>
+        <translation>Súbor zálohy skopírovaný do tohto telefónu.</translation>
+    </message>
+    <message>
+        <source>Add as second device</source>
+        <translation>Pridať ako druhé zariadenie</translation>
+    </message>
+    <message>
+        <source>The other device keeps it. Both get everything new.</source>
+        <translation>Druhé zariadenie si ho nechá. Obe dostanú všetko nové.</translation>
     </message>
 </context>
 <context>
@@ -136,8 +167,12 @@
         <translation>Uložené do %1</translation>
     </message>
     <message>
-        <source>This profile&apos;s messages, contacts and key in one file, saved to Documents. Whoever has that file has the profile, so keep it somewhere safe. Your other profiles are not in it: each one is backed up from its own page.</source>
-        <translation>Správy, kontakty a kľúč tohto profilu v jednom súbore, uloženom do Dokumentov. Kto má ten súbor, má profil – uchovajte ho teda na bezpečnom mieste. Vaše ostatné profily v ňom nie sú: každý sa zálohuje zo svojej vlastnej stránky.</translation>
+        <source>Messages, contacts and key in one file, saved to Documents. Whoever has the file has the profile.</source>
+        <translation>Správy, kontakty a kľúč v jednom súbore, uloženom do Dokumentov. Kto má súbor, má profil.</translation>
+    </message>
+    <message>
+        <source>Swipe on for your chats.</source>
+        <translation>Potiahni ďalej na svoje chaty.</translation>
     </message>
 </context>
 <context>
@@ -480,10 +515,6 @@
         <translation>Miznúce správy</translation>
     </message>
     <message>
-        <source>Applies to all members of this chat, they can still copy, save, and forward messages.</source>
-        <translation>Platí pre všetkých členov tohto chatu; správy môžu naďalej kopírovať, ukladať a preposielať.</translation>
-    </message>
-    <message>
         <source>After 1 year</source>
         <translation>Po 1 roku</translation>
     </message>
@@ -515,6 +546,10 @@
         <source>After %1 seconds</source>
         <translation>Po %1 sekundách</translation>
     </message>
+    <message>
+        <source>Applies to everyone in the chat. They can still copy and forward.</source>
+        <translation>Platí pre všetkých v chate. Kopírovať a preposielať môžu ďalej.</translation>
+    </message>
 </context>
 <context>
     <name>ExistingProfilePage</name>
@@ -527,16 +562,16 @@
         <translation>Pridať ako druhé zariadenie</translation>
     </message>
     <message>
-        <source>The device that has it keeps it. This one joins, over the same network.</source>
-        <translation>Zariadenie, ktoré ho má, si ho nechá. Toto sa pridá cez tú istú sieť.</translation>
-    </message>
-    <message>
         <source>Restore from a backup</source>
         <translation>Obnoviť zo zálohy</translation>
     </message>
     <message>
-        <source>A backup file the other device wrote, copied onto this phone.</source>
-        <translation>Súbor so zálohou, ktorý zapísalo druhé zariadenie, skopírovaný do tohto telefónu.</translation>
+        <source>The other device keeps it. Both get everything new.</source>
+        <translation>Druhé zariadenie si ho nechá. Obe dostanú všetko nové.</translation>
+    </message>
+    <message>
+        <source>A backup file copied onto this phone.</source>
+        <translation>Súbor zálohy skopírovaný do tohto telefónu.</translation>
     </message>
 </context>
 <context>
@@ -619,24 +654,12 @@
         <translation>Žiadna registrácia, žiadne telefónne číslo</translation>
     </message>
     <message>
-        <source>Your profile is made here on your phone. No phone number, no account with a company, nothing to sign.</source>
-        <translation>Váš profil vznikne tu, v telefóne. Žiadne telefónne číslo, žiadny účet vo firme, nič na podpis.</translation>
-    </message>
-    <message>
         <source>You choose who can reach you</source>
         <translation>Vy rozhodujete, kto sa vám ozve</translation>
     </message>
     <message>
-        <source>There is no directory to be found in. Show a friend a code to scan, or send them a link, and the two of you can write.</source>
-        <translation>Neexistuje zoznam, v ktorom by vás niekto našiel. Ukážte kamarátovi kód na naskenovanie alebo mu pošlite odkaz a môžete si písať.</translation>
-    </message>
-    <message>
         <source>Groups of equals</source>
         <translation>Skupiny rovných</translation>
-    </message>
-    <message>
-        <source>Everyone in a group has the same rights: anyone can add a friend, rename it or leave. Nobody is in charge.</source>
-        <translation>V skupine majú všetci rovnaké práva: ktokoľvek môže pridať kamaráta, premenovať ju alebo z nej odísť. Nikto tu nevelí.</translation>
     </message>
     <message>
         <source>The server only passes it on</source>
@@ -651,12 +674,24 @@
         <translation>Každá správa je šifrovaná</translation>
     </message>
     <message>
-        <source>Messages are encrypted the whole way, always. Servers that transport them cannot read a word.</source>
-        <translation>Správy sú vždy šifrované po celej ceste. Servery, ktoré ich prenášajú, neprečítajú ani slovo.</translation>
+        <source>Made here on your phone. No phone number, no account, nothing to sign.</source>
+        <translation>Vzniká tu, v tvojom telefóne. Žiadne číslo, žiadny účet, nič na podpis.</translation>
     </message>
     <message>
-        <source>A server holds a message until the other phone is online, and that is all it does. Your chats stay on your device.</source>
-        <translation>Server podrží správu, kým nie je druhý telefón online, a nič viac nerobí. Vaše rozhovory zostávajú vo vašom zariadení.</translation>
+        <source>There is no directory to be found in. Show a friend a code, or send a link.</source>
+        <translation>Niet zoznamu, v ktorom by sa dalo nájsť ťa. Ukáž kamarátovi kód alebo pošli odkaz.</translation>
+    </message>
+    <message>
+        <source>Encrypted the whole way, always. The servers cannot read a word.</source>
+        <translation>Vždy šifrované celou cestou. Servery neprečítajú ani slovo.</translation>
+    </message>
+    <message>
+        <source>Anyone can add a friend, rename the group or leave. Nobody is in charge.</source>
+        <translation>Ktokoľvek môže pridať kamaráta, premenovať skupinu alebo odísť. Nikto tu nevelí.</translation>
+    </message>
+    <message>
+        <source>It holds a message until the other phone is online, and nothing more.</source>
+        <translation>Podrží správu, kým druhý telefón nie je online, a nič viac.</translation>
     </message>
 </context>
 <context>
@@ -674,9 +709,9 @@
         <translation>Zrušiť</translation>
     </message>
     <message>
-        <source>Leave %1? You will stop receiving its messages, and only a member can add you back.</source>
+        <source>Leave %1? Only a member can add you back.</source>
         <extracomment>%1 is the group&apos;s name.</extracomment>
-        <translation>Opustiť %1? Prestanú vám chodiť jej správy a späť vás môže pridať len člen.</translation>
+        <translation>Opustiť %1? Späť ťa môže pridať len člen.</translation>
     </message>
 </context>
 <context>
@@ -902,16 +937,8 @@
         <translation>Adresa</translation>
     </message>
     <message>
-        <source>Show invite code</source>
-        <translation>Zobraziť kód pozvánky</translation>
-    </message>
-    <message>
         <source>Send read receipts</source>
         <translation>Odosielať potvrdenia o prečítaní</translation>
-    </message>
-    <message>
-        <source>Tells the people you write to when you have read their messages, and asks the same of them. With this off you send none and see none.</source>
-        <translation>Dáva ľuďom, ktorým píšete, vedieť, kedy ste si prečítali ich správy, a žiada od nich to isté. Keď je to vypnuté, žiadne neposielate ani nevidíte.</translation>
     </message>
     <message>
         <source>Storage and connectivity</source>
@@ -952,12 +979,8 @@
         <translation>Meno na každej správe, ktorú pošlete</translation>
     </message>
     <message>
-        <source>Backup</source>
-        <translation>Záloha</translation>
-    </message>
-    <message>
-        <source>Back up this profile</source>
-        <translation>Zálohovať tento profil</translation>
+        <source>Both ways: with this off you send none and see none.</source>
+        <translation>Oboma smermi: vypnuté žiadne neposielaš a žiadne nevidíš.</translation>
     </message>
 </context>
 <context>
@@ -983,8 +1006,8 @@
         <translation>%1 neodpovedal do %2 sekúnd.</translation>
     </message>
     <message>
-        <source>Chatmail relays are run by volunteers in their spare time. If this one does not seem to work, go back and try another one.</source>
-        <translation>Chatmail relé prevádzkujú dobrovoľníci vo svojom voľnom čase. Ak sa zdá, že toto nefunguje, vráťte sa a skúste iné.</translation>
+        <source>Relays are run by volunteers. Go back and try another one.</source>
+        <translation>Relay prevádzkujú dobrovoľníci. Vráť sa a skús iný.</translation>
     </message>
 </context>
 <context>
@@ -1030,12 +1053,12 @@
         <translation>Žiadne profily</translation>
     </message>
     <message>
-        <source>Add as second device</source>
-        <translation>Pridať ako druhé zariadenie</translation>
+        <source>Invite code</source>
+        <translation>Kód pozvánky</translation>
     </message>
     <message>
-        <source>Restore profile from backup</source>
-        <translation>Obnoviť profil zo zálohy</translation>
+        <source>Back up profile</source>
+        <translation>Záloha profilu</translation>
     </message>
 </context>
 <context>
@@ -1088,14 +1111,6 @@
 <context>
     <name>RestoreProfilePage</name>
     <message>
-        <source>The other device runs a newer Delta Chat than this app can take a profile from.</source>
-        <translation>Na druhom zariadení beží novší Delta Chat, než z akého vie táto aplikácia prevziať profil.</translation>
-    </message>
-    <message>
-        <source>The transfer stopped before it finished. Both devices have to stay on the same network, with this page open.</source>
-        <translation>Prenos sa zastavil pred dokončením. Obe zariadenia musia zostať v tej istej sieti a táto stránka otvorená.</translation>
-    </message>
-    <message>
         <source>That is not the code a device shows while it is offering its profile.</source>
         <translation>Toto nie je kód, ktorý zariadenie ukazuje, kým ponúka svoj profil.</translation>
     </message>
@@ -1108,10 +1123,6 @@
         <translation>Obnoviť zo zálohy</translation>
     </message>
     <message>
-        <source>On the device that has your profile, make a backup and copy the file onto this phone. Then choose it here.</source>
-        <translation>Na zariadení s vaším profilom vytvorte zálohu a skopírujte súbor do tohto telefónu. Potom ho tu vyberte.</translation>
-    </message>
-    <message>
         <source>Choose a backup file</source>
         <translation>Vybrať súbor so zálohou</translation>
     </message>
@@ -1122,14 +1133,6 @@
     <message>
         <source>Cancel</source>
         <translation>Zrušiť</translation>
-    </message>
-    <message>
-        <source>The camera is not available on this device. A backup file works without one.</source>
-        <translation>Na tomto zariadení nie je fotoaparát. So súborom zálohy to ide aj bez neho.</translation>
-    </message>
-    <message>
-        <source>On your other device, open Settings and choose to add a second device. Both phones have to be on the same network.</source>
-        <translation>Na zariadení s vaším profilom otvorte nastavenia a zvoľte pridanie druhého zariadenia. Obe musia byť v tej istej sieti.</translation>
     </message>
     <message>
         <source>Hold the phone up to the code it shows</source>
@@ -1158,6 +1161,26 @@
     <message>
         <source>Choose another file</source>
         <translation>Vybrať iný súbor</translation>
+    </message>
+    <message>
+        <source>The other device runs a newer Delta Chat than this app can read.</source>
+        <translation>Druhé zariadenie má novší Delta Chat, než táto aplikácia vie prečítať.</translation>
+    </message>
+    <message>
+        <source>The transfer stopped. Both devices have to stay on one network, with this page open.</source>
+        <translation>Prenos sa zastavil. Obe zariadenia musia zostať v jednej sieti a táto stránka otvorená.</translation>
+    </message>
+    <message>
+        <source>No camera on this device. A backup file works without one.</source>
+        <translation>Toto zariadenie nemá fotoaparát. Súbor zálohy funguje aj bez neho.</translation>
+    </message>
+    <message>
+        <source>On the other device: Settings, then add a second device. Both on one network.</source>
+        <translation>Na druhom zariadení: Nastavenia, potom pridať druhé zariadenie. Obe v jednej sieti.</translation>
+    </message>
+    <message>
+        <source>Make a backup on the other device, copy the file here, then choose it.</source>
+        <translation>Urob na druhom zariadení zálohu, skopíruj súbor sem a potom ho vyber.</translation>
     </message>
 </context>
 <context>
@@ -1249,10 +1272,6 @@
         <translation>Automaticky sťahovať prílohy</translation>
     </message>
     <message>
-        <source>Bigger ones wait until you ask for them. Applies to every profile and to messages that arrive from now on.</source>
-        <translation>Väčšie počkajú, kým si ich nevyžiadate. Platí pre každý profil a pre správy, ktoré prídu odteraz.</translation>
-    </message>
-    <message>
         <source>Links</source>
         <translation>Odkazy</translation>
     </message>
@@ -1261,16 +1280,8 @@
         <translation>Odstrániť sledovanie z odkazov</translation>
     </message>
     <message>
-        <source>Known tracking parameters -- click ids, campaign tags, the sharer&apos;s account -- are taken out of the links in the messages you send. The rest of the link is left as it was.</source>
-        <translation>Známe sledovacie parametre – ID kliknutí, značky kampaní, účet zdieľajúceho – sa z odkazov vo vašich odosielaných správach odstránia. Zvyšok odkazu zostane, aký bol.</translation>
-    </message>
-    <message>
         <source>Notifications</source>
         <translation>Oznámenia</translation>
-    </message>
-    <message>
-        <source>On the lock screen and in the notification area. The chat it is from opens on a tap either way.</source>
-        <translation>Na uzamknutej obrazovke a v oblasti oznámení. Chat, z ktorého je, sa klepnutím otvorí tak či tak.</translation>
     </message>
     <message>
         <source>Who wrote, and what</source>
@@ -1292,10 +1303,6 @@
         <source>Enable webxdc apps (experimental)</source>
         <extracomment>A webxdc app is a small program somebody sends into a chat and everyone in it plays with. Keep the name: it is what every other Delta Chat client calls them.</extracomment>
         <translation>Povoliť aplikácie webxdc (experimentálne)</translation>
-    </message>
-    <message>
-        <source>Apps somebody sends run inside the chat, and the attach tray offers a store to take new ones from. An app is somebody else&apos;s code, and this part is not yet as tested as the rest.</source>
-        <translation>Aplikácie, ktoré niekto pošle, bežia priamo v rozhovore a panel príloh ponúka obchod, odkiaľ si možno vziať nové. Aplikácia je cudzí kód a táto časť ešte nie je tak otestovaná ako ostatné.</translation>
     </message>
     <message>
         <source>After 1 hour</source>
@@ -1322,10 +1329,6 @@
         <translation>Mazať správy zo zariadenia</translation>
     </message>
     <message>
-        <source>Older messages go from this phone, in every chat of every profile, whatever a chat&apos;s own disappearing messages setting says. &quot;Saved messages&quot; are kept.</source>
-        <translation>Staršie správy z tohto telefónu zmiznú, v každom chate každého profilu, nech už má chat sám miznúce správy nastavené akokoľvek. „Uložené správy“ zostávajú.</translation>
-    </message>
-    <message>
         <source>A new notification shows</source>
         <translation>Nové oznámenie ukazuje</translation>
     </message>
@@ -1335,25 +1338,45 @@
         <translation>Zmienky</translation>
     </message>
     <message>
-        <source>In a muted group, a reply to one of your messages still notifies you.</source>
-        <translation>V stlmenej skupine vás odpoveď na vašu správu aj tak upozorní.</translation>
-    </message>
-    <message>
         <source>Enter sends the message</source>
         <extracomment>The return key on the keyboard.</extracomment>
         <translation>Enter odošle správu</translation>
-    </message>
-    <message>
-        <source>When on, the return key sends. When off, it starts a new line, the message field grows with what is written, and the send button sends.</source>
-        <translation>Zapnuté kláves Enter odosiela. Vypnuté začne nový riadok, pole správy rastie s napísaným a odosiela tlačidlo odoslania.</translation>
     </message>
     <message>
         <source>Use Markdown formatting</source>
         <translation>Používať formátovanie Markdown</translation>
     </message>
     <message>
-        <source>When on, a message written with *stars* and `backticks` is shown with the bold, the italics and the links drawn. When off, it is shown exactly as it was written.</source>
-        <translation>Zapnuté sa správa písaná s *hviezdičkami* a `spätnými apostrofmi` zobrazí s vykresleným tučným písmom, kurzívou a odkazmi. Vypnuté sa zobrazí presne tak, ako bola napísaná.</translation>
+        <source>Otherwise it starts a new line, and the button sends.</source>
+        <translation>Inak začne nový riadok a odosiela tlačidlo.</translation>
+    </message>
+    <message>
+        <source>Draws *stars* and `backticks` rather than showing them.</source>
+        <translation>Vykreslí *hviezdičky* a `spätné apostrofy` namiesto toho, aby ich ukazoval.</translation>
+    </message>
+    <message>
+        <source>Bigger ones wait until you ask for them. Every profile, from now on.</source>
+        <translation>Väčšie počkajú, kým si o ne povieš. Všetky profily, odteraz.</translation>
+    </message>
+    <message>
+        <source>Every chat of every profile. &quot;Saved messages&quot; are kept.</source>
+        <translation>Každý chat každého profilu. „Uložené správy“ zostávajú.</translation>
+    </message>
+    <message>
+        <source>On the lock screen and in the notification area.</source>
+        <translation>Na uzamknutej obrazovke a v oblasti upozornení.</translation>
+    </message>
+    <message>
+        <source>A reply to you gets through a muted group.</source>
+        <translation>Odpoveď tebe prejde aj stlmenou skupinou.</translation>
+    </message>
+    <message>
+        <source>Click ids and campaign tags come out of the links you send.</source>
+        <translation>Identifikátory kliknutí a značky kampaní vypadnú z odkazov, ktoré posielaš.</translation>
+    </message>
+    <message>
+        <source>Small apps run inside the chat. Somebody else&apos;s code, and less tested than the rest.</source>
+        <translation>Malé aplikácie bežia vnútri chatu. Cudzí kód, a menej vyskúšaný než zvyšok.</translation>
     </message>
 </context>
 <context>

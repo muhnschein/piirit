@@ -35,10 +35,6 @@
         <translation>Създаване</translation>
     </message>
     <message>
-        <source>Pick a chatmail relay or enter a custom server. The server assigns the address; the encryption keys are made on this device.</source>
-        <translation>Изберете chatmail релей или въведете собствен сървър. Сървърът задава адреса; ключовете за шифроване се създават на това устройство.</translation>
-    </message>
-    <message>
         <source>Your name</source>
         <translation>Вашето име</translation>
     </message>
@@ -53,6 +49,41 @@
     <message>
         <source>See &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; for the full list.</source>
         <translation>Пълният списък е на &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
+    </message>
+    <message>
+        <source>The relay gives you an address. The keys are made on this phone.</source>
+        <translation>Релеят ви дава адрес. Ключовете се правят на този телефон.</translation>
+    </message>
+</context>
+<context>
+    <name>AddProfilePage</name>
+    <message>
+        <source>Add profile</source>
+        <translation>Добавяне на профил</translation>
+    </message>
+    <message>
+        <source>Create a profile</source>
+        <translation>Създаване на профил</translation>
+    </message>
+    <message>
+        <source>A new address on a chatmail relay.</source>
+        <translation>Нов адрес на релей chatmail.</translation>
+    </message>
+    <message>
+        <source>Restore from a backup</source>
+        <translation>Възстановяване от резервно копие</translation>
+    </message>
+    <message>
+        <source>A backup file copied onto this phone.</source>
+        <translation>Файл с резервно копие, копиран на този телефон.</translation>
+    </message>
+    <message>
+        <source>Add as second device</source>
+        <translation>Добавяне като второ устройство</translation>
+    </message>
+    <message>
+        <source>The other device keeps it. Both get everything new.</source>
+        <translation>Другото устройство го запазва. И двете получават всичко ново.</translation>
     </message>
 </context>
 <context>
@@ -135,8 +166,12 @@
         <translation>Запазено в %1</translation>
     </message>
     <message>
-        <source>This profile&apos;s messages, contacts and key in one file, saved to Documents. Whoever has that file has the profile, so keep it somewhere safe. Your other profiles are not in it: each one is backed up from its own page.</source>
-        <translation>Съобщенията, контактите и ключът на този профил в един файл, запазен в „Документи“. Който има този файл, има и профила — пазете го на сигурно място. Другите ви профили не са в него: всеки се архивира от собствената си страница.</translation>
+        <source>Messages, contacts and key in one file, saved to Documents. Whoever has the file has the profile.</source>
+        <translation>Съобщения, контакти и ключ в един файл, запазен в „Документи“. Който има файла, има профила.</translation>
+    </message>
+    <message>
+        <source>Swipe on for your chats.</source>
+        <translation>Плъзнете нататък към разговорите си.</translation>
     </message>
 </context>
 <context>
@@ -478,10 +513,6 @@
         <translation>Изчезващи съобщения</translation>
     </message>
     <message>
-        <source>Applies to all members of this chat, they can still copy, save, and forward messages.</source>
-        <translation>Важи за всички членове на този чат; те все още могат да копират, запазват и препращат съобщения.</translation>
-    </message>
-    <message>
         <source>After 1 year</source>
         <translation>След 1 година</translation>
     </message>
@@ -513,6 +544,10 @@
         <source>After %1 seconds</source>
         <translation>След %1 секунди</translation>
     </message>
+    <message>
+        <source>Applies to everyone in the chat. They can still copy and forward.</source>
+        <translation>Важи за всички в разговора. Все още могат да копират и препращат.</translation>
+    </message>
 </context>
 <context>
     <name>ExistingProfilePage</name>
@@ -525,16 +560,16 @@
         <translation>Добавяне като второ устройство</translation>
     </message>
     <message>
-        <source>The device that has it keeps it. This one joins, over the same network.</source>
-        <translation>Устройството, на което е, го запазва. Това се присъединява през същата мрежа.</translation>
-    </message>
-    <message>
         <source>Restore from a backup</source>
         <translation>Възстановяване от резервно копие</translation>
     </message>
     <message>
-        <source>A backup file the other device wrote, copied onto this phone.</source>
-        <translation>Файл с резервно копие, записан от другото устройство и копиран на този телефон.</translation>
+        <source>The other device keeps it. Both get everything new.</source>
+        <translation>Другото устройство го запазва. И двете получават всичко ново.</translation>
+    </message>
+    <message>
+        <source>A backup file copied onto this phone.</source>
+        <translation>Файл с резервно копие, копиран на този телефон.</translation>
     </message>
 </context>
 <context>
@@ -615,24 +650,12 @@
         <translation>Без регистрация, без телефонен номер</translation>
     </message>
     <message>
-        <source>Your profile is made here on your phone. No phone number, no account with a company, nothing to sign.</source>
-        <translation>Профилът ви се създава тук, на телефона. Без телефонен номер, без регистрация във фирма, няма нищо за подписване.</translation>
-    </message>
-    <message>
         <source>You choose who can reach you</source>
         <translation>Вие избирате кой може да ви пише</translation>
     </message>
     <message>
-        <source>There is no directory to be found in. Show a friend a code to scan, or send them a link, and the two of you can write.</source>
-        <translation>Няма указател, в който да ви открият. Покажете на приятел код за сканиране или му изпратете връзка и двамата можете да си пишете.</translation>
-    </message>
-    <message>
         <source>Groups of equals</source>
         <translation>Групи от равни</translation>
-    </message>
-    <message>
-        <source>Everyone in a group has the same rights: anyone can add a friend, rename it or leave. Nobody is in charge.</source>
-        <translation>Всички в групата имат еднакви права: всеки може да добави приятел, да я преименува или да я напусне. Никой не командва.</translation>
     </message>
     <message>
         <source>The server only passes it on</source>
@@ -647,12 +670,24 @@
         <translation>Всяко съобщение е шифровано</translation>
     </message>
     <message>
-        <source>Messages are encrypted the whole way, always. Servers that transport them cannot read a word.</source>
-        <translation>Съобщенията са шифровани по целия път, винаги. Сървърите, които ги пренасят, не могат да прочетат и дума.</translation>
+        <source>Made here on your phone. No phone number, no account, nothing to sign.</source>
+        <translation>Създава се тук, на телефона ви. Без номер, без регистрация, нищо за подписване.</translation>
     </message>
     <message>
-        <source>A server holds a message until the other phone is online, and that is all it does. Your chats stay on your device.</source>
-        <translation>Сървърът пази съобщението, докато другият телефон излезе онлайн, и това е всичко. Разговорите ви остават на вашето устройство.</translation>
+        <source>There is no directory to be found in. Show a friend a code, or send a link.</source>
+        <translation>Няма указател, в който да ви открият. Покажете на приятел код или му изпратете връзка.</translation>
+    </message>
+    <message>
+        <source>Encrypted the whole way, always. The servers cannot read a word.</source>
+        <translation>Винаги шифровано по целия път. Сървърите не четат и дума.</translation>
+    </message>
+    <message>
+        <source>Anyone can add a friend, rename the group or leave. Nobody is in charge.</source>
+        <translation>Всеки може да добави приятел, да преименува групата или да си тръгне. Никой не командва.</translation>
+    </message>
+    <message>
+        <source>It holds a message until the other phone is online, and nothing more.</source>
+        <translation>Задържа съобщението, докато другият телефон е на линия, и нищо повече.</translation>
     </message>
 </context>
 <context>
@@ -670,9 +705,9 @@
         <translation>Отказ</translation>
     </message>
     <message>
-        <source>Leave %1? You will stop receiving its messages, and only a member can add you back.</source>
+        <source>Leave %1? Only a member can add you back.</source>
         <extracomment>%1 is the group&apos;s name.</extracomment>
-        <translation>Да напуснете %1? Ще спрете да получавате съобщенията ѝ, а само член може да ви добави обратно.</translation>
+        <translation>Да напуснете ли %1? Само член може да ви добави обратно.</translation>
     </message>
 </context>
 <context>
@@ -896,16 +931,8 @@
         <translation>Адрес</translation>
     </message>
     <message>
-        <source>Show invite code</source>
-        <translation>Показване на кода за покана</translation>
-    </message>
-    <message>
         <source>Send read receipts</source>
         <translation>Изпращане на потвърждения за прочитане</translation>
-    </message>
-    <message>
-        <source>Tells the people you write to when you have read their messages, and asks the same of them. With this off you send none and see none.</source>
-        <translation>Съобщава на хората, на които пишете, кога сте прочели съобщенията им, и иска същото от тях. Изключено, вие не изпращате и не виждате такива.</translation>
     </message>
     <message>
         <source>Storage and connectivity</source>
@@ -946,12 +973,8 @@
         <translation>Името върху всяко съобщение, което изпращате</translation>
     </message>
     <message>
-        <source>Backup</source>
-        <translation>Резервно копие</translation>
-    </message>
-    <message>
-        <source>Back up this profile</source>
-        <translation>Резервно копие на този профил</translation>
+        <source>Both ways: with this off you send none and see none.</source>
+        <translation>И в двете посоки: изключено — не изпращате и не виждате нито едно.</translation>
     </message>
 </context>
 <context>
@@ -977,8 +1000,8 @@
         <translation>%1 не отговори в рамките на %2 секунди.</translation>
     </message>
     <message>
-        <source>Chatmail relays are run by volunteers in their spare time. If this one does not seem to work, go back and try another one.</source>
-        <translation>Chatmail релетата се поддържат от доброволци в свободното им време. Ако това не изглежда да работи, върнете се и опитайте друго.</translation>
+        <source>Relays are run by volunteers. Go back and try another one.</source>
+        <translation>Релеите се поддържат от доброволци. Върнете се и опитайте друг.</translation>
     </message>
 </context>
 <context>
@@ -1024,12 +1047,12 @@
         <translation>Няма профили</translation>
     </message>
     <message>
-        <source>Add as second device</source>
-        <translation>Добавяне като второ устройство</translation>
+        <source>Invite code</source>
+        <translation>Код за покана</translation>
     </message>
     <message>
-        <source>Restore profile from backup</source>
-        <translation>Възстановяване на профил от резервно копие</translation>
+        <source>Back up profile</source>
+        <translation>Резервно копие на профила</translation>
     </message>
 </context>
 <context>
@@ -1082,14 +1105,6 @@
 <context>
     <name>RestoreProfilePage</name>
     <message>
-        <source>The other device runs a newer Delta Chat than this app can take a profile from.</source>
-        <translation>На другото устройство работи по-нов Delta Chat, отколкото това приложение може да поеме профил от.</translation>
-    </message>
-    <message>
-        <source>The transfer stopped before it finished. Both devices have to stay on the same network, with this page open.</source>
-        <translation>Прехвърлянето спря, преди да завърши. И двете устройства трябва да останат в една и съща мрежа, с отворена тази страница.</translation>
-    </message>
-    <message>
         <source>That is not the code a device shows while it is offering its profile.</source>
         <translation>Това не е кодът, който устройството показва, докато предлага профила си.</translation>
     </message>
@@ -1102,10 +1117,6 @@
         <translation>Възстановяване от резервно копие</translation>
     </message>
     <message>
-        <source>On the device that has your profile, make a backup and copy the file onto this phone. Then choose it here.</source>
-        <translation>На устройството с вашия профил направете резервно копие и копирайте файла на този телефон. После го изберете тук.</translation>
-    </message>
-    <message>
         <source>Choose a backup file</source>
         <translation>Избор на файл с резервно копие</translation>
     </message>
@@ -1116,14 +1127,6 @@
     <message>
         <source>Cancel</source>
         <translation>Отказ</translation>
-    </message>
-    <message>
-        <source>The camera is not available on this device. A backup file works without one.</source>
-        <translation>На това устройство няма камера. С файл с резервно копие става и без нея.</translation>
-    </message>
-    <message>
-        <source>On your other device, open Settings and choose to add a second device. Both phones have to be on the same network.</source>
-        <translation>На устройството с вашия профил отворете настройките и изберете добавяне на второ устройство. И двете устройства трябва да са в една и съща мрежа.</translation>
     </message>
     <message>
         <source>Hold the phone up to the code it shows</source>
@@ -1152,6 +1155,26 @@
     <message>
         <source>Choose another file</source>
         <translation>Избор на друг файл</translation>
+    </message>
+    <message>
+        <source>The other device runs a newer Delta Chat than this app can read.</source>
+        <translation>На другото устройство има по-нов Delta Chat, отколкото това приложение може да прочете.</translation>
+    </message>
+    <message>
+        <source>The transfer stopped. Both devices have to stay on one network, with this page open.</source>
+        <translation>Прехвърлянето спря. И двете устройства трябва да останат в една мрежа, с тази страница отворена.</translation>
+    </message>
+    <message>
+        <source>No camera on this device. A backup file works without one.</source>
+        <translation>Това устройство няма камера. Файл с резервно копие работи и без нея.</translation>
+    </message>
+    <message>
+        <source>On the other device: Settings, then add a second device. Both on one network.</source>
+        <translation>На другото устройство: Настройки, после добавяне като второ устройство. И двете в една мрежа.</translation>
+    </message>
+    <message>
+        <source>Make a backup on the other device, copy the file here, then choose it.</source>
+        <translation>Направете резервно копие на другото устройство, копирайте файла тук и го изберете.</translation>
     </message>
 </context>
 <context>
@@ -1243,10 +1266,6 @@
         <translation>Автоматично изтегляне на прикачените файлове</translation>
     </message>
     <message>
-        <source>Bigger ones wait until you ask for them. Applies to every profile and to messages that arrive from now on.</source>
-        <translation>По-големите чакат, докато не ги поискате. Важи за всеки профил и за съобщенията, които пристигат отсега нататък.</translation>
-    </message>
-    <message>
         <source>Links</source>
         <translation>Връзки</translation>
     </message>
@@ -1255,16 +1274,8 @@
         <translation>Премахване на проследяването от връзките</translation>
     </message>
     <message>
-        <source>Known tracking parameters -- click ids, campaign tags, the sharer&apos;s account -- are taken out of the links in the messages you send. The rest of the link is left as it was.</source>
-        <translation>Известните параметри за проследяване – идентификатори на кликвания, етикети на кампании, акаунтът на споделящия – се премахват от връзките в съобщенията, които изпращате. Останалата част от връзката се оставя както е.</translation>
-    </message>
-    <message>
         <source>Notifications</source>
         <translation>Известия</translation>
-    </message>
-    <message>
-        <source>On the lock screen and in the notification area. The chat it is from opens on a tap either way.</source>
-        <translation>На заключения екран и в областта за известия. Чатът, от който е, се отваря с докосване така или иначе.</translation>
     </message>
     <message>
         <source>Who wrote, and what</source>
@@ -1286,10 +1297,6 @@
         <source>Enable webxdc apps (experimental)</source>
         <extracomment>A webxdc app is a small program somebody sends into a chat and everyone in it plays with. Keep the name: it is what every other Delta Chat client calls them.</extracomment>
         <translation>Включване на webxdc приложения (експериментално)</translation>
-    </message>
-    <message>
-        <source>Apps somebody sends run inside the chat, and the attach tray offers a store to take new ones from. An app is somebody else&apos;s code, and this part is not yet as tested as the rest.</source>
-        <translation>Приложенията, които някой изпраща, се изпълняват в разговора, а таблото за прикачване предлага магазин, от който да вземете нови. Приложението е чужд код и тази част още не е толкова изпитана, колкото останалите.</translation>
     </message>
     <message>
         <source>After 1 hour</source>
@@ -1316,10 +1323,6 @@
         <translation>Изтриване на съобщения от устройството</translation>
     </message>
     <message>
-        <source>Older messages go from this phone, in every chat of every profile, whatever a chat&apos;s own disappearing messages setting says. &quot;Saved messages&quot; are kept.</source>
-        <translation>По-старите съобщения се изтриват от този телефон, във всеки чат на всеки профил, независимо от настройката за изчезващи съобщения на самия чат. „Запазени съобщения“ се запазват.</translation>
-    </message>
-    <message>
         <source>A new notification shows</source>
         <translation>Ново известие показва</translation>
     </message>
@@ -1329,25 +1332,45 @@
         <translation>Споменавания</translation>
     </message>
     <message>
-        <source>In a muted group, a reply to one of your messages still notifies you.</source>
-        <translation>В заглушена група отговор на ваше съобщение все пак ви известява.</translation>
-    </message>
-    <message>
         <source>Enter sends the message</source>
         <extracomment>The return key on the keyboard.</extracomment>
         <translation>Enter изпраща съобщението</translation>
-    </message>
-    <message>
-        <source>When on, the return key sends. When off, it starts a new line, the message field grows with what is written, and the send button sends.</source>
-        <translation>Включено, клавишът Enter изпраща. Изключено, той започва нов ред, полето за съобщение расте с написаното, а изпраща бутонът за изпращане.</translation>
     </message>
     <message>
         <source>Use Markdown formatting</source>
         <translation>Използване на форматиране с Markdown</translation>
     </message>
     <message>
-        <source>When on, a message written with *stars* and `backticks` is shown with the bold, the italics and the links drawn. When off, it is shown exactly as it was written.</source>
-        <translation>Включено, съобщение, написано със *звездички* и `обратни апострофи`, се показва с оформени удебелен текст, курсив и връзки. Изключено, показва се точно както е написано.</translation>
+        <source>Otherwise it starts a new line, and the button sends.</source>
+        <translation>Иначе започва нов ред, а бутонът изпраща.</translation>
+    </message>
+    <message>
+        <source>Draws *stars* and `backticks` rather than showing them.</source>
+        <translation>Изчертава *звездичките* и `обратните апострофи`, вместо да ги показва.</translation>
+    </message>
+    <message>
+        <source>Bigger ones wait until you ask for them. Every profile, from now on.</source>
+        <translation>По-големите чакат, докато ги поискате. Всички профили, отсега нататък.</translation>
+    </message>
+    <message>
+        <source>Every chat of every profile. &quot;Saved messages&quot; are kept.</source>
+        <translation>Всеки разговор на всеки профил. „Запазените съобщения“ остават.</translation>
+    </message>
+    <message>
+        <source>On the lock screen and in the notification area.</source>
+        <translation>На заключения екран и в областта за известия.</translation>
+    </message>
+    <message>
+        <source>A reply to you gets through a muted group.</source>
+        <translation>Отговор до вас минава дори през заглушена група.</translation>
+    </message>
+    <message>
+        <source>Click ids and campaign tags come out of the links you send.</source>
+        <translation>Идентификаторите на кликвания и етикетите на кампании изпадат от връзките, които изпращате.</translation>
+    </message>
+    <message>
+        <source>Small apps run inside the chat. Somebody else&apos;s code, and less tested than the rest.</source>
+        <translation>Малки приложения работят вътре в разговора. Чужд код и по-малко изпитан от останалото.</translation>
     </message>
 </context>
 <context>

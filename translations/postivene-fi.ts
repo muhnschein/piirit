@@ -35,10 +35,6 @@
         <translation>Luo</translation>
     </message>
     <message>
-        <source>Pick a chatmail relay or enter a custom server. The server assigns the address; the encryption keys are made on this device.</source>
-        <translation>Valitse chatmail-välittäjä tai anna oma palvelin. Palvelin antaa osoitteen; salausavaimet luodaan tällä laitteella.</translation>
-    </message>
-    <message>
         <source>Your name</source>
         <translation>Nimesi</translation>
     </message>
@@ -53,6 +49,41 @@
     <message>
         <source>See &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; for the full list.</source>
         <translation>Koko luettelo on osoitteessa &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
+    </message>
+    <message>
+        <source>The relay gives you an address. The keys are made on this phone.</source>
+        <translation>Välittäjä antaa sinulle osoitteen. Avaimet tehdään tässä puhelimessa.</translation>
+    </message>
+</context>
+<context>
+    <name>AddProfilePage</name>
+    <message>
+        <source>Add profile</source>
+        <translation>Lisää profiili</translation>
+    </message>
+    <message>
+        <source>Create a profile</source>
+        <translation>Luo profiili</translation>
+    </message>
+    <message>
+        <source>A new address on a chatmail relay.</source>
+        <translation>Uusi osoite chatmail-välittäjällä.</translation>
+    </message>
+    <message>
+        <source>Restore from a backup</source>
+        <translation>Palauta varmuuskopiosta</translation>
+    </message>
+    <message>
+        <source>A backup file copied onto this phone.</source>
+        <translation>Varmuuskopiotiedosto, kopioituna tähän puhelimeen.</translation>
+    </message>
+    <message>
+        <source>Add as second device</source>
+        <translation>Lisää toisena laitteena</translation>
+    </message>
+    <message>
+        <source>The other device keeps it. Both get everything new.</source>
+        <translation>Toinen laite pitää sen. Molemmat saavat kaiken uuden.</translation>
     </message>
 </context>
 <context>
@@ -135,8 +166,12 @@
         <translation>Tallennettu kohteeseen %1</translation>
     </message>
     <message>
-        <source>This profile&apos;s messages, contacts and key in one file, saved to Documents. Whoever has that file has the profile, so keep it somewhere safe. Your other profiles are not in it: each one is backed up from its own page.</source>
-        <translation>Tämän profiilin viestit, yhteystiedot ja avain yhdessä tiedostossa, tallennettuna Asiakirjat-kansioon. Jolla on tiedosto, sillä on profiili – säilytä se siis turvallisessa paikassa. Muut profiilisi eivät ole mukana: jokainen varmuuskopioidaan omalta sivultaan.</translation>
+        <source>Messages, contacts and key in one file, saved to Documents. Whoever has the file has the profile.</source>
+        <translation>Viestit, yhteystiedot ja avain yhdessä tiedostossa, tallennettuna Dokumentteihin. Jolla on tiedosto, sillä on profiili.</translation>
+    </message>
+    <message>
+        <source>Swipe on for your chats.</source>
+        <translation>Pyyhkäise eteenpäin keskusteluihisi.</translation>
     </message>
 </context>
 <context>
@@ -478,10 +513,6 @@
         <translation>Katoavat viestit</translation>
     </message>
     <message>
-        <source>Applies to all members of this chat, they can still copy, save, and forward messages.</source>
-        <translation>Koskee kaikkia tämän keskustelun jäseniä; he voivat silti kopioida, tallentaa ja välittää viestejä.</translation>
-    </message>
-    <message>
         <source>After 1 year</source>
         <translation>1 vuoden kuluttua</translation>
     </message>
@@ -513,6 +544,10 @@
         <source>After %1 seconds</source>
         <translation>%1 sekunnin kuluttua</translation>
     </message>
+    <message>
+        <source>Applies to everyone in the chat. They can still copy and forward.</source>
+        <translation>Koskee kaikkia keskustelussa. He voivat yhä kopioida ja välittää.</translation>
+    </message>
 </context>
 <context>
     <name>ExistingProfilePage</name>
@@ -525,16 +560,16 @@
         <translation>Lisää toisena laitteena</translation>
     </message>
     <message>
-        <source>The device that has it keeps it. This one joins, over the same network.</source>
-        <translation>Laite, jolla se on, pitää sen. Tämä liittyy mukaan samassa verkossa.</translation>
-    </message>
-    <message>
         <source>Restore from a backup</source>
         <translation>Palauta varmuuskopiosta</translation>
     </message>
     <message>
-        <source>A backup file the other device wrote, copied onto this phone.</source>
-        <translation>Varmuuskopiotiedosto, jonka toinen laite kirjoitti ja joka on kopioitu tähän puhelimeen.</translation>
+        <source>The other device keeps it. Both get everything new.</source>
+        <translation>Toinen laite pitää sen. Molemmat saavat kaiken uuden.</translation>
+    </message>
+    <message>
+        <source>A backup file copied onto this phone.</source>
+        <translation>Varmuuskopiotiedosto, kopioituna tähän puhelimeen.</translation>
     </message>
 </context>
 <context>
@@ -615,24 +650,12 @@
         <translation>Ei rekisteröitymistä, ei puhelinnumeroa</translation>
     </message>
     <message>
-        <source>Your profile is made here on your phone. No phone number, no account with a company, nothing to sign.</source>
-        <translation>Profiilisi syntyy tässä puhelimessa. Ei puhelinnumeroa, ei tiliä yrityksessä, ei mitään allekirjoitettavaa.</translation>
-    </message>
-    <message>
         <source>You choose who can reach you</source>
         <translation>Sinä päätät, kuka voi tavoittaa sinut</translation>
     </message>
     <message>
-        <source>There is no directory to be found in. Show a friend a code to scan, or send them a link, and the two of you can write.</source>
-        <translation>Mitään luetteloa, josta sinut löytäisi, ei ole. Näytä kaverille skannattava koodi tai lähetä hänelle linkki, niin voitte kirjoittaa toisillenne.</translation>
-    </message>
-    <message>
         <source>Groups of equals</source>
         <translation>Ryhmiä vertaisten kesken</translation>
-    </message>
-    <message>
-        <source>Everyone in a group has the same rights: anyone can add a friend, rename it or leave. Nobody is in charge.</source>
-        <translation>Ryhmässä kaikilla on samat oikeudet: kuka tahansa voi lisätä kaverin, nimetä ryhmän uudelleen tai poistua. Kukaan ei määrää.</translation>
     </message>
     <message>
         <source>The server only passes it on</source>
@@ -647,12 +670,24 @@
         <translation>Jokainen viesti on salattu</translation>
     </message>
     <message>
-        <source>Messages are encrypted the whole way, always. Servers that transport them cannot read a word.</source>
-        <translation>Viestit on aina salattu koko matkan. Palvelimet, jotka niitä kuljettavat, eivät lue niistä sanaakaan.</translation>
+        <source>Made here on your phone. No phone number, no account, nothing to sign.</source>
+        <translation>Tehty täällä puhelimessasi. Ei puhelinnumeroa, ei tiliä, ei mitään allekirjoitettavaa.</translation>
     </message>
     <message>
-        <source>A server holds a message until the other phone is online, and that is all it does. Your chats stay on your device.</source>
-        <translation>Palvelin pitää viestin, kunnes toinen puhelin on verkossa, eikä tee muuta. Keskustelusi pysyvät laitteessasi.</translation>
+        <source>There is no directory to be found in. Show a friend a code, or send a link.</source>
+        <translation>Ei ole hakemistoa, josta sinut löydettäisiin. Näytä ystävälle koodi tai lähetä linkki.</translation>
+    </message>
+    <message>
+        <source>Encrypted the whole way, always. The servers cannot read a word.</source>
+        <translation>Aina päästä päähän salattu. Palvelimet eivät lue sanaakaan.</translation>
+    </message>
+    <message>
+        <source>Anyone can add a friend, rename the group or leave. Nobody is in charge.</source>
+        <translation>Kuka tahansa voi lisätä ystävän, nimetä ryhmän uudelleen tai lähteä. Kukaan ei määrää.</translation>
+    </message>
+    <message>
+        <source>It holds a message until the other phone is online, and nothing more.</source>
+        <translation>Se pitää viestiä, kunnes toinen puhelin on verkossa, ei muuta.</translation>
     </message>
 </context>
 <context>
@@ -670,9 +705,9 @@
         <translation>Peruuta</translation>
     </message>
     <message>
-        <source>Leave %1? You will stop receiving its messages, and only a member can add you back.</source>
+        <source>Leave %1? Only a member can add you back.</source>
         <extracomment>%1 is the group&apos;s name.</extracomment>
-        <translation>Poistutaanko ryhmästä %1? Et saa enää sen viestejä, ja vain jäsen voi lisätä sinut takaisin.</translation>
+        <translation>Poistutaanko ryhmästä %1? Vain jäsen voi lisätä sinut takaisin.</translation>
     </message>
 </context>
 <context>
@@ -896,16 +931,8 @@
         <translation>Osoite</translation>
     </message>
     <message>
-        <source>Show invite code</source>
-        <translation>Näytä kutsukoodi</translation>
-    </message>
-    <message>
         <source>Send read receipts</source>
         <translation>Lähetä lukukuittaukset</translation>
-    </message>
-    <message>
-        <source>Tells the people you write to when you have read their messages, and asks the same of them. With this off you send none and see none.</source>
-        <translation>Kertoo niille, joille kirjoitat, milloin olet lukenut heidän viestinsä, ja pyytää heiltä samaa. Pois päältä et lähetä etkä näe kuittauksia.</translation>
     </message>
     <message>
         <source>Storage and connectivity</source>
@@ -946,12 +973,8 @@
         <translation>Nimi jokaisessa lähettämässäsi viestissä</translation>
     </message>
     <message>
-        <source>Backup</source>
-        <translation>Varmuuskopio</translation>
-    </message>
-    <message>
-        <source>Back up this profile</source>
-        <translation>Varmuuskopioi tämä profiili</translation>
+        <source>Both ways: with this off you send none and see none.</source>
+        <translation>Molempiin suuntiin: pois päältä et lähetä etkä näe yhtään.</translation>
     </message>
 </context>
 <context>
@@ -977,8 +1000,8 @@
         <translation>%1 ei vastannut %2 sekunnin kuluessa.</translation>
     </message>
     <message>
-        <source>Chatmail relays are run by volunteers in their spare time. If this one does not seem to work, go back and try another one.</source>
-        <translation>Chatmail-välityspalvelimia ylläpitävät vapaaehtoiset vapaa-ajallaan. Jos tämä ei näytä toimivan, palaa takaisin ja kokeile toista.</translation>
+        <source>Relays are run by volunteers. Go back and try another one.</source>
+        <translation>Välittäjiä pyörittävät vapaaehtoiset. Palaa takaisin ja kokeile toista.</translation>
     </message>
 </context>
 <context>
@@ -1024,12 +1047,12 @@
         <translation>Ei profiileja</translation>
     </message>
     <message>
-        <source>Add as second device</source>
-        <translation>Lisää toisena laitteena</translation>
+        <source>Invite code</source>
+        <translation>Kutsukoodi</translation>
     </message>
     <message>
-        <source>Restore profile from backup</source>
-        <translation>Palauta profiili varmuuskopiosta</translation>
+        <source>Back up profile</source>
+        <translation>Varmuuskopioi profiili</translation>
     </message>
 </context>
 <context>
@@ -1082,14 +1105,6 @@
 <context>
     <name>RestoreProfilePage</name>
     <message>
-        <source>The other device runs a newer Delta Chat than this app can take a profile from.</source>
-        <translation>Toisessa laitteessa on uudempi Delta Chat kuin mistä tämä sovellus osaa ottaa profiilin vastaan.</translation>
-    </message>
-    <message>
-        <source>The transfer stopped before it finished. Both devices have to stay on the same network, with this page open.</source>
-        <translation>Siirto keskeytyi ennen kuin se valmistui. Molempien laitteiden on pysyttävä samassa verkossa, tämä sivu auki.</translation>
-    </message>
-    <message>
         <source>That is not the code a device shows while it is offering its profile.</source>
         <translation>Tämä ei ole se koodi, jonka laite näyttää tarjotessaan profiiliaan.</translation>
     </message>
@@ -1102,10 +1117,6 @@
         <translation>Palauta varmuuskopiosta</translation>
     </message>
     <message>
-        <source>On the device that has your profile, make a backup and copy the file onto this phone. Then choose it here.</source>
-        <translation>Tee profiilin sisältävässä laitteessa varmuuskopio ja kopioi tiedosto tähän puhelimeen. Valitse se sitten täältä.</translation>
-    </message>
-    <message>
         <source>Choose a backup file</source>
         <translation>Valitse varmuuskopiotiedosto</translation>
     </message>
@@ -1116,14 +1127,6 @@
     <message>
         <source>Cancel</source>
         <translation>Peruuta</translation>
-    </message>
-    <message>
-        <source>The camera is not available on this device. A backup file works without one.</source>
-        <translation>Tässä laitteessa ei ole kameraa. Varmuuskopiotiedostolla onnistuu ilmankin.</translation>
-    </message>
-    <message>
-        <source>On your other device, open Settings and choose to add a second device. Both phones have to be on the same network.</source>
-        <translation>Avaa profiilin sisältävässä laitteessa asetukset ja valitse toisen laitteen lisääminen. Molempien on oltava samassa verkossa.</translation>
     </message>
     <message>
         <source>Hold the phone up to the code it shows</source>
@@ -1152,6 +1155,26 @@
     <message>
         <source>Choose another file</source>
         <translation>Valitse toinen tiedosto</translation>
+    </message>
+    <message>
+        <source>The other device runs a newer Delta Chat than this app can read.</source>
+        <translation>Toisessa laitteessa on uudempi Delta Chat kuin tämä sovellus osaa lukea.</translation>
+    </message>
+    <message>
+        <source>The transfer stopped. Both devices have to stay on one network, with this page open.</source>
+        <translation>Siirto pysähtyi. Molempien laitteiden on pysyttävä samassa verkossa, tämä sivu auki.</translation>
+    </message>
+    <message>
+        <source>No camera on this device. A backup file works without one.</source>
+        <translation>Tässä laitteessa ei ole kameraa. Varmuuskopiotiedosto toimii ilmankin.</translation>
+    </message>
+    <message>
+        <source>On the other device: Settings, then add a second device. Both on one network.</source>
+        <translation>Toisella laitteella: Asetukset, ja sitten lisää toinen laite. Molemmat samassa verkossa.</translation>
+    </message>
+    <message>
+        <source>Make a backup on the other device, copy the file here, then choose it.</source>
+        <translation>Tee varmuuskopio toisella laitteella, kopioi tiedosto tänne ja valitse se sitten.</translation>
     </message>
 </context>
 <context>
@@ -1243,10 +1266,6 @@
         <translation>Lataa liitteet automaattisesti</translation>
     </message>
     <message>
-        <source>Bigger ones wait until you ask for them. Applies to every profile and to messages that arrive from now on.</source>
-        <translation>Suuremmat odottavat, kunnes pyydät niitä. Koskee kaikkia profiileja ja tästä lähtien saapuvia viestejä.</translation>
-    </message>
-    <message>
         <source>Links</source>
         <translation>Linkit</translation>
     </message>
@@ -1255,16 +1274,8 @@
         <translation>Poista seuranta linkeistä</translation>
     </message>
     <message>
-        <source>Known tracking parameters -- click ids, campaign tags, the sharer&apos;s account -- are taken out of the links in the messages you send. The rest of the link is left as it was.</source>
-        <translation>Tunnetut seurantaparametrit – klikkaustunnisteet, kampanjatunnisteet, jakajan tili – poistetaan lähettämiesi viestien linkeistä. Linkin loppuosa jää ennalleen.</translation>
-    </message>
-    <message>
         <source>Notifications</source>
         <translation>Ilmoitukset</translation>
-    </message>
-    <message>
-        <source>On the lock screen and in the notification area. The chat it is from opens on a tap either way.</source>
-        <translation>Lukitusnäytöllä ja ilmoitusalueella. Keskustelu, josta se tuli, avautuu napautuksella joka tapauksessa.</translation>
     </message>
     <message>
         <source>Who wrote, and what</source>
@@ -1286,10 +1297,6 @@
         <source>Enable webxdc apps (experimental)</source>
         <extracomment>A webxdc app is a small program somebody sends into a chat and everyone in it plays with. Keep the name: it is what every other Delta Chat client calls them.</extracomment>
         <translation>Ota webxdc-sovellukset käyttöön (kokeellinen)</translation>
-    </message>
-    <message>
-        <source>Apps somebody sends run inside the chat, and the attach tray offers a store to take new ones from. An app is somebody else&apos;s code, and this part is not yet as tested as the rest.</source>
-        <translation>Jonkun lähettämät sovellukset toimivat keskustelun sisällä, ja liitepaletti tarjoaa kaupan, josta saa uusia. Sovellus on toisen koodia, eikä tämä osa ole vielä yhtä testattu kuin muu.</translation>
     </message>
     <message>
         <source>After 1 hour</source>
@@ -1316,10 +1323,6 @@
         <translation>Poista viestit laitteesta</translation>
     </message>
     <message>
-        <source>Older messages go from this phone, in every chat of every profile, whatever a chat&apos;s own disappearing messages setting says. &quot;Saved messages&quot; are kept.</source>
-        <translation>Vanhemmat viestit katoavat tästä puhelimesta, jokaisen profiilin jokaisesta keskustelusta, sanoipa keskustelun oma katoavien viestien asetus mitä tahansa. &quot;Tallennetut viestit&quot; säilytetään.</translation>
-    </message>
-    <message>
         <source>A new notification shows</source>
         <translation>Uusi ilmoitus näyttää</translation>
     </message>
@@ -1329,25 +1332,45 @@
         <translation>Maininnat</translation>
     </message>
     <message>
-        <source>In a muted group, a reply to one of your messages still notifies you.</source>
-        <translation>Mykistetyssä ryhmässä vastaus viestiisi ilmoittaa silti sinulle.</translation>
-    </message>
-    <message>
         <source>Enter sends the message</source>
         <extracomment>The return key on the keyboard.</extracomment>
         <translation>Enter lähettää viestin</translation>
-    </message>
-    <message>
-        <source>When on, the return key sends. When off, it starts a new line, the message field grows with what is written, and the send button sends.</source>
-        <translation>Päällä Enter-näppäin lähettää. Pois päältä se aloittaa uuden rivin, viestikenttä kasvaa kirjoitetun mukana ja lähettää lähetyspainike.</translation>
     </message>
     <message>
         <source>Use Markdown formatting</source>
         <translation>Käytä Markdown-muotoilua</translation>
     </message>
     <message>
-        <source>When on, a message written with *stars* and `backticks` is shown with the bold, the italics and the links drawn. When off, it is shown exactly as it was written.</source>
-        <translation>Päällä *tähdillä* ja `gravismerkeillä` kirjoitettu viesti näytetään lihavointi, kursiivi ja linkit muotoiltuina. Pois päältä se näytetään täsmälleen kuten se kirjoitettiin.</translation>
+        <source>Otherwise it starts a new line, and the button sends.</source>
+        <translation>Muuten se aloittaa uuden rivin, ja painike lähettää.</translation>
+    </message>
+    <message>
+        <source>Draws *stars* and `backticks` rather than showing them.</source>
+        <translation>Piirtää *tähdet* ja `gravikset` sen sijaan että näyttäisi ne.</translation>
+    </message>
+    <message>
+        <source>Bigger ones wait until you ask for them. Every profile, from now on.</source>
+        <translation>Isommat odottavat, kunnes pyydät niitä. Kaikki profiilit, tästä lähtien.</translation>
+    </message>
+    <message>
+        <source>Every chat of every profile. &quot;Saved messages&quot; are kept.</source>
+        <translation>Jokainen keskustelu jokaisessa profiilissa. ”Tallennetut viestit” säilyvät.</translation>
+    </message>
+    <message>
+        <source>On the lock screen and in the notification area.</source>
+        <translation>Lukitusnäytöllä ja ilmoitusalueella.</translation>
+    </message>
+    <message>
+        <source>A reply to you gets through a muted group.</source>
+        <translation>Sinulle osoitettu vastaus pääsee läpi vaimennetustakin ryhmästä.</translation>
+    </message>
+    <message>
+        <source>Click ids and campaign tags come out of the links you send.</source>
+        <translation>Klikkaustunnisteet ja kampanjamerkinnät lähtevät pois lähettämistäsi linkeistä.</translation>
+    </message>
+    <message>
+        <source>Small apps run inside the chat. Somebody else&apos;s code, and less tested than the rest.</source>
+        <translation>Pienet sovellukset pyörivät keskustelun sisällä. Jonkun toisen koodia, ja vähemmän koeteltua kuin muu.</translation>
     </message>
 </context>
 <context>

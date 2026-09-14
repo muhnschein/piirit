@@ -8,14 +8,14 @@ import Postivene 1.0
  * One profile, as everyone else sees it and as this device holds it: the
  * picture, the name on every message, the line under it, the address it
  * writes from, whether the other end is told when something has been
- * read, the way to write the profile out to a backup file, and how the
- * relay and the phone are doing by it. Reached from the
+ * read, and how the relay and the phone are doing by it. Reached from the
  * profile's row on the profiles page. The settings that belong to no
  * profile are on the settings page instead (SettingsPage.qml).
  *
- * The backup is here rather than there because the core's export is per
- * profile: it takes an account id and writes that account. See
- * BackupPage.qml, which does the writing.
+ * This page is a profile's settings, so the two things about a profile
+ * that are not settings are not here: the invite code to show and the backup to
+ * write are on the profile's row on the profiles page, which is where
+ * the profile is picked in the first place.
  *
  * The editable parts are core config keys rather than a record of their
  * own, so this page owns a Profile object over get_config/set_config
@@ -308,21 +308,11 @@ Page {
                 }
             }
 
-            // Room between the address and the button: the two are not
+            // Room between the address and the switch: the two are not
             // one thing, and read as one without it.
             Item {
                 width: 1
                 height: Theme.paddingLarge
-            }
-
-            // The invite is how anyone gets in touch with this profile,
-            // so the page about the profile leads to it.
-            Button {
-                objectName: "inviteButton"
-                anchors.horizontalCenter: parent.horizontalCenter
-                text: qsTr("Show invite code")
-                onClicked: pageStack.push(Qt.resolvedUrl("QrPage.qml"),
-                                          { accountId: page.accountId })
             }
 
             TextSwitch {
@@ -332,7 +322,7 @@ Page {
                 // sent and requested", so this is not one-way: with it
                 // off nothing is asked for either, and read marks stop
                 // coming back from the people who would have sent them.
-                description: qsTr("Tells the people you write to when you have read their messages, and asks the same of them. With this off you send none and see none.")
+                description: qsTr("Both ways: with this off you send none and see none.")
                 // Bound to the profile, not held here: the core is what
                 // decides, and a switch that drifts from it is a lie. So
                 // the tap must not flip it either -- Silica does that by
@@ -344,26 +334,6 @@ Page {
                 checked: profile.read_receipts
                 enabled: profile.loaded
                 onClicked: profile.set_read_receipts(!checked)
-            }
-
-            // A backup is one profile's, because the core's export is:
-            // it takes an account and writes that account. So it belongs
-            // here, on the page about this profile, rather than among
-            // the settings that belong to no profile -- a phone with
-            // three profiles on it makes three backups. What the file is
-            // and where it goes is said on the page itself.
-            SectionHeader {
-                text: qsTr("Backup")
-            }
-
-            Button {
-                objectName: "backupButton"
-                anchors.horizontalCenter: parent.horizontalCenter
-                text: qsTr("Back up this profile")
-                onClicked: pageStack.push(Qt.resolvedUrl("BackupPage.qml"), {
-                    accountId: page.accountId,
-                    address: profile.address
-                })
             }
 
             SectionHeader {

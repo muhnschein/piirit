@@ -35,10 +35,6 @@
         <translation>Criar</translation>
     </message>
     <message>
-        <source>Pick a chatmail relay or enter a custom server. The server assigns the address; the encryption keys are made on this device.</source>
-        <translation>Escolha um relay chatmail ou introduza um servidor personalizado. O servidor atribui o endereço; as chaves de cifra são criadas neste dispositivo.</translation>
-    </message>
-    <message>
         <source>Your name</source>
         <translation>O seu nome</translation>
     </message>
@@ -53,6 +49,41 @@
     <message>
         <source>See &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; for the full list.</source>
         <translation>A lista completa está em &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
+    </message>
+    <message>
+        <source>The relay gives you an address. The keys are made on this phone.</source>
+        <translation>O relay dá-lhe um endereço. As chaves são feitas neste telefone.</translation>
+    </message>
+</context>
+<context>
+    <name>AddProfilePage</name>
+    <message>
+        <source>Add profile</source>
+        <translation>Adicionar perfil</translation>
+    </message>
+    <message>
+        <source>Create a profile</source>
+        <translation>Criar um perfil</translation>
+    </message>
+    <message>
+        <source>A new address on a chatmail relay.</source>
+        <translation>Um endereço novo num relay chatmail.</translation>
+    </message>
+    <message>
+        <source>Restore from a backup</source>
+        <translation>Restaurar a partir de uma cópia</translation>
+    </message>
+    <message>
+        <source>A backup file copied onto this phone.</source>
+        <translation>Um ficheiro de cópia copiado para este telefone.</translation>
+    </message>
+    <message>
+        <source>Add as second device</source>
+        <translation>Adicionar como segundo dispositivo</translation>
+    </message>
+    <message>
+        <source>The other device keeps it. Both get everything new.</source>
+        <translation>O outro dispositivo fica com ele. Ambos recebem tudo o que é novo.</translation>
     </message>
 </context>
 <context>
@@ -135,8 +166,12 @@
         <translation>Guardado em %1</translation>
     </message>
     <message>
-        <source>This profile&apos;s messages, contacts and key in one file, saved to Documents. Whoever has that file has the profile, so keep it somewhere safe. Your other profiles are not in it: each one is backed up from its own page.</source>
-        <translation>As mensagens, os contactos e a chave deste perfil num só ficheiro, guardado em Documentos. Quem tiver esse ficheiro tem o perfil, por isso guarde-o num local seguro. Os seus outros perfis não estão nele: cada um é copiado a partir da sua própria página.</translation>
+        <source>Messages, contacts and key in one file, saved to Documents. Whoever has the file has the profile.</source>
+        <translation>Mensagens, contactos e chave num só ficheiro, guardado em Documentos. Quem tem o ficheiro tem o perfil.</translation>
+    </message>
+    <message>
+        <source>Swipe on for your chats.</source>
+        <translation>Deslize para as suas conversas.</translation>
     </message>
 </context>
 <context>
@@ -478,10 +513,6 @@
         <translation>Mensagens temporárias</translation>
     </message>
     <message>
-        <source>Applies to all members of this chat, they can still copy, save, and forward messages.</source>
-        <translation>Aplica-se a todos os membros desta conversa; continuam a poder copiar, guardar e reencaminhar mensagens.</translation>
-    </message>
-    <message>
         <source>After 1 year</source>
         <translation>Após 1 ano</translation>
     </message>
@@ -513,6 +544,10 @@
         <source>After %1 seconds</source>
         <translation>Após %1 segundos</translation>
     </message>
+    <message>
+        <source>Applies to everyone in the chat. They can still copy and forward.</source>
+        <translation>Vale para todos na conversa. Continuam a poder copiar e reencaminhar.</translation>
+    </message>
 </context>
 <context>
     <name>ExistingProfilePage</name>
@@ -525,16 +560,16 @@
         <translation>Adicionar como segundo dispositivo</translation>
     </message>
     <message>
-        <source>The device that has it keeps it. This one joins, over the same network.</source>
-        <translation>O dispositivo que o tem fica com ele. Este junta-se, pela mesma rede.</translation>
-    </message>
-    <message>
         <source>Restore from a backup</source>
         <translation>Restaurar a partir de uma cópia</translation>
     </message>
     <message>
-        <source>A backup file the other device wrote, copied onto this phone.</source>
-        <translation>Um ficheiro de cópia escrito pelo outro dispositivo, copiado para este telefone.</translation>
+        <source>The other device keeps it. Both get everything new.</source>
+        <translation>O outro dispositivo fica com ele. Ambos recebem tudo o que é novo.</translation>
+    </message>
+    <message>
+        <source>A backup file copied onto this phone.</source>
+        <translation>Um ficheiro de cópia copiado para este telefone.</translation>
     </message>
 </context>
 <context>
@@ -615,24 +650,12 @@
         <translation>Sem registo, sem número de telefone</translation>
     </message>
     <message>
-        <source>Your profile is made here on your phone. No phone number, no account with a company, nothing to sign.</source>
-        <translation>O seu perfil é criado aqui, no telefone. Sem número de telefone, sem conta numa empresa, nada para assinar.</translation>
-    </message>
-    <message>
         <source>You choose who can reach you</source>
         <translation>É você que escolhe quem lhe pode escrever</translation>
     </message>
     <message>
-        <source>There is no directory to be found in. Show a friend a code to scan, or send them a link, and the two of you can write.</source>
-        <translation>Não existe nenhuma lista onde o possam encontrar. Mostre a um amigo um código para ler ou envie-lhe uma ligação, e podem escrever-se.</translation>
-    </message>
-    <message>
         <source>Groups of equals</source>
         <translation>Grupos entre iguais</translation>
-    </message>
-    <message>
-        <source>Everyone in a group has the same rights: anyone can add a friend, rename it or leave. Nobody is in charge.</source>
-        <translation>Num grupo todos têm os mesmos direitos: qualquer um pode adicionar alguém, mudar o nome ou sair. Ninguém manda.</translation>
     </message>
     <message>
         <source>The server only passes it on</source>
@@ -647,12 +670,24 @@
         <translation>Cada mensagem vai cifrada</translation>
     </message>
     <message>
-        <source>Messages are encrypted the whole way, always. Servers that transport them cannot read a word.</source>
-        <translation>As mensagens vão sempre cifradas de ponta a ponta. Os servidores que as transportam não leem uma palavra.</translation>
+        <source>Made here on your phone. No phone number, no account, nothing to sign.</source>
+        <translation>Criado aqui, no seu telefone. Sem número, sem conta, nada para assinar.</translation>
     </message>
     <message>
-        <source>A server holds a message until the other phone is online, and that is all it does. Your chats stay on your device.</source>
-        <translation>Um servidor guarda a mensagem até o outro telefone estar em linha, e mais nada. As suas conversas ficam no seu dispositivo.</translation>
+        <source>There is no directory to be found in. Show a friend a code, or send a link.</source>
+        <translation>Não há um directório onde ser encontrado. Mostre um código a um amigo, ou envie uma ligação.</translation>
+    </message>
+    <message>
+        <source>Encrypted the whole way, always. The servers cannot read a word.</source>
+        <translation>Cifrado de ponta a ponta, sempre. Os servidores não leem uma palavra.</translation>
+    </message>
+    <message>
+        <source>Anyone can add a friend, rename the group or leave. Nobody is in charge.</source>
+        <translation>Qualquer um pode juntar um amigo, mudar o nome ou sair. Ninguém manda.</translation>
+    </message>
+    <message>
+        <source>It holds a message until the other phone is online, and nothing more.</source>
+        <translation>Guarda a mensagem até o outro telefone estar em linha, e mais nada.</translation>
     </message>
 </context>
 <context>
@@ -670,9 +705,9 @@
         <translation>Cancelar</translation>
     </message>
     <message>
-        <source>Leave %1? You will stop receiving its messages, and only a member can add you back.</source>
+        <source>Leave %1? Only a member can add you back.</source>
         <extracomment>%1 is the group&apos;s name.</extracomment>
-        <translation>Sair de %1? Deixará de receber as suas mensagens, e só um membro o pode voltar a adicionar.</translation>
+        <translation>Sair de %1? Só um membro o pode voltar a juntar.</translation>
     </message>
 </context>
 <context>
@@ -896,16 +931,8 @@
         <translation>Endereço</translation>
     </message>
     <message>
-        <source>Show invite code</source>
-        <translation>Mostrar código de convite</translation>
-    </message>
-    <message>
         <source>Send read receipts</source>
         <translation>Enviar confirmações de leitura</translation>
-    </message>
-    <message>
-        <source>Tells the people you write to when you have read their messages, and asks the same of them. With this off you send none and see none.</source>
-        <translation>Diz às pessoas a quem escreve quando leu as mensagens delas, e pede-lhes o mesmo. Desligado, não envia nenhuma nem vê nenhuma.</translation>
     </message>
     <message>
         <source>Storage and connectivity</source>
@@ -946,12 +973,8 @@
         <translation>O nome em cada mensagem que envia</translation>
     </message>
     <message>
-        <source>Backup</source>
-        <translation>Cópia de segurança</translation>
-    </message>
-    <message>
-        <source>Back up this profile</source>
-        <translation>Fazer cópia deste perfil</translation>
+        <source>Both ways: with this off you send none and see none.</source>
+        <translation>Nos dois sentidos: com isto desligado não envia nem vê nenhuma.</translation>
     </message>
 </context>
 <context>
@@ -977,8 +1000,8 @@
         <translation>%1 não respondeu em %2 segundos.</translation>
     </message>
     <message>
-        <source>Chatmail relays are run by volunteers in their spare time. If this one does not seem to work, go back and try another one.</source>
-        <translation>Os relés chatmail são mantidos por voluntários nos seus tempos livres. Se este não parecer funcionar, volte atrás e experimente outro.</translation>
+        <source>Relays are run by volunteers. Go back and try another one.</source>
+        <translation>Os relays são mantidos por voluntários. Volte atrás e tente outro.</translation>
     </message>
 </context>
 <context>
@@ -1024,12 +1047,12 @@
         <translation>Sem perfis</translation>
     </message>
     <message>
-        <source>Add as second device</source>
-        <translation>Adicionar como segundo dispositivo</translation>
+        <source>Invite code</source>
+        <translation>Código de convite</translation>
     </message>
     <message>
-        <source>Restore profile from backup</source>
-        <translation>Restaurar perfil a partir de uma cópia</translation>
+        <source>Back up profile</source>
+        <translation>Cópia de segurança do perfil</translation>
     </message>
 </context>
 <context>
@@ -1082,14 +1105,6 @@
 <context>
     <name>RestoreProfilePage</name>
     <message>
-        <source>The other device runs a newer Delta Chat than this app can take a profile from.</source>
-        <translation>O outro dispositivo tem um Delta Chat mais recente do que aquele de que esta aplicação consegue receber um perfil.</translation>
-    </message>
-    <message>
-        <source>The transfer stopped before it finished. Both devices have to stay on the same network, with this page open.</source>
-        <translation>A transferência parou antes de terminar. Os dois dispositivos têm de ficar na mesma rede, com esta página aberta.</translation>
-    </message>
-    <message>
         <source>That is not the code a device shows while it is offering its profile.</source>
         <translation>Esse não é o código que um dispositivo mostra enquanto oferece o seu perfil.</translation>
     </message>
@@ -1102,10 +1117,6 @@
         <translation>Restaurar a partir de uma cópia</translation>
     </message>
     <message>
-        <source>On the device that has your profile, make a backup and copy the file onto this phone. Then choose it here.</source>
-        <translation>No dispositivo que tem o seu perfil, faça uma cópia de segurança e copie o ficheiro para este telefone. Depois escolha-o aqui.</translation>
-    </message>
-    <message>
         <source>Choose a backup file</source>
         <translation>Escolher um ficheiro de cópia</translation>
     </message>
@@ -1116,14 +1127,6 @@
     <message>
         <source>Cancel</source>
         <translation>Cancelar</translation>
-    </message>
-    <message>
-        <source>The camera is not available on this device. A backup file works without one.</source>
-        <translation>Não há câmara neste dispositivo. Com um ficheiro de cópia dispensa-se.</translation>
-    </message>
-    <message>
-        <source>On your other device, open Settings and choose to add a second device. Both phones have to be on the same network.</source>
-        <translation>No dispositivo que tem o seu perfil, abra as definições e escolha adicionar um segundo dispositivo. Os dois têm de estar na mesma rede.</translation>
     </message>
     <message>
         <source>Hold the phone up to the code it shows</source>
@@ -1152,6 +1155,26 @@
     <message>
         <source>Choose another file</source>
         <translation>Escolher outro ficheiro</translation>
+    </message>
+    <message>
+        <source>The other device runs a newer Delta Chat than this app can read.</source>
+        <translation>O outro dispositivo tem um Delta Chat mais recente do que esta aplicação consegue ler.</translation>
+    </message>
+    <message>
+        <source>The transfer stopped. Both devices have to stay on one network, with this page open.</source>
+        <translation>A transferência parou. Ambos os dispositivos têm de ficar na mesma rede, com esta página aberta.</translation>
+    </message>
+    <message>
+        <source>No camera on this device. A backup file works without one.</source>
+        <translation>Este dispositivo não tem câmara. Um ficheiro de cópia funciona sem ela.</translation>
+    </message>
+    <message>
+        <source>On the other device: Settings, then add a second device. Both on one network.</source>
+        <translation>No outro dispositivo: Definições, depois adicionar um segundo dispositivo. Ambos na mesma rede.</translation>
+    </message>
+    <message>
+        <source>Make a backup on the other device, copy the file here, then choose it.</source>
+        <translation>Faça uma cópia no outro dispositivo, copie o ficheiro para aqui e escolha-o.</translation>
     </message>
 </context>
 <context>
@@ -1243,10 +1266,6 @@
         <translation>Transferir anexos automaticamente</translation>
     </message>
     <message>
-        <source>Bigger ones wait until you ask for them. Applies to every profile and to messages that arrive from now on.</source>
-        <translation>Os maiores esperam até que os peça. Aplica-se a todos os perfis e às mensagens que chegarem a partir de agora.</translation>
-    </message>
-    <message>
         <source>Links</source>
         <translation>Ligações</translation>
     </message>
@@ -1255,16 +1274,8 @@
         <translation>Remover rastreio das ligações</translation>
     </message>
     <message>
-        <source>Known tracking parameters -- click ids, campaign tags, the sharer&apos;s account -- are taken out of the links in the messages you send. The rest of the link is left as it was.</source>
-        <translation>Os parâmetros de rastreio conhecidos – identificadores de clique, etiquetas de campanha, a conta de quem partilha – são retirados das ligações nas mensagens que envia. O resto da ligação fica como estava.</translation>
-    </message>
-    <message>
         <source>Notifications</source>
         <translation>Notificações</translation>
-    </message>
-    <message>
-        <source>On the lock screen and in the notification area. The chat it is from opens on a tap either way.</source>
-        <translation>No ecrã de bloqueio e na área de notificações. A conversa de onde vem abre-se com um toque de qualquer forma.</translation>
     </message>
     <message>
         <source>Who wrote, and what</source>
@@ -1286,10 +1297,6 @@
         <source>Enable webxdc apps (experimental)</source>
         <extracomment>A webxdc app is a small program somebody sends into a chat and everyone in it plays with. Keep the name: it is what every other Delta Chat client calls them.</extracomment>
         <translation>Ativar aplicações webxdc (experimental)</translation>
-    </message>
-    <message>
-        <source>Apps somebody sends run inside the chat, and the attach tray offers a store to take new ones from. An app is somebody else&apos;s code, and this part is not yet as tested as the rest.</source>
-        <translation>As aplicações que alguém envia correm dentro da conversa, e o tabuleiro de anexos oferece uma loja para obter novas. Uma aplicação é código de outra pessoa, e esta parte ainda não está tão testada como o resto.</translation>
     </message>
     <message>
         <source>After 1 hour</source>
@@ -1316,10 +1323,6 @@
         <translation>Eliminar mensagens do dispositivo</translation>
     </message>
     <message>
-        <source>Older messages go from this phone, in every chat of every profile, whatever a chat&apos;s own disappearing messages setting says. &quot;Saved messages&quot; are kept.</source>
-        <translation>As mensagens mais antigas desaparecem deste telemóvel, em cada conversa de cada perfil, diga o que disser a definição de mensagens temporárias da própria conversa. &quot;Mensagens guardadas&quot; mantém-se.</translation>
-    </message>
-    <message>
         <source>A new notification shows</source>
         <translation>Uma notificação nova mostra</translation>
     </message>
@@ -1329,25 +1332,45 @@
         <translation>Menções</translation>
     </message>
     <message>
-        <source>In a muted group, a reply to one of your messages still notifies you.</source>
-        <translation>Num grupo silenciado, uma resposta a uma das suas mensagens continua a notificá-lo.</translation>
-    </message>
-    <message>
         <source>Enter sends the message</source>
         <extracomment>The return key on the keyboard.</extracomment>
         <translation>Enter envia a mensagem</translation>
-    </message>
-    <message>
-        <source>When on, the return key sends. When off, it starts a new line, the message field grows with what is written, and the send button sends.</source>
-        <translation>Ligado, a tecla Enter envia. Desligado, começa uma nova linha, o campo da mensagem cresce com o que é escrito e é o botão de enviar que envia.</translation>
     </message>
     <message>
         <source>Use Markdown formatting</source>
         <translation>Usar formatação Markdown</translation>
     </message>
     <message>
-        <source>When on, a message written with *stars* and `backticks` is shown with the bold, the italics and the links drawn. When off, it is shown exactly as it was written.</source>
-        <translation>Ligado, uma mensagem escrita com *asteriscos* e `plicas invertidas` é mostrada com o negrito, o itálico e as ligações formatados. Desligado, é mostrada tal como foi escrita.</translation>
+        <source>Otherwise it starts a new line, and the button sends.</source>
+        <translation>Caso contrário começa uma linha nova, e o botão envia.</translation>
+    </message>
+    <message>
+        <source>Draws *stars* and `backticks` rather than showing them.</source>
+        <translation>Desenha *asteriscos* e `plicas invertidas` em vez de os mostrar.</translation>
+    </message>
+    <message>
+        <source>Bigger ones wait until you ask for them. Every profile, from now on.</source>
+        <translation>Os maiores esperam que os peça. Todos os perfis, a partir de agora.</translation>
+    </message>
+    <message>
+        <source>Every chat of every profile. &quot;Saved messages&quot; are kept.</source>
+        <translation>Todas as conversas de todos os perfis. As «mensagens guardadas» ficam.</translation>
+    </message>
+    <message>
+        <source>On the lock screen and in the notification area.</source>
+        <translation>No ecrã de bloqueio e na área de notificações.</translation>
+    </message>
+    <message>
+        <source>A reply to you gets through a muted group.</source>
+        <translation>Uma resposta para si passa mesmo num grupo silenciado.</translation>
+    </message>
+    <message>
+        <source>Click ids and campaign tags come out of the links you send.</source>
+        <translation>Identificadores de clique e etiquetas de campanha saem das ligações que envia.</translation>
+    </message>
+    <message>
+        <source>Small apps run inside the chat. Somebody else&apos;s code, and less tested than the rest.</source>
+        <translation>Pequenas aplicações correm dentro da conversa. Código de outros, e menos testado que o resto.</translation>
     </message>
 </context>
 <context>

@@ -35,10 +35,6 @@
         <translation>Létrehozás</translation>
     </message>
     <message>
-        <source>Pick a chatmail relay or enter a custom server. The server assigns the address; the encryption keys are made on this device.</source>
-        <translation>Válasszon egy chatmail-közvetítőt, vagy adjon meg saját kiszolgálót. A címet a kiszolgáló adja; a titkosítási kulcsok ezen az eszközön készülnek.</translation>
-    </message>
-    <message>
         <source>Your name</source>
         <translation>Az Ön neve</translation>
     </message>
@@ -53,6 +49,41 @@
     <message>
         <source>See &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; for the full list.</source>
         <translation>A teljes lista itt található: &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
+    </message>
+    <message>
+        <source>The relay gives you an address. The keys are made on this phone.</source>
+        <translation>A közvetítő ad egy címet. A kulcsok ezen a telefonon készülnek.</translation>
+    </message>
+</context>
+<context>
+    <name>AddProfilePage</name>
+    <message>
+        <source>Add profile</source>
+        <translation>Profil hozzáadása</translation>
+    </message>
+    <message>
+        <source>Create a profile</source>
+        <translation>Profil létrehozása</translation>
+    </message>
+    <message>
+        <source>A new address on a chatmail relay.</source>
+        <translation>Új cím egy chatmail közvetítőn.</translation>
+    </message>
+    <message>
+        <source>Restore from a backup</source>
+        <translation>Visszaállítás mentésből</translation>
+    </message>
+    <message>
+        <source>A backup file copied onto this phone.</source>
+        <translation>Egy mentésfájl, erre a telefonra másolva.</translation>
+    </message>
+    <message>
+        <source>Add as second device</source>
+        <translation>Hozzáadás második eszközként</translation>
+    </message>
+    <message>
+        <source>The other device keeps it. Both get everything new.</source>
+        <translation>A másik eszköz megtartja. Mindkettő megkap minden újat.</translation>
     </message>
 </context>
 <context>
@@ -134,8 +165,12 @@
         <translation>Mentve ide: %1</translation>
     </message>
     <message>
-        <source>This profile&apos;s messages, contacts and key in one file, saved to Documents. Whoever has that file has the profile, so keep it somewhere safe. Your other profiles are not in it: each one is backed up from its own page.</source>
-        <translation>Ennek a profilnak az üzenetei, névjegyei és kulcsa egyetlen fájlban, a Dokumentumok közé mentve. Akinél a fájl van, annál a profil is van – tartsd biztonságos helyen. A többi profilod nincs benne: mindegyiket a saját oldaláról kell menteni.</translation>
+        <source>Messages, contacts and key in one file, saved to Documents. Whoever has the file has the profile.</source>
+        <translation>Üzenetek, névjegyek és kulcs egyetlen fájlban, a Dokumentumokba mentve. Akinél a fájl van, annál a profil van.</translation>
+    </message>
+    <message>
+        <source>Swipe on for your chats.</source>
+        <translation>Húzd tovább a csevegéseidhez.</translation>
     </message>
 </context>
 <context>
@@ -476,10 +511,6 @@
         <translation>Eltűnő üzenetek</translation>
     </message>
     <message>
-        <source>Applies to all members of this chat, they can still copy, save, and forward messages.</source>
-        <translation>A csevegés minden tagjára érvényes; az üzeneteket továbbra is másolhatják, menthetik és továbbíthatják.</translation>
-    </message>
-    <message>
         <source>After 1 year</source>
         <translation>1 év után</translation>
     </message>
@@ -511,6 +542,10 @@
         <source>After %1 seconds</source>
         <translation>%1 másodperc után</translation>
     </message>
+    <message>
+        <source>Applies to everyone in the chat. They can still copy and forward.</source>
+        <translation>Mindenkire vonatkozik a csevegésben. Másolni és továbbítani továbbra is tudnak.</translation>
+    </message>
 </context>
 <context>
     <name>ExistingProfilePage</name>
@@ -523,16 +558,16 @@
         <translation>Hozzáadás második eszközként</translation>
     </message>
     <message>
-        <source>The device that has it keeps it. This one joins, over the same network.</source>
-        <translation>Az az eszköz, amelyiken van, megtartja. Ez csatlakozik hozzá, ugyanazon a hálózaton.</translation>
-    </message>
-    <message>
         <source>Restore from a backup</source>
         <translation>Visszaállítás mentésből</translation>
     </message>
     <message>
-        <source>A backup file the other device wrote, copied onto this phone.</source>
-        <translation>A másik eszköz által írt mentésfájl, erre a telefonra másolva.</translation>
+        <source>The other device keeps it. Both get everything new.</source>
+        <translation>A másik eszköz megtartja. Mindkettő megkap minden újat.</translation>
+    </message>
+    <message>
+        <source>A backup file copied onto this phone.</source>
+        <translation>Egy mentésfájl, erre a telefonra másolva.</translation>
     </message>
 </context>
 <context>
@@ -611,24 +646,12 @@
         <translation>Nincs regisztráció, nincs telefonszám</translation>
     </message>
     <message>
-        <source>Your profile is made here on your phone. No phone number, no account with a company, nothing to sign.</source>
-        <translation>A profilja itt, a telefonján készül el. Nem kell telefonszám, nem kell fiók egy cégnél, nincs mit aláírni.</translation>
-    </message>
-    <message>
         <source>You choose who can reach you</source>
         <translation>Ön dönti el, ki érheti el</translation>
     </message>
     <message>
-        <source>There is no directory to be found in. Show a friend a code to scan, or send them a link, and the two of you can write.</source>
-        <translation>Nincs névjegyzék, amelyben megtalálnák. Mutasson egy ismerősének beolvasható kódot, vagy küldjön neki hivatkozást, és már írhatnak egymásnak.</translation>
-    </message>
-    <message>
         <source>Groups of equals</source>
         <translation>Egyenlők csoportjai</translation>
-    </message>
-    <message>
-        <source>Everyone in a group has the same rights: anyone can add a friend, rename it or leave. Nobody is in charge.</source>
-        <translation>A csoportban mindenkinek ugyanannyi joga van: bárki hozzáadhat valakit, átnevezheti vagy elhagyhatja. Senki sem főnök.</translation>
     </message>
     <message>
         <source>The server only passes it on</source>
@@ -643,12 +666,24 @@
         <translation>Minden üzenet titkosítva van</translation>
     </message>
     <message>
-        <source>Messages are encrypted the whole way, always. Servers that transport them cannot read a word.</source>
-        <translation>Az üzenetek mindig végig titkosítva utaznak. A kiszolgálók, amelyek szállítják őket, egy szót sem olvashatnak.</translation>
+        <source>Made here on your phone. No phone number, no account, nothing to sign.</source>
+        <translation>Itt készül, a telefonodon. Nincs telefonszám, nincs fiók, nincs mit aláírni.</translation>
     </message>
     <message>
-        <source>A server holds a message until the other phone is online, and that is all it does. Your chats stay on your device.</source>
-        <translation>A kiszolgáló addig őrzi az üzenetet, amíg a másik telefon el nem érhető, és mást nem tesz. A beszélgetései a készülékén maradnak.</translation>
+        <source>There is no directory to be found in. Show a friend a code, or send a link.</source>
+        <translation>Nincs névjegyzék, amelyben megtalálhatnának. Mutass egy barátodnak kódot, vagy küldj neki hivatkozást.</translation>
+    </message>
+    <message>
+        <source>Encrypted the whole way, always. The servers cannot read a word.</source>
+        <translation>Mindig végig titkosítva. A kiszolgálók egy szót sem olvasnak.</translation>
+    </message>
+    <message>
+        <source>Anyone can add a friend, rename the group or leave. Nobody is in charge.</source>
+        <translation>Bárki hozzáadhat egy barátot, átnevezheti a csoportot vagy kiléphet. Senki sem parancsol.</translation>
+    </message>
+    <message>
+        <source>It holds a message until the other phone is online, and nothing more.</source>
+        <translation>Addig őrzi az üzenetet, amíg a másik telefon elérhető nem lesz, és semmi több.</translation>
     </message>
 </context>
 <context>
@@ -666,9 +701,9 @@
         <translation>Mégse</translation>
     </message>
     <message>
-        <source>Leave %1? You will stop receiving its messages, and only a member can add you back.</source>
+        <source>Leave %1? Only a member can add you back.</source>
         <extracomment>%1 is the group&apos;s name.</extracomment>
-        <translation>Kilép innen: %1? Nem kapja többé az üzeneteit, és csak egy tag veheti vissza.</translation>
+        <translation>Kilépsz innen: %1? Csak egy tag tud visszavenni.</translation>
     </message>
 </context>
 <context>
@@ -890,16 +925,8 @@
         <translation>Cím</translation>
     </message>
     <message>
-        <source>Show invite code</source>
-        <translation>Meghívókód megjelenítése</translation>
-    </message>
-    <message>
         <source>Send read receipts</source>
         <translation>Olvasási visszaigazolás küldése</translation>
-    </message>
-    <message>
-        <source>Tells the people you write to when you have read their messages, and asks the same of them. With this off you send none and see none.</source>
-        <translation>Tudatja azokkal, akiknek ír, hogy mikor olvasta el az üzeneteiket, és ugyanezt kéri tőlük. Kikapcsolva nem küld és nem is lát ilyet.</translation>
     </message>
     <message>
         <source>Storage and connectivity</source>
@@ -940,12 +967,8 @@
         <translation>A név minden elküldött üzenetén</translation>
     </message>
     <message>
-        <source>Backup</source>
-        <translation>Mentés</translation>
-    </message>
-    <message>
-        <source>Back up this profile</source>
-        <translation>Ennek a profilnak a mentése</translation>
+        <source>Both ways: with this off you send none and see none.</source>
+        <translation>Mindkét irányban: kikapcsolva egyet sem küldesz és egyet sem látsz.</translation>
     </message>
 </context>
 <context>
@@ -971,8 +994,8 @@
         <translation>%1 nem válaszolt %2 másodpercen belül.</translation>
     </message>
     <message>
-        <source>Chatmail relays are run by volunteers in their spare time. If this one does not seem to work, go back and try another one.</source>
-        <translation>A chatmail-továbbítókat önkéntesek üzemeltetik a szabadidejükben. Ha ez nem tűnik működőnek, lépjen vissza, és próbáljon ki egy másikat.</translation>
+        <source>Relays are run by volunteers. Go back and try another one.</source>
+        <translation>A közvetítőket önkéntesek üzemeltetik. Menj vissza és próbálj másikat.</translation>
     </message>
 </context>
 <context>
@@ -1018,12 +1041,12 @@
         <translation>Nincs profil</translation>
     </message>
     <message>
-        <source>Add as second device</source>
-        <translation>Hozzáadás második eszközként</translation>
+        <source>Invite code</source>
+        <translation>Meghívókód</translation>
     </message>
     <message>
-        <source>Restore profile from backup</source>
-        <translation>Profil visszaállítása mentésből</translation>
+        <source>Back up profile</source>
+        <translation>Profil mentése</translation>
     </message>
 </context>
 <context>
@@ -1076,14 +1099,6 @@
 <context>
     <name>RestoreProfilePage</name>
     <message>
-        <source>The other device runs a newer Delta Chat than this app can take a profile from.</source>
-        <translation>A másik eszközön újabb Delta Chat fut, mint amelyikből ez az alkalmazás profilt tud átvenni.</translation>
-    </message>
-    <message>
-        <source>The transfer stopped before it finished. Both devices have to stay on the same network, with this page open.</source>
-        <translation>Az átvitel a vége előtt megállt. Mindkét eszköznek ugyanazon a hálózaton kell maradnia, ezzel az oldallal nyitva.</translation>
-    </message>
-    <message>
         <source>That is not the code a device shows while it is offering its profile.</source>
         <translation>Ez nem az a kód, amit egy eszköz mutat, amíg a profilját felkínálja.</translation>
     </message>
@@ -1096,10 +1111,6 @@
         <translation>Visszaállítás mentésből</translation>
     </message>
     <message>
-        <source>On the device that has your profile, make a backup and copy the file onto this phone. Then choose it here.</source>
-        <translation>A profilt tartalmazó eszközön készítsen mentést, és másolja a fájlt erre a telefonra. Utána válassza ki itt.</translation>
-    </message>
-    <message>
         <source>Choose a backup file</source>
         <translation>Mentésfájl kiválasztása</translation>
     </message>
@@ -1110,14 +1121,6 @@
     <message>
         <source>Cancel</source>
         <translation>Mégse</translation>
-    </message>
-    <message>
-        <source>The camera is not available on this device. A backup file works without one.</source>
-        <translation>Ezen az eszközön nincs kamera. Mentésfájllal kamera nélkül is megy.</translation>
-    </message>
-    <message>
-        <source>On your other device, open Settings and choose to add a second device. Both phones have to be on the same network.</source>
-        <translation>A profilt tartalmazó eszközön nyissa meg a beállításokat, és válassza a második eszköz hozzáadását. Mindkettőnek ugyanazon a hálózaton kell lennie.</translation>
     </message>
     <message>
         <source>Hold the phone up to the code it shows</source>
@@ -1146,6 +1149,26 @@
     <message>
         <source>Choose another file</source>
         <translation>Másik fájl választása</translation>
+    </message>
+    <message>
+        <source>The other device runs a newer Delta Chat than this app can read.</source>
+        <translation>A másik eszközön újabb Delta Chat fut, mint amit ez az alkalmazás el tud olvasni.</translation>
+    </message>
+    <message>
+        <source>The transfer stopped. Both devices have to stay on one network, with this page open.</source>
+        <translation>Az átvitel megállt. Mindkét eszköznek egy hálózaton kell maradnia, ezzel az oldallal nyitva.</translation>
+    </message>
+    <message>
+        <source>No camera on this device. A backup file works without one.</source>
+        <translation>Ezen az eszközön nincs kamera. A mentésfájl kamera nélkül is működik.</translation>
+    </message>
+    <message>
+        <source>On the other device: Settings, then add a second device. Both on one network.</source>
+        <translation>A másik eszközön: Beállítások, majd második eszköz hozzáadása. Mindkettő egy hálózaton.</translation>
+    </message>
+    <message>
+        <source>Make a backup on the other device, copy the file here, then choose it.</source>
+        <translation>Készíts mentést a másik eszközön, másold ide a fájlt, majd válaszd ki.</translation>
     </message>
 </context>
 <context>
@@ -1237,10 +1260,6 @@
         <translation>Mellékletek automatikus letöltése</translation>
     </message>
     <message>
-        <source>Bigger ones wait until you ask for them. Applies to every profile and to messages that arrive from now on.</source>
-        <translation>A nagyobbak megvárják, amíg kéri őket. Minden profilra és a mostantól érkező üzenetekre vonatkozik.</translation>
-    </message>
-    <message>
         <source>Links</source>
         <translation>Hivatkozások</translation>
     </message>
@@ -1249,16 +1268,8 @@
         <translation>Követés eltávolítása a hivatkozásokból</translation>
     </message>
     <message>
-        <source>Known tracking parameters -- click ids, campaign tags, the sharer&apos;s account -- are taken out of the links in the messages you send. The rest of the link is left as it was.</source>
-        <translation>Az ismert követési paraméterek – kattintásazonosítók, kampánycímkék, a megosztó fiókja – kikerülnek az elküldött üzenetek hivatkozásaiból. A hivatkozás többi része marad, ahogy volt.</translation>
-    </message>
-    <message>
         <source>Notifications</source>
         <translation>Értesítések</translation>
-    </message>
-    <message>
-        <source>On the lock screen and in the notification area. The chat it is from opens on a tap either way.</source>
-        <translation>A lezárási képernyőn és az értesítési területen. A csevegés, amelyből jött, egy koppintásra mindenképp megnyílik.</translation>
     </message>
     <message>
         <source>Who wrote, and what</source>
@@ -1280,10 +1291,6 @@
         <source>Enable webxdc apps (experimental)</source>
         <extracomment>A webxdc app is a small program somebody sends into a chat and everyone in it plays with. Keep the name: it is what every other Delta Chat client calls them.</extracomment>
         <translation>webxdc alkalmazások engedélyezése (kísérleti)</translation>
-    </message>
-    <message>
-        <source>Apps somebody sends run inside the chat, and the attach tray offers a store to take new ones from. An app is somebody else&apos;s code, and this part is not yet as tested as the rest.</source>
-        <translation>A valaki által küldött alkalmazások a beszélgetésen belül futnak, a csatolótálca pedig áruházat kínál újak beszerzéséhez. Az alkalmazás más kódja, és ez a rész még nincs annyira letesztelve, mint a többi.</translation>
     </message>
     <message>
         <source>After 1 hour</source>
@@ -1310,10 +1317,6 @@
         <translation>Üzenetek törlése az eszközről</translation>
     </message>
     <message>
-        <source>Older messages go from this phone, in every chat of every profile, whatever a chat&apos;s own disappearing messages setting says. &quot;Saved messages&quot; are kept.</source>
-        <translation>A régebbi üzenetek eltűnnek erről a telefonról, minden profil minden csevegéséből, bármit mond is a csevegés saját eltűnő üzenetek beállítása. A „Mentett üzenetek” megmaradnak.</translation>
-    </message>
-    <message>
         <source>A new notification shows</source>
         <translation>Egy új értesítés mutatja</translation>
     </message>
@@ -1323,25 +1326,45 @@
         <translation>Említések</translation>
     </message>
     <message>
-        <source>In a muted group, a reply to one of your messages still notifies you.</source>
-        <translation>Némított csoportban az egyik üzenetedre adott válasz így is értesít.</translation>
-    </message>
-    <message>
         <source>Enter sends the message</source>
         <extracomment>The return key on the keyboard.</extracomment>
         <translation>Az Enter elküldi az üzenetet</translation>
-    </message>
-    <message>
-        <source>When on, the return key sends. When off, it starts a new line, the message field grows with what is written, and the send button sends.</source>
-        <translation>Bekapcsolva az Enter billentyű küld. Kikapcsolva új sort kezd, az üzenetmező a leírtakkal nő, és a küldés gomb küld.</translation>
     </message>
     <message>
         <source>Use Markdown formatting</source>
         <translation>Markdown-formázás használata</translation>
     </message>
     <message>
-        <source>When on, a message written with *stars* and `backticks` is shown with the bold, the italics and the links drawn. When off, it is shown exactly as it was written.</source>
-        <translation>Bekapcsolva a *csillagokkal* és `visszafelé dőlő idézőjelekkel` írt üzenet félkövéren, dőlten és hivatkozásokkal megjelenítve látszik. Kikapcsolva pontosan úgy, ahogy írták.</translation>
+        <source>Otherwise it starts a new line, and the button sends.</source>
+        <translation>Különben új sort kezd, és a gomb küld.</translation>
+    </message>
+    <message>
+        <source>Draws *stars* and `backticks` rather than showing them.</source>
+        <translation>A *csillagokat* és a `visszafelé aposztrófokat` megrajzolja, nem mutatja.</translation>
+    </message>
+    <message>
+        <source>Bigger ones wait until you ask for them. Every profile, from now on.</source>
+        <translation>A nagyobbak megvárják, amíg kéred őket. Minden profil, mostantól.</translation>
+    </message>
+    <message>
+        <source>Every chat of every profile. &quot;Saved messages&quot; are kept.</source>
+        <translation>Minden profil minden csevegése. A „mentett üzenetek” megmaradnak.</translation>
+    </message>
+    <message>
+        <source>On the lock screen and in the notification area.</source>
+        <translation>A zárolási képernyőn és az értesítési területen.</translation>
+    </message>
+    <message>
+        <source>A reply to you gets through a muted group.</source>
+        <translation>A neked szóló válasz a némított csoportból is átjut.</translation>
+    </message>
+    <message>
+        <source>Click ids and campaign tags come out of the links you send.</source>
+        <translation>A kattintásazonosítók és a kampánycímkék kiesnek az általad küldött hivatkozásokból.</translation>
+    </message>
+    <message>
+        <source>Small apps run inside the chat. Somebody else&apos;s code, and less tested than the rest.</source>
+        <translation>Kis alkalmazások futnak a csevegésen belül. Más kódja, és a többinél kevésbé kipróbált.</translation>
     </message>
 </context>
 <context>

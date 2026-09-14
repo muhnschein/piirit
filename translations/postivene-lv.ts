@@ -35,10 +35,6 @@
         <translation>Izveidot</translation>
     </message>
     <message>
-        <source>Pick a chatmail relay or enter a custom server. The server assigns the address; the encryption keys are made on this device.</source>
-        <translation>Izvēlieties chatmail releju vai ievadiet savu serveri. Serveris piešķir adresi; šifrēšanas atslēgas tiek izveidotas šajā ierīcē.</translation>
-    </message>
-    <message>
         <source>Your name</source>
         <translation>Jūsu vārds</translation>
     </message>
@@ -53,6 +49,41 @@
     <message>
         <source>See &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; for the full list.</source>
         <translation>Pilns saraksts ir &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
+    </message>
+    <message>
+        <source>The relay gives you an address. The keys are made on this phone.</source>
+        <translation>Relejs iedod tev adresi. Atslēgas top šajā tālrunī.</translation>
+    </message>
+</context>
+<context>
+    <name>AddProfilePage</name>
+    <message>
+        <source>Add profile</source>
+        <translation>Pievienot profilu</translation>
+    </message>
+    <message>
+        <source>Create a profile</source>
+        <translation>Izveidot profilu</translation>
+    </message>
+    <message>
+        <source>A new address on a chatmail relay.</source>
+        <translation>Jauna adrese chatmail relejā.</translation>
+    </message>
+    <message>
+        <source>Restore from a backup</source>
+        <translation>Atjaunot no rezerves kopijas</translation>
+    </message>
+    <message>
+        <source>A backup file copied onto this phone.</source>
+        <translation>Rezerves kopijas fails, iekopēts šajā tālrunī.</translation>
+    </message>
+    <message>
+        <source>Add as second device</source>
+        <translation>Pievienot kā otru ierīci</translation>
+    </message>
+    <message>
+        <source>The other device keeps it. Both get everything new.</source>
+        <translation>Otra ierīce to patur. Abas saņem visu jauno.</translation>
     </message>
 </context>
 <context>
@@ -136,8 +167,12 @@
         <translation>Saglabāts: %1</translation>
     </message>
     <message>
-        <source>This profile&apos;s messages, contacts and key in one file, saved to Documents. Whoever has that file has the profile, so keep it somewhere safe. Your other profiles are not in it: each one is backed up from its own page.</source>
-        <translation>Šī profila ziņas, kontakti un atslēga vienā datnē, saglabātā mapē Dokumenti. Kam ir šī datne, tam ir arī profils, tāpēc glabājiet to drošā vietā. Pārējo profilu tajā nav: katrs tiek kopēts no savas lapas.</translation>
+        <source>Messages, contacts and key in one file, saved to Documents. Whoever has the file has the profile.</source>
+        <translation>Ziņas, kontakti un atslēga vienā failā, saglabātā mapē Dokumenti. Kam ir fails, tam ir profils.</translation>
+    </message>
+    <message>
+        <source>Swipe on for your chats.</source>
+        <translation>Pavelc uz priekšu pie savām sarunām.</translation>
     </message>
 </context>
 <context>
@@ -480,10 +515,6 @@
         <translation>Pazūdošās ziņas</translation>
     </message>
     <message>
-        <source>Applies to all members of this chat, they can still copy, save, and forward messages.</source>
-        <translation>Attiecas uz visiem šīs sarunas dalībniekiem; viņi joprojām var kopēt, saglabāt un pārsūtīt ziņas.</translation>
-    </message>
-    <message>
         <source>After 1 year</source>
         <translation>Pēc 1 gada</translation>
     </message>
@@ -515,6 +546,10 @@
         <source>After %1 seconds</source>
         <translation>Pēc %1 sekundēm</translation>
     </message>
+    <message>
+        <source>Applies to everyone in the chat. They can still copy and forward.</source>
+        <translation>Attiecas uz visiem sarunā. Kopēt un pārsūtīt viņi joprojām var.</translation>
+    </message>
 </context>
 <context>
     <name>ExistingProfilePage</name>
@@ -527,16 +562,16 @@
         <translation>Pievienot kā otru ierīci</translation>
     </message>
     <message>
-        <source>The device that has it keeps it. This one joins, over the same network.</source>
-        <translation>Ierīce, kurā tas ir, to patur. Šī pievienojas tajā pašā tīklā.</translation>
-    </message>
-    <message>
         <source>Restore from a backup</source>
         <translation>Atjaunot no rezerves kopijas</translation>
     </message>
     <message>
-        <source>A backup file the other device wrote, copied onto this phone.</source>
-        <translation>Rezerves kopijas datne, ko uzrakstīja otra ierīce un kas nokopēta uz šo tālruni.</translation>
+        <source>The other device keeps it. Both get everything new.</source>
+        <translation>Otra ierīce to patur. Abas saņem visu jauno.</translation>
+    </message>
+    <message>
+        <source>A backup file copied onto this phone.</source>
+        <translation>Rezerves kopijas fails, iekopēts šajā tālrunī.</translation>
     </message>
 </context>
 <context>
@@ -619,24 +654,12 @@
         <translation>Bez reģistrācijas, bez tālruņa numura</translation>
     </message>
     <message>
-        <source>Your profile is made here on your phone. No phone number, no account with a company, nothing to sign.</source>
-        <translation>Jūsu profils tiek izveidots šeit, tālrunī. Nav vajadzīgs ne tālruņa numurs, ne konts kādā uzņēmumā, nekas nav jāparaksta.</translation>
-    </message>
-    <message>
         <source>You choose who can reach you</source>
         <translation>Jūs izlemjat, kurš var jums rakstīt</translation>
     </message>
     <message>
-        <source>There is no directory to be found in. Show a friend a code to scan, or send them a link, and the two of you can write.</source>
-        <translation>Nav nekāda saraksta, kurā jūs atrast. Parādiet draugam skenējamu kodu vai nosūtiet saiti, un jūs abi varēsiet rakstīties.</translation>
-    </message>
-    <message>
         <source>Groups of equals</source>
         <translation>Vienlīdzīgo grupas</translation>
-    </message>
-    <message>
-        <source>Everyone in a group has the same rights: anyone can add a friend, rename it or leave. Nobody is in charge.</source>
-        <translation>Grupā visiem ir vienādas tiesības: ikviens var pievienot draugu, pārdēvēt to vai aiziet. Neviens nav priekšnieks.</translation>
     </message>
     <message>
         <source>The server only passes it on</source>
@@ -651,12 +674,24 @@
         <translation>Katra ziņa ir šifrēta</translation>
     </message>
     <message>
-        <source>Messages are encrypted the whole way, always. Servers that transport them cannot read a word.</source>
-        <translation>Ziņas vienmēr ir šifrētas visā ceļā. Serveri, kas tās pārvadā, nenolasa ne vārda.</translation>
+        <source>Made here on your phone. No phone number, no account, nothing to sign.</source>
+        <translation>Izveidots šeit, tavā tālrunī. Nav tālruņa numura, nav konta, nav ko parakstīt.</translation>
     </message>
     <message>
-        <source>A server holds a message until the other phone is online, and that is all it does. Your chats stay on your device.</source>
-        <translation>Serveris patur ziņu, līdz otrs tālrunis ir tiešsaistē, un neko vairāk nedara. Jūsu sarunas paliek jūsu ierīcē.</translation>
+        <source>There is no directory to be found in. Show a friend a code, or send a link.</source>
+        <translation>Nav kataloga, kurā tevi atrast. Parādi draugam kodu vai nosūti saiti.</translation>
+    </message>
+    <message>
+        <source>Encrypted the whole way, always. The servers cannot read a word.</source>
+        <translation>Vienmēr šifrēts visu ceļu. Serveri nenolasa ne vārda.</translation>
+    </message>
+    <message>
+        <source>Anyone can add a friend, rename the group or leave. Nobody is in charge.</source>
+        <translation>Ikviens var pievienot draugu, pārdēvēt grupu vai aiziet. Neviens nekomandē.</translation>
+    </message>
+    <message>
+        <source>It holds a message until the other phone is online, and nothing more.</source>
+        <translation>Tas patur ziņu, līdz otrs tālrunis ir tiešsaistē, un neko vairāk.</translation>
     </message>
 </context>
 <context>
@@ -674,9 +709,9 @@
         <translation>Atcelt</translation>
     </message>
     <message>
-        <source>Leave %1? You will stop receiving its messages, and only a member can add you back.</source>
+        <source>Leave %1? Only a member can add you back.</source>
         <extracomment>%1 is the group&apos;s name.</extracomment>
-        <translation>Pamest %1? Jūs vairs nesaņemsiet tās ziņas, un atpakaļ jūs var pievienot tikai dalībnieks.</translation>
+        <translation>Pamest %1? Tikai dalībnieks var tevi pievienot atpakaļ.</translation>
     </message>
 </context>
 <context>
@@ -902,16 +937,8 @@
         <translation>Adrese</translation>
     </message>
     <message>
-        <source>Show invite code</source>
-        <translation>Rādīt ielūguma kodu</translation>
-    </message>
-    <message>
         <source>Send read receipts</source>
         <translation>Sūtīt lasīšanas apstiprinājumus</translation>
-    </message>
-    <message>
-        <source>Tells the people you write to when you have read their messages, and asks the same of them. With this off you send none and see none.</source>
-        <translation>Paziņo tiem, kam rakstāt, kad esat izlasījis viņu ziņas, un lūdz to pašu no viņiem. Izslēgts – jūs nevienu nesūtāt un neredzat.</translation>
     </message>
     <message>
         <source>Storage and connectivity</source>
@@ -952,12 +979,8 @@
         <translation>Vārds uz katras jūsu sūtītās ziņas</translation>
     </message>
     <message>
-        <source>Backup</source>
-        <translation>Rezerves kopija</translation>
-    </message>
-    <message>
-        <source>Back up this profile</source>
-        <translation>Veidot šī profila rezerves kopiju</translation>
+        <source>Both ways: with this off you send none and see none.</source>
+        <translation>Abos virzienos: izslēgts — tu nesūti nevienu un neredzi nevienu.</translation>
     </message>
 </context>
 <context>
@@ -983,8 +1006,8 @@
         <translation>%1 neatbildēja %2 sekunžu laikā.</translation>
     </message>
     <message>
-        <source>Chatmail relays are run by volunteers in their spare time. If this one does not seem to work, go back and try another one.</source>
-        <translation>Chatmail relejus brīvprātīgie uztur savā brīvajā laikā. Ja šis, šķiet, nedarbojas, dodieties atpakaļ un izmēģiniet citu.</translation>
+        <source>Relays are run by volunteers. Go back and try another one.</source>
+        <translation>Relejus uztur brīvprātīgie. Ej atpakaļ un pamēģini citu.</translation>
     </message>
 </context>
 <context>
@@ -1030,12 +1053,12 @@
         <translation>Nav profilu</translation>
     </message>
     <message>
-        <source>Add as second device</source>
-        <translation>Pievienot kā otru ierīci</translation>
+        <source>Invite code</source>
+        <translation>Ielūguma kods</translation>
     </message>
     <message>
-        <source>Restore profile from backup</source>
-        <translation>Atjaunot profilu no rezerves kopijas</translation>
+        <source>Back up profile</source>
+        <translation>Profila rezerves kopija</translation>
     </message>
 </context>
 <context>
@@ -1088,14 +1111,6 @@
 <context>
     <name>RestoreProfilePage</name>
     <message>
-        <source>The other device runs a newer Delta Chat than this app can take a profile from.</source>
-        <translation>Otrā ierīcē darbojas jaunāks Delta Chat, nekā šī lietotne spēj pārņemt profilu.</translation>
-    </message>
-    <message>
-        <source>The transfer stopped before it finished. Both devices have to stay on the same network, with this page open.</source>
-        <translation>Pārsūtīšana apstājās pirms beigām. Abām ierīcēm jāpaliek vienā tīklā, ar šo lapu atvērtu.</translation>
-    </message>
-    <message>
         <source>That is not the code a device shows while it is offering its profile.</source>
         <translation>Šis nav tas kods, ko ierīce rāda, kamēr piedāvā savu profilu.</translation>
     </message>
@@ -1108,10 +1123,6 @@
         <translation>Atjaunot no rezerves kopijas</translation>
     </message>
     <message>
-        <source>On the device that has your profile, make a backup and copy the file onto this phone. Then choose it here.</source>
-        <translation>Ierīcē, kurā ir jūsu profils, izveidojiet rezerves kopiju un nokopējiet datni uz šo tālruni. Tad izvēlieties to šeit.</translation>
-    </message>
-    <message>
         <source>Choose a backup file</source>
         <translation>Izvēlēties rezerves kopijas datni</translation>
     </message>
@@ -1122,14 +1133,6 @@
     <message>
         <source>Cancel</source>
         <translation>Atcelt</translation>
-    </message>
-    <message>
-        <source>The camera is not available on this device. A backup file works without one.</source>
-        <translation>Šajā ierīcē nav kameras. Ar rezerves kopijas datni iztiek arī bez tās.</translation>
-    </message>
-    <message>
-        <source>On your other device, open Settings and choose to add a second device. Both phones have to be on the same network.</source>
-        <translation>Ierīcē, kurā ir jūsu profils, atveriet iestatījumus un izvēlieties pievienot otru ierīci. Abām jābūt vienā tīklā.</translation>
     </message>
     <message>
         <source>Hold the phone up to the code it shows</source>
@@ -1158,6 +1161,26 @@
     <message>
         <source>Choose another file</source>
         <translation>Izvēlēties citu datni</translation>
+    </message>
+    <message>
+        <source>The other device runs a newer Delta Chat than this app can read.</source>
+        <translation>Otrā ierīcē ir jaunāks Delta Chat, nekā šī lietotne spēj nolasīt.</translation>
+    </message>
+    <message>
+        <source>The transfer stopped. Both devices have to stay on one network, with this page open.</source>
+        <translation>Pārsūtīšana apstājās. Abām ierīcēm jāpaliek vienā tīklā, ar šo lapu atvērtu.</translation>
+    </message>
+    <message>
+        <source>No camera on this device. A backup file works without one.</source>
+        <translation>Šajā ierīcē nav kameras. Rezerves kopijas fails darbojas arī bez tās.</translation>
+    </message>
+    <message>
+        <source>On the other device: Settings, then add a second device. Both on one network.</source>
+        <translation>Otrā ierīcē: Iestatījumi, tad pievieno otru ierīci. Abas vienā tīklā.</translation>
+    </message>
+    <message>
+        <source>Make a backup on the other device, copy the file here, then choose it.</source>
+        <translation>Izveido rezerves kopiju otrā ierīcē, iekopē failu šeit un tad izvēlies to.</translation>
     </message>
 </context>
 <context>
@@ -1249,10 +1272,6 @@
         <translation>Automātiski lejupielādēt pielikumus</translation>
     </message>
     <message>
-        <source>Bigger ones wait until you ask for them. Applies to every profile and to messages that arrive from now on.</source>
-        <translation>Lielākie gaida, līdz tos pieprasāt. Attiecas uz katru profilu un uz ziņām, kas pienāk no šī brīža.</translation>
-    </message>
-    <message>
         <source>Links</source>
         <translation>Saites</translation>
     </message>
@@ -1261,16 +1280,8 @@
         <translation>Noņemt izsekošanu no saitēm</translation>
     </message>
     <message>
-        <source>Known tracking parameters -- click ids, campaign tags, the sharer&apos;s account -- are taken out of the links in the messages you send. The rest of the link is left as it was.</source>
-        <translation>Zināmie izsekošanas parametri – klikšķu ID, kampaņu birkas, kopīgotāja konts – tiek izņemti no saitēm jūsu sūtītajās ziņās. Pārējā saites daļa paliek, kāda bija.</translation>
-    </message>
-    <message>
         <source>Notifications</source>
         <translation>Paziņojumi</translation>
-    </message>
-    <message>
-        <source>On the lock screen and in the notification area. The chat it is from opens on a tap either way.</source>
-        <translation>Bloķēšanas ekrānā un paziņojumu zonā. Saruna, no kuras tā ir, ar pieskārienu atveras jebkurā gadījumā.</translation>
     </message>
     <message>
         <source>Who wrote, and what</source>
@@ -1292,10 +1303,6 @@
         <source>Enable webxdc apps (experimental)</source>
         <extracomment>A webxdc app is a small program somebody sends into a chat and everyone in it plays with. Keep the name: it is what every other Delta Chat client calls them.</extracomment>
         <translation>Iespējot webxdc lietotnes (eksperimentāli)</translation>
-    </message>
-    <message>
-        <source>Apps somebody sends run inside the chat, and the attach tray offers a store to take new ones from. An app is somebody else&apos;s code, and this part is not yet as tested as the rest.</source>
-        <translation>Kāda atsūtītās lietotnes darbojas pašā sarunā, un pielikumu paletē ir veikals, no kura ņemt jaunas. Lietotne ir cita cilvēka kods, un šī daļa vēl nav tik pārbaudīta kā pārējās.</translation>
     </message>
     <message>
         <source>After 1 hour</source>
@@ -1322,10 +1329,6 @@
         <translation>Dzēst ziņas no ierīces</translation>
     </message>
     <message>
-        <source>Older messages go from this phone, in every chat of every profile, whatever a chat&apos;s own disappearing messages setting says. &quot;Saved messages&quot; are kept.</source>
-        <translation>Vecākas ziņas pazūd no šī tālruņa, katrā katra profila sarunā, lai ko teiktu pašas sarunas pazūdošo ziņu iestatījums. „Saglabātās ziņas“ paliek.</translation>
-    </message>
-    <message>
         <source>A new notification shows</source>
         <translation>Jauns paziņojums rāda</translation>
     </message>
@@ -1335,25 +1338,45 @@
         <translation>Pieminējumi</translation>
     </message>
     <message>
-        <source>In a muted group, a reply to one of your messages still notifies you.</source>
-        <translation>Apklusinātā grupā atbilde uz jūsu ziņu jūs tomēr informē.</translation>
-    </message>
-    <message>
         <source>Enter sends the message</source>
         <extracomment>The return key on the keyboard.</extracomment>
         <translation>Enter nosūta ziņu</translation>
-    </message>
-    <message>
-        <source>When on, the return key sends. When off, it starts a new line, the message field grows with what is written, and the send button sends.</source>
-        <translation>Ieslēgts Enter taustiņš nosūta. Izslēgts tas sāk jaunu rindu, ziņas lauks aug līdzi rakstītajam, un nosūta sūtīšanas poga.</translation>
     </message>
     <message>
         <source>Use Markdown formatting</source>
         <translation>Lietot Markdown noformējumu</translation>
     </message>
     <message>
-        <source>When on, a message written with *stars* and `backticks` is shown with the bold, the italics and the links drawn. When off, it is shown exactly as it was written.</source>
-        <translation>Ieslēgts ziņa, kas rakstīta ar *zvaigznītēm* un `atpakaļvērstiem apostrofiem`, tiek rādīta ar noformētu treknrakstu, slīprakstu un saitēm. Izslēgts tā tiek rādīta tieši tā, kā rakstīts.</translation>
+        <source>Otherwise it starts a new line, and the button sends.</source>
+        <translation>Citādi tas sāk jaunu rindu, un poga nosūta.</translation>
+    </message>
+    <message>
+        <source>Draws *stars* and `backticks` rather than showing them.</source>
+        <translation>Zīmē *zvaigznītes* un `atpakaļvērstās pēdiņas`, nevis rāda tās.</translation>
+    </message>
+    <message>
+        <source>Bigger ones wait until you ask for them. Every profile, from now on.</source>
+        <translation>Lielākie gaida, līdz tos pieprasi. Visi profili, no šī brīža.</translation>
+    </message>
+    <message>
+        <source>Every chat of every profile. &quot;Saved messages&quot; are kept.</source>
+        <translation>Katra saruna katrā profilā. „Saglabātās ziņas” paliek.</translation>
+    </message>
+    <message>
+        <source>On the lock screen and in the notification area.</source>
+        <translation>Bloķēšanas ekrānā un paziņojumu jomā.</translation>
+    </message>
+    <message>
+        <source>A reply to you gets through a muted group.</source>
+        <translation>Atbilde tev izkļūst cauri arī apklusinātai grupai.</translation>
+    </message>
+    <message>
+        <source>Click ids and campaign tags come out of the links you send.</source>
+        <translation>Klikšķu identifikatori un kampaņu birkas izkrīt no saitēm, ko sūti.</translation>
+    </message>
+    <message>
+        <source>Small apps run inside the chat. Somebody else&apos;s code, and less tested than the rest.</source>
+        <translation>Mazas lietotnes darbojas sarunas iekšienē. Kāda cita kods, un mazāk pārbaudīts nekā pārējais.</translation>
     </message>
 </context>
 <context>
