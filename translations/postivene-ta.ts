@@ -1328,10 +1328,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>இணைப்புகளைத் தானாகப் பதிவிறக்கு</translation>
     </message>
     <message>
-        <source>Links</source>
-        <translation>இணைப்புகள்</translation>
-    </message>
-    <message>
         <source>Remove tracking from links</source>
         <translation>இணைப்புகளிலிருந்து கண்காணிப்பை நீக்கு</translation>
     </message>

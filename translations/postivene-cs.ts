@@ -1338,10 +1338,6 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
         <translation>Automaticky stahovat přílohy</translation>
     </message>
     <message>
-        <source>Links</source>
-        <translation>Odkazy</translation>
-    </message>
-    <message>
         <source>Remove tracking from links</source>
         <translation>Odstranit sledování z odkazů</translation>
     </message>

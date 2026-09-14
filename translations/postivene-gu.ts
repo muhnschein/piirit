@@ -1332,10 +1332,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>જોડાણો આપોઆપ ડાઉનલોડ કરો</translation>
     </message>
     <message>
-        <source>Links</source>
-        <translation>લિંક</translation>
-    </message>
-    <message>
         <source>Remove tracking from links</source>
         <translation>લિંકમાંથી ટ્રૅકિંગ દૂર કરો</translation>
     </message>

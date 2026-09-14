@@ -1328,10 +1328,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Last ned vedlegg automatisk</translation>
     </message>
     <message>
-        <source>Links</source>
-        <translation>Lenker</translation>
-    </message>
-    <message>
         <source>Remove tracking from links</source>
         <translation>Fjern sporing fra lenker</translation>
     </message>

@@ -1328,10 +1328,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Lataa liitteet automaattisesti</translation>
     </message>
     <message>
-        <source>Links</source>
-        <translation>Linkit</translation>
-    </message>
-    <message>
         <source>Remove tracking from links</source>
         <translation>Poista seuranta linkeistä</translation>
     </message>

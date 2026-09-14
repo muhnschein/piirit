@@ -1328,10 +1328,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>జోడింపులను ఆటోమేటిక్‌గా డౌన్‌లోడ్ చేయి</translation>
     </message>
     <message>
-        <source>Links</source>
-        <translation>లింక్‌లు</translation>
-    </message>
-    <message>
         <source>Remove tracking from links</source>
         <translation>లింక్‌ల నుండి ట్రాకింగ్ తీసివేయి</translation>
     </message>

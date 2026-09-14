@@ -1334,10 +1334,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Automatiškai atsisiųsti priedus</translation>
     </message>
     <message>
-        <source>Links</source>
-        <translation>Nuorodos</translation>
-    </message>
-    <message>
         <source>Remove tracking from links</source>
         <translation>Šalinti sekimą iš nuorodų</translation>
     </message>

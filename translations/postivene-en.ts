@@ -1328,10 +1328,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Links</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Remove tracking from links</source>
         <translation type="unfinished"></translation>
     </message>

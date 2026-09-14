@@ -1334,10 +1334,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Descarcă atașamentele automat</translation>
     </message>
     <message>
-        <source>Links</source>
-        <translation>Linkuri</translation>
-    </message>
-    <message>
         <source>Remove tracking from links</source>
         <translation>Elimină urmărirea din linkuri</translation>
     </message>

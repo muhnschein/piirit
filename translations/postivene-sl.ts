@@ -1344,10 +1344,6 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
         <translation>Samodejno prenesi priloge</translation>
     </message>
     <message>
-        <source>Links</source>
-        <translation>Povezave</translation>
-    </message>
-    <message>
         <source>Remove tracking from links</source>
         <translation>Odstrani sledenje iz povezav</translation>
     </message>

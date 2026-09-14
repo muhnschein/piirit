@@ -1332,10 +1332,6 @@ Mensagens de contactos bloqueados não serão ocultadas noutros grupos.</transla
         <translation>Transferir anexos automaticamente</translation>
     </message>
     <message>
-        <source>Links</source>
-        <translation>Ligações</translation>
-    </message>
-    <message>
         <source>Remove tracking from links</source>
         <translation>Remover rastreio das ligações</translation>
     </message>

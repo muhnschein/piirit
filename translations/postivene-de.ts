@@ -1332,10 +1332,6 @@ In anderen Gruppen mit blockierten Kontakten werden deren Nachrichten weiterhin 
         <translation>Anhänge automatisch herunterladen</translation>
     </message>
     <message>
-        <source>Links</source>
-        <translation>Links</translation>
-    </message>
-    <message>
         <source>Remove tracking from links</source>
         <translation>Tracking aus Links entfernen</translation>
     </message>

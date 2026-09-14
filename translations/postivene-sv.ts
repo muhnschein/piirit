@@ -1328,10 +1328,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Hämta bilagor automatiskt</translation>
     </message>
     <message>
-        <source>Links</source>
-        <translation>Länkar</translation>
-    </message>
-    <message>
         <source>Remove tracking from links</source>
         <translation>Ta bort spårning från länkar</translation>
     </message>

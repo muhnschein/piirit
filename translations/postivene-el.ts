@@ -1328,10 +1328,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Αυτόματη λήψη συνημμένων</translation>
     </message>
     <message>
-        <source>Links</source>
-        <translation>Σύνδεσμοι</translation>
-    </message>
-    <message>
         <source>Remove tracking from links</source>
         <translation>Αφαίρεση παρακολούθησης από τους συνδέσμους</translation>
     </message>

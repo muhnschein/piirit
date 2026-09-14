@@ -1322,10 +1322,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Mellékletek automatikus letöltése</translation>
     </message>
     <message>
-        <source>Links</source>
-        <translation>Hivatkozások</translation>
-    </message>
-    <message>
         <source>Remove tracking from links</source>
         <translation>Követés eltávolítása a hivatkozásokból</translation>
     </message>

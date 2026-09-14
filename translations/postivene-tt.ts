@@ -1326,10 +1326,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Кушымталарны автоматик йөкләргә</translation>
     </message>
     <message>
-        <source>Links</source>
-        <translation>Сылтамалар</translation>
-    </message>
-    <message>
         <source>Remove tracking from links</source>
         <translation>Сылтамалардан күзәтүне алырга</translation>
     </message>

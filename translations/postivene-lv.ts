@@ -1338,10 +1338,6 @@ Citās grupās, kurās ir bloķēti kontakti, viņu ziņas joprojām būs redzam
         <translation>Automātiski lejupielādēt pielikumus</translation>
     </message>
     <message>
-        <source>Links</source>
-        <translation>Saites</translation>
-    </message>
-    <message>
         <source>Remove tracking from links</source>
         <translation>Noņemt izsekošanu no saitēm</translation>
     </message>

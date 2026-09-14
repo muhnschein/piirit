@@ -1338,10 +1338,6 @@ Správy od zablokovaných kontaktov v ostatných skupinách sa budú naďalej zo
         <translation>Automaticky sťahovať prílohy</translation>
     </message>
     <message>
-        <source>Links</source>
-        <translation>Odkazy</translation>
-    </message>
-    <message>
         <source>Remove tracking from links</source>
         <translation>Odstrániť sledovanie z odkazov</translation>
     </message>

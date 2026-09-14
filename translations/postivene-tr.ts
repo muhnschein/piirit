@@ -1326,10 +1326,6 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
         <translation>Ekleri otomatik indir</translation>
     </message>
     <message>
-        <source>Links</source>
-        <translation>Bağlantılar</translation>
-    </message>
-    <message>
         <source>Remove tracking from links</source>
         <translation>Bağlantılardan izlemeyi kaldır</translation>
     </message>

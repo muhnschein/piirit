@@ -1322,10 +1322,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Tự động tải tệp đính kèm</translation>
     </message>
     <message>
-        <source>Links</source>
-        <translation>Liên kết</translation>
-    </message>
-    <message>
         <source>Remove tracking from links</source>
         <translation>Gỡ theo dõi khỏi liên kết</translation>
     </message>

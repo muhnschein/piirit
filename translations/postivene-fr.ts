@@ -1332,10 +1332,6 @@ Vous continuerez à voir les messages des contacts bloqués dans les autres grou
         <translation>Téléchargement automatique des pièces jointes</translation>
     </message>
     <message>
-        <source>Links</source>
-        <translation>Liens</translation>
-    </message>
-    <message>
         <source>Remove tracking from links</source>
         <translation>Retirer le pistage des liens</translation>
     </message>

@@ -1332,10 +1332,6 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
         <translation>Laadi manused automaatselt alla</translation>
     </message>
     <message>
-        <source>Links</source>
-        <translation>Lingid</translation>
-    </message>
-    <message>
         <source>Remove tracking from links</source>
         <translation>Eemalda linkidest jälgimine</translation>
     </message>

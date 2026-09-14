@@ -1338,10 +1338,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Автоматически скачивать вложения</translation>
     </message>
     <message>
-        <source>Links</source>
-        <translation>Ссылки</translation>
-    </message>
-    <message>
         <source>Remove tracking from links</source>
         <translation>Убирать отслеживание из ссылок</translation>
     </message>

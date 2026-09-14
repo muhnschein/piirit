@@ -1328,10 +1328,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Descargar adjuntos automáticamente</translation>
     </message>
     <message>
-        <source>Links</source>
-        <translation>Enlaces</translation>
-    </message>
-    <message>
         <source>Remove tracking from links</source>
         <translation>Quitar el rastreo de los enlaces</translation>
     </message>

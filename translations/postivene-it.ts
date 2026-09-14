@@ -1332,10 +1332,6 @@ Gli altri gruppi con contatti bloccati continueranno a visualizzare i loro messa
         <translation>Scarica automaticamente gli allegati</translation>
     </message>
     <message>
-        <source>Links</source>
-        <translation>Link</translation>
-    </message>
-    <message>
         <source>Remove tracking from links</source>
         <translation>Rimuovi il tracciamento dai link</translation>
     </message>

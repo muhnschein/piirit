@@ -1338,10 +1338,6 @@ Wiadomości innych grup z zablokowanymi kontaktami nadal będą wyświetlane.</t
         <translation>Automatycznie pobieraj załączniki</translation>
     </message>
     <message>
-        <source>Links</source>
-        <translation>Linki</translation>
-    </message>
-    <message>
         <source>Remove tracking from links</source>
         <translation>Usuwaj śledzenie z linków</translation>
     </message>

@@ -1322,10 +1322,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>自動下載附件</translation>
     </message>
     <message>
-        <source>Links</source>
-        <translation>連結</translation>
-    </message>
-    <message>
         <source>Remove tracking from links</source>
         <translation>移除連結中的追蹤參數</translation>
     </message>

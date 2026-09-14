@@ -1332,10 +1332,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>संलग्नके आपोआप डाउनलोड करा</translation>
     </message>
     <message>
-        <source>Links</source>
-        <translation>दुवे</translation>
-    </message>
-    <message>
         <source>Remove tracking from links</source>
         <translation>दुव्यांमधून ट्रॅकिंग काढा</translation>
     </message>
