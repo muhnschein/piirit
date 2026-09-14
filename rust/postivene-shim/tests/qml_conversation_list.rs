@@ -201,16 +201,6 @@ const PROBE_QML: &str = r"
     }
 ";
 
-fn component_url(name: &str) -> String {
-    format!(
-        "file://{}",
-        std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR"))
-            .join("../../qml/components")
-            .join(name)
-            .display()
-    )
-}
-
 // A script of timed steps, in the order they happen; splitting it would
 // hide that order for no gain.
 #[allow(clippy::too_many_lines)]
@@ -253,7 +243,10 @@ fn a_conversation_opens_at_the_newest_message_and_stays_where_it_is_left() {
         record!("filled", call!("append", 40));
         record!(
             "load",
-            call!("load", QString::from(component_url("ConversationList.qml")))
+            call!(
+                "load",
+                QString::from(common::component_url("ConversationList.qml"))
+            )
         );
     });
 
@@ -424,7 +417,7 @@ fn a_conversation_opens_at_the_newest_message_and_stays_where_it_is_left() {
     single_shot(Duration::from_secs(17), move || unsafe {
         // Back from a picture, held on a row up in the history, and the
         // jump button tapped before the hold has run out. A row measured
-        // after the jump used to put the reader straight back.
+        // after the jump would put the reader straight back.
         call!("holdAt", 20);
         call!("jump");
         call!("append", 1);

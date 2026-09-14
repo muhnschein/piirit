@@ -75,11 +75,11 @@ Page {
     // already in the model before the transition starts and the page comes
     // in with its messages rather than filling in behind itself.
     //
-    // This used to wait for PageStatus.Active. It had to: a chat was
-    // fetched whole, and building every row of a long history in one go on
-    // the Qt thread froze the transition. A chat now opens on one page of
-    // fifty, and the prefetch has usually built those rows already -- the
-    // handover is then a move, with no core round trip in it at all.
+    // Not deferred to PageStatus.Active: a chat opens on one page of fifty
+    // rather than whole, so there is no long history to build on the Qt
+    // thread and freeze the transition with. The prefetch has usually built
+    // those rows already, leaving the handover a move with no core round
+    // trip in it at all.
     //
     // In `Component.onCompleted` rather than a binding on the declaration
     // above, because the order matters: this must run after
@@ -683,10 +683,9 @@ Page {
             // same on this side the send button sits nearer the edge.
             rightMargin: Theme.horizontalPageMargin
             bottom: parent.bottom
-            // Off the edge of the screen. The field used to sit on it:
-            // a TextField carries room under its text and a TextArea
-            // does not, so what was a comfortable gap became none. The
-            // recording strip carries less still.
+            // Off the edge of the screen rather than on it: a TextArea
+            // carries no room under its text the way a TextField does,
+            // and the recording strip carries less still.
             bottomMargin: Theme.paddingLarge
         }
         spacing: Theme.paddingSmall
@@ -837,11 +836,9 @@ Page {
     // somebody else's file to open, and a page here that could only say
     // "cannot show this" would be worse than the handover.
     //
-    // A page of its own for a file was tried and taken out again: the
-    // reader's own answer was that there should be no such thing, and
-    // that a page for reading belongs to a long message rather than to
-    // an attachment. What a file still needs and a tap cannot give is a
-    // copy, and that is on the row's menu.
+    // No page of its own for a file: a page for reading belongs to a long
+    // message rather than to an attachment. What a file needs and a tap
+    // cannot give is a copy, and that is on the row's menu.
     function openAttachment(fileUrl, fileName, viewType, previewWidth) {
         if (viewType === "Image" || viewType === "Gif"
                 || viewType === "Sticker") {

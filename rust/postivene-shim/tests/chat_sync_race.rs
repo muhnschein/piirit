@@ -88,9 +88,8 @@ fn a_send_answered_mid_fetch_lands_once() {
     // test never happened. It is the id list that has to have been read,
     // not the message: the send's own reply put the row in, so the
     // reconciliation finds it already there and fetches nothing. That *is*
-    // the duplicate not being made -- it used to be avoided one step later,
-    // by a fetch that then had to notice the row it had just asked for was
-    // already present.
+    // the duplicate not being made, rather than a fetch noticing one step
+    // later that the row it asked for was already present.
     assert!(
         names
             .iter()

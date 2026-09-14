@@ -160,21 +160,6 @@ const PROBE_QML: &str = r"
     }
 ";
 
-type Steps = Rc<RefCell<Vec<(String, String)>>>;
-
-fn record(steps: &Steps, label: &str, value: QString) {
-    steps
-        .borrow_mut()
-        .push((label.to_string(), value.to_string()));
-}
-
-fn value_of<'a>(steps: &'a [(String, String)], label: &str) -> &'a str {
-    steps
-        .iter()
-        .find(|(name, _)| name == label)
-        .map_or("<step did not run>", |(_, value)| value.as_str())
-}
-
 // The engine, the QObject boxes and every step share one scope: all of
 // them have to outlive `exec()`. The assertions are in the helper below.
 #[allow(clippy::too_many_lines)]
@@ -228,12 +213,12 @@ fn a_profile_that_exists_already_is_asked_after_and_brought_over() {
         }};
     }
 
-    let steps: Steps = Rc::new(RefCell::new(Vec::new()));
+    let steps: common::Steps = Rc::new(RefCell::new(Vec::new()));
 
     // 1s: the question, and both answers.
     let s = steps.clone();
     single_shot(Duration::from_secs(1), move || {
-        record(
+        common::record(
             &s,
             "ask-load",
             call!(
@@ -242,31 +227,31 @@ fn a_profile_that_exists_already_is_asked_after_and_brought_over() {
                 "{}"
             ),
         );
-        record(&s, "ask-device", call!("click", "secondDeviceTile"));
-        record(&s, "ask-file", call!("click", "backupFileTile"));
+        common::record(&s, "ask-device", call!("click", "secondDeviceTile"));
+        common::record(&s, "ask-file", call!("click", "backupFileTile"));
         // And the same question asked of a reader who already has a
         // profile, from the plus under the profiles list: three ways
         // rather than two, because making one is the third.
-        record(
+        common::record(
             &s,
             "add-load",
             call!("loadWith", common::page_url("AddProfilePage.qml"), "{}"),
         );
-        record(&s, "add-stacked", call!("get", "addWays", "stacked"));
-        record(&s, "add-header", call!("get", "header", "height"));
-        record(&s, "add-ways-y", call!("get", "addWays", "y"));
-        record(&s, "add-ways-height", call!("get", "addWays", "height"));
-        record(&s, "add-page-height", call!("pageProperty", "height"));
-        record(&s, "add-create", call!("click", "createProfileTile"));
-        record(&s, "add-file", call!("click", "backupFileTile"));
-        record(&s, "add-device", call!("click", "secondDeviceTile"));
+        common::record(&s, "add-stacked", call!("get", "addWays", "stacked"));
+        common::record(&s, "add-header", call!("get", "header", "height"));
+        common::record(&s, "add-ways-y", call!("get", "addWays", "y"));
+        common::record(&s, "add-ways-height", call!("get", "addWays", "height"));
+        common::record(&s, "add-page-height", call!("pageProperty", "height"));
+        common::record(&s, "add-create", call!("click", "createProfileTile"));
+        common::record(&s, "add-file", call!("click", "backupFileTile"));
+        common::record(&s, "add-device", call!("click", "secondDeviceTile"));
     });
 
     // 2s: the file half. The browser is offered, the camera is not, and
     // choosing opens the browser.
     let s = steps.clone();
     single_shot(Duration::from_secs(2), move || {
-        record(
+        common::record(
             &s,
             "file-load",
             call!(
@@ -275,30 +260,30 @@ fn a_profile_that_exists_already_is_asked_after_and_brought_over() {
                 r#"{"from":"file","status":2}"#
             ),
         );
-        record(
+        common::record(
             &s,
             "file-button",
             call!("get", "chooseFileButton", "visible"),
         );
-        record(&s, "file-scanner", call!("get", "scanArea", "visible"));
-        record(&s, "file-choose", call!("click", "chooseFileButton"));
+        common::record(&s, "file-scanner", call!("get", "scanArea", "visible"));
+        common::record(&s, "file-choose", call!("click", "chooseFileButton"));
         // And what the browser reports back: the import starts.
-        record(&s, "file-begin", call!("begin", "/tmp/holiday-backup.tar"));
-        record(&s, "file-busy", call!("pageProperty", "busy"));
+        common::record(&s, "file-begin", call!("begin", "/tmp/holiday-backup.tar"));
+        common::record(&s, "file-busy", call!("pageProperty", "busy"));
     });
 
     // 4s: the core has answered, and the page is on the profile it
     // brought over.
     let s = steps.clone();
     single_shot(Duration::from_secs(4), move || {
-        record(&s, "file-done", call!("pageProperty", "busy"));
+        common::record(&s, "file-done", call!("pageProperty", "busy"));
     });
 
     // 5s: the device half, handed a code from a newer Delta Chat than
     // this core can read.
     let s = steps.clone();
     single_shot(Duration::from_secs(5), move || {
-        record(
+        common::record(
             &s,
             "device-load",
             call!(
@@ -307,7 +292,7 @@ fn a_profile_that_exists_already_is_asked_after_and_brought_over() {
                 r#"{"from":"device","status":2}"#
             ),
         );
-        record(
+        common::record(
             &s,
             "device-button",
             call!("get", "chooseFileButton", "visible"),
@@ -318,17 +303,17 @@ fn a_profile_that_exists_already_is_asked_after_and_brought_over() {
     // a code is handed over -- a transfer takes the viewfinder down.
     let s = steps.clone();
     single_shot(Duration::from_secs(6), move || {
-        record(&s, "device-foot", call!("bottomOf", "scanArea"));
-        record(&s, "device-page", call!("pageProperty", "height"));
-        record(&s, "device-link", call!("viewProperty", "offerLink"));
-        record(&s, "device-hint", call!("get", "hint", "text"));
-        record(&s, "device-typed", call!("get", "typeLinkButton", "text"));
-        record(
+        common::record(&s, "device-foot", call!("bottomOf", "scanArea"));
+        common::record(&s, "device-page", call!("pageProperty", "height"));
+        common::record(&s, "device-link", call!("viewProperty", "offerLink"));
+        common::record(&s, "device-hint", call!("get", "hint", "text"));
+        common::record(&s, "device-typed", call!("get", "typeLinkButton", "text"));
+        common::record(
             &s,
             "device-field",
             call!("get", "linkField", "placeholderText"),
         );
-        record(
+        common::record(
             &s,
             "device-begin",
             call!("scan", "DCBACKUP2:toonew.example"),
@@ -337,22 +322,22 @@ fn a_profile_that_exists_already_is_asked_after_and_brought_over() {
 
     let s = steps.clone();
     single_shot(Duration::from_secs(8), move || {
-        record(&s, "device-busy", call!("pageProperty", "busy"));
-        record(&s, "device-said", call!("pageProperty", "errorMessage"));
+        common::record(&s, "device-busy", call!("pageProperty", "busy"));
+        common::record(&s, "device-said", call!("pageProperty", "errorMessage"));
         // A failure is the page, not a strip along the bottom of a
         // viewfinder that has carried on without it.
-        record(&s, "failed-block", call!("get", "failureBlock", "visible"));
-        record(&s, "failed-scanner", call!("get", "scanArea", "visible"));
-        record(&s, "failed-retry", call!("click", "retryButton"));
+        common::record(&s, "failed-block", call!("get", "failureBlock", "visible"));
+        common::record(&s, "failed-scanner", call!("get", "scanArea", "visible"));
+        common::record(&s, "failed-retry", call!("click", "retryButton"));
     });
 
     // 9s: after the retry the camera is back, and reading again rather
     // than still holding the code it stopped itself on.
     let s = steps.clone();
     single_shot(Duration::from_secs(9), move || {
-        record(&s, "retried-scanner", call!("get", "scanArea", "visible"));
-        record(&s, "retried-holding", call!("viewProperty", "done"));
-        record(&s, "retried-camera", call!("get", "camera", "running"));
+        common::record(&s, "retried-scanner", call!("get", "scanArea", "visible"));
+        common::record(&s, "retried-holding", call!("viewProperty", "done"));
+        common::record(&s, "retried-camera", call!("get", "camera", "running"));
     });
 
     single_shot(Duration::from_secs(10), move || unsafe {
@@ -373,7 +358,7 @@ fn assert_pages(steps: &[(String, String)], navigation: &str) {
     let context = format!("steps: {steps:?}\nnavigation: {navigation}");
 
     assert_eq!(
-        value_of(steps, "ask-load"),
+        common::value_of(steps, "ask-load"),
         "ok",
         "the question did not load. {context}"
     );
@@ -389,23 +374,23 @@ fn assert_pages(steps: &[(String, String)], navigation: &str) {
     );
 
     assert_eq!(
-        value_of(steps, "file-load"),
+        common::value_of(steps, "file-load"),
         "ok",
         "the take-over page did not load. {context}"
     );
     assert_eq!(
-        value_of(steps, "file-button"),
+        common::value_of(steps, "file-button"),
         "true",
         "the file half does not offer the file browser. {context}"
     );
     assert_eq!(
-        value_of(steps, "file-scanner"),
+        common::value_of(steps, "file-scanner"),
         "false",
         "the file half put the camera up anyway. {context}"
     );
     for label in ["add-load", "add-create", "add-file", "add-device"] {
         assert_eq!(
-            value_of(steps, label),
+            common::value_of(steps, label),
             "ok",
             "the page behind the profiles plus does not offer all three \
              ways in: {label}. {context}"
@@ -415,14 +400,15 @@ fn assert_pages(steps: &[(String, String)], navigation: &str) {
     // would get a third of the screen, which is not room for a line of
     // words with a second line under it.
     assert_eq!(
-        value_of(steps, "add-stacked"),
+        common::value_of(steps, "add-stacked"),
         "true",
         "the three ways in are crowded into one row. {context}"
     );
     // And the stack starts under the header rather than sitting in the
     // middle of the page: a list is read from the top, which is where
     // every other list on the phone starts.
-    let measure = |label: &str| -> f64 { value_of(steps, label).parse().unwrap_or_default() };
+    let measure =
+        |label: &str| -> f64 { common::value_of(steps, label).parse().unwrap_or_default() };
     let above = measure("add-ways-y") - measure("add-header");
     let below = measure("add-page-height") - measure("add-ways-y") - measure("add-ways-height");
     assert!(
@@ -439,12 +425,12 @@ fn assert_pages(steps: &[(String, String)], navigation: &str) {
         "choosing a backup did not open the file browser. {context}"
     );
     assert_eq!(
-        value_of(steps, "file-busy"),
+        common::value_of(steps, "file-busy"),
         "true",
         "the import did not start on the file that was chosen. {context}"
     );
     assert_eq!(
-        value_of(steps, "file-done"),
+        common::value_of(steps, "file-done"),
         "false",
         "the page is still transferring after the core has answered. \
          {context}"
@@ -455,7 +441,7 @@ fn assert_pages(steps: &[(String, String)], navigation: &str) {
     );
 
     assert_eq!(
-        value_of(steps, "device-button"),
+        common::value_of(steps, "device-button"),
         "false",
         "the device half offers the file browser as well. {context}"
     );
@@ -473,8 +459,12 @@ fn assert_device_half(steps: &[(String, String)], context: &str) {
     // it is: a page laid out on a phone puts a header and a line of
     // instructions above it, and what matters is that everything left
     // after those is the camera's.
-    let foot: f64 = value_of(steps, "device-foot").parse().unwrap_or(0.0);
-    let page: f64 = value_of(steps, "device-page").parse().unwrap_or(0.0);
+    let foot: f64 = common::value_of(steps, "device-foot")
+        .parse()
+        .unwrap_or(0.0);
+    let page: f64 = common::value_of(steps, "device-page")
+        .parse()
+        .unwrap_or(0.0);
     assert!(
         page > 0.0 && page - foot <= 64.0,
         "the camera stops {} short of the foot of a {page} page, so it \
@@ -486,74 +476,74 @@ fn assert_device_half(steps: &[(String, String)], context: &str) {
     // A camera that will not read is a dead end without this, and the
     // other device shows the same string as text beside its code.
     assert_eq!(
-        value_of(steps, "device-link"),
+        common::value_of(steps, "device-link"),
         "true",
         "the take-over scanner gives a reader no way past a camera that \
          will not read the code. {context}"
     );
-    let typed = value_of(steps, "device-typed");
+    let typed = common::value_of(steps, "device-typed");
     assert!(
         !typed.to_lowercase().contains("invite"),
         "the typed half is still worded for an invite: {typed:?}. \
          {context}"
     );
     assert_eq!(
-        value_of(steps, "device-field"),
+        common::value_of(steps, "device-field"),
         "DCBACKUP2:...",
         "the field does not show what it is waiting for. {context}"
     );
     assert_eq!(
-        value_of(steps, "failed-block"),
+        common::value_of(steps, "failed-block"),
         "true",
         "a failed transfer is not said anywhere the reader will see it. \
          {context}"
     );
     assert_eq!(
-        value_of(steps, "failed-scanner"),
+        common::value_of(steps, "failed-scanner"),
         "false",
         "the camera came straight back over the failure, which reads as \
          the app having carried on. {context}"
     );
     assert_eq!(
-        value_of(steps, "failed-retry"),
+        common::value_of(steps, "failed-retry"),
         "ok",
         "there is no way to have another go. {context}"
     );
     assert_eq!(
-        value_of(steps, "retried-scanner"),
+        common::value_of(steps, "retried-scanner"),
         "true",
         "the retry did not bring the camera back. {context}"
     );
     assert_eq!(
-        value_of(steps, "retried-holding"),
+        common::value_of(steps, "retried-holding"),
         "false",
         "the view is still holding the code it stopped itself on, so it \
          will never read another. {context}"
     );
     assert_eq!(
-        value_of(steps, "retried-camera"),
+        common::value_of(steps, "retried-camera"),
         "true",
         "the retry brought back a viewfinder with the camera off behind \
          it. {context}"
     );
 
-    let hint = value_of(steps, "device-hint");
+    let hint = common::value_of(steps, "device-hint");
     assert!(
         hint.contains("code it shows"),
         "the view still says it is looking for an invite: {hint:?}. \
          {context}"
     );
     assert_eq!(
-        value_of(steps, "device-begin"),
+        common::value_of(steps, "device-begin"),
         "ok",
         "the code from the camera was not acted on. {context}"
     );
     assert_eq!(
-        value_of(steps, "device-busy"),
+        common::value_of(steps, "device-busy"),
         "false",
         "the page waits on a code the shim already refused. {context}"
     );
-    let said = value_of(steps, "device-said");
+    let said = common::value_of(steps, "device-said");
     assert!(
         said.contains("newer"),
         "the refusal was not put into words for the reader: {said:?}. \

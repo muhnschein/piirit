@@ -1,10 +1,10 @@
 //! A message is one surface: a tap opens whatever it has to open, and a
 //! long press anywhere on it -- the picture included -- opens its menu.
 //!
-//! The picture used to take the press for itself, so a long press on it
-//! never reached the row's menu and a tap just off it did nothing. Now
-//! nothing in the row takes a press but the few small controls that need
-//! one, and those hand a long press on to the row.
+//! Nothing in the row takes a press but the few small controls that need
+//! one, and those hand a long press on to the row. A picture taking the
+//! press for itself would keep a long press on it from ever reaching the
+//! row's menu.
 
 // Qt harness: see qml_chat_list.rs.
 #![allow(

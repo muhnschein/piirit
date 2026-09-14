@@ -53,7 +53,7 @@ async fn echoes_arbitrary_json_params() {
 
 /// A line the reader cannot decode is one bad line, not the transport
 /// closing: the answer that follows it, and every call after that, still
-/// arrive. The reader used to end on it and report every pending call as
+/// arrive. A reader ending on it would report every pending call as
 /// `TransportClosed` while the server was still running.
 #[tokio::test]
 async fn an_undecodable_line_does_not_end_the_transport() {
@@ -169,10 +169,10 @@ async fn event_loop_streams_batches_in_order() {
 
     // The server answers the next six polls with an error object. Each is
     // one bad answer, not the transport going away, and the stream has to
-    // carry on past every one of them: the loop used to give up after
-    // five, the shim read the stream ending as the core having died, and
-    // the app then killed a running core to start another. The wait
-    // between attempts backs off, so this takes a few seconds by design.
+    // carry on past every one of them: a loop giving up after five ends the
+    // stream, the shim reads that as the core having died, and the app
+    // kills a running core to start another. The wait between attempts
+    // backs off, so this takes a few seconds by design.
     let eighth = events
         .recv()
         .await

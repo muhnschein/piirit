@@ -1,16 +1,11 @@
 //! Scrolling to the top of a long chat reaches its first message.
 //!
-//! This is the report that took four attempts: going to the beginning of a
-//! busy chat landed somewhere in the middle of it, unpredictably. Three of
-//! those attempts were aimed at the view -- holding the row it was put on,
-//! keeping the control reachable, fixing a race between a jump and a
-//! reconciliation. Each was a real defect and none of them was the cause,
-//! because the cause was the shape: a model holding a moving window of
-//! loaded messages has to have its contents replaced to get anywhere, and
-//! everything about positioning into a model that has just been replaced is
-//! contingent.
+//! The shape is what makes this reliable, not the view: a model holding a
+//! moving window of loaded messages has to have its contents replaced to
+//! get anywhere, and positioning into a model that has just been replaced
+//! is contingent on how fast rows are measured.
 //!
-//! The model now holds a row for every message in the chat. The first
+//! The model holds a row for every message in the chat. The first
 //! message is row 0 from the moment the id list arrives, so reaching it is
 //! scrolling -- there is nothing to fetch, nothing to replace, and nothing
 //! that can put the reader somewhere else. Rows fill in where they stand.
@@ -161,11 +156,11 @@ fn the_top_of_the_view_is_the_first_message_in_the_chat() {
         std::env::set_var("POSTIVENE_ACCOUNTS_DIR", temp.join("accounts"));
         std::env::set_var("POSTIVENE_FAKE_LONG_CHAT", MESSAGES.to_string());
         // Messages long enough to wrap, so filling a row in really does
-        // change its height -- which is what used to carry the reader off.
+        // change its height -- which is what can carry the reader off.
         std::env::set_var("POSTIVENE_FAKE_WORDY", "1");
-        // And the first row a core notice, as a real chat's is: the report
-        // was a date drawn over "messages are end-to-end encrypted", which
-        // is the first row of the first day of every chat there is.
+        // And the first row a core notice, as a real chat's is: a date
+        // drawn over "messages are end-to-end encrypted" is the first row
+        // of the first day of every chat there is.
         std::env::set_var("POSTIVENE_FAKE_INFO_FIRST", "1");
     }
 

@@ -54,29 +54,6 @@ const PROBE_QML: &str = r"
     }
 ";
 
-/// A picture that really is one, so the image can reach `Ready`: an
-/// avatar draws a picture only once it has loaded, and until then it is
-/// the disc and the initial. Any committed PNG would do; this is the
-/// one that is certainly there.
-fn a_real_picture() -> String {
-    std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR"))
-        .join("../../qml/art/faces-portrait.png")
-        .canonicalize()
-        .expect("the committed art is there")
-        .display()
-        .to_string()
-}
-
-fn component_url(name: &str) -> String {
-    format!(
-        "file://{}",
-        std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR"))
-            .join("../../qml/components")
-            .join(name)
-            .display()
-    )
-}
-
 #[test]
 #[allow(clippy::too_many_lines)]
 fn an_avatar_with_news_wears_the_ambiences_colour_rather_than_its_own() {
@@ -115,7 +92,7 @@ fn an_avatar_with_news_wears_the_ambiences_colour_rather_than_its_own() {
     single_shot(Duration::from_secs(1), move || unsafe {
         record!(
             "load",
-            call!("load", QString::from(component_url("Avatar.qml")))
+            call!("load", QString::from(common::component_url("Avatar.qml")))
         );
         record!(
             "initial",
@@ -138,7 +115,7 @@ fn an_avatar_with_news_wears_the_ambiences_colour_rather_than_its_own() {
         call!(
             "set",
             QString::from("picturePath"),
-            QString::from(a_real_picture())
+            QString::from(common::a_real_picture())
         );
     });
 

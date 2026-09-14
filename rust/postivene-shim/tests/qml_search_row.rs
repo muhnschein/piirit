@@ -81,16 +81,6 @@ const PROBE_QML: &str = r"
     }
 ";
 
-fn component_url(name: &str) -> String {
-    format!(
-        "file://{}",
-        std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR"))
-            .join("../../qml/components")
-            .join(name)
-            .display()
-    )
-}
-
 #[test]
 #[allow(clippy::too_many_lines)]
 fn a_long_result_stays_inside_the_screen() {
@@ -134,7 +124,7 @@ fn a_long_result_stays_inside_the_screen() {
             "load",
             call!(
                 "load",
-                QString::from(component_url("SearchResultRow.qml")),
+                QString::from(common::component_url("SearchResultRow.qml")),
                 ROW_WIDTH
             )
         );

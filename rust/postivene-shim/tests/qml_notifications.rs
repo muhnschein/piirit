@@ -95,16 +95,6 @@ const PROBE_QML: &str = r"
     }
 ";
 
-fn component_url(name: &str) -> String {
-    format!(
-        "file://{}",
-        std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR"))
-            .join("../../qml/components")
-            .join(name)
-            .display()
-    )
-}
-
 #[test]
 #[allow(clippy::too_many_lines)]
 fn a_message_is_announced_unless_the_reader_is_already_in_that_chat() {
@@ -154,7 +144,7 @@ fn a_message_is_announced_unless_the_reader_is_already_in_that_chat() {
     single_shot(Duration::from_secs(1), move || unsafe {
         record!(
             "load",
-            call!("load", QString::from(component_url("Notifier.qml")))
+            call!("load", QString::from(common::component_url("Notifier.qml")))
         );
         call!("set", QString::from("appActive"), true);
         call!("set", QString::from("viewingChatId"), 0);

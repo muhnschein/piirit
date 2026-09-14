@@ -5,11 +5,11 @@
 //! chat out of it, and makes a row nobody can scroll past. So the row
 //! shows the first few lines and offers the rest on a page of its own.
 //!
-//! Opening one out in place was offered too, and is not any more. It was
-//! a second way to read the same words and the worse of the two: it made
-//! exactly the row nobody can scroll past, and folding it again had to
-//! put the reader back where they had been by hand. The page shows the
-//! whole message and leaving it puts them back.
+//! A page rather than an unfold in place, which would be a second way to
+//! read the same words and the worse of the two: it makes exactly the row
+//! nobody can scroll past, and folding it again has to put the reader back
+//! by hand. The page shows the whole message and leaving it puts them
+//! back.
 //!
 //! What this pins is where the offer appears and where it does not: a
 //! short message must not grow two words of chrome it has no use for,
@@ -284,7 +284,7 @@ fn a_long_body_is_cut_to_a_few_lines_with_the_rest_on_a_page() {
         );
         record!("cut-height", call!("ask", QString::from("height")));
         // Forty short lines: the bubble is as wide as its widest line, so
-        // this is the narrow one the offer used to hang out of.
+        // this is the narrow case the offer must not hang out of.
         call!("set", QString::from("hasHtml"), false);
         call!(
             "set",

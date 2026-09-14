@@ -6,13 +6,10 @@ BackgroundItem 1.0 BackgroundItem.qml
 Button 1.0 Button.qml
 Column 1.0 Column.qml
 ComboBox 1.0 ComboBox.qml
-DetailItem 1.0 DetailItem.qml
 Dialog 1.0 Dialog.qml
 DialogHeader 1.0 DialogHeader.qml
 GridItem 1.0 GridItem.qml
 ContextMenu 1.0 ContextMenu.qml
-CoverAction 1.0 CoverAction.qml
-CoverActionList 1.0 CoverActionList.qml
 CoverBackground 1.0 CoverBackground.qml
 IconButton 1.0 IconButton.qml
 Label 1.0 Label.qml
@@ -20,11 +17,9 @@ ListItem 1.0 ListItem.qml
 MenuItem 1.0 MenuItem.qml
 Page 1.0 Page.qml
 PageHeader 1.0 PageHeader.qml
-PasswordField 1.0 PasswordField.qml
 ProgressBar 1.0 ProgressBar.qml
 PullDownMenu 1.0 PullDownMenu.qml
 RemorseItem 1.0 RemorseItem.qml
-RemorsePopup 1.0 RemorsePopup.qml
 SearchField 1.0 SearchField.qml
 SectionHeader 1.0 SectionHeader.qml
 SilicaFlickable 1.0 SilicaFlickable.qml

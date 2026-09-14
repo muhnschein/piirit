@@ -58,27 +58,6 @@ const PROBE_QML: &str = r"
     }
 ";
 
-/// A picture that really is one, so the image can reach `Ready`. Any
-/// committed PNG would do; this is the one that is certainly there.
-fn a_real_picture() -> String {
-    std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR"))
-        .join("../../qml/art/faces-portrait.png")
-        .canonicalize()
-        .expect("the committed art is there")
-        .display()
-        .to_string()
-}
-
-fn component_url(name: &str) -> String {
-    format!(
-        "file://{}",
-        std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR"))
-            .join("../../qml/components")
-            .join(name)
-            .display()
-    )
-}
-
 #[test]
 fn a_picture_avatar_is_drawn_through_a_round_mask() {
     // SAFETY: single-threaded test binary; set before Qt starts.
@@ -121,7 +100,10 @@ fn a_picture_avatar_is_drawn_through_a_round_mask() {
     single_shot(Duration::from_secs(1), move || unsafe {
         record!(
             "load",
-            call!("load", QString::from(component_url("ChatListDelegate.qml")))
+            call!(
+                "load",
+                QString::from(common::component_url("ChatListDelegate.qml"))
+            )
         );
         record!(
             "name",
@@ -141,7 +123,7 @@ fn a_picture_avatar_is_drawn_through_a_round_mask() {
             call!(
                 "set",
                 QString::from("avatarPath"),
-                QString::from(a_real_picture())
+                QString::from(common::a_real_picture())
             )
         );
         record!("loading-initial", get!("avatarInitial", "visible"));

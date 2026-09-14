@@ -94,8 +94,7 @@ step covers the first group; the rest is "Before submitting" below.
 
 The sharpest example is the `__libc_start_main` version: it depends
 entirely on which SDK built the binary, so no reading of the sources can
-predict it, and it went unnoticed until the first real package went
-through the real validator.
+predict it and only the real validator on a built package can answer it.
 
 - The `Requires:` and `Provides:` **rpm generates** from the binary, as
   opposed to the ones the spec states.
@@ -187,8 +186,7 @@ it -- a setuid bit or a dynamic link on the bundled server would still
 fail.
 
 A waiver that stops matching anything fails the check, so the file cannot
-outlive what it excuses. Its entries cover the two blockers below --
-removing the QtWidgets waiver is what the fix above had to do to land.
+outlive what it excuses. Its entries cover the two blockers below.
 
 ## QtWidgets, and the vendored qmetaobject
 
@@ -217,20 +215,17 @@ patch, and requires the result to match the vendored tree exactly. A stray
 edit fails it; so does a patch that stops describing the tree.
 
 The crate's own `tests/` are not vendored, and the check drops them from
-both sides. Cargo never builds a dependency's tests, so they were 1,200
-lines that could not run -- and CodeQL scanned them anyway and reported
-seven high-severity findings in code this repository does not compile.
+both sides. Cargo never builds a dependency's tests, so they are 1,200
+lines that cannot run, and CodeQL would scan them anyway and report
+high-severity findings in code this repository does not compile.
 
-The same scanner reports the same kind of finding on our own code, and it
-is worth knowing before spending an afternoon on it. **Every
+The same scanner reports the same kind of finding on our own code. **Every
 `#[derive(QObject)]` a pull request adds draws a high-severity "Access of
 invalid pointer" alert**, on the `#[derive]` line itself: the macro
 generates the dispatcher and destructor Qt calls through raw pointers, and
-CodeQL attributes expanded code to the macro. It follows the derive rather
-than the file -- moving one from `tests/qml_media_pages.rs` into
-`tests/common/mod.rs` moved the alert with it. The derives already
-throughout `src/` do not report, only because CodeQL comments on lines a
-pull request changed.
+CodeQL attributes expanded code to the macro. The alert follows the derive
+rather than the file, and the derives already throughout `src/` do not
+report only because CodeQL comments on lines a pull request changed.
 
 Nothing in the code answers it. Test scaffolding that stands in for a
 `pageStack` has to be a QObject, because a page loaded on its own reads
@@ -318,10 +313,10 @@ removed from the store even after approval. Not an option.
    and that the notice appears once the draft passes about forty lines.
    Then turn on Settings > Messages > "Enter sends the message" and
    check the other half: the keyboard draws the key as the accept key,
-   greyed while the field is empty, a press sends, and nothing of the
-   line break the key used to put in is left behind in the field or in
-   the message -- what Silica does with that break is Silica's, and the
-   headless tests load the page with the `EnterKey` lines taken out.
+   greyed while the field is empty, a press sends, and no line break is
+   left behind in the field or in the message -- what Silica does with
+   that break is Silica's, and the headless tests load the page with the
+   `EnterKey` lines taken out.
    Send it, and check at the other end that its line breaks are line
    breaks, that the bubble folds it, and that View full message shows
    the whole of it -- including for a message another client sent long enough that
@@ -330,14 +325,13 @@ removed from the store even after approval. Not an option.
    Deleting is a device path three times over: for the timing, for the
    look, and for the two agreeing. Delete four messages one after
    another, faster than the four seconds each waits, and check that all
-   four go: the wait used to belong to the row, and deleting the message
-   above a waiting row took its wait with it, so most of a run never
-   went at all.
+   four go: the wait belongs to the list rather than the row, so deleting
+   the message above a waiting row cannot take its wait with it.
    Watch them go one at a time, in the order they were asked for, each
-   as its own countdown ends. They shared one countdown once, restarted
-   on every new delete, so a message's countdown would run out, the
-   message would come back as though nothing had happened, and the lot
-   would go together at the end. Deleting a single message looked right
+   as its own countdown ends. Every id carries its own deadline; one
+   countdown shared between them and restarted on each new delete would
+   let a message's countdown run out, put that message back, and send
+   the lot together at the end. Deleting a single message looks right
    the whole time that was true, so delete two a second apart and watch
    the first one specifically.
    The look is Silica's own countdown and has to be indistinguishable
@@ -467,7 +461,7 @@ removed from the store even after approval. Not an option.
    that swiping past the last fact lands in the setup screen rather
    than rubber banding back. Then turn the phone on that last fact and
    check it stays put: the view moves when the screen does, and that
-   used to carry the reader off the page with no finger on it. "Set up
+   must not carry the reader off the page with no finger on it. "Set up
    my profile" is that same setup screen. "I already have a profile"
    asks where it is, and both answers want two devices to check
    properly: with another Delta Chat holding a profile, open its
@@ -504,9 +498,9 @@ removed from the store even after approval. Not an option.
    thirty the page gives up on its own, saying which relay did not
    answer and in how long, with the hint still there and Back under it.
    Then go back, pick a relay from the list, and check that the profile
-   is made -- that retry used to fail with "There is already another
-   ongoing process running", the core still being on the first relay,
-   and now takes a fresh account (`signup.rs`). Cancel during a wait
+   is made: the retry takes a fresh account (`signup.rs`) rather than
+   failing with "There is already another ongoing process running" while
+   the core is still on the first relay. Cancel during a wait
    should go back at once, and a profile the first relay makes after
    all must not appear in the profiles list.
 5. Delete the cache directory while the app runs; confirm nothing breaks.

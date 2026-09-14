@@ -118,8 +118,8 @@ Page {
     // conversation attaches a photo: the Attach*Page files are the only
     // ones that name a `Sailfish.Pickers` type, so a type that is not
     // there costs this button rather than the page. That page also
-    // ignores a cancelled pick, which this one used to hand to the core
-    // as `undefined`.
+    // ignores a cancelled pick, so the core is never handed an
+    // `undefined` path.
     function pickPicture() {
         var picker = pageStack.push(Qt.resolvedUrl("AttachPhotoPage.qml"))
         if (picker) {

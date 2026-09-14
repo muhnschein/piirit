@@ -28,33 +28,28 @@ const UNSEEN_STATES: [u32; 2] = [10, 13];
 /// message from the moment that list arrives, and fills in only the ones
 /// somebody is looking at.
 ///
-/// That is what makes the first message row 0 and keeps it there. The model
-/// used to hold a moving window of loaded messages instead, and every way
-/// of getting somewhere in a chat meant replacing its contents: the view's
-/// idea of where it was went with them, positioning into a model that had
-/// just been reset was unreliable in ways that depended on how fast rows
-/// were measured, and a reconciliation that overlapped a move undid it. It
-/// took three attempts at the symptoms to be sure the shape was the fault.
-/// Whisperfish and deltachat-android both keep the whole conversation
-/// addressable and neither has any of this.
+/// That is what makes the first message row 0 and keeps it there. A moving
+/// window of loaded messages instead would mean replacing the model's
+/// contents to get anywhere in a chat, taking the view's idea of where it
+/// was with them. Whisperfish and deltachat-android keep the whole
+/// conversation addressable for the same reason.
 const PAGE: usize = 50;
 
 /// How far beyond what the reader can see to fill in, so that scrolling
 /// does not walk into blank rows before the next fetch answers.
 ///
 /// In rows, and a placeholder is one line tall, so a screen of them is
-/// thirty-odd rows: a margin smaller than a screen ran out in the middle
-/// of one on a fast scroll, and the rest of the screen waited for the next
-/// round trip.
+/// thirty-odd rows. Smaller than a screen and a fast scroll walks into
+/// blanks halfway down one, with the rest waiting on the next round trip.
 const MARGIN: usize = 40;
 
 /// How many fetches may be in the air at once.
 ///
-/// One was not enough. A reader flinging up through the history moves
-/// faster than a round trip, and a fetch for rows they have already passed
-/// held up the fetch for the rows in front of them until it landed -- which
-/// was a screen of blanks for as long as that took. Bounded, so a long
-/// flick asks for what it passes over rather than for everything at once.
+/// More than one, because a reader flinging up through the history moves
+/// faster than a round trip: with a single fetch in the air, one for rows
+/// already passed holds up the rows in front of them until it lands, and
+/// the screen stays blank meanwhile. Bounded, so a long flick asks for
+/// what it passes over rather than for everything at once.
 const IN_FLIGHT: usize = 4;
 
 /// A message as the id list knows it: which message, and which day it is
@@ -622,8 +617,8 @@ impl ChatMessages {
                 let entries = message_entries(&rpc, account_id, chat_id).await?;
                 // A row for every message, but the content of only one
                 // page. Ten thousand rows is a vector of ids; ten thousand
-                // *messages* is what used to be built on the Qt thread
-                // before the page could show any of them.
+                // *messages* would be built on the Qt thread before the
+                // page could show any of them.
                 let items =
                     fetch_messages(&rpc, account_id, &ids_of(opening_page(&entries, 0))).await?;
                 // Marking read is the callback's job, not this one's: what
@@ -938,9 +933,8 @@ impl ChatMessages {
     /// stands as. Not only at the end: the core sorts a received message
     /// below the newest *seen* message and no further, so while the reader
     /// is up in the history a late message in a busy group lands among the
-    /// unread ones. That used to count as a reorder and start the model
-    /// over, which emptied every row the reader had filled in and lost
-    /// them their place.
+    /// unread ones. Counting that as a reorder would start the model over,
+    /// emptying every row the reader had filled in and losing their place.
     fn synced(&mut self, entries: &[Entry]) {
         let current: Vec<u32> = self
             .rows

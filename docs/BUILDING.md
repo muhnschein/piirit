@@ -134,12 +134,11 @@ laptop is a green CI.
 The scanner **imports** coverage; it does not measure it. `make
 sonar-reports` writes `rust/target/sonar/lcov.info` with `cargo llvm-cov`
 over the whole workspace, and the workflow runs it before the scan. Without
-it the reading is a confident 0.0% rather than "no data", which is what it
-read for as long as nothing wrote a report. The target needs
+it the reading is a confident 0.0% rather than "no data". The target needs
 `cargo-llvm-cov`, so it is opt-in rather than part of `make check`. It runs
 the suite under `cargo-nextest` when that is installed too, for the reason
-`make test` does: cargo-llvm-cov's own runner is `cargo test`, one binary
-at a time, and instrumented that was ten minutes of the scan job. Without
+`make test` does: cargo-llvm-cov's own runner is `cargo test`, one binary at
+a time, which instrumented costs the scan job about ten minutes. Without
 nextest the report is still written, the slow way.
 
 ```
@@ -154,16 +153,15 @@ invokes cargo where it finds the project, and this workspace is under
 `rust/`, not at the root, so it would run a different clippy from the one
 that gates this project -- or none. And a report of our own would be empty:
 `make lint` denies warnings, so a warning in this project's code fails the
-gate and never reaches a branch Sonar analyses. One was produced and held
-four diagnostics, all in `third_party/qmetaobject`, which is excluded
-anyway. Producing it cost a `cargo clean` and a full recompile inside the
-scan job.
+gate and never reaches a branch Sonar analyses, leaving only findings in
+`third_party/qmetaobject`, which is excluded anyway. Producing one costs a
+`cargo clean` and a full recompile inside the scan job.
 
 `sonar.tests` separates the fixtures from the application, so coverage and
 duplication are measured on what ships. That matters more here than in most
-trees, because the rule above is that test volume exceeds source volume:
-indexed as main sources, the fixtures were most of what every ratio was
-computed over. `sonar.exclusions` drops the vendored crates, the patched
+trees, because test volume exceeds source volume: indexed as main sources,
+the fixtures would be most of what every ratio was computed over.
+`sonar.exclusions` drops the vendored crates, the patched
 qmetaobject, the rendered icons, and `translations/` -- a Qt catalog is
 named `.ts`, so the scanner reads thirty-nine of them as TypeScript.
 `sonar.coverage.exclusions` keeps `qml/` out of the coverage arithmetic
@@ -188,27 +186,25 @@ the runners are worth knowing.
 
 **Packages come through `ci/apt-install.sh`**, not a bare `apt-get`.
 `apt-get update` exits non-zero when *any* configured repository fails, and
-the runner image ships several this project never installs from. On
-2026-09-09 Google Chrome's index served a hash that did not match its own
-Release file, and every job died before installing anything or running a
-test; nothing in this repository had changed. The script drops the
+the runner image ships several this project never installs from -- so one
+of them serving a bad index kills every job before a test runs, with
+nothing in this repository having changed. The script drops the
 third-party lists first, keeping Ubuntu's wherever the image puts them --
 a list survives only if something in it names an `ubuntu.com` host, which
 is what stops it deleting the archive it is about to install from.
 
 **The Rust jobs cache their `target/`** (`Swatinem/rust-cache`, scoped to
-the `rust` workspace). Every job used to compile the whole dependency
+the `rust` workspace); without it every job compiles the whole dependency
 graph from nothing on every push. `msrv` carries a cache key of its own
 because it builds with `+1.75.0` while the action keys on the default
 toolchain, and without it the two would share a slot and neither would
 ever hit. `CARGO_INCREMENTAL: 0` because a runner compiles once and throws
 the machine away, so incremental state is written, cached and never read.
 
-Caching was measured and is worth less than it looks: with a warm cache
-clippy compiles the workspace in about twenty seconds, but the `test` job
-barely moved, because compilation was never its cost. Ten of its twelve
-minutes were the suite waiting on timers, which is what nextest addresses
-above.
+Caching is worth less than it looks: with a warm cache clippy compiles the
+workspace in about twenty seconds, but the `test` job barely moves, because
+compilation is not its cost -- most of its time is the suite waiting on
+timers, which is what nextest addresses above.
 
 **The test job installs `cargo-nextest`** and runs the suite under the
 `ci` profile, which differs from a laptop's in two ways: `fail-fast` is
@@ -365,14 +361,13 @@ together took 30 s and now take 3.
 
 A target here is two rootfs -- the pristine one, and the `<target>.default`
 snapshot that mb2 actually builds in and that `build-requires` installs
-into. Both are kept. Deleting the snapshot as a redundant copy is what
-made the first derived image come out with no rust in it.
+into. Both are kept: deleting the snapshot as a redundant copy leaves the
+image with no rust in it.
 
 `sdk-image.yml` publishes the image to the repository's registry; `rpm.yml`
 derives and publishes one itself when it finds none, so a new SDK version
 needs a pinned digest in `ci/build-sdk-image.sh` and nothing else. That
-first run pays for it: run 97 took 850 s, of which 576 was deriving and
-pushing.
+first run pays for it: about 850 s, of which 576 is deriving and pushing.
 
 **`rust/target` and the crates are carried between runs.** Keyed on the
 lockfile and on the image, because they are artifacts for one target triple
@@ -384,17 +379,16 @@ content, so only the path crates rebuild. The two caches are small, 112 MB
 and 12 MB.
 
 **cargo runs four jobs inside scratchbox2**, which is worth another 60 s.
-See the job count under "Spec constraints" below for what that setting is
-and why it was one for so long.
+See the job count under "Spec constraints" below for what that setting is.
 
 ## Spec constraints
 
-Landmines encoded in `rpm/harbour-postivene.spec`, each found the hard way:
+Constraints encoded in `rpm/harbour-postivene.spec`:
 
-- **The cargo job count under sb2 is a define.** At `-j4`
-  cargo was seen to futex-wait forever on an unreaped child while
-  qmetaobject's C++ glue compiled, and `%{jobs}` exists so that is a
-  setting rather than a rediscovery: `mb2 build --define "jobs N"`, which
+- **The cargo job count under sb2 is a define.** At `-j4` cargo can
+  futex-wait forever on an unreaped child while qmetaobject's C++ glue
+  compiles, so `%{jobs}` makes the count a setting rather than a
+  rediscovery: `mb2 build --define "jobs N"`, which
   is what `rpm.yml`'s `cargo_jobs` input passes. It applies only inside
   sb2; a native OBS worker lets cargo pick. The same spec also keeps the
   build's temporaries in the build directory, because a parallel link
@@ -403,8 +397,7 @@ Landmines encoded in `rpm/harbour-postivene.spec`, each found the hard way:
 
   It defaults to **4**, which device builds have run green on the 5.2 SDK
   (runs 99 and 100) and which takes the `Build the RPM` step from 142 s to
-  82 s. If one ever hangs there again, `--define "jobs 1"` is the way
-  back, and that is the whole reason the number is a setting.
+  82 s. `--define "jobs 1"` is the way back if one ever hangs.
 
   Why it is worth so much: CPU time equals wall time at `-j1`, because
   cargo hands rustc its codegen threads from the same jobserver, so one
@@ -435,5 +428,5 @@ Landmines encoded in `rpm/harbour-postivene.spec`, each found the hard way:
 - **No bare `%` in a spec comment.** rpm expands macros inside comments, and
   on the SDK's older rpm a comment mentioning `%build` expands to a preamble
   starting `LANG=C`, which rpm reads as a tag. Host rpm 4.18 leaves comments
-  alone and had parsed the same file through an entire successful build.
+  alone, so such a spec parses locally and fails only on the SDK.
   `ci/packaging-lint.sh` checks for this directly.

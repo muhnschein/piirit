@@ -1,6 +1,6 @@
 //! What a contact row shows. The contact lists sit one tap from the chat
-//! list and used to look like a different application; this pins the marks
-//! they now share.
+//! list, so this pins the marks the two share rather than letting them
+//! drift into looking like different applications.
 
 // Qt harness: see qml_chat_row.rs.
 #![allow(
@@ -47,16 +47,6 @@ const PROBE_QML: &str = r"
     }
 ";
 
-fn component_url(name: &str) -> String {
-    format!(
-        "file://{}",
-        std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR"))
-            .join("../../qml/components")
-            .join(name)
-            .display()
-    )
-}
-
 #[test]
 fn a_contact_row_marks_who_can_be_written_to_encrypted() {
     // SAFETY: single-threaded test binary; set before Qt starts.
@@ -94,7 +84,10 @@ fn a_contact_row_marks_who_can_be_written_to_encrypted() {
     single_shot(Duration::from_secs(1), move || unsafe {
         record!(
             "load",
-            call!("load", QString::from(component_url("ContactRow.qml")))
+            call!(
+                "load",
+                QString::from(common::component_url("ContactRow.qml"))
+            )
         );
         call!("set", QString::from("displayName"), QString::from("Ada"));
         call!(

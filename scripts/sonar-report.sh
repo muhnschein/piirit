@@ -24,14 +24,12 @@
 # -- which is also what makes this testable against a stub server, as
 # ci/sonar-report-selftest.sh does.
 #
-# Taken from the sibling project vuo, which hit all of this first. The
-# comments below are its scars, kept because they are the reasons.
+# Taken from the sibling project vuo.
 set -euo pipefail
 
 # `${1:-default}` and `${VAR:+...}` are avoided throughout. Not taste:
-# SonarQube's own shell analyser cannot parse them -- it reported "Syntax
-# error at 121:63" on the first version of this file and then analysed none
-# of it. A script that turns off the checker it ships beside is not clever.
+# SonarQube's own shell analyser cannot parse them and gives up on the whole
+# file. A script that turns off the checker it ships beside is not clever.
 if [[ "$#" -ge 1 ]]; then
     TASK_FILE=$1
 else
@@ -83,9 +81,8 @@ BODY=$(mktemp)
 # Ask, with credentials when there are any.
 #
 # SonarQube Cloud answers 404 -- not 403 -- for a resource the caller may not
-# read, and the first version of this script took that at face value: it
-# treated 404 as "no such thing", never retried with the token, and reported
-# nothing at all. So the token goes FIRST now. The scanner itself reads these
+# read, so a 404 taken at face value reads as "no such thing" and nothing is
+# ever reported. The token therefore goes FIRST. The scanner itself reads these
 # same endpoints with the analysis token when `sonar.qualitygate.wait` is set,
 # which makes it the likelier of the two to be allowed; anonymous is the
 # fallback, for a public project where the token lacks browse rights.

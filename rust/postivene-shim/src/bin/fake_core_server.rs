@@ -650,9 +650,9 @@ const LONG_MESSAGE_HEAD: &str = "# Groceries";
 /// The newlines matter and are why they are here. The core's own
 /// template puts its head on lines of its own, and turns each newline of
 /// the message into `<br/>` *followed by a newline* -- so a reader that
-/// counts both gets a blank line between every line of the message. This
-/// fixture used to be one unbroken line, and a to-do list arrived on the
-/// phone double-spaced with nothing here to notice.
+/// counts both gets a blank line between every line of the message. Written
+/// out on one line here, that double-spacing would reach the phone with
+/// nothing in the suite to notice it.
 const LONG_MESSAGE_HTML: &str = "<!DOCTYPE html>\n\
      <html><head>\n\
      <meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" />\n\
@@ -1302,16 +1302,6 @@ async fn serve() {
                                   "contactId": SELF, "msgId": msg},
                     }));
                     ok(&id, &json!(carrier))
-                }
-                "get_message_reactions" => {
-                    let msg = positional(1)
-                        .as_u64()
-                        .and_then(|value| u32::try_from(value).ok())
-                        .unwrap_or_default();
-                    let mut state = state.lock().await;
-                    state.seed_chats();
-                    let reactions = state.reactions_object(msg);
-                    ok(&id, &reactions)
                 }
                 // A join and a one-to-one both end in a fresh chat at the top.
                 "create_chat_by_contact_id" | "secure_join" => {

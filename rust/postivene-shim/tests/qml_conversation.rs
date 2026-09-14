@@ -61,16 +61,6 @@ const PROBE_QML: &str = r"
     }
 ";
 
-fn component_url(name: &str) -> String {
-    format!(
-        "file://{}",
-        std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR"))
-            .join("../../qml/components")
-            .join(name)
-            .display()
-    )
-}
-
 #[test]
 #[allow(clippy::too_many_lines)]
 fn a_message_shows_its_sender_time_quote_and_attachment() {
@@ -122,7 +112,10 @@ fn a_message_shows_its_sender_time_quote_and_attachment() {
     single_shot(Duration::from_secs(1), move || unsafe {
         record!(
             "load",
-            call!("load", QString::from(component_url("MessageDelegate.qml")))
+            call!(
+                "load",
+                QString::from(common::component_url("MessageDelegate.qml"))
+            )
         );
         set!("messageText", QString::from("hello there"));
         set!("senderName", QString::from("Ada Lovelace"));

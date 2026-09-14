@@ -1,15 +1,12 @@
 //! Each message deleted goes when its own wait is up, not when the last
 //! one's is.
 //!
-//! Reported from a phone, and it was a design mistake rather than an
-//! accident: the list kept one countdown for everything waiting and
-//! restarted it on every new delete. So deleting one message and then
-//! another a second later meant the first message's countdown ran out,
-//! the platform put the message back as though nothing had happened, and
-//! then both went together when the second countdown ended. One delete
-//! on its own looked right, which is why it took a phone to see.
+//! One countdown kept for everything waiting would have to be restarted on
+//! each new delete, so the first message's countdown runs out, the platform
+//! puts that message back, and both go together when the second countdown
+//! ends. A single delete never shows the difference.
 //!
-//! Every id carries its own deadline now, and the timer is armed for
+//! Every id carries its own deadline, and the timer is armed for
 //! whichever is soonest. What this pins is the shape a shared countdown
 //! cannot produce: asked a second apart, the first is gone while the
 //! second is still waiting.

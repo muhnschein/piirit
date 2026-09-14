@@ -3,8 +3,11 @@
 // Not every test uses every helper.
 #![allow(dead_code)]
 
+use std::cell::RefCell;
 use std::path::{Path, PathBuf};
+use std::rc::Rc;
 
+use qmetaobject::QString;
 use serde_json::Value;
 
 /// Every recorded call, in order. A line that does not parse is a torn
@@ -91,13 +94,6 @@ pub fn page_url(name: &str) -> String {
 ///
 /// The copy is keyed by process id and rebuilt each time, so it never
 /// serves a stale page from an earlier run.
-///
-/// No page uses `EnterKey` today: the conversation's field became one
-/// that takes line breaks, so the return key belongs to the message
-/// rather than to sending it, and the last two lines this stripped went
-/// with it. The copy stays because a page that wants the keyboard to
-/// show a Send key is a reasonable thing to write again, and every test
-/// that loads a page loads it through here.
 pub fn qml_tree_without_enter_key() -> PathBuf {
     let source = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../qml");
     let target = std::env::temp_dir().join(format!("postivene-qml-{}", std::process::id()));
@@ -130,4 +126,70 @@ fn copy_qml_without_enter_key(source: &Path, target: &Path) {
 /// A `file://` URL for a page inside a copied tree.
 pub fn page_url_in(tree: &Path, name: &str) -> String {
     format!("file://{}", tree.join("pages").join(name).display())
+}
+
+/// The committed art, which the intro and welcome pages draw from.
+pub fn art_dir() -> PathBuf {
+    PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../qml/art")
+}
+
+/// Width, height, bit depth, colour type and interlace byte of a committed
+/// PNG, read straight out of its IHDR rather than through an image crate.
+pub fn png_header(file: &str) -> (u32, u32, u8, u8, u8) {
+    let bytes = std::fs::read(art_dir().join(file))
+        .unwrap_or_else(|err| panic!("qml/art/{file} is missing ({err}); it is committed art"));
+    assert_eq!(
+        &bytes[..8],
+        b"\x89PNG\r\n\x1a\n",
+        "qml/art/{file} is not a PNG"
+    );
+    assert_eq!(
+        &bytes[12..16],
+        b"IHDR",
+        "qml/art/{file} does not start with IHDR"
+    );
+    let at = |offset: usize| {
+        u32::from_be_bytes([
+            bytes[offset],
+            bytes[offset + 1],
+            bytes[offset + 2],
+            bytes[offset + 3],
+        ])
+    };
+    (at(16), at(20), bytes[24], bytes[25], bytes[28])
+}
+
+/// A picture that really is one, so an `Image` can reach `Ready`. Any
+/// committed PNG would do; this is the one that is certainly there.
+pub fn a_real_picture() -> String {
+    art_dir()
+        .join("faces-portrait.png")
+        .canonicalize()
+        .expect("the committed art is there")
+        .display()
+        .to_string()
+}
+
+/// Each step and what it recorded. One step per tick: the shim answers
+/// asynchronously and `single_shot` only handles whole seconds.
+pub type Steps = Rc<RefCell<Vec<(String, String)>>>;
+
+/// Push one step's result onto [`Steps`].
+// By value rather than by reference: every call site hands over a `QString`
+// the `call!` macro has just built, and asking each of them to borrow it
+// buys nothing.
+#[allow(clippy::needless_pass_by_value)]
+pub fn record(steps: &Steps, label: &str, value: QString) {
+    steps
+        .borrow_mut()
+        .push((label.to_string(), value.to_string()));
+}
+
+/// What one labelled step recorded, or a legible stand-in when the step
+/// never ran at all.
+pub fn value_of<'a>(steps: &'a [(String, String)], label: &str) -> &'a str {
+    steps
+        .iter()
+        .find(|(name, _)| name == label)
+        .map_or("<step did not run>", |(_, value)| value.as_str())
 }

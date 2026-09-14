@@ -78,13 +78,12 @@ SilicaListView {
 
     /// Ask for rows a moment from now, unless an ask is already on its way.
     ///
-    /// Started, never restarted. A flick changes `contentY` every frame,
-    /// and a timer restarted on each of them did not fire until the flick
-    /// had stopped -- so nothing was fetched for as long as the reader was
-    /// moving, and a fast scroll up into the history ended on a screen of
-    /// blanks that filled in a moment later. Left to run, the timer fires
-    /// every sixty milliseconds of a flick instead, and the rows in front
-    /// of the reader are asked for while they are still on their way there.
+    /// Started, never restarted. A flick changes `contentY` every frame, so
+    /// a timer restarted on each of them would not fire until the flick had
+    /// stopped, and a fast scroll into the history would end on a screen of
+    /// blanks. Left to run, it fires every sixty milliseconds of a flick
+    /// instead, and the rows in front of the reader are asked for while
+    /// they are still on their way there.
     function askSoon() {
         if (!fillRows.running) {
             fillRows.start()
@@ -453,13 +452,12 @@ SilicaListView {
     }
 
     // A held row is let go of when the reader takes the view over, and
-    // otherwise not until this. There used to be a shorter timer as well,
-    // restarted on each change, on the reasoning that the hold should last
-    // exactly as long as the content was still moving -- but a device does
-    // not move its content in one run. It lays the rows out, goes quiet
-    // while a picture decodes, and moves them again; the gap was longer
-    // than the timer, so the hold was gone by the time the reader was
-    // carried off. Holding a view nobody is touching costs nothing.
+    // otherwise not until this. No shorter timer sized to the movement
+    // itself: a device does not move its content in one run -- it lays the
+    // rows out, goes quiet while a picture decodes, and moves them again --
+    // so such a timer expires in the gap and the hold is gone by the time
+    // the reader is carried off. Holding a view nobody is touching costs
+    // nothing.
     Timer {
         id: holdDeadline
         interval: 6000

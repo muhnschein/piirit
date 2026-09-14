@@ -1,10 +1,8 @@
 //! What a chat is: its name, its picture and who is in it.
 //!
-//! One model for both kinds of chat. A group's name, picture and members can
-//! be changed here -- creating one used to be the only thing the app could
-//! do to it, and `add_contact_to_chat` was reachable from nowhere but
-//! `create_group`. A one-to-one chat has one member, the contact, and the
-//! same model reads them so the contact page needs nothing of its own.
+//! One model for both kinds of chat. A group's name, picture and members
+//! can be changed here. A one-to-one chat has one member, the contact, and
+//! the same model reads them, so the contact page needs nothing of its own.
 
 use std::cell::RefCell;
 

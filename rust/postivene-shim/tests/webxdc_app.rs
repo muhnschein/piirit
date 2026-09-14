@@ -321,10 +321,9 @@ fn an_app_is_served_to_itself_alone_and_its_updates_reach_the_chat() {
                 .unwrap_or_else(|err| err)
         );
 
-        // And one past the 100 MB this route used to refuse. Nothing
-        // holds it either, so the only thing that could stop it now is
-        // the disk -- a video an app made is exactly the case the cap
-        // was in the way of.
+        // And one past 100 MB. Nothing holds it either, so the only thing
+        // that can stop it is the disk -- a video an app made is exactly
+        // the case a cap would be in the way of.
         let huge = "A".repeat(101 * 1024 * 1024);
         record!(
             "to-chat-huge",

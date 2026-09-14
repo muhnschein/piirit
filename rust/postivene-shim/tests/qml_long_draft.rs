@@ -1,10 +1,10 @@
 //! Writing a message longer than one line, and longer than the core
 //! will carry whole.
 //!
-//! Two things about the field a message is written in. It takes more
-//! than a line: the return key used to send, so a message written here
-//! was one line however long it ran, and a paragraph could not be typed
-//! at all. And it says when what is in it has grown past the point where
+//! Two things about the field a message is written in. It takes more than
+//! a line: with the return key sending, a message written here would be
+//! one line however long it ran and a paragraph could not be typed at all.
+//! And it says when what is in it has grown past the point where
 //! the core cuts a body in two -- past that, what arrives at the other
 //! end is a preview with something to tap, which is worth knowing before
 //! pressing send and not worth a dialog afterwards. parla says the same

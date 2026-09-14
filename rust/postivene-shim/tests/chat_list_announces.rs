@@ -3,11 +3,10 @@
 //!
 //! The real core follows every `IncomingMsg` with a `ChatlistItemChanged`
 //! within the same millisecond (and a `ChatlistChanged` besides when the
-//! order changed), each starting a refresh of its own. The announcement
-//! used to ride on the refresh the first event started -- which the one
-//! behind it made stale before it landed -- so nothing was ever announced
-//! on a device. The fake core sends the pair now, and this is the test
-//! that would have caught it.
+//! order changed), each starting a refresh of its own. An announcement
+//! riding on the refresh the first event started is made stale by the one
+//! behind it before it lands, so nothing reaches the reader at all. The
+//! fake core sends the pair, which is what makes this test see it.
 
 // Qt harness: see qml_chat_list.rs.
 #![allow(

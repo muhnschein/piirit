@@ -131,21 +131,6 @@ const PROBE_QML: &str = r"
 const SLOW_PAGE: &str = r#"{"displayName":"Ada","providerQr":"dcaccount:slow.example","status":0}"#;
 
 /// Each step and what it recorded.
-type Steps = Rc<RefCell<Vec<(String, String)>>>;
-
-fn record(steps: &Steps, label: &str, value: QString) {
-    steps
-        .borrow_mut()
-        .push((label.to_string(), value.to_string()));
-}
-
-fn value_of<'a>(steps: &'a [(String, String)], label: &str) -> &'a str {
-    steps
-        .iter()
-        .find(|(name, _)| name == label)
-        .map_or("<step did not run>", |(_, value)| value.as_str())
-}
-
 // The engine, the QObject boxes and every step share one scope: all must
 // outlive `exec()`. The assertions are in the helpers below.
 #[allow(clippy::too_many_lines)]
@@ -190,7 +175,7 @@ fn a_slow_relay_is_explained_given_up_on_and_cancellable() {
         .borrow_mut()
         .start(QString::from(env!("CARGO_BIN_EXE_fake-core-server")));
 
-    let steps: Steps = Rc::new(RefCell::new(Vec::new()));
+    let steps: common::Steps = Rc::new(RefCell::new(Vec::new()));
     let engine_ptr = std::ptr::addr_of_mut!(engine);
 
     // SAFETY: these callbacks fire only while `exec()` is running on this
@@ -210,7 +195,7 @@ fn a_slow_relay_is_explained_given_up_on_and_cancellable() {
     // 1s: the page, on screen, asks the slow relay.
     let s = steps.clone();
     single_shot(Duration::from_secs(1), move || {
-        record(
+        common::record(
             &s,
             "load",
             call!(
@@ -219,38 +204,38 @@ fn a_slow_relay_is_explained_given_up_on_and_cancellable() {
                 SLOW_PAGE
             ),
         );
-        record(&s, "activate", call!("activate"));
+        common::record(&s, "activate", call!("activate"));
     });
 
     // 2s: waiting, with nothing said yet.
     let s = steps.clone();
     single_shot(Duration::from_secs(2), move || {
-        record(&s, "early-busy", call!("pageProperty", "busy"));
-        record(&s, "early-hint", call!("get", "slowHint", "visible"));
-        record(&s, "early-label", call!("get", "progressBar", "label"));
+        common::record(&s, "early-busy", call!("pageProperty", "busy"));
+        common::record(&s, "early-hint", call!("get", "slowHint", "visible"));
+        common::record(&s, "early-label", call!("get", "progressBar", "label"));
     });
 
     // 6s: the fourth second has passed.
     let s = steps.clone();
     single_shot(Duration::from_secs(6), move || {
-        record(&s, "hint", call!("get", "slowHint", "visible"));
-        record(&s, "still-busy", call!("pageProperty", "busy"));
+        common::record(&s, "hint", call!("get", "slowHint", "visible"));
+        common::record(&s, "still-busy", call!("pageProperty", "busy"));
     });
 
     // 8s: the deadline passed at seven.
     let s = steps.clone();
     single_shot(Duration::from_secs(8), move || {
-        record(&s, "late-busy", call!("pageProperty", "busy"));
-        record(&s, "late-error", call!("pageProperty", "errorMessage"));
-        record(&s, "late-hint", call!("get", "slowHint", "visible"));
-        record(&s, "late-back", call!("get", "backButton", "visible"));
-        record(&s, "late-cancel", call!("get", "cancelButton", "visible"));
+        common::record(&s, "late-busy", call!("pageProperty", "busy"));
+        common::record(&s, "late-error", call!("pageProperty", "errorMessage"));
+        common::record(&s, "late-hint", call!("get", "slowHint", "visible"));
+        common::record(&s, "late-back", call!("get", "backButton", "visible"));
+        common::record(&s, "late-cancel", call!("get", "cancelButton", "visible"));
     });
 
     // 9s: a second attempt, while the core is still on the first.
     let s = steps.clone();
     single_shot(Duration::from_secs(9), move || {
-        record(
+        common::record(
             &s,
             "reload",
             call!(
@@ -259,14 +244,14 @@ fn a_slow_relay_is_explained_given_up_on_and_cancellable() {
                 SLOW_PAGE
             ),
         );
-        record(&s, "reactivate", call!("activate"));
+        common::record(&s, "reactivate", call!("activate"));
     });
 
     // 10s: cancelled.
     let s = steps.clone();
     single_shot(Duration::from_secs(10), move || {
-        record(&s, "cancel", call!("click", "cancelButton"));
-        record(&s, "cancelled-busy", call!("pageProperty", "busy"));
+        common::record(&s, "cancel", call!("click", "cancelButton"));
+        common::record(&s, "cancelled-busy", call!("pageProperty", "busy"));
     });
 
     single_shot(Duration::from_secs(12), move || unsafe {
@@ -288,26 +273,30 @@ fn a_slow_relay_is_explained_given_up_on_and_cancellable() {
 /// The hint is not there at two seconds and is at six.
 fn assert_hint_timing(steps: &[(String, String)], context: &str) {
     for step in ["load", "activate"] {
-        assert_eq!(value_of(steps, step), "ok", "{step} failed. {context}");
+        assert_eq!(
+            common::value_of(steps, step),
+            "ok",
+            "{step} failed. {context}"
+        );
     }
-    assert_eq!(value_of(steps, "early-busy"), "true", "{context}");
+    assert_eq!(common::value_of(steps, "early-busy"), "true", "{context}");
     assert_eq!(
-        value_of(steps, "early-hint"),
+        common::value_of(steps, "early-hint"),
         "false",
         "the hint about relays was shown before the relay had kept anyone \
          waiting. {context}"
     );
     assert_eq!(
-        value_of(steps, "early-label"),
+        common::value_of(steps, "early-label"),
         "Contacting slow.example...",
         "the progress bar does not name the relay. {context}"
     );
     assert_eq!(
-        value_of(steps, "hint"),
+        common::value_of(steps, "hint"),
         "true",
         "four seconds of waiting did not bring the hint up. {context}"
     );
-    assert_eq!(value_of(steps, "still-busy"), "true", "{context}");
+    assert_eq!(common::value_of(steps, "still-busy"), "true", "{context}");
 }
 
 /// At the deadline the page stops waiting, says which relay did not
@@ -315,22 +304,22 @@ fn assert_hint_timing(steps: &[(String, String)], context: &str) {
 /// in place.
 fn assert_time_out(steps: &[(String, String)], context: &str) {
     assert_eq!(
-        value_of(steps, "late-busy"),
+        common::value_of(steps, "late-busy"),
         "false",
         "the page is still waiting after the deadline. {context}"
     );
     assert_eq!(
-        value_of(steps, "late-error"),
+        common::value_of(steps, "late-error"),
         "slow.example did not answer within 6 seconds.",
         "the time-out is not said with the relay and the seconds. {context}"
     );
     assert_eq!(
-        value_of(steps, "late-hint"),
+        common::value_of(steps, "late-hint"),
         "true",
         "the hint went with the wait; it is the way it points at. {context}"
     );
-    assert_eq!(value_of(steps, "late-back"), "true", "{context}");
-    assert_eq!(value_of(steps, "late-cancel"), "false", "{context}");
+    assert_eq!(common::value_of(steps, "late-back"), "true", "{context}");
+    assert_eq!(common::value_of(steps, "late-cancel"), "false", "{context}");
 }
 
 /// A second attempt takes a fresh account rather than the one the core
@@ -342,9 +331,17 @@ fn assert_cancel(
     context: &str,
 ) {
     for step in ["reload", "reactivate", "cancel"] {
-        assert_eq!(value_of(steps, step), "ok", "{step} failed. {context}");
+        assert_eq!(
+            common::value_of(steps, step),
+            "ok",
+            "{step} failed. {context}"
+        );
     }
-    assert_eq!(value_of(steps, "cancelled-busy"), "false", "{context}");
+    assert_eq!(
+        common::value_of(steps, "cancelled-busy"),
+        "false",
+        "{context}"
+    );
     assert!(
         navigation.ends_with("pop|"),
         "Cancel did not go back. {context}"

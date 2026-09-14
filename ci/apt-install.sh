@@ -3,12 +3,9 @@
 # apt repository take the build down with it.
 #
 # `apt-get update` exits 100 when ANY configured repository fails, and the
-# runner image ships several this project never installs from. On
-# 2026-09-09 Google Chrome's index served a hash that did not match its own
-# Release file, and every job in ci.yml died at `apt-get update` before
-# installing anything or running a single test. Nothing in this repository
-# had changed, and the same thing had happened often enough elsewhere to be
-# unremarkable.
+# runner image ships several this project never installs from -- so one of
+# them serving a bad index kills every job before a single test runs, with
+# nothing in this repository having changed.
 #
 # So the third-party lists go before the update. Ubuntu's own are kept
 # wherever the image puts them -- /etc/apt/sources.list, or a .list or

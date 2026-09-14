@@ -611,9 +611,8 @@ fn no_wait_before_a_deletion_lives_on_the_row_it_was_asked_on() {
 ///
 /// Silica's `RemorseItem` is what a Sailfish reader already knows a
 /// countdown to look like: the bar, the seconds, "Tap to cancel", the
-/// fade over what is going. A hand-made stand-in was tried and looked
-/// wrong on a phone, which is the whole reason this rule exists. Every
-/// list that holds a wait has to raise the real one.
+/// fade over what is going. A hand-made stand-in looks wrong on a phone,
+/// so every list that holds a wait has to raise the real one.
 #[test]
 fn every_pending_removal_is_drawn_by_the_platform() {
     let mut offenders = Vec::new();
@@ -1091,8 +1090,8 @@ fn the_frame_scripts_the_pages_load_are_there() {
 /// name can carry, but the button an app draws over it is a download --
 /// `sharer`'s is a download arrow -- and what the reader means by that is
 /// the file, on their phone. So it is saved where the file manager looks,
-/// and nothing is asked: a chooser between opening and keeping was tried
-/// and was two taps in front of the one thing already asked for. Nothing
+/// and nothing is asked: a chooser between opening and keeping is two taps
+/// in front of the one thing already asked for. Nothing
 /// else can check this: the page names `Sailfish.WebView`, so it is never
 /// loaded off a phone.
 #[test]

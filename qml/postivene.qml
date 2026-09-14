@@ -112,9 +112,8 @@ ApplicationWindow {
 
     // IO belongs to the window rather than to whichever page happens to
     // be up: a phone that resumes onto its chat list never sees the
-    // welcome page, which is where this used to be asked for. Every
-    // profile, not only the one on screen -- each of them is one people
-    // write to, and the cover counts them all.
+    // welcome page at all. Every profile, not only the one on screen --
+    // each of them is one people write to, and the cover counts them all.
     Connections {
         target: core
         // Qt 5.6 handler syntax; see WelcomePage.qml.

@@ -4,8 +4,8 @@
 //! than deserialised into structs: typing its several dozen shapes would be
 //! the protocol reimplementation `docs/PROJECT.md` rules out, and a field
 //! that is absent or null is the ordinary case, not an error. So "absent
-//! means empty, zero or false" is decided here, once, instead of in the
-//! four private copies of these that the models used to carry.
+//! means empty, zero or false" is decided here, once, rather than
+//! separately in every model.
 //!
 //! `path` is either a bare field name (`"chatId"`) or a JSON pointer
 //! (`"/quote/text"`) for a field inside a nested object.

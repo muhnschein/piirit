@@ -4,9 +4,9 @@
 //! The page mirrors the group's own (`qml_group_page.rs`), so what is
 //! checked is the same shape: the reader among the members from the
 //! start, whoever the picker hands back drawn as a member, and creating
-//! refused until there is a name. The regression this file began as is
-//! still here: `nameField` used to live inside the list's header, its own
-//! scope, so typing a name never enabled the Create button.
+//! refused until there is a name -- which needs `nameField` to be reachable
+//! from the page's own scope, not buried in the list's header where the
+//! Create button cannot see it.
 //!
 //! "Drawn as a member" is asked as `shown`, not as `visible`: the rows
 //! are the ones `picked_rows` hands back, so a contact nobody picked has

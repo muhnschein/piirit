@@ -6,13 +6,11 @@
 //! chat. The row's menu offers to mark a read chat unread, and an unread
 //! one read -- one or the other, never both.
 //!
-//! Both of these were reported from a device twice. The first time they
-//! were written, a patch script asserted and died before saving, so
-//! neither reached the tree -- and nothing here would have noticed,
-//! because what a page *hides* had no coverage at all.
+//! What a page *hides* needs covering as much as what it shows, which is
+//! what this file is for.
 //!
-//! Profiles: it used to appear only once a second profile existed, which
-//! hid the one route to making one.
+//! Profiles: showing it only once a second profile exists would hide the
+//! one route to making one.
 //!
 //! The archived search field: an archive with nothing in it has nothing
 //! to search, and a field over an empty list is a control that cannot do
