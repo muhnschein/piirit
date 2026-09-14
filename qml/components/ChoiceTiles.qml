@@ -47,12 +47,26 @@ Item {
     /// already inset by them.
     property real sideMargin: Theme.horizontalPageMargin
 
+    /// Whether the tiles stand one under another rather than side by
+    /// side. Two tiles share a screen comfortably; three leave each of
+    /// them a third of it, which is not room for a line of words with a
+    /// second line under it, so the page that asks three things at once
+    /// stacks them instead.
+    property bool stacked: false
+
+    /// What is kept between stacked tiles, so that two of them read as
+    /// two rather than as one tall block.
+    property real gap: Theme.paddingMedium
+
     /// The reader picked one, by `name`.
     signal chosen(string name)
 
-    /// How wide one tile is: what the margins leave, shared out.
+    /// How wide one tile is: the whole row stacked, and what the margins
+    /// leave shared out otherwise.
     readonly property real tileWidth: root.choices.length > 0
-        ? (root.width - 2 * root.sideMargin) / root.choices.length
+        ? (root.stacked
+           ? root.width - 2 * root.sideMargin
+           : (root.width - 2 * root.sideMargin) / root.choices.length)
         : 0
 
     /// How tall every tile is: as tall as the one that needs most room,
@@ -73,7 +87,10 @@ Item {
     }
 
     width: parent ? parent.width : 0
-    height: root.tileHeight
+    height: root.stacked
+            ? root.choices.length * root.tileHeight
+              + Math.max(0, root.choices.length - 1) * root.gap
+            : root.tileHeight
 
     Repeater {
         id: tiles
@@ -86,7 +103,8 @@ Item {
         BackgroundItem {
             id: tile
             objectName: modelData.name + "Tile"
-            x: root.sideMargin + index * root.tileWidth
+            x: root.sideMargin + (root.stacked ? 0 : index * root.tileWidth)
+            y: root.stacked ? index * (root.tileHeight + root.gap) : 0
             width: root.tileWidth
             height: root.tileHeight
             // `undefined` is a choice that never mentioned it, which is

@@ -26,55 +26,60 @@ Page {
 
     SilicaFlickable {
         anchors.fill: parent
-        contentHeight: column.height + Theme.paddingLarge
+        // Long enough to hold the tiles where they are put, and never
+        // shorter than the page: the stack is placed against the page's
+        // own height rather than against this, which would be a loop.
+        contentHeight: Math.max(height, ways.y + ways.height + Theme.paddingLarge)
 
-        Column {
-            id: column
-            width: parent.width
-            spacing: Theme.paddingMedium
+        PageHeader {
+            id: header
+            objectName: "header"
+            title: qsTr("Add profile")
+        }
 
-            PageHeader {
-                title: qsTr("Add profile")
-            }
-
-            // The three ways as tiles, the way the first screen offers
-            // its two (components/ChoiceTiles.qml): an icon apiece says
-            // which is which before the words are read, and three of
-            // them stand in a row where three buttons and their small
-            // print took a screenful.
-            ChoiceTiles {
-                objectName: "addWays"
-                width: parent.width
-                choices: [
-                    {
-                        name: "createProfile",
-                        icon: "icon-m-add",
-                        text: qsTr("Create a profile"),
-                        hint: qsTr("A new address on a chatmail relay."),
-                        // Nothing to create with until the core is up,
-                        // and the relay dialog hands straight over to
-                        // the setup.
-                        enabled: core.status === "ready"
-                    },
-                    {
-                        name: "backupFile",
-                        icon: "icon-m-backup",
-                        text: qsTr("Restore from a backup"),
-                        hint: qsTr("A backup file copied onto this phone.")
-                    },
-                    {
-                        name: "secondDevice",
-                        icon: "icon-m-device",
-                        text: qsTr("Add as second device"),
-                        hint: qsTr("The other device keeps it. Both get everything new.")
-                    }
-                ]
-                onChosen: {
-                    if (name === "createProfile") {
-                        pageStack.push(Qt.resolvedUrl("AddProfileDialog.qml"), {})
-                    } else {
-                        page.takeOver(name === "backupFile" ? "file" : "device")
-                    }
+        // The three ways, one under another and centred in what the
+        // header leaves. Three tiles in a row left each of them a third
+        // of the screen, which is not room for a line of words and the
+        // line under it; stacked, each gets the width and the eye goes
+        // down them one at a time. Centred rather than stacked up under
+        // the header: three tall tiles at the top of a long screen read
+        // as a list that ran out.
+        ChoiceTiles {
+            id: ways
+            objectName: "addWays"
+            stacked: true
+            width: page.width
+            y: header.height + Math.max(Theme.paddingLarge,
+                                        (page.height - header.height
+                                         - ways.height) / 2)
+            choices: [
+                {
+                    name: "createProfile",
+                    icon: "icon-m-add",
+                    text: qsTr("Create a profile"),
+                    hint: qsTr("A new address on a chatmail relay."),
+                    // Nothing to create with until the core is up, and
+                    // the relay dialog hands straight over to the setup.
+                    enabled: core.status === "ready"
+                },
+                {
+                    name: "backupFile",
+                    icon: "icon-m-backup",
+                    text: qsTr("Restore from a backup"),
+                    hint: qsTr("A backup file copied onto this phone.")
+                },
+                {
+                    name: "secondDevice",
+                    icon: "icon-m-device",
+                    text: qsTr("Add as second device"),
+                    hint: qsTr("The other device keeps it. Both get everything new.")
+                }
+            ]
+            onChosen: {
+                if (name === "createProfile") {
+                    pageStack.push(Qt.resolvedUrl("AddProfileDialog.qml"), {})
+                } else {
+                    page.takeOver(name === "backupFile" ? "file" : "device")
                 }
             }
         }

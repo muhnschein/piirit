@@ -81,12 +81,18 @@ const PROBE_QML: &str = r"
             if (!found) { return 'missing:' + tile + '/' + part }
             return '' + found[property]
         }
-        // Where a tile stands and how big it is.
+        // Where a tile stands and how big it is: x,y,width,height.
         function boxOf(tile) {
             var item = findIn(loader.item, tile)
             if (!item) { return 'missing:' + tile }
-            return Math.round(item.x) + ',' + Math.round(item.width) + ','
-                   + Math.round(item.height)
+            return Math.round(item.x) + ',' + Math.round(item.y) + ','
+                   + Math.round(item.width) + ',' + Math.round(item.height)
+        }
+        // One under another rather than side by side.
+        function stack(on) {
+            if (!loader.item) { return 'no-row' }
+            loader.item.stacked = (on === 'true')
+            return 'ok'
         }
         function tap(name) {
             var item = findIn(loader.item, name)
@@ -105,6 +111,17 @@ const CHOICES: &str = r#"[
     { "name": "setup", "icon": "icon-m-person", "text": "Set up my profile",
       "hint": "A new address, on a relay that carries chat mail and nothing else at all.",
       "enabled": false }
+]"#;
+
+/// Three ways in, as the page behind the profiles plus writes them: too
+/// many to stand side by side on a phone.
+const THREE: &str = r#"[
+    { "name": "createProfile", "icon": "icon-m-add", "text": "Create a profile",
+      "hint": "A new address on a chatmail relay." },
+    { "name": "backupFile", "icon": "icon-m-backup", "text": "Restore from a backup",
+      "hint": "A backup file copied onto this phone." },
+    { "name": "secondDevice", "icon": "icon-m-device", "text": "Add as second device",
+      "hint": "The other device keeps it. Both get everything new." }
 ]"#;
 
 type Steps = Rc<RefCell<Vec<(String, String)>>>;
@@ -192,12 +209,94 @@ fn a_row_of_tiles_is_named_drawn_and_answered_for() {
         r("picked", call!("pickedSoFar"));
     });
 
-    single_shot(Duration::from_secs(3), move || unsafe {
+    // 3s: the same row with three choices in it, stacked.
+    let r = record.clone();
+    single_shot(Duration::from_secs(3), move || {
+        r("three", call!("offer", THREE));
+        r("stack", call!("stack", "true"));
+    });
+
+    let r = record.clone();
+    single_shot(Duration::from_secs(4), move || {
+        r("first-box", call!("boxOf", "createProfileTile"));
+        r("second-box", call!("boxOf", "backupFileTile"));
+        r("third-box", call!("boxOf", "secondDeviceTile"));
+        r("stacked-height", call!("own", "height"));
+        r("gap", call!("own", "gap"));
+    });
+
+    single_shot(Duration::from_secs(5), move || unsafe {
         (*engine_ptr).quit();
     });
 
     engine.exec();
     assert_row(&steps.borrow());
+    assert_stack(&steps.borrow());
+}
+
+/// Three choices stand one under another, the full width of the row.
+///
+/// Side by side each of them had a third of the screen, which crowds a
+/// line of words with a second line under it -- the phone showed it on
+/// the page behind the profiles plus.
+fn assert_stack(steps: &[(String, String)]) {
+    let value = |label: &str| -> &str {
+        steps
+            .iter()
+            .find(|(name, _)| name == label)
+            .map_or("<step did not run>", |(_, value)| value.as_str())
+    };
+    let context = format!("steps: {steps:?}");
+    assert_eq!(
+        value("three"),
+        "ok",
+        "the three choices were refused. {context}"
+    );
+    assert_eq!(value("stack"), "ok", "the row did not stack. {context}");
+
+    let part = |label: &str, index: usize| -> f64 {
+        value(label)
+            .split(',')
+            .nth(index)
+            .unwrap_or_default()
+            .parse()
+            .unwrap_or_default()
+    };
+    let boxes = ["first-box", "second-box", "third-box"];
+    for label in boxes {
+        // The stub's margin is 24 and the row is 1080 across, so a
+        // stacked tile is the whole 1032 between the margins.
+        assert_eq!(
+            (part(label, 0), part(label, 2)),
+            (24.0, 1032.0),
+            "a stacked tile does not fill the row between its margins: \
+             {label}. {context}"
+        );
+    }
+
+    let gap = value("gap").parse::<f64>().unwrap_or_default();
+    let tile = part("first-box", 3);
+    assert!(
+        tile > 0.0 && gap > 0.0,
+        "a stacked tile has no height, or no room under it. {context}"
+    );
+    for (index, label) in boxes.iter().enumerate() {
+        #[allow(clippy::cast_precision_loss)]
+        let expected = index as f64 * (tile + gap);
+        assert!(
+            (part(label, 1) - expected).abs() < 1.0,
+            "the stacked tiles do not follow one another down the page: \
+             {label} is at {} rather than {expected}. {context}",
+            part(label, 1)
+        );
+    }
+    assert!(
+        (value("stacked-height").parse::<f64>().unwrap_or_default() - (3.0 * tile + 2.0 * gap))
+            .abs()
+            < 1.0,
+        "the stack is not as tall as the tiles and the room between \
+         them. {context}"
+    );
 }
 
 fn assert_row(steps: &[(String, String)]) {
@@ -243,24 +342,24 @@ fn assert_row(steps: &[(String, String)]) {
     // Side by side inside the margins, and both as tall as the one that
     // needs most: the stub's margin is 24 and the row is 1080 across, so
     // a tile is 516 wide and the second starts at 540.
+    let part = |label: &str, index: usize| -> String {
+        value(label)
+            .split(',')
+            .nth(index)
+            .unwrap_or_default()
+            .to_string()
+    };
     assert_eq!(
-        value("about-box").split(',').take(2).collect::<Vec<_>>(),
-        vec!["24", "516"],
+        (part("about-box", 0), part("about-box", 2)),
+        ("24".to_string(), "516".to_string()),
         "the first tile does not start inside the margin at half the row. {context}"
     );
     assert_eq!(
-        value("setup-box").split(',').take(2).collect::<Vec<_>>(),
-        vec!["540", "516"],
+        (part("setup-box", 0), part("setup-box", 2)),
+        ("540".to_string(), "516".to_string()),
         "the second tile does not stand beside the first. {context}"
     );
-    let height = |label: &str| -> f64 {
-        value(label)
-            .split(',')
-            .nth(2)
-            .unwrap_or_default()
-            .parse()
-            .unwrap_or_default()
-    };
+    let height = |label: &str| -> f64 { part(label, 3).parse().unwrap_or_default() };
     assert!(
         height("about-box") > 0.0,
         "the tiles have no height at all. {context}"

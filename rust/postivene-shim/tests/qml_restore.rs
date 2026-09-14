@@ -252,6 +252,11 @@ fn a_profile_that_exists_already_is_asked_after_and_brought_over() {
             "add-load",
             call!("loadWith", common::page_url("AddProfilePage.qml"), "{}"),
         );
+        record(&s, "add-stacked", call!("get", "addWays", "stacked"));
+        record(&s, "add-header", call!("get", "header", "height"));
+        record(&s, "add-ways-y", call!("get", "addWays", "y"));
+        record(&s, "add-ways-height", call!("get", "addWays", "height"));
+        record(&s, "add-page-height", call!("pageProperty", "height"));
         record(&s, "add-create", call!("click", "createProfileTile"));
         record(&s, "add-file", call!("click", "backupFileTile"));
         record(&s, "add-device", call!("click", "secondDeviceTile"));
@@ -406,6 +411,25 @@ fn assert_pages(steps: &[(String, String)], navigation: &str) {
              ways in: {label}. {context}"
         );
     }
+    // Three of them, so they stand one under another: side by side each
+    // would get a third of the screen, which is not room for a line of
+    // words with a second line under it.
+    assert_eq!(
+        value_of(steps, "add-stacked"),
+        "true",
+        "the three ways in are crowded into one row. {context}"
+    );
+    // And the stack sits in the middle of what the header leaves rather
+    // than piled under it, which on a long screen read as a list that
+    // had run out.
+    let measure = |label: &str| -> f64 { value_of(steps, label).parse().unwrap_or_default() };
+    let above = measure("add-ways-y") - measure("add-header");
+    let below = measure("add-page-height") - measure("add-ways-y") - measure("add-ways-height");
+    assert!(
+        above > 0.0 && (above - below).abs() < 2.0,
+        "the three ways are not centred in what the header leaves: \
+         {above} above, {below} below. {context}"
+    );
     assert!(
         navigation.contains("push:AddProfileDialog.qml"),
         "nothing on the add-profile page makes a new profile. {context}"
