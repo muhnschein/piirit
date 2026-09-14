@@ -1,5 +1,6 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
+import "../components"
 
 /*
  * Where the setup path begins: reached from the first screen, and from
@@ -42,19 +43,34 @@ Page {
 
         Item { width: 1; height: Theme.paddingLarge }
 
-        Button {
-            objectName: "existingProfileButton"
-            anchors.horizontalCenter: parent.horizontalCenter
-            text: qsTr("I already have a profile")
-            onClicked: pageStack.push(Qt.resolvedUrl("ExistingProfilePage.qml"), {})
-        }
-
-        Button {
-            objectName: "createProfileButton"
-            anchors.horizontalCenter: parent.horizontalCenter
-            text: qsTr("Create a profile")
-            enabled: core.status === "ready"
-            onClicked: pageStack.push(Qt.resolvedUrl("AddProfileDialog.qml"), {})
+        // The two ways on, as tiles: the arrows of a transfer for a
+        // profile that is somewhere else already, the plus for one that
+        // does not exist yet.
+        ChoiceTiles {
+            objectName: "startWays"
+            width: parent.width
+            // The column is already inside the page's margins.
+            sideMargin: 0
+            choices: [
+                {
+                    name: "existingProfile",
+                    icon: "icon-m-transfer",
+                    text: qsTr("I already have a profile")
+                },
+                {
+                    name: "createProfile",
+                    icon: "icon-m-add",
+                    text: qsTr("Create a profile"),
+                    enabled: core.status === "ready"
+                }
+            ]
+            onChosen: {
+                if (name === "existingProfile") {
+                    pageStack.push(Qt.resolvedUrl("ExistingProfilePage.qml"), {})
+                } else {
+                    pageStack.push(Qt.resolvedUrl("AddProfileDialog.qml"), {})
+                }
+            }
         }
     }
 }

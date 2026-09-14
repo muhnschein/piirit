@@ -71,6 +71,47 @@ Page {
     /// Nothing sets it; a test turns it down rather than waiting.
     property int handOverDeadline: 4000
 
+    /// Lay the field over the whole screen, in this page's coordinates.
+    ///
+    /// A Silica page is centred in what holds it and turned inside it
+    /// (Page.qml), and on a phone that keeps a band of its screen for
+    /// the camera, what holds the page is bigger than the page: upright
+    /// that band is a strip across the top, turned on its side it is a
+    /// strip down the edge the camera is on. A field anchored to the
+    /// page leaves that strip empty, which is exactly where the eye
+    /// goes.
+    ///
+    /// So the field is given the whole of whatever the page is in,
+    /// measured through the page's own coordinates -- which turn with
+    /// it, so one sum serves both ways up -- and never less than the
+    /// page, which is what a test that loads the page on its own gives
+    /// it. The proportions are the shader's business: it crops the mask
+    /// to what it is given rather than stretching it
+    /// (components/FaceField.qml), so a wider field is more field, not a
+    /// wider face.
+    function spreadField() {
+        var screen = page
+        while (screen.parent) {
+            screen = screen.parent
+        }
+        var near = page.mapFromItem(screen, 0, 0)
+        var far = page.mapFromItem(screen, screen.width, screen.height)
+        var left = Math.min(0, near.x, far.x)
+        var top = Math.min(0, near.y, far.y)
+        field.x = left
+        field.y = top
+        field.width = Math.max(page.width, near.x, far.x) - left
+        field.height = Math.max(page.height, near.y, far.y) - top
+    }
+
+    // Everything that moves the page inside the screen: it is resized
+    // and turned as the phone is, and put into the stack after it is
+    // built.
+    onWidthChanged: page.spreadField()
+    onHeightChanged: page.spreadField()
+    onRotationChanged: page.spreadField()
+    onParentChanged: page.spreadField()
+
     /// Go to the chat list, if a profile to open it on is known of.
     ///
     /// IO is not asked for here: the window asks for it as soon as the
@@ -129,6 +170,7 @@ Page {
 
     // The core may be ready before the handler below exists.
     Component.onCompleted: {
+        page.spreadField()
         if (core.status === "ready") {
             core.refresh_accounts()
         } else if (core.status.indexOf("error") === 0) {
@@ -176,10 +218,12 @@ Page {
     // The field, under everything, cleared around the words by as much
     // as they take up: the box follows the column, so a language in
     // which the line about relays runs long clears more.
+    //
+    // Laid out by `spreadField()` rather than anchored to the page, so
+    // that it covers the screen even where the page does not.
     FaceField {
         id: field
         objectName: "faceField"
-        anchors.fill: parent
         // Down until it is known there is no chat list to be on. A
         // screenful of faces drawn for the half second a hand-over takes
         // reads as the app opening in the wrong place and then
@@ -194,8 +238,11 @@ Page {
         // is more of the ambience showing through.
         ink: 0.45
         litInk: 0.8
-        clearX: words.x + words.width / 2
-        clearY: words.y + words.height / 2
+        // The words are placed on the page and the box is cut in the
+        // field, which starts where the page does only on a phone with
+        // nothing in the way of it.
+        clearX: words.x + words.width / 2 - field.x
+        clearY: words.y + words.height / 2 - field.y
         clearWidth: words.width
         clearHeight: words.height
         // Room around the words rather than up against them: the field
@@ -248,24 +295,39 @@ Page {
 
         Item { width: 1; height: Theme.paddingLarge }
 
-        Button {
-            objectName: "aboutButton"
-            anchors.horizontalCenter: parent.horizontalCenter
-            text: qsTr("Tell me about Delta Chat")
-            onClicked: pageStack.push(Qt.resolvedUrl("IntroPage.qml"), {})
-        }
-
-        Button {
-            objectName: "setupButton"
-            anchors.horizontalCenter: parent.horizontalCenter
-            text: qsTr("Set up my profile")
-            enabled: core.status === "ready"
-            onClicked: pageStack.push(Qt.resolvedUrl("ProfileStartPage.qml"), {})
+        // The two ways on, side by side under the name: what Delta
+        // Chat is, for a reader who has not heard of it, and the way
+        // into a profile for one who has.
+        ChoiceTiles {
+            objectName: "welcomeWays"
+            width: parent.width
+            // The column is already inside the page's margins.
+            sideMargin: 0
+            choices: [
+                {
+                    name: "about",
+                    icon: "icon-m-about",
+                    text: qsTr("Tell me about Delta Chat")
+                },
+                {
+                    name: "setup",
+                    icon: "icon-m-person",
+                    text: qsTr("Set up my profile"),
+                    enabled: core.status === "ready"
+                }
+            ]
+            onChosen: {
+                if (name === "about") {
+                    pageStack.push(Qt.resolvedUrl("IntroPage.qml"), {})
+                } else {
+                    pageStack.push(Qt.resolvedUrl("ProfileStartPage.qml"), {})
+                }
+            }
         }
 
         // The one thing that can go wrong before anything has been
-        // asked for: the core did not start. Said here, where the
-        // buttons that it stops are.
+        // asked for: the core did not start. Said here, where the tile
+        // that it stops is.
         Label {
             objectName: "coreError"
             width: parent.width

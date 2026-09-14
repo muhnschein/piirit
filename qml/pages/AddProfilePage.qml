@@ -1,5 +1,6 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
+import "../components"
 
 /*
  * The three ways a profile gets onto this phone, asked as one question.
@@ -36,68 +37,45 @@ Page {
                 title: qsTr("Add profile")
             }
 
-            Button {
-                objectName: "createProfileButton"
-                anchors.horizontalCenter: parent.horizontalCenter
-                text: qsTr("Create a profile")
-                // Nothing to create with until the core is up, and the
-                // relay dialog hands straight over to the setup.
-                enabled: core.status === "ready"
-                onClicked: pageStack.push(Qt.resolvedUrl("AddProfileDialog.qml"), {})
-            }
-
-            Label {
-                objectName: "createProfileHint"
-                x: Theme.horizontalPageMargin
-                width: parent.width - 2 * Theme.horizontalPageMargin
-                horizontalAlignment: Text.AlignHCenter
-                wrapMode: Text.Wrap
-                textFormat: Text.PlainText
-                font.pixelSize: Theme.fontSizeExtraSmall
-                color: Theme.secondaryHighlightColor
-                text: qsTr("A new address on a chatmail relay.")
-            }
-
-            Item { width: 1; height: Theme.paddingLarge }
-
-            Button {
-                objectName: "backupFileButton"
-                anchors.horizontalCenter: parent.horizontalCenter
-                text: qsTr("Restore from a backup")
-                onClicked: page.takeOver("file")
-            }
-
-            Label {
-                objectName: "backupFileHint"
-                x: Theme.horizontalPageMargin
-                width: parent.width - 2 * Theme.horizontalPageMargin
-                horizontalAlignment: Text.AlignHCenter
-                wrapMode: Text.Wrap
-                textFormat: Text.PlainText
-                font.pixelSize: Theme.fontSizeExtraSmall
-                color: Theme.secondaryHighlightColor
-                text: qsTr("A backup file copied onto this phone.")
-            }
-
-            Item { width: 1; height: Theme.paddingLarge }
-
-            Button {
-                objectName: "secondDeviceButton"
-                anchors.horizontalCenter: parent.horizontalCenter
-                text: qsTr("Add as second device")
-                onClicked: page.takeOver("device")
-            }
-
-            Label {
-                objectName: "secondDeviceHint"
-                x: Theme.horizontalPageMargin
-                width: parent.width - 2 * Theme.horizontalPageMargin
-                horizontalAlignment: Text.AlignHCenter
-                wrapMode: Text.Wrap
-                textFormat: Text.PlainText
-                font.pixelSize: Theme.fontSizeExtraSmall
-                color: Theme.secondaryHighlightColor
-                text: qsTr("The other device keeps it. Both get everything new.")
+            // The three ways as tiles, the way the first screen offers
+            // its two (components/ChoiceTiles.qml): an icon apiece says
+            // which is which before the words are read, and three of
+            // them stand in a row where three buttons and their small
+            // print took a screenful.
+            ChoiceTiles {
+                objectName: "addWays"
+                width: parent.width
+                choices: [
+                    {
+                        name: "createProfile",
+                        icon: "icon-m-add",
+                        text: qsTr("Create a profile"),
+                        hint: qsTr("A new address on a chatmail relay."),
+                        // Nothing to create with until the core is up,
+                        // and the relay dialog hands straight over to
+                        // the setup.
+                        enabled: core.status === "ready"
+                    },
+                    {
+                        name: "backupFile",
+                        icon: "icon-m-backup",
+                        text: qsTr("Restore from a backup"),
+                        hint: qsTr("A backup file copied onto this phone.")
+                    },
+                    {
+                        name: "secondDevice",
+                        icon: "icon-m-device",
+                        text: qsTr("Add as second device"),
+                        hint: qsTr("The other device keeps it. Both get everything new.")
+                    }
+                ]
+                onChosen: {
+                    if (name === "createProfile") {
+                        pageStack.push(Qt.resolvedUrl("AddProfileDialog.qml"), {})
+                    } else {
+                        page.takeOver(name === "backupFile" ? "file" : "device")
+                    }
+                }
             }
         }
     }

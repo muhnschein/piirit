@@ -242,8 +242,8 @@ fn a_profile_that_exists_already_is_asked_after_and_brought_over() {
                 "{}"
             ),
         );
-        record(&s, "ask-device", call!("click", "secondDeviceButton"));
-        record(&s, "ask-file", call!("click", "backupFileButton"));
+        record(&s, "ask-device", call!("click", "secondDeviceTile"));
+        record(&s, "ask-file", call!("click", "backupFileTile"));
         // And the same question asked of a reader who already has a
         // profile, from the plus under the profiles list: three ways
         // rather than two, because making one is the third.
@@ -252,9 +252,9 @@ fn a_profile_that_exists_already_is_asked_after_and_brought_over() {
             "add-load",
             call!("loadWith", common::page_url("AddProfilePage.qml"), "{}"),
         );
-        record(&s, "add-create", call!("click", "createProfileButton"));
-        record(&s, "add-file", call!("click", "backupFileButton"));
-        record(&s, "add-device", call!("click", "secondDeviceButton"));
+        record(&s, "add-create", call!("click", "createProfileTile"));
+        record(&s, "add-file", call!("click", "backupFileTile"));
+        record(&s, "add-device", call!("click", "secondDeviceTile"));
     });
 
     // 2s: the file half. The browser is offered, the camera is not, and
