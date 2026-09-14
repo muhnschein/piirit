@@ -235,35 +235,6 @@ const PROBE_QML: &str = r"
     }
 ";
 
-fn qml_dir() -> PathBuf {
-    PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../qml")
-}
-
-fn stubs_dir() -> PathBuf {
-    PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../tests/silica-stubs")
-}
-
-fn page_url(name: &str) -> String {
-    format!("file://{}", qml_dir().join("pages").join(name).display())
-}
-
-/// Each step and what it recorded. One step per tick: the shim answers
-/// asynchronously and `single_shot` only handles whole seconds.
-type Steps = Rc<RefCell<Vec<(String, String)>>>;
-
-fn record(steps: &Steps, label: &str, value: QString) {
-    steps
-        .borrow_mut()
-        .push((label.to_string(), value.to_string()));
-}
-
-fn value_of<'a>(steps: &'a [(String, String)], label: &str) -> &'a str {
-    steps
-        .iter()
-        .find(|(name, _)| name == label)
-        .map_or("<step did not run>", |(_, value)| value.as_str())
-}
-
 /// Temp directories and environment, returning the journal path.
 fn prepare_environment() -> PathBuf {
     let temp = std::env::temp_dir().join(format!("postivene-qml-pages-{}", std::process::id()));
@@ -291,7 +262,9 @@ fn onboarding_pages_drive_the_core_and_navigate() {
 
     let mut engine = QmlEngine::new();
     // Without this the page files do not parse their imports.
-    engine.add_import_path(QString::from(stubs_dir().to_string_lossy().into_owned()));
+    engine.add_import_path(QString::from(
+        common::stubs_dir().to_string_lossy().into_owned(),
+    ));
     // The two enum namespaces the .qml stubs cannot express.
     let uri = CString::new("Sailfish.Silica").expect("static uri");
     qml_register_enum::<BusyIndicatorSize>(
@@ -315,7 +288,7 @@ fn onboarding_pages_drive_the_core_and_navigate() {
         .borrow_mut()
         .start(QString::from(env!("CARGO_BIN_EXE_fake-core-server")));
 
-    let steps: Steps = Rc::new(RefCell::new(Vec::new()));
+    let steps: common::Steps = Rc::new(RefCell::new(Vec::new()));
     let engine_ptr = std::ptr::addr_of_mut!(engine);
 
     // SAFETY: these callbacks fire only while `exec()` is running on this
@@ -335,17 +308,17 @@ fn onboarding_pages_drive_the_core_and_navigate() {
     // One step per tick; whole seconds only (clippy.toml).
     let s = steps.clone();
     single_shot(Duration::from_secs(1), move || {
-        record(
+        common::record(
             &s,
             "welcome-load",
-            call!("load", page_url("WelcomePage.qml")),
+            call!("load", common::page_url("WelcomePage.qml")),
         );
     });
 
     let s = steps.clone();
     single_shot(Duration::from_secs(2), move || {
-        record(&s, "welcome-probing", call!("pageProperty", "probing"));
-        record(&s, "welcome-click", call!("click", "setupButton"));
+        common::record(&s, "welcome-probing", call!("pageProperty", "probing"));
+        common::record(&s, "welcome-click", call!("click", "setupButton"));
     });
 
     // Where that lands: the two ways into a profile. One asks where the
@@ -353,50 +326,50 @@ fn onboarding_pages_drive_the_core_and_navigate() {
     // dialog.
     let s = steps.clone();
     single_shot(Duration::from_secs(3), move || {
-        record(
+        common::record(
             &s,
             "start-load",
-            call!("load", page_url("ProfileStartPage.qml")),
+            call!("load", common::page_url("ProfileStartPage.qml")),
         );
-        record(
+        common::record(
             &s,
             "start-existing",
             call!("click", "existingProfileButton"),
         );
-        record(&s, "start-create", call!("click", "createProfileButton"));
+        common::record(&s, "start-create", call!("click", "createProfileButton"));
     });
 
     // The dialog: nothing to accept until there is a name; the first
     // relay unless another is picked or one is typed.
     let s = steps.clone();
     single_shot(Duration::from_secs(4), move || {
-        record(
+        common::record(
             &s,
             "dialog-load",
-            call!("load", page_url("AddProfileDialog.qml")),
+            call!("load", common::page_url("AddProfileDialog.qml")),
         );
-        record(&s, "dialog-empty", call!("pageProperty", "canAccept"));
-        record(
+        common::record(&s, "dialog-empty", call!("pageProperty", "canAccept"));
+        common::record(
             &s,
             "dialog-index",
             call!("get", "relayCombo", "currentIndex"),
         );
-        record(&s, "dialog-provider", call!("pageProperty", "providerQr"));
-        record(&s, "dialog-name", call!("setText", "nameField", " Ada "));
-        record(&s, "dialog-named", call!("pageProperty", "canAccept"));
-        record(&s, "dialog-pick", call!("pick", "relayCombo", "1"));
-        record(&s, "dialog-picked", call!("pageProperty", "providerQr"));
-        record(
+        common::record(&s, "dialog-provider", call!("pageProperty", "providerQr"));
+        common::record(&s, "dialog-name", call!("setText", "nameField", " Ada "));
+        common::record(&s, "dialog-named", call!("pageProperty", "canAccept"));
+        common::record(&s, "dialog-pick", call!("pick", "relayCombo", "1"));
+        common::record(&s, "dialog-picked", call!("pageProperty", "providerQr"));
+        common::record(
             &s,
             "dialog-custom",
             call!("setText", "customField", " chat.example.org "),
         );
-        record(&s, "dialog-typed", call!("pageProperty", "providerQr"));
-        record(&s, "dialog-list-off", call!("get", "relayCombo", "enabled"));
-        record(&s, "dialog-uncustom", call!("setText", "customField", ""));
-        record(&s, "dialog-unpick", call!("pick", "relayCombo", "0"));
-        record(&s, "dialog-accept", call!("accept"));
-        record(&s, "dialog-handed", call!("handed"));
+        common::record(&s, "dialog-typed", call!("pageProperty", "providerQr"));
+        common::record(&s, "dialog-list-off", call!("get", "relayCombo", "enabled"));
+        common::record(&s, "dialog-uncustom", call!("setText", "customField", ""));
+        common::record(&s, "dialog-unpick", call!("pick", "relayCombo", "0"));
+        common::record(&s, "dialog-accept", call!("accept"));
+        common::record(&s, "dialog-handed", call!("handed"));
     });
 
     // The setup page, made before it is on screen the way Silica makes
@@ -404,12 +377,12 @@ fn onboarding_pages_drive_the_core_and_navigate() {
     // asked of the core until the page is the one on screen.
     let s = steps.clone();
     single_shot(Duration::from_secs(5), move || {
-        record(
+        common::record(
             &s,
             "setup-load",
             call!(
                 "loadWith",
-                page_url("ProfileSetupPage.qml"),
+                common::page_url("ProfileSetupPage.qml"),
                 r#"{"displayName":"Ada","providerQr":"dcaccount:nine.testrun.org","status":0}"#
             ),
         );
@@ -421,15 +394,15 @@ fn onboarding_pages_drive_the_core_and_navigate() {
         let asked_early = common::records(&journal_early).iter().any(|call| {
             call.get("method").and_then(Value::as_str) == Some("add_transport_from_qr")
         });
-        record(&s, "setup-early", QString::from(asked_early.to_string()));
-        record(&s, "setup-activate", call!("activate"));
+        common::record(&s, "setup-early", QString::from(asked_early.to_string()));
+        common::record(&s, "setup-activate", call!("activate"));
     });
 
     let s = steps.clone();
     single_shot(Duration::from_secs(8), move || {
-        record(&s, "setup-permille", call!("pageProperty", "permille"));
-        record(&s, "setup-error", call!("pageProperty", "errorMessage"));
-        record(&s, "setup-busy", call!("pageProperty", "busy"));
+        common::record(&s, "setup-permille", call!("pageProperty", "permille"));
+        common::record(&s, "setup-error", call!("pageProperty", "errorMessage"));
+        common::record(&s, "setup-busy", call!("pageProperty", "busy"));
     });
 
     single_shot(Duration::from_secs(11), move || unsafe {
@@ -453,7 +426,11 @@ fn onboarding_pages_drive_the_core_and_navigate() {
 /// Every page file must instantiate; nothing below means anything if not.
 fn assert_pages_loaded(steps: &[(String, String)], context: &str) {
     for step in ["welcome-load", "start-load", "dialog-load", "setup-load"] {
-        assert_eq!(value_of(steps, step), "ok", "{step} failed. {context}");
+        assert_eq!(
+            common::value_of(steps, step),
+            "ok",
+            "{step} failed. {context}"
+        );
     }
 }
 
@@ -468,11 +445,11 @@ fn assert_welcome_and_navigation(
     context: &str,
 ) {
     assert_eq!(
-        value_of(steps, "welcome-probing"),
+        common::value_of(steps, "welcome-probing"),
         "false",
         "the welcome page never stopped probing. {context}"
     );
-    assert_eq!(value_of(steps, "welcome-click"), "ok", "{context}");
+    assert_eq!(common::value_of(steps, "welcome-click"), "ok", "{context}");
     assert!(
         navigation.contains("push:ProfileStartPage.qml"),
         "Set up my profile did not start the profile path. {context}"
@@ -507,48 +484,52 @@ fn assert_dialog(steps: &[(String, String)], context: &str) {
         "dialog-unpick",
         "dialog-accept",
     ] {
-        assert_eq!(value_of(steps, step), "ok", "{step} failed. {context}");
+        assert_eq!(
+            common::value_of(steps, step),
+            "ok",
+            "{step} failed. {context}"
+        );
     }
     assert_eq!(
-        value_of(steps, "dialog-empty"),
+        common::value_of(steps, "dialog-empty"),
         "false",
         "the dialog can be accepted without a name. {context}"
     );
     // One of the list, at random: not the first every time.
-    let index: usize = value_of(steps, "dialog-index")
+    let index: usize = common::value_of(steps, "dialog-index")
         .parse()
         .unwrap_or(usize::MAX);
     assert!(
         index < 26,
         "the relay picked on arrival is not one of the list. {context}"
     );
-    let provider = value_of(steps, "dialog-provider");
+    let provider = common::value_of(steps, "dialog-provider");
     assert!(
         provider.starts_with("dcaccount:") && provider.contains('.'),
         "the relay picked on arrival is not a dcaccount: payload with a domain. {context}"
     );
     assert_eq!(
-        value_of(steps, "dialog-named"),
+        common::value_of(steps, "dialog-named"),
         "true",
         "a name does not make the dialog acceptable. {context}"
     );
     assert_eq!(
-        value_of(steps, "dialog-picked"),
+        common::value_of(steps, "dialog-picked"),
         "dcaccount:mehl.cloud",
         "picking the second relay did not change the payload. {context}"
     );
     assert_eq!(
-        value_of(steps, "dialog-typed"),
+        common::value_of(steps, "dialog-typed"),
         "dcaccount:chat.example.org",
         "a typed server does not take over from the list, trimmed. {context}"
     );
     assert_eq!(
-        value_of(steps, "dialog-list-off"),
+        common::value_of(steps, "dialog-list-off"),
         "false",
         "the list is still offered while a server is typed. {context}"
     );
     assert_eq!(
-        value_of(steps, "dialog-handed"),
+        common::value_of(steps, "dialog-handed"),
         "Ada,dcaccount:nine.testrun.org",
         "the setup page was not handed the trimmed name and the relay. {context}"
     );
@@ -558,24 +539,24 @@ fn assert_dialog(steps: &[(String, String)], context: &str) {
 /// made, and progress reaches it.
 fn assert_profile_creation(steps: &[(String, String)], context: &str) {
     assert_eq!(
-        value_of(steps, "setup-early"),
+        common::value_of(steps, "setup-early"),
         "false",
         "the setup page asked the core before it was on screen, which is \
          when Silica makes it, with nothing filled in yet. {context}"
     );
-    assert_eq!(value_of(steps, "setup-activate"), "ok", "{context}");
+    assert_eq!(common::value_of(steps, "setup-activate"), "ok", "{context}");
     assert_eq!(
-        value_of(steps, "setup-permille"),
+        common::value_of(steps, "setup-permille"),
         "1000",
         "ConfigureProgress never reached the page. {context}"
     );
     assert_eq!(
-        value_of(steps, "setup-error"),
+        common::value_of(steps, "setup-error"),
         "",
         "a successful profile left an error on the page. {context}"
     );
     assert_eq!(
-        value_of(steps, "setup-busy"),
+        common::value_of(steps, "setup-busy"),
         "false",
         "the page is still busy after the core answered. {context}"
     );

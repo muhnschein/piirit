@@ -30,7 +30,6 @@
     clippy::needless_pass_by_value
 )]
 
-use std::path::PathBuf;
 use std::time::Duration;
 
 use qmetaobject::*;
@@ -158,36 +157,6 @@ const PROBE_QML: &str = r"
     }
 ";
 
-fn art_dir() -> PathBuf {
-    PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../qml/art")
-}
-
-/// Width, height, bit depth, colour type and interlacing, off the header
-/// chunk every PNG starts with.
-fn png_header(file: &str) -> (u32, u32, u8, u8, u8) {
-    let bytes = std::fs::read(art_dir().join(file))
-        .unwrap_or_else(|err| panic!("qml/art/{file} is missing ({err}); it is committed art"));
-    assert_eq!(
-        &bytes[..8],
-        b"\x89PNG\r\n\x1a\n",
-        "qml/art/{file} is not a PNG"
-    );
-    assert_eq!(
-        &bytes[12..16],
-        b"IHDR",
-        "qml/art/{file} does not start with IHDR"
-    );
-    let at = |offset: usize| {
-        u32::from_be_bytes([
-            bytes[offset],
-            bytes[offset + 1],
-            bytes[offset + 2],
-            bytes[offset + 3],
-        ])
-    };
-    (at(16), at(20), bytes[24], bytes[25], bytes[28])
-}
-
 /// The pictures are what the shader reads: two channels of an 8-bit RGB
 /// PNG, square, not interlaced. One re-exported as grayscale or with an
 /// alpha channel would lose its accents or tint them wrong, and one that
@@ -200,7 +169,7 @@ fn png_header(file: &str) -> (u32, u32, u8, u8, u8) {
 #[test]
 fn the_intro_pictures_are_the_shape_the_shader_reads() {
     for file in PICTURES {
-        let (width, height, depth, colour, interlace) = png_header(file);
+        let (width, height, depth, colour, interlace) = common::png_header(file);
         assert_eq!(depth, 8, "qml/art/{file} is not 8 bits per channel");
         assert_eq!(
             colour, 2,

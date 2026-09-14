@@ -15,8 +15,6 @@ pub(crate) struct RequestEnvelope<'a> {
 
 #[derive(Debug, Deserialize)]
 pub(crate) struct ResponseEnvelope {
-    #[allow(dead_code)]
-    pub jsonrpc: Option<String>,
     pub id: Option<u64>,
     #[serde(default)]
     pub result: Option<Value>,

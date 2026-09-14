@@ -94,16 +94,6 @@ const PROBE_QML: &str = r"
     }
 ";
 
-fn component_url(name: &str) -> String {
-    format!(
-        "file://{}",
-        std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR"))
-            .join("../../qml/components")
-            .join(name)
-            .display()
-    )
-}
-
 /// Long enough to overflow three lines even at the stub's small font; on a
 /// phone it takes far less.
 const LONG_BODY: &str = "a quoted message long enough to need three lines of its own in \
@@ -153,7 +143,7 @@ fn the_reply_bar_wraps_the_jump_button_is_opaque_and_a_notice_is_quiet() {
     single_shot(Duration::from_secs(1), move || unsafe {
         record!(
             "bar-load",
-            call!("load", QString::from(component_url("ReplyBar.qml")))
+            call!("load", QString::from(common::component_url("ReplyBar.qml")))
         );
         call!("set", QString::from("author"), QString::from("Ada"));
         call!("set", QString::from("body"), QString::from(LONG_BODY));
@@ -180,7 +170,10 @@ fn the_reply_bar_wraps_the_jump_button_is_opaque_and_a_notice_is_quiet() {
 
         record!(
             "jump-load",
-            call!("load", QString::from(component_url("JumpButton.qml")))
+            call!(
+                "load",
+                QString::from(common::component_url("JumpButton.qml"))
+            )
         );
     });
 
@@ -244,7 +237,7 @@ fn the_reply_bar_wraps_the_jump_button_is_opaque_and_a_notice_is_quiet() {
 
         record!(
             "banner-load",
-            call!("load", QString::from(component_url("Banner.qml")))
+            call!("load", QString::from(common::component_url("Banner.qml")))
         );
         call!(
             "call",
@@ -279,7 +272,10 @@ fn the_reply_bar_wraps_the_jump_button_is_opaque_and_a_notice_is_quiet() {
         // it is not there until the page says it is.
         record!(
             "tray-load",
-            call!("load", QString::from(component_url("AttachButton.qml")))
+            call!(
+                "load",
+                QString::from(common::component_url("AttachButton.qml"))
+            )
         );
         record!("tray-watch", call!("watchTray"));
         call!("set", QString::from("open"), true);

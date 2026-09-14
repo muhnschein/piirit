@@ -53,16 +53,6 @@ const PROBE_QML: &str = r"
     }
 ";
 
-fn component_url(name: &str) -> String {
-    format!(
-        "file://{}",
-        std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR"))
-            .join("../../qml/components")
-            .join(name)
-            .display()
-    )
-}
-
 #[test]
 fn a_chat_row_shows_its_unread_count_time_and_marks() {
     // SAFETY: single-threaded test binary; set before Qt starts.
@@ -113,7 +103,10 @@ fn a_chat_row_shows_its_unread_count_time_and_marks() {
     single_shot(Duration::from_secs(1), move || unsafe {
         record!(
             "load",
-            call!("load", QString::from(component_url("ChatListDelegate.qml")))
+            call!(
+                "load",
+                QString::from(common::component_url("ChatListDelegate.qml"))
+            )
         );
         set!("chatName", QString::from("Ada Lovelace"));
         set!("preview", QString::from("see you there"));

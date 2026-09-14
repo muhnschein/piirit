@@ -1265,16 +1265,6 @@ async fn serve() {
                     }));
                     ok(&id, &json!(carrier))
                 }
-                "get_message_reactions" => {
-                    let msg = positional(1)
-                        .as_u64()
-                        .and_then(|value| u32::try_from(value).ok())
-                        .unwrap_or_default();
-                    let mut state = state.lock().await;
-                    state.seed_chats();
-                    let reactions = state.reactions_object(msg);
-                    ok(&id, &reactions)
-                }
                 // A join and a one-to-one both end in a fresh chat at the top.
                 "create_chat_by_contact_id" | "secure_join" => {
                     let mut state = state.lock().await;
