@@ -161,6 +161,20 @@ pub struct ChatList {
     /// until it is opened a second time. Typing in the search field starts
     /// one per keystroke for the same reason.
     generation: u64,
+
+    /// What has been asked about and not answered yet, the questions
+    /// whose answers were dropped for being stale among them.
+    ///
+    /// A refresh reads every row it is not refetching out of the model as
+    /// it stands, so a row it leaves alone is only as current as the last
+    /// answer that was kept. Marking a chat read and a message arriving
+    /// in another chat a moment later is enough to lose the first: the
+    /// second refresh carries the read chat's row from before it was
+    /// marked, the first refresh is thrown away for being older, and
+    /// nothing asks about that chat again -- the badge comes back and
+    /// stays. So whatever is still owed an answer is refetched by
+    /// whichever refresh comes next, until one of them lands.
+    awaiting: Awaiting,
 }
 
 impl ChatList {
@@ -446,11 +460,13 @@ impl ChatList {
 
     /// Bring the model in line with the core.
     ///
-    /// [`Refresh::One`] refetches the chat it names along with any chat not
-    /// in the model yet, and reuses every other row -- so a message
-    /// arriving in one chat costs one entry listing and one item fetch, not
-    /// a rebuild. [`Refresh::All`] refetches the lot, which is what the
-    /// core asks for when it reports a change it cannot attribute.
+    /// [`Refresh::One`] refetches the chat it names, along with any chat
+    /// not in the model yet and any chat an earlier refresh is still
+    /// waiting on (see `awaiting`), and reuses every other row -- so a
+    /// message arriving in one chat costs one entry listing and one item
+    /// fetch, not a rebuild. [`Refresh::All`] refetches the lot, which is
+    /// what the core asks for when it reports a change it cannot
+    /// attribute.
     fn refresh(&mut self, scope: Refresh) {
         self.refresh_announcing(scope, None);
     }
@@ -476,6 +492,16 @@ impl ChatList {
             self.pending_announcements.insert(chat_id);
         }
 
+        // What this refresh has to re-read: what it was started for, plus
+        // whatever an earlier refresh was started for and has not been
+        // answered yet. See `awaiting`.
+        self.awaiting.add(scope);
+        let refetch_all = matches!(self.awaiting, Awaiting::Everything);
+        let awaiting = match &self.awaiting {
+            Awaiting::Chats(chats) => chats.clone(),
+            Awaiting::Nothing | Awaiting::Everything => HashSet::new(),
+        };
+
         self.generation = self.generation.wrapping_add(1);
         let generation = self.generation;
 
@@ -498,6 +524,11 @@ impl ChatList {
                         this_mut.pinned_count = u32::try_from(pinned).unwrap_or(u32::MAX);
                         this_mut.unpinned_count =
                             u32::try_from(target.len() - pinned).unwrap_or(u32::MAX);
+                        // Everything that was waiting was re-read by this
+                        // refresh, so nothing is owed any more. A failed
+                        // one leaves it waiting, for the next refresh to
+                        // ask about again.
+                        this_mut.awaiting = Awaiting::Nothing;
                     }
                     {
                         let this_ref = this.borrow();
@@ -522,10 +553,7 @@ impl ChatList {
                 let wanted: Vec<u32> = entries
                     .iter()
                     .copied()
-                    .filter(|id| match scope {
-                        Refresh::All => true,
-                        Refresh::One(chat) => *id == chat || !known.contains(id),
-                    })
+                    .filter(|id| refetch_all || awaiting.contains(id) || !known.contains(id))
                     .collect();
                 let fresh = if wanted.is_empty() {
                     HashMap::new()
@@ -577,6 +605,36 @@ async fn is_mention(rpc: &RpcClient, account_id: u32, chat_id: u32, message_id: 
     };
     // Contact id 1 is the well-known DC_CONTACT_ID_SELF.
     json::u32_opt(&original, "fromId") == Some(1)
+}
+
+/// What the model has asked the core about and not heard back on; see
+/// the field of the same name.
+#[derive(Default)]
+enum Awaiting {
+    /// Every question asked has been answered.
+    #[default]
+    Nothing,
+    /// These chats have been asked about.
+    Chats(HashSet<u32>),
+    /// So has the whole list, which covers every chat: one row re-read
+    /// would not do in its place, because the answer carrying the rest
+    /// can still be dropped for being stale.
+    Everything,
+}
+
+impl Awaiting {
+    /// Add what a refresh is about to ask for.
+    fn add(&mut self, scope: Refresh) {
+        match (&mut *self, scope) {
+            (Awaiting::Everything, _) | (_, Refresh::All) => *self = Awaiting::Everything,
+            (Awaiting::Chats(chats), Refresh::One(chat_id)) => {
+                chats.insert(chat_id);
+            }
+            (Awaiting::Nothing, Refresh::One(chat_id)) => {
+                *self = Awaiting::Chats(HashSet::from([chat_id]));
+            }
+        }
+    }
 }
 
 /// How much of the list a refresh has to re-read from the core.
