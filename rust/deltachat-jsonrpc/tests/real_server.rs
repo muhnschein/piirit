@@ -1324,6 +1324,74 @@ async fn offline_round_trip_against_real_core() {
         "a query still lists the account's own contact: {contacts_searched:?}"
     );
 
+    // Blocking, which the core keeps a list of its own for: a blocked
+    // contact is listed by `get_blocked_contacts` -- which takes the
+    // account and nothing else -- as a whole contact object, the same
+    // shape a row is drawn from, and each way round is announced as a
+    // `ContactsChanged`, which is all an open page is told.
+    //
+    // That a blocked contact leaves `get_contacts` is not asserted here
+    // and cannot be: everything this offline session can make is an
+    // address contact, which the core's contact listing leaves out
+    // whether it is blocked or not (`get_contacts` above answers with
+    // the account's own contact and nothing else). The fake core models
+    // the exclusion, and `postivene-shim/tests/blocking.rs` drives this
+    // side of it.
+    client
+        .call::<_, ()>("block_contact", (sender_id, ada))
+        .await
+        .expect("block_contact");
+    let blocked: Vec<Value> = client
+        .call("get_blocked_contacts", (sender_id,))
+        .await
+        .expect("get_blocked_contacts");
+    let blocked_ada = blocked
+        .iter()
+        .find(|contact| contact.get("id").and_then(Value::as_u64) == Some(u64::from(ada)))
+        .unwrap_or_else(|| panic!("a blocked contact is not on the blocked list: {blocked:?}"));
+    assert_eq!(
+        (
+            blocked_ada.get("isBlocked").and_then(Value::as_bool),
+            blocked_ada.get("displayName").and_then(Value::as_str),
+        ),
+        (Some(true), Some("Ada Lovelace")),
+        "the blocked list does not carry whole contacts: {blocked_ada:?}"
+    );
+    let mut saw_contacts_changed = false;
+    let deadline = tokio::time::Instant::now() + Duration::from_secs(30);
+    while tokio::time::Instant::now() < deadline {
+        match tokio::time::timeout_at(deadline, events.recv()).await {
+            Ok(Some(event)) => {
+                if event.context_id == sender_id
+                    && event.event.get("kind").and_then(Value::as_str) == Some("ContactsChanged")
+                {
+                    saw_contacts_changed = true;
+                    break;
+                }
+            }
+            _ => break,
+        }
+    }
+    assert!(
+        saw_contacts_changed,
+        "no ContactsChanged event arrived after blocking a contact, so an \
+         open block list would never hear of one made elsewhere"
+    );
+    client
+        .call::<_, ()>("unblock_contact", (sender_id, ada))
+        .await
+        .expect("unblock_contact");
+    let blocked_after: Vec<Value> = client
+        .call("get_blocked_contacts", (sender_id,))
+        .await
+        .expect("get_blocked_contacts after unblocking");
+    assert!(
+        !blocked_after
+            .iter()
+            .any(|contact| contact.get("id").and_then(Value::as_u64) == Some(u64::from(ada))),
+        "an unblocked contact is still on the blocked list: {blocked_after:?}"
+    );
+
     // What the row's context menu does. Visibility is one method with the
     // core's own variant names, and muting takes a tagged duration.
     for visibility in ["Pinned", "Archived", "Normal"] {

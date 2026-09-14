@@ -176,6 +176,72 @@
     </message>
 </context>
 <context>
+    <name>BlockContactDialog</name>
+    <message>
+        <source>Block contact</source>
+        <translation>Zablokovat kontakt</translation>
+    </message>
+    <message>
+        <source>Unblock contact</source>
+        <translation>Odblokovat kontakt</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Zrušit</translation>
+    </message>
+    <message>
+        <source>Block this contact?
+
+Direct messages or groups created by blocked contacts will not show up.
+
+Other groups with blocked contacts will still show their messages.</source>
+        <translation>Přejete si zablokovat tento kontakt?
+
+Soukromé zprávy a skupiny vytvořené zablokovanými kontakty budou skryty.
+
+V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se jejich zprávy budou zobrazovat i nadále.</translation>
+    </message>
+    <message>
+        <source>Unblock this contact?</source>
+        <translation>Přejete si odblokovat tento kontakt?</translation>
+    </message>
+</context>
+<context>
+    <name>BlockContactPage</name>
+    <message>
+        <source>Block contact</source>
+        <translation>Zablokovat kontakt</translation>
+    </message>
+    <message>
+        <source>Search</source>
+        <translation>Hledat</translation>
+    </message>
+    <message>
+        <source>Nobody matches</source>
+        <translation>Nikdo nevyhovuje</translation>
+    </message>
+    <message>
+        <source>No contacts yet</source>
+        <translation>Zatím žádné kontakty</translation>
+    </message>
+</context>
+<context>
+    <name>BlockedContactsPage</name>
+    <message>
+        <source>Block contact</source>
+        <extracomment>Opens the contacts, to pick one to block.</extracomment>
+        <translation>Zablokovat kontakt</translation>
+    </message>
+    <message>
+        <source>Blocked contacts</source>
+        <translation>Blokované kontakty</translation>
+    </message>
+    <message>
+        <source>Blocked contacts will appear here.</source>
+        <translation>Zablokované kontakty se zobrazí zde.</translation>
+    </message>
+</context>
+<context>
     <name>CapturePage</name>
     <message>
         <source>The video could not be saved</source>
@@ -1272,10 +1338,6 @@
         <translation>Automaticky stahovat přílohy</translation>
     </message>
     <message>
-        <source>Links</source>
-        <translation>Odkazy</translation>
-    </message>
-    <message>
         <source>Remove tracking from links</source>
         <translation>Odstranit sledování z odkazů</translation>
     </message>
@@ -1377,6 +1439,14 @@
     <message>
         <source>Small apps run inside the chat. Somebody else&apos;s code, and less tested than the rest.</source>
         <translation>Malé aplikace běží uvnitř chatu. Cizí kód, a méně vyzkoušený než zbytek.</translation>
+    </message>
+    <message>
+        <source>Privacy</source>
+        <translation>Soukromí</translation>
+    </message>
+    <message>
+        <source>Blocked contacts</source>
+        <translation>Blokované kontakty</translation>
     </message>
 </context>
 <context>

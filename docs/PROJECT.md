@@ -488,8 +488,7 @@ In order of what matters:
    validator runs against each built RPM. One blocker remains, and it is not
    fixable here: the bundled `deltachat-rpc-server` is a second ELF
    executable, which Harbour permits nowhere.
-2. **Blocking** outside a request; add-as-second-device and
-   restore-from-backup.
+2. **Add-as-second-device**, and restore-from-backup.
 3. **Message polish**: avatars on bubbles, and a way to react with an
    emoji the quick row does not offer.
 4. **The rest of the webxdc API.** Apps are sent, shown and run

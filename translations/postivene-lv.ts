@@ -176,6 +176,72 @@
     </message>
 </context>
 <context>
+    <name>BlockContactDialog</name>
+    <message>
+        <source>Block contact</source>
+        <translation>Bloķēt kontaktu</translation>
+    </message>
+    <message>
+        <source>Unblock contact</source>
+        <translation>Atbloķēt kontaktu</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Atcelt</translation>
+    </message>
+    <message>
+        <source>Block this contact?
+
+Direct messages or groups created by blocked contacts will not show up.
+
+Other groups with blocked contacts will still show their messages.</source>
+        <translation>Bloķēt šo kontaktu?
+
+Bloķēto kontaktu tiešās ziņas un to izveidotās grupas netiks rādītas.
+
+Citās grupās, kurās ir bloķēti kontakti, viņu ziņas joprojām būs redzamas.</translation>
+    </message>
+    <message>
+        <source>Unblock this contact?</source>
+        <translation>Atbloķēt šo kontaktu?</translation>
+    </message>
+</context>
+<context>
+    <name>BlockContactPage</name>
+    <message>
+        <source>Block contact</source>
+        <translation>Bloķēt kontaktu</translation>
+    </message>
+    <message>
+        <source>Search</source>
+        <translation>Meklēt</translation>
+    </message>
+    <message>
+        <source>Nobody matches</source>
+        <translation>Neviens neatbilst</translation>
+    </message>
+    <message>
+        <source>No contacts yet</source>
+        <translation>Vēl nav kontaktu</translation>
+    </message>
+</context>
+<context>
+    <name>BlockedContactsPage</name>
+    <message>
+        <source>Block contact</source>
+        <extracomment>Opens the contacts, to pick one to block.</extracomment>
+        <translation>Bloķēt kontaktu</translation>
+    </message>
+    <message>
+        <source>Blocked contacts</source>
+        <translation>Bloķētie kontakti</translation>
+    </message>
+    <message>
+        <source>Blocked contacts will appear here.</source>
+        <translation>Bloķētie kontakti parādīsies šeit.</translation>
+    </message>
+</context>
+<context>
     <name>CapturePage</name>
     <message>
         <source>The video could not be saved</source>
@@ -1272,10 +1338,6 @@
         <translation>Automātiski lejupielādēt pielikumus</translation>
     </message>
     <message>
-        <source>Links</source>
-        <translation>Saites</translation>
-    </message>
-    <message>
         <source>Remove tracking from links</source>
         <translation>Noņemt izsekošanu no saitēm</translation>
     </message>
@@ -1377,6 +1439,14 @@
     <message>
         <source>Small apps run inside the chat. Somebody else&apos;s code, and less tested than the rest.</source>
         <translation>Mazas lietotnes darbojas sarunas iekšienē. Kāda cita kods, un mazāk pārbaudīts nekā pārējais.</translation>
+    </message>
+    <message>
+        <source>Privacy</source>
+        <translation>Privātums</translation>
+    </message>
+    <message>
+        <source>Blocked contacts</source>
+        <translation>Bloķētie kontakti</translation>
     </message>
 </context>
 <context>

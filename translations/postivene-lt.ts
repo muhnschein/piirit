@@ -176,6 +176,68 @@
     </message>
 </context>
 <context>
+    <name>BlockContactDialog</name>
+    <message>
+        <source>Block contact</source>
+        <translation>Užblokuoti adresatą</translation>
+    </message>
+    <message>
+        <source>Unblock contact</source>
+        <translation>Atblokuoti adresatą</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Atšaukti</translation>
+    </message>
+    <message>
+        <source>Block this contact?
+
+Direct messages or groups created by blocked contacts will not show up.
+
+Other groups with blocked contacts will still show their messages.</source>
+        <translation>Užblokuoti šį adresatą? Jūs daugiau nebegausite žinučių nuo šio adresato.</translation>
+    </message>
+    <message>
+        <source>Unblock this contact?</source>
+        <translation>Atblokuoti šį adresatą? Jūs ir vėl galėsite gauti žinutes nuo šio adresato.</translation>
+    </message>
+</context>
+<context>
+    <name>BlockContactPage</name>
+    <message>
+        <source>Block contact</source>
+        <translation>Užblokuoti adresatą</translation>
+    </message>
+    <message>
+        <source>Search</source>
+        <translation>Ieškoti</translation>
+    </message>
+    <message>
+        <source>Nobody matches</source>
+        <translation>Niekas neatitinka</translation>
+    </message>
+    <message>
+        <source>No contacts yet</source>
+        <translation>Kontaktų dar nėra</translation>
+    </message>
+</context>
+<context>
+    <name>BlockedContactsPage</name>
+    <message>
+        <source>Block contact</source>
+        <extracomment>Opens the contacts, to pick one to block.</extracomment>
+        <translation>Užblokuoti adresatą</translation>
+    </message>
+    <message>
+        <source>Blocked contacts</source>
+        <translation>Užblokuoti adresatai</translation>
+    </message>
+    <message>
+        <source>Blocked contacts will appear here.</source>
+        <translation>Jei užblokuosite adresatus, jie bus rodomi čia.</translation>
+    </message>
+</context>
+<context>
     <name>CapturePage</name>
     <message>
         <source>The video could not be saved</source>
@@ -1272,10 +1334,6 @@
         <translation>Automatiškai atsisiųsti priedus</translation>
     </message>
     <message>
-        <source>Links</source>
-        <translation>Nuorodos</translation>
-    </message>
-    <message>
         <source>Remove tracking from links</source>
         <translation>Šalinti sekimą iš nuorodų</translation>
     </message>
@@ -1377,6 +1435,14 @@
     <message>
         <source>Small apps run inside the chat. Somebody else&apos;s code, and less tested than the rest.</source>
         <translation>Mažos programėlės veikia pokalbio viduje. Kito žmogaus kodas, ir mažiau išbandytas nei visa kita.</translation>
+    </message>
+    <message>
+        <source>Privacy</source>
+        <translation>Privatumas</translation>
+    </message>
+    <message>
+        <source>Blocked contacts</source>
+        <translation>Užblokuoti adresatai</translation>
     </message>
 </context>
 <context>

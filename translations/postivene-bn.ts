@@ -175,6 +175,72 @@
     </message>
 </context>
 <context>
+    <name>BlockContactDialog</name>
+    <message>
+        <source>Block contact</source>
+        <translation>পরিচিতি ব্লক করুন</translation>
+    </message>
+    <message>
+        <source>Unblock contact</source>
+        <translation>পরিচিতি আনব্লক করুন</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>বাতিল</translation>
+    </message>
+    <message>
+        <source>Block this contact?
+
+Direct messages or groups created by blocked contacts will not show up.
+
+Other groups with blocked contacts will still show their messages.</source>
+        <translation>এই পরিচিতিকে ব্লক করবেন?
+
+ব্লক করা পরিচিতিদের সরাসরি বার্তা বা তাদের তৈরি গ্রুপ দেখা যাবে না।
+
+ব্লক করা পরিচিতি আছে এমন অন্য গ্রুপে তাদের বার্তা তবুও দেখা যাবে।</translation>
+    </message>
+    <message>
+        <source>Unblock this contact?</source>
+        <translation>এই পরিচিতিকে আনব্লক করবেন?</translation>
+    </message>
+</context>
+<context>
+    <name>BlockContactPage</name>
+    <message>
+        <source>Block contact</source>
+        <translation>পরিচিতি ব্লক করুন</translation>
+    </message>
+    <message>
+        <source>Search</source>
+        <translation>অনুসন্ধান</translation>
+    </message>
+    <message>
+        <source>Nobody matches</source>
+        <translation>কেউ মেলে না</translation>
+    </message>
+    <message>
+        <source>No contacts yet</source>
+        <translation>এখনও কোনো পরিচিতি নেই</translation>
+    </message>
+</context>
+<context>
+    <name>BlockedContactsPage</name>
+    <message>
+        <source>Block contact</source>
+        <extracomment>Opens the contacts, to pick one to block.</extracomment>
+        <translation>পরিচিতি ব্লক করুন</translation>
+    </message>
+    <message>
+        <source>Blocked contacts</source>
+        <translation>ব্লক করা পরিচিতি</translation>
+    </message>
+    <message>
+        <source>Blocked contacts will appear here.</source>
+        <translation>ব্লক করা পরিচিতিরা এখানে দেখা যাবে।</translation>
+    </message>
+</context>
+<context>
     <name>CapturePage</name>
     <message>
         <source>The video could not be saved</source>
@@ -1266,10 +1332,6 @@
         <translation>সংযুক্তি স্বয়ংক্রিয়ভাবে ডাউনলোড করুন</translation>
     </message>
     <message>
-        <source>Links</source>
-        <translation>লিংক</translation>
-    </message>
-    <message>
         <source>Remove tracking from links</source>
         <translation>লিংক থেকে ট্র্যাকিং সরান</translation>
     </message>
@@ -1371,6 +1433,14 @@
     <message>
         <source>Small apps run inside the chat. Somebody else&apos;s code, and less tested than the rest.</source>
         <translation>ছোট অ্যাপ আড্ডার ভেতরেই চলে। অন্যের কোড, আর বাকিটার চেয়ে কম পরখ করা।</translation>
+    </message>
+    <message>
+        <source>Privacy</source>
+        <translation>গোপনীয়তা</translation>
+    </message>
+    <message>
+        <source>Blocked contacts</source>
+        <translation>ব্লক করা পরিচিতি</translation>
     </message>
 </context>
 <context>

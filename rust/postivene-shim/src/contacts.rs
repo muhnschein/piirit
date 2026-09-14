@@ -13,6 +13,10 @@ use crate::models::{ContactItem, ContactListModel};
 
 /// Known, unblocked contacts, and the calls that turn one into a chat.
 ///
+/// With `blocked` set it lists the account's blocked contacts instead,
+/// which is the other list the core keeps and the one the blocked
+/// contacts page shows.
+///
 /// ```qml
 /// ContactList { id: contacts; account_id: page.accountId }
 /// SilicaListView { model: contacts.rows }
@@ -38,6 +42,16 @@ pub struct ContactList {
     pub include_self: qt_property!(bool; WRITE set_include_self NOTIFY include_self_changed),
     /// Emitted when `include_self` changes.
     pub include_self_changed: qt_signal!(),
+
+    /// List the contacts this account has blocked rather than the ones
+    /// it can write to. The core keeps the two apart -- a blocked
+    /// contact is in neither `get_contacts` nor any picker -- so this is
+    /// a different list, not a filter over the one above. `query` and
+    /// `include_self` say nothing here: the core's call takes neither,
+    /// and a blocked list is short enough to read.
+    pub blocked: qt_property!(bool; WRITE set_blocked NOTIFY blocked_changed),
+    /// Emitted when `blocked` changes.
+    pub blocked_changed: qt_signal!(),
 
     /// The rows, for a `SilicaListView`'s `model`.
     pub rows: qt_property!(RefCell<ContactListModel>; CONST),
@@ -82,6 +96,26 @@ pub struct ContactList {
     /// it cost to open that page was the size of an address book that
     /// had nothing to do with the group.
     pub picked_rows: qt_method!(fn(&self, contact_ids: QVariantList) -> QVariantList),
+
+    /// Stop hearing from a contact: nothing they send arrives, and they
+    /// are not offered by anything that picks a contact. Blocking is the
+    /// account's, as the core keeps it -- one profile's block list says
+    /// nothing about another's.
+    pub block: qt_method!(fn(&mut self, contact_id: u32)),
+
+    /// Hear from a contact again.
+    pub unblock: qt_method!(fn(&mut self, contact_id: u32)),
+
+    /// A block was applied, and this list has been asked again. `blocked`
+    /// is which way it went, for a page that says so.
+    pub blocking_applied: qt_signal!(contact_id: u32, blocked: bool),
+
+    /// Feed a `core_event` in. Events for other accounts are ignored.
+    ///
+    /// Blocking from another device lands here as a `ContactsChanged`,
+    /// and so does the core's own answer to a block made on this one.
+    pub handle_event:
+        qt_method!(fn(&mut self, context_id: u32, kind: QString, payload_json: QString)),
 
     /// Fetch this account's own invite, the one to hand out. Answers on
     /// `invite_ready`.
@@ -131,6 +165,15 @@ impl ContactList {
         }
     }
 
+    /// Show the blocked contacts, or the ones that can be written to.
+    pub fn set_blocked(&mut self, blocked: bool) {
+        if self.blocked != blocked {
+            self.blocked = blocked;
+            self.blocked_changed();
+            self.reload();
+        }
+    }
+
     /// Reload the list.
     pub fn reload(&mut self) {
         let account_id = self.account_id;
@@ -145,6 +188,7 @@ impl ContactList {
         // puts the account's own contact at the end of them. The
         // "verified only" flag is never wanted here.
         let list_flags: u32 = if self.include_self { 2 } else { 0 };
+        let blocked = self.blocked;
         self.generation = self.generation.wrapping_add(1);
         let generation = self.generation;
 
@@ -166,14 +210,93 @@ impl ContactList {
         });
 
         runtime.spawn(async move {
-            let query = if query.is_empty() { None } else { Some(query) };
-            let result = rpc
-                .call::<_, Vec<serde_json::Value>>("get_contacts", (account_id, list_flags, query))
+            // Two calls rather than a flag on one: the core lists the
+            // blocked contacts through a method of its own, which takes
+            // neither the flags nor the query.
+            let contacts = if blocked {
+                rpc.call::<_, Vec<serde_json::Value>>("get_blocked_contacts", (account_id,))
+                    .await
+            } else {
+                let query = if query.is_empty() { None } else { Some(query) };
+                rpc.call::<_, Vec<serde_json::Value>>(
+                    "get_contacts",
+                    (account_id, list_flags, query),
+                )
                 .await
+            };
+            let result = contacts
                 .map(|contacts| contacts.iter().map(contact_row).collect())
                 .map_err(|err| err.to_string());
             done(result);
         });
+    }
+
+    /// Stop hearing from a contact.
+    pub fn block(&mut self, contact_id: u32) {
+        self.set_blocking(contact_id, true);
+    }
+
+    /// Hear from a contact again.
+    pub fn unblock(&mut self, contact_id: u32) {
+        self.set_blocking(contact_id, false);
+    }
+
+    /// Block or unblock, then read the list back.
+    ///
+    /// Read back rather than edited in place: a block takes the contact
+    /// out of one of these lists and puts it into the other, and which
+    /// list this one is deciding that is the core's business, not a row
+    /// removal guessed at here.
+    fn set_blocking(&mut self, contact_id: u32, blocked: bool) {
+        let account_id = self.account_id;
+        if account_id == 0 || contact_id == 0 {
+            return;
+        }
+        let Some((rpc, runtime)) = connection() else {
+            self.error(QString::from("not started"));
+            return;
+        };
+
+        let ptr: QPointer<Self> = QPointer::from(&*self);
+        let done = queued_callback(move |result: Result<(), String>| {
+            let Some(this) = ptr.as_pinned() else { return };
+            match result {
+                Ok(()) => {
+                    this.borrow_mut().reload();
+                    this.borrow().blocking_applied(contact_id, blocked);
+                }
+                Err(err) => this.borrow().error(err.into()),
+            }
+        });
+
+        let method = if blocked {
+            "block_contact"
+        } else {
+            "unblock_contact"
+        };
+        runtime.spawn(async move {
+            let result = rpc
+                .call::<_, ()>(method, (account_id, contact_id))
+                .await
+                .map_err(|err| err.to_string());
+            done(result);
+        });
+    }
+
+    /// Apply one core event.
+    pub fn handle_event(&mut self, context_id: u32, kind: QString, _payload_json: QString) {
+        if context_id != self.account_id || self.account_id == 0 {
+            return;
+        }
+        // A contact added, renamed, blocked or unblocked -- from here or
+        // from another device -- and the overflow that says events were
+        // dropped, which is answered by reading everything again.
+        if matches!(
+            kind.to_string().as_str(),
+            "ContactsChanged" | "EventChannelOverflow"
+        ) {
+            self.reload();
+        }
     }
 
     /// The reader's own row, then the picked ones. See the declaration.

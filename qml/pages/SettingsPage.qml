@@ -14,6 +14,16 @@ import "../components"
  * two things about a profile that are not settings, its invite code and
  * its backup, since the core's export does one account at a time.
  *
+ * The one exception to that division is the way into the block list,
+ * under Privacy with the link cleaning, which is the other setting about
+ * what the reader gives away. Blocking is the core's, and the core keeps it per
+ * account, so the page it opens (BlockedContactsPage.qml) is a profile's
+ * -- it is here because that is where both reference clients keep it,
+ * and because a reader looking for it looks in the app's settings rather
+ * than in a profile's. The profile is `accountId`, handed in by the chat
+ * list this was pulled down from, which is the profile whose chats the
+ * reader was looking at.
+ *
  * The values live in dconf, behind the `Settings` singleton every page
  * reads (qml/components/Settings.qml); this page writes the same object,
  * so a change here reaches every open page without either side being
@@ -29,6 +39,10 @@ import "../components"
  */
 Page {
     id: page
+
+    /// Whose block list the Privacy row opens. Nothing else on this page
+    /// belongs to a profile; see the note above.
+    property int accountId
 
     /// The download limits offered, in bytes, as parla offers them. The
     /// first is the smallest the core accepts, which is as near to never
@@ -296,8 +310,12 @@ Page {
                 onClicked: Settings.mentionNotifications = !checked
             }
 
+            // What the reader gives away, in one place: what leaves with
+            // a link they send, and who is not heard from at all. The
+            // link switch had a heading of its own with nothing else
+            // under it.
             SectionHeader {
-                text: qsTr("Links")
+                text: qsTr("Privacy")
             }
 
             TextSwitch {
@@ -309,6 +327,38 @@ Page {
                 automaticCheck: false
                 checked: Settings.cleanLinks === true
                 onClicked: Settings.cleanLinks = !checked
+            }
+
+            // The one row on this page that leads somewhere rather than
+            // setting something, so it goes under the switches: the block
+            // list is a list of people, and that is a page
+            // (BlockedContactsPage.qml). It is where the reference clients
+            // put it -- both keep it in the app's settings -- and it is
+            // the one thing here that belongs to a profile rather than to
+            // the phone, since the core keeps a block list per account. No
+            // line under it saying which profile: this is pulled down from
+            // that profile's chats, and every other page reached that way
+            // is that profile's too.
+            BackgroundItem {
+                id: blockedEntry
+                objectName: "blockedContactsEntry"
+                width: parent.width
+                height: Theme.itemSizeSmall
+
+                Label {
+                    objectName: "blockedContactsLabel"
+                    x: Theme.horizontalPageMargin
+                    width: parent.width - 2 * Theme.horizontalPageMargin
+                    anchors.verticalCenter: parent.verticalCenter
+                    truncationMode: TruncationMode.Fade
+                    color: blockedEntry.highlighted ? Theme.highlightColor
+                                                    : Theme.primaryColor
+                    text: qsTr("Blocked contacts")
+                }
+
+                onClicked: pageStack.push(Qt.resolvedUrl("BlockedContactsPage.qml"), {
+                    accountId: page.accountId
+                })
             }
 
             SectionHeader {
