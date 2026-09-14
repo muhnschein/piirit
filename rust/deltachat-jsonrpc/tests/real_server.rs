@@ -1325,12 +1325,18 @@ async fn offline_round_trip_against_real_core() {
     );
 
     // Blocking, which the core keeps a list of its own for: a blocked
-    // contact leaves `get_contacts` whatever flags it is given, and
-    // `get_blocked_contacts` -- which takes the account and nothing else
-    // -- is the only way back to them. That is what the blocked contacts
-    // page is built on, and what the picker in front of it relies on to
-    // offer nobody who is blocked already. Put back at the end, so the
-    // rest of this test meets the contact it expects.
+    // contact is listed by `get_blocked_contacts` -- which takes the
+    // account and nothing else -- as a whole contact object, the same
+    // shape a row is drawn from, and each way round is announced as a
+    // `ContactsChanged`, which is all an open page is told.
+    //
+    // That a blocked contact leaves `get_contacts` is not asserted here
+    // and cannot be: everything this offline session can make is an
+    // address contact, which the core's contact listing leaves out
+    // whether it is blocked or not (`get_contacts` above answers with
+    // the account's own contact and nothing else). The fake core models
+    // the exclusion, and `postivene-shim/tests/blocking.rs` drives this
+    // side of it.
     client
         .call::<_, ()>("block_contact", (sender_id, ada))
         .await
@@ -1339,21 +1345,37 @@ async fn offline_round_trip_against_real_core() {
         .call("get_blocked_contacts", (sender_id,))
         .await
         .expect("get_blocked_contacts");
-    assert!(
-        blocked
-            .iter()
-            .any(|contact| contact.get("id").and_then(Value::as_u64) == Some(u64::from(ada))),
-        "a blocked contact is not on the core's blocked list: {blocked:?}"
+    let blocked_ada = blocked
+        .iter()
+        .find(|contact| contact.get("id").and_then(Value::as_u64) == Some(u64::from(ada)))
+        .unwrap_or_else(|| panic!("a blocked contact is not on the blocked list: {blocked:?}"));
+    assert_eq!(
+        (
+            blocked_ada.get("isBlocked").and_then(Value::as_bool),
+            blocked_ada.get("displayName").and_then(Value::as_str),
+        ),
+        (Some(true), Some("Ada Lovelace")),
+        "the blocked list does not carry whole contacts: {blocked_ada:?}"
     );
-    let contacts_blocked: Vec<Value> = client
-        .call("get_contacts", (sender_id, 2, Option::<String>::None))
-        .await
-        .expect("get_contacts with a blocked contact");
+    let mut saw_contacts_changed = false;
+    let deadline = tokio::time::Instant::now() + Duration::from_secs(30);
+    while tokio::time::Instant::now() < deadline {
+        match tokio::time::timeout_at(deadline, events.recv()).await {
+            Ok(Some(event)) => {
+                if event.context_id == sender_id
+                    && event.event.get("kind").and_then(Value::as_str) == Some("ContactsChanged")
+                {
+                    saw_contacts_changed = true;
+                    break;
+                }
+            }
+            _ => break,
+        }
+    }
     assert!(
-        !contacts_blocked
-            .iter()
-            .any(|contact| contact.get("id").and_then(Value::as_u64) == Some(u64::from(ada))),
-        "get_contacts still lists a blocked contact: {contacts_blocked:?}"
+        saw_contacts_changed,
+        "no ContactsChanged event arrived after blocking a contact, so an \
+         open block list would never hear of one made elsewhere"
     );
     client
         .call::<_, ()>("unblock_contact", (sender_id, ada))
@@ -1368,16 +1390,6 @@ async fn offline_round_trip_against_real_core() {
             .iter()
             .any(|contact| contact.get("id").and_then(Value::as_u64) == Some(u64::from(ada))),
         "an unblocked contact is still on the blocked list: {blocked_after:?}"
-    );
-    let contacts_unblocked: Vec<Value> = client
-        .call("get_contacts", (sender_id, 2, Option::<String>::None))
-        .await
-        .expect("get_contacts after unblocking");
-    assert!(
-        contacts_unblocked
-            .iter()
-            .any(|contact| contact.get("id").and_then(Value::as_u64) == Some(u64::from(ada))),
-        "an unblocked contact did not come back to get_contacts: {contacts_unblocked:?}"
     );
 
     // What the row's context menu does. Visibility is one method with the
