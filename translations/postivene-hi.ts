@@ -175,6 +175,72 @@
     </message>
 </context>
 <context>
+    <name>BlockContactDialog</name>
+    <message>
+        <source>Block contact</source>
+        <translation>संपर्क ब्लॉक करें</translation>
+    </message>
+    <message>
+        <source>Unblock contact</source>
+        <translation>संपर्क अनब्लॉक करें</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>रद्द करें</translation>
+    </message>
+    <message>
+        <source>Block this contact?
+
+Direct messages or groups created by blocked contacts will not show up.
+
+Other groups with blocked contacts will still show their messages.</source>
+        <translation>इस संपर्क को ब्लॉक करें?
+
+ब्लॉक किए गए संपर्कों के सीधे संदेश या उनके बनाए समूह दिखाई नहीं देंगे।
+
+ब्लॉक किए गए संपर्कों वाले अन्य समूहों में उनके संदेश फिर भी दिखेंगे।</translation>
+    </message>
+    <message>
+        <source>Unblock this contact?</source>
+        <translation>इस संपर्क को अनब्लॉक करें?</translation>
+    </message>
+</context>
+<context>
+    <name>BlockContactPage</name>
+    <message>
+        <source>Block contact</source>
+        <translation>संपर्क ब्लॉक करें</translation>
+    </message>
+    <message>
+        <source>Search</source>
+        <translation>खोजें</translation>
+    </message>
+    <message>
+        <source>Nobody matches</source>
+        <translation>कोई मेल नहीं खाता</translation>
+    </message>
+    <message>
+        <source>No contacts yet</source>
+        <translation>अभी कोई संपर्क नहीं</translation>
+    </message>
+</context>
+<context>
+    <name>BlockedContactsPage</name>
+    <message>
+        <source>Block contact</source>
+        <extracomment>Opens the contacts, to pick one to block.</extracomment>
+        <translation>संपर्क ब्लॉक करें</translation>
+    </message>
+    <message>
+        <source>Blocked contacts</source>
+        <translation>ब्लॉक किए गए संपर्क</translation>
+    </message>
+    <message>
+        <source>Blocked contacts will appear here.</source>
+        <translation>ब्लॉक किए गए संपर्क यहाँ दिखाई देंगे।</translation>
+    </message>
+</context>
+<context>
     <name>CapturePage</name>
     <message>
         <source>The video could not be saved</source>
@@ -1266,10 +1332,6 @@
         <translation>अटैचमेंट अपने आप डाउनलोड करें</translation>
     </message>
     <message>
-        <source>Links</source>
-        <translation>लिंक</translation>
-    </message>
-    <message>
         <source>Remove tracking from links</source>
         <translation>लिंक से ट्रैकिंग हटाएँ</translation>
     </message>
@@ -1371,6 +1433,14 @@
     <message>
         <source>Small apps run inside the chat. Somebody else&apos;s code, and less tested than the rest.</source>
         <translation>छोटे ऐप चैट के भीतर चलते हैं। किसी और का कोड, और बाकी से कम आज़माया हुआ।</translation>
+    </message>
+    <message>
+        <source>Privacy</source>
+        <translation>गोपनीयता</translation>
+    </message>
+    <message>
+        <source>Blocked contacts</source>
+        <translation>ब्लॉक किए गए संपर्क</translation>
     </message>
 </context>
 <context>

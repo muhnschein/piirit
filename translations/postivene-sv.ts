@@ -175,6 +175,68 @@
     </message>
 </context>
 <context>
+    <name>BlockContactDialog</name>
+    <message>
+        <source>Block contact</source>
+        <translation>Blockera kontakt</translation>
+    </message>
+    <message>
+        <source>Unblock contact</source>
+        <translation>Avblockera kontakten</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Avbryt</translation>
+    </message>
+    <message>
+        <source>Block this contact?
+
+Direct messages or groups created by blocked contacts will not show up.
+
+Other groups with blocked contacts will still show their messages.</source>
+        <translation>Vill du blockera den här kontakten? Du kommer inte att få fler meddelanden från den här kontakten.</translation>
+    </message>
+    <message>
+        <source>Unblock this contact?</source>
+        <translation>Vill du avblockera den här kontakten? Du kommer återigen att kunna ta emot meddelanden från den här kontakten.</translation>
+    </message>
+</context>
+<context>
+    <name>BlockContactPage</name>
+    <message>
+        <source>Block contact</source>
+        <translation>Blockera kontakt</translation>
+    </message>
+    <message>
+        <source>Search</source>
+        <translation>Sök</translation>
+    </message>
+    <message>
+        <source>Nobody matches</source>
+        <translation>Ingen matchar</translation>
+    </message>
+    <message>
+        <source>No contacts yet</source>
+        <translation>Inga kontakter än</translation>
+    </message>
+</context>
+<context>
+    <name>BlockedContactsPage</name>
+    <message>
+        <source>Block contact</source>
+        <extracomment>Opens the contacts, to pick one to block.</extracomment>
+        <translation>Blockera kontakt</translation>
+    </message>
+    <message>
+        <source>Blocked contacts</source>
+        <translation>Blockerade kontakter</translation>
+    </message>
+    <message>
+        <source>Blocked contacts will appear here.</source>
+        <translation>Blockerade kontakter kommer att visas här.</translation>
+    </message>
+</context>
+<context>
     <name>CapturePage</name>
     <message>
         <source>The video could not be saved</source>
@@ -1266,10 +1328,6 @@
         <translation>Hämta bilagor automatiskt</translation>
     </message>
     <message>
-        <source>Links</source>
-        <translation>Länkar</translation>
-    </message>
-    <message>
         <source>Remove tracking from links</source>
         <translation>Ta bort spårning från länkar</translation>
     </message>
@@ -1371,6 +1429,14 @@
     <message>
         <source>Small apps run inside the chat. Somebody else&apos;s code, and less tested than the rest.</source>
         <translation>Små appar körs inne i chatten. Någon annans kod, och mindre beprövad än resten.</translation>
+    </message>
+    <message>
+        <source>Privacy</source>
+        <translation>Integritet</translation>
+    </message>
+    <message>
+        <source>Blocked contacts</source>
+        <translation>Blockerade kontakter</translation>
     </message>
 </context>
 <context>

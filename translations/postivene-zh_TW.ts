@@ -174,6 +174,68 @@
     </message>
 </context>
 <context>
+    <name>BlockContactDialog</name>
+    <message>
+        <source>Block contact</source>
+        <translation>封鎖聯絡人</translation>
+    </message>
+    <message>
+        <source>Unblock contact</source>
+        <translation>解除封鎖聯絡人</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>取消</translation>
+    </message>
+    <message>
+        <source>Block this contact?
+
+Direct messages or groups created by blocked contacts will not show up.
+
+Other groups with blocked contacts will still show their messages.</source>
+        <translation>要封鎖這個人嗎？你之後不會再收到這個人的訊息。</translation>
+    </message>
+    <message>
+        <source>Unblock this contact?</source>
+        <translation>要解除封鎖嗎？你之後可以繼續收到這個人的訊息。</translation>
+    </message>
+</context>
+<context>
+    <name>BlockContactPage</name>
+    <message>
+        <source>Block contact</source>
+        <translation>封鎖聯絡人</translation>
+    </message>
+    <message>
+        <source>Search</source>
+        <translation>搜尋</translation>
+    </message>
+    <message>
+        <source>Nobody matches</source>
+        <translation>沒有相符的聯絡人</translation>
+    </message>
+    <message>
+        <source>No contacts yet</source>
+        <translation>還沒有聯絡人</translation>
+    </message>
+</context>
+<context>
+    <name>BlockedContactsPage</name>
+    <message>
+        <source>Block contact</source>
+        <extracomment>Opens the contacts, to pick one to block.</extracomment>
+        <translation>封鎖聯絡人</translation>
+    </message>
+    <message>
+        <source>Blocked contacts</source>
+        <translation>已封鎖的聯絡人</translation>
+    </message>
+    <message>
+        <source>Blocked contacts will appear here.</source>
+        <translation>被封鎖的聯絡人將在此處顯示。</translation>
+    </message>
+</context>
+<context>
     <name>CapturePage</name>
     <message>
         <source>The video could not be saved</source>
@@ -1260,10 +1322,6 @@
         <translation>自動下載附件</translation>
     </message>
     <message>
-        <source>Links</source>
-        <translation>連結</translation>
-    </message>
-    <message>
         <source>Remove tracking from links</source>
         <translation>移除連結中的追蹤參數</translation>
     </message>
@@ -1365,6 +1423,14 @@
     <message>
         <source>Small apps run inside the chat. Somebody else&apos;s code, and less tested than the rest.</source>
         <translation>小應用程式在聊天裡執行。別人的程式碼，也比其餘部分少經檢驗。</translation>
+    </message>
+    <message>
+        <source>Privacy</source>
+        <translation>隱私權設定</translation>
+    </message>
+    <message>
+        <source>Blocked contacts</source>
+        <translation>已封鎖的聯絡人</translation>
     </message>
 </context>
 <context>

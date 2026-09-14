@@ -174,6 +174,68 @@
     </message>
 </context>
 <context>
+    <name>BlockContactDialog</name>
+    <message>
+        <source>Block contact</source>
+        <translation>Chặn liên hệ</translation>
+    </message>
+    <message>
+        <source>Unblock contact</source>
+        <translation>Bỏ chặn liên hệ</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Hủy</translation>
+    </message>
+    <message>
+        <source>Block this contact?
+
+Direct messages or groups created by blocked contacts will not show up.
+
+Other groups with blocked contacts will still show their messages.</source>
+        <translation>Chặn liên hệ này? Bạn sẽ không còn nhận được tin nhắn từ họ nữa.</translation>
+    </message>
+    <message>
+        <source>Unblock this contact?</source>
+        <translation>Bỏ chặn liên hệ này? Sau đó bạn sẽ có thể nhận tin nhắn từ họ.</translation>
+    </message>
+</context>
+<context>
+    <name>BlockContactPage</name>
+    <message>
+        <source>Block contact</source>
+        <translation>Chặn liên hệ</translation>
+    </message>
+    <message>
+        <source>Search</source>
+        <translation>Tìm kiếm</translation>
+    </message>
+    <message>
+        <source>Nobody matches</source>
+        <translation>Không ai khớp</translation>
+    </message>
+    <message>
+        <source>No contacts yet</source>
+        <translation>Chưa có liên hệ nào</translation>
+    </message>
+</context>
+<context>
+    <name>BlockedContactsPage</name>
+    <message>
+        <source>Block contact</source>
+        <extracomment>Opens the contacts, to pick one to block.</extracomment>
+        <translation>Chặn liên hệ</translation>
+    </message>
+    <message>
+        <source>Blocked contacts</source>
+        <translation>Liên hệ bị chặn</translation>
+    </message>
+    <message>
+        <source>Blocked contacts will appear here.</source>
+        <translation>Các liên hệ bị chặn sẽ xuất hiện ở đây.</translation>
+    </message>
+</context>
+<context>
     <name>CapturePage</name>
     <message>
         <source>The video could not be saved</source>
@@ -1260,10 +1322,6 @@
         <translation>Tự động tải tệp đính kèm</translation>
     </message>
     <message>
-        <source>Links</source>
-        <translation>Liên kết</translation>
-    </message>
-    <message>
         <source>Remove tracking from links</source>
         <translation>Gỡ theo dõi khỏi liên kết</translation>
     </message>
@@ -1365,6 +1423,14 @@
     <message>
         <source>Small apps run inside the chat. Somebody else&apos;s code, and less tested than the rest.</source>
         <translation>Ứng dụng nhỏ chạy ngay trong cuộc trò chuyện. Mã của người khác, và ít được thử hơn phần còn lại.</translation>
+    </message>
+    <message>
+        <source>Privacy</source>
+        <translation>Quyền riêng tư</translation>
+    </message>
+    <message>
+        <source>Blocked contacts</source>
+        <translation>Liên hệ bị chặn</translation>
     </message>
 </context>
 <context>

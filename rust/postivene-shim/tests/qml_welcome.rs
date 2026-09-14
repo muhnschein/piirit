@@ -52,11 +52,46 @@ fn probe_qml() -> String {
 const PROBE_QML: &str = r"
     import QtQuick 2.0
     import 'file://__COMPONENTS__'
+    // The screen, with the page in it: a page is not the whole of what
+    // it is drawn on, and on a phone that keeps a band for its camera it
+    // is a band short of it. `frame` is what holds the page, so a test
+    // can move it in the way that band does.
     Item {
-        Loader { id: loader }
+        id: probe
+        width: 1080
+        height: 2520
+        Item {
+            id: frame
+            width: probe.width
+            height: probe.height
+            Loader { id: loader }
+        }
         function load(url) {
             loader.setSource(url, { width: 1080, height: 2520 })
             return loader.status === Loader.Ready ? 'ok' : 'load-failed'
+        }
+        // The screen this size, with the page put in it short of a band
+        // of `band` pixels down one edge -- moved off that edge, and
+        // that much narrower, which is what the page is given on a phone
+        // with a camera cutout.
+        function cutout(width, height, band) {
+            probe.width = parseInt(width, 10)
+            probe.height = parseInt(height, 10)
+            frame.x = parseInt(band, 10)
+            frame.width = probe.width - frame.x
+            frame.height = probe.height
+            if (!loader.item) { return 'no-page' }
+            loader.item.width = frame.width
+            loader.item.height = frame.height
+            return 'ok'
+        }
+        // Where the field lies on the screen, as `x,y,width,height`.
+        function fieldBox() {
+            var field = findIn(loader.item, 'faceField')
+            if (!field) { return 'missing:faceField' }
+            var at = probe.mapFromItem(field, 0, 0)
+            return Math.round(at.x) + ',' + Math.round(at.y) + ','
+                   + Math.round(field.width) + ',' + Math.round(field.height)
         }
         function turn(width, height) {
             loader.item.width = parseInt(width)
@@ -122,8 +157,11 @@ const PROBE_QML: &str = r"
             var title = findIn(loader.item, 'title')
             if (!field || !title) { return 'missing' }
             var words = title.parent
-            var centred = Math.abs(field.clearX - (words.x + words.width / 2)) < 1
-                          && Math.abs(field.clearY - (words.y + words.height / 2)) < 1
+            // The box is cut in the field, and the field starts where
+            // the page does only where nothing is in its way.
+            var centred =
+                Math.abs(field.x + field.clearX - (words.x + words.width / 2)) < 1
+                && Math.abs(field.y + field.clearY - (words.y + words.height / 2)) < 1
             var sized = field.clearWidth === words.width
                         && field.clearHeight === words.height
             return '' + (centred && sized && words.height > 0)
@@ -255,6 +293,15 @@ fn the_welcome_page_draws_the_field_and_turns_with_the_phone() {
         r("title", call!("get", "title", "text"));
         r("turn", call!("turn", "2520", "1080"));
         r("sideways", call!("maskFile"));
+        // Upright again, and then turned by handing the page a sideways
+        // screen: one it has all of, and one where a band down the edge
+        // belongs to the camera. A page is told about the band by being
+        // given less, which is the only way it hears of it.
+        r("upright-again", call!("cutout", "1080", "2520", "0"));
+        r("whole", call!("cutout", "2520", "1080", "0"));
+        r("whole-box", call!("fieldBox"));
+        r("cutout", call!("cutout", "2520", "1080", "120"));
+        r("cutout-box", call!("fieldBox"));
     });
 
     // 3s: a stack that refuses, which is what the real one does while
@@ -309,8 +356,53 @@ fn the_welcome_page_draws_the_field_and_turns_with_the_phone() {
 
     let navigation = stack_box.pinned().borrow().log.to_string();
     assert_field_drawn(&steps.borrow(), &navigation);
+    assert_the_field_covers_the_screen(&steps.borrow());
     assert_remembered_profile_opens(&steps.borrow(), &navigation);
     assert_a_refused_hand_over_is_survived(&steps.borrow(), &navigation);
+}
+
+/// The field is the screen's, not the page's.
+///
+/// A Silica page is centred in what holds it, and on a phone that keeps
+/// a band of its screen for the camera the page is that band short of
+/// the screen: upright it is a strip across the top, turned on its side
+/// it is a strip down the edge the camera is on. A field that fills the
+/// page leaves that strip bare, which on the first screen is the first
+/// thing the reader sees.
+fn assert_the_field_covers_the_screen(steps: &[(String, String)]) {
+    let value = |label: &str| -> &str {
+        steps
+            .iter()
+            .find(|(name, _)| name == label)
+            .map_or("<step did not run>", |(_, value)| value.as_str())
+    };
+    let context = format!("steps: {steps:?}");
+    assert_eq!(
+        value("upright-again"),
+        "ok",
+        "the page could not be put back upright. {context}"
+    );
+    assert_eq!(
+        value("whole"),
+        "ok",
+        "the page could not be put on a screen of its own. {context}"
+    );
+    assert_eq!(
+        value("whole-box"),
+        "0,0,2520,1080",
+        "the field does not cover a screen the page has all of. {context}"
+    );
+    assert_eq!(
+        value("cutout"),
+        "ok",
+        "the page could not be put on a screen with a cutout. {context}"
+    );
+    assert_eq!(
+        value("cutout-box"),
+        "0,0,2520,1080",
+        "the page was moved off the edge the camera is on and the field \
+         went with it, leaving the band beside it bare. {context}"
+    );
 }
 
 /// A hand-over the stack refuses must leave the page working.

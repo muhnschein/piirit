@@ -75,6 +75,10 @@ struct State {
     /// in place of what the contact calls themselves, and an empty name
     /// puts theirs back.
     contact_names: std::collections::BTreeMap<u32, String>,
+    /// Contacts this account has blocked. The real core keeps them out of
+    /// `get_contacts` whatever the flags say and lists them through
+    /// `get_blocked_contacts` alone; so does this.
+    blocked: std::collections::BTreeSet<u32>,
     /// Messages whose remainder was asked for; see `downloadState`.
     downloaded: std::collections::BTreeSet<u32>,
     /// Chats with an unread message on them, by account: marked unread
@@ -1132,8 +1136,9 @@ async fn serve() {
                     let mut ids: Vec<u32> = state
                         .contacts
                         .iter()
-                        .filter(|(_, address)| {
-                            query.is_empty() || address.to_lowercase().contains(&query)
+                        .filter(|(contact, address)| {
+                            !state.blocked.contains(contact)
+                                && (query.is_empty() || address.to_lowercase().contains(&query))
                         })
                         .map(|(contact, _)| *contact)
                         .collect();
@@ -1152,6 +1157,39 @@ async fn serve() {
                 // A name of the reader's own for a contact; empty puts the
                 // contact's own back. Announced the way the real core
                 // announces any contact change.
+                // The other contact list the core keeps: the blocked
+                // ones, which no flag on `get_contacts` brings back.
+                "get_blocked_contacts" => {
+                    let mut state = state.lock().await;
+                    state.seed_chats();
+                    let ids: Vec<u32> = state.blocked.iter().copied().collect();
+                    let contacts: Vec<Value> = ids
+                        .iter()
+                        .filter_map(|contact| state.contact_object(*contact))
+                        .collect();
+                    ok(&id, &Value::Array(contacts))
+                }
+                // Blocking and letting back in. Both answer with nothing
+                // and announce the change, as the real core does.
+                "block_contact" | "unblock_contact" => {
+                    let account = account_id();
+                    let contact = positional(1)
+                        .as_u64()
+                        .and_then(|value| u32::try_from(value).ok())
+                        .unwrap_or_default();
+                    let mut state = state.lock().await;
+                    state.seed_chats();
+                    if method == "block_contact" {
+                        state.blocked.insert(contact);
+                    } else {
+                        state.blocked.remove(&contact);
+                    }
+                    state.events.push_back(json!({
+                        "contextId": account,
+                        "event": {"kind": "ContactsChanged", "contactId": contact},
+                    }));
+                    ok(&id, &Value::Null)
+                }
                 "change_contact_name" => {
                     let account = account_id();
                     let contact = positional(1)

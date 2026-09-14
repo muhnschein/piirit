@@ -297,7 +297,10 @@ Page {
                 objectName: "settingsMenuItem"
                 visible: !page.archived
                 text: qsTr("Settings")
-                onClicked: pulleyHost.openPage(Qt.resolvedUrl("SettingsPage.qml"), {})
+                // The profile goes in for the one row there that is a
+                // profile's: the block list the core keeps per account.
+                onClicked: pulleyHost.openPage(Qt.resolvedUrl("SettingsPage.qml"),
+                                          { accountId: page.accountId })
             }
             MenuItem {
                 objectName: "profilesMenuItem"

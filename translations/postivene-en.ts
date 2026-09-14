@@ -175,6 +175,68 @@
     </message>
 </context>
 <context>
+    <name>BlockContactDialog</name>
+    <message>
+        <source>Block contact</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unblock contact</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Block this contact?
+
+Direct messages or groups created by blocked contacts will not show up.
+
+Other groups with blocked contacts will still show their messages.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unblock this contact?</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>BlockContactPage</name>
+    <message>
+        <source>Block contact</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Search</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Nobody matches</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No contacts yet</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>BlockedContactsPage</name>
+    <message>
+        <source>Block contact</source>
+        <extracomment>Opens the contacts, to pick one to block.</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Blocked contacts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Blocked contacts will appear here.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>CapturePage</name>
     <message>
         <source>The video could not be saved</source>
@@ -1266,10 +1328,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Links</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Remove tracking from links</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1370,6 +1428,14 @@
     </message>
     <message>
         <source>Small apps run inside the chat. Somebody else&apos;s code, and less tested than the rest.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Privacy</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Blocked contacts</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

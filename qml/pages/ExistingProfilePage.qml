@@ -1,5 +1,6 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
+import "../components"
 
 /*
  * The reader has a profile already, somewhere else. Where it is decides
@@ -49,42 +50,30 @@ Page {
 
         Item { width: 1; height: Theme.paddingLarge }
 
-        Button {
-            objectName: "secondDeviceButton"
-            anchors.horizontalCenter: parent.horizontalCenter
-            text: qsTr("Add as second device")
-            onClicked: page.takeOver("device")
-        }
-
-        Label {
-            objectName: "secondDeviceHint"
+        // Both answers side by side, each with the thing it is about
+        // over it: the other phone, and the file it wrote. What was a
+        // line of small print under each button is the tile's own second
+        // line now, which is where a reader looks for it anyway.
+        ChoiceTiles {
+            objectName: "whereWays"
             width: parent.width
-            horizontalAlignment: Text.AlignHCenter
-            wrapMode: Text.Wrap
-            textFormat: Text.PlainText
-            font.pixelSize: Theme.fontSizeExtraSmall
-            color: Theme.secondaryHighlightColor
-            text: qsTr("The other device keeps it. Both get everything new.")
-        }
-
-        Item { width: 1; height: Theme.paddingLarge }
-
-        Button {
-            objectName: "backupFileButton"
-            anchors.horizontalCenter: parent.horizontalCenter
-            text: qsTr("Restore from a backup")
-            onClicked: page.takeOver("file")
-        }
-
-        Label {
-            objectName: "backupFileHint"
-            width: parent.width
-            horizontalAlignment: Text.AlignHCenter
-            wrapMode: Text.Wrap
-            textFormat: Text.PlainText
-            font.pixelSize: Theme.fontSizeExtraSmall
-            color: Theme.secondaryHighlightColor
-            text: qsTr("A backup file copied onto this phone.")
+            // The column is already inside the page's margins.
+            sideMargin: 0
+            choices: [
+                {
+                    name: "secondDevice",
+                    icon: "icon-m-device",
+                    text: qsTr("Add as second device"),
+                    hint: qsTr("The other device keeps it. Both get everything new.")
+                },
+                {
+                    name: "backupFile",
+                    icon: "icon-m-backup",
+                    text: qsTr("Restore from a backup"),
+                    hint: qsTr("A backup file copied onto this phone.")
+                }
+            ]
+            onChosen: page.takeOver(name === "backupFile" ? "file" : "device")
         }
     }
 }

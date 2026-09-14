@@ -429,7 +429,30 @@ removed from the store even after approval. Not an option.
    the screen on its side too, with the middle still clear, and that
    nothing stutters on the way in: the field is one picture and one
    shader (`components/FaceField.qml`), and the headless tests can load
-   it but cannot see it drawn.
+   it but cannot see it drawn. Sideways is where the edges are worth
+   looking at: on a phone that keeps a band of its screen for the
+   camera, the page is given that band short of the screen, and the
+   field is laid over the whole of what the page is in rather than over
+   the page, so there must be faces right up to both edges -- the
+   camera's one included -- and the field must still be faces rather
+   than a stretched picture.
+   The two ways on from that screen are tiles rather than buttons -- an
+   icon over the words, the way a contact's page offers what a chat
+   holds (`components/ChoiceTiles.qml`) -- and the icons are the
+   theme's own, asked for by name: `icon-m-about` and `icon-m-person`
+   here, `icon-m-transfer` and `icon-m-add` on the setup screen,
+   `icon-m-device` and `icon-m-backup` where the profile is asked
+   after, and those three again on Add profile, where they stand one
+   under another under the header rather than three to a row -- each of
+   them a row with its icon at the left and its two lines beside it,
+   ranged left. A name this phone's
+   theme does not have draws nothing at all, and a tile with no icon is
+   the one thing a headless test cannot see, so check that every one of
+   them is there, in the ambience's colours, and that the tile lights
+   up under a thumb. Before the core is up, the tile that needs it --
+   "Set up my profile", "Create a profile" -- is greyed rather than
+   gone.
+
    The two ways on from that screen are worth walking once each, and
    neither draws the field behind it. "Tell me about Delta Chat" is
    five facts swiped through one at a time (`pages/IntroPage.qml`):

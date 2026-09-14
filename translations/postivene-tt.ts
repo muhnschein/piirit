@@ -174,6 +174,72 @@
     </message>
 </context>
 <context>
+    <name>BlockContactDialog</name>
+    <message>
+        <source>Block contact</source>
+        <translation>Контактны блоклау</translation>
+    </message>
+    <message>
+        <source>Unblock contact</source>
+        <translation>Контактны блоктан чыгару</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Баш тартырга</translation>
+    </message>
+    <message>
+        <source>Block this contact?
+
+Direct messages or groups created by blocked contacts will not show up.
+
+Other groups with blocked contacts will still show their messages.</source>
+        <translation>Бу контактны блоклыйсызмы?
+
+Блокланган контактларның турыдан-туры хатлары һәм алар булдырган төркемнәр күренмәячәк.
+
+Блокланган контактлар булган башка төркемнәрдә аларның хатлары барыбер күренәчәк.</translation>
+    </message>
+    <message>
+        <source>Unblock this contact?</source>
+        <translation>Бу контактны блоктан чыгарасызмы?</translation>
+    </message>
+</context>
+<context>
+    <name>BlockContactPage</name>
+    <message>
+        <source>Block contact</source>
+        <translation>Контактны блоклау</translation>
+    </message>
+    <message>
+        <source>Search</source>
+        <translation>Эзләү</translation>
+    </message>
+    <message>
+        <source>Nobody matches</source>
+        <translation>Беркем дә туры килми</translation>
+    </message>
+    <message>
+        <source>No contacts yet</source>
+        <translation>Контактлар әлегә юк</translation>
+    </message>
+</context>
+<context>
+    <name>BlockedContactsPage</name>
+    <message>
+        <source>Block contact</source>
+        <extracomment>Opens the contacts, to pick one to block.</extracomment>
+        <translation>Контактны блоклау</translation>
+    </message>
+    <message>
+        <source>Blocked contacts</source>
+        <translation>Блокланган контактлар</translation>
+    </message>
+    <message>
+        <source>Blocked contacts will appear here.</source>
+        <translation>Блокланган контактлар монда күренәчәк.</translation>
+    </message>
+</context>
+<context>
     <name>CapturePage</name>
     <message>
         <source>The video could not be saved</source>
@@ -1260,10 +1326,6 @@
         <translation>Кушымталарны автоматик йөкләргә</translation>
     </message>
     <message>
-        <source>Links</source>
-        <translation>Сылтамалар</translation>
-    </message>
-    <message>
         <source>Remove tracking from links</source>
         <translation>Сылтамалардан күзәтүне алырга</translation>
     </message>
@@ -1365,6 +1427,14 @@
     <message>
         <source>Small apps run inside the chat. Somebody else&apos;s code, and less tested than the rest.</source>
         <translation>Кечкенә кушымталар сөйләшү эчендә эшли. Кеше коды, һәм калганнарга караганда азрак сыналган.</translation>
+    </message>
+    <message>
+        <source>Privacy</source>
+        <translation>Хосусыйлык</translation>
+    </message>
+    <message>
+        <source>Blocked contacts</source>
+        <translation>Блокланган контактлар</translation>
     </message>
 </context>
 <context>

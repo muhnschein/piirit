@@ -175,6 +175,68 @@
     </message>
 </context>
 <context>
+    <name>BlockContactDialog</name>
+    <message>
+        <source>Block contact</source>
+        <translation>పరిచయాన్ని నిరోధించు</translation>
+    </message>
+    <message>
+        <source>Unblock contact</source>
+        <translation>పరిచయంపై నిరోధాన్ని తొలగించు</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>రద్దు చేయి</translation>
+    </message>
+    <message>
+        <source>Block this contact?
+
+Direct messages or groups created by blocked contacts will not show up.
+
+Other groups with blocked contacts will still show their messages.</source>
+        <translation>మీరు ఈ పరిచయాన్ని రద్దుచేయాలని నిర్ణయించుకున్నారా?</translation>
+    </message>
+    <message>
+        <source>Unblock this contact?</source>
+        <translation>ఈ పరిచయంపై నిరోధాన్ని తొలగించాలా?</translation>
+    </message>
+</context>
+<context>
+    <name>BlockContactPage</name>
+    <message>
+        <source>Block contact</source>
+        <translation>పరిచయాన్ని నిరోధించు</translation>
+    </message>
+    <message>
+        <source>Search</source>
+        <translation>వెతకండి</translation>
+    </message>
+    <message>
+        <source>Nobody matches</source>
+        <translation>ఎవరూ సరిపోలడం లేదు</translation>
+    </message>
+    <message>
+        <source>No contacts yet</source>
+        <translation>ఇంకా పరిచయాలు లేవు</translation>
+    </message>
+</context>
+<context>
+    <name>BlockedContactsPage</name>
+    <message>
+        <source>Block contact</source>
+        <extracomment>Opens the contacts, to pick one to block.</extracomment>
+        <translation>పరిచయాన్ని నిరోధించు</translation>
+    </message>
+    <message>
+        <source>Blocked contacts</source>
+        <translation>నిరోధించిన పరిచయాలు</translation>
+    </message>
+    <message>
+        <source>Blocked contacts will appear here.</source>
+        <translation>నిరోధించిన పరిచయాలు ఇక్కడ కనిపిస్తాయి.</translation>
+    </message>
+</context>
+<context>
     <name>CapturePage</name>
     <message>
         <source>The video could not be saved</source>
@@ -1266,10 +1328,6 @@
         <translation>జోడింపులను ఆటోమేటిక్‌గా డౌన్‌లోడ్ చేయి</translation>
     </message>
     <message>
-        <source>Links</source>
-        <translation>లింక్‌లు</translation>
-    </message>
-    <message>
         <source>Remove tracking from links</source>
         <translation>లింక్‌ల నుండి ట్రాకింగ్ తీసివేయి</translation>
     </message>
@@ -1371,6 +1429,14 @@
     <message>
         <source>Small apps run inside the chat. Somebody else&apos;s code, and less tested than the rest.</source>
         <translation>చిన్న యాప్‌లు సంభాషణ లోపలే నడుస్తాయి. ఇతరుల కోడ్, మిగతా వాటికంటే తక్కువ పరీక్షించినది.</translation>
+    </message>
+    <message>
+        <source>Privacy</source>
+        <translation>గోప్యత</translation>
+    </message>
+    <message>
+        <source>Blocked contacts</source>
+        <translation>నిరోధించిన పరిచయాలు</translation>
     </message>
 </context>
 <context>
