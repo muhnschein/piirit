@@ -42,7 +42,7 @@ pub const DEFAULT_PROVIDER_QR: &str = "dcaccount:nine.testrun.org";
 pub const BUNDLED_SERVER: &str = "/usr/libexec/harbour-postivene/deltachat-rpc-server";
 
 /// The event kinds anything in the app reads, and so the only ones
-/// [`DeltaChatCore::core_event`] is fired for.
+/// `DeltaChatCore::core_event` is fired for.
 ///
 /// The core says a great deal that nothing here listens to -- most of it is
 /// its log -- and every event fired reaches every page still on the stack
