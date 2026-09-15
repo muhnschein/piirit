@@ -555,6 +555,43 @@ Wiadomości innych grup z zablokowanymi kontaktami nadal będą wyświetlane.</t
     </message>
 </context>
 <context>
+    <name>DeleteMessageDialog</name>
+    <message>
+        <source>Delete</source>
+        <translation>Usuń</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Anuluj</translation>
+    </message>
+    <message>
+        <source>Delete for me</source>
+        <extracomment>One of the two ways to delete a message.</extracomment>
+        <translation>Usuń u mnie</translation>
+    </message>
+    <message>
+        <source>Delete for everyone</source>
+        <extracomment>The other way: every other device in the chat is asked to delete its copy too.</extracomment>
+        <translation>Usuń u wszystkich</translation>
+    </message>
+    <message>
+        <source>Only an encrypted message you sent yourself can be deleted for everyone.</source>
+        <translation>U wszystkich można usunąć tylko zaszyfrowaną wiadomość wysłaną przez ciebie.</translation>
+    </message>
+    <message>
+        <source>How do you want to delete this message? This cannot be undone.</source>
+        <translation>Jak chcesz usunąć tę wiadomość? Tego nie da się cofnąć.</translation>
+    </message>
+    <message>
+        <source>It goes from your devices. Everybody else keeps their copy.</source>
+        <translation>Znika z twoich urządzeń. Wszyscy inni zachowują swoją kopię.</translation>
+    </message>
+    <message>
+        <source>It goes from your devices, and every other device in this chat is asked to delete it too.</source>
+        <translation>Znika z twoich urządzeń, a każde inne urządzenie w tej rozmowie zostaje poproszone o jej usunięcie.</translation>
+    </message>
+</context>
+<context>
     <name>DisappearingMessages</name>
     <message>
         <source>Off</source>

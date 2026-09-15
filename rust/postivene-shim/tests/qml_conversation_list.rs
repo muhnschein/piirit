@@ -85,7 +85,15 @@ const PROBE_QML: &str = r"
                 raised = 'reply:' + id + ':' + body + ':' + author
             })
             view.copyRequested.connect(function(body) { raised = 'copy:' + body })
-            view.deleteRequested.connect(function(id) { raised = 'delete:' + id })
+            // Delete asks before it deletes: the menu raises the ask, the
+            // page behind it says which kind, and only then does the wait
+            // start and this arrive.
+            view.deleteRequested.connect(function(id, forEveryone) {
+                raised = 'delete:' + id + ':' + forEveryone
+            })
+            view.deleteChoiceRequested.connect(function(id, canForAll) {
+                raised = 'ask:' + id + ':' + canForAll
+            })
             // The wait before a message goes, turned down so this does not
             // have to sit through four seconds of it.
             view.pendingDelay = 60
@@ -119,6 +127,11 @@ const PROBE_QML: &str = r"
             return item ? '' + item.visible : 'missing'
         }
         function clearRaised() { raised = ''; return 'ok' }
+        // What the page the menu leads to reports back.
+        function confirm(messageId, forEveryone) {
+            loader.item.confirmDelete(messageId, forEveryone)
+            return 'ok'
+        }
         function emptyModel() { rows.clear(); return '' + rows.count }
         // Destroys the delegate the menu belongs to, as a reload or a
         // reorder does.
@@ -299,9 +312,13 @@ fn a_conversation_opens_at_the_newest_message_and_stays_where_it_is_left() {
         record!("copy", call!("raisedSignal"));
         call!("pickMenu", QString::from("resendItem"));
         record!("resend", call!("raisedSignal"));
-        // The list waits before it deletes anything, so this is read on
-        // the next step rather than this one.
+        // Delete asks which kind of delete it is rather than deleting:
+        // the menu raises the ask, and the page behind it answers.
         call!("pickMenu", QString::from("deleteItem"));
+        record!("delete-ask", call!("raisedSignal"));
+        // And the list waits after the answer, so the delete itself is
+        // read on the next step rather than this one.
+        call!("confirm", 1, false);
 
         // Scrolled away again, so an arrival is counted rather than shown.
         call!("toTop");
@@ -361,6 +378,7 @@ fn a_conversation_opens_at_the_newest_message_and_stays_where_it_is_left() {
         // a fresh one and the assertion would hold either way.
         call!("clearRaised");
         call!("pickMenu", QString::from("deleteItem"));
+        call!("confirm", 1, false);
         call!("removeRow", 0);
     });
 
@@ -373,6 +391,11 @@ fn a_conversation_opens_at_the_newest_message_and_stays_where_it_is_left() {
 
     single_shot(Duration::from_secs(11), move || unsafe {
         record!("resend-when-failed", call!("resendVisible"));
+        // The same row is one of this account's own, and encrypted, so
+        // the ask says the core would take a deletion for everyone of it.
+        call!("clearRaised");
+        call!("pickMenu", QString::from("deleteItem"));
+        record!("delete-ask-own", call!("raisedSignal"));
         call!("resetToState", 26);
     });
 
@@ -585,9 +608,24 @@ fn assert_outcome(steps: &[(&str, String)]) {
         value("copy")
     );
     assert_eq!(
+        value("delete-ask"),
+        "ask:1:false",
+        "Delete did not ask which kind of delete it is, or did not name \
+         its message. Somebody else's message is not one the core will \
+         delete for everyone. {context}"
+    );
+    assert_eq!(
+        value("delete-ask-own"),
+        "ask:1:true",
+        "the ask does not offer to delete this account's own encrypted \
+         message for everyone, which is exactly what the core takes. \
+         {context}"
+    );
+    assert_eq!(
         value("delete"),
-        "delete:1",
-        "Delete did not name its message. {context}"
+        "delete:1:false",
+        "Delete did not name its message, or lost which kind of delete \
+         the reader picked on the way through the wait. {context}"
     );
     assert_eq!(
         value("resend"),
@@ -597,7 +635,7 @@ fn assert_outcome(steps: &[(&str, String)]) {
 
     assert_eq!(
         value("delete-after-removal"),
-        "delete:1",
+        "delete:1:false",
         "a delete whose row was destroyed mid-countdown never arrived. \
          The wait belongs to the list, not to the row: a row is destroyed \
          by the very thing this is used for, which is deleting the \

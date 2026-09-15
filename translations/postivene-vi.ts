@@ -547,6 +547,43 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>DeleteMessageDialog</name>
+    <message>
+        <source>Delete</source>
+        <translation>Xóa</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Hủy</translation>
+    </message>
+    <message>
+        <source>Delete for me</source>
+        <extracomment>One of the two ways to delete a message.</extracomment>
+        <translation>Chỉ xóa ở máy tôi</translation>
+    </message>
+    <message>
+        <source>Delete for everyone</source>
+        <extracomment>The other way: every other device in the chat is asked to delete its copy too.</extracomment>
+        <translation>Xóa với mọi người</translation>
+    </message>
+    <message>
+        <source>Only an encrypted message you sent yourself can be deleted for everyone.</source>
+        <translation>Chỉ tin nhắn đã mã hóa do chính bạn gửi mới có thể xóa với mọi người.</translation>
+    </message>
+    <message>
+        <source>How do you want to delete this message? This cannot be undone.</source>
+        <translation>Bạn muốn xóa tin nhắn này thế nào? Không thể hoàn tác.</translation>
+    </message>
+    <message>
+        <source>It goes from your devices. Everybody else keeps their copy.</source>
+        <translation>Nó biến mất khỏi các thiết bị của bạn. Mọi người khác vẫn giữ bản sao của họ.</translation>
+    </message>
+    <message>
+        <source>It goes from your devices, and every other device in this chat is asked to delete it too.</source>
+        <translation>Nó biến mất khỏi các thiết bị của bạn, và mọi thiết bị khác trong cuộc trò chuyện này cũng được yêu cầu xóa nó.</translation>
+    </message>
+</context>
+<context>
     <name>DisappearingMessages</name>
     <message>
         <source>Off</source>

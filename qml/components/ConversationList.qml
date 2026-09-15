@@ -115,7 +115,17 @@ SilicaListView {
     /// row may be gone by the time the page gets round to it.
     signal editRequested(int messageId, string body)
     signal copyRequested(string body)
-    signal deleteRequested(int messageId)
+    /// A message's wait is up, and it goes now -- from this account's
+    /// devices alone, or from everybody's, which is what the reader
+    /// picked when they asked.
+    signal deleteRequested(int messageId, bool forEveryone)
+    /// The reader asked to delete a message and has not said which kind
+    /// of delete yet. Which is a dialog of its own
+    /// (pages/DeleteMessageDialog.qml), and pushing one is the page's
+    /// business, not this component's. `canDeleteForEveryone` travels
+    /// with the ask because only the row knows it, and the row may be
+    /// gone by the time the answer comes back.
+    signal deleteChoiceRequested(int messageId, bool canDeleteForEveryone)
     signal resendRequested(int messageId)
     signal forwardRequested(int messageId)
     /// The reader tapped an attachment. What opening it means -- a page
@@ -157,6 +167,14 @@ SilicaListView {
         return doomedMessages.pending(messageId)
     }
 
+    /// The reader picked one of the two deletes, on the page the menu
+    /// led to. The wait starts now, carrying which kind it is, and the
+    /// row puts the countdown up off `doomed` -- the row the menu was
+    /// opened on may well have been rebuilt while the page was up.
+    function confirmDelete(messageId, forEveryone) {
+        doomedMessages.ask(messageId, forEveryone === true)
+    }
+
     /// The messages the reader has asked to delete, waiting out the
     /// moment in which they can say they did not mean it.
     ///
@@ -165,7 +183,9 @@ SilicaListView {
     /// of deletes lost all but the first. See PendingRemoval.
     PendingRemoval {
         id: doomedMessages
-        onRemove: root.deleteRequested(id)
+        // `tag` is what the reader picked on the page: true for a delete
+        // that asks the other ends to delete their copies too.
+        onRemove: root.deleteRequested(id, tag === true)
     }
 
     /// The emoji the menu offers first, as the reference clients offer
@@ -739,14 +759,22 @@ SilicaListView {
                 MenuItem {
                     objectName: "deleteItem"
                     text: qsTr("Delete")
-                    // The list is told, not this row: the wait before a
-                    // message goes has to outlive the row it was asked for
-                    // on, and deleting one is what destroys rows. See
-                    // PendingRemoval.
-                    onClicked: {
-                        doomedMessages.ask(model.message_id)
-                        messageRow.raiseRemorse()
-                    }
+                    // One entry, not two: which kind of delete is asked
+                    // in a dialog (pages/DeleteMessageDialog.qml),
+                    // because "for me" and "for everyone" side by side on
+                    // a long-press menu is how the wrong one gets tapped.
+                    //
+                    // Both are read now rather than in the answer:
+                    // choosing takes as long as the reader takes, and
+                    // this row may be gone by then -- the same reason
+                    // Forward hoists its id. What the core will take a
+                    // deletion for everyone of is a message this account
+                    // sent, and an encrypted one; a notice is nobody's
+                    // message at all.
+                    onClicked: root.deleteChoiceRequested(
+                                   model.message_id,
+                                   model.is_outgoing && model.show_padlock
+                                   && !model.is_info)
                 }
             }
         }
@@ -763,6 +791,25 @@ SilicaListView {
         /// This message is on its way out.
         readonly property bool doomed: doomedMessages.pending(model.message_id)
 
+        /// Whether this row has already put a countdown up over the wait
+        /// it is in. The wait is asked for on a page rather than in the
+        /// menu now, so the row that shows it is whichever row is here
+        /// when the answer lands -- and both the answer and a rebuild
+        /// raise it. Two `execute` calls over one item is a countdown
+        /// restarting itself under the reader.
+        property bool countingDown: false
+
+        // The wait starts elsewhere: on the page the menu leads to, or
+        // in the list while this row was scrolled away. Either way the
+        // row learns of it here and puts the platform's countdown up.
+        onDoomedChanged: {
+            if (messageRow.doomed) {
+                messageRow.raiseRemorse()
+            } else {
+                messageRow.countingDown = false
+            }
+        }
+
         /// Silica's own countdown, drawn over the message: the bar, the
         /// seconds, "Tap to cancel", all of it the platform's.
         ///
@@ -772,6 +819,10 @@ SilicaListView {
         /// callback that does nothing and asked only to draw and to
         /// report the tap.
         function raiseRemorse() {
+            if (messageRow.countingDown) {
+                return
+            }
+            messageRow.countingDown = true
             remorse.active = true
             //: What Silica's countdown says it is doing, over a
             //: message the reader has asked to delete.

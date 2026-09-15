@@ -549,6 +549,43 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>DeleteMessageDialog</name>
+    <message>
+        <source>Delete</source>
+        <translation>Slet</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Annullér</translation>
+    </message>
+    <message>
+        <source>Delete for me</source>
+        <extracomment>One of the two ways to delete a message.</extracomment>
+        <translation>Slet for mig</translation>
+    </message>
+    <message>
+        <source>Delete for everyone</source>
+        <extracomment>The other way: every other device in the chat is asked to delete its copy too.</extracomment>
+        <translation>Slet for alle</translation>
+    </message>
+    <message>
+        <source>Only an encrypted message you sent yourself can be deleted for everyone.</source>
+        <translation>Kun en krypteret besked, du selv har sendt, kan slettes for alle.</translation>
+    </message>
+    <message>
+        <source>How do you want to delete this message? This cannot be undone.</source>
+        <translation>Hvordan vil du slette denne besked? Det kan ikke fortrydes.</translation>
+    </message>
+    <message>
+        <source>It goes from your devices. Everybody else keeps their copy.</source>
+        <translation>Den forsvinder fra dine enheder. Alle andre beholder deres kopi.</translation>
+    </message>
+    <message>
+        <source>It goes from your devices, and every other device in this chat is asked to delete it too.</source>
+        <translation>Den forsvinder fra dine enheder, og alle andre enheder i denne samtale bliver bedt om også at slette den.</translation>
+    </message>
+</context>
+<context>
     <name>DisappearingMessages</name>
     <message>
         <source>Off</source>

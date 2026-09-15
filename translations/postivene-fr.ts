@@ -553,6 +553,43 @@ Vous continuerez à voir les messages des contacts bloqués dans les autres grou
     </message>
 </context>
 <context>
+    <name>DeleteMessageDialog</name>
+    <message>
+        <source>Delete</source>
+        <translation>Supprimer</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Annuler</translation>
+    </message>
+    <message>
+        <source>Delete for me</source>
+        <extracomment>One of the two ways to delete a message.</extracomment>
+        <translation>Supprimer pour moi</translation>
+    </message>
+    <message>
+        <source>Delete for everyone</source>
+        <extracomment>The other way: every other device in the chat is asked to delete its copy too.</extracomment>
+        <translation>Supprimer pour tout le monde</translation>
+    </message>
+    <message>
+        <source>Only an encrypted message you sent yourself can be deleted for everyone.</source>
+        <translation>Seul un message chiffré que vous avez envoyé vous-même peut être supprimé pour tout le monde.</translation>
+    </message>
+    <message>
+        <source>How do you want to delete this message? This cannot be undone.</source>
+        <translation>Comment voulez-vous supprimer ce message ? Cela ne peut pas être annulé.</translation>
+    </message>
+    <message>
+        <source>It goes from your devices. Everybody else keeps their copy.</source>
+        <translation>Il disparaît de vos appareils. Tous les autres gardent leur copie.</translation>
+    </message>
+    <message>
+        <source>It goes from your devices, and every other device in this chat is asked to delete it too.</source>
+        <translation>Il disparaît de vos appareils, et il est demandé à tous les autres appareils de cette discussion de le supprimer aussi.</translation>
+    </message>
+</context>
+<context>
     <name>DisappearingMessages</name>
     <message>
         <source>Off</source>

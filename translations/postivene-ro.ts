@@ -551,6 +551,43 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>DeleteMessageDialog</name>
+    <message>
+        <source>Delete</source>
+        <translation>Șterge</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Anulează</translation>
+    </message>
+    <message>
+        <source>Delete for me</source>
+        <extracomment>One of the two ways to delete a message.</extracomment>
+        <translation>Șterge doar pentru mine</translation>
+    </message>
+    <message>
+        <source>Delete for everyone</source>
+        <extracomment>The other way: every other device in the chat is asked to delete its copy too.</extracomment>
+        <translation>Șterge pentru toți</translation>
+    </message>
+    <message>
+        <source>Only an encrypted message you sent yourself can be deleted for everyone.</source>
+        <translation>Pentru toți poate fi șters doar un mesaj criptat trimis de tine.</translation>
+    </message>
+    <message>
+        <source>How do you want to delete this message? This cannot be undone.</source>
+        <translation>Cum vrei să ștergi acest mesaj? Nu se poate anula.</translation>
+    </message>
+    <message>
+        <source>It goes from your devices. Everybody else keeps their copy.</source>
+        <translation>Dispare de pe dispozitivele tale. Toți ceilalți își păstrează copia.</translation>
+    </message>
+    <message>
+        <source>It goes from your devices, and every other device in this chat is asked to delete it too.</source>
+        <translation>Dispare de pe dispozitivele tale, iar fiecare alt dispozitiv din această conversație este rugat să îl șteargă și el.</translation>
+    </message>
+</context>
+<context>
     <name>DisappearingMessages</name>
     <message>
         <source>Off</source>

@@ -37,14 +37,24 @@ import QtQuick 2.0
 QtObject {
     id: root
 
-    /// What to do to each one, once its wait is up.
-    signal remove(int id)
+    /// What to do to each one, once its wait is up. `tag` is whatever
+    /// was asked with it, for a list where there is more than one way to
+    /// remove a thing -- the conversation deletes a message for one
+    /// account or for everybody in the chat, and which was chosen must
+    /// not go missing between the tap and the wait being up. `undefined`
+    /// where nothing was said.
+    signal remove(int id, var tag)
 
     /// How long a wait is, in milliseconds. Silica's own remorse waits
     /// five seconds; four, to match what the rows ask their `RemorseItem`
     /// for. A property because a test turns it down rather than sitting
     /// through it.
     property int delay: 4000
+
+    /// What each waiting id was asked with, by id. Held beside the
+    /// deadlines rather than inside them so that `ids` stays the one
+    /// thing a row's bindings read.
+    property var tags: ({})
 
     /// The ids waiting, each against the clock reading its own wait is up
     /// at.
@@ -84,14 +94,19 @@ QtObject {
         return left > 0 ? left : root.delay
     }
 
-    /// Ask for one to go, once the reader has had their moment.
+    /// Ask for one to go, once the reader has had their moment. `tag`
+    /// travels with it to `remove`, for a list with more than one way to
+    /// remove a thing; leave it out where there is only one.
     ///
     /// Nothing already waiting is touched: its deadline is its own, and
     /// moving it is the bug this shape exists to prevent.
-    function ask(id) {
+    function ask(id, tag) {
         var next = root.copied()
         next[id] = Date.now() + root.delay
         root.ids = next
+        var marks = root.copiedTags()
+        marks[id] = tag
+        root.tags = marks
         root.arm()
     }
 
@@ -101,18 +116,23 @@ QtObject {
         var next = root.copied()
         delete next[id]
         root.ids = next
+        var marks = root.copiedTags()
+        delete marks[id]
+        root.tags = marks
         root.arm()
     }
 
     /// Everything still waiting goes now, whatever is left on it.
     function flush() {
         var going = root.ids
+        var marks = root.tags
         root.ids = ({})
+        root.tags = ({})
         root.countdown.stop()
         // Cleared before any of them is acted on: whatever answers
         // `remove` may come straight back here, and must not find a
         // list this is still working through.
-        root.send(Object.keys(going))
+        root.send(Object.keys(going), marks)
     }
 
     /// Point the timer at the soonest deadline there is, or stop it when
@@ -141,26 +161,30 @@ QtObject {
         var now = Date.now()
         var going = []
         var next = {}
+        var marks = root.tags
+        var kept = {}
         for (var key in root.ids) {
             if (root.ids[key] <= now) {
                 going.push(key)
             } else {
                 next[key] = root.ids[key]
+                kept[key] = marks[key]
             }
         }
         root.ids = next
+        root.tags = kept
         root.arm()
-        root.send(going)
+        root.send(going, marks)
     }
 
     /// Say `remove` for each of them, in the order their ids were asked
-    /// for, oldest first.
-    function send(waiting) {
+    /// for, oldest first, each with whatever it was asked with.
+    function send(waiting, marks) {
         waiting.sort(function(one, other) {
             return parseInt(one, 10) - parseInt(other, 10)
         })
         for (var i = 0; i < waiting.length; i++) {
-            root.remove(parseInt(waiting[i], 10))
+            root.remove(parseInt(waiting[i], 10), marks[waiting[i]])
         }
     }
 
@@ -169,6 +193,15 @@ QtObject {
         var next = {}
         for (var key in root.ids) {
             next[key] = root.ids[key]
+        }
+        return next
+    }
+
+    /// The same, for what each of them was asked with.
+    function copiedTags() {
+        var next = {}
+        for (var key in root.tags) {
+            next[key] = root.tags[key]
         }
         return next
     }

@@ -379,6 +379,26 @@ fn the_conversation_page_uses_the_pieces_that_are_tested() {
         "leaving the chat does not send the deletes still waiting, so a \
          reader who asked for a message to go and then left keeps it"
     );
+    // Both ends of deleting a message, neither of which can be loaded
+    // headlessly: the menu leads to the page that asks which kind of
+    // delete this is, and what the wait then answers with decides which
+    // of the core's two calls is made. A page that made one call for both
+    // answers would take a message off everybody's phone that the reader
+    // asked to take off their own, or leave it on everybody's when they
+    // asked for the opposite -- and neither can be taken back.
+    let choosing = block_of(&text, "onDeleteChoiceRequested");
+    assert!(
+        choosing.contains("DeleteMessageDialog.qml") && choosing.contains("confirmDelete"),
+        "the conversation does not ask which kind of delete a message is, \
+         or never tells the list what was answered"
+    );
+    let deleting = block_of(&text, "onDeleteRequested");
+    assert!(
+        deleting.contains("messages.delete_message_for_all(messageId)")
+            && deleting.contains("messages.delete_message(messageId)"),
+        "the conversation does not make both of the core's deletions, so \
+         one of the two answers the reader can give is not the one acted on"
+    );
     // The return key is the reader's to give back to sending, and no test
     // can see it: every test loads the page with the `EnterKey.` lines
     // taken out (common::qml_tree_without_enter_key), which is also why
@@ -1214,6 +1234,13 @@ fn the_pages_the_app_pushes_are_there() {
         pushed.iter().any(|path| path.ends_with("MessagePage.qml")),
         "nothing pushes MessagePage.qml any more, so a long message has \
          nowhere to be read whole: {pushed:?}"
+    );
+    assert!(
+        pushed
+            .iter()
+            .any(|path| path.ends_with("DeleteMessageDialog.qml")),
+        "nothing pushes DeleteMessageDialog.qml any more, so Delete has \
+         nowhere to ask which kind of delete it is: {pushed:?}"
     );
 }
 

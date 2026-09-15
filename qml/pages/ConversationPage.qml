@@ -502,7 +502,34 @@ Page {
         // On or off is the model's call: it knows what the reader already
         // sent, and the core takes the whole list either way.
         onReactionRequested: messages.react(messageId, emoji)
-        onDeleteRequested: messages.delete_message(messageId)
+        // Which kind of delete was picked on the page the menu led to,
+        // and the wait is up: the message goes from this account's
+        // devices, or from everybody's.
+        onDeleteRequested: {
+            if (forEveryone) {
+                messages.delete_message_for_all(messageId)
+            } else {
+                messages.delete_message(messageId)
+            }
+        }
+        // The menu asks for a deletion; which kind is a dialog, and
+        // pushing it is the page's business rather than the list's.
+        // Nothing is deleted until that dialog is accepted and the wait
+        // after it is up, so leaving by the back edge deletes nothing.
+        onDeleteChoiceRequested: {
+            // Taken now rather than in the callback: choosing takes a
+            // page push, and the row may be gone by the time the answer
+            // comes back -- the same reason Forward hoists its id.
+            var doomed = messageId
+            var chooser = pageStack.push(
+                Qt.resolvedUrl("DeleteMessageDialog.qml"),
+                { canDeleteForEveryone: canDeleteForEveryone })
+            if (chooser) {
+                chooser.picked.connect(function(forEveryone) {
+                    listView.confirmDelete(doomed, forEveryone)
+                })
+            }
+        }
         onResendRequested: messages.resend_message(messageId)
         onForwardRequested: {
             // The picker reports back rather than acting, so the

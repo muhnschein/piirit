@@ -111,6 +111,10 @@ pub struct ChatMedia {
     /// Delete a message, here and on the mail server: what the
     /// conversation's row menu does, offered on a media page's row too.
     pub delete_message: qt_method!(fn(&mut self, message_id: u32)),
+    /// Delete a message for everyone in the chat, not only here: the
+    /// same choice the conversation offers, since a picture on this page
+    /// is a message in that chat.
+    pub delete_message_for_all: qt_method!(fn(&mut self, message_id: u32)),
     /// Apply one core event. Only what changes this chat is acted on.
     pub handle_event:
         qt_method!(fn(&mut self, context_id: u32, kind: QString, payload_json: QString)),
@@ -329,6 +333,20 @@ impl ChatMedia {
     }
 
     /// Delete a message, here and on the mail server.
+    pub fn delete_message(&mut self, message_id: u32) {
+        self.remove("delete_messages", message_id);
+    }
+
+    /// Delete a message for everyone in the chat, not only here: the
+    /// core's `delete_messages_for_all`. Offered for the same messages
+    /// the conversation offers it for, and refused by the core for the
+    /// rest -- see `ChatMessages::delete_message_for_all`.
+    pub fn delete_message_for_all(&mut self, message_id: u32) {
+        self.remove("delete_messages_for_all", message_id);
+    }
+
+    /// Ask the core to delete this message, one way or the other, and
+    /// read the list again once it has.
     ///
     /// The core announces the deletion and the list is read again on
     /// that; the read here is so the row goes the moment the core has
@@ -336,7 +354,7 @@ impl ChatMedia {
     /// any other failure. Both reads land on the same list, and the
     /// second moves nothing. No core is nothing to delete from: every
     /// row here came out of one.
-    pub fn delete_message(&mut self, message_id: u32) {
+    fn remove(&mut self, method: &'static str, message_id: u32) {
         let account_id = self.account_id;
         if account_id == 0 || message_id == 0 {
             return;
@@ -354,7 +372,7 @@ impl ChatMedia {
             this.borrow_mut().reload();
         });
         runtime.spawn(async move {
-            done(act_on_message(&rpc, "delete_messages", account_id, message_id).await);
+            done(act_on_message(&rpc, method, account_id, message_id).await);
         });
     }
 

@@ -1575,7 +1575,12 @@ async fn serve() {
                     &id,
                     &json!("https://i.delta.chat/#ABCDEF&a=me%40example.org&n=Me"),
                 ),
-                "delete_messages" => {
+                // Both ways a message goes: only here, or here and
+                // at every other end. The second sends a deletion
+                // request out as a message of its own; nothing in
+                // this server delivers anything, so what it does to
+                // the chat is what the first does.
+                "delete_messages" | "delete_messages_for_all" => {
                     let ids: Vec<u32> = positional(1)
                         .as_array()
                         .map(|array| {

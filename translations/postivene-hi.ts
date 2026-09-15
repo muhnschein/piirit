@@ -553,6 +553,43 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>DeleteMessageDialog</name>
+    <message>
+        <source>Delete</source>
+        <translation>हटाएँ</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>रद्द करें</translation>
+    </message>
+    <message>
+        <source>Delete for me</source>
+        <extracomment>One of the two ways to delete a message.</extracomment>
+        <translation>सिर्फ़ मेरे लिए हटाएँ</translation>
+    </message>
+    <message>
+        <source>Delete for everyone</source>
+        <extracomment>The other way: every other device in the chat is asked to delete its copy too.</extracomment>
+        <translation>सबके लिए हटाएँ</translation>
+    </message>
+    <message>
+        <source>Only an encrypted message you sent yourself can be deleted for everyone.</source>
+        <translation>सबके लिए सिर्फ़ वही एन्क्रिप्टेड संदेश हटाया जा सकता है जो आपने खुद भेजा हो।</translation>
+    </message>
+    <message>
+        <source>How do you want to delete this message? This cannot be undone.</source>
+        <translation>आप यह संदेश कैसे हटाना चाहते हैं? इसे वापस नहीं लिया जा सकता।</translation>
+    </message>
+    <message>
+        <source>It goes from your devices. Everybody else keeps their copy.</source>
+        <translation>यह आपके उपकरणों से चला जाता है। बाकी सबके पास उनकी प्रति बनी रहती है।</translation>
+    </message>
+    <message>
+        <source>It goes from your devices, and every other device in this chat is asked to delete it too.</source>
+        <translation>यह आपके उपकरणों से चला जाता है, और इस बातचीत के हर दूसरे उपकरण से भी इसे हटाने को कहा जाता है।</translation>
+    </message>
+</context>
+<context>
     <name>DisappearingMessages</name>
     <message>
         <source>Off</source>

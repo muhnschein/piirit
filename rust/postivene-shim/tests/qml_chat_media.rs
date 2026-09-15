@@ -57,6 +57,10 @@ struct PageStackProbe {
     detail: qt_property!(QVariant),
     /// The conversation under that.
     chat: qt_property!(QVariant),
+    /// The dialog Delete leads to, which asks which kind of delete
+    /// this is: `push` hands it back the way Silica hands back the page
+    /// it made, and the test picks on it.
+    chooser: qt_property!(QVariant),
     /// How many steps down the current walk has taken.
     hops: qt_property!(u32),
     push: qt_method!(fn(&mut self, page: QString, properties: QVariantMap) -> QVariant),
@@ -79,7 +83,18 @@ impl PageStackProbe {
             QString::from_qvariant(properties.value(QString::from("kind"), QVariant::default()))
                 .map(|kind| kind.to_string())
                 .unwrap_or_default();
-        self.note(&format!("push:{name}({kind})"));
+        // The delete dialog carries no kind; what it is asked with is
+        // whether the core would take a deletion for everyone of this
+        // message, which is all of it worth reading back.
+        let everyone = bool::from_qvariant(
+            properties.value(QString::from("canDeleteForEveryone"), QVariant::default()),
+        )
+        .map(|gate| format!("everyone={gate}"))
+        .unwrap_or_default();
+        self.note(&format!("push:{name}({kind}{everyone})"));
+        if name == "DeleteMessageDialog.qml" {
+            return self.chooser.clone();
+        }
         QVariant::default()
     }
 
@@ -129,11 +144,21 @@ const PROBE_QML: &str = r"
             property int shown: 0
             function showMessage(messageId) { shown = messageId }
         }
+        // The dialog Delete leads to, as the stack hands it back:
+        // which kind of delete is asked there, and this is the answer.
+        QtObject {
+            id: chooser
+            objectName: 'chooser'
+            signal picked(bool forEveryone)
+            function pick(forEveryone) { picked(forEveryone) }
+        }
         function armStack() {
             pageStack.detail = detailBelow
             pageStack.chat = chatBelow
+            pageStack.chooser = chooser
             return 'ok'
         }
+        function pickDelete(forEveryone) { chooser.pick(forEveryone); return 'ok' }
         function shownInChat() { return '' + chatBelow.shown }
         // The wait before a deletion, turned down from four seconds.
         function hurry(ms) { loader.item.pendingDelay = ms; return 'ok' }
@@ -305,6 +330,10 @@ fn a_chats_media_has_pages_of_its_own_behind_the_tiles() {
                 QString::from("deleteItem")
             )
         );
+        // Nothing is deleted on the tap: the page asks which kind of
+        // delete this is, and the wait starts on the answer.
+        record!("countdown-before-pick", get!("mediaRemorse", "active"));
+        record!("pick-delete", call!("pickDelete", false));
         record!("countdown-up", get!("mediaRemorse", "active"));
         record!("count-while-waiting", get!("media", "count"));
     });
@@ -454,6 +483,7 @@ fn assert_pages(steps: &[(&str, String)], navigation: &str, calls: &[(String, Va
         "show-in-chat",
         "hurry",
         "delete-picture",
+        "pick-delete",
         "load-files",
         "save",
         "load-audio",
@@ -519,6 +549,15 @@ fn assert_pages(steps: &[(&str, String)], navigation: &str, calls: &[(String, Va
             "Show in chat did not tell the conversation which message",
         ),
         (
+            // Not "false" but nothing at all: the countdown is built the
+            // first time a tile asks for one, and the tap that asks is
+            // the answer from the page, not the menu entry.
+            "countdown-before-pick",
+            "missing:mediaRemorse",
+            "Delete started a countdown before the reader had said which \
+             kind of delete it is",
+        ),
+        (
             "countdown-up",
             "true",
             "Delete did not put the platform's countdown up over the tile",
@@ -542,8 +581,21 @@ fn assert_pages(steps: &[(&str, String)], navigation: &str, calls: &[(String, Va
         assert_eq!(value(label), expected, "{complaint}. {context}");
     }
     assert!(
+        navigation.contains("push:DeleteMessageDialog.qml(everyone=false)"),
+        "Delete did not ask which kind of delete it is, or offered to \
+         delete somebody else's picture for everyone -- which the core \
+         refuses. {context}"
+    );
+    assert!(
         calls.contains(&("delete_messages".to_string(), serde_json::json!([1, [10]]))),
         "the core was not asked to delete the picture. {context}"
+    );
+    assert!(
+        !calls
+            .iter()
+            .any(|(name, _)| name == "delete_messages_for_all"),
+        "the picture was deleted for everybody in the chat, and the \
+         reader asked for it to go from their own phone. {context}"
     );
 
     // The files list: the document, its size, its icon, who sent it, and
@@ -641,11 +693,13 @@ fn assert_pages(steps: &[(&str, String)], navigation: &str, calls: &[(String, Va
     }
 
     // Every tap opened what it should: a picture on the picture page, a
-    // video on the video page, an app on its own page, and a tile the
-    // media page for its kind.
+    // video on the video page, an app on its own page, a tile the media
+    // page for its kind -- and Delete the dialog that asks which kind
+    // of delete it is, which is where the conversation asks as well.
     assert_eq!(
         navigation,
-        "push:PicturePage.qml()|push:VideoPage.qml()|pop|push:WebxdcPage.qml()|\
+        "push:PicturePage.qml()|push:VideoPage.qml()|pop|\
+         push:DeleteMessageDialog.qml(everyone=false)|push:WebxdcPage.qml()|\
          push:ChatMediaPage.qml(gallery)|push:ChatMediaPage.qml(files)|",
         "a tap did not open the right page, or Show in chat did not pop \
          back to the conversation. {context}"

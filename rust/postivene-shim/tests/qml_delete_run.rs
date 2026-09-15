@@ -114,13 +114,21 @@ const PROBE_QML: &str = r"
             }
             return null
         }
-        /// Delete, from that message's own menu.
+        /// Delete, from that message's own menu, and answer the page it
+        /// leads to.
+        ///
+        /// The menu asks which kind of delete this is rather than
+        /// deleting (pages/DeleteMessageDialog.qml); the wait starts when
+        /// that page reports back, which is what `confirmDelete` is.
+        /// Both here, so that what this test drives is one reader's one
+        /// decision to delete a message.
         function deleteRow(messageId) {
             var row = rowFor(messageId)
             if (!row) { return 'missing:row:' + messageId }
             var item = findIn(row.menu, 'deleteItem')
             if (!item) { return 'missing:deleteItem' }
             item.clicked()
+            list.item.confirmDelete(messageId, false)
             return 'ok'
         }
         /// Whether the platform's countdown is up over that message.

@@ -286,6 +286,16 @@ pub struct ChatMessages {
     /// Delete a message. Not only here: the core also removes it from the
     /// mail server, which for this client is where it lived.
     pub delete_message: qt_method!(fn(&mut self, message_id: u32)),
+    /// Delete a message for everyone in the chat, not only here: the
+    /// core's `delete_messages_for_all`, which deletes it the way
+    /// `delete_message` does and sends the other ends a request to do
+    /// the same.
+    ///
+    /// The core takes only messages this account sent, and only
+    /// encrypted ones -- which is what the row menu reads `is_outgoing`
+    /// and `show_padlock` for before it offers the choice. A refusal
+    /// comes back on `error` like any other.
+    pub delete_message_for_all: qt_method!(fn(&mut self, message_id: u32)),
     /// Try a failed message again.
     pub resend_message: qt_method!(fn(&mut self, message_id: u32)),
     /// Replace the text of a message of ours, here and at every other end:
@@ -1164,7 +1174,70 @@ impl ChatMessages {
 
     /// Delete a message, here and on the mail server.
     pub fn delete_message(&mut self, message_id: u32) {
-        self.act("delete_messages", message_id);
+        self.remove_message("delete_messages", message_id);
+    }
+
+    /// Delete a message here and at every other end: the deletion
+    /// request goes out as a message of its own, which the receiving
+    /// cores act on. What the core refuses -- somebody else's message,
+    /// an unencrypted one -- is reported like a failed send.
+    pub fn delete_message_for_all(&mut self, message_id: u32) {
+        self.remove_message("delete_messages_for_all", message_id);
+    }
+
+    /// Ask the core to delete a message, one way or the other, and take
+    /// the row out once it has agreed.
+    ///
+    /// The row goes here rather than on the event the core sends after
+    /// it, because the id list read on that event cannot say that the
+    /// *newest* message has gone: a row past every id in the list reads
+    /// as one the list is simply too old to know about, which is what
+    /// keeps a message just sent from vanishing and coming back
+    /// (`RowDiff::between`). Deleting one's own last message is exactly
+    /// that case -- and the likeliest thing to delete for everybody --
+    /// so it sat on the screen until the chat was opened again.
+    ///
+    /// A refusal leaves the row where it is and is reported like a failed
+    /// send: the core takes a deletion for everyone only of this
+    /// account's own encrypted messages, which is what the menu offers it
+    /// for, and what it refuses it has not deleted.
+    fn remove_message(&mut self, method: &'static str, message_id: u32) {
+        let account_id = self.account_id;
+        if account_id == 0 || message_id == 0 {
+            return;
+        }
+        let Some((rpc, runtime)) = connection() else {
+            self.error(QString::from("not started"));
+            return;
+        };
+
+        let ptr: QPointer<Self> = QPointer::from(&*self);
+        let done = queued_callback(move |result: Result<(), String>| {
+            let Some(this) = ptr.as_pinned() else { return };
+            match result {
+                Ok(()) => this.borrow_mut().drop_row(message_id),
+                Err(err) => this.borrow().error(err.into()),
+            }
+        });
+
+        runtime.spawn(async move {
+            done(act_on_message(&rpc, method, account_id, message_id).await);
+        });
+    }
+
+    /// Take one row out, where it is still here. The core's own event
+    /// follows and finds a list that already agrees with it.
+    fn drop_row(&mut self, message_id: u32) {
+        let index = self
+            .rows
+            .borrow()
+            .iter()
+            .position(|row| row.message_id == message_id);
+        let Some(index) = index else {
+            return;
+        };
+        self.remove_rows(&[index]);
+        self.rows_changed();
     }
 
     /// Try a failed message again.
