@@ -270,6 +270,29 @@ pub struct DeltaChatCore {
     /// account at once.
     pub io_started: qt_signal!(account_id: u32, success: bool, error: QString),
 
+    /// Stop IO for every account, for as long as there is no network to
+    /// carry it.
+    ///
+    /// Only ever called when the phone itself says it has no connection
+    /// (see `qml/components/NetworkWatch.qml`). A core whose IO is running
+    /// on a dead network keeps trying to make a connection -- a name
+    /// lookup, a TCP connect, a failure, a wait, again -- and every attempt
+    /// wakes the radio for nothing. Nothing is given up by stopping: no
+    /// message can arrive over a network that is not there.
+    ///
+    /// Never called because the app was backgrounded. The app in the
+    /// background is the only way a message reaches this platform at all,
+    /// and stopping IO then would be stopping the app from working.
+    ///
+    /// Forgets what IO was asked for, so a core restarted while the network
+    /// is still gone comes back with IO stopped too. Whatever starts IO
+    /// again -- the network returning, or the reader opening the app --
+    /// asks for it afresh.
+    pub stop_all_account_io: qt_method!(fn(&mut self)),
+    /// Result of stopping IO. Reported for the same reason `io_started` is:
+    /// so a test can see it happened.
+    pub io_stopped: qt_signal!(success: bool, error: QString),
+
     /// Tell the core the network may have changed under it.
     ///
     /// The core's own `maybe_network`. A connection killed by a move from
@@ -1166,6 +1189,36 @@ impl DeltaChatCore {
 
         runtime.spawn(async move {
             done(start_io(&rpc, None).await);
+        });
+    }
+
+    /// Stop IO for every account; see the declaration.
+    pub fn stop_all_account_io(&mut self) {
+        // Forgotten before the call, and both of them: a core that dies and
+        // is restarted while the network is still gone must not come back
+        // with IO running, and `resume_io` reads exactly these two.
+        self.io_all = false;
+        self.io_accounts.clear();
+        let Some((rpc, runtime)) = self.connection() else {
+            self.io_stopped(false, QString::from("not started"));
+            return;
+        };
+
+        let ptr: QPointer<Self> = QPointer::from(&*self);
+        let done = queued_callback(move |result: Result<(), String>| {
+            let Some(this) = ptr.as_pinned() else { return };
+            match result {
+                Ok(()) => this.borrow().io_stopped(true, QString::default()),
+                Err(err) => this.borrow().io_stopped(false, err.into()),
+            }
+        });
+
+        runtime.spawn(async move {
+            done(
+                rpc.call_unit::<()>("stop_io_for_all_accounts")
+                    .await
+                    .map_err(|err| err.to_string()),
+            );
         });
     }
 

@@ -55,6 +55,36 @@ And on the app's side:
 - **Attachments stop at 1 MiB by default**, so a photo arrives and a video
   waits to be asked for.
 
+## What the app does about the rest
+
+None of these gives up a message:
+
+### Stopping IO while there is no network at all
+
+When the phone has no connection, the core keeps trying to make one:
+a name lookup, a TCP connect, a failure, a wait, again. Every attempt
+wakes the radio and none of them can succeed. A tunnel, a basement, a lift,
+a flight -- an hour of that is dozens of wakeups bought for nothing.
+
+So `NetworkWatch` listens for connman saying the network is gone, and after
+it has stayed gone for a while the window stops the core's IO. When connman
+says the network is back, IO starts again and the core is asked to look at
+it (`maybe_network`).
+
+This is the opposite of a change that was considered and rejected: stopping
+IO when the app is *backgrounded* would destroy the only path by which
+messages arrive, and is never done. Stopping IO when there is *no network*
+gives up nothing, because nothing can arrive over a network that is not
+there.
+
+It is deliberately timid about it. IO is only ever stopped after connman has
+positively said the network is gone and stayed saying it -- an unknown state
+never stops anything -- and it is started again by any of three separate
+things: connman saying the network is back, the app being brought to the
+front, or the core being restarted under it. A watcher that got it wrong
+costs a reconnection; a watcher that got it wrong and had only one way back
+would cost the messages.
+
 ## Measuring it
 
 None of the above is worth believing without a number, and the number is

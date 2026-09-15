@@ -184,17 +184,46 @@ ApplicationWindow {
     /// nothing here shadows it.
     property bool appActive: Qt.application.state === Qt.ApplicationActive
 
+    /// Whether IO was stopped because the phone has no network.
+    ///
+    /// The one reason IO is ever stopped while the app is running, and it
+    /// costs no message: nothing arrives over a network that is not there.
+    /// Stopping it for any other reason -- the app being backgrounded, say
+    /// -- would stop the app working, because the app in the background is
+    /// the only way a message reaches this platform.
+    property bool ioPaused: false
+
+    /// There is a network again, as far as anything here knows: start IO
+    /// if it was stopped for want of one, and ask the core to look at what
+    /// it has now.
+    ///
+    /// Called by everything that could mean the network is back -- connman
+    /// saying so, and the reader opening the app. More than one way back is
+    /// the point: a watch that got the loss wrong costs a reconnection,
+    /// and a watch that got it wrong with only one way back would cost the
+    /// messages.
+    function resumeIo() {
+        // A core that is still starting has no connection to reconsider,
+        // and the IO it starts with is a fresh one anyway.
+        if (core.status !== "ready") {
+            return
+        }
+        if (appWindow.ioPaused) {
+            appWindow.ioPaused = false
+            core.start_all_account_io()
+        }
+        core.maybe_network()
+    }
+
     // Coming back to the app is the one moment the reader is watching for
     // a message, and the likeliest moment for the connection the core is
     // holding to be a dead one -- the phone has been in a pocket through
     // a change of network, and a connection killed that way says nothing
     // until the core's IDLE times out five minutes later. Asking here
-    // turns that wait into a reconnection now. Nothing is asked while the
-    // core is away: a core that is still starting has no connection to
-    // reconsider, and the IO it starts with is a fresh one anyway.
+    // turns that wait into a reconnection now.
     onAppActiveChanged: {
-        if (appWindow.appActive && core.status === "ready") {
-            core.maybe_network()
+        if (appWindow.appActive) {
+            appWindow.resumeIo()
         }
     }
 
@@ -204,10 +233,20 @@ ApplicationWindow {
     // one only this can rescue. See components/NetworkWatch.qml.
     NetworkWatch {
         objectName: "networkWatch"
-        onNetworkChanged: {
-            if (core.status === "ready") {
-                core.maybe_network()
+
+        onNetworkChanged: appWindow.resumeIo()
+
+        // The network has been gone long enough that it is not a handover.
+        // Left alone, the core would spend that time reconnecting to
+        // nothing, and each attempt wakes the radio for a failure. Nothing
+        // is given up by stopping: see docs/POWER.md.
+        onNetworkLost: {
+            if (core.status !== "ready" || !appWindow.askedForIo
+                    || appWindow.ioPaused) {
+                return
             }
+            appWindow.ioPaused = true
+            core.stop_all_account_io()
         }
     }
 
