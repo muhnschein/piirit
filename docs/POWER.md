@@ -85,6 +85,17 @@ front, or the core being restarted under it. A watcher that got it wrong
 costs a reconnection; a watcher that got it wrong and had only one way back
 would cost the messages.
 
+### Not handing out events nobody is listening for
+
+Every event from the core used to be serialised to JSON and handed to every
+listener in the app -- each page still on the stack, and one list per
+profile on the cover -- whether or not anything wanted that kind of event.
+The core is chatty, so a sync of a few hundred messages meant a great deal
+of string work with the screen off.
+
+The events any part of the app actually reads are a known set, so the rest
+are dropped before they are serialised.
+
 ## Measuring it
 
 None of the above is worth believing without a number, and the number is

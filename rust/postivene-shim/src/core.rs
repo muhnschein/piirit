@@ -41,6 +41,45 @@ pub const DEFAULT_PROVIDER_QR: &str = "dcaccount:nine.testrun.org";
 /// Where the RPM installs the server: beside the app, and not on `PATH`.
 pub const BUNDLED_SERVER: &str = "/usr/libexec/harbour-postivene/deltachat-rpc-server";
 
+/// The event kinds anything in the app reads, and so the only ones
+/// [`DeltaChatCore::core_event`] is fired for.
+///
+/// The core says a great deal that nothing here listens to -- most of it is
+/// its log -- and every event fired reaches every page still on the stack
+/// and one chat list per profile on the cover, each of which parses the
+/// payload again. Dropping the rest before it is serialised is work not
+/// done, and the bulk syncs where there is most of it are exactly when the
+/// screen is off. See `DeltaChatCore::relay`.
+///
+/// This is the union of every kind matched in a `handle_event` in this
+/// crate and every kind named in an `onCore_event` in `qml/`. **A page that
+/// starts reading a new kind has to add it here**, or it will never see
+/// one; `tests/event_kinds.rs` reads both sides and fails if they differ,
+/// and `tests/event_fanout.rs` is that the gate is really applied.
+///
+/// Sorted, so the list can be read at a glance.
+pub const HANDLED_EVENT_KINDS: &[&str] = &[
+    "ChatDeleted",
+    "ChatEphemeralTimerModified",
+    "ChatModified",
+    "ChatlistChanged",
+    "ChatlistItemChanged",
+    "ConnectivityChanged",
+    "ContactsChanged",
+    "EventChannelOverflow",
+    "ImexProgress",
+    "IncomingMsg",
+    "MsgDeleted",
+    "MsgDelivered",
+    "MsgFailed",
+    "MsgRead",
+    "MsgsChanged",
+    "MsgsNoticed",
+    "ReactionsChanged",
+    "WebxdcInstanceDeleted",
+    "WebxdcStatusUpdate",
+];
+
 /// How long the app waits for the server to go at exit.
 const SHUTDOWN_TIMEOUT: Duration = Duration::from_secs(3);
 
@@ -745,7 +784,6 @@ impl DeltaChatCore {
             "" => "Unknown".to_string(),
             kind => kind.to_string(),
         };
-        let payload = serde_json::to_string(&event.event).unwrap_or_default();
         if kind == "Error" {
             let text = match json::str_at(&event.event, "msg") {
                 "" => "the core reported an error",
@@ -784,6 +822,17 @@ impl DeltaChatCore {
         ) {
             self.refresh_unread(event.context_id);
         }
+        // Everything above is this object's own business and happens
+        // whatever the kind. The fan-out below is not: `core_event` reaches
+        // every page still on the stack and one chat list per profile on the
+        // cover, and the core says a great deal that none of them read --
+        // its whole log, for one. Serialising that and handing it round is
+        // work done with the screen off, once per listener, during exactly
+        // the bulk syncs where there is most of it.
+        if !HANDLED_EVENT_KINDS.contains(&kind.as_str()) {
+            return;
+        }
+        let payload = serde_json::to_string(&event.event).unwrap_or_default();
         self.core_event(event.context_id, kind.into(), payload.into());
     }
 

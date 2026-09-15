@@ -908,6 +908,21 @@ async fn serve() {
     let state = Arc::new(Mutex::new(State::default()));
     let stdout = Arc::new(Mutex::new(tokio::io::stdout()));
 
+    // Events of whatever kind is asked for, queued before anything else
+    // and with no payload beyond the kind. The real core cannot be made to
+    // say a particular thing on demand, and what an event of an unread kind
+    // costs the app is exactly what `HANDLED_EVENT_KINDS` is about, so a
+    // test names the kinds it wants to see arrive.
+    if let Ok(kinds) = std::env::var("POSTIVENE_FAKE_SEED_EVENTS") {
+        let mut state = state.lock().await;
+        for kind in kinds.split(',').filter(|kind| !kind.is_empty()) {
+            state.events.push_back(json!({
+                "contextId": 1,
+                "event": {"kind": kind},
+            }));
+        }
+        drop(state);
+    }
     // Stands in for the server dying under the client.
     if let Ok(after) = std::env::var("POSTIVENE_FAKE_EXIT_AFTER_MS") {
         if let Ok(millis) = after.parse() {
