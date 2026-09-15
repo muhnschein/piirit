@@ -133,7 +133,7 @@ fn kinds_read() -> BTreeSet<String> {
 
     let src = crate_dir().join("src");
     let mut sources: Vec<PathBuf> = std::fs::read_dir(&src)
-        .expect("the crate has a src directory")
+        .unwrap_or_else(|err| panic!("cannot read {}: {err}", src.display()))
         .filter_map(Result::ok)
         .map(|entry| entry.path())
         .filter(|path| path.extension().is_some_and(|kind| kind == "rs"))

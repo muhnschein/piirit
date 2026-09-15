@@ -66,6 +66,7 @@ const PROBE_QML: &str = r"
 ";
 
 #[test]
+#[allow(clippy::too_many_lines)]
 fn a_cover_nobody_is_looking_at_waits_and_catches_up_when_looked_at() {
     let temp = std::env::temp_dir().join(format!("postivene-cover-asleep-{}", std::process::id()));
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
