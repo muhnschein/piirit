@@ -1110,6 +1110,7 @@ async fn serve() {
                 }
                 "start_io"
                 | "start_io_for_all_accounts"
+                | "maybe_network"
                 | "markseen_msgs"
                 | "set_chat_visibility"
                 | "resend_messages" => ok(&id, &Value::Null),

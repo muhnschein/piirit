@@ -111,7 +111,10 @@ SupportsMultipleFiles=no
 # profile applies instead, which is what the app ran under until now.
 #
 # Internet, for the core's own traffic; everything else it does happens
-# inside its own account directory.
+# inside its own account directory. It also covers listening to connman on
+# the system bus, which is what tells the app the phone has changed network
+# (components/NetworkWatch.qml): Internet.permission includes
+# Connman.permission, so no separate grant is needed and none is asked for.
 #
 # Pictures and MediaIndexing are both needed by the settings page's
 # profile picture, and neither is sufficient alone: Pictures whitelists

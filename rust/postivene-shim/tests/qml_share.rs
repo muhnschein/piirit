@@ -183,6 +183,7 @@ fn what_is_shared_reaches_the_chat_the_reader_picks() {
     engine.add_import_path(QString::from(
         common::stubs_dir().to_string_lossy().into_owned(),
     ));
+    common::register_dbus_enum();
     engine.set_object_property("core".into(), core_box.pinned());
     engine.set_object_property("pageStack".into(), stack_box.pinned());
     engine.set_property(

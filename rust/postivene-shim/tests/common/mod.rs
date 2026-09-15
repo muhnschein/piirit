@@ -4,11 +4,40 @@
 #![allow(dead_code)]
 
 use std::cell::RefCell;
+use std::ffi::CString;
 use std::path::{Path, PathBuf};
 use std::rc::Rc;
+use std::sync::Once;
 
-use qmetaobject::QString;
+use qmetaobject::{qml_register_enum, QEnum, QString};
 use serde_json::Value;
+
+/// `DBus.SystemBus`, which `NetworkWatch.qml` names and a `.qml` stub
+/// cannot express: QML forbids capitalised property names, and a
+/// registered enum is how the other stub namespaces do it (see the two in
+/// `qml_pages.rs`).
+#[derive(QEnum)]
+#[repr(u8)]
+pub enum DBus {
+    SessionBus = 0,
+    SystemBus = 1,
+}
+
+/// Register the stub `Nemo.DBus` enum, once per process. Every test that
+/// loads the window needs it: the window holds a `NetworkWatch`, and a
+/// component whose `bus:` does not resolve takes the window down with it.
+pub fn register_dbus_enum() {
+    static ONCE: Once = Once::new();
+    ONCE.call_once(|| {
+        let Ok(uri) = CString::new("Nemo.DBus") else {
+            return;
+        };
+        let Ok(name) = CString::new("DBus") else {
+            return;
+        };
+        qml_register_enum::<DBus>(&uri, 2, 0, &name);
+    });
+}
 
 /// Every recorded call, in order. A line that does not parse is a torn
 /// write, not noise: fail rather than drop it and assert on a short list.

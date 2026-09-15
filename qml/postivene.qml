@@ -171,6 +171,41 @@ ApplicationWindow {
         }
     }
 
+    /// Whether the app is the one being looked at.
+    ///
+    /// Held as a property rather than read where it is wanted: what
+    /// matters is the moment it becomes true again, and a binding is what
+    /// notices that. Silica's own `applicationActive` is not used, so
+    /// nothing here shadows it.
+    property bool appActive: Qt.application.state === Qt.ApplicationActive
+
+    // Coming back to the app is the one moment the reader is watching for
+    // a message, and the likeliest moment for the connection the core is
+    // holding to be a dead one -- the phone has been in a pocket through
+    // a change of network, and a connection killed that way says nothing
+    // until the core's IDLE times out five minutes later. Asking here
+    // turns that wait into a reconnection now. Nothing is asked while the
+    // core is away: a core that is still starting has no connection to
+    // reconsider, and the IO it starts with is a fresh one anyway.
+    onAppActiveChanged: {
+        if (appWindow.appActive && core.status === "ready") {
+            core.maybe_network()
+        }
+    }
+
+    // The other half of the ask above, and the half that matters when
+    // nobody is looking: the phone announces every change of network on
+    // its own bus, and a message that arrives while it is in a pocket is
+    // one only this can rescue. See components/NetworkWatch.qml.
+    NetworkWatch {
+        objectName: "networkWatch"
+        onNetworkChanged: {
+            if (core.status === "ready") {
+                core.maybe_network()
+            }
+        }
+    }
+
     Component.onCompleted: {
         // Takes the binding off `resumeAccountId`: the window has its
         // answer, and from here the key belongs to the chat list.
