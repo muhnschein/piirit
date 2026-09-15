@@ -41,6 +41,8 @@ See the non-goals in [`docs/PROJECT.md`](docs/PROJECT.md) for more information.
 how a device RPM is built
 - [`docs/HARBOUR.md`](docs/HARBOUR.md) — our understanding of Jolla's store 
 rules, how CI tries to gate them, and the two that still block submission
+- [`docs/POWER.md`](docs/POWER.md) — what running in the background costs,
+what the app does about it, and how to measure whether any of it worked
 
 ## Building
 
