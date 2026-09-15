@@ -1,5 +1,11 @@
 //! What a message's context menu sends: a reply carries the quote, and
 //! delete and resend name the message they act on.
+//!
+//! Delete is two calls rather than one -- the message goes from this
+//! account's devices, or the other ends are asked to delete their copies
+//! too -- and which of them the reader picked has to reach the core
+//! intact. Which kind is asked on a page (`qml_delete_choice`); this is
+//! the far end of it.
 
 // Qt harness: needs `unsafe` for `env::set_var` before Qt starts
 // (`unused_unsafe` because it is only unsafe from edition 2024 on),
@@ -63,6 +69,11 @@ const PROBE_QML: &str = r"
         // read, and must not while the reader is up in the history.
         function forceReload() { chat.delete_message(1) }
         function remove() { chat.delete_message(2) }
+        // The other kind: this account's own message, gone from
+        // everybody's phone rather than from this one. 101 is the reply
+        // sent above -- the fake core numbers what it is sent from 101,
+        // above the ids it seeds a chat with.
+        function removeEverywhere() { chat.delete_message_for_all(101) }
         function retry() { chat.resend_message(1) }
         function count() { return '' + chat.count }
         function error() { return lastError }
@@ -139,6 +150,7 @@ fn a_reply_carries_its_quote_and_the_rest_name_their_message() {
 
     single_shot(Duration::from_secs(12), move || unsafe {
         call!("catchUp");
+        call!("removeEverywhere");
     });
     single_shot(Duration::from_secs(14), move || unsafe {
         (*steps_ptr).push(("error", call!("error")));
@@ -209,6 +221,15 @@ fn assert_outcome(calls: &[(String, Value)], steps: &[(&str, String)]) {
         params_of("resend_messages"),
         vec![serde_json::json!([1, [1]])],
         "resending did not name its message. {context}"
+    );
+    // The reply sent above, deleted the other way: the core's own
+    // `delete_messages_for_all`, which is the call that asks the other
+    // ends to delete their copies as well.
+    assert_eq!(
+        params_of("delete_messages_for_all"),
+        vec![serde_json::json!([1, [101]])],
+        "deleting for everyone did not reach the core as the call that \
+         means it. {context}"
     );
     // A resend leaves the id list alone, so the sync a core event triggers
     // fetches nothing: without an explicit re-read the row keeps the failed

@@ -95,12 +95,17 @@ const PROBE_QML: &str = r"
             }
             return null
         }
+        /// Delete, from that message's own menu, and answer the page it
+        /// leads to: the menu asks which kind of delete this is
+        /// (pages/DeleteMessagePage.qml) and the wait starts on the
+        /// answer, so both are one reader's one decision.
         function deleteRow(messageId) {
             var row = rowFor(messageId)
             if (!row) { return 'missing:row:' + messageId }
             var item = findIn(row.menu, 'deleteItem')
             if (!item) { return 'missing:deleteItem' }
             item.clicked()
+            list.item.confirmDelete(messageId, false)
             return 'ok'
         }
         /// Which messages are still waiting, oldest id first. A shared

@@ -79,7 +79,15 @@ Page {
     /// destroys rows, and every event reloads them. See PendingRemoval.
     PendingRemoval {
         id: doomedMessages
-        onRemove: media.delete_message(id)
+        // `tag` is which kind of delete was picked on the page the menu
+        // led to: true asks the other ends to delete their copies too.
+        onRemove: {
+            if (tag === true) {
+                media.delete_message_for_all(id)
+            } else {
+                media.delete_message(id)
+            }
+        }
     }
 
     // Leaving inside the wait is still asking for the message to go:
@@ -91,6 +99,29 @@ Page {
         }
     }
 
+    /// Ask which kind of delete this is, on the page the conversation
+    /// asks on: a picture here is a message in that chat, and the two
+    /// ways to delete one are the same either way. The wait starts when
+    /// the answer comes back, and nothing goes until it is up.
+    ///
+    /// What the page needs is taken now rather than in the answer: the
+    /// row may be gone by the time the reader has chosen.
+    function askDelete(messageId, body, fileName, author, canDeleteForEveryone) {
+        var chooser = pageStack.push(
+            Qt.resolvedUrl("DeleteMessagePage.qml"),
+            {
+                senderName: author,
+                body: body,
+                fileName: fileName,
+                canDeleteForEveryone: canDeleteForEveryone
+            })
+        if (chooser) {
+            chooser.picked.connect(function(forEveryone) {
+                doomedMessages.ask(messageId, forEveryone)
+            })
+        }
+    }
+
     /// Silica's own countdown, drawn over what is going: the bar, the
     /// seconds, "Tap to cancel", all of it the platform's. Built the
     /// first time a row asks, in the row's own `loader`, since every row
@@ -99,7 +130,14 @@ Page {
     /// `doomedMessages`, which outlives the row -- so it is handed a
     /// callback that does nothing and asked only to draw and to report
     /// the tap.
-    function raiseRemorse(loader, over, messageId) {
+    function raiseRemorse(cell, loader, over, messageId) {
+        // Once per wait: the answer that starts one and a rebuild of the
+        // row inside it both come through here, and two `execute` calls
+        // over one item is a countdown restarting under the reader.
+        if (cell.countingDown) {
+            return
+        }
+        cell.countingDown = true
         loader.active = true
         //: What Silica's countdown says it is doing, over a picture, a
         //: sound, a file or an app the reader has asked to delete.
@@ -240,6 +278,9 @@ Page {
                 /// This picture is on its way out.
                 readonly property bool doomed:
                     doomedMessages.pending(model.message_id)
+                /// Whether this tile has already put a countdown up over
+                /// the wait it is in; see `page.raiseRemorse`.
+                property bool countingDown: false
 
                 Loader {
                     id: remorse
@@ -250,12 +291,22 @@ Page {
                     }
                 }
 
+                // The wait is asked for on a page now, so it starts while
+                // the menu is long gone: the tile hears of it here.
+                onDoomedChanged: {
+                    if (tile.doomed) {
+                        page.raiseRemorse(tile, remorse, body, model.message_id)
+                    } else {
+                        tile.countingDown = false
+                    }
+                }
+
                 // A tile is rebuilt every time it scrolls back into view,
                 // so one scrolled past mid-wait comes back with no
                 // countdown on it. Put it up again with what is left.
                 Component.onCompleted: {
                     if (tile.doomed) {
-                        page.raiseRemorse(remorse, body, model.message_id)
+                        page.raiseRemorse(tile, remorse, body, model.message_id)
                     }
                 }
 
@@ -271,11 +322,14 @@ Page {
                         text: qsTr("Delete")
                         // The page is told, not this tile: the wait
                         // before a message goes has to outlive the tile
-                        // it was asked for on. See PendingRemoval.
-                        onClicked: {
-                            doomedMessages.ask(model.message_id)
-                            page.raiseRemorse(remorse, body, model.message_id)
-                        }
+                        // it was asked for on; which kind of delete
+                        // this is belongs to a page of its own. See
+                        // PendingRemoval and DeleteMessagePage.
+                        onClicked: page.askDelete(
+                                       model.message_id, model.text,
+                                       model.file_name, model.sender_name,
+                                       model.is_outgoing && model.show_padlock
+                                       && !model.is_info)
                     }
                 }
 
@@ -383,6 +437,19 @@ Page {
                 /// This message is on its way out.
                 readonly property bool doomed:
                     doomedMessages.pending(model.message_id)
+                /// Whether this row has already put a countdown up; see
+                /// the tile.
+                property bool countingDown: false
+
+                // The wait starts on the page the menu leads to, by which
+                // time the menu is gone; see the tile.
+                onDoomedChanged: {
+                    if (row.doomed) {
+                        page.raiseRemorse(row, remorse, content, model.message_id)
+                    } else {
+                        row.countingDown = false
+                    }
+                }
 
                 Loader {
                     id: remorse
@@ -396,7 +463,7 @@ Page {
                 // A row rebuilt mid-wait comes back bare; see the tile.
                 Component.onCompleted: {
                     if (row.doomed) {
-                        page.raiseRemorse(remorse, content, model.message_id)
+                        page.raiseRemorse(row, remorse, content, model.message_id)
                     }
                 }
 
@@ -423,10 +490,11 @@ Page {
                         objectName: "deleteItem"
                         text: qsTr("Delete")
                         // The page is told, not this row; see the tile.
-                        onClicked: {
-                            doomedMessages.ask(model.message_id)
-                            page.raiseRemorse(remorse, content, model.message_id)
-                        }
+                        onClicked: page.askDelete(
+                                       model.message_id, model.text,
+                                       model.file_name, model.sender_name,
+                                       model.is_outgoing && model.show_padlock
+                                       && !model.is_info)
                     }
                 }
 
