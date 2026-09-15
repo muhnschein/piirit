@@ -553,11 +553,6 @@ Other groups with blocked contacts will still show their messages.</source>
 <context>
     <name>DeleteMessageDialog</name>
     <message>
-        <source>Delete message</source>
-        <extracomment>Heading of the dialog asking which kind of delete.</extracomment>
-        <translation>Șterge mesajul</translation>
-    </message>
-    <message>
         <source>Delete</source>
         <translation>Șterge</translation>
     </message>
@@ -578,6 +573,23 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Only an encrypted message you sent yourself can be deleted for everyone.</source>
         <translation>Pentru toți poate fi șters doar un mesaj criptat trimis de tine.</translation>
+    </message>
+    <message>
+        <source>Delete message?</source>
+        <extracomment>Heading of the dialog asking which kind of delete.</extracomment>
+        <translation>Ștergi mesajul?</translation>
+    </message>
+    <message>
+        <source>How do you want to delete this message? This cannot be undone.</source>
+        <translation>Cum vrei să ștergi acest mesaj? Nu se poate anula.</translation>
+    </message>
+    <message>
+        <source>It goes from your devices. Everybody else keeps their copy.</source>
+        <translation>Dispare de pe dispozitivele tale. Toți ceilalți își păstrează copia.</translation>
+    </message>
+    <message>
+        <source>It goes from your devices, and every other device in this chat is asked to delete it too.</source>
+        <translation>Dispare de pe dispozitivele tale, iar fiecare alt dispozitiv din această conversație este rugat să îl șteargă și el.</translation>
     </message>
 </context>
 <context>

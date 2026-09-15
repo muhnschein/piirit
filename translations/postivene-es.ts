@@ -551,11 +551,6 @@ Other groups with blocked contacts will still show their messages.</source>
 <context>
     <name>DeleteMessageDialog</name>
     <message>
-        <source>Delete message</source>
-        <extracomment>Heading of the dialog asking which kind of delete.</extracomment>
-        <translation>Eliminar mensaje</translation>
-    </message>
-    <message>
         <source>Delete</source>
         <translation>Eliminar</translation>
     </message>
@@ -576,6 +571,23 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Only an encrypted message you sent yourself can be deleted for everyone.</source>
         <translation>Solo se puede eliminar para todos un mensaje cifrado que hayas enviado tú.</translation>
+    </message>
+    <message>
+        <source>Delete message?</source>
+        <extracomment>Heading of the dialog asking which kind of delete.</extracomment>
+        <translation>¿Eliminar mensaje?</translation>
+    </message>
+    <message>
+        <source>How do you want to delete this message? This cannot be undone.</source>
+        <translation>¿Cómo quieres eliminar este mensaje? Esto no se puede deshacer.</translation>
+    </message>
+    <message>
+        <source>It goes from your devices. Everybody else keeps their copy.</source>
+        <translation>Desaparece de tus dispositivos. Los demás conservan su copia.</translation>
+    </message>
+    <message>
+        <source>It goes from your devices, and every other device in this chat is asked to delete it too.</source>
+        <translation>Desaparece de tus dispositivos, y se pide a los demás dispositivos de este chat que también lo eliminen.</translation>
     </message>
 </context>
 <context>

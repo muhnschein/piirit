@@ -557,11 +557,6 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
 <context>
     <name>DeleteMessageDialog</name>
     <message>
-        <source>Delete message</source>
-        <extracomment>Heading of the dialog asking which kind of delete.</extracomment>
-        <translation>Smazat zprávu</translation>
-    </message>
-    <message>
         <source>Delete</source>
         <translation>Smazat</translation>
     </message>
@@ -582,6 +577,23 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
     <message>
         <source>Only an encrypted message you sent yourself can be deleted for everyone.</source>
         <translation>U všech lze smazat jen tvoji vlastní šifrovanou zprávu.</translation>
+    </message>
+    <message>
+        <source>Delete message?</source>
+        <extracomment>Heading of the dialog asking which kind of delete.</extracomment>
+        <translation>Smazat zprávu?</translation>
+    </message>
+    <message>
+        <source>How do you want to delete this message? This cannot be undone.</source>
+        <translation>Jak chceš tuto zprávu smazat? Tohle nejde vzít zpět.</translation>
+    </message>
+    <message>
+        <source>It goes from your devices. Everybody else keeps their copy.</source>
+        <translation>Zmizí z tvých zařízení. Všem ostatním jejich kopie zůstane.</translation>
+    </message>
+    <message>
+        <source>It goes from your devices, and every other device in this chat is asked to delete it too.</source>
+        <translation>Zmizí z tvých zařízení a každé další zařízení v tomto chatu je požádáno, aby ji smazalo také.</translation>
     </message>
 </context>
 <context>

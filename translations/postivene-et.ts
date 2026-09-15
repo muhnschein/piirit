@@ -555,11 +555,6 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
 <context>
     <name>DeleteMessageDialog</name>
     <message>
-        <source>Delete message</source>
-        <extracomment>Heading of the dialog asking which kind of delete.</extracomment>
-        <translation>Kustuta sõnum</translation>
-    </message>
-    <message>
         <source>Delete</source>
         <translation>Kustuta</translation>
     </message>
@@ -580,6 +575,23 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
     <message>
         <source>Only an encrypted message you sent yourself can be deleted for everyone.</source>
         <translation>Kõigi jaoks saab kustutada ainult krüptitud sõnumi, mille sa ise saatsid.</translation>
+    </message>
+    <message>
+        <source>Delete message?</source>
+        <extracomment>Heading of the dialog asking which kind of delete.</extracomment>
+        <translation>Kustutada sõnum?</translation>
+    </message>
+    <message>
+        <source>How do you want to delete this message? This cannot be undone.</source>
+        <translation>Kuidas soovid selle sõnumi kustutada? Seda ei saa tagasi võtta.</translation>
+    </message>
+    <message>
+        <source>It goes from your devices. Everybody else keeps their copy.</source>
+        <translation>See kaob sinu seadmetest. Kõigil teistel jääb oma koopia alles.</translation>
+    </message>
+    <message>
+        <source>It goes from your devices, and every other device in this chat is asked to delete it too.</source>
+        <translation>See kaob sinu seadmetest ja kõiki teisi selle vestluse seadmeid palutakse see samuti kustutada.</translation>
     </message>
 </context>
 <context>

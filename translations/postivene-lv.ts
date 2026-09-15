@@ -557,11 +557,6 @@ Citās grupās, kurās ir bloķēti kontakti, viņu ziņas joprojām būs redzam
 <context>
     <name>DeleteMessageDialog</name>
     <message>
-        <source>Delete message</source>
-        <extracomment>Heading of the dialog asking which kind of delete.</extracomment>
-        <translation>Dzēst ziņu</translation>
-    </message>
-    <message>
         <source>Delete</source>
         <translation>Dzēst</translation>
     </message>
@@ -582,6 +577,23 @@ Citās grupās, kurās ir bloķēti kontakti, viņu ziņas joprojām būs redzam
     <message>
         <source>Only an encrypted message you sent yourself can be deleted for everyone.</source>
         <translation>Visiem var izdzēst tikai tavu paša sūtīto šifrēto ziņu.</translation>
+    </message>
+    <message>
+        <source>Delete message?</source>
+        <extracomment>Heading of the dialog asking which kind of delete.</extracomment>
+        <translation>Dzēst ziņu?</translation>
+    </message>
+    <message>
+        <source>How do you want to delete this message? This cannot be undone.</source>
+        <translation>Kā vēlies dzēst šo ziņu? To nevar atsaukt.</translation>
+    </message>
+    <message>
+        <source>It goes from your devices. Everybody else keeps their copy.</source>
+        <translation>Tā pazūd no tavām ierīcēm. Visi pārējie patur savu kopiju.</translation>
+    </message>
+    <message>
+        <source>It goes from your devices, and every other device in this chat is asked to delete it too.</source>
+        <translation>Tā pazūd no tavām ierīcēm, un katrai citai šīs sarakstes ierīcei tiek lūgts to arī izdzēst.</translation>
     </message>
 </context>
 <context>

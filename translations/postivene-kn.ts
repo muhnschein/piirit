@@ -555,11 +555,6 @@ Other groups with blocked contacts will still show their messages.</source>
 <context>
     <name>DeleteMessageDialog</name>
     <message>
-        <source>Delete message</source>
-        <extracomment>Heading of the dialog asking which kind of delete.</extracomment>
-        <translation>ಸಂದೇಶವನ್ನು ಅಳಿಸಿ</translation>
-    </message>
-    <message>
         <source>Delete</source>
         <translation>ಅಳಿಸಿ</translation>
     </message>
@@ -580,6 +575,23 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Only an encrypted message you sent yourself can be deleted for everyone.</source>
         <translation>ನೀವೇ ಕಳುಹಿಸಿದ ಎನ್‌ಕ್ರಿಪ್ಟ್ ಮಾಡಿದ ಸಂದೇಶವನ್ನು ಮಾತ್ರ ಎಲ್ಲರಿಗೂ ಅಳಿಸಬಹುದು.</translation>
+    </message>
+    <message>
+        <source>Delete message?</source>
+        <extracomment>Heading of the dialog asking which kind of delete.</extracomment>
+        <translation>ಸಂದೇಶವನ್ನು ಅಳಿಸಬೇಕೆ?</translation>
+    </message>
+    <message>
+        <source>How do you want to delete this message? This cannot be undone.</source>
+        <translation>ಈ ಸಂದೇಶವನ್ನು ಹೇಗೆ ಅಳಿಸಬೇಕು? ಇದನ್ನು ಹಿಂಪಡೆಯಲು ಸಾಧ್ಯವಿಲ್ಲ.</translation>
+    </message>
+    <message>
+        <source>It goes from your devices. Everybody else keeps their copy.</source>
+        <translation>ಇದು ನಿಮ್ಮ ಸಾಧನಗಳಿಂದ ಹೋಗುತ್ತದೆ. ಉಳಿದವರೆಲ್ಲರೂ ತಮ್ಮ ಪ್ರತಿಯನ್ನು ಇಟ್ಟುಕೊಳ್ಳುತ್ತಾರೆ.</translation>
+    </message>
+    <message>
+        <source>It goes from your devices, and every other device in this chat is asked to delete it too.</source>
+        <translation>ಇದು ನಿಮ್ಮ ಸಾಧನಗಳಿಂದ ಹೋಗುತ್ತದೆ, ಮತ್ತು ಈ ಚಾಟ್‌ನ ಉಳಿದ ಪ್ರತಿ ಸಾಧನಕ್ಕೂ ಅದನ್ನು ಅಳಿಸುವಂತೆ ಕೇಳಲಾಗುತ್ತದೆ.</translation>
     </message>
 </context>
 <context>

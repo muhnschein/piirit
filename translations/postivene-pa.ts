@@ -555,11 +555,6 @@ Other groups with blocked contacts will still show their messages.</source>
 <context>
     <name>DeleteMessageDialog</name>
     <message>
-        <source>Delete message</source>
-        <extracomment>Heading of the dialog asking which kind of delete.</extracomment>
-        <translation>ਸੁਨੇਹਾ ਹਟਾਓ</translation>
-    </message>
-    <message>
         <source>Delete</source>
         <translation>ਹਟਾਓ</translation>
     </message>
@@ -580,6 +575,23 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Only an encrypted message you sent yourself can be deleted for everyone.</source>
         <translation>ਸਾਰਿਆਂ ਲਈ ਸਿਰਫ਼ ਉਹੀ ਇਨਕ੍ਰਿਪਟਡ ਸੁਨੇਹਾ ਹਟਾਇਆ ਜਾ ਸਕਦਾ ਹੈ ਜੋ ਤੁਸੀਂ ਆਪ ਭੇਜਿਆ ਹੋਵੇ।</translation>
+    </message>
+    <message>
+        <source>Delete message?</source>
+        <extracomment>Heading of the dialog asking which kind of delete.</extracomment>
+        <translation>ਸੁਨੇਹਾ ਹਟਾਉਣਾ ਹੈ?</translation>
+    </message>
+    <message>
+        <source>How do you want to delete this message? This cannot be undone.</source>
+        <translation>ਤੁਸੀਂ ਇਹ ਸੁਨੇਹਾ ਕਿਵੇਂ ਹਟਾਉਣਾ ਚਾਹੁੰਦੇ ਹੋ? ਇਹ ਵਾਪਸ ਨਹੀਂ ਲਿਆ ਜਾ ਸਕਦਾ।</translation>
+    </message>
+    <message>
+        <source>It goes from your devices. Everybody else keeps their copy.</source>
+        <translation>ਇਹ ਤੁਹਾਡੇ ਡਿਵਾਈਸਾਂ ਤੋਂ ਚਲਾ ਜਾਂਦਾ ਹੈ। ਬਾਕੀ ਸਾਰੇ ਆਪਣੀ ਕਾਪੀ ਰੱਖਦੇ ਹਨ।</translation>
+    </message>
+    <message>
+        <source>It goes from your devices, and every other device in this chat is asked to delete it too.</source>
+        <translation>ਇਹ ਤੁਹਾਡੇ ਡਿਵਾਈਸਾਂ ਤੋਂ ਚਲਾ ਜਾਂਦਾ ਹੈ, ਅਤੇ ਇਸ ਗੱਲਬਾਤ ਦੇ ਹਰ ਦੂਜੇ ਡਿਵਾਈਸ ਨੂੰ ਵੀ ਇਸਨੂੰ ਹਟਾਉਣ ਲਈ ਕਿਹਾ ਜਾਂਦਾ ਹੈ।</translation>
     </message>
 </context>
 <context>

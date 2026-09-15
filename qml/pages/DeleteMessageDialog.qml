@@ -58,9 +58,24 @@ Dialog {
         DialogHeader {
             objectName: "deleteHeader"
             //: Heading of the dialog asking which kind of delete.
-            title: qsTr("Delete message")
+            title: qsTr("Delete message?")
             acceptText: qsTr("Delete")
             cancelText: qsTr("Cancel")
+        }
+
+        // What the question is, under the heading that asks it: a
+        // header's own line is drawn as whatever markup it is handed
+        // (see ConversationHeader), and this one has something to say
+        // that the two switches do not -- that there is no way back from
+        // either of them.
+        Label {
+            objectName: "deleteQuestion"
+            x: Theme.horizontalPageMargin
+            width: parent.width - 2 * Theme.horizontalPageMargin
+            wrapMode: Text.Wrap
+            font.pixelSize: Theme.fontSizeSmall
+            color: Theme.secondaryHighlightColor
+            text: qsTr("How do you want to delete this message? This cannot be undone.")
         }
 
         // `automaticCheck: false` on both: Silica's own switch flips
@@ -71,6 +86,9 @@ Dialog {
             objectName: "forMeSwitch"
             //: One of the two ways to delete a message.
             text: qsTr("Delete for me")
+            // Who keeps a copy is the whole difference between the two,
+            // and it does not fit in a switch's own three words.
+            description: qsTr("It goes from your devices. Everybody else keeps their copy.")
             automaticCheck: false
             checked: dialog.choice === "me"
             onClicked: dialog.choose("me")
@@ -81,6 +99,7 @@ Dialog {
             //: The other way: every other device in the chat is asked to
             //: delete its copy too.
             text: qsTr("Delete for everyone")
+            description: qsTr("It goes from your devices, and every other device in this chat is asked to delete it too.")
             automaticCheck: false
             checked: dialog.choice === "everyone"
             enabled: dialog.canDeleteForEveryone

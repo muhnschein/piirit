@@ -549,11 +549,6 @@ Other groups with blocked contacts will still show their messages.</source>
 <context>
     <name>DeleteMessageDialog</name>
     <message>
-        <source>Delete message</source>
-        <extracomment>Heading of the dialog asking which kind of delete.</extracomment>
-        <translation>刪除訊息</translation>
-    </message>
-    <message>
         <source>Delete</source>
         <translation>刪除</translation>
     </message>
@@ -574,6 +569,23 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Only an encrypted message you sent yourself can be deleted for everyone.</source>
         <translation>只有你自己發送的加密訊息才能為所有人刪除。</translation>
+    </message>
+    <message>
+        <source>Delete message?</source>
+        <extracomment>Heading of the dialog asking which kind of delete.</extracomment>
+        <translation>刪除訊息？</translation>
+    </message>
+    <message>
+        <source>How do you want to delete this message? This cannot be undone.</source>
+        <translation>你想怎樣刪除這則訊息？此操作無法復原。</translation>
+    </message>
+    <message>
+        <source>It goes from your devices. Everybody else keeps their copy.</source>
+        <translation>它會從你的裝置上消失，其他人仍然留著各自的副本。</translation>
+    </message>
+    <message>
+        <source>It goes from your devices, and every other device in this chat is asked to delete it too.</source>
+        <translation>它會從你的裝置上消失，這個聊天中的其他每部裝置也會收到刪除它的請求。</translation>
     </message>
 </context>
 <context>

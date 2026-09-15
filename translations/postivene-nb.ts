@@ -551,11 +551,6 @@ Other groups with blocked contacts will still show their messages.</source>
 <context>
     <name>DeleteMessageDialog</name>
     <message>
-        <source>Delete message</source>
-        <extracomment>Heading of the dialog asking which kind of delete.</extracomment>
-        <translation>Slett melding</translation>
-    </message>
-    <message>
         <source>Delete</source>
         <translation>Slett</translation>
     </message>
@@ -576,6 +571,23 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Only an encrypted message you sent yourself can be deleted for everyone.</source>
         <translation>Bare en kryptert melding du har sendt selv, kan slettes for alle.</translation>
+    </message>
+    <message>
+        <source>Delete message?</source>
+        <extracomment>Heading of the dialog asking which kind of delete.</extracomment>
+        <translation>Slette meldingen?</translation>
+    </message>
+    <message>
+        <source>How do you want to delete this message? This cannot be undone.</source>
+        <translation>Hvordan vil du slette denne meldingen? Dette kan ikke angres.</translation>
+    </message>
+    <message>
+        <source>It goes from your devices. Everybody else keeps their copy.</source>
+        <translation>Den forsvinner fra enhetene dine. Alle andre beholder kopien sin.</translation>
+    </message>
+    <message>
+        <source>It goes from your devices, and every other device in this chat is asked to delete it too.</source>
+        <translation>Den forsvinner fra enhetene dine, og alle andre enheter i denne samtalen blir bedt om å slette den også.</translation>
     </message>
 </context>
 <context>

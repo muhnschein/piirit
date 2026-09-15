@@ -551,11 +551,6 @@ Other groups with blocked contacts will still show their messages.</source>
 <context>
     <name>DeleteMessageDialog</name>
     <message>
-        <source>Delete message</source>
-        <extracomment>Heading of the dialog asking which kind of delete.</extracomment>
-        <translation>Poista viesti</translation>
-    </message>
-    <message>
         <source>Delete</source>
         <translation>Poista</translation>
     </message>
@@ -576,6 +571,23 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Only an encrypted message you sent yourself can be deleted for everyone.</source>
         <translation>Kaikilta voi poistaa vain itse lähettämäsi salatun viestin.</translation>
+    </message>
+    <message>
+        <source>Delete message?</source>
+        <extracomment>Heading of the dialog asking which kind of delete.</extracomment>
+        <translation>Poistetaanko viesti?</translation>
+    </message>
+    <message>
+        <source>How do you want to delete this message? This cannot be undone.</source>
+        <translation>Miten haluat poistaa tämän viestin? Tätä ei voi perua.</translation>
+    </message>
+    <message>
+        <source>It goes from your devices. Everybody else keeps their copy.</source>
+        <translation>Se katoaa laitteiltasi. Kaikki muut säilyttävät oman kopionsa.</translation>
+    </message>
+    <message>
+        <source>It goes from your devices, and every other device in this chat is asked to delete it too.</source>
+        <translation>Se katoaa laitteiltasi, ja jokaista muuta tämän keskustelun laitetta pyydetään poistamaan se myös.</translation>
     </message>
 </context>
 <context>

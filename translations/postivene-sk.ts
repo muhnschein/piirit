@@ -557,11 +557,6 @@ Správy od zablokovaných kontaktov v ostatných skupinách sa budú naďalej zo
 <context>
     <name>DeleteMessageDialog</name>
     <message>
-        <source>Delete message</source>
-        <extracomment>Heading of the dialog asking which kind of delete.</extracomment>
-        <translation>Odstrániť správu</translation>
-    </message>
-    <message>
         <source>Delete</source>
         <translation>Odstrániť</translation>
     </message>
@@ -582,6 +577,23 @@ Správy od zablokovaných kontaktov v ostatných skupinách sa budú naďalej zo
     <message>
         <source>Only an encrypted message you sent yourself can be deleted for everyone.</source>
         <translation>U všetkých možno odstrániť len tvoju vlastnú šifrovanú správu.</translation>
+    </message>
+    <message>
+        <source>Delete message?</source>
+        <extracomment>Heading of the dialog asking which kind of delete.</extracomment>
+        <translation>Odstrániť správu?</translation>
+    </message>
+    <message>
+        <source>How do you want to delete this message? This cannot be undone.</source>
+        <translation>Ako chceš túto správu odstrániť? Toto sa nedá vrátiť späť.</translation>
+    </message>
+    <message>
+        <source>It goes from your devices. Everybody else keeps their copy.</source>
+        <translation>Zmizne z tvojich zariadení. Všetkým ostatným kópia zostane.</translation>
+    </message>
+    <message>
+        <source>It goes from your devices, and every other device in this chat is asked to delete it too.</source>
+        <translation>Zmizne z tvojich zariadení a každé ďalšie zariadenie v tomto rozhovore je požiadané, aby ju tiež odstránilo.</translation>
     </message>
 </context>
 <context>

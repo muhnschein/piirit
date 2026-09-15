@@ -549,11 +549,6 @@ Other groups with blocked contacts will still show their messages.</source>
 <context>
     <name>DeleteMessageDialog</name>
     <message>
-        <source>Delete message</source>
-        <extracomment>Heading of the dialog asking which kind of delete.</extracomment>
-        <translation>Üzenet törlése</translation>
-    </message>
-    <message>
         <source>Delete</source>
         <translation>Törlés</translation>
     </message>
@@ -574,6 +569,23 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Only an encrypted message you sent yourself can be deleted for everyone.</source>
         <translation>Mindenkinél csak olyan titkosított üzenet törölhető, amelyet te magad küldtél.</translation>
+    </message>
+    <message>
+        <source>Delete message?</source>
+        <extracomment>Heading of the dialog asking which kind of delete.</extracomment>
+        <translation>Törlöd az üzenetet?</translation>
+    </message>
+    <message>
+        <source>How do you want to delete this message? This cannot be undone.</source>
+        <translation>Hogyan szeretnéd törölni ezt az üzenetet? Ezt nem lehet visszavonni.</translation>
+    </message>
+    <message>
+        <source>It goes from your devices. Everybody else keeps their copy.</source>
+        <translation>Eltűnik az eszközeidről. Mindenki más megtartja a saját másolatát.</translation>
+    </message>
+    <message>
+        <source>It goes from your devices, and every other device in this chat is asked to delete it too.</source>
+        <translation>Eltűnik az eszközeidről, és a beszélgetés minden más eszköze is felkérést kap a törlésére.</translation>
     </message>
 </context>
 <context>

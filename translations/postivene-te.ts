@@ -551,11 +551,6 @@ Other groups with blocked contacts will still show their messages.</source>
 <context>
     <name>DeleteMessageDialog</name>
     <message>
-        <source>Delete message</source>
-        <extracomment>Heading of the dialog asking which kind of delete.</extracomment>
-        <translation>సందేశాన్ని తొలగించు</translation>
-    </message>
-    <message>
         <source>Delete</source>
         <translation>తొలగించు</translation>
     </message>
@@ -576,6 +571,23 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Only an encrypted message you sent yourself can be deleted for everyone.</source>
         <translation>మీరే పంపిన ఎన్‌క్రిప్టెడ్ సందేశాన్ని మాత్రమే అందరికీ తొలగించగలరు.</translation>
+    </message>
+    <message>
+        <source>Delete message?</source>
+        <extracomment>Heading of the dialog asking which kind of delete.</extracomment>
+        <translation>సందేశాన్ని తొలగించాలా?</translation>
+    </message>
+    <message>
+        <source>How do you want to delete this message? This cannot be undone.</source>
+        <translation>ఈ సందేశాన్ని ఎలా తొలగించాలి? దీన్ని తిరిగి తీసుకోలేరు.</translation>
+    </message>
+    <message>
+        <source>It goes from your devices. Everybody else keeps their copy.</source>
+        <translation>ఇది మీ పరికరాల నుండి పోతుంది. మిగతా అందరూ తమ కాపీని ఉంచుకుంటారు.</translation>
+    </message>
+    <message>
+        <source>It goes from your devices, and every other device in this chat is asked to delete it too.</source>
+        <translation>ఇది మీ పరికరాల నుండి పోతుంది, ఈ చాట్‌లోని ప్రతి ఇతర పరికరాన్ని కూడా దాన్ని తొలగించమని అడుగుతారు.</translation>
     </message>
 </context>
 <context>

@@ -555,11 +555,6 @@ Vous continuerez à voir les messages des contacts bloqués dans les autres grou
 <context>
     <name>DeleteMessageDialog</name>
     <message>
-        <source>Delete message</source>
-        <extracomment>Heading of the dialog asking which kind of delete.</extracomment>
-        <translation>Supprimer le message</translation>
-    </message>
-    <message>
         <source>Delete</source>
         <translation>Supprimer</translation>
     </message>
@@ -580,6 +575,23 @@ Vous continuerez à voir les messages des contacts bloqués dans les autres grou
     <message>
         <source>Only an encrypted message you sent yourself can be deleted for everyone.</source>
         <translation>Seul un message chiffré que vous avez envoyé vous-même peut être supprimé pour tout le monde.</translation>
+    </message>
+    <message>
+        <source>Delete message?</source>
+        <extracomment>Heading of the dialog asking which kind of delete.</extracomment>
+        <translation>Supprimer le message ?</translation>
+    </message>
+    <message>
+        <source>How do you want to delete this message? This cannot be undone.</source>
+        <translation>Comment voulez-vous supprimer ce message ? Cela ne peut pas être annulé.</translation>
+    </message>
+    <message>
+        <source>It goes from your devices. Everybody else keeps their copy.</source>
+        <translation>Il disparaît de vos appareils. Tous les autres gardent leur copie.</translation>
+    </message>
+    <message>
+        <source>It goes from your devices, and every other device in this chat is asked to delete it too.</source>
+        <translation>Il disparaît de vos appareils, et il est demandé à tous les autres appareils de cette discussion de le supprimer aussi.</translation>
     </message>
 </context>
 <context>

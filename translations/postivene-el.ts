@@ -551,11 +551,6 @@ Other groups with blocked contacts will still show their messages.</source>
 <context>
     <name>DeleteMessageDialog</name>
     <message>
-        <source>Delete message</source>
-        <extracomment>Heading of the dialog asking which kind of delete.</extracomment>
-        <translation>Διαγραφή μηνύματος</translation>
-    </message>
-    <message>
         <source>Delete</source>
         <translation>Διαγραφή</translation>
     </message>
@@ -576,6 +571,23 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Only an encrypted message you sent yourself can be deleted for everyone.</source>
         <translation>Για όλους μπορεί να διαγραφεί μόνο ένα κρυπτογραφημένο μήνυμα που στείλατε εσείς.</translation>
+    </message>
+    <message>
+        <source>Delete message?</source>
+        <extracomment>Heading of the dialog asking which kind of delete.</extracomment>
+        <translation>Διαγραφή μηνύματος;</translation>
+    </message>
+    <message>
+        <source>How do you want to delete this message? This cannot be undone.</source>
+        <translation>Πώς θέλετε να διαγράψετε αυτό το μήνυμα; Δεν μπορεί να αναιρεθεί.</translation>
+    </message>
+    <message>
+        <source>It goes from your devices. Everybody else keeps their copy.</source>
+        <translation>Φεύγει από τις συσκευές σας. Όλοι οι άλλοι κρατούν το αντίγραφό τους.</translation>
+    </message>
+    <message>
+        <source>It goes from your devices, and every other device in this chat is asked to delete it too.</source>
+        <translation>Φεύγει από τις συσκευές σας και κάθε άλλη συσκευή σε αυτή τη συνομιλία καλείται να το διαγράψει επίσης.</translation>
     </message>
 </context>
 <context>

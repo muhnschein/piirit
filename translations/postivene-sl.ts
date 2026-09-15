@@ -559,11 +559,6 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
 <context>
     <name>DeleteMessageDialog</name>
     <message>
-        <source>Delete message</source>
-        <extracomment>Heading of the dialog asking which kind of delete.</extracomment>
-        <translation>Izbriši sporočilo</translation>
-    </message>
-    <message>
         <source>Delete</source>
         <translation>Izbriši</translation>
     </message>
@@ -584,6 +579,23 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
     <message>
         <source>Only an encrypted message you sent yourself can be deleted for everyone.</source>
         <translation>Pri vseh je mogoče izbrisati le tvoje lastno šifrirano sporočilo.</translation>
+    </message>
+    <message>
+        <source>Delete message?</source>
+        <extracomment>Heading of the dialog asking which kind of delete.</extracomment>
+        <translation>Izbrisati sporočilo?</translation>
+    </message>
+    <message>
+        <source>How do you want to delete this message? This cannot be undone.</source>
+        <translation>Kako želiš izbrisati to sporočilo? Tega ni mogoče razveljaviti.</translation>
+    </message>
+    <message>
+        <source>It goes from your devices. Everybody else keeps their copy.</source>
+        <translation>Izgine s tvojih naprav. Vsi drugi obdržijo svojo kopijo.</translation>
+    </message>
+    <message>
+        <source>It goes from your devices, and every other device in this chat is asked to delete it too.</source>
+        <translation>Izgine s tvojih naprav, vse druge naprave v tem pogovoru pa dobijo prošnjo, naj ga izbrišejo tudi.</translation>
     </message>
 </context>
 <context>

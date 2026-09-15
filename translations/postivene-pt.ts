@@ -555,11 +555,6 @@ Mensagens de contactos bloqueados não serão ocultadas noutros grupos.</transla
 <context>
     <name>DeleteMessageDialog</name>
     <message>
-        <source>Delete message</source>
-        <extracomment>Heading of the dialog asking which kind of delete.</extracomment>
-        <translation>Eliminar mensagem</translation>
-    </message>
-    <message>
         <source>Delete</source>
         <translation>Eliminar</translation>
     </message>
@@ -580,6 +575,23 @@ Mensagens de contactos bloqueados não serão ocultadas noutros grupos.</transla
     <message>
         <source>Only an encrypted message you sent yourself can be deleted for everyone.</source>
         <translation>Só uma mensagem cifrada que enviou pode ser eliminada para todos.</translation>
+    </message>
+    <message>
+        <source>Delete message?</source>
+        <extracomment>Heading of the dialog asking which kind of delete.</extracomment>
+        <translation>Eliminar a mensagem?</translation>
+    </message>
+    <message>
+        <source>How do you want to delete this message? This cannot be undone.</source>
+        <translation>Como quer eliminar esta mensagem? Isto não pode ser anulado.</translation>
+    </message>
+    <message>
+        <source>It goes from your devices. Everybody else keeps their copy.</source>
+        <translation>Desaparece dos seus dispositivos. Todos os outros ficam com a sua cópia.</translation>
+    </message>
+    <message>
+        <source>It goes from your devices, and every other device in this chat is asked to delete it too.</source>
+        <translation>Desaparece dos seus dispositivos, e é pedido a todos os outros dispositivos desta conversa que a eliminem também.</translation>
     </message>
 </context>
 <context>
