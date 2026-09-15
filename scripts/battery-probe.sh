@@ -96,6 +96,21 @@ to_ua() {
     fi
 }
 
+# What the phone says it is running. Read rather than sourced: sourcing it
+# would run whatever is in there, and only one line of it is wanted.
+os_release() {
+    if [ ! -r /etc/os-release ]; then
+        echo unknown
+        return
+    fi
+    name=$(sed -n 's/^PRETTY_NAME=//p' /etc/os-release | head -n 1 | tr -d '"')
+    if [ -z "$name" ]; then
+        echo unknown
+    else
+        echo "$name"
+    fi
+}
+
 charger_online() {
     for node in /sys/class/power_supply/*/online; do
         [ -r "$node" ] || continue
@@ -110,7 +125,7 @@ conditions() {
     echo "# --- conditions ---"
     echo "# host              $(uname -n)"
     echo "# kernel            $(uname -r)"
-    echo "# release           $(. /etc/os-release 2>/dev/null && echo "${PRETTY_NAME:-unknown}")"
+    echo "# release           $(os_release)"
     echo "# battery node      $BATTERY"
     echo "# charger connected $(charger_online)"
 
