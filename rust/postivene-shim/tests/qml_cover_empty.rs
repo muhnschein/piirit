@@ -81,6 +81,7 @@ fn a_cover_with_only_oneself_and_the_device_says_there_are_no_messages() {
     }
 
     postivene_shim::register_qml_types();
+    common::register_cover_enum();
 
     let core_box = QObjectBox::new(DeltaChatCore::default());
     let mut engine = QmlEngine::new();

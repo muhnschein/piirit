@@ -105,10 +105,43 @@ CoverBackground {
         return (whole ? 0 : 100) + row * 2 + fromMiddle
     }
 
-    /// Read the lists again: who is there, how much is unread, and what
-    /// fills the grid. Called on every change to any list and whenever
-    /// the shape changes, so the cells are always the right number.
+    /// Whether the cover is the thing being looked at.
+    ///
+    /// A cover is drawn only when the app is minimised, the home screen is
+    /// showing and the display is on. The rest of the time -- which is most
+    /// of it, and all of the night -- the app is still receiving and the
+    /// lists below are still following every arrival, but nothing is on
+    /// screen to redraw. See docs/POWER.md.
+    readonly property bool looking: cover.status === Cover.Active
+
+    /// Something changed while nothing was looking, so the cells are not
+    /// the current answer. True to start with: nothing has been read yet.
+    property bool stale: true
+
+    /// Read the lists again if there is anyone to read them for, and
+    /// otherwise remember that they want reading.
+    ///
+    /// Called on every change to any list and whenever the shape changes,
+    /// so the cells are the right number by the time they are drawn.
     function gather() {
+        if (!cover.looking) {
+            cover.stale = true
+            return
+        }
+        cover.stale = false
+        cover.rebuild()
+    }
+
+    // Whatever was missed while the cover was away, done once on the way
+    // back rather than once per arrival while it was gone.
+    onLookingChanged: {
+        if (cover.looking && cover.stale) {
+            cover.gather()
+        }
+    }
+
+    /// Who is there, how much is unread, and what fills the grid.
+    function rebuild() {
         var everyone = []
         var total = 0
         for (var i = 0; i < lists.count; i++) {

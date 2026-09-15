@@ -96,6 +96,14 @@ of string work with the screen off.
 The events any part of the app actually reads are a known set, so the rest
 are dropped before they are serialised.
 
+### Not redrawing a cover nobody is looking at
+
+The cover rebuilt its grid of faces on every change to any profile's chat
+list, including at three in the morning with the phone face down. A cover is
+only drawn when the app is minimised, the home screen is showing and the
+display is on, so the work now waits for that and is done once when it
+becomes true.
+
 ## Measuring it
 
 None of the above is worth believing without a number, and the number is
