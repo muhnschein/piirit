@@ -193,6 +193,19 @@ ApplicationWindow {
         }
     }
 
+    // The other half of the ask above, and the half that matters when
+    // nobody is looking: the phone announces every change of network on
+    // its own bus, and a message that arrives while it is in a pocket is
+    // one only this can rescue. See components/NetworkWatch.qml.
+    NetworkWatch {
+        objectName: "networkWatch"
+        onNetworkChanged: {
+            if (core.status === "ready") {
+                core.maybe_network()
+            }
+        }
+    }
+
     Component.onCompleted: {
         // Takes the binding off `resumeAccountId`: the window has its
         // answer, and from here the key belongs to the chat list.

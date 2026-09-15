@@ -10,6 +10,12 @@
 //! networks in a pocket. Nothing is asked on the way out: the app carries
 //! on receiving in the background, which on this platform is the only way
 //! a message arrives at all.
+//!
+//! The other way round matters more, and is here too: connman says the
+//! network changed while the app is off screen, and the core is asked then
+//! and there. That is the path a notification arrives by when nobody is
+//! looking at the phone. What the component makes of connman's own words
+//! is `qml_network_watch`; this is that it reaches the core.
 
 // Qt harness: see qml_share.rs.
 #![allow(
@@ -51,10 +57,29 @@ const PROBE_QML: &str = r"
         function away() { window.item.appActive = false; return 'ok' }
         function back() { window.item.appActive = true; return 'ok' }
         function coreStatus() { return '' + core.status }
+        // connman, as the window's own watch hears it. Found the way
+        // anything in the window is found, by the name it carries.
+        function connman(value) {
+            var watch = findIn(window.item, 'networkWatch')
+            if (!watch) { return 'missing:networkWatch' }
+            watch.heard('State', value)
+            return 'ok'
+        }
+        function findIn(node, name) {
+            if (!node) { return null }
+            if (node.objectName === name) { return node }
+            var kids = node.data !== undefined ? node.data : node.children
+            for (var i = 0; kids && i < kids.length; i++) {
+                var hit = findIn(kids[i], name)
+                if (hit) { return hit }
+            }
+            return null
+        }
     }
 ";
 
 #[test]
+#[allow(clippy::too_many_lines)]
 fn the_core_is_asked_to_reconnect_when_the_app_comes_back_to_the_front() {
     let temp = std::env::temp_dir().join(format!("postivene-network-hint-{}", std::process::id()));
     let journal = common::fresh_journal(&temp);
@@ -78,6 +103,7 @@ fn the_core_is_asked_to_reconnect_when_the_app_comes_back_to_the_front() {
     engine.add_import_path(QString::from(
         common::stubs_dir().to_string_lossy().into_owned(),
     ));
+    common::register_dbus_enum();
     engine.set_object_property("core".into(), core_box.pinned());
     engine.set_object_property("pageStack".into(), stack_box.pinned());
     engine.set_property(
@@ -113,6 +139,8 @@ fn the_core_is_asked_to_reconnect_when_the_app_comes_back_to_the_front() {
     let mut while_away = 0usize;
     let away_ptr: *mut usize = std::ptr::addr_of_mut!(while_away);
     let away_journal = journal.clone();
+    let mut reached = String::new();
+    let reached_ptr: *mut String = std::ptr::addr_of_mut!(reached);
     single_shot(Duration::from_secs(4), move || unsafe {
         *status_ptr = call!("coreStatus");
         call!("away");
@@ -120,13 +148,24 @@ fn the_core_is_asked_to_reconnect_when_the_app_comes_back_to_the_front() {
             .into_iter()
             .filter(|method| method == "maybe_network")
             .count();
+        // Off screen, and the phone changes network under the app.
+        *reached_ptr = call!("connman", QString::from("online"));
     });
 
-    single_shot(Duration::from_secs(5), move || unsafe {
+    // The watch waits to see whether more announcements are coming
+    // (`NetworkWatch.settleMs`), so this reads after that wait.
+    let mut while_off_screen = 0usize;
+    let off_screen_ptr: *mut usize = std::ptr::addr_of_mut!(while_off_screen);
+    let off_screen_journal = journal.clone();
+    single_shot(Duration::from_secs(7), move || unsafe {
+        *off_screen_ptr = common::methods(&off_screen_journal)
+            .into_iter()
+            .filter(|method| method == "maybe_network")
+            .count();
         call!("back");
     });
 
-    single_shot(Duration::from_secs(7), move || unsafe {
+    single_shot(Duration::from_secs(9), move || unsafe {
         (*engine_ptr).quit();
     });
 
@@ -143,13 +182,24 @@ fn the_core_is_asked_to_reconnect_when_the_app_comes_back_to_the_front() {
         "the app asked the core to reconsider the network while it was \
          being switched away from, which is not when a reader is waiting"
     );
+    assert_eq!(
+        reached, "ok",
+        "the window holds no network watch, so nothing in it is listening \
+         to the phone's own account of the network"
+    );
+    assert_eq!(
+        while_off_screen, 1,
+        "connman said the network had changed while the app was off \
+         screen and the core was never told, so a message sent to a phone \
+         in a pocket waits for the core's own five-minute IDLE timeout"
+    );
 
     let hints = common::methods(&journal)
         .into_iter()
         .filter(|method| method == "maybe_network")
         .count();
     assert!(
-        hints >= 1,
+        hints > while_off_screen,
         "coming back to the app never asked the core to look at the \
          network again, so a connection killed in a pocket stays dead \
          until the core's own five-minute IDLE times out"

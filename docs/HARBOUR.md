@@ -510,12 +510,19 @@ removed from the store even after approval. Not an option.
    network -- nothing arrives on it and nothing says so -- and the core
    would otherwise find out only when its IDLE times out five minutes on.
    The window asks it to look again as it comes back to the front
-   (`postivene.qml`, `maybe_network`), and that is the whole of what can
-   be checked here: the app has to be running for any of it, which on
-   this platform is also the only way a message ever arrives. A phone
-   with the app swiped away receives nothing until it is opened, and no
-   amount of this changes that -- Harbour allows no service to receive in
-   its place.
+   (`postivene.qml`, `maybe_network`).
+   The other half needs a second phone and no looking: leave the app in
+   the background, change network -- turn wi-fi off with mobile data on --
+   wait a minute, and have the other phone write. The notification should
+   arrive in seconds. That path is connman's: the app listens for what it
+   says on the system bus and asks the core then and there
+   (`components/NetworkWatch.qml`), with nothing polled and nothing woken
+   in between. It is also the path that cannot be checked anywhere but on
+   a device, since the sandbox is half of it -- `Internet` is what grants
+   `net.connman`, and a phone is the only place that grant is real.
+   What neither half can do is receive with the app swiped away: a closed
+   app gets nothing until it is opened, and Harbour allows no service to
+   receive in its place.
 6. Delete the cache directory while the app runs; confirm nothing breaks.
 7. Kill `deltachat-rpc-server` from a terminal while the app is open. The
    banner should say it is reconnecting and then clear itself, and messages
