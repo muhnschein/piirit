@@ -99,22 +99,17 @@ Page {
         }
     }
 
-    /// Ask which kind of delete this is, on the page the conversation
-    /// asks on: a picture here is a message in that chat, and the two
+    /// Ask which kind of delete this is, in the dialog the conversation
+    /// asks in: a picture here is a message in that chat, and the two
     /// ways to delete one are the same either way. The wait starts when
-    /// the answer comes back, and nothing goes until it is up.
+    /// the dialog is accepted, and nothing goes until it is up.
     ///
-    /// What the page needs is taken now rather than in the answer: the
-    /// row may be gone by the time the reader has chosen.
-    function askDelete(messageId, body, fileName, author, canDeleteForEveryone) {
+    /// The gate is read now rather than in the answer: the row may be
+    /// gone by the time the reader has chosen.
+    function askDelete(messageId, canDeleteForEveryone) {
         var chooser = pageStack.push(
-            Qt.resolvedUrl("DeleteMessagePage.qml"),
-            {
-                senderName: author,
-                body: body,
-                fileName: fileName,
-                canDeleteForEveryone: canDeleteForEveryone
-            })
+            Qt.resolvedUrl("DeleteMessageDialog.qml"),
+            { canDeleteForEveryone: canDeleteForEveryone })
         if (chooser) {
             chooser.picked.connect(function(forEveryone) {
                 doomedMessages.ask(messageId, forEveryone)
@@ -323,11 +318,10 @@ Page {
                         // The page is told, not this tile: the wait
                         // before a message goes has to outlive the tile
                         // it was asked for on; which kind of delete
-                        // this is belongs to a page of its own. See
-                        // PendingRemoval and DeleteMessagePage.
+                        // this is belongs to a dialog of its own. See
+                        // PendingRemoval and DeleteMessageDialog.
                         onClicked: page.askDelete(
-                                       model.message_id, model.text,
-                                       model.file_name, model.sender_name,
+                                       model.message_id,
                                        model.is_outgoing && model.show_padlock
                                        && !model.is_info)
                     }
@@ -491,8 +485,7 @@ Page {
                         text: qsTr("Delete")
                         // The page is told, not this row; see the tile.
                         onClicked: page.askDelete(
-                                       model.message_id, model.text,
-                                       model.file_name, model.sender_name,
+                                       model.message_id,
                                        model.is_outgoing && model.show_padlock
                                        && !model.is_info)
                     }

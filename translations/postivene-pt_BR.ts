@@ -549,16 +549,19 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
-    <name>DeleteMessagePage</name>
+    <name>DeleteMessageDialog</name>
     <message>
         <source>Delete message</source>
-        <extracomment>Heading of the page asking which kind of delete.</extracomment>
+        <extracomment>Heading of the dialog asking which kind of delete.</extracomment>
         <translation>Excluir mensagem</translation>
     </message>
     <message>
-        <source>This message has no text</source>
-        <extracomment>Stands in for the message on the delete page, when it has no words and nothing named to show instead.</extracomment>
-        <translation>Esta mensagem não tem texto</translation>
+        <source>Delete</source>
+        <translation>Excluir</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Cancelar</translation>
     </message>
     <message>
         <source>Delete for me</source>
@@ -566,25 +569,13 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Excluir só para mim</translation>
     </message>
     <message>
-        <source>It goes from your devices. Everybody else keeps their copy.</source>
-        <translation>Ela some dos seus aparelhos. Todos os outros ficam com a cópia deles.</translation>
-    </message>
-    <message>
         <source>Delete for everyone</source>
         <extracomment>The other way: every other device in the chat is asked to delete its copy too.</extracomment>
         <translation>Excluir para todos</translation>
     </message>
     <message>
-        <source>It goes from your devices, and every other device in this chat is asked to delete it too.</source>
-        <translation>Ela some dos seus aparelhos, e todos os outros aparelhos desta conversa são solicitados a excluí-la também.</translation>
-    </message>
-    <message>
         <source>Only an encrypted message you sent yourself can be deleted for everyone.</source>
         <translation>Só uma mensagem criptografada enviada por você mesmo pode ser excluída para todos.</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation>Cancelar</translation>
     </message>
 </context>
 <context>

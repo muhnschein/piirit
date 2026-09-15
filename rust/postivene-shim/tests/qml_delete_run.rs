@@ -118,7 +118,7 @@ const PROBE_QML: &str = r"
         /// leads to.
         ///
         /// The menu asks which kind of delete this is rather than
-        /// deleting (pages/DeleteMessagePage.qml); the wait starts when
+        /// deleting (pages/DeleteMessageDialog.qml); the wait starts when
         /// that page reports back, which is what `confirmDelete` is.
         /// Both here, so that what this test drives is one reader's one
         /// decision to delete a message.

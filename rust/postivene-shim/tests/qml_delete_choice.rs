@@ -1,18 +1,17 @@
-//! Which kind of delete, asked on a page of its own.
+//! Which kind of delete, asked before anything goes.
 //!
-//! Deleting a message used to be one entry on a row's menu that took the
-//! message off this phone alone. The core will also ask the other ends
-//! to delete their copies (`delete_messages_for_all`), and the two are
-//! different enough -- one of them is irreversible for everybody in the
-//! chat -- that the choice is a page rather than a second menu entry
-//! next to the first.
+//! Deleting a message took it off this account's devices alone; the core
+//! will also ask the other ends to delete their copies
+//! (`delete_messages_for_all`). The two are different enough -- one of
+//! them cannot be taken back by anybody -- that the row menu asks rather
+//! than offering both as entries, and this is the dialog it asks in.
 //!
-//! So this pins what that page does: it shows the message about to go,
-//! it offers both ways, it offers the second only where the core would
-//! take it, and it answers with which was picked. What it never does is
-//! delete anything: the page it was pushed from starts the wait on the
-//! answer (`qml_delete_run`), and leaving without picking says nothing
-//! at all.
+//! What it pins is the shape of that question: nothing picked when it
+//! opens, one of the two at a time, the second offered only where the
+//! core would take it, no forward swipe until something is picked, and
+//! an answer that says which was. What it never does is delete
+//! anything: accepting starts the wait (`qml_delete_run`), and a dialog
+//! left by the back edge says nothing at all.
 
 // Qt harness: see qml_conversation.rs.
 #![allow(
@@ -29,43 +28,31 @@ use qmetaobject::*;
 
 mod common;
 
-/// The page stack is a QML object handed over as a context property,
-/// for the reason `qml_auto_delete_flow` gives: an object a method hands
-/// to QML is QML's to delete.
 const PROBE_QML: &str = r"
     import QtQuick 2.0
     import Sailfish.Silica 1.0
     Item {
         Loader { id: loader }
-        /// What the page answered with, and how many times it took
-        /// itself off the stack.
+        /// What the dialog answered with, if anything.
         property string answer: ''
-        property int pops: 0
 
-        QtObject {
-            id: stack
-            function pop() { pops += 1 }
-        }
-        function stackObject() { return stack }
-
-        function load(url, body, fileName, author, canForAll) {
+        function load(url, canForAll) {
             answer = ''
-            pops = 0
             loader.setSource('', {})
-            loader.setSource(url, {
-                senderName: author,
-                body: body,
-                fileName: fileName,
-                canDeleteForEveryone: canForAll
-            })
+            loader.setSource(url, { canDeleteForEveryone: canForAll })
             if (loader.status !== Loader.Ready) { return 'load-failed' }
             loader.item.picked.connect(function(forEveryone) {
                 answer = 'picked:' + forEveryone
             })
             return 'ok'
         }
-        /// What was answered, and whether the page left with it.
-        function answered() { return answer + '/' + pops }
+        function answered() { return answer }
+        /// The forward swipe, which Silica only allows while `canAccept`.
+        function swipeForward() {
+            loader.item.accept()
+            return 'ok'
+        }
+        function canAccept() { return '' + loader.item.canAccept }
 
         function findIn(node, name) {
             if (!node) { return null }
@@ -85,18 +72,25 @@ const PROBE_QML: &str = r"
             if (!item) { return 'missing:' + name }
             return '' + item[property]
         }
-        function click(name) {
+        /// Whether the dialog draws this at all.
+        function has(name) { return '' + (findIn(loader.item, name) !== null) }
+        function tap(name) {
             var item = findIn(loader.item, name)
             if (!item) { return 'missing:' + name }
             item.clicked()
             return 'ok'
+        }
+        /// Both switches at once, as `for-me/for-everyone`.
+        function switches() {
+            return get('forMeSwitch', 'checked') + '/'
+                   + get('forEveryoneSwitch', 'checked')
         }
     }
 ";
 
 #[test]
 #[allow(clippy::too_many_lines)]
-fn the_page_shows_the_message_and_answers_with_which_delete_was_picked() {
+fn the_dialog_picks_one_of_the_two_and_accepts_only_then() {
     // SAFETY: single-threaded test binary; set before Qt starts.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
@@ -107,15 +101,12 @@ fn the_page_shows_the_message_and_answers_with_which_delete_was_picked() {
         common::stubs_dir().to_string_lossy().into_owned(),
     ));
     engine.load_data(QByteArray::from(PROBE_QML));
-    // Named for the page before it is loaded, as Silica names its own.
-    let stack = engine.invoke_method("stackObject".into(), &[]);
-    engine.set_property("pageStack".into(), stack);
 
     let engine_ptr = std::ptr::addr_of_mut!(engine);
     let mut steps: Vec<(&str, String)> = Vec::new();
     let steps_ptr: *mut Vec<(&str, String)> = std::ptr::addr_of_mut!(steps);
-    let page = common::page_url("DeleteMessagePage.qml");
-    let (with_file, empty, own) = (page.clone(), page.clone(), page.clone());
+    let dialog = common::page_url("DeleteMessageDialog.qml");
+    let (own, theirs) = (dialog.clone(), dialog.clone());
 
     macro_rules! call {
         ($name:expr $(, $arg:expr)*) => {{
@@ -139,93 +130,63 @@ fn the_page_shows_the_message_and_answers_with_which_delete_was_picked() {
         };
     }
 
-    // Somebody else's message: the core deletes it here and nowhere
-    // else, so only one of the two ways is open.
+    // This account's own encrypted message: both ways are open.
     single_shot(Duration::from_secs(1), move || unsafe {
+        record!("load-own", call!("load", QString::from(own.clone()), true));
+        record!("picked-on-open", call!("switches"));
+        record!("accept-on-open", call!("canAccept"));
+        // Neither the message nor a Cancel button: the chat is one swipe
+        // back, and the reader has just come from the message itself.
         record!(
-            "load-theirs",
-            call!(
-                "load",
-                QString::from(page.clone()),
-                QString::from("see you there"),
-                QString::from(""),
-                QString::from("Ada Lovelace"),
-                false
-            )
+            "shows-message",
+            call!("has", QString::from("deletePreview"))
         );
-        record!("sender", get!("deleteSender", "text"));
-        record!("preview", get!("deletePreview", "text"));
-        record!("preview-plain", get!("deletePreview", "textFormat"));
-        record!("empty-shown", get!("deleteEmpty", "visible"));
-        record!("for-me-offered", get!("forMeTile", "enabled"));
-        record!("for-everyone-offered", get!("forEveryoneTile", "enabled"));
+        record!("shows-cancel", call!("has", QString::from("deleteCancel")));
+        // Silica's own switch flips itself unless told not to, which
+        // would fight the binding that makes these two one answer.
+        record!("me-manual", get!("forMeSwitch", "automaticCheck"));
+        record!(
+            "everyone-manual",
+            get!("forEveryoneSwitch", "automaticCheck")
+        );
+        record!("everyone-offered", get!("forEveryoneSwitch", "enabled"));
         record!("why-not-shown", get!("deleteWhyNot", "visible"));
-        record!("pick-for-me", call!("click", QString::from("forMeTile")));
-        record!("answer-for-me", call!("answered"));
+
+        record!("tap-me", call!("tap", QString::from("forMeSwitch")));
+        record!("picked-me", call!("switches"));
+        record!("accept-after-me", call!("canAccept"));
+        // The other way instead: one answer, not two settings.
+        call!("tap", QString::from("forEveryoneSwitch"));
+        record!("picked-everyone", call!("switches"));
+        // And off again, which puts it back where it opened.
+        call!("tap", QString::from("forEveryoneSwitch"));
+        record!("picked-none", call!("switches"));
+        record!("accept-after-none", call!("canAccept"));
+        record!("answer-so-far", call!("answered"));
     });
 
-    // An attachment with no caption is shown by what it carries: a page
-    // asking whether to delete "" is a page asking about nothing.
     single_shot(Duration::from_secs(2), move || unsafe {
-        record!(
-            "load-file",
-            call!(
-                "load",
-                QString::from(with_file.clone()),
-                QString::from(""),
-                QString::from("notes.pdf"),
-                QString::from("Ada Lovelace"),
-                false
-            )
-        );
-        record!("file-preview", get!("deletePreview", "text"));
-        record!("cancel", call!("click", QString::from("deleteCancel")));
-        record!("answer-after-cancel", call!("answered"));
+        call!("tap", QString::from("forEveryoneSwitch"));
+        record!("swipe", call!("swipeForward"));
+        record!("answer-everyone", call!("answered"));
     });
 
-    // A message with neither words nor a name to show says so, rather
-    // than leaving the reader a page with a gap in it.
+    // Somebody else's message, or an unencrypted one: the core deletes
+    // it here and nowhere else, so only one way is open.
     single_shot(Duration::from_secs(3), move || unsafe {
         record!(
-            "load-empty",
-            call!(
-                "load",
-                QString::from(empty.clone()),
-                QString::from(""),
-                QString::from(""),
-                QString::from(""),
-                false
-            )
+            "load-theirs",
+            call!("load", QString::from(theirs.clone()), false)
         );
-        record!("empty-preview-shown", get!("deletePreview", "visible"));
-        record!("empty-said", get!("deleteEmpty", "visible"));
-        record!("sender-shown", get!("deleteSender", "visible"));
+        record!("theirs-everyone", get!("forEveryoneSwitch", "enabled"));
+        record!("theirs-why-not", get!("deleteWhyNot", "visible"));
+        call!("tap", QString::from("forMeSwitch"));
+        record!("theirs-accept", call!("canAccept"));
+        call!("swipeForward");
+        record!("answer-me", call!("answered"));
     });
 
-    // This account's own encrypted message: both ways are open, and the
-    // second is the one the core has a call of its own for.
     single_shot(Duration::from_secs(4), move || unsafe {
-        record!(
-            "load-own",
-            call!(
-                "load",
-                QString::from(own.clone()),
-                QString::from("on my way"),
-                QString::from(""),
-                QString::from("Me"),
-                true
-            )
-        );
-        record!("own-for-everyone", get!("forEveryoneTile", "enabled"));
-        record!("own-why-not", get!("deleteWhyNot", "visible"));
-        record!(
-            "pick-for-everyone",
-            call!("click", QString::from("forEveryoneTile"))
-        );
-        record!("answer-for-everyone", call!("answered"));
-    });
-
-    single_shot(Duration::from_secs(5), move || unsafe {
         (*engine_ptr).quit();
     });
 
@@ -240,103 +201,118 @@ fn the_page_shows_the_message_and_answers_with_which_delete_was_picked() {
     };
     let context = format!("steps: {steps:?}");
 
-    for label in [
-        "load-theirs",
-        "load-file",
-        "load-empty",
-        "load-own",
-        "pick-for-me",
-        "pick-for-everyone",
-        "cancel",
-    ] {
+    for label in ["load-own", "load-theirs", "tap-me", "swipe"] {
         assert_eq!(value(label), "ok", "step {label} failed. {context}");
     }
 
     for (label, expected, complaint) in [
         (
-            "sender",
-            "Ada Lovelace",
-            "the page does not say whose message is about to go",
+            "picked-on-open",
+            "false/false",
+            "the dialog opens with one of the two ways already picked, so \
+             a reader who swipes forward without reading deletes the way \
+             this dialog chose for them",
         ),
         (
-            "preview",
-            "see you there",
-            "the page does not show the message it is asking about",
-        ),
-        (
-            "preview-plain",
-            "0",
-            "the message is not drawn as plain text, so Qt decides for \
-             itself whether what somebody sent is markup",
-        ),
-        (
-            "empty-shown",
+            "accept-on-open",
             "false",
-            "a message with words in it is called empty",
+            "the dialog can be accepted before either way is picked",
         ),
-        ("for-me-offered", "true", "there is no way to delete at all"),
         (
-            "for-everyone-offered",
+            "shows-message",
             "false",
-            "the page offers to delete somebody else's message for \
-             everyone, which the core refuses",
+            "the dialog still shows the message; the reader has just come \
+             from it",
+        ),
+        (
+            "shows-cancel",
+            "false",
+            "the dialog still draws a Cancel button, which the back edge \
+             already is",
+        ),
+        (
+            "me-manual",
+            "false",
+            "the first switch flips itself, which fights the binding that \
+             makes the two of them one answer",
+        ),
+        (
+            "everyone-manual",
+            "false",
+            "the second switch flips itself, which fights the binding that \
+             makes the two of them one answer",
+        ),
+        (
+            "everyone-offered",
+            "true",
+            "deleting one's own encrypted message for everyone is not \
+             offered, which is exactly what the core takes",
         ),
         (
             "why-not-shown",
+            "false",
+            "the dialog says why the second way is greyed while offering it",
+        ),
+        (
+            "picked-me",
+            "true/false",
+            "picking the first way did not take",
+        ),
+        (
+            "accept-after-me",
+            "true",
+            "there is no way to accept a way that has been picked",
+        ),
+        (
+            "picked-everyone",
+            "false/true",
+            "picking the second way left the first one picked too, so what \
+             is accepted is whichever the dialog happens to read",
+        ),
+        (
+            "picked-none",
+            "false/false",
+            "a second tap on the picked way did not put it back",
+        ),
+        (
+            "accept-after-none",
+            "false",
+            "the dialog can still be accepted after the reader took their \
+             answer back",
+        ),
+        (
+            "answer-so-far",
+            "",
+            "the dialog answered before it was accepted, so picking a way \
+             deletes the message by itself",
+        ),
+        (
+            "answer-everyone",
+            "picked:true",
+            "accepting the second way did not say so, and a message the \
+             reader asked to take off everybody's phone would go off their \
+             own alone",
+        ),
+        (
+            "theirs-everyone",
+            "false",
+            "the dialog offers to delete somebody else's message for \
+             everyone, which the core refuses",
+        ),
+        (
+            "theirs-why-not",
             "true",
             "the greyed way is greyed with no reason given",
         ),
         (
-            "answer-for-me",
-            "picked:false/1",
-            "picking the first way did not answer with it, or did not \
-             take the page back off the stack",
-        ),
-        (
-            "file-preview",
-            "notes.pdf",
-            "a message with no words is shown as nothing at all, rather \
-             than by what it carries",
-        ),
-        (
-            "answer-after-cancel",
-            "/1",
-            "Cancel deleted something, or did not leave the page",
-        ),
-        (
-            "empty-preview-shown",
-            "false",
-            "a message with nothing to show draws an empty line anyway",
-        ),
-        (
-            "empty-said",
+            "theirs-accept",
             "true",
-            "a message with nothing to show leaves the page with a gap in \
-             it instead of saying so",
+            "the one way that is open cannot be accepted",
         ),
         (
-            "sender-shown",
-            "false",
-            "a message with no sender draws an empty line for one",
-        ),
-        (
-            "own-for-everyone",
-            "true",
-            "the page does not offer to delete this account's own \
-             encrypted message for everyone, which is exactly what the \
-             core takes",
-        ),
-        (
-            "own-why-not",
-            "false",
-            "the page says why the second way is greyed while offering it",
-        ),
-        (
-            "answer-for-everyone",
-            "picked:true/1",
-            "picking the second way did not answer with it, so a message \
-             the reader asked to take off everybody's phone would go off \
-             their own alone",
+            "answer-me",
+            "picked:false",
+            "accepting the first way did not say so",
         ),
     ] {
         assert_eq!(value(label), expected, "{complaint}. {context}");

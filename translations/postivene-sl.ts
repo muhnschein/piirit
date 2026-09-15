@@ -557,16 +557,19 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
     </message>
 </context>
 <context>
-    <name>DeleteMessagePage</name>
+    <name>DeleteMessageDialog</name>
     <message>
         <source>Delete message</source>
-        <extracomment>Heading of the page asking which kind of delete.</extracomment>
+        <extracomment>Heading of the dialog asking which kind of delete.</extracomment>
         <translation>Izbriši sporočilo</translation>
     </message>
     <message>
-        <source>This message has no text</source>
-        <extracomment>Stands in for the message on the delete page, when it has no words and nothing named to show instead.</extracomment>
-        <translation>To sporočilo nima besedila</translation>
+        <source>Delete</source>
+        <translation>Izbriši</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Prekliči</translation>
     </message>
     <message>
         <source>Delete for me</source>
@@ -574,25 +577,13 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
         <translation>Izbriši samo pri meni</translation>
     </message>
     <message>
-        <source>It goes from your devices. Everybody else keeps their copy.</source>
-        <translation>Izgine s tvojih naprav. Vsi drugi obdržijo svojo kopijo.</translation>
-    </message>
-    <message>
         <source>Delete for everyone</source>
         <extracomment>The other way: every other device in the chat is asked to delete its copy too.</extracomment>
         <translation>Izbriši pri vseh</translation>
     </message>
     <message>
-        <source>It goes from your devices, and every other device in this chat is asked to delete it too.</source>
-        <translation>Izgine s tvojih naprav, vse druge naprave v tem pogovoru pa dobijo prošnjo, naj ga izbrišejo tudi.</translation>
-    </message>
-    <message>
         <source>Only an encrypted message you sent yourself can be deleted for everyone.</source>
         <translation>Pri vseh je mogoče izbrisati le tvoje lastno šifrirano sporočilo.</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation>Prekliči</translation>
     </message>
 </context>
 <context>

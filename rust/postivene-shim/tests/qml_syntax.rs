@@ -388,7 +388,7 @@ fn the_conversation_page_uses_the_pieces_that_are_tested() {
     // asked for the opposite -- and neither can be taken back.
     let choosing = block_of(&text, "onDeleteChoiceRequested");
     assert!(
-        choosing.contains("DeleteMessagePage.qml") && choosing.contains("confirmDelete"),
+        choosing.contains("DeleteMessageDialog.qml") && choosing.contains("confirmDelete"),
         "the conversation does not ask which kind of delete a message is, \
          or never tells the list what was answered"
     );
@@ -436,7 +436,7 @@ fn the_conversation_page_uses_the_pieces_that_are_tested() {
 fn text_from_the_other_end_is_pinned_to_plain() {
     // Bindings the core fills in from a message, a contact or a chat.
     // Anything reading one of these is showing remote input.
-    const REMOTE: [&str; 30] = [
+    const REMOTE: [&str; 29] = [
         "model.",
         "root.messageText",
         "root.quoteText",
@@ -466,7 +466,6 @@ fn text_from_the_other_end_is_pinned_to_plain() {
         "page.fileMime",
         "page.senderName",
         "page.myInvite",
-        "page.preview",
     ];
 
     /// The element a line sits in, as the nearest `Foo {` above it.
@@ -1232,18 +1231,15 @@ fn the_pages_the_app_pushes_are_there() {
         }
     }
     assert!(
-        pushed
-            .iter()
-            .any(|path| path.ends_with("MessagePage.qml")
-                && !path.ends_with("DeleteMessagePage.qml")),
+        pushed.iter().any(|path| path.ends_with("MessagePage.qml")),
         "nothing pushes MessagePage.qml any more, so a long message has \
          nowhere to be read whole: {pushed:?}"
     );
     assert!(
         pushed
             .iter()
-            .any(|path| path.ends_with("DeleteMessagePage.qml")),
-        "nothing pushes DeleteMessagePage.qml any more, so Delete has \
+            .any(|path| path.ends_with("DeleteMessageDialog.qml")),
+        "nothing pushes DeleteMessageDialog.qml any more, so Delete has \
          nowhere to ask which kind of delete it is: {pushed:?}"
     );
 }

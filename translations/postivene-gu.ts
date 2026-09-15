@@ -553,16 +553,19 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
-    <name>DeleteMessagePage</name>
+    <name>DeleteMessageDialog</name>
     <message>
         <source>Delete message</source>
-        <extracomment>Heading of the page asking which kind of delete.</extracomment>
+        <extracomment>Heading of the dialog asking which kind of delete.</extracomment>
         <translation>સંદેશ કાઢી નાખો</translation>
     </message>
     <message>
-        <source>This message has no text</source>
-        <extracomment>Stands in for the message on the delete page, when it has no words and nothing named to show instead.</extracomment>
-        <translation>આ સંદેશમાં કોઈ લખાણ નથી</translation>
+        <source>Delete</source>
+        <translation>કાઢી નાખો</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>રદ કરો</translation>
     </message>
     <message>
         <source>Delete for me</source>
@@ -570,25 +573,13 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>ફક્ત મારા માટે કાઢી નાખો</translation>
     </message>
     <message>
-        <source>It goes from your devices. Everybody else keeps their copy.</source>
-        <translation>તે તમારાં ઉપકરણોમાંથી જતો રહે છે. બાકીના બધા પોતાની નકલ રાખે છે.</translation>
-    </message>
-    <message>
         <source>Delete for everyone</source>
         <extracomment>The other way: every other device in the chat is asked to delete its copy too.</extracomment>
         <translation>બધા માટે કાઢી નાખો</translation>
     </message>
     <message>
-        <source>It goes from your devices, and every other device in this chat is asked to delete it too.</source>
-        <translation>તે તમારાં ઉપકરણોમાંથી જતો રહે છે, અને આ ચેટના બીજા દરેક ઉપકરણને પણ તેને કાઢી નાખવા કહેવામાં આવે છે.</translation>
-    </message>
-    <message>
         <source>Only an encrypted message you sent yourself can be deleted for everyone.</source>
         <translation>બધા માટે ફક્ત તમે પોતે મોકલેલો એન્ક્રિપ્ટેડ સંદેશ જ કાઢી શકાય છે.</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation>રદ કરો</translation>
     </message>
 </context>
 <context>

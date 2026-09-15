@@ -555,16 +555,19 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
-    <name>DeleteMessagePage</name>
+    <name>DeleteMessageDialog</name>
     <message>
         <source>Delete message</source>
-        <extracomment>Heading of the page asking which kind of delete.</extracomment>
+        <extracomment>Heading of the dialog asking which kind of delete.</extracomment>
         <translation>Удалить сообщение</translation>
     </message>
     <message>
-        <source>This message has no text</source>
-        <extracomment>Stands in for the message on the delete page, when it has no words and nothing named to show instead.</extracomment>
-        <translation>В этом сообщении нет текста</translation>
+        <source>Delete</source>
+        <translation>Удалить</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Отмена</translation>
     </message>
     <message>
         <source>Delete for me</source>
@@ -572,25 +575,13 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Удалить у себя</translation>
     </message>
     <message>
-        <source>It goes from your devices. Everybody else keeps their copy.</source>
-        <translation>Оно исчезает с ваших устройств. У всех остальных копия остаётся.</translation>
-    </message>
-    <message>
         <source>Delete for everyone</source>
         <extracomment>The other way: every other device in the chat is asked to delete its copy too.</extracomment>
         <translation>Удалить у всех</translation>
     </message>
     <message>
-        <source>It goes from your devices, and every other device in this chat is asked to delete it too.</source>
-        <translation>Оно исчезает с ваших устройств, а всем другим устройствам в этом чате отправляется просьба тоже его удалить.</translation>
-    </message>
-    <message>
         <source>Only an encrypted message you sent yourself can be deleted for everyone.</source>
         <translation>У всех можно удалить только зашифрованное сообщение, отправленное вами.</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation>Отмена</translation>
     </message>
 </context>
 <context>

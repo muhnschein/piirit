@@ -91,10 +91,9 @@ const PROBE_QML: &str = r"
             view.deleteRequested.connect(function(id, forEveryone) {
                 raised = 'delete:' + id + ':' + forEveryone
             })
-            view.deleteChoiceRequested.connect(
-                function(id, body, fileName, author, canForAll) {
-                    raised = 'ask:' + id + ':' + author + ':' + canForAll
-                })
+            view.deleteChoiceRequested.connect(function(id, canForAll) {
+                raised = 'ask:' + id + ':' + canForAll
+            })
             // The wait before a message goes, turned down so this does not
             // have to sit through four seconds of it.
             view.pendingDelay = 60
@@ -610,14 +609,14 @@ fn assert_outcome(steps: &[(&str, String)]) {
     );
     assert_eq!(
         value("delete-ask"),
-        "ask:1:Ada:false",
-        "Delete did not ask which kind of delete it is, or did not carry \
-         the message the page has to show. Somebody else's message is not \
-         one the core will delete for everyone. {context}"
+        "ask:1:false",
+        "Delete did not ask which kind of delete it is, or did not name \
+         its message. Somebody else's message is not one the core will \
+         delete for everyone. {context}"
     );
     assert_eq!(
         value("delete-ask-own"),
-        "ask:1:Me:true",
+        "ask:1:true",
         "the ask does not offer to delete this account's own encrypted \
          message for everyone, which is exactly what the core takes. \
          {context}"

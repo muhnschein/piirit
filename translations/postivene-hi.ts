@@ -553,16 +553,19 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
-    <name>DeleteMessagePage</name>
+    <name>DeleteMessageDialog</name>
     <message>
         <source>Delete message</source>
-        <extracomment>Heading of the page asking which kind of delete.</extracomment>
+        <extracomment>Heading of the dialog asking which kind of delete.</extracomment>
         <translation>संदेश हटाएँ</translation>
     </message>
     <message>
-        <source>This message has no text</source>
-        <extracomment>Stands in for the message on the delete page, when it has no words and nothing named to show instead.</extracomment>
-        <translation>इस संदेश में कोई पाठ नहीं है</translation>
+        <source>Delete</source>
+        <translation>हटाएँ</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>रद्द करें</translation>
     </message>
     <message>
         <source>Delete for me</source>
@@ -570,25 +573,13 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>सिर्फ़ मेरे लिए हटाएँ</translation>
     </message>
     <message>
-        <source>It goes from your devices. Everybody else keeps their copy.</source>
-        <translation>यह आपके उपकरणों से चला जाता है। बाकी सबके पास उनकी प्रति बनी रहती है।</translation>
-    </message>
-    <message>
         <source>Delete for everyone</source>
         <extracomment>The other way: every other device in the chat is asked to delete its copy too.</extracomment>
         <translation>सबके लिए हटाएँ</translation>
     </message>
     <message>
-        <source>It goes from your devices, and every other device in this chat is asked to delete it too.</source>
-        <translation>यह आपके उपकरणों से चला जाता है, और इस बातचीत के हर दूसरे उपकरण से भी इसे हटाने को कहा जाता है।</translation>
-    </message>
-    <message>
         <source>Only an encrypted message you sent yourself can be deleted for everyone.</source>
         <translation>सबके लिए सिर्फ़ वही एन्क्रिप्टेड संदेश हटाया जा सकता है जो आपने खुद भेजा हो।</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation>रद्द करें</translation>
     </message>
 </context>
 <context>

@@ -120,13 +120,12 @@ SilicaListView {
     /// picked when they asked.
     signal deleteRequested(int messageId, bool forEveryone)
     /// The reader asked to delete a message and has not said which kind
-    /// of delete yet. Which is a page of its own
-    /// (pages/DeleteMessagePage.qml), and pushing one is the page's
-    /// business, not this component's -- so the message travels with the
-    /// ask, the way a reply's does: this row may be gone by the time the
-    /// answer comes back.
-    signal deleteChoiceRequested(int messageId, string body, string fileName,
-                                 string author, bool canDeleteForEveryone)
+    /// of delete yet. Which is a dialog of its own
+    /// (pages/DeleteMessageDialog.qml), and pushing one is the page's
+    /// business, not this component's. `canDeleteForEveryone` travels
+    /// with the ask because only the row knows it, and the row may be
+    /// gone by the time the answer comes back.
+    signal deleteChoiceRequested(int messageId, bool canDeleteForEveryone)
     signal resendRequested(int messageId)
     signal forwardRequested(int messageId)
     /// The reader tapped an attachment. What opening it means -- a page
@@ -761,21 +760,19 @@ SilicaListView {
                     objectName: "deleteItem"
                     text: qsTr("Delete")
                     // One entry, not two: which kind of delete is asked
-                    // on a page that shows the message
-                    // (pages/DeleteMessagePage.qml), because "for me" and
-                    // "for everyone" side by side on a long-press menu is
-                    // how the wrong one gets tapped.
+                    // in a dialog (pages/DeleteMessageDialog.qml),
+                    // because "for me" and "for everyone" side by side on
+                    // a long-press menu is how the wrong one gets tapped.
                     //
-                    // Everything the page needs is taken now rather than
-                    // in the answer: pushing a page and choosing on it
-                    // takes as long as the reader takes, and this row may
-                    // be gone by then -- the same reason Forward hoists
-                    // its id. What the core will take a deletion for
-                    // everyone of is a message this account sent, and an
-                    // encrypted one; a notice is nobody's message at all.
+                    // Both are read now rather than in the answer:
+                    // choosing takes as long as the reader takes, and
+                    // this row may be gone by then -- the same reason
+                    // Forward hoists its id. What the core will take a
+                    // deletion for everyone of is a message this account
+                    // sent, and an encrypted one; a notice is nobody's
+                    // message at all.
                     onClicked: root.deleteChoiceRequested(
-                                   model.message_id, model.text,
-                                   model.file_name, model.sender_name,
+                                   model.message_id,
                                    model.is_outgoing && model.show_padlock
                                    && !model.is_info)
                 }

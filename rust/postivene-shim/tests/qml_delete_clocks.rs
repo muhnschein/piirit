@@ -97,7 +97,7 @@ const PROBE_QML: &str = r"
         }
         /// Delete, from that message's own menu, and answer the page it
         /// leads to: the menu asks which kind of delete this is
-        /// (pages/DeleteMessagePage.qml) and the wait starts on the
+        /// (pages/DeleteMessageDialog.qml) and the wait starts on the
         /// answer, so both are one reader's one decision.
         function deleteRow(messageId) {
             var row = rowFor(messageId)

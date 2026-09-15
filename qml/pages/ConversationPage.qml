@@ -512,23 +512,18 @@ Page {
                 messages.delete_message(messageId)
             }
         }
-        // The menu asks for a deletion; which kind is a page showing the
-        // message, and pushing it is the page's business rather than the
-        // list's. Nothing is deleted until the answer comes back and the
-        // wait after it is up, so leaving the page deletes nothing.
+        // The menu asks for a deletion; which kind is a dialog, and
+        // pushing it is the page's business rather than the list's.
+        // Nothing is deleted until that dialog is accepted and the wait
+        // after it is up, so leaving by the back edge deletes nothing.
         onDeleteChoiceRequested: {
             // Taken now rather than in the callback: choosing takes a
             // page push, and the row may be gone by the time the answer
             // comes back -- the same reason Forward hoists its id.
             var doomed = messageId
             var chooser = pageStack.push(
-                Qt.resolvedUrl("DeleteMessagePage.qml"),
-                {
-                    senderName: author,
-                    body: body,
-                    fileName: fileName,
-                    canDeleteForEveryone: canDeleteForEveryone
-                })
+                Qt.resolvedUrl("DeleteMessageDialog.qml"),
+                { canDeleteForEveryone: canDeleteForEveryone })
             if (chooser) {
                 chooser.picked.connect(function(forEveryone) {
                     listView.confirmDelete(doomed, forEveryone)

@@ -553,16 +553,19 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
-    <name>DeleteMessagePage</name>
+    <name>DeleteMessageDialog</name>
     <message>
         <source>Delete message</source>
-        <extracomment>Heading of the page asking which kind of delete.</extracomment>
+        <extracomment>Heading of the dialog asking which kind of delete.</extracomment>
         <translation>ಸಂದೇಶವನ್ನು ಅಳಿಸಿ</translation>
     </message>
     <message>
-        <source>This message has no text</source>
-        <extracomment>Stands in for the message on the delete page, when it has no words and nothing named to show instead.</extracomment>
-        <translation>ಈ ಸಂದೇಶದಲ್ಲಿ ಪಠ್ಯವಿಲ್ಲ</translation>
+        <source>Delete</source>
+        <translation>ಅಳಿಸಿ</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>ರದ್ದುಮಾಡಿ</translation>
     </message>
     <message>
         <source>Delete for me</source>
@@ -570,25 +573,13 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>ನನಗೆ ಮಾತ್ರ ಅಳಿಸಿ</translation>
     </message>
     <message>
-        <source>It goes from your devices. Everybody else keeps their copy.</source>
-        <translation>ಇದು ನಿಮ್ಮ ಸಾಧನಗಳಿಂದ ಹೋಗುತ್ತದೆ. ಉಳಿದವರೆಲ್ಲರೂ ತಮ್ಮ ಪ್ರತಿಯನ್ನು ಇಟ್ಟುಕೊಳ್ಳುತ್ತಾರೆ.</translation>
-    </message>
-    <message>
         <source>Delete for everyone</source>
         <extracomment>The other way: every other device in the chat is asked to delete its copy too.</extracomment>
         <translation>ಎಲ್ಲರಿಗೂ ಅಳಿಸಿ</translation>
     </message>
     <message>
-        <source>It goes from your devices, and every other device in this chat is asked to delete it too.</source>
-        <translation>ಇದು ನಿಮ್ಮ ಸಾಧನಗಳಿಂದ ಹೋಗುತ್ತದೆ, ಮತ್ತು ಈ ಚಾಟ್‌ನ ಉಳಿದ ಪ್ರತಿ ಸಾಧನಕ್ಕೂ ಅದನ್ನು ಅಳಿಸುವಂತೆ ಕೇಳಲಾಗುತ್ತದೆ.</translation>
-    </message>
-    <message>
         <source>Only an encrypted message you sent yourself can be deleted for everyone.</source>
         <translation>ನೀವೇ ಕಳುಹಿಸಿದ ಎನ್‌ಕ್ರಿಪ್ಟ್ ಮಾಡಿದ ಸಂದೇಶವನ್ನು ಮಾತ್ರ ಎಲ್ಲರಿಗೂ ಅಳಿಸಬಹುದು.</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation>ರದ್ದುಮಾಡಿ</translation>
     </message>
 </context>
 <context>

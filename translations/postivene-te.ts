@@ -549,16 +549,19 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
-    <name>DeleteMessagePage</name>
+    <name>DeleteMessageDialog</name>
     <message>
         <source>Delete message</source>
-        <extracomment>Heading of the page asking which kind of delete.</extracomment>
+        <extracomment>Heading of the dialog asking which kind of delete.</extracomment>
         <translation>సందేశాన్ని తొలగించు</translation>
     </message>
     <message>
-        <source>This message has no text</source>
-        <extracomment>Stands in for the message on the delete page, when it has no words and nothing named to show instead.</extracomment>
-        <translation>ఈ సందేశంలో పాఠ్యం లేదు</translation>
+        <source>Delete</source>
+        <translation>తొలగించు</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>రద్దు చేయి</translation>
     </message>
     <message>
         <source>Delete for me</source>
@@ -566,25 +569,13 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>నాకు మాత్రమే తొలగించు</translation>
     </message>
     <message>
-        <source>It goes from your devices. Everybody else keeps their copy.</source>
-        <translation>ఇది మీ పరికరాల నుండి పోతుంది. మిగతా అందరూ తమ కాపీని ఉంచుకుంటారు.</translation>
-    </message>
-    <message>
         <source>Delete for everyone</source>
         <extracomment>The other way: every other device in the chat is asked to delete its copy too.</extracomment>
         <translation>అందరికీ తొలగించు</translation>
     </message>
     <message>
-        <source>It goes from your devices, and every other device in this chat is asked to delete it too.</source>
-        <translation>ఇది మీ పరికరాల నుండి పోతుంది, ఈ చాట్‌లోని ప్రతి ఇతర పరికరాన్ని కూడా దాన్ని తొలగించమని అడుగుతారు.</translation>
-    </message>
-    <message>
         <source>Only an encrypted message you sent yourself can be deleted for everyone.</source>
         <translation>మీరే పంపిన ఎన్‌క్రిప్టెడ్ సందేశాన్ని మాత్రమే అందరికీ తొలగించగలరు.</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation>రద్దు చేయి</translation>
     </message>
 </context>
 <context>

@@ -44,9 +44,9 @@ const PROBE_QML: &str = r"
         /// The last page pushed, as `Page.qml:body=...,everyone=...`.
         property string pushed: ''
 
-        // The page Delete leads to, as the stack hands it back: Silica
-        // answers a push with the page it made, and this page reports
-        // which kind of delete was picked on it.
+        // The dialog Delete leads to, as the stack hands it back:
+        // Silica answers a push with the page it made, and this one
+        // reports which kind of delete was accepted on it.
         QtObject {
             id: chooser
             signal picked(bool forEveryone)
@@ -56,10 +56,7 @@ const PROBE_QML: &str = r"
             id: stack
             function push(url, props) {
                 var name = ('' + url).split('/').pop()
-                pushed = name + ':body=' + props.body
-                         + ',file=' + props.fileName
-                         + ',sender=' + props.senderName
-                         + ',everyone=' + props.canDeleteForEveryone
+                pushed = name + ':everyone=' + props.canDeleteForEveryone
                 return chooser
             }
             function pop() { }
@@ -280,9 +277,9 @@ fn a_message_the_reader_deletes_for_everyone_reaches_the_core_as_that() {
     );
     assert_eq!(
         value("pushed"),
-        "DeleteMessagePage.qml:body=on my way,file=,sender=,everyone=true",
-        "Delete did not ask which kind of delete it is, or did not carry \
-         the message to the page that asks. {context}"
+        "DeleteMessageDialog.qml:everyone=true",
+        "Delete did not ask which kind of delete it is, or did not say \
+         that the core would take this one for everyone. {context}"
     );
     assert_eq!(
         value("countdown-before-pick"),

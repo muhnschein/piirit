@@ -549,16 +549,19 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
-    <name>DeleteMessagePage</name>
+    <name>DeleteMessageDialog</name>
     <message>
         <source>Delete message</source>
-        <extracomment>Heading of the page asking which kind of delete.</extracomment>
+        <extracomment>Heading of the dialog asking which kind of delete.</extracomment>
         <translation>Διαγραφή μηνύματος</translation>
     </message>
     <message>
-        <source>This message has no text</source>
-        <extracomment>Stands in for the message on the delete page, when it has no words and nothing named to show instead.</extracomment>
-        <translation>Αυτό το μήνυμα δεν έχει κείμενο</translation>
+        <source>Delete</source>
+        <translation>Διαγραφή</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Ακύρωση</translation>
     </message>
     <message>
         <source>Delete for me</source>
@@ -566,25 +569,13 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Διαγραφή μόνο για μένα</translation>
     </message>
     <message>
-        <source>It goes from your devices. Everybody else keeps their copy.</source>
-        <translation>Φεύγει από τις συσκευές σας. Όλοι οι άλλοι κρατούν το αντίγραφό τους.</translation>
-    </message>
-    <message>
         <source>Delete for everyone</source>
         <extracomment>The other way: every other device in the chat is asked to delete its copy too.</extracomment>
         <translation>Διαγραφή για όλους</translation>
     </message>
     <message>
-        <source>It goes from your devices, and every other device in this chat is asked to delete it too.</source>
-        <translation>Φεύγει από τις συσκευές σας και κάθε άλλη συσκευή σε αυτή τη συνομιλία καλείται να το διαγράψει επίσης.</translation>
-    </message>
-    <message>
         <source>Only an encrypted message you sent yourself can be deleted for everyone.</source>
         <translation>Για όλους μπορεί να διαγραφεί μόνο ένα κρυπτογραφημένο μήνυμα που στείλατε εσείς.</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation>Ακύρωση</translation>
     </message>
 </context>
 <context>

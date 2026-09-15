@@ -57,9 +57,9 @@ struct PageStackProbe {
     detail: qt_property!(QVariant),
     /// The conversation under that.
     chat: qt_property!(QVariant),
-    /// The page Delete leads to, which asks which kind of delete this
-    /// is: `push` hands it back the way Silica hands back the page it
-    /// made, and the test picks on it.
+    /// The dialog Delete leads to, which asks which kind of delete
+    /// this is: `push` hands it back the way Silica hands back the page
+    /// it made, and the test picks on it.
     chooser: qt_property!(QVariant),
     /// How many steps down the current walk has taken.
     hops: qt_property!(u32),
@@ -83,16 +83,16 @@ impl PageStackProbe {
             QString::from_qvariant(properties.value(QString::from("kind"), QVariant::default()))
                 .map(|kind| kind.to_string())
                 .unwrap_or_default();
-        // The delete page carries no kind; what it is asked with is
+        // The delete dialog carries no kind; what it is asked with is
         // whether the core would take a deletion for everyone of this
-        // message, which is the half of it worth reading back.
+        // message, which is all of it worth reading back.
         let everyone = bool::from_qvariant(
             properties.value(QString::from("canDeleteForEveryone"), QVariant::default()),
         )
         .map(|gate| format!("everyone={gate}"))
         .unwrap_or_default();
         self.note(&format!("push:{name}({kind}{everyone})"));
-        if name == "DeleteMessagePage.qml" {
+        if name == "DeleteMessageDialog.qml" {
             return self.chooser.clone();
         }
         QVariant::default()
@@ -144,8 +144,8 @@ const PROBE_QML: &str = r"
             property int shown: 0
             function showMessage(messageId) { shown = messageId }
         }
-        // The page Delete leads to, as the stack hands it back: which
-        // kind of delete is asked there, and this is the answer.
+        // The dialog Delete leads to, as the stack hands it back:
+        // which kind of delete is asked there, and this is the answer.
         QtObject {
             id: chooser
             objectName: 'chooser'
@@ -581,7 +581,7 @@ fn assert_pages(steps: &[(&str, String)], navigation: &str, calls: &[(String, Va
         assert_eq!(value(label), expected, "{complaint}. {context}");
     }
     assert!(
-        navigation.contains("push:DeleteMessagePage.qml(everyone=false)"),
+        navigation.contains("push:DeleteMessageDialog.qml(everyone=false)"),
         "Delete did not ask which kind of delete it is, or offered to \
          delete somebody else's picture for everyone -- which the core \
          refuses. {context}"
@@ -694,12 +694,12 @@ fn assert_pages(steps: &[(&str, String)], navigation: &str, calls: &[(String, Va
 
     // Every tap opened what it should: a picture on the picture page, a
     // video on the video page, an app on its own page, a tile the media
-    // page for its kind -- and Delete the page that asks which kind of
-    // delete it is, which is where the conversation asks as well.
+    // page for its kind -- and Delete the dialog that asks which kind
+    // of delete it is, which is where the conversation asks as well.
     assert_eq!(
         navigation,
         "push:PicturePage.qml()|push:VideoPage.qml()|pop|\
-         push:DeleteMessagePage.qml(everyone=false)|push:WebxdcPage.qml()|\
+         push:DeleteMessageDialog.qml(everyone=false)|push:WebxdcPage.qml()|\
          push:ChatMediaPage.qml(gallery)|push:ChatMediaPage.qml(files)|",
         "a tap did not open the right page, or Show in chat did not pop \
          back to the conversation. {context}"
