@@ -571,11 +571,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Chỉ tin nhắn đã mã hóa do chính bạn gửi mới có thể xóa với mọi người.</translation>
     </message>
     <message>
-        <source>Delete message?</source>
-        <extracomment>Heading of the dialog asking which kind of delete.</extracomment>
-        <translation>Xóa tin nhắn?</translation>
-    </message>
-    <message>
         <source>How do you want to delete this message? This cannot be undone.</source>
         <translation>Bạn muốn xóa tin nhắn này thế nào? Không thể hoàn tác.</translation>
     </message>

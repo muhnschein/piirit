@@ -575,11 +575,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Барысында да сез үзегез җибәргән шифрланган хәбәрне генә бетереп була.</translation>
     </message>
     <message>
-        <source>Delete message?</source>
-        <extracomment>Heading of the dialog asking which kind of delete.</extracomment>
-        <translation>Хәбәрне бетерергәме?</translation>
-    </message>
-    <message>
         <source>How do you want to delete this message? This cannot be undone.</source>
         <translation>Бу хәбәрне ничек бетерергә телисез? Моны кире кайтарып булмый.</translation>
     </message>

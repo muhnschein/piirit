@@ -573,11 +573,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Só uma mensagem criptografada enviada por você mesmo pode ser excluída para todos.</translation>
     </message>
     <message>
-        <source>Delete message?</source>
-        <extracomment>Heading of the dialog asking which kind of delete.</extracomment>
-        <translation>Excluir a mensagem?</translation>
-    </message>
-    <message>
         <source>How do you want to delete this message? This cannot be undone.</source>
         <translation>Como você quer excluir esta mensagem? Isso não pode ser desfeito.</translation>
     </message>

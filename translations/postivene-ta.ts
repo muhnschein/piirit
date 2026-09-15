@@ -573,11 +573,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>நீங்களே அனுப்பிய மறையாக்கம் செய்யப்பட்ட செய்தியை மட்டுமே அனைவருக்கும் நீக்க முடியும்.</translation>
     </message>
     <message>
-        <source>Delete message?</source>
-        <extracomment>Heading of the dialog asking which kind of delete.</extracomment>
-        <translation>செய்தியை நீக்கவா?</translation>
-    </message>
-    <message>
         <source>How do you want to delete this message? This cannot be undone.</source>
         <translation>இந்தச் செய்தியை எப்படி நீக்க வேண்டும்? இதைத் திரும்பப் பெற முடியாது.</translation>
     </message>

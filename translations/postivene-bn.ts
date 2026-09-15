@@ -577,11 +577,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>শুধু আপনার নিজের পাঠানো এনক্রিপ্ট করা বার্তাই সবার জন্য মোছা যায়।</translation>
     </message>
     <message>
-        <source>Delete message?</source>
-        <extracomment>Heading of the dialog asking which kind of delete.</extracomment>
-        <translation>বার্তা মুছবেন?</translation>
-    </message>
-    <message>
         <source>How do you want to delete this message? This cannot be undone.</source>
         <translation>আপনি এই বার্তাটি কীভাবে মুছতে চান? এটি ফিরিয়ে আনা যাবে না।</translation>
     </message>

@@ -573,11 +573,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Για όλους μπορεί να διαγραφεί μόνο ένα κρυπτογραφημένο μήνυμα που στείλατε εσείς.</translation>
     </message>
     <message>
-        <source>Delete message?</source>
-        <extracomment>Heading of the dialog asking which kind of delete.</extracomment>
-        <translation>Διαγραφή μηνύματος;</translation>
-    </message>
-    <message>
         <source>How do you want to delete this message? This cannot be undone.</source>
         <translation>Πώς θέλετε να διαγράψετε αυτό το μήνυμα; Δεν μπορεί να αναιρεθεί.</translation>
     </message>

@@ -579,11 +579,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>В усіх можна видалити лише зашифроване повідомлення, надіслане вами.</translation>
     </message>
     <message>
-        <source>Delete message?</source>
-        <extracomment>Heading of the dialog asking which kind of delete.</extracomment>
-        <translation>Видалити повідомлення?</translation>
-    </message>
-    <message>
         <source>How do you want to delete this message? This cannot be undone.</source>
         <translation>Як ви хочете видалити це повідомлення? Це не можна скасувати.</translation>
     </message>

@@ -577,11 +577,6 @@ Mensagens de contactos bloqueados não serão ocultadas noutros grupos.</transla
         <translation>Só uma mensagem cifrada que enviou pode ser eliminada para todos.</translation>
     </message>
     <message>
-        <source>Delete message?</source>
-        <extracomment>Heading of the dialog asking which kind of delete.</extracomment>
-        <translation>Eliminar a mensagem?</translation>
-    </message>
-    <message>
         <source>How do you want to delete this message? This cannot be undone.</source>
         <translation>Como quer eliminar esta mensagem? Isto não pode ser anulado.</translation>
     </message>

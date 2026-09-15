@@ -575,11 +575,6 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
         <translation>Herkeste yalnızca kendi gönderdiğin şifreli bir mesaj silinebilir.</translation>
     </message>
     <message>
-        <source>Delete message?</source>
-        <extracomment>Heading of the dialog asking which kind of delete.</extracomment>
-        <translation>Mesaj silinsin mi?</translation>
-    </message>
-    <message>
         <source>How do you want to delete this message? This cannot be undone.</source>
         <translation>Bu mesajı nasıl silmek istersin? Bu geri alınamaz.</translation>
     </message>

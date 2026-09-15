@@ -571,11 +571,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Mindenkinél csak olyan titkosított üzenet törölhető, amelyet te magad küldtél.</translation>
     </message>
     <message>
-        <source>Delete message?</source>
-        <extracomment>Heading of the dialog asking which kind of delete.</extracomment>
-        <translation>Törlöd az üzenetet?</translation>
-    </message>
-    <message>
         <source>How do you want to delete this message? This cannot be undone.</source>
         <translation>Hogyan szeretnéd törölni ezt az üzenetet? Ezt nem lehet visszavonni.</translation>
     </message>

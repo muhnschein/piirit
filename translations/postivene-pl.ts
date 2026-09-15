@@ -579,11 +579,6 @@ Wiadomości innych grup z zablokowanymi kontaktami nadal będą wyświetlane.</t
         <translation>U wszystkich można usunąć tylko zaszyfrowaną wiadomość wysłaną przez ciebie.</translation>
     </message>
     <message>
-        <source>Delete message?</source>
-        <extracomment>Heading of the dialog asking which kind of delete.</extracomment>
-        <translation>Usunąć wiadomość?</translation>
-    </message>
-    <message>
         <source>How do you want to delete this message? This cannot be undone.</source>
         <translation>Jak chcesz usunąć tę wiadomość? Tego nie da się cofnąć.</translation>
     </message>

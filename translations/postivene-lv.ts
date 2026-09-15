@@ -579,11 +579,6 @@ Citās grupās, kurās ir bloķēti kontakti, viņu ziņas joprojām būs redzam
         <translation>Visiem var izdzēst tikai tavu paša sūtīto šifrēto ziņu.</translation>
     </message>
     <message>
-        <source>Delete message?</source>
-        <extracomment>Heading of the dialog asking which kind of delete.</extracomment>
-        <translation>Dzēst ziņu?</translation>
-    </message>
-    <message>
         <source>How do you want to delete this message? This cannot be undone.</source>
         <translation>Kā vēlies dzēst šo ziņu? To nevar atsaukt.</translation>
     </message>

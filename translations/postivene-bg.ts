@@ -573,11 +573,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>За всички може да се изтрие само шифровано съобщение, изпратено от вас.</translation>
     </message>
     <message>
-        <source>Delete message?</source>
-        <extracomment>Heading of the dialog asking which kind of delete.</extracomment>
-        <translation>Да се изтрие ли съобщението?</translation>
-    </message>
-    <message>
         <source>How do you want to delete this message? This cannot be undone.</source>
         <translation>Как искате да изтриете това съобщение? Това не може да се отмени.</translation>
     </message>

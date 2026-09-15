@@ -571,11 +571,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>只有你自己發送的加密訊息才能為所有人刪除。</translation>
     </message>
     <message>
-        <source>Delete message?</source>
-        <extracomment>Heading of the dialog asking which kind of delete.</extracomment>
-        <translation>刪除訊息？</translation>
-    </message>
-    <message>
         <source>How do you want to delete this message? This cannot be undone.</source>
         <translation>你想怎樣刪除這則訊息？此操作無法復原。</translation>
     </message>

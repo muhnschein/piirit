@@ -579,11 +579,6 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
         <translation>U všech lze smazat jen tvoji vlastní šifrovanou zprávu.</translation>
     </message>
     <message>
-        <source>Delete message?</source>
-        <extracomment>Heading of the dialog asking which kind of delete.</extracomment>
-        <translation>Smazat zprávu?</translation>
-    </message>
-    <message>
         <source>How do you want to delete this message? This cannot be undone.</source>
         <translation>Jak chceš tuto zprávu smazat? Tohle nejde vzít zpět.</translation>
     </message>

@@ -573,11 +573,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Bara ett krypterat meddelande som du själv har skickat kan tas bort för alla.</translation>
     </message>
     <message>
-        <source>Delete message?</source>
-        <extracomment>Heading of the dialog asking which kind of delete.</extracomment>
-        <translation>Ta bort meddelandet?</translation>
-    </message>
-    <message>
         <source>How do you want to delete this message? This cannot be undone.</source>
         <translation>Hur vill du ta bort det här meddelandet? Det går inte att ångra.</translation>
     </message>

@@ -573,11 +573,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Alleen een versleuteld bericht dat je zelf hebt verstuurd, kan voor iedereen worden verwijderd.</translation>
     </message>
     <message>
-        <source>Delete message?</source>
-        <extracomment>Heading of the dialog asking which kind of delete.</extracomment>
-        <translation>Bericht verwijderen?</translation>
-    </message>
-    <message>
         <source>How do you want to delete this message? This cannot be undone.</source>
         <translation>Hoe wil je dit bericht verwijderen? Dit kan niet ongedaan worden gemaakt.</translation>
     </message>

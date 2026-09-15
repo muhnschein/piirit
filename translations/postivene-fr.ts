@@ -577,11 +577,6 @@ Vous continuerez à voir les messages des contacts bloqués dans les autres grou
         <translation>Seul un message chiffré que vous avez envoyé vous-même peut être supprimé pour tout le monde.</translation>
     </message>
     <message>
-        <source>Delete message?</source>
-        <extracomment>Heading of the dialog asking which kind of delete.</extracomment>
-        <translation>Supprimer le message ?</translation>
-    </message>
-    <message>
         <source>How do you want to delete this message? This cannot be undone.</source>
         <translation>Comment voulez-vous supprimer ce message ? Cela ne peut pas être annulé.</translation>
     </message>

@@ -144,10 +144,10 @@ fn the_dialog_picks_one_of_the_two_and_accepts_only_then() {
         record!("shows-cancel", call!("has", QString::from("deleteCancel")));
         // Silica's own switch flips itself unless told not to, which
         // would fight the binding that makes these two one answer.
-        // The question itself, and a line under each way saying who
-        // keeps a copy: the heading asks, the switches are three words
-        // each, and neither says that there is no way back.
-        record!("asks", get!("deleteHeader", "title"));
+        // The question, and a line under each way saying who keeps a
+        // copy: the switches are three words each, and neither says that
+        // there is no way back.
+        record!("heading", get!("deleteHeader", "title"));
         record!("question", call!("has", QString::from("deleteQuestion")));
         record!("me-says-more", get!("forMeSwitch", "description"));
         record!(
@@ -241,16 +241,16 @@ fn the_dialog_picks_one_of_the_two_and_accepts_only_then() {
              already is",
         ),
         (
-            "asks",
-            "Delete message?",
-            "the heading does not ask anything, so the two switches read \
-             as settings rather than as an answer",
+            "heading",
+            "",
+            "the header carries a title as well as the question below it, \
+             which says the same thing twice",
         ),
         (
             "question",
             "true",
-            "nothing under the heading says what is being asked, or that \
-             neither way can be taken back",
+            "nothing says what is being asked, or that neither way can be \
+             taken back",
         ),
         (
             "me-says-more",

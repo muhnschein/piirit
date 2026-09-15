@@ -579,11 +579,6 @@ Správy od zablokovaných kontaktov v ostatných skupinách sa budú naďalej zo
         <translation>U všetkých možno odstrániť len tvoju vlastnú šifrovanú správu.</translation>
     </message>
     <message>
-        <source>Delete message?</source>
-        <extracomment>Heading of the dialog asking which kind of delete.</extracomment>
-        <translation>Odstrániť správu?</translation>
-    </message>
-    <message>
         <source>How do you want to delete this message? This cannot be undone.</source>
         <translation>Ako chceš túto správu odstrániť? Toto sa nedá vrátiť späť.</translation>
     </message>

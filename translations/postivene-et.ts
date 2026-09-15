@@ -577,11 +577,6 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
         <translation>Kõigi jaoks saab kustutada ainult krüptitud sõnumi, mille sa ise saatsid.</translation>
     </message>
     <message>
-        <source>Delete message?</source>
-        <extracomment>Heading of the dialog asking which kind of delete.</extracomment>
-        <translation>Kustutada sõnum?</translation>
-    </message>
-    <message>
         <source>How do you want to delete this message? This cannot be undone.</source>
         <translation>Kuidas soovid selle sõnumi kustutada? Seda ei saa tagasi võtta.</translation>
     </message>

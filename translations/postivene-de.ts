@@ -577,11 +577,6 @@ In anderen Gruppen mit blockierten Kontakten werden deren Nachrichten weiterhin 
         <translation>Für alle löschen geht nur bei einer verschlüsselten Nachricht, die du selbst gesendet hast.</translation>
     </message>
     <message>
-        <source>Delete message?</source>
-        <extracomment>Heading of the dialog asking which kind of delete.</extracomment>
-        <translation>Nachricht löschen?</translation>
-    </message>
-    <message>
         <source>How do you want to delete this message? This cannot be undone.</source>
         <translation>Wie möchtest du diese Nachricht löschen? Das lässt sich nicht rückgängig machen.</translation>
     </message>

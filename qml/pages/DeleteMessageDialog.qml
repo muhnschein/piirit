@@ -55,19 +55,17 @@ Dialog {
         width: parent.width
         spacing: Theme.paddingLarge
 
+        // No title on it: what the dialog wants is the question below,
+        // and a heading saying the same thing in fewer words was saying
+        // it twice. The accept and cancel words are the header's.
         DialogHeader {
             objectName: "deleteHeader"
-            //: Heading of the dialog asking which kind of delete.
-            title: qsTr("Delete message?")
             acceptText: qsTr("Delete")
             cancelText: qsTr("Cancel")
         }
 
-        // What the question is, under the heading that asks it: a
-        // header's own line is drawn as whatever markup it is handed
-        // (see ConversationHeader), and this one has something to say
-        // that the two switches do not -- that there is no way back from
-        // either of them.
+        // The question, and the half neither switch says: that there is
+        // no way back from either of them.
         Label {
             objectName: "deleteQuestion"
             x: Theme.horizontalPageMargin

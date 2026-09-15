@@ -581,11 +581,6 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
         <translation>Pri vseh je mogoče izbrisati le tvoje lastno šifrirano sporočilo.</translation>
     </message>
     <message>
-        <source>Delete message?</source>
-        <extracomment>Heading of the dialog asking which kind of delete.</extracomment>
-        <translation>Izbrisati sporočilo?</translation>
-    </message>
-    <message>
         <source>How do you want to delete this message? This cannot be undone.</source>
         <translation>Kako želiš izbrisati to sporočilo? Tega ni mogoče razveljaviti.</translation>
     </message>

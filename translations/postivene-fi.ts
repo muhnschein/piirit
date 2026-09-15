@@ -573,11 +573,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Kaikilta voi poistaa vain itse lähettämäsi salatun viestin.</translation>
     </message>
     <message>
-        <source>Delete message?</source>
-        <extracomment>Heading of the dialog asking which kind of delete.</extracomment>
-        <translation>Poistetaanko viesti?</translation>
-    </message>
-    <message>
         <source>How do you want to delete this message? This cannot be undone.</source>
         <translation>Miten haluat poistaa tämän viestin? Tätä ei voi perua.</translation>
     </message>

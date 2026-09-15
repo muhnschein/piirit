@@ -577,11 +577,6 @@ Gli altri gruppi con contatti bloccati continueranno a visualizzare i loro messa
         <translation>Per tutti si può eliminare solo un messaggio cifrato inviato da te.</translation>
     </message>
     <message>
-        <source>Delete message?</source>
-        <extracomment>Heading of the dialog asking which kind of delete.</extracomment>
-        <translation>Eliminare il messaggio?</translation>
-    </message>
-    <message>
         <source>How do you want to delete this message? This cannot be undone.</source>
         <translation>Come vuoi eliminare questo messaggio? Non si può annullare.</translation>
     </message>

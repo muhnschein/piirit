@@ -573,11 +573,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>మీరే పంపిన ఎన్‌క్రిప్టెడ్ సందేశాన్ని మాత్రమే అందరికీ తొలగించగలరు.</translation>
     </message>
     <message>
-        <source>Delete message?</source>
-        <extracomment>Heading of the dialog asking which kind of delete.</extracomment>
-        <translation>సందేశాన్ని తొలగించాలా?</translation>
-    </message>
-    <message>
         <source>How do you want to delete this message? This cannot be undone.</source>
         <translation>ఈ సందేశాన్ని ఎలా తొలగించాలి? దీన్ని తిరిగి తీసుకోలేరు.</translation>
     </message>

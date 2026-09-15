@@ -575,11 +575,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Pentru toți poate fi șters doar un mesaj criptat trimis de tine.</translation>
     </message>
     <message>
-        <source>Delete message?</source>
-        <extracomment>Heading of the dialog asking which kind of delete.</extracomment>
-        <translation>Ștergi mesajul?</translation>
-    </message>
-    <message>
         <source>How do you want to delete this message? This cannot be undone.</source>
         <translation>Cum vrei să ștergi acest mesaj? Nu se poate anula.</translation>
     </message>

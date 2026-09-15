@@ -577,11 +577,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>ನೀವೇ ಕಳುಹಿಸಿದ ಎನ್‌ಕ್ರಿಪ್ಟ್ ಮಾಡಿದ ಸಂದೇಶವನ್ನು ಮಾತ್ರ ಎಲ್ಲರಿಗೂ ಅಳಿಸಬಹುದು.</translation>
     </message>
     <message>
-        <source>Delete message?</source>
-        <extracomment>Heading of the dialog asking which kind of delete.</extracomment>
-        <translation>ಸಂದೇಶವನ್ನು ಅಳಿಸಬೇಕೆ?</translation>
-    </message>
-    <message>
         <source>How do you want to delete this message? This cannot be undone.</source>
         <translation>ಈ ಸಂದೇಶವನ್ನು ಹೇಗೆ ಅಳಿಸಬೇಕು? ಇದನ್ನು ಹಿಂಪಡೆಯಲು ಸಾಧ್ಯವಿಲ್ಲ.</translation>
     </message>

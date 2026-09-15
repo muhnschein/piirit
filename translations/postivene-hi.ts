@@ -577,11 +577,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>सबके लिए सिर्फ़ वही एन्क्रिप्टेड संदेश हटाया जा सकता है जो आपने खुद भेजा हो।</translation>
     </message>
     <message>
-        <source>Delete message?</source>
-        <extracomment>Heading of the dialog asking which kind of delete.</extracomment>
-        <translation>संदेश हटाएँ?</translation>
-    </message>
-    <message>
         <source>How do you want to delete this message? This cannot be undone.</source>
         <translation>आप यह संदेश कैसे हटाना चाहते हैं? इसे वापस नहीं लिया जा सकता।</translation>
     </message>
