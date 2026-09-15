@@ -261,6 +261,19 @@ pub struct DeltaChatCore {
     /// account at once.
     pub io_started: qt_signal!(account_id: u32, success: bool, error: QString),
 
+    /// Tell the core the network may have changed under it.
+    ///
+    /// The core's own `maybe_network`. A connection killed by a move from
+    /// wi-fi to mobile data dies silently -- nothing arrives on it and
+    /// nothing says so -- and the core finds out only when its IDLE times
+    /// out, five minutes later, which is the wait between walking out of
+    /// the house and the day's first message landing. This interrupts that
+    /// wait and reconnects now.
+    ///
+    /// A hint, not an instruction: the core is free to find the connection
+    /// it has is fine.
+    pub maybe_network: qt_method!(fn(&mut self)),
+
     /// The default chatmail server's `dcaccount:` payload.
     pub default_provider_qr: qt_method!(fn(&mut self) -> QString),
 
@@ -1128,6 +1141,23 @@ impl DeltaChatCore {
 
         runtime.spawn(async move {
             done(start_io(&rpc, None).await);
+        });
+    }
+
+    /// Tell the core the network may have changed; see the declaration.
+    ///
+    /// Best effort, and nothing is reported either way. There is nothing a
+    /// reader could do about a hint that did not land, and the core's own
+    /// reconnection is what happens if it never does -- late rather than
+    /// never. A hint sent before the core is up is dropped here, which is
+    /// the right answer: a core that is still starting has no connection
+    /// to reconsider.
+    pub fn maybe_network(&mut self) {
+        let Some((rpc, runtime)) = self.connection() else {
+            return;
+        };
+        runtime.spawn(async move {
+            let _ = rpc.call_unit::<()>("maybe_network").await;
         });
     }
 

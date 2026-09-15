@@ -503,17 +503,30 @@ removed from the store even after approval. Not an option.
    the core is still on the first relay. Cancel during a wait
    should go back at once, and a profile the first relay makes after
    all must not appear in the profiles list.
-5. Delete the cache directory while the app runs; confirm nothing breaks.
-6. Kill `deltachat-rpc-server` from a terminal while the app is open. The
+5. Walk out of the house with the app open, or turn wi-fi off with mobile
+   data on, and then come back to the app: the first message should land
+   within seconds of the app being on screen rather than minutes later.
+   The connection the core holds is killed silently by a change of
+   network -- nothing arrives on it and nothing says so -- and the core
+   would otherwise find out only when its IDLE times out five minutes on.
+   The window asks it to look again as it comes back to the front
+   (`postivene.qml`, `maybe_network`), and that is the whole of what can
+   be checked here: the app has to be running for any of it, which on
+   this platform is also the only way a message ever arrives. A phone
+   with the app swiped away receives nothing until it is opened, and no
+   amount of this changes that -- Harbour allows no service to receive in
+   its place.
+6. Delete the cache directory while the app runs; confirm nothing breaks.
+7. Kill `deltachat-rpc-server` from a terminal while the app is open. The
    banner should say it is reconnecting and then clear itself, and messages
    should keep arriving afterwards -- the app starts a replacement and
    resumes IO on it (`PROJECT.md`). Nothing else in this list exercises
    that, and it is the failure a phone produces on its own by reclaiming
    memory.
-7. Confirm **Version** was bumped, not just Release. Harbour refuses an
+8. Confirm **Version** was bumped, not just Release. Harbour refuses an
    update that does not sort higher than the one in the Store, and a
    Release-only bump is the most common avoidable resubmission.
-8. Set "From OS version" to 4.5.0 on the submission form. The spec cannot
+9. Set "From OS version" to 4.5.0 on the submission form. The spec cannot
    say so — `sailfish-version` is not an allowed dependency, and a
    versioned one would be rejected twice over — but the `[X-Sailjail]`
    section needs it.
