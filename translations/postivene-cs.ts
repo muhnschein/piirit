@@ -559,38 +559,38 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
     <message>
         <source>Delete message</source>
         <extracomment>Heading of the page asking which kind of delete.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Smazat zprávu</translation>
     </message>
     <message>
         <source>This message has no text</source>
         <extracomment>Stands in for the message on the delete page, when it has no words and nothing named to show instead.</extracomment>
-        <translation type="unfinished">Tato zpráva neobsahuje text</translation>
+        <translation>Tato zpráva neobsahuje text</translation>
     </message>
     <message>
         <source>Delete for me</source>
         <extracomment>One of the two ways to delete a message.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Smazat jen u mě</translation>
     </message>
     <message>
         <source>It goes from your devices. Everybody else keeps their copy.</source>
-        <translation type="unfinished"></translation>
+        <translation>Zmizí z tvých zařízení. Všem ostatním jejich kopie zůstane.</translation>
     </message>
     <message>
         <source>Delete for everyone</source>
         <extracomment>The other way: every other device in the chat is asked to delete its copy too.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Smazat u všech</translation>
     </message>
     <message>
         <source>It goes from your devices, and every other device in this chat is asked to delete it too.</source>
-        <translation type="unfinished"></translation>
+        <translation>Zmizí z tvých zařízení a každé další zařízení v tomto chatu je požádáno, aby ji smazalo také.</translation>
     </message>
     <message>
         <source>Only an encrypted message you sent yourself can be deleted for everyone.</source>
-        <translation type="unfinished"></translation>
+        <translation>U všech lze smazat jen tvoji vlastní šifrovanou zprávu.</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">Zrušit</translation>
+        <translation>Zrušit</translation>
     </message>
 </context>
 <context>

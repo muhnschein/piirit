@@ -553,38 +553,38 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Delete message</source>
         <extracomment>Heading of the page asking which kind of delete.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>செய்தியை நீக்கு</translation>
     </message>
     <message>
         <source>This message has no text</source>
         <extracomment>Stands in for the message on the delete page, when it has no words and nothing named to show instead.</extracomment>
-        <translation type="unfinished">இந்தச் செய்தியில் உரை இல்லை</translation>
+        <translation>இந்தச் செய்தியில் உரை இல்லை</translation>
     </message>
     <message>
         <source>Delete for me</source>
         <extracomment>One of the two ways to delete a message.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>எனக்கு மட்டும் நீக்கு</translation>
     </message>
     <message>
         <source>It goes from your devices. Everybody else keeps their copy.</source>
-        <translation type="unfinished"></translation>
+        <translation>இது உங்கள் சாதனங்களிலிருந்து போய்விடும். மற்ற அனைவரும் தங்கள் நகலை வைத்திருப்பார்கள்.</translation>
     </message>
     <message>
         <source>Delete for everyone</source>
         <extracomment>The other way: every other device in the chat is asked to delete its copy too.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>அனைவருக்கும் நீக்கு</translation>
     </message>
     <message>
         <source>It goes from your devices, and every other device in this chat is asked to delete it too.</source>
-        <translation type="unfinished"></translation>
+        <translation>இது உங்கள் சாதனங்களிலிருந்து போய்விடும், இந்த உரையாடலில் உள்ள மற்ற ஒவ்வொரு சாதனத்திடமும் அதை நீக்கும்படி கேட்கப்படும்.</translation>
     </message>
     <message>
         <source>Only an encrypted message you sent yourself can be deleted for everyone.</source>
-        <translation type="unfinished"></translation>
+        <translation>நீங்களே அனுப்பிய மறையாக்கம் செய்யப்பட்ட செய்தியை மட்டுமே அனைவருக்கும் நீக்க முடியும்.</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">ரத்துசெய்</translation>
+        <translation>ரத்துசெய்</translation>
     </message>
 </context>
 <context>

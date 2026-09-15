@@ -553,38 +553,38 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Delete message</source>
         <extracomment>Heading of the page asking which kind of delete.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Slett melding</translation>
     </message>
     <message>
         <source>This message has no text</source>
         <extracomment>Stands in for the message on the delete page, when it has no words and nothing named to show instead.</extracomment>
-        <translation type="unfinished">Denne meldingen har ingen tekst</translation>
+        <translation>Denne meldingen har ingen tekst</translation>
     </message>
     <message>
         <source>Delete for me</source>
         <extracomment>One of the two ways to delete a message.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Slett for meg</translation>
     </message>
     <message>
         <source>It goes from your devices. Everybody else keeps their copy.</source>
-        <translation type="unfinished"></translation>
+        <translation>Den forsvinner fra enhetene dine. Alle andre beholder kopien sin.</translation>
     </message>
     <message>
         <source>Delete for everyone</source>
         <extracomment>The other way: every other device in the chat is asked to delete its copy too.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Slett for alle</translation>
     </message>
     <message>
         <source>It goes from your devices, and every other device in this chat is asked to delete it too.</source>
-        <translation type="unfinished"></translation>
+        <translation>Den forsvinner fra enhetene dine, og alle andre enheter i denne samtalen blir bedt om å slette den også.</translation>
     </message>
     <message>
         <source>Only an encrypted message you sent yourself can be deleted for everyone.</source>
-        <translation type="unfinished"></translation>
+        <translation>Bare en kryptert melding du har sendt selv, kan slettes for alle.</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">Avbryt</translation>
+        <translation>Avbryt</translation>
     </message>
 </context>
 <context>

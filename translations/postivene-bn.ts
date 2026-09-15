@@ -557,38 +557,38 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Delete message</source>
         <extracomment>Heading of the page asking which kind of delete.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>বার্তা মুছুন</translation>
     </message>
     <message>
         <source>This message has no text</source>
         <extracomment>Stands in for the message on the delete page, when it has no words and nothing named to show instead.</extracomment>
-        <translation type="unfinished">এই বার্তায় কোনো লেখা নেই</translation>
+        <translation>এই বার্তায় কোনো লেখা নেই</translation>
     </message>
     <message>
         <source>Delete for me</source>
         <extracomment>One of the two ways to delete a message.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>শুধু আমার জন্য মুছুন</translation>
     </message>
     <message>
         <source>It goes from your devices. Everybody else keeps their copy.</source>
-        <translation type="unfinished"></translation>
+        <translation>এটি আপনার ডিভাইস থেকে চলে যায়। বাকি সবাই নিজের কপি রেখে দেয়।</translation>
     </message>
     <message>
         <source>Delete for everyone</source>
         <extracomment>The other way: every other device in the chat is asked to delete its copy too.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>সবার জন্য মুছুন</translation>
     </message>
     <message>
         <source>It goes from your devices, and every other device in this chat is asked to delete it too.</source>
-        <translation type="unfinished"></translation>
+        <translation>এটি আপনার ডিভাইস থেকে চলে যায়, আর এই চ্যাটের অন্য প্রতিটি ডিভাইসকেও এটি মুছে ফেলতে বলা হয়।</translation>
     </message>
     <message>
         <source>Only an encrypted message you sent yourself can be deleted for everyone.</source>
-        <translation type="unfinished"></translation>
+        <translation>শুধু আপনার নিজের পাঠানো এনক্রিপ্ট করা বার্তাই সবার জন্য মোছা যায়।</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">বাতিল</translation>
+        <translation>বাতিল</translation>
     </message>
 </context>
 <context>

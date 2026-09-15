@@ -557,38 +557,38 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Delete message</source>
         <extracomment>Heading of the page asking which kind of delete.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>संदेश हटवा</translation>
     </message>
     <message>
         <source>This message has no text</source>
         <extracomment>Stands in for the message on the delete page, when it has no words and nothing named to show instead.</extracomment>
-        <translation type="unfinished">या संदेशात मजकूर नाही</translation>
+        <translation>या संदेशात मजकूर नाही</translation>
     </message>
     <message>
         <source>Delete for me</source>
         <extracomment>One of the two ways to delete a message.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>फक्त माझ्यासाठी हटवा</translation>
     </message>
     <message>
         <source>It goes from your devices. Everybody else keeps their copy.</source>
-        <translation type="unfinished"></translation>
+        <translation>तो तुमच्या उपकरणांवरून जातो. बाकी सर्वांकडे त्यांची प्रत राहते.</translation>
     </message>
     <message>
         <source>Delete for everyone</source>
         <extracomment>The other way: every other device in the chat is asked to delete its copy too.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>सर्वांसाठी हटवा</translation>
     </message>
     <message>
         <source>It goes from your devices, and every other device in this chat is asked to delete it too.</source>
-        <translation type="unfinished"></translation>
+        <translation>तो तुमच्या उपकरणांवरून जातो आणि या संभाषणातील इतर प्रत्येक उपकरणालाही तो हटवण्यास सांगितले जाते.</translation>
     </message>
     <message>
         <source>Only an encrypted message you sent yourself can be deleted for everyone.</source>
-        <translation type="unfinished"></translation>
+        <translation>सर्वांसाठी फक्त तुम्ही स्वतः पाठवलेला एन्क्रिप्टेड संदेशच हटवता येतो.</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">रद्द करा</translation>
+        <translation>रद्द करा</translation>
     </message>
 </context>
 <context>

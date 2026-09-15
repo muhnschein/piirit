@@ -557,38 +557,38 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Delete message</source>
         <extracomment>Heading of the page asking which kind of delete.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>സന്ദേശം ഇല്ലാതാക്കുക</translation>
     </message>
     <message>
         <source>This message has no text</source>
         <extracomment>Stands in for the message on the delete page, when it has no words and nothing named to show instead.</extracomment>
-        <translation type="unfinished">ഈ സന്ദേശത്തിൽ വാചകമില്ല</translation>
+        <translation>ഈ സന്ദേശത്തിൽ വാചകമില്ല</translation>
     </message>
     <message>
         <source>Delete for me</source>
         <extracomment>One of the two ways to delete a message.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>എനിക്കു മാത്രം ഇല്ലാതാക്കുക</translation>
     </message>
     <message>
         <source>It goes from your devices. Everybody else keeps their copy.</source>
-        <translation type="unfinished"></translation>
+        <translation>ഇത് നിങ്ങളുടെ ഉപകരണങ്ങളിൽ നിന്ന് പോകും. മറ്റുള്ളവരെല്ലാം അവരുടെ പകർപ്പ് സൂക്ഷിക്കും.</translation>
     </message>
     <message>
         <source>Delete for everyone</source>
         <extracomment>The other way: every other device in the chat is asked to delete its copy too.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>എല്ലാവർക്കും ഇല്ലാതാക്കുക</translation>
     </message>
     <message>
         <source>It goes from your devices, and every other device in this chat is asked to delete it too.</source>
-        <translation type="unfinished"></translation>
+        <translation>ഇത് നിങ്ങളുടെ ഉപകരണങ്ങളിൽ നിന്ന് പോകും, ഈ ചാറ്റിലെ മറ്റെല്ലാ ഉപകരണങ്ങളോടും ഇത് ഇല്ലാതാക്കാൻ ആവശ്യപ്പെടും.</translation>
     </message>
     <message>
         <source>Only an encrypted message you sent yourself can be deleted for everyone.</source>
-        <translation type="unfinished"></translation>
+        <translation>നിങ്ങൾ തന്നെ അയച്ച എൻക്രിപ്റ്റ് ചെയ്ത സന്ദേശം മാത്രമേ എല്ലാവർക്കുമായി ഇല്ലാതാക്കാൻ കഴിയൂ.</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">റദ്ദാക്കുക</translation>
+        <translation>റദ്ദാക്കുക</translation>
     </message>
 </context>
 <context>
