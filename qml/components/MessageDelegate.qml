@@ -115,10 +115,10 @@ Item {
     property int imageHeight: 0
     /// A message the reader has not seen before; see AttachmentPreview.
     property bool isNew: false
-    /// `hasHtml` upstream: the sending core cut this message, so what is
-    /// in `messageText` ends in `[...]` and the rest is only behind the
-    /// core, which is the one thing the page can fetch and this row
-    /// cannot.
+    /// `hasHtml` upstream: the text shown here is not the whole of what
+    /// arrived, and an HTML part holds the rest -- which the page can
+    /// fetch from the core and this row cannot. Being cut is only one of
+    /// the things it means; see `wasCut`.
     property bool hasHtml: false
     // A shared contact, parsed by the core.
     property string vcardName: ""
@@ -163,7 +163,8 @@ Item {
     //: Opens the whole message on a page of its own.
     readonly property string fullText: qsTr("View full message")
 
-    /// How wide the offer wants to be.
+    /// How wide the offer wants to be. Nothing when there is none, so an
+    /// ordinary bubble is not held open by two words it does not show.
     readonly property real actionsWidth: root.showsFull
                                          ? fullMetric.implicitWidth : 0
 
@@ -197,27 +198,71 @@ Item {
     /// excluded before, and an attachment arriving in an open chat grew
     /// a View full message it had no use for.
     readonly property bool hasBody: root.messageText.length > 0 && !root.heldBack
+    /// Whether the sending core cut this message, leaving the rest of it
+    /// in an HTML part and off this phone.
+    ///
+    /// `hasHtml` alone does not say that, though the name reads as if it
+    /// does. The core raises it for any message whose text is not the
+    /// whole of what arrived: an ordinary mail with an HTML alternative
+    /// beside its plain part, a mail written only in HTML, a reply whose
+    /// quoted history was stripped, a forward. That is very nearly
+    /// everything written in a mail client rather than a chat app, and
+    /// reading it as "cut" put a View full message under most of a
+    /// mailbox -- two-word replies included -- each one offering a page
+    /// with the same words already in the bubble.
+    ///
+    /// A message the core really did cut ends in the marker it writes,
+    /// `[...]`, and only a cut one does: that marker goes on in the one
+    /// place upstream shortens a body. So both are asked for. The flag
+    /// says there is an HTML part to fetch the rest out of, and the
+    /// marker says the rest is what is missing rather than a second
+    /// rendering of what is here.
+    readonly property bool wasCut: root.hasHtml
+                                   && root.messageText.slice(-5) === "[...]"
     /// Whether to offer the page: anything the bubble is not showing
     /// whole, and every message the sending core cut -- for those the
     /// rest is not on this phone at all, and the page is the only thing
     /// that can go and get it.
     readonly property bool showsFull: root.hasBody
-                                      && (root.hasHtml || messageLabel.truncated)
+                                      && (root.wasCut || messageLabel.truncated)
 
     // A bubble is as wide as its content, up to most of the screen. The
     // widths come off unconstrained copies of the text: measuring the real
     // labels, whose width comes back from the bubble, is a binding loop.
     property real maxWidth: root.width * 0.78 - 2 * Theme.paddingMedium
-    property real contentWidth: Math.min(
+    /// How wide everything but the offer wants the bubble, and the width
+    /// the body is wrapped at.
+    ///
+    /// Held apart from the bubble's own width because the offer is
+    /// decided from whether the body fits. Wrap the body at a width the
+    /// offer has already widened, and the offer's appearing changes the
+    /// wrapping that decides whether it appears: the body fits, so the
+    /// offer goes, so the bubble narrows, so the body no longer fits.
+    /// QML answers a circle like that by dropping a binding where it
+    /// stands, which leaves a bubble at a width nothing on it asked for,
+    /// and leaves it there until the row is built again -- so what a
+    /// message looked like came down to the order its properties
+    /// happened to arrive in, and looked different after leaving the
+    /// chat and coming back.
+    ///
+    /// The offer cannot reach this width. The bubble's is this one
+    /// widened to hold the offer, below.
+    property real bodyWidth: Math.min(
         root.maxWidth,
         Math.max(textMetric.implicitWidth,
                  attachmentMetric.implicitWidth,
                  reactionRow.wantedWidth,
-                 root.actionsWidth,
                  footerMetric.implicitWidth,
                  attachment.item && attachment.item.wantsFullWidth
                      ? root.maxWidth : 0,
                  Theme.itemSizeSmall))
+    /// How wide the bubble is: what its content wants, widened to hold
+    /// the offer when there is one. A long message of short lines makes
+    /// a narrow bubble, and the offer under it would hang out of one
+    /// sized from the lines alone.
+    property real contentWidth: Math.min(root.maxWidth,
+                                         Math.max(root.bodyWidth,
+                                                  root.actionsWidth))
 
     // The chips hang below the bubble, and what hangs is the row's to
     // make room for: without it they draw over the next message.
@@ -481,7 +526,10 @@ Item {
             height: messageLabel.shown ? implicitHeight : 0
             x: Theme.paddingMedium
             y: root.below(attachment, messageLabel.shown)
-            width: root.contentWidth
+            // The body's width, not the bubble's: see `bodyWidth`. The
+            // two differ only when the offer widened the bubble, and the
+            // body is left-aligned in it either way.
+            width: root.bodyWidth
             wrapMode: Text.Wrap
             // A bubble is a shape for a remark, not for a document. A
             // long body is cut to a readable few lines and the rest is

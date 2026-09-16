@@ -28,6 +28,21 @@
 //! first, and an RPM arriving in an open chat grew a View full message
 //! it had no use for.
 //!
+//! Nor is it about a message that merely came from a mail client. The
+//! core raises `hasHtml` on anything whose text is not the whole of what
+//! arrived -- a plain part with an HTML one beside it, a mail written
+//! only in HTML, a reply whose quoted history was stripped -- and taking
+//! that for "cut" put the offer under nearly every message in a mailbox,
+//! two-word replies included. A message the core really cut ends in its
+//! `[...]`, and that is what is asked for here.
+//!
+//! And that the offer's own width cannot reach the width the body is
+//! wrapped at. It could, once, and the circle -- the offer widens the
+//! bubble, the wider bubble fits the body, the fitting body sends the
+//! offer away -- left QML dropping a binding wherever it happened to
+//! notice, so the same message came out one way and then another after
+//! leaving the chat and coming back.
+//!
 //! The delegate and the list are loaded on their own, as the other QML
 //! tests load them.
 
@@ -369,6 +384,58 @@ fn a_long_body_is_cut_to_a_few_lines_with_the_rest_on_a_page() {
                 QString::from("visible")
             )
         );
+        // A two-word reply written in a mail client: its plain part has
+        // an HTML one beside it, so the core raises `hasHtml` on a
+        // message it never cut and whose every word is in the bubble.
+        call!("set", QString::from("downloadState"), QString::from("Done"));
+        call!(
+            "set",
+            QString::from("messageText"),
+            QString::from("Will do")
+        );
+        call!("set", QString::from("hasHtml"), true);
+    });
+
+    single_shot(Duration::from_secs(9), move || unsafe {
+        record!(
+            "mail-actions",
+            call!(
+                "get",
+                QString::from("bodyActions"),
+                QString::from("visible")
+            )
+        );
+        record!("mail-cut", call!("ask", QString::from("wasCut")));
+        record!(
+            "mail-offer-width",
+            call!("ask", QString::from("actionsWidth"))
+        );
+        // One paragraph, still from a mail client, still nothing cut:
+        // wide enough to reach the bubble's limit, which is where the
+        // offer's width used to be left behind after the offer went.
+        call!(
+            "set",
+            QString::from("messageText"),
+            QString::from(
+                "A somewhat longer remark, but one paragraph, and nowhere \
+                 near the dozen lines the bubble folds at."
+            )
+        );
+    });
+
+    single_shot(Duration::from_secs(10), move || unsafe {
+        record!(
+            "paragraph-actions",
+            call!(
+                "get",
+                QString::from("bodyActions"),
+                QString::from("visible")
+            )
+        );
+        record!(
+            "paragraph-offer-width",
+            call!("ask", QString::from("actionsWidth"))
+        );
         (*engine_ptr).quit();
     });
 
@@ -443,6 +510,48 @@ fn a_long_body_is_cut_to_a_few_lines_with_the_rest_on_a_page() {
         "a message the sending core cut did not offer the page, so its \
          `[...]` is the end of it as far as the reader can tell. {context}"
     );
+
+    // `hasHtml` is not "cut". The core raises it for any message whose
+    // text is not the whole of what arrived -- a plain part with an HTML
+    // one beside it, a mail written only in HTML, a stripped quote, a
+    // forward -- which is very nearly everything written in a mail
+    // client. Read as "cut", it put the offer under two-word replies,
+    // each one opening a page with the words already in the bubble.
+    assert_eq!(
+        value("mail-cut"),
+        "false",
+        "a two-word reply with an HTML part beside its text was taken \
+         for a message the core had cut. {context}"
+    );
+    assert_eq!(
+        value("mail-actions"),
+        "false",
+        "a two-word reply offered a page of its own because it came \
+         from a mail client. {context}"
+    );
+    assert_eq!(
+        value("paragraph-actions"),
+        "false",
+        "a one-paragraph mail the bubble drew whole offered a page with \
+         the same paragraph on it. {context}"
+    );
+
+    // What the offer asks of the bubble's width, once there is no offer.
+    // The body used to be wrapped at a width the offer had widened, so
+    // the offer's going changed the wrapping that decided it had to go:
+    // a circle, which QML ends by dropping a binding where it stands.
+    // What that left was a bubble held open by an offer that was not
+    // there, and a row whose look came down to the order its properties
+    // arrived in -- the same message drawn one way, and another way
+    // after leaving the chat and coming back.
+    for label in ["mail-offer-width", "paragraph-offer-width"] {
+        assert_eq!(
+            number(label),
+            0.0,
+            "with no offer shown, {label} is still the width of one: the \
+             bubble is sized from an offer it does not have. {context}"
+        );
+    }
 
     assert_eq!(value("list"), "ok", "the list did not load. {context}");
     assert_eq!(value("row-full"), "ok", "the row has no offer. {context}");

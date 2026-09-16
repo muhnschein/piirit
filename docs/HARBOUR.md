@@ -322,6 +322,11 @@ removed from the store even after approval. Not an option.
    the whole of it -- including for a message another client sent long enough that
    the core had to cut it, which is the case the page cannot be tested
    for anywhere else.
+   The other half of that is a mailbox: write to the account from an
+   ordinary mail client, which sends an HTML part beside the plain one,
+   and check that a two-word reply gets no View full message under it.
+   The core marks every such message as having more to it than its
+   text, and only a real mail client sends one.
    Deleting is a device path three times over: for the timing, for the
    look, and for the two agreeing. Delete four messages one after
    another, faster than the four seconds each waits, and check that all

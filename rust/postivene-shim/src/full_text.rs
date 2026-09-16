@@ -152,10 +152,12 @@ impl FullText {
 
 /// The whole text of one message.
 ///
-/// `hasHtml` marks the ones that were cut: for those the rest is in the
-/// HTML part, and only there. For everything else the message's own text
-/// *is* the whole of it, and asking the core for an HTML part it has not
-/// got would be a round trip for an empty string.
+/// `hasHtml` marks the ones with more to them than their text: for those
+/// the rest is in the HTML part, and only there. For everything else the
+/// message's own text *is* the whole of it, and asking the core for an
+/// HTML part it has not got would be a round trip for an empty string.
+/// (Which of those the row offers this page for is the row's own
+/// question, and a narrower one: see `wasCut` in `MessageDelegate.qml`.)
 async fn fetch(rpc: &RpcClient, account_id: u32, message_id: u32) -> Result<Loaded, String> {
     let message: serde_json::Value = rpc
         .call("get_message", (account_id, message_id))
