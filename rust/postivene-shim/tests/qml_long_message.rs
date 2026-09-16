@@ -544,12 +544,15 @@ fn a_long_body_is_cut_to_a_few_lines_with_the_rest_on_a_page() {
     // there, and a row whose look came down to the order its properties
     // arrived in -- the same message drawn one way, and another way
     // after leaving the chat and coming back.
+    // A range rather than an equality: `number` answers -1 for a step
+    // that was never recorded, which a "not a pixel wide" test has to
+    // fail rather than pass.
     for label in ["mail-offer-width", "paragraph-offer-width"] {
-        assert_eq!(
-            number(label),
-            0.0,
-            "with no offer shown, {label} is still the width of one: the \
-             bubble is sized from an offer it does not have. {context}"
+        let asked = number(label);
+        assert!(
+            (0.0..1.0).contains(&asked),
+            "with no offer shown, {label} is {asked}, the width of one: \
+             the bubble is sized from an offer it does not have. {context}"
         );
     }
 
