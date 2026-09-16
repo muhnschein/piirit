@@ -165,6 +165,10 @@ fn the_settings_page_writes_what_the_app_reads() {
             call!("appKey", QString::from("cleanLinksConfig"))
         );
         record!(
+            "app-quality-key",
+            call!("appKey", QString::from("mediaQualityConfig"))
+        );
+        record!(
             "app-download-key",
             call!("appKey", QString::from("downloadLimitConfig"))
         );
@@ -205,6 +209,11 @@ fn the_settings_page_writes_what_the_app_reads() {
             call!("appReads", QString::from("markdownMode"))
         );
         record!("markdown-switch", get!("markdownSwitch", "checked"));
+        record!(
+            "quality-default",
+            call!("appReads", QString::from("mediaQuality"))
+        );
+        record!("quality-index", get!("qualityCombo", "currentIndex"));
         record!(
             "download-default",
             call!("appReads", QString::from("downloadLimit"))
@@ -261,6 +270,24 @@ fn the_settings_page_writes_what_the_app_reads() {
             call!("appReads", QString::from("markdownMode"))
         );
         record!("markdown-shown", get!("markdownSwitch", "checked"));
+        record!(
+            "pick-worse",
+            call!("click", QString::from("qualityOption1"))
+        );
+        record!(
+            "quality-picked",
+            call!("appReads", QString::from("mediaQuality"))
+        );
+        record!("quality-shown", get!("qualityCombo", "currentIndex"));
+        record!(
+            "pick-balanced",
+            call!("click", QString::from("qualityOption0"))
+        );
+        record!(
+            "balanced-picked",
+            call!("appReads", QString::from("mediaQuality"))
+        );
+        record!("balanced-shown", get!("qualityCombo", "currentIndex"));
         record!(
             "pick-download",
             call!("click", QString::from("downloadOption32768"))
@@ -395,6 +422,17 @@ fn the_settings_page_writes_what_the_app_reads() {
         ("enter-off", "false"),
         ("markdown-default", "0"),
         ("markdown-switch", "true"),
+        ("app-quality-key", "/apps/harbour-postivene/media_quality"),
+        // Balanced, which is the core's own default and both reference
+        // clients'.
+        ("quality-default", "0"),
+        ("quality-index", "0"),
+        ("pick-worse", "ok"),
+        ("quality-picked", "1"),
+        ("quality-shown", "1"),
+        ("pick-balanced", "ok"),
+        ("balanced-picked", "0"),
+        ("balanced-shown", "0"),
         ("download-default", "1048576"),
         ("download-index", "3"),
         ("deletion-default", "0"),

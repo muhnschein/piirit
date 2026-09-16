@@ -60,6 +60,77 @@ fn one_second_wav() -> Vec<u8> {
     wav
 }
 
+/// A plain PNG `side` pixels square, stored rather than compressed.
+///
+/// Big enough that the core has to recode it: past
+/// `BALANCED_IMAGE_BYTES` it scales the picture down and re-encodes it as
+/// JPEG, and that is the difference the assertions below are about. Built
+/// here for the reason `one_second_wav` is -- the sizes are then
+/// arithmetic -- and stored uncompressed because a deflate
+/// implementation is not worth carrying for a test fixture.
+fn plain_png(side: usize) -> Vec<u8> {
+    /// A length as a PNG writes one.
+    fn span(value: usize) -> u32 {
+        u32::try_from(value).unwrap_or(u32::MAX)
+    }
+
+    // A gradient rather than noise: what the core re-encodes has to come
+    // out visibly smaller, and noise is what JPEG is worst at.
+    let mut raw = Vec::with_capacity(side * (side * 3 + 1));
+    for row in 0..side {
+        raw.push(0); // filter: none
+        for column in 0..side {
+            let shade = u8::try_from((row + column) * 255 / (2 * side)).unwrap_or(255);
+            raw.extend_from_slice(&[shade, shade / 2, 255 - shade]);
+        }
+    }
+
+    // zlib: the usual header, then stored deflate blocks, then Adler-32.
+    let mut zlib = vec![0x78, 0x01];
+    let mut adler: (u32, u32) = (1, 0);
+    for byte in &raw {
+        adler.0 = (adler.0 + u32::from(*byte)) % 65521;
+        adler.1 = (adler.1 + adler.0) % 65521;
+    }
+    let mut rest = raw.as_slice();
+    while !rest.is_empty() {
+        let take = rest.len().min(65535);
+        let (block, left) = rest.split_at(take);
+        let last = u8::from(left.is_empty());
+        let len = u16::try_from(take).unwrap_or(u16::MAX);
+        zlib.push(last);
+        zlib.extend_from_slice(&len.to_le_bytes());
+        zlib.extend_from_slice(&(!len).to_le_bytes());
+        zlib.extend_from_slice(block);
+        rest = left;
+    }
+    zlib.extend_from_slice(&((adler.1 << 16) | adler.0).to_be_bytes());
+
+    // A PNG chunk: its length, its name, its bytes, and the same CRC-32
+    // a zip entry carries.
+    let chunk = |kind: &[u8], data: &[u8]| {
+        let mut out = Vec::with_capacity(12 + data.len());
+        out.extend_from_slice(&span(data.len()).to_be_bytes());
+        out.extend_from_slice(kind);
+        out.extend_from_slice(data);
+        let mut crc_over = kind.to_vec();
+        crc_over.extend_from_slice(data);
+        out.extend_from_slice(&crc32(&crc_over).to_be_bytes());
+        out
+    };
+    let mut header = Vec::with_capacity(13);
+    header.extend_from_slice(&span(side).to_be_bytes());
+    header.extend_from_slice(&span(side).to_be_bytes());
+    // 8 bits a channel, truecolour, no interlacing.
+    header.extend_from_slice(&[8, 2, 0, 0, 0]);
+
+    let mut png = vec![0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a];
+    png.extend_from_slice(&chunk(b"IHDR", &header));
+    png.extend_from_slice(&chunk(b"IDAT", &zlib));
+    png.extend_from_slice(&chunk(b"IEND", &[]));
+    png
+}
+
 /// Send one file to `chat` and hand back the message the core stored, which
 /// is the shape every row is built from.
 async fn send_file(
@@ -917,6 +988,125 @@ async fn offline_round_trip_against_real_core() {
              the picture from: {sent_picture:?}"
         );
     }
+
+    // The core leaves a picture sent as a `File` at the size it was given
+    // and recodes one named `Image`. That is the whole reason the app
+    // names a picture before sending it (postivene-shim/src/media.rs):
+    // every message it composes would otherwise go out as a `File`, and
+    // the outgoing media quality setting, which the core reads only while
+    // recoding, would do nothing at all. A picture past
+    // `BALANCED_IMAGE_BYTES` is what makes the difference visible.
+    let wide = std::env::temp_dir().join("postivene-real-server-wide.png");
+    let wide_bytes = plain_png(1400);
+    std::fs::write(&wide, &wide_bytes).expect("write the big picture");
+    let untouched = send_file(&client, sender_id, saved, &wide, "wide.png").await;
+    assert_eq!(
+        untouched.get("fileBytes").and_then(Value::as_u64),
+        u64::try_from(wide_bytes.len()).ok(),
+        "the core recoded a picture sent as a file, which is the one way \
+         left to send one at its original size: {untouched:?}"
+    );
+
+    let as_image = |quality: &'static str| {
+        let client = &client;
+        let wide = wide.clone();
+        async move {
+            client
+                .call::<_, ()>("set_config", (sender_id, "media_quality", Some(quality)))
+                .await
+                .expect("set_config media_quality");
+            let message_id: u32 = client
+                .call(
+                    "send_msg",
+                    (
+                        sender_id,
+                        saved,
+                        serde_json::json!({
+                            "text": Option::<String>::None,
+                            "file": wide.to_string_lossy(),
+                            "filename": "wide.png",
+                            "viewtype": "Image",
+                            "quotedMessageId": Option::<u32>::None,
+                        }),
+                    ),
+                )
+                .await
+                .expect("send_msg with an Image view type");
+            let messages: std::collections::HashMap<u32, Value> = client
+                .call("get_messages", (sender_id, vec![message_id]))
+                .await
+                .expect("get_messages for the recoded picture");
+            messages[&message_id].clone()
+        }
+    };
+
+    // 0 is the core's own default, and what the settings page calls
+    // balanced; 1 is what it calls worse quality.
+    let balanced = as_image("0").await;
+    let balanced_bytes = balanced
+        .get("fileBytes")
+        .and_then(Value::as_u64)
+        .unwrap_or(u64::MAX);
+    assert!(
+        balanced_bytes * 4 < wide_bytes.len() as u64,
+        "the core did not recode a picture named `Image`, so naming one \
+         buys the app nothing: {balanced_bytes} bytes against {} sent: \
+         {balanced:?}",
+        wide_bytes.len()
+    );
+    // The other half of naming a picture, and the reason the bar's name
+    // and the recipient's differ for one: the core replaces an image's
+    // filename with a dated one of its own, deliberately, because a
+    // camera's own name carries a timestamp and a running number. It is
+    // a JPEG by then whatever went in.
+    let recoded_name = balanced
+        .get("fileName")
+        .and_then(Value::as_str)
+        .unwrap_or_default();
+    assert!(
+        recoded_name.starts_with("image_")
+            && std::path::Path::new(recoded_name)
+                .extension()
+                .is_some_and(|suffix| suffix.eq_ignore_ascii_case("jpg")),
+        "a recoded PNG is a JPEG under a name of the core's own, and the \
+         app shows whichever name the core kept: {balanced:?}"
+    );
+
+    let worse = as_image("1").await;
+    let worse_bytes = worse
+        .get("fileBytes")
+        .and_then(Value::as_u64)
+        .unwrap_or(u64::MAX);
+    assert!(
+        worse_bytes < balanced_bytes,
+        "media_quality made no difference to what was sent -- {worse_bytes} \
+         bytes at the worse setting against {balanced_bytes} at the \
+         balanced one -- so the settings page would be offering a choice \
+         that does nothing: {worse:?}"
+    );
+    client
+        .call::<_, ()>("set_config", (sender_id, "media_quality", Some("0")))
+        .await
+        .expect("put media_quality back");
+    let _ = std::fs::remove_file(&wide);
+
+    // What the core recommends as the largest attachment for this
+    // profile's relay, which is what the conversation refuses a bigger
+    // file on the strength of. A computed `sys.` key rather than anything
+    // stored, so it answers on an account that has never been asked.
+    let recommended: Option<String> = client
+        .call("get_config", (sender_id, "sys.msgsize_max_recommended"))
+        .await
+        .expect("get_config sys.msgsize_max_recommended");
+    assert!(
+        recommended
+            .as_deref()
+            .and_then(|value| value.parse::<u64>().ok())
+            .is_some_and(|bytes| bytes > 1024 * 1024),
+        "the core no longer says how big an attachment it recommends, so \
+         the conversation has no ceiling to hold a video to: \
+         {recommended:?}"
+    );
 
     // What the core does NOT fill in, which is as much of the contract as
     // what it does: a GIF gets no dimensions and a sound file gets no

@@ -540,6 +540,11 @@ Other groups with blocked contacts will still show their messages.</source>
             <numerusform>%n জন সদস্য</numerusform>
         </translation>
     </message>
+    <message>
+        <source>Too big to send: %1. This relay takes %2.</source>
+        <extracomment>Shown above the message field when the attached file is bigger than the relay will carry. %1 is the file&apos;s size and %2 the largest the relay takes, each such as &quot;24 MB&quot;.</extracomment>
+        <translation>পাঠানোর জন্য খুব বড়: %1। এই রিলে %2 পর্যন্ত নেয়।</translation>
+    </message>
 </context>
 <context>
     <name>CoverPage</name>
@@ -1079,6 +1084,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Both ways: with this off you send none and see none.</source>
         <translation>দুদিকেই: বন্ধ থাকলে আপনি একটিও পাঠান না, একটিও দেখেন না।</translation>
     </message>
+    <message>
+        <source>Attachments up to %1</source>
+        <extracomment>The biggest attachment the relay will carry. %1 is a size such as &quot;22.3 MB&quot;.</extracomment>
+        <translation>%1 পর্যন্ত সংযুক্তি</translation>
+    </message>
 </context>
 <context>
     <name>ProfileSetupPage</name>
@@ -1482,6 +1492,25 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Blocked contacts</source>
         <translation>ব্লক করা পরিচিতি</translation>
+    </message>
+    <message>
+        <source>Worse quality, save data</source>
+        <extracomment>Outgoing media quality: smaller pictures and videos, which cost the reader and whoever they write to less data. Both reference clients&apos; words for it.</extracomment>
+        <translation>নিম্ন মান, কম ডেটা</translation>
+    </message>
+    <message>
+        <source>Balanced</source>
+        <extracomment>Outgoing media quality: what the core picks by default.</extracomment>
+        <translation>ভারসাম্যপূর্ণ</translation>
+    </message>
+    <message>
+        <source>Outgoing media quality</source>
+        <extracomment>Pictures and videos on their way out of the phone.</extracomment>
+        <translation>পাঠানো মিডিয়ার মান</translation>
+    </message>
+    <message>
+        <source>Pictures are made smaller before sending, and the camera records at this quality.</source>
+        <translation>ছবি পাঠানোর আগে ছোট করা হয়, এবং ক্যামেরা এই মানেই রেকর্ড করে।</translation>
     </message>
 </context>
 <context>

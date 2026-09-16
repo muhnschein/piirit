@@ -540,6 +540,11 @@ Gli altri gruppi con contatti bloccati continueranno a visualizzare i loro messa
             <numerusform>%n membri</numerusform>
         </translation>
     </message>
+    <message>
+        <source>Too big to send: %1. This relay takes %2.</source>
+        <extracomment>Shown above the message field when the attached file is bigger than the relay will carry. %1 is the file&apos;s size and %2 the largest the relay takes, each such as &quot;24 MB&quot;.</extracomment>
+        <translation>Troppo grande da inviare: %1. Questo relay accetta %2.</translation>
+    </message>
 </context>
 <context>
     <name>CoverPage</name>
@@ -1079,6 +1084,11 @@ Gli altri gruppi con contatti bloccati continueranno a visualizzare i loro messa
         <source>Both ways: with this off you send none and see none.</source>
         <translation>In entrambi i sensi: da spento non ne mandi e non ne vedi.</translation>
     </message>
+    <message>
+        <source>Attachments up to %1</source>
+        <extracomment>The biggest attachment the relay will carry. %1 is a size such as &quot;22.3 MB&quot;.</extracomment>
+        <translation>Allegati fino a %1</translation>
+    </message>
 </context>
 <context>
     <name>ProfileSetupPage</name>
@@ -1482,6 +1492,25 @@ Gli altri gruppi con contatti bloccati continueranno a visualizzare i loro messa
     <message>
         <source>Blocked contacts</source>
         <translation>Contatti Bloccati</translation>
+    </message>
+    <message>
+        <source>Worse quality, save data</source>
+        <extracomment>Outgoing media quality: smaller pictures and videos, which cost the reader and whoever they write to less data. Both reference clients&apos; words for it.</extracomment>
+        <translation>Qualità peggiore, dimensione ridotta</translation>
+    </message>
+    <message>
+        <source>Balanced</source>
+        <extracomment>Outgoing media quality: what the core picks by default.</extracomment>
+        <translation>Bilanciata</translation>
+    </message>
+    <message>
+        <source>Outgoing media quality</source>
+        <extracomment>Pictures and videos on their way out of the phone.</extracomment>
+        <translation>Qualità media in uscita</translation>
+    </message>
+    <message>
+        <source>Pictures are made smaller before sending, and the camera records at this quality.</source>
+        <translation>Le immagini vengono ridotte prima dell’invio e la fotocamera registra con questa qualità.</translation>
     </message>
 </context>
 <context>

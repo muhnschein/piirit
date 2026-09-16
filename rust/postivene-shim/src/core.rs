@@ -217,6 +217,15 @@ pub struct DeltaChatCore {
     /// Emitted when [`DeltaChatCore::download_limit`] changes.
     pub download_limit_changed: qt_signal!(),
 
+    /// How much a picture or a video is compressed on its way out: 0
+    /// balanced, 1 worse quality and less data. The reader's setting,
+    /// applied to every account the way the download limit is. The
+    /// core's `media_quality`, which it reads while recoding a picture
+    /// it is about to send.
+    pub media_quality: qt_property!(u32; WRITE set_media_quality NOTIFY media_quality_changed),
+    /// Emitted when [`DeltaChatCore::media_quality`] changes.
+    pub media_quality_changed: qt_signal!(),
+
     /// Messages older than this many seconds are deleted from this
     /// device; 0 keeps them. The reader's setting, applied to every
     /// account the way the download limit is. The core's
@@ -377,6 +386,8 @@ pub struct DeltaChatCore {
     download_limit_set: bool,
     /// The same, for the deletion period.
     delete_device_after_set: bool,
+    /// The same, for the outgoing media quality.
+    media_quality_set: bool,
     /// The attempts at a profile there have been, shared with the tasks
     /// that carry each one out.
     attempts: Arc<Attempts>,
@@ -853,6 +864,17 @@ impl DeltaChatCore {
         self.spread("download_limit", bytes.to_string());
     }
 
+    /// Set the outgoing media quality and apply it to every account.
+    pub fn set_media_quality(&mut self, quality: u32) {
+        if self.media_quality_set && self.media_quality == quality {
+            return;
+        }
+        self.media_quality = quality;
+        self.media_quality_set = true;
+        self.media_quality_changed();
+        self.spread("media_quality", quality.to_string());
+    }
+
     /// Set the deletion period and apply it to every account.
     pub fn set_delete_device_after(&mut self, seconds: u32) {
         if self.delete_device_after_set && self.delete_device_after == seconds {
@@ -896,6 +918,9 @@ impl DeltaChatCore {
                 "delete_device_after",
                 self.delete_device_after.to_string(),
             );
+        }
+        if self.media_quality_set {
+            self.write_config(ids, "media_quality", self.media_quality.to_string());
         }
     }
 

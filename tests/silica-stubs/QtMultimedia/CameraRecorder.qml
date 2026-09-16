@@ -13,6 +13,11 @@ QtObject {
     property int recorderState: 0
     property int recorderStatus: 3
     property int duration: 0
+    /// What the page asks the encoder for, from the reader's outgoing
+    /// media quality setting. Nothing here encodes anything; they are
+    /// here so the page can name them.
+    property int videoBitRate: 0
+    property int audioBitRate: 0
     /// Whether `stop` is acted on; a backend that ignores it is the case
     /// the page's fallback is for.
     property bool stopsOnRequest: true

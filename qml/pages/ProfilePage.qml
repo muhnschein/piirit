@@ -428,6 +428,25 @@ Page {
                 //: How much room the profile takes on the phone. %1 is a size such as "12.3 MB".
                 text: qsTr("%1 on this phone").arg(Format.readableSize(profile.storage_bytes))
             }
+
+            // What the relay will carry in one message, which is the
+            // other thing about it worth knowing before a long video is
+            // picked. The core's own recommendation rather than anything
+            // measured here; the conversation refuses a bigger file on
+            // the strength of the same number.
+            Label {
+                objectName: "attachmentLimitLabel"
+                x: Theme.horizontalPageMargin
+                width: parent.width - 2 * Theme.horizontalPageMargin
+                wrapMode: Text.Wrap
+                visible: profile.attachment_limit_bytes > 0
+                font.pixelSize: Theme.fontSizeSmall
+                color: Theme.secondaryColor
+                textFormat: Text.PlainText
+                //: The biggest attachment the relay will carry. %1 is a size such as "22.3 MB".
+                text: qsTr("Attachments up to %1")
+                      .arg(Format.readableSize(profile.attachment_limit_bytes))
+            }
         }
     }
 

@@ -4,12 +4,13 @@ import "../components"
 
 /*
  * The settings that belong to no profile: whether the return key sends,
- * how a message is drawn, what goes out with a link, how much of an
- * attachment arrives unasked, how long a message is kept, how much a
- * notification gives away and whether a muted group can still raise one,
- * and whether webxdc apps are offered at all. Reached from the chat
- * list's pull-down. A profile's own settings -- picture, name, address,
- * read receipts, what the relay says -- are on the profile's page,
+ * how a message is drawn, what goes out with a link, how much of a
+ * picture or a video leaves with it, how much of an attachment arrives
+ * unasked, how long a message is kept, how much a notification gives
+ * away and whether a muted group can still raise one, and whether webxdc
+ * apps are offered at all. Reached from the chat list's pull-down. A
+ * profile's own settings -- picture, name, address, read receipts, what
+ * the relay says, what it takes -- are on the profile's page,
  * reached from its row on the profiles page; that row also carries the
  * two things about a profile that are not settings, its invite code and
  * its backup, since the core's export does one account at a time.
@@ -43,6 +44,26 @@ Page {
     /// Whose block list the Privacy row opens. Nothing else on this page
     /// belongs to a profile; see the note above.
     property int accountId
+
+    /// The outgoing media qualities, as the core numbers them and as
+    /// both reference clients offer them: balanced, or smaller and
+    /// worse.
+    function qualityLabel(index) {
+        if (index === 1) {
+            //: Outgoing media quality: smaller pictures and videos,
+            //: which cost the reader and whoever they write to less
+            //: data. Both reference clients' words for it.
+            return qsTr("Worse quality, save data")
+        }
+        //: Outgoing media quality: what the core picks by default.
+        return qsTr("Balanced")
+    }
+
+    /// Which choice a quality is. Anything the core does not know is
+    /// balanced, which is what it falls back to itself.
+    function qualityIndex(quality) {
+        return quality === 1 ? 1 : 0
+    }
 
     /// The download limits offered, in bytes, as parla offers them. The
     /// first is the smallest the core accepts, which is as near to never
@@ -105,6 +126,7 @@ Page {
     /// choice is put back from the setting each time it changes -- the
     /// arrangement DisappearingMessages uses.
     function refresh() {
+        qualityCombo.currentIndex = page.qualityIndex(Settings.mediaQuality)
         downloadCombo.currentIndex = page.limitIndex(Settings.downloadLimit)
         deletionCombo.currentIndex = page.periodIndex(Settings.deleteDeviceAfter)
         notificationCombo.currentIndex =
@@ -113,6 +135,7 @@ Page {
 
     Connections {
         target: Settings
+        onMediaQualityChanged: page.refresh()
         onDownloadLimitChanged: page.refresh()
         onDeleteDeviceAfterChanged: page.refresh()
         onNotificationDetailChanged: page.refresh()
@@ -216,6 +239,32 @@ Page {
                 automaticCheck: false
                 checked: Settings.markdownMode === 0
                 onClicked: Settings.markdownMode = checked ? 1 : 0
+            }
+
+            // What leaves the phone, above what arrives on it. The core
+            // recodes a picture as it sends, and the camera records a
+            // video, at whichever of these two the reader picks; both
+            // reference clients offer the same pair under the same name.
+            ComboBox {
+                id: qualityCombo
+                objectName: "qualityCombo"
+                width: parent.width
+                //: Pictures and videos on their way out of the phone.
+                label: qsTr("Outgoing media quality")
+                description: qsTr("Pictures are made smaller before sending, and the camera records at this quality.")
+
+                menu: ContextMenu {
+                    MenuItem {
+                        objectName: "qualityOption0"
+                        text: page.qualityLabel(0)
+                        onClicked: Settings.mediaQuality = 0
+                    }
+                    MenuItem {
+                        objectName: "qualityOption1"
+                        text: page.qualityLabel(1)
+                        onClicked: Settings.mediaQuality = 1
+                    }
+                }
             }
 
             ComboBox {

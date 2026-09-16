@@ -4,10 +4,11 @@ import Nemo.Configuration 1.0
 
 /*
  * The settings that belong to no profile: whether the return key sends,
- * how a message is drawn, what goes out with a link, how much of an
- * attachment arrives unasked, how long a message is kept, how much a
- * notification gives away and whether a muted group can still raise one,
- * and whether webxdc apps are offered at all.
+ * how a message is drawn, what goes out with a link, how much of a
+ * picture or a video leaves with it, how much of an attachment arrives
+ * unasked, how long a message is kept, how much a notification gives away
+ * and whether a muted group can still raise one, and whether webxdc apps
+ * are offered at all.
  *
  * They live in dconf under the app's own path, and every page reads
  * them through this one object: the settings page (qml/pages/
@@ -32,6 +33,12 @@ QtObject {
     property alias markdownMode: markdownValue.value
     /// Take known tracking parameters out of links before sending.
     property alias cleanLinks: cleanLinksValue.value
+    /// How much a picture or a video is compressed on its way out: 0
+    /// balanced, 1 worse quality and less data. The core's own
+    /// `media_quality`, applied to every profile, and what the camera
+    /// records a video at. The reference clients' setting, with their
+    /// two choices and their default.
+    property alias mediaQuality: mediaQualityValue.value
     /// Attachments bigger than this many bytes wait to be asked for; 0
     /// fetches everything. The core's own `download_limit`, applied to
     /// every profile.
@@ -88,6 +95,14 @@ QtObject {
         id: cleanLinksValue
         key: "/apps/harbour-postivene/clean_links"
         defaultValue: false
+    }
+
+    property ConfigurationValue mediaQualityConfig: ConfigurationValue {
+        id: mediaQualityValue
+        key: "/apps/harbour-postivene/media_quality"
+        // Balanced, which is the core's own default and the reference
+        // clients'.
+        defaultValue: 0
     }
 
     property ConfigurationValue downloadLimitConfig: ConfigurationValue {

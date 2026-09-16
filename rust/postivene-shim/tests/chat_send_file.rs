@@ -1,6 +1,12 @@
 //! What sending an attachment puts on the wire, and what the sender then
 //! sees.
 //!
+//! Two shapes, because the core treats one file differently from the
+//! rest: a picture is named `Image` through `send_msg`, which is what
+//! puts it through the core's own recoding, and everything else goes
+//! through `misc_send_msg` for the core to name from the file itself.
+//! See `media.rs`.
+//!
 //! The parameter shape is pinned against the real core by
 //! `deltachat-jsonrpc/tests/real_server.rs`, which sends one message with a
 //! file and one without. This asserts the shim fills those slots from what
@@ -115,41 +121,51 @@ fn a_picked_file_reaches_the_core_and_comes_back_on_the_row() {
 
     engine.exec();
 
-    let sends: Vec<Value> = common::calls(&journal)
+    let sends: Vec<(String, Value)> = common::calls(&journal)
         .into_iter()
-        .filter(|(method, _)| method == "misc_send_msg")
-        .map(|(_, params)| params)
+        .filter(|(method, _)| method == "misc_send_msg" || method == "send_msg")
         .collect();
 
-    // account, chat, text, file, filename, location, quoted_message_id.
+    // account, chat, MessageData: a picture is named, so that the core
+    // recodes it rather than leaving a `File` at its original size.
     assert_eq!(
         sends.first(),
-        Some(&serde_json::json!([
-            1,
-            1,
-            "look at this",
-            "/tmp/postivene-fake/holiday photo.png",
-            "holiday photo.png",
-            null,
-            null
-        ])),
-        "a picked photo did not reach the core with its path and name. Sends: {sends:?}"
+        Some(&(
+            "send_msg".to_string(),
+            serde_json::json!([
+                1,
+                1,
+                {
+                    "text": "look at this",
+                    "file": "/tmp/postivene-fake/holiday photo.png",
+                    "filename": "holiday photo.png",
+                    "viewtype": "Image",
+                    "quotedMessageId": null,
+                }
+            ])
+        )),
+        "a picked photo did not reach the core as a picture. Sends: {sends:?}"
     );
 
+    // Everything else is the core's to name, through the other send.
+    //
     // A URL is what a `url` property hands back, and the core takes a path:
     // the scheme has to go and the escapes have to be decoded, or the file
     // does not exist as far as the core is concerned.
     assert_eq!(
         sends.get(1),
-        Some(&serde_json::json!([
-            1,
-            1,
-            null,
-            "/tmp/postivene-fake/notes and more.txt",
-            "notes and more.txt",
-            null,
-            null
-        ])),
+        Some(&(
+            "misc_send_msg".to_string(),
+            serde_json::json!([
+                1,
+                1,
+                null,
+                "/tmp/postivene-fake/notes and more.txt",
+                "notes and more.txt",
+                null,
+                null
+            ])
+        )),
         "a file:// URL was not turned into a path the core can open, or a \
          caption-free send sent an empty body instead of none. Sends: {sends:?}"
     );

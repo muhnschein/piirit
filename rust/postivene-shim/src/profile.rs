@@ -10,6 +10,7 @@ use qmetaobject::*;
 use crate::connectivity::{quota_from_report, Quota};
 use crate::core::connection;
 use crate::json;
+use crate::media;
 
 /// One account's profile, loaded and saved.
 ///
@@ -44,6 +45,10 @@ pub struct Profile {
     /// Whether the other end is told when a message has been read.
     /// `mdns_enabled` to the core, which defaults it on.
     pub read_receipts: qt_property!(bool; NOTIFY loaded_changed),
+    /// The largest attachment the core recommends for this profile's
+    /// relay, in bytes; 0 until read. Through f64 because QML has no
+    /// 64-bit integer. See `media.rs`.
+    pub attachment_limit_bytes: qt_property!(f64; NOTIFY loaded_changed),
 
     /// The core's `get_connectivity` band: 0 until asked, then 1000 not
     /// connected, 2000 connecting, 3000 connected and working, 4000
@@ -101,8 +106,9 @@ pub struct Profile {
     generation: u64,
 }
 
-/// What one load brings back: name, status, picture, address, receipts.
-type Fields = (String, String, String, String, bool, String);
+/// What one load brings back: name, status, picture, address, receipts,
+/// colour, and what the relay takes.
+type Fields = (String, String, String, String, bool, String, u64);
 
 /// What one connectivity check brings back: the band, the mailbox quota
 /// if the relay reports one, and the profile's size on the device.
@@ -225,7 +231,15 @@ impl Profile {
                 return;
             }
             match result {
-                Ok((display_name, status, avatar_path, address, read_receipts, color)) => {
+                Ok((
+                    display_name,
+                    status,
+                    avatar_path,
+                    address,
+                    read_receipts,
+                    color,
+                    attachment_limit,
+                )) => {
                     {
                         let mut this_mut = this.borrow_mut();
                         this_mut.display_name = display_name.into();
@@ -234,6 +248,11 @@ impl Profile {
                         this_mut.address = address.into();
                         this_mut.read_receipts = read_receipts;
                         this_mut.color = color.into();
+                        // Exact to 2^53 bytes, which no relay takes.
+                        #[allow(clippy::cast_precision_loss)]
+                        {
+                            this_mut.attachment_limit_bytes = attachment_limit as f64;
+                        }
                         this_mut.loaded = true;
                     }
                     this.borrow().loaded_changed();
@@ -268,6 +287,10 @@ impl Profile {
                         .await
                         .map(|contact| json::str_at(&contact, "color").to_string())
                         .unwrap_or_default(),
+                    // The relay's ceiling on an attachment, as the core
+                    // recommends it. Nice to have rather than needed: a
+                    // profile whose relay has not said still has a name.
+                    media::attachment_limit(&rpc, account_id).await,
                 ))
             }
             .await;

@@ -124,9 +124,11 @@ fn a_second_tap_while_the_first_send_is_in_flight_sends_nothing() {
     };
     let context = format!("steps: {steps:?}");
 
+    // Both sends the app makes: text goes through one, a picture through
+    // the other. See `media.rs`.
     let sends = common::calls(&journal)
         .into_iter()
-        .filter(|(method, _)| method == "misc_send_msg")
+        .filter(|(method, _)| method == "misc_send_msg" || method == "send_msg")
         .count();
     assert_eq!(
         sends, 2,

@@ -536,6 +536,11 @@ Other groups with blocked contacts will still show their messages.</source>
             <numerusform>%n medlemmar</numerusform>
         </translation>
     </message>
+    <message>
+        <source>Too big to send: %1. This relay takes %2.</source>
+        <extracomment>Shown above the message field when the attached file is bigger than the relay will carry. %1 is the file&apos;s size and %2 the largest the relay takes, each such as &quot;24 MB&quot;.</extracomment>
+        <translation>För stor för att skicka: %1. Reläet tar emot %2.</translation>
+    </message>
 </context>
 <context>
     <name>CoverPage</name>
@@ -1075,6 +1080,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Both ways: with this off you send none and see none.</source>
         <translation>Åt båda hållen: med detta av skickar du inga och ser inga.</translation>
     </message>
+    <message>
+        <source>Attachments up to %1</source>
+        <extracomment>The biggest attachment the relay will carry. %1 is a size such as &quot;22.3 MB&quot;.</extracomment>
+        <translation>Bilagor upp till %1</translation>
+    </message>
 </context>
 <context>
     <name>ProfileSetupPage</name>
@@ -1478,6 +1488,25 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Blocked contacts</source>
         <translation>Blockerade kontakter</translation>
+    </message>
+    <message>
+        <source>Worse quality, save data</source>
+        <extracomment>Outgoing media quality: smaller pictures and videos, which cost the reader and whoever they write to less data. Both reference clients&apos; words for it.</extracomment>
+        <translation>Sämre kvalitet, mindre storlek</translation>
+    </message>
+    <message>
+        <source>Balanced</source>
+        <extracomment>Outgoing media quality: what the core picks by default.</extracomment>
+        <translation>Balanserad</translation>
+    </message>
+    <message>
+        <source>Outgoing media quality</source>
+        <extracomment>Pictures and videos on their way out of the phone.</extracomment>
+        <translation>Kvalitet på utgående media</translation>
+    </message>
+    <message>
+        <source>Pictures are made smaller before sending, and the camera records at this quality.</source>
+        <translation>Bilder förminskas innan de skickas, och kameran spelar in med den här kvaliteten.</translation>
     </message>
 </context>
 <context>

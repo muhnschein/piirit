@@ -536,6 +536,11 @@ Other groups with blocked contacts will still show their messages.</source>
             <numerusform>%n μέλη</numerusform>
         </translation>
     </message>
+    <message>
+        <source>Too big to send: %1. This relay takes %2.</source>
+        <extracomment>Shown above the message field when the attached file is bigger than the relay will carry. %1 is the file&apos;s size and %2 the largest the relay takes, each such as &quot;24 MB&quot;.</extracomment>
+        <translation>Πολύ μεγάλο για αποστολή: %1. Αυτός ο αναμεταδότης δέχεται %2.</translation>
+    </message>
 </context>
 <context>
     <name>CoverPage</name>
@@ -1075,6 +1080,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Both ways: with this off you send none and see none.</source>
         <translation>Και προς τις δύο κατευθύνσεις: κλειστό, δεν στέλνετε καμία και δεν βλέπετε καμία.</translation>
     </message>
+    <message>
+        <source>Attachments up to %1</source>
+        <extracomment>The biggest attachment the relay will carry. %1 is a size such as &quot;22.3 MB&quot;.</extracomment>
+        <translation>Συνημμένα έως %1</translation>
+    </message>
 </context>
 <context>
     <name>ProfileSetupPage</name>
@@ -1478,6 +1488,25 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Blocked contacts</source>
         <translation>Αποκλεισμένες Επαφές</translation>
+    </message>
+    <message>
+        <source>Worse quality, save data</source>
+        <extracomment>Outgoing media quality: smaller pictures and videos, which cost the reader and whoever they write to less data. Both reference clients&apos; words for it.</extracomment>
+        <translation>Χειρότερη ποιότητα, μικρό μέγεθος</translation>
+    </message>
+    <message>
+        <source>Balanced</source>
+        <extracomment>Outgoing media quality: what the core picks by default.</extracomment>
+        <translation>Ισορροπημένο</translation>
+    </message>
+    <message>
+        <source>Outgoing media quality</source>
+        <extracomment>Pictures and videos on their way out of the phone.</extracomment>
+        <translation>Ποιότητα εξερχόμενων μέσων</translation>
+    </message>
+    <message>
+        <source>Pictures are made smaller before sending, and the camera records at this quality.</source>
+        <translation>Οι εικόνες σμικρύνονται πριν σταλούν και η κάμερα καταγράφει σε αυτήν την ποιότητα.</translation>
     </message>
 </context>
 <context>
