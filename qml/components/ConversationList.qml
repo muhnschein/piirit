@@ -222,6 +222,14 @@ SilicaListView {
         root.stickToBottom = true
         root.missedCount = 0
         toEnd.restart()
+        // Last, because the jump is the part that has to happen. A tap
+        // on the button does not reach the row a context menu is open on
+        // either, so Silica leaves the menu up -- and while one is up
+        // nothing here moves the view, which left the button doing
+        // nothing at all. The reader is leaving the row the menu is on,
+        // so the menu goes with them; the scroll above is already asked
+        // for by the time it does.
+        root.closeOpenMenu()
     }
 
     // A list draws its delegates outside its own box unless told not to,
@@ -237,7 +245,7 @@ SilicaListView {
         // Checked again here: the reader can scroll away between the
         // arrival that started this and the pass it fires on.
         onTriggered: {
-            if (root.following) {
+            if (root.following && !root.menuOpen) {
                 root.positionViewAtEnd()
                 root.reachedEnd = true
             }
@@ -260,6 +268,67 @@ SilicaListView {
     // following that hauls them straight back down again.
     readonly property bool following: root.stickToBottom && !root.held
 
+    /// The row whose context menu is open, null for none.
+    ///
+    /// A long press is not a drag -- `onMovementStarted` never fires for
+    /// one -- so nothing here knew a menu had been opened, while
+    /// unfolding one is the largest change a row's height ever makes and
+    /// Silica scrolls the view itself to bring the whole menu on screen.
+    /// Every move made from here during that unfold is a move fighting
+    /// that one: the follow threw the view at the newest message the
+    /// moment a menu finished opening, and a hold put a menu opened on a
+    /// held row straight back under the bottom of the view. So the view
+    /// is left alone while a menu is up, and this is what says so.
+    ///
+    /// Typed as an Item so that a row destroyed with its menu open --
+    /// scrolled out of view, or taken by a reload -- clears this by
+    /// itself rather than leaving the view pinned for good.
+    property Item openMenuRow: null
+    readonly property bool menuOpen: root.openMenuRow !== null
+
+    /// A row's context menu has opened.
+    ///
+    /// The reader is looking at the menu, so a held row is let go of
+    /// here exactly as it is when a drag takes the view over: what the
+    /// hold is for is putting the reader back after the content moves
+    /// under them, and this time the content moved because they asked
+    /// it to.
+    function menuOpened(row) {
+        root.openMenuRow = row
+        root.releaseRow()
+    }
+
+    /// Take down whatever menu is open, and stop waiting on it.
+    ///
+    /// Forgotten here before Silica is asked, so that the row reporting
+    /// itself closed a moment later has nothing of its own to answer for
+    /// and leaves whatever asked for this to finish its own work.
+    function closeOpenMenu() {
+        var row = root.openMenuRow
+        if (!row) {
+            return
+        }
+        root.openMenuRow = null
+        row.closeMenu()
+    }
+
+    /// A row's context menu has closed.
+    function menuClosed(row) {
+        // Only the row that opened it. A menu opening on a second row
+        // closes the first, and the two arrive in no fixed order.
+        if (root.openMenuRow !== row) {
+            return
+        }
+        root.openMenuRow = null
+        // The row shrinks back as the menu folds away, and a view that
+        // was following the newest message goes back to it: the fold is
+        // the last thing to change the content, so without this the
+        // reader is left a menu's height short of the end.
+        if (root.following) {
+            toEnd.restart()
+        }
+    }
+
     // Taking hold of the list is taking it over, so a held row lets go.
     onMovementStarted: {
         root.held = true
@@ -268,8 +337,17 @@ SilicaListView {
 
     // Both of these, because a row arriving and that row being measured are
     // separate steps: the first moves `count`, the second `contentHeight`.
-    onMessageCountChanged: if (root.following) toEnd.restart()
+    onMessageCountChanged: if (root.following && !root.menuOpen) toEnd.restart()
     onContentHeightChanged: {
+        // A menu unfolding is the content growing a row at a time, and
+        // the reader is looking straight at it. Neither the hold nor the
+        // follow gets a say until it is closed again: Silica is moving
+        // the view to bring the menu on screen, and this is the handler
+        // that was moving it back.
+        if (root.menuOpen) {
+            root.askSoon()
+            return
+        }
         // A held row first: the content changing height is exactly what
         // moves the reader off it, so this is the moment to put them back.
         if (root.pendingRow >= 0) {
@@ -326,8 +404,15 @@ SilicaListView {
         // put at the end of the row as it stood, the row grew, and the
         // move that would have followed it down had been switched off by
         // the one before.
+        //
+        // Nor is the scroll Silica makes to bring a context menu on
+        // screen, which moves the view up whenever the menu it is
+        // revealing sits below the bottom of it -- and dropping the
+        // follow there left a reader who had opened a menu at the newest
+        // message no longer at it once they closed it again.
         if (movedUp && root.reachedEnd && root.stickToBottom && !root.held
-                && !root.restoring && root.pendingRow < 0 && !root.nearBottom) {
+                && !root.restoring && root.pendingRow < 0 && !root.nearBottom
+                && !root.menuOpen) {
             root.stickToBottom = false
         }
     }
@@ -415,7 +500,12 @@ SilicaListView {
     property bool restoring: false
 
     function putBack() {
-        if (root.restoring || root.pendingRow < 0) {
+        // Not under an open menu, whoever asks. A hold is let go of when
+        // one opens, but the page can arm a fresh one at any time -- a
+        // search result landing, a step back through the history -- and
+        // a hold applied over an open menu drags it off the screen the
+        // reader just opened it on.
+        if (root.restoring || root.menuOpen || root.pendingRow < 0) {
             return
         }
         root.restoring = true
@@ -613,6 +703,20 @@ SilicaListView {
     delegate: ListItem {
         id: messageRow
         objectName: "messageRow"
+
+        // The view has to know, because it spends the rest of its time
+        // moving itself: following the newest message, putting a held
+        // row back. A menu unfolding does both of the things those watch
+        // for -- the content grows, and Silica scrolls to bring the menu
+        // on screen -- and a row is the only thing that can say which of
+        // them is happening.
+        onMenuOpenChanged: {
+            if (messageRow.menuOpen) {
+                root.menuOpened(messageRow)
+            } else {
+                root.menuClosed(messageRow)
+            }
+        }
 
         // A Component rather than a menu built with the row. Silica builds
         // a Component the first time the menu is opened; a ContextMenu
