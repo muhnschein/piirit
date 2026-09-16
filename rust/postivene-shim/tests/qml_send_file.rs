@@ -326,22 +326,28 @@ fn assert_outcome(steps: &[(&str, String)], journal: &std::path::Path) {
         "the field still asks for a message when it is asking for a caption. {context}"
     );
 
-    let sends: Vec<Value> = common::calls(journal)
+    // A picture goes through `send_msg` named `Image`, which is what puts
+    // it through the core's own recoding; see `media.rs`.
+    let sends: Vec<(String, Value)> = common::calls(journal)
         .into_iter()
-        .filter(|(method, _)| method == "misc_send_msg")
-        .map(|(_, params)| params)
+        .filter(|(method, _)| method == "misc_send_msg" || method == "send_msg")
         .collect();
     assert_eq!(
         sends.first(),
-        Some(&serde_json::json!([
-            1,
-            1,
-            null,
-            "/tmp/postivene-fake/holiday photo.png",
-            "holiday photo.png",
-            null,
-            null
-        ])),
+        Some(&(
+            "send_msg".to_string(),
+            serde_json::json!([
+                1,
+                1,
+                {
+                    "text": null,
+                    "file": "/tmp/postivene-fake/holiday photo.png",
+                    "filename": "holiday photo.png",
+                    "viewtype": "Image",
+                    "quotedMessageId": null,
+                }
+            ])
+        )),
         "the page's send did not carry the picked file. {context}. Sends: {sends:?}"
     );
 

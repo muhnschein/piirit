@@ -1,6 +1,7 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
 import "../components"
+import "../js/Format.js" as Format
 import Postivene 1.0
 
 /*
@@ -26,6 +27,11 @@ Page {
         // The reader's setting, from the settings page: known tracking
         // parameters come out of links on the way out.
         clean_links: Settings.cleanLinks === true
+        // What is waiting on the attachment bar, so the model can weigh
+        // it against what this profile's relay takes. Put aside with the
+        // bar itself while a message is being edited, since an edit
+        // carries no file.
+        pending_file: page.editing ? "" : page.attachmentPath
         onError: {
             page.errorMessage = message
             // A voice message that could not be sent is still on the
@@ -617,7 +623,7 @@ Page {
         anchors {
             left: parent.left
             right: parent.right
-            bottom: longMessageBar.top
+            bottom: tooBigBar.top
         }
         // Put aside with the draft while a message is edited: an edit
         // carries no file, and a bar saying one is about to be sent would
@@ -625,6 +631,35 @@ Page {
         filePath: page.editing ? "" : page.attachmentPath
         fileName: page.attachmentName
         onCancelled: page.dropAttachment()
+    }
+
+    // Under the file it is about: this one the relay will not take, so
+    // there is nothing to do but pick something smaller. Said here rather
+    // than after a send that failed, and the send button is off while it
+    // stands -- a picture is never this, since the core shrinks those on
+    // the way out. The limit is the core's own recommendation for the
+    // profile's relay; see rust/postivene-shim/src/media.rs.
+    Banner {
+        id: tooBigBar
+        objectName: "tooBigBar"
+        labelObjectName: "tooBigLabel"
+        tone: "error"
+        // Not transient, for the reason the long-message notice is not:
+        // it is true for as long as the file is on the bar.
+        timeout: 0
+        text: messages.attachment_too_big
+              //: Shown above the message field when the attached file is
+              //: bigger than the relay will carry. %1 is the file's size
+              //: and %2 the largest the relay takes, each such as "24 MB".
+              ? qsTr("Too big to send: %1. This relay takes %2.")
+                .arg(Format.readableSize(messages.attachment_bytes))
+                .arg(Format.readableSize(messages.attachment_limit))
+              : ""
+        anchors {
+            left: parent.left
+            right: parent.right
+            bottom: longMessageBar.top
+        }
     }
 
     /// Whether what is in the field is long enough that the core will
@@ -681,9 +716,15 @@ Page {
 
     /// The text and the file: what send has to send. While a message is
     /// being edited the file is put aside, and only the text counts.
+    ///
+    /// Nothing at all while the file on the bar is bigger than the relay
+    /// takes, text included: the caption belongs to the file, and sending
+    /// it on its own would drop the file without saying so. The way on is
+    /// to take the file off the bar.
     readonly property bool hasSomethingToSend:
-        textField.text.trim().length > 0
-        || (!page.editing && page.attachmentPath.length > 0)
+        !(!page.editing && messages.attachment_too_big)
+        && (textField.text.trim().length > 0
+            || (!page.editing && page.attachmentPath.length > 0))
 
     /// Whether the return key sends, from the settings page. Off, it
     /// puts in a line break and the button sends. `=== true` because
@@ -984,6 +1025,11 @@ Page {
         // and a trailing newline from the keyboard is not part of one.
         var text = textField.text.trim()
         if (page.attachmentPath.length > 0) {
+            // The button is already off and the bar says why; this is the
+            // same rule for a send that arrives by the return key.
+            if (messages.attachment_too_big) {
+                return
+            }
             page.errorMessage = ""
             messages.send_file(text, page.attachmentPath)
         } else if (text.length > 0) {

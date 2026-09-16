@@ -149,7 +149,12 @@ fn a_recording_is_sent_as_a_voice_message() {
                 1,
                 1,
                 {
+                    // A recording carries neither a caption nor a name
+                    // anyone sees; both slots go over as null, which is
+                    // what the core reads as absent.
+                    "text": null,
                     "file": "/tmp/postivene-fake/captures/voice-20260904-151212.ogg",
+                    "filename": null,
                     "viewtype": "Voice",
                     "quotedMessageId": null
                 }

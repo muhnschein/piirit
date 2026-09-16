@@ -540,6 +540,11 @@ Other groups with blocked contacts will still show their messages.</source>
             <numerusform>%n ಸದಸ್ಯರು</numerusform>
         </translation>
     </message>
+    <message>
+        <source>Too big to send: %1. This relay takes %2.</source>
+        <extracomment>Shown above the message field when the attached file is bigger than the relay will carry. %1 is the file&apos;s size and %2 the largest the relay takes, each such as &quot;24 MB&quot;.</extracomment>
+        <translation>ಕಳುಹಿಸಲು ತುಂಬಾ ದೊಡ್ಡದು: %1. ಈ ರಿಲೇ %2 ವರೆಗೆ ಸ್ವೀಕರಿಸುತ್ತದೆ.</translation>
+    </message>
 </context>
 <context>
     <name>CoverPage</name>
@@ -1079,6 +1084,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Both ways: with this off you send none and see none.</source>
         <translation>ಎರಡೂ ಕಡೆ: ಆಫ್ ಇದ್ದರೆ ನೀವು ಒಂದನ್ನೂ ಕಳುಹಿಸುವುದಿಲ್ಲ, ಒಂದನ್ನೂ ಕಾಣುವುದಿಲ್ಲ.</translation>
     </message>
+    <message>
+        <source>Attachments up to %1</source>
+        <extracomment>The biggest attachment the relay will carry. %1 is a size such as &quot;22.3 MB&quot;.</extracomment>
+        <translation>%1 ವರೆಗಿನ ಲಗತ್ತುಗಳು</translation>
+    </message>
 </context>
 <context>
     <name>ProfileSetupPage</name>
@@ -1482,6 +1492,25 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Blocked contacts</source>
         <translation>ನಿರ್ಬಂಧಿಸಿದ ಸಂಪರ್ಕಗಳು</translation>
+    </message>
+    <message>
+        <source>Worse quality, save data</source>
+        <extracomment>Outgoing media quality: smaller pictures and videos, which cost the reader and whoever they write to less data. Both reference clients&apos; words for it.</extracomment>
+        <translation>ಕಡಿಮೆ ಗುಣಮಟ್ಟ, ಕಡಿಮೆ ಡೇಟಾ</translation>
+    </message>
+    <message>
+        <source>Balanced</source>
+        <extracomment>Outgoing media quality: what the core picks by default.</extracomment>
+        <translation>ಸಮತೋಲಿತ</translation>
+    </message>
+    <message>
+        <source>Outgoing media quality</source>
+        <extracomment>Pictures and videos on their way out of the phone.</extracomment>
+        <translation>ಕಳುಹಿಸುವ ಮಾಧ್ಯಮದ ಗುಣಮಟ್ಟ</translation>
+    </message>
+    <message>
+        <source>Pictures are made smaller before sending, and the camera records at this quality.</source>
+        <translation>ಚಿತ್ರಗಳನ್ನು ಕಳುಹಿಸುವ ಮೊದಲು ಚಿಕ್ಕದಾಗಿಸಲಾಗುತ್ತದೆ, ಮತ್ತು ಕ್ಯಾಮೆರಾ ಇದೇ ಗುಣಮಟ್ಟದಲ್ಲಿ ರೆಕಾರ್ಡ್ ಮಾಡುತ್ತದೆ.</translation>
     </message>
 </context>
 <context>

@@ -29,6 +29,7 @@ mod html;
 mod json;
 mod links;
 mod markdown;
+mod media;
 mod models;
 mod prefetch;
 mod profile;

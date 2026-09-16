@@ -536,6 +536,11 @@ Other groups with blocked contacts will still show their messages.</source>
             <numerusform>%n உறுப்பினர்கள்</numerusform>
         </translation>
     </message>
+    <message>
+        <source>Too big to send: %1. This relay takes %2.</source>
+        <extracomment>Shown above the message field when the attached file is bigger than the relay will carry. %1 is the file&apos;s size and %2 the largest the relay takes, each such as &quot;24 MB&quot;.</extracomment>
+        <translation>அனுப்ப மிகப் பெரியது: %1. இந்த ரிலே %2 வரை ஏற்கும்.</translation>
+    </message>
 </context>
 <context>
     <name>CoverPage</name>
@@ -1075,6 +1080,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Both ways: with this off you send none and see none.</source>
         <translation>இரு பக்கமும்: அணைத்திருந்தால் நீங்கள் ஒன்றும் அனுப்புவதில்லை, ஒன்றும் காண்பதில்லை.</translation>
     </message>
+    <message>
+        <source>Attachments up to %1</source>
+        <extracomment>The biggest attachment the relay will carry. %1 is a size such as &quot;22.3 MB&quot;.</extracomment>
+        <translation>%1 வரையிலான இணைப்புகள்</translation>
+    </message>
 </context>
 <context>
     <name>ProfileSetupPage</name>
@@ -1478,6 +1488,25 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Blocked contacts</source>
         <translation>தடுக்கபட்ட தொடர்புகள்</translation>
+    </message>
+    <message>
+        <source>Worse quality, save data</source>
+        <extracomment>Outgoing media quality: smaller pictures and videos, which cost the reader and whoever they write to less data. Both reference clients&apos; words for it.</extracomment>
+        <translation>குறைந்த தரம், குறைந்த தரவு</translation>
+    </message>
+    <message>
+        <source>Balanced</source>
+        <extracomment>Outgoing media quality: what the core picks by default.</extracomment>
+        <translation>சமநிலை</translation>
+    </message>
+    <message>
+        <source>Outgoing media quality</source>
+        <extracomment>Pictures and videos on their way out of the phone.</extracomment>
+        <translation>அனுப்பப்படும் ஊடகத்தின் தரம்</translation>
+    </message>
+    <message>
+        <source>Pictures are made smaller before sending, and the camera records at this quality.</source>
+        <translation>படங்கள் அனுப்பும் முன் சிறிதாக்கப்படும், கேமராவும் இதே தரத்தில் பதிவு செய்யும்.</translation>
     </message>
 </context>
 <context>

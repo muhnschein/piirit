@@ -21,10 +21,38 @@ use tokio::sync::Mutex;
 /// `DC_CONTACT_ID_SELF`: the account's own contact.
 const SELF: u32 = 1;
 
+/// The config key the core answers the largest recommended attachment
+/// with, and the real core's own answer to it: `(30 - 1) MiB * 3/4`,
+/// which is 30 MiB of chatmail relay less a megabyte of headers and less
+/// what base64 adds. Computed there and here, never stored.
+const RECOMMENDED_SIZE_KEY: &str = "sys.msgsize_max_recommended";
+const RECOMMENDED_SIZE: u64 = (30 - 1) * 1024 * 1024 / 4 * 3;
+
+/// What to answer `sys.msgsize_max_recommended` with.
+///
+/// `POSTIVENE_FAKE_MSGSIZE_MAX` lowers it, so a test about a file the
+/// relay will not take can write a file of a few kilobytes rather than
+/// twenty-odd megabytes.
+fn recommended_size() -> String {
+    std::env::var("POSTIVENE_FAKE_MSGSIZE_MAX")
+        .ok()
+        .filter(|value| value.parse::<u64>().is_ok())
+        .unwrap_or_else(|| RECOMMENDED_SIZE.to_string())
+}
+
 /// One account, as `get_all_accounts` reports it.
 struct Account {
     id: u32,
     configured: bool,
+}
+
+/// What one `send_msg` handed over: the fields of its `MessageData` the
+/// row has to carry back.
+struct Sent {
+    file: Value,
+    view_type: String,
+    text: Option<String>,
+    file_name: Option<String>,
 }
 
 #[derive(Default)]
@@ -89,9 +117,9 @@ struct State {
     /// core keeps one list per contact, and the list this account sends
     /// replaces whatever it had there before.
     reactions: std::collections::BTreeMap<u32, std::collections::BTreeMap<u32, Vec<String>>>,
-    /// The file and view type of a message sent with `send_msg`, so
-    /// `get_messages` can say what was sent.
-    sent_files: std::collections::BTreeMap<u32, (Value, String)>,
+    /// What a `send_msg` handed over, by message, so `get_messages` can
+    /// say what was sent.
+    sent_files: std::collections::BTreeMap<u32, Sent>,
     /// Status updates per webxdc instance, in the order they were sent.
     /// The real core numbers them from 1 and hands out everything after
     /// the serial it is asked from; so does this.
@@ -323,10 +351,16 @@ impl State {
         let mut message = message_object(msg);
         let id = u32::try_from(msg).unwrap_or_default();
         message["chatId"] = json!(self.chat_of(id));
-        if let Some((file, view_type)) = self.sent_files.get(&id) {
-            message["file"] = file.clone();
-            message["viewType"] = json!(view_type);
+        if let Some(sent) = self.sent_files.get(&id) {
+            message["file"] = sent.file.clone();
+            message["viewType"] = json!(sent.view_type);
             message["fromId"] = json!(SELF);
+            if let Some(text) = &sent.text {
+                message["text"] = json!(text);
+            }
+            if let Some(file_name) = &sent.file_name {
+                message["fileName"] = json!(file_name);
+            }
         }
         if std::env::var_os("POSTIVENE_FAKE_SELF_SENT").is_some() && self.sent.contains(&id) {
             message["fromId"] = json!(SELF);
@@ -1015,10 +1049,15 @@ async fn serve() {
                         .unwrap_or_default();
                     let key = positional(1).as_str().unwrap_or_default().to_string();
                     let state = state.lock().await;
+                    // The `sys.` keys are the core's own answers rather
+                    // than anything stored: it computes this one, and a
+                    // test that wants another number sets it.
+                    let default = (key == RECOMMENDED_SIZE_KEY).then(recommended_size);
                     let value = state
                         .config
                         .get(&(account, key))
                         .cloned()
+                        .or(default)
                         .map_or(Value::Null, Value::String);
                     ok(&id, &value)
                 }
@@ -2022,11 +2061,15 @@ async fn serve() {
                         // a message that arrived as an app has to still
                         // be one then.
                         if view_type == "Webxdc" {
-                            state
-                                .lock()
-                                .await
-                                .sent_files
-                                .insert(msg, (file.clone(), view_type.to_string()));
+                            state.lock().await.sent_files.insert(
+                                msg,
+                                Sent {
+                                    file: file.clone(),
+                                    view_type: view_type.to_string(),
+                                    text: None,
+                                    file_name: None,
+                                },
+                            );
                         }
                         ok(
                             &id,
@@ -2058,12 +2101,31 @@ async fn serve() {
                         .and_then(Value::as_str)
                         .unwrap_or("Text")
                         .to_string();
+                    let text = data
+                        .get("text")
+                        .and_then(Value::as_str)
+                        .map(ToString::to_string);
+                    let file_name = data
+                        .get("filename")
+                        .and_then(Value::as_str)
+                        .map(ToString::to_string);
                     if file.is_null() {
                         err(&id, "send_msg without a file is not what the app sends")
                     } else {
+                        // Held back the way the other send is, so a test
+                        // about a send in flight covers both of them.
+                        tokio::time::sleep(delay("POSTIVENE_FAKE_SEND_DELAY_MS")).await;
                         let mut state = state.lock().await;
                         let msg = state.add_message(account, chat);
-                        state.sent_files.insert(msg, (file, view_type));
+                        state.sent_files.insert(
+                            msg,
+                            Sent {
+                                file,
+                                view_type,
+                                text,
+                                file_name,
+                            },
+                        );
                         state.note_quote(
                             msg,
                             data.get("quotedMessageId").unwrap_or(&Value::Null),

@@ -135,6 +135,18 @@ Page {
         }
 
         videoRecorder {
+            // How much a minute of video costs, from the reader's
+            // outgoing media quality setting. The bitrate and nothing
+            // else: it is what decides the size of the file, and it
+            // applies whatever the pipeline chose to record at, whereas
+            // asking for a resolution this phone's encoder does not offer
+            // is a recording that fails rather than a smaller one. The
+            // two rates are deltachat-android's ceiling for a recoded
+            // video and roughly what deltachat-ios's low preset comes to.
+            // Nothing recodes a video here afterwards, so this is the one
+            // chance to keep one inside what a relay takes.
+            videoBitRate: Settings.mediaQuality === 1 ? 500000 : 1500000
+            audioBitRate: Settings.mediaQuality === 1 ? 24000 : 64000
             // The status runs Recording, Finalizing, Loaded; the first
             // Loaded after a stop was asked for is the file. The location
             // is set as recording starts in the platform's backend, so it

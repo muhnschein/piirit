@@ -14,7 +14,7 @@ use qmetaobject::*;
 use crate::core::connection;
 use crate::json;
 use crate::models::{MessageListItem, MessageListModel};
-use crate::{links, markdown, truncation, webxdc};
+use crate::{links, markdown, media, truncation, webxdc};
 
 /// `DC_STATE_IN_FRESH` and `DC_STATE_IN_NOTICED`: an incoming message the
 /// account has not read yet.
@@ -248,6 +248,32 @@ pub struct ChatMessages {
     /// Emitted when [`Self::clean_links`] changes.
     pub clean_links_changed: qt_signal!(),
 
+    /// The file waiting on the attachment bar, empty for none.
+    ///
+    /// Held here rather than only on the page because the answer below is
+    /// the core's: the page hands the path over and reads back whether
+    /// the relay will take it.
+    pub pending_file: qt_property!(QString; WRITE set_pending_file NOTIFY pending_file_changed),
+    /// Emitted when [`Self::pending_file`] changes.
+    pub pending_file_changed: qt_signal!(),
+    /// What [`Self::pending_file`] weighs on the phone, in bytes, 0 when
+    /// there is none or it cannot be measured. What the bar says about a
+    /// file the relay will not take. Through f64 because QML has no
+    /// 64-bit integer.
+    pub attachment_bytes: qt_property!(f64; NOTIFY pending_file_changed),
+    /// The largest attachment the core recommends for this profile's
+    /// relay, in bytes; 0 until it has said. A real for the reason above.
+    /// See `media.rs`.
+    pub attachment_limit: qt_property!(f64; NOTIFY attachment_limit_changed),
+    /// Emitted when the limit is read.
+    pub attachment_limit_changed: qt_signal!(),
+    /// Whether [`Self::pending_file`] is bigger than that. False while
+    /// the limit is unknown, and false for a picture whatever it weighs:
+    /// the core recodes those on the way out.
+    pub attachment_too_big: qt_property!(bool; NOTIFY attachment_too_big_changed),
+    /// Emitted when [`Self::attachment_too_big`] changes.
+    pub attachment_too_big_changed: qt_signal!(),
+
     /// Fetch the rest of a message the core holds only the header of.
     /// The core announces the result as a change to the message.
     pub download_full: qt_method!(fn(&mut self, message_id: u32)),
@@ -347,6 +373,11 @@ pub struct ChatMessages {
     /// told, correctly, that there is nothing unread any more.
     unread_marked_chat: u32,
 
+    /// Which account `attachment_limit` was read for, 0 for none: the
+    /// limit belongs to the profile's relay, so it is asked for once per
+    /// profile rather than once per chat.
+    limit_account: u32,
+
     /// The rows asked for and not yet answered, so the next ask skips them
     /// rather than asking twice.
     pending: HashSet<u32>,
@@ -429,6 +460,87 @@ impl ChatMessages {
                 .ok()
                 .flatten();
             done(first);
+        });
+    }
+
+    /// Take the file the attachment bar is holding, and say whether the
+    /// relay will take it.
+    pub fn set_pending_file(&mut self, file_path: QString) {
+        if self.pending_file == file_path {
+            return;
+        }
+        self.pending_file = file_path;
+        // Exact to 2^53 bytes, which no phone holds.
+        #[allow(clippy::cast_precision_loss)]
+        {
+            self.attachment_bytes = media::file_bytes(&self.pending_path()) as f64;
+        }
+        self.pending_file_changed();
+        self.weigh_pending_file();
+    }
+
+    /// The path the bar is holding, as the core would open it: a picker
+    /// hands back a URL, and `local_path` is what turns one into a path.
+    fn pending_path(&self) -> String {
+        local_path(&self.pending_file.to_string())
+    }
+
+    /// Measure whatever is on the bar against the limit, and say so when
+    /// the answer changed. Called when either of the two moves.
+    fn weigh_pending_file(&mut self) {
+        let too_big = media::exceeds_limit(&self.pending_path(), self.relay_limit());
+        if self.attachment_too_big != too_big {
+            self.attachment_too_big = too_big;
+            self.attachment_too_big_changed();
+        }
+    }
+
+    /// What the relay takes, as bytes; 0 while the core has not said.
+    fn relay_limit(&self) -> u64 {
+        // Exact to 2^53 bytes, which no relay takes.
+        #[allow(clippy::cast_sign_loss, clippy::cast_possible_truncation)]
+        {
+            self.attachment_limit.max(0.0) as u64
+        }
+    }
+
+    /// Ask the core what this profile's relay takes.
+    ///
+    /// Once per profile: the answer is the same for every chat in it, and
+    /// is kept under `limit_account` so a reload that is not a change of
+    /// profile does not ask again.
+    fn load_attachment_limit(&mut self) {
+        let account_id = self.account_id;
+        if account_id == 0 || self.limit_account == account_id {
+            return;
+        }
+        let Some((rpc, runtime)) = connection() else {
+            return;
+        };
+
+        let ptr: QPointer<Self> = QPointer::from(&*self);
+        let done = queued_callback(move |limit: u64| {
+            let Some(this) = ptr.as_pinned() else { return };
+            // The reader can have moved to another profile meanwhile, and
+            // an answer about the one they left is not about this one.
+            if this.borrow().account_id != account_id {
+                return;
+            }
+            {
+                let mut this_mut = this.borrow_mut();
+                this_mut.limit_account = account_id;
+                // Exact to 2^53 bytes, which no relay takes.
+                #[allow(clippy::cast_precision_loss)]
+                {
+                    this_mut.attachment_limit = limit as f64;
+                }
+            }
+            this.borrow().attachment_limit_changed();
+            this.borrow_mut().weigh_pending_file();
+        });
+
+        runtime.spawn(async move {
+            done(media::attachment_limit(&rpc, account_id).await);
         });
     }
 
@@ -566,6 +678,9 @@ impl ChatMessages {
         // Where the reader left off, likewise: asked here so the question
         // is in flight before anything on either path is marked read.
         self.load_unread_mark();
+        // And what this profile's relay takes, so the answer is in before
+        // the reader has picked anything to attach.
+        self.load_attachment_limit();
         // Already loaded, by whoever opened this page: take it and skip
         // the round trip entirely. This is what lets the transition start
         // with the rows in place rather than fill in behind it.
@@ -1475,6 +1590,9 @@ impl ChatMessages {
             self.error(QString::from("no file to send"));
             return;
         }
+        if self.refuse_if_too_big(&path) {
+            return;
+        }
         let name = file_name_of(&path);
         self.send_message(self.outgoing_text(&text.to_string()), Some((path, name)));
     }
@@ -1486,7 +1604,24 @@ impl ChatMessages {
             self.error(QString::from("no recording to send"));
             return;
         }
+        if self.refuse_if_too_big(&path) {
+            return;
+        }
         self.send_message(String::new(), Some((path, String::new())));
+    }
+
+    /// Refuse a file the relay will not take, and say so.
+    ///
+    /// The last word on one. The bar above the field says the same thing
+    /// while the file is sitting there and the send button is off, so
+    /// this is for whatever reaches a send without going past that -- a
+    /// share, a recording that ran for hours, a page that got it wrong.
+    fn refuse_if_too_big(&mut self, path: &str) -> bool {
+        if media::exceeds_limit(path, self.relay_limit()) {
+            self.error(QString::from("the file is bigger than this relay takes"));
+            return true;
+        }
+        false
     }
 
     /// The one send. `file` is the path the core should attach and the name
@@ -1587,33 +1722,46 @@ impl Outgoing {
         account_id: u32,
         chat_id: u32,
     ) -> Result<MessageListItem, String> {
-        // A file with no name is a voice message: the one kind the core
-        // has to be told, since to it a recording is a sound file like any
-        // other. It takes the shape `send_msg` takes and `misc_send_msg`
-        // does not, and answers with the id alone, so the row is fetched
-        // the way every other row is.
-        let voice = matches!(&self.file, Some((_, name)) if name.is_empty());
-        if voice {
-            self.send_voice(rpc, account_id, chat_id).await
+        // Two kinds have to be named, and the rest the core reads off the
+        // file itself.
+        //
+        // A file with no name is a voice message: to the core a recording
+        // is a sound file like any other. A picture is named so that the
+        // core recodes it -- it leaves a `File` at its original size on
+        // purpose, which is what `misc_send_msg` would make of it, and
+        // the outgoing media quality setting is read during that recoding
+        // and nowhere else. See `media.rs`.
+        let viewtype = match &self.file {
+            Some((_, name)) if name.is_empty() => Some("Voice"),
+            Some((path, _)) => media::outgoing_viewtype(path),
+            None => None,
+        };
+        if let Some(viewtype) = viewtype {
+            self.send_as(rpc, account_id, chat_id, viewtype).await
         } else {
             self.send_text_or_file(rpc, account_id, chat_id).await
         }
     }
 
-    /// A voice message, through `send_msg`.
-    async fn send_voice(
+    /// A message whose view type the core is told, through `send_msg`.
+    async fn send_as(
         self,
         rpc: &RpcClient,
         account_id: u32,
         chat_id: u32,
+        viewtype: &str,
     ) -> Result<MessageListItem, String> {
-        let (path, _) = self.file.unzip();
+        let (path, name) = self.file.unzip();
         // send_msg params: account, chat, MessageData -- camelCase
         // fields, the view type by its variant name. Pinned against the
         // real core by deltachat-jsonrpc/tests/real_server.rs.
         let data = serde_json::json!({
+            // Empty rather than absent would be a message whose body is
+            // "", and a recording is named for nobody.
+            "text": (!self.text.is_empty()).then_some(self.text),
             "file": path,
-            "viewtype": "Voice",
+            "filename": name.filter(|name| !name.is_empty()),
+            "viewtype": viewtype,
             "quotedMessageId": (self.quoted != 0).then_some(self.quoted),
         });
         match rpc
@@ -1626,7 +1774,7 @@ impl Outgoing {
                     items
                         .into_iter()
                         .next()
-                        .ok_or_else(|| "the core lost the voice message".to_string())
+                        .ok_or_else(|| "the core lost the message it just sent".to_string())
                 }),
             Err(err) => Err(err.to_string()),
         }
@@ -2384,7 +2532,9 @@ pub(crate) fn local_path(raw: &str) -> String {
 ///
 /// The core would derive its own name from the path, and for a gallery
 /// picture that path is often the camera's serial-number filename. This is
-/// the same thing, but ours to change.
+/// the same thing, but ours to change -- except for a picture, where the
+/// core replaces whatever it is given with a dated name of its own, for
+/// the same reason it recodes one.
 fn file_name_of(path: &str) -> String {
     std::path::Path::new(path)
         .file_name()
