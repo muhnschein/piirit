@@ -14,7 +14,7 @@ use crate::models::{FolderItem, FolderListModel};
 /// The directories under `path`, as rows.
 ///
 /// ```qml
-/// FolderList { id: folders; path: "/home/nemo/Documents" }
+/// FolderList { id: folders; path: StandardPaths.documents }
 /// SilicaListView { model: folders.rows; delegate: Label { text: model.name } }
 /// ```
 #[derive(QObject, Default)]
