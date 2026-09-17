@@ -362,10 +362,6 @@ Other groups with blocked contacts will still show their messages.</source>
 <context>
     <name>ChatMediaPage</name>
     <message>
-        <source>Saved to Downloads</source>
-        <translation>Gemt i Downloads</translation>
-    </message>
-    <message>
         <source>Open in another app</source>
         <extracomment>Hands the attachment to whatever else on the phone handles files of its kind.</extracomment>
         <translation>Åbn i en anden app</translation>
@@ -387,6 +383,11 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Delete</source>
         <translation>Slet</translation>
+    </message>
+    <message>
+        <source>Saved to %1</source>
+        <extracomment>%1 is a folder, such as &quot;Documents/Postivene&quot;.</extracomment>
+        <translation>Gemt i %1</translation>
     </message>
 </context>
 <context>
@@ -524,10 +525,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Saved to Videos</source>
         <translation>Gemt i Videoer</translation>
     </message>
-    <message>
-        <source>Saved to Downloads</source>
-        <translation>Gemt i Downloads</translation>
-    </message>
     <message numerus="yes">
         <source>%n member(s)</source>
         <extracomment>Under a group&apos;s name, over its messages. %n is how many people are in the group.</extracomment>
@@ -540,6 +537,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Too big to send: %1. This relay takes %2.</source>
         <extracomment>Shown above the message field when the attached file is bigger than the relay will carry. %1 is the file&apos;s size and %2 the largest the relay takes, each such as &quot;24 MB&quot;.</extracomment>
         <translation>For stor til at sende: %1. Dette relæ tager %2.</translation>
+    </message>
+    <message>
+        <source>Saved to %1</source>
+        <extracomment>%1 is a folder, such as &quot;Documents/Postivene&quot;.</extracomment>
+        <translation>Gemt i %1</translation>
     </message>
 </context>
 <context>
@@ -1507,6 +1509,23 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Pictures are made smaller before sending, and the camera records at this quality.</source>
         <translation>Billeder gøres mindre før de sendes, og kameraet optager i denne kvalitet.</translation>
+    </message>
+    <message>
+        <source>Save files to</source>
+        <extracomment>Where a copy of a file from a chat is put.</extracomment>
+        <translation>Gem filer i</translation>
+    </message>
+    <message>
+        <source>A folder under Documents, Downloads, Music, Videos or Pictures. Pictures and videos go to the gallery.</source>
+        <translation>En mappe under Dokumenter, Overførsler, Musik, Videoer eller Billeder. Billeder og videoer går til galleriet.</translation>
+    </message>
+    <message>
+        <source>Show notifications</source>
+        <translation>Vis notifikationer</translation>
+    </message>
+    <message>
+        <source>Off, nothing is announced when a message arrives.</source>
+        <translation>Slået fra bliver intet meddelt, når en besked kommer.</translation>
     </message>
 </context>
 <context>

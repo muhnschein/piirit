@@ -5,8 +5,8 @@
 //! double, with the group seeded with one of each kind. What a headless
 //! run can check is the wiring: the gallery draws a tile per picture or
 //! video and a tap opens the page the conversation opens for that kind;
-//! the files list names a file and its size and keeps a copy where the
-//! platform says downloads go; the audio and apps lists draw the
+//! the files list names a file and its size and keeps a copy, under the
+//! sender's name, where the reader saves files; the audio and apps lists draw the
 //! conversation's own rows, and a tap on an app runs it; a kind the chat
 //! has none of says so; and the tiles on both detail pages open the
 //! page for the kind that was tapped, with no Apps tile while apps are
@@ -162,9 +162,10 @@ const PROBE_QML: &str = r"
         function shownInChat() { return '' + chatBelow.shown }
         // The wait before a deletion, turned down from four seconds.
         function hurry(ms) { loader.item.pendingDelay = ms; return 'ok' }
-        // Where the platform says downloads go, pointed at a directory of
-        // this test's own.
-        function setDownloads(folder) { StandardPaths.download = folder; return 'ok' }
+        // Where the platform says documents go, pointed at a directory
+        // of this test's own: a saved file goes to the app's own folder
+        // under it until the reader chooses another.
+        function setDocuments(folder) { StandardPaths.documents = folder; return 'ok' }
         // `data` rather than `children`: the model is a plain QObject, so
         // it is not among an Item's visual children at all.
         function findIn(node, name) {
@@ -219,8 +220,14 @@ fn a_chats_media_has_pages_of_its_own_behind_the_tiles() {
     // be made.
     let fake_dir = std::path::Path::new("/tmp/postivene-fake");
     std::fs::create_dir_all(fake_dir).expect("create the fake's file dir");
-    std::fs::write(fake_dir.join("notes.pdf"), b"%PDF-1.4 notes").expect("write the fake pdf");
-    let downloads = temp.join("Downloads");
+    // Under its hash, as the real core keeps a received file: the name
+    // the sender gave it is on the message, and a copy is to carry that.
+    std::fs::write(
+        fake_dir.join("6f5902ac237024bdd0c176cb93063dc4.pdf"),
+        b"%PDF-1.4 notes",
+    )
+    .expect("write the fake pdf");
+    let documents = temp.join("Documents");
 
     // SAFETY: single-threaded test binary; set before Qt starts.
     unsafe {
@@ -277,7 +284,7 @@ fn a_chats_media_has_pages_of_its_own_behind_the_tiles() {
     let contact_page = common::page_url("ContactPage.qml");
     let group_page = common::page_url("GroupPage.qml");
     let tiles = common::component_url("MediaKinds.qml");
-    let downloads_for_probe = downloads.to_string_lossy().into_owned();
+    let documents_for_probe = documents.to_string_lossy().into_owned();
 
     // The group's gallery: a picture and a video.
     let page = media_page.clone();
@@ -355,14 +362,14 @@ fn a_chats_media_has_pages_of_its_own_behind_the_tiles() {
     });
 
     let page = media_page.clone();
-    let folder = downloads_for_probe.clone();
+    let folder = documents_for_probe.clone();
     single_shot(Duration::from_secs(7), move || unsafe {
         record!("files-count", get!("media", "count"));
         record!("file-name", get!("fileName", "text"));
         record!("file-size", get!("fileDetail", "text"));
         record!("file-icon", get!("fileIcon", "source"));
         record!("file-caption", get!("rowCaption", "text"));
-        call!("setDownloads", QString::from(folder.clone()));
+        call!("setDocuments", QString::from(folder.clone()));
         record!("save", call!("click", QString::from("saveItem")));
         record!("saved-notice", get!("noticeLabel", "text"));
         record!(
@@ -454,9 +461,12 @@ fn a_chats_media_has_pages_of_its_own_behind_the_tiles() {
     let navigation = stack_box.pinned().borrow().log.to_string();
     assert_pages(&steps, &navigation, &common::calls(&journal));
     assert_eq!(
-        std::fs::read(downloads.join("notes.pdf")).ok().as_deref(),
+        std::fs::read(documents.join("Postivene").join("notes.pdf"))
+            .ok()
+            .as_deref(),
         Some(&b"%PDF-1.4 notes"[..]),
-        "Save to device did not put a copy of the file in the Downloads folder"
+        "Save to device did not put a copy of the file, under the name the \
+         sender gave it, in the app's folder under Documents"
     );
     let _ = std::fs::remove_dir_all(&temp);
 }
@@ -599,7 +609,7 @@ fn assert_pages(steps: &[(&str, String)], navigation: &str, calls: &[(String, Va
     );
 
     // The files list: the document, its size, its icon, who sent it, and
-    // a copy where the platform says downloads go.
+    // a copy in the folder the reader saves files to.
     for (label, expected, complaint) in [
         (
             "files-count",
@@ -610,7 +620,7 @@ fn assert_pages(steps: &[(&str, String)], navigation: &str, calls: &[(String, Va
         ("file-size", "20.5 kB", "the file's size is not said"),
         (
             "saved-notice",
-            "Saved to Downloads",
+            "Saved to Documents/Postivene",
             "saving did not say where the copy went",
         ),
     ] {

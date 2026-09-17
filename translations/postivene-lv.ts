@@ -367,10 +367,6 @@ Citās grupās, kurās ir bloķēti kontakti, viņu ziņas joprojām būs redzam
 <context>
     <name>ChatMediaPage</name>
     <message>
-        <source>Saved to Downloads</source>
-        <translation>Saglabāts lejupielādēs</translation>
-    </message>
-    <message>
         <source>Open in another app</source>
         <extracomment>Hands the attachment to whatever else on the phone handles files of its kind.</extracomment>
         <translation>Atvērt citā lietotnē</translation>
@@ -392,6 +388,11 @@ Citās grupās, kurās ir bloķēti kontakti, viņu ziņas joprojām būs redzam
     <message>
         <source>Delete</source>
         <translation>Dzēst</translation>
+    </message>
+    <message>
+        <source>Saved to %1</source>
+        <extracomment>%1 is a folder, such as &quot;Documents/Postivene&quot;.</extracomment>
+        <translation>Saglabāts: %1</translation>
     </message>
 </context>
 <context>
@@ -529,10 +530,6 @@ Citās grupās, kurās ir bloķēti kontakti, viņu ziņas joprojām būs redzam
         <source>Saved to Videos</source>
         <translation>Saglabāts mapē Video</translation>
     </message>
-    <message>
-        <source>Saved to Downloads</source>
-        <translation>Saglabāts lejupielādēs</translation>
-    </message>
     <message numerus="yes">
         <source>%n member(s)</source>
         <extracomment>Under a group&apos;s name, over its messages. %n is how many people are in the group.</extracomment>
@@ -546,6 +543,11 @@ Citās grupās, kurās ir bloķēti kontakti, viņu ziņas joprojām būs redzam
         <source>Too big to send: %1. This relay takes %2.</source>
         <extracomment>Shown above the message field when the attached file is bigger than the relay will carry. %1 is the file&apos;s size and %2 the largest the relay takes, each such as &quot;24 MB&quot;.</extracomment>
         <translation>Pārāk liels, lai nosūtītu: %1. Šis relejs pieņem %2.</translation>
+    </message>
+    <message>
+        <source>Saved to %1</source>
+        <extracomment>%1 is a folder, such as &quot;Documents/Postivene&quot;.</extracomment>
+        <translation>Saglabāts: %1</translation>
     </message>
 </context>
 <context>
@@ -1517,6 +1519,23 @@ Citās grupās, kurās ir bloķēti kontakti, viņu ziņas joprojām būs redzam
     <message>
         <source>Pictures are made smaller before sending, and the camera records at this quality.</source>
         <translation>Attēli tiek samazināti pirms nosūtīšanas, un kamera ieraksta šādā kvalitātē.</translation>
+    </message>
+    <message>
+        <source>Save files to</source>
+        <extracomment>Where a copy of a file from a chat is put.</extracomment>
+        <translation>Saglabāt failus mapē</translation>
+    </message>
+    <message>
+        <source>A folder under Documents, Downloads, Music, Videos or Pictures. Pictures and videos go to the gallery.</source>
+        <translation>Mape zem Dokumenti, Lejupielādes, Mūzika, Video vai Attēli. Attēli un video nonāk galerijā.</translation>
+    </message>
+    <message>
+        <source>Show notifications</source>
+        <translation>Rādīt paziņojumus</translation>
+    </message>
+    <message>
+        <source>Off, nothing is announced when a message arrives.</source>
+        <translation>Izslēgts: par ienākošu ziņu nekas netiek paziņots.</translation>
     </message>
 </context>
 <context>

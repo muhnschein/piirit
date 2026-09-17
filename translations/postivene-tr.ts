@@ -365,10 +365,6 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
 <context>
     <name>ChatMediaPage</name>
     <message>
-        <source>Saved to Downloads</source>
-        <translation>İndirilenler&apos;e kaydedildi</translation>
-    </message>
-    <message>
         <source>Open in another app</source>
         <extracomment>Hands the attachment to whatever else on the phone handles files of its kind.</extracomment>
         <translation>Başka bir uygulamada aç</translation>
@@ -390,6 +386,11 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
     <message>
         <source>Delete</source>
         <translation>Sil</translation>
+    </message>
+    <message>
+        <source>Saved to %1</source>
+        <extracomment>%1 is a folder, such as &quot;Documents/Postivene&quot;.</extracomment>
+        <translation>%1 konumuna kaydedildi</translation>
     </message>
 </context>
 <context>
@@ -527,10 +528,6 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
         <source>Saved to Videos</source>
         <translation>Videolar&apos;a kaydedildi</translation>
     </message>
-    <message>
-        <source>Saved to Downloads</source>
-        <translation>İndirilenler&apos;e kaydedildi</translation>
-    </message>
     <message numerus="yes">
         <source>%n member(s)</source>
         <extracomment>Under a group&apos;s name, over its messages. %n is how many people are in the group.</extracomment>
@@ -542,6 +539,11 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
         <source>Too big to send: %1. This relay takes %2.</source>
         <extracomment>Shown above the message field when the attached file is bigger than the relay will carry. %1 is the file&apos;s size and %2 the largest the relay takes, each such as &quot;24 MB&quot;.</extracomment>
         <translation>Göndermek için çok büyük: %1. Bu aktarıcı %2 kabul ediyor.</translation>
+    </message>
+    <message>
+        <source>Saved to %1</source>
+        <extracomment>%1 is a folder, such as &quot;Documents/Postivene&quot;.</extracomment>
+        <translation>%1 konumuna kaydedildi</translation>
     </message>
 </context>
 <context>
@@ -1505,6 +1507,23 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
     <message>
         <source>Pictures are made smaller before sending, and the camera records at this quality.</source>
         <translation>Resimler gönderilmeden önce küçültülür ve kamera bu kalitede kaydeder.</translation>
+    </message>
+    <message>
+        <source>Save files to</source>
+        <extracomment>Where a copy of a file from a chat is put.</extracomment>
+        <translation>Dosyaları şuraya kaydet</translation>
+    </message>
+    <message>
+        <source>A folder under Documents, Downloads, Music, Videos or Pictures. Pictures and videos go to the gallery.</source>
+        <translation>Belgeler, İndirilenler, Müzik, Videolar veya Resimler altında bir klasör. Resimler ve videolar galeriye gider.</translation>
+    </message>
+    <message>
+        <source>Show notifications</source>
+        <translation>Bildirimleri göster</translation>
+    </message>
+    <message>
+        <source>Off, nothing is announced when a message arrives.</source>
+        <translation>Kapalıyken bir ileti geldiğinde hiçbir şey bildirilmez.</translation>
     </message>
 </context>
 <context>

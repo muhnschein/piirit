@@ -134,8 +134,10 @@ SilicaListView {
                          real previewWidth)
     /// The reader asked to keep a copy of an attachment somewhere they
     /// can find it again. Where that is depends on what it is, which is
-    /// the page's to decide.
-    signal saveRequested(url fileUrl, string viewType)
+    /// the page's to decide. The name travels with it: the core keeps
+    /// the file under a name of its own, and the copy is to be under the
+    /// sender's.
+    signal saveRequested(url fileUrl, string fileName, string viewType)
     /// The reader asked to read one message on a page of its own. The
     /// author travels with it: the page names who wrote what it shows,
     /// and this row may be gone by the time it is built.
@@ -831,6 +833,7 @@ SilicaListView {
                              && !root.opensOnItsOwnPage(model.view_type)
                     text: qsTr("Save")
                     onClicked: root.saveRequested("file://" + model.file_path,
+                                                  model.file_name,
                                                   model.view_type)
                 }
                 MenuItem {

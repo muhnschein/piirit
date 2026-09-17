@@ -40,6 +40,16 @@ Item {
     /// A notification was tapped: the chat to open.
     signal openRequested(int chatId)
 
+    // `enabled` is the Item's own, put to use: off, nothing arriving is
+    // announced and whatever is up comes down, since a reader who turned
+    // notifications off did not mean the ones already there to stay. The
+    // page binds it to the setting; the component itself reads none.
+    onEnabledChanged: {
+        if (!enabled) {
+            notifier.clearAll()
+        }
+    }
+
     /// chatId -> Notification.
     property var notes: ({})
     /// chatId -> the chat's name, kept apart from the notification, which
@@ -121,6 +131,9 @@ Item {
 
     /// Announce a message, unless the reader is already looking at it.
     function arrived(chatId, chatName, sender, preview) {
+        if (!notifier.enabled) {
+            return
+        }
         if (appActive && chatId === viewingChatId) {
             return
         }
@@ -165,6 +178,13 @@ Item {
     }
 
     /// How many chats are currently speaking for themselves. For tests.
+    /// Every notification down, and every count back to nothing.
+    function clearAll() {
+        for (var id in notifier.notes) {
+            notifier.clear(parseInt(id, 10))
+        }
+    }
+
     function publishedCount() {
         var total = 0
         for (var id in notifier.notes) {

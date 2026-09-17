@@ -100,6 +100,15 @@ fn probe_qml() -> String {
         }}
         function appWrites(name, value) {{ Settings[name] = value; return 'ok' }}
         function appKey(name) {{ return '' + Settings[name].key }}
+        // Typing into the folder field: the field takes focus, as it
+        // would under a finger, and the text changes under it.
+        function typeFolder(text) {{
+            var field = findIn(loader.item, 'folderField')
+            if (!field) {{ return 'missing:folderField' }}
+            field.forceActiveFocus()
+            field.text = text
+            return 'ok'
+        }}
     }}
 ",
         components.display()
@@ -187,6 +196,14 @@ fn the_settings_page_writes_what_the_app_reads() {
         record!(
             "app-apps-key",
             call!("appKey", QString::from("webxdcEnabledConfig"))
+        );
+        record!(
+            "app-folder-key",
+            call!("appKey", QString::from("saveFolderConfig"))
+        );
+        record!(
+            "app-notifications-key",
+            call!("appKey", QString::from("notificationsEnabledConfig"))
         );
         record!(
             "load",
@@ -387,10 +404,84 @@ fn the_settings_page_writes_what_the_app_reads() {
             call!("appWrites", QString::from("deleteDeviceAfter"), 604_800)
         );
         record!("deletion-follows", get!("deletionCombo", "currentIndex"));
+
+        // Whether anything is announced at all stands first under
+        // Notifications, on by default, and off it greys out the two
+        // settings under it rather than hiding them.
+        record!(
+            "first-under-notifications",
+            call!("firstUnder", QString::from("Notifications"))
+        );
+        record!(
+            "notifications-default",
+            call!("appReads", QString::from("notificationsEnabled"))
+        );
+        record!(
+            "notifications-switch",
+            get!("notificationsSwitch", "checked")
+        );
+        record!("detail-usable", get!("notificationCombo", "enabled"));
+        record!("mentions-usable", get!("mentionsSwitch", "enabled"));
+        record!(
+            "flip-notifications",
+            call!("click", QString::from("notificationsSwitch"))
+        );
+        record!(
+            "notifications-off",
+            call!("appReads", QString::from("notificationsEnabled"))
+        );
+        record!(
+            "notifications-switch-off",
+            get!("notificationsSwitch", "checked")
+        );
+        record!("detail-greyed", get!("notificationCombo", "enabled"));
+        record!("mentions-greyed", get!("mentionsSwitch", "enabled"));
+        record!(
+            "flip-notifications-back",
+            call!("click", QString::from("notificationsSwitch"))
+        );
+        record!(
+            "notifications-on",
+            call!("appReads", QString::from("notificationsEnabled"))
+        );
+        record!("detail-usable-again", get!("notificationCombo", "enabled"));
+
+        // Where a saved file goes: the app's own folder under Documents
+        // until the reader types another, which becomes the setting once
+        // the typing has paused. Emptied, it goes back to the default.
+        record!(
+            "folder-default",
+            call!("appReads", QString::from("saveFolder"))
+        );
+        record!("folder-shown", get!("folderField", "text"));
+        record!("folder-label", get!("folderField", "label"));
+        record!(
+            "type-folder",
+            call!("typeFolder", QString::from("/home/nemo/Downloads/chat/"))
+        );
+        record!(
+            "folder-unwritten",
+            call!("appReads", QString::from("saveFolder"))
+        );
     });
-    // The core's refusal arrives a turn later.
-    single_shot(Duration::from_secs(2), move || unsafe {
+    // The core's refusal arrives a turn later; the typed folder lands
+    // once the typing has paused.
+    single_shot(Duration::from_secs(3), move || unsafe {
         record!("deletion-error", get!("errorBanner", "text"));
+        record!(
+            "folder-written",
+            call!("appReads", QString::from("saveFolder"))
+        );
+        record!("folder-shown-written", get!("folderField", "text"));
+        record!("type-nothing", call!("typeFolder", QString::from("  ")));
+    });
+    // Whole seconds: `single_shot` rounds, and the pause ends at 4.2.
+    single_shot(Duration::from_secs(5), move || unsafe {
+        record!(
+            "folder-back-to-default",
+            call!("appReads", QString::from("saveFolder"))
+        );
+        record!("folder-shown-default", get!("folderField", "text"));
         (*engine_ptr).quit();
     });
 
@@ -470,6 +561,51 @@ fn the_settings_page_writes_what_the_app_reads() {
             "/apps/harbour-postivene/mention_notifications",
         ),
         ("app-apps-key", "/apps/harbour-postivene/webxdc_enabled"),
+        ("app-folder-key", "/apps/harbour-postivene/save_folder"),
+        (
+            "app-notifications-key",
+            "/apps/harbour-postivene/notifications_enabled",
+        ),
+        ("first-under-notifications", "notificationsSwitch"),
+        ("notifications-default", "true"),
+        ("notifications-switch", "true"),
+        ("detail-usable", "true"),
+        ("mentions-usable", "true"),
+        ("flip-notifications", "ok"),
+        ("notifications-off", "false"),
+        ("notifications-switch-off", "false"),
+        ("detail-greyed", "false"),
+        ("mentions-greyed", "false"),
+        ("flip-notifications-back", "ok"),
+        ("notifications-on", "true"),
+        ("detail-usable-again", "true"),
+        (
+            "folder-default",
+            "/tmp/postivene-stub-standardpaths/Documents/Postivene",
+        ),
+        (
+            "folder-shown",
+            "/tmp/postivene-stub-standardpaths/Documents/Postivene",
+        ),
+        ("folder-label", "Save files to"),
+        ("type-folder", "ok"),
+        // Not on the keystroke.
+        (
+            "folder-unwritten",
+            "/tmp/postivene-stub-standardpaths/Documents/Postivene",
+        ),
+        // Once the typing has paused, without the trailing slash.
+        ("folder-written", "/home/nemo/Downloads/chat"),
+        ("folder-shown-written", "/home/nemo/Downloads/chat"),
+        ("type-nothing", "ok"),
+        (
+            "folder-back-to-default",
+            "/tmp/postivene-stub-standardpaths/Documents/Postivene",
+        ),
+        (
+            "folder-shown-default",
+            "/tmp/postivene-stub-standardpaths/Documents/Postivene",
+        ),
         ("apps-default", "false"),
         ("apps-switch", "false"),
         ("flip-apps", "ok"),

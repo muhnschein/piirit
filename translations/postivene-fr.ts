@@ -366,10 +366,6 @@ Vous continuerez à voir les messages des contacts bloqués dans les autres grou
 <context>
     <name>ChatMediaPage</name>
     <message>
-        <source>Saved to Downloads</source>
-        <translation>Enregistré dans Téléchargements</translation>
-    </message>
-    <message>
         <source>Open in another app</source>
         <extracomment>Hands the attachment to whatever else on the phone handles files of its kind.</extracomment>
         <translation>Ouvrir dans une autre application</translation>
@@ -391,6 +387,11 @@ Vous continuerez à voir les messages des contacts bloqués dans les autres grou
     <message>
         <source>Delete</source>
         <translation>Supprimer</translation>
+    </message>
+    <message>
+        <source>Saved to %1</source>
+        <extracomment>%1 is a folder, such as &quot;Documents/Postivene&quot;.</extracomment>
+        <translation>Enregistré dans %1</translation>
     </message>
 </context>
 <context>
@@ -528,10 +529,6 @@ Vous continuerez à voir les messages des contacts bloqués dans les autres grou
         <source>Saved to Videos</source>
         <translation>Enregistré dans Vidéos</translation>
     </message>
-    <message>
-        <source>Saved to Downloads</source>
-        <translation>Enregistré dans Téléchargements</translation>
-    </message>
     <message numerus="yes">
         <source>%n member(s)</source>
         <extracomment>Under a group&apos;s name, over its messages. %n is how many people are in the group.</extracomment>
@@ -544,6 +541,11 @@ Vous continuerez à voir les messages des contacts bloqués dans les autres grou
         <source>Too big to send: %1. This relay takes %2.</source>
         <extracomment>Shown above the message field when the attached file is bigger than the relay will carry. %1 is the file&apos;s size and %2 the largest the relay takes, each such as &quot;24 MB&quot;.</extracomment>
         <translation>Trop volumineux pour être envoyé : %1. Ce relais accepte %2.</translation>
+    </message>
+    <message>
+        <source>Saved to %1</source>
+        <extracomment>%1 is a folder, such as &quot;Documents/Postivene&quot;.</extracomment>
+        <translation>Enregistré dans %1</translation>
     </message>
 </context>
 <context>
@@ -1511,6 +1513,23 @@ Vous continuerez à voir les messages des contacts bloqués dans les autres grou
     <message>
         <source>Pictures are made smaller before sending, and the camera records at this quality.</source>
         <translation>Les images sont réduites avant l’envoi, et la caméra enregistre à cette qualité.</translation>
+    </message>
+    <message>
+        <source>Save files to</source>
+        <extracomment>Where a copy of a file from a chat is put.</extracomment>
+        <translation>Enregistrer les fichiers dans</translation>
+    </message>
+    <message>
+        <source>A folder under Documents, Downloads, Music, Videos or Pictures. Pictures and videos go to the gallery.</source>
+        <translation>Un dossier dans Documents, Téléchargements, Musique, Vidéos ou Images. Les images et les vidéos vont dans la galerie.</translation>
+    </message>
+    <message>
+        <source>Show notifications</source>
+        <translation>Afficher les notifications</translation>
+    </message>
+    <message>
+        <source>Off, nothing is announced when a message arrives.</source>
+        <translation>Désactivé, rien n’est annoncé à l’arrivée d’un message.</translation>
     </message>
 </context>
 <context>

@@ -362,10 +362,6 @@ Other groups with blocked contacts will still show their messages.</source>
 <context>
     <name>ChatMediaPage</name>
     <message>
-        <source>Saved to Downloads</source>
-        <translation>பதிவிறக்கங்களில் சேமிக்கப்பட்டது</translation>
-    </message>
-    <message>
         <source>Open in another app</source>
         <extracomment>Hands the attachment to whatever else on the phone handles files of its kind.</extracomment>
         <translation>வேறு பயன்பாட்டில் திற</translation>
@@ -387,6 +383,11 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Delete</source>
         <translation>நீக்கு</translation>
+    </message>
+    <message>
+        <source>Saved to %1</source>
+        <extracomment>%1 is a folder, such as &quot;Documents/Postivene&quot;.</extracomment>
+        <translation>%1 இல் சேமிக்கப்பட்டது</translation>
     </message>
 </context>
 <context>
@@ -524,10 +525,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Saved to Videos</source>
         <translation>வீடியோக்களில் சேமிக்கப்பட்டது</translation>
     </message>
-    <message>
-        <source>Saved to Downloads</source>
-        <translation>பதிவிறக்கங்களில் சேமிக்கப்பட்டது</translation>
-    </message>
     <message numerus="yes">
         <source>%n member(s)</source>
         <extracomment>Under a group&apos;s name, over its messages. %n is how many people are in the group.</extracomment>
@@ -540,6 +537,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Too big to send: %1. This relay takes %2.</source>
         <extracomment>Shown above the message field when the attached file is bigger than the relay will carry. %1 is the file&apos;s size and %2 the largest the relay takes, each such as &quot;24 MB&quot;.</extracomment>
         <translation>அனுப்ப மிகப் பெரியது: %1. இந்த ரிலே %2 வரை ஏற்கும்.</translation>
+    </message>
+    <message>
+        <source>Saved to %1</source>
+        <extracomment>%1 is a folder, such as &quot;Documents/Postivene&quot;.</extracomment>
+        <translation>%1 இல் சேமிக்கப்பட்டது</translation>
     </message>
 </context>
 <context>
@@ -1507,6 +1509,23 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Pictures are made smaller before sending, and the camera records at this quality.</source>
         <translation>படங்கள் அனுப்பும் முன் சிறிதாக்கப்படும், கேமராவும் இதே தரத்தில் பதிவு செய்யும்.</translation>
+    </message>
+    <message>
+        <source>Save files to</source>
+        <extracomment>Where a copy of a file from a chat is put.</extracomment>
+        <translation>கோப்புகளை இங்கே சேமி</translation>
+    </message>
+    <message>
+        <source>A folder under Documents, Downloads, Music, Videos or Pictures. Pictures and videos go to the gallery.</source>
+        <translation>Documents, Downloads, Music, Videos அல்லது Pictures-க்குள் உள்ள ஒரு கோப்புறை. படங்களும் வீடியோக்களும் கேலரிக்குச் செல்லும்.</translation>
+    </message>
+    <message>
+        <source>Show notifications</source>
+        <translation>அறிவிப்புகளைக் காட்டு</translation>
+    </message>
+    <message>
+        <source>Off, nothing is announced when a message arrives.</source>
+        <translation>அணைக்கப்பட்டிருந்தால், செய்தி வரும்போது எதுவும் அறிவிக்கப்படாது.</translation>
     </message>
 </context>
 <context>

@@ -496,7 +496,7 @@ Page {
         }
         onOpenRequested: page.openAttachment(fileUrl, fileName, viewType,
                                              previewWidth)
-        onSaveRequested: page.saveAttachment(fileUrl, viewType)
+        onSaveRequested: page.saveAttachment(fileUrl, fileName, viewType)
         onFullTextRequested: pageStack.push(Qt.resolvedUrl("MessagePage.qml"), {
             accountId: page.accountId,
             messageId: messageId,
@@ -927,20 +927,26 @@ Page {
         }
     }
 
-    // Where a copy of an attachment goes: the folder the platform
-    // indexes for its kind, which is the one the reader will look in.
-    // The sandbox grants all three (Pictures, Videos, Downloads).
-    function saveAttachment(fileUrl, viewType) {
+    // Where a copy of an attachment goes: for a picture or a video the
+    // folder the gallery indexes, which is where the reader will look
+    // for it; for anything else the folder the reader chose in the
+    // settings, or Documents/Postivene until they choose one. Under the
+    // name the sender gave it, since the core keeps the file under a
+    // name of its own. The sandbox grants the gallery's two and the
+    // folders the setting may name.
+    function saveAttachment(fileUrl, fileName, viewType) {
         if (viewType === "Image" || viewType === "Gif"
                 || viewType === "Sticker") {
             page.savedTo = qsTr("Saved to Pictures")
-            attachmentSaver.save(fileUrl, StandardPaths.pictures)
+            attachmentSaver.save_as(fileUrl, StandardPaths.pictures, fileName)
         } else if (viewType === "Video") {
             page.savedTo = qsTr("Saved to Videos")
-            attachmentSaver.save(fileUrl, StandardPaths.videos)
+            attachmentSaver.save_as(fileUrl, StandardPaths.videos, fileName)
         } else {
-            page.savedTo = qsTr("Saved to Downloads")
-            attachmentSaver.save(fileUrl, StandardPaths.download)
+            //: %1 is a folder, such as "Documents/Postivene".
+            page.savedTo = qsTr("Saved to %1").arg(
+                        Settings.folderLabel(Settings.saveFolder))
+            attachmentSaver.save_as(fileUrl, Settings.saveFolder, fileName)
         }
     }
 
