@@ -41,6 +41,45 @@ pub const DEFAULT_PROVIDER_QR: &str = "dcaccount:nine.testrun.org";
 /// Where the RPM installs the server: beside the app, and not on `PATH`.
 pub const BUNDLED_SERVER: &str = "/usr/libexec/harbour-postivene/deltachat-rpc-server";
 
+/// The event kinds anything in the app reads, and so the only ones
+/// `DeltaChatCore::core_event` is fired for.
+///
+/// The core says a great deal that nothing here listens to -- most of it is
+/// its log -- and every event fired reaches every page still on the stack
+/// and one chat list per profile on the cover, each of which parses the
+/// payload again. Dropping the rest before it is serialised is work not
+/// done, and the bulk syncs where there is most of it are exactly when the
+/// screen is off. See `DeltaChatCore::relay`.
+///
+/// This is the union of every kind matched in a `handle_event` in this
+/// crate and every kind named in an `onCore_event` in `qml/`. **A page that
+/// starts reading a new kind has to add it here**, or it will never see
+/// one; `tests/event_kinds.rs` reads both sides and fails if they differ,
+/// and `tests/event_fanout.rs` is that the gate is really applied.
+///
+/// Sorted, so the list can be read at a glance.
+pub const HANDLED_EVENT_KINDS: &[&str] = &[
+    "ChatDeleted",
+    "ChatEphemeralTimerModified",
+    "ChatModified",
+    "ChatlistChanged",
+    "ChatlistItemChanged",
+    "ConnectivityChanged",
+    "ContactsChanged",
+    "EventChannelOverflow",
+    "ImexProgress",
+    "IncomingMsg",
+    "MsgDeleted",
+    "MsgDelivered",
+    "MsgFailed",
+    "MsgRead",
+    "MsgsChanged",
+    "MsgsNoticed",
+    "ReactionsChanged",
+    "WebxdcInstanceDeleted",
+    "WebxdcStatusUpdate",
+];
+
 /// How long the app waits for the server to go at exit.
 const SHUTDOWN_TIMEOUT: Duration = Duration::from_secs(3);
 
@@ -269,6 +308,29 @@ pub struct DeltaChatCore {
     /// Result of resuming IO. `account_id` is 0 for a resume of every
     /// account at once.
     pub io_started: qt_signal!(account_id: u32, success: bool, error: QString),
+
+    /// Stop IO for every account, for as long as there is no network to
+    /// carry it.
+    ///
+    /// Only ever called when the phone itself says it has no connection
+    /// (see `qml/components/NetworkWatch.qml`). A core whose IO is running
+    /// on a dead network keeps trying to make a connection -- a name
+    /// lookup, a TCP connect, a failure, a wait, again -- and every attempt
+    /// wakes the radio for nothing. Nothing is given up by stopping: no
+    /// message can arrive over a network that is not there.
+    ///
+    /// Never called because the app was backgrounded. The app in the
+    /// background is the only way a message reaches this platform at all,
+    /// and stopping IO then would be stopping the app from working.
+    ///
+    /// Forgets what IO was asked for, so a core restarted while the network
+    /// is still gone comes back with IO stopped too. Whatever starts IO
+    /// again -- the network returning, or the reader opening the app --
+    /// asks for it afresh.
+    pub stop_all_account_io: qt_method!(fn(&mut self)),
+    /// Result of stopping IO. Reported for the same reason `io_started` is:
+    /// so a test can see it happened.
+    pub io_stopped: qt_signal!(success: bool, error: QString),
 
     /// Tell the core the network may have changed under it.
     ///
@@ -722,7 +784,6 @@ impl DeltaChatCore {
             "" => "Unknown".to_string(),
             kind => kind.to_string(),
         };
-        let payload = serde_json::to_string(&event.event).unwrap_or_default();
         if kind == "Error" {
             let text = match json::str_at(&event.event, "msg") {
                 "" => "the core reported an error",
@@ -761,6 +822,17 @@ impl DeltaChatCore {
         ) {
             self.refresh_unread(event.context_id);
         }
+        // Everything above is this object's own business and happens
+        // whatever the kind. The fan-out below is not: `core_event` reaches
+        // every page still on the stack and one chat list per profile on the
+        // cover, and the core says a great deal that none of them read --
+        // its whole log, for one. Serialising that and handing it round is
+        // work done with the screen off, once per listener, during exactly
+        // the bulk syncs where there is most of it.
+        if !HANDLED_EVENT_KINDS.contains(&kind.as_str()) {
+            return;
+        }
+        let payload = serde_json::to_string(&event.event).unwrap_or_default();
         self.core_event(event.context_id, kind.into(), payload.into());
     }
 
@@ -1166,6 +1238,36 @@ impl DeltaChatCore {
 
         runtime.spawn(async move {
             done(start_io(&rpc, None).await);
+        });
+    }
+
+    /// Stop IO for every account; see the declaration.
+    pub fn stop_all_account_io(&mut self) {
+        // Forgotten before the call, and both of them: a core that dies and
+        // is restarted while the network is still gone must not come back
+        // with IO running, and `resume_io` reads exactly these two.
+        self.io_all = false;
+        self.io_accounts.clear();
+        let Some((rpc, runtime)) = self.connection() else {
+            self.io_stopped(false, QString::from("not started"));
+            return;
+        };
+
+        let ptr: QPointer<Self> = QPointer::from(&*self);
+        let done = queued_callback(move |result: Result<(), String>| {
+            let Some(this) = ptr.as_pinned() else { return };
+            match result {
+                Ok(()) => this.borrow().io_stopped(true, QString::default()),
+                Err(err) => this.borrow().io_stopped(false, err.into()),
+            }
+        });
+
+        runtime.spawn(async move {
+            done(
+                rpc.call_unit::<()>("stop_io_for_all_accounts")
+                    .await
+                    .map_err(|err| err.to_string()),
+            );
         });
     }
 

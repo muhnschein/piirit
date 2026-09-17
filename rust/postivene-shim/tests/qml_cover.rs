@@ -153,6 +153,7 @@ fn the_cover_draws_everyone_and_lights_whoever_wrote() {
     }
 
     postivene_shim::register_qml_types();
+    common::register_cover_enum();
 
     let core_box = QObjectBox::new(DeltaChatCore::default());
     let mut engine = QmlEngine::new();

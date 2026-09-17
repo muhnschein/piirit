@@ -1,10 +1,13 @@
 //! What the app does with connman's account of the network.
 //!
-//! The rule is the core's own: `maybe_network` says the network may have
-//! come back, so arriving at one that works is worth passing on and losing
-//! one is not -- the core has nothing to reconnect to, and an attempt that
-//! cannot succeed is a wasted one. A single handover is several
-//! announcements, so they are taken as the one change they are.
+//! Two things come out of it, and they are not symmetrical. Arriving at a
+//! network that works means `maybe_network`: the core may have a dead
+//! socket to replace, and a handover is several announcements taken as the
+//! one change they are, so the ask waits a moment to collect them.
+//!
+//! Losing one means stopping IO, which costs messages if it is wrong -- so
+//! that waits much longer, long enough that no handover can look like an
+//! outage. A loss that does not last is never announced at all.
 //!
 //! The component is loaded as shipped, against the stub `Nemo.DBus`: what
 //! a device's bus would deliver arrives here as the call the interface
@@ -29,25 +32,30 @@ const PROBE_QML: &str = r"
     import QtQuick 2.0
     Item {
         property int hints: 0
+        property int losses: 0
         Loader { id: loader }
 
         function load(url) {
             loader.setSource(url, {})
             if (loader.status !== Loader.Ready) { return 'load-failed' }
             loader.item.networkChanged.connect(function () { hints++ })
+            loader.item.networkLost.connect(function () { losses++ })
+            // Half a minute is the real wait and the point of it; a test
+            // that sat through it would be a test nobody runs.
+            loader.item.lostMs = 400
             return 'ok'
         }
         // What connman announced, as the interface hands it over.
         function say(value) { loader.item.heard('State', value); return 'ok' }
         // Something else about connman changed. Not the connection.
         function sayOther() { loader.item.heard('OfflineMode', false); return 'ok' }
-        function count() { return '' + hints }
+        function count() { return hints + '|' + losses }
     }
 ";
 
 #[test]
 #[allow(clippy::too_many_lines)]
-fn only_arriving_at_a_working_network_is_passed_on_and_a_handover_counts_once() {
+fn a_handover_counts_once_and_only_an_outage_that_lasts_is_called_one() {
     // SAFETY: single-threaded test binary; set before Qt starts.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
@@ -97,9 +105,11 @@ fn only_arriving_at_a_working_network_is_passed_on_and_a_handover_counts_once() 
     let settled = steps.clone();
     single_shot(Duration::from_secs(3), move || unsafe {
         common::record(&settled, "after-handover", call!("count").into());
-        // Losing the network, and a property that is not the connection.
+        // The network goes, and connman changes its mind about which kind
+        // of nothing it has -- which must not put the announcement off.
         call!("say", QString::from("offline"));
         call!("say", QString::from("idle"));
+        // Something about connman that is not the connection at all.
         call!("sayOther");
     });
 
@@ -112,8 +122,20 @@ fn only_arriving_at_a_working_network_is_passed_on_and_a_handover_counts_once() 
     });
 
     let back = steps.clone();
-    single_shot(Duration::from_secs(7), move || unsafe {
+    single_shot(Duration::from_millis(7000), move || unsafe {
         common::record(&back, "after-return", call!("count").into());
+        // A blink: gone and back again well inside the wait. A handover
+        // looks like this, and nothing should come of it.
+        call!("say", QString::from("offline"));
+    });
+
+    single_shot(Duration::from_millis(7150), move || unsafe {
+        call!("say", QString::from("online"));
+    });
+
+    let blinked = steps.clone();
+    single_shot(Duration::from_millis(9500), move || unsafe {
+        common::record(&blinked, "after-blink", call!("count").into());
         (*engine_ptr).quit();
     });
 
@@ -127,25 +149,33 @@ fn only_arriving_at_a_working_network_is_passed_on_and_a_handover_counts_once() 
     );
     assert_eq!(
         common::value_of(&steps, "during"),
-        "0",
+        "0|0",
         "the first announcement of a handover was passed on straight away, \
          so one change of network is three asks of the core"
     );
     assert_eq!(
         common::value_of(&steps, "after-handover"),
-        "1",
-        "a handover was not passed on as exactly one change"
+        "1|0",
+        "a handover was not passed on as exactly one change, or the `idle` \
+         it passes through was called an outage"
     );
     assert_eq!(
         common::value_of(&steps, "after-loss"),
-        "1",
-        "losing the network was passed on as though it had come back: the \
-         core would try to reconnect to nothing"
+        "1|1",
+        "losing the network was passed on as though it had come back -- the \
+         core would try to reconnect to nothing -- or connman changing its \
+         mind between `offline` and `idle` put the announcement off again"
     );
     assert_eq!(
         common::value_of(&steps, "after-return"),
-        "2",
+        "2|1",
         "coming back was not passed on, or connman repeating itself was \
          counted twice"
+    );
+    assert_eq!(
+        common::value_of(&steps, "after-blink"),
+        "3|1",
+        "a network gone and back inside the wait was called an outage, so \
+         an ordinary handover would stop the app receiving"
     );
 }

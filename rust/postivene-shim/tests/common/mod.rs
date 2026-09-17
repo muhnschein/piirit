@@ -39,6 +39,36 @@ pub fn register_dbus_enum() {
     });
 }
 
+/// `Cover.Active` and the rest, which `CoverPage.qml` compares its own
+/// `status` against. A registered enum for the same reason as `DBus`
+/// above: QML before 5.10 cannot declare one, and the device floor is
+/// Qt 5.6. The numbering is Silica's own order; only that both sides of
+/// the comparison come from here matters, since on a device both come
+/// from Silica.
+#[derive(QEnum)]
+#[repr(u8)]
+pub enum Cover {
+    Inactive = 0,
+    Activating = 1,
+    Active = 2,
+    Deactivating = 3,
+}
+
+/// Register the stub `Cover` enum, once per process. Needed by anything
+/// that loads `qml/cover/CoverPage.qml`.
+pub fn register_cover_enum() {
+    static ONCE: Once = Once::new();
+    ONCE.call_once(|| {
+        let Ok(uri) = CString::new("Sailfish.Silica") else {
+            return;
+        };
+        let Ok(name) = CString::new("Cover") else {
+            return;
+        };
+        qml_register_enum::<Cover>(&uri, 1, 0, &name);
+    });
+}
+
 /// Every recorded call, in order. A line that does not parse is a torn
 /// write, not noise: fail rather than drop it and assert on a short list.
 pub fn records(journal: &Path) -> Vec<Value> {
