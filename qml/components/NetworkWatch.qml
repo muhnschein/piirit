@@ -53,6 +53,19 @@ Item {
     /// anything. Kept so a state repeated is not read as a change.
     property string connectivity: ""
 
+    /// Whether the network is gone and `networkLost` has said so: true
+    /// from that signal until connman announces a network again.
+    ///
+    /// The signal is for whoever is listening when it goes. This is for
+    /// whoever was not -- a core that was away restarting at the time, and
+    /// comes back with IO running against a network that is still not
+    /// there -- so it can be asked afterwards. Never set on a state connman
+    /// has not positively announced, for the same reason as the signal.
+    ///
+    /// Set only here. Writable because QML before 5.10 has no other way
+    /// to give a property a value from a handler in the same file.
+    property bool lost: false
+
     /// Whether the last thing connman said was that there is a network.
     /// False before it has said anything, which is not the same as knowing
     /// there is none -- nothing acts on this being false on its own.
@@ -103,8 +116,9 @@ Item {
         watch.connectivity = state
         if (watch.online) {
             // Whichever way round: a network that is back cancels a loss
-            // that was on its way to being announced.
+            // that was on its way to being announced, and ends one that was.
             lost.stop()
+            watch.lost = false
             settle.restart()
         } else {
             settle.stop()
@@ -174,7 +188,10 @@ Item {
     Timer {
         id: lost
         interval: watch.lostMs
-        onTriggered: watch.networkLost()
+        onTriggered: {
+            watch.lost = true
+            watch.networkLost()
+        }
     }
 
     Component.onCompleted: watch.look()

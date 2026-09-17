@@ -169,7 +169,23 @@ ApplicationWindow {
         target: core
         // Qt 5.6 handler syntax; see WelcomePage.qml.
         onStatus_changed: {
-            if (core.status === "ready" && !appWindow.askedForIo) {
+            if (core.status !== "ready") {
+                return
+            }
+            // The network went before the core was up -- a phone opened
+            // in a basement -- so there is nothing to start IO for. Marked
+            // as asked for and stopped instead, which is what `resumeIo`
+            // reads when the network is back. Also true of a core that
+            // died and came back mid-outage, which `pauseIo` has already
+            // dealt with: the stop it sent an absent core is what keeps
+            // this one from resuming IO, and the guard in `pauseIo` makes
+            // this a no-op.
+            if (networkWatch.lost) {
+                appWindow.askedForIo = true
+                appWindow.pauseIo()
+                return
+            }
+            if (!appWindow.askedForIo) {
                 appWindow.askedForIo = true
                 core.start_all_account_io()
             }
@@ -215,6 +231,24 @@ ApplicationWindow {
         core.maybe_network()
     }
 
+    /// There is no network and has not been for a while: stop IO, once.
+    ///
+    /// Not gated on the core being there, on purpose. A core that is away
+    /// -- restarting after it died -- has no IO to stop, but the shim
+    /// remembers what IO was asked for and resumes it under whatever core
+    /// comes back; asking it to stop now is what makes it forget, so the
+    /// core comes back with IO stopped rather than reconnecting to nothing
+    /// until the next time connman changes its mind. IO that was never
+    /// asked for is not the window's to stop, and IO already stopped need
+    /// not be stopped again.
+    function pauseIo() {
+        if (!appWindow.askedForIo || appWindow.ioPaused) {
+            return
+        }
+        appWindow.ioPaused = true
+        core.stop_all_account_io()
+    }
+
     // Coming back to the app is the one moment the reader is watching for
     // a message, and the likeliest moment for the connection the core is
     // holding to be a dead one -- the phone has been in a pocket through
@@ -232,6 +266,7 @@ ApplicationWindow {
     // its own bus, and a message that arrives while it is in a pocket is
     // one only this can rescue. See components/NetworkWatch.qml.
     NetworkWatch {
+        id: networkWatch
         objectName: "networkWatch"
 
         onNetworkChanged: appWindow.resumeIo()
@@ -240,14 +275,7 @@ ApplicationWindow {
         // Left alone, the core would spend that time reconnecting to
         // nothing, and each attempt wakes the radio for a failure. Nothing
         // is given up by stopping.
-        onNetworkLost: {
-            if (core.status !== "ready" || !appWindow.askedForIo
-                    || appWindow.ioPaused) {
-                return
-            }
-            appWindow.ioPaused = true
-            core.stop_all_account_io()
-        }
+        onNetworkLost: appWindow.pauseIo()
     }
 
     Component.onCompleted: {
