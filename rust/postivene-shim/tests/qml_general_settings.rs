@@ -457,7 +457,10 @@ fn the_settings_page_writes_what_the_app_reads() {
         record!("folder-label", get!("folderField", "label"));
         record!(
             "type-folder",
-            call!("typeFolder", QString::from("/home/nemo/Downloads/chat/"))
+            call!(
+                "typeFolder",
+                QString::from("/tmp/postivene-stub-standardpaths/Downloads/chat/")
+            )
         );
         record!(
             "folder-unwritten",
@@ -595,8 +598,14 @@ fn the_settings_page_writes_what_the_app_reads() {
             "/tmp/postivene-stub-standardpaths/Documents/Postivene",
         ),
         // Once the typing has paused, without the trailing slash.
-        ("folder-written", "/home/nemo/Downloads/chat"),
-        ("folder-shown-written", "/home/nemo/Downloads/chat"),
+        (
+            "folder-written",
+            "/tmp/postivene-stub-standardpaths/Downloads/chat",
+        ),
+        (
+            "folder-shown-written",
+            "/tmp/postivene-stub-standardpaths/Downloads/chat",
+        ),
         ("type-nothing", "ok"),
         (
             "folder-back-to-default",
