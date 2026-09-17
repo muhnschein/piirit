@@ -197,6 +197,20 @@ fn a_message_is_announced_unless_the_reader_is_already_in_that_chat() {
         // A tap comes back to the chat, through the name the adaptor owns.
         record!("tap", call!("tap", 13));
 
+        // Notifications off: whatever is up comes down, and nothing
+        // arriving goes up, however loudly. On again, arrivals are news
+        // as before.
+        record!("before-off", call!("published"));
+        call!("set", QString::from("enabled"), false);
+        record!("after-off", call!("published"));
+        arrived!(17, "Linus", "", "anyone there?");
+        record!("while-off", call!("published"));
+        record!("nothing-said", call!("saying", 17));
+        call!("set", QString::from("enabled"), true);
+        arrived!(17, "Linus", "", "hello again");
+        record!("after-on", call!("published"));
+        record!("said-again", call!("saying", 17));
+
         (*engine_ptr).quit();
     });
 
@@ -207,6 +221,7 @@ fn a_message_is_announced_unless_the_reader_is_already_in_that_chat() {
 
 /// Who was told, who was spared, what they were told, and where a tap
 /// went.
+#[allow(clippy::too_many_lines)]
 fn assert_outcome(steps: &[(&str, String)]) {
     let value = |label: &str| {
         steps
@@ -299,5 +314,29 @@ fn assert_outcome(steps: &[(&str, String)]) {
         value("tap"),
         "13",
         "a tap on the notification did not come back to its chat. {context}"
+    );
+    assert_ne!(
+        value("before-off"),
+        "0",
+        "nothing was up to take down, so turning notifications off proves \
+         nothing here. {context}"
+    );
+    assert_eq!(
+        value("after-off"),
+        "0",
+        "notifications turned off left the ones already up. {context}"
+    );
+    assert_eq!(
+        (value("while-off"), value("nothing-said")),
+        ("0".to_string(), "none".to_string()),
+        "a message arriving with notifications off was announced. {context}"
+    );
+    // Said the way the detail setting left it: only that something
+    // arrived.
+    assert_eq!(
+        (value("after-on"), value("said-again")),
+        ("1".to_string(), "1 new message(s)/".to_string()),
+        "notifications turned back on did not announce the next arrival. \
+         {context}"
     );
 }

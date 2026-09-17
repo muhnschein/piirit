@@ -368,10 +368,6 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
 <context>
     <name>ChatMediaPage</name>
     <message>
-        <source>Saved to Downloads</source>
-        <translation>Shranjeno v Prenose</translation>
-    </message>
-    <message>
         <source>Open in another app</source>
         <extracomment>Hands the attachment to whatever else on the phone handles files of its kind.</extracomment>
         <translation>Odpri v drugi aplikaciji</translation>
@@ -393,6 +389,11 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
     <message>
         <source>Delete</source>
         <translation>Izbriši</translation>
+    </message>
+    <message>
+        <source>Saved to %1</source>
+        <extracomment>%1 is a folder, such as &quot;Documents/Postivene&quot;.</extracomment>
+        <translation>Shranjeno v %1</translation>
     </message>
 </context>
 <context>
@@ -530,10 +531,6 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
         <source>Saved to Videos</source>
         <translation>Shranjeno v Videoposnetke</translation>
     </message>
-    <message>
-        <source>Saved to Downloads</source>
-        <translation>Shranjeno v Prenose</translation>
-    </message>
     <message numerus="yes">
         <source>%n member(s)</source>
         <extracomment>Under a group&apos;s name, over its messages. %n is how many people are in the group.</extracomment>
@@ -548,6 +545,11 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
         <source>Too big to send: %1. This relay takes %2.</source>
         <extracomment>Shown above the message field when the attached file is bigger than the relay will carry. %1 is the file&apos;s size and %2 the largest the relay takes, each such as &quot;24 MB&quot;.</extracomment>
         <translation>Prevelika za pošiljanje: %1. Ta rele sprejme %2.</translation>
+    </message>
+    <message>
+        <source>Saved to %1</source>
+        <extracomment>%1 is a folder, such as &quot;Documents/Postivene&quot;.</extracomment>
+        <translation>Shranjeno v %1</translation>
     </message>
 </context>
 <context>
@@ -682,6 +684,24 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
     <message>
         <source>A backup file copied onto this phone.</source>
         <translation>Datoteka varnostne kopije, prekopirana na ta telefon.</translation>
+    </message>
+</context>
+<context>
+    <name>FolderPickerDialog</name>
+    <message>
+        <source>Default folder</source>
+        <extracomment>Puts the folder back to the one a fresh install saves to.</extracomment>
+        <translation>Privzeta mapa</translation>
+    </message>
+    <message>
+        <source>Choose a folder</source>
+        <extracomment>Above the list of folders to choose from.</extracomment>
+        <translation>Izberite mapo</translation>
+    </message>
+    <message>
+        <source>No folders here</source>
+        <extracomment>Under a folder with no folders in it: it can still be chosen.</extracomment>
+        <translation>Tu ni map</translation>
     </message>
 </context>
 <context>
@@ -1523,6 +1543,19 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
     <message>
         <source>Pictures are made smaller before sending, and the camera records at this quality.</source>
         <translation>Slike se pred pošiljanjem pomanjšajo, kamera pa snema v tej kakovosti.</translation>
+    </message>
+    <message>
+        <source>Save files to</source>
+        <extracomment>Where a copy of a file from a chat is put.</extracomment>
+        <translation>Shrani datoteke v</translation>
+    </message>
+    <message>
+        <source>Show notifications</source>
+        <translation>Prikaži obvestila</translation>
+    </message>
+    <message>
+        <source>Pictures and videos always go to the gallery.</source>
+        <translation>Slike in videi gredo vedno v galerijo.</translation>
     </message>
 </context>
 <context>

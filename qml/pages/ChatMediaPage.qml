@@ -3,6 +3,7 @@ import QtQuick 2.5
 import Sailfish.Silica 1.0
 import Nemo.Thumbnailer 1.0
 import "../components"
+import "../components"
 import "../js/Media.js" as Media
 import "../js/Format.js" as Format
 import Postivene 1.0
@@ -199,13 +200,15 @@ Page {
         pageStack.pop(below)
     }
 
-    // A copy into Downloads, where the file manager looks: what the
-    // conversation's row menu does with a file, and the sandbox grants
-    // the folder (Downloads).
+    // A copy into the folder the reader chose for files, under the name
+    // the sender gave it: what the conversation's row menu does with a
+    // file, and the same words for it.
     FileSaver {
         id: saver
         objectName: "saver"
-        onSaved: notice.show(qsTr("Saved to Downloads"))
+        //: %1 is a folder, such as "Documents/Postivene".
+        onSaved: notice.show(qsTr("Saved to %1").arg(
+                                 Settings.folderLabel(Settings.saveFolder)))
         onError: page.errorMessage = message
     }
 
@@ -478,7 +481,8 @@ Page {
                     MenuItem {
                         objectName: "saveItem"
                         text: qsTr("Save to device")
-                        onClicked: saver.save(row.fileUrl, StandardPaths.download)
+                        onClicked: saver.save_as(row.fileUrl, Settings.saveFolder,
+                                                 model.file_name)
                     }
                     MenuItem {
                         objectName: "deleteItem"

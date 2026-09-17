@@ -29,6 +29,7 @@ Slider 1.0 Slider.qml
 TextArea 1.0 TextArea.qml
 TextField 1.0 TextField.qml
 TextSwitch 1.0 TextSwitch.qml
+ValueButton 1.0 ValueButton.qml
 VerticalScrollDecorator 1.0 VerticalScrollDecorator.qml
 ViewPlaceholder 1.0 ViewPlaceholder.qml
 singleton Theme 1.0 Theme.qml

@@ -256,3 +256,14 @@ pub struct SearchItem {
 
 /// Search model, for the grouped results list.
 pub type SearchListModel = SimpleListModel<SearchItem>;
+
+/// One folder under another, for the folder picker.
+#[derive(Default, Clone, qmetaobject::SimpleListItem)]
+pub struct FolderItem {
+    /// The folder's own name.
+    pub name: QString,
+    /// Its full path.
+    pub path: QString,
+}
+
+pub type FolderListModel = SimpleListModel<FolderItem>;

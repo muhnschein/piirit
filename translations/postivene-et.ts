@@ -366,10 +366,6 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
 <context>
     <name>ChatMediaPage</name>
     <message>
-        <source>Saved to Downloads</source>
-        <translation>Salvestatud allalaadimistesse</translation>
-    </message>
-    <message>
         <source>Open in another app</source>
         <extracomment>Hands the attachment to whatever else on the phone handles files of its kind.</extracomment>
         <translation>Ava teises rakenduses</translation>
@@ -391,6 +387,11 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
     <message>
         <source>Delete</source>
         <translation>Kustuta</translation>
+    </message>
+    <message>
+        <source>Saved to %1</source>
+        <extracomment>%1 is a folder, such as &quot;Documents/Postivene&quot;.</extracomment>
+        <translation>Salvestatud: %1</translation>
     </message>
 </context>
 <context>
@@ -528,10 +529,6 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
         <source>Saved to Videos</source>
         <translation>Salvestatud Videote alla</translation>
     </message>
-    <message>
-        <source>Saved to Downloads</source>
-        <translation>Salvestatud allalaadimistesse</translation>
-    </message>
     <message numerus="yes">
         <source>%n member(s)</source>
         <extracomment>Under a group&apos;s name, over its messages. %n is how many people are in the group.</extracomment>
@@ -544,6 +541,11 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
         <source>Too big to send: %1. This relay takes %2.</source>
         <extracomment>Shown above the message field when the attached file is bigger than the relay will carry. %1 is the file&apos;s size and %2 the largest the relay takes, each such as &quot;24 MB&quot;.</extracomment>
         <translation>Liiga suur, et saata: %1. See relee võtab vastu %2.</translation>
+    </message>
+    <message>
+        <source>Saved to %1</source>
+        <extracomment>%1 is a folder, such as &quot;Documents/Postivene&quot;.</extracomment>
+        <translation>Salvestatud: %1</translation>
     </message>
 </context>
 <context>
@@ -678,6 +680,24 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
     <message>
         <source>A backup file copied onto this phone.</source>
         <translation>Varukoopia fail, kopeeritud sellesse telefoni.</translation>
+    </message>
+</context>
+<context>
+    <name>FolderPickerDialog</name>
+    <message>
+        <source>Default folder</source>
+        <extracomment>Puts the folder back to the one a fresh install saves to.</extracomment>
+        <translation>Vaikimisi kaust</translation>
+    </message>
+    <message>
+        <source>Choose a folder</source>
+        <extracomment>Above the list of folders to choose from.</extracomment>
+        <translation>Vali kaust</translation>
+    </message>
+    <message>
+        <source>No folders here</source>
+        <extracomment>Under a folder with no folders in it: it can still be chosen.</extracomment>
+        <translation>Siin pole kaustu</translation>
     </message>
 </context>
 <context>
@@ -1511,6 +1531,19 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
     <message>
         <source>Pictures are made smaller before sending, and the camera records at this quality.</source>
         <translation>Pilte vähendatakse enne saatmist ja kaamera salvestab selle kvaliteediga.</translation>
+    </message>
+    <message>
+        <source>Save files to</source>
+        <extracomment>Where a copy of a file from a chat is put.</extracomment>
+        <translation>Salvesta failid kausta</translation>
+    </message>
+    <message>
+        <source>Show notifications</source>
+        <translation>Näita teavitusi</translation>
+    </message>
+    <message>
+        <source>Pictures and videos always go to the gallery.</source>
+        <translation>Pildid ja videod lähevad alati galeriisse.</translation>
     </message>
 </context>
 <context>

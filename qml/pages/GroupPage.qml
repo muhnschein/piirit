@@ -193,7 +193,13 @@ Page {
         anchors.fill: parent
         contentHeight: column.height + Theme.paddingLarge
 
+        // Both entries belong to a member, so for a reader who has left
+        // the group -- or was removed from it -- the menu would be empty,
+        // and an empty pull-down is a pull that does nothing.
         PullDownMenu {
+            objectName: "groupMenu"
+            visible: chat.can_edit
+
             MenuItem {
                 objectName: "leaveButton"
                 visible: chat.can_edit

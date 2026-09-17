@@ -362,10 +362,6 @@ Other groups with blocked contacts will still show their messages.</source>
 <context>
     <name>ChatMediaPage</name>
     <message>
-        <source>Saved to Downloads</source>
-        <translation>Sparat i Hämtningar</translation>
-    </message>
-    <message>
         <source>Open in another app</source>
         <extracomment>Hands the attachment to whatever else on the phone handles files of its kind.</extracomment>
         <translation>Öppna i en annan app</translation>
@@ -387,6 +383,11 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Delete</source>
         <translation>Ta bort</translation>
+    </message>
+    <message>
+        <source>Saved to %1</source>
+        <extracomment>%1 is a folder, such as &quot;Documents/Postivene&quot;.</extracomment>
+        <translation>Sparat i %1</translation>
     </message>
 </context>
 <context>
@@ -524,10 +525,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Saved to Videos</source>
         <translation>Sparat i Videor</translation>
     </message>
-    <message>
-        <source>Saved to Downloads</source>
-        <translation>Sparat i Hämtningar</translation>
-    </message>
     <message numerus="yes">
         <source>%n member(s)</source>
         <extracomment>Under a group&apos;s name, over its messages. %n is how many people are in the group.</extracomment>
@@ -540,6 +537,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Too big to send: %1. This relay takes %2.</source>
         <extracomment>Shown above the message field when the attached file is bigger than the relay will carry. %1 is the file&apos;s size and %2 the largest the relay takes, each such as &quot;24 MB&quot;.</extracomment>
         <translation>För stor för att skicka: %1. Reläet tar emot %2.</translation>
+    </message>
+    <message>
+        <source>Saved to %1</source>
+        <extracomment>%1 is a folder, such as &quot;Documents/Postivene&quot;.</extracomment>
+        <translation>Sparat i %1</translation>
     </message>
 </context>
 <context>
@@ -674,6 +676,24 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>A backup file copied onto this phone.</source>
         <translation>En säkerhetskopiefil, kopierad till den här telefonen.</translation>
+    </message>
+</context>
+<context>
+    <name>FolderPickerDialog</name>
+    <message>
+        <source>Default folder</source>
+        <extracomment>Puts the folder back to the one a fresh install saves to.</extracomment>
+        <translation>Standardmapp</translation>
+    </message>
+    <message>
+        <source>Choose a folder</source>
+        <extracomment>Above the list of folders to choose from.</extracomment>
+        <translation>Välj en mapp</translation>
+    </message>
+    <message>
+        <source>No folders here</source>
+        <extracomment>Under a folder with no folders in it: it can still be chosen.</extracomment>
+        <translation>Inga mappar här</translation>
     </message>
 </context>
 <context>
@@ -1507,6 +1527,19 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Pictures are made smaller before sending, and the camera records at this quality.</source>
         <translation>Bilder förminskas innan de skickas, och kameran spelar in med den här kvaliteten.</translation>
+    </message>
+    <message>
+        <source>Save files to</source>
+        <extracomment>Where a copy of a file from a chat is put.</extracomment>
+        <translation>Spara filer i</translation>
+    </message>
+    <message>
+        <source>Show notifications</source>
+        <translation>Visa aviseringar</translation>
+    </message>
+    <message>
+        <source>Pictures and videos always go to the gallery.</source>
+        <translation>Bilder och videor går alltid till galleriet.</translation>
     </message>
 </context>
 <context>

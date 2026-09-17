@@ -366,10 +366,6 @@ In anderen Gruppen mit blockierten Kontakten werden deren Nachrichten weiterhin 
 <context>
     <name>ChatMediaPage</name>
     <message>
-        <source>Saved to Downloads</source>
-        <translation>In Downloads gespeichert</translation>
-    </message>
-    <message>
         <source>Open in another app</source>
         <extracomment>Hands the attachment to whatever else on the phone handles files of its kind.</extracomment>
         <translation>In anderer App öffnen</translation>
@@ -391,6 +387,11 @@ In anderen Gruppen mit blockierten Kontakten werden deren Nachrichten weiterhin 
     <message>
         <source>Delete</source>
         <translation>Löschen</translation>
+    </message>
+    <message>
+        <source>Saved to %1</source>
+        <extracomment>%1 is a folder, such as &quot;Documents/Postivene&quot;.</extracomment>
+        <translation>Gespeichert unter %1</translation>
     </message>
 </context>
 <context>
@@ -528,10 +529,6 @@ In anderen Gruppen mit blockierten Kontakten werden deren Nachrichten weiterhin 
         <source>Saved to Videos</source>
         <translation>Unter Videos gespeichert</translation>
     </message>
-    <message>
-        <source>Saved to Downloads</source>
-        <translation>In Downloads gespeichert</translation>
-    </message>
     <message numerus="yes">
         <source>%n member(s)</source>
         <extracomment>Under a group&apos;s name, over its messages. %n is how many people are in the group.</extracomment>
@@ -544,6 +541,11 @@ In anderen Gruppen mit blockierten Kontakten werden deren Nachrichten weiterhin 
         <source>Too big to send: %1. This relay takes %2.</source>
         <extracomment>Shown above the message field when the attached file is bigger than the relay will carry. %1 is the file&apos;s size and %2 the largest the relay takes, each such as &quot;24 MB&quot;.</extracomment>
         <translation>Zu groß zum Senden: %1. Dieses Relay nimmt %2.</translation>
+    </message>
+    <message>
+        <source>Saved to %1</source>
+        <extracomment>%1 is a folder, such as &quot;Documents/Postivene&quot;.</extracomment>
+        <translation>Gespeichert unter %1</translation>
     </message>
 </context>
 <context>
@@ -678,6 +680,24 @@ In anderen Gruppen mit blockierten Kontakten werden deren Nachrichten weiterhin 
     <message>
         <source>A backup file copied onto this phone.</source>
         <translation>Eine Backup-Datei, auf dieses Telefon kopiert.</translation>
+    </message>
+</context>
+<context>
+    <name>FolderPickerDialog</name>
+    <message>
+        <source>Default folder</source>
+        <extracomment>Puts the folder back to the one a fresh install saves to.</extracomment>
+        <translation>Standardordner</translation>
+    </message>
+    <message>
+        <source>Choose a folder</source>
+        <extracomment>Above the list of folders to choose from.</extracomment>
+        <translation>Ordner wählen</translation>
+    </message>
+    <message>
+        <source>No folders here</source>
+        <extracomment>Under a folder with no folders in it: it can still be chosen.</extracomment>
+        <translation>Keine Ordner hier</translation>
     </message>
 </context>
 <context>
@@ -1511,6 +1531,19 @@ In anderen Gruppen mit blockierten Kontakten werden deren Nachrichten weiterhin 
     <message>
         <source>Pictures are made smaller before sending, and the camera records at this quality.</source>
         <translation>Bilder werden vor dem Senden verkleinert, und die Kamera nimmt in dieser Qualität auf.</translation>
+    </message>
+    <message>
+        <source>Save files to</source>
+        <extracomment>Where a copy of a file from a chat is put.</extracomment>
+        <translation>Dateien speichern unter</translation>
+    </message>
+    <message>
+        <source>Show notifications</source>
+        <translation>Benachrichtigungen anzeigen</translation>
+    </message>
+    <message>
+        <source>Pictures and videos always go to the gallery.</source>
+        <translation>Bilder und Videos gehen immer in die Galerie.</translation>
     </message>
 </context>
 <context>

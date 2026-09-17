@@ -109,6 +109,9 @@ Page {
     Notifier {
         id: notifier
         objectName: "notifier"
+        // Off, nothing is announced and what was is taken down; the
+        // model still says what arrived, for the list's own sake.
+        enabled: Settings.notificationsEnabled === true
         detail: Settings.notificationDetail
         // A tap on a notification: back to the list, then into the chat,
         // in front of whatever the reader was doing.

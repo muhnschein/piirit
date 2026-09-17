@@ -367,10 +367,6 @@ Správy od zablokovaných kontaktov v ostatných skupinách sa budú naďalej zo
 <context>
     <name>ChatMediaPage</name>
     <message>
-        <source>Saved to Downloads</source>
-        <translation>Uložené do Stiahnutých</translation>
-    </message>
-    <message>
         <source>Open in another app</source>
         <extracomment>Hands the attachment to whatever else on the phone handles files of its kind.</extracomment>
         <translation>Otvoriť v inej aplikácii</translation>
@@ -392,6 +388,11 @@ Správy od zablokovaných kontaktov v ostatných skupinách sa budú naďalej zo
     <message>
         <source>Delete</source>
         <translation>Odstrániť</translation>
+    </message>
+    <message>
+        <source>Saved to %1</source>
+        <extracomment>%1 is a folder, such as &quot;Documents/Postivene&quot;.</extracomment>
+        <translation>Uložené do %1</translation>
     </message>
 </context>
 <context>
@@ -529,10 +530,6 @@ Správy od zablokovaných kontaktov v ostatných skupinách sa budú naďalej zo
         <source>Saved to Videos</source>
         <translation>Uložené do Videí</translation>
     </message>
-    <message>
-        <source>Saved to Downloads</source>
-        <translation>Uložené do Stiahnutých</translation>
-    </message>
     <message numerus="yes">
         <source>%n member(s)</source>
         <extracomment>Under a group&apos;s name, over its messages. %n is how many people are in the group.</extracomment>
@@ -546,6 +543,11 @@ Správy od zablokovaných kontaktov v ostatných skupinách sa budú naďalej zo
         <source>Too big to send: %1. This relay takes %2.</source>
         <extracomment>Shown above the message field when the attached file is bigger than the relay will carry. %1 is the file&apos;s size and %2 the largest the relay takes, each such as &quot;24 MB&quot;.</extracomment>
         <translation>Príliš veľké na odoslanie: %1. Tento relay prijíma %2.</translation>
+    </message>
+    <message>
+        <source>Saved to %1</source>
+        <extracomment>%1 is a folder, such as &quot;Documents/Postivene&quot;.</extracomment>
+        <translation>Uložené do %1</translation>
     </message>
 </context>
 <context>
@@ -680,6 +682,24 @@ Správy od zablokovaných kontaktov v ostatných skupinách sa budú naďalej zo
     <message>
         <source>A backup file copied onto this phone.</source>
         <translation>Súbor zálohy skopírovaný do tohto telefónu.</translation>
+    </message>
+</context>
+<context>
+    <name>FolderPickerDialog</name>
+    <message>
+        <source>Default folder</source>
+        <extracomment>Puts the folder back to the one a fresh install saves to.</extracomment>
+        <translation>Predvolený priečinok</translation>
+    </message>
+    <message>
+        <source>Choose a folder</source>
+        <extracomment>Above the list of folders to choose from.</extracomment>
+        <translation>Vyberte priečinok</translation>
+    </message>
+    <message>
+        <source>No folders here</source>
+        <extracomment>Under a folder with no folders in it: it can still be chosen.</extracomment>
+        <translation>Žiadne priečinky</translation>
     </message>
 </context>
 <context>
@@ -1517,6 +1537,19 @@ Správy od zablokovaných kontaktov v ostatných skupinách sa budú naďalej zo
     <message>
         <source>Pictures are made smaller before sending, and the camera records at this quality.</source>
         <translation>Obrázky sa pred odoslaním zmenšia a kamera nahráva v tejto kvalite.</translation>
+    </message>
+    <message>
+        <source>Save files to</source>
+        <extracomment>Where a copy of a file from a chat is put.</extracomment>
+        <translation>Ukladať súbory do</translation>
+    </message>
+    <message>
+        <source>Show notifications</source>
+        <translation>Zobrazovať upozornenia</translation>
+    </message>
+    <message>
+        <source>Pictures and videos always go to the gallery.</source>
+        <translation>Obrázky a videá idú vždy do galérie.</translation>
     </message>
 </context>
 <context>

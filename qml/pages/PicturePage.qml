@@ -178,7 +178,8 @@ Page {
             MenuItem {
                 objectName: "saveToDevice"
                 text: qsTr("Save to device")
-                onClicked: saver.save(page.fileUrl, StandardPaths.pictures)
+                onClicked: saver.save_as(page.fileUrl, StandardPaths.pictures,
+                                         page.fileName)
             }
         }
 

@@ -636,7 +636,9 @@ fn message_object(msg: u64) -> Value {
     match msg {
         12 => {
             message["viewType"] = json!("File");
-            message["file"] = json!("/tmp/postivene-fake/notes.pdf");
+            // Under its hash, as the real core keeps a received file;
+            // the sender's name for it is `fileName` and nowhere else.
+            message["file"] = json!("/tmp/postivene-fake/6f5902ac237024bdd0c176cb93063dc4.pdf");
             message["fileName"] = json!("notes.pdf");
             message["fileMime"] = json!("application/pdf");
             message["fileBytes"] = json!(20_480);
