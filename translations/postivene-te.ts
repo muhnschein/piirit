@@ -679,6 +679,24 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>FolderPickerDialog</name>
+    <message>
+        <source>Default folder</source>
+        <extracomment>Puts the folder back to the one a fresh install saves to.</extracomment>
+        <translation>డిఫాల్ట్ ఫోల్డర్</translation>
+    </message>
+    <message>
+        <source>Choose a folder</source>
+        <extracomment>Above the list of folders to choose from.</extracomment>
+        <translation>ఒక ఫోల్డర్‌ను ఎంచుకోండి</translation>
+    </message>
+    <message>
+        <source>No folders here</source>
+        <extracomment>Under a folder with no folders in it: it can still be chosen.</extracomment>
+        <translation>ఇక్కడ ఫోల్డర్లు లేవు</translation>
+    </message>
+</context>
+<context>
     <name>Format</name>
     <message>
         <source>now</source>
@@ -1516,16 +1534,12 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>ఫైళ్లను ఇక్కడ సేవ్ చేయి</translation>
     </message>
     <message>
-        <source>A folder under Documents, Downloads, Music, Videos or Pictures. Pictures and videos go to the gallery.</source>
-        <translation>Documents, Downloads, Music, Videos లేదా Pictures లోని ఒక ఫోల్డర్. చిత్రాలు మరియు వీడియోలు గ్యాలరీకి వెళ్తాయి.</translation>
-    </message>
-    <message>
         <source>Show notifications</source>
         <translation>నోటిఫికేషన్లను చూపించు</translation>
     </message>
     <message>
-        <source>Off, nothing is announced when a message arrives.</source>
-        <translation>ఆఫ్‌లో ఉంటే, సందేశం వచ్చినప్పుడు ఏమీ తెలియజేయబడదు.</translation>
+        <source>Pictures and videos always go to the gallery.</source>
+        <translation>చిత్రాలు మరియు వీడియోలు ఎల్లప్పుడూ గ్యాలరీకి వెళ్తాయి.</translation>
     </message>
 </context>
 <context>

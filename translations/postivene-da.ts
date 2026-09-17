@@ -679,6 +679,24 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>FolderPickerDialog</name>
+    <message>
+        <source>Default folder</source>
+        <extracomment>Puts the folder back to the one a fresh install saves to.</extracomment>
+        <translation>Standardmappe</translation>
+    </message>
+    <message>
+        <source>Choose a folder</source>
+        <extracomment>Above the list of folders to choose from.</extracomment>
+        <translation>Vælg en mappe</translation>
+    </message>
+    <message>
+        <source>No folders here</source>
+        <extracomment>Under a folder with no folders in it: it can still be chosen.</extracomment>
+        <translation>Ingen mapper her</translation>
+    </message>
+</context>
+<context>
     <name>Format</name>
     <message>
         <source>now</source>
@@ -1516,16 +1534,12 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Gem filer i</translation>
     </message>
     <message>
-        <source>A folder under Documents, Downloads, Music, Videos or Pictures. Pictures and videos go to the gallery.</source>
-        <translation>En mappe under Dokumenter, Overførsler, Musik, Videoer eller Billeder. Billeder og videoer går til galleriet.</translation>
-    </message>
-    <message>
         <source>Show notifications</source>
         <translation>Vis notifikationer</translation>
     </message>
     <message>
-        <source>Off, nothing is announced when a message arrives.</source>
-        <translation>Slået fra bliver intet meddelt, når en besked kommer.</translation>
+        <source>Pictures and videos always go to the gallery.</source>
+        <translation>Billeder og videoer går altid til galleriet.</translation>
     </message>
 </context>
 <context>

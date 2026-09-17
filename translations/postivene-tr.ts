@@ -681,6 +681,24 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
     </message>
 </context>
 <context>
+    <name>FolderPickerDialog</name>
+    <message>
+        <source>Default folder</source>
+        <extracomment>Puts the folder back to the one a fresh install saves to.</extracomment>
+        <translation>Varsayılan klasör</translation>
+    </message>
+    <message>
+        <source>Choose a folder</source>
+        <extracomment>Above the list of folders to choose from.</extracomment>
+        <translation>Bir klasör seçin</translation>
+    </message>
+    <message>
+        <source>No folders here</source>
+        <extracomment>Under a folder with no folders in it: it can still be chosen.</extracomment>
+        <translation>Burada klasör yok</translation>
+    </message>
+</context>
+<context>
     <name>Format</name>
     <message>
         <source>now</source>
@@ -1514,16 +1532,12 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
         <translation>Dosyaları şuraya kaydet</translation>
     </message>
     <message>
-        <source>A folder under Documents, Downloads, Music, Videos or Pictures. Pictures and videos go to the gallery.</source>
-        <translation>Belgeler, İndirilenler, Müzik, Videolar veya Resimler altında bir klasör. Resimler ve videolar galeriye gider.</translation>
-    </message>
-    <message>
         <source>Show notifications</source>
         <translation>Bildirimleri göster</translation>
     </message>
     <message>
-        <source>Off, nothing is announced when a message arrives.</source>
-        <translation>Kapalıyken bir ileti geldiğinde hiçbir şey bildirilmez.</translation>
+        <source>Pictures and videos always go to the gallery.</source>
+        <translation>Resimler ve videolar her zaman galeriye gider.</translation>
     </message>
 </context>
 <context>

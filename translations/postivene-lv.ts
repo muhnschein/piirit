@@ -685,6 +685,24 @@ Citās grupās, kurās ir bloķēti kontakti, viņu ziņas joprojām būs redzam
     </message>
 </context>
 <context>
+    <name>FolderPickerDialog</name>
+    <message>
+        <source>Default folder</source>
+        <extracomment>Puts the folder back to the one a fresh install saves to.</extracomment>
+        <translation>Noklusējuma mape</translation>
+    </message>
+    <message>
+        <source>Choose a folder</source>
+        <extracomment>Above the list of folders to choose from.</extracomment>
+        <translation>Izvēlieties mapi</translation>
+    </message>
+    <message>
+        <source>No folders here</source>
+        <extracomment>Under a folder with no folders in it: it can still be chosen.</extracomment>
+        <translation>Šeit nav mapju</translation>
+    </message>
+</context>
+<context>
     <name>Format</name>
     <message>
         <source>now</source>
@@ -1526,16 +1544,12 @@ Citās grupās, kurās ir bloķēti kontakti, viņu ziņas joprojām būs redzam
         <translation>Saglabāt failus mapē</translation>
     </message>
     <message>
-        <source>A folder under Documents, Downloads, Music, Videos or Pictures. Pictures and videos go to the gallery.</source>
-        <translation>Mape zem Dokumenti, Lejupielādes, Mūzika, Video vai Attēli. Attēli un video nonāk galerijā.</translation>
-    </message>
-    <message>
         <source>Show notifications</source>
         <translation>Rādīt paziņojumus</translation>
     </message>
     <message>
-        <source>Off, nothing is announced when a message arrives.</source>
-        <translation>Izslēgts: par ienākošu ziņu nekas netiek paziņots.</translation>
+        <source>Pictures and videos always go to the gallery.</source>
+        <translation>Attēli un video vienmēr nonāk galerijā.</translation>
     </message>
 </context>
 <context>

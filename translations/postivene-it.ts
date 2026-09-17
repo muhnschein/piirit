@@ -683,6 +683,24 @@ Gli altri gruppi con contatti bloccati continueranno a visualizzare i loro messa
     </message>
 </context>
 <context>
+    <name>FolderPickerDialog</name>
+    <message>
+        <source>Default folder</source>
+        <extracomment>Puts the folder back to the one a fresh install saves to.</extracomment>
+        <translation>Cartella predefinita</translation>
+    </message>
+    <message>
+        <source>Choose a folder</source>
+        <extracomment>Above the list of folders to choose from.</extracomment>
+        <translation>Scegli una cartella</translation>
+    </message>
+    <message>
+        <source>No folders here</source>
+        <extracomment>Under a folder with no folders in it: it can still be chosen.</extracomment>
+        <translation>Nessuna cartella qui</translation>
+    </message>
+</context>
+<context>
     <name>Format</name>
     <message>
         <source>now</source>
@@ -1520,16 +1538,12 @@ Gli altri gruppi con contatti bloccati continueranno a visualizzare i loro messa
         <translation>Salva i file in</translation>
     </message>
     <message>
-        <source>A folder under Documents, Downloads, Music, Videos or Pictures. Pictures and videos go to the gallery.</source>
-        <translation>Una cartella dentro Documenti, Download, Musica, Video o Immagini. Immagini e video vanno nella galleria.</translation>
-    </message>
-    <message>
         <source>Show notifications</source>
         <translation>Mostra le notifiche</translation>
     </message>
     <message>
-        <source>Off, nothing is announced when a message arrives.</source>
-        <translation>Disattivato, nulla viene annunciato all’arrivo di un messaggio.</translation>
+        <source>Pictures and videos always go to the gallery.</source>
+        <translation>Immagini e video vanno sempre nella galleria.</translation>
     </message>
 </context>
 <context>

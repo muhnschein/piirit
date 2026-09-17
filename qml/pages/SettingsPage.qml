@@ -35,10 +35,11 @@ import "../components"
  * that entry to appear at all.
  *
  * Nothing here needs saving: each control writes its setting on the tap.
- * Two exceptions. The deletion period deletes messages the moment it is
- * set, so that one asks first -- on a page of its own, with the count of
- * what would go. And the save folder is typed, so that one waits for the
- * typing to pause, the way the profile page waits on a name.
+ * Two are chosen on a page of their own instead. The deletion period
+ * deletes messages the moment it is set, so that one asks first, with
+ * the count of what would go. And the save folder is walked to, in a
+ * dialog that takes the folder on a swipe forward and nothing on a swipe
+ * back.
  */
 Page {
     id: page
@@ -130,11 +131,6 @@ Page {
     function refresh() {
         qualityCombo.currentIndex = page.qualityIndex(Settings.mediaQuality)
         downloadCombo.currentIndex = page.limitIndex(Settings.downloadLimit)
-        // Not while the reader is typing in it: what they have so far
-        // is not yet the setting, and is not to be replaced by it.
-        if (!folderSave.running) {
-            folderField.text = Settings.saveFolder
-        }
         deletionCombo.currentIndex = page.periodIndex(Settings.deleteDeviceAfter)
         notificationCombo.currentIndex =
             page.notificationIndex(Settings.notificationDetail)
@@ -151,30 +147,19 @@ Page {
 
     Component.onCompleted: page.refresh()
 
-    /// The typed folder becomes the setting once the typing has paused,
-    /// or the moment the field is left. Emptied, it goes back to the
-    /// default rather than to nowhere: a copy has to go somewhere.
-    Timer {
-        id: folderSave
-        objectName: "folderSave"
-        interval: 1200
-        onTriggered: page.applyFolder()
-    }
-
-    function applyFolder() {
-        folderSave.stop()
-        var typed = folderField.text.replace(/^\s+|\s+$/g, "")
-        // A trailing slash is the same folder.
-        while (typed.length > 1 && typed.charAt(typed.length - 1) === "/") {
-            typed = typed.substring(0, typed.length - 1)
-        }
-        if (typed.length === 0) {
-            typed = Settings.defaultSaveFolder
-        }
-        if (typed !== Settings.saveFolder) {
-            Settings.saveFolder = typed
-        } else {
-            folderField.text = typed
+    /// Choose the save folder: a dialog that walks the folders the app
+    /// may write in. The setting is written only when the dialog is
+    /// accepted -- a swipe forward -- and left alone on a swipe back.
+    function chooseFolder() {
+        var dialog = pageStack.push(Qt.resolvedUrl("FolderPickerDialog.qml"), {
+            folder: Settings.saveFolder
+        })
+        if (dialog) {
+            dialog.accepted.connect(function() {
+                if (dialog.chosen.length > 0) {
+                    Settings.saveFolder = dialog.chosen
+                }
+            })
         }
     }
 
@@ -322,35 +307,19 @@ Page {
                 }
             }
 
-            // Where a file lands when the reader keeps a copy of it.
-            // Typed rather than picked: Silica has no folder picker a
-            // Harbour app may use. A picture or a video keeps going to
-            // the gallery's folders, which is where the gallery looks.
-            TextField {
-                id: folderField
-                objectName: "folderField"
+            // Where a file lands when the reader keeps a copy of it,
+            // chosen on a page of its own (FolderPickerDialog.qml). A
+            // picture or a video keeps going to the gallery's folders,
+            // which is where the gallery looks, and the line under says
+            // so.
+            ValueButton {
+                objectName: "folderButton"
                 width: parent.width
                 //: Where a copy of a file from a chat is put.
                 label: qsTr("Save files to")
-                placeholderText: Settings.defaultSaveFolder
-                description: qsTr("A folder under Documents, Downloads, Music, Videos or Pictures. Pictures and videos go to the gallery.")
-                inputMethodHints: Qt.ImhNoAutoUppercase | Qt.ImhNoPredictiveText
-                // A change that is not the setting arriving is the reader
-                // typing: the pause starts over with each letter.
-                onTextChanged: {
-                    if (text !== Settings.saveFolder) {
-                        folderSave.restart()
-                    }
-                }
-                // Leaving the field is the other way to say "done": the
-                // pause is for a reader who stops to think, this for one
-                // who taps away. No `EnterKey` here -- the keyboard's own
-                // Done key drops the focus, which lands here too.
-                onActiveFocusChanged: {
-                    if (!activeFocus) {
-                        page.applyFolder()
-                    }
-                }
+                value: Settings.folderLabel(Settings.saveFolder)
+                description: qsTr("Pictures and videos always go to the gallery.")
+                onClicked: page.chooseFolder()
             }
 
             // The core's own `delete_device_after`, which it applies to
@@ -389,7 +358,6 @@ Page {
             TextSwitch {
                 objectName: "notificationsSwitch"
                 text: qsTr("Show notifications")
-                description: qsTr("Off, nothing is announced when a message arrives.")
                 automaticCheck: false
                 checked: Settings.notificationsEnabled === true
                 onClicked: Settings.notificationsEnabled = !checked

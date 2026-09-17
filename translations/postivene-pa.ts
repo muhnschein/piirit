@@ -683,6 +683,24 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>FolderPickerDialog</name>
+    <message>
+        <source>Default folder</source>
+        <extracomment>Puts the folder back to the one a fresh install saves to.</extracomment>
+        <translation>ਡਿਫਾਲਟ ਫੋਲਡਰ</translation>
+    </message>
+    <message>
+        <source>Choose a folder</source>
+        <extracomment>Above the list of folders to choose from.</extracomment>
+        <translation>ਇੱਕ ਫੋਲਡਰ ਚੁਣੋ</translation>
+    </message>
+    <message>
+        <source>No folders here</source>
+        <extracomment>Under a folder with no folders in it: it can still be chosen.</extracomment>
+        <translation>ਇੱਥੇ ਕੋਈ ਫੋਲਡਰ ਨਹੀਂ</translation>
+    </message>
+</context>
+<context>
     <name>Format</name>
     <message>
         <source>now</source>
@@ -1520,16 +1538,12 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>ਫ਼ਾਈਲਾਂ ਇੱਥੇ ਸੰਭਾਲੋ</translation>
     </message>
     <message>
-        <source>A folder under Documents, Downloads, Music, Videos or Pictures. Pictures and videos go to the gallery.</source>
-        <translation>Documents, Downloads, Music, Videos ਜਾਂ Pictures ਵਿੱਚ ਇੱਕ ਫੋਲਡਰ। ਤਸਵੀਰਾਂ ਅਤੇ ਵੀਡੀਓ ਗੈਲਰੀ ਵਿੱਚ ਜਾਂਦੇ ਹਨ।</translation>
-    </message>
-    <message>
         <source>Show notifications</source>
         <translation>ਸੂਚਨਾਵਾਂ ਦਿਖਾਓ</translation>
     </message>
     <message>
-        <source>Off, nothing is announced when a message arrives.</source>
-        <translation>ਬੰਦ ਹੋਣ &apos;ਤੇ ਸੁਨੇਹਾ ਆਉਣ &apos;ਤੇ ਕੁਝ ਨਹੀਂ ਦੱਸਿਆ ਜਾਂਦਾ।</translation>
+        <source>Pictures and videos always go to the gallery.</source>
+        <translation>ਤਸਵੀਰਾਂ ਅਤੇ ਵੀਡੀਓ ਹਮੇਸ਼ਾ ਗੈਲਰੀ ਵਿੱਚ ਜਾਂਦੇ ਹਨ।</translation>
     </message>
 </context>
 <context>

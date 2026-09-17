@@ -683,6 +683,24 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>FolderPickerDialog</name>
+    <message>
+        <source>Default folder</source>
+        <extracomment>Puts the folder back to the one a fresh install saves to.</extracomment>
+        <translation>डिफ़ॉल्ट फ़ोल्डर</translation>
+    </message>
+    <message>
+        <source>Choose a folder</source>
+        <extracomment>Above the list of folders to choose from.</extracomment>
+        <translation>एक फ़ोल्डर चुनें</translation>
+    </message>
+    <message>
+        <source>No folders here</source>
+        <extracomment>Under a folder with no folders in it: it can still be chosen.</extracomment>
+        <translation>यहाँ कोई फ़ोल्डर नहीं</translation>
+    </message>
+</context>
+<context>
     <name>Format</name>
     <message>
         <source>now</source>
@@ -1520,16 +1538,12 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>फ़ाइलें यहाँ सहेजें</translation>
     </message>
     <message>
-        <source>A folder under Documents, Downloads, Music, Videos or Pictures. Pictures and videos go to the gallery.</source>
-        <translation>Documents, Downloads, Music, Videos या Pictures के अंदर एक फ़ोल्डर। चित्र और वीडियो गैलरी में जाते हैं।</translation>
-    </message>
-    <message>
         <source>Show notifications</source>
         <translation>सूचनाएँ दिखाएँ</translation>
     </message>
     <message>
-        <source>Off, nothing is announced when a message arrives.</source>
-        <translation>बंद होने पर संदेश आने पर कुछ नहीं बताया जाता।</translation>
+        <source>Pictures and videos always go to the gallery.</source>
+        <translation>चित्र और वीडियो हमेशा गैलरी में जाते हैं।</translation>
     </message>
 </context>
 <context>

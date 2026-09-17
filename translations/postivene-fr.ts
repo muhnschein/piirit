@@ -683,6 +683,24 @@ Vous continuerez à voir les messages des contacts bloqués dans les autres grou
     </message>
 </context>
 <context>
+    <name>FolderPickerDialog</name>
+    <message>
+        <source>Default folder</source>
+        <extracomment>Puts the folder back to the one a fresh install saves to.</extracomment>
+        <translation>Dossier par défaut</translation>
+    </message>
+    <message>
+        <source>Choose a folder</source>
+        <extracomment>Above the list of folders to choose from.</extracomment>
+        <translation>Choisir un dossier</translation>
+    </message>
+    <message>
+        <source>No folders here</source>
+        <extracomment>Under a folder with no folders in it: it can still be chosen.</extracomment>
+        <translation>Aucun dossier ici</translation>
+    </message>
+</context>
+<context>
     <name>Format</name>
     <message>
         <source>now</source>
@@ -1520,16 +1538,12 @@ Vous continuerez à voir les messages des contacts bloqués dans les autres grou
         <translation>Enregistrer les fichiers dans</translation>
     </message>
     <message>
-        <source>A folder under Documents, Downloads, Music, Videos or Pictures. Pictures and videos go to the gallery.</source>
-        <translation>Un dossier dans Documents, Téléchargements, Musique, Vidéos ou Images. Les images et les vidéos vont dans la galerie.</translation>
-    </message>
-    <message>
         <source>Show notifications</source>
         <translation>Afficher les notifications</translation>
     </message>
     <message>
-        <source>Off, nothing is announced when a message arrives.</source>
-        <translation>Désactivé, rien n’est annoncé à l’arrivée d’un message.</translation>
+        <source>Pictures and videos always go to the gallery.</source>
+        <translation>Les images et les vidéos vont toujours dans la galerie.</translation>
     </message>
 </context>
 <context>

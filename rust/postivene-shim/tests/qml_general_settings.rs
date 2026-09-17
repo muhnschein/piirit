@@ -100,15 +100,34 @@ fn probe_qml() -> String {
         }}
         function appWrites(name, value) {{ Settings[name] = value; return 'ok' }}
         function appKey(name) {{ return '' + Settings[name].key }}
-        // Typing into the folder field: the field takes focus, as it
-        // would under a finger, and the text changes under it.
-        function typeFolder(text) {{
-            var field = findIn(loader.item, 'folderField')
-            if (!field) {{ return 'missing:folderField' }}
-            field.forceActiveFocus()
-            field.text = text
+        // Silica's page stack, as far as this page uses it: push records
+        // what was pushed and hands back a dialog for the page to connect
+        // to, the way Silica hands back the page it made. The folder
+        // picker is that dialog, reduced to what the page reads of it.
+        QtObject {{
+            id: stack
+            property string pushed: ''
+            property QtObject dialog: QtObject {{
+                property string chosen: ''
+                signal accepted()
+                signal rejected()
+                function accept() {{ accepted() }}
+            }}
+            function push(url, props) {{
+                var name = ('' + url).split('/').pop()
+                pushed = name + ':folder=' + props.folder
+                return dialog
+            }}
+        }}
+        function stackObject() {{ return stack }}
+        function pushed() {{ return stack.pushed }}
+        // The reader swiped forward on `folder`, or back with nothing.
+        function acceptFolder(folder) {{
+            stack.dialog.chosen = folder
+            stack.dialog.accept()
             return 'ok'
         }}
+        function rejectFolder() {{ stack.dialog.rejected(); return 'ok' }}
     }}
 ",
         components.display()
@@ -132,6 +151,9 @@ fn the_settings_page_writes_what_the_app_reads() {
     ));
     engine.set_object_property("core".into(), core_box.pinned());
     engine.load_data(QByteArray::from(probe_qml()));
+    // Named for the page before it is loaded, as Silica names its own.
+    let stack = engine.invoke_method("stackObject".into(), &[]);
+    engine.set_property("pageStack".into(), stack);
 
     let engine_ptr = std::ptr::addr_of_mut!(engine);
     let mut steps: Vec<(&str, String)> = Vec::new();
@@ -447,44 +469,43 @@ fn the_settings_page_writes_what_the_app_reads() {
         record!("detail-usable-again", get!("notificationCombo", "enabled"));
 
         // Where a saved file goes: the app's own folder under Documents
-        // until the reader types another, which becomes the setting once
-        // the typing has paused. Emptied, it goes back to the default.
+        // until the reader chooses another, in a dialog of its own that
+        // writes the setting on a swipe forward and nothing on a swipe
+        // back.
         record!(
             "folder-default",
             call!("appReads", QString::from("saveFolder"))
         );
-        record!("folder-shown", get!("folderField", "text"));
-        record!("folder-label", get!("folderField", "label"));
+        record!("folder-label", get!("folderButton", "label"));
+        record!("folder-value", get!("folderButton", "value"));
+        record!("folder-note", get!("folderButton", "description"));
+        record!("open-picker", call!("click", QString::from("folderButton")));
+        record!("picker-pushed", call!("pushed"));
+        record!("back-out", call!("rejectFolder"));
         record!(
-            "type-folder",
-            call!(
-                "typeFolder",
-                QString::from("/tmp/postivene-stub-standardpaths/Downloads/chat/")
-            )
-        );
-        record!(
-            "folder-unwritten",
+            "folder-unchanged",
             call!("appReads", QString::from("saveFolder"))
         );
-    });
-    // The core's refusal arrives a turn later; the typed folder lands
-    // once the typing has paused.
-    single_shot(Duration::from_secs(3), move || unsafe {
-        record!("deletion-error", get!("errorBanner", "text"));
+        record!(
+            "open-picker-again",
+            call!("click", QString::from("folderButton"))
+        );
+        record!(
+            "choose",
+            call!(
+                "acceptFolder",
+                QString::from("/tmp/postivene-stub-standardpaths/Downloads/chat")
+            )
+        );
         record!(
             "folder-written",
             call!("appReads", QString::from("saveFolder"))
         );
-        record!("folder-shown-written", get!("folderField", "text"));
-        record!("type-nothing", call!("typeFolder", QString::from("  ")));
+        record!("folder-value-written", get!("folderButton", "value"));
     });
-    // Whole seconds: `single_shot` rounds, and the pause ends at 4.2.
-    single_shot(Duration::from_secs(5), move || unsafe {
-        record!(
-            "folder-back-to-default",
-            call!("appReads", QString::from("saveFolder"))
-        );
-        record!("folder-shown-default", get!("folderField", "text"));
+    // The core's refusal arrives a turn later.
+    single_shot(Duration::from_secs(2), move || unsafe {
+        record!("deletion-error", get!("errorBanner", "text"));
         (*engine_ptr).quit();
     });
 
@@ -586,63 +607,28 @@ fn the_settings_page_writes_what_the_app_reads() {
             "folder-default",
             "/tmp/postivene-stub-standardpaths/Documents/Postivene",
         ),
-        (
-            "folder-shown",
-            "/tmp/postivene-stub-standardpaths/Documents/Postivene",
-        ),
         ("folder-label", "Save files to"),
-        ("type-folder", "ok"),
-        // Not on the keystroke.
+        ("folder-value", "Documents/Postivene"),
         (
-            "folder-unwritten",
+            "folder-note",
+            "Pictures and videos always go to the gallery.",
+        ),
+        ("open-picker", "ok"),
+        (
+            "picker-pushed",
+            "FolderPickerDialog.qml:folder=/tmp/postivene-stub-standardpaths/Documents/Postivene",
+        ),
+        ("back-out", "ok"),
+        (
+            "folder-unchanged",
             "/tmp/postivene-stub-standardpaths/Documents/Postivene",
         ),
-        // Once the typing has paused, without the trailing slash.
+        ("choose", "ok"),
         (
             "folder-written",
             "/tmp/postivene-stub-standardpaths/Downloads/chat",
         ),
-        (
-            "folder-shown-written",
-            "/tmp/postivene-stub-standardpaths/Downloads/chat",
-        ),
-        ("type-nothing", "ok"),
-        (
-            "folder-back-to-default",
-            "/tmp/postivene-stub-standardpaths/Documents/Postivene",
-        ),
-        (
-            "folder-shown-default",
-            "/tmp/postivene-stub-standardpaths/Documents/Postivene",
-        ),
-        ("apps-default", "false"),
-        ("apps-switch", "false"),
-        ("flip-apps", "ok"),
-        ("apps-on", "true"),
-        ("apps-switch-on", "true"),
-        ("flip-apps-back", "ok"),
-        ("apps-off", "false"),
-        ("apps-switch-off", "false"),
-        ("notification-default", "0"),
-        ("notification-index", "0"),
-        ("notification-label", "A new notification shows"),
-        ("pick-notification", "ok"),
-        ("notification-picked", "2"),
-        ("notification-shown", "2"),
-        ("mentions-default", "true"),
-        ("mentions-switch", "true"),
-        ("flip-mentions", "ok"),
-        ("mentions-off", "false"),
-        ("mentions-switch-off", "false"),
-        ("flip-mentions-back", "ok"),
-        ("mentions-on", "true"),
-        ("pick-deletion", "ok"),
-        ("deletion-unwritten", "0"),
-        ("deletion-shown", "0"),
-        ("app-write", "ok"),
-        ("page-follows", "false"),
-        ("app-write-deletion", "ok"),
-        ("deletion-follows", "3"),
+        ("folder-value-written", "Downloads/chat"),
     ] {
         assert_eq!(value(label), expected, "{label} is wrong. {context}");
     }

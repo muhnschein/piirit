@@ -685,6 +685,24 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
     </message>
 </context>
 <context>
+    <name>FolderPickerDialog</name>
+    <message>
+        <source>Default folder</source>
+        <extracomment>Puts the folder back to the one a fresh install saves to.</extracomment>
+        <translation>Výchozí složka</translation>
+    </message>
+    <message>
+        <source>Choose a folder</source>
+        <extracomment>Above the list of folders to choose from.</extracomment>
+        <translation>Vyberte složku</translation>
+    </message>
+    <message>
+        <source>No folders here</source>
+        <extracomment>Under a folder with no folders in it: it can still be chosen.</extracomment>
+        <translation>Žádné složky</translation>
+    </message>
+</context>
+<context>
     <name>Format</name>
     <message>
         <source>now</source>
@@ -1526,16 +1544,12 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
         <translation>Ukládat soubory do</translation>
     </message>
     <message>
-        <source>A folder under Documents, Downloads, Music, Videos or Pictures. Pictures and videos go to the gallery.</source>
-        <translation>Složka v Dokumentech, Staženém, Hudbě, Videích nebo Obrázcích. Obrázky a videa jdou do galerie.</translation>
-    </message>
-    <message>
         <source>Show notifications</source>
         <translation>Zobrazovat oznámení</translation>
     </message>
     <message>
-        <source>Off, nothing is announced when a message arrives.</source>
-        <translation>Vypnuto: při příchodu zprávy se nic neoznámí.</translation>
+        <source>Pictures and videos always go to the gallery.</source>
+        <translation>Obrázky a videa jdou vždy do galerie.</translation>
     </message>
 </context>
 <context>

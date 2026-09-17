@@ -679,6 +679,24 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>FolderPickerDialog</name>
+    <message>
+        <source>Default folder</source>
+        <extracomment>Puts the folder back to the one a fresh install saves to.</extracomment>
+        <translation>Папка по подразбиране</translation>
+    </message>
+    <message>
+        <source>Choose a folder</source>
+        <extracomment>Above the list of folders to choose from.</extracomment>
+        <translation>Изберете папка</translation>
+    </message>
+    <message>
+        <source>No folders here</source>
+        <extracomment>Under a folder with no folders in it: it can still be chosen.</extracomment>
+        <translation>Тук няма папки</translation>
+    </message>
+</context>
+<context>
     <name>Format</name>
     <message>
         <source>now</source>
@@ -1516,16 +1534,12 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Записване на файлове в</translation>
     </message>
     <message>
-        <source>A folder under Documents, Downloads, Music, Videos or Pictures. Pictures and videos go to the gallery.</source>
-        <translation>Папка в Документи, Изтегляния, Музика, Видео или Снимки. Снимките и видеата отиват в галерията.</translation>
-    </message>
-    <message>
         <source>Show notifications</source>
         <translation>Показване на известия</translation>
     </message>
     <message>
-        <source>Off, nothing is announced when a message arrives.</source>
-        <translation>Изключено: нищо не се съобщава при пристигане на съобщение.</translation>
+        <source>Pictures and videos always go to the gallery.</source>
+        <translation>Снимките и видеата винаги отиват в галерията.</translation>
     </message>
 </context>
 <context>

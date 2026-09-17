@@ -681,6 +681,24 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>FolderPickerDialog</name>
+    <message>
+        <source>Default folder</source>
+        <extracomment>Puts the folder back to the one a fresh install saves to.</extracomment>
+        <translation>Гадәти папка</translation>
+    </message>
+    <message>
+        <source>Choose a folder</source>
+        <extracomment>Above the list of folders to choose from.</extracomment>
+        <translation>Папка сайлагыз</translation>
+    </message>
+    <message>
+        <source>No folders here</source>
+        <extracomment>Under a folder with no folders in it: it can still be chosen.</extracomment>
+        <translation>Монда папкалар юк</translation>
+    </message>
+</context>
+<context>
     <name>Format</name>
     <message>
         <source>now</source>
@@ -1514,16 +1532,12 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Файлларны саклау урыны</translation>
     </message>
     <message>
-        <source>A folder under Documents, Downloads, Music, Videos or Pictures. Pictures and videos go to the gallery.</source>
-        <translation>Документлар, Йөкләүләр, Музыка, Видео яки Рәсемнәр эчендәге папка. Рәсемнәр һәм видеолар галереягә китә.</translation>
-    </message>
-    <message>
         <source>Show notifications</source>
         <translation>Белдерүләрне күрсәтү</translation>
     </message>
     <message>
-        <source>Off, nothing is announced when a message arrives.</source>
-        <translation>Сүндерелгән: хәбәр килгәндә бернәрсә дә белдерелми.</translation>
+        <source>Pictures and videos always go to the gallery.</source>
+        <translation>Рәсемнәр һәм видеолар һәрвакыт галереягә китә.</translation>
     </message>
 </context>
 <context>

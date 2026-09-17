@@ -679,6 +679,24 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>FolderPickerDialog</name>
+    <message>
+        <source>Default folder</source>
+        <extracomment>Puts the folder back to the one a fresh install saves to.</extracomment>
+        <translation>Standaardmap</translation>
+    </message>
+    <message>
+        <source>Choose a folder</source>
+        <extracomment>Above the list of folders to choose from.</extracomment>
+        <translation>Kies een map</translation>
+    </message>
+    <message>
+        <source>No folders here</source>
+        <extracomment>Under a folder with no folders in it: it can still be chosen.</extracomment>
+        <translation>Geen mappen hier</translation>
+    </message>
+</context>
+<context>
     <name>Format</name>
     <message>
         <source>now</source>
@@ -1516,16 +1534,12 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Bestanden opslaan in</translation>
     </message>
     <message>
-        <source>A folder under Documents, Downloads, Music, Videos or Pictures. Pictures and videos go to the gallery.</source>
-        <translation>Een map onder Documenten, Downloads, Muziek, Video’s of Afbeeldingen. Afbeeldingen en video’s gaan naar de galerij.</translation>
-    </message>
-    <message>
         <source>Show notifications</source>
         <translation>Meldingen tonen</translation>
     </message>
     <message>
-        <source>Off, nothing is announced when a message arrives.</source>
-        <translation>Uit: er wordt niets gemeld als een bericht binnenkomt.</translation>
+        <source>Pictures and videos always go to the gallery.</source>
+        <translation>Afbeeldingen en video’s gaan altijd naar de galerij.</translation>
     </message>
 </context>
 <context>

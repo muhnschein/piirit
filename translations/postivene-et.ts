@@ -683,6 +683,24 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
     </message>
 </context>
 <context>
+    <name>FolderPickerDialog</name>
+    <message>
+        <source>Default folder</source>
+        <extracomment>Puts the folder back to the one a fresh install saves to.</extracomment>
+        <translation>Vaikimisi kaust</translation>
+    </message>
+    <message>
+        <source>Choose a folder</source>
+        <extracomment>Above the list of folders to choose from.</extracomment>
+        <translation>Vali kaust</translation>
+    </message>
+    <message>
+        <source>No folders here</source>
+        <extracomment>Under a folder with no folders in it: it can still be chosen.</extracomment>
+        <translation>Siin pole kaustu</translation>
+    </message>
+</context>
+<context>
     <name>Format</name>
     <message>
         <source>now</source>
@@ -1520,16 +1538,12 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
         <translation>Salvesta failid kausta</translation>
     </message>
     <message>
-        <source>A folder under Documents, Downloads, Music, Videos or Pictures. Pictures and videos go to the gallery.</source>
-        <translation>Kaust kaustades Dokumendid, Allalaadimised, Muusika, Videod või Pildid. Pildid ja videod lähevad galeriisse.</translation>
-    </message>
-    <message>
         <source>Show notifications</source>
         <translation>Näita teavitusi</translation>
     </message>
     <message>
-        <source>Off, nothing is announced when a message arrives.</source>
-        <translation>Väljas: sõnumi saabumisel ei teatata midagi.</translation>
+        <source>Pictures and videos always go to the gallery.</source>
+        <translation>Pildid ja videod lähevad alati galeriisse.</translation>
     </message>
 </context>
 <context>

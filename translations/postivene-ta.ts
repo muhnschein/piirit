@@ -679,6 +679,24 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>FolderPickerDialog</name>
+    <message>
+        <source>Default folder</source>
+        <extracomment>Puts the folder back to the one a fresh install saves to.</extracomment>
+        <translation>இயல்புநிலை கோப்புறை</translation>
+    </message>
+    <message>
+        <source>Choose a folder</source>
+        <extracomment>Above the list of folders to choose from.</extracomment>
+        <translation>ஒரு கோப்புறையைத் தேர்வுசெய்க</translation>
+    </message>
+    <message>
+        <source>No folders here</source>
+        <extracomment>Under a folder with no folders in it: it can still be chosen.</extracomment>
+        <translation>இங்கே கோப்புறைகள் இல்லை</translation>
+    </message>
+</context>
+<context>
     <name>Format</name>
     <message>
         <source>now</source>
@@ -1516,16 +1534,12 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>கோப்புகளை இங்கே சேமி</translation>
     </message>
     <message>
-        <source>A folder under Documents, Downloads, Music, Videos or Pictures. Pictures and videos go to the gallery.</source>
-        <translation>Documents, Downloads, Music, Videos அல்லது Pictures-க்குள் உள்ள ஒரு கோப்புறை. படங்களும் வீடியோக்களும் கேலரிக்குச் செல்லும்.</translation>
-    </message>
-    <message>
         <source>Show notifications</source>
         <translation>அறிவிப்புகளைக் காட்டு</translation>
     </message>
     <message>
-        <source>Off, nothing is announced when a message arrives.</source>
-        <translation>அணைக்கப்பட்டிருந்தால், செய்தி வரும்போது எதுவும் அறிவிக்கப்படாது.</translation>
+        <source>Pictures and videos always go to the gallery.</source>
+        <translation>படங்களும் வீடியோக்களும் எப்போதும் கேலரிக்குச் செல்லும்.</translation>
     </message>
 </context>
 <context>

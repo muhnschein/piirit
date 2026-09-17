@@ -683,6 +683,24 @@ Mensagens de contactos bloqueados não serão ocultadas noutros grupos.</transla
     </message>
 </context>
 <context>
+    <name>FolderPickerDialog</name>
+    <message>
+        <source>Default folder</source>
+        <extracomment>Puts the folder back to the one a fresh install saves to.</extracomment>
+        <translation>Pasta predefinida</translation>
+    </message>
+    <message>
+        <source>Choose a folder</source>
+        <extracomment>Above the list of folders to choose from.</extracomment>
+        <translation>Escolha uma pasta</translation>
+    </message>
+    <message>
+        <source>No folders here</source>
+        <extracomment>Under a folder with no folders in it: it can still be chosen.</extracomment>
+        <translation>Sem pastas aqui</translation>
+    </message>
+</context>
+<context>
     <name>Format</name>
     <message>
         <source>now</source>
@@ -1520,16 +1538,12 @@ Mensagens de contactos bloqueados não serão ocultadas noutros grupos.</transla
         <translation>Guardar ficheiros em</translation>
     </message>
     <message>
-        <source>A folder under Documents, Downloads, Music, Videos or Pictures. Pictures and videos go to the gallery.</source>
-        <translation>Uma pasta dentro de Documentos, Transferências, Música, Vídeos ou Imagens. As imagens e os vídeos vão para a galeria.</translation>
-    </message>
-    <message>
         <source>Show notifications</source>
         <translation>Mostrar notificações</translation>
     </message>
     <message>
-        <source>Off, nothing is announced when a message arrives.</source>
-        <translation>Desligado, nada é anunciado quando chega uma mensagem.</translation>
+        <source>Pictures and videos always go to the gallery.</source>
+        <translation>As imagens e os vídeos vão sempre para a galeria.</translation>
     </message>
 </context>
 <context>

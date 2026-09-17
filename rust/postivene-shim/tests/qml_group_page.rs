@@ -181,6 +181,7 @@ fn the_group_page_shows_the_group_and_renames_it() {
         record!("contact-row", get!("memberRow10", "objectName"));
         record!("add-offered", get!("addMembersButton", "visible"));
         record!("leave-offered", get!("leaveButton", "visible"));
+        record!("menu-offered", get!("groupMenu", "visible"));
         record!("badge", get!("editBadge", "visible"));
         record!("remove-picture", get!("removePicture", "visible"));
         // Disappearing messages: off, as the core holds it, and a tap on
@@ -234,6 +235,9 @@ fn the_group_page_shows_the_group_and_renames_it() {
         record!("single-readonly", get!("groupNameField", "readOnly"));
         record!("single-add", get!("addMembersButton", "visible"));
         record!("single-leave", get!("leaveButton", "visible"));
+        // Nothing on the menu applies, so the menu itself is not there:
+        // an empty pull-down is a pull that does nothing.
+        record!("single-menu", get!("groupMenu", "visible"));
         record!("single-badge", get!("editBadge", "visible"));
         (*engine_ptr).quit();
     });
@@ -331,7 +335,7 @@ fn assert_page(steps: &[(&str, String)], navigation: &str, calls: &[(String, Val
         "memberRow10",
         "the other member's row is missing. {context}"
     );
-    for label in ["add-offered", "leave-offered", "badge"] {
+    for label in ["add-offered", "leave-offered", "menu-offered", "badge"] {
         assert_eq!(
             value(label),
             "true",
@@ -365,7 +369,7 @@ fn assert_page(steps: &[(&str, String)], navigation: &str, calls: &[(String, Val
         "true",
         "a one-to-one chat offers renaming, which the core refuses. {context}"
     );
-    for label in ["single-add", "single-leave", "single-badge"] {
+    for label in ["single-add", "single-leave", "single-menu", "single-badge"] {
         assert_eq!(
             value(label),
             "false",

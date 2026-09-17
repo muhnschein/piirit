@@ -679,6 +679,24 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>FolderPickerDialog</name>
+    <message>
+        <source>Default folder</source>
+        <extracomment>Puts the folder back to the one a fresh install saves to.</extracomment>
+        <translation>Oletuskansio</translation>
+    </message>
+    <message>
+        <source>Choose a folder</source>
+        <extracomment>Above the list of folders to choose from.</extracomment>
+        <translation>Valitse kansio</translation>
+    </message>
+    <message>
+        <source>No folders here</source>
+        <extracomment>Under a folder with no folders in it: it can still be chosen.</extracomment>
+        <translation>Ei kansioita</translation>
+    </message>
+</context>
+<context>
     <name>Format</name>
     <message>
         <source>now</source>
@@ -1516,16 +1534,12 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Tallenna tiedostot kansioon</translation>
     </message>
     <message>
-        <source>A folder under Documents, Downloads, Music, Videos or Pictures. Pictures and videos go to the gallery.</source>
-        <translation>Kansio Asiakirjojen, Latausten, Musiikin, Videoiden tai Kuvien alla. Kuvat ja videot menevät galleriaan.</translation>
-    </message>
-    <message>
         <source>Show notifications</source>
         <translation>Näytä ilmoitukset</translation>
     </message>
     <message>
-        <source>Off, nothing is announced when a message arrives.</source>
-        <translation>Pois päältä: viestin saapumisesta ei ilmoiteta.</translation>
+        <source>Pictures and videos always go to the gallery.</source>
+        <translation>Kuvat ja videot menevät aina galleriaan.</translation>
     </message>
 </context>
 <context>

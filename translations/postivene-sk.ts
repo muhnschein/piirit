@@ -685,6 +685,24 @@ Správy od zablokovaných kontaktov v ostatných skupinách sa budú naďalej zo
     </message>
 </context>
 <context>
+    <name>FolderPickerDialog</name>
+    <message>
+        <source>Default folder</source>
+        <extracomment>Puts the folder back to the one a fresh install saves to.</extracomment>
+        <translation>Predvolený priečinok</translation>
+    </message>
+    <message>
+        <source>Choose a folder</source>
+        <extracomment>Above the list of folders to choose from.</extracomment>
+        <translation>Vyberte priečinok</translation>
+    </message>
+    <message>
+        <source>No folders here</source>
+        <extracomment>Under a folder with no folders in it: it can still be chosen.</extracomment>
+        <translation>Žiadne priečinky</translation>
+    </message>
+</context>
+<context>
     <name>Format</name>
     <message>
         <source>now</source>
@@ -1526,16 +1544,12 @@ Správy od zablokovaných kontaktov v ostatných skupinách sa budú naďalej zo
         <translation>Ukladať súbory do</translation>
     </message>
     <message>
-        <source>A folder under Documents, Downloads, Music, Videos or Pictures. Pictures and videos go to the gallery.</source>
-        <translation>Priečinok v Dokumentoch, Stiahnutých, Hudbe, Videách alebo Obrázkoch. Obrázky a videá idú do galérie.</translation>
-    </message>
-    <message>
         <source>Show notifications</source>
         <translation>Zobrazovať upozornenia</translation>
     </message>
     <message>
-        <source>Off, nothing is announced when a message arrives.</source>
-        <translation>Vypnuté: pri príchode správy sa nič neoznámi.</translation>
+        <source>Pictures and videos always go to the gallery.</source>
+        <translation>Obrázky a videá idú vždy do galérie.</translation>
     </message>
 </context>
 <context>

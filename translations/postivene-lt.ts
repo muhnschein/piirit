@@ -681,6 +681,24 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>FolderPickerDialog</name>
+    <message>
+        <source>Default folder</source>
+        <extracomment>Puts the folder back to the one a fresh install saves to.</extracomment>
+        <translation>Numatytasis aplankas</translation>
+    </message>
+    <message>
+        <source>Choose a folder</source>
+        <extracomment>Above the list of folders to choose from.</extracomment>
+        <translation>Pasirinkite aplanką</translation>
+    </message>
+    <message>
+        <source>No folders here</source>
+        <extracomment>Under a folder with no folders in it: it can still be chosen.</extracomment>
+        <translation>Čia aplankų nėra</translation>
+    </message>
+</context>
+<context>
     <name>Format</name>
     <message>
         <source>now</source>
@@ -1522,16 +1540,12 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Įrašyti failus į</translation>
     </message>
     <message>
-        <source>A folder under Documents, Downloads, Music, Videos or Pictures. Pictures and videos go to the gallery.</source>
-        <translation>Aplankas Dokumentuose, Atsiuntimuose, Muzikoje, Vaizdo įrašuose arba Paveiksluose. Paveikslai ir vaizdo įrašai keliauja į galeriją.</translation>
-    </message>
-    <message>
         <source>Show notifications</source>
         <translation>Rodyti pranešimus</translation>
     </message>
     <message>
-        <source>Off, nothing is announced when a message arrives.</source>
-        <translation>Išjungta: gavus žinutę niekas nepranešama.</translation>
+        <source>Pictures and videos always go to the gallery.</source>
+        <translation>Paveikslai ir vaizdo įrašai visada keliauja į galeriją.</translation>
     </message>
 </context>
 <context>

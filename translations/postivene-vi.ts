@@ -677,6 +677,24 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>FolderPickerDialog</name>
+    <message>
+        <source>Default folder</source>
+        <extracomment>Puts the folder back to the one a fresh install saves to.</extracomment>
+        <translation>Thư mục mặc định</translation>
+    </message>
+    <message>
+        <source>Choose a folder</source>
+        <extracomment>Above the list of folders to choose from.</extracomment>
+        <translation>Chọn một thư mục</translation>
+    </message>
+    <message>
+        <source>No folders here</source>
+        <extracomment>Under a folder with no folders in it: it can still be chosen.</extracomment>
+        <translation>Không có thư mục nào ở đây</translation>
+    </message>
+</context>
+<context>
     <name>Format</name>
     <message>
         <source>now</source>
@@ -1510,16 +1528,12 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Lưu tệp vào</translation>
     </message>
     <message>
-        <source>A folder under Documents, Downloads, Music, Videos or Pictures. Pictures and videos go to the gallery.</source>
-        <translation>Một thư mục trong Documents, Downloads, Music, Videos hoặc Pictures. Ảnh và video được lưu vào thư viện.</translation>
-    </message>
-    <message>
         <source>Show notifications</source>
         <translation>Hiện thông báo</translation>
     </message>
     <message>
-        <source>Off, nothing is announced when a message arrives.</source>
-        <translation>Tắt: không có gì được báo khi có tin nhắn đến.</translation>
+        <source>Pictures and videos always go to the gallery.</source>
+        <translation>Ảnh và video luôn được lưu vào thư viện.</translation>
     </message>
 </context>
 <context>

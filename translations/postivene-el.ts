@@ -679,6 +679,24 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>FolderPickerDialog</name>
+    <message>
+        <source>Default folder</source>
+        <extracomment>Puts the folder back to the one a fresh install saves to.</extracomment>
+        <translation>Προεπιλεγμένος φάκελος</translation>
+    </message>
+    <message>
+        <source>Choose a folder</source>
+        <extracomment>Above the list of folders to choose from.</extracomment>
+        <translation>Επιλέξτε φάκελο</translation>
+    </message>
+    <message>
+        <source>No folders here</source>
+        <extracomment>Under a folder with no folders in it: it can still be chosen.</extracomment>
+        <translation>Δεν υπάρχουν φάκελοι εδώ</translation>
+    </message>
+</context>
+<context>
     <name>Format</name>
     <message>
         <source>now</source>
@@ -1516,16 +1534,12 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Αποθήκευση αρχείων σε</translation>
     </message>
     <message>
-        <source>A folder under Documents, Downloads, Music, Videos or Pictures. Pictures and videos go to the gallery.</source>
-        <translation>Ένας φάκελος μέσα στα Έγγραφα, Λήψεις, Μουσική, Βίντεο ή Εικόνες. Οι εικόνες και τα βίντεο πηγαίνουν στη συλλογή.</translation>
-    </message>
-    <message>
         <source>Show notifications</source>
         <translation>Εμφάνιση ειδοποιήσεων</translation>
     </message>
     <message>
-        <source>Off, nothing is announced when a message arrives.</source>
-        <translation>Απενεργοποιημένο: τίποτα δεν ανακοινώνεται όταν φτάνει μήνυμα.</translation>
+        <source>Pictures and videos always go to the gallery.</source>
+        <translation>Οι εικόνες και τα βίντεο πηγαίνουν πάντα στη συλλογή.</translation>
     </message>
 </context>
 <context>

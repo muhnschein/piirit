@@ -681,6 +681,24 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>FolderPickerDialog</name>
+    <message>
+        <source>Default folder</source>
+        <extracomment>Puts the folder back to the one a fresh install saves to.</extracomment>
+        <translation>默认文件夹</translation>
+    </message>
+    <message>
+        <source>Choose a folder</source>
+        <extracomment>Above the list of folders to choose from.</extracomment>
+        <translation>选择文件夹</translation>
+    </message>
+    <message>
+        <source>No folders here</source>
+        <extracomment>Under a folder with no folders in it: it can still be chosen.</extracomment>
+        <translation>此处没有文件夹</translation>
+    </message>
+</context>
+<context>
     <name>Format</name>
     <message>
         <source>now</source>
@@ -1514,16 +1532,12 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>文件保存到</translation>
     </message>
     <message>
-        <source>A folder under Documents, Downloads, Music, Videos or Pictures. Pictures and videos go to the gallery.</source>
-        <translation>“文档”“下载”“音乐”“视频”或“图片”下的一个文件夹。图片和视频会存入图库。</translation>
-    </message>
-    <message>
         <source>Show notifications</source>
         <translation>显示通知</translation>
     </message>
     <message>
-        <source>Off, nothing is announced when a message arrives.</source>
-        <translation>关闭后，收到消息时不会有任何提示。</translation>
+        <source>Pictures and videos always go to the gallery.</source>
+        <translation>图片和视频始终存入图库。</translation>
     </message>
 </context>
 <context>
