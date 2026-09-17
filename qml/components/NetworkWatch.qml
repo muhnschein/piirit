@@ -17,7 +17,7 @@ import Nemo.DBus 2.0
  * lift, a basement, a flight. The core keeps trying to reconnect over a
  * network that is not there, and every attempt wakes the radio for a
  * failure. So a loss that lasts is passed on too, and the window stops the
- * core's IO until there is something to carry it. See docs/POWER.md.
+ * core's IO until there is something to carry it.
  *
  * Nothing here polls or wakes anything. connman announces every change of
  * connectivity on the system bus the moment it happens, because the rest

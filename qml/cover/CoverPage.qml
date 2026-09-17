@@ -111,7 +111,7 @@ CoverBackground {
     /// showing and the display is on. The rest of the time -- which is most
     /// of it, and all of the night -- the app is still receiving and the
     /// lists below are still following every arrival, but nothing is on
-    /// screen to redraw. See docs/POWER.md.
+    /// screen to redraw.
     readonly property bool looking: cover.status === Cover.Active
 
     /// Something changed while nothing was looking, so the cells are not

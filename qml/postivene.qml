@@ -239,7 +239,7 @@ ApplicationWindow {
         // The network has been gone long enough that it is not a handover.
         // Left alone, the core would spend that time reconnecting to
         // nothing, and each attempt wakes the radio for a failure. Nothing
-        // is given up by stopping: see docs/POWER.md.
+        // is given up by stopping.
         onNetworkLost: {
             if (core.status !== "ready" || !appWindow.askedForIo
                     || appWindow.ioPaused) {

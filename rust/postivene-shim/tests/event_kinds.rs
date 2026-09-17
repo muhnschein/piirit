@@ -4,7 +4,6 @@
 //! list, because everything it fires reaches every page still on the stack
 //! and one chat list per profile on the cover, each of which parses the
 //! payload again -- work done with the screen off for events nothing reads.
-//! See docs/POWER.md.
 //!
 //! The risk that buys is silence: a page that starts reading a new kind and
 //! is not added to the list never sees one, and nothing about that looks

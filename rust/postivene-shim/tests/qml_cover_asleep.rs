@@ -4,8 +4,7 @@
 //! showing and the display is on. The rest of the time -- which is most of
 //! it, and all of the night -- the app is still receiving and the cover's
 //! chat lists are still following every arrival, so every message used to
-//! rebuild a grid of faces that nothing was going to draw. See
-//! docs/POWER.md.
+//! rebuild a grid of faces that nothing was going to draw.
 //!
 //! What it must not do is stay wrong: whatever it missed has to be there by
 //! the time it is looked at. Both halves are here.

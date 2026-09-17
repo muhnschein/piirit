@@ -5,7 +5,7 @@
 //! says a great deal that none of them read -- most of it is its own log --
 //! and a bulk sync is thousands of those, arriving while the screen is off.
 //! So `relay` drops what is not on `HANDLED_EVENT_KINDS` before it is even
-//! serialised. See docs/POWER.md.
+//! serialised.
 //!
 //! That the list matches the code that reads it is `event_kinds.rs`. This is
 //! that the gate is really there: the core says four things, two of which

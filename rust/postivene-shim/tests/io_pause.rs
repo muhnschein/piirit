@@ -5,7 +5,7 @@
 //! again. Every attempt wakes the radio and none of them can succeed, and
 //! an hour in a tunnel is a great many of them. Nothing is given up by
 //! stopping, because no message can arrive over a network that is not
-//! there. See docs/POWER.md.
+//! there.
 //!
 //! What must never happen is the other thing that looks like it: stopping
 //! IO because the app was backgrounded. The app in the background is the
