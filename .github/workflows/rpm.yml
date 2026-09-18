@@ -130,8 +130,12 @@ jobs:
       # the file said it was new.
       #
       # The run number is monotonic, so each build is an upgrade of the
-      # last. The spec keeps Release: 1 in the tree, which is what a tagged
-      # release should be.
+      # last. The spec keeps Release: 1 in the tree, and a `v*` tag builds
+      # exactly that: the package a release page offers is the spec as
+      # committed, not stamped with a run number nobody can find again.
+      # The tag has to say what the spec says, or the package would carry
+      # one version and the release another; a tag pushed before the bump
+      # stops here.
       #
       # Digits and periods only: Harbour rejects any other character in
       # Release, so the short SHA that used to be appended here would have
@@ -139,7 +143,16 @@ jobs:
       - name: Stamp the build so each one is its own package
         run: |
           short=$(git rev-parse --short HEAD)
-          release="1.${GITHUB_RUN_NUMBER}"
+          version=$(sed -n 's/^Version:[[:space:]]*//p' rpm/harbour-piirit.spec)
+          case "$GITHUB_REF" in
+            refs/tags/v*)
+              tag=${GITHUB_REF#refs/tags/v}
+              [ "$tag" = "$version" ] || {
+                echo "::error::tag v$tag, but rpm/harbour-piirit.spec says Version: $version"; exit 1; }
+              release="1" ;;
+            *)
+              release="1.${GITHUB_RUN_NUMBER}" ;;
+          esac
           sed -i "s/^Release:.*/Release:    ${release}/" rpm/harbour-piirit.spec
           grep '^Version:\|^Release:' rpm/harbour-piirit.spec
           echo "SHORT_SHA=$short" >> "$GITHUB_ENV"
@@ -284,3 +297,50 @@ jobs:
           [ -n "$rpm" ] || { echo "::error::no RPM to validate"; exit 1; }
           echo "Validating $rpm"
           ./ci/harbour-validate-rpm.sh "$rpm"
+
+  # A `v*` tag is a release: the package the job above built goes on a
+  # GitHub release named after the tag, with that version's section of
+  # CHANGELOG.md as its text. Its own job so that `contents: write` is held
+  # only here, by three commands, and never by the build running an SDK
+  # image with `--privileged`.
+  #
+  # `gh` is the runner's own; the token is the job's. `--verify-tag` refuses
+  # to invent a tag that is not there, and a tag whose changelog section is
+  # missing fails in scripts/release-notes.sh before anything is published.
+  release:
+    needs: rpm
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+      actions: read
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Fetch the package this run built
+        run: gh run download "$GITHUB_RUN_ID" --dir rpms
+
+      # The device package and its checksum, and nothing else: the debug
+      # and source RPMs are for a developer with the tree, not a phone.
+      - name: Gather the assets
+        run: |
+          mkdir -p assets
+          find rpms -name 'harbour-piirit-*.rpm' ! -name '*debug*' \
+               ! -name '*.src.rpm' -exec cp {} assets/ \;
+          [ -n "$(ls assets)" ] || { echo "::error::no device RPM to release"; exit 1; }
+          (cd assets && sha256sum -- * > SHA256SUMS)
+          cat assets/SHA256SUMS
+
+      - name: Publish the release
+        run: |
+          version=${GITHUB_REF_NAME#v}
+          ./scripts/release-notes.sh "$version" > notes.md
+          gh release create "$GITHUB_REF_NAME" \
+            --verify-tag \
+            --title "Piirit $version" \
+            --notes-file notes.md \
+            assets/*
