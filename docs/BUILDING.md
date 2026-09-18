@@ -260,19 +260,6 @@ and the only crate the whole feature adds. The alternative was a zip
 reader and an inflate implementation, to unpack an app the core can
 already read.
 
-What is not there any more, and where the line is: `thiserror` was two
-crates for a dozen lines of `Display`, so the transport's errors are
-written out; the fake servers build their tokio runtime by hand, so
-`macros` is a dev-dependency and the app's build carries no
-`tokio-macros`; qmetaobject's `log` feature is off. `serde`'s `derive`
-could go the same way for one crate less, at the cost of hand-written
-`Deserialize` for the four wire types -- more code than it saves, so it
-stays. Everything else is either the vendored qmetaobject's own
-(`lazy_static`, `syn 1`) or a build script's (`cc`, `regex`, `semver`,
-`rustversion`), and the platform-gated crates in `Cargo.lock` --
-`windows-*`, `wasm-bindgen`, `js-sys` -- are resolved for other targets
-and never built here.
-
 ## Comments
 
 One sentence where one will do. A comment states what is true now and why.
@@ -325,7 +312,7 @@ Environment requirements, each of which cost an attempt:
 ## What a device build costs
 
 | Step | One job | Four jobs |
-|---|---|---|---|
+|---|---|---|
 | Pull the SDK image | 105 s | 80 s |
 | Build the RPM |142 s | 82 s |
 | Validate against Harbour | 10 s | 10 s |
