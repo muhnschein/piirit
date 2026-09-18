@@ -6,7 +6,7 @@
 
 > 🤖 **This project was developed using AI.** If that provenance troubles
 > you, feel free to use something else. That being said, this is largely a
-> GUI wrapper around an excellent core from the upstream Delta Chat project.
+> GUI wrapper around an [excellent core](https://github.com/chatmail/core) from the upstream Delta Chat project.
 >
 > 📱 **Modern SailfishOS-only:** Piirit currently targets the 
 > Jolla Phone 2026 and nothing else. No effort is made to accommodate older
@@ -15,7 +15,7 @@
 
 ## Overview
 
-Piirit is a Silica/QML application built on top of the Delta Chat core.
+Piirit is a Silica/QML application built on top of the [Delta Chat core](https://github.com/chatmail/core).
 
 It implements no messaging protocol of its own. Every piece of
 IMAP/SMTP/MIME/crypto logic lives in upstream's `deltachat-rpc-server`, which
