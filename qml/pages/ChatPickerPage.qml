@@ -1,7 +1,7 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
 import "../components"
-import Postivene 1.0
+import Piiri 1.0
 
 /*
  * Pick a chat to send something into.

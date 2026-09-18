@@ -10,7 +10,7 @@ import "../components"
  * Also the way back onto a chat list, for a phone the window could not
  * send there itself. The window reads `Settings.lastAccountId` before it
  * puts anything up and opens on the chat list directly when it names a
- * profile (postivene.qml), so this page is not even made on an ordinary
+ * profile (piiri.qml), so this page is not even made on an ordinary
  * launch. What is left to it is the phone whose key was never written --
  * a profile made before the key existed, or one restored into a fresh
  * install -- where the core's own answer (`accounts_refreshed`) is the
@@ -115,7 +115,7 @@ Page {
     /// Go to the chat list, if a profile to open it on is known of.
     ///
     /// IO is not asked for here: the window asks for it as soon as the
-    /// core is ready, whichever page is up (postivene.qml).
+    /// core is ready, whichever page is up (piiri.qml).
     function resumeRemembered() {
         if (page.leaving || !(page.resumeAccountId > 0)) {
             return
@@ -274,7 +274,7 @@ Page {
             width: parent.width
             horizontalAlignment: Text.AlignHCenter
             textFormat: Text.PlainText
-            text: "Postivene"
+            text: "Piiri"
             font.family: Theme.fontFamilyHeading
             font.pixelSize: Theme.fontSizeHuge
             color: Theme.highlightColor

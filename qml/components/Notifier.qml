@@ -19,7 +19,7 @@ import Nemo.DBus 2.0
  *
  * A tap on a notification comes back over D-Bus. Sailjail lets the app
  * own the name made of its desktop file's OrganizationName and
- * ApplicationName, which is `postivene.postivene`; the adaptor below owns
+ * ApplicationName, which is `piiri.piiri`; the adaptor below owns
  * it and the notification's remote action names it, so lipstick's call
  * lands here and is passed on as `openRequested`.
  */
@@ -61,7 +61,7 @@ Item {
     /// The D-Bus name a tap calls back to; see the note above. One string
     /// for the service and the interface, as the reference for Nemo's
     /// remote actions shows it.
-    readonly property string busName: "postivene.postivene"
+    readonly property string busName: "piiri.piiri"
     readonly property string busPath: "/"
 
     // Reading a chat is the answer to "have I seen this", so drop the
@@ -83,7 +83,7 @@ Item {
         service: notifier.busName
         path: notifier.busPath
         iface: notifier.busName
-        xml: "  <interface name=\"postivene.postivene\">\n" +
+        xml: "  <interface name=\"piiri.piiri\">\n" +
              "    <method name=\"showChat\">\n" +
              "      <arg name=\"chatId\" type=\"i\" direction=\"in\"/>\n" +
              "    </method>\n" +
@@ -100,8 +100,8 @@ Item {
     property Component noteComponent: Component {
         Notification {
             category: "x-nemo.messaging.im"
-            appName: "Postivene"
-            appIcon: "harbour-postivene"
+            appName: "Piiri"
+            appIcon: "harbour-piiri"
         }
     }
 

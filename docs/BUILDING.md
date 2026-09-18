@@ -25,8 +25,8 @@ outside tests, `missing_docs` and `unsafe_code` denied.
 `env::set_var` before Qt initialises, and because two things the app does
 have no safe binding: installing a `QTranslator`, and recording a voice
 message through `QAudioRecorder`, neither of which qmetaobject wraps.
-Those are the two `cpp!` files in the tree, `postivene-app/src/translations.rs`
-and `postivene-shim/src/recorder.rs`, and the C++ build step in each
+Those are the two `cpp!` files in the tree, `piiri-app/src/translations.rs`
+and `piiri-shim/src/recorder.rs`, and the C++ build step in each
 crate's `build.rs` exists for them alone. Every exception is at the
 narrowest scope and says why, and every block is short enough to be
 checked by reading.
@@ -41,7 +41,7 @@ failures: `tokio::runtime::Runtime::new` (must go through `CoreRuntime`) and
 
 ## Testing
 
-Postivene parses almost nothing — protocol and crypto are the core's, and
+Piiri parses almost nothing — protocol and crypto are the core's, and
 the subprocess we talk to is one we spawned. The failure mode is misreading
 the core's JSON, or calling it wrongly, with nothing noticing until the app
 is on a phone. The tests aim at that.
@@ -214,8 +214,8 @@ two-hundred-line log the summary is what anyone reads.
 
 ## Translations
 
-The strings are the `qsTr()` calls in `qml/`; `translations/postivene.ts`
-is the untranslated source catalog and `translations/postivene-<lang>.ts`
+The strings are the `qsTr()` calls in `qml/`; `translations/piiri.ts`
+is the untranslated source catalog and `translations/piiri-<lang>.ts`
 one catalog per language Sailfish ships in. `scripts/update-translations.sh`
 regenerates all of them from the source in one `lupdate` run, so a new
 string turns up as `unfinished` in every language at once, and
@@ -224,7 +224,7 @@ that run produces. `tests/translation_catalogs.rs` fails when a string in
 any language is left untranslated, so a new string is not done until every
 catalog has it.
 
-The app loads `postivene-<lang>.qm`, which `scripts/release-translations.sh`
+The app loads `piiri-<lang>.qm`, which `scripts/release-translations.sh`
 compiles with `lrelease` -- in the RPM's `%build`, and locally with
 `make translations`, which leaves them beside the `.ts` files where a
 source-tree run finds them. `lupdate` and `lrelease` are Debian's
@@ -236,7 +236,7 @@ the most specific form down: `de` serves every German locale, `pt_BR`
 only Brazil, and a language with no catalog gets the English one -- the
 strings are English already, and that catalog holds their plural forms.
 To add one, write the three-line header `update-translations.sh` documents to
-`translations/postivene-<lang>.ts` and run the script; `lupdate` fills in
+`translations/piiri-<lang>.ts` and run the script; `lupdate` fills in
 every string with as many plural forms as that language has.
 
 ## Dependencies
@@ -345,7 +345,7 @@ and `zypper` leaves the critical path.
 
 ## Spec constraints
 
-Constraints encoded in `rpm/harbour-postivene.spec`:
+Constraints encoded in `rpm/harbour-piiri.spec`:
 
 - **The cargo job count under sb2 is a define.** At `-j4` cargo can
   futex-wait forever on an unreaped child while qmetaobject's C++ glue
@@ -371,7 +371,7 @@ Constraints encoded in `rpm/harbour-postivene.spec`:
   cannot exec the target `qmake` under sb2. `QT_LIBRARY_PATH` uses
   `%{_libdir}` — Qt is in `/usr/lib64` on aarch64, not `/usr/lib`.
 - **`%{_target_cpu}`, not `%{_arch}`**, for the bundled server path.
-- **`Exec=harbour-postivene`** in the desktop file: the invoker does not
+- **`Exec=harbour-piiri`** in the desktop file: the invoker does not
   honour an `Exec=env FOO=bar` wrapper, so the bundled server path is a
   fallback inside the binary.
 - **Harbour constrains the name, the paths and every `Requires:`.**

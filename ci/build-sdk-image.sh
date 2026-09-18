@@ -77,7 +77,7 @@ trap cleanup EXIT
 # Copied in rather than bind-mounted: a mount leaves its mount point behind
 # in the exported filesystem, and the spec is the only thing from this tree
 # the bake reads.
-docker cp "$root/rpm/harbour-postivene.spec" "$cid:/tmp/harbour-postivene.spec"
+docker cp "$root/rpm/harbour-piiri.spec" "$cid:/tmp/harbour-piiri.spec"
 
 # The bake, in two halves, because the two need different users and this
 # image grants no passwordless sudo -- inside it `sudo` answers "PAM
@@ -91,9 +91,9 @@ docker exec -e TARGET="$target" "$cid" bash -euxo pipefail -c '
     # A build directory named for the package: mb2 derives the package it
     # is building from the directory it runs in, and then looks for
     # rpm/<that>.spec.
-    mkdir -p ~/harbour-postivene/rpm
-    cp /tmp/harbour-postivene.spec ~/harbour-postivene/rpm/
-    cd ~/harbour-postivene
+    mkdir -p ~/harbour-piiri/rpm
+    cp /tmp/harbour-piiri.spec ~/harbour-piiri/rpm/
+    cd ~/harbour-piiri
 
     # -X (--no-fix-version) for the reason rpm.yml passes it: without it
     # build-init asks `git describe` for a version, finds no tags, and
@@ -112,7 +112,7 @@ docker exec -e TARGET="$target" "$cid" bash -euxo pipefail -c '
     sed -i "s|^DEFAULT_TARGET=.*|DEFAULT_TARGET=$TARGET|" "$HOME/.scratchbox2/config"
     grep "^DEFAULT_TARGET=$TARGET$" "$HOME/.scratchbox2/config"
 
-    rm -rf ~/harbour-postivene
+    rm -rf ~/harbour-piiri
 '
 
 echo ">> putting the rustlib where the linker looks, and dropping the rest"
@@ -150,7 +150,7 @@ docker exec --user root -e TARGET="$target" "$cid" bash -euxo pipefail -c '
     done
 
     # The bake s own leavings, and the package cache it filled.
-    rm -f /tmp/harbour-postivene.spec
+    rm -f /tmp/harbour-piiri.spec
     rm -rf "/srv/mer/targets/$TARGET/var/cache/zypp"/*
 '
 
@@ -185,7 +185,7 @@ fi
 
 docker export "$cid" |
     docker import "${changes[@]}" \
-        --message "postivene: $target, BuildRequires installed, one architecture" \
+        --message "piiri: $target, BuildRequires installed, one architecture" \
         - "$output" >/dev/null
 
 # A gate, not a report: an image that cannot answer these is one that fails

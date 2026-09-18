@@ -1,0 +1,156 @@
+[Desktop Entry]
+Type=Application
+X-Nemo-Application-Type=silica-qt5
+Icon=harbour-piiri
+Exec=harbour-piiri
+Name=Piiri
+Name[fi]=Piiri
+Comment=Delta Chat client
+Categories=Network;InstantMessaging;
+# One instance: a share arrives at the app that is already running, and a
+# second copy of a chat client is not a thing anybody wants.
+X-Nemo-Single-Instance=yes
+
+# What the platform's share sheet offers when something is shared to this
+# app -- a picture from the gallery, a link from the browser, a file from
+# the file manager. Each name here has a group below it and a
+# `ShareProvider` of the same name in qml/share/ShareTarget.qml; the
+# provider is what receives the file or the text, and a name in one place
+# and not the other is a method that is offered and does nothing.
+X-Share-Methods=files;text
+
+[X-Share Method files]
+Description=Send in a chat
+Description[bg]=Изпращане в чат
+Description[bn]=চ্যাটে পাঠান
+Description[cs]=Odeslat do chatu
+Description[da]=Send i en chat
+Description[de]=In einen Chat senden
+Description[el]=Αποστολή σε συνομιλία
+Description[es]=Enviar a un chat
+Description[et]=Saada vestlusesse
+Description[fi]=Lähetä keskusteluun
+Description[fr]=Envoyer dans une discussion
+Description[gu]=ચેટમાં મોકલો
+Description[hi]=चैट में भेजें
+Description[hu]=Küldés csevegésbe
+Description[it]=Invia in una chat
+Description[kn]=ಚಾಟ್‌ಗೆ ಕಳುಹಿಸಿ
+Description[lt]=Siųsti į pokalbį
+Description[lv]=Sūtīt tērzēšanā
+Description[ml]=ചാറ്റിലേക്ക് അയയ്ക്കുക
+Description[mr]=चॅटमध्ये पाठवा
+Description[nb]=Send i en chat
+Description[nl]=In een chat versturen
+Description[pa]=ਚੈਟ ਵਿੱਚ ਭੇਜੋ
+Description[pl]=Wyślij na czacie
+Description[pt]=Enviar numa conversa
+Description[pt_BR]=Enviar em uma conversa
+Description[ro]=Trimite într-o conversație
+Description[ru]=Отправить в чат
+Description[sk]=Odoslať do chatu
+Description[sl]=Pošlji v klepet
+Description[sv]=Skicka i en chatt
+Description[ta]=அரட்டையில் அனுப்பு
+Description[te]=చాట్‌కు పంపు
+Description[tr]=Sohbete gönder
+Description[tt]=Чатка җибәрү
+Description[uk]=Надіслати в чат
+Description[vi]=Gửi vào cuộc trò chuyện
+Description[zh_CN]=发送到聊天
+Description[zh_HK]=傳送到聊天
+Description[zh_TW]=傳送到聊天
+SupportsMultipleFiles=no
+
+[X-Share Method text]
+Description=Send as a message
+Description[bg]=Изпращане като съобщение
+Description[bn]=বার্তা হিসেবে পাঠান
+Description[cs]=Odeslat jako zprávu
+Description[da]=Send som besked
+Description[de]=Als Nachricht senden
+Description[el]=Αποστολή ως μήνυμα
+Description[es]=Enviar como mensaje
+Description[et]=Saada sõnumina
+Description[fi]=Lähetä viestinä
+Description[fr]=Envoyer comme message
+Description[gu]=સંદેશ તરીકે મોકલો
+Description[hi]=संदेश के रूप में भेजें
+Description[hu]=Küldés üzenetként
+Description[it]=Invia come messaggio
+Description[kn]=ಸಂದೇಶವಾಗಿ ಕಳುಹಿಸಿ
+Description[lt]=Siųsti kaip žinutę
+Description[lv]=Sūtīt kā ziņu
+Description[ml]=സന്ദേശമായി അയയ്ക്കുക
+Description[mr]=संदेश म्हणून पाठवा
+Description[nb]=Send som melding
+Description[nl]=Als bericht versturen
+Description[pa]=ਸੁਨੇਹੇ ਵਜੋਂ ਭੇਜੋ
+Description[pl]=Wyślij jako wiadomość
+Description[pt]=Enviar como mensagem
+Description[pt_BR]=Enviar como mensagem
+Description[ro]=Trimite ca mesaj
+Description[ru]=Отправить сообщением
+Description[sk]=Odoslať ako správu
+Description[sl]=Pošlji kot sporočilo
+Description[sv]=Skicka som meddelande
+Description[ta]=செய்தியாக அனுப்பு
+Description[te]=సందేశంగా పంపు
+Description[tr]=İleti olarak gönder
+Description[tt]=Хат итеп җибәрү
+Description[uk]=Надіслати повідомленням
+Description[vi]=Gửi dưới dạng tin nhắn
+Description[zh_CN]=作为消息发送
+Description[zh_HK]=以訊息傳送
+Description[zh_TW]=以訊息傳送
+Capabilities=text/*;text/x-url;text/uri-list
+SupportsMultipleFiles=no
+
+# Sailjail confines the app to $HOME/.local/share/<Org>/<App> (and the
+# .cache and .config equivalents). Without this section a relaxed default
+# profile applies instead, which is what the app ran under until now.
+#
+# Internet, for the core's own traffic; everything else it does happens
+# inside its own account directory. It also covers listening to connman on
+# the system bus, which is what tells the app the phone has changed network
+# (components/NetworkWatch.qml): Internet.permission includes
+# Connman.permission, so no separate grant is needed and none is asked for.
+#
+# Pictures and MediaIndexing are both needed by the settings page's
+# profile picture, and neither is sufficient alone: Pictures whitelists
+# ~/Pictures and the Android storage equivalents, while MediaIndexing
+# grants `dbus-user.talk org.freedesktop.Tracker3.Miner.Files` -- the
+# index the gallery picker actually lists from. With only Pictures the
+# picker can read the files and cannot find them, which is why it came up
+# empty on a device.
+#
+# UserDirs is what the attach button needs: Silica's pickers run inside
+# this process, so a file the sandbox does not grant is one the app cannot
+# read however it was chosen. It covers the XDG user directories --
+# Documents, Downloads, Music, Videos -- in one permission rather than
+# four, which is also what harbour-whisperfish declares for its own
+# attachment picker. Pictures is kept beside it because it is not certain
+# from the outside that UserDirs subsumes it, and this is the grant the
+# profile picture was found to need on a real device.
+#
+# Audio is for playing a voice message or a sound file in the conversation,
+# which goes through PulseAudio. Microphone is for recording one
+# (VoiceBar.qml, over the shim's VoiceRecorder), and for the sound track
+# of a video taken in the app.
+#
+# Camera is for the QR scanner -- an invite or a chatmail server code held
+# up to the phone -- and for a picture or a video taken to send.
+# ScanView.qml and CapturePage.qml are the only files that open it, and
+# only while they are on screen.
+#
+# WebView is for webxdc apps: running one, which is a small web page
+# somebody sent (WebxdcPage.qml), and the store one is fetched from
+# (WebxdcStorePage.qml). It is what lets the app use the platform's
+# browser engine. A running app reaches nothing but the loopback address
+# the shim serves it on, and a content-security-policy keeps it there
+# (webxdc_host.rs); the store is an ordinary website, and the app it
+# hands over is fetched by the core rather than downloaded by the engine.
+[X-Sailjail]
+Permissions=Internet;Pictures;MediaIndexing;UserDirs;Audio;Microphone;Camera;WebView
+OrganizationName=piiri
+ApplicationName=piiri

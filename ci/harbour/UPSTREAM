@@ -6,7 +6,7 @@ verbatim from
 at commit 7dd7dd5d62aa3e814c92ade089fdca4c3872b8ac (2026-09-10), by scripts/update-harbour-rules.sh.
 ci/harbour-validate-rpm.sh runs the validator from that same commit.
 
-They carry that project's licence, GPL-2.0-or-later, which Postivene's own
+They carry that project's licence, GPL-2.0-or-later, which Piiri's own
 GPL-3.0-or-later terms accept. rpmvalidation.sh itself is not vendored:
 ci/harbour-check.sh reimplements the checks that a source tree can answer,
 and .github/workflows/rpm.yml runs the real script against a built RPM.

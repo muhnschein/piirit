@@ -1,4 +1,4 @@
-# postivene -- developer targets.
+# piiri -- developer targets.
 #
 # `make check` is what CI runs, minus what needs the Sailfish SDK or a
 # phone. It is not entirely offline: `msrv` fetches a toolchain the first

@@ -1,5 +1,5 @@
 #!/bin/sh
-# Build the Postivene RPM for a Sailfish device, using the Sailfish SDK.
+# Build the Piiri RPM for a Sailfish device, using the Sailfish SDK.
 #
 #     scripts/build-rpm.sh [<arch>] [<sfos-target-version>]
 #

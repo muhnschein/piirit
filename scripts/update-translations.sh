@@ -1,6 +1,6 @@
 #!/bin/sh
-# Regenerate the catalogs from the qsTr() calls in qml/: postivene.ts, the
-# untranslated source catalog, and every postivene-<lang>.ts beside it.
+# Regenerate the catalogs from the qsTr() calls in qml/: piiri.ts, the
+# untranslated source catalog, and every piiri-<lang>.ts beside it.
 # One lupdate run over all of them, so a string added to the source shows
 # up as unfinished in every language at once.
 #
@@ -16,7 +16,7 @@
 # rather than kept as a tombstone. The catalog is regenerated from source,
 # not maintained by hand.
 #
-# To add a language, write its header to translations/postivene-<lang>.ts:
+# To add a language, write its header to translations/piiri-<lang>.ts:
 #
 #     <?xml version="1.0" encoding="utf-8"?>
 #     <!DOCTYPE TS>
@@ -38,8 +38,8 @@ fi
 
 # The source catalog first, then the languages in name order, so the
 # order lupdate reports them in is the same every run.
-set -- "$dir/postivene.ts"
-for catalog in "$dir"/postivene-*.ts; do
+set -- "$dir/piiri.ts"
+for catalog in "$dir"/piiri-*.ts; do
     [ -f "$catalog" ] || continue
     set -- "$@" "$catalog"
 done

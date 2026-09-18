@@ -57,7 +57,7 @@ jobs:
       - name: Derive the image
         run: |
           owner=$(echo "${{ github.repository_owner }}" | tr 'A-Z' 'a-z')
-          image="ghcr.io/$owner/postivene-sdk:$SFOS-$ARCH"
+          image="ghcr.io/$owner/piiri-sdk:$SFOS-$ARCH"
           ./ci/build-sdk-image.sh "$SFOS" "$ARCH" "$image"
           echo "IMAGE=$image" >> "$GITHUB_ENV"
 

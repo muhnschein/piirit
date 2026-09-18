@@ -27,8 +27,8 @@ if [[ ! -d "$pristine/ci" ]] || [[ ! -f "$pristine/.github/workflows/rpm.yml" ]]
     exit 1
 fi
 
-if [[ ! -f "$pristine/rpm/harbour-postivene.spec" ]] ||
-    [[ ! -f "$pristine/harbour-postivene.desktop" ]]; then
+if [[ ! -f "$pristine/rpm/harbour-piiri.spec" ]] ||
+    [[ ! -f "$pristine/harbour-piiri.desktop" ]]; then
     echo "selftest: FAIL the spec or the .desktop file is not where this test expects it" >&2
     exit 1
 fi
@@ -62,14 +62,14 @@ break_and_expect() {
     return 0
 }
 
-S='rpm/harbour-postivene.spec'
-D='harbour-postivene.desktop'
+S='rpm/harbour-piiri.spec'
+D='harbour-piiri.desktop'
 Q='qml/cover/CoverPage.qml'
 # The only .qml with relative-path imports, which two cases need.
-R='qml/postivene.qml'
+R='qml/piiri.qml'
 
 break_and_expect 1.1.1 "package name without the harbour- prefix" \
-    "sed -i 's/^Name:.*/Name:       postivene/' $S"
+    "sed -i 's/^Name:.*/Name:       piiri/' $S"
 break_and_expect 1.1.3 "Version with a letter in it" \
     "sed -i 's/^Version:.*/Version:    0.1.0rc1/' $S"
 break_and_expect 1.1.4 "Release with a letter in it" \
@@ -79,11 +79,11 @@ break_and_expect 1.1.4 "Release with a letter in it" \
 break_and_expect 1.1.4 "an rpm workflow that stamps a git hash into Release" \
     "sed -i 's|^ *release=.*|          release=\"1.17.gabc1234\"|' .github/workflows/rpm.yml"
 break_and_expect 1.2.1 "a file installed outside the allowed paths" \
-    "sed -i 's|^%{_bindir}/%{name}\$|%{_bindir}/%{name}\\n/etc/harbour-postivene.conf|' $S"
+    "sed -i 's|^%{_bindir}/%{name}\$|%{_bindir}/%{name}\\n/etc/harbour-piiri.conf|' $S"
 break_and_expect 1.8.1 "a Vendor: tag" \
     "sed -i 's|^Group:.*|Vendor:     acme\\nGroup:      Qt/Qt|' $S"
 break_and_expect 1.8.2 "an explicit Provides:" \
-    "sed -i 's|^Group:.*|Provides:   postivene\\nGroup:      Qt/Qt|' $S"
+    "sed -i 's|^Group:.*|Provides:   piiri\\nGroup:      Qt/Qt|' $S"
 break_and_expect 1.8.3 "a dependency that is not on the allowed list" \
     "sed -i 's|^Requires:   sailfishsilica-qt5\$|Requires:   sailfishsilica-qt5\\nRequires:   libcurl|' $S"
 break_and_expect 1.8.4 "a versioned Requires" \
@@ -94,7 +94,7 @@ break_and_expect 1.8.7 "requiring the sailfish-qml launcher without using it" \
     "sed -i 's|^Requires:   sailfishsilica-qt5\$|Requires:   sailfishsilica-qt5\\nRequires:   libsailfishapp-launcher|' $S"
 
 break_and_expect 1.3.2 "an Exec= that is not the package name" \
-    "sed -i 's|^Exec=.*|Exec=/usr/bin/harbour-postivene|' $D"
+    "sed -i 's|^Exec=.*|Exec=/usr/bin/harbour-piiri|' $D"
 break_and_expect 1.3.3 "an Icon= with a path in it" \
     "sed -i 's|^Icon=.*|Icon=/usr/share/icons/x.png|' $D"
 break_and_expect 1.3.4 "a missing Type=Application" \
@@ -104,11 +104,11 @@ break_and_expect 1.3.5 "an X-Nemo-Application-Type that is not silica-qt5" \
 break_and_expect 1.3.6 "a [Sailjail] section header" \
     "sed -i 's|^\\[X-Sailjail\\]\$|[Sailjail]|' $D"
 break_and_expect 1.4.1 "an OrganizationName with illegal characters" \
-    "sed -i 's|^OrganizationName=.*|OrganizationName=Postivene!|' $D"
+    "sed -i 's|^OrganizationName=.*|OrganizationName=Piiri!|' $D"
 break_and_expect 1.4.2 "an OrganizationName component starting with a digit" \
-    "sed -i 's|^OrganizationName=.*|OrganizationName=9postivene|' $D"
+    "sed -i 's|^OrganizationName=.*|OrganizationName=9piiri|' $D"
 break_and_expect 1.4.4 "an ApplicationName with illegal characters" \
-    "sed -i 's|^ApplicationName=.*|ApplicationName=.postivene|' $D"
+    "sed -i 's|^ApplicationName=.*|ApplicationName=.piiri|' $D"
 break_and_expect 1.4.5 "a permission that is not on the whitelist" \
     "sed -i 's|^Permissions=.*|Permissions=Internet;Telepathy|' $D"
 break_and_expect 1.4.5 "the Compatibility permission" \
@@ -116,34 +116,34 @@ break_and_expect 1.4.5 "the Compatibility permission" \
 break_and_expect 1.4.7 "a key that is not allowed in [X-Sailjail]" \
     "printf 'DBusName=org.example\\n' >> $D"
 break_and_expect 2.5 "a sandbox grant the app's data path does not match" \
-    "sed -i 's|^ApplicationName=.*|ApplicationName=Postivene|' $D"
+    "sed -i 's|^ApplicationName=.*|ApplicationName=Piiri|' $D"
 
 break_and_expect 1.6.4 "a QML import at a version Harbour does not allow" \
     "sed -i 's|^import QtQuick 2.0\$|import QtQuick 2.7|' $Q"
 break_and_expect 1.6.4 "an import that was dropped from the platform" \
     "sed -i '1i import QtWebKit 3.0' $Q"
 break_and_expect 1.6.4 "a private QML module under a blocked prefix" \
-    "sed -i 's|^import Postivene 1.0\$|import Nemo.Postivene 1.0|' $Q"
+    "sed -i 's|^import Piiri 1.0\$|import Nemo.Piiri 1.0|' $Q"
 break_and_expect 1.6.5 "an absolute-path QML import" \
-    "sed -i 's|^import \"pages\"\$|import \"/usr/share/harbour-postivene/qml/pages\"|' $R"
+    "sed -i 's|^import \"pages\"\$|import \"/usr/share/harbour-piiri/qml/pages\"|' $R"
 break_and_expect 1.6.6 "a relative import pointing outside the installed tree" \
     "sed -i 's|^import \"pages\"\$|import \"../icons\"|' $R"
 break_and_expect 1.8.6 "XmlListModel used without requiring its package" \
     "sed -i '1i import QtQuick.XmlListModel 2.0' $Q"
 
 break_and_expect 1.5.1 "a missing icon size" \
-    "rm icons/128x128/harbour-postivene.png"
+    "rm icons/128x128/harbour-piiri.png"
 break_and_expect 1.5.4 "an icon whose pixels do not match its directory" \
-    "cp icons/86x86/harbour-postivene.png icons/172x172/harbour-postivene.png"
+    "cp icons/86x86/harbour-piiri.png icons/172x172/harbour-piiri.png"
 break_and_expect 1.5.3 "an icon that is not a PNG" \
-    "printf 'not a png' > icons/86x86/harbour-postivene.png"
+    "printf 'not a png' > icons/86x86/harbour-piiri.png"
 
 break_and_expect 2.1 "a hardcoded /home/nemo path" \
-    "sed -i 's|\"/usr/share/harbour-postivene/qml\"|\"/home/nemo/qml\"|' rust/postivene-app/src/main.rs"
+    "sed -i 's|\"/usr/share/harbour-piiri/qml\"|\"/home/nemo/qml\"|' rust/piiri-app/src/main.rs"
 break_and_expect 2.6 "a write into the installed data directory" \
-    "sed -i 's|    let installed = |    let _ = std::fs::create_dir_all(\"/usr/share/harbour-postivene/x\");\\n    let installed = |' rust/postivene-app/src/main.rs"
+    "sed -i 's|    let installed = |    let _ = std::fs::create_dir_all(\"/usr/share/harbour-piiri/x\");\\n    let installed = |' rust/piiri-app/src/main.rs"
 break_and_expect 1.2.3 "a cargo binary named something other than the package" \
-    "sed -i 's|^name = \"harbour-postivene\"\$|name = \"postivene\"|' rust/postivene-app/Cargo.toml"
+    "sed -i 's|^name = \"harbour-piiri\"\$|name = \"piiri\"|' rust/piiri-app/Cargo.toml"
 
 # ci/harbour-validate-rpm.sh judges the real validator's output against the
 # same waiver file, and its matching is the subtle part: a layout error
@@ -173,17 +173,17 @@ validate_rpm() {
 
 validate_rpm pass "an RPM breaking only the waived rules" \
 '!BEGIN!x
-ERROR|/usr/libexec/harbour-postivene|Installation not allowed in this location
-ERROR|/usr/libexec/harbour-postivene/deltachat-rpc-server|ELF binary in wrong location
-ERROR|/usr/libexec/harbour-postivene/deltachat-rpc-server|File must not be executable (current permissions: 755)
-WARNING|/usr/bin/harbour-postivene|file is not stripped!
+ERROR|/usr/libexec/harbour-piiri|Installation not allowed in this location
+ERROR|/usr/libexec/harbour-piiri/deltachat-rpc-server|ELF binary in wrong location
+ERROR|/usr/libexec/harbour-piiri/deltachat-rpc-server|File must not be executable (current permissions: 755)
+WARNING|/usr/bin/harbour-piiri|file is not stripped!
 !END!FAIL!x
 '
 # The vendored qmetaobject patch is what keeps this out of the binary. If
 # it is ever lost, the RPM check has to say so rather than wave it through.
 validate_rpm fail "a binary that links QtWidgets again" \
 '!BEGIN!x
-ERROR|/usr/bin/harbour-postivene|Cannot link to shared library: libQt5Widgets.so.5
+ERROR|/usr/bin/harbour-piiri|Cannot link to shared library: libQt5Widgets.so.5
 !END!FAIL!x
 '
 # The waiver names the path and the two errors it accepts about it; any
@@ -191,27 +191,27 @@ ERROR|/usr/bin/harbour-postivene|Cannot link to shared library: libQt5Widgets.so
 # the path alone would have swallowed it.
 validate_rpm fail "a waived path with an error the waiver does not name" \
 '!BEGIN!x
-ERROR|/usr/libexec/harbour-postivene/deltachat-rpc-server|setuid, setgid or sticky bit set
+ERROR|/usr/libexec/harbour-piiri/deltachat-rpc-server|setuid, setgid or sticky bit set
 !END!FAIL!x
 '
 validate_rpm fail "a waived path that has become a dynamic binary" \
 '!BEGIN!x
-ERROR|/usr/libexec/harbour-postivene/deltachat-rpc-server|Cannot link to shared library: libc.so.6
+ERROR|/usr/libexec/harbour-piiri/deltachat-rpc-server|Cannot link to shared library: libc.so.6
 !END!FAIL!x
 '
 validate_rpm fail "a waived message about a path the waiver does not name" \
 '!BEGIN!x
-ERROR|/usr/share/harbour-postivene/qml/postivene.qml|File must not be executable (current permissions: 755)
+ERROR|/usr/share/harbour-piiri/qml/piiri.qml|File must not be executable (current permissions: 755)
 !END!FAIL!x
 '
 validate_rpm fail "an RPM installing somewhere new" \
 '!BEGIN!x
-ERROR|/etc/harbour-postivene.conf|Installation not allowed in this location
+ERROR|/etc/harbour-piiri.conf|Installation not allowed in this location
 !END!FAIL!x
 '
 validate_rpm fail "an RPM whose binary stopped exporting main()" \
 '!BEGIN!x
-ERROR|/usr/bin/harbour-postivene|Binary must export main() symbol for booster to work (Q_DECL_EXPORT)
+ERROR|/usr/bin/harbour-piiri|Binary must export main() symbol for booster to work (Q_DECL_EXPORT)
 !END!FAIL!x
 '
 validate_rpm fail "a dependency the allow-list does not carry" \
@@ -224,7 +224,7 @@ validate_rpm pass "an RPM the validator accepts outright" \
 !END!PASS!x
 '
 validate_rpm fail "a validation log that was cut off before the verdict" \
-'ERROR|/usr/bin/harbour-postivene|something
+'ERROR|/usr/bin/harbour-piiri|something
 '
 
 # The runner's Node parent ignores SIGPIPE and every child inherits it, so
@@ -237,7 +237,7 @@ validate_rpm pass "a log buried in broken-pipe noise" \
 $(for _ in $(seq 1 50); do
     printf '%s\n' '/tmp/harbour-validator/rpmvalidation.sh: line 773: echo: write error: Broken pipe'
 done)
-WARNING|/usr/bin/harbour-postivene|file is not stripped!
+WARNING|/usr/bin/harbour-piiri|file is not stripped!
 !END!PASS!x
 "
 

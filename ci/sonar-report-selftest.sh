@@ -88,13 +88,13 @@ ISSUES = {
         {
             "severity": "MAJOR",
             "rule": "rust:S1234",
-            "component": "muhnschein_postivene:rust/postivene-shim/src/lib.rs",
+            "component": "muhnschein_piiri:rust/piiri-shim/src/lib.rs",
             "line": 42,
             "message": "Remove this unused import.",
         },
         {
             "rule": "shell:S5678",
-            "component": "muhnschein_postivene:ci/qml-lint.sh",
+            "component": "muhnschein_piiri:ci/qml-lint.sh",
             "impacts": [{"severity": "LOW"}],
             "message": "Quote this expansion.",
         },
@@ -177,12 +177,12 @@ write_task() {
     local scope=$1
     local port
     port=$(cat "$work/port")
-    local dash="http://127.0.0.1:$port/dashboard?id=muhnschein_postivene"
+    local dash="http://127.0.0.1:$port/dashboard?id=muhnschein_piiri"
     if [[ -n "$scope" ]]; then
         dash="$dash&$scope"
     fi
     cat >"$work/report-task.txt" <<EOF
-projectKey=muhnschein_postivene
+projectKey=muhnschein_piiri
 serverUrl=http://127.0.0.1:$port
 serverVersion=8.0
 dashboardUrl=$dash
@@ -252,9 +252,9 @@ expect "a new-code measure reads its period value" "- new_coverage: 91.4" "$work
 # with `period`. The first real run printed "-" for every new_* measure.
 expect "and one in Cloud's periods shape too" "- new_lines_to_cover: 1" "$work/out"
 expect "issues are counted" "### Open issues: 2" "$work/out"
-expect "an issue names its file and line" "rust/postivene-shim/src/lib.rs:42" "$work/out"
+expect "an issue names its file and line" "rust/piiri-shim/src/lib.rs:42" "$work/out"
 expect "an issue with only impacts still has a severity" "LOW  shell:S5678" "$work/out"
-expect "the dashboard link is printed" "/dashboard?id=muhnschein_postivene" "$work/out"
+expect "the dashboard link is printed" "/dashboard?id=muhnschein_piiri" "$work/out"
 
 # The first real run had 115 issues and the script asked for 100, so the
 # report ended in "15 more not listed". A page is the most the API gives.
@@ -279,10 +279,10 @@ env -u SONAR_TOKEN -u GITHUB_STEP_SUMMARY \
 
 expect "the scope is named in the report" "pullRequest=45" "$work/out"
 expect "the measures query carries the scope" \
-    "/api/measures/component?component=muhnschein_postivene&pullRequest=45&" \
+    "/api/measures/component?component=muhnschein_piiri&pullRequest=45&" \
     "$work/seen"
 expect "the issues query carries the scope" \
-    "/api/issues/search?componentKeys=muhnschein_postivene&pullRequest=45&" \
+    "/api/issues/search?componentKeys=muhnschein_piiri&pullRequest=45&" \
     "$work/seen"
 
 # --------------------------------------------------------- the token first

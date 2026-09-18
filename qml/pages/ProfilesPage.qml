@@ -39,7 +39,7 @@ Page {
 
     // Deleting the last profile leaves the app with nothing to show, and
     // the way back to where a first profile is made belongs to the window
-    // (postivene.qml) rather than to this page: this page is destroyed by
+    // (piiri.qml) rather than to this page: this page is destroyed by
     // the same swipe that asks for the deletion, so a move made from here
     // would be a move by a page that is no longer there.
     Connections {

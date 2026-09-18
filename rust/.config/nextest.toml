@@ -10,7 +10,7 @@
 #
 # Nothing here is shared between tests, which is what makes that safe: the
 # webxdc host binds port 0 and lets the kernel choose (see
-# postivene-shim/src/webxdc_host.rs), the QML probes copy the tree into a
+# piiri-shim/src/webxdc_host.rs), the QML probes copy the tree into a
 # directory named for their own pid, and the fixed /tmp paths in the tests
 # are strings handed to a fake server rather than files anyone opens.
 #

@@ -1,6 +1,6 @@
 #!/bin/sh
 # Fetch upstream deltachat-rpc-server binaries for the architectures
-# Postivene packages, and place them where rpm/harbour-postivene.spec expects
+# Piiri packages, and place them where rpm/harbour-piiri.spec expects
 #
 #     vendor/deltachat-rpc-server/<sailfish-arch>/deltachat-rpc-server
 #

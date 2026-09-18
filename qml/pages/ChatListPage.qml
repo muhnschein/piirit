@@ -1,7 +1,7 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
 import "../components"
-import Postivene 1.0
+import Piiri 1.0
 
 Page {
     id: page
@@ -179,13 +179,13 @@ Page {
 
     property string errorMessage: ""
     // Three states, not two: the core going away is now something the app
-    // does something about, and a banner that says "restart Postivene"
-    // while Postivene is already fixing it is worse than none.
+    // does something about, and a banner that says "restart Piiri"
+    // while Piiri is already fixing it is worse than none.
     readonly property string coreStatusMessage:
         core.status === "reconnecting"
         ? qsTr("Lost the connection to the Delta Chat core. Reconnecting...")
         : core.status === "stopped"
-          ? qsTr("Lost the connection to the Delta Chat core. Restart Postivene.")
+          ? qsTr("Lost the connection to the Delta Chat core. Restart Piiri.")
           : ""
 
     Connections {
@@ -215,7 +215,7 @@ Page {
         // left in it is the window's business rather than this page's:
         // it comes in while this page is being replaced or the one above
         // it popped, and a page in the middle of a transition is the one
-        // thing on the phone that cannot move the stack. postivene.qml.
+        // thing on the phone that cannot move the stack. piiri.qml.
         onAccounts_refreshed: page.accountCount = configured_count
         // Failures that would otherwise reach no one.
         onCore_error: page.errorMessage = message

@@ -1,0 +1,31 @@
+[package]
+name = "piiri-app"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+description = "Binary that wires DeltaChatCore + the chat/message list models into a QmlEngine and loads the Silica UI from qml/."
+
+[dependencies]
+piiri-shim = { path = "../piiri-shim" }
+# Without its `log` bridge; see piiri-shim/Cargo.toml.
+qmetaobject = { version = "0.2", default-features = false }
+# The one `cpp!` block in the tree: src/translations.rs, which installs a
+# QTranslator, a class qmetaobject does not bind. Same versions as the
+# vendored qmetaobject's, so nothing new reaches Cargo.lock.
+cpp = "0.5"
+# Not used from Rust. qttypes' build script is what finds Qt, and it tells
+# only its direct dependents where: build.rs reads the DEP_QT_* variables
+# it exports, which is how the C++ above finds <QtCore/QTranslator>.
+qttypes = "0.2"
+
+[build-dependencies]
+cpp_build = "0.5"
+
+[[bin]]
+name = "harbour-piiri"
+path = "src/main.rs"
+
+[lints]
+workspace = true

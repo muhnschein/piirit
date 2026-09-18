@@ -1,8 +1,8 @@
 # cargo-deny policy. The licence half is the one that matters here:
-# Postivene is GPL-3.0-or-later and ships alongside an MPL-2.0 core binary,
+# Piiri is GPL-3.0-or-later and ships alongside an MPL-2.0 core binary,
 # so a dependency arriving under an incompatible licence is a distribution
 # problem rather than a preference: the `License:` tag in
-# rpm/harbour-postivene.spec and vendor/deltachat-rpc-server/SOURCE.md say
+# rpm/harbour-piiri.spec and vendor/deltachat-rpc-server/SOURCE.md say
 # how the two are conveyed together.
 
 [advisories]
@@ -12,7 +12,7 @@ yanked = "deny"
 [licenses]
 version = 2
 # Permissive licences, plus the two copyleft ones this tree already lives
-# with: GPL-3.0-or-later is Postivene's own (the workspace crates declare
+# with: GPL-3.0-or-later is Piiri's own (the workspace crates declare
 # it), and MPL-2.0 is what the Delta Chat core is under. Both directions
 # check out -- permissive and MPL-2.0 code may be conveyed as part of a
 # GPLv3 work. Anything outside this list needs a

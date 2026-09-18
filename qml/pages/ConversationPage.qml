@@ -2,7 +2,7 @@ import QtQuick 2.0
 import Sailfish.Silica 1.0
 import "../components"
 import "../js/Format.js" as Format
-import Postivene 1.0
+import Piiri 1.0
 
 /*
  * One conversation. The messages come from a ChatMessages instance owned by
@@ -283,13 +283,13 @@ Page {
 
     property string errorMessage: ""
     // Three states, not two: the core going away is now something the app
-    // does something about, and a banner that says "restart Postivene"
-    // while Postivene is already fixing it is worse than none.
+    // does something about, and a banner that says "restart Piiri"
+    // while Piiri is already fixing it is worse than none.
     readonly property string coreStatusMessage:
         core.status === "reconnecting"
         ? qsTr("Lost the connection to the Delta Chat core. Reconnecting...")
         : core.status === "stopped"
-          ? qsTr("Lost the connection to the Delta Chat core. Restart Postivene.")
+          ? qsTr("Lost the connection to the Delta Chat core. Restart Piiri.")
           : ""
 
     // Qt 5.6 handler syntax; see WelcomePage.qml.
@@ -638,7 +638,7 @@ Page {
     // than after a send that failed, and the send button is off while it
     // stands -- a picture is never this, since the core shrinks those on
     // the way out. The limit is the core's own recommendation for the
-    // profile's relay; see rust/postivene-shim/src/media.rs.
+    // profile's relay; see rust/piiri-shim/src/media.rs.
     Banner {
         id: tooBigBar
         objectName: "tooBigBar"
@@ -898,7 +898,7 @@ Page {
         }
     }
 
-    // Which kinds Postivene shows itself, and which it hands on. Handing a
+    // Which kinds Piiri shows itself, and which it hands on. Handing a
     // picture or a video to the system took the reader out of the app to
     // something that then failed to play it; everything else is still
     // somebody else's file to open, and a page here that could only say
@@ -930,7 +930,7 @@ Page {
     // Where a copy of an attachment goes: for a picture or a video the
     // folder the gallery indexes, which is where the reader will look
     // for it; for anything else the folder the reader chose in the
-    // settings, or Documents/Postivene until they choose one. Under the
+    // settings, or Documents/Piiri until they choose one. Under the
     // name the sender gave it, since the core keeps the file under a
     // name of its own. The sandbox grants the gallery's two and the
     // folders the setting may name.
@@ -943,7 +943,7 @@ Page {
             page.savedTo = qsTr("Saved to Videos")
             attachmentSaver.save_as(fileUrl, StandardPaths.videos, fileName)
         } else {
-            //: %1 is a folder, such as "Documents/Postivene".
+            //: %1 is a folder, such as "Documents/Piiri".
             page.savedTo = qsTr("Saved to %1").arg(
                         Settings.folderLabel(Settings.saveFolder))
             attachmentSaver.save_as(fileUrl, Settings.saveFolder, fileName)

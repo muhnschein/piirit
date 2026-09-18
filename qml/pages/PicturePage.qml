@@ -2,13 +2,13 @@
 import QtQuick 2.5
 import Sailfish.Silica 1.0
 import "../components"
-import Postivene 1.0
+import Piiri 1.0
 
 /*
  * One picture, as big as the screen will show it.
  *
  * Shown here rather than handed to whatever the system thinks handles the
- * type, which leaves Postivene and fails on a device. A page and a
+ * type, which leaves Piiri and fails on a device. A page and a
  * Flickable; the way out to another app stays in the pull-down for the
  * cases this cannot do anything with.
  *

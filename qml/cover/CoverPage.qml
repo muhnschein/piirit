@@ -1,6 +1,6 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
-import Postivene 1.0
+import Piiri 1.0
 import "../components"
 
 /*
@@ -240,7 +240,7 @@ CoverBackground {
             // not a word to be put into another language, and a
             // catalogue that had this string in it would let one
             // through.
-            text: "Postivene"
+            text: "Piiri"
             color: Theme.highlightColor
             font.pixelSize: Theme.fontSizeMedium
             wrapMode: Text.Wrap

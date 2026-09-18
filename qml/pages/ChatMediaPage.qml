@@ -6,7 +6,7 @@ import "../components"
 import "../components"
 import "../js/Media.js" as Media
 import "../js/Format.js" as Format
-import Postivene 1.0
+import Piiri 1.0
 
 /*
  * Everything of one kind that a chat holds: its pictures and videos as a
@@ -206,7 +206,7 @@ Page {
     FileSaver {
         id: saver
         objectName: "saver"
-        //: %1 is a folder, such as "Documents/Postivene".
+        //: %1 is a folder, such as "Documents/Piiri".
         onSaved: notice.show(qsTr("Saved to %1").arg(
                                  Settings.folderLabel(Settings.saveFolder)))
         onError: page.errorMessage = message

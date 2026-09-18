@@ -1,7 +1,7 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
 import "../components"
-import Postivene 1.0
+import Piiri 1.0
 
 /*
  * QR codes, both ways: this profile's invite drawn as a code, for a phone

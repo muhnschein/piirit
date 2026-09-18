@@ -2,7 +2,7 @@ import QtQuick 2.0
 import Sailfish.Silica 1.0
 import "../components"
 import "../js/Format.js" as Format
-import Postivene 1.0
+import Piiri 1.0
 
 /*
  * One profile, as everyone else sees it and as this device holds it: the
