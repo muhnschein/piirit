@@ -7,14 +7,11 @@ import Sailfish.Silica 1.0
  * introduction (pages/IntroPage.qml) puts above each fact, painted ahead
  * of time by tools/faces/scenes.py into qml/art/.
  *
- * The same two channels as the field of faces, and for the same reason:
- * what ships has no colour in it, the red channel is what the theme's
- * primary colour draws and the green what its highlight draws, so one
- * file is right on every ambience -- a light one included -- and nothing
- * has to be redrawn when Sailfish gains another. FaceField does this too,
- * over a whole screen, with a crop and a hole cut in it; a picture needs
- * none of that, so it is its own small thing rather than a fifth mode of
- * that one.
+ * Two channels rather than a colour picture: what ships has no colour in
+ * it, the red channel is what the theme's primary colour draws and the
+ * green what its highlight draws, so one file is right on every ambience
+ * -- a light one included -- and nothing has to be redrawn when Sailfish
+ * gains another.
  *
  * The pictures are square and this does not letterbox: give it a square.
  */

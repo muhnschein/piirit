@@ -29,10 +29,10 @@ skip() {
 if command -v rpmspec >/dev/null 2>&1; then
     ran=$((ran + 1))
     # -P expands and parses only; BuildRequires are the SDK's job.
-    if rpmspec -P "$root/rpm/harbour-postivene.spec" >/dev/null; then
-        echo "packaging-lint: rpm/harbour-postivene.spec parses"
+    if rpmspec -P "$root/rpm/harbour-piirit.spec" >/dev/null; then
+        echo "packaging-lint: rpm/harbour-piirit.spec parses"
     else
-        echo "packaging-lint: FAIL rpm/harbour-postivene.spec does not parse" >&2
+        echo "packaging-lint: FAIL rpm/harbour-piirit.spec does not parse" >&2
         status=1
     fi
 else
@@ -49,7 +49,7 @@ bare=$(awk '/^[[:space:]]*#/ {
         stripped = $0
         gsub(/%%/, "", stripped)
         if (stripped ~ /%/) printf "%s:%d: %s\n", FILENAME, FNR, $0
-    }' "$root/rpm/harbour-postivene.spec")
+    }' "$root/rpm/harbour-piirit.spec")
 if [ -z "$bare" ]; then
     echo "packaging-lint: spec comments escape their macros"
 else
@@ -62,14 +62,14 @@ if command -v desktop-file-validate >/dev/null 2>&1; then
     ran=$((ran + 1))
     # Sailfish's own keys are not in the freedesktop spec; each expected
     # warning is named, and anything else still fails.
-    out=$(desktop-file-validate "$root/harbour-postivene.desktop" 2>&1 |
+    out=$(desktop-file-validate "$root/harbour-piirit.desktop" 2>&1 |
         grep -v 'value "silica-qt5" for key "X-Nemo-Application-Type"' |
         grep -v 'key "X-Nemo-Application-Type" .* is not known' || true)
     if [ -z "$out" ]; then
-        echo "packaging-lint: harbour-postivene.desktop valid"
+        echo "packaging-lint: harbour-piirit.desktop valid"
     else
         echo "$out" >&2
-        echo "packaging-lint: FAIL harbour-postivene.desktop" >&2
+        echo "packaging-lint: FAIL harbour-piirit.desktop" >&2
         status=1
     fi
 else
@@ -80,11 +80,11 @@ fi
 #
 # The spec pins Version and Release, and mb2 runs with -X so nothing
 # derives them from git -- so without a stamp in the workflow every build
-# is harbour-postivene-0.1.0-1 and `rpm -U` refuses it as already
+# is harbour-piirit-0.1.0-1 and `rpm -U` refuses it as already
 # installed. A phone then keeps the build it has while the file claims to
 # be new, which is exactly what happened.
 ran=$((ran + 1))
-if grep -q '^Release:' "$root/rpm/harbour-postivene.spec" &&
+if grep -q '^Release:' "$root/rpm/harbour-piirit.spec" &&
     ! grep -q 'sed -i "s/\^Release:' "$root/.github/workflows/rpm.yml"; then
     echo "packaging-lint: FAIL the rpm workflow no longer stamps Release, so" \
          "every build would be the same NEVRA and refuse to install over" \
@@ -183,7 +183,7 @@ if command -v lrelease >/dev/null 2>&1 || command -v lrelease-qt5 >/dev/null 2>&
     qm_dir=$(mktemp -d)
     if out=$("$root/scripts/release-translations.sh" "$qm_dir" 2>&1) &&
         ! echo "$out" | grep -qi 'warning'; then
-        echo "packaging-lint: every translations/postivene-*.ts compiles cleanly"
+        echo "packaging-lint: every translations/piirit-*.ts compiles cleanly"
     else
         echo "$out" >&2
         echo "packaging-lint: FAIL a catalog does not compile cleanly with lrelease" >&2

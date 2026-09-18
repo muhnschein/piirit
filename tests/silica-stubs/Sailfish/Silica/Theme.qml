@@ -17,6 +17,7 @@ QtObject {
     property int fontSizeSmall: 12
     property int fontSizeMedium: 18
     property int fontSizeLarge: 24
+    property int fontSizeTiny: 10
     property int fontSizeHuge: 48
     property string fontFamilyHeading: "Sans Serif"
     property color primaryColor: "#ffffff"

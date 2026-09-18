@@ -1,6 +1,6 @@
 #!/bin/sh
 # Generate the offline crate sources the `--with vendor` build mode of
-# rpm/harbour-postivene.spec expects:
+# rpm/harbour-piirit.spec expects:
 #
 #     rpm/vendor.tar.xz   -- `cargo vendor` output, packed as rust/vendor/
 #     rpm/vendor.toml     -- the [source] replacement stanza cargo prints

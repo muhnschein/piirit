@@ -1,0 +1,1599 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.1" language="gu">
+<context>
+    <name>AddMembersPage</name>
+    <message>
+        <source>Add to group</source>
+        <translation>જૂથમાં ઉમેરો</translation>
+    </message>
+    <message>
+        <source>Add members</source>
+        <translation>સભ્યો ઉમેરો</translation>
+    </message>
+    <message>
+        <source>No contacts to add</source>
+        <translation>ઉમેરવા માટે કોઈ સંપર્ક નથી</translation>
+    </message>
+    <message>
+        <source>Nobody matches</source>
+        <translation>કોઈ મેળ ખાતું નથી</translation>
+    </message>
+    <message>
+        <source>Search</source>
+        <translation>શોધો</translation>
+    </message>
+</context>
+<context>
+    <name>AddProfileDialog</name>
+    <message>
+        <source>Add profile</source>
+        <translation>પ્રોફાઇલ ઉમેરો</translation>
+    </message>
+    <message>
+        <source>Create</source>
+        <translation>બનાવો</translation>
+    </message>
+    <message>
+        <source>Your name</source>
+        <translation>તમારું નામ</translation>
+    </message>
+    <message>
+        <source>Relay</source>
+        <translation>રિલે</translation>
+    </message>
+    <message>
+        <source>Custom server</source>
+        <translation>પોતાનું સર્વર</translation>
+    </message>
+    <message>
+        <source>See &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; for the full list.</source>
+        <translation>સંપૂર્ણ સૂચિ &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; પર જુઓ.</translation>
+    </message>
+    <message>
+        <source>The relay gives you an address. The keys are made on this phone.</source>
+        <translation>રિલે તમને સરનામું આપે છે. ચાવીઓ આ જ ફોન પર બને છે.</translation>
+    </message>
+</context>
+<context>
+    <name>AddProfilePage</name>
+    <message>
+        <source>Add profile</source>
+        <translation>પ્રોફાઇલ ઉમેરો</translation>
+    </message>
+    <message>
+        <source>Create a profile</source>
+        <translation>પ્રોફાઇલ બનાવો</translation>
+    </message>
+    <message>
+        <source>A new address on a chatmail relay.</source>
+        <translation>કોઈ ચેટમેલ રિલે પર નવું સરનામું.</translation>
+    </message>
+    <message>
+        <source>Restore from a backup</source>
+        <translation>બેકઅપમાંથી પુનઃસ્થાપિત કરો</translation>
+    </message>
+    <message>
+        <source>A backup file copied onto this phone.</source>
+        <translation>આ ફોન પર કૉપિ કરેલી બેકઅપ ફાઇલ.</translation>
+    </message>
+    <message>
+        <source>Add as second device</source>
+        <translation>બીજા ઉપકરણ તરીકે ઉમેરો</translation>
+    </message>
+    <message>
+        <source>The other device keeps it. Both get everything new.</source>
+        <translation>બીજું ઉપકરણ એને રાખે છે. બંનેને બધું નવું મળે છે.</translation>
+    </message>
+</context>
+<context>
+    <name>AttachmentBar</name>
+    <message>
+        <source>Sending %1</source>
+        <extracomment>Shown above the message field once a file has been picked. %1 is the file name.</extracomment>
+        <translation>%1 મોકલાઈ રહ્યું છે</translation>
+    </message>
+</context>
+<context>
+    <name>AttachmentPreview</name>
+    <message>
+        <source>Voice message</source>
+        <extracomment>A recorded voice message, which has no useful file name.</extracomment>
+        <translation>વૉઇસ સંદેશ</translation>
+    </message>
+</context>
+<context>
+    <name>AutoDeleteDialog</name>
+    <message>
+        <source>Delete messages from device</source>
+        <translation>ઉપકરણમાંથી સંદેશ કાઢી નાખો</translation>
+    </message>
+    <message>
+        <source>Delete</source>
+        <translation>કાઢી નાખો</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>રદ કરો</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n message(s) will be deleted now, and from then on every message will be once it is that old.</source>
+        <extracomment>%n is how many messages would be deleted straight away.</extracomment>
+        <translation>
+            <numerusform>%n સંદેશ હમણાં કાઢી નાખવામાં આવશે, અને ત્યારપછી દરેક સંદેશ એટલો જૂનો થાય કે તરત.</numerusform>
+            <numerusform>%n સંદેશ હમણાં કાઢી નાખવામાં આવશે, અને ત્યારપછી દરેક સંદેશ એટલો જૂનો થાય કે તરત.</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>This includes pictures, videos and files.</source>
+        <translation>આમાં ચિત્રો, વિડિઓ અને ફાઇલો શામેલ છે.</translation>
+    </message>
+    <message>
+        <source>Messages are deleted whether they were read or not.</source>
+        <translation>સંદેશ વાંચ્યા હોય કે ન હોય, કાઢી નાખવામાં આવે છે.</translation>
+    </message>
+    <message>
+        <source>&quot;Saved messages&quot; are kept.</source>
+        <extracomment>&quot;Saved messages&quot; is the name of the chat with oneself.</extracomment>
+        <translation>&quot;સાચવેલા સંદેશ&quot; રાખવામાં આવે છે.</translation>
+    </message>
+    <message>
+        <source>I understand, delete all these messages</source>
+        <translation>હું સમજું છું, આ બધા સંદેશ કાઢી નાખો</translation>
+    </message>
+</context>
+<context>
+    <name>BackupPage</name>
+    <message>
+        <source>Back up profile</source>
+        <translation>પ્રોફાઇલનો બેકઅપ</translation>
+    </message>
+    <message>
+        <source>Write the backup</source>
+        <translation>બેકઅપ લખો</translation>
+    </message>
+    <message>
+        <source>Writing the backup...</source>
+        <translation>બેકઅપ લખાઈ રહ્યો છે...</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>રદ કરો</translation>
+    </message>
+    <message>
+        <source>Saved to %1</source>
+        <extracomment>Said once the backup is written. %1 is the full path of the file.</extracomment>
+        <translation>%1 માં સાચવ્યું</translation>
+    </message>
+    <message>
+        <source>Messages, contacts and key in one file, saved to Documents. Whoever has the file has the profile.</source>
+        <translation>સંદેશા, સંપર્કો અને ચાવી એક જ ફાઇલમાં, દસ્તાવેજોમાં સાચવેલી. જેની પાસે ફાઇલ, તેની પાસે પ્રોફાઇલ.</translation>
+    </message>
+    <message>
+        <source>Swipe on for your chats.</source>
+        <translation>આગળ સ્વાઇપ કરીને તમારી ચેટ પર જાઓ.</translation>
+    </message>
+</context>
+<context>
+    <name>BlockContactDialog</name>
+    <message>
+        <source>Block contact</source>
+        <translation>સંપર્કને બ્લૉક કરો</translation>
+    </message>
+    <message>
+        <source>Unblock contact</source>
+        <translation>સંપર્કને અનબ્લૉક કરો</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>રદ કરો</translation>
+    </message>
+    <message>
+        <source>Block this contact?
+
+Direct messages or groups created by blocked contacts will not show up.
+
+Other groups with blocked contacts will still show their messages.</source>
+        <translation>આ સંપર્કને બ્લૉક કરવો છે?
+
+બ્લૉક કરેલા સંપર્કોના સીધા સંદેશા કે તેમણે બનાવેલા ગ્રુપ દેખાશે નહીં.
+
+બ્લૉક કરેલા સંપર્કો ધરાવતા બીજા ગ્રુપમાં તેમના સંદેશા તો દેખાશે.</translation>
+    </message>
+    <message>
+        <source>Unblock this contact?</source>
+        <translation>આ સંપર્કને અનબ્લૉક કરવો છે?</translation>
+    </message>
+</context>
+<context>
+    <name>BlockContactPage</name>
+    <message>
+        <source>Block contact</source>
+        <translation>સંપર્કને બ્લૉક કરો</translation>
+    </message>
+    <message>
+        <source>Search</source>
+        <translation>શોધો</translation>
+    </message>
+    <message>
+        <source>Nobody matches</source>
+        <translation>કોઈ મેળ ખાતું નથી</translation>
+    </message>
+    <message>
+        <source>No contacts yet</source>
+        <translation>હજી કોઈ સંપર્ક નથી</translation>
+    </message>
+</context>
+<context>
+    <name>BlockedContactsPage</name>
+    <message>
+        <source>Block contact</source>
+        <extracomment>Opens the contacts, to pick one to block.</extracomment>
+        <translation>સંપર્કને બ્લૉક કરો</translation>
+    </message>
+    <message>
+        <source>Blocked contacts</source>
+        <translation>બ્લૉક કરેલા સંપર્કો</translation>
+    </message>
+    <message>
+        <source>Blocked contacts will appear here.</source>
+        <translation>બ્લૉક કરેલા સંપર્કો અહીં દેખાશે.</translation>
+    </message>
+</context>
+<context>
+    <name>CapturePage</name>
+    <message>
+        <source>The video could not be saved</source>
+        <translation>વિડિઓ સાચવી શકાયો નથી</translation>
+    </message>
+</context>
+<context>
+    <name>ChatListPage</name>
+    <message>
+        <source>Lost the connection to the Delta Chat core. Reconnecting...</source>
+        <translation>Delta Chat કોર સાથે જોડાણ તૂટી ગયું. ફરી જોડાઈ રહ્યું છે...</translation>
+    </message>
+    <message>
+        <source>Lost the connection to the Delta Chat core. Restart Piirit.</source>
+        <translation>Delta Chat કોર સાથે જોડાણ તૂટી ગયું. Piirit ફરી શરૂ કરો.</translation>
+    </message>
+    <message>
+        <source>Profiles</source>
+        <translation>પ્રોફાઇલ</translation>
+    </message>
+    <message>
+        <source>Archived chats</source>
+        <translation>આર્કાઇવ કરેલ ચેટ</translation>
+    </message>
+    <message>
+        <source>New chat</source>
+        <translation>નવી ચેટ</translation>
+    </message>
+    <message>
+        <source>Archived</source>
+        <translation>આર્કાઇવ કરેલ</translation>
+    </message>
+    <message>
+        <source>Chats</source>
+        <translation>ચેટ</translation>
+    </message>
+    <message>
+        <source>Pinned</source>
+        <translation>પિન કરેલ</translation>
+    </message>
+    <message>
+        <source>Other chats</source>
+        <translation>અન્ય ચેટ</translation>
+    </message>
+    <message>
+        <source>Mark as read</source>
+        <translation>વાંચેલ તરીકે નિશાન કરો</translation>
+    </message>
+    <message>
+        <source>Unpin</source>
+        <translation>અનપિન કરો</translation>
+    </message>
+    <message>
+        <source>Pin</source>
+        <translation>પિન કરો</translation>
+    </message>
+    <message>
+        <source>Unmute</source>
+        <translation>અનમ્યૂટ કરો</translation>
+    </message>
+    <message>
+        <source>Mute</source>
+        <translation>મ્યૂટ કરો</translation>
+    </message>
+    <message>
+        <source>Accept</source>
+        <translation>સ્વીકારો</translation>
+    </message>
+    <message>
+        <source>Block</source>
+        <translation>બ્લોક કરો</translation>
+    </message>
+    <message>
+        <source>Archive</source>
+        <translation>આર્કાઇવ કરો</translation>
+    </message>
+    <message>
+        <source>Unarchive</source>
+        <translation>આર્કાઇવમાંથી બહાર કાઢો</translation>
+    </message>
+    <message>
+        <source>Delete</source>
+        <translation>કાઢી નાખો</translation>
+    </message>
+    <message>
+        <source>Deleting</source>
+        <extracomment>What Silica&apos;s countdown says it is doing, over a chat the reader has asked to delete.</extracomment>
+        <translation>કાઢી નાખવામાં આવે છે</translation>
+    </message>
+    <message>
+        <source>No archived chats</source>
+        <translation>કોઈ આર્કાઇવ કરેલ ચેટ નથી</translation>
+    </message>
+    <message>
+        <source>No chats yet</source>
+        <translation>હજી કોઈ ચેટ નથી</translation>
+    </message>
+    <message>
+        <source>Pull down to start one</source>
+        <translation>શરૂ કરવા નીચે ખેંચો</translation>
+    </message>
+    <message>
+        <source>Settings</source>
+        <translation>સેટિંગ્સ</translation>
+    </message>
+    <message>
+        <source>QR code</source>
+        <translation>QR કોડ</translation>
+    </message>
+    <message>
+        <source>New group</source>
+        <translation>નવું જૂથ</translation>
+    </message>
+    <message>
+        <source>Mark as unread</source>
+        <translation>ન વાંચેલ તરીકે નિશાન કરો</translation>
+    </message>
+    <message>
+        <source>Search</source>
+        <translation>શોધો</translation>
+    </message>
+</context>
+<context>
+    <name>ChatMediaPage</name>
+    <message>
+        <source>Open in another app</source>
+        <extracomment>Hands the attachment to whatever else on the phone handles files of its kind.</extracomment>
+        <translation>બીજી ઍપમાં ખોલો</translation>
+    </message>
+    <message>
+        <source>Save to device</source>
+        <translation>ઉપકરણ પર સાચવો</translation>
+    </message>
+    <message>
+        <source>Deleting</source>
+        <extracomment>What Silica&apos;s countdown says it is doing, over a picture, a sound, a file or an app the reader has asked to delete.</extracomment>
+        <translation>કાઢી નાખવામાં આવે છે</translation>
+    </message>
+    <message>
+        <source>Show in chat</source>
+        <extracomment>Goes back to the conversation, at this message.</extracomment>
+        <translation>ચેટમાં બતાવો</translation>
+    </message>
+    <message>
+        <source>Delete</source>
+        <translation>કાઢી નાખો</translation>
+    </message>
+    <message>
+        <source>Saved to Downloads</source>
+        <translation>ડાઉનલોડ્સમાં સાચવ્યું</translation>
+    </message>
+</context>
+<context>
+    <name>ChatPickerPage</name>
+    <message>
+        <source>Forward to</source>
+        <translation>આમાં ફોરવર્ડ કરો</translation>
+    </message>
+    <message>
+        <source>No chats to forward to</source>
+        <translation>ફોરવર્ડ કરવા માટે કોઈ ચેટ નથી</translation>
+    </message>
+    <message>
+        <source>Search</source>
+        <translation>શોધો</translation>
+    </message>
+</context>
+<context>
+    <name>ContactPage</name>
+    <message>
+        <source>Saved</source>
+        <translation>સાચવ્યું</translation>
+    </message>
+    <message>
+        <source>Contact</source>
+        <translation>સંપર્ક</translation>
+    </message>
+    <message>
+        <source>Verified: end-to-end encrypted, and checked in person</source>
+        <translation>ચકાસાયેલ: એન્ડ-ટુ-એન્ડ એન્ક્રિપ્ટેડ, અને રૂબરૂ તપાસેલ</translation>
+    </message>
+    <message>
+        <source>End-to-end encrypted</source>
+        <translation>એન્ડ-ટુ-એન્ડ એન્ક્રિપ્ટેડ</translation>
+    </message>
+    <message>
+        <source>Not encrypted: a plain email contact</source>
+        <translation>એન્ક્રિપ્ટેડ નથી: સાદો ઈમેલ સંપર્ક</translation>
+    </message>
+    <message>
+        <source>Name</source>
+        <translation>નામ</translation>
+    </message>
+    <message>
+        <source>Leave blank to use the name they chose</source>
+        <translation>તેમણે પસંદ કરેલું નામ વાપરવા ખાલી રાખો</translation>
+    </message>
+</context>
+<context>
+    <name>ConversationList</name>
+    <message>
+        <source>Reply</source>
+        <translation>જવાબ આપો</translation>
+    </message>
+    <message>
+        <source>Copy</source>
+        <translation>કૉપિ કરો</translation>
+    </message>
+    <message>
+        <source>Forward</source>
+        <translation>ફોરવર્ડ કરો</translation>
+    </message>
+    <message>
+        <source>Send again</source>
+        <translation>ફરી મોકલો</translation>
+    </message>
+    <message>
+        <source>Download</source>
+        <translation>ડાઉનલોડ કરો</translation>
+    </message>
+    <message>
+        <source>Delete</source>
+        <translation>કાઢી નાખો</translation>
+    </message>
+    <message>
+        <source>Deleting</source>
+        <extracomment>What Silica&apos;s countdown says it is doing, over a message the reader has asked to delete.</extracomment>
+        <translation>કાઢી નાખવામાં આવે છે</translation>
+    </message>
+    <message>
+        <source>New messages</source>
+        <extracomment>The line in a conversation above the first message that arrived while the reader was away.</extracomment>
+        <translation>નવા સંદેશા</translation>
+    </message>
+    <message>
+        <source>Open</source>
+        <translation>ખોલો</translation>
+    </message>
+    <message>
+        <source>Save</source>
+        <translation>સાચવો</translation>
+    </message>
+    <message>
+        <source>Edit</source>
+        <translation>સંપાદિત કરો</translation>
+    </message>
+</context>
+<context>
+    <name>ConversationPage</name>
+    <message>
+        <source>Lost the connection to the Delta Chat core. Reconnecting...</source>
+        <translation>Delta Chat કોર સાથે જોડાણ તૂટી ગયું. ફરી જોડાઈ રહ્યું છે...</translation>
+    </message>
+    <message>
+        <source>Lost the connection to the Delta Chat core. Restart Piirit.</source>
+        <translation>Delta Chat કોર સાથે જોડાણ તૂટી ગયું. Piirit ફરી શરૂ કરો.</translation>
+    </message>
+    <message>
+        <source>No messages yet</source>
+        <translation>હજી કોઈ સંદેશ નથી</translation>
+    </message>
+    <message>
+        <source>Copied to clipboard</source>
+        <translation>ક્લિપબોર્ડ પર કૉપિ થયું</translation>
+    </message>
+    <message>
+        <source>Caption</source>
+        <extracomment>Message field placeholder. Also the prompt for the caption on a message that is carrying a file.</extracomment>
+        <translation>કૅપ્શન</translation>
+    </message>
+    <message>
+        <source>Message</source>
+        <translation>સંદેશ</translation>
+    </message>
+    <message>
+        <source>Long message: the other end sees a preview and taps to read the rest</source>
+        <extracomment>Shown above the message field while what is being written is long enough that the other end will receive a shortened version with the rest behind a tap.</extracomment>
+        <translation>લાંબો સંદેશ: સામેની બાજુ ઝલક દેખાય છે અને બાકીનું વાંચવા ટૅપ કરવું પડે છે</translation>
+    </message>
+    <message>
+        <source>Saved to Pictures</source>
+        <translation>ચિત્રોમાં સાચવ્યું</translation>
+    </message>
+    <message>
+        <source>Saved to Videos</source>
+        <translation>વિડિઓમાં સાચવ્યું</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n member(s)</source>
+        <extracomment>Under a group&apos;s name, over its messages. %n is how many people are in the group.</extracomment>
+        <translation>
+            <numerusform>%n સભ્ય</numerusform>
+            <numerusform>%n સભ્યો</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Too big to send: %1. This relay takes %2.</source>
+        <extracomment>Shown above the message field when the attached file is bigger than the relay will carry. %1 is the file&apos;s size and %2 the largest the relay takes, each such as &quot;24 MB&quot;.</extracomment>
+        <translation>મોકલવા માટે ખૂબ મોટું: %1. આ રિલે %2 સુધી લે છે.</translation>
+    </message>
+    <message>
+        <source>Saved to Downloads</source>
+        <translation>ડાઉનલોડ્સમાં સાચવ્યું</translation>
+    </message>
+</context>
+<context>
+    <name>CoverPage</name>
+    <message>
+        <source>%1 new</source>
+        <extracomment>On the cover, in a pill among the avatars: how many messages are unread. %1 is the number, or &quot;99+&quot;.</extracomment>
+        <translation>%1 નવા</translation>
+    </message>
+</context>
+<context>
+    <name>DeleteMessageDialog</name>
+    <message>
+        <source>Delete</source>
+        <translation>કાઢી નાખો</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>રદ કરો</translation>
+    </message>
+    <message>
+        <source>Delete for me</source>
+        <extracomment>One of the two ways to delete a message.</extracomment>
+        <translation>ફક્ત મારા માટે કાઢી નાખો</translation>
+    </message>
+    <message>
+        <source>Delete for everyone</source>
+        <extracomment>The other way: every other device in the chat is asked to delete its copy too.</extracomment>
+        <translation>બધા માટે કાઢી નાખો</translation>
+    </message>
+    <message>
+        <source>Only an encrypted message you sent yourself can be deleted for everyone.</source>
+        <translation>બધા માટે ફક્ત તમે પોતે મોકલેલો એન્ક્રિપ્ટેડ સંદેશ જ કાઢી શકાય છે.</translation>
+    </message>
+    <message>
+        <source>How do you want to delete this message? This cannot be undone.</source>
+        <translation>તમે આ સંદેશ કેવી રીતે કાઢી નાખવા માંગો છો? આ પાછું લઈ શકાતું નથી.</translation>
+    </message>
+    <message>
+        <source>It goes from your devices. Everybody else keeps their copy.</source>
+        <translation>તે તમારાં ઉપકરણોમાંથી જતો રહે છે. બાકીના બધા પોતાની નકલ રાખે છે.</translation>
+    </message>
+    <message>
+        <source>It goes from your devices, and every other device in this chat is asked to delete it too.</source>
+        <translation>તે તમારાં ઉપકરણોમાંથી જતો રહે છે, અને આ ચેટના બીજા દરેક ઉપકરણને પણ તેને કાઢી નાખવા કહેવામાં આવે છે.</translation>
+    </message>
+</context>
+<context>
+    <name>DisappearingMessages</name>
+    <message>
+        <source>Off</source>
+        <translation>બંધ</translation>
+    </message>
+    <message>
+        <source>After 1 minute</source>
+        <translation>1 મિનિટ પછી</translation>
+    </message>
+    <message>
+        <source>After 1 hour</source>
+        <translation>1 કલાક પછી</translation>
+    </message>
+    <message>
+        <source>After 1 day</source>
+        <translation>1 દિવસ પછી</translation>
+    </message>
+    <message>
+        <source>After 1 week</source>
+        <translation>1 અઠવાડિયા પછી</translation>
+    </message>
+    <message>
+        <source>Disappearing messages</source>
+        <translation>ગાયબ થતા સંદેશ</translation>
+    </message>
+    <message>
+        <source>After 1 year</source>
+        <translation>1 વર્ષ પછી</translation>
+    </message>
+    <message>
+        <source>After %1 years</source>
+        <translation>%1 વર્ષ પછી</translation>
+    </message>
+    <message>
+        <source>After %1 weeks</source>
+        <translation>%1 અઠવાડિયા પછી</translation>
+    </message>
+    <message>
+        <source>After %1 days</source>
+        <translation>%1 દિવસ પછી</translation>
+    </message>
+    <message>
+        <source>After %1 hours</source>
+        <translation>%1 કલાક પછી</translation>
+    </message>
+    <message>
+        <source>After %1 minutes</source>
+        <translation>%1 મિનિટ પછી</translation>
+    </message>
+    <message>
+        <source>After 1 second</source>
+        <translation>1 સેકન્ડ પછી</translation>
+    </message>
+    <message>
+        <source>After %1 seconds</source>
+        <translation>%1 સેકન્ડ પછી</translation>
+    </message>
+    <message>
+        <source>Applies to everyone in the chat. They can still copy and forward.</source>
+        <translation>ચેટમાંના બધા માટે લાગુ. તેઓ તોય કૉપિ અને ફોરવર્ડ કરી શકે છે.</translation>
+    </message>
+</context>
+<context>
+    <name>ExistingProfilePage</name>
+    <message>
+        <source>Where is your profile now?</source>
+        <translation>તમારી પ્રોફાઇલ અત્યારે ક્યાં છે?</translation>
+    </message>
+    <message>
+        <source>Add as second device</source>
+        <translation>બીજા ઉપકરણ તરીકે ઉમેરો</translation>
+    </message>
+    <message>
+        <source>Restore from a backup</source>
+        <translation>બેકઅપમાંથી પુનઃસ્થાપિત કરો</translation>
+    </message>
+    <message>
+        <source>The other device keeps it. Both get everything new.</source>
+        <translation>બીજું ઉપકરણ એને રાખે છે. બંનેને બધું નવું મળે છે.</translation>
+    </message>
+    <message>
+        <source>A backup file copied onto this phone.</source>
+        <translation>આ ફોન પર કૉપિ કરેલી બેકઅપ ફાઇલ.</translation>
+    </message>
+</context>
+<context>
+    <name>Format</name>
+    <message>
+        <source>now</source>
+        <translation>હમણાં</translation>
+    </message>
+    <message>
+        <source>%1 min</source>
+        <translation>%1 મિનિટ</translation>
+    </message>
+    <message>
+        <source>%1 h</source>
+        <translation>%1 કલાક</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n day(s)</source>
+        <extracomment>How long ago a chat&apos;s last message was. %n is a count of days.</extracomment>
+        <translation>
+            <numerusform>%n દિવસ</numerusform>
+            <numerusform>%n દિવસ</numerusform>
+        </translation>
+    </message>
+</context>
+<context>
+    <name>GroupPage</name>
+    <message>
+        <source>Saved</source>
+        <translation>સાચવ્યું</translation>
+    </message>
+    <message>
+        <source>Leave group</source>
+        <translation>જૂથ છોડો</translation>
+    </message>
+    <message>
+        <source>Add members</source>
+        <translation>સભ્યો ઉમેરો</translation>
+    </message>
+    <message>
+        <source>Group</source>
+        <translation>જૂથ</translation>
+    </message>
+    <message>
+        <source>Remove picture</source>
+        <translation>ચિત્ર દૂર કરો</translation>
+    </message>
+    <message>
+        <source>Group name</source>
+        <translation>જૂથનું નામ</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n member(s)</source>
+        <extracomment>Heading over the member list. %n is how many there are.</extracomment>
+        <translation>
+            <numerusform>%n સભ્ય</numerusform>
+            <numerusform>%n સભ્યો</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Remove from group</source>
+        <translation>જૂથમાંથી દૂર કરો</translation>
+    </message>
+    <message>
+        <source>Removing</source>
+        <extracomment>What Silica&apos;s countdown says it is doing, over a member the reader has asked to remove from the group.</extracomment>
+        <translation>દૂર કરવામાં આવે છે</translation>
+    </message>
+    <message>
+        <source>Everyone in the group sees the name</source>
+        <translation>જૂથમાં બધા નામ જુએ છે</translation>
+    </message>
+</context>
+<context>
+    <name>IntroPage</name>
+    <message>
+        <source>No sign-up, no phone number</source>
+        <translation>કોઈ સાઇન-અપ નહીં, કોઈ ફોન નંબર નહીં</translation>
+    </message>
+    <message>
+        <source>You choose who can reach you</source>
+        <translation>તમને કોણ સંપર્ક કરી શકે તે તમે નક્કી કરો છો</translation>
+    </message>
+    <message>
+        <source>Groups of equals</source>
+        <translation>સમાન હકવાળા જૂથ</translation>
+    </message>
+    <message>
+        <source>The server only passes it on</source>
+        <translation>સર્વર માત્ર આગળ પહોંચાડે છે</translation>
+    </message>
+    <message>
+        <source>Keep swiping to set up your profile.</source>
+        <translation>પ્રોફાઇલ સેટ કરવા માટે સ્વાઇપ કરતા રહો.</translation>
+    </message>
+    <message>
+        <source>Every message is encrypted</source>
+        <translation>દરેક સંદેશ એન્ક્રિપ્ટ થયેલો છે</translation>
+    </message>
+    <message>
+        <source>Made here on your phone. No phone number, no account, nothing to sign.</source>
+        <translation>અહીં જ, તમારા ફોન પર બને છે. ફોન નંબર નહીં, ખાતું નહીં, સહી કરવાનું કંઈ નહીં.</translation>
+    </message>
+    <message>
+        <source>There is no directory to be found in. Show a friend a code, or send a link.</source>
+        <translation>તમને શોધી શકાય એવી કોઈ યાદી નથી. મિત્રને કોડ બતાવો, કે લિંક મોકલો.</translation>
+    </message>
+    <message>
+        <source>Encrypted the whole way, always. The servers cannot read a word.</source>
+        <translation>હંમેશાં આખા રસ્તે એન્ક્રિપ્ટેડ. સર્વર એક શબ્દ પણ વાંચતા નથી.</translation>
+    </message>
+    <message>
+        <source>Anyone can add a friend, rename the group or leave. Nobody is in charge.</source>
+        <translation>કોઈ પણ મિત્રને ઉમેરી શકે, સમૂહનું નામ બદલી શકે કે નીકળી શકે. કોઈ માલિક નથી.</translation>
+    </message>
+    <message>
+        <source>It holds a message until the other phone is online, and nothing more.</source>
+        <translation>બીજો ફોન ઑનલાઇન ન થાય ત્યાં સુધી એ સંદેશ રાખે છે, એથી વધુ કંઈ નહીં.</translation>
+    </message>
+</context>
+<context>
+    <name>LeaveGroupDialog</name>
+    <message>
+        <source>Leave group</source>
+        <translation>જૂથ છોડો</translation>
+    </message>
+    <message>
+        <source>Leave</source>
+        <translation>છોડો</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>રદ કરો</translation>
+    </message>
+    <message>
+        <source>Leave %1? Only a member can add you back.</source>
+        <extracomment>%1 is the group&apos;s name.</extracomment>
+        <translation>%1 છોડવું? તમને પાછા ફક્ત સભ્ય જ ઉમેરી શકે.</translation>
+    </message>
+</context>
+<context>
+    <name>Media</name>
+    <message>
+        <source>Gallery</source>
+        <extracomment>The pictures and videos of a chat: a tile, and a page heading.</extracomment>
+        <translation>ગેલેરી</translation>
+    </message>
+    <message>
+        <source>Audio</source>
+        <extracomment>The voice messages and music of a chat.</extracomment>
+        <translation>ઑડિયો</translation>
+    </message>
+    <message>
+        <source>Files</source>
+        <extracomment>The documents and other files of a chat.</extracomment>
+        <translation>ફાઇલો</translation>
+    </message>
+    <message>
+        <source>Apps</source>
+        <extracomment>The webxdc apps of a chat.</extracomment>
+        <translation>એપ્સ</translation>
+    </message>
+    <message>
+        <source>No pictures or videos yet</source>
+        <translation>હજુ સુધી કોઈ ચિત્રો કે વિડિયો નથી</translation>
+    </message>
+    <message>
+        <source>No voice messages or music yet</source>
+        <translation>હજુ સુધી કોઈ વૉઇસ સંદેશ કે સંગીત નથી</translation>
+    </message>
+    <message>
+        <source>No files yet</source>
+        <translation>હજુ સુધી કોઈ ફાઇલો નથી</translation>
+    </message>
+    <message>
+        <source>No apps yet</source>
+        <translation>હજુ સુધી કોઈ એપ્સ નથી</translation>
+    </message>
+</context>
+<context>
+    <name>MessageDelegate</name>
+    <message>
+        <source>Forwarded</source>
+        <translation>ફોરવર્ડ કરેલ</translation>
+    </message>
+    <message>
+        <source>Downloading…</source>
+        <translation>ડાઉનલોડ થઈ રહ્યું છે…</translation>
+    </message>
+    <message>
+        <source>⬇ Download failed, tap to try again</source>
+        <translation>⬇ ડાઉનલોડ નિષ્ફળ, ફરી પ્રયાસ કરવા ટૅપ કરો</translation>
+    </message>
+    <message>
+        <source>Cannot be decrypted</source>
+        <translation>ડિક્રિપ્ટ કરી શકાતું નથી</translation>
+    </message>
+    <message>
+        <source>⬇ Download</source>
+        <extracomment>Fetches a message the auto-download limit held back.</extracomment>
+        <translation>⬇ ડાઉનલોડ કરો</translation>
+    </message>
+    <message>
+        <source>View full message</source>
+        <extracomment>Opens the whole message on a page of its own.</extracomment>
+        <translation>આખો સંદેશ જુઓ</translation>
+    </message>
+    <message>
+        <source>Edited</source>
+        <translation>સંપાદિત</translation>
+    </message>
+</context>
+<context>
+    <name>MessagePage</name>
+    <message>
+        <source>Copy</source>
+        <translation>કૉપિ કરો</translation>
+    </message>
+    <message>
+        <source>Copied</source>
+        <translation>નકલ થઈ</translation>
+    </message>
+    <message>
+        <source>Message</source>
+        <extracomment>Heading of the page showing one message on its own.</extracomment>
+        <translation>સંદેશ</translation>
+    </message>
+    <message>
+        <source>This message has no text</source>
+        <extracomment>Shown on the full-message page for a message that turns out to have no words in it at all.</extracomment>
+        <translation>આ સંદેશમાં કોઈ લખાણ નથી</translation>
+    </message>
+</context>
+<context>
+    <name>NewChatPage</name>
+    <message>
+        <source>Chat</source>
+        <translation>ચેટ</translation>
+    </message>
+    <message>
+        <source>New chat</source>
+        <translation>નવી ચેટ</translation>
+    </message>
+    <message>
+        <source>No contacts yet</source>
+        <translation>હજી કોઈ સંપર્ક નથી</translation>
+    </message>
+    <message>
+        <source>Scan someone&apos;s invite from the chat list: QR code</source>
+        <translation>ચેટ સૂચિમાંથી કોઈનું આમંત્રણ સ્કૅન કરો: QR કોડ</translation>
+    </message>
+    <message>
+        <source>Search</source>
+        <translation>શોધો</translation>
+    </message>
+</context>
+<context>
+    <name>NewGroupPage</name>
+    <message>
+        <source>Please name the group</source>
+        <translation>કૃપા કરીને જૂથને નામ આપો</translation>
+    </message>
+    <message>
+        <source>Create Group</source>
+        <translation>જૂથ બનાવો</translation>
+    </message>
+    <message>
+        <source>New group</source>
+        <translation>નવું જૂથ</translation>
+    </message>
+    <message>
+        <source>Group name</source>
+        <translation>જૂથનું નામ</translation>
+    </message>
+    <message>
+        <source>Remove picture</source>
+        <translation>ચિત્ર દૂર કરો</translation>
+    </message>
+    <message>
+        <source>Everyone in the group sees the name</source>
+        <translation>જૂથમાં બધા નામ જુએ છે</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n member(s)</source>
+        <extracomment>Heading over the member list. %n is how many there are, the reader included.</extracomment>
+        <translation>
+            <numerusform>%n સભ્ય</numerusform>
+            <numerusform>%n સભ્યો</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Remove from group</source>
+        <translation>જૂથમાંથી દૂર કરો</translation>
+    </message>
+    <message>
+        <source>Add members</source>
+        <translation>સભ્યો ઉમેરો</translation>
+    </message>
+</context>
+<context>
+    <name>Notifier</name>
+    <message numerus="yes">
+        <source>%n new message(s)</source>
+        <extracomment>A notification that says no more than this. %n is how many arrived in one chat.</extracomment>
+        <translation>
+            <numerusform>%n નવો સંદેશ</numerusform>
+            <numerusform>%n નવા સંદેશા</numerusform>
+        </translation>
+    </message>
+</context>
+<context>
+    <name>PicturePage</name>
+    <message>
+        <source>Saved to Pictures</source>
+        <translation>ચિત્રોમાં સાચવ્યું</translation>
+    </message>
+    <message>
+        <source>Open in another app</source>
+        <extracomment>Hands the attachment to whatever else on the phone handles files of its kind.</extracomment>
+        <translation>બીજી ઍપમાં ખોલો</translation>
+    </message>
+    <message>
+        <source>Save to device</source>
+        <translation>ઉપકરણ પર સાચવો</translation>
+    </message>
+</context>
+<context>
+    <name>ProfilePage</name>
+    <message>
+        <source>Not connected</source>
+        <translation>જોડાયેલ નથી</translation>
+    </message>
+    <message>
+        <source>Checking the connection</source>
+        <translation>જોડાણ તપાસાઈ રહ્યું છે</translation>
+    </message>
+    <message>
+        <source>Profile</source>
+        <translation>પ્રોફાઇલ</translation>
+    </message>
+    <message>
+        <source>Remove picture</source>
+        <translation>ચિત્ર દૂર કરો</translation>
+    </message>
+    <message>
+        <source>Your name</source>
+        <translation>તમારું નામ</translation>
+    </message>
+    <message>
+        <source>Bio</source>
+        <translation>પરિચય</translation>
+    </message>
+    <message>
+        <source>A line about you</source>
+        <translation>તમારા વિશે એક લીટી</translation>
+    </message>
+    <message>
+        <source>Address</source>
+        <translation>સરનામું</translation>
+    </message>
+    <message>
+        <source>Send read receipts</source>
+        <translation>વાંચ્યાની પહોંચ મોકલો</translation>
+    </message>
+    <message>
+        <source>Storage and connectivity</source>
+        <translation>સ્ટોરેજ અને કનેક્ટિવિટી</translation>
+    </message>
+    <message>
+        <source>%1 on this phone</source>
+        <extracomment>How much room the profile takes on the phone. %1 is a size such as &quot;12.3 MB&quot;.</extracomment>
+        <translation>આ ફોન પર %1</translation>
+    </message>
+    <message>
+        <source>Saved</source>
+        <translation>સાચવ્યું</translation>
+    </message>
+    <message>
+        <source>Connected, and up to date</source>
+        <translation>જોડાયેલ અને અદ્યતન</translation>
+    </message>
+    <message>
+        <source>Connected, sending or syncing messages</source>
+        <translation>જોડાયેલ, સંદેશા મોકલી કે સમન્વયિત કરી રહ્યું છે</translation>
+    </message>
+    <message>
+        <source>Connecting to the relay</source>
+        <translation>રિલે સાથે જોડાઈ રહ્યું છે</translation>
+    </message>
+    <message>
+        <source>%1 used · %2 left of %3</source>
+        <extracomment>The mailbox on the relay. %1 used, %2 left, %3 the whole, each a size such as &quot;1.4 GB&quot;.</extracomment>
+        <translation>%3માંથી %1 વપરાયેલ · %2 બાકી</translation>
+    </message>
+    <message>
+        <source>The relay has not reported its quota yet</source>
+        <translation>રિલેએ હજી તેનો ક્વોટા જણાવ્યો નથી</translation>
+    </message>
+    <message>
+        <source>The name on every message you send</source>
+        <translation>તમે મોકલો છો તે દરેક સંદેશા પરનું નામ</translation>
+    </message>
+    <message>
+        <source>Both ways: with this off you send none and see none.</source>
+        <translation>બંને બાજુ: બંધ હોય તો તમે એકેય મોકલતા નથી અને એકેય જોતા નથી.</translation>
+    </message>
+    <message>
+        <source>Attachments up to %1</source>
+        <extracomment>The biggest attachment the relay will carry. %1 is a size such as &quot;22.3 MB&quot;.</extracomment>
+        <translation>%1 સુધીનાં જોડાણો</translation>
+    </message>
+</context>
+<context>
+    <name>ProfileSetupPage</name>
+    <message>
+        <source>Add profile</source>
+        <translation>પ્રોફાઇલ ઉમેરો</translation>
+    </message>
+    <message>
+        <source>Contacting %1...</source>
+        <translation>%1 નો સંપર્ક કરવામાં આવે છે...</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>રદ કરો</translation>
+    </message>
+    <message>
+        <source>Back</source>
+        <translation>પાછળ</translation>
+    </message>
+    <message>
+        <source>%1 did not answer within %2 seconds.</source>
+        <translation>%1 એ %2 સેકન્ડમાં જવાબ આપ્યો નહીં.</translation>
+    </message>
+    <message>
+        <source>Relays are run by volunteers. Go back and try another one.</source>
+        <translation>રિલે સ્વયંસેવકો ચલાવે છે. પાછા જઈને બીજું અજમાવો.</translation>
+    </message>
+</context>
+<context>
+    <name>ProfileStartPage</name>
+    <message>
+        <source>Alright, let&apos;s get you set up.</source>
+        <translation>ચાલો, તમારી પ્રોફાઇલ તૈયાર કરીએ.</translation>
+    </message>
+    <message>
+        <source>I already have a profile</source>
+        <translation>મારી પાસે પહેલેથી પ્રોફાઇલ છે</translation>
+    </message>
+    <message>
+        <source>Create a profile</source>
+        <translation>પ્રોફાઇલ બનાવો</translation>
+    </message>
+</context>
+<context>
+    <name>ProfilesPage</name>
+    <message>
+        <source>Add profile</source>
+        <translation>પ્રોફાઇલ ઉમેરો</translation>
+    </message>
+    <message>
+        <source>Profiles</source>
+        <translation>પ્રોફાઇલ</translation>
+    </message>
+    <message>
+        <source>Profile settings</source>
+        <translation>પ્રોફાઇલ સેટિંગ</translation>
+    </message>
+    <message>
+        <source>Delete profile</source>
+        <translation>પ્રોફાઇલ કાઢી નાખો</translation>
+    </message>
+    <message>
+        <source>Deleting profile</source>
+        <extracomment>What Silica&apos;s countdown says it is doing, over a profile the reader has asked to delete.</extracomment>
+        <translation>પ્રોફાઇલ કાઢી નાખવામાં આવે છે</translation>
+    </message>
+    <message>
+        <source>No profiles</source>
+        <translation>કોઈ પ્રોફાઇલ નથી</translation>
+    </message>
+    <message>
+        <source>Invite code</source>
+        <translation>આમંત્રણ કોડ</translation>
+    </message>
+    <message>
+        <source>Back up profile</source>
+        <translation>પ્રોફાઇલનો બેકઅપ</translation>
+    </message>
+</context>
+<context>
+    <name>QrPage</name>
+    <message>
+        <source>Chat</source>
+        <translation>ચેટ</translation>
+    </message>
+    <message>
+        <source>QR code</source>
+        <translation>QR કોડ</translation>
+    </message>
+    <message>
+        <source>My code</source>
+        <translation>મારો કોડ</translation>
+    </message>
+    <message>
+        <source>Scan</source>
+        <translation>સ્કૅન કરો</translation>
+    </message>
+    <message>
+        <source>Let someone scan this code, or send them the link.</source>
+        <translation>કોઈને આ કોડ સ્કૅન કરવા દો, અથવા તેમને લિંક મોકલો.</translation>
+    </message>
+    <message>
+        <source>Fetching...</source>
+        <translation>લાવવામાં આવે છે...</translation>
+    </message>
+    <message>
+        <source>Copy Invite Link</source>
+        <translation>આમંત્રણ લિંક કૉપિ કરો</translation>
+    </message>
+    <message>
+        <source>The camera is not available on this device.</source>
+        <translation>આ ઉપકરણ પર કૅમેરા ઉપલબ્ધ નથી.</translation>
+    </message>
+</context>
+<context>
+    <name>ReplyBar</name>
+    <message>
+        <source>Replying to %1</source>
+        <translation>%1 ને જવાબ</translation>
+    </message>
+    <message>
+        <source>Editing message</source>
+        <extracomment>Above the message field while a sent message&apos;s text is being changed; the message&apos;s text follows.</extracomment>
+        <translation>સંદેશ સંપાદિત થઈ રહ્યો છે</translation>
+    </message>
+</context>
+<context>
+    <name>RestoreProfilePage</name>
+    <message>
+        <source>That is not the code a device shows while it is offering its profile.</source>
+        <translation>કોઈ ઉપકરણ પોતાની પ્રોફાઇલ આપતી વખતે જે કોડ બતાવે છે, આ તે નથી.</translation>
+    </message>
+    <message>
+        <source>Add as second device</source>
+        <translation>બીજા ઉપકરણ તરીકે ઉમેરો</translation>
+    </message>
+    <message>
+        <source>Restore from a backup</source>
+        <translation>બેકઅપમાંથી પુનઃસ્થાપિત કરો</translation>
+    </message>
+    <message>
+        <source>Choose a backup file</source>
+        <translation>બેકઅપ ફાઇલ પસંદ કરો</translation>
+    </message>
+    <message>
+        <source>Taking the profile over...</source>
+        <translation>પ્રોફાઇલ લેવાઈ રહી છે...</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>રદ કરો</translation>
+    </message>
+    <message>
+        <source>Hold the phone up to the code it shows</source>
+        <translation>તે જે કોડ બતાવે તેની સામે આ ફોન ધરો</translation>
+    </message>
+    <message>
+        <source>Enter the code instead</source>
+        <translation>તેના બદલે કોડ દાખલ કરો</translation>
+    </message>
+    <message>
+        <source>Code from the other device</source>
+        <translation>બીજા ઉપકરણનો કોડ</translation>
+    </message>
+    <message>
+        <source>Take the profile over</source>
+        <translation>પ્રોફાઇલ લો</translation>
+    </message>
+    <message>
+        <source>That did not work</source>
+        <translation>એ કામ ન કર્યું</translation>
+    </message>
+    <message>
+        <source>Try the code again</source>
+        <translation>કોડ ફરી અજમાવો</translation>
+    </message>
+    <message>
+        <source>Choose another file</source>
+        <translation>બીજી ફાઇલ પસંદ કરો</translation>
+    </message>
+    <message>
+        <source>The other device runs a newer Delta Chat than this app can read.</source>
+        <translation>બીજા ઉપકરણ પરનું Delta Chat આ ઍપ વાંચી શકે એના કરતાં નવું છે.</translation>
+    </message>
+    <message>
+        <source>The transfer stopped. Both devices have to stay on one network, with this page open.</source>
+        <translation>ફેરબદલી અટકી ગઈ. બંને ઉપકરણો એક જ નેટવર્ક પર રહેવાં જોઈએ, આ પાનું ખુલ્લું રાખીને.</translation>
+    </message>
+    <message>
+        <source>No camera on this device. A backup file works without one.</source>
+        <translation>આ ઉપકરણમાં કૅમેરા નથી. બેકઅપ ફાઇલ કૅમેરા વગર પણ ચાલે છે.</translation>
+    </message>
+    <message>
+        <source>On the other device: Settings, then add a second device. Both on one network.</source>
+        <translation>બીજા ઉપકરણ પર: સેટિંગ્સ, પછી બીજું ઉપકરણ ઉમેરો. બંને એક જ નેટવર્ક પર.</translation>
+    </message>
+    <message>
+        <source>Make a backup on the other device, copy the file here, then choose it.</source>
+        <translation>બીજા ઉપકરણ પર બેકઅપ લો, ફાઇલ અહીં કૉપિ કરો, પછી એને પસંદ કરો.</translation>
+    </message>
+    <message>
+        <source>That profile is already on this phone. Open it from the profiles list.</source>
+        <translation>આ પ્રોફાઇલ આ ફોન પર પહેલેથી જ છે. એને પ્રોફાઇલની યાદીમાંથી ખોલો.</translation>
+    </message>
+</context>
+<context>
+    <name>ScanView</name>
+    <message>
+        <source>Enter invite link</source>
+        <translation>આમંત્રણ લિંક દાખલ કરો</translation>
+    </message>
+    <message>
+        <source>Invite link</source>
+        <translation>આમંત્રણ લિંક</translation>
+    </message>
+    <message>
+        <source>Connect</source>
+        <translation>જોડાઓ</translation>
+    </message>
+    <message>
+        <source>Or point the camera at the code</source>
+        <translation>અથવા કૅમેરા કોડ તરફ રાખો</translation>
+    </message>
+    <message>
+        <source>Point the camera at someone&apos;s invite code</source>
+        <translation>કૅમેરા કોઈના આમંત્રણ કોડ તરફ રાખો</translation>
+    </message>
+</context>
+<context>
+    <name>SearchResultsList</name>
+    <message>
+        <source>Chats (%1)</source>
+        <translation>ચેટ (%1)</translation>
+    </message>
+    <message>
+        <source>Contacts (%1)</source>
+        <translation>સંપર્કો (%1)</translation>
+    </message>
+    <message>
+        <source>Messages (%1 of %2)</source>
+        <translation>સંદેશ (%2 માંથી %1)</translation>
+    </message>
+    <message>
+        <source>Messages (%1)</source>
+        <translation>સંદેશ (%1)</translation>
+    </message>
+    <message>
+        <source>Nothing found</source>
+        <translation>કંઈ મળ્યું નહીં</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsPage</name>
+    <message>
+        <source>Never</source>
+        <translation>ક્યારેય નહીં</translation>
+    </message>
+    <message>
+        <source>Up to 256 kB</source>
+        <translation>256 kB સુધી</translation>
+    </message>
+    <message>
+        <source>Up to 512 kB</source>
+        <translation>512 kB સુધી</translation>
+    </message>
+    <message>
+        <source>Up to 1 MB</source>
+        <translation>1 MB સુધી</translation>
+    </message>
+    <message>
+        <source>Up to 2 MB</source>
+        <translation>2 MB સુધી</translation>
+    </message>
+    <message>
+        <source>Up to 5 MB</source>
+        <translation>5 MB સુધી</translation>
+    </message>
+    <message>
+        <source>Always</source>
+        <translation>હંમેશા</translation>
+    </message>
+    <message>
+        <source>Settings</source>
+        <translation>સેટિંગ્સ</translation>
+    </message>
+    <message>
+        <source>Messages</source>
+        <translation>સંદેશ</translation>
+    </message>
+    <message>
+        <source>Auto-download attachments</source>
+        <translation>જોડાણો આપોઆપ ડાઉનલોડ કરો</translation>
+    </message>
+    <message>
+        <source>Remove tracking from links</source>
+        <translation>લિંકમાંથી ટ્રૅકિંગ દૂર કરો</translation>
+    </message>
+    <message>
+        <source>Notifications</source>
+        <translation>સૂચનાઓ</translation>
+    </message>
+    <message>
+        <source>Who wrote, and what</source>
+        <translation>કોણે લખ્યું, અને શું</translation>
+    </message>
+    <message>
+        <source>Who wrote</source>
+        <translation>કોણે લખ્યું</translation>
+    </message>
+    <message>
+        <source>Only that something arrived</source>
+        <translation>ફક્ત કે કંઈક આવ્યું છે</translation>
+    </message>
+    <message>
+        <source>Apps</source>
+        <translation>એપ્સ</translation>
+    </message>
+    <message>
+        <source>Enable webxdc apps (experimental)</source>
+        <extracomment>A webxdc app is a small program somebody sends into a chat and everyone in it plays with. Keep the name: it is what every other Delta Chat client calls them.</extracomment>
+        <translation>webxdc એપ્સ સક્રિય કરો (પ્રાયોગિક)</translation>
+    </message>
+    <message>
+        <source>After 1 hour</source>
+        <translation>1 કલાક પછી</translation>
+    </message>
+    <message>
+        <source>After 1 day</source>
+        <translation>1 દિવસ પછી</translation>
+    </message>
+    <message>
+        <source>After 1 week</source>
+        <translation>1 અઠવાડિયા પછી</translation>
+    </message>
+    <message>
+        <source>After 5 weeks</source>
+        <translation>5 અઠવાડિયા પછી</translation>
+    </message>
+    <message>
+        <source>After 1 year</source>
+        <translation>1 વર્ષ પછી</translation>
+    </message>
+    <message>
+        <source>Delete messages from device</source>
+        <translation>ઉપકરણમાંથી સંદેશ કાઢી નાખો</translation>
+    </message>
+    <message>
+        <source>A new notification shows</source>
+        <translation>નવી સૂચના બતાવે છે</translation>
+    </message>
+    <message>
+        <source>Mentions</source>
+        <extracomment>A reply to one of the reader&apos;s own messages, arriving in a group they have muted.</extracomment>
+        <translation>ઉલ્લેખો</translation>
+    </message>
+    <message>
+        <source>Enter sends the message</source>
+        <extracomment>The return key on the keyboard.</extracomment>
+        <translation>Enter સંદેશ મોકલે છે</translation>
+    </message>
+    <message>
+        <source>Use Markdown formatting</source>
+        <translation>માર્કડાઉન બંધારણ વાપરો</translation>
+    </message>
+    <message>
+        <source>Otherwise it starts a new line, and the button sends.</source>
+        <translation>નહીંતર એ નવી લીટી શરૂ કરે છે, અને બટન મોકલે છે.</translation>
+    </message>
+    <message>
+        <source>Draws *stars* and `backticks` rather than showing them.</source>
+        <translation>*તારા* અને `બેકટિક` બતાવવાને બદલે દોરે છે.</translation>
+    </message>
+    <message>
+        <source>Bigger ones wait until you ask for them. Every profile, from now on.</source>
+        <translation>મોટી ફાઇલો તમે માંગો ત્યાં સુધી રાહ જુએ છે. દરેક પ્રોફાઇલ, હવેથી.</translation>
+    </message>
+    <message>
+        <source>Every chat of every profile. &quot;Saved messages&quot; are kept.</source>
+        <translation>દરેક પ્રોફાઇલની દરેક ચેટ. “સાચવેલા સંદેશા” રહે છે.</translation>
+    </message>
+    <message>
+        <source>On the lock screen and in the notification area.</source>
+        <translation>લૉક સ્ક્રીન પર અને સૂચના વિસ્તારમાં.</translation>
+    </message>
+    <message>
+        <source>A reply to you gets through a muted group.</source>
+        <translation>તમને આપેલો જવાબ શાંત કરેલા સમૂહમાં પણ પહોંચે છે.</translation>
+    </message>
+    <message>
+        <source>Click ids and campaign tags come out of the links you send.</source>
+        <translation>ક્લિક આઈડી અને ઝુંબેશના ટૅગ તમે મોકલેલી લિંકમાંથી નીકળી જાય છે.</translation>
+    </message>
+    <message>
+        <source>Small apps run inside the chat. Somebody else&apos;s code, and less tested than the rest.</source>
+        <translation>નાની ઍપ ચેટની અંદર જ ચાલે છે. બીજાનો કોડ, અને બાકીના કરતાં ઓછો અજમાવેલો.</translation>
+    </message>
+    <message>
+        <source>Privacy</source>
+        <translation>ગોપનીયતા</translation>
+    </message>
+    <message>
+        <source>Blocked contacts</source>
+        <translation>બ્લૉક કરેલા સંપર્કો</translation>
+    </message>
+    <message>
+        <source>Worse quality, save data</source>
+        <extracomment>Outgoing media quality: smaller pictures and videos, which cost the reader and whoever they write to less data. Both reference clients&apos; words for it.</extracomment>
+        <translation>ઓછી ગુણવત્તા, ઓછો ડેટા</translation>
+    </message>
+    <message>
+        <source>Balanced</source>
+        <extracomment>Outgoing media quality: what the core picks by default.</extracomment>
+        <translation>સંતુલિત</translation>
+    </message>
+    <message>
+        <source>Outgoing media quality</source>
+        <extracomment>Pictures and videos on their way out of the phone.</extracomment>
+        <translation>મોકલવાના મીડિયાની ગુણવત્તા</translation>
+    </message>
+    <message>
+        <source>Pictures are made smaller before sending, and the camera records at this quality.</source>
+        <translation>ચિત્રો મોકલતા પહેલાં નાનાં કરવામાં આવે છે, અને કૅમેરા આ જ ગુણવત્તામાં રેકોર્ડ કરે છે.</translation>
+    </message>
+    <message>
+        <source>Show notifications</source>
+        <translation>સૂચનાઓ બતાવો</translation>
+    </message>
+</context>
+<context>
+    <name>ShareTarget</name>
+    <message>
+        <source>Send in a chat</source>
+        <extracomment>Shown in the phone&apos;s share sheet, for a file shared to this app.</extracomment>
+        <translation>ચેટમાં મોકલો</translation>
+    </message>
+    <message>
+        <source>Send as a message</source>
+        <extracomment>Shown in the phone&apos;s share sheet, for text or a link shared to this app.</extracomment>
+        <translation>સંદેશ તરીકે મોકલો</translation>
+    </message>
+</context>
+<context>
+    <name>VideoPage</name>
+    <message>
+        <source>Saved to Videos</source>
+        <translation>વિડિઓમાં સાચવ્યું</translation>
+    </message>
+    <message>
+        <source>Open in another app</source>
+        <extracomment>Hands the attachment to whatever else on the phone handles files of its kind.</extracomment>
+        <translation>બીજી ઍપમાં ખોલો</translation>
+    </message>
+    <message>
+        <source>Save to device</source>
+        <translation>ઉપકરણ પર સાચવો</translation>
+    </message>
+</context>
+<context>
+    <name>VoiceBar</name>
+    <message>
+        <source>Recording %1</source>
+        <extracomment>Shown while a voice message records. %1 is the time so far, such as &quot;0:07&quot;.</extracomment>
+        <translation>રેકોર્ડિંગ %1</translation>
+    </message>
+</context>
+<context>
+    <name>WebxdcPage</name>
+    <message>
+        <source>Starting the app</source>
+        <extracomment>Shown while a webxdc app is being made ready to run.</extracomment>
+        <translation>એપ શરૂ થઈ રહી છે</translation>
+    </message>
+    <message>
+        <source>Saved to Downloads</source>
+        <extracomment>Where a file a webxdc app produced was copied to.</extracomment>
+        <translation>ડાઉનલોડ્સમાં સાચવ્યું</translation>
+    </message>
+    <message>
+        <source>Copied to clipboard</source>
+        <translation>ક્લિપબોર્ડ પર કૉપિ થયું</translation>
+    </message>
+</context>
+<context>
+    <name>WebxdcStorePage</name>
+    <message>
+        <source>Apps</source>
+        <extracomment>The heading over the webxdc app store.</extracomment>
+        <translation>એપ્સ</translation>
+    </message>
+    <message>
+        <source>From the phone</source>
+        <extracomment>Button under the app store: pick a .xdc file already on the phone.</extracomment>
+        <translation>ફોનમાંથી</translation>
+    </message>
+</context>
+<context>
+    <name>WelcomePage</name>
+    <message>
+        <source>Tell me about Delta Chat</source>
+        <translation>Delta Chat શું છે?</translation>
+    </message>
+    <message>
+        <source>Set up my profile</source>
+        <translation>મારી પ્રોફાઇલ સેટ કરો</translation>
+    </message>
+    <message>
+        <source>Secure decentralised chat based on Delta Chat</source>
+        <translation>Delta Chat પર આધારિત સુરક્ષિત, વિકેન્દ્રિત ચેટ</translation>
+    </message>
+</context>
+</TS>

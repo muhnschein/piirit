@@ -1,7 +1,7 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
 import "../components"
-import Postivene 1.0
+import Piirit 1.0
 
 /*
  * A group after it has been made: its picture, its name, and who is in it.

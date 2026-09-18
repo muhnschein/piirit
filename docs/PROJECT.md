@@ -1,4 +1,4 @@
-# Postivene
+# Piirit
 
 *A native SailfishOS client for [Delta Chat](https://delta.chat).*
 
@@ -9,7 +9,7 @@ number and no central operator.
 
 The thesis is narrow: **do not build a messenger, build a SailfishOS UI on
 top of one.** Protocol, cryptography and storage are the upstream core's.
-Postivene contributes the presentation layer, the platform integration and
+Piirit contributes the presentation layer, the platform integration and
 the packaging, and aspires to ships to Jolla's Harbour app store.
 
 ## What this isn't
@@ -54,7 +54,7 @@ deltachat-rpc-server (bundled binary, subprocess) = the entire core
   `__libc_start_main@GLIBC_2.34`, which only a 5.x glibc provides.
 - `aarch64` and `armv7hl` for devices; `i486`/`x86_64` for the emulator.
 - Account storage is the core's own, pinned inside the sailjail grant at
-  `$XDG_DATA_HOME/postivene/postivene/accounts` (`POSTIVENE_ACCOUNTS_DIR`
+  `$XDG_DATA_HOME/piirit/piirit/accounts` (`PIIRIT_ACCOUNTS_DIR`
   overrides).
 
 ## What is missing

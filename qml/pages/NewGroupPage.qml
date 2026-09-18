@@ -1,7 +1,7 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
 import "../components"
-import Postivene 1.0
+import Piirit 1.0
 
 /*
  * Name a group, give it a picture and pick its members, laid out the way

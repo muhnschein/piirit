@@ -1,13 +1,12 @@
 pragma Singleton
 import QtQuick 2.0
-import Sailfish.Silica 1.0
 import Nemo.Configuration 1.0
 
 /*
  * The settings that belong to no profile: whether the return key sends,
  * how a message is drawn, what goes out with a link, how much of a
  * picture or a video leaves with it, how much of an attachment arrives
- * unasked, where a saved file goes, how long a message is kept, whether
+ * unasked, how long a message is kept, whether
  * anything is announced at all and if so how much a notification gives
  * away and whether a muted group can still raise one, and whether webxdc
  * apps are offered at all.
@@ -45,16 +44,6 @@ QtObject {
     /// fetches everything. The core's own `download_limit`, applied to
     /// every profile.
     property alias downloadLimit: downloadLimitValue.value
-    /// Where a file saved from a chat goes: a folder, as a path. A
-    /// picture or a video goes to the gallery's own folders instead,
-    /// which is where the gallery looks. The sandbox lets the app write
-    /// under Documents, Downloads, Music, Videos and Pictures, and a
-    /// folder outside those fails at the copy.
-    property alias saveFolder: saveFolderValue.value
-    /// The folder a fresh phone saves to: a folder of the app's own
-    /// under Documents, so what came in by chat is together and apart
-    /// from the rest.
-    readonly property string defaultSaveFolder: StandardPaths.documents + "/Postivene"
     /// Messages older than this many seconds are deleted from the phone,
     /// in every chat of every profile, whatever a chat's own disappearing
     /// messages timer says; 0 keeps them. The core's own
@@ -94,7 +83,7 @@ QtObject {
     // every other file to reading them through this object.
     property ConfigurationValue enterSendsConfig: ConfigurationValue {
         id: enterSendsValue
-        key: "/apps/harbour-postivene/enter_sends"
+        key: "/apps/harbour-piirit/enter_sends"
         // A line break, until the reader says otherwise: the field took
         // the return key for one before there was a choice, and a key
         // that sends by surprise sends half a message.
@@ -103,19 +92,19 @@ QtObject {
 
     property ConfigurationValue markdownConfig: ConfigurationValue {
         id: markdownValue
-        key: "/apps/harbour-postivene/markdown_mode"
+        key: "/apps/harbour-piirit/markdown_mode"
         defaultValue: 0
     }
 
     property ConfigurationValue cleanLinksConfig: ConfigurationValue {
         id: cleanLinksValue
-        key: "/apps/harbour-postivene/clean_links"
+        key: "/apps/harbour-piirit/clean_links"
         defaultValue: false
     }
 
     property ConfigurationValue mediaQualityConfig: ConfigurationValue {
         id: mediaQualityValue
-        key: "/apps/harbour-postivene/media_quality"
+        key: "/apps/harbour-piirit/media_quality"
         // Balanced, which is the core's own default and the reference
         // clients'.
         defaultValue: 0
@@ -123,21 +112,15 @@ QtObject {
 
     property ConfigurationValue downloadLimitConfig: ConfigurationValue {
         id: downloadLimitValue
-        key: "/apps/harbour-postivene/download_limit"
+        key: "/apps/harbour-piirit/download_limit"
         // One megabyte, as parla defaults it: a photo arrives, a video
         // waits to be asked for.
         defaultValue: 1048576
     }
 
-    property ConfigurationValue saveFolderConfig: ConfigurationValue {
-        id: saveFolderValue
-        key: "/apps/harbour-postivene/save_folder"
-        defaultValue: defaultSaveFolder
-    }
-
     property ConfigurationValue deleteDeviceAfterConfig: ConfigurationValue {
         id: deleteDeviceAfterValue
-        key: "/apps/harbour-postivene/delete_device_after"
+        key: "/apps/harbour-piirit/delete_device_after"
         // Kept for good until the reader says otherwise, which is the
         // core's own default and the only one that loses nothing.
         defaultValue: 0
@@ -145,7 +128,7 @@ QtObject {
 
     property ConfigurationValue notificationsEnabledConfig: ConfigurationValue {
         id: notificationsEnabledValue
-        key: "/apps/harbour-postivene/notifications_enabled"
+        key: "/apps/harbour-piirit/notifications_enabled"
         // On: a chat client that says nothing when a message arrives is
         // not doing its job until it is asked to stop.
         defaultValue: true
@@ -153,45 +136,31 @@ QtObject {
 
     property ConfigurationValue notificationDetailConfig: ConfigurationValue {
         id: notificationDetailValue
-        key: "/apps/harbour-postivene/notification_detail"
+        key: "/apps/harbour-piirit/notification_detail"
         defaultValue: 0
     }
 
     property ConfigurationValue mentionNotificationsConfig: ConfigurationValue {
         id: mentionNotificationsValue
-        key: "/apps/harbour-postivene/mention_notifications"
+        key: "/apps/harbour-piirit/mention_notifications"
         defaultValue: true
     }
 
     property ConfigurationValue lastAccountConfig: ConfigurationValue {
         id: lastAccountValue
-        key: "/apps/harbour-postivene/last_account"
+        key: "/apps/harbour-piirit/last_account"
         // No profile until a chat list has been on one.
         defaultValue: 0
     }
 
     property ConfigurationValue webxdcEnabledConfig: ConfigurationValue {
         id: webxdcEnabledValue
-        key: "/apps/harbour-postivene/webxdc_enabled"
+        key: "/apps/harbour-piirit/webxdc_enabled"
         // Off on a phone that has never been asked. Running somebody
         // else's code, however sandboxed the engine is, is not a thing
         // to switch on for a reader who did not ask for it -- and the
         // half of it that is ours is new enough to still be finding out
         // what it gets wrong.
         defaultValue: false
-    }
-
-    /// `path` as the reader knows it: relative to the folder above
-    /// Documents, which is the home directory, when it is under there --
-    /// "Documents/Postivene" rather than the whole of it -- and as given
-    /// otherwise. For a notice that says where a copy went.
-    function folderLabel(path) {
-        var documents = "" + StandardPaths.documents
-        var home = documents.substring(0, documents.lastIndexOf("/") + 1)
-        var text = "" + path
-        if (home.length > 1 && text.indexOf(home) === 0) {
-            return text.substring(home.length)
-        }
-        return text
     }
 }

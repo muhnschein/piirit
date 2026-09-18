@@ -10,7 +10,7 @@ import "../components"
  * Also the way back onto a chat list, for a phone the window could not
  * send there itself. The window reads `Settings.lastAccountId` before it
  * puts anything up and opens on the chat list directly when it names a
- * profile (postivene.qml), so this page is not even made on an ordinary
+ * profile (piirit.qml), so this page is not even made on an ordinary
  * launch. What is left to it is the phone whose key was never written --
  * a profile made before the key existed, or one restored into a fresh
  * install -- where the core's own answer (`accounts_refreshed`) is the
@@ -23,13 +23,11 @@ import "../components"
  * whole first screen for the half second before the chat list arrived,
  * and recording the refusal as a departure left a blank screen for good.
  *
- * What it looks like is what the cover looks like once there are
- * people: a field of faces in the ambience's colours, a few of them lit,
- * filling the screen either way up -- and in the middle, where the
- * field clears for them, the app's name, what it is, and the way on.
- * There is no second chance at a first impression, so the field is a
- * picture (components/FaceField.qml): one texture, one pass, drawn the
- * frame the page is.
+ * What it looks like: the app's own mark over its name, what it is in
+ * one line, and the two ways on, in a column in the middle of an
+ * otherwise empty page. Nothing behind them. There is no second chance
+ * at a first impression, and a page that is only the ambience and a
+ * few words reads as what it is: the start.
  *
  * Two ways on rather than one. A reader who has never heard of Delta
  * Chat is a swipe away from being told (IntroPage.qml); a reader who
@@ -40,7 +38,7 @@ import "../components"
 Page {
     id: page
 
-    // Both ways up: the field has a master for each.
+    // Both ways up: a column in the middle is a column either way.
     allowedOrientations: Orientation.All
 
     /// Nothing is drawn yet, because it is not yet known whether this
@@ -71,51 +69,10 @@ Page {
     /// Nothing sets it; a test turns it down rather than waiting.
     property int handOverDeadline: 4000
 
-    /// Lay the field over the whole screen, in this page's coordinates.
-    ///
-    /// A Silica page is centred in what holds it and turned inside it
-    /// (Page.qml), and on a phone that keeps a band of its screen for
-    /// the camera, what holds the page is bigger than the page: upright
-    /// that band is a strip across the top, turned on its side it is a
-    /// strip down the edge the camera is on. A field anchored to the
-    /// page leaves that strip empty, which is exactly where the eye
-    /// goes.
-    ///
-    /// So the field is given the whole of whatever the page is in,
-    /// measured through the page's own coordinates -- which turn with
-    /// it, so one sum serves both ways up -- and never less than the
-    /// page, which is what a test that loads the page on its own gives
-    /// it. The proportions are the shader's business: it crops the mask
-    /// to what it is given rather than stretching it
-    /// (components/FaceField.qml), so a wider field is more field, not a
-    /// wider face.
-    function spreadField() {
-        var screen = page
-        while (screen.parent) {
-            screen = screen.parent
-        }
-        var near = page.mapFromItem(screen, 0, 0)
-        var far = page.mapFromItem(screen, screen.width, screen.height)
-        var left = Math.min(0, near.x, far.x)
-        var top = Math.min(0, near.y, far.y)
-        field.x = left
-        field.y = top
-        field.width = Math.max(page.width, near.x, far.x) - left
-        field.height = Math.max(page.height, near.y, far.y) - top
-    }
-
-    // Everything that moves the page inside the screen: it is resized
-    // and turned as the phone is, and put into the stack after it is
-    // built.
-    onWidthChanged: page.spreadField()
-    onHeightChanged: page.spreadField()
-    onRotationChanged: page.spreadField()
-    onParentChanged: page.spreadField()
-
     /// Go to the chat list, if a profile to open it on is known of.
     ///
     /// IO is not asked for here: the window asks for it as soon as the
-    /// core is ready, whichever page is up (postivene.qml).
+    /// core is ready, whichever page is up (piirit.qml).
     function resumeRemembered() {
         if (page.leaving || !(page.resumeAccountId > 0)) {
             return
@@ -170,7 +127,6 @@ Page {
 
     // The core may be ready before the handler below exists.
     Component.onCompleted: {
-        page.spreadField()
         if (core.status === "ready") {
             core.refresh_accounts()
         } else if (core.status.indexOf("error") === 0) {
@@ -215,43 +171,6 @@ Page {
         onAccount_error: page.probing = false
     }
 
-    // The field, under everything, cleared around the words by as much
-    // as they take up: the box follows the column, so a language in
-    // which the line about relays runs long clears more.
-    //
-    // Laid out by `spreadField()` rather than anchored to the page, so
-    // that it covers the screen even where the page does not.
-    FaceField {
-        id: field
-        objectName: "faceField"
-        // Down until it is known there is no chat list to be on. A
-        // screenful of faces drawn for the half second a hand-over takes
-        // reads as the app opening in the wrong place and then
-        // correcting itself.
-        visible: !page.probing
-        source: page.width > page.height ? "../art/faces-landscape.png"
-                                         : "../art/faces-portrait.png"
-        // Fainter than the component's own default. The field is the
-        // welcome, not the reading matter, and what it is painted from
-        // carries more ink than the flat masks it started as: both
-        // channels scale the colour and its alpha together, so less ink
-        // is more of the ambience showing through.
-        ink: 0.45
-        litInk: 0.8
-        // The words are placed on the page and the box is cut in the
-        // field, which starts where the page does only on a phone with
-        // nothing in the way of it.
-        clearX: words.x + words.width / 2 - field.x
-        clearY: words.y + words.height / 2 - field.y
-        clearWidth: words.width
-        clearHeight: words.height
-        // Room around the words rather than up against them: the field
-        // is cleared this far out from the column before it begins to
-        // fade back in.
-        clearRadius: Theme.itemSizeExtraSmall
-        clearFeather: Theme.itemSizeLarge
-    }
-
     Column {
         id: words
         anchors {
@@ -260,12 +179,37 @@ Page {
             // A little above the middle, where a title sits.
             verticalCenterOffset: -page.height * 0.04
         }
-        // Narrower than the page: the field is what fills it, and the
-        // words are what is read.
+        // Narrower than the page, so that the line about what the app
+        // is wraps as a line of reading rather than a line of screen.
         width: Math.min(parent.width - 2 * Theme.horizontalPageMargin,
                         Screen.width - 2 * Theme.horizontalPageMargin)
         spacing: Theme.paddingMedium
+        // Down until it is known there is no chat list to be on. A
+        // first screen drawn for the half second a hand-over takes
+        // reads as the app opening in the wrong place and then
+        // correcting itself.
         visible: !page.probing
+
+        // The app's own mark over its name: the launcher icon, as it is
+        // (qml/art/logo.png is icons/harbour-piirit.svg drawn out), so
+        // the first screen and the launcher say the same thing. Placed
+        // rather than anchored: a Column lays its children out
+        // vertically and has an opinion about vertical anchors.
+        Image {
+            id: logo
+            objectName: "logo"
+            x: (parent.width - width) / 2
+            width: Theme.itemSizeLarge
+            height: width
+            // Decoded at the size it is drawn at rather than at the
+            // master's: a first screen should not cost a screenful of
+            // texture for one mark.
+            sourceSize.width: width
+            sourceSize.height: height
+            fillMode: Image.PreserveAspectFit
+            smooth: true
+            source: "../art/logo.png"
+        }
 
         // The app's own name, and never a translated one (see the
         // cover): large, in the heading face, in the ambience's colour.
@@ -274,7 +218,7 @@ Page {
             width: parent.width
             horizontalAlignment: Text.AlignHCenter
             textFormat: Text.PlainText
-            text: "Postivene"
+            text: "Piirit"
             font.family: Theme.fontFamilyHeading
             font.pixelSize: Theme.fontSizeHuge
             color: Theme.highlightColor
@@ -297,7 +241,9 @@ Page {
 
         // The two ways on, side by side under the name: what Delta
         // Chat is, for a reader who has not heard of it, and the way
-        // into a profile for one who has.
+        // into a profile for one who has -- under the mark for an
+        // account, drawn by this app so that it is there on every
+        // phone (components/AccountMark.qml).
         ChoiceTiles {
             objectName: "welcomeWays"
             width: parent.width
@@ -311,7 +257,7 @@ Page {
                 },
                 {
                     name: "setup",
-                    icon: "icon-m-person",
+                    mark: "account",
                     text: qsTr("Set up my profile"),
                     enabled: core.status === "ready"
                 }

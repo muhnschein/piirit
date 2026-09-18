@@ -6,7 +6,7 @@ import "../components"
 import "../components"
 import "../js/Media.js" as Media
 import "../js/Format.js" as Format
-import Postivene 1.0
+import Piirit 1.0
 
 /*
  * Everything of one kind that a chat holds: its pictures and videos as a
@@ -200,15 +200,13 @@ Page {
         pageStack.pop(below)
     }
 
-    // A copy into the folder the reader chose for files, under the name
-    // the sender gave it: what the conversation's row menu does with a
-    // file, and the same words for it.
+    // A copy into Downloads, under the name the sender gave it: what the
+    // conversation's row menu does with a file, and the same words for
+    // it.
     FileSaver {
         id: saver
         objectName: "saver"
-        //: %1 is a folder, such as "Documents/Postivene".
-        onSaved: notice.show(qsTr("Saved to %1").arg(
-                                 Settings.folderLabel(Settings.saveFolder)))
+        onSaved: notice.show(qsTr("Saved to Downloads"))
         onError: page.errorMessage = message
     }
 
@@ -481,7 +479,7 @@ Page {
                     MenuItem {
                         objectName: "saveItem"
                         text: qsTr("Save to device")
-                        onClicked: saver.save_as(row.fileUrl, Settings.saveFolder,
+                        onClicked: saver.save_as(row.fileUrl, StandardPaths.download,
                                                  model.file_name)
                     }
                     MenuItem {

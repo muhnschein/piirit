@@ -2,7 +2,7 @@ import QtQuick 2.0
 import QtMultimedia 5.6
 import QtSensors 5.0
 import Sailfish.Silica 1.0
-import Postivene 1.0
+import Piirit 1.0
 import "../components"
 
 /*

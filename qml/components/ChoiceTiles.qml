@@ -19,7 +19,9 @@ import Sailfish.Silica 1.0
  * tiles wear whatever ambience the phone wears. They are asked for by
  * names this app has seen on a device (see AppMark for what an icon that
  * is not there looks like): a reader on a tile they cannot see is a
- * reader who cannot start.
+ * reader who cannot start. The one tile that cannot risk even that --
+ * the way into a profile on the first screen -- has its mark drawn by
+ * this app instead (AccountMark.qml).
  *
  * Laid out by bindings rather than a Row, for the reason MediaKinds
  * gives: a positioner sizes itself in a polish pass, which never runs
@@ -36,6 +38,10 @@ Item {
     /// - `name`: what `chosen` hands back, and what the tile is called --
     ///   a tile is `<name>Tile`, which is how a test finds it.
     /// - `icon`: the theme icon over the words, by name.
+    /// - `mark`: a mark drawn by this app in the icon's place, for a
+    ///   tile whose icon must be there on every phone: `account` is the
+    ///   head and shoulders in a ring (AccountMark.qml). Given, `icon`
+    ///   is not read.
     /// - `text`: the words themselves.
     /// - `hint`: a quieter line under them, or left out for none.
     /// - `enabled`: false to grey the tile out and ignore taps on it.
@@ -148,7 +154,19 @@ Item {
                 y: Theme.paddingMedium
                 width: Theme.iconSizeMedium
                 height: width
-                source: "image://theme/" + modelData.icon + "?" + tile.tint
+                // Nothing asked of the theme where the mark is drawn.
+                source: modelData.mark === undefined
+                        ? "image://theme/" + modelData.icon + "?" + tile.tint
+                        : ""
+            }
+
+            // The drawn mark, in the icon's place and the icon's colour.
+            AccountMark {
+                objectName: "tileMark"
+                visible: modelData.mark === "account"
+                anchors.fill: icon
+                size: icon.width
+                color: tile.tint
             }
 
             Label {

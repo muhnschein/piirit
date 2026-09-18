@@ -104,7 +104,7 @@ jobs:
       - run: cd rust && cargo test --locked -p deltachat-jsonrpc --test real_server
         env:
           DELTACHAT_RPC_SERVER: vendor/deltachat-rpc-server/x86_64/deltachat-rpc-server
-      - run: cd rust && cargo test --locked -p postivene-shim --test real_core
+      - run: cd rust && cargo test --locked -p piirit-shim --test real_core
         env:
           DELTACHAT_RPC_SERVER: vendor/deltachat-rpc-server/x86_64/deltachat-rpc-server
           QT_QPA_PLATFORM: offscreen
@@ -154,7 +154,7 @@ jobs:
       # 1.7 reads the linked binary: that main() is exported, and that it
       # survives the strip rpmbuild does. Debug is enough -- both are
       # settled by the link, not the optimisation level.
-      - run: cd rust && cargo build --locked -p postivene-app
+      - run: cd rust && cargo build --locked -p piirit-app
       # The gate itself, then the proof that the gate still bites.
       - run: ./ci/harbour-check.sh
         env:
@@ -164,7 +164,7 @@ jobs:
       # so what it contains is a Harbour question too.
       - run: ./ci/vendor-check.sh
 
-  # Licences matter here: Postivene is GPLv3+ and ships beside an MPL-2.0
+  # Licences matter here: Piirit is GPLv3+ and ships beside an MPL-2.0
   # core binary, so an incompatible dependency is a distribution problem
   # (docs/PROJECT.md).
   deny:

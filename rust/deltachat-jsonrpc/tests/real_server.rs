@@ -321,7 +321,7 @@ async fn offline_round_trip_against_real_core() {
     };
 
     let accounts_dir =
-        std::env::temp_dir().join(format!("postivene-real-server-test-{}", std::process::id()));
+        std::env::temp_dir().join(format!("piirit-real-server-test-{}", std::process::id()));
     std::fs::create_dir_all(&accounts_dir).expect("create accounts dir");
 
     let client = Arc::new(
@@ -353,7 +353,7 @@ async fn offline_round_trip_against_real_core() {
     client
         .call::<_, ()>(
             "set_config",
-            (account_id, "displayname", Some("Postivene Test")),
+            (account_id, "displayname", Some("Piirit Test")),
         )
         .await
         .expect("set_config");
@@ -361,7 +361,7 @@ async fn offline_round_trip_against_real_core() {
         .call("get_config", (account_id, "displayname"))
         .await
         .expect("get_config");
-    assert_eq!(name.as_deref(), Some("Postivene Test"));
+    assert_eq!(name.as_deref(), Some("Piirit Test"));
 
     // Start the event stream BEFORE doing something that emits an event.
     let (mut events, handle) = spawn_event_loop(client.clone());
@@ -750,7 +750,7 @@ async fn offline_round_trip_against_real_core() {
             "add_device_message",
             (
                 account_id,
-                "postivene-unread-probe",
+                "piirit-unread-probe",
                 serde_json::json!({"text": "something new"}),
             ),
         )
@@ -816,7 +816,7 @@ async fn offline_round_trip_against_real_core() {
         )
         .await
         .expect("misc_send_msg");
-    let attachment = std::env::temp_dir().join("postivene-real-server-note.txt");
+    let attachment = std::env::temp_dir().join("piirit-real-server-note.txt");
     std::fs::write(&attachment, b"hi").expect("write attachment");
     let (second, _): (u32, Value) = client
         .call(
@@ -950,7 +950,7 @@ async fn offline_round_trip_against_real_core() {
     // The core decides the view type from the file, and the conversation
     // renders a picture inline on the strength of that: nothing in the app
     // classifies an attachment, and nothing should start.
-    let picture = std::env::temp_dir().join("postivene-real-server-dot.png");
+    let picture = std::env::temp_dir().join("piirit-real-server-dot.png");
     // The smallest valid PNG: an 1x1 image, so the core has real pixels to
     // read rather than a name to guess from.
     std::fs::write(&picture, ONE_PIXEL_PNG).expect("write picture");
@@ -991,12 +991,12 @@ async fn offline_round_trip_against_real_core() {
 
     // The core leaves a picture sent as a `File` at the size it was given
     // and recodes one named `Image`. That is the whole reason the app
-    // names a picture before sending it (postivene-shim/src/media.rs):
+    // names a picture before sending it (piirit-shim/src/media.rs):
     // every message it composes would otherwise go out as a `File`, and
     // the outgoing media quality setting, which the core reads only while
     // recoding, would do nothing at all. A picture past
     // `BALANCED_IMAGE_BYTES` is what makes the difference visible.
-    let wide = std::env::temp_dir().join("postivene-real-server-wide.png");
+    let wide = std::env::temp_dir().join("piirit-real-server-wide.png");
     let wide_bytes = plain_png(1400);
     std::fs::write(&wide, &wide_bytes).expect("write the big picture");
     let untouched = send_file(&client, sender_id, saved, &wide, "wide.png").await;
@@ -1114,7 +1114,7 @@ async fn offline_round_trip_against_real_core() {
     // them without checking. This is the whole reason AttachmentPreview
     // falls back to the loaded item's own proportions and lets the audio
     // player report its own length.
-    let animation = std::env::temp_dir().join("postivene-real-server-dot.gif");
+    let animation = std::env::temp_dir().join("piirit-real-server-dot.gif");
     std::fs::write(&animation, ONE_PIXEL_GIF).expect("write gif");
     let sent_gif = send_file(&client, sender_id, saved, &animation, "dot.gif").await;
     assert_eq!(
@@ -1133,7 +1133,7 @@ async fn offline_round_trip_against_real_core() {
         );
     }
 
-    let tone = std::env::temp_dir().join("postivene-real-server-tone.wav");
+    let tone = std::env::temp_dir().join("piirit-real-server-tone.wav");
     std::fs::write(&tone, one_second_wav()).expect("write wav");
 
     // A voice message, as ChatMessages::send_voice sends one: `send_msg`
@@ -1200,7 +1200,7 @@ async fn offline_round_trip_against_real_core() {
     );
 
     // The chat's own index of what it holds, which the media pages are
-    // built on (postivene-shim/src/chat_media.rs): up to three view types
+    // built on (piirit-shim/src/chat_media.rs): up to three view types
     // in one call, the chat optional, and the ids come back oldest first
     // -- the voice message went before the tone, so it stands before it.
     let tone_id = sent_tone
@@ -1252,7 +1252,7 @@ async fn offline_round_trip_against_real_core() {
         .call("make_vcard", (sender_id, vec![ada]))
         .await
         .expect("make_vcard");
-    let card_path = std::env::temp_dir().join("postivene-real-server-ada.vcf");
+    let card_path = std::env::temp_dir().join("piirit-real-server-ada.vcf");
     std::fs::write(&card_path, &card).expect("write vcard");
     let sent_card = send_file(&client, sender_id, saved, &card_path, "ada.vcf").await;
     assert_eq!(
@@ -1273,10 +1273,10 @@ async fn offline_round_trip_against_real_core() {
 
     // A webxdc app, and the four calls running one is made of. Nothing in
     // this repository opens the archive: the shim serves an app out of
-    // `get_webxdc_blob` (postivene-shim/src/webxdc_host.rs), so a wrong
+    // `get_webxdc_blob` (piirit-shim/src/webxdc_host.rs), so a wrong
     // assumption about any of these is a blank page on a phone and
     // nothing anywhere else.
-    let app_file = std::env::temp_dir().join("postivene-real-server-checkers.xdc");
+    let app_file = std::env::temp_dir().join("piirit-real-server-checkers.xdc");
     let page = b"<html><head></head><body>board</body></html>";
     std::fs::write(
         &app_file,
@@ -1525,7 +1525,7 @@ async fn offline_round_trip_against_real_core() {
     // address contact, which the core's contact listing leaves out
     // whether it is blocked or not (`get_contacts` above answers with
     // the account's own contact and nothing else). The fake core models
-    // the exclusion, and `postivene-shim/tests/blocking.rs` drives this
+    // the exclusion, and `piirit-shim/tests/blocking.rs` drives this
     // side of it.
     client
         .call::<_, ()>("block_contact", (sender_id, ada))
@@ -1801,7 +1801,7 @@ async fn offline_round_trip_against_real_core() {
     // directory*, not a value: an empty string is rejected outright with
     // "Copying new blobfile failed". A settings page has to hand it a
     // real file, and clear it with null rather than "".
-    let avatar = std::env::temp_dir().join("postivene-real-server-avatar.png");
+    let avatar = std::env::temp_dir().join("piirit-real-server-avatar.png");
     // The smallest valid PNG; the core rejects what it cannot decode.
     std::fs::write(
         &avatar,

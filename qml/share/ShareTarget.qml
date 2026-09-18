@@ -13,7 +13,7 @@ import Sailfish.Share 1.0
  * outside the app for this: the older way, a plugin in the transfer
  * engine's own directory, is not open to a Harbour package and this is.
  *
- * Loaded rather than declared, from postivene.qml, for the reason the
+ * Loaded rather than declared, from piirit.qml, for the reason the
  * webxdc pages are pushed by URL: `Sailfish.Share` resolves only on a
  * release that has it, and an import that does not resolve must cost this
  * file rather than the window every page is loaded into.
@@ -34,7 +34,7 @@ Item {
      * where this app learnt the mechanism, does the same.
      *
      * Both must match the `Description=` of the group of the same name
-     * in harbour-postivene.desktop, which tests/qml_syntax.rs checks.
+     * in harbour-piirit.desktop, which tests/qml_syntax.rs checks.
      */
     //: Shown in the phone's share sheet, for a file shared to this app.
     readonly property string filesDescription: qsTr("Send in a chat")
