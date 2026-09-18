@@ -1,10 +1,11 @@
 //! The cover, with people in it, across two profiles.
 //!
-//! Two of its three states: the staggered grid of everyone in grey while
-//! nothing is new, with the count's pill grey among them; and whoever
-//! wrote lit up in the ambience's own highlight -- in the cells worth
-//! having -- with the pill lit and counting, once something is; counted
-//! and drawn across both profiles the fake core is told to have. The third state -- nobody yet -- is
+//! Two of its three states: the staggered grid of everyone in grey,
+//! once each, with empty circles for the cells left over and no pill,
+//! while nothing is new; and whoever wrote lit up in the ambience's own
+//! highlight -- in the cells worth having, under the pill that counts --
+//! once something is; counted and drawn across both profiles the fake
+//! core is told to have. The third state -- nobody yet -- is
 //! `qml_cover_empty.rs`, since it takes a core seeded differently.
 
 // Qt harness: needs `unsafe` for `env::set_var` before Qt starts
@@ -125,28 +126,105 @@ pub const PROBE_QML: &str = r"
             return '' + least
         }
         function planned() { return '' + loader.item.cells.length }
-        // The pill against the cover: whether it is centred -- as near
-        // as a cell is, since every cell sits at the left of its slot
-        // -- two cells wide, and drawn over no face. The rows nest, so
-        // a face's edge under the pill's edge is by design; a face's
-        // centre under the pill is not.
+        // The pill against the cover: whether it is centred, two cells
+        // wide, and drawn over no face -- no face's edge inside it, so
+        // the room between it and its neighbours is at least the grid's
+        // own gap.
         function pillPlace() {
             var pill = findIn(loader.item, 'unreadPill')
             var size = loader.item.cellSize
-            var centred = Math.abs((pill.x + pill.width / 2) - loader.item.width / 2) <= size / 8
+            var centred = Math.abs((pill.x + pill.width / 2) - loader.item.width / 2) <= 1
             var twoWide = Math.abs(pill.width - 2 * size) < size / 4
             var cells = allIn(loader.item, 'gridCell', [])
             var clear = true
             for (var i = 0; i < cells.length; i++) {
-                var cx = cells[i].x + cells[i].width / 2
-                var cy = cells[i].y + cells[i].height / 2
-                var inside = cx >= pill.x && cx <= pill.x + pill.width
-                             && cy >= pill.y && cy <= pill.y + pill.height
-                if (inside) { clear = false }
+                var apart = cells[i].x + cells[i].width <= pill.x
+                            || cells[i].x >= pill.x + pill.width
+                            || cells[i].y + cells[i].height <= pill.y
+                            || cells[i].y >= pill.y + pill.height
+                if (!apart) { clear = false }
             }
             return (centred ? 'centred' : 'off') + ';'
                    + (twoWide ? 'two-wide' : 'narrow') + ';'
                    + (clear ? 'clear' : 'over-a-face')
+        }
+        // Whether every lit face sits under the pill.
+        function litBelowPill() {
+            var pill = findIn(loader.item, 'unreadPill')
+            var cells = allIn(loader.item, 'gridCell', [])
+            for (var i = 0; i < cells.length; i++) {
+                if (cells[i].highlight && cells[i].y < pill.y + pill.height) {
+                    return 'above'
+                }
+            }
+            return 'below'
+        }
+        // The smallest gap between any two circles, or between a circle
+        // and the pill when it is there: what keeps them from touching.
+        function closest() {
+            var items = allIn(loader.item, 'gridCell', [])
+            var pill = findIn(loader.item, 'unreadPill')
+            if (pill.visible) { items.push(pill) }
+            var least = 1000000
+            for (var i = 0; i < items.length; i++) {
+                for (var j = i + 1; j < items.length; j++) {
+                    var a = items[i], b = items[j]
+                    var dx = Math.max(0, Math.max(a.x, b.x) - Math.min(a.x + a.width, b.x + b.width))
+                    var dy = Math.max(0, Math.max(a.y, b.y) - Math.min(a.y + a.height, b.y + b.height))
+                    if (dx === 0 && dy === 0) { return 'touching' }
+                    // Two circles on nested rows meet corner to corner.
+                    least = Math.min(least, Math.sqrt(dx * dx + dy * dy))
+                }
+            }
+            return '' + least
+        }
+        // How many cells hold someone, and how many different someones.
+        function placed() {
+            var cells = loader.item.cells
+            var total = 0
+            var keys = {}
+            var distinct = 0
+            for (var i = 0; i < cells.length; i++) {
+                if (!cells[i].person) { continue }
+                total += 1
+                if (!keys[cells[i].person.key]) { keys[cells[i].person.key] = true; distinct += 1 }
+            }
+            return total + '|' + distinct
+        }
+        // The worst place anyone was given against the best an empty
+        // circle took: people before holes.
+        function peopleFirst() {
+            var cells = loader.item.cells
+            var worstPerson = -1
+            var bestHole = 1000000
+            for (var i = 0; i < cells.length; i++) {
+                var place = loader.item.prominence(cells[i].row, cells[i].col)
+                if (cells[i].person) {
+                    worstPerson = Math.max(worstPerson, place)
+                } else {
+                    bestHole = Math.min(bestHole, place)
+                }
+            }
+            // Not strictly: two cells the same way out from the middle
+            // are as good as each other.
+            return worstPerson <= bestHole ? 'people-first' : 'a-hole-first'
+        }
+        // The topmost cell: the grid starts above the cover.
+        function topmost() {
+            var cells = allIn(loader.item, 'gridCell', [])
+            var least = 0
+            for (var i = 0; i < cells.length; i++) {
+                if (cells[i].y < least) { least = cells[i].y }
+            }
+            return '' + least
+        }
+        // The order people take cells in, read off the cover's own rule.
+        function ranks() {
+            var rank = loader.item.rank
+            return rank({ unread_count: 2, avatar_path: '' }) + ';'
+                   + rank({ unread_count: 0, avatar_path: '/p/a.png' }) + ';'
+                   + rank({ unread_count: 0, avatar_path: '' }) + ';'
+                   + rank({ unread_count: 1, avatar_path: '/p/a.png' })
         }
         function people() { return '' + loader.item.people.length }
         // The lists, one per profile, in the profiles' order.
@@ -223,17 +301,18 @@ fn the_cover_draws_everyone_and_lights_whoever_wrote() {
 
     single_shot(Duration::from_secs(4), move || unsafe {
         record!("lists", call!("lists"));
-        record!("empty-hidden", get!("emptyLabel", "visible"));
-        record!("count-quiet", get!("unreadTotal", "text"));
-        record!("count-shown", get!("unreadTotal", "visible"));
-        record!("pill-quiet", get!("unreadPill", "highlight"));
-        record!("pill-place", call!("pillPlace"));
+        record!("pill-quiet", get!("unreadPill", "visible"));
         record!("people", call!("people"));
         record!("planned", call!("planned"));
         record!("drawn-quiet", call!("drawn"));
+        record!("placed-quiet", call!("placed"));
+        record!("people-first", call!("peopleFirst"));
         record!("lit-quiet", call!("lit"));
         record!("own-quiet", call!("ownColoured"));
         record!("leftmost", call!("leftmost"));
+        record!("topmost", call!("topmost"));
+        record!("closest-quiet", call!("closest"));
+        record!("ranks", call!("ranks"));
         // Someone writes under each profile.
         record!("mark-first", call!("markUnread", 0, 1));
         record!("mark-second", call!("markUnread", 1, 2));
@@ -241,10 +320,13 @@ fn the_cover_draws_everyone_and_lights_whoever_wrote() {
 
     single_shot(Duration::from_secs(6), move || unsafe {
         record!("count-loud", get!("unreadTotal", "text"));
-        record!("pill-loud", get!("unreadPill", "highlight"));
-        record!("pill-place-loud", call!("pillPlace"));
+        record!("pill-loud", get!("unreadPill", "visible"));
+        record!("pill-place", call!("pillPlace"));
+        record!("lit-below-pill", call!("litBelowPill"));
+        record!("closest-loud", call!("closest"));
         record!("drawn-loud", call!("drawn"));
         record!("planned-loud", call!("planned"));
+        record!("placed-loud", call!("placed"));
         record!("lit-loud", call!("lit"));
         record!("own-loud", call!("ownColoured"));
         record!("lit-places", call!("litPlaces"));
@@ -270,33 +352,41 @@ fn the_cover_draws_everyone_and_lights_whoever_wrote() {
         "the cover does not keep a list per profile. {context}"
     );
     assert_eq!(
-        value("empty-hidden"),
-        "false",
-        "the cover says there is nobody while there are chats. {context}"
-    );
-    assert_eq!(
-        value("count-shown"),
-        "true",
-        "the count is hidden with nothing unread; a zero says as much. {context}"
-    );
-    assert_eq!(
-        value("count-quiet"),
-        "0 new",
-        "the pill does not say that nothing is new. {context}"
-    );
-    assert_eq!(
         value("pill-quiet"),
         "false",
-        "the pill is lit with nothing unread. {context}"
+        "the pill is drawn with nothing unread; the grid alone says as much. \
+         {context}"
     );
-    for label in ["pill-place", "pill-place-loud"] {
-        assert_eq!(
-            value(label),
-            "centred;two-wide;clear",
-            "the pill is not a centred, two-cell-wide cell of the grid's own \
-             ({label}). {context}"
+    assert_eq!(
+        value("pill-place"),
+        "centred;two-wide;clear",
+        "the pill is not a centred, two-cell-wide cell of the grid's own. \
+         {context}"
+    );
+    assert_eq!(
+        value("lit-below-pill"),
+        "below",
+        "a lit face sits above the pill rather than under it. {context}"
+    );
+    for label in ["closest-quiet", "closest-loud"] {
+        let closest: f64 = value(label).parse().unwrap_or(0.0);
+        assert!(
+            closest >= 4.0,
+            "two circles, or a circle and the pill, are too close ({label}: {}). \
+             {context}",
+            value(label)
         );
     }
+    assert_eq!(
+        value("ranks"),
+        "0;1;2;0",
+        "people are not ranked new first, then pictured, then the rest. {context}"
+    );
+    assert_eq!(
+        value("people-first"),
+        "people-first",
+        "an empty circle was given a better cell than someone. {context}"
+    );
     assert_eq!(
         value("people"),
         "4",
@@ -310,8 +400,17 @@ fn the_cover_draws_everyone_and_lights_whoever_wrote() {
     assert_eq!(
         value("drawn-quiet"),
         planned.to_string(),
-        "the grid is not filled from the people there are. {context}"
+        "the grid is not drawn cell for cell. {context}"
     );
+    // Four people, each drawn once; every other cell is an empty circle
+    // rather than someone drawn again.
+    for label in ["placed-quiet", "placed-loud"] {
+        assert_eq!(
+            value(label),
+            "4|4",
+            "the people are not drawn once each ({label}). {context}"
+        );
+    }
     assert_eq!(
         value("lit-quiet"),
         "0",
@@ -321,6 +420,11 @@ fn the_cover_draws_everyone_and_lights_whoever_wrote() {
     assert!(
         leftmost < 0.0,
         "no row is shifted off the edge, so the rows do not stagger. {context}"
+    );
+    let topmost: f64 = value("topmost").parse().unwrap_or(0.0);
+    assert!(
+        topmost < 0.0,
+        "the first row is drawn whole rather than cut by the top edge. {context}"
     );
     for label in ["mark-first", "mark-second"] {
         assert_eq!(
@@ -337,12 +441,12 @@ fn the_cover_draws_everyone_and_lights_whoever_wrote() {
     assert_eq!(
         value("pill-loud"),
         "true",
-        "the pill is not lit once something is new. {context}"
+        "the pill is not there once something is new. {context}"
     );
     assert_eq!(
         value("drawn-loud"),
         value("planned-loud"),
-        "the grid changed shape when someone wrote. {context}"
+        "the grid is not drawn cell for cell once someone wrote. {context}"
     );
     assert_eq!(
         value("lit-loud"),

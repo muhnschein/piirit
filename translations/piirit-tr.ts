@@ -551,10 +551,6 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
         <extracomment>On the cover, in a pill among the avatars: how many messages are unread. %1 is the number, or &quot;99+&quot;.</extracomment>
         <translation>%1 yeni</translation>
     </message>
-    <message>
-        <source>No messages</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>DeleteMessageDialog</name>

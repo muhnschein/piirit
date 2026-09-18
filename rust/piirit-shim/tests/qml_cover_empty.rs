@@ -1,8 +1,8 @@
 //! The cover with nobody in it.
 //!
 //! The chat with oneself and the core's own device chat are chats, but
-//! not people: a cover with only those says there are no messages rather
-//! than drawing a grid of the reader's own face. Seeded so through the
+//! not people: a cover with only those is a grid of empty circles, with
+//! no pill, rather than the reader's own face drawn again and again. Seeded so through the
 //! fake core, which is why this is its own binary.
 
 // Qt harness: see qml_cover.rs.
@@ -59,12 +59,21 @@ const PROBE_QML: &str = r"
         function rows() {
             return '' + findIn(loader.item, 'coverChats').count
         }
+        // How many cells hold someone rather than an empty circle.
+        function faces() {
+            var cells = loader.item.cells
+            var total = 0
+            for (var i = 0; i < cells.length; i++) {
+                if (cells[i].person) { total += 1 }
+            }
+            return '' + total
+        }
     }
 ";
 
 #[test]
 #[allow(clippy::too_many_lines)]
-fn a_cover_with_only_oneself_and_the_device_says_there_are_no_messages() {
+fn a_cover_with_only_oneself_and_the_device_is_a_grid_of_empty_circles() {
     let temp = std::env::temp_dir().join(format!("piirit-qml-cover-empty-{}", std::process::id()));
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
 
@@ -133,13 +142,9 @@ fn a_cover_with_only_oneself_and_the_device_says_there_are_no_messages() {
 
     single_shot(Duration::from_secs(4), move || unsafe {
         record!("rows", call!("rows"));
-        record!("empty-shown", get!("emptyLabel", "visible"));
-        record!("empty-says", get!("emptyLabel", "text"));
-        record!("empty-wraps", get!("emptyLabel", "wrapMode"));
         record!("grid", call!("count", QString::from("gridCell")));
-        record!("count-says", get!("unreadTotal", "text"));
+        record!("faces", call!("faces"));
         record!("pill-shown", get!("unreadPill", "visible"));
-        record!("pill-lit", get!("unreadPill", "highlight"));
         (*engine_ptr).quit();
     });
 
@@ -160,41 +165,19 @@ fn a_cover_with_only_oneself_and_the_device_says_there_are_no_messages() {
         "2",
         "the two chats did not load, so this proves nothing. {context}"
     );
-    assert_eq!(
-        value("empty-shown"),
-        "true",
-        "the cover does not say there are no messages when the only chats \
-         are with oneself and the device. {context}"
+    let grid: u32 = value("grid").parse().unwrap_or(0);
+    assert!(
+        grid >= 7,
+        "the grid of empty circles is not drawn with nobody there. {context}"
     );
     assert_eq!(
-        value("empty-says"),
-        "No messages",
-        "the line is not the one asked for. {context}"
-    );
-    assert_ne!(
-        value("empty-wraps"),
+        value("faces"),
         "0",
-        "the line cannot wrap, so a longer language runs off the cover. {context}"
-    );
-    assert_eq!(
-        value("grid"),
-        "0",
-        "a grid is drawn from chats that are nobody. {context}"
-    );
-    assert_eq!(
-        value("count-says"),
-        "0 new",
-        "the pill does not say that nothing is new with nobody there. {context}"
+        "a face is drawn from chats that are nobody. {context}"
     );
     assert_eq!(
         value("pill-shown"),
-        "true",
-        "the pill is gone with nobody there; a zero says as much as a count. \
-         {context}"
-    );
-    assert_eq!(
-        value("pill-lit"),
         "false",
-        "the pill is lit with nobody there. {context}"
+        "the pill is drawn with nobody there and nothing new. {context}"
     );
 }

@@ -553,10 +553,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <extracomment>On the cover, in a pill among the avatars: how many messages are unread. %1 is the number, or &quot;99+&quot;.</extracomment>
         <translation>%1 ಹೊಸ</translation>
     </message>
-    <message>
-        <source>No messages</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>DeleteMessageDialog</name>
