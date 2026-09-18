@@ -311,21 +311,23 @@ Environment requirements, each of which cost an attempt:
 
 ## Cutting a release
 
-A release is a `v*` tag on `main`, and everything after the push is
-`rpm.yml`'s:
+A release is `rpm.yml` run for a version, on `main`:
 
 1. Put the version in `rpm/harbour-piirit.spec` (`Version:`) and in the
    three crates' `Cargo.toml`, refresh `Cargo.lock` (`cargo check`), and
    write the version's section in `CHANGELOG.md`. Merge that.
-2. Tag the merge commit `v<version>` and push the tag.
+2. Either dispatch `rpm.yml` on `main` from the Actions tab with the
+   version in its `release` input, which tags the commit `v<version>`
+   itself; or tag the merge commit `v<version>` by hand and push the tag,
+   which runs the same workflow.
 
 The workflow builds the package with the spec's own `Release: 1` rather
-than the run-number stamp an ordinary build gets, refuses a tag that does
-not say what the spec says, and then publishes a GitHub release named after
-the tag: the device RPM, a `SHA256SUMS`, and that version's section of
-`CHANGELOG.md` as the text (`scripts/release-notes.sh`, which fails the run
-if the section is missing). The debug and source RPMs stay on the run's
-artifact.
+than the run-number stamp an ordinary build gets, refuses a version that
+is not what the spec says (and a dispatch that is not on `main`), and then
+publishes a GitHub release named `v<version>`: the device RPM, a
+`SHA256SUMS`, and that version's section of `CHANGELOG.md` as the text
+(`scripts/release-notes.sh`, which fails the run if the section is
+missing). The debug and source RPMs stay on the run's artifact.
 
 Harbour intake is by hand: the RPM on the release page is the one to
 upload, and `docs/HARBOUR.md` says what the validator will say about it.
