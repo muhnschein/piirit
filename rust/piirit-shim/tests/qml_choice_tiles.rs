@@ -369,13 +369,18 @@ fn assert_stack(steps: &[(String, String)]) {
     );
 }
 
+/// What the step with this label reported, or a marker that it never ran.
+fn step<'a>(steps: &'a [(String, String)], label: &str) -> &'a str {
+    steps
+        .iter()
+        .find(|(name, _)| name == label)
+        .map_or("<step did not run>", |(_, value)| value.as_str())
+}
+
+/// The row loaded and each tile shows what it was given: the theme icon
+/// or the drawn mark, the words, the quiet line only where there is one.
 fn assert_row(steps: &[(String, String)]) {
-    let value = |label: &str| -> &str {
-        steps
-            .iter()
-            .find(|(name, _)| name == label)
-            .map_or("<step did not run>", |(_, value)| value.as_str())
-    };
+    let value = |label: &str| step(steps, label);
     let context = format!("steps: {steps:?}");
     assert_eq!(value("load"), "ok", "the row did not load. {context}");
     assert_eq!(value("offer"), "ok", "the choices were refused. {context}");
@@ -430,9 +435,17 @@ fn assert_row(steps: &[(String, String)]) {
         "the choice's second line is not drawn. {context}"
     );
 
-    // Side by side inside the margins, and both as tall as the one that
-    // needs most: the stub's margin is 24 and the row is 1080 across, so
-    // a tile is 516 wide and the second starts at 540.
+    assert_row_layout(steps);
+}
+
+/// Side by side inside the margins, both as tall as the one that needs
+/// most, off where a choice is off, and a tap says which tile it was.
+fn assert_row_layout(steps: &[(String, String)]) {
+    let value = |label: &str| step(steps, label);
+    let context = format!("steps: {steps:?}");
+
+    // The stub's margin is 24 and the row is 1080 across, so a tile is
+    // 516 wide and the second starts at 540.
     let part = |label: &str, index: usize| -> String {
         value(label)
             .split(',')
