@@ -2,7 +2,7 @@
 # Parse every .qml file, and every .js the package ships beside them.
 #
 # Syntax only: qmllint cannot resolve `Sailfish.Silica`. The Qt 5.6 dialect
-# rules it cannot express live in rust/piiri-shim/tests/qml_syntax.rs.
+# rules it cannot express live in rust/piirit-shim/tests/qml_syntax.rs.
 #
 # The .js files are not QML imports -- qml/webxdc/catch.js is a frame
 # script for the browser engine -- but they are shipped, they are parsed

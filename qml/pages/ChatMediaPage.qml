@@ -6,7 +6,7 @@ import "../components"
 import "../components"
 import "../js/Media.js" as Media
 import "../js/Format.js" as Format
-import Piiri 1.0
+import Piirit 1.0
 
 /*
  * Everything of one kind that a chat holds: its pictures and videos as a

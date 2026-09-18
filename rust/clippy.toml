@@ -6,7 +6,7 @@ disallowed-methods = [
     # own thread. `Builder::build` is not banned: `#[tokio::main]` and
     # `#[tokio::test]` expand to it, and CoreRuntime itself uses it to
     # size the pool.
-    { path = "tokio::runtime::Runtime::new", reason = "use CoreRuntime (piiri-shim/src/runtime.rs)" },
+    { path = "tokio::runtime::Runtime::new", reason = "use CoreRuntime (piirit-shim/src/runtime.rs)" },
 
     # qmetaobject 0.2.10 truncates the sub-second part of a Duration to 0,
     # so anything under a second fires immediately. Pass whole seconds.

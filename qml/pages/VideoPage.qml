@@ -2,13 +2,13 @@ import QtQuick 2.0
 import QtMultimedia 5.6
 import Sailfish.Silica 1.0
 import "../components"
-import Piiri 1.0
+import Piirit 1.0
 
 /*
  * One video, played here.
  *
  * Played here rather than handed to whatever the system thinks plays
- * video, which leaves Piiri and fails on a device. QtMultimedia is
+ * video, which leaves Piirit and fails on a device. QtMultimedia is
  * already how a voice message plays in its own row; this is the same
  * player with a picture. The way out to another app stays in the pull-down,
  * and so does a copy into the Videos folder, where the gallery finds it.

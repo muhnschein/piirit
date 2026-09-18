@@ -83,7 +83,7 @@ QtObject {
     // every other file to reading them through this object.
     property ConfigurationValue enterSendsConfig: ConfigurationValue {
         id: enterSendsValue
-        key: "/apps/harbour-piiri/enter_sends"
+        key: "/apps/harbour-piirit/enter_sends"
         // A line break, until the reader says otherwise: the field took
         // the return key for one before there was a choice, and a key
         // that sends by surprise sends half a message.
@@ -92,19 +92,19 @@ QtObject {
 
     property ConfigurationValue markdownConfig: ConfigurationValue {
         id: markdownValue
-        key: "/apps/harbour-piiri/markdown_mode"
+        key: "/apps/harbour-piirit/markdown_mode"
         defaultValue: 0
     }
 
     property ConfigurationValue cleanLinksConfig: ConfigurationValue {
         id: cleanLinksValue
-        key: "/apps/harbour-piiri/clean_links"
+        key: "/apps/harbour-piirit/clean_links"
         defaultValue: false
     }
 
     property ConfigurationValue mediaQualityConfig: ConfigurationValue {
         id: mediaQualityValue
-        key: "/apps/harbour-piiri/media_quality"
+        key: "/apps/harbour-piirit/media_quality"
         // Balanced, which is the core's own default and the reference
         // clients'.
         defaultValue: 0
@@ -112,7 +112,7 @@ QtObject {
 
     property ConfigurationValue downloadLimitConfig: ConfigurationValue {
         id: downloadLimitValue
-        key: "/apps/harbour-piiri/download_limit"
+        key: "/apps/harbour-piirit/download_limit"
         // One megabyte, as parla defaults it: a photo arrives, a video
         // waits to be asked for.
         defaultValue: 1048576
@@ -120,7 +120,7 @@ QtObject {
 
     property ConfigurationValue deleteDeviceAfterConfig: ConfigurationValue {
         id: deleteDeviceAfterValue
-        key: "/apps/harbour-piiri/delete_device_after"
+        key: "/apps/harbour-piirit/delete_device_after"
         // Kept for good until the reader says otherwise, which is the
         // core's own default and the only one that loses nothing.
         defaultValue: 0
@@ -128,7 +128,7 @@ QtObject {
 
     property ConfigurationValue notificationsEnabledConfig: ConfigurationValue {
         id: notificationsEnabledValue
-        key: "/apps/harbour-piiri/notifications_enabled"
+        key: "/apps/harbour-piirit/notifications_enabled"
         // On: a chat client that says nothing when a message arrives is
         // not doing its job until it is asked to stop.
         defaultValue: true
@@ -136,26 +136,26 @@ QtObject {
 
     property ConfigurationValue notificationDetailConfig: ConfigurationValue {
         id: notificationDetailValue
-        key: "/apps/harbour-piiri/notification_detail"
+        key: "/apps/harbour-piirit/notification_detail"
         defaultValue: 0
     }
 
     property ConfigurationValue mentionNotificationsConfig: ConfigurationValue {
         id: mentionNotificationsValue
-        key: "/apps/harbour-piiri/mention_notifications"
+        key: "/apps/harbour-piirit/mention_notifications"
         defaultValue: true
     }
 
     property ConfigurationValue lastAccountConfig: ConfigurationValue {
         id: lastAccountValue
-        key: "/apps/harbour-piiri/last_account"
+        key: "/apps/harbour-piirit/last_account"
         // No profile until a chat list has been on one.
         defaultValue: 0
     }
 
     property ConfigurationValue webxdcEnabledConfig: ConfigurationValue {
         id: webxdcEnabledValue
-        key: "/apps/harbour-piiri/webxdc_enabled"
+        key: "/apps/harbour-piirit/webxdc_enabled"
         // Off on a phone that has never been asked. Running somebody
         // else's code, however sandboxed the engine is, is not a thing
         // to switch on for a reader who did not ask for it -- and the

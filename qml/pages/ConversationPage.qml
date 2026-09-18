@@ -2,7 +2,7 @@ import QtQuick 2.0
 import Sailfish.Silica 1.0
 import "../components"
 import "../js/Format.js" as Format
-import Piiri 1.0
+import Piirit 1.0
 
 /*
  * One conversation. The messages come from a ChatMessages instance owned by
@@ -283,13 +283,13 @@ Page {
 
     property string errorMessage: ""
     // Three states, not two: the core going away is now something the app
-    // does something about, and a banner that says "restart Piiri"
-    // while Piiri is already fixing it is worse than none.
+    // does something about, and a banner that says "restart Piirit"
+    // while Piirit is already fixing it is worse than none.
     readonly property string coreStatusMessage:
         core.status === "reconnecting"
         ? qsTr("Lost the connection to the Delta Chat core. Reconnecting...")
         : core.status === "stopped"
-          ? qsTr("Lost the connection to the Delta Chat core. Restart Piiri.")
+          ? qsTr("Lost the connection to the Delta Chat core. Restart Piirit.")
           : ""
 
     // Qt 5.6 handler syntax; see WelcomePage.qml.
@@ -638,7 +638,7 @@ Page {
     // than after a send that failed, and the send button is off while it
     // stands -- a picture is never this, since the core shrinks those on
     // the way out. The limit is the core's own recommendation for the
-    // profile's relay; see rust/piiri-shim/src/media.rs.
+    // profile's relay; see rust/piirit-shim/src/media.rs.
     Banner {
         id: tooBigBar
         objectName: "tooBigBar"
@@ -898,7 +898,7 @@ Page {
         }
     }
 
-    // Which kinds Piiri shows itself, and which it hands on. Handing a
+    // Which kinds Piirit shows itself, and which it hands on. Handing a
     // picture or a video to the system took the reader out of the app to
     // something that then failed to play it; everything else is still
     // somebody else's file to open, and a page here that could only say

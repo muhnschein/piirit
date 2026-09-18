@@ -2,8 +2,8 @@
 resolver = "2"
 members = [
     "deltachat-jsonrpc",
-    "piiri-shim",
-    "piiri-app",
+    "piirit-shim",
+    "piirit-app",
 ]
 
 [workspace.package]

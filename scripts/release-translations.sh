@@ -1,11 +1,11 @@
 #!/bin/sh
-# Compile every translations/piiri-<lang>.ts into a .qm beside it, or
+# Compile every translations/piirit-<lang>.ts into a .qm beside it, or
 # into the directory given, with lrelease. What the RPM's %build runs, what
 # `make translations` runs, and what ci/packaging-lint.sh runs to prove
 # the catalogs compile at all -- a numerus form too few, or a stray tag,
 # is an error here and a missing language on a phone.
 #
-# piiri.ts itself is the untranslated source catalog, kept for lupdate
+# piirit.ts itself is the untranslated source catalog, kept for lupdate
 # to read the strings from; it is not compiled.
 set -eu
 
@@ -20,7 +20,7 @@ fi
 
 mkdir -p "$out"
 count=0
-for catalog in "$root"/translations/piiri-*.ts; do
+for catalog in "$root"/translations/piirit-*.ts; do
     [ -f "$catalog" ] || continue
     name=$(basename "$catalog" .ts)
     # -silent: lrelease otherwise reports every catalog's counts, and a
@@ -30,7 +30,7 @@ for catalog in "$root"/translations/piiri-*.ts; do
 done
 
 if [ "$count" -eq 0 ]; then
-    echo "release-translations: no translations/piiri-*.ts found" >&2
+    echo "release-translations: no translations/piirit-*.ts found" >&2
     exit 1
 fi
 echo "release-translations: $count catalog(s) compiled into $out"

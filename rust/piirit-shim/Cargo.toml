@@ -1,0 +1,67 @@
+[package]
+name = "piirit-shim"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+description = "Qt/QML integration layer: exposes DeltaChatCore as a QObject and chat/message lists as QAbstractListModel for use from Silica QML. Depends on Qt5 via qmetaobject-rs."
+
+[dependencies]
+deltachat-jsonrpc = { path = "../deltachat-jsonrpc" }
+# Without its `log` bridge, which nothing here installs and which is the
+# `log` crate's only reason to be in the tree.
+qmetaobject = { version = "0.2", default-features = false }
+# The `cpp!` blocks in src/recorder.rs: QAudioRecorder, which qmetaobject
+# does not bind. Same versions as the vendored qmetaobject's, so nothing
+# new reaches Cargo.lock.
+cpp = "0.5"
+# Not used from Rust. qttypes' build script is what finds Qt, and it tells
+# only its direct dependents where: build.rs reads the DEP_QT_* variables
+# it exports, which is how the C++ above finds <QtMultimedia/...> and the
+# library to link.
+qttypes = "0.2"
+# `net` and `io-util` are the loopback host one webxdc app is served
+# from (webxdc_host.rs): a TcpListener on 127.0.0.1 and the read/write
+# traits for one small HTTP exchange. `net` is what brings socket2 in,
+# tokio's own platform layer for sockets. `time` is the restart backoff
+# and the deadline an attempt at a profile is given (signup.rs); the
+# JSON-RPC client turns it on anyway, but it is used here too. `fs` is
+# the few files the async side writes -- a webxdc's icon, an app off the
+# store, a file an app hands over -- so that none of them blocks a
+# runtime thread the JSON-RPC client is waiting on.
+tokio = { version = "1", features = ["rt-multi-thread", "sync", "net", "io-util", "time", "fs"] }
+# Only for the viewer's timezone. A day separator has to ask what the
+# offset was at the message's own instant, not the one in force now,
+# and std has no timezone support -- the alternative was localtime_r,
+# which this crate denies (`unsafe_code`).
+chrono = { version = "0.4", default-features = false, features = ["clock", "std"] }
+serde_json = "1"
+# QR codes both ways, pure Rust and under the 1.75 floor. Default
+# features off: rqrr's pull in the image crate, whose current releases
+# want Rust 1.85, and the pixels come from a PGM Qt writes anyway.
+qrcode = { version = "0.14", default-features = false }
+rqrr = { version = "0.10", default-features = false }
+
+[build-dependencies]
+cpp_build = "0.5"
+
+[dev-dependencies]
+tokio = { version = "1", features = ["io-std", "io-util", "macros"] }
+
+[[bin]]
+name = "fake-health-server"
+path = "src/bin/fake_health_server.rs"
+test = false
+doc = false
+
+# The recording double the onboarding tests drive. See its module docs for
+# why the journal exists.
+[[bin]]
+name = "fake-core-server"
+path = "src/bin/fake_core_server.rs"
+test = false
+doc = false
+
+[lints]
+workspace = true

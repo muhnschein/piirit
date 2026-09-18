@@ -1,6 +1,6 @@
 # Harbour
 
-Piiri is packaged for [Jolla's Harbour store](https://harbour.jolla.com).
+Piirit is packaged for [Jolla's Harbour store](https://harbour.jolla.com).
 Harbour's rules are not advice: a validator failure is a guaranteed
 rejection, and several of them constrain things — the package name, the
 install paths, the linker flags — that are expensive to change once code
@@ -103,7 +103,7 @@ predict it and only the real validator on a built package can answer it.
   enough for the Qt and C++ dependencies, which is what the rule is about.
 - That the app works under Sailjail. Running it from a terminal or the
   IDE bypasses the sandbox entirely, so a missing permission does not
-  surface until QA installs it. Force it: `sailjail /usr/bin/harbour-piiri`.
+  surface until QA installs it. Force it: `sailjail /usr/bin/harbour-piirit`.
   Note what the sandbox is *for*: it confines user data, not the read-only
   system tree. A confined app still reads `/etc`, `/usr` and `/lib` -- it
   has to, for certificates, fonts and `/etc/hosts` -- so being able to
@@ -149,7 +149,7 @@ Only a 5.x SDK provides it. The first real validator run, against a package
 built with 4.6.0.13, failed on exactly this while every other finding was
 one of the two known blockers:
 
-    FAIL /usr/bin/harbour-piiri -- Binary does not link to __libc_start_main@GLIBC_2.34.
+    FAIL /usr/bin/harbour-piirit -- Binary does not link to __libc_start_main@GLIBC_2.34.
 
 `rpm.yml` therefore defaults to **5.2.0.15**, the Jolla Phone's baseline.
 That is a deliberate floor, not a compromise: a binary from a newer SDK can
@@ -165,7 +165,7 @@ symbol up dynamically. C++ apps mark it `Q_DECL_EXPORT`.
 Rust has no equivalent. `fn main` becomes an ordinary global symbol, which
 lives only in `.symtab` — and rpmbuild strips `.symtab` on the way into
 the package, so by the time Harbour looks there is nothing there.
-`rust/piiri-app/build.rs` passes `--dynamic-list` at link time to put
+`rust/piirit-app/build.rs` passes `--dynamic-list` at link time to put
 `main` in `.dynsym`, where stripping cannot reach it.
 
 `--dynamic-list` rather than `--export-dynamic-symbol`, which needs
@@ -204,7 +204,7 @@ member type and the constructor.
 
 `qttypes` separately passes `-lQt5Widgets` unconditionally, which would
 record the dependency even with nothing using it. Rather than fork a
-second crate for one line, `rust/piiri-app/build.rs` links with
+second crate for one line, `rust/piirit-app/build.rs` links with
 `--as-needed`, which drops any library no symbol refers to. That only
 works *because* the patch removed the last reference — with `QApplication`
 still in use the library is genuinely needed and `--as-needed` keeps it.
@@ -234,7 +234,7 @@ Rewriting a test to avoid the derive means putting it somewhere it does
 not belong, which costs more than the alert does. Dismiss it in the
 Security tab, or -- for a lasting answer -- move the repository from
 CodeQL's default setup to an advanced one whose configuration can exclude
-`rust/piiri-shim/tests/`.
+`rust/piirit-shim/tests/`.
 
 The real fix is upstream: a feature flag choosing between `QApplication`
 and `QGuiApplication` would serve every Sailfish app built on qmetaobject,
@@ -243,7 +243,7 @@ cleanly.
 
 ## The open blockers
 
-**Piiri cannot be submitted to Harbour today.** One rule is broken,
+**Piirit cannot be submitted to Harbour today.** One rule is broken,
 and it is structural: it cannot be fixed by editing anything in this
 repository. (A second, an entry in the system's Settings app for the
 app's own settings, was broken knowingly for a while; the entry never
@@ -253,7 +253,7 @@ inside the app.)
 ### The bundled core
 
 `deltachat-rpc-server` is an ELF executable, bundled at
-`/usr/libexec/harbour-piiri/`, spawned as a subprocess and spoken to
+`/usr/libexec/harbour-piirit/`, spawned as a subprocess and spoken to
 over JSON-RPC on stdio. Harbour allows ELF files in exactly two places:
 `/usr/bin/<NAME>`, and `*.so` under `/usr/share/<NAME>/lib/`. Neither fits
 a second executable, so this is three validator errors — the path, the
@@ -294,7 +294,7 @@ removed from the store even after approval. Not an option.
 2. Read every warning, not just the errors — several describe things that
    will be dropped in a future release.
 3. Install on a real device and launch it as
-   `sailjail /usr/bin/harbour-piiri`.
+   `sailjail /usr/bin/harbour-piirit`.
 4. Exercise every permission-dependent path under the sandbox: the
    profile picture picker needs both `Pictures` and `MediaIndexing`, the
    attach tray's paper clip needs `UserDirs` for anything outside
@@ -355,7 +355,7 @@ removed from the store even after approval. Not an option.
    that both of each go and that each looks like the platform.
    Sharing *to* the app is a device path of its own, and the sandbox is
    half of it: share a picture from the gallery, a document from the file
-   manager and a link from the browser, and check that Piiri is in
+   manager and a link from the browser, and check that Piirit is in
    the sheet under both of its entries, that picking a chat opens that
    chat with the file already on the attachment bar (or the text in the
    field), and that sending it works -- a file the sandbox will not let
@@ -387,7 +387,7 @@ removed from the store even after approval. Not an option.
    nothing holds it, so there is no size limit to hit: what a big one
    costs is free storage, not memory. Check that it does not cost it
    twice -- after the notice says the copy is in Downloads, the cache
-   copy under `~/.cache/piiri/piiri/webxdc/outbox/` should be
+   copy under `~/.cache/piirit/piirit/webxdc/outbox/` should be
    gone, and the whole directory should be empty again next time the app
    is opened.
    An app that will not open says why rather than drawing grey: the host
@@ -515,7 +515,7 @@ removed from the store even after approval. Not an option.
    network -- nothing arrives on it and nothing says so -- and the core
    would otherwise find out only when its IDLE times out five minutes on.
    The window asks it to look again as it comes back to the front
-   (`piiri.qml`, `maybe_network`).
+   (`piirit.qml`, `maybe_network`).
    The other half needs a second phone and no looking: leave the app in
    the background, change network -- turn wi-fi off with mobile data on --
    wait a minute, and have the other phone write. The notification should

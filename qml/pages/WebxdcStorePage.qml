@@ -2,7 +2,7 @@ import QtQuick 2.0
 import Sailfish.Silica 1.0
 import Sailfish.WebView 1.0
 import "../components"
-import Piiri 1.0
+import Piirit 1.0
 
 /*
  * Where an app comes from: the webxdc store, as a page.
@@ -143,7 +143,7 @@ Page {
     // on the view would replace WebView.qml's own, which is where it
     // registers the messages it needs to work at all.
     Component.onCompleted: {
-        view.addMessageListener("piiri:app")
+        view.addMessageListener("piirit:app")
         view.loadFrameScript(Qt.resolvedUrl("../webxdc/catch.js"))
     }
 
@@ -153,7 +153,7 @@ Page {
     Connections {
         target: view
         onRecvAsyncMessage: {
-            if (message === "piiri:app" && data) {
+            if (message === "piirit:app" && data) {
                 page.catchApp(data.uri)
             }
         }

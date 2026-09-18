@@ -77,7 +77,7 @@ jobs:
           [[ $CARGO_JOBS =~ ^[1-9][0-9]?$ ]] || {
             echo "::error::cargo_jobs '$CARGO_JOBS' is not a small number"; exit 1; }
           owner=$(echo "${{ github.repository_owner }}" | tr 'A-Z' 'a-z')
-          echo "SDK_IMAGE=ghcr.io/$owner/piiri-sdk:$SFOS-$ARCH" >> "$GITHUB_ENV"
+          echo "SDK_IMAGE=ghcr.io/$owner/piirit-sdk:$SFOS-$ARCH" >> "$GITHUB_ENV"
 
       - name: Sign in to the registry
         run: |
@@ -122,7 +122,7 @@ jobs:
           echo "Building against $target"
           echo "TARGET=$target" >> "$GITHUB_ENV"
 
-      # Every build used to produce harbour-piiri-0.1.0-1.aarch64.rpm,
+      # Every build used to produce harbour-piirit-0.1.0-1.aarch64.rpm,
       # because the spec pins both fields and mb2 runs with -X so nothing derives
       # them from git. Same name, same NEVRA, every time -- so `rpm -U`
       # and `pkcon install-local` saw a package that was already installed
@@ -140,8 +140,8 @@ jobs:
         run: |
           short=$(git rev-parse --short HEAD)
           release="1.${GITHUB_RUN_NUMBER}"
-          sed -i "s/^Release:.*/Release:    ${release}/" rpm/harbour-piiri.spec
-          grep '^Version:\|^Release:' rpm/harbour-piiri.spec
+          sed -i "s/^Release:.*/Release:    ${release}/" rpm/harbour-piirit.spec
+          grep '^Version:\|^Release:' rpm/harbour-piirit.spec
           echo "SHORT_SHA=$short" >> "$GITHUB_ENV"
           echo "RPM_RELEASE=$release" >> "$GITHUB_ENV"
 
@@ -169,7 +169,7 @@ jobs:
       - name: Restore the crates
         uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
         with:
-          path: ~/.cache/piiri-cargo
+          path: ~/.cache/piirit-cargo
           key: rpm-cargo-${{ hashFiles('rust/Cargo.lock') }}
           restore-keys: rpm-cargo-
 
@@ -182,23 +182,23 @@ jobs:
           gid=$(docker run --rm "$SDK_IMAGE" id -g)
           home=$(docker run --rm "$SDK_IMAGE" sh -c 'echo $HOME')
           echo "SDK builds as uid=$uid gid=$gid, HOME=$home"
-          echo "BUILDDIR=$home/harbour-piiri" >> "$GITHUB_ENV"
-          mkdir -p ~/.cache/piiri-cargo
-          sudo chown -R "$uid:$gid" "$PWD" ~/.cache/piiri-cargo
+          echo "BUILDDIR=$home/harbour-piirit" >> "$GITHUB_ENV"
+          mkdir -p ~/.cache/piirit-cargo
+          sudo chown -R "$uid:$gid" "$PWD" ~/.cache/piirit-cargo
 
       # Mounted inside the SDK user's home, and that placement is the
       # whole fix. rpm runs under scratchbox2, which redirects absolute
       # paths it does not recognise into the target rootfs -- so with the
-      # tree at /build/harbour-piiri, mb2 wrote .mb2/spec (it is right
+      # tree at /build/harbour-piirit, mb2 wrote .mb2/spec (it is right
       # there afterwards, 10 KB of it) and rpm then looked for the same
       # path inside the target and found nothing:
       #
-      #   error: Unable to open /build/harbour-piiri/.mb2/spec: No such file
+      #   error: Unable to open /build/harbour-piirit/.mb2/spec: No such file
       #
       # A file that exists and cannot be opened is two different roots.
       # docs/BUILDING.md bind-mounted under /home/mersdk for this
       # reason. The directory keeps the project's name either way: mb2
-      # derives the package from it, so rpm/harbour-piiri.spec is found.
+      # derives the package from it, so rpm/harbour-piirit.spec is found.
       #
       # `build-init` because mb2's help says a build directory is
       # initialised before it is built in, and `-X` (--no-fix-version)
@@ -220,7 +220,7 @@ jobs:
           docker run --rm --privileged \
             -e TARGET -e CARGO_JOBS \
             -v "$PWD:$BUILDDIR" -w "$BUILDDIR" \
-            -v "$HOME/.cache/piiri-cargo:/home/mersdk/.cargo" \
+            -v "$HOME/.cache/piirit-cargo:/home/mersdk/.cargo" \
             "$SDK_IMAGE" \
             /bin/bash -c 'set -e
               since=$(date +%s)
@@ -248,8 +248,8 @@ jobs:
       - name: Take the tree back
         if: always()
         run: |
-          mkdir -p ~/.cache/piiri-cargo
-          sudo chown -R "$(id -u):$(id -g)" "$PWD" ~/.cache/piiri-cargo
+          mkdir -p ~/.cache/piirit-cargo
+          sudo chown -R "$(id -u):$(id -g)" "$PWD" ~/.cache/piirit-cargo
 
       - name: Show what was built
         run: |
@@ -258,7 +258,7 @@ jobs:
 
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: harbour-piiri-${{ env.ARCH }}-sfos${{ env.SFOS }}-${{ env.SHORT_SHA }}
+          name: harbour-piirit-${{ env.ARCH }}-sfos${{ env.SFOS }}-${{ env.SHORT_SHA }}
           path: |
             RPMS/**/*.rpm
             **/*.rpm
@@ -279,7 +279,7 @@ jobs:
       - name: Validate the RPM against Harbour's rules
         run: |
           ./ci/apt-install.sh binutils rpm cpio file
-          rpm=$(find . -name 'harbour-piiri-*.rpm' ! -name '*debug*' \
+          rpm=$(find . -name 'harbour-piirit-*.rpm' ! -name '*debug*' \
                        ! -name '*.src.rpm' | head -1)
           [ -n "$rpm" ] || { echo "::error::no RPM to validate"; exit 1; }
           echo "Validating $rpm"

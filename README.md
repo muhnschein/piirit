@@ -1,8 +1,8 @@
-# Piiri ⛵💬
+# Piirit ⛵💬
 
 A native SailfishOS client for Delta Chat.
 
-> ⚠️ **Work in progress:** Piiri is under very active development.
+> ⚠️ **Work in progress:** Piirit is under very active development.
 > Expect things to break.
 >
 > 🤖 **Vibe-coded:** Much of this project was developed using AI. If that
@@ -10,18 +10,18 @@ A native SailfishOS client for Delta Chat.
 > is largely a pretty wrapper around official, handmade code from the upstream
 > Delta Chat project. More on that below.
 >
-> 📱 **Modern SailfishOS-only:** Piiri currently targets the 
+> 📱 **Modern SailfishOS-only:** Piirit currently targets the 
 > Jolla Phone 2026 and nothing else. No effort is made to accommodate older
 > targets. [Buy a Jolla Phone 2026](https://commerce.jolla.com/) and support
 > European-made alternatives. 👊🇪🇺🔥
 
 ## Overview
 
-Piiri is a Silica/QML application built on top of the Delta Chat core.
+Piirit is a Silica/QML application built on top of the Delta Chat core.
 
 It implements no messaging protocol of its own. Every piece of
 IMAP/SMTP/MIME/crypto logic lives in upstream's `deltachat-rpc-server`, which
-Piiri spawns as a subprocess and drives over JSON-RPC on stdio. Piiri
+Piirit spawns as a subprocess and drives over JSON-RPC on stdio. Piirit
 itself *never* touches a mail server or a key.
 
 ## Limitations
@@ -49,8 +49,8 @@ VirtualBox one cannot compile Rust — and a build target for your device's
 architecture.
 
 ```
-$ git clone https://github.com/muhnschein/piiri.git
-$ cd piiri
+$ git clone https://github.com/muhnschein/piirit.git
+$ cd piirit
 $ scripts/fetch-rpc-server.sh     # bundled deltachat-rpc-server binaries
 $ scripts/build-rpm.sh aarch64    # or: armv7hl; add a version, e.g. 5.2.0.15
 ```
@@ -77,7 +77,7 @@ toolchain floor are in [`docs/BUILDING.md`](docs/BUILDING.md).
   that is modern, secure, and standards-based - and for making all of that
   available in a handy, memory-safe [core library](https://github.com/chatmail/core).  
 * [parla](https://github.com/trufae/parla), for building an excellent Delta
-  Chat client. Piiri's settings, tracking protection (`links.rs`) are taken 
+  Chat client. Piirit's settings, tracking protection (`links.rs`) are taken 
   from it. Its Markdown formatting (`markdown.rs`) and relay connectivity info
    (`connectivity.rs`) are modeled after it.
 * [whisperfish](https://gitlab.com/whisperfish/whisperfish), for showing what's
@@ -87,4 +87,4 @@ toolchain floor are in [`docs/BUILDING.md`](docs/BUILDING.md).
 
 Licensed GPLv3+, see the LICENSE file for details.
 
-Copyright © Piiri contributors.
+Copyright © Piirit contributors.

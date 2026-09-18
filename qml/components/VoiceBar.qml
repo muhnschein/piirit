@@ -1,6 +1,6 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
-import Piiri 1.0
+import Piirit 1.0
 
 /*
  * A voice message being recorded, where the message field was.

@@ -77,7 +77,7 @@ trap cleanup EXIT
 # Copied in rather than bind-mounted: a mount leaves its mount point behind
 # in the exported filesystem, and the spec is the only thing from this tree
 # the bake reads.
-docker cp "$root/rpm/harbour-piiri.spec" "$cid:/tmp/harbour-piiri.spec"
+docker cp "$root/rpm/harbour-piirit.spec" "$cid:/tmp/harbour-piirit.spec"
 
 # The bake, in two halves, because the two need different users and this
 # image grants no passwordless sudo -- inside it `sudo` answers "PAM
@@ -91,9 +91,9 @@ docker exec -e TARGET="$target" "$cid" bash -euxo pipefail -c '
     # A build directory named for the package: mb2 derives the package it
     # is building from the directory it runs in, and then looks for
     # rpm/<that>.spec.
-    mkdir -p ~/harbour-piiri/rpm
-    cp /tmp/harbour-piiri.spec ~/harbour-piiri/rpm/
-    cd ~/harbour-piiri
+    mkdir -p ~/harbour-piirit/rpm
+    cp /tmp/harbour-piirit.spec ~/harbour-piirit/rpm/
+    cd ~/harbour-piirit
 
     # -X (--no-fix-version) for the reason rpm.yml passes it: without it
     # build-init asks `git describe` for a version, finds no tags, and
@@ -112,7 +112,7 @@ docker exec -e TARGET="$target" "$cid" bash -euxo pipefail -c '
     sed -i "s|^DEFAULT_TARGET=.*|DEFAULT_TARGET=$TARGET|" "$HOME/.scratchbox2/config"
     grep "^DEFAULT_TARGET=$TARGET$" "$HOME/.scratchbox2/config"
 
-    rm -rf ~/harbour-piiri
+    rm -rf ~/harbour-piirit
 '
 
 echo ">> putting the rustlib where the linker looks, and dropping the rest"
@@ -150,7 +150,7 @@ docker exec --user root -e TARGET="$target" "$cid" bash -euxo pipefail -c '
     done
 
     # The bake s own leavings, and the package cache it filled.
-    rm -f /tmp/harbour-piiri.spec
+    rm -f /tmp/harbour-piirit.spec
     rm -rf "/srv/mer/targets/$TARGET/var/cache/zypp"/*
 '
 
@@ -185,7 +185,7 @@ fi
 
 docker export "$cid" |
     docker import "${changes[@]}" \
-        --message "piiri: $target, BuildRequires installed, one architecture" \
+        --message "piirit: $target, BuildRequires installed, one architecture" \
         - "$output" >/dev/null
 
 # A gate, not a report: an image that cannot answer these is one that fails

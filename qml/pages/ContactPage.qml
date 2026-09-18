@@ -1,7 +1,7 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
 import "../components"
-import Piiri 1.0
+import Piirit 1.0
 
 /*
  * Who a one-to-one chat is with: their picture, their name, the line they

@@ -2,7 +2,7 @@ import QtQuick 2.0
 import Sailfish.Silica 1.0
 import Sailfish.WebView 1.0
 import "../components"
-import Piiri 1.0
+import Piirit 1.0
 
 /*
  * A webxdc app, running.
