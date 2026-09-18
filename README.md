@@ -1,14 +1,12 @@
-# Piirit ⛵💬
+# Piirit
 
-A native SailfishOS client for Delta Chat.
+![Piirit - Secure decentralised chat based on Delta Chat.](store/cover.png)
 
-> ⚠️ **Work in progress:** Piirit is under very active development.
-> Expect things to break.
->
-> 🤖 **Vibe-coded:** Much of this project was developed using AI. If that
-> provenance troubles you, use something else. That being said, this project
-> is largely a pretty wrapper around official, handmade code from the upstream
-> Delta Chat project. More on that below.
+[![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=muhnschein_piirit&metric=security_rating)](https://sonarcloud.io/summary/new_code?id=muhnschein_piirit)[![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=muhnschein_piirit&metric=reliability_rating)](https://sonarcloud.io/summary/new_code?id=muhnschein_piirit)[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=muhnschein_piirit&metric=coverage)](https://sonarcloud.io/summary/new_code?id=muhnschein_piirit)[![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=muhnschein_piirit&metric=ncloc)](https://sonarcloud.io/summary/new_code?id=muhnschein_piirit)
+
+> 🤖 **This project was developed using AI.** If that provenance troubles
+> you, feel free to use something else. That being said, this is largely a
+> GUI wrapper around an excellent core from the upstream Delta Chat project.
 >
 > 📱 **Modern SailfishOS-only:** Piirit currently targets the 
 > Jolla Phone 2026 and nothing else. No effort is made to accommodate older
