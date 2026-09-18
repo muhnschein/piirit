@@ -18,6 +18,15 @@ Page {
     property int accountId
     property string errorMessage: ""
 
+    // The core has said who is in this profile, whatever that was.
+    //
+    // An empty model means one of two things and they are opposite: no
+    // contacts, or no answer yet. For the first moment after the page
+    // opens the second is what is true, and "No contacts yet" over a
+    // list about to fill is the app telling the reader something it
+    // does not know. It flashed under the rows on every visit.
+    property bool contactsLoaded: false
+
     // Not bound straight to the field: a round trip per keystroke asks the
     // core four times to type "anna", and only the last answer is wanted.
     Timer {
@@ -31,6 +40,9 @@ Page {
         objectName: "contacts"
         account_id: page.accountId
         onError: page.errorMessage = message
+        // Emitted once the rows have been set, whether there turned out
+        // to be any or none.
+        onRows_changed: page.contactsLoaded = true
         // Open the chat that now exists, above the page that opened this
         // one: this page has done its job.
         onChat_ready: pageStack.replaceAbove(pageStack.previousPage(page),
@@ -123,7 +135,9 @@ Page {
             }
 
             ViewPlaceholder {
-                enabled: contacts.count === 0
+                objectName: "contactsPlaceholder"
+                // Not until the core has answered: see `contactsLoaded`.
+                enabled: page.contactsLoaded && contacts.count === 0
                 text: qsTr("No contacts yet")
                 hintText: qsTr("Scan someone's invite from the chat list: QR code")
             }

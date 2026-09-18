@@ -480,6 +480,15 @@ Page {
         target: profile
         // Quiet confirmation that something reached the core, since
         // nothing else on this page says so any more.
-        onSaved: notice.show(qsTr("Saved"))
+        onSaved: {
+            notice.show(qsTr("Saved"))
+            // The profiles page under this one draws its rows off the
+            // core's account list, and the core does not say when a
+            // name or a picture changes: it is re-read here, so the row
+            // shows the new name on the swipe back rather than on the
+            // next visit. Reconciled in place (core.rs), so the rows do
+            // not flicker.
+            core.refresh_accounts()
+        }
     }
 }

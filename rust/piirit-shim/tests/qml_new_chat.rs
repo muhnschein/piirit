@@ -100,7 +100,10 @@ const PROBE_QML: &str = r"
         function findIn(node, name) {
             if (!node) { return null }
             if (node.objectName === name) { return node }
-            var kids = node.children
+            // `data` rather than `children`: the contact model is a child
+            // of the page but not a visual one, and `children` holds only
+            // what is drawn.
+            var kids = node.data !== undefined ? node.data : node.children
             for (var i = 0; kids && i < kids.length; i++) {
                 var hit = findIn(kids[i], name)
                 if (hit) { return hit }
@@ -114,6 +117,19 @@ const PROBE_QML: &str = r"
             var item = findIn(loader.item, name)
             if (!item) { return 'missing:' + name }
             item.clicked()
+            return 'ok'
+        }
+        function get(name, property) {
+            var item = findIn(loader.item, name)
+            if (!item) { return 'missing:' + name }
+            return '' + item[property]
+        }
+        // A search no contact answers to, so the list really is empty
+        // and the placeholder is the only thing left to draw.
+        function searchForNothing() {
+            var model = findIn(loader.item, 'contacts')
+            if (!model) { return 'missing:contacts' }
+            model.query = 'zzqq-nobody-is-called-this'
             return 'ok'
         }
     }
@@ -176,17 +192,38 @@ fn the_new_chat_page_opens_a_chat_with_a_contact() {
                 1
             ),
         ));
+        // Nothing has been read yet. An empty model means "no answer"
+        // this early and "no contacts" later, and the two are opposite.
+        (*steps_ptr).push((
+            "placeholder-fresh",
+            call!(
+                "get",
+                QString::from("contactsPlaceholder"),
+                QString::from("enabled")
+            ),
+        ));
     });
 
     single_shot(Duration::from_secs(3), move || unsafe {
         // The first known contact; tapping it opens a chat with them.
         (*steps_ptr).push(("tap-contact", call!("click", QString::from("contactRow"))));
+        (*steps_ptr).push(("search", call!("searchForNothing")));
     });
 
     single_shot(Duration::from_secs(6), move || unsafe {
         (*steps_ptr).push((
             "after-contact",
             (*stack_ptr).pinned().borrow().log.to_string(),
+        ));
+        // The core has answered and there is nobody to show: now the
+        // placeholder is the one thing that should be on the list.
+        (*steps_ptr).push((
+            "placeholder-empty",
+            call!(
+                "get",
+                QString::from("contactsPlaceholder"),
+                QString::from("enabled")
+            ),
         ));
         // Neither way to something new is here: both moved to the chat
         // list's pull-down, and an entry here as well would be the same
@@ -223,6 +260,16 @@ fn assert_outcome(steps: &[(&str, String)], navigation: &str, chat_id: u32, jour
             "new-contact" | "new-group" => assert!(
                 value.starts_with("missing:"),
                 "{name} is still offered here, as well as on the chat list. {context}"
+            ),
+            "placeholder-fresh" => assert_eq!(
+                value, "false",
+                "\"No contacts yet\" is up before the core has said whether \
+                 there are any, so it flashes under the rows on the way in. {context}"
+            ),
+            "placeholder-empty" => assert_eq!(
+                value, "true",
+                "a search nobody answers to says nothing at all, which reads \
+                 as a list that has not loaded. {context}"
             ),
             _ => assert_eq!(value, "ok", "step {name} returned {value:?}. {context}"),
         }

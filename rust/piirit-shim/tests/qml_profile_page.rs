@@ -140,6 +140,9 @@ const PROBE_QML: &str = r"
             profile.clear_picture()
             return 'ok'
         }
+        // What the profiles page under this one does when it opens, so
+        // its rows are there to go stale.
+        function listProfiles() { core.refresh_accounts(); return 'ok' }
     }
 ";
 
@@ -155,6 +158,9 @@ fn the_profile_page_round_trips_the_profile() {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_FAKE_JOURNAL", &journal);
         std::env::set_var("PIIRIT_ACCOUNTS_DIR", temp.join("accounts"));
+        // A profile the core lists, so the profiles page's row for it
+        // is there to be watched.
+        std::env::set_var("PIIRIT_FAKE_ACCOUNTS", "1");
     }
 
     piirit_shim::register_qml_types();
@@ -175,6 +181,7 @@ fn the_profile_page_round_trips_the_profile() {
         .start(QString::from(env!("CARGO_BIN_EXE_fake-core-server")));
 
     let engine_ptr = std::ptr::addr_of_mut!(engine);
+    let core_ptr: *const QObjectBox<DeltaChatCore> = std::ptr::addr_of!(core_box);
     let mut steps: Vec<(&str, String)> = Vec::new();
     let steps_ptr: *mut Vec<(&str, String)> = std::ptr::addr_of_mut!(steps);
 
@@ -199,6 +206,13 @@ fn the_profile_page_round_trips_the_profile() {
             (*steps_ptr).push(($label, $value))
         };
     }
+    // The row the profiles page draws for this profile: name and
+    // picture as the core's account list has them right now.
+    macro_rules! listed {
+        () => {
+            listed_row(&(*core_ptr).pinned().borrow(), 1)
+        };
+    }
 
     single_shot(Duration::from_secs(1), move || unsafe {
         record!(
@@ -209,9 +223,12 @@ fn the_profile_page_round_trips_the_profile() {
                 1
             )
         );
+        record!("listed", call!("listProfiles"));
     });
 
     single_shot(Duration::from_secs(3), move || unsafe {
+        // The row as it stands before anything is typed.
+        record!("listed-before", listed!());
         // What the relay and the phone say, as parla's dialog shows it.
         record!("address", get!("addressLabel", "text"));
         record!("connection", get!("connectivityLabel", "text"));
@@ -259,6 +276,9 @@ fn the_profile_page_round_trips_the_profile() {
     single_shot(Duration::from_secs(7), move || unsafe {
         record!("saved-name", get!("profile", "display_name"));
         record!("saved-bio", get!("profile", "status"));
+        // The profiles page under this one: its row, without it being
+        // opened again.
+        record!("listed-name", listed!());
         // Opened again, on a profile that now has a name in it. Filling
         // the fields from the core must not read as the reader typing:
         // leaving the page would then write them straight back, and a
@@ -292,11 +312,13 @@ fn the_profile_page_round_trips_the_profile() {
 
     single_shot(Duration::from_secs(12), move || unsafe {
         record!("picture", get!("profile", "avatar_path"));
+        record!("listed-picture", listed!());
         record!("unpicked", call!("unpick"));
     });
 
     single_shot(Duration::from_secs(14), move || unsafe {
         record!("picture-gone", get!("profile", "avatar_path"));
+        record!("listed-picture-gone", listed!());
         (*engine_ptr).quit();
     });
 
@@ -409,6 +431,57 @@ fn the_profile_page_round_trips_the_profile() {
         value("picture-gone"),
         "",
         "the picture was cleared but the page still shows one. {context}"
+    );
+    assert_profiles_row_follows(&steps, &context);
+}
+
+/// The row the profiles page draws for the profile: `name|picture`, or
+/// a note that the list has no such row.
+fn listed_row(core: &DeltaChatCore, account_id: u32) -> String {
+    core.account_list
+        .borrow()
+        .iter()
+        .find(|row| row.account_id == account_id)
+        .map_or_else(
+            || "<not listed>".to_string(),
+            |row| format!("{}|{}", row.display_name, row.avatar_path),
+        )
+}
+
+/// The profiles page under this one draws its rows off the core's
+/// account list, and a name or picture saved here has to reach that row
+/// before the swipe back, not on the next visit.
+fn assert_profiles_row_follows(steps: &[(&str, String)], context: &str) {
+    let value = |label: &str| {
+        steps
+            .iter()
+            .find(|(name, _)| *name == label)
+            .map(|(_, value)| value.as_str())
+            .unwrap_or_default()
+    };
+    assert_eq!(
+        value("listed-before"),
+        "|",
+        "the profiles page's row was not there before the edit, so the rest \
+         of this proves nothing. {context}"
+    );
+    assert_eq!(
+        value("listed-name"),
+        "Ada Lovelace|",
+        "the name was saved but the profiles page's row still shows the old \
+         one: it changes only when that page is opened again. {context}"
+    );
+    assert_eq!(
+        value("listed-picture"),
+        "Ada Lovelace|/tmp/piirit-fake/photo.jpg",
+        "the picture was set but the profiles page's row does not show it \
+         yet. {context}"
+    );
+    assert_eq!(
+        value("listed-picture-gone"),
+        "Ada Lovelace|",
+        "the picture was cleared but the profiles page's row still has it. \
+         {context}"
     );
 }
 
