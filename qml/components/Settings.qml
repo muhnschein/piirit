@@ -1,13 +1,12 @@
 pragma Singleton
 import QtQuick 2.0
-import Sailfish.Silica 1.0
 import Nemo.Configuration 1.0
 
 /*
  * The settings that belong to no profile: whether the return key sends,
  * how a message is drawn, what goes out with a link, how much of a
  * picture or a video leaves with it, how much of an attachment arrives
- * unasked, where a saved file goes, how long a message is kept, whether
+ * unasked, how long a message is kept, whether
  * anything is announced at all and if so how much a notification gives
  * away and whether a muted group can still raise one, and whether webxdc
  * apps are offered at all.
@@ -45,16 +44,6 @@ QtObject {
     /// fetches everything. The core's own `download_limit`, applied to
     /// every profile.
     property alias downloadLimit: downloadLimitValue.value
-    /// Where a file saved from a chat goes: a folder, as a path. A
-    /// picture or a video goes to the gallery's own folders instead,
-    /// which is where the gallery looks. The sandbox lets the app write
-    /// under Documents, Downloads, Music, Videos and Pictures, and a
-    /// folder outside those fails at the copy.
-    property alias saveFolder: saveFolderValue.value
-    /// The folder a fresh phone saves to: a folder of the app's own
-    /// under Documents, so what came in by chat is together and apart
-    /// from the rest.
-    readonly property string defaultSaveFolder: StandardPaths.documents + "/Piiri"
     /// Messages older than this many seconds are deleted from the phone,
     /// in every chat of every profile, whatever a chat's own disappearing
     /// messages timer says; 0 keeps them. The core's own
@@ -129,12 +118,6 @@ QtObject {
         defaultValue: 1048576
     }
 
-    property ConfigurationValue saveFolderConfig: ConfigurationValue {
-        id: saveFolderValue
-        key: "/apps/harbour-piiri/save_folder"
-        defaultValue: defaultSaveFolder
-    }
-
     property ConfigurationValue deleteDeviceAfterConfig: ConfigurationValue {
         id: deleteDeviceAfterValue
         key: "/apps/harbour-piiri/delete_device_after"
@@ -179,19 +162,5 @@ QtObject {
         // half of it that is ours is new enough to still be finding out
         // what it gets wrong.
         defaultValue: false
-    }
-
-    /// `path` as the reader knows it: relative to the folder above
-    /// Documents, which is the home directory, when it is under there --
-    /// "Documents/Piiri" rather than the whole of it -- and as given
-    /// otherwise. For a notice that says where a copy went.
-    function folderLabel(path) {
-        var documents = "" + StandardPaths.documents
-        var home = documents.substring(0, documents.lastIndexOf("/") + 1)
-        var text = "" + path
-        if (home.length > 1 && text.indexOf(home) === 0) {
-            return text.substring(home.length)
-        }
-        return text
     }
 }

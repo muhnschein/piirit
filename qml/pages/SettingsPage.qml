@@ -6,7 +6,7 @@ import "../components"
  * The settings that belong to no profile: whether the return key sends,
  * how a message is drawn, what goes out with a link, how much of a
  * picture or a video leaves with it, how much of an attachment arrives
- * unasked, where a saved file goes, how long a message is kept, whether
+ * unasked, how long a message is kept, whether
  * anything is announced and how much a notification gives away and
  * whether a muted group can still raise one, and whether webxdc apps
  * are offered at all. Reached from the chat list's pull-down. A
@@ -35,11 +35,9 @@ import "../components"
  * that entry to appear at all.
  *
  * Nothing here needs saving: each control writes its setting on the tap.
- * Two are chosen on a page of their own instead. The deletion period
+ * One is chosen on a page of its own instead: the deletion period
  * deletes messages the moment it is set, so that one asks first, with
- * the count of what would go. And the save folder is walked to, in a
- * dialog that takes the folder on a swipe forward and nothing on a swipe
- * back.
+ * the count of what would go.
  */
 Page {
     id: page
@@ -142,26 +140,9 @@ Page {
         onDownloadLimitChanged: page.refresh()
         onDeleteDeviceAfterChanged: page.refresh()
         onNotificationDetailChanged: page.refresh()
-        onSaveFolderChanged: page.refresh()
     }
 
     Component.onCompleted: page.refresh()
-
-    /// Choose the save folder: a dialog that walks the folders the app
-    /// may write in. The setting is written only when the dialog is
-    /// accepted -- a swipe forward -- and left alone on a swipe back.
-    function chooseFolder() {
-        var dialog = pageStack.push(Qt.resolvedUrl("FolderPickerDialog.qml"), {
-            folder: Settings.saveFolder
-        })
-        if (dialog) {
-            dialog.accepted.connect(function() {
-                if (dialog.chosen.length > 0) {
-                    Settings.saveFolder = dialog.chosen
-                }
-            })
-        }
-    }
 
     /// The reader picked a deletion period.
     ///
@@ -305,21 +286,6 @@ Page {
                         }
                     }
                 }
-            }
-
-            // Where a file lands when the reader keeps a copy of it,
-            // chosen on a page of its own (FolderPickerDialog.qml). A
-            // picture or a video keeps going to the gallery's folders,
-            // which is where the gallery looks, and the line under says
-            // so.
-            ValueButton {
-                objectName: "folderButton"
-                width: parent.width
-                //: Where a copy of a file from a chat is put.
-                label: qsTr("Save files to")
-                value: Settings.folderLabel(Settings.saveFolder)
-                description: qsTr("Pictures and videos always go to the gallery.")
-                onClicked: page.chooseFolder()
             }
 
             // The core's own `delete_device_after`, which it applies to

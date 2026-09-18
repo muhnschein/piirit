@@ -929,11 +929,11 @@ Page {
 
     // Where a copy of an attachment goes: for a picture or a video the
     // folder the gallery indexes, which is where the reader will look
-    // for it; for anything else the folder the reader chose in the
-    // settings, or Documents/Piiri until they choose one. Under the
-    // name the sender gave it, since the core keeps the file under a
-    // name of its own. The sandbox grants the gallery's two and the
-    // folders the setting may name.
+    // for it; for anything else Downloads, where the file manager looks
+    // and where the platform's own browser puts what it fetches -- no
+    // setting, as tuuli has none. Under the name the sender gave it,
+    // since the core keeps the file under a name of its own. The
+    // sandbox grants all three (UserDirs).
     function saveAttachment(fileUrl, fileName, viewType) {
         if (viewType === "Image" || viewType === "Gif"
                 || viewType === "Sticker") {
@@ -943,10 +943,8 @@ Page {
             page.savedTo = qsTr("Saved to Videos")
             attachmentSaver.save_as(fileUrl, StandardPaths.videos, fileName)
         } else {
-            //: %1 is a folder, such as "Documents/Piiri".
-            page.savedTo = qsTr("Saved to %1").arg(
-                        Settings.folderLabel(Settings.saveFolder))
-            attachmentSaver.save_as(fileUrl, Settings.saveFolder, fileName)
+            page.savedTo = qsTr("Saved to Downloads")
+            attachmentSaver.save_as(fileUrl, StandardPaths.download, fileName)
         }
     }
 

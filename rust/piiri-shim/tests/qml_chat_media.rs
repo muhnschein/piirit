@@ -162,10 +162,9 @@ const PROBE_QML: &str = r"
         function shownInChat() { return '' + chatBelow.shown }
         // The wait before a deletion, turned down from four seconds.
         function hurry(ms) { loader.item.pendingDelay = ms; return 'ok' }
-        // Where the platform says documents go, pointed at a directory
-        // of this test's own: a saved file goes to the app's own folder
-        // under it until the reader chooses another.
-        function setDocuments(folder) { StandardPaths.documents = folder; return 'ok' }
+        // Where the platform says downloads go, pointed at a directory
+        // of this test's own: a saved file goes there.
+        function setDownloads(folder) { StandardPaths.download = folder; return 'ok' }
         // `data` rather than `children`: the model is a plain QObject, so
         // it is not among an Item's visual children at all.
         function findIn(node, name) {
@@ -226,7 +225,7 @@ fn a_chats_media_has_pages_of_its_own_behind_the_tiles() {
         b"%PDF-1.4 notes",
     )
     .expect("write the fake pdf");
-    let documents = temp.join("Documents");
+    let downloads = temp.join("Downloads");
 
     // SAFETY: single-threaded test binary; set before Qt starts.
     unsafe {
@@ -283,7 +282,7 @@ fn a_chats_media_has_pages_of_its_own_behind_the_tiles() {
     let contact_page = common::page_url("ContactPage.qml");
     let group_page = common::page_url("GroupPage.qml");
     let tiles = common::component_url("MediaKinds.qml");
-    let documents_for_probe = documents.to_string_lossy().into_owned();
+    let downloads_for_probe = downloads.to_string_lossy().into_owned();
 
     // The group's gallery: a picture and a video.
     let page = media_page.clone();
@@ -361,14 +360,14 @@ fn a_chats_media_has_pages_of_its_own_behind_the_tiles() {
     });
 
     let page = media_page.clone();
-    let folder = documents_for_probe.clone();
+    let folder = downloads_for_probe.clone();
     single_shot(Duration::from_secs(7), move || unsafe {
         record!("files-count", get!("media", "count"));
         record!("file-name", get!("fileName", "text"));
         record!("file-size", get!("fileDetail", "text"));
         record!("file-icon", get!("fileIcon", "source"));
         record!("file-caption", get!("rowCaption", "text"));
-        call!("setDocuments", QString::from(folder.clone()));
+        call!("setDownloads", QString::from(folder.clone()));
         record!("save", call!("click", QString::from("saveItem")));
         record!("saved-notice", get!("noticeLabel", "text"));
         record!(
@@ -460,12 +459,10 @@ fn a_chats_media_has_pages_of_its_own_behind_the_tiles() {
     let navigation = stack_box.pinned().borrow().log.to_string();
     assert_pages(&steps, &navigation, &common::calls(&journal));
     assert_eq!(
-        std::fs::read(documents.join("Piiri").join("notes.pdf"))
-            .ok()
-            .as_deref(),
+        std::fs::read(downloads.join("notes.pdf")).ok().as_deref(),
         Some(&b"%PDF-1.4 notes"[..]),
         "Save to device did not put a copy of the file, under the name the \
-         sender gave it, in the app's folder under Documents"
+         sender gave it, in Downloads"
     );
     let _ = std::fs::remove_dir_all(&temp);
 }
@@ -608,7 +605,7 @@ fn assert_pages(steps: &[(&str, String)], navigation: &str, calls: &[(String, Va
     );
 
     // The files list: the document, its size, its icon, who sent it, and
-    // a copy in the folder the reader saves files to.
+    // a copy in Downloads.
     for (label, expected, complaint) in [
         (
             "files-count",
@@ -619,7 +616,7 @@ fn assert_pages(steps: &[(&str, String)], navigation: &str, calls: &[(String, Va
         ("file-size", "20.5 kB", "the file's size is not said"),
         (
             "saved-notice",
-            "Saved to Documents/Piiri",
+            "Saved to Downloads",
             "saving did not say where the copy went",
         ),
     ] {

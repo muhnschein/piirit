@@ -3,9 +3,9 @@
 //! Everything a chat receives lives in the core's blob directory, which is
 //! the app's own and goes with it, and where the core names a file by its
 //! content rather than by what the sender called it. Saving is one copy
-//! into a folder the reader looks in -- Pictures, Videos, or the one they
-//! chose for files -- under the name the sender gave the file, or that
-//! name and a number when it is taken.
+//! into a folder the reader looks in -- Pictures, Videos, or Downloads for
+//! anything else -- under the name the sender gave the file, or that name
+//! and a number when it is taken.
 
 use qmetaobject::*;
 
@@ -183,7 +183,7 @@ mod tests {
         std::fs::create_dir_all(&temp).expect("temp dir");
         let blob = temp.join("5d41402abc4b2a76b9719d911017c592.pdf");
         std::fs::write(&blob, b"%PDF").expect("write blob");
-        let files = temp.join("Documents").join("Piiri");
+        let files = temp.join("Downloads");
         let files_str = files.to_string_lossy().into_owned();
 
         let named = copy_into(&blob.to_string_lossy(), &files_str, "minutes.pdf").expect("copy");

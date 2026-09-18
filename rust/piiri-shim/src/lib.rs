@@ -24,7 +24,6 @@ mod chatlist;
 mod connectivity;
 mod contacts;
 mod core;
-mod folders;
 mod full_text;
 mod html;
 mod json;
@@ -54,7 +53,6 @@ pub use crate::contacts::ContactList;
 pub use crate::core::{
     server_path, server_pid, shutdown, DeltaChatCore, BUNDLED_SERVER, HANDLED_EVENT_KINDS,
 };
-pub use crate::folders::FolderList;
 pub use crate::full_text::FullText;
 pub use crate::prefetch::ChatPrefetch;
 pub use crate::profile::Profile;
@@ -106,10 +104,7 @@ pub fn register_qml_types() {
     ) else {
         return;
     };
-    let (Ok(backup), Ok(folders)) = (
-        std::ffi::CStr::from_bytes_with_nul(b"Backup\0"),
-        std::ffi::CStr::from_bytes_with_nul(b"FolderList\0"),
-    ) else {
+    let Ok(backup) = std::ffi::CStr::from_bytes_with_nul(b"Backup\0") else {
         return;
     };
     qmetaobject::qml_register_type::<ChatMessages>(uri, 1, 0, messages);
@@ -128,7 +123,6 @@ pub fn register_qml_types() {
     qmetaobject::qml_register_type::<VoiceRecorder>(uri, 1, 0, recorder);
     qmetaobject::qml_register_type::<WebxdcApp>(uri, 1, 0, webxdc);
     qmetaobject::qml_register_type::<WebxdcStore>(uri, 1, 0, store);
-    qmetaobject::qml_register_type::<FolderList>(uri, 1, 0, folders);
     qmetaobject::qml_register_type::<Backup>(uri, 1, 0, backup);
 }
 pub use models::{

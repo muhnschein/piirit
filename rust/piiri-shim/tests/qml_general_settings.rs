@@ -100,34 +100,6 @@ fn probe_qml() -> String {
         }}
         function appWrites(name, value) {{ Settings[name] = value; return 'ok' }}
         function appKey(name) {{ return '' + Settings[name].key }}
-        // Silica's page stack, as far as this page uses it: push records
-        // what was pushed and hands back a dialog for the page to connect
-        // to, the way Silica hands back the page it made. The folder
-        // picker is that dialog, reduced to what the page reads of it.
-        QtObject {{
-            id: stack
-            property string pushed: ''
-            property QtObject dialog: QtObject {{
-                property string chosen: ''
-                signal accepted()
-                signal rejected()
-                function accept() {{ accepted() }}
-            }}
-            function push(url, props) {{
-                var name = ('' + url).split('/').pop()
-                pushed = name + ':folder=' + props.folder
-                return dialog
-            }}
-        }}
-        function stackObject() {{ return stack }}
-        function pushed() {{ return stack.pushed }}
-        // The reader swiped forward on `folder`, or back with nothing.
-        function acceptFolder(folder) {{
-            stack.dialog.chosen = folder
-            stack.dialog.accept()
-            return 'ok'
-        }}
-        function rejectFolder() {{ stack.dialog.rejected(); return 'ok' }}
     }}
 ",
         components.display()
@@ -151,9 +123,6 @@ fn the_settings_page_writes_what_the_app_reads() {
     ));
     engine.set_object_property("core".into(), core_box.pinned());
     engine.load_data(QByteArray::from(probe_qml()));
-    // Named for the page before it is loaded, as Silica names its own.
-    let stack = engine.invoke_method("stackObject".into(), &[]);
-    engine.set_property("pageStack".into(), stack);
 
     let engine_ptr = std::ptr::addr_of_mut!(engine);
     let mut steps: Vec<(&str, String)> = Vec::new();
@@ -218,10 +187,6 @@ fn the_settings_page_writes_what_the_app_reads() {
         record!(
             "app-apps-key",
             call!("appKey", QString::from("webxdcEnabledConfig"))
-        );
-        record!(
-            "app-folder-key",
-            call!("appKey", QString::from("saveFolderConfig"))
         );
         record!(
             "app-notifications-key",
@@ -467,41 +432,6 @@ fn the_settings_page_writes_what_the_app_reads() {
             call!("appReads", QString::from("notificationsEnabled"))
         );
         record!("detail-usable-again", get!("notificationCombo", "enabled"));
-
-        // Where a saved file goes: the app's own folder under Documents
-        // until the reader chooses another, in a dialog of its own that
-        // writes the setting on a swipe forward and nothing on a swipe
-        // back.
-        record!(
-            "folder-default",
-            call!("appReads", QString::from("saveFolder"))
-        );
-        record!("folder-label", get!("folderButton", "label"));
-        record!("folder-value", get!("folderButton", "value"));
-        record!("folder-note", get!("folderButton", "description"));
-        record!("open-picker", call!("click", QString::from("folderButton")));
-        record!("picker-pushed", call!("pushed"));
-        record!("back-out", call!("rejectFolder"));
-        record!(
-            "folder-unchanged",
-            call!("appReads", QString::from("saveFolder"))
-        );
-        record!(
-            "open-picker-again",
-            call!("click", QString::from("folderButton"))
-        );
-        record!(
-            "choose",
-            call!(
-                "acceptFolder",
-                QString::from("/tmp/piiri-stub-standardpaths/Downloads/chat")
-            )
-        );
-        record!(
-            "folder-written",
-            call!("appReads", QString::from("saveFolder"))
-        );
-        record!("folder-value-written", get!("folderButton", "value"));
     });
     // The core's refusal arrives a turn later.
     single_shot(Duration::from_secs(2), move || unsafe {
@@ -585,7 +515,6 @@ fn the_settings_page_writes_what_the_app_reads() {
             "/apps/harbour-piiri/mention_notifications",
         ),
         ("app-apps-key", "/apps/harbour-piiri/webxdc_enabled"),
-        ("app-folder-key", "/apps/harbour-piiri/save_folder"),
         (
             "app-notifications-key",
             "/apps/harbour-piiri/notifications_enabled",
@@ -603,32 +532,6 @@ fn the_settings_page_writes_what_the_app_reads() {
         ("flip-notifications-back", "ok"),
         ("notifications-on", "true"),
         ("detail-usable-again", "true"),
-        (
-            "folder-default",
-            "/tmp/piiri-stub-standardpaths/Documents/Piiri",
-        ),
-        ("folder-label", "Save files to"),
-        ("folder-value", "Documents/Piiri"),
-        (
-            "folder-note",
-            "Pictures and videos always go to the gallery.",
-        ),
-        ("open-picker", "ok"),
-        (
-            "picker-pushed",
-            "FolderPickerDialog.qml:folder=/tmp/piiri-stub-standardpaths/Documents/Piiri",
-        ),
-        ("back-out", "ok"),
-        (
-            "folder-unchanged",
-            "/tmp/piiri-stub-standardpaths/Documents/Piiri",
-        ),
-        ("choose", "ok"),
-        (
-            "folder-written",
-            "/tmp/piiri-stub-standardpaths/Downloads/chat",
-        ),
-        ("folder-value-written", "Downloads/chat"),
     ] {
         assert_eq!(value(label), expected, "{label} is wrong. {context}");
     }
