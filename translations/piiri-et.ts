@@ -389,9 +389,8 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
         <translation>Kustuta</translation>
     </message>
     <message>
-        <source>Saved to %1</source>
-        <extracomment>%1 is a folder, such as &quot;Documents/Piiri&quot;.</extracomment>
-        <translation>Salvestatud: %1</translation>
+        <source>Saved to Downloads</source>
+        <translation>Salvestatud allalaadimistesse</translation>
     </message>
 </context>
 <context>
@@ -543,9 +542,8 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
         <translation>Liiga suur, et saata: %1. See relee võtab vastu %2.</translation>
     </message>
     <message>
-        <source>Saved to %1</source>
-        <extracomment>%1 is a folder, such as &quot;Documents/Piiri&quot;.</extracomment>
-        <translation>Salvestatud: %1</translation>
+        <source>Saved to Downloads</source>
+        <translation>Salvestatud allalaadimistesse</translation>
     </message>
 </context>
 <context>
@@ -555,8 +553,9 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
         <translation>Sõnumeid pole</translation>
     </message>
     <message>
-        <source>Messages</source>
-        <translation>Sõnumid</translation>
+        <source>%1 new</source>
+        <extracomment>On the cover, in a pill among the avatars: how many messages are unread. %1 is the number, or &quot;99+&quot;.</extracomment>
+        <translation>%1 uut</translation>
     </message>
 </context>
 <context>
@@ -680,24 +679,6 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
     <message>
         <source>A backup file copied onto this phone.</source>
         <translation>Varukoopia fail, kopeeritud sellesse telefoni.</translation>
-    </message>
-</context>
-<context>
-    <name>FolderPickerDialog</name>
-    <message>
-        <source>Default folder</source>
-        <extracomment>Puts the folder back to the one a fresh install saves to.</extracomment>
-        <translation>Vaikimisi kaust</translation>
-    </message>
-    <message>
-        <source>Choose a folder</source>
-        <extracomment>Above the list of folders to choose from.</extracomment>
-        <translation>Vali kaust</translation>
-    </message>
-    <message>
-        <source>No folders here</source>
-        <extracomment>Under a folder with no folders in it: it can still be chosen.</extracomment>
-        <translation>Siin pole kaustu</translation>
     </message>
 </context>
 <context>
@@ -1533,17 +1514,8 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
         <translation>Pilte vähendatakse enne saatmist ja kaamera salvestab selle kvaliteediga.</translation>
     </message>
     <message>
-        <source>Save files to</source>
-        <extracomment>Where a copy of a file from a chat is put.</extracomment>
-        <translation>Salvesta failid kausta</translation>
-    </message>
-    <message>
         <source>Show notifications</source>
         <translation>Näita teavitusi</translation>
-    </message>
-    <message>
-        <source>Pictures and videos always go to the gallery.</source>
-        <translation>Pildid ja videod lähevad alati galeriisse.</translation>
     </message>
 </context>
 <context>

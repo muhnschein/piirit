@@ -389,9 +389,8 @@ In anderen Gruppen mit blockierten Kontakten werden deren Nachrichten weiterhin 
         <translation>Löschen</translation>
     </message>
     <message>
-        <source>Saved to %1</source>
-        <extracomment>%1 is a folder, such as &quot;Documents/Piiri&quot;.</extracomment>
-        <translation>Gespeichert unter %1</translation>
+        <source>Saved to Downloads</source>
+        <translation>In Downloads gespeichert</translation>
     </message>
 </context>
 <context>
@@ -543,9 +542,8 @@ In anderen Gruppen mit blockierten Kontakten werden deren Nachrichten weiterhin 
         <translation>Zu groß zum Senden: %1. Dieses Relay nimmt %2.</translation>
     </message>
     <message>
-        <source>Saved to %1</source>
-        <extracomment>%1 is a folder, such as &quot;Documents/Piiri&quot;.</extracomment>
-        <translation>Gespeichert unter %1</translation>
+        <source>Saved to Downloads</source>
+        <translation>In Downloads gespeichert</translation>
     </message>
 </context>
 <context>
@@ -555,8 +553,9 @@ In anderen Gruppen mit blockierten Kontakten werden deren Nachrichten weiterhin 
         <translation>Keine Nachrichten</translation>
     </message>
     <message>
-        <source>Messages</source>
-        <translation>Nachrichten</translation>
+        <source>%1 new</source>
+        <extracomment>On the cover, in a pill among the avatars: how many messages are unread. %1 is the number, or &quot;99+&quot;.</extracomment>
+        <translation>%1 neu</translation>
     </message>
 </context>
 <context>
@@ -680,24 +679,6 @@ In anderen Gruppen mit blockierten Kontakten werden deren Nachrichten weiterhin 
     <message>
         <source>A backup file copied onto this phone.</source>
         <translation>Eine Backup-Datei, auf dieses Telefon kopiert.</translation>
-    </message>
-</context>
-<context>
-    <name>FolderPickerDialog</name>
-    <message>
-        <source>Default folder</source>
-        <extracomment>Puts the folder back to the one a fresh install saves to.</extracomment>
-        <translation>Standardordner</translation>
-    </message>
-    <message>
-        <source>Choose a folder</source>
-        <extracomment>Above the list of folders to choose from.</extracomment>
-        <translation>Ordner wählen</translation>
-    </message>
-    <message>
-        <source>No folders here</source>
-        <extracomment>Under a folder with no folders in it: it can still be chosen.</extracomment>
-        <translation>Keine Ordner hier</translation>
     </message>
 </context>
 <context>
@@ -1533,17 +1514,8 @@ In anderen Gruppen mit blockierten Kontakten werden deren Nachrichten weiterhin 
         <translation>Bilder werden vor dem Senden verkleinert, und die Kamera nimmt in dieser Qualität auf.</translation>
     </message>
     <message>
-        <source>Save files to</source>
-        <extracomment>Where a copy of a file from a chat is put.</extracomment>
-        <translation>Dateien speichern unter</translation>
-    </message>
-    <message>
         <source>Show notifications</source>
         <translation>Benachrichtigungen anzeigen</translation>
-    </message>
-    <message>
-        <source>Pictures and videos always go to the gallery.</source>
-        <translation>Bilder und Videos gehen immer in die Galerie.</translation>
     </message>
 </context>
 <context>

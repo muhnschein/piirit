@@ -389,9 +389,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>ಅಳಿಸಿ</translation>
     </message>
     <message>
-        <source>Saved to %1</source>
-        <extracomment>%1 is a folder, such as &quot;Documents/Piiri&quot;.</extracomment>
-        <translation>%1 ನಲ್ಲಿ ಉಳಿಸಲಾಗಿದೆ</translation>
+        <source>Saved to Downloads</source>
+        <translation>ಡೌನ್‌ಲೋಡ್‌ಗಳಲ್ಲಿ ಉಳಿಸಲಾಗಿದೆ</translation>
     </message>
 </context>
 <context>
@@ -543,9 +542,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>ಕಳುಹಿಸಲು ತುಂಬಾ ದೊಡ್ಡದು: %1. ಈ ರಿಲೇ %2 ವರೆಗೆ ಸ್ವೀಕರಿಸುತ್ತದೆ.</translation>
     </message>
     <message>
-        <source>Saved to %1</source>
-        <extracomment>%1 is a folder, such as &quot;Documents/Piiri&quot;.</extracomment>
-        <translation>%1 ನಲ್ಲಿ ಉಳಿಸಲಾಗಿದೆ</translation>
+        <source>Saved to Downloads</source>
+        <translation>ಡೌನ್‌ಲೋಡ್‌ಗಳಲ್ಲಿ ಉಳಿಸಲಾಗಿದೆ</translation>
     </message>
 </context>
 <context>
@@ -555,8 +553,9 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>ಸಂದೇಶಗಳಿಲ್ಲ</translation>
     </message>
     <message>
-        <source>Messages</source>
-        <translation>ಸಂದೇಶಗಳು</translation>
+        <source>%1 new</source>
+        <extracomment>On the cover, in a pill among the avatars: how many messages are unread. %1 is the number, or &quot;99+&quot;.</extracomment>
+        <translation>%1 ಹೊಸ</translation>
     </message>
 </context>
 <context>
@@ -680,24 +679,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>A backup file copied onto this phone.</source>
         <translation>ಈ ಫೋನ್‌ಗೆ ನಕಲಿಸಿದ ಬ್ಯಾಕಪ್ ಫೈಲ್.</translation>
-    </message>
-</context>
-<context>
-    <name>FolderPickerDialog</name>
-    <message>
-        <source>Default folder</source>
-        <extracomment>Puts the folder back to the one a fresh install saves to.</extracomment>
-        <translation>ಡೀಫಾಲ್ಟ್ ಫೋಲ್ಡರ್</translation>
-    </message>
-    <message>
-        <source>Choose a folder</source>
-        <extracomment>Above the list of folders to choose from.</extracomment>
-        <translation>ಫೋಲ್ಡರ್ ಆಯ್ಕೆಮಾಡಿ</translation>
-    </message>
-    <message>
-        <source>No folders here</source>
-        <extracomment>Under a folder with no folders in it: it can still be chosen.</extracomment>
-        <translation>ಇಲ್ಲಿ ಫೋಲ್ಡರ್‌ಗಳಿಲ್ಲ</translation>
     </message>
 </context>
 <context>
@@ -1533,17 +1514,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>ಚಿತ್ರಗಳನ್ನು ಕಳುಹಿಸುವ ಮೊದಲು ಚಿಕ್ಕದಾಗಿಸಲಾಗುತ್ತದೆ, ಮತ್ತು ಕ್ಯಾಮೆರಾ ಇದೇ ಗುಣಮಟ್ಟದಲ್ಲಿ ರೆಕಾರ್ಡ್ ಮಾಡುತ್ತದೆ.</translation>
     </message>
     <message>
-        <source>Save files to</source>
-        <extracomment>Where a copy of a file from a chat is put.</extracomment>
-        <translation>ಫೈಲ್‌ಗಳನ್ನು ಇಲ್ಲಿ ಉಳಿಸಿ</translation>
-    </message>
-    <message>
         <source>Show notifications</source>
         <translation>ಅಧಿಸೂಚನೆಗಳನ್ನು ತೋರಿಸಿ</translation>
-    </message>
-    <message>
-        <source>Pictures and videos always go to the gallery.</source>
-        <translation>ಚಿತ್ರಗಳು ಮತ್ತು ವೀಡಿಯೊಗಳು ಯಾವಾಗಲೂ ಗ್ಯಾಲರಿಗೆ ಹೋಗುತ್ತವೆ.</translation>
     </message>
 </context>
 <context>

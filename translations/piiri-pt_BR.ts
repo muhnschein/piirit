@@ -385,9 +385,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Excluir</translation>
     </message>
     <message>
-        <source>Saved to %1</source>
-        <extracomment>%1 is a folder, such as &quot;Documents/Piiri&quot;.</extracomment>
-        <translation>Salvo em %1</translation>
+        <source>Saved to Downloads</source>
+        <translation>Salvo em Downloads</translation>
     </message>
 </context>
 <context>
@@ -539,9 +538,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Grande demais para enviar: %1. Este relay aceita %2.</translation>
     </message>
     <message>
-        <source>Saved to %1</source>
-        <extracomment>%1 is a folder, such as &quot;Documents/Piiri&quot;.</extracomment>
-        <translation>Salvo em %1</translation>
+        <source>Saved to Downloads</source>
+        <translation>Salvo em Downloads</translation>
     </message>
 </context>
 <context>
@@ -551,8 +549,9 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Sem mensagens</translation>
     </message>
     <message>
-        <source>Messages</source>
-        <translation>Mensagens</translation>
+        <source>%1 new</source>
+        <extracomment>On the cover, in a pill among the avatars: how many messages are unread. %1 is the number, or &quot;99+&quot;.</extracomment>
+        <translation>%1 novas</translation>
     </message>
 </context>
 <context>
@@ -676,24 +675,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>A backup file copied onto this phone.</source>
         <translation>Um arquivo de backup copiado para este celular.</translation>
-    </message>
-</context>
-<context>
-    <name>FolderPickerDialog</name>
-    <message>
-        <source>Default folder</source>
-        <extracomment>Puts the folder back to the one a fresh install saves to.</extracomment>
-        <translation>Pasta padrão</translation>
-    </message>
-    <message>
-        <source>Choose a folder</source>
-        <extracomment>Above the list of folders to choose from.</extracomment>
-        <translation>Escolha uma pasta</translation>
-    </message>
-    <message>
-        <source>No folders here</source>
-        <extracomment>Under a folder with no folders in it: it can still be chosen.</extracomment>
-        <translation>Nenhuma pasta aqui</translation>
     </message>
 </context>
 <context>
@@ -1529,17 +1510,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>As imagens são reduzidas antes do envio e a câmera grava nessa qualidade.</translation>
     </message>
     <message>
-        <source>Save files to</source>
-        <extracomment>Where a copy of a file from a chat is put.</extracomment>
-        <translation>Salvar arquivos em</translation>
-    </message>
-    <message>
         <source>Show notifications</source>
         <translation>Mostrar notificações</translation>
-    </message>
-    <message>
-        <source>Pictures and videos always go to the gallery.</source>
-        <translation>Imagens e vídeos sempre vão para a galeria.</translation>
     </message>
 </context>
 <context>

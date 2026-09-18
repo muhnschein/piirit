@@ -385,9 +385,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Изтриване</translation>
     </message>
     <message>
-        <source>Saved to %1</source>
-        <extracomment>%1 is a folder, such as &quot;Documents/Piiri&quot;.</extracomment>
-        <translation>Запазено в %1</translation>
+        <source>Saved to Downloads</source>
+        <translation>Запазено в „Изтегляния“</translation>
     </message>
 </context>
 <context>
@@ -539,9 +538,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Твърде голям за изпращане: %1. Това реле приема %2.</translation>
     </message>
     <message>
-        <source>Saved to %1</source>
-        <extracomment>%1 is a folder, such as &quot;Documents/Piiri&quot;.</extracomment>
-        <translation>Запазено в %1</translation>
+        <source>Saved to Downloads</source>
+        <translation>Запазено в „Изтегляния“</translation>
     </message>
 </context>
 <context>
@@ -551,8 +549,9 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Няма съобщения</translation>
     </message>
     <message>
-        <source>Messages</source>
-        <translation>Съобщения</translation>
+        <source>%1 new</source>
+        <extracomment>On the cover, in a pill among the avatars: how many messages are unread. %1 is the number, or &quot;99+&quot;.</extracomment>
+        <translation>%1 нови</translation>
     </message>
 </context>
 <context>
@@ -676,24 +675,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>A backup file copied onto this phone.</source>
         <translation>Файл с резервно копие, копиран на този телефон.</translation>
-    </message>
-</context>
-<context>
-    <name>FolderPickerDialog</name>
-    <message>
-        <source>Default folder</source>
-        <extracomment>Puts the folder back to the one a fresh install saves to.</extracomment>
-        <translation>Папка по подразбиране</translation>
-    </message>
-    <message>
-        <source>Choose a folder</source>
-        <extracomment>Above the list of folders to choose from.</extracomment>
-        <translation>Изберете папка</translation>
-    </message>
-    <message>
-        <source>No folders here</source>
-        <extracomment>Under a folder with no folders in it: it can still be chosen.</extracomment>
-        <translation>Тук няма папки</translation>
     </message>
 </context>
 <context>
@@ -1529,17 +1510,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Снимките се смаляват преди изпращане, а камерата записва с това качество.</translation>
     </message>
     <message>
-        <source>Save files to</source>
-        <extracomment>Where a copy of a file from a chat is put.</extracomment>
-        <translation>Записване на файлове в</translation>
-    </message>
-    <message>
         <source>Show notifications</source>
         <translation>Показване на известия</translation>
-    </message>
-    <message>
-        <source>Pictures and videos always go to the gallery.</source>
-        <translation>Снимките и видеата винаги отиват в галерията.</translation>
     </message>
 </context>
 <context>

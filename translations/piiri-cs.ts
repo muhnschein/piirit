@@ -390,9 +390,8 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
         <translation>Smazat</translation>
     </message>
     <message>
-        <source>Saved to %1</source>
-        <extracomment>%1 is a folder, such as &quot;Documents/Piiri&quot;.</extracomment>
-        <translation>Uloženo do %1</translation>
+        <source>Saved to Downloads</source>
+        <translation>Uloženo do Stažených</translation>
     </message>
 </context>
 <context>
@@ -545,9 +544,8 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
         <translation>Příliš velké k odeslání: %1. Tento relay přijímá %2.</translation>
     </message>
     <message>
-        <source>Saved to %1</source>
-        <extracomment>%1 is a folder, such as &quot;Documents/Piiri&quot;.</extracomment>
-        <translation>Uloženo do %1</translation>
+        <source>Saved to Downloads</source>
+        <translation>Uloženo do Stažených</translation>
     </message>
 </context>
 <context>
@@ -557,8 +555,9 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
         <translation>Žádné zprávy</translation>
     </message>
     <message>
-        <source>Messages</source>
-        <translation>Zprávy</translation>
+        <source>%1 new</source>
+        <extracomment>On the cover, in a pill among the avatars: how many messages are unread. %1 is the number, or &quot;99+&quot;.</extracomment>
+        <translation>%1 nových</translation>
     </message>
 </context>
 <context>
@@ -682,24 +681,6 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
     <message>
         <source>A backup file copied onto this phone.</source>
         <translation>Soubor zálohy zkopírovaný do tohoto telefonu.</translation>
-    </message>
-</context>
-<context>
-    <name>FolderPickerDialog</name>
-    <message>
-        <source>Default folder</source>
-        <extracomment>Puts the folder back to the one a fresh install saves to.</extracomment>
-        <translation>Výchozí složka</translation>
-    </message>
-    <message>
-        <source>Choose a folder</source>
-        <extracomment>Above the list of folders to choose from.</extracomment>
-        <translation>Vyberte složku</translation>
-    </message>
-    <message>
-        <source>No folders here</source>
-        <extracomment>Under a folder with no folders in it: it can still be chosen.</extracomment>
-        <translation>Žádné složky</translation>
     </message>
 </context>
 <context>
@@ -1539,17 +1520,8 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
         <translation>Obrázky se před odesláním zmenší a kamera nahrává v této kvalitě.</translation>
     </message>
     <message>
-        <source>Save files to</source>
-        <extracomment>Where a copy of a file from a chat is put.</extracomment>
-        <translation>Ukládat soubory do</translation>
-    </message>
-    <message>
         <source>Show notifications</source>
         <translation>Zobrazovat oznámení</translation>
-    </message>
-    <message>
-        <source>Pictures and videos always go to the gallery.</source>
-        <translation>Obrázky a videa jdou vždy do galerie.</translation>
     </message>
 </context>
 <context>

@@ -390,9 +390,8 @@ Wiadomości innych grup z zablokowanymi kontaktami nadal będą wyświetlane.</t
         <translation>Usuń</translation>
     </message>
     <message>
-        <source>Saved to %1</source>
-        <extracomment>%1 is a folder, such as &quot;Documents/Piiri&quot;.</extracomment>
-        <translation>Zapisano w %1</translation>
+        <source>Saved to Downloads</source>
+        <translation>Zapisano w Pobranych</translation>
     </message>
 </context>
 <context>
@@ -545,9 +544,8 @@ Wiadomości innych grup z zablokowanymi kontaktami nadal będą wyświetlane.</t
         <translation>Za duży, aby wysłać: %1. Ten przekaźnik przyjmuje %2.</translation>
     </message>
     <message>
-        <source>Saved to %1</source>
-        <extracomment>%1 is a folder, such as &quot;Documents/Piiri&quot;.</extracomment>
-        <translation>Zapisano w %1</translation>
+        <source>Saved to Downloads</source>
+        <translation>Zapisano w Pobranych</translation>
     </message>
 </context>
 <context>
@@ -557,8 +555,9 @@ Wiadomości innych grup z zablokowanymi kontaktami nadal będą wyświetlane.</t
         <translation>Brak wiadomości</translation>
     </message>
     <message>
-        <source>Messages</source>
-        <translation>Wiadomości</translation>
+        <source>%1 new</source>
+        <extracomment>On the cover, in a pill among the avatars: how many messages are unread. %1 is the number, or &quot;99+&quot;.</extracomment>
+        <translation>%1 nowych</translation>
     </message>
 </context>
 <context>
@@ -682,24 +681,6 @@ Wiadomości innych grup z zablokowanymi kontaktami nadal będą wyświetlane.</t
     <message>
         <source>A backup file copied onto this phone.</source>
         <translation>Plik kopii zapasowej skopiowany na ten telefon.</translation>
-    </message>
-</context>
-<context>
-    <name>FolderPickerDialog</name>
-    <message>
-        <source>Default folder</source>
-        <extracomment>Puts the folder back to the one a fresh install saves to.</extracomment>
-        <translation>Folder domyślny</translation>
-    </message>
-    <message>
-        <source>Choose a folder</source>
-        <extracomment>Above the list of folders to choose from.</extracomment>
-        <translation>Wybierz folder</translation>
-    </message>
-    <message>
-        <source>No folders here</source>
-        <extracomment>Under a folder with no folders in it: it can still be chosen.</extracomment>
-        <translation>Brak folderów</translation>
     </message>
 </context>
 <context>
@@ -1539,17 +1520,8 @@ Wiadomości innych grup z zablokowanymi kontaktami nadal będą wyświetlane.</t
         <translation>Zdjęcia są zmniejszane przed wysłaniem, a kamera nagrywa w tej jakości.</translation>
     </message>
     <message>
-        <source>Save files to</source>
-        <extracomment>Where a copy of a file from a chat is put.</extracomment>
-        <translation>Zapisuj pliki w</translation>
-    </message>
-    <message>
         <source>Show notifications</source>
         <translation>Pokazuj powiadomienia</translation>
-    </message>
-    <message>
-        <source>Pictures and videos always go to the gallery.</source>
-        <translation>Obrazy i filmy zawsze trafiają do galerii.</translation>
     </message>
 </context>
 <context>

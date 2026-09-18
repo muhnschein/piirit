@@ -385,9 +385,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Verwijderen</translation>
     </message>
     <message>
-        <source>Saved to %1</source>
-        <extracomment>%1 is a folder, such as &quot;Documents/Piiri&quot;.</extracomment>
-        <translation>Opgeslagen in %1</translation>
+        <source>Saved to Downloads</source>
+        <translation>Opgeslagen in Downloads</translation>
     </message>
 </context>
 <context>
@@ -539,9 +538,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Te groot om te versturen: %1. Deze relay neemt %2.</translation>
     </message>
     <message>
-        <source>Saved to %1</source>
-        <extracomment>%1 is a folder, such as &quot;Documents/Piiri&quot;.</extracomment>
-        <translation>Opgeslagen in %1</translation>
+        <source>Saved to Downloads</source>
+        <translation>Opgeslagen in Downloads</translation>
     </message>
 </context>
 <context>
@@ -551,8 +549,9 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Geen berichten</translation>
     </message>
     <message>
-        <source>Messages</source>
-        <translation>Berichten</translation>
+        <source>%1 new</source>
+        <extracomment>On the cover, in a pill among the avatars: how many messages are unread. %1 is the number, or &quot;99+&quot;.</extracomment>
+        <translation>%1 nieuw</translation>
     </message>
 </context>
 <context>
@@ -676,24 +675,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>A backup file copied onto this phone.</source>
         <translation>Een back-upbestand, naar deze telefoon gekopieerd.</translation>
-    </message>
-</context>
-<context>
-    <name>FolderPickerDialog</name>
-    <message>
-        <source>Default folder</source>
-        <extracomment>Puts the folder back to the one a fresh install saves to.</extracomment>
-        <translation>Standaardmap</translation>
-    </message>
-    <message>
-        <source>Choose a folder</source>
-        <extracomment>Above the list of folders to choose from.</extracomment>
-        <translation>Kies een map</translation>
-    </message>
-    <message>
-        <source>No folders here</source>
-        <extracomment>Under a folder with no folders in it: it can still be chosen.</extracomment>
-        <translation>Geen mappen hier</translation>
     </message>
 </context>
 <context>
@@ -1529,17 +1510,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Foto’s worden voor het versturen verkleind, en de camera neemt op in deze kwaliteit.</translation>
     </message>
     <message>
-        <source>Save files to</source>
-        <extracomment>Where a copy of a file from a chat is put.</extracomment>
-        <translation>Bestanden opslaan in</translation>
-    </message>
-    <message>
         <source>Show notifications</source>
         <translation>Meldingen tonen</translation>
-    </message>
-    <message>
-        <source>Pictures and videos always go to the gallery.</source>
-        <translation>Afbeeldingen en video’s gaan altijd naar de galerij.</translation>
     </message>
 </context>
 <context>

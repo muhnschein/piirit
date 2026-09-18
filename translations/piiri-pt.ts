@@ -389,9 +389,8 @@ Mensagens de contactos bloqueados não serão ocultadas noutros grupos.</transla
         <translation>Eliminar</translation>
     </message>
     <message>
-        <source>Saved to %1</source>
-        <extracomment>%1 is a folder, such as &quot;Documents/Piiri&quot;.</extracomment>
-        <translation>Guardado em %1</translation>
+        <source>Saved to Downloads</source>
+        <translation>Guardado em Transferências</translation>
     </message>
 </context>
 <context>
@@ -543,9 +542,8 @@ Mensagens de contactos bloqueados não serão ocultadas noutros grupos.</transla
         <translation>Demasiado grande para enviar: %1. Este relé aceita %2.</translation>
     </message>
     <message>
-        <source>Saved to %1</source>
-        <extracomment>%1 is a folder, such as &quot;Documents/Piiri&quot;.</extracomment>
-        <translation>Guardado em %1</translation>
+        <source>Saved to Downloads</source>
+        <translation>Guardado em Transferências</translation>
     </message>
 </context>
 <context>
@@ -555,8 +553,9 @@ Mensagens de contactos bloqueados não serão ocultadas noutros grupos.</transla
         <translation>Sem mensagens</translation>
     </message>
     <message>
-        <source>Messages</source>
-        <translation>Mensagens</translation>
+        <source>%1 new</source>
+        <extracomment>On the cover, in a pill among the avatars: how many messages are unread. %1 is the number, or &quot;99+&quot;.</extracomment>
+        <translation>%1 novas</translation>
     </message>
 </context>
 <context>
@@ -680,24 +679,6 @@ Mensagens de contactos bloqueados não serão ocultadas noutros grupos.</transla
     <message>
         <source>A backup file copied onto this phone.</source>
         <translation>Um ficheiro de cópia copiado para este telefone.</translation>
-    </message>
-</context>
-<context>
-    <name>FolderPickerDialog</name>
-    <message>
-        <source>Default folder</source>
-        <extracomment>Puts the folder back to the one a fresh install saves to.</extracomment>
-        <translation>Pasta predefinida</translation>
-    </message>
-    <message>
-        <source>Choose a folder</source>
-        <extracomment>Above the list of folders to choose from.</extracomment>
-        <translation>Escolha uma pasta</translation>
-    </message>
-    <message>
-        <source>No folders here</source>
-        <extracomment>Under a folder with no folders in it: it can still be chosen.</extracomment>
-        <translation>Sem pastas aqui</translation>
     </message>
 </context>
 <context>
@@ -1533,17 +1514,8 @@ Mensagens de contactos bloqueados não serão ocultadas noutros grupos.</transla
         <translation>As imagens são reduzidas antes do envio e a câmara grava com esta qualidade.</translation>
     </message>
     <message>
-        <source>Save files to</source>
-        <extracomment>Where a copy of a file from a chat is put.</extracomment>
-        <translation>Guardar ficheiros em</translation>
-    </message>
-    <message>
         <source>Show notifications</source>
         <translation>Mostrar notificações</translation>
-    </message>
-    <message>
-        <source>Pictures and videos always go to the gallery.</source>
-        <translation>As imagens e os vídeos vão sempre para a galeria.</translation>
     </message>
 </context>
 <context>

@@ -385,9 +385,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>நீக்கு</translation>
     </message>
     <message>
-        <source>Saved to %1</source>
-        <extracomment>%1 is a folder, such as &quot;Documents/Piiri&quot;.</extracomment>
-        <translation>%1 இல் சேமிக்கப்பட்டது</translation>
+        <source>Saved to Downloads</source>
+        <translation>பதிவிறக்கங்களில் சேமிக்கப்பட்டது</translation>
     </message>
 </context>
 <context>
@@ -539,9 +538,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>அனுப்ப மிகப் பெரியது: %1. இந்த ரிலே %2 வரை ஏற்கும்.</translation>
     </message>
     <message>
-        <source>Saved to %1</source>
-        <extracomment>%1 is a folder, such as &quot;Documents/Piiri&quot;.</extracomment>
-        <translation>%1 இல் சேமிக்கப்பட்டது</translation>
+        <source>Saved to Downloads</source>
+        <translation>பதிவிறக்கங்களில் சேமிக்கப்பட்டது</translation>
     </message>
 </context>
 <context>
@@ -551,8 +549,9 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>செய்திகள் இல்லை</translation>
     </message>
     <message>
-        <source>Messages</source>
-        <translation>செய்திகள்</translation>
+        <source>%1 new</source>
+        <extracomment>On the cover, in a pill among the avatars: how many messages are unread. %1 is the number, or &quot;99+&quot;.</extracomment>
+        <translation>%1 புதியவை</translation>
     </message>
 </context>
 <context>
@@ -676,24 +675,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>A backup file copied onto this phone.</source>
         <translation>இந்தத் தொலைபேசிக்கு நகலெடுக்கப்பட்ட ஒரு காப்புப் பிரதிக் கோப்பு.</translation>
-    </message>
-</context>
-<context>
-    <name>FolderPickerDialog</name>
-    <message>
-        <source>Default folder</source>
-        <extracomment>Puts the folder back to the one a fresh install saves to.</extracomment>
-        <translation>இயல்புநிலை கோப்புறை</translation>
-    </message>
-    <message>
-        <source>Choose a folder</source>
-        <extracomment>Above the list of folders to choose from.</extracomment>
-        <translation>ஒரு கோப்புறையைத் தேர்வுசெய்க</translation>
-    </message>
-    <message>
-        <source>No folders here</source>
-        <extracomment>Under a folder with no folders in it: it can still be chosen.</extracomment>
-        <translation>இங்கே கோப்புறைகள் இல்லை</translation>
     </message>
 </context>
 <context>
@@ -1529,17 +1510,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>படங்கள் அனுப்பும் முன் சிறிதாக்கப்படும், கேமராவும் இதே தரத்தில் பதிவு செய்யும்.</translation>
     </message>
     <message>
-        <source>Save files to</source>
-        <extracomment>Where a copy of a file from a chat is put.</extracomment>
-        <translation>கோப்புகளை இங்கே சேமி</translation>
-    </message>
-    <message>
         <source>Show notifications</source>
         <translation>அறிவிப்புகளைக் காட்டு</translation>
-    </message>
-    <message>
-        <source>Pictures and videos always go to the gallery.</source>
-        <translation>படங்களும் வீடியோக்களும் எப்போதும் கேலரிக்குச் செல்லும்.</translation>
     </message>
 </context>
 <context>

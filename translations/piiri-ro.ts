@@ -386,9 +386,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Șterge</translation>
     </message>
     <message>
-        <source>Saved to %1</source>
-        <extracomment>%1 is a folder, such as &quot;Documents/Piiri&quot;.</extracomment>
-        <translation>Salvat în %1</translation>
+        <source>Saved to Downloads</source>
+        <translation>Salvat în Descărcări</translation>
     </message>
 </context>
 <context>
@@ -541,9 +540,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Prea mare pentru a fi trimis: %1. Acest releu acceptă %2.</translation>
     </message>
     <message>
-        <source>Saved to %1</source>
-        <extracomment>%1 is a folder, such as &quot;Documents/Piiri&quot;.</extracomment>
-        <translation>Salvat în %1</translation>
+        <source>Saved to Downloads</source>
+        <translation>Salvat în Descărcări</translation>
     </message>
 </context>
 <context>
@@ -553,8 +551,9 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Niciun mesaj</translation>
     </message>
     <message>
-        <source>Messages</source>
-        <translation>Mesaje</translation>
+        <source>%1 new</source>
+        <extracomment>On the cover, in a pill among the avatars: how many messages are unread. %1 is the number, or &quot;99+&quot;.</extracomment>
+        <translation>%1 noi</translation>
     </message>
 </context>
 <context>
@@ -678,24 +677,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>A backup file copied onto this phone.</source>
         <translation>Un fișier de copie, copiat pe acest telefon.</translation>
-    </message>
-</context>
-<context>
-    <name>FolderPickerDialog</name>
-    <message>
-        <source>Default folder</source>
-        <extracomment>Puts the folder back to the one a fresh install saves to.</extracomment>
-        <translation>Dosar implicit</translation>
-    </message>
-    <message>
-        <source>Choose a folder</source>
-        <extracomment>Above the list of folders to choose from.</extracomment>
-        <translation>Alege un dosar</translation>
-    </message>
-    <message>
-        <source>No folders here</source>
-        <extracomment>Under a folder with no folders in it: it can still be chosen.</extracomment>
-        <translation>Niciun dosar aici</translation>
     </message>
 </context>
 <context>
@@ -1535,17 +1516,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Imaginile sunt micșorate înainte de trimitere, iar camera înregistrează la această calitate.</translation>
     </message>
     <message>
-        <source>Save files to</source>
-        <extracomment>Where a copy of a file from a chat is put.</extracomment>
-        <translation>Salvează fișierele în</translation>
-    </message>
-    <message>
         <source>Show notifications</source>
         <translation>Afișează notificările</translation>
-    </message>
-    <message>
-        <source>Pictures and videos always go to the gallery.</source>
-        <translation>Imaginile și videoclipurile merg întotdeauna în galerie.</translation>
     </message>
 </context>
 <context>

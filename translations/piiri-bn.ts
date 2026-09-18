@@ -389,9 +389,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>মুছুন</translation>
     </message>
     <message>
-        <source>Saved to %1</source>
-        <extracomment>%1 is a folder, such as &quot;Documents/Piiri&quot;.</extracomment>
-        <translation>সংরক্ষিত: %1</translation>
+        <source>Saved to Downloads</source>
+        <translation>ডাউনলোডে সংরক্ষিত</translation>
     </message>
 </context>
 <context>
@@ -543,9 +542,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>পাঠানোর জন্য খুব বড়: %1। এই রিলে %2 পর্যন্ত নেয়।</translation>
     </message>
     <message>
-        <source>Saved to %1</source>
-        <extracomment>%1 is a folder, such as &quot;Documents/Piiri&quot;.</extracomment>
-        <translation>সংরক্ষিত: %1</translation>
+        <source>Saved to Downloads</source>
+        <translation>ডাউনলোডে সংরক্ষিত</translation>
     </message>
 </context>
 <context>
@@ -555,8 +553,9 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>কোনো বার্তা নেই</translation>
     </message>
     <message>
-        <source>Messages</source>
-        <translation>বার্তা</translation>
+        <source>%1 new</source>
+        <extracomment>On the cover, in a pill among the avatars: how many messages are unread. %1 is the number, or &quot;99+&quot;.</extracomment>
+        <translation>%1টি নতুন</translation>
     </message>
 </context>
 <context>
@@ -680,24 +679,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>A backup file copied onto this phone.</source>
         <translation>এই ফোনে কপি করা একটি ব্যাকআপ ফাইল।</translation>
-    </message>
-</context>
-<context>
-    <name>FolderPickerDialog</name>
-    <message>
-        <source>Default folder</source>
-        <extracomment>Puts the folder back to the one a fresh install saves to.</extracomment>
-        <translation>ডিফল্ট ফোল্ডার</translation>
-    </message>
-    <message>
-        <source>Choose a folder</source>
-        <extracomment>Above the list of folders to choose from.</extracomment>
-        <translation>একটি ফোল্ডার বেছে নিন</translation>
-    </message>
-    <message>
-        <source>No folders here</source>
-        <extracomment>Under a folder with no folders in it: it can still be chosen.</extracomment>
-        <translation>এখানে কোনো ফোল্ডার নেই</translation>
     </message>
 </context>
 <context>
@@ -1533,17 +1514,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>ছবি পাঠানোর আগে ছোট করা হয়, এবং ক্যামেরা এই মানেই রেকর্ড করে।</translation>
     </message>
     <message>
-        <source>Save files to</source>
-        <extracomment>Where a copy of a file from a chat is put.</extracomment>
-        <translation>ফাইল সংরক্ষণের স্থান</translation>
-    </message>
-    <message>
         <source>Show notifications</source>
         <translation>বিজ্ঞপ্তি দেখান</translation>
-    </message>
-    <message>
-        <source>Pictures and videos always go to the gallery.</source>
-        <translation>ছবি ও ভিডিও সবসময় গ্যালারিতে যায়।</translation>
     </message>
 </context>
 <context>

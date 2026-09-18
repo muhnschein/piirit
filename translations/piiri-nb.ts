@@ -385,9 +385,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Slett</translation>
     </message>
     <message>
-        <source>Saved to %1</source>
-        <extracomment>%1 is a folder, such as &quot;Documents/Piiri&quot;.</extracomment>
-        <translation>Lagret i %1</translation>
+        <source>Saved to Downloads</source>
+        <translation>Lagret i Nedlastinger</translation>
     </message>
 </context>
 <context>
@@ -539,9 +538,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>For stor til å sende: %1. Dette reléet tar %2.</translation>
     </message>
     <message>
-        <source>Saved to %1</source>
-        <extracomment>%1 is a folder, such as &quot;Documents/Piiri&quot;.</extracomment>
-        <translation>Lagret i %1</translation>
+        <source>Saved to Downloads</source>
+        <translation>Lagret i Nedlastinger</translation>
     </message>
 </context>
 <context>
@@ -551,8 +549,9 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Ingen meldinger</translation>
     </message>
     <message>
-        <source>Messages</source>
-        <translation>Meldinger</translation>
+        <source>%1 new</source>
+        <extracomment>On the cover, in a pill among the avatars: how many messages are unread. %1 is the number, or &quot;99+&quot;.</extracomment>
+        <translation>%1 nye</translation>
     </message>
 </context>
 <context>
@@ -676,24 +675,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>A backup file copied onto this phone.</source>
         <translation>En sikkerhetskopifil, kopiert over på denne telefonen.</translation>
-    </message>
-</context>
-<context>
-    <name>FolderPickerDialog</name>
-    <message>
-        <source>Default folder</source>
-        <extracomment>Puts the folder back to the one a fresh install saves to.</extracomment>
-        <translation>Standardmappe</translation>
-    </message>
-    <message>
-        <source>Choose a folder</source>
-        <extracomment>Above the list of folders to choose from.</extracomment>
-        <translation>Velg en mappe</translation>
-    </message>
-    <message>
-        <source>No folders here</source>
-        <extracomment>Under a folder with no folders in it: it can still be chosen.</extracomment>
-        <translation>Ingen mapper her</translation>
     </message>
 </context>
 <context>
@@ -1529,17 +1510,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Bilder gjøres mindre før de sendes, og kameraet tar opp i denne kvaliteten.</translation>
     </message>
     <message>
-        <source>Save files to</source>
-        <extracomment>Where a copy of a file from a chat is put.</extracomment>
-        <translation>Lagre filer i</translation>
-    </message>
-    <message>
         <source>Show notifications</source>
         <translation>Vis varsler</translation>
-    </message>
-    <message>
-        <source>Pictures and videos always go to the gallery.</source>
-        <translation>Bilder og videoer går alltid til galleriet.</translation>
     </message>
 </context>
 <context>

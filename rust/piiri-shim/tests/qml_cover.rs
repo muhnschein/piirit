@@ -1,10 +1,10 @@
 //! The cover, with people in it, across two profiles.
 //!
 //! Two of its three states: the staggered grid of everyone in grey while
-//! nothing is new, and whoever wrote lit up in the ambience's own
-//! highlight -- in the cells worth having -- with the count, once
-//! something is; counted and drawn across both profiles the fake core is
-//! told to have. The third state -- nobody yet -- is
+//! nothing is new, with the count's pill grey among them; and whoever
+//! wrote lit up in the ambience's own highlight -- in the cells worth
+//! having -- with the pill lit and counting, once something is; counted
+//! and drawn across both profiles the fake core is told to have. The third state -- nobody yet -- is
 //! `qml_cover_empty.rs`, since it takes a core seeded differently.
 
 // Qt harness: needs `unsafe` for `env::set_var` before Qt starts
@@ -125,6 +125,29 @@ pub const PROBE_QML: &str = r"
             return '' + least
         }
         function planned() { return '' + loader.item.cells.length }
+        // The pill against the cover: whether it is centred -- as near
+        // as a cell is, since every cell sits at the left of its slot
+        // -- two cells wide, and drawn over no face. The rows nest, so
+        // a face's edge under the pill's edge is by design; a face's
+        // centre under the pill is not.
+        function pillPlace() {
+            var pill = findIn(loader.item, 'unreadPill')
+            var size = loader.item.cellSize
+            var centred = Math.abs((pill.x + pill.width / 2) - loader.item.width / 2) <= size / 8
+            var twoWide = Math.abs(pill.width - 2 * size) < size / 4
+            var cells = allIn(loader.item, 'gridCell', [])
+            var clear = true
+            for (var i = 0; i < cells.length; i++) {
+                var cx = cells[i].x + cells[i].width / 2
+                var cy = cells[i].y + cells[i].height / 2
+                var inside = cx >= pill.x && cx <= pill.x + pill.width
+                             && cy >= pill.y && cy <= pill.y + pill.height
+                if (inside) { clear = false }
+            }
+            return (centred ? 'centred' : 'off') + ';'
+                   + (twoWide ? 'two-wide' : 'narrow') + ';'
+                   + (clear ? 'clear' : 'over-a-face')
+        }
         function people() { return '' + loader.item.people.length }
         // The lists, one per profile, in the profiles' order.
         function lists() {
@@ -200,11 +223,11 @@ fn the_cover_draws_everyone_and_lights_whoever_wrote() {
 
     single_shot(Duration::from_secs(4), move || unsafe {
         record!("lists", call!("lists"));
-        record!("brand", get!("brand", "text"));
-        record!("subtitle", get!("subtitle", "text"));
         record!("empty-hidden", get!("emptyLabel", "visible"));
         record!("count-quiet", get!("unreadTotal", "text"));
         record!("count-shown", get!("unreadTotal", "visible"));
+        record!("pill-quiet", get!("unreadPill", "highlight"));
+        record!("pill-place", call!("pillPlace"));
         record!("people", call!("people"));
         record!("planned", call!("planned"));
         record!("drawn-quiet", call!("drawn"));
@@ -218,6 +241,8 @@ fn the_cover_draws_everyone_and_lights_whoever_wrote() {
 
     single_shot(Duration::from_secs(6), move || unsafe {
         record!("count-loud", get!("unreadTotal", "text"));
+        record!("pill-loud", get!("unreadPill", "highlight"));
+        record!("pill-place-loud", call!("pillPlace"));
         record!("drawn-loud", call!("drawn"));
         record!("planned-loud", call!("planned"));
         record!("lit-loud", call!("lit"));
@@ -245,16 +270,6 @@ fn the_cover_draws_everyone_and_lights_whoever_wrote() {
         "the cover does not keep a list per profile. {context}"
     );
     assert_eq!(
-        value("brand"),
-        "Piiri",
-        "the cover does not name the app in its corner. {context}"
-    );
-    assert_eq!(
-        value("subtitle"),
-        "Messages",
-        "the line under the name is not there. {context}"
-    );
-    assert_eq!(
         value("empty-hidden"),
         "false",
         "the cover says there is nobody while there are chats. {context}"
@@ -266,9 +281,22 @@ fn the_cover_draws_everyone_and_lights_whoever_wrote() {
     );
     assert_eq!(
         value("count-quiet"),
-        "0",
-        "the count is not zero with nothing unread. {context}"
+        "0 new",
+        "the pill does not say that nothing is new. {context}"
     );
+    assert_eq!(
+        value("pill-quiet"),
+        "false",
+        "the pill is lit with nothing unread. {context}"
+    );
+    for label in ["pill-place", "pill-place-loud"] {
+        assert_eq!(
+            value(label),
+            "centred;two-wide;clear",
+            "the pill is not a centred, two-cell-wide cell of the grid's own \
+             ({label}). {context}"
+        );
+    }
     assert_eq!(
         value("people"),
         "4",
@@ -303,8 +331,13 @@ fn the_cover_draws_everyone_and_lights_whoever_wrote() {
     }
     assert_eq!(
         value("count-loud"),
-        "2",
+        "2 new",
         "the count is not every unread message across both profiles. {context}"
+    );
+    assert_eq!(
+        value("pill-loud"),
+        "true",
+        "the pill is not lit once something is new. {context}"
     );
     assert_eq!(
         value("drawn-loud"),
@@ -343,8 +376,10 @@ fn the_cover_draws_everyone_and_lights_whoever_wrote() {
                 quiet.parse::<f64>().unwrap_or(0.0),
             )
         });
+    // Not strictly: the top row's two outer cells are as good as each
+    // other, and a second lit face takes one of them.
     assert!(
-        worst_lit < best_quiet,
+        worst_lit <= best_quiet,
         "a grey face was given a better place than a lit one ({order}). \
          {context}"
     );

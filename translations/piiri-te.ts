@@ -385,9 +385,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>తొలగించు</translation>
     </message>
     <message>
-        <source>Saved to %1</source>
-        <extracomment>%1 is a folder, such as &quot;Documents/Piiri&quot;.</extracomment>
-        <translation>%1 లో భద్రపరచబడింది</translation>
+        <source>Saved to Downloads</source>
+        <translation>డౌన్‌లోడ్‌లలో భద్రపరచబడింది</translation>
     </message>
 </context>
 <context>
@@ -539,9 +538,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>పంపడానికి చాలా పెద్దది: %1. ఈ రిలే %2 వరకు తీసుకుంటుంది.</translation>
     </message>
     <message>
-        <source>Saved to %1</source>
-        <extracomment>%1 is a folder, such as &quot;Documents/Piiri&quot;.</extracomment>
-        <translation>%1 లో భద్రపరచబడింది</translation>
+        <source>Saved to Downloads</source>
+        <translation>డౌన్‌లోడ్‌లలో భద్రపరచబడింది</translation>
     </message>
 </context>
 <context>
@@ -551,8 +549,9 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>సందేశాలు లేవు</translation>
     </message>
     <message>
-        <source>Messages</source>
-        <translation>సందేశాలు</translation>
+        <source>%1 new</source>
+        <extracomment>On the cover, in a pill among the avatars: how many messages are unread. %1 is the number, or &quot;99+&quot;.</extracomment>
+        <translation>%1 కొత్తవి</translation>
     </message>
 </context>
 <context>
@@ -676,24 +675,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>A backup file copied onto this phone.</source>
         <translation>ఈ ఫోన్‌కు కాపీ చేసిన బ్యాకప్ ఫైలు.</translation>
-    </message>
-</context>
-<context>
-    <name>FolderPickerDialog</name>
-    <message>
-        <source>Default folder</source>
-        <extracomment>Puts the folder back to the one a fresh install saves to.</extracomment>
-        <translation>డిఫాల్ట్ ఫోల్డర్</translation>
-    </message>
-    <message>
-        <source>Choose a folder</source>
-        <extracomment>Above the list of folders to choose from.</extracomment>
-        <translation>ఒక ఫోల్డర్‌ను ఎంచుకోండి</translation>
-    </message>
-    <message>
-        <source>No folders here</source>
-        <extracomment>Under a folder with no folders in it: it can still be chosen.</extracomment>
-        <translation>ఇక్కడ ఫోల్డర్లు లేవు</translation>
     </message>
 </context>
 <context>
@@ -1529,17 +1510,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>చిత్రాలు పంపే ముందు చిన్నవి చేయబడతాయి, కెమెరా కూడా ఇదే నాణ్యతలో రికార్డ్ చేస్తుంది.</translation>
     </message>
     <message>
-        <source>Save files to</source>
-        <extracomment>Where a copy of a file from a chat is put.</extracomment>
-        <translation>ఫైళ్లను ఇక్కడ సేవ్ చేయి</translation>
-    </message>
-    <message>
         <source>Show notifications</source>
         <translation>నోటిఫికేషన్లను చూపించు</translation>
-    </message>
-    <message>
-        <source>Pictures and videos always go to the gallery.</source>
-        <translation>చిత్రాలు మరియు వీడియోలు ఎల్లప్పుడూ గ్యాలరీకి వెళ్తాయి.</translation>
     </message>
 </context>
 <context>

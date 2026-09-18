@@ -1033,26 +1033,6 @@ fn only_the_share_target_imports_sailfish_share() {
 
 /// The app's own name on the cover is not a string to be translated.
 ///
-/// A name is the same word in every language, and a catalogue with this
-/// string in it is an invitation to translate it -- one `qsTr` here and
-/// some language ships a cover calling the app something else. It is a
-/// literal, and this is what keeps it one.
-#[test]
-fn the_covers_name_is_the_apps_own_and_never_translated() {
-    let path = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../qml/cover/CoverPage.qml");
-    let text = fs::read_to_string(&path).expect("read the cover");
-    let brand = block_of(&text, "objectName: \"brand\"");
-    assert!(
-        brand.contains("text: \"Piiri\""),
-        "the cover does not name the app in its heading:\n{brand}"
-    );
-    assert!(
-        !brand.contains("qsTr"),
-        "the app's name on the cover is run through a translation \
-         catalogue:\n{brand}"
-    );
-}
-
 /// Every frame script a page hands the browser engine is a file that
 /// ships.
 ///

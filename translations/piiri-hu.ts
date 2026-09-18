@@ -384,9 +384,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Törlés</translation>
     </message>
     <message>
-        <source>Saved to %1</source>
-        <extracomment>%1 is a folder, such as &quot;Documents/Piiri&quot;.</extracomment>
-        <translation>Mentve ide: %1</translation>
+        <source>Saved to Downloads</source>
+        <translation>Mentve a Letöltésekbe</translation>
     </message>
 </context>
 <context>
@@ -537,9 +536,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Túl nagy a küldéshez: %1. Ez a relé %2 méretet fogad el.</translation>
     </message>
     <message>
-        <source>Saved to %1</source>
-        <extracomment>%1 is a folder, such as &quot;Documents/Piiri&quot;.</extracomment>
-        <translation>Mentve ide: %1</translation>
+        <source>Saved to Downloads</source>
+        <translation>Mentve a Letöltésekbe</translation>
     </message>
 </context>
 <context>
@@ -549,8 +547,9 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Nincs üzenet</translation>
     </message>
     <message>
-        <source>Messages</source>
-        <translation>Üzenetek</translation>
+        <source>%1 new</source>
+        <extracomment>On the cover, in a pill among the avatars: how many messages are unread. %1 is the number, or &quot;99+&quot;.</extracomment>
+        <translation>%1 új</translation>
     </message>
 </context>
 <context>
@@ -674,24 +673,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>A backup file copied onto this phone.</source>
         <translation>Egy mentésfájl, erre a telefonra másolva.</translation>
-    </message>
-</context>
-<context>
-    <name>FolderPickerDialog</name>
-    <message>
-        <source>Default folder</source>
-        <extracomment>Puts the folder back to the one a fresh install saves to.</extracomment>
-        <translation>Alapértelmezett mappa</translation>
-    </message>
-    <message>
-        <source>Choose a folder</source>
-        <extracomment>Above the list of folders to choose from.</extracomment>
-        <translation>Válasszon mappát</translation>
-    </message>
-    <message>
-        <source>No folders here</source>
-        <extracomment>Under a folder with no folders in it: it can still be chosen.</extracomment>
-        <translation>Nincsenek itt mappák</translation>
     </message>
 </context>
 <context>
@@ -1523,17 +1504,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>A képek küldés előtt kisebbek lesznek, a kamera pedig ebben a minőségben rögzít.</translation>
     </message>
     <message>
-        <source>Save files to</source>
-        <extracomment>Where a copy of a file from a chat is put.</extracomment>
-        <translation>Fájlok mentése ide</translation>
-    </message>
-    <message>
         <source>Show notifications</source>
         <translation>Értesítések megjelenítése</translation>
-    </message>
-    <message>
-        <source>Pictures and videos always go to the gallery.</source>
-        <translation>A képek és videók mindig a galériába kerülnek.</translation>
     </message>
 </context>
 <context>

@@ -391,9 +391,8 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
         <translation>Izbriši</translation>
     </message>
     <message>
-        <source>Saved to %1</source>
-        <extracomment>%1 is a folder, such as &quot;Documents/Piiri&quot;.</extracomment>
-        <translation>Shranjeno v %1</translation>
+        <source>Saved to Downloads</source>
+        <translation>Shranjeno v Prenose</translation>
     </message>
 </context>
 <context>
@@ -547,9 +546,8 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
         <translation>Prevelika za pošiljanje: %1. Ta rele sprejme %2.</translation>
     </message>
     <message>
-        <source>Saved to %1</source>
-        <extracomment>%1 is a folder, such as &quot;Documents/Piiri&quot;.</extracomment>
-        <translation>Shranjeno v %1</translation>
+        <source>Saved to Downloads</source>
+        <translation>Shranjeno v Prenose</translation>
     </message>
 </context>
 <context>
@@ -559,8 +557,9 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
         <translation>Ni sporočil</translation>
     </message>
     <message>
-        <source>Messages</source>
-        <translation>Sporočila</translation>
+        <source>%1 new</source>
+        <extracomment>On the cover, in a pill among the avatars: how many messages are unread. %1 is the number, or &quot;99+&quot;.</extracomment>
+        <translation>%1 novih</translation>
     </message>
 </context>
 <context>
@@ -684,24 +683,6 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
     <message>
         <source>A backup file copied onto this phone.</source>
         <translation>Datoteka varnostne kopije, prekopirana na ta telefon.</translation>
-    </message>
-</context>
-<context>
-    <name>FolderPickerDialog</name>
-    <message>
-        <source>Default folder</source>
-        <extracomment>Puts the folder back to the one a fresh install saves to.</extracomment>
-        <translation>Privzeta mapa</translation>
-    </message>
-    <message>
-        <source>Choose a folder</source>
-        <extracomment>Above the list of folders to choose from.</extracomment>
-        <translation>Izberite mapo</translation>
-    </message>
-    <message>
-        <source>No folders here</source>
-        <extracomment>Under a folder with no folders in it: it can still be chosen.</extracomment>
-        <translation>Tu ni map</translation>
     </message>
 </context>
 <context>
@@ -1545,17 +1526,8 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
         <translation>Slike se pred pošiljanjem pomanjšajo, kamera pa snema v tej kakovosti.</translation>
     </message>
     <message>
-        <source>Save files to</source>
-        <extracomment>Where a copy of a file from a chat is put.</extracomment>
-        <translation>Shrani datoteke v</translation>
-    </message>
-    <message>
         <source>Show notifications</source>
         <translation>Prikaži obvestila</translation>
-    </message>
-    <message>
-        <source>Pictures and videos always go to the gallery.</source>
-        <translation>Slike in videi gredo vedno v galerijo.</translation>
     </message>
 </context>
 <context>

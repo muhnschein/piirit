@@ -390,9 +390,8 @@ Správy od zablokovaných kontaktov v ostatných skupinách sa budú naďalej zo
         <translation>Odstrániť</translation>
     </message>
     <message>
-        <source>Saved to %1</source>
-        <extracomment>%1 is a folder, such as &quot;Documents/Piiri&quot;.</extracomment>
-        <translation>Uložené do %1</translation>
+        <source>Saved to Downloads</source>
+        <translation>Uložené do Stiahnutých</translation>
     </message>
 </context>
 <context>
@@ -545,9 +544,8 @@ Správy od zablokovaných kontaktov v ostatných skupinách sa budú naďalej zo
         <translation>Príliš veľké na odoslanie: %1. Tento relay prijíma %2.</translation>
     </message>
     <message>
-        <source>Saved to %1</source>
-        <extracomment>%1 is a folder, such as &quot;Documents/Piiri&quot;.</extracomment>
-        <translation>Uložené do %1</translation>
+        <source>Saved to Downloads</source>
+        <translation>Uložené do Stiahnutých</translation>
     </message>
 </context>
 <context>
@@ -557,8 +555,9 @@ Správy od zablokovaných kontaktov v ostatných skupinách sa budú naďalej zo
         <translation>Žiadne správy</translation>
     </message>
     <message>
-        <source>Messages</source>
-        <translation>Správy</translation>
+        <source>%1 new</source>
+        <extracomment>On the cover, in a pill among the avatars: how many messages are unread. %1 is the number, or &quot;99+&quot;.</extracomment>
+        <translation>%1 nových</translation>
     </message>
 </context>
 <context>
@@ -682,24 +681,6 @@ Správy od zablokovaných kontaktov v ostatných skupinách sa budú naďalej zo
     <message>
         <source>A backup file copied onto this phone.</source>
         <translation>Súbor zálohy skopírovaný do tohto telefónu.</translation>
-    </message>
-</context>
-<context>
-    <name>FolderPickerDialog</name>
-    <message>
-        <source>Default folder</source>
-        <extracomment>Puts the folder back to the one a fresh install saves to.</extracomment>
-        <translation>Predvolený priečinok</translation>
-    </message>
-    <message>
-        <source>Choose a folder</source>
-        <extracomment>Above the list of folders to choose from.</extracomment>
-        <translation>Vyberte priečinok</translation>
-    </message>
-    <message>
-        <source>No folders here</source>
-        <extracomment>Under a folder with no folders in it: it can still be chosen.</extracomment>
-        <translation>Žiadne priečinky</translation>
     </message>
 </context>
 <context>
@@ -1539,17 +1520,8 @@ Správy od zablokovaných kontaktov v ostatných skupinách sa budú naďalej zo
         <translation>Obrázky sa pred odoslaním zmenšia a kamera nahráva v tejto kvalite.</translation>
     </message>
     <message>
-        <source>Save files to</source>
-        <extracomment>Where a copy of a file from a chat is put.</extracomment>
-        <translation>Ukladať súbory do</translation>
-    </message>
-    <message>
         <source>Show notifications</source>
         <translation>Zobrazovať upozornenia</translation>
-    </message>
-    <message>
-        <source>Pictures and videos always go to the gallery.</source>
-        <translation>Obrázky a videá idú vždy do galérie.</translation>
     </message>
 </context>
 <context>

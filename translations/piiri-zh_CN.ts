@@ -388,9 +388,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>删除</translation>
     </message>
     <message>
-        <source>Saved to %1</source>
-        <extracomment>%1 is a folder, such as &quot;Documents/Piiri&quot;.</extracomment>
-        <translation>已保存到 %1</translation>
+        <source>Saved to Downloads</source>
+        <translation>已保存到下载</translation>
     </message>
 </context>
 <context>
@@ -541,9 +540,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>太大，无法发送：%1。此中继最多接受 %2。</translation>
     </message>
     <message>
-        <source>Saved to %1</source>
-        <extracomment>%1 is a folder, such as &quot;Documents/Piiri&quot;.</extracomment>
-        <translation>已保存到 %1</translation>
+        <source>Saved to Downloads</source>
+        <translation>已保存到下载</translation>
     </message>
 </context>
 <context>
@@ -553,8 +551,9 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>没有消息</translation>
     </message>
     <message>
-        <source>Messages</source>
-        <translation>消息</translation>
+        <source>%1 new</source>
+        <extracomment>On the cover, in a pill among the avatars: how many messages are unread. %1 is the number, or &quot;99+&quot;.</extracomment>
+        <translation>%1 条新消息</translation>
     </message>
 </context>
 <context>
@@ -678,24 +677,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>A backup file copied onto this phone.</source>
         <translation>已复制到这台手机上的备份文件。</translation>
-    </message>
-</context>
-<context>
-    <name>FolderPickerDialog</name>
-    <message>
-        <source>Default folder</source>
-        <extracomment>Puts the folder back to the one a fresh install saves to.</extracomment>
-        <translation>默认文件夹</translation>
-    </message>
-    <message>
-        <source>Choose a folder</source>
-        <extracomment>Above the list of folders to choose from.</extracomment>
-        <translation>选择文件夹</translation>
-    </message>
-    <message>
-        <source>No folders here</source>
-        <extracomment>Under a folder with no folders in it: it can still be chosen.</extracomment>
-        <translation>此处没有文件夹</translation>
     </message>
 </context>
 <context>
@@ -1527,17 +1508,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>图片在发送前会被压缩，摄像头也按此质量录制。</translation>
     </message>
     <message>
-        <source>Save files to</source>
-        <extracomment>Where a copy of a file from a chat is put.</extracomment>
-        <translation>文件保存到</translation>
-    </message>
-    <message>
         <source>Show notifications</source>
         <translation>显示通知</translation>
-    </message>
-    <message>
-        <source>Pictures and videos always go to the gallery.</source>
-        <translation>图片和视频始终存入图库。</translation>
     </message>
 </context>
 <context>

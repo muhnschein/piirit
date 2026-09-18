@@ -385,9 +385,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Poista</translation>
     </message>
     <message>
-        <source>Saved to %1</source>
-        <extracomment>%1 is a folder, such as &quot;Documents/Piiri&quot;.</extracomment>
-        <translation>Tallennettu kohteeseen %1</translation>
+        <source>Saved to Downloads</source>
+        <translation>Tallennettu Lataukset-kansioon</translation>
     </message>
 </context>
 <context>
@@ -539,9 +538,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Liian suuri lähetettäväksi: %1. Tämä välityspalvelin ottaa %2.</translation>
     </message>
     <message>
-        <source>Saved to %1</source>
-        <extracomment>%1 is a folder, such as &quot;Documents/Piiri&quot;.</extracomment>
-        <translation>Tallennettu kohteeseen %1</translation>
+        <source>Saved to Downloads</source>
+        <translation>Tallennettu Lataukset-kansioon</translation>
     </message>
 </context>
 <context>
@@ -551,8 +549,9 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Ei viestejä</translation>
     </message>
     <message>
-        <source>Messages</source>
-        <translation>Viestit</translation>
+        <source>%1 new</source>
+        <extracomment>On the cover, in a pill among the avatars: how many messages are unread. %1 is the number, or &quot;99+&quot;.</extracomment>
+        <translation>%1 uutta</translation>
     </message>
 </context>
 <context>
@@ -676,24 +675,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>A backup file copied onto this phone.</source>
         <translation>Varmuuskopiotiedosto, kopioituna tähän puhelimeen.</translation>
-    </message>
-</context>
-<context>
-    <name>FolderPickerDialog</name>
-    <message>
-        <source>Default folder</source>
-        <extracomment>Puts the folder back to the one a fresh install saves to.</extracomment>
-        <translation>Oletuskansio</translation>
-    </message>
-    <message>
-        <source>Choose a folder</source>
-        <extracomment>Above the list of folders to choose from.</extracomment>
-        <translation>Valitse kansio</translation>
-    </message>
-    <message>
-        <source>No folders here</source>
-        <extracomment>Under a folder with no folders in it: it can still be chosen.</extracomment>
-        <translation>Ei kansioita</translation>
     </message>
 </context>
 <context>
@@ -1529,17 +1510,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Kuvia pienennetään ennen lähetystä, ja kamera tallentaa tällä laadulla.</translation>
     </message>
     <message>
-        <source>Save files to</source>
-        <extracomment>Where a copy of a file from a chat is put.</extracomment>
-        <translation>Tallenna tiedostot kansioon</translation>
-    </message>
-    <message>
         <source>Show notifications</source>
         <translation>Näytä ilmoitukset</translation>
-    </message>
-    <message>
-        <source>Pictures and videos always go to the gallery.</source>
-        <translation>Kuvat ja videot menevät aina galleriaan.</translation>
     </message>
 </context>
 <context>

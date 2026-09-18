@@ -7,14 +7,15 @@ import "../components"
  * What the cover has to say while the app is minimised: who is there,
  * and whether any of them has said something new.
  *
- * The heading is laid out as the platform's own covers lay theirs out
- * -- the calendar's, say: the name top left with a line under it, and
- * the number top right, large. Under it, everyone's avatar in a
- * staggered grid, in grey, the few repeated to fill it; whoever has
- * written is drawn in the ambience's own highlight colour, in the cells
- * that are seen whole and nearest the top. Nobody yet -- no chat but
+ * The whole cover is a staggered grid of everyone's avatar, in grey,
+ * the few repeated to fill it; whoever has written is drawn in the
+ * ambience's own highlight colour, in the cells that are seen whole and
+ * nearest the top. The count sits in the grid rather than over it: a
+ * pill the width of two cells, in the middle of the second row, saying
+ * how many messages are new -- highlighted when the answer is not zero,
+ * grey like the faces around it when it is. Nobody yet -- no chat but
  * the one with oneself and the core's own -- and the cover says so in a
- * line instead.
+ * line instead of the faces.
  *
  * Every profile counts: one ChatList per configured profile, so the
  * number is every unread message on the phone and the grid is everyone
@@ -76,17 +77,42 @@ CoverBackground {
     /// The grid's shape: three across, with every other row shifted half
     /// a cell and holding one more, cut off at both edges -- so the rows
     /// nest, and the grid reads as a field of faces rather than a table.
+    /// The first row is a whole one, so the shifted row under it is where
+    /// the pill goes: its two middle cells are whole and centred.
     readonly property int columns: 3
     readonly property int cellSize: Math.floor(cover.width / cover.columns)
     readonly property int rowStep: Math.max(1, Math.round(cover.cellSize * 0.9))
     readonly property int rows: cover.cellSize > 0
-                                ? Math.ceil(grid.height / cover.rowStep)
+                                ? Math.ceil(cover.height / cover.rowStep)
                                 : 0
+
+    /// Whether a row is the shifted kind: one more cell, half a cell to
+    /// the left.
+    function shifted(row) {
+        return row % 2 === 1
+    }
+
+    /// How many cells a row has.
+    function across(row) {
+        return cover.shifted(row) ? cover.columns + 1 : cover.columns
+    }
 
     /// Where a cell is, across the grid.
     function cellX(row, col) {
         return col * cover.cellSize
-               - (row % 2 === 0 ? cover.cellSize / 2 : 0)
+               - (cover.shifted(row) ? cover.cellSize / 2 : 0)
+    }
+
+    /// The row the pill is in, and the two cells it takes: the middle
+    /// pair of the first shifted row, which the shift puts on either
+    /// side of the centre line.
+    readonly property int pillRow: 1
+    readonly property int pillFirstCol: cover.across(cover.pillRow) / 2 - 1
+
+    /// Whether a cell is one of the two the pill is drawn over.
+    function underPill(row, col) {
+        return row === cover.pillRow
+               && (col === cover.pillFirstCol || col === cover.pillFirstCol + 1)
     }
 
     /// How good a cell is to be seen in, smaller being better.
@@ -100,7 +126,7 @@ CoverBackground {
         var size = cover.cellSize
         var x = cover.cellX(row, col)
         var whole = x >= 0 && x + size <= cover.width
-                    && row * cover.rowStep + size <= grid.height
+                    && row * cover.rowStep + size <= cover.height
         var fromMiddle = Math.abs((x + size / 2) - cover.width / 2) / size
         return (whole ? 0 : 100) + row * 2 + fromMiddle
     }
@@ -161,11 +187,14 @@ CoverBackground {
             }
         }
 
-        // The cells there are, in the order they are drawn.
+        // The cells there are, in the order they are drawn -- less the
+        // two the pill sits on.
         var slots = []
         for (var row = 0; row < cover.rows && everyone.length > 0; row++) {
-            var across = row % 2 === 0 ? cover.columns + 1 : cover.columns
-            for (var col = 0; col < across; col++) {
+            for (var col = 0; col < cover.across(row); col++) {
+                if (cover.underPill(row, col)) {
+                    continue
+                }
                 slots.push({ row: row, col: col, person: null, loud: false })
             }
         }
@@ -214,88 +243,12 @@ CoverBackground {
     onRowsChanged: cover.gather()
     onWidthChanged: cover.gather()
 
-    // The name and what it is, top left; the number top right, always
-    // -- a zero says as much as a count.
-    Column {
-        id: heading
-        anchors {
-            top: parent.top
-            left: parent.left
-            right: unreadLabel.left
-            margins: Theme.paddingLarge
-            rightMargin: Theme.paddingMedium
-        }
-        // The two lines are one heading: closer than their own leading
-        // would put them.
-        spacing: -Theme.paddingSmall
-
-        // Wrapped rather than faded: a cover is narrow, and the word
-        // for "Messages" is a long one in several of the languages the
-        // app speaks. The grid starts under whatever this comes to.
-        Label {
-            id: brand
-            objectName: "brand"
-            width: parent.width
-            // The app's own name, and never a translated one: a name is
-            // not a word to be put into another language, and a
-            // catalogue that had this string in it would let one
-            // through.
-            text: "Piiri"
-            color: Theme.highlightColor
-            font.pixelSize: Theme.fontSizeMedium
-            wrapMode: Text.Wrap
-        }
-
-        Label {
-            objectName: "subtitle"
-            width: parent.width
-            text: qsTr("Messages")
-            color: Theme.secondaryHighlightColor
-            font.pixelSize: Theme.fontSizeExtraSmall
-            wrapMode: Text.Wrap
-        }
-    }
-
-    Label {
-        id: unreadLabel
-        objectName: "unreadTotal"
-        anchors {
-            top: parent.top
-            right: parent.right
-            topMargin: Theme.paddingMedium
-            rightMargin: Theme.paddingLarge
-        }
-        font.pixelSize: Theme.fontSizeHuge
-        color: Theme.primaryColor
-        text: cover.unreadTotal > 99 ? "99+" : cover.unreadTotal
-    }
-
-    // Nobody yet: say so, in a line that wraps rather than runs off the
-    // cover in a language where it is longer.
-    Label {
-        objectName: "emptyLabel"
-        anchors.centerIn: grid
-        width: parent.width - 2 * Theme.paddingLarge
-        visible: cover.people.length === 0
-        horizontalAlignment: Text.AlignHCenter
-        wrapMode: Text.Wrap
-        font.pixelSize: Theme.fontSizeSmall
-        color: Theme.secondaryColor
-        text: qsTr("No messages")
-    }
-
-    // Everyone, filling the room under the heading. The shifted rows run
-    // past both edges by half a cell, which the clip takes care of.
+    // Everyone, filling the cover. The shifted rows run past both edges
+    // by half a cell, which the clip takes care of.
     Item {
         id: grid
         objectName: "avatarGrid"
-        anchors {
-            top: heading.bottom
-            left: parent.left
-            right: parent.right
-            bottom: parent.bottom
-            topMargin: Theme.paddingLarge
-        }
+        anchors.fill: parent
         clip: true
 
         Repeater {
@@ -323,5 +276,70 @@ CoverBackground {
                 z: modelData.loud ? 1 : 0
             }
         }
+
+        // The count, in a cell of its own two cells wide: a circle
+        // stretched sideways, so it sits among the faces as one of them
+        // rather than over them. Always drawn -- a zero says as much as
+        // a count -- and in the highlight only when there is something
+        // new, the way a face is.
+        Rectangle {
+            id: pill
+            objectName: "unreadPill"
+            x: cover.cellX(cover.pillRow, cover.pillFirstCol)
+            y: cover.pillRow * cover.rowStep
+            width: 2 * cover.cellSize - Theme.paddingSmall
+            height: cover.cellSize - Theme.paddingSmall
+            radius: height / 2
+            /// Whether there is something new, which is what colours it.
+            readonly property bool highlight: cover.unreadTotal > 0
+            color: highlight ? Theme.highlightColor
+                             : Theme.rgba(Theme.primaryColor, 0.25)
+            opacity: highlight ? 1.0 : 0.6
+            // Above the faces for the same reason a lit one is: the row
+            // under it draws over its bottom edge otherwise.
+            z: 2
+
+            Label {
+                objectName: "unreadTotal"
+                anchors {
+                    fill: parent
+                    leftMargin: Theme.paddingMedium
+                    rightMargin: Theme.paddingMedium
+                }
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+                color: Theme.primaryColor
+                font.pixelSize: Theme.fontSizeLarge
+                // Shrunk to fit rather than cut: "99+ new" in a language
+                // with a long word for new still has to be read whole.
+                fontSizeMode: Text.HorizontalFit
+                minimumPixelSize: Theme.fontSizeTiny
+                //: On the cover, in a pill among the avatars: how many
+                //: messages are unread. %1 is the number, or "99+".
+                text: qsTr("%1 new").arg(cover.unreadTotal > 99 ? "99+"
+                                                                  : cover.unreadTotal)
+            }
+        }
+    }
+
+    // Nobody yet: say so, in a line that wraps rather than runs off the
+    // cover in a language where it is longer. Under the pill, which is
+    // still there to say that nothing is new.
+    Label {
+        objectName: "emptyLabel"
+        anchors {
+            top: pill.bottom
+            left: parent.left
+            right: parent.right
+            topMargin: Theme.paddingLarge
+            leftMargin: Theme.paddingLarge
+            rightMargin: Theme.paddingLarge
+        }
+        visible: cover.people.length === 0
+        horizontalAlignment: Text.AlignHCenter
+        wrapMode: Text.Wrap
+        font.pixelSize: Theme.fontSizeSmall
+        color: Theme.secondaryColor
+        text: qsTr("No messages")
     }
 }

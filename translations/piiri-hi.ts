@@ -389,9 +389,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>हटाएँ</translation>
     </message>
     <message>
-        <source>Saved to %1</source>
-        <extracomment>%1 is a folder, such as &quot;Documents/Piiri&quot;.</extracomment>
-        <translation>%1 में सहेजा गया</translation>
+        <source>Saved to Downloads</source>
+        <translation>डाउनलोड में सहेजा गया</translation>
     </message>
 </context>
 <context>
@@ -543,9 +542,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>भेजने के लिए बहुत बड़ा: %1। यह रिले %2 तक लेता है।</translation>
     </message>
     <message>
-        <source>Saved to %1</source>
-        <extracomment>%1 is a folder, such as &quot;Documents/Piiri&quot;.</extracomment>
-        <translation>%1 में सहेजा गया</translation>
+        <source>Saved to Downloads</source>
+        <translation>डाउनलोड में सहेजा गया</translation>
     </message>
 </context>
 <context>
@@ -555,8 +553,9 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>कोई संदेश नहीं</translation>
     </message>
     <message>
-        <source>Messages</source>
-        <translation>संदेश</translation>
+        <source>%1 new</source>
+        <extracomment>On the cover, in a pill among the avatars: how many messages are unread. %1 is the number, or &quot;99+&quot;.</extracomment>
+        <translation>%1 नए</translation>
     </message>
 </context>
 <context>
@@ -680,24 +679,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>A backup file copied onto this phone.</source>
         <translation>इस फ़ोन पर कॉपी की गई एक बैकअप फ़ाइल।</translation>
-    </message>
-</context>
-<context>
-    <name>FolderPickerDialog</name>
-    <message>
-        <source>Default folder</source>
-        <extracomment>Puts the folder back to the one a fresh install saves to.</extracomment>
-        <translation>डिफ़ॉल्ट फ़ोल्डर</translation>
-    </message>
-    <message>
-        <source>Choose a folder</source>
-        <extracomment>Above the list of folders to choose from.</extracomment>
-        <translation>एक फ़ोल्डर चुनें</translation>
-    </message>
-    <message>
-        <source>No folders here</source>
-        <extracomment>Under a folder with no folders in it: it can still be chosen.</extracomment>
-        <translation>यहाँ कोई फ़ोल्डर नहीं</translation>
     </message>
 </context>
 <context>
@@ -1533,17 +1514,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>तस्वीरें भेजने से पहले छोटी कर दी जाती हैं, और कैमरा इसी गुणवत्ता में रिकॉर्ड करता है।</translation>
     </message>
     <message>
-        <source>Save files to</source>
-        <extracomment>Where a copy of a file from a chat is put.</extracomment>
-        <translation>फ़ाइलें यहाँ सहेजें</translation>
-    </message>
-    <message>
         <source>Show notifications</source>
         <translation>सूचनाएँ दिखाएँ</translation>
-    </message>
-    <message>
-        <source>Pictures and videos always go to the gallery.</source>
-        <translation>चित्र और वीडियो हमेशा गैलरी में जाते हैं।</translation>
     </message>
 </context>
 <context>

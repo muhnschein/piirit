@@ -385,9 +385,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Διαγραφή</translation>
     </message>
     <message>
-        <source>Saved to %1</source>
-        <extracomment>%1 is a folder, such as &quot;Documents/Piiri&quot;.</extracomment>
-        <translation>Αποθηκεύτηκε στο %1</translation>
+        <source>Saved to Downloads</source>
+        <translation>Αποθηκεύτηκε στις Λήψεις</translation>
     </message>
 </context>
 <context>
@@ -539,9 +538,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Πολύ μεγάλο για αποστολή: %1. Αυτός ο αναμεταδότης δέχεται %2.</translation>
     </message>
     <message>
-        <source>Saved to %1</source>
-        <extracomment>%1 is a folder, such as &quot;Documents/Piiri&quot;.</extracomment>
-        <translation>Αποθηκεύτηκε στο %1</translation>
+        <source>Saved to Downloads</source>
+        <translation>Αποθηκεύτηκε στις Λήψεις</translation>
     </message>
 </context>
 <context>
@@ -551,8 +549,9 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Κανένα μήνυμα</translation>
     </message>
     <message>
-        <source>Messages</source>
-        <translation>Μηνύματα</translation>
+        <source>%1 new</source>
+        <extracomment>On the cover, in a pill among the avatars: how many messages are unread. %1 is the number, or &quot;99+&quot;.</extracomment>
+        <translation>%1 νέα</translation>
     </message>
 </context>
 <context>
@@ -676,24 +675,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>A backup file copied onto this phone.</source>
         <translation>Ένα αρχείο αντιγράφου, αντιγραμμένο σε αυτό το τηλέφωνο.</translation>
-    </message>
-</context>
-<context>
-    <name>FolderPickerDialog</name>
-    <message>
-        <source>Default folder</source>
-        <extracomment>Puts the folder back to the one a fresh install saves to.</extracomment>
-        <translation>Προεπιλεγμένος φάκελος</translation>
-    </message>
-    <message>
-        <source>Choose a folder</source>
-        <extracomment>Above the list of folders to choose from.</extracomment>
-        <translation>Επιλέξτε φάκελο</translation>
-    </message>
-    <message>
-        <source>No folders here</source>
-        <extracomment>Under a folder with no folders in it: it can still be chosen.</extracomment>
-        <translation>Δεν υπάρχουν φάκελοι εδώ</translation>
     </message>
 </context>
 <context>
@@ -1529,17 +1510,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Οι εικόνες σμικρύνονται πριν σταλούν και η κάμερα καταγράφει σε αυτήν την ποιότητα.</translation>
     </message>
     <message>
-        <source>Save files to</source>
-        <extracomment>Where a copy of a file from a chat is put.</extracomment>
-        <translation>Αποθήκευση αρχείων σε</translation>
-    </message>
-    <message>
         <source>Show notifications</source>
         <translation>Εμφάνιση ειδοποιήσεων</translation>
-    </message>
-    <message>
-        <source>Pictures and videos always go to the gallery.</source>
-        <translation>Οι εικόνες και τα βίντεο πηγαίνουν πάντα στη συλλογή.</translation>
     </message>
 </context>
 <context>

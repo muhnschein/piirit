@@ -389,9 +389,8 @@ Vous continuerez à voir les messages des contacts bloqués dans les autres grou
         <translation>Supprimer</translation>
     </message>
     <message>
-        <source>Saved to %1</source>
-        <extracomment>%1 is a folder, such as &quot;Documents/Piiri&quot;.</extracomment>
-        <translation>Enregistré dans %1</translation>
+        <source>Saved to Downloads</source>
+        <translation>Enregistré dans Téléchargements</translation>
     </message>
 </context>
 <context>
@@ -543,9 +542,8 @@ Vous continuerez à voir les messages des contacts bloqués dans les autres grou
         <translation>Trop volumineux pour être envoyé : %1. Ce relais accepte %2.</translation>
     </message>
     <message>
-        <source>Saved to %1</source>
-        <extracomment>%1 is a folder, such as &quot;Documents/Piiri&quot;.</extracomment>
-        <translation>Enregistré dans %1</translation>
+        <source>Saved to Downloads</source>
+        <translation>Enregistré dans Téléchargements</translation>
     </message>
 </context>
 <context>
@@ -555,8 +553,9 @@ Vous continuerez à voir les messages des contacts bloqués dans les autres grou
         <translation>Aucun message</translation>
     </message>
     <message>
-        <source>Messages</source>
-        <translation>Messages</translation>
+        <source>%1 new</source>
+        <extracomment>On the cover, in a pill among the avatars: how many messages are unread. %1 is the number, or &quot;99+&quot;.</extracomment>
+        <translation>%1 nouveaux</translation>
     </message>
 </context>
 <context>
@@ -680,24 +679,6 @@ Vous continuerez à voir les messages des contacts bloqués dans les autres grou
     <message>
         <source>A backup file copied onto this phone.</source>
         <translation>Un fichier de sauvegarde copié sur ce téléphone.</translation>
-    </message>
-</context>
-<context>
-    <name>FolderPickerDialog</name>
-    <message>
-        <source>Default folder</source>
-        <extracomment>Puts the folder back to the one a fresh install saves to.</extracomment>
-        <translation>Dossier par défaut</translation>
-    </message>
-    <message>
-        <source>Choose a folder</source>
-        <extracomment>Above the list of folders to choose from.</extracomment>
-        <translation>Choisir un dossier</translation>
-    </message>
-    <message>
-        <source>No folders here</source>
-        <extracomment>Under a folder with no folders in it: it can still be chosen.</extracomment>
-        <translation>Aucun dossier ici</translation>
     </message>
 </context>
 <context>
@@ -1533,17 +1514,8 @@ Vous continuerez à voir les messages des contacts bloqués dans les autres grou
         <translation>Les images sont réduites avant l’envoi, et la caméra enregistre à cette qualité.</translation>
     </message>
     <message>
-        <source>Save files to</source>
-        <extracomment>Where a copy of a file from a chat is put.</extracomment>
-        <translation>Enregistrer les fichiers dans</translation>
-    </message>
-    <message>
         <source>Show notifications</source>
         <translation>Afficher les notifications</translation>
-    </message>
-    <message>
-        <source>Pictures and videos always go to the gallery.</source>
-        <translation>Les images et les vidéos vont toujours dans la galerie.</translation>
     </message>
 </context>
 <context>

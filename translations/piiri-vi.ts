@@ -384,9 +384,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Xóa</translation>
     </message>
     <message>
-        <source>Saved to %1</source>
-        <extracomment>%1 is a folder, such as &quot;Documents/Piiri&quot;.</extracomment>
-        <translation>Đã lưu vào %1</translation>
+        <source>Saved to Downloads</source>
+        <translation>Đã lưu vào Tải xuống</translation>
     </message>
 </context>
 <context>
@@ -537,9 +536,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Quá lớn để gửi: %1. Máy chủ chuyển tiếp này nhận %2.</translation>
     </message>
     <message>
-        <source>Saved to %1</source>
-        <extracomment>%1 is a folder, such as &quot;Documents/Piiri&quot;.</extracomment>
-        <translation>Đã lưu vào %1</translation>
+        <source>Saved to Downloads</source>
+        <translation>Đã lưu vào Tải xuống</translation>
     </message>
 </context>
 <context>
@@ -549,8 +547,9 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Không có tin nhắn</translation>
     </message>
     <message>
-        <source>Messages</source>
-        <translation>Tin nhắn</translation>
+        <source>%1 new</source>
+        <extracomment>On the cover, in a pill among the avatars: how many messages are unread. %1 is the number, or &quot;99+&quot;.</extracomment>
+        <translation>%1 mới</translation>
     </message>
 </context>
 <context>
@@ -674,24 +673,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>A backup file copied onto this phone.</source>
         <translation>Một tệp sao lưu đã chép sang điện thoại này.</translation>
-    </message>
-</context>
-<context>
-    <name>FolderPickerDialog</name>
-    <message>
-        <source>Default folder</source>
-        <extracomment>Puts the folder back to the one a fresh install saves to.</extracomment>
-        <translation>Thư mục mặc định</translation>
-    </message>
-    <message>
-        <source>Choose a folder</source>
-        <extracomment>Above the list of folders to choose from.</extracomment>
-        <translation>Chọn một thư mục</translation>
-    </message>
-    <message>
-        <source>No folders here</source>
-        <extracomment>Under a folder with no folders in it: it can still be chosen.</extracomment>
-        <translation>Không có thư mục nào ở đây</translation>
     </message>
 </context>
 <context>
@@ -1523,17 +1504,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Ảnh được thu nhỏ trước khi gửi, và máy ảnh quay ở chất lượng này.</translation>
     </message>
     <message>
-        <source>Save files to</source>
-        <extracomment>Where a copy of a file from a chat is put.</extracomment>
-        <translation>Lưu tệp vào</translation>
-    </message>
-    <message>
         <source>Show notifications</source>
         <translation>Hiện thông báo</translation>
-    </message>
-    <message>
-        <source>Pictures and videos always go to the gallery.</source>
-        <translation>Ảnh và video luôn được lưu vào thư viện.</translation>
     </message>
 </context>
 <context>

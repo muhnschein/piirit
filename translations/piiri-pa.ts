@@ -389,9 +389,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>ਹਟਾਓ</translation>
     </message>
     <message>
-        <source>Saved to %1</source>
-        <extracomment>%1 is a folder, such as &quot;Documents/Piiri&quot;.</extracomment>
-        <translation>%1 ਵਿੱਚ ਸੰਭਾਲਿਆ</translation>
+        <source>Saved to Downloads</source>
+        <translation>ਡਾਊਨਲੋਡ ਵਿੱਚ ਸੰਭਾਲਿਆ</translation>
     </message>
 </context>
 <context>
@@ -543,9 +542,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>ਭੇਜਣ ਲਈ ਬਹੁਤ ਵੱਡਾ: %1। ਇਹ ਰਿਲੇ %2 ਤੱਕ ਲੈਂਦਾ ਹੈ।</translation>
     </message>
     <message>
-        <source>Saved to %1</source>
-        <extracomment>%1 is a folder, such as &quot;Documents/Piiri&quot;.</extracomment>
-        <translation>%1 ਵਿੱਚ ਸੰਭਾਲਿਆ</translation>
+        <source>Saved to Downloads</source>
+        <translation>ਡਾਊਨਲੋਡ ਵਿੱਚ ਸੰਭਾਲਿਆ</translation>
     </message>
 </context>
 <context>
@@ -555,8 +553,9 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>ਕੋਈ ਸੁਨੇਹਾ ਨਹੀਂ</translation>
     </message>
     <message>
-        <source>Messages</source>
-        <translation>ਸੁਨੇਹੇ</translation>
+        <source>%1 new</source>
+        <extracomment>On the cover, in a pill among the avatars: how many messages are unread. %1 is the number, or &quot;99+&quot;.</extracomment>
+        <translation>%1 ਨਵੇਂ</translation>
     </message>
 </context>
 <context>
@@ -680,24 +679,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>A backup file copied onto this phone.</source>
         <translation>ਇਸ ਫ਼ੋਨ ਉੱਤੇ ਕਾਪੀ ਕੀਤੀ ਬੈਕਅੱਪ ਫ਼ਾਈਲ।</translation>
-    </message>
-</context>
-<context>
-    <name>FolderPickerDialog</name>
-    <message>
-        <source>Default folder</source>
-        <extracomment>Puts the folder back to the one a fresh install saves to.</extracomment>
-        <translation>ਡਿਫਾਲਟ ਫੋਲਡਰ</translation>
-    </message>
-    <message>
-        <source>Choose a folder</source>
-        <extracomment>Above the list of folders to choose from.</extracomment>
-        <translation>ਇੱਕ ਫੋਲਡਰ ਚੁਣੋ</translation>
-    </message>
-    <message>
-        <source>No folders here</source>
-        <extracomment>Under a folder with no folders in it: it can still be chosen.</extracomment>
-        <translation>ਇੱਥੇ ਕੋਈ ਫੋਲਡਰ ਨਹੀਂ</translation>
     </message>
 </context>
 <context>
@@ -1533,17 +1514,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>ਤਸਵੀਰਾਂ ਭੇਜਣ ਤੋਂ ਪਹਿਲਾਂ ਛੋਟੀਆਂ ਕੀਤੀਆਂ ਜਾਂਦੀਆਂ ਹਨ, ਅਤੇ ਕੈਮਰਾ ਇਸੇ ਗੁਣਵੱਤਾ ਵਿੱਚ ਰਿਕਾਰਡ ਕਰਦਾ ਹੈ।</translation>
     </message>
     <message>
-        <source>Save files to</source>
-        <extracomment>Where a copy of a file from a chat is put.</extracomment>
-        <translation>ਫ਼ਾਈਲਾਂ ਇੱਥੇ ਸੰਭਾਲੋ</translation>
-    </message>
-    <message>
         <source>Show notifications</source>
         <translation>ਸੂਚਨਾਵਾਂ ਦਿਖਾਓ</translation>
-    </message>
-    <message>
-        <source>Pictures and videos always go to the gallery.</source>
-        <translation>ਤਸਵੀਰਾਂ ਅਤੇ ਵੀਡੀਓ ਹਮੇਸ਼ਾ ਗੈਲਰੀ ਵਿੱਚ ਜਾਂਦੇ ਹਨ।</translation>
     </message>
 </context>
 <context>

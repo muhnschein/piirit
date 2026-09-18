@@ -138,7 +138,8 @@ fn a_cover_with_only_oneself_and_the_device_says_there_are_no_messages() {
         record!("empty-wraps", get!("emptyLabel", "wrapMode"));
         record!("grid", call!("count", QString::from("gridCell")));
         record!("count-says", get!("unreadTotal", "text"));
-        record!("brand", get!("brand", "text"));
+        record!("pill-shown", get!("unreadPill", "visible"));
+        record!("pill-lit", get!("unreadPill", "highlight"));
         (*engine_ptr).quit();
     });
 
@@ -182,12 +183,18 @@ fn a_cover_with_only_oneself_and_the_device_says_there_are_no_messages() {
     );
     assert_eq!(
         value("count-says"),
-        "0",
-        "the count is not zero with nobody there. {context}"
+        "0 new",
+        "the pill does not say that nothing is new with nobody there. {context}"
     );
     assert_eq!(
-        value("brand"),
-        "Piiri",
-        "the cover does not name the app in its corner. {context}"
+        value("pill-shown"),
+        "true",
+        "the pill is gone with nobody there; a zero says as much as a count. \
+         {context}"
+    );
+    assert_eq!(
+        value("pill-lit"),
+        "false",
+        "the pill is lit with nobody there. {context}"
     );
 }

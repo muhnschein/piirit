@@ -390,9 +390,8 @@ Citās grupās, kurās ir bloķēti kontakti, viņu ziņas joprojām būs redzam
         <translation>Dzēst</translation>
     </message>
     <message>
-        <source>Saved to %1</source>
-        <extracomment>%1 is a folder, such as &quot;Documents/Piiri&quot;.</extracomment>
-        <translation>Saglabāts: %1</translation>
+        <source>Saved to Downloads</source>
+        <translation>Saglabāts lejupielādēs</translation>
     </message>
 </context>
 <context>
@@ -545,9 +544,8 @@ Citās grupās, kurās ir bloķēti kontakti, viņu ziņas joprojām būs redzam
         <translation>Pārāk liels, lai nosūtītu: %1. Šis relejs pieņem %2.</translation>
     </message>
     <message>
-        <source>Saved to %1</source>
-        <extracomment>%1 is a folder, such as &quot;Documents/Piiri&quot;.</extracomment>
-        <translation>Saglabāts: %1</translation>
+        <source>Saved to Downloads</source>
+        <translation>Saglabāts lejupielādēs</translation>
     </message>
 </context>
 <context>
@@ -557,8 +555,9 @@ Citās grupās, kurās ir bloķēti kontakti, viņu ziņas joprojām būs redzam
         <translation>Nav ziņu</translation>
     </message>
     <message>
-        <source>Messages</source>
-        <translation>Ziņas</translation>
+        <source>%1 new</source>
+        <extracomment>On the cover, in a pill among the avatars: how many messages are unread. %1 is the number, or &quot;99+&quot;.</extracomment>
+        <translation>%1 jaunas</translation>
     </message>
 </context>
 <context>
@@ -682,24 +681,6 @@ Citās grupās, kurās ir bloķēti kontakti, viņu ziņas joprojām būs redzam
     <message>
         <source>A backup file copied onto this phone.</source>
         <translation>Rezerves kopijas fails, iekopēts šajā tālrunī.</translation>
-    </message>
-</context>
-<context>
-    <name>FolderPickerDialog</name>
-    <message>
-        <source>Default folder</source>
-        <extracomment>Puts the folder back to the one a fresh install saves to.</extracomment>
-        <translation>Noklusējuma mape</translation>
-    </message>
-    <message>
-        <source>Choose a folder</source>
-        <extracomment>Above the list of folders to choose from.</extracomment>
-        <translation>Izvēlieties mapi</translation>
-    </message>
-    <message>
-        <source>No folders here</source>
-        <extracomment>Under a folder with no folders in it: it can still be chosen.</extracomment>
-        <translation>Šeit nav mapju</translation>
     </message>
 </context>
 <context>
@@ -1539,17 +1520,8 @@ Citās grupās, kurās ir bloķēti kontakti, viņu ziņas joprojām būs redzam
         <translation>Attēli tiek samazināti pirms nosūtīšanas, un kamera ieraksta šādā kvalitātē.</translation>
     </message>
     <message>
-        <source>Save files to</source>
-        <extracomment>Where a copy of a file from a chat is put.</extracomment>
-        <translation>Saglabāt failus mapē</translation>
-    </message>
-    <message>
         <source>Show notifications</source>
         <translation>Rādīt paziņojumus</translation>
-    </message>
-    <message>
-        <source>Pictures and videos always go to the gallery.</source>
-        <translation>Attēli un video vienmēr nonāk galerijā.</translation>
     </message>
 </context>
 <context>

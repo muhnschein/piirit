@@ -389,9 +389,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>ഇല്ലാതാക്കുക</translation>
     </message>
     <message>
-        <source>Saved to %1</source>
-        <extracomment>%1 is a folder, such as &quot;Documents/Piiri&quot;.</extracomment>
-        <translation>%1 എന്നതിൽ സൂക്ഷിച്ചു</translation>
+        <source>Saved to Downloads</source>
+        <translation>ഡൗൺലോഡുകളിൽ സൂക്ഷിച്ചു</translation>
     </message>
 </context>
 <context>
@@ -543,9 +542,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>അയയ്ക്കാൻ വളരെ വലുത്: %1. ഈ റിലേ %2 വരെ സ്വീകരിക്കും.</translation>
     </message>
     <message>
-        <source>Saved to %1</source>
-        <extracomment>%1 is a folder, such as &quot;Documents/Piiri&quot;.</extracomment>
-        <translation>%1 എന്നതിൽ സൂക്ഷിച്ചു</translation>
+        <source>Saved to Downloads</source>
+        <translation>ഡൗൺലോഡുകളിൽ സൂക്ഷിച്ചു</translation>
     </message>
 </context>
 <context>
@@ -555,8 +553,9 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>സന്ദേശങ്ങളില്ല</translation>
     </message>
     <message>
-        <source>Messages</source>
-        <translation>സന്ദേശങ്ങൾ</translation>
+        <source>%1 new</source>
+        <extracomment>On the cover, in a pill among the avatars: how many messages are unread. %1 is the number, or &quot;99+&quot;.</extracomment>
+        <translation>%1 പുതിയത്</translation>
     </message>
 </context>
 <context>
@@ -680,24 +679,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>A backup file copied onto this phone.</source>
         <translation>ഈ ഫോണിലേക്ക് പകർത്തിയ ഒരു ബാക്കപ്പ് ഫയൽ.</translation>
-    </message>
-</context>
-<context>
-    <name>FolderPickerDialog</name>
-    <message>
-        <source>Default folder</source>
-        <extracomment>Puts the folder back to the one a fresh install saves to.</extracomment>
-        <translation>സ്ഥിര ഫോൾഡർ</translation>
-    </message>
-    <message>
-        <source>Choose a folder</source>
-        <extracomment>Above the list of folders to choose from.</extracomment>
-        <translation>ഒരു ഫോൾഡർ തിരഞ്ഞെടുക്കുക</translation>
-    </message>
-    <message>
-        <source>No folders here</source>
-        <extracomment>Under a folder with no folders in it: it can still be chosen.</extracomment>
-        <translation>ഇവിടെ ഫോൾഡറുകളില്ല</translation>
     </message>
 </context>
 <context>
@@ -1533,17 +1514,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>ചിത്രങ്ങൾ അയയ്ക്കുന്നതിന് മുൻപ് ചെറുതാക്കുന്നു, ക്യാമറയും ഈ നിലവാരത്തിൽ റെക്കോർഡ് ചെയ്യുന്നു.</translation>
     </message>
     <message>
-        <source>Save files to</source>
-        <extracomment>Where a copy of a file from a chat is put.</extracomment>
-        <translation>ഫയലുകൾ ഇവിടെ സൂക്ഷിക്കുക</translation>
-    </message>
-    <message>
         <source>Show notifications</source>
         <translation>അറിയിപ്പുകൾ കാണിക്കുക</translation>
-    </message>
-    <message>
-        <source>Pictures and videos always go to the gallery.</source>
-        <translation>ചിത്രങ്ങളും വീഡിയോകളും എപ്പോഴും ഗാലറിയിലേക്ക് പോകുന്നു.</translation>
     </message>
 </context>
 <context>
