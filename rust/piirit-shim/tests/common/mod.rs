@@ -222,7 +222,7 @@ pub fn png_header(file: &str) -> (u32, u32, u8, u8, u8) {
 /// committed PNG would do; this is the one that is certainly there.
 pub fn a_real_picture() -> String {
     art_dir()
-        .join("faces-portrait.png")
+        .join("logo.png")
         .canonicalize()
         .expect("the committed art is there")
         .display()

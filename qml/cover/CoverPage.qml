@@ -312,7 +312,11 @@ CoverBackground {
         // The count, in a cell of its own two cells wide: a circle
         // stretched sideways, so it sits among the faces as one of them
         // rather than over them. There only when something is new, and
-        // then in the highlight, the way a face with something new is.
+        // then in the highlight, the way a face with something new is
+        // -- as an outline with the number in the same colour, rather
+        // than a filled disc: the number is what the pill is there to
+        // say, and in the ambience's own text colour on a disc of its
+        // highlight it was the harder of the two to read.
         Rectangle {
             id: pill
             objectName: "unreadPill"
@@ -322,7 +326,9 @@ CoverBackground {
             width: 2 * cover.cellSize - cover.gap
             height: cover.cellSize - cover.gap
             radius: height / 2
-            color: Theme.highlightColor
+            color: "transparent"
+            border.width: Math.max(2, Math.round(Theme.paddingSmall / 2))
+            border.color: Theme.highlightColor
             z: 2
 
             Label {
@@ -334,7 +340,7 @@ CoverBackground {
                 }
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
-                color: Theme.primaryColor
+                color: Theme.highlightColor
                 font.pixelSize: Theme.fontSizeLarge
                 // Shrunk to fit rather than cut: "99+ new" in a language
                 // with a long word for new still has to be read whole.

@@ -408,7 +408,7 @@ removed from the store even after approval. Not an option.
    the newest one or wherever the chat was left.
    Opening the app on a phone that already has a profile is its own
    check: the chat list is what comes up, and nothing else on the way --
-   no field of faces, no buttons, and no empty screen with a spinner
+   no mark and name, no buttons, and no empty screen with a spinner
    either. The profile it opens on is read from dconf, which answers in
    the time it takes to open a file, and it is the window that reads it,
    before it puts anything up: the welcome page is not drawn and then
@@ -424,28 +424,21 @@ removed from the store even after approval. Not an option.
    holes that fill in one by one. Pictures are read off the phone's own
    disk, which is the part a headless test cannot have.
    The first screen is a device path because the phone's own colours
-   are: on a fresh install, before a profile, it is a field of faces
-   filling the screen with the words in a cleared box in the middle,
-   and the faces must be in the ambience's own colours -- grey in its
-   primary, a few lit in its highlight, the way the cover draws whoever
-   has written. Change the ambience with the app open and check the
-   field follows it; try a light ambience, where the faces have to be
-   dark on light rather than vanish. Turn the phone and check it fills
-   the screen on its side too, with the middle still clear, and that
-   nothing stutters on the way in: the field is one picture and one
-   shader (`components/FaceField.qml`), and the headless tests can load
-   it but cannot see it drawn. Sideways is where the edges are worth
-   looking at: on a phone that keeps a band of its screen for the
-   camera, the page is given that band short of the screen, and the
-   field is laid over the whole of what the page is in rather than over
-   the page, so there must be faces right up to both edges -- the
-   camera's one included -- and the field must still be faces rather
-   than a stretched picture.
+   are: on a fresh install, before a profile, it is the launcher icon
+   over the app's name, one line under it, and the two ways on, in a
+   column in the middle of an otherwise empty page, so the ambience is
+   what is behind them. Check the mark is sharp rather than scaled up
+   soft (`qml/art/logo.png` is the icon drawn out large), that the name
+   is in the ambience's highlight, and that turning the phone keeps the
+   column in the middle both ways up.
    The two ways on from that screen are tiles rather than buttons -- an
    icon over the words, the way a contact's page offers what a chat
    holds (`components/ChoiceTiles.qml`) -- and the icons are the
-   theme's own, asked for by name: `icon-m-about` and `icon-m-person`
-   here, `icon-m-transfer` and `icon-m-add` on the setup screen,
+   theme's own, asked for by name, except the one that starts the app:
+   "Set up my profile" is under a head and shoulders in a ring drawn by
+   this app (`components/AccountMark.qml`), so check it reads as an
+   account at a glance and greys with the tile. The rest are
+   `icon-m-about` here, `icon-m-transfer` and `icon-m-add` on the setup screen,
    `icon-m-device` and `icon-m-backup` where the profile is asked
    after, and those three again on Add profile, where they stand one
    under another under the header rather than three to a row -- each of

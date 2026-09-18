@@ -1,12 +1,11 @@
-//! The first screen's field of faces.
+//! The first screen: the app's mark over its name, and the ways on.
 //!
-//! The field is a picture (`qml/art/`), tinted by a shader in
-//! `components/FaceField.qml`; what is checked here is that the picture
-//! is there in the shape the shader reads -- an 8-bit RGB PNG, one per
-//! orientation, at a phone's size -- that the page loads it and swaps
-//! it with the orientation, and that the words sit over a cleared box
-//! that follows them. What it looks like is a manual check: `make
-//! faces`, then look at what it wrote.
+//! The mark is the launcher icon drawn out into a picture (`qml/art/`);
+//! what is checked here is that the picture is there in a shape a phone
+//! can draw, that the page loads it and puts it over the name, and that
+//! none of it is drawn before the core has said whether there is a chat
+//! list to be on instead. What it looks like is a manual check
+//! (docs/HARBOUR.md).
 
 // Qt harness: needs `unsafe` for `env::set_var` before Qt starts
 // (`unused_unsafe` because it is only unsafe from edition 2024 on),
@@ -52,51 +51,15 @@ fn probe_qml() -> String {
 const PROBE_QML: &str = r"
     import QtQuick 2.0
     import 'file://__COMPONENTS__'
-    // The screen, with the page in it: a page is not the whole of what
-    // it is drawn on, and on a phone that keeps a band for its camera it
-    // is a band short of it. `frame` is what holds the page, so a test
-    // can move it in the way that band does.
+    // The screen, with the page in it at a phone's size.
     Item {
         id: probe
         width: 1080
         height: 2520
-        Item {
-            id: frame
-            width: probe.width
-            height: probe.height
-            Loader { id: loader }
-        }
+        Loader { id: loader }
         function load(url) {
             loader.setSource(url, { width: 1080, height: 2520 })
             return loader.status === Loader.Ready ? 'ok' : 'load-failed'
-        }
-        // The screen this size, with the page put in it short of a band
-        // of `band` pixels down one edge -- moved off that edge, and
-        // that much narrower, which is what the page is given on a phone
-        // with a camera cutout.
-        function cutout(width, height, band) {
-            probe.width = parseInt(width, 10)
-            probe.height = parseInt(height, 10)
-            frame.x = parseInt(band, 10)
-            frame.width = probe.width - frame.x
-            frame.height = probe.height
-            if (!loader.item) { return 'no-page' }
-            loader.item.width = frame.width
-            loader.item.height = frame.height
-            return 'ok'
-        }
-        // Where the field lies on the screen, as `x,y,width,height`.
-        function fieldBox() {
-            var field = findIn(loader.item, 'faceField')
-            if (!field) { return 'missing:faceField' }
-            var at = probe.mapFromItem(field, 0, 0)
-            return Math.round(at.x) + ',' + Math.round(at.y) + ','
-                   + Math.round(field.width) + ',' + Math.round(field.height)
-        }
-        function turn(width, height) {
-            loader.item.width = parseInt(width)
-            loader.item.height = parseInt(height)
-            return 'ok'
         }
         function findIn(node, name) {
             if (!node) { return null }
@@ -113,6 +76,13 @@ const PROBE_QML: &str = r"
             if (!item) { return 'missing:' + name }
             return '' + item[property]
         }
+        // A property of a part of a named item: the tiles each hold a
+        // part of every name, so a part is asked for through its tile.
+        function partOf(name, part, property) {
+            var item = findIn(findIn(loader.item, name), part)
+            if (!item) { return 'missing:' + name + '/' + part }
+            return '' + item[property]
+        }
         function pageProperty(property) {
             return loader.item ? '' + loader.item[property] : 'no-page'
         }
@@ -126,11 +96,11 @@ const PROBE_QML: &str = r"
             core.accounts_refreshed(parseInt(count, 10), 4)
             return 'ok'
         }
-        // The mask's file name, without the checkout path.
-        function maskFile() {
-            var mask = findIn(loader.item, 'faceMask')
-            if (!mask) { return 'missing:faceMask' }
-            var url = '' + mask.source
+        // The mark's file name, without the checkout path.
+        function logoFile() {
+            var logo = findIn(loader.item, 'logo')
+            if (!logo) { return 'missing:logo' }
+            var url = '' + logo.source
             return url.substring(url.lastIndexOf('/') + 1)
         }
         // What this phone remembers about the profile it was last on.
@@ -151,68 +121,57 @@ const PROBE_QML: &str = r"
             loader.item.probing = false
             return 'ok'
         }
-        // Whether the cleared box is the column of words.
-        function clearsTheWords() {
-            var field = findIn(loader.item, 'faceField')
+        // Whether the mark stands over the name: drawn, above it, and
+        // on the same centre line.
+        function logoOverTitle() {
+            var logo = findIn(loader.item, 'logo')
             var title = findIn(loader.item, 'title')
-            if (!field || !title) { return 'missing' }
-            var words = title.parent
-            // The box is cut in the field, and the field starts where
-            // the page does only where nothing is in its way.
-            var centred =
-                Math.abs(field.x + field.clearX - (words.x + words.width / 2)) < 1
-                && Math.abs(field.y + field.clearY - (words.y + words.height / 2)) < 1
-            var sized = field.clearWidth === words.width
-                        && field.clearHeight === words.height
-            return '' + (centred && sized && words.height > 0)
+            if (!logo || !title) { return 'missing' }
+            var above = logo.height > 0 && logo.y + logo.height <= title.y
+            var centred = Math.abs((logo.x + logo.width / 2)
+                                   - (title.x + title.width / 2)) < 1
+            return '' + (above && centred)
+        }
+        // Whether anything of the first screen is drawn.
+        function wordsShown() {
+            var title = findIn(loader.item, 'title')
+            if (!title) { return 'missing:title' }
+            return '' + title.parent.visible
         }
     }
 ";
 
-/// A phone's short side. The masters are only ever scaled down, so
-/// anything narrower than this would be drawn bigger than it was
-/// painted.
-const SHORT_SIDE: u32 = 800;
+/// The smallest the mark may be painted: it is drawn at a large item's
+/// size, which on a phone is short of this, so anything smaller would be
+/// drawn bigger than it was painted.
+const SMALLEST_LOGO: u32 = 256;
 
-/// The masks are what the shader reads: two channels of an 8-bit RGB
-/// PNG, not interlaced (Qt loads either, but a mask re-exported as
-/// grayscale or with an alpha channel would tint the field wrong), one
-/// master per orientation and neither of them small.
-///
-/// The exact size is not pinned: the field is redrawn from time to time
-/// and the shader crops rather than stretches, so what matters is the
-/// shape of the channels, which way up each master runs, and that there
-/// are pixels enough.
+/// The mark is the launcher icon drawn out: an 8-bit PNG with an alpha
+/// channel, since it stands on the ambience rather than on a colour of
+/// its own, square, not interlaced, and not small.
 #[test]
-fn the_face_masks_are_the_shape_the_shader_reads() {
-    for (file, upright) in [("faces-portrait.png", true), ("faces-landscape.png", false)] {
-        let (width, height, depth, colour, interlace) = common::png_header(file);
-        assert_eq!(depth, 8, "qml/art/{file} is not 8 bits per channel");
-        assert_eq!(
-            colour, 2,
-            "qml/art/{file} is not RGB: the shader reads red and green"
-        );
-        assert_eq!(interlace, 0, "qml/art/{file} is interlaced");
-        let (long, short) = if upright {
-            (height, width)
-        } else {
-            (width, height)
-        };
-        assert!(
-            long > short,
-            "qml/art/{file} is {width}x{height}, which is not the master \
-             for the orientation it is named after"
-        );
-        assert!(
-            short >= SHORT_SIDE,
-            "qml/art/{file} is only {short} across its short side; a phone \
-             would draw it bigger than it was painted"
-        );
-    }
+fn the_logo_is_the_launcher_icon_drawn_out() {
+    let (width, height, depth, colour, interlace) = common::png_header("logo.png");
+    assert_eq!(depth, 8, "qml/art/logo.png is not 8 bits per channel");
+    assert_eq!(
+        colour, 6,
+        "qml/art/logo.png is not RGBA: the mark stands on the ambience, \
+         so it needs its alpha channel"
+    );
+    assert_eq!(interlace, 0, "qml/art/logo.png is interlaced");
+    assert_eq!(
+        width, height,
+        "qml/art/logo.png is {width}x{height}, and the launcher icon is square"
+    );
+    assert!(
+        width >= SMALLEST_LOGO,
+        "qml/art/logo.png is only {width} square; a phone would draw it \
+         bigger than it was painted"
+    );
 }
 
 #[test]
-fn the_welcome_page_draws_the_field_and_turns_with_the_phone() {
+fn the_welcome_page_leads_with_the_mark_and_the_name() {
     let temp = std::env::temp_dir().join(format!("piirit-qml-welcome-{}", std::process::id()));
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
     // SAFETY: single-threaded, and set before Qt starts.
@@ -222,9 +181,9 @@ fn the_welcome_page_draws_the_field_and_turns_with_the_phone() {
     }
 
     // Never started: the page is what is under test, and it shows its
-    // words only once the core has answered -- so the field is checked
-    // with the core in its error state, which the page shows over the
-    // field as it shows everything else.
+    // words only once the core has answered -- so the first screen is
+    // checked with the core in its error state, which the page says
+    // under the tiles as it shows everything else.
     let core_box = QObjectBox::new(DeltaChatCore::default());
     let stack_box = QObjectBox::new(NoStack::default());
 
@@ -274,34 +233,26 @@ fn the_welcome_page_draws_the_field_and_turns_with_the_phone() {
         // behind would otherwise decide what this page does.
         r("fresh", call!("rememberProfile", "0"));
         r("load", call!("load", common::page_url("WelcomePage.qml")));
-        r("upright", call!("maskFile"));
+        r("logo-file", call!("logoFile"));
         // Nothing is drawn until the core has said whether there is a
         // profile to resume: a phone that has one goes straight to the
-        // chat list, and a screenful of faces on the way reads as the
-        // app opening in the wrong place.
-        r("probing-field", call!("get", "faceField", "visible"));
+        // chat list, and a first screen on the way reads as the app
+        // opening in the wrong place.
+        r("probing-words", call!("wordsShown"));
         r("probing-spinner", call!("get", "probeSpinner", "running"));
         r("probed", call!("endProbe"));
     });
 
-    // The mask loads off the main thread; a second is plenty.
+    // A second is plenty for the picture to load.
     let r = record.clone();
     single_shot(Duration::from_secs(2), move || {
-        r("mask", call!("get", "faceMask", "status"));
-        r("shader", call!("get", "faceShader", "visible"));
-        r("clears", call!("clearsTheWords"));
+        r("logo", call!("get", "logo", "status"));
+        r("logo-over-title", call!("logoOverTitle"));
         r("title", call!("get", "title", "text"));
-        r("turn", call!("turn", "2520", "1080"));
-        r("sideways", call!("maskFile"));
-        // Upright again, and then turned by handing the page a sideways
-        // screen: one it has all of, and one where a band down the edge
-        // belongs to the camera. A page is told about the band by being
-        // given less, which is the only way it hears of it.
-        r("upright-again", call!("cutout", "1080", "2520", "0"));
-        r("whole", call!("cutout", "2520", "1080", "0"));
-        r("whole-box", call!("fieldBox"));
-        r("cutout", call!("cutout", "2520", "1080", "120"));
-        r("cutout-box", call!("fieldBox"));
+        r(
+            "setup-mark",
+            call!("partOf", "setupTile", "tileMark", "visible"),
+        );
     });
 
     // 3s: a stack that refuses, which is what the real one does while
@@ -355,54 +306,9 @@ fn the_welcome_page_draws_the_field_and_turns_with_the_phone() {
     engine.exec();
 
     let navigation = stack_box.pinned().borrow().log.to_string();
-    assert_field_drawn(&steps.borrow(), &navigation);
-    assert_the_field_covers_the_screen(&steps.borrow());
+    assert_first_screen(&steps.borrow(), &navigation);
     assert_remembered_profile_opens(&steps.borrow(), &navigation);
     assert_a_refused_hand_over_is_survived(&steps.borrow(), &navigation);
-}
-
-/// The field is the screen's, not the page's.
-///
-/// A Silica page is centred in what holds it, and on a phone that keeps
-/// a band of its screen for the camera the page is that band short of
-/// the screen: upright it is a strip across the top, turned on its side
-/// it is a strip down the edge the camera is on. A field that fills the
-/// page leaves that strip bare, which on the first screen is the first
-/// thing the reader sees.
-fn assert_the_field_covers_the_screen(steps: &[(String, String)]) {
-    let value = |label: &str| -> &str {
-        steps
-            .iter()
-            .find(|(name, _)| name == label)
-            .map_or("<step did not run>", |(_, value)| value.as_str())
-    };
-    let context = format!("steps: {steps:?}");
-    assert_eq!(
-        value("upright-again"),
-        "ok",
-        "the page could not be put back upright. {context}"
-    );
-    assert_eq!(
-        value("whole"),
-        "ok",
-        "the page could not be put on a screen of its own. {context}"
-    );
-    assert_eq!(
-        value("whole-box"),
-        "0,0,2520,1080",
-        "the field does not cover a screen the page has all of. {context}"
-    );
-    assert_eq!(
-        value("cutout"),
-        "ok",
-        "the page could not be put on a screen with a cutout. {context}"
-    );
-    assert_eq!(
-        value("cutout-box"),
-        "0,0,2520,1080",
-        "the page was moved off the edge the camera is on and the field \
-         went with it, leaving the band beside it bare. {context}"
-    );
 }
 
 /// A hand-over the stack refuses must leave the page working.
@@ -442,7 +348,7 @@ fn assert_a_refused_hand_over_is_survived(steps: &[(String, String)], navigation
         value("refused-probing"),
         "true",
         "the page drew itself the moment one hand-over was refused, so a \
-         phone with a profile shows the whole first screen -- field, \
+         phone with a profile shows the whole first screen -- mark, \
          name, buttons -- on its way to the chat list. {context}"
     );
     assert_eq!(
@@ -506,10 +412,9 @@ fn assert_remembered_profile_opens(steps: &[(String, String)], navigation: &str)
     );
 }
 
-/// The page upright draws the portrait master, the mask loads and the
-/// shader shows over it, the box is cleared where the words are, the
-/// name leads, and the page on its side swaps to the landscape master.
-fn assert_field_drawn(steps: &[(String, String)], navigation: &str) {
+/// The page draws the mark, loaded, over the name, and the name is the
+/// app's own; and none of it before the core has answered.
+fn assert_first_screen(steps: &[(String, String)], navigation: &str) {
     let value = |label: &str| -> &str {
         steps
             .iter()
@@ -524,22 +429,16 @@ fn assert_field_drawn(steps: &[(String, String)], navigation: &str) {
         "the welcome page did not load. {context}"
     );
     assert_eq!(
-        value("upright"),
-        "faces-portrait.png",
-        "the page upright does not draw the portrait master. {context}"
-    );
-    // Image.Ready is 1.
-    assert_eq!(
-        value("mask"),
-        "1",
-        "the mask never loaded, so the field is not drawn. {context}"
+        value("logo-file"),
+        "logo.png",
+        "the page does not draw the launcher icon's picture. {context}"
     );
     assert_eq!(
-        value("probing-field"),
+        value("probing-words"),
         "false",
-        "the field is drawn before the core has said whether there is a \
-         profile, so a phone with one flashes the welcome on its way to \
-         the chat list. {context}"
+        "the first screen is drawn before the core has said whether there \
+         is a profile, so a phone with one flashes the welcome on its way \
+         to the chat list. {context}"
     );
     assert_eq!(
         value("probing-spinner"),
@@ -553,15 +452,17 @@ fn assert_field_drawn(steps: &[(String, String)], navigation: &str) {
         "ok",
         "the probe could not be ended. {context}"
     );
+    // Image.Ready is 1.
     assert_eq!(
-        value("shader"),
-        "true",
-        "the shader is not shown once the mask is there. {context}"
+        value("logo"),
+        "1",
+        "the mark never loaded, so the first screen leads with a hole. \
+         {context}"
     );
     assert_eq!(
-        value("clears"),
+        value("logo-over-title"),
         "true",
-        "the field is not cleared where the words are. {context}"
+        "the mark does not stand over the name. {context}"
     );
     assert_eq!(
         value("title"),
@@ -569,9 +470,10 @@ fn assert_field_drawn(steps: &[(String, String)], navigation: &str) {
         "the app's name is not what the page leads with. {context}"
     );
     assert_eq!(
-        value("sideways"),
-        "faces-landscape.png",
-        "the page on its side does not swap to the landscape master. {context}"
+        value("setup-mark"),
+        "true",
+        "the way into a profile is not under the drawn account mark, so \
+         it is on the theme for an icon that may not be there. {context}"
     );
 }
 

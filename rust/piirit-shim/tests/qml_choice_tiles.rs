@@ -108,7 +108,7 @@ const PROBE_QML: &str = r"
 /// and the other without, one of them off.
 const CHOICES: &str = r#"[
     { "name": "about", "icon": "icon-m-about", "text": "Tell me about Delta Chat" },
-    { "name": "setup", "icon": "icon-m-person", "text": "Set up my profile",
+    { "name": "setup", "mark": "account", "text": "Set up my profile",
       "hint": "A new address, on a relay that carries chat mail and nothing else at all.",
       "enabled": false }
 ]"#;
@@ -192,6 +192,14 @@ fn a_row_of_tiles_is_named_drawn_and_answered_for() {
         r(
             "about-hint",
             call!("partOf", "aboutTile", "tileHint", "visible"),
+        );
+        r(
+            "setup-mark",
+            call!("partOf", "setupTile", "tileMark", "visible"),
+        );
+        r(
+            "about-mark",
+            call!("partOf", "aboutTile", "tileMark", "visible"),
         );
         r(
             "setup-icon",
@@ -378,9 +386,22 @@ fn assert_row(steps: &[(String, String)]) {
         value("about-icon").starts_with("image://theme/icon-m-about?"),
         "the tile does not draw the theme icon it was given. {context}"
     );
-    assert!(
-        value("setup-icon").starts_with("image://theme/icon-m-person?"),
-        "the second tile does not draw its own icon. {context}"
+    // A choice that names a drawn mark gets the mark, and asks the theme
+    // for nothing; one that names an icon gets no mark.
+    assert_eq!(
+        value("setup-mark"),
+        "true",
+        "the tile given a drawn mark does not draw it. {context}"
+    );
+    assert_eq!(
+        value("setup-icon"),
+        "",
+        "the tile given a drawn mark still asks the theme for an icon. {context}"
+    );
+    assert_eq!(
+        value("about-mark"),
+        "false",
+        "the tile given a theme icon draws the account mark too. {context}"
     );
     assert_eq!(
         value("about-text"),
