@@ -55,16 +55,20 @@ on:
     # becomes available once a workflow is on main.
     tags: ["v*", "build-*"]
 
+# Reading the tree is all the workflow as a whole needs; each job says what
+# more it holds, so neither holds the other's.
 permissions:
   contents: read
-  # The derived SDK image lives in this repository's registry, and a run
-  # that finds none there publishes the one it had to build.
-  packages: write
 
 jobs:
   rpm:
     runs-on: ubuntu-latest
     timeout-minutes: 120
+    permissions:
+      contents: read
+      # The derived SDK image lives in this repository's registry, and a
+      # run that finds none there publishes the one it had to build.
+      packages: write
     env:
       ARCH: aarch64
       SFOS: ${{ inputs.sfos_version || '5.2.0.15' }}
