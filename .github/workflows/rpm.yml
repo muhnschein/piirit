@@ -40,26 +40,40 @@ on:
         type: choice
         options: ["4", "2", "1"]
         default: "4"
+      release:
+        description: >
+          Cut a release: the version to publish, which has to be what
+          rpm/harbour-piirit.spec says, run on main. The commit is tagged
+          v<version> and a GitHub release goes up with the package and
+          CHANGELOG.md's section for it. Leave empty for an ordinary
+          build. See docs/BUILDING.md.
+        type: string
+        default: ""
   push:
     # `v*` for a release. `build-*` is a throwaway handle for running this
     # before it reaches the default branch, since workflow_dispatch only
     # becomes available once a workflow is on main.
     tags: ["v*", "build-*"]
 
+# Reading the tree is all the workflow as a whole needs; each job says what
+# more it holds, so neither holds the other's.
 permissions:
   contents: read
-  # The derived SDK image lives in this repository's registry, and a run
-  # that finds none there publishes the one it had to build.
-  packages: write
 
 jobs:
   rpm:
     runs-on: ubuntu-latest
     timeout-minutes: 120
+    permissions:
+      contents: read
+      # The derived SDK image lives in this repository's registry, and a
+      # run that finds none there publishes the one it had to build.
+      packages: write
     env:
       ARCH: aarch64
       SFOS: ${{ inputs.sfos_version || '5.2.0.15' }}
       CARGO_JOBS: ${{ inputs.cargo_jobs || '4' }}
+      RELEASE: ${{ inputs.release || '' }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
@@ -130,8 +144,16 @@ jobs:
       # the file said it was new.
       #
       # The run number is monotonic, so each build is an upgrade of the
-      # last. The spec keeps Release: 1 in the tree, which is what a tagged
-      # release should be.
+      # last. The spec keeps Release: 1 in the tree, and a release builds
+      # exactly that: the package a release page offers is the spec as
+      # committed, not stamped with a run number nobody can find again.
+      #
+      # A release is a `v*` tag, or a dispatch on main with the version in
+      # `release`. Either has to say what the spec says, or the package
+      # would carry one version and the release another; a tag pushed or
+      # a version typed before the bump stops here. A dispatch is held to
+      # main because the job below tags the commit it runs on, and a tag
+      # on a branch is a release of something main may never carry.
       #
       # Digits and periods only: Harbour rejects any other character in
       # Release, so the short SHA that used to be appended here would have
@@ -139,7 +161,23 @@ jobs:
       - name: Stamp the build so each one is its own package
         run: |
           short=$(git rev-parse --short HEAD)
-          release="1.${GITHUB_RUN_NUMBER}"
+          version=$(sed -n 's/^Version:[[:space:]]*//p' rpm/harbour-piirit.spec)
+          wanted=""
+          case "$GITHUB_REF" in
+            refs/tags/v*) wanted=${GITHUB_REF#refs/tags/v} ;;
+          esac
+          if [ -n "$RELEASE" ]; then
+            [ "$GITHUB_REF" = "refs/heads/main" ] || {
+              echo "::error::a release is cut on main, not on $GITHUB_REF"; exit 1; }
+            wanted=$RELEASE
+          fi
+          if [ -n "$wanted" ]; then
+            [ "$wanted" = "$version" ] || {
+              echo "::error::release $wanted, but rpm/harbour-piirit.spec says Version: $version"; exit 1; }
+            release="1"
+          else
+            release="1.${GITHUB_RUN_NUMBER}"
+          fi
           sed -i "s/^Release:.*/Release:    ${release}/" rpm/harbour-piirit.spec
           grep '^Version:\|^Release:' rpm/harbour-piirit.spec
           echo "SHORT_SHA=$short" >> "$GITHUB_ENV"
@@ -284,3 +322,59 @@ jobs:
           [ -n "$rpm" ] || { echo "::error::no RPM to validate"; exit 1; }
           echo "Validating $rpm"
           ./ci/harbour-validate-rpm.sh "$rpm"
+
+  # A release: the package the job above built goes on a GitHub release
+  # named v<version>, with that version's section of CHANGELOG.md as its
+  # text. Its own job so that `contents: write` is held only here, by
+  # three commands, and never by the build running an SDK image with
+  # `--privileged`.
+  #
+  # From a `v*` tag the tag is there already and `--verify-tag` refuses to
+  # invent one; from a dispatch the release is what makes the tag, on the
+  # commit this run checked out. A version whose changelog section is
+  # missing fails in scripts/release-notes.sh before anything is published.
+  # `gh` is the runner's own; the token is the job's.
+  release:
+    needs: rpm
+    if: startsWith(github.ref, 'refs/tags/v') || inputs.release != ''
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+      actions: read
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+      RELEASE: ${{ inputs.release || '' }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Fetch the package this run built
+        run: gh run download "$GITHUB_RUN_ID" --dir rpms
+
+      # The device package and its checksum, and nothing else: the debug
+      # and source RPMs are for a developer with the tree, not a phone.
+      - name: Gather the assets
+        run: |
+          mkdir -p assets
+          find rpms -name 'harbour-piirit-*.rpm' ! -name '*debug*' \
+               ! -name '*.src.rpm' -exec cp {} assets/ \;
+          [ -n "$(ls assets)" ] || { echo "::error::no device RPM to release"; exit 1; }
+          (cd assets && sha256sum -- * > SHA256SUMS)
+          cat assets/SHA256SUMS
+
+      - name: Publish the release
+        run: |
+          if [ -n "$RELEASE" ]; then
+            version=$RELEASE
+            where="--target $GITHUB_SHA"
+          else
+            version=${GITHUB_REF_NAME#v}
+            where="--verify-tag"
+          fi
+          ./scripts/release-notes.sh "$version" > notes.md
+          # shellcheck disable=SC2086  # $where is one flag, or a flag and a SHA
+          gh release create "v$version" $where \
+            --title "Piirit $version" \
+            --notes-file notes.md \
+            assets/*

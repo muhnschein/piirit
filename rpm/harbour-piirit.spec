@@ -39,7 +39,7 @@
 # not this.
 Name:       harbour-piirit
 Summary:    Native SailfishOS client for Delta Chat
-Version:    0.1.0
+Version:    1.0.0
 Release:    1
 # Piirit's own code is GPL-3.0-or-later; the bundled
 # deltachat-rpc-server is upstream's unmodified MPL-2.0 binary, and the tag
