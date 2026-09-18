@@ -627,7 +627,7 @@ async fn take_handover(
             message,
         )),
         Written::Failed => {
-            drop(std::fs::remove_file(&path));
+            drop(tokio::fs::remove_file(&path).await);
             Ok(Response::empty("500 Internal Server Error"))
         }
     }
@@ -645,12 +645,10 @@ async fn write_streamed(
     path: &std::path::Path,
     head: &Head,
 ) -> std::io::Result<Written> {
-    use std::io::Write as _;
-
-    // `std::fs` rather than tokio's: these are chunk-sized writes to the
-    // phone's own storage, and what this replaces was a single blocking
-    // write of the entire file.
-    let Ok(mut file) = std::fs::File::create(path) else {
+    // tokio's file rather than std's: this runs on the runtime the
+    // JSON-RPC client shares, and a write to a full or slow disk would
+    // otherwise hold one of its threads for the duration.
+    let Ok(mut file) = tokio::fs::File::create(path).await else {
         drain(stream, head.started.len(), head.length).await?;
         return Ok(Written::Failed);
     };
@@ -663,7 +661,7 @@ async fn write_streamed(
     loop {
         // A write that fails is the disk being full as often as not,
         // which is the only ceiling this route has left.
-        if !rest.is_empty() && file.write_all(rest).is_err() {
+        if !rest.is_empty() && file.write_all(rest).await.is_err() {
             drain(stream, taken, head.length).await?;
             return Ok(Written::Failed);
         }
@@ -677,7 +675,7 @@ async fn write_streamed(
         rest = &chunk[..read];
         taken += read;
     }
-    if file.flush().is_err() {
+    if file.flush().await.is_err() {
         return Ok(Written::Failed);
     }
     Ok(Written::Done)

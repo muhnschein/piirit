@@ -131,7 +131,7 @@ async fn fetch_icon(rpc: &RpcClient, account_id: u32, message_id: u32, icon: &st
     let Some(bytes) = answer.ok().as_deref().and_then(decode_base64) else {
         return String::new();
     };
-    match std::fs::write(&path, bytes) {
+    match tokio::fs::write(&path, bytes).await {
         Ok(()) => path.to_string_lossy().into_owned(),
         Err(_) => String::new(),
     }
@@ -489,7 +489,9 @@ async fn download(rpc: &RpcClient, account_id: u32, url: &str) -> Result<String,
         return Err("the app came back empty".to_string());
     }
     let path = cache_file(&format!("{STORE_DIR}/{}", app_file_name(url)))?;
-    std::fs::write(&path, bytes).map_err(|err| format!("cannot save the app: {err}"))?;
+    tokio::fs::write(&path, bytes)
+        .await
+        .map_err(|err| format!("cannot save the app: {err}"))?;
     Ok(path.to_string_lossy().into_owned())
 }
 

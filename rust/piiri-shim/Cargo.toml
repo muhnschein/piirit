@@ -26,8 +26,11 @@ qttypes = "0.2"
 # traits for one small HTTP exchange. `net` is what brings socket2 in,
 # tokio's own platform layer for sockets. `time` is the restart backoff
 # and the deadline an attempt at a profile is given (signup.rs); the
-# JSON-RPC client turns it on anyway, but it is used here too.
-tokio = { version = "1", features = ["rt-multi-thread", "sync", "net", "io-util", "time"] }
+# JSON-RPC client turns it on anyway, but it is used here too. `fs` is
+# the few files the async side writes -- a webxdc's icon, an app off the
+# store, a file an app hands over -- so that none of them blocks a
+# runtime thread the JSON-RPC client is waiting on.
+tokio = { version = "1", features = ["rt-multi-thread", "sync", "net", "io-util", "time", "fs"] }
 # Only for the viewer's timezone. A day separator has to ask what the
 # offset was at the message's own instant, not the one in force now,
 # and std has no timezone support -- the alternative was localtime_r,
