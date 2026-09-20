@@ -26,10 +26,63 @@ pub(crate) struct Quota {
     pub limit_bytes: u64,
 }
 
-/// The first quota bar in a connectivity report, if there is one. A relay
-/// that reports no quota, or a report from before the first connection,
-/// has none.
-pub(crate) fn quota_from_report(html: &str) -> Option<Quota> {
+/// The quota bar for `address`'s relay, if there is one. A relay that
+/// reports no quota, or a report from before the first connection, has
+/// none.
+///
+/// A profile can have several transports, and the core writes one
+/// `<li class="transport">` per transport, in the order they were added,
+/// each with its own quota. Reading the first bar in the report would
+/// give whichever relay was set up first rather than the one the profile
+/// sends from, so the block is picked by the address before the bar is
+/// read. A report with one transport block has only one relay to report
+/// on, whatever the block is headed with, and a report with none of them
+/// at all -- an older core -- is read as it always was.
+pub(crate) fn quota_from_report(html: &str, address: &str) -> Option<Quota> {
+    let blocks = transport_blocks(html);
+    match blocks.len() {
+        0 => quota_in(html),
+        1 => quota_in(blocks[0]),
+        // Several relays and none of them this profile's primary: no
+        // quota rather than another relay's.
+        _ => quota_in(block_for(&blocks, address)?),
+    }
+}
+
+/// Where each `<li class="transport">` block starts and ends. The core
+/// writes them one after another inside the incoming-messages list, so a
+/// block runs to the next one, or to the end of the report.
+fn transport_blocks(html: &str) -> Vec<&str> {
+    const MARK: &str = "<li class=\"transport\">";
+    let starts: Vec<usize> = html.match_indices(MARK).map(|(at, _)| at).collect();
+    starts
+        .iter()
+        .enumerate()
+        .map(|(nth, &start)| {
+            let end = starts.get(nth + 1).copied().unwrap_or(html.len());
+            &html[start..end]
+        })
+        .collect()
+}
+
+/// The block for the relay `address` sends from: the core heads each one
+/// with `<b>domain:</b>`, the domain of that transport's address.
+fn block_for<'html>(blocks: &[&'html str], address: &str) -> Option<&'html str> {
+    let domain = address.rsplit('@').next()?.trim();
+    if domain.is_empty() {
+        return None;
+    }
+    blocks.iter().copied().find(|block| {
+        block
+            .split("<b>")
+            .skip(1)
+            .filter_map(|after| after.split_once(":</b>"))
+            .any(|(name, _)| name.trim().eq_ignore_ascii_case(domain))
+    })
+}
+
+/// The first quota bar in a fragment of the report, if there is one.
+fn quota_in(html: &str) -> Option<Quota> {
     // The bar the core draws: `<div class="progress grey" style="width:
     // 12%">12%</div>`. The number inside the div is the real percentage;
     // the width is capped at 100.
@@ -156,10 +209,22 @@ mod tests {
         <div class=\"bar\"><div class=\"progress grey\" style=\"width: 67%\">67%</div></div>\
         </li></ul></li></ul><h3>Outgoing messages</h3><ul><li>Connected</li></ul></body></html>";
 
+    /// Two transports, the way a profile set up twice has them: the older
+    /// one first, as the core lists them, and the profile's own second.
+    const TWO: &str = "<html><body><h3>Incoming messages</h3><ul>\
+        <li class=\"transport\"><span class=\"dot green\"></span> <b>nine.testrun.org:</b> Connected<br />\
+        <ul class=\"quota-list\"><li>1.34 GiB of 2 GiB used\
+        <div class=\"bar\"><div class=\"progress grey\" style=\"width: 67%\">67%</div></div>\
+        </li></ul></li>\
+        <li class=\"transport\"><span class=\"dot green\"></span> <b>chat.example.org:</b> Connected<br />\
+        <ul class=\"quota-list\"><li>12 MiB of 1 GiB used\
+        <div class=\"bar\"><div class=\"progress grey\" style=\"width: 2%\">2%</div></div>\
+        </li></ul></li></ul><h3>Outgoing messages</h3><ul><li>Connected</li></ul></body></html>";
+
     #[test]
     fn the_quota_is_read_off_the_bar_the_core_drew() {
         assert_eq!(
-            quota_from_report(REPORT),
+            quota_from_report(REPORT, "ada@nine.testrun.org"),
             Some(Quota {
                 percent: 67,
                 text: "1.34 GiB of 2 GiB used".to_string(),
@@ -167,6 +232,63 @@ mod tests {
                 limit_bytes: 2_147_483_648,
             })
         );
+    }
+
+    /// One relay to report on is that profile's, whatever it is headed
+    /// with -- a report written before the core has named the transport
+    /// still has a quota to show.
+    #[test]
+    fn a_single_transport_is_read_whatever_the_address() {
+        assert_eq!(
+            quota_from_report(REPORT, "ada@chat.example.org").map(|quota| quota.percent),
+            Some(67)
+        );
+        assert_eq!(
+            quota_from_report(REPORT, "").map(|quota| quota.percent),
+            Some(67)
+        );
+    }
+
+    /// The bug behind this: with a second transport, the first bar in the
+    /// report is the first relay ever set up, not the one the profile
+    /// sends from.
+    #[test]
+    fn the_quota_is_the_relay_the_profile_sends_from() {
+        assert_eq!(
+            quota_from_report(TWO, "ada@chat.example.org"),
+            Some(Quota {
+                percent: 2,
+                text: "12 MiB of 1 GiB used".to_string(),
+                used_bytes: 12_582_912,
+                limit_bytes: 1_073_741_824,
+            })
+        );
+        assert_eq!(
+            quota_from_report(TWO, "ada@nine.testrun.org").map(|quota| quota.percent),
+            Some(67)
+        );
+        // The core writes the domain as it stored it; the address the
+        // profile was configured with need not match its case.
+        assert_eq!(
+            quota_from_report(TWO, "Ada@Chat.Example.ORG").map(|quota| quota.percent),
+            Some(2)
+        );
+    }
+
+    /// A relay that reports no quota of its own reports none: the bar
+    /// beside another relay's name is not this profile's mailbox.
+    #[test]
+    fn another_relays_bar_is_not_borrowed() {
+        let silent = TWO.replace(
+            "<ul class=\"quota-list\"><li>12 MiB of 1 GiB used\
+             <div class=\"bar\"><div class=\"progress grey\" style=\"width: 2%\">2%</div></div>\
+             </li></ul>",
+            "",
+        );
+        assert_eq!(quota_from_report(&silent, "ada@chat.example.org"), None);
+        // Nor is it borrowed for an address no block is headed with.
+        assert_eq!(quota_from_report(TWO, "ada@chat.elsewhere.org"), None);
+        assert_eq!(quota_from_report(TWO, ""), None);
     }
 
     #[test]
@@ -189,14 +311,17 @@ mod tests {
     #[test]
     fn a_report_without_a_bar_has_no_quota() {
         assert_eq!(
-            quota_from_report("<html><body><h3>Not connected</h3></body></html>"),
+            quota_from_report(
+                "<html><body><h3>Not connected</h3></body></html>",
+                "ada@nine.testrun.org"
+            ),
             None
         );
-        assert_eq!(quota_from_report(""), None);
+        assert_eq!(quota_from_report("", "ada@nine.testrun.org"), None);
         // Over-full: the width is capped but the number is not.
         let full = REPORT.replace("width: 67%\">67%", "width: 100%\">120%");
         assert_eq!(
-            quota_from_report(&full).map(|quota| quota.percent),
+            quota_from_report(&full, "ada@nine.testrun.org").map(|quota| quota.percent),
             Some(120)
         );
     }
@@ -208,7 +333,7 @@ mod tests {
             "<b>Storage:</b> 1.34&nbsp;GiB of 2 GiB used &amp; counting",
         );
         assert_eq!(
-            quota_from_report(&report).map(|quota| quota.text),
+            quota_from_report(&report, "ada@nine.testrun.org").map(|quota| quota.text),
             Some("Storage: 1.34 GiB of 2 GiB used & counting".to_string())
         );
     }

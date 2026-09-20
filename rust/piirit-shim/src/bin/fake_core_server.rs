@@ -156,7 +156,14 @@ impl State {
                             "id": account.id,
                             "kind": "Configured",
                             "displayName": self.config(account.id, "displayname").unwrap_or_default(),
-                            "addr": self.config(account.id, "configured_addr")
+                            // The core's own `addr`, which this list
+                            // carries: a key deprecated in 2026-04 that
+                            // falls back to `configured_addr` only while
+                            // nothing was written to it. A profile that
+                            // once had another transport keeps the older
+                            // address here.
+                            "addr": self.config(account.id, "addr")
+                                .or_else(|| self.config(account.id, "configured_addr"))
                                 .unwrap_or_else(|| format!("account{}@example.org", account.id)),
                             "profileImage": self.config(account.id, "selfavatar"),
                             "color": "#4a90d9",
@@ -992,12 +999,26 @@ async fn serve() {
                     // configured, named in PIIRIT_FAKE_ACCOUNTS. The
                     // onboarding tests leave it unset and start from none.
                     if state.accounts.is_empty() {
+                        // A profile set up twice keeps the address of the
+                        // relay it was set up on first in the core's
+                        // deprecated `addr`, while `configured_addr` is
+                        // the relay it sends from now.
+                        let older = std::env::var("PIIRIT_FAKE_OLDER_RELAY").ok();
                         for account in env_ids("PIIRIT_FAKE_ACCOUNTS") {
                             if let Ok(account) = u32::try_from(account) {
                                 state.accounts.push(Account {
                                     id: account,
                                     configured: true,
                                 });
+                                if let Some(older) = &older {
+                                    state
+                                        .config
+                                        .insert((account, "addr".to_string()), older.clone());
+                                    state.config.insert(
+                                        (account, "configured_addr".to_string()),
+                                        format!("account{account}@example.org"),
+                                    );
+                                }
                             }
                         }
                     }
@@ -1133,7 +1154,14 @@ async fn serve() {
                     let mut state = state.lock().await;
                     state.seed_chats();
                     let mut first: Option<u32> = None;
-                    for msg in state.chats.get(&chat).cloned().unwrap_or_default().iter().rev() {
+                    for msg in state
+                        .chats
+                        .get(&chat)
+                        .cloned()
+                        .unwrap_or_default()
+                        .iter()
+                        .rev()
+                    {
                         match message_object(u64::from(*msg))
                             .get("state")
                             .and_then(Value::as_u64)
@@ -1300,16 +1328,34 @@ async fn serve() {
                 // with the quota on a bar in it -- the shape the real core
                 // writes, pinned in deltachat-jsonrpc/tests/real_server.rs.
                 "get_connectivity" => ok(&id, &json!(4000)),
-                "get_connectivity_html" => ok(
-                    &id,
-                    &json!(concat!(
-                        "<html><body><h3>Incoming messages</h3><ul>",
-                        "<li class=\"transport\"><b>example.org:</b> Connected<br />",
-                        "<ul class=\"quota-list\"><li>1.34 GiB of 2 GiB used",
-                        "<div class=\"bar\"><div class=\"progress grey\" style=\"width: 67%\">67%</div></div>",
-                        "</li></ul></li></ul></body></html>"
-                    )),
-                ),
+                "get_connectivity_html" => {
+                    // The core reports every transport, oldest first,
+                    // each with its own quota. A profile set up twice
+                    // has the older relay's bar before its own.
+                    let older = std::env::var("PIIRIT_FAKE_OLDER_RELAY")
+                        .ok()
+                        .map(|addr| {
+                            let domain = addr.rsplit('@').next().unwrap_or(&addr).to_string();
+                            format!(
+                                "<li class=\"transport\"><b>{domain}:</b> Connected<br />\
+                                 <ul class=\"quota-list\"><li>1.9 GiB of 2 GiB used\
+                                 <div class=\"bar\"><div class=\"progress red\" style=\"width: 95%\">95%</div></div>\
+                                 </li></ul></li>"
+                            )
+                        })
+                        .unwrap_or_default();
+                    ok(
+                        &id,
+                        &json!(format!(
+                            "<html><body><h3>Incoming messages</h3><ul>\
+                             {older}\
+                             <li class=\"transport\"><b>example.org:</b> Connected<br />\
+                             <ul class=\"quota-list\"><li>1.34 GiB of 2 GiB used\
+                             <div class=\"bar\"><div class=\"progress grey\" style=\"width: 67%\">67%</div></div>\
+                             </li></ul></li></ul></body></html>"
+                        )),
+                    )
+                }
                 "get_account_file_size" => ok(&id, &json!(123_456)),
                 // The rest of a message held back by the download limit.
                 // One message, as `get_messages` gives them out. What
@@ -1738,7 +1784,9 @@ async fn serve() {
                     let seconds = positional(2).as_i64().unwrap_or_default();
                     let cutoff = std::time::SystemTime::now()
                         .duration_since(std::time::UNIX_EPOCH)
-                        .map_or(0, |since| i64::try_from(since.as_secs()).unwrap_or(i64::MAX))
+                        .map_or(0, |since| {
+                            i64::try_from(since.as_secs()).unwrap_or(i64::MAX)
+                        })
                         .saturating_sub(seconds);
                     let mut state = state.lock().await;
                     state.seed_chats();
@@ -2144,10 +2192,7 @@ async fn serve() {
                                 file_name,
                             },
                         );
-                        state.note_quote(
-                            msg,
-                            data.get("quotedMessageId").unwrap_or(&Value::Null),
-                        );
+                        state.note_quote(msg, data.get("quotedMessageId").unwrap_or(&Value::Null));
                         ok(&id, &json!(msg))
                     }
                 }
@@ -2228,7 +2273,10 @@ async fn serve() {
                     let state = state.lock().await;
                     let updates = state.webxdc_updates.get(&msg).cloned().unwrap_or_default();
                     let after: Vec<Value> = updates.iter().skip(serial).cloned().collect();
-                    ok(&id, &json!(serde_json::to_string(&after).unwrap_or_default()))
+                    ok(
+                        &id,
+                        &json!(serde_json::to_string(&after).unwrap_or_default()),
+                    )
                 }
                 "send_webxdc_status_update" => {
                     let account = account_id();

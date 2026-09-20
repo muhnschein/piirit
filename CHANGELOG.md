@@ -6,6 +6,23 @@ of the GitHub release, which `scripts/release-notes.sh` cuts out of this
 file when the release is made (`.github/workflows/rpm.yml`;
 docs/BUILDING.md, "Cutting a release").
 
+## Unreleased
+
+A profile can have more than one transport -- a relay set up long ago
+beside the one it sends from now -- and the app took the wrong one of
+them in two places, reported from a phone whose profiles page named a
+relay its profile had left.
+
+- The address under a profile's name on the profiles page is the relay it
+  sends from (`configured_addr`) rather than the account list's `addr`,
+  a key the core deprecated and only falls back to it with.
+- The mailbox figure on the profile page is that same relay's. The core's
+  connectivity report covers every transport, and the first quota bar in
+  it belongs to whichever was set up first.
+- The relay list is the one chatmail.at/relays publishes today, and the
+  dialog no longer opens on a relay of its own choosing: it asks, and
+  Create waits until the answer is there.
+
 ## 1.0.0 — 2026-09-18
 
 The first release. Piirit is a native Sailfish OS client for

@@ -194,9 +194,19 @@ impl Profile {
                     .call("get_account_file_size", (account_id,))
                     .await
                     .unwrap_or(0);
+                // Which relay's mailbox to read off the report: a profile
+                // can have more than one transport, and the report covers
+                // them all. Asked here rather than taken from `address`,
+                // which the load fills and may not have yet.
+                let address: String = rpc
+                    .call::<_, Option<String>>("get_config", (account_id, "configured_addr"))
+                    .await
+                    .ok()
+                    .flatten()
+                    .unwrap_or_default();
                 Ok::<_, String>((
                     connectivity,
-                    quota_from_report(&report),
+                    quota_from_report(&report, &address),
                     // Through f64 because QML has no 64-bit integer. Exact
                     // to 2^53 bytes, which no phone holds.
                     #[allow(clippy::cast_precision_loss)]

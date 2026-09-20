@@ -8,12 +8,17 @@ import Sailfish.Silica 1.0
  *
  * A dialog rather than a form with a button, the way Silica asks a
  * question: what was typed is on this page, and accepting it goes to
- * ProfileSetupPage, which does the work and shows the progress. The relay
- * list and the shape of the page follow parla's account dialog
- * (github.com/trufae/parla), whose curated list of public relays is
- * copied here; one of them is picked at random each time. Anyone can run
- * a relay, so a custom one can be typed, and takes over from the list
- * while it is.
+ * ProfileSetupPage, which does the work and shows the progress. The shape
+ * of the page follows parla's account dialog (github.com/trufae/parla).
+ * Anyone can run a relay, so a custom one can be typed, and takes over
+ * from the list while it is.
+ *
+ * Nothing is picked to begin with, and the dialog cannot be accepted
+ * until something is: a relay is where someone's address and their
+ * mailbox live for as long as they keep the profile, so it is a choice
+ * to make rather than one to be handed. An earlier version opened on a
+ * relay of the list at random, which is a choice made for the reader by
+ * a dialog they have not read yet.
  */
 Dialog {
     id: dialog
@@ -24,27 +29,30 @@ Dialog {
                             : (relayCombo.currentIndex >= 0 && relayCombo.currentIndex < relays.length
                                ? relays[relayCombo.currentIndex].domain : "")
     /// What the core is handed: `dcaccount:` and a relay, which it takes
-    /// with or without the `https://.../new` around it.
-    property string providerQr: "dcaccount:" + domain
+    /// with or without the `https://.../new` around it. Empty until a
+    /// relay is chosen: there is nothing to hand over before that.
+    property string providerQr: domain.length > 0 ? "dcaccount:" + domain : ""
 
-    // From chatmail.at/relays, as parla curates it.
+    // The public relays chatmail.at/relays listed on 2026-09-20, in its
+    // order, with what it says about each. Anyone may run a relay and
+    // the page is the list that is kept up to date, so this one is a
+    // starting point rather than the whole of it -- the hint under the
+    // field points at the page itself.
     readonly property var relays: [
-        { domain: "nine.testrun.org", location: "Germany" },
-        { domain: "mehl.cloud", location: "German" },
-        { domain: "mailchat.pl", location: "Poland" },
-        { domain: "chatmail.woodpeckersnest.space", location: "Italy" },
-        { domain: "chatmail.culturanerd.it", location: "Italy" },
+        { domain: "nine.testrun.org", location: "Default for many chatmail apps" },
+        { domain: "mehl.cloud", location: "German speakers" },
+        { domain: "mailchat.pl", location: "Polish speakers" },
+        { domain: "chatmail.woodpeckersnest.space", location: "Italian speakers" },
+        { domain: "chatmail.culturanerd.it", location: "Italian speakers" },
         { domain: "chat.adminforge.de", location: "Falkenstein, Germany" },
         { domain: "chika.aangat.lahat.computer", location: "Santa Clara, USA" },
         { domain: "tarpit.fun", location: "Nuremberg, Germany" },
         { domain: "d.gaufr.es", location: "Roubaix, France" },
         { domain: "chtml.ca", location: "Quebec, Canada" },
-        { domain: "chatmail.au", location: "Melbourne, Australia" },
         { domain: "e2ee.wang", location: "Johannesburg, South Africa" },
         { domain: "chat.privittytech.com", location: "Bangalore, India" },
         { domain: "e2ee.im", location: "Orastie, Romania" },
         { domain: "chatmail.email", location: "Warsaw, Poland" },
-        { domain: "danneskjold.de", location: "Helsinki, Finland" },
         { domain: "chat.in-the.eu", location: "Falkenstein, Germany" },
         { domain: "chat.nuvon.app", location: "Prague, Czechia" },
         { domain: "nibblehole.com", location: "Zug, Switzerland" },
@@ -57,6 +65,8 @@ Dialog {
         { domain: "delta.disobey.net", location: "Roon, Netherlands" }
     ]
 
+    // A name, and a relay picked or typed: neither is guessed for the
+    // reader.
     canAccept: nameField.text.trim().length > 0 && domain.length > 0
 
     // The setup page does the work, with what was typed here. Silica
@@ -67,11 +77,6 @@ Dialog {
         dialog.acceptDestinationInstance.displayName = nameField.text.trim()
         dialog.acceptDestinationInstance.providerQr = dialog.providerQr
     }
-
-    // Any relay, each time: no one of them is the default, so the
-    // profiles made here spread over the list rather than all landing on
-    // its first entry.
-    Component.onCompleted: relayCombo.currentIndex = Math.floor(Math.random() * relays.length)
 
     SilicaFlickable {
         anchors.fill: parent
@@ -110,7 +115,11 @@ Dialog {
                 objectName: "relayCombo"
                 width: parent.width
                 label: qsTr("Relay")
-                currentIndex: 0
+                // Nothing to begin with: the reader picks. The label
+                // above the empty value says what is being asked for,
+                // and Create stays dim until it is answered, so the
+                // dialog asks rather than answers for them.
+                currentIndex: -1
                 // A typed server is the one that counts.
                 enabled: customField.text.trim().length === 0
 

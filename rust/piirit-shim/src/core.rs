@@ -1123,10 +1123,14 @@ impl DeltaChatCore {
                         })
                     })
                     .collect();
-                // One more call per profile, for the badge on its row.
-                // Only the configured ones: an unconfigured account has
-                // no chats to count.
+                // Two more calls per profile, for the address under its
+                // name and the badge on its row. Only the configured
+                // ones: an unconfigured account has neither an address
+                // nor chats to count.
                 for item in items.iter_mut().filter(|item| item.is_configured) {
+                    if let Some(addr) = primary_addr(&rpc, item.account_id).await {
+                        item.addr = addr.into();
+                    }
                     item.unread_count = fresh_count(&rpc, item.account_id).await;
                 }
                 Ok::<_, String>((items, selected))
@@ -1556,6 +1560,24 @@ async fn account_ids(rpc: &RpcClient) -> Result<Vec<u32>, String> {
                 .collect()
         })
         .map_err(|err| err.to_string())
+}
+
+/// The address a profile sends from: `configured_addr`, the core's
+/// primary transport, which is what the profile page shows.
+///
+/// The account list's own `addr` is not it. That is the core's `addr`
+/// key, deprecated since 2026-04 and only a fallback to
+/// `configured_addr` when nothing was ever written to it -- a profile
+/// that once had another transport set up keeps that older address
+/// there, and the row would then name a relay the profile no longer
+/// sends from. None when the core cannot say, so the row keeps what the
+/// account list gave it.
+async fn primary_addr(rpc: &RpcClient, account_id: u32) -> Option<String> {
+    rpc.call::<_, Option<String>>("get_config", (account_id, "configured_addr"))
+        .await
+        .ok()
+        .flatten()
+        .filter(|addr| !addr.is_empty())
 }
 
 async fn fresh_count(rpc: &RpcClient, account_id: u32) -> u32 {

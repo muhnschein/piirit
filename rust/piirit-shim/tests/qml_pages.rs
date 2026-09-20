@@ -335,8 +335,8 @@ fn onboarding_pages_drive_the_core_and_navigate() {
         common::record(&s, "start-create", call!("click", "createProfileTile"));
     });
 
-    // The dialog: nothing to accept until there is a name; the first
-    // relay unless another is picked or one is typed.
+    // The dialog: nothing to accept until there is a name and a relay,
+    // and no relay until one is picked or typed.
     let s = steps.clone();
     single_shot(Duration::from_secs(4), move || {
         common::record(
@@ -355,6 +355,11 @@ fn onboarding_pages_drive_the_core_and_navigate() {
         common::record(&s, "dialog-named", call!("pageProperty", "canAccept"));
         common::record(&s, "dialog-pick", call!("pick", "relayCombo", "1"));
         common::record(&s, "dialog-picked", call!("pageProperty", "providerQr"));
+        common::record(
+            &s,
+            "dialog-named-picked",
+            call!("pageProperty", "canAccept"),
+        );
         common::record(
             &s,
             "dialog-custom",
@@ -468,9 +473,9 @@ fn assert_welcome_and_navigation(
     );
 }
 
-/// The dialog: no accepting without a name, the first relay by default,
-/// a picked or typed one otherwise, and what was chosen is what the
-/// setup page is handed.
+/// The dialog: no accepting without a name and a relay, nothing picked
+/// until the reader picks it, and what was chosen is what the setup page
+/// is handed.
 fn assert_dialog(steps: &[(String, String)], context: &str) {
     for step in [
         "dialog-name",
@@ -491,23 +496,28 @@ fn assert_dialog(steps: &[(String, String)], context: &str) {
         "false",
         "the dialog can be accepted without a name. {context}"
     );
-    // One of the list, at random: not the first every time.
-    let index: usize = common::value_of(steps, "dialog-index")
-        .parse()
-        .unwrap_or(usize::MAX);
-    assert!(
-        index < 26,
-        "the relay picked on arrival is not one of the list. {context}"
+    // Nothing picked on arrival: the relay is the reader's choice, not
+    // the dialog's.
+    assert_eq!(
+        common::value_of(steps, "dialog-index"),
+        "-1",
+        "the dialog opened on a relay of its own choosing. {context}"
     );
-    let provider = common::value_of(steps, "dialog-provider");
-    assert!(
-        provider.starts_with("dcaccount:") && provider.contains('.'),
-        "the relay picked on arrival is not a dcaccount: payload with a domain. {context}"
+    assert_eq!(
+        common::value_of(steps, "dialog-provider"),
+        "",
+        "the dialog had a relay to hand over before one was chosen. {context}"
     );
     assert_eq!(
         common::value_of(steps, "dialog-named"),
+        "false",
+        "a name alone makes the dialog acceptable, so a profile can be \
+         made on no relay in particular. {context}"
+    );
+    assert_eq!(
+        common::value_of(steps, "dialog-named-picked"),
         "true",
-        "a name does not make the dialog acceptable. {context}"
+        "a name and a picked relay do not make the dialog acceptable. {context}"
     );
     assert_eq!(
         common::value_of(steps, "dialog-picked"),
