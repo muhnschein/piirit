@@ -39,10 +39,6 @@
         <translation>Votre nom</translation>
     </message>
     <message>
-        <source>Pick a name and a relay. There is nothing else to set up.</source>
-        <translation>Choisissez un nom et un relais. Il n&apos;y a rien d&apos;autre à configurer.</translation>
-    </message>
-    <message>
         <source>Select a public chatmail relay</source>
         <translation>Sélectionner un relais chatmail public</translation>
     </message>
@@ -53,6 +49,10 @@
     <message>
         <source>Piirit works only with chatmail relays. These are a particular kind of e-mail server; ordinary e-mail servers are not supported. For more, see &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. A full list of public, free-to-use chatmail relays is at &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</source>
         <translation>Piirit ne fonctionne qu&apos;avec des relais chatmail. Il s&apos;agit d&apos;un type particulier de serveur de courrier ; les serveurs de courrier ordinaires ne sont pas pris en charge. Pour en savoir plus, voir &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. La liste complète des relais chatmail publics et gratuits se trouve sur &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
+    </message>
+    <message>
+        <source>Pick a name and a relay. That&apos;s it! There is nothing else to set up.</source>
+        <translation>Choisissez un nom et un relais. C&apos;est tout ! Il n&apos;y a rien d&apos;autre à configurer.</translation>
     </message>
 </context>
 <context>

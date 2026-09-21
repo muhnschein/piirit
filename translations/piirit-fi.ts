@@ -39,10 +39,6 @@
         <translation>Nimesi</translation>
     </message>
     <message>
-        <source>Pick a name and a relay. There is nothing else to set up.</source>
-        <translation>Valitse nimi ja välittäjä. Muuta ei tarvitse asettaa.</translation>
-    </message>
-    <message>
         <source>Select a public chatmail relay</source>
         <translation>Valitse julkinen chatmail-välittäjä</translation>
     </message>
@@ -53,6 +49,10 @@
     <message>
         <source>Piirit works only with chatmail relays. These are a particular kind of e-mail server; ordinary e-mail servers are not supported. For more, see &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. A full list of public, free-to-use chatmail relays is at &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</source>
         <translation>Piirit toimii vain chatmail-välittäjien kanssa. Ne ovat erityinen sähköpostipalvelimien laji; tavallisia sähköpostipalvelimia ei tueta. Lisätietoa: &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. Täydellinen luettelo julkisista, maksutta käytettävistä chatmail-välittäjistä on osoitteessa &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
+    </message>
+    <message>
+        <source>Pick a name and a relay. That&apos;s it! There is nothing else to set up.</source>
+        <translation>Valitse nimi ja välittäjä. Siinä kaikki! Muuta ei tarvitse asettaa.</translation>
     </message>
 </context>
 <context>

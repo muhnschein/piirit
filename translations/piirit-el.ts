@@ -39,10 +39,6 @@
         <translation>Το όνομά σας</translation>
     </message>
     <message>
-        <source>Pick a name and a relay. There is nothing else to set up.</source>
-        <translation>Διαλέξτε ένα όνομα και έναν αναμεταδότη. Δεν χρειάζεται τίποτα άλλο.</translation>
-    </message>
-    <message>
         <source>Select a public chatmail relay</source>
         <translation>Επιλέξτε δημόσιο αναμεταδότη chatmail</translation>
     </message>
@@ -53,6 +49,10 @@
     <message>
         <source>Piirit works only with chatmail relays. These are a particular kind of e-mail server; ordinary e-mail servers are not supported. For more, see &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. A full list of public, free-to-use chatmail relays is at &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</source>
         <translation>Το Piirit λειτουργεί μόνο με αναμεταδότες chatmail. Είναι ένα ιδιαίτερο είδος διακομιστή e-mail· οι συνηθισμένοι διακομιστές e-mail δεν υποστηρίζονται. Περισσότερα στο &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. Πλήρης λίστα δημόσιων, δωρεάν αναμεταδοτών chatmail υπάρχει στο &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
+    </message>
+    <message>
+        <source>Pick a name and a relay. That&apos;s it! There is nothing else to set up.</source>
+        <translation>Διαλέξτε ένα όνομα και έναν αναμεταδότη. Αυτό ήταν! Δεν χρειάζεται τίποτα άλλο.</translation>
     </message>
 </context>
 <context>

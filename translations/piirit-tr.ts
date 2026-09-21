@@ -39,10 +39,6 @@
         <translation>Adınız</translation>
     </message>
     <message>
-        <source>Pick a name and a relay. There is nothing else to set up.</source>
-        <translation>Bir ad ve bir aktarıcı seç. Başka ayarlanacak bir şey yok.</translation>
-    </message>
-    <message>
         <source>Select a public chatmail relay</source>
         <translation>Herkese açık bir chatmail aktarıcısı seç</translation>
     </message>
@@ -53,6 +49,10 @@
     <message>
         <source>Piirit works only with chatmail relays. These are a particular kind of e-mail server; ordinary e-mail servers are not supported. For more, see &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. A full list of public, free-to-use chatmail relays is at &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</source>
         <translation>Piirit yalnızca chatmail aktarıcılarıyla çalışır. Bunlar özel bir tür e-posta sunucusudur; sıradan e-posta sunucuları desteklenmez. Daha fazlası için &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt; adresine bak. Herkese açık, ücretsiz chatmail aktarıcılarının tam listesi &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; adresinde.</translation>
+    </message>
+    <message>
+        <source>Pick a name and a relay. That&apos;s it! There is nothing else to set up.</source>
+        <translation>Bir ad ve bir aktarıcı seç. Hepsi bu! Başka ayarlanacak bir şey yok.</translation>
     </message>
 </context>
 <context>

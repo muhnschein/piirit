@@ -39,10 +39,6 @@
         <translation>Vaše ime</translation>
     </message>
     <message>
-        <source>Pick a name and a relay. There is nothing else to set up.</source>
-        <translation>Izberi ime in posrednika. Ničesar drugega ni treba nastaviti.</translation>
-    </message>
-    <message>
         <source>Select a public chatmail relay</source>
         <translation>Izberi javnega posrednika chatmail</translation>
     </message>
@@ -53,6 +49,10 @@
     <message>
         <source>Piirit works only with chatmail relays. These are a particular kind of e-mail server; ordinary e-mail servers are not supported. For more, see &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. A full list of public, free-to-use chatmail relays is at &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</source>
         <translation>Piirit deluje samo s posredniki chatmail. To je posebna vrsta e-poštnih strežnikov; navadni e-poštni strežniki niso podprti. Več na &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. Celoten seznam javnih, brezplačnih posrednikov chatmail je na &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
+    </message>
+    <message>
+        <source>Pick a name and a relay. That&apos;s it! There is nothing else to set up.</source>
+        <translation>Izberi ime in posrednika. To je vse! Ničesar drugega ni treba nastaviti.</translation>
     </message>
 </context>
 <context>

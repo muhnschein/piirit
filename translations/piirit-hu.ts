@@ -39,10 +39,6 @@
         <translation>Az Ön neve</translation>
     </message>
     <message>
-        <source>Pick a name and a relay. There is nothing else to set up.</source>
-        <translation>Válassz egy nevet és egy közvetítőt. Mást nem kell beállítani.</translation>
-    </message>
-    <message>
         <source>Select a public chatmail relay</source>
         <translation>Nyilvános chatmail-közvetítő választása</translation>
     </message>
@@ -53,6 +49,10 @@
     <message>
         <source>Piirit works only with chatmail relays. These are a particular kind of e-mail server; ordinary e-mail servers are not supported. For more, see &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. A full list of public, free-to-use chatmail relays is at &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</source>
         <translation>A Piirit csak chatmail-közvetítőkkel működik. Ezek különleges fajta e-mail-kiszolgálók; a közönséges e-mail-kiszolgálók nem támogatottak. Bővebben: &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. A nyilvános, ingyenesen használható chatmail-közvetítők teljes listája: &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
+    </message>
+    <message>
+        <source>Pick a name and a relay. That&apos;s it! There is nothing else to set up.</source>
+        <translation>Válassz egy nevet és egy közvetítőt. Ennyi! Mást nem kell beállítani.</translation>
     </message>
 </context>
 <context>

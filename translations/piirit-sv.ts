@@ -39,10 +39,6 @@
         <translation>Ditt namn</translation>
     </message>
     <message>
-        <source>Pick a name and a relay. There is nothing else to set up.</source>
-        <translation>Välj ett namn och ett relä. Det finns inget mer att ställa in.</translation>
-    </message>
-    <message>
         <source>Select a public chatmail relay</source>
         <translation>Välj ett offentligt chatmail-relä</translation>
     </message>
@@ -53,6 +49,10 @@
     <message>
         <source>Piirit works only with chatmail relays. These are a particular kind of e-mail server; ordinary e-mail servers are not supported. For more, see &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. A full list of public, free-to-use chatmail relays is at &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</source>
         <translation>Piirit fungerar bara med chatmail-reläer. Det är en särskild sorts e-postserver; vanliga e-postservrar stöds inte. Läs mer på &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. En fullständig lista över offentliga, kostnadsfria chatmail-reläer finns på &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
+    </message>
+    <message>
+        <source>Pick a name and a relay. That&apos;s it! There is nothing else to set up.</source>
+        <translation>Välj ett namn och ett relä. Det är allt! Det finns inget mer att ställa in.</translation>
     </message>
 </context>
 <context>

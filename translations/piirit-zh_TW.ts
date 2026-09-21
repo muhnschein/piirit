@@ -39,10 +39,6 @@
         <translation>你的名字</translation>
     </message>
     <message>
-        <source>Pick a name and a relay. There is nothing else to set up.</source>
-        <translation>選一個名字和一個中繼，不需要其他設定。</translation>
-    </message>
-    <message>
         <source>Select a public chatmail relay</source>
         <translation>選擇公共 chatmail 中繼</translation>
     </message>
@@ -53,6 +49,10 @@
     <message>
         <source>Piirit works only with chatmail relays. These are a particular kind of e-mail server; ordinary e-mail servers are not supported. For more, see &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. A full list of public, free-to-use chatmail relays is at &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</source>
         <translation>Piirit 只能搭配 chatmail 中繼使用。這是一種特殊的電子郵件伺服器；不支援一般的電子郵件伺服器。詳情請見 &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;。公共、免費的 chatmail 中繼完整清單請見 &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;。</translation>
+    </message>
+    <message>
+        <source>Pick a name and a relay. That&apos;s it! There is nothing else to set up.</source>
+        <translation>選一個名字和一個中繼，就這樣！不需要其他設定。</translation>
     </message>
 </context>
 <context>

@@ -39,10 +39,6 @@
         <translation>आपका नाम</translation>
     </message>
     <message>
-        <source>Pick a name and a relay. There is nothing else to set up.</source>
-        <translation>एक नाम और एक रिले चुनें। और कुछ सेट करने की ज़रूरत नहीं।</translation>
-    </message>
-    <message>
         <source>Select a public chatmail relay</source>
         <translation>सार्वजनिक chatmail रिले चुनें</translation>
     </message>
@@ -53,6 +49,10 @@
     <message>
         <source>Piirit works only with chatmail relays. These are a particular kind of e-mail server; ordinary e-mail servers are not supported. For more, see &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. A full list of public, free-to-use chatmail relays is at &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</source>
         <translation>Piirit केवल chatmail रिले के साथ काम करता है। ये एक ख़ास तरह के ई-मेल सर्वर हैं; साधारण ई-मेल सर्वर समर्थित नहीं हैं। अधिक जानकारी के लिए &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt; देखें। सार्वजनिक, मुफ़्त chatmail रिले की पूरी सूची &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; पर है।</translation>
+    </message>
+    <message>
+        <source>Pick a name and a relay. That&apos;s it! There is nothing else to set up.</source>
+        <translation>एक नाम और एक रिले चुनें। बस! और कुछ सेट करने की ज़रूरत नहीं।</translation>
     </message>
 </context>
 <context>

@@ -72,7 +72,7 @@ Dialog {
                 wrapMode: Text.Wrap
                 font.pixelSize: Theme.fontSizeSmall
                 color: Theme.secondaryHighlightColor
-                text: qsTr("Pick a name and a relay. There is nothing else to set up.")
+                text: qsTr("Pick a name and a relay. That's it! There is nothing else to set up.")
             }
 
             TextField {
