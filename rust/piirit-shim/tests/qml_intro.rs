@@ -48,6 +48,14 @@ const PICTURES: [&str; 5] = [
 /// fifths of a phone's width, so anything under this would be drawn
 /// bigger than it was painted.
 const SMALLEST_PICTURE: u32 = 400;
+/// The largest, which is a packaging rule rather than a drawing one. A
+/// picture is drawn at `min(width * 0.42, height * 0.30)` (`IntroPage`),
+/// which is 453 px on the tallest phone Sailfish runs on and 614 px on
+/// the Jolla Tablet, and PNG is already compressed, so every pixel past
+/// that is paid for twice: once in the package the reader downloads and
+/// once in the one installed on the phone. Five masters at 1254 square
+/// were 3.05 MB of a 14.3 MB package, more than the app's own binary.
+const LARGEST_PICTURE: u32 = 800;
 
 /// Silica's `pageStack`, recorded rather than performed: where the end of
 /// the walk leads, and how often.
@@ -163,9 +171,10 @@ const PROBE_QML: &str = r"
 /// is not square would be drawn stretched, since `InkArt` does not
 /// letterbox.
 ///
-/// How big is not pinned, only how small: the pictures are redrawn from
-/// time to time, and a phone scales whatever they are down to the box it
-/// has for them.
+/// How big is pinned at both ends: a phone scales whatever they are down
+/// to the box it has for them, so a picture under the floor is drawn
+/// bigger than it was painted, and one over the ceiling is package
+/// weight nothing on a phone can show.
 #[test]
 fn the_intro_pictures_are_the_shape_the_shader_reads() {
     for file in PICTURES {
@@ -185,6 +194,11 @@ fn the_intro_pictures_are_the_shape_the_shader_reads() {
             width >= SMALLEST_PICTURE,
             "qml/art/{file} is only {width} square; a phone would draw it \
              bigger than it was painted"
+        );
+        assert!(
+            width <= LARGEST_PICTURE,
+            "qml/art/{file} is {width} square; no phone draws one bigger \
+             than {LARGEST_PICTURE}, so the rest is package weight"
         );
     }
 }

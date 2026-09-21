@@ -353,6 +353,51 @@ and `zypper` leaves the critical path.
 - `rust/target` and the crates are carried between runs.
 - cargo runs four jobs inside scratchbox2.
 
+## What a package weighs
+
+The aarch64 package, built against SDK 5.2.0.15. "In the package" is what
+a file costs inside the zstd payload, which is the number that matters for
+a download; raw is what it costs on the phone.
+
+Taken apart at 1.0.0 (`rpm/harbour-piirit.spec` 1.0.0-1, run 152):
+
+| raw | in the package | what |
+|---|---|---|
+| 20.42 MB | 9.38 MB | `%{_libexecdir}/%{name}/deltachat-rpc-server` |
+| 5.83 MB | 1.46 MB | `%{_bindir}/%{name}` |
+| 3.05 MB | 3.01 MB | `qml/art/intro-*.png` |
+| 1.42 MB | ~0.1 MB | the 41 `.qm` catalogs |
+| ~0.7 MB | ~0.6 MB | the rest of `qml/`, the icons, `LICENSE`, `SOURCE.md` |
+
+The bundled server is a fixed cost: upstream's stripped static-musl build,
+and Harbour leaves nowhere else to put the core (`HARBOUR.md`). The other
+rows are this tree's to answer for, and two of them were answered:
+
+- **The pictures are painted at the size a phone draws them.** `IntroPage`
+shows one at `min(width * 0.42, height * 0.30)` -- 453 px on the tallest
+phone, 614 px on the Jolla Tablet -- and PNG is already compressed, so a
+1254 px master was carried whole into the download and scaled away on the
+device. At 640 px the five of them are 0.75 MB instead of 3.05 MB.
+`the_intro_pictures_are_the_shape_the_shader_reads` pins both ends of that
+range now, so they cannot regrow without a test saying so.
+- **The binary is stripped by `[profile.release]`, not by rpmbuild.**
+rpmbuild here does not strip what it packages -- the validator said `file
+is not stripped!` of every build up to 1.0.0, which carried 2.08 MB of
+symbol tables. `strip = "symbols"` removes them; `main` stays reachable
+because `build.rs` exports it into `.dynsym` (`HARBOUR.md`). `lto = "thin"`
+and `codegen-units = 1` are in the same block.
+
+Measured either side of those three settings, on `main` and on the branch
+that introduced them:
+
+| | before (run 160) | after (run 161) |
+|---|---|---|
+| Download | 15,027,710 B (14.33 MiB) | 12,254,749 B (11.69 MiB) |
+| Installed | 65126 blocks (31.80 MiB) | 55270 blocks (26.99 MiB) |
+
+The build pays about a minute for the LTO: five and a half minutes became
+six and a half at one cargo job.
+
 ## Spec constraints
 
 Constraints encoded in `rpm/harbour-piirit.spec`:
