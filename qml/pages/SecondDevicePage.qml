@@ -16,12 +16,20 @@ import Piirit 1.0
  * it and takes a copy, and both end up with the profile. So this page is
  * the code, and the bar the transfer draws once somebody reads it.
  *
- * The offer starts with the page rather than behind a button. There is
- * nothing else to do here -- the reader agreed to this in the dialog in
- * front of it (SecondDeviceDialog.qml), which is also where the warning
- * about who can see the code lives -- and a code is what they came for;
- * the button that is here instead is the one that starts another offer
- * after one has ended.
+ * The code waits behind a button. Nothing on the phone can tell a
+ * second device of the reader's own from a camera over their shoulder,
+ * and what this page shows is the profile -- messages, contacts and key
+ * -- so the reader is the one who says when it goes up, with the line
+ * above the button saying what it is they are putting on screen. That
+ * is also why the button does not start the offer on the way in: a page
+ * opened by mistake shows nothing worth reading.
+ *
+ * The button says what it is about to do: "Show code" before there has
+ * been one, "Show code again" once the reader has seen one -- after
+ * Cancel, after the app has been away, or after an offer nobody came
+ * for. Cancel takes the code down and leaves the reader here, on the
+ * button, rather than off the page: that is what stopping the code
+ * means when the page is a place of its own.
  *
  * Leaving the page ends the offer. A provider left running behind a
  * page that is gone holds the profile out with nobody watching and with
@@ -58,10 +66,10 @@ Page {
     property bool taken: false
     /// The chats are attached to the right, so there is a swipe to offer.
     property bool chatsAttached: false
-    /// An offer has been started at least once. Until then there is
-    /// nothing to try again -- the page is on its way up, or waiting
-    /// for a core that is still starting.
-    property bool started: false
+    /// A code has been on screen at least once. Until then there is
+    /// nothing to show *again*, so the button says what it means: a
+    /// start that never got as far as a code does not count.
+    property bool shown: false
 
     /// The core is preparing the provider and there is nothing to show
     /// yet.
@@ -101,6 +109,15 @@ Page {
         // transfer, both giving up on the same silence.
         onStalled: page.errorMessage = qsTr("Nothing took the profile. Both phones have to stay on one network, with this page open.")
         onError: page.errorMessage = message
+        // What the button says next time depends on whether there has
+        // ever been a code to look at, rather than on whether an offer
+        // was started: a provider that failed before it had one showed
+        // the reader nothing.
+        onCode_changed: {
+            if (device.code.length > 0) {
+                page.shown = true
+            }
+        }
     }
 
     // The core reports the transfer the way it reports an import or an
@@ -119,12 +136,7 @@ Page {
         text: device.code
     }
 
-    // Offered as soon as the page is up, and again if the core was not
-    // ready when it was: a page opened while the app is still starting
-    // has nothing to ask.
-    Component.onCompleted: page.begin()
-
-    // And ended when the page is left, whichever way. The provider is
+    // Ended when the page is left, whichever way. The provider is
     // the core's and outlives this page; left running it would hold the
     // profile out to whoever asks, with nothing on screen to say so and
     // nothing left to stop it. Cancel does this and then pops; a swipe
@@ -136,24 +148,17 @@ Page {
         }
     }
 
-    // Qt 5.6 handler syntax; see WelcomePage.qml.
-    Connections {
-        target: core
-        onStatus_changed: {
-            if (core.status === "ready") {
-                page.begin()
-            }
-        }
-    }
-
-    /// Start the offer, once there is a core to start it on.
+    /// Start the offer, on the reader's word.
+    ///
+    /// No check on the core being up: a core that is not there answers
+    /// this with "not started" on `error`, which is a banner the reader
+    /// can read, and a button that quietly does nothing is not.
     function begin() {
-        if (core.status !== "ready" || device.running) {
+        if (device.running) {
             return
         }
         page.errorMessage = ""
         page.taken = false
-        page.started = true
         device.offer()
     }
 
@@ -213,10 +218,9 @@ Page {
                 text: qsTr("On the other device: add a profile you have already, then \"Add as second device\", and read this code with it. Both phones on one network.")
             }
 
-            // What the core does while the code is up, said rather than
-            // found out. That whoever reads the code gets the profile
-            // was said in the dialog in front of this page, where it
-            // could still be answered with Cancel.
+            // What pressing the button puts on screen, said before it
+            // is pressed: this is the last moment the reader can decide
+            // who is in the room.
             Label {
                 objectName: "caution"
                 visible: !page.taken
@@ -226,7 +230,7 @@ Page {
                 textFormat: Text.PlainText
                 font.pixelSize: Theme.fontSizeExtraSmall
                 color: Theme.secondaryColor
-                text: qsTr("This profile stops collecting mail until the code is gone.")
+                text: qsTr("Whoever reads this code gets the profile. It stops collecting mail until the code is gone.")
             }
 
             // While the core is getting the provider up there is no code
@@ -291,25 +295,28 @@ Page {
                 label: qsTr("Handing the profile over...")
             }
 
+            // Stops the offer and stays: the page is where the button
+            // is, and taking the code down is what Cancel means here.
+            // What is left is the button again, saying "Show code
+            // again". Leaving the page is the swipe, which ends the
+            // offer too.
             Button {
                 objectName: "cancelButton"
                 anchors.horizontalCenter: parent.horizontalCenter
                 visible: device.running
                 text: qsTr("Cancel")
-                onClicked: {
-                    device.cancel()
-                    pageStack.pop()
-                }
+                onClicked: device.cancel()
             }
 
-            // The offer is over and nothing came of it: what went wrong
-            // is in the strip along the bottom, and this is the way to
-            // have another go.
+            // The only thing this page does on its own account: put the
+            // code up, and put it up again afterwards. Gone while an
+            // offer is running, because Cancel is what that state is
+            // answered with, and gone once a device has the profile.
             Button {
-                objectName: "retryButton"
+                objectName: "showButton"
                 anchors.horizontalCenter: parent.horizontalCenter
-                visible: page.started && !device.running && !page.taken
-                text: qsTr("Show the code again")
+                visible: !device.running && !page.taken
+                text: page.shown ? qsTr("Show code again") : qsTr("Show code")
                 onClicked: page.begin()
             }
 

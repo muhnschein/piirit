@@ -1387,33 +1387,6 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
     </message>
 </context>
 <context>
-    <name>SecondDeviceDialog</name>
-    <message>
-        <source>Add a second device</source>
-        <translation>Přidat druhé zařízení</translation>
-    </message>
-    <message>
-        <source>Continue</source>
-        <translation>Pokračovat</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation>Zrušit</translation>
-    </message>
-    <message>
-        <source>This makes a code the other device reads to copy the profile onto itself.</source>
-        <translation>Vytvoří to kód, který druhé zařízení načte a zkopíruje si profil.</translation>
-    </message>
-    <message>
-        <source>Make sure nobody, and no camera, can see the screen that comes next. Whoever reads that code gets the profile, key and all.</source>
-        <translation>Dej pozor, ať na další obrazovku nevidí nikdo ani žádná kamera. Kdo ten kód načte, má profil i s klíčem.</translation>
-    </message>
-    <message>
-        <source>Both phones have to be on the same network, and this profile stops collecting mail while the code is up.</source>
-        <translation>Oba telefony musí být v jedné síti a tenhle profil nevybírá poštu, dokud je kód na obrazovce.</translation>
-    </message>
-</context>
-<context>
     <name>SecondDevicePage</name>
     <message>
         <source>Nothing took the profile. Both phones have to stay on one network, with this page open.</source>
@@ -1440,10 +1413,6 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
         <translation>Zrušit</translation>
     </message>
     <message>
-        <source>Show the code again</source>
-        <translation>Ukázat kód znovu</translation>
-    </message>
-    <message>
         <source>The other device has the profile. Both get everything new from now on.</source>
         <translation>Druhé zařízení má profil. Od teď dostanou obě všechno nové.</translation>
     </message>
@@ -1452,8 +1421,16 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
         <translation>Přejeď dál na své chaty.</translation>
     </message>
     <message>
-        <source>This profile stops collecting mail until the code is gone.</source>
-        <translation>Tenhle profil nevybírá poštu, dokud kód nezmizí.</translation>
+        <source>Whoever reads this code gets the profile. It stops collecting mail until the code is gone.</source>
+        <translation>Kdo načte tenhle kód, má profil. Do té doby, než kód zmizí, profil nevybírá poštu.</translation>
+    </message>
+    <message>
+        <source>Show code again</source>
+        <translation>Ukázat kód znovu</translation>
+    </message>
+    <message>
+        <source>Show code</source>
+        <translation>Ukázat kód</translation>
     </message>
 </context>
 <context>

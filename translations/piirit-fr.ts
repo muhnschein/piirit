@@ -1381,33 +1381,6 @@ Vous continuerez à voir les messages des contacts bloqués dans les autres grou
     </message>
 </context>
 <context>
-    <name>SecondDeviceDialog</name>
-    <message>
-        <source>Add a second device</source>
-        <translation>Ajouter un deuxième appareil</translation>
-    </message>
-    <message>
-        <source>Continue</source>
-        <translation>Continuer</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation>Annuler</translation>
-    </message>
-    <message>
-        <source>This makes a code the other device reads to copy the profile onto itself.</source>
-        <translation>Cela crée un code que l&apos;autre appareil lit pour copier le profil.</translation>
-    </message>
-    <message>
-        <source>Make sure nobody, and no camera, can see the screen that comes next. Whoever reads that code gets the profile, key and all.</source>
-        <translation>Assurez-vous que personne, et aucune caméra, ne peut voir l&apos;écran suivant. Qui lit ce code reçoit le profil, clé comprise.</translation>
-    </message>
-    <message>
-        <source>Both phones have to be on the same network, and this profile stops collecting mail while the code is up.</source>
-        <translation>Les deux téléphones doivent être sur le même réseau, et ce profil ne relève pas le courrier tant que le code est affiché.</translation>
-    </message>
-</context>
-<context>
     <name>SecondDevicePage</name>
     <message>
         <source>Nothing took the profile. Both phones have to stay on one network, with this page open.</source>
@@ -1434,10 +1407,6 @@ Vous continuerez à voir les messages des contacts bloqués dans les autres grou
         <translation>Annuler</translation>
     </message>
     <message>
-        <source>Show the code again</source>
-        <translation>Afficher le code à nouveau</translation>
-    </message>
-    <message>
         <source>The other device has the profile. Both get everything new from now on.</source>
         <translation>L&apos;autre appareil a le profil. À partir de maintenant, les deux reçoivent tout ce qui arrive.</translation>
     </message>
@@ -1446,8 +1415,16 @@ Vous continuerez à voir les messages des contacts bloqués dans les autres grou
         <translation>Glissez vers vos discussions.</translation>
     </message>
     <message>
-        <source>This profile stops collecting mail until the code is gone.</source>
-        <translation>Ce profil ne relève pas le courrier tant que le code est affiché.</translation>
+        <source>Whoever reads this code gets the profile. It stops collecting mail until the code is gone.</source>
+        <translation>Qui lit ce code reçoit le profil. Tant que le code est affiché, le profil ne relève pas le courrier.</translation>
+    </message>
+    <message>
+        <source>Show code again</source>
+        <translation>Afficher le code à nouveau</translation>
+    </message>
+    <message>
+        <source>Show code</source>
+        <translation>Afficher le code</translation>
     </message>
 </context>
 <context>

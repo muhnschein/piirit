@@ -1393,33 +1393,6 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
     </message>
 </context>
 <context>
-    <name>SecondDeviceDialog</name>
-    <message>
-        <source>Add a second device</source>
-        <translation>Dodaj drugo napravo</translation>
-    </message>
-    <message>
-        <source>Continue</source>
-        <translation>Naprej</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation>Prekliči</translation>
-    </message>
-    <message>
-        <source>This makes a code the other device reads to copy the profile onto itself.</source>
-        <translation>To ustvari kodo, ki jo druga naprava prebere in si prekopira profil.</translation>
-    </message>
-    <message>
-        <source>Make sure nobody, and no camera, can see the screen that comes next. Whoever reads that code gets the profile, key and all.</source>
-        <translation>Poskrbi, da naslednjega zaslona ne vidi nihče in nobena kamera. Kdor prebere to kodo, dobi profil s ključem vred.</translation>
-    </message>
-    <message>
-        <source>Both phones have to be on the same network, and this profile stops collecting mail while the code is up.</source>
-        <translation>Oba telefona morata biti v istem omrežju, ta profil pa ne pobira pošte, dokler je koda na zaslonu.</translation>
-    </message>
-</context>
-<context>
     <name>SecondDevicePage</name>
     <message>
         <source>Nothing took the profile. Both phones have to stay on one network, with this page open.</source>
@@ -1446,10 +1419,6 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
         <translation>Prekliči</translation>
     </message>
     <message>
-        <source>Show the code again</source>
-        <translation>Znova pokaži kodo</translation>
-    </message>
-    <message>
         <source>The other device has the profile. Both get everything new from now on.</source>
         <translation>Druga naprava ima profil. Odslej dobita obe vse novo.</translation>
     </message>
@@ -1458,8 +1427,16 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
         <translation>Podrsaj naprej do svojih klepetov.</translation>
     </message>
     <message>
-        <source>This profile stops collecting mail until the code is gone.</source>
-        <translation>Ta profil ne pobira pošte, dokler koda ne izgine.</translation>
+        <source>Whoever reads this code gets the profile. It stops collecting mail until the code is gone.</source>
+        <translation>Kdor prebere to kodo, dobi profil. Dokler je koda na zaslonu, profil ne pobira pošte.</translation>
+    </message>
+    <message>
+        <source>Show code again</source>
+        <translation>Znova pokaži kodo</translation>
+    </message>
+    <message>
+        <source>Show code</source>
+        <translation>Pokaži kodo</translation>
     </message>
 </context>
 <context>

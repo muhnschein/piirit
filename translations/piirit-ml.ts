@@ -1381,33 +1381,6 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
-    <name>SecondDeviceDialog</name>
-    <message>
-        <source>Add a second device</source>
-        <translation>രണ്ടാമത്തെ ഉപകരണം ചേർക്കുക</translation>
-    </message>
-    <message>
-        <source>Continue</source>
-        <translation>തുടരുക</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation>റദ്ദാക്കുക</translation>
-    </message>
-    <message>
-        <source>This makes a code the other device reads to copy the profile onto itself.</source>
-        <translation>ഇത് ഒരു കോഡ് ഉണ്ടാക്കുന്നു; അത് വായിച്ച് മറ്റേ ഉപകരണം പ്രൊഫൈൽ പകർത്തിയെടുക്കും.</translation>
-    </message>
-    <message>
-        <source>Make sure nobody, and no camera, can see the screen that comes next. Whoever reads that code gets the profile, key and all.</source>
-        <translation>അടുത്ത സ്ക്രീൻ ആരും, ഒരു ക്യാമറയും കാണുന്നില്ലെന്ന് ഉറപ്പാക്കുക. ആ കോഡ് വായിക്കുന്നയാൾക്കു താക്കോലടക്കം പ്രൊഫൈൽ കിട്ടും.</translation>
-    </message>
-    <message>
-        <source>Both phones have to be on the same network, and this profile stops collecting mail while the code is up.</source>
-        <translation>രണ്ട് ഫോണുകളും ഒരേ ശൃംഖലയിലായിരിക്കണം, കോഡ് സ്ക്രീനിലുള്ളിടത്തോളം ഈ പ്രൊഫൈൽ തപാൽ എടുക്കുന്നത് നിർത്തിവയ്ക്കും.</translation>
-    </message>
-</context>
-<context>
     <name>SecondDevicePage</name>
     <message>
         <source>Nothing took the profile. Both phones have to stay on one network, with this page open.</source>
@@ -1434,10 +1407,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>റദ്ദാക്കുക</translation>
     </message>
     <message>
-        <source>Show the code again</source>
-        <translation>കോഡ് വീണ്ടും കാണിക്കുക</translation>
-    </message>
-    <message>
         <source>The other device has the profile. Both get everything new from now on.</source>
         <translation>മറ്റേ ഉപകരണത്തിനു പ്രൊഫൈൽ ഉണ്ട്. ഇനി മുതൽ രണ്ടിനും പുതിയതെല്ലാം കിട്ടും.</translation>
     </message>
@@ -1446,8 +1415,16 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>മുന്നോട്ട് നീക്കി നിങ്ങളുടെ സംഭാഷണങ്ങളിലേക്കു പോകുക.</translation>
     </message>
     <message>
-        <source>This profile stops collecting mail until the code is gone.</source>
-        <translation>കോഡ് പോകുംവരെ ഈ പ്രൊഫൈൽ തപാൽ എടുക്കുന്നത് നിർത്തിവയ്ക്കും.</translation>
+        <source>Whoever reads this code gets the profile. It stops collecting mail until the code is gone.</source>
+        <translation>ഈ കോഡ് വായിക്കുന്നയാൾക്കു പ്രൊഫൈൽ കിട്ടും. കോഡ് പോകുംവരെ അതു തപാൽ എടുക്കുന്നത് നിർത്തിവയ്ക്കും.</translation>
+    </message>
+    <message>
+        <source>Show code again</source>
+        <translation>കോഡ് വീണ്ടും കാണിക്കുക</translation>
+    </message>
+    <message>
+        <source>Show code</source>
+        <translation>കോഡ് കാണിക്കുക</translation>
     </message>
 </context>
 <context>

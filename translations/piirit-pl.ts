@@ -1387,33 +1387,6 @@ Wiadomości innych grup z zablokowanymi kontaktami nadal będą wyświetlane.</t
     </message>
 </context>
 <context>
-    <name>SecondDeviceDialog</name>
-    <message>
-        <source>Add a second device</source>
-        <translation>Dodaj drugie urządzenie</translation>
-    </message>
-    <message>
-        <source>Continue</source>
-        <translation>Dalej</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation>Anuluj</translation>
-    </message>
-    <message>
-        <source>This makes a code the other device reads to copy the profile onto itself.</source>
-        <translation>Tworzy to kod, który drugie urządzenie odczytuje, żeby skopiować sobie profil.</translation>
-    </message>
-    <message>
-        <source>Make sure nobody, and no camera, can see the screen that comes next. Whoever reads that code gets the profile, key and all.</source>
-        <translation>Zadbaj, żeby następnego ekranu nie widział nikt ani żaden aparat. Kto odczyta ten kod, dostaje profil razem z kluczem.</translation>
-    </message>
-    <message>
-        <source>Both phones have to be on the same network, and this profile stops collecting mail while the code is up.</source>
-        <translation>Oba telefony muszą być w jednej sieci, a ten profil nie odbiera poczty, dopóki kod jest na ekranie.</translation>
-    </message>
-</context>
-<context>
     <name>SecondDevicePage</name>
     <message>
         <source>Nothing took the profile. Both phones have to stay on one network, with this page open.</source>
@@ -1440,10 +1413,6 @@ Wiadomości innych grup z zablokowanymi kontaktami nadal będą wyświetlane.</t
         <translation>Anuluj</translation>
     </message>
     <message>
-        <source>Show the code again</source>
-        <translation>Pokaż kod jeszcze raz</translation>
-    </message>
-    <message>
         <source>The other device has the profile. Both get everything new from now on.</source>
         <translation>Drugie urządzenie ma profil. Od teraz oba dostają wszystko, co nowe.</translation>
     </message>
@@ -1452,8 +1421,16 @@ Wiadomości innych grup z zablokowanymi kontaktami nadal będą wyświetlane.</t
         <translation>Przesuń dalej, do swoich czatów.</translation>
     </message>
     <message>
-        <source>This profile stops collecting mail until the code is gone.</source>
-        <translation>Ten profil nie odbiera poczty, dopóki kod nie zniknie.</translation>
+        <source>Whoever reads this code gets the profile. It stops collecting mail until the code is gone.</source>
+        <translation>Kto odczyta ten kod, dostaje profil. Dopóki kod jest na ekranie, profil nie odbiera poczty.</translation>
+    </message>
+    <message>
+        <source>Show code again</source>
+        <translation>Pokaż kod jeszcze raz</translation>
+    </message>
+    <message>
+        <source>Show code</source>
+        <translation>Pokaż kod</translation>
     </message>
 </context>
 <context>

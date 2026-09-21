@@ -1383,33 +1383,6 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
-    <name>SecondDeviceDialog</name>
-    <message>
-        <source>Add a second device</source>
-        <translation>Adaugă un al doilea dispozitiv</translation>
-    </message>
-    <message>
-        <source>Continue</source>
-        <translation>Continuă</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation>Anulează</translation>
-    </message>
-    <message>
-        <source>This makes a code the other device reads to copy the profile onto itself.</source>
-        <translation>Asta creează un cod pe care celălalt dispozitiv îl citește ca să copieze profilul.</translation>
-    </message>
-    <message>
-        <source>Make sure nobody, and no camera, can see the screen that comes next. Whoever reads that code gets the profile, key and all.</source>
-        <translation>Ai grijă ca ecranul următor să nu fie văzut de nimeni și de nicio cameră. Cine citește codul acela primește profilul, cu cheie cu tot.</translation>
-    </message>
-    <message>
-        <source>Both phones have to be on the same network, and this profile stops collecting mail while the code is up.</source>
-        <translation>Ambele telefoane trebuie să fie în aceeași rețea, iar profilul acesta nu mai ia poșta cât timp codul e pe ecran.</translation>
-    </message>
-</context>
-<context>
     <name>SecondDevicePage</name>
     <message>
         <source>Nothing took the profile. Both phones have to stay on one network, with this page open.</source>
@@ -1436,10 +1409,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Anulează</translation>
     </message>
     <message>
-        <source>Show the code again</source>
-        <translation>Arată codul din nou</translation>
-    </message>
-    <message>
         <source>The other device has the profile. Both get everything new from now on.</source>
         <translation>Celălalt dispozitiv are profilul. De acum amândouă primesc tot ce e nou.</translation>
     </message>
@@ -1448,8 +1417,16 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Glisează mai departe spre conversațiile tale.</translation>
     </message>
     <message>
-        <source>This profile stops collecting mail until the code is gone.</source>
-        <translation>Profilul acesta nu mai ia poșta cât timp codul e aici.</translation>
+        <source>Whoever reads this code gets the profile. It stops collecting mail until the code is gone.</source>
+        <translation>Cine citește acest cod primește profilul. Cât timp codul e aici, profilul nu mai ia poșta.</translation>
+    </message>
+    <message>
+        <source>Show code again</source>
+        <translation>Arată codul din nou</translation>
+    </message>
+    <message>
+        <source>Show code</source>
+        <translation>Arată codul</translation>
     </message>
 </context>
 <context>

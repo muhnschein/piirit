@@ -1375,33 +1375,6 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
     </message>
 </context>
 <context>
-    <name>SecondDeviceDialog</name>
-    <message>
-        <source>Add a second device</source>
-        <translation>İkinci cihaz ekle</translation>
-    </message>
-    <message>
-        <source>Continue</source>
-        <translation>Devam</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation>İptal</translation>
-    </message>
-    <message>
-        <source>This makes a code the other device reads to copy the profile onto itself.</source>
-        <translation>Bu, diğer cihazın okuyup profili kendine kopyaladığı bir kod üretir.</translation>
-    </message>
-    <message>
-        <source>Make sure nobody, and no camera, can see the screen that comes next. Whoever reads that code gets the profile, key and all.</source>
-        <translation>Sıradaki ekranı kimsenin ve hiçbir kameranın görmediğinden emin ol. O kodu kim okursa profili anahtarıyla birlikte alır.</translation>
-    </message>
-    <message>
-        <source>Both phones have to be on the same network, and this profile stops collecting mail while the code is up.</source>
-        <translation>İki telefon da aynı ağda olmalı ve kod ekrandayken bu profil posta almaz.</translation>
-    </message>
-</context>
-<context>
     <name>SecondDevicePage</name>
     <message>
         <source>Nothing took the profile. Both phones have to stay on one network, with this page open.</source>
@@ -1428,10 +1401,6 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
         <translation>İptal</translation>
     </message>
     <message>
-        <source>Show the code again</source>
-        <translation>Kodu yeniden göster</translation>
-    </message>
-    <message>
         <source>The other device has the profile. Both get everything new from now on.</source>
         <translation>Profil diğer cihazda da var. Bundan sonra ikisi de yeni gelen her şeyi alır.</translation>
     </message>
@@ -1440,8 +1409,16 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
         <translation>Sohbetlerine doğru kaydır.</translation>
     </message>
     <message>
-        <source>This profile stops collecting mail until the code is gone.</source>
-        <translation>Kod gidene kadar bu profil posta almaz.</translation>
+        <source>Whoever reads this code gets the profile. It stops collecting mail until the code is gone.</source>
+        <translation>Bu kodu kim okursa profil onun olur. Kod ekranda durduğu sürece profil posta almaz.</translation>
+    </message>
+    <message>
+        <source>Show code again</source>
+        <translation>Kodu yeniden göster</translation>
+    </message>
+    <message>
+        <source>Show code</source>
+        <translation>Kodu göster</translation>
     </message>
 </context>
 <context>

@@ -1371,33 +1371,6 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
-    <name>SecondDeviceDialog</name>
-    <message>
-        <source>Add a second device</source>
-        <translation>Második eszköz hozzáadása</translation>
-    </message>
-    <message>
-        <source>Continue</source>
-        <translation>Tovább</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation>Mégse</translation>
-    </message>
-    <message>
-        <source>This makes a code the other device reads to copy the profile onto itself.</source>
-        <translation>Ez egy kódot készít, amit a másik eszköz beolvas, hogy lemásolja a profilt.</translation>
-    </message>
-    <message>
-        <source>Make sure nobody, and no camera, can see the screen that comes next. Whoever reads that code gets the profile, key and all.</source>
-        <translation>Ügyelj rá, hogy a következő képernyőt senki és semmilyen kamera ne lássa. Aki beolvassa azt a kódot, megkapja a profilt, kulcsostul.</translation>
-    </message>
-    <message>
-        <source>Both phones have to be on the same network, and this profile stops collecting mail while the code is up.</source>
-        <translation>Mindkét telefonnak egy hálózaton kell lennie, és ez a profil nem hoz le levelet, amíg a kód a képernyőn van.</translation>
-    </message>
-</context>
-<context>
     <name>SecondDevicePage</name>
     <message>
         <source>Nothing took the profile. Both phones have to stay on one network, with this page open.</source>
@@ -1424,10 +1397,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Mégse</translation>
     </message>
     <message>
-        <source>Show the code again</source>
-        <translation>Kód megmutatása újra</translation>
-    </message>
-    <message>
         <source>The other device has the profile. Both get everything new from now on.</source>
         <translation>A másik eszközön megvan a profil. Mostantól mindkettő megkap minden újat.</translation>
     </message>
@@ -1436,8 +1405,16 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Húzd tovább a csevegéseidhez.</translation>
     </message>
     <message>
-        <source>This profile stops collecting mail until the code is gone.</source>
-        <translation>Ez a profil nem hoz le levelet, amíg a kód el nem tűnik.</translation>
+        <source>Whoever reads this code gets the profile. It stops collecting mail until the code is gone.</source>
+        <translation>Aki beolvassa ezt a kódot, megkapja a profilt. Amíg a kód fent van, a profil nem hoz le levelet.</translation>
+    </message>
+    <message>
+        <source>Show code again</source>
+        <translation>Kód megmutatása újra</translation>
+    </message>
+    <message>
+        <source>Show code</source>
+        <translation>Kód megmutatása</translation>
     </message>
 </context>
 <context>

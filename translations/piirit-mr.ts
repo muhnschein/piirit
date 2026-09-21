@@ -1381,33 +1381,6 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
-    <name>SecondDeviceDialog</name>
-    <message>
-        <source>Add a second device</source>
-        <translation>दुसरे उपकरण जोडा</translation>
-    </message>
-    <message>
-        <source>Continue</source>
-        <translation>पुढे चला</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation>रद्द करा</translation>
-    </message>
-    <message>
-        <source>This makes a code the other device reads to copy the profile onto itself.</source>
-        <translation>यातून एक कोड तयार होतो, जो वाचून दुसरे उपकरण प्रोफाइलची नक्कल घेते.</translation>
-    </message>
-    <message>
-        <source>Make sure nobody, and no camera, can see the screen that comes next. Whoever reads that code gets the profile, key and all.</source>
-        <translation>पुढचा पडदा कोणालाही, कोणत्याही कॅमेऱ्याला दिसणार नाही याची खात्री करा. जो तो कोड वाचेल, त्याला किल्लीसह प्रोफाइल मिळेल.</translation>
-    </message>
-    <message>
-        <source>Both phones have to be on the same network, and this profile stops collecting mail while the code is up.</source>
-        <translation>दोन्ही फोन एकाच नेटवर्कवर हवेत, आणि कोड पडद्यावर असेपर्यंत हे प्रोफाइल टपाल घेणे थांबवते.</translation>
-    </message>
-</context>
-<context>
     <name>SecondDevicePage</name>
     <message>
         <source>Nothing took the profile. Both phones have to stay on one network, with this page open.</source>
@@ -1434,10 +1407,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>रद्द करा</translation>
     </message>
     <message>
-        <source>Show the code again</source>
-        <translation>कोड पुन्हा दाखवा</translation>
-    </message>
-    <message>
         <source>The other device has the profile. Both get everything new from now on.</source>
         <translation>दुसऱ्या उपकरणाकडे प्रोफाइल आहे. आतापासून दोघांनाही सगळे नवे मिळेल.</translation>
     </message>
@@ -1446,8 +1415,16 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>पुढे सरकवून तुमच्या गप्पांकडे जा.</translation>
     </message>
     <message>
-        <source>This profile stops collecting mail until the code is gone.</source>
-        <translation>कोड जाईपर्यंत हे प्रोफाइल टपाल घेणे थांबवते.</translation>
+        <source>Whoever reads this code gets the profile. It stops collecting mail until the code is gone.</source>
+        <translation>जो हा कोड वाचेल, त्याला प्रोफाइल मिळेल. कोड जाईपर्यंत ते टपाल घेणे थांबवते.</translation>
+    </message>
+    <message>
+        <source>Show code again</source>
+        <translation>कोड पुन्हा दाखवा</translation>
+    </message>
+    <message>
+        <source>Show code</source>
+        <translation>कोड दाखवा</translation>
     </message>
 </context>
 <context>

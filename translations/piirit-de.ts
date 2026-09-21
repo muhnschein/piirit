@@ -1381,33 +1381,6 @@ In anderen Gruppen mit blockierten Kontakten werden deren Nachrichten weiterhin 
     </message>
 </context>
 <context>
-    <name>SecondDeviceDialog</name>
-    <message>
-        <source>Add a second device</source>
-        <translation>Zweites Gerät hinzufügen</translation>
-    </message>
-    <message>
-        <source>Continue</source>
-        <translation>Weiter</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation>Abbrechen</translation>
-    </message>
-    <message>
-        <source>This makes a code the other device reads to copy the profile onto itself.</source>
-        <translation>Das erzeugt einen Code, den das andere Gerät liest, um das Profil zu kopieren.</translation>
-    </message>
-    <message>
-        <source>Make sure nobody, and no camera, can see the screen that comes next. Whoever reads that code gets the profile, key and all.</source>
-        <translation>Achte darauf, dass niemand und keine Kamera den nächsten Bildschirm sehen kann. Wer diesen Code liest, bekommt das Profil, Schlüssel und alles.</translation>
-    </message>
-    <message>
-        <source>Both phones have to be on the same network, and this profile stops collecting mail while the code is up.</source>
-        <translation>Beide Telefone müssen im selben Netz sein, und dieses Profil holt keine Post ab, solange der Code offen ist.</translation>
-    </message>
-</context>
-<context>
     <name>SecondDevicePage</name>
     <message>
         <source>Nothing took the profile. Both phones have to stay on one network, with this page open.</source>
@@ -1434,10 +1407,6 @@ In anderen Gruppen mit blockierten Kontakten werden deren Nachrichten weiterhin 
         <translation>Abbrechen</translation>
     </message>
     <message>
-        <source>Show the code again</source>
-        <translation>Code wieder anzeigen</translation>
-    </message>
-    <message>
         <source>The other device has the profile. Both get everything new from now on.</source>
         <translation>Das andere Gerät hat das Profil. Von jetzt an bekommen beide alles Neue.</translation>
     </message>
@@ -1446,8 +1415,16 @@ In anderen Gruppen mit blockierten Kontakten werden deren Nachrichten weiterhin 
         <translation>Wisch weiter zu deinen Chats.</translation>
     </message>
     <message>
-        <source>This profile stops collecting mail until the code is gone.</source>
-        <translation>Dieses Profil holt keine Post ab, bis der Code weg ist.</translation>
+        <source>Whoever reads this code gets the profile. It stops collecting mail until the code is gone.</source>
+        <translation>Wer diesen Code liest, bekommt das Profil. Solange der Code offen ist, holt es keine Post ab.</translation>
+    </message>
+    <message>
+        <source>Show code again</source>
+        <translation>Code wieder anzeigen</translation>
+    </message>
+    <message>
+        <source>Show code</source>
+        <translation>Code anzeigen</translation>
     </message>
 </context>
 <context>

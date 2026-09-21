@@ -1377,33 +1377,6 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
-    <name>SecondDeviceDialog</name>
-    <message>
-        <source>Add a second device</source>
-        <translation>Een tweede apparaat toevoegen</translation>
-    </message>
-    <message>
-        <source>Continue</source>
-        <translation>Doorgaan</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation>Annuleren</translation>
-    </message>
-    <message>
-        <source>This makes a code the other device reads to copy the profile onto itself.</source>
-        <translation>Dit maakt een code die het andere apparaat leest om het profiel over te nemen.</translation>
-    </message>
-    <message>
-        <source>Make sure nobody, and no camera, can see the screen that comes next. Whoever reads that code gets the profile, key and all.</source>
-        <translation>Zorg dat niemand, en geen camera, het volgende scherm kan zien. Wie die code leest, krijgt het profiel, sleutel en al.</translation>
-    </message>
-    <message>
-        <source>Both phones have to be on the same network, and this profile stops collecting mail while the code is up.</source>
-        <translation>Beide telefoons moeten op hetzelfde netwerk zitten, en dit profiel haalt geen post op zolang de code in beeld is.</translation>
-    </message>
-</context>
-<context>
     <name>SecondDevicePage</name>
     <message>
         <source>Nothing took the profile. Both phones have to stay on one network, with this page open.</source>
@@ -1430,10 +1403,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Annuleren</translation>
     </message>
     <message>
-        <source>Show the code again</source>
-        <translation>Code opnieuw tonen</translation>
-    </message>
-    <message>
         <source>The other device has the profile. Both get everything new from now on.</source>
         <translation>Het andere apparaat heeft het profiel. Vanaf nu krijgen ze allebei alles wat nieuw is.</translation>
     </message>
@@ -1442,8 +1411,16 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Veeg door naar je chats.</translation>
     </message>
     <message>
-        <source>This profile stops collecting mail until the code is gone.</source>
-        <translation>Dit profiel haalt geen post op totdat de code weg is.</translation>
+        <source>Whoever reads this code gets the profile. It stops collecting mail until the code is gone.</source>
+        <translation>Wie deze code leest, krijgt het profiel. Zolang de code er staat, haalt het geen post op.</translation>
+    </message>
+    <message>
+        <source>Show code again</source>
+        <translation>Code opnieuw tonen</translation>
+    </message>
+    <message>
+        <source>Show code</source>
+        <translation>Code tonen</translation>
     </message>
 </context>
 <context>

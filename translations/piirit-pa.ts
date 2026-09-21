@@ -1381,33 +1381,6 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
-    <name>SecondDeviceDialog</name>
-    <message>
-        <source>Add a second device</source>
-        <translation>ਦੂਜਾ ਜੰਤਰ ਸ਼ਾਮਲ ਕਰੋ</translation>
-    </message>
-    <message>
-        <source>Continue</source>
-        <translation>ਅੱਗੇ ਚੱਲੋ</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation>ਰੱਦ ਕਰੋ</translation>
-    </message>
-    <message>
-        <source>This makes a code the other device reads to copy the profile onto itself.</source>
-        <translation>ਇਸ ਨਾਲ ਇੱਕ ਕੋਡ ਬਣਦਾ ਹੈ, ਜਿਹੜਾ ਪੜ੍ਹ ਕੇ ਦੂਜਾ ਜੰਤਰ ਪ੍ਰੋਫ਼ਾਈਲ ਦੀ ਨਕਲ ਲੈ ਲੈਂਦਾ ਹੈ।</translation>
-    </message>
-    <message>
-        <source>Make sure nobody, and no camera, can see the screen that comes next. Whoever reads that code gets the profile, key and all.</source>
-        <translation>ਧਿਆਨ ਰੱਖੋ ਕਿ ਅਗਲਾ ਸਫ਼ਾ ਕੋਈ ਵੀ ਜਾਂ ਕੋਈ ਕੈਮਰਾ ਨਾ ਵੇਖੇ। ਜਿਹੜਾ ਉਹ ਕੋਡ ਪੜ੍ਹੇ, ਉਸ ਨੂੰ ਕੁੰਜੀ ਸਣੇ ਪੂਰੀ ਪ੍ਰੋਫ਼ਾਈਲ ਮਿਲ ਜਾਂਦੀ ਹੈ।</translation>
-    </message>
-    <message>
-        <source>Both phones have to be on the same network, and this profile stops collecting mail while the code is up.</source>
-        <translation>ਦੋਵੇਂ ਫ਼ੋਨ ਇੱਕੋ ਨੈੱਟਵਰਕ ਉੱਤੇ ਹੋਣੇ ਚਾਹੀਦੇ ਹਨ, ਤੇ ਕੋਡ ਸਫ਼ੇ ਉੱਤੇ ਹੋਣ ਤੱਕ ਇਹ ਪ੍ਰੋਫ਼ਾਈਲ ਡਾਕ ਲੈਣੀ ਬੰਦ ਰੱਖਦੀ ਹੈ।</translation>
-    </message>
-</context>
-<context>
     <name>SecondDevicePage</name>
     <message>
         <source>Nothing took the profile. Both phones have to stay on one network, with this page open.</source>
@@ -1434,10 +1407,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>ਰੱਦ ਕਰੋ</translation>
     </message>
     <message>
-        <source>Show the code again</source>
-        <translation>ਕੋਡ ਮੁੜ ਵਿਖਾਓ</translation>
-    </message>
-    <message>
         <source>The other device has the profile. Both get everything new from now on.</source>
         <translation>ਦੂਜੇ ਜੰਤਰ ਕੋਲ ਪ੍ਰੋਫ਼ਾਈਲ ਹੈ। ਹੁਣ ਤੋਂ ਦੋਵਾਂ ਨੂੰ ਸਭ ਨਵਾਂ ਮਿਲੇਗਾ।</translation>
     </message>
@@ -1446,8 +1415,16 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>ਅੱਗੇ ਸਵਾਈਪ ਕਰ ਕੇ ਆਪਣੀਆਂ ਗੱਲਾਂ ਉੱਤੇ ਜਾਓ।</translation>
     </message>
     <message>
-        <source>This profile stops collecting mail until the code is gone.</source>
-        <translation>ਕੋਡ ਹਟਣ ਤੱਕ ਇਹ ਪ੍ਰੋਫ਼ਾਈਲ ਡਾਕ ਲੈਣੀ ਬੰਦ ਰੱਖਦੀ ਹੈ।</translation>
+        <source>Whoever reads this code gets the profile. It stops collecting mail until the code is gone.</source>
+        <translation>ਜਿਹੜਾ ਇਹ ਕੋਡ ਪੜ੍ਹੇ, ਪ੍ਰੋਫ਼ਾਈਲ ਉਸੇ ਦੀ। ਕੋਡ ਹਟਣ ਤੱਕ ਇਹ ਡਾਕ ਲੈਣੀ ਬੰਦ ਰੱਖਦੀ ਹੈ।</translation>
+    </message>
+    <message>
+        <source>Show code again</source>
+        <translation>ਕੋਡ ਮੁੜ ਵਿਖਾਓ</translation>
+    </message>
+    <message>
+        <source>Show code</source>
+        <translation>ਕੋਡ ਵਿਖਾਓ</translation>
     </message>
 </context>
 <context>

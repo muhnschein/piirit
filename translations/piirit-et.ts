@@ -1381,33 +1381,6 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
     </message>
 </context>
 <context>
-    <name>SecondDeviceDialog</name>
-    <message>
-        <source>Add a second device</source>
-        <translation>Lisa teine seade</translation>
-    </message>
-    <message>
-        <source>Continue</source>
-        <translation>Edasi</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation>Loobu</translation>
-    </message>
-    <message>
-        <source>This makes a code the other device reads to copy the profile onto itself.</source>
-        <translation>See teeb koodi, mille teine seade loeb, et profiil endale kopeerida.</translation>
-    </message>
-    <message>
-        <source>Make sure nobody, and no camera, can see the screen that comes next. Whoever reads that code gets the profile, key and all.</source>
-        <translation>Hoolitse, et järgmist ekraani ei näeks keegi ega ükski kaamera. Kes selle koodi loeb, saab profiili koos võtmega.</translation>
-    </message>
-    <message>
-        <source>Both phones have to be on the same network, and this profile stops collecting mail while the code is up.</source>
-        <translation>Mõlemad telefonid peavad olema samas võrgus ja see profiil ei võta posti vastu, kuni kood on ekraanil.</translation>
-    </message>
-</context>
-<context>
     <name>SecondDevicePage</name>
     <message>
         <source>Nothing took the profile. Both phones have to stay on one network, with this page open.</source>
@@ -1434,10 +1407,6 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
         <translation>Loobu</translation>
     </message>
     <message>
-        <source>Show the code again</source>
-        <translation>Näita koodi uuesti</translation>
-    </message>
-    <message>
         <source>The other device has the profile. Both get everything new from now on.</source>
         <translation>Teisel seadmel on profiil. Nüüdsest saavad mõlemad kõik uue.</translation>
     </message>
@@ -1446,8 +1415,16 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
         <translation>Libista edasi oma vestlustesse.</translation>
     </message>
     <message>
-        <source>This profile stops collecting mail until the code is gone.</source>
-        <translation>See profiil ei võta posti vastu, kuni kood on väljas.</translation>
+        <source>Whoever reads this code gets the profile. It stops collecting mail until the code is gone.</source>
+        <translation>Kes selle koodi loeb, saab profiili. Seni kuni kood on väljas, ei võta profiil posti vastu.</translation>
+    </message>
+    <message>
+        <source>Show code again</source>
+        <translation>Näita koodi uuesti</translation>
+    </message>
+    <message>
+        <source>Show code</source>
+        <translation>Näita koodi</translation>
     </message>
 </context>
 <context>

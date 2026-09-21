@@ -10,13 +10,14 @@
 //! - the offer goes out as `provide_backup` on this profile's account,
 //!   with `get_backup_qr` beside it for the text of the code, and the
 //!   code the page draws and prints is the one the core answered with;
-//! - the dialog in front of the page carries the warning about who can
-//!   see the code, and hands the profile on when it is accepted;
+//! - nothing goes up on its own: the code waits behind a button, which
+//!   says "Show code" until the reader has seen one and "Show code
+//!   again" after that;
 //! - the page can be walked away from, and going back ends the offer in
 //!   the core rather than leaving a provider running behind a page that
 //!   is gone; only a transfer already under way pins it;
-//! - Cancel stops the provider in the core rather than only on the
-//!   page;
+//! - Cancel stops the provider in the core and leaves the reader on the
+//!   page, with the button back;
 //! - an offer the reader stops reports nothing: the core refuses the
 //!   provider it was told to stop, which is the reader's own doing;
 //! - a core that cannot produce a code does not leave a provider
@@ -150,23 +151,6 @@ const PROBE_QML: &str = r"
             return '' + item[property]
         }
         function pageProperty(property) { return '' + loader.item[property] }
-        // What Silica makes of a dialog's accept destination as soon as
-        // the dialog is on screen, for the dialog to fill in on accept.
-        QtObject {
-            id: destination
-            property int accountId
-            property int currentAccountId
-        }
-        // Silica accepts a dialog on a tap of its header or a swipe;
-        // the stub's accept() is the same thing.
-        function accept() {
-            loader.item.acceptDestinationInstance = destination
-            loader.item.accept()
-            return 'ok'
-        }
-        function handed() {
-            return destination.accountId + ':' + destination.currentAccountId
-        }
         // What Silica does to a page on the way off it, whichever way
         // the reader is going.
         function leave() {
@@ -255,23 +239,13 @@ fn the_second_device_page_offers_one_profile_and_hands_it_over() {
         };
     }
 
-    // The dialog first: the warning has to be in front of the code, and
-    // accepting it has to carry the profile on to the page. Then the
-    // profile the core will not show a code for. The chats are on
+    // The profile the core will not show a code for. The chats are on
     // another profile throughout: offering one is not switching to it.
+    //
+    // Every offer in this test starts with a press: the page puts
+    // nothing up on its own, and the button says so before it is
+    // pressed the first time.
     single_shot(Duration::from_secs(1), move || unsafe {
-        record!(
-            "load-dialog",
-            call!(
-                "load",
-                QString::from(common::page_url("SecondDeviceDialog.qml")),
-                4,
-                9
-            )
-        );
-        record!("dialog-warning", get!("warning", "text"));
-        record!("dialog-accept", call!("accept"));
-        record!("dialog-handed", call!("handed"));
         record!(
             "load-no-code",
             call!(
@@ -281,6 +255,10 @@ fn the_second_device_page_offers_one_profile_and_hands_it_over() {
                 9
             )
         );
+        record!("idle-code", get!("device", "code"));
+        record!("idle-running", get!("device", "running"));
+        record!("first-label", get!("showButton", "text"));
+        record!("first-press", call!("click", QString::from("showButton")));
     });
 
     single_shot(Duration::from_secs(3), move || unsafe {
@@ -289,7 +267,9 @@ fn the_second_device_page_offers_one_profile_and_hands_it_over() {
             call!("pageProperty", QString::from("errorMessage"))
         );
         record!("no-code-idle", get!("device", "running"));
-        record!("no-code-retry", get!("retryButton", "visible"));
+        record!("no-code-button", get!("showButton", "visible"));
+        // No code ever went up, so there is nothing to show *again*.
+        record!("no-code-label", get!("showButton", "text"));
         // The profile the core refuses to offer at all.
         record!(
             "load-refused",
@@ -300,6 +280,7 @@ fn the_second_device_page_offers_one_profile_and_hands_it_over() {
                 9
             )
         );
+        record!("press-refused", call!("click", QString::from("showButton")));
     });
 
     single_shot(Duration::from_secs(5), move || unsafe {
@@ -320,6 +301,7 @@ fn the_second_device_page_offers_one_profile_and_hands_it_over() {
                 9
             )
         );
+        record!("press-waiting", call!("click", QString::from("showButton")));
     });
 
     single_shot(Duration::from_secs(7), move || unsafe {
@@ -350,6 +332,9 @@ fn the_second_device_page_offers_one_profile_and_hands_it_over() {
             "cancelled-leavable",
             call!("pageProperty", QString::from("backNavigation"))
         );
+        record!("cancelled-button", get!("showButton", "visible"));
+        // A code has been on screen now, so the button says so.
+        record!("cancelled-label", get!("showButton", "text"));
         // The same give-up, by going back instead of by Cancel: the
         // provider has to end in the core either way.
         record!(
@@ -361,6 +346,7 @@ fn the_second_device_page_offers_one_profile_and_hands_it_over() {
                 9
             )
         );
+        record!("press-leaving", call!("click", QString::from("showButton")));
     });
 
     single_shot(Duration::from_secs(11), move || unsafe {
@@ -385,6 +371,7 @@ fn the_second_device_page_offers_one_profile_and_hands_it_over() {
                 9
             )
         );
+        record!("press-taken", call!("click", QString::from("showButton")));
     });
 
     single_shot(Duration::from_secs(17), move || unsafe {
@@ -404,7 +391,7 @@ fn the_second_device_page_offers_one_profile_and_hands_it_over() {
         record!("taken-said", get!("takenLabel", "visible"));
         record!("taken-idle", get!("device", "running"));
         record!("taken-code", get!("device", "code"));
-        record!("taken-retry", get!("retryButton", "visible"));
+        record!("taken-button", get!("showButton", "visible"));
         record!("onward", get!("onwardHint", "visible"));
         record!(
             "taken-leavable",
@@ -423,6 +410,7 @@ fn the_second_device_page_offers_one_profile_and_hands_it_over() {
                 9
             )
         );
+        record!("press-stalled", call!("click", QString::from("showButton")));
     });
 
     single_shot(Duration::from_secs(26), move || unsafe {
@@ -435,7 +423,8 @@ fn the_second_device_page_offers_one_profile_and_hands_it_over() {
             "stalled-said",
             call!("pageProperty", QString::from("errorMessage"))
         );
-        record!("stalled-retry", get!("retryButton", "visible"));
+        record!("stalled-button", get!("showButton", "visible"));
+        record!("stalled-label", get!("showButton", "text"));
         (*engine_ptr).quit();
     });
 
@@ -465,31 +454,34 @@ fn the_second_device_page_offers_one_profile_and_hands_it_over() {
         "the page did not load. {context}"
     );
     assert_eq!(
-        value("load-dialog"),
-        "ok",
-        "the dialog in front of the page did not load. {context}"
+        (
+            value("first-press").as_str(),
+            value("press-refused").as_str(),
+            value("press-waiting").as_str(),
+            value("press-leaving").as_str(),
+            value("press-taken").as_str(),
+            value("press-stalled").as_str()
+        ),
+        ("ok", "ok", "ok", "ok", "ok", "ok"),
+        "an offer was not started by the button. {context}"
     );
 
-    // The warning is the whole reason the dialog is there: a code on
-    // screen is the profile in the room, and that is the last moment it
-    // can be answered with Cancel.
-    let warning = value("dialog-warning");
-    assert!(
-        warning.contains("see the screen") && warning.contains("gets the profile"),
-        "the dialog does not warn who a code on screen hands the profile \
-         to: {warning:?}. {context}"
+    // Nothing goes up on the way in: the page opened by mistake shows
+    // nothing worth reading, and the button says what it is about to do
+    // before it has ever done it.
+    assert_eq!(
+        (value("idle-code").as_str(), value("idle-running").as_str()),
+        ("", "false"),
+        "the page put an offer up on its own, before the reader asked \
+         for one. {context}"
     );
     assert_eq!(
-        value("dialog-accept"),
-        "ok",
-        "the dialog could not be accepted. {context}"
+        value("first-label"),
+        "Show code",
+        "the button on a page that has never shown a code offers to \
+         show one *again*. {context}"
     );
-    assert_eq!(
-        value("dialog-handed"),
-        "4:9",
-        "accepting the dialog did not carry the profile, and the chats to \
-         swipe on to, through to the page. {context}"
-    );
+
     assert_eq!(
         value("colour"),
         "#00875a",
@@ -509,9 +501,15 @@ fn the_second_device_page_offers_one_profile_and_hands_it_over() {
         "an offer with no code to show was left running. {context}"
     );
     assert_eq!(
-        value("no-code-retry"),
+        value("no-code-button"),
         "true",
         "a failed offer left nothing to try again with. {context}"
+    );
+    assert_eq!(
+        value("no-code-label"),
+        "Show code",
+        "an offer that never got as far as a code left the button \
+         offering to show one again. {context}"
     );
 
     // A provider the core refuses outright.
@@ -587,8 +585,9 @@ fn the_second_device_page_offers_one_profile_and_hands_it_over() {
     // Stopped by the reader: nothing reported, nothing left up.
     assert_eq!(value("cancel"), "ok", "nothing cancelled. {context}");
     assert!(
-        popped.contains("pop:"),
-        "Cancel did not leave the page. {context}"
+        !popped.contains("pop:"),
+        "Cancel took the reader off the page: it takes the code down, \
+         and the page is where the button is. {context}"
     );
     assert_eq!(
         (
@@ -600,6 +599,17 @@ fn the_second_device_page_offers_one_profile_and_hands_it_over() {
         ("false", "", "", "true"),
         "an offer the reader stopped was reported back to them, or left \
          a code up, or left the page pinned. {context}"
+    );
+    // Cancel takes the code down and leaves the reader here, on the
+    // button -- which now has a code behind it to show again.
+    assert_eq!(
+        (
+            value("cancelled-button").as_str(),
+            value("cancelled-label").as_str()
+        ),
+        ("true", "Show code again"),
+        "after Cancel the reader should be left on the page with the \
+         button back, saying it can show the code again. {context}"
     );
 
     // A device that starts and goes away: the same `Ok` a hand-over
@@ -621,9 +631,13 @@ fn the_second_device_page_offers_one_profile_and_hands_it_over() {
         value("stalled-said")
     );
     assert_eq!(
-        value("stalled-retry"),
-        "true",
-        "an offer nothing took left nothing to try again with. {context}"
+        (
+            value("stalled-button").as_str(),
+            value("stalled-label").as_str()
+        ),
+        ("true", "Show code again"),
+        "an offer nothing took left nothing to show the code again \
+         with. {context}"
     );
 
     // A device taking the profile: the transfer reported while it runs,
@@ -655,7 +669,7 @@ fn the_second_device_page_offers_one_profile_and_hands_it_over() {
         "a profile handed over did not end the page. {context}"
     );
     assert_eq!(
-        value("taken-retry"),
+        value("taken-button"),
         "false",
         "a profile already handed over still offers to show the code \
          again. {context}"
