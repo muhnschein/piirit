@@ -584,13 +584,13 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
         </translation>
     </message>
     <message>
-        <source>Too big to send: %1. This relay takes %2.</source>
-        <extracomment>Shown above the message field when the attached file is bigger than the relay will carry. %1 is the file&apos;s size and %2 the largest the relay takes, each such as &quot;24 MB&quot;.</extracomment>
-        <translation>Prevelika za pošiljanje: %1. Ta rele sprejme %2.</translation>
-    </message>
-    <message>
         <source>Saved to Downloads</source>
         <translation>Shranjeno v Prenose</translation>
+    </message>
+    <message>
+        <source>Too big to send: %1. Attachments go up to %2.</source>
+        <extracomment>Shown above the message field when the attached file is bigger than will be sent. %1 is the file&apos;s size and %2 the largest that goes, each such as &quot;24 MB&quot;.</extracomment>
+        <translation>Preveliko za pošiljanje: %1. Priponke so lahko velike do %2.</translation>
     </message>
 </context>
 <context>
@@ -1138,9 +1138,9 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
         <translation>Dodaj posrednika</translation>
     </message>
     <message>
-        <source>The relay this profile sends from takes attachments up to %1.</source>
-        <extracomment>The biggest attachment the relay the profile sends from will carry. %1 is a size such as &quot;22.3 MB&quot;.</extracomment>
-        <translation>Posrednik, prek katerega pošilja ta profil, sprejme priponke do %1.</translation>
+        <source>Attachments up to %1 can be sent.</source>
+        <extracomment>The biggest attachment that will be sent, the same for every relay. %1 is a size such as &quot;22.3 MB&quot;.</extracomment>
+        <translation>Pošiljati je mogoče priponke do %1.</translation>
     </message>
 </context>
 <context>

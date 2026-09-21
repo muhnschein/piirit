@@ -582,13 +582,13 @@ Správy od zablokovaných kontaktov v ostatných skupinách sa budú naďalej zo
         </translation>
     </message>
     <message>
-        <source>Too big to send: %1. This relay takes %2.</source>
-        <extracomment>Shown above the message field when the attached file is bigger than the relay will carry. %1 is the file&apos;s size and %2 the largest the relay takes, each such as &quot;24 MB&quot;.</extracomment>
-        <translation>Príliš veľké na odoslanie: %1. Tento relay prijíma %2.</translation>
-    </message>
-    <message>
         <source>Saved to Downloads</source>
         <translation>Uložené do Stiahnutých</translation>
+    </message>
+    <message>
+        <source>Too big to send: %1. Attachments go up to %2.</source>
+        <extracomment>Shown above the message field when the attached file is bigger than will be sent. %1 is the file&apos;s size and %2 the largest that goes, each such as &quot;24 MB&quot;.</extracomment>
+        <translation>Príliš veľké na odoslanie: %1. Prílohy môžu mať najviac %2.</translation>
     </message>
 </context>
 <context>
@@ -1132,9 +1132,9 @@ Správy od zablokovaných kontaktov v ostatných skupinách sa budú naďalej zo
         <translation>Pridať relay</translation>
     </message>
     <message>
-        <source>The relay this profile sends from takes attachments up to %1.</source>
-        <extracomment>The biggest attachment the relay the profile sends from will carry. %1 is a size such as &quot;22.3 MB&quot;.</extracomment>
-        <translation>Relay, z ktorého tento profil odosiela, berie prílohy do %1.</translation>
+        <source>Attachments up to %1 can be sent.</source>
+        <extracomment>The biggest attachment that will be sent, the same for every relay. %1 is a size such as &quot;22.3 MB&quot;.</extracomment>
+        <translation>Prílohy možno posielať do %1.</translation>
     </message>
 </context>
 <context>

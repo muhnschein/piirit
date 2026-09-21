@@ -580,13 +580,13 @@ Other groups with blocked contacts will still show their messages.</source>
         </translation>
     </message>
     <message>
-        <source>Too big to send: %1. This relay takes %2.</source>
-        <extracomment>Shown above the message field when the attached file is bigger than the relay will carry. %1 is the file&apos;s size and %2 the largest the relay takes, each such as &quot;24 MB&quot;.</extracomment>
-        <translation>पाठवण्यासाठी खूप मोठे: %1. हा रिले %2 पर्यंत घेतो.</translation>
-    </message>
-    <message>
         <source>Saved to Downloads</source>
         <translation>डाउनलोडमध्ये जतन केले</translation>
+    </message>
+    <message>
+        <source>Too big to send: %1. Attachments go up to %2.</source>
+        <extracomment>Shown above the message field when the attached file is bigger than will be sent. %1 is the file&apos;s size and %2 the largest that goes, each such as &quot;24 MB&quot;.</extracomment>
+        <translation>पाठवण्यासाठी खूप मोठे: %1. संलग्नक जास्तीत जास्त %2 पर्यंत असू शकतात.</translation>
     </message>
 </context>
 <context>
@@ -1126,9 +1126,9 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>रिले जोडा</translation>
     </message>
     <message>
-        <source>The relay this profile sends from takes attachments up to %1.</source>
-        <extracomment>The biggest attachment the relay the profile sends from will carry. %1 is a size such as &quot;22.3 MB&quot;.</extracomment>
-        <translation>हे प्रोफाइल ज्या रिलेवरून पाठवते तो %1 पर्यंतच्या संलग्नक स्वीकारतो.</translation>
+        <source>Attachments up to %1 can be sent.</source>
+        <extracomment>The biggest attachment that will be sent, the same for every relay. %1 is a size such as &quot;22.3 MB&quot;.</extracomment>
+        <translation>%1 पर्यंतच्या संलग्नक पाठवता येतात.</translation>
     </message>
 </context>
 <context>

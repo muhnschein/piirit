@@ -576,13 +576,13 @@ Other groups with blocked contacts will still show their messages.</source>
         </translation>
     </message>
     <message>
-        <source>Too big to send: %1. This relay takes %2.</source>
-        <extracomment>Shown above the message field when the attached file is bigger than the relay will carry. %1 is the file&apos;s size and %2 the largest the relay takes, each such as &quot;24 MB&quot;.</extracomment>
-        <translation>పంపడానికి చాలా పెద్దది: %1. ఈ రిలే %2 వరకు తీసుకుంటుంది.</translation>
-    </message>
-    <message>
         <source>Saved to Downloads</source>
         <translation>డౌన్‌లోడ్‌లలో భద్రపరచబడింది</translation>
+    </message>
+    <message>
+        <source>Too big to send: %1. Attachments go up to %2.</source>
+        <extracomment>Shown above the message field when the attached file is bigger than will be sent. %1 is the file&apos;s size and %2 the largest that goes, each such as &quot;24 MB&quot;.</extracomment>
+        <translation>పంపడానికి చాలా పెద్దది: %1. జోడింపులు గరిష్ఠంగా %2 వరకు ఉండవచ్చు.</translation>
     </message>
 </context>
 <context>
@@ -1122,9 +1122,9 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>రిలే చేర్చు</translation>
     </message>
     <message>
-        <source>The relay this profile sends from takes attachments up to %1.</source>
-        <extracomment>The biggest attachment the relay the profile sends from will carry. %1 is a size such as &quot;22.3 MB&quot;.</extracomment>
-        <translation>ఈ ప్రొఫైల్ పంపే రిలే %1 వరకు జోడింపులను తీసుకుంటుంది.</translation>
+        <source>Attachments up to %1 can be sent.</source>
+        <extracomment>The biggest attachment that will be sent, the same for every relay. %1 is a size such as &quot;22.3 MB&quot;.</extracomment>
+        <translation>%1 వరకు జోడింపులను పంపవచ్చు.</translation>
     </message>
 </context>
 <context>

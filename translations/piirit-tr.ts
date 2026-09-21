@@ -578,13 +578,13 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
         </translation>
     </message>
     <message>
-        <source>Too big to send: %1. This relay takes %2.</source>
-        <extracomment>Shown above the message field when the attached file is bigger than the relay will carry. %1 is the file&apos;s size and %2 the largest the relay takes, each such as &quot;24 MB&quot;.</extracomment>
-        <translation>Göndermek için çok büyük: %1. Bu aktarıcı %2 kabul ediyor.</translation>
-    </message>
-    <message>
         <source>Saved to Downloads</source>
         <translation>İndirilenler&apos;e kaydedildi</translation>
+    </message>
+    <message>
+        <source>Too big to send: %1. Attachments go up to %2.</source>
+        <extracomment>Shown above the message field when the attached file is bigger than will be sent. %1 is the file&apos;s size and %2 the largest that goes, each such as &quot;24 MB&quot;.</extracomment>
+        <translation>Göndermek için çok büyük: %1. Ekler en fazla %2 olabilir.</translation>
     </message>
 </context>
 <context>
@@ -1120,9 +1120,9 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
         <translation>Aktarıcı ekle</translation>
     </message>
     <message>
-        <source>The relay this profile sends from takes attachments up to %1.</source>
-        <extracomment>The biggest attachment the relay the profile sends from will carry. %1 is a size such as &quot;22.3 MB&quot;.</extracomment>
-        <translation>Bu profilin gönderdiği aktarıcı %1 boyutuna kadar ek kabul eder.</translation>
+        <source>Attachments up to %1 can be sent.</source>
+        <extracomment>The biggest attachment that will be sent, the same for every relay. %1 is a size such as &quot;22.3 MB&quot;.</extracomment>
+        <translation>%1 boyutuna kadar ek gönderilebilir.</translation>
     </message>
 </context>
 <context>

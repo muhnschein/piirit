@@ -580,13 +580,13 @@ Vous continuerez à voir les messages des contacts bloqués dans les autres grou
         </translation>
     </message>
     <message>
-        <source>Too big to send: %1. This relay takes %2.</source>
-        <extracomment>Shown above the message field when the attached file is bigger than the relay will carry. %1 is the file&apos;s size and %2 the largest the relay takes, each such as &quot;24 MB&quot;.</extracomment>
-        <translation>Trop volumineux pour être envoyé : %1. Ce relais accepte %2.</translation>
-    </message>
-    <message>
         <source>Saved to Downloads</source>
         <translation>Enregistré dans Téléchargements</translation>
+    </message>
+    <message>
+        <source>Too big to send: %1. Attachments go up to %2.</source>
+        <extracomment>Shown above the message field when the attached file is bigger than will be sent. %1 is the file&apos;s size and %2 the largest that goes, each such as &quot;24 MB&quot;.</extracomment>
+        <translation>Trop volumineux pour être envoyé : %1. Les pièces jointes peuvent aller jusqu&apos;à %2.</translation>
     </message>
 </context>
 <context>
@@ -1126,9 +1126,9 @@ Vous continuerez à voir les messages des contacts bloqués dans les autres grou
         <translation>Ajouter un relais</translation>
     </message>
     <message>
-        <source>The relay this profile sends from takes attachments up to %1.</source>
-        <extracomment>The biggest attachment the relay the profile sends from will carry. %1 is a size such as &quot;22.3 MB&quot;.</extracomment>
-        <translation>Le relais depuis lequel ce profil envoie accepte des pièces jointes jusqu&apos;à %1.</translation>
+        <source>Attachments up to %1 can be sent.</source>
+        <extracomment>The biggest attachment that will be sent, the same for every relay. %1 is a size such as &quot;22.3 MB&quot;.</extracomment>
+        <translation>Des pièces jointes jusqu&apos;à %1 peuvent être envoyées.</translation>
     </message>
 </context>
 <context>

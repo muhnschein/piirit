@@ -9,7 +9,7 @@
 //! The rest of the page is what parla's profile dialog shows: the relays
 //! and the address on each (their own test is `relays.rs`; here only that
 //! the one sent from is listed first), and what the relays and the phone
-//! say about the profile -- what the relay sent from will carry, the
+//! say about the profile -- what will go in one message, the
 //! space taken on the device, and per relay the connection in the core's
 //! own words and the mailbox quota read off its report, said as used,
 //! left and whole. The name is a field under the picture, with nothing
@@ -517,10 +517,10 @@ fn assert_page_says_what_the_relay_said(steps: &[(&str, String)], context: &str)
         "the first relay row is not marked as the one sent from. {context}"
     );
     assert!(
-        value("attachments")
-            .starts_with("The relay this profile sends from takes attachments up to"),
-        "what the relay sent from will carry is not said first, or not \
-         as the relay's. {context}"
+        value("attachments").starts_with("Attachments up to "),
+        "what will go in one message is not said first, or is said as the \
+         relay's -- it is the core's own ceiling, the same for every \
+         relay. {context}"
     );
     assert_eq!(
         value("connection"),

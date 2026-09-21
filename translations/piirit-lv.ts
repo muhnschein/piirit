@@ -582,13 +582,13 @@ Citās grupās, kurās ir bloķēti kontakti, viņu ziņas joprojām būs redzam
         </translation>
     </message>
     <message>
-        <source>Too big to send: %1. This relay takes %2.</source>
-        <extracomment>Shown above the message field when the attached file is bigger than the relay will carry. %1 is the file&apos;s size and %2 the largest the relay takes, each such as &quot;24 MB&quot;.</extracomment>
-        <translation>Pārāk liels, lai nosūtītu: %1. Šis relejs pieņem %2.</translation>
-    </message>
-    <message>
         <source>Saved to Downloads</source>
         <translation>Saglabāts lejupielādēs</translation>
+    </message>
+    <message>
+        <source>Too big to send: %1. Attachments go up to %2.</source>
+        <extracomment>Shown above the message field when the attached file is bigger than will be sent. %1 is the file&apos;s size and %2 the largest that goes, each such as &quot;24 MB&quot;.</extracomment>
+        <translation>Pārāk liels, lai nosūtītu: %1. Pielikumi var būt līdz %2.</translation>
     </message>
 </context>
 <context>
@@ -1132,9 +1132,9 @@ Citās grupās, kurās ir bloķēti kontakti, viņu ziņas joprojām būs redzam
         <translation>Pievienot releju</translation>
     </message>
     <message>
-        <source>The relay this profile sends from takes attachments up to %1.</source>
-        <extracomment>The biggest attachment the relay the profile sends from will carry. %1 is a size such as &quot;22.3 MB&quot;.</extracomment>
-        <translation>Relejs, no kura sūta šis profils, pieņem pielikumus līdz %1.</translation>
+        <source>Attachments up to %1 can be sent.</source>
+        <extracomment>The biggest attachment that will be sent, the same for every relay. %1 is a size such as &quot;22.3 MB&quot;.</extracomment>
+        <translation>Var sūtīt pielikumus līdz %1.</translation>
     </message>
 </context>
 <context>

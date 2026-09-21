@@ -582,13 +582,13 @@ Wiadomości innych grup z zablokowanymi kontaktami nadal będą wyświetlane.</t
         </translation>
     </message>
     <message>
-        <source>Too big to send: %1. This relay takes %2.</source>
-        <extracomment>Shown above the message field when the attached file is bigger than the relay will carry. %1 is the file&apos;s size and %2 the largest the relay takes, each such as &quot;24 MB&quot;.</extracomment>
-        <translation>Za duży, aby wysłać: %1. Ten przekaźnik przyjmuje %2.</translation>
-    </message>
-    <message>
         <source>Saved to Downloads</source>
         <translation>Zapisano w Pobranych</translation>
+    </message>
+    <message>
+        <source>Too big to send: %1. Attachments go up to %2.</source>
+        <extracomment>Shown above the message field when the attached file is bigger than will be sent. %1 is the file&apos;s size and %2 the largest that goes, each such as &quot;24 MB&quot;.</extracomment>
+        <translation>Za duży, by wysłać: %1. Załączniki mogą mieć najwyżej %2.</translation>
     </message>
 </context>
 <context>
@@ -1132,9 +1132,9 @@ Wiadomości innych grup z zablokowanymi kontaktami nadal będą wyświetlane.</t
         <translation>Dodaj przekaźnik</translation>
     </message>
     <message>
-        <source>The relay this profile sends from takes attachments up to %1.</source>
-        <extracomment>The biggest attachment the relay the profile sends from will carry. %1 is a size such as &quot;22.3 MB&quot;.</extracomment>
-        <translation>Przekaźnik, z którego wysyła ten profil, przyjmuje załączniki do %1.</translation>
+        <source>Attachments up to %1 can be sent.</source>
+        <extracomment>The biggest attachment that will be sent, the same for every relay. %1 is a size such as &quot;22.3 MB&quot;.</extracomment>
+        <translation>Można wysyłać załączniki do %1.</translation>
     </message>
 </context>
 <context>

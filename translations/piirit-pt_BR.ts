@@ -576,13 +576,13 @@ Other groups with blocked contacts will still show their messages.</source>
         </translation>
     </message>
     <message>
-        <source>Too big to send: %1. This relay takes %2.</source>
-        <extracomment>Shown above the message field when the attached file is bigger than the relay will carry. %1 is the file&apos;s size and %2 the largest the relay takes, each such as &quot;24 MB&quot;.</extracomment>
-        <translation>Grande demais para enviar: %1. Este relay aceita %2.</translation>
-    </message>
-    <message>
         <source>Saved to Downloads</source>
         <translation>Salvo em Downloads</translation>
+    </message>
+    <message>
+        <source>Too big to send: %1. Attachments go up to %2.</source>
+        <extracomment>Shown above the message field when the attached file is bigger than will be sent. %1 is the file&apos;s size and %2 the largest that goes, each such as &quot;24 MB&quot;.</extracomment>
+        <translation>Grande demais para enviar: %1. Os anexos podem ter até %2.</translation>
     </message>
 </context>
 <context>
@@ -1122,9 +1122,9 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Adicionar um relay</translation>
     </message>
     <message>
-        <source>The relay this profile sends from takes attachments up to %1.</source>
-        <extracomment>The biggest attachment the relay the profile sends from will carry. %1 is a size such as &quot;22.3 MB&quot;.</extracomment>
-        <translation>O relay pelo qual este perfil envia aceita anexos de até %1.</translation>
+        <source>Attachments up to %1 can be sent.</source>
+        <extracomment>The biggest attachment that will be sent, the same for every relay. %1 is a size such as &quot;22.3 MB&quot;.</extracomment>
+        <translation>Anexos de até %1 podem ser enviados.</translation>
     </message>
 </context>
 <context>

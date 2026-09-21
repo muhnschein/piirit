@@ -45,9 +45,10 @@ pub struct Profile {
     /// Whether the other end is told when a message has been read.
     /// `mdns_enabled` to the core, which defaults it on.
     pub read_receipts: qt_property!(bool; NOTIFY loaded_changed),
-    /// The largest attachment the core recommends for this profile's
-    /// relay, in bytes; 0 until read. Through f64 because QML has no
-    /// 64-bit integer. See `media.rs`.
+    /// The largest attachment the core recommends, in bytes; 0 until
+    /// read. The core's own constant, the same whichever relay the
+    /// profile sends from. Through f64 because QML has no 64-bit
+    /// integer. See `media.rs`.
     pub attachment_limit_bytes: qt_property!(f64; NOTIFY loaded_changed),
 
     /// The core's `get_connectivity` band: 0 until asked, then 1000 not

@@ -31,8 +31,8 @@ import Piirit 1.0
  * its connection with the core's own words beside it, and the bar for
  * its mailbox, always there, at nothing until the relay has said, with
  * what is used, what is left and what there is under it. Before the
- * relays, what the relay sent from will carry in one message and what
- * the profile takes on the phone. What parla's "Details" dialog adds --
+ * relays, what will go in one message and what the profile takes on the
+ * phone. What parla's "Details" dialog adds --
  * the storage per conversation, scanned message by message -- is not
  * here: on a phone that scan is what the reader would be waiting on.
  *
@@ -525,12 +525,12 @@ Page {
                 text: qsTr("Storage and connectivity")
             }
 
-            // What the relay the profile sends from will carry in one
-            // message, first: it is the one thing here worth knowing
-            // before a long video is picked. The core's own
-            // recommendation rather than anything measured here; the
-            // conversation refuses a bigger file on the strength of the
-            // same number.
+            // What will go in one message, first: it is the one thing
+            // here worth knowing before a long video is picked. The
+            // core's own ceiling, the same whichever relay the profile
+            // sends from (media.rs) -- so it is not said as the relay's,
+            // and does not change when the relay does. The conversation
+            // refuses a bigger file on the strength of the same number.
             Label {
                 objectName: "attachmentLimitLabel"
                 x: Theme.horizontalPageMargin
@@ -540,8 +540,8 @@ Page {
                 font.pixelSize: Theme.fontSizeSmall
                 color: Theme.secondaryHighlightColor
                 textFormat: Text.PlainText
-                //: The biggest attachment the relay the profile sends from will carry. %1 is a size such as "22.3 MB".
-                text: qsTr("The relay this profile sends from takes attachments up to %1.")
+                //: The biggest attachment that will be sent, the same for every relay. %1 is a size such as "22.3 MB".
+                text: qsTr("Attachments up to %1 can be sent.")
                       .arg(Format.readableSize(profile.attachment_limit_bytes))
             }
 

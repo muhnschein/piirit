@@ -576,13 +576,13 @@ Other groups with blocked contacts will still show their messages.</source>
         </translation>
     </message>
     <message>
-        <source>Too big to send: %1. This relay takes %2.</source>
-        <extracomment>Shown above the message field when the attached file is bigger than the relay will carry. %1 is the file&apos;s size and %2 the largest the relay takes, each such as &quot;24 MB&quot;.</extracomment>
-        <translation>அனுப்ப மிகப் பெரியது: %1. இந்த ரிலே %2 வரை ஏற்கும்.</translation>
-    </message>
-    <message>
         <source>Saved to Downloads</source>
         <translation>பதிவிறக்கங்களில் சேமிக்கப்பட்டது</translation>
+    </message>
+    <message>
+        <source>Too big to send: %1. Attachments go up to %2.</source>
+        <extracomment>Shown above the message field when the attached file is bigger than will be sent. %1 is the file&apos;s size and %2 the largest that goes, each such as &quot;24 MB&quot;.</extracomment>
+        <translation>அனுப்ப மிகப் பெரியது: %1. இணைப்புகள் அதிகபட்சம் %2 வரை இருக்கலாம்.</translation>
     </message>
 </context>
 <context>
@@ -1122,9 +1122,9 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>ரிலே சேர்</translation>
     </message>
     <message>
-        <source>The relay this profile sends from takes attachments up to %1.</source>
-        <extracomment>The biggest attachment the relay the profile sends from will carry. %1 is a size such as &quot;22.3 MB&quot;.</extracomment>
-        <translation>இந்தச் சுயவிவரம் அனுப்பும் ரிலே %1 வரையிலான இணைப்புகளை ஏற்கும்.</translation>
+        <source>Attachments up to %1 can be sent.</source>
+        <extracomment>The biggest attachment that will be sent, the same for every relay. %1 is a size such as &quot;22.3 MB&quot;.</extracomment>
+        <translation>%1 வரையிலான இணைப்புகளை அனுப்பலாம்.</translation>
     </message>
 </context>
 <context>

@@ -576,13 +576,13 @@ Other groups with blocked contacts will still show their messages.</source>
         </translation>
     </message>
     <message>
-        <source>Too big to send: %1. This relay takes %2.</source>
-        <extracomment>Shown above the message field when the attached file is bigger than the relay will carry. %1 is the file&apos;s size and %2 the largest the relay takes, each such as &quot;24 MB&quot;.</extracomment>
-        <translation>For stor til at sende: %1. Dette relæ tager %2.</translation>
-    </message>
-    <message>
         <source>Saved to Downloads</source>
         <translation>Gemt i Downloads</translation>
+    </message>
+    <message>
+        <source>Too big to send: %1. Attachments go up to %2.</source>
+        <extracomment>Shown above the message field when the attached file is bigger than will be sent. %1 is the file&apos;s size and %2 the largest that goes, each such as &quot;24 MB&quot;.</extracomment>
+        <translation>For stor til at sende: %1. Vedhæftninger kan være op til %2.</translation>
     </message>
 </context>
 <context>
@@ -1122,9 +1122,9 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Tilføj et relæ</translation>
     </message>
     <message>
-        <source>The relay this profile sends from takes attachments up to %1.</source>
-        <extracomment>The biggest attachment the relay the profile sends from will carry. %1 is a size such as &quot;22.3 MB&quot;.</extracomment>
-        <translation>Relæet, denne profil sender fra, tager vedhæftninger på op til %1.</translation>
+        <source>Attachments up to %1 can be sent.</source>
+        <extracomment>The biggest attachment that will be sent, the same for every relay. %1 is a size such as &quot;22.3 MB&quot;.</extracomment>
+        <translation>Vedhæftninger på op til %1 kan sendes.</translation>
     </message>
 </context>
 <context>
