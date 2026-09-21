@@ -90,6 +90,10 @@ fn the_real_core_accepts_the_shapes_we_send() {
         std::env::set_var("PIIRIT_ACCOUNTS_DIR", &temp);
     }
 
+    // The offer to a second device is an object of its own rather than a
+    // method on the core, so the QML below has to be able to make one.
+    piirit_shim::register_qml_types();
+
     let core_box = QObjectBox::new(DeltaChatCore::default());
     let mut engine = QmlEngine::new();
     engine.set_object_property("core".into(), core_box.pinned());
@@ -97,6 +101,7 @@ fn the_real_core_accepts_the_shapes_we_send() {
     // Errors reported, plus how the core classified a `dcaccount:` payload.
     let qml = r"
         import QtQuick 2.0
+        import Piirit 1.0
         Item {
             property string errors: ''
             property int created: 0
@@ -119,6 +124,18 @@ fn the_real_core_accepts_the_shapes_we_send() {
                 // only that the core never came up; the status says why.
                 onStatus_changed: errors = errors + '|status=' + core.status
             }
+            // The other end of taking a profile over: this phone
+            // offering one. Two calls of its own (`provide_backup` and
+            // `get_backup_qr`), so their shapes belong in this report
+            // like every other.
+            SecondDevice {
+                id: device
+                account_id: 1
+                onError: errors = errors + '|offer=' + message
+                onStalled: errors = errors + '|offer=stalled'
+                onTaken: created = created + 1
+            }
+            function offerToASecondDevice() { device.offer() }
             function report() { return created + '#' + qrKind + '#' + errors }
         }
     ";
@@ -174,6 +191,21 @@ fn the_real_core_accepts_the_shapes_we_send() {
         }
     });
 
+    // Offering account 1 to a second device. The core cannot: an account
+    // whose configure failed has no key to offer a backup of, which it
+    // says in its own words -- a delivery failure like the unreachable
+    // server above, and not a complaint about the params. What a
+    // provider a device really turns up for does is the fake core's to
+    // say (`qml_second_device.rs`); what the real one makes of the call
+    // is this.
+    let offer_ptr = std::ptr::addr_of_mut!(engine);
+    single_shot(Duration::from_secs(15), move || {
+        // SAFETY: see tests/smoke.rs.
+        unsafe {
+            (*offer_ptr).invoke_method("offerToASecondDevice".into(), &[]);
+        }
+    });
+
     let engine_ptr = &engine as *const QmlEngine;
     single_shot(Duration::from_secs(20), move || {
         // SAFETY: see tests/smoke.rs.
@@ -216,6 +248,16 @@ fn the_real_core_accepts_the_shapes_we_send() {
         errors.contains("|relay="),
         "adding a relay to the account answered nothing within the time \
          budget. Report: {report:?}"
+    );
+
+    // Without this the shape check above would pass an offer the core
+    // never answered at all: the provider's two calls would go out, say
+    // nothing, and nothing would notice.
+    assert!(
+        errors.contains("|offer="),
+        "offering the profile to a second device answered nothing within \
+         the time budget, so nothing here saw what the core made of \
+         `provide_backup`. Report: {report:?}"
     );
 
     // A wrong `check_qr` shape would land in `qr_error` and leave this

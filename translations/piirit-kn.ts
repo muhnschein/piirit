@@ -1203,6 +1203,10 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Back up profile</source>
         <translation>ಪ್ರೊಫೈಲ್ ಬ್ಯಾಕಪ್</translation>
     </message>
+    <message>
+        <source>Add a second device</source>
+        <translation>ಎರಡನೇ ಸಾಧನ ಸೇರಿಸಿ</translation>
+    </message>
 </context>
 <context>
     <name>QrPage</name>
@@ -1374,6 +1378,49 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Nothing found</source>
         <translation>ಏನೂ ಸಿಗಲಿಲ್ಲ</translation>
+    </message>
+</context>
+<context>
+    <name>SecondDevicePage</name>
+    <message>
+        <source>Nothing took the profile. Both phones have to stay on one network, with this page open.</source>
+        <translation>ಪ್ರೊಫೈಲ್ ಅನ್ನು ಯಾರೂ ತೆಗೆದುಕೊಳ್ಳಲಿಲ್ಲ. ಎರಡೂ ಫೋನುಗಳು ಒಂದೇ ಜಾಲದಲ್ಲಿ ಉಳಿಯಬೇಕು, ಈ ಪುಟ ತೆರೆದಿರಬೇಕು.</translation>
+    </message>
+    <message>
+        <source>Add a second device</source>
+        <translation>ಎರಡನೇ ಸಾಧನ ಸೇರಿಸಿ</translation>
+    </message>
+    <message>
+        <source>On the other device: add a profile you have already, then &quot;Add as second device&quot;, and read this code with it. Both phones on one network.</source>
+        <translation>ಇನ್ನೊಂದು ಸಾಧನದಲ್ಲಿ: ನಿಮ್ಮ ಬಳಿ ಈಗಾಗಲೇ ಇರುವ ಪ್ರೊಫೈಲ್ ಸೇರಿಸಿ, ನಂತರ “ಎರಡನೇ ಸಾಧನವಾಗಿ ಸೇರಿಸಿ”, ಮತ್ತು ಅದರಿಂದ ಈ ಕೋಡ್ ಓದಿ. ಎರಡೂ ಫೋನುಗಳು ಒಂದೇ ಜಾಲದಲ್ಲಿ.</translation>
+    </message>
+    <message>
+        <source>Whoever reads this code gets the profile. It stops collecting mail until the code is gone.</source>
+        <translation>ಈ ಕೋಡ್ ಓದಿದವರಿಗೆ ಪ್ರೊಫೈಲ್ ಸಿಗುತ್ತದೆ. ಕೋಡ್ ಇರುವವರೆಗೆ ಅದು ಅಂಚೆ ತರುವುದನ್ನು ನಿಲ್ಲಿಸುತ್ತದೆ.</translation>
+    </message>
+    <message>
+        <source>Copy the code</source>
+        <translation>ಕೋಡ್ ನಕಲಿಸಿ</translation>
+    </message>
+    <message>
+        <source>Handing the profile over...</source>
+        <translation>ಪ್ರೊಫೈಲ್ ಹಸ್ತಾಂತರಿಸಲಾಗುತ್ತಿದೆ...</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>ರದ್ದುಮಾಡಿ</translation>
+    </message>
+    <message>
+        <source>Show the code again</source>
+        <translation>ಕೋಡ್ ಮತ್ತೆ ತೋರಿಸಿ</translation>
+    </message>
+    <message>
+        <source>The other device has the profile. Both get everything new from now on.</source>
+        <translation>ಇನ್ನೊಂದು ಸಾಧನದಲ್ಲಿ ಪ್ರೊಫೈಲ್ ಇದೆ. ಇನ್ನು ಮುಂದೆ ಎರಡಕ್ಕೂ ಹೊಸದೆಲ್ಲ ಸಿಗುತ್ತದೆ.</translation>
+    </message>
+    <message>
+        <source>Swipe on for your chats.</source>
+        <translation>ಮುಂದಕ್ಕೆ ಸರಿಸಿ ನಿಮ್ಮ ಚಾಟ್‌ಗಳಿಗೆ ಹೋಗಿ.</translation>
     </message>
 </context>
 <context>

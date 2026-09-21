@@ -8,6 +8,32 @@ docs/BUILDING.md, "Cutting a release").
 
 ## Unreleased
 
+Piirit can be the *first* device now, not only the second. A profile on
+this phone could be joined to a setup another Delta Chat was already
+holding, but could not be the device holding it -- so a phone with
+nothing else in the house had a profile no second device could ever be
+added to.
+
+- A profile's row on the profiles page offers "Add a second device",
+  beside its invite code and its backup: the page puts the core's own
+  provider up (`provide_backup`), shows the code it answers with as a
+  picture and as text to send over, and draws the transfer as it runs.
+  The other device reads that code with what it already had -- "Add as
+  second device" -- and both phones end up with the profile.
+- The page says what the core does rather than leaving it to be found
+  out: whoever reads the code gets the profile, and the profile stops
+  collecting mail while the code is up. It cannot be left mid-offer,
+  Cancel stops the provider in the core, and a hand-over ends the page
+  with the chats a swipe away.
+- A profile is only ever reported as handed over when the core says the
+  transfer finished. The provider answers the same way whether a device
+  took the profile or the offer was stopped, so the progress it reports
+  is what decides -- an offer that ended with nobody having taken it says
+  so, and offers to show the code again.
+- The code a device offers is read whatever version the core speaks: the
+  pinned core shows `DCBACKUP5:`, and pasting one in no longer depends on
+  it being the older `DCBACKUP2:`.
+
 A profile can have more than one transport -- a relay set up long ago
 beside the one it sends from now -- and the app took the wrong one of
 them in two places, reported from a phone whose profiles page named a

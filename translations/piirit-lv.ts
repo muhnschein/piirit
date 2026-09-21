@@ -1209,6 +1209,10 @@ Citās grupās, kurās ir bloķēti kontakti, viņu ziņas joprojām būs redzam
         <source>Back up profile</source>
         <translation>Profila rezerves kopija</translation>
     </message>
+    <message>
+        <source>Add a second device</source>
+        <translation>Pievienot otru ierīci</translation>
+    </message>
 </context>
 <context>
     <name>QrPage</name>
@@ -1380,6 +1384,49 @@ Citās grupās, kurās ir bloķēti kontakti, viņu ziņas joprojām būs redzam
     <message>
         <source>Nothing found</source>
         <translation>Nekas nav atrasts</translation>
+    </message>
+</context>
+<context>
+    <name>SecondDevicePage</name>
+    <message>
+        <source>Nothing took the profile. Both phones have to stay on one network, with this page open.</source>
+        <translation>Profilu neviens nepaņēma. Abiem tālruņiem jāpaliek vienā tīklā, ar šo lapu atvērtu.</translation>
+    </message>
+    <message>
+        <source>Add a second device</source>
+        <translation>Pievienot otru ierīci</translation>
+    </message>
+    <message>
+        <source>On the other device: add a profile you have already, then &quot;Add as second device&quot;, and read this code with it. Both phones on one network.</source>
+        <translation>Otrā ierīcē: pievieno profilu, kas tev jau ir, tad „Pievienot kā otru ierīci“, un ar to nolasi šo kodu. Abi tālruņi vienā tīklā.</translation>
+    </message>
+    <message>
+        <source>Whoever reads this code gets the profile. It stops collecting mail until the code is gone.</source>
+        <translation>Kas nolasa šo kodu, tas dabū profilu. Kamēr kods ir redzams, profils pastu nesaņem.</translation>
+    </message>
+    <message>
+        <source>Copy the code</source>
+        <translation>Kopēt kodu</translation>
+    </message>
+    <message>
+        <source>Handing the profile over...</source>
+        <translation>Profils tiek nodots...</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Atcelt</translation>
+    </message>
+    <message>
+        <source>Show the code again</source>
+        <translation>Rādīt kodu vēlreiz</translation>
+    </message>
+    <message>
+        <source>The other device has the profile. Both get everything new from now on.</source>
+        <translation>Otrai ierīcei ir profils. No šī brīža abas saņem visu jauno.</translation>
+    </message>
+    <message>
+        <source>Swipe on for your chats.</source>
+        <translation>Pavelc uz priekšu pie savām sarunām.</translation>
     </message>
 </context>
 <context>

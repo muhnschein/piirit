@@ -1199,6 +1199,10 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Back up profile</source>
         <translation>ప్రొఫైల్ బ్యాకప్</translation>
     </message>
+    <message>
+        <source>Add a second device</source>
+        <translation>రెండో పరికరాన్ని చేర్చు</translation>
+    </message>
 </context>
 <context>
     <name>QrPage</name>
@@ -1370,6 +1374,49 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Nothing found</source>
         <translation>ఏమీ దొరకలేదు</translation>
+    </message>
+</context>
+<context>
+    <name>SecondDevicePage</name>
+    <message>
+        <source>Nothing took the profile. Both phones have to stay on one network, with this page open.</source>
+        <translation>ప్రొఫైల్‌ను ఎవరూ తీసుకోలేదు. రెండు ఫోన్లూ ఒకే నెట్‌వర్క్‌లో ఉండాలి, ఈ పుట తెరిచి ఉంచాలి.</translation>
+    </message>
+    <message>
+        <source>Add a second device</source>
+        <translation>రెండో పరికరాన్ని చేర్చు</translation>
+    </message>
+    <message>
+        <source>On the other device: add a profile you have already, then &quot;Add as second device&quot;, and read this code with it. Both phones on one network.</source>
+        <translation>రెండో పరికరంలో: మీ దగ్గర ఇప్పటికే ఉన్న ప్రొఫైల్‌ను చేర్చండి, ఆపై “రెండో పరికరంగా చేర్చు”, దానితో ఈ కోడ్‌ను చదవండి. రెండు ఫోన్లూ ఒకే నెట్‌వర్క్‌లో.</translation>
+    </message>
+    <message>
+        <source>Whoever reads this code gets the profile. It stops collecting mail until the code is gone.</source>
+        <translation>ఈ కోడ్ చదివినవారికే ప్రొఫైల్. కోడ్ ఉన్నంత వరకు అది తపాలా తీసుకోవడం ఆపేస్తుంది.</translation>
+    </message>
+    <message>
+        <source>Copy the code</source>
+        <translation>కోడ్‌ను కాపీ చేయి</translation>
+    </message>
+    <message>
+        <source>Handing the profile over...</source>
+        <translation>ప్రొఫైల్ అప్పగించబడుతోంది...</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>రద్దు చేయి</translation>
+    </message>
+    <message>
+        <source>Show the code again</source>
+        <translation>కోడ్‌ను మళ్ళీ చూపు</translation>
+    </message>
+    <message>
+        <source>The other device has the profile. Both get everything new from now on.</source>
+        <translation>రెండో పరికరం దగ్గర ప్రొఫైల్ ఉంది. ఇప్పటినుంచి రెండింటికీ కొత్తదంతా వస్తుంది.</translation>
+    </message>
+    <message>
+        <source>Swipe on for your chats.</source>
+        <translation>ముందుకు జరిపి మీ సంభాషణలకు వెళ్ళండి.</translation>
     </message>
 </context>
 <context>

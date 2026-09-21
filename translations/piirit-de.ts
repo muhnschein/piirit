@@ -1203,6 +1203,10 @@ In anderen Gruppen mit blockierten Kontakten werden deren Nachrichten weiterhin 
         <source>Back up profile</source>
         <translation>Profil sichern</translation>
     </message>
+    <message>
+        <source>Add a second device</source>
+        <translation>Zweites Gerät hinzufügen</translation>
+    </message>
 </context>
 <context>
     <name>QrPage</name>
@@ -1374,6 +1378,49 @@ In anderen Gruppen mit blockierten Kontakten werden deren Nachrichten weiterhin 
     <message>
         <source>Nothing found</source>
         <translation>Nichts gefunden</translation>
+    </message>
+</context>
+<context>
+    <name>SecondDevicePage</name>
+    <message>
+        <source>Nothing took the profile. Both phones have to stay on one network, with this page open.</source>
+        <translation>Niemand hat das Profil genommen. Beide Telefone müssen im selben Netz bleiben, mit dieser Seite offen.</translation>
+    </message>
+    <message>
+        <source>Add a second device</source>
+        <translation>Zweites Gerät hinzufügen</translation>
+    </message>
+    <message>
+        <source>On the other device: add a profile you have already, then &quot;Add as second device&quot;, and read this code with it. Both phones on one network.</source>
+        <translation>Auf dem anderen Gerät: ein Profil hinzufügen, das du schon hast, dann „Als zweites Gerät hinzufügen“, und diesen Code damit lesen. Beide Telefone im selben Netz.</translation>
+    </message>
+    <message>
+        <source>Whoever reads this code gets the profile. It stops collecting mail until the code is gone.</source>
+        <translation>Wer diesen Code liest, bekommt das Profil. Solange der Code offen ist, holt es keine Post ab.</translation>
+    </message>
+    <message>
+        <source>Copy the code</source>
+        <translation>Code kopieren</translation>
+    </message>
+    <message>
+        <source>Handing the profile over...</source>
+        <translation>Profil wird übergeben...</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Abbrechen</translation>
+    </message>
+    <message>
+        <source>Show the code again</source>
+        <translation>Code wieder anzeigen</translation>
+    </message>
+    <message>
+        <source>The other device has the profile. Both get everything new from now on.</source>
+        <translation>Das andere Gerät hat das Profil. Von jetzt an bekommen beide alles Neue.</translation>
+    </message>
+    <message>
+        <source>Swipe on for your chats.</source>
+        <translation>Wisch weiter zu deinen Chats.</translation>
     </message>
 </context>
 <context>

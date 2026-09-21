@@ -1197,6 +1197,10 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
         <source>Back up profile</source>
         <translation>Profili yedekle</translation>
     </message>
+    <message>
+        <source>Add a second device</source>
+        <translation>İkinci cihaz ekle</translation>
+    </message>
 </context>
 <context>
     <name>QrPage</name>
@@ -1368,6 +1372,49 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
     <message>
         <source>Nothing found</source>
         <translation>Hiçbir şey bulunamadı</translation>
+    </message>
+</context>
+<context>
+    <name>SecondDevicePage</name>
+    <message>
+        <source>Nothing took the profile. Both phones have to stay on one network, with this page open.</source>
+        <translation>Profili kimse almadı. İki telefon da aynı ağda kalmalı, bu sayfa açıkken.</translation>
+    </message>
+    <message>
+        <source>Add a second device</source>
+        <translation>İkinci cihaz ekle</translation>
+    </message>
+    <message>
+        <source>On the other device: add a profile you have already, then &quot;Add as second device&quot;, and read this code with it. Both phones on one network.</source>
+        <translation>Diğer cihazda: zaten sahip olduğun bir profili ekle, sonra “İkinci cihaz olarak ekle”, ve bu kodu onunla oku. İki telefon da aynı ağda.</translation>
+    </message>
+    <message>
+        <source>Whoever reads this code gets the profile. It stops collecting mail until the code is gone.</source>
+        <translation>Bu kodu kim okursa profil onun olur. Kod ekranda durduğu sürece profil posta almaz.</translation>
+    </message>
+    <message>
+        <source>Copy the code</source>
+        <translation>Kodu kopyala</translation>
+    </message>
+    <message>
+        <source>Handing the profile over...</source>
+        <translation>Profil devrediliyor...</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>İptal</translation>
+    </message>
+    <message>
+        <source>Show the code again</source>
+        <translation>Kodu yeniden göster</translation>
+    </message>
+    <message>
+        <source>The other device has the profile. Both get everything new from now on.</source>
+        <translation>Profil diğer cihazda da var. Bundan sonra ikisi de yeni gelen her şeyi alır.</translation>
+    </message>
+    <message>
+        <source>Swipe on for your chats.</source>
+        <translation>Sohbetlerine doğru kaydır.</translation>
     </message>
 </context>
 <context>

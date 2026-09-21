@@ -1203,6 +1203,10 @@ Gli altri gruppi con contatti bloccati continueranno a visualizzare i loro messa
         <source>Back up profile</source>
         <translation>Backup del profilo</translation>
     </message>
+    <message>
+        <source>Add a second device</source>
+        <translation>Aggiungi un secondo dispositivo</translation>
+    </message>
 </context>
 <context>
     <name>QrPage</name>
@@ -1374,6 +1378,49 @@ Gli altri gruppi con contatti bloccati continueranno a visualizzare i loro messa
     <message>
         <source>Nothing found</source>
         <translation>Nessun risultato</translation>
+    </message>
+</context>
+<context>
+    <name>SecondDevicePage</name>
+    <message>
+        <source>Nothing took the profile. Both phones have to stay on one network, with this page open.</source>
+        <translation>Nessuno ha preso il profilo. Entrambi i telefoni devono restare sulla stessa rete, con questa pagina aperta.</translation>
+    </message>
+    <message>
+        <source>Add a second device</source>
+        <translation>Aggiungi un secondo dispositivo</translation>
+    </message>
+    <message>
+        <source>On the other device: add a profile you have already, then &quot;Add as second device&quot;, and read this code with it. Both phones on one network.</source>
+        <translation>Sull&apos;altro dispositivo: aggiungi un profilo che hai già, poi “Aggiungi come secondo dispositivo”, e leggi questo codice con quello. Entrambi i telefoni sulla stessa rete.</translation>
+    </message>
+    <message>
+        <source>Whoever reads this code gets the profile. It stops collecting mail until the code is gone.</source>
+        <translation>Chi legge questo codice si prende il profilo. Finché il codice è qui, il profilo non ritira la posta.</translation>
+    </message>
+    <message>
+        <source>Copy the code</source>
+        <translation>Copia il codice</translation>
+    </message>
+    <message>
+        <source>Handing the profile over...</source>
+        <translation>Sto consegnando il profilo...</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Annulla</translation>
+    </message>
+    <message>
+        <source>Show the code again</source>
+        <translation>Mostra di nuovo il codice</translation>
+    </message>
+    <message>
+        <source>The other device has the profile. Both get everything new from now on.</source>
+        <translation>L&apos;altro dispositivo ha il profilo. Da ora entrambi ricevono tutto il nuovo.</translation>
+    </message>
+    <message>
+        <source>Swipe on for your chats.</source>
+        <translation>Scorri avanti verso le tue chat.</translation>
     </message>
 </context>
 <context>

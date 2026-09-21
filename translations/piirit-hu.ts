@@ -1193,6 +1193,10 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Back up profile</source>
         <translation>Profil mentése</translation>
     </message>
+    <message>
+        <source>Add a second device</source>
+        <translation>Második eszköz hozzáadása</translation>
+    </message>
 </context>
 <context>
     <name>QrPage</name>
@@ -1364,6 +1368,49 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Nothing found</source>
         <translation>Nincs találat</translation>
+    </message>
+</context>
+<context>
+    <name>SecondDevicePage</name>
+    <message>
+        <source>Nothing took the profile. Both phones have to stay on one network, with this page open.</source>
+        <translation>A profilt nem vitte el senki. Mindkét telefonnak egy hálózaton kell maradnia, ezzel az oldallal nyitva.</translation>
+    </message>
+    <message>
+        <source>Add a second device</source>
+        <translation>Második eszköz hozzáadása</translation>
+    </message>
+    <message>
+        <source>On the other device: add a profile you have already, then &quot;Add as second device&quot;, and read this code with it. Both phones on one network.</source>
+        <translation>A másik eszközön: adj hozzá egy profilt, ami már megvan, majd „Hozzáadás második eszközként”, és olvasd be vele ezt a kódot. Mindkét telefon egy hálózaton.</translation>
+    </message>
+    <message>
+        <source>Whoever reads this code gets the profile. It stops collecting mail until the code is gone.</source>
+        <translation>Aki beolvassa ezt a kódot, megkapja a profilt. Amíg a kód fent van, a profil nem hoz le levelet.</translation>
+    </message>
+    <message>
+        <source>Copy the code</source>
+        <translation>Kód másolása</translation>
+    </message>
+    <message>
+        <source>Handing the profile over...</source>
+        <translation>A profil átadása...</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Mégse</translation>
+    </message>
+    <message>
+        <source>Show the code again</source>
+        <translation>Kód megmutatása újra</translation>
+    </message>
+    <message>
+        <source>The other device has the profile. Both get everything new from now on.</source>
+        <translation>A másik eszközön megvan a profil. Mostantól mindkettő megkap minden újat.</translation>
+    </message>
+    <message>
+        <source>Swipe on for your chats.</source>
+        <translation>Húzd tovább a csevegéseidhez.</translation>
     </message>
 </context>
 <context>

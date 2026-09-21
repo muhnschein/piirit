@@ -1203,6 +1203,10 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Back up profile</source>
         <translation>പ്രൊഫൈൽ ബാക്കപ്പ്</translation>
     </message>
+    <message>
+        <source>Add a second device</source>
+        <translation>രണ്ടാമത്തെ ഉപകരണം ചേർക്കുക</translation>
+    </message>
 </context>
 <context>
     <name>QrPage</name>
@@ -1374,6 +1378,49 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Nothing found</source>
         <translation>ഒന്നും കണ്ടെത്തിയില്ല</translation>
+    </message>
+</context>
+<context>
+    <name>SecondDevicePage</name>
+    <message>
+        <source>Nothing took the profile. Both phones have to stay on one network, with this page open.</source>
+        <translation>പ്രൊഫൈൽ ആരും എടുത്തില്ല. രണ്ട് ഫോണുകളും ഒരേ ശൃംഖലയിൽ തുടരണം, ഈ താൾ തുറന്നിരിക്കണം.</translation>
+    </message>
+    <message>
+        <source>Add a second device</source>
+        <translation>രണ്ടാമത്തെ ഉപകരണം ചേർക്കുക</translation>
+    </message>
+    <message>
+        <source>On the other device: add a profile you have already, then &quot;Add as second device&quot;, and read this code with it. Both phones on one network.</source>
+        <translation>മറ്റേ ഉപകരണത്തിൽ: നിങ്ങൾക്കു നേരത്തേയുള്ള ഒരു പ്രൊഫൈൽ ചേർക്കുക, പിന്നെ “രണ്ടാമത്തെ ഉപകരണമായി ചേർക്കുക”, എന്നിട്ട് അതുകൊണ്ട് ഈ കോഡ് വായിക്കുക. രണ്ട് ഫോണുകളും ഒരേ ശൃംഖലയിൽ.</translation>
+    </message>
+    <message>
+        <source>Whoever reads this code gets the profile. It stops collecting mail until the code is gone.</source>
+        <translation>ഈ കോഡ് വായിക്കുന്നയാൾക്കു പ്രൊഫൈൽ കിട്ടും. കോഡ് പോകുംവരെ അതു തപാൽ എടുക്കുന്നത് നിർത്തിവയ്ക്കും.</translation>
+    </message>
+    <message>
+        <source>Copy the code</source>
+        <translation>കോഡ് പകർത്തുക</translation>
+    </message>
+    <message>
+        <source>Handing the profile over...</source>
+        <translation>പ്രൊഫൈൽ കൈമാറുന്നു...</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>റദ്ദാക്കുക</translation>
+    </message>
+    <message>
+        <source>Show the code again</source>
+        <translation>കോഡ് വീണ്ടും കാണിക്കുക</translation>
+    </message>
+    <message>
+        <source>The other device has the profile. Both get everything new from now on.</source>
+        <translation>മറ്റേ ഉപകരണത്തിനു പ്രൊഫൈൽ ഉണ്ട്. ഇനി മുതൽ രണ്ടിനും പുതിയതെല്ലാം കിട്ടും.</translation>
+    </message>
+    <message>
+        <source>Swipe on for your chats.</source>
+        <translation>മുന്നോട്ട് നീക്കി നിങ്ങളുടെ സംഭാഷണങ്ങളിലേക്കു പോകുക.</translation>
     </message>
 </context>
 <context>

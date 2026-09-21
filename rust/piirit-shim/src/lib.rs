@@ -38,6 +38,7 @@ mod recorder;
 mod runtime;
 mod saver;
 mod search;
+mod second_device;
 mod signup;
 mod transports;
 mod truncation;
@@ -61,6 +62,7 @@ pub use crate::qr::{QrCode, QrScanner};
 pub use crate::recorder::VoiceRecorder;
 pub use crate::saver::FileSaver;
 pub use crate::search::SearchResults;
+pub use crate::second_device::SecondDevice;
 pub use crate::transports::Transports;
 pub use crate::webxdc::{WebxdcApp, WebxdcStore};
 
@@ -106,9 +108,10 @@ pub fn register_qml_types() {
     ) else {
         return;
     };
-    let (Ok(backup), Ok(transports)) = (
+    let (Ok(backup), Ok(transports), Ok(second_device)) = (
         std::ffi::CStr::from_bytes_with_nul(b"Backup\0"),
         std::ffi::CStr::from_bytes_with_nul(b"Transports\0"),
+        std::ffi::CStr::from_bytes_with_nul(b"SecondDevice\0"),
     ) else {
         return;
     };
@@ -130,6 +133,7 @@ pub fn register_qml_types() {
     qmetaobject::qml_register_type::<WebxdcStore>(uri, 1, 0, store);
     qmetaobject::qml_register_type::<Backup>(uri, 1, 0, backup);
     qmetaobject::qml_register_type::<Transports>(uri, 1, 0, transports);
+    qmetaobject::qml_register_type::<SecondDevice>(uri, 1, 0, second_device);
 }
 pub use models::{
     AccountItem, ChatListItem, ChatListModel, ContactItem, ContactListModel, MessageListItem,
