@@ -39,20 +39,20 @@
         <translation>Jūsų vardas</translation>
     </message>
     <message>
-        <source>Relay</source>
-        <translation>Retransliatorius</translation>
+        <source>Pick a name and a relay. There is nothing else to set up.</source>
+        <translation>Pasirink vardą ir retransliatorių. Daugiau nieko nustatyti nereikia.</translation>
     </message>
     <message>
-        <source>Custom server</source>
-        <translation>Savas serveris</translation>
+        <source>Select a public chatmail relay</source>
+        <translation>Pasirinkti viešą chatmail retransliatorių</translation>
     </message>
     <message>
-        <source>See &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; for the full list.</source>
-        <translation>Visas sąrašas yra &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
+        <source>Use a custom chatmail relay</source>
+        <translation>Naudoti savo chatmail retransliatorių</translation>
     </message>
     <message>
-        <source>The relay gives you an address. The keys are made on this phone.</source>
-        <translation>Retransliatorius duoda tau adresą. Raktai sukuriami šiame telefone.</translation>
+        <source>Piirit works only with chatmail relays. These are a particular kind of e-mail server; ordinary e-mail servers are not supported. For more, see &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. A full list of public, free-to-use chatmail relays is at &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</source>
+        <translation>Piirit veikia tik su chatmail retransliatoriais. Tai ypatinga el. pašto serverių rūšis; įprasti el. pašto serveriai nepalaikomi. Daugiau – &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. Visas viešų, nemokamų chatmail retransliatorių sąrašas yra &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
     </message>
 </context>
 <context>
@@ -101,18 +101,6 @@
         <translation>Dar vienas šio profilio adresas, kitame retransliatoriuje. Profilis siunčia vienu metu tik iš vieno retransliatoriaus; jo puslapis rodo, iš kurio, ir leidžia jį pakeisti.</translation>
     </message>
     <message>
-        <source>Relay</source>
-        <translation>Retransliatorius</translation>
-    </message>
-    <message>
-        <source>Custom server</source>
-        <translation>Savas serveris</translation>
-    </message>
-    <message>
-        <source>See &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; for the full list.</source>
-        <translation>Visas sąrašas yra &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
-    </message>
-    <message>
         <source>Add relay</source>
         <translation>Pridėti retransliatorių</translation>
     </message>
@@ -127,6 +115,18 @@
     <message>
         <source>Relays are run by volunteers. Try another one.</source>
         <translation>Retransliatorius prižiūri savanoriai. Pabandyk kitą.</translation>
+    </message>
+    <message>
+        <source>Select a public chatmail relay</source>
+        <translation>Pasirinkti viešą chatmail retransliatorių</translation>
+    </message>
+    <message>
+        <source>Use a custom chatmail relay</source>
+        <translation>Naudoti savo chatmail retransliatorių</translation>
+    </message>
+    <message>
+        <source>Piirit works only with chatmail relays. These are a particular kind of e-mail server; ordinary e-mail servers are not supported. For more, see &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. A full list of public, free-to-use chatmail relays is at &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</source>
+        <translation>Piirit veikia tik su chatmail retransliatoriais. Tai ypatinga el. pašto serverių rūšis; įprasti el. pašto serveriai nepalaikomi. Daugiau – &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. Visas viešų, nemokamų chatmail retransliatorių sąrašas yra &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
     </message>
 </context>
 <context>
@@ -1049,10 +1049,6 @@ Other groups with blocked contacts will still show their messages.</source>
 <context>
     <name>ProfilePage</name>
     <message>
-        <source>Not connected</source>
-        <translation>Neprisijungta</translation>
-    </message>
-    <message>
         <source>Checking the connection</source>
         <translation>Tikrinamas ryšys</translation>
     </message>
@@ -1094,18 +1090,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Išsaugota</translation>
     </message>
     <message>
-        <source>Connected, and up to date</source>
-        <translation>Prisijungta, viskas atnaujinta</translation>
-    </message>
-    <message>
-        <source>Connected, sending or syncing messages</source>
-        <translation>Prisijungta, siunčiamos arba sinchronizuojamos žinutės</translation>
-    </message>
-    <message>
-        <source>Connecting to the relay</source>
-        <translation>Jungiamasi prie retransliatoriaus</translation>
-    </message>
-    <message>
         <source>%1 used · %2 left of %3</source>
         <extracomment>The mailbox on the relay. %1 used, %2 left, %3 the whole, each a size such as &quot;1.4 GB&quot;.</extracomment>
         <translation>Užimta %1 · liko %2 iš %3</translation>
@@ -1115,17 +1099,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Retransliatorius dar nepranešė savo kvotos</translation>
     </message>
     <message>
-        <source>The name on every message you send</source>
-        <translation>Vardas ant kiekvienos jūsų siunčiamos žinutės</translation>
-    </message>
-    <message>
         <source>Both ways: with this off you send none and see none.</source>
         <translation>Abiem kryptimis: išjungus nesiunti nė vieno ir nematai nė vieno.</translation>
-    </message>
-    <message>
-        <source>Attachments up to %1</source>
-        <extracomment>The biggest attachment the relay will carry. %1 is a size such as &quot;22.3 MB&quot;.</extracomment>
-        <translation>Priedai iki %1</translation>
     </message>
     <message>
         <source>Relays</source>
@@ -1151,6 +1126,11 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Add a relay</source>
         <translation>Pridėti retransliatorių</translation>
+    </message>
+    <message>
+        <source>The relay this profile sends from takes attachments up to %1.</source>
+        <extracomment>The biggest attachment the relay the profile sends from will carry. %1 is a size such as &quot;22.3 MB&quot;.</extracomment>
+        <translation>Retransliatorius, iš kurio siunčia šis profilis, priima priedus iki %1.</translation>
     </message>
 </context>
 <context>

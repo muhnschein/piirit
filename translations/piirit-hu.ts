@@ -39,20 +39,20 @@
         <translation>Az Ön neve</translation>
     </message>
     <message>
-        <source>Relay</source>
-        <translation>Közvetítő</translation>
+        <source>Pick a name and a relay. There is nothing else to set up.</source>
+        <translation>Válassz egy nevet és egy közvetítőt. Mást nem kell beállítani.</translation>
     </message>
     <message>
-        <source>Custom server</source>
-        <translation>Saját kiszolgáló</translation>
+        <source>Select a public chatmail relay</source>
+        <translation>Nyilvános chatmail-közvetítő választása</translation>
     </message>
     <message>
-        <source>See &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; for the full list.</source>
-        <translation>A teljes lista itt található: &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
+        <source>Use a custom chatmail relay</source>
+        <translation>Saját chatmail-közvetítő használata</translation>
     </message>
     <message>
-        <source>The relay gives you an address. The keys are made on this phone.</source>
-        <translation>A közvetítő ad egy címet. A kulcsok ezen a telefonon készülnek.</translation>
+        <source>Piirit works only with chatmail relays. These are a particular kind of e-mail server; ordinary e-mail servers are not supported. For more, see &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. A full list of public, free-to-use chatmail relays is at &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</source>
+        <translation>A Piirit csak chatmail-közvetítőkkel működik. Ezek különleges fajta e-mail-kiszolgálók; a közönséges e-mail-kiszolgálók nem támogatottak. Bővebben: &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. A nyilvános, ingyenesen használható chatmail-közvetítők teljes listája: &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
     </message>
 </context>
 <context>
@@ -101,18 +101,6 @@
         <translation>Még egy cím ehhez a profilhoz, egy másik közvetítőn. A profil egyszerre egy közvetítőről küld; az oldala mutatja, melyikről, és ott át is állíthatod.</translation>
     </message>
     <message>
-        <source>Relay</source>
-        <translation>Közvetítő</translation>
-    </message>
-    <message>
-        <source>Custom server</source>
-        <translation>Saját kiszolgáló</translation>
-    </message>
-    <message>
-        <source>See &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; for the full list.</source>
-        <translation>A teljes lista itt található: &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
-    </message>
-    <message>
         <source>Add relay</source>
         <translation>Közvetítő hozzáadása</translation>
     </message>
@@ -127,6 +115,18 @@
     <message>
         <source>Relays are run by volunteers. Try another one.</source>
         <translation>A közvetítőket önkéntesek üzemeltetik. Próbálj másikat.</translation>
+    </message>
+    <message>
+        <source>Select a public chatmail relay</source>
+        <translation>Nyilvános chatmail-közvetítő választása</translation>
+    </message>
+    <message>
+        <source>Use a custom chatmail relay</source>
+        <translation>Saját chatmail-közvetítő használata</translation>
+    </message>
+    <message>
+        <source>Piirit works only with chatmail relays. These are a particular kind of e-mail server; ordinary e-mail servers are not supported. For more, see &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. A full list of public, free-to-use chatmail relays is at &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</source>
+        <translation>A Piirit csak chatmail-közvetítőkkel működik. Ezek különleges fajta e-mail-kiszolgálók; a közönséges e-mail-kiszolgálók nem támogatottak. Bővebben: &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. A nyilvános, ingyenesen használható chatmail-közvetítők teljes listája: &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
     </message>
 </context>
 <context>
@@ -1037,10 +1037,6 @@ Other groups with blocked contacts will still show their messages.</source>
 <context>
     <name>ProfilePage</name>
     <message>
-        <source>Not connected</source>
-        <translation>Nincs kapcsolat</translation>
-    </message>
-    <message>
         <source>Checking the connection</source>
         <translation>Kapcsolat ellenőrzése folyamatban</translation>
     </message>
@@ -1082,18 +1078,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Mentve</translation>
     </message>
     <message>
-        <source>Connected, and up to date</source>
-        <translation>Kapcsolódva, naprakész</translation>
-    </message>
-    <message>
-        <source>Connected, sending or syncing messages</source>
-        <translation>Kapcsolódva, üzenetek küldése vagy szinkronizálása</translation>
-    </message>
-    <message>
-        <source>Connecting to the relay</source>
-        <translation>Kapcsolódás a közvetítőhöz</translation>
-    </message>
-    <message>
         <source>%1 used · %2 left of %3</source>
         <extracomment>The mailbox on the relay. %1 used, %2 left, %3 the whole, each a size such as &quot;1.4 GB&quot;.</extracomment>
         <translation>%1 használt · %2 szabad, összesen %3</translation>
@@ -1103,17 +1087,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>A közvetítő még nem jelentette a kvótáját</translation>
     </message>
     <message>
-        <source>The name on every message you send</source>
-        <translation>A név minden elküldött üzenetén</translation>
-    </message>
-    <message>
         <source>Both ways: with this off you send none and see none.</source>
         <translation>Mindkét irányban: kikapcsolva egyet sem küldesz és egyet sem látsz.</translation>
-    </message>
-    <message>
-        <source>Attachments up to %1</source>
-        <extracomment>The biggest attachment the relay will carry. %1 is a size such as &quot;22.3 MB&quot;.</extracomment>
-        <translation>Mellékletek legfeljebb %1</translation>
     </message>
     <message>
         <source>Relays</source>
@@ -1139,6 +1114,11 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Add a relay</source>
         <translation>Közvetítő hozzáadása</translation>
+    </message>
+    <message>
+        <source>The relay this profile sends from takes attachments up to %1.</source>
+        <extracomment>The biggest attachment the relay the profile sends from will carry. %1 is a size such as &quot;22.3 MB&quot;.</extracomment>
+        <translation>A közvetítő, amelyről ez a profil küld, legfeljebb %1 méretű mellékletet fogad.</translation>
     </message>
 </context>
 <context>

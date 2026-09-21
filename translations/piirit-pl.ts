@@ -39,20 +39,20 @@
         <translation>Twoje imię</translation>
     </message>
     <message>
-        <source>Relay</source>
-        <translation>Przekaźnik</translation>
+        <source>Pick a name and a relay. There is nothing else to set up.</source>
+        <translation>Wybierz imię i przekaźnik. Nic więcej nie trzeba ustawiać.</translation>
     </message>
     <message>
-        <source>Custom server</source>
-        <translation>Własny serwer</translation>
+        <source>Select a public chatmail relay</source>
+        <translation>Wybierz publiczny przekaźnik chatmail</translation>
     </message>
     <message>
-        <source>See &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; for the full list.</source>
-        <translation>Pełna lista jest na &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
+        <source>Use a custom chatmail relay</source>
+        <translation>Użyj własnego przekaźnika chatmail</translation>
     </message>
     <message>
-        <source>The relay gives you an address. The keys are made on this phone.</source>
-        <translation>Przekaźnik daje ci adres. Klucze powstają na tym telefonie.</translation>
+        <source>Piirit works only with chatmail relays. These are a particular kind of e-mail server; ordinary e-mail servers are not supported. For more, see &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. A full list of public, free-to-use chatmail relays is at &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</source>
+        <translation>Piirit działa tylko z przekaźnikami chatmail. To szczególny rodzaj serwera pocztowego; zwykłe serwery pocztowe nie są obsługiwane. Więcej na &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. Pełna lista publicznych, darmowych przekaźników chatmail jest na &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
     </message>
 </context>
 <context>
@@ -101,18 +101,6 @@
         <translation>Kolejny adres tego profilu, na innym przekaźniku. Profil wysyła naraz tylko z jednego przekaźnika; jego strona pokazuje, z którego, i pozwala to zmienić.</translation>
     </message>
     <message>
-        <source>Relay</source>
-        <translation>Przekaźnik</translation>
-    </message>
-    <message>
-        <source>Custom server</source>
-        <translation>Własny serwer</translation>
-    </message>
-    <message>
-        <source>See &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; for the full list.</source>
-        <translation>Pełna lista jest na &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
-    </message>
-    <message>
         <source>Add relay</source>
         <translation>Dodaj przekaźnik</translation>
     </message>
@@ -127,6 +115,18 @@
     <message>
         <source>Relays are run by volunteers. Try another one.</source>
         <translation>Przekaźniki prowadzą wolontariusze. Spróbuj innego.</translation>
+    </message>
+    <message>
+        <source>Select a public chatmail relay</source>
+        <translation>Wybierz publiczny przekaźnik chatmail</translation>
+    </message>
+    <message>
+        <source>Use a custom chatmail relay</source>
+        <translation>Użyj własnego przekaźnika chatmail</translation>
+    </message>
+    <message>
+        <source>Piirit works only with chatmail relays. These are a particular kind of e-mail server; ordinary e-mail servers are not supported. For more, see &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. A full list of public, free-to-use chatmail relays is at &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</source>
+        <translation>Piirit działa tylko z przekaźnikami chatmail. To szczególny rodzaj serwera pocztowego; zwykłe serwery pocztowe nie są obsługiwane. Więcej na &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. Pełna lista publicznych, darmowych przekaźników chatmail jest na &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
     </message>
 </context>
 <context>
@@ -1053,10 +1053,6 @@ Wiadomości innych grup z zablokowanymi kontaktami nadal będą wyświetlane.</t
 <context>
     <name>ProfilePage</name>
     <message>
-        <source>Not connected</source>
-        <translation>Brak połączenia</translation>
-    </message>
-    <message>
         <source>Checking the connection</source>
         <translation>Sprawdzanie połączenia</translation>
     </message>
@@ -1098,18 +1094,6 @@ Wiadomości innych grup z zablokowanymi kontaktami nadal będą wyświetlane.</t
         <translation>Zapisano</translation>
     </message>
     <message>
-        <source>Connected, and up to date</source>
-        <translation>Połączono, wszystko aktualne</translation>
-    </message>
-    <message>
-        <source>Connected, sending or syncing messages</source>
-        <translation>Połączono, wysyłanie lub synchronizowanie wiadomości</translation>
-    </message>
-    <message>
-        <source>Connecting to the relay</source>
-        <translation>Łączenie z przekaźnikiem</translation>
-    </message>
-    <message>
         <source>%1 used · %2 left of %3</source>
         <extracomment>The mailbox on the relay. %1 used, %2 left, %3 the whole, each a size such as &quot;1.4 GB&quot;.</extracomment>
         <translation>Zajęte %1 · wolne %2 z %3</translation>
@@ -1119,17 +1103,8 @@ Wiadomości innych grup z zablokowanymi kontaktami nadal będą wyświetlane.</t
         <translation>Przekaźnik nie podał jeszcze swojego limitu</translation>
     </message>
     <message>
-        <source>The name on every message you send</source>
-        <translation>Nazwa na każdej wysyłanej wiadomości</translation>
-    </message>
-    <message>
         <source>Both ways: with this off you send none and see none.</source>
         <translation>W obie strony: wyłączone — nie wysyłasz żadnych i nie widzisz żadnych.</translation>
-    </message>
-    <message>
-        <source>Attachments up to %1</source>
-        <extracomment>The biggest attachment the relay will carry. %1 is a size such as &quot;22.3 MB&quot;.</extracomment>
-        <translation>Załączniki do %1</translation>
     </message>
     <message>
         <source>Relays</source>
@@ -1155,6 +1130,11 @@ Wiadomości innych grup z zablokowanymi kontaktami nadal będą wyświetlane.</t
     <message>
         <source>Add a relay</source>
         <translation>Dodaj przekaźnik</translation>
+    </message>
+    <message>
+        <source>The relay this profile sends from takes attachments up to %1.</source>
+        <extracomment>The biggest attachment the relay the profile sends from will carry. %1 is a size such as &quot;22.3 MB&quot;.</extracomment>
+        <translation>Przekaźnik, z którego wysyła ten profil, przyjmuje załączniki do %1.</translation>
     </message>
 </context>
 <context>

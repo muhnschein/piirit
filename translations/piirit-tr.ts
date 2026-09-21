@@ -39,20 +39,20 @@
         <translation>Adınız</translation>
     </message>
     <message>
-        <source>Relay</source>
-        <translation>Aktarıcı</translation>
+        <source>Pick a name and a relay. There is nothing else to set up.</source>
+        <translation>Bir ad ve bir aktarıcı seç. Başka ayarlanacak bir şey yok.</translation>
     </message>
     <message>
-        <source>Custom server</source>
-        <translation>Özel sunucu</translation>
+        <source>Select a public chatmail relay</source>
+        <translation>Herkese açık bir chatmail aktarıcısı seç</translation>
     </message>
     <message>
-        <source>See &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; for the full list.</source>
-        <translation>Tam liste için &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; adresine bakın.</translation>
+        <source>Use a custom chatmail relay</source>
+        <translation>Kendi chatmail aktarıcını kullan</translation>
     </message>
     <message>
-        <source>The relay gives you an address. The keys are made on this phone.</source>
-        <translation>Aktarıcı sana bir adres verir. Anahtarlar bu telefonda üretilir.</translation>
+        <source>Piirit works only with chatmail relays. These are a particular kind of e-mail server; ordinary e-mail servers are not supported. For more, see &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. A full list of public, free-to-use chatmail relays is at &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</source>
+        <translation>Piirit yalnızca chatmail aktarıcılarıyla çalışır. Bunlar özel bir tür e-posta sunucusudur; sıradan e-posta sunucuları desteklenmez. Daha fazlası için &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt; adresine bak. Herkese açık, ücretsiz chatmail aktarıcılarının tam listesi &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; adresinde.</translation>
     </message>
 </context>
 <context>
@@ -101,18 +101,6 @@
         <translation>Bu profil için başka bir aktarıcıda bir adres daha. Profil aynı anda tek bir aktarıcıdan gönderir; hangisi olduğunu sayfası gösterir ve değiştirmene izin verir.</translation>
     </message>
     <message>
-        <source>Relay</source>
-        <translation>Aktarıcı</translation>
-    </message>
-    <message>
-        <source>Custom server</source>
-        <translation>Özel sunucu</translation>
-    </message>
-    <message>
-        <source>See &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; for the full list.</source>
-        <translation>Tam liste için &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; adresine bakın.</translation>
-    </message>
-    <message>
         <source>Add relay</source>
         <translation>Aktarıcı ekle</translation>
     </message>
@@ -127,6 +115,18 @@
     <message>
         <source>Relays are run by volunteers. Try another one.</source>
         <translation>Aktarıcıları gönüllüler işletir. Bir başkasını dene.</translation>
+    </message>
+    <message>
+        <source>Select a public chatmail relay</source>
+        <translation>Herkese açık bir chatmail aktarıcısı seç</translation>
+    </message>
+    <message>
+        <source>Use a custom chatmail relay</source>
+        <translation>Kendi chatmail aktarıcını kullan</translation>
+    </message>
+    <message>
+        <source>Piirit works only with chatmail relays. These are a particular kind of e-mail server; ordinary e-mail servers are not supported. For more, see &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. A full list of public, free-to-use chatmail relays is at &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</source>
+        <translation>Piirit yalnızca chatmail aktarıcılarıyla çalışır. Bunlar özel bir tür e-posta sunucusudur; sıradan e-posta sunucuları desteklenmez. Daha fazlası için &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt; adresine bak. Herkese açık, ücretsiz chatmail aktarıcılarının tam listesi &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; adresinde.</translation>
     </message>
 </context>
 <context>
@@ -1041,10 +1041,6 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
 <context>
     <name>ProfilePage</name>
     <message>
-        <source>Not connected</source>
-        <translation>Bağlı değil</translation>
-    </message>
-    <message>
         <source>Checking the connection</source>
         <translation>Bağlantı denetleniyor</translation>
     </message>
@@ -1086,18 +1082,6 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
         <translation>Kaydedildi</translation>
     </message>
     <message>
-        <source>Connected, and up to date</source>
-        <translation>Bağlı ve güncel</translation>
-    </message>
-    <message>
-        <source>Connected, sending or syncing messages</source>
-        <translation>Bağlı, mesaj gönderiyor veya eşitliyor</translation>
-    </message>
-    <message>
-        <source>Connecting to the relay</source>
-        <translation>Aktarıcıya bağlanıyor</translation>
-    </message>
-    <message>
         <source>%1 used · %2 left of %3</source>
         <extracomment>The mailbox on the relay. %1 used, %2 left, %3 the whole, each a size such as &quot;1.4 GB&quot;.</extracomment>
         <translation>%3 içinden %1 kullanıldı · %2 kaldı</translation>
@@ -1107,17 +1091,8 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
         <translation>Aktarıcı kotasını henüz bildirmedi</translation>
     </message>
     <message>
-        <source>The name on every message you send</source>
-        <translation>Gönderdiğiniz her mesajdaki ad</translation>
-    </message>
-    <message>
         <source>Both ways: with this off you send none and see none.</source>
         <translation>Her iki yönde de: kapalıyken ne gönderirsin ne görürsün.</translation>
-    </message>
-    <message>
-        <source>Attachments up to %1</source>
-        <extracomment>The biggest attachment the relay will carry. %1 is a size such as &quot;22.3 MB&quot;.</extracomment>
-        <translation>En fazla %1 boyutunda ek</translation>
     </message>
     <message>
         <source>Relays</source>
@@ -1143,6 +1118,11 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
     <message>
         <source>Add a relay</source>
         <translation>Aktarıcı ekle</translation>
+    </message>
+    <message>
+        <source>The relay this profile sends from takes attachments up to %1.</source>
+        <extracomment>The biggest attachment the relay the profile sends from will carry. %1 is a size such as &quot;22.3 MB&quot;.</extracomment>
+        <translation>Bu profilin gönderdiği aktarıcı %1 boyutuna kadar ek kabul eder.</translation>
     </message>
 </context>
 <context>

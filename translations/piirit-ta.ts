@@ -39,20 +39,20 @@
         <translation>உங்கள் பெயர்</translation>
     </message>
     <message>
-        <source>Relay</source>
-        <translation>ரிலே</translation>
+        <source>Pick a name and a relay. There is nothing else to set up.</source>
+        <translation>ஒரு பெயரையும் ஒரு ரிலேயையும் தேர்ந்தெடுங்கள். வேறு எதையும் அமைக்க வேண்டியதில்லை.</translation>
     </message>
     <message>
-        <source>Custom server</source>
-        <translation>சொந்த சேவையகம்</translation>
+        <source>Select a public chatmail relay</source>
+        <translation>பொது chatmail ரிலேயைத் தேர்ந்தெடு</translation>
     </message>
     <message>
-        <source>See &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; for the full list.</source>
-        <translation>முழுப் பட்டியலை &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; இல் காணலாம்.</translation>
+        <source>Use a custom chatmail relay</source>
+        <translation>சொந்த chatmail ரிலேயைப் பயன்படுத்து</translation>
     </message>
     <message>
-        <source>The relay gives you an address. The keys are made on this phone.</source>
-        <translation>ரிலே உங்களுக்கு ஒரு முகவரியைத் தரும். சாவிகள் இந்தத் தொலைபேசியிலேயே உருவாகும்.</translation>
+        <source>Piirit works only with chatmail relays. These are a particular kind of e-mail server; ordinary e-mail servers are not supported. For more, see &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. A full list of public, free-to-use chatmail relays is at &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</source>
+        <translation>Piirit chatmail ரிலேக்களுடன் மட்டுமே வேலை செய்யும். இவை ஒரு தனி வகை மின்னஞ்சல் சேவையகங்கள்; சாதாரண மின்னஞ்சல் சேவையகங்கள் ஆதரிக்கப்படுவதில்லை. மேலும் அறிய &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt; பார்க்கவும். பொது, இலவச chatmail ரிலேக்களின் முழுப் பட்டியல் &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;-இல் உள்ளது.</translation>
     </message>
 </context>
 <context>
@@ -101,18 +101,6 @@
         <translation>இந்தச் சுயவிவரத்திற்கு வேறொரு ரிலேயில் இன்னொரு முகவரி. சுயவிவரம் ஒரு நேரத்தில் ஒரே ரிலேயிலிருந்துதான் அனுப்பும்; எது என்று அதன் பக்கம் காட்டும், மாற்றவும் விடும்.</translation>
     </message>
     <message>
-        <source>Relay</source>
-        <translation>ரிலே</translation>
-    </message>
-    <message>
-        <source>Custom server</source>
-        <translation>சொந்த சேவையகம்</translation>
-    </message>
-    <message>
-        <source>See &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; for the full list.</source>
-        <translation>முழுப் பட்டியலை &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; இல் காணலாம்.</translation>
-    </message>
-    <message>
         <source>Add relay</source>
         <translation>ரிலே சேர்</translation>
     </message>
@@ -127,6 +115,18 @@
     <message>
         <source>Relays are run by volunteers. Try another one.</source>
         <translation>ரிலேக்களைத் தன்னார்வலர்கள் நடத்துகிறார்கள். வேறொன்றை முயலுங்கள்.</translation>
+    </message>
+    <message>
+        <source>Select a public chatmail relay</source>
+        <translation>பொது chatmail ரிலேயைத் தேர்ந்தெடு</translation>
+    </message>
+    <message>
+        <source>Use a custom chatmail relay</source>
+        <translation>சொந்த chatmail ரிலேயைப் பயன்படுத்து</translation>
+    </message>
+    <message>
+        <source>Piirit works only with chatmail relays. These are a particular kind of e-mail server; ordinary e-mail servers are not supported. For more, see &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. A full list of public, free-to-use chatmail relays is at &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</source>
+        <translation>Piirit chatmail ரிலேக்களுடன் மட்டுமே வேலை செய்யும். இவை ஒரு தனி வகை மின்னஞ்சல் சேவையகங்கள்; சாதாரண மின்னஞ்சல் சேவையகங்கள் ஆதரிக்கப்படுவதில்லை. மேலும் அறிய &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt; பார்க்கவும். பொது, இலவச chatmail ரிலேக்களின் முழுப் பட்டியல் &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;-இல் உள்ளது.</translation>
     </message>
 </context>
 <context>
@@ -1043,10 +1043,6 @@ Other groups with blocked contacts will still show their messages.</source>
 <context>
     <name>ProfilePage</name>
     <message>
-        <source>Not connected</source>
-        <translation>இணைக்கப்படவில்லை</translation>
-    </message>
-    <message>
         <source>Checking the connection</source>
         <translation>இணைப்பு சரிபார்க்கப்படுகிறது</translation>
     </message>
@@ -1088,18 +1084,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>சேமிக்கப்பட்டது</translation>
     </message>
     <message>
-        <source>Connected, and up to date</source>
-        <translation>இணைக்கப்பட்டது, புதுப்பித்த நிலையில் உள்ளது</translation>
-    </message>
-    <message>
-        <source>Connected, sending or syncing messages</source>
-        <translation>இணைக்கப்பட்டது, செய்திகளை அனுப்புகிறது அல்லது ஒத்திசைக்கிறது</translation>
-    </message>
-    <message>
-        <source>Connecting to the relay</source>
-        <translation>ரிலேயுடன் இணைக்கப்படுகிறது</translation>
-    </message>
-    <message>
         <source>%1 used · %2 left of %3</source>
         <extracomment>The mailbox on the relay. %1 used, %2 left, %3 the whole, each a size such as &quot;1.4 GB&quot;.</extracomment>
         <translation>%3-இல் %1 பயன்படுத்தப்பட்டது · %2 மீதம்</translation>
@@ -1109,17 +1093,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>ரிலே தனது ஒதுக்கீட்டை இன்னும் தெரிவிக்கவில்லை</translation>
     </message>
     <message>
-        <source>The name on every message you send</source>
-        <translation>நீங்கள் அனுப்பும் ஒவ்வொரு செய்தியிலும் உள்ள பெயர்</translation>
-    </message>
-    <message>
         <source>Both ways: with this off you send none and see none.</source>
         <translation>இரு பக்கமும்: அணைத்திருந்தால் நீங்கள் ஒன்றும் அனுப்புவதில்லை, ஒன்றும் காண்பதில்லை.</translation>
-    </message>
-    <message>
-        <source>Attachments up to %1</source>
-        <extracomment>The biggest attachment the relay will carry. %1 is a size such as &quot;22.3 MB&quot;.</extracomment>
-        <translation>%1 வரையிலான இணைப்புகள்</translation>
     </message>
     <message>
         <source>Relays</source>
@@ -1145,6 +1120,11 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Add a relay</source>
         <translation>ரிலே சேர்</translation>
+    </message>
+    <message>
+        <source>The relay this profile sends from takes attachments up to %1.</source>
+        <extracomment>The biggest attachment the relay the profile sends from will carry. %1 is a size such as &quot;22.3 MB&quot;.</extracomment>
+        <translation>இந்தச் சுயவிவரம் அனுப்பும் ரிலே %1 வரையிலான இணைப்புகளை ஏற்கும்.</translation>
     </message>
 </context>
 <context>

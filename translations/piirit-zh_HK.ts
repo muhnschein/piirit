@@ -39,20 +39,20 @@
         <translation>你的名字</translation>
     </message>
     <message>
-        <source>Relay</source>
-        <translation>中繼</translation>
+        <source>Pick a name and a relay. There is nothing else to set up.</source>
+        <translation>選一個名字和一個中繼，無需其他設定。</translation>
     </message>
     <message>
-        <source>Custom server</source>
-        <translation>自訂伺服器</translation>
+        <source>Select a public chatmail relay</source>
+        <translation>選擇公共 chatmail 中繼</translation>
     </message>
     <message>
-        <source>See &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; for the full list.</source>
-        <translation>完整清單請見 &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;。</translation>
+        <source>Use a custom chatmail relay</source>
+        <translation>使用自訂 chatmail 中繼</translation>
     </message>
     <message>
-        <source>The relay gives you an address. The keys are made on this phone.</source>
-        <translation>中繼給你一個地址。金鑰在這部手機上產生。</translation>
+        <source>Piirit works only with chatmail relays. These are a particular kind of e-mail server; ordinary e-mail servers are not supported. For more, see &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. A full list of public, free-to-use chatmail relays is at &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</source>
+        <translation>Piirit 只能配合 chatmail 中繼使用。這是一種特殊的電郵伺服器；不支援普通的電郵伺服器。詳情見 &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;。公共、免費的 chatmail 中繼完整清單見 &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;。</translation>
     </message>
 </context>
 <context>
@@ -101,18 +101,6 @@
         <translation>為此個人檔案在另一個中繼上多加一個地址。個人檔案一次只由一個中繼傳送；其頁面會顯示是哪一個，並可以更改。</translation>
     </message>
     <message>
-        <source>Relay</source>
-        <translation>中繼</translation>
-    </message>
-    <message>
-        <source>Custom server</source>
-        <translation>自訂伺服器</translation>
-    </message>
-    <message>
-        <source>See &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; for the full list.</source>
-        <translation>完整清單請見 &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;。</translation>
-    </message>
-    <message>
         <source>Add relay</source>
         <translation>新增中繼</translation>
     </message>
@@ -127,6 +115,18 @@
     <message>
         <source>Relays are run by volunteers. Try another one.</source>
         <translation>中繼由義工維護。試試另一個。</translation>
+    </message>
+    <message>
+        <source>Select a public chatmail relay</source>
+        <translation>選擇公共 chatmail 中繼</translation>
+    </message>
+    <message>
+        <source>Use a custom chatmail relay</source>
+        <translation>使用自訂 chatmail 中繼</translation>
+    </message>
+    <message>
+        <source>Piirit works only with chatmail relays. These are a particular kind of e-mail server; ordinary e-mail servers are not supported. For more, see &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. A full list of public, free-to-use chatmail relays is at &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</source>
+        <translation>Piirit 只能配合 chatmail 中繼使用。這是一種特殊的電郵伺服器；不支援普通的電郵伺服器。詳情見 &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;。公共、免費的 chatmail 中繼完整清單見 &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;。</translation>
     </message>
 </context>
 <context>
@@ -1037,10 +1037,6 @@ Other groups with blocked contacts will still show their messages.</source>
 <context>
     <name>ProfilePage</name>
     <message>
-        <source>Not connected</source>
-        <translation>未連線</translation>
-    </message>
-    <message>
         <source>Checking the connection</source>
         <translation>正在檢查連線</translation>
     </message>
@@ -1082,18 +1078,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>已儲存</translation>
     </message>
     <message>
-        <source>Connected, and up to date</source>
-        <translation>已連線，一切最新</translation>
-    </message>
-    <message>
-        <source>Connected, sending or syncing messages</source>
-        <translation>已連線，正在傳送或同步訊息</translation>
-    </message>
-    <message>
-        <source>Connecting to the relay</source>
-        <translation>正在連線至中繼</translation>
-    </message>
-    <message>
         <source>%1 used · %2 left of %3</source>
         <extracomment>The mailbox on the relay. %1 used, %2 left, %3 the whole, each a size such as &quot;1.4 GB&quot;.</extracomment>
         <translation>已用 %1 · 剩餘 %2，共 %3</translation>
@@ -1103,17 +1087,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>中繼尚未回報其配額</translation>
     </message>
     <message>
-        <source>The name on every message you send</source>
-        <translation>你傳送的每則訊息上顯示的名字</translation>
-    </message>
-    <message>
         <source>Both ways: with this off you send none and see none.</source>
         <translation>兩個方向：關掉後你不會傳送，也看不到。</translation>
-    </message>
-    <message>
-        <source>Attachments up to %1</source>
-        <extracomment>The biggest attachment the relay will carry. %1 is a size such as &quot;22.3 MB&quot;.</extracomment>
-        <translation>附件最大 %1</translation>
     </message>
     <message>
         <source>Relays</source>
@@ -1139,6 +1114,11 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Add a relay</source>
         <translation>新增中繼</translation>
+    </message>
+    <message>
+        <source>The relay this profile sends from takes attachments up to %1.</source>
+        <extracomment>The biggest attachment the relay the profile sends from will carry. %1 is a size such as &quot;22.3 MB&quot;.</extracomment>
+        <translation>此個人檔案傳送所用的中繼接受最大 %1 的附件。</translation>
     </message>
 </context>
 <context>

@@ -39,20 +39,20 @@
         <translation>Numele tău</translation>
     </message>
     <message>
-        <source>Relay</source>
-        <translation>Releu</translation>
+        <source>Pick a name and a relay. There is nothing else to set up.</source>
+        <translation>Alege un nume și un releu. Nu mai e nimic de configurat.</translation>
     </message>
     <message>
-        <source>Custom server</source>
-        <translation>Server propriu</translation>
+        <source>Select a public chatmail relay</source>
+        <translation>Alege un releu chatmail public</translation>
     </message>
     <message>
-        <source>See &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; for the full list.</source>
-        <translation>Lista completă se află la &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
+        <source>Use a custom chatmail relay</source>
+        <translation>Folosește un releu chatmail propriu</translation>
     </message>
     <message>
-        <source>The relay gives you an address. The keys are made on this phone.</source>
-        <translation>Releul îți dă o adresă. Cheile se fac pe acest telefon.</translation>
+        <source>Piirit works only with chatmail relays. These are a particular kind of e-mail server; ordinary e-mail servers are not supported. For more, see &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. A full list of public, free-to-use chatmail relays is at &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</source>
+        <translation>Piirit funcționează doar cu relee chatmail. Acestea sunt un tip aparte de server de e-mail; serverele de e-mail obișnuite nu sunt acceptate. Mai multe pe &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. Lista completă a releelor chatmail publice, gratuite, este la &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
     </message>
 </context>
 <context>
@@ -101,18 +101,6 @@
         <translation>Încă o adresă pentru acest profil, pe alt releu. Profilul trimite printr-un singur releu odată; pagina lui arată care și te lasă să-l schimbi.</translation>
     </message>
     <message>
-        <source>Relay</source>
-        <translation>Releu</translation>
-    </message>
-    <message>
-        <source>Custom server</source>
-        <translation>Server propriu</translation>
-    </message>
-    <message>
-        <source>See &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; for the full list.</source>
-        <translation>Lista completă se află la &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
-    </message>
-    <message>
         <source>Add relay</source>
         <translation>Adaugă releul</translation>
     </message>
@@ -127,6 +115,18 @@
     <message>
         <source>Relays are run by volunteers. Try another one.</source>
         <translation>Releele sunt ținute de voluntari. Încearcă altul.</translation>
+    </message>
+    <message>
+        <source>Select a public chatmail relay</source>
+        <translation>Alege un releu chatmail public</translation>
+    </message>
+    <message>
+        <source>Use a custom chatmail relay</source>
+        <translation>Folosește un releu chatmail propriu</translation>
+    </message>
+    <message>
+        <source>Piirit works only with chatmail relays. These are a particular kind of e-mail server; ordinary e-mail servers are not supported. For more, see &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. A full list of public, free-to-use chatmail relays is at &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</source>
+        <translation>Piirit funcționează doar cu relee chatmail. Acestea sunt un tip aparte de server de e-mail; serverele de e-mail obișnuite nu sunt acceptate. Mai multe pe &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. Lista completă a releelor chatmail publice, gratuite, este la &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
     </message>
 </context>
 <context>
@@ -1049,10 +1049,6 @@ Other groups with blocked contacts will still show their messages.</source>
 <context>
     <name>ProfilePage</name>
     <message>
-        <source>Not connected</source>
-        <translation>Neconectat</translation>
-    </message>
-    <message>
         <source>Checking the connection</source>
         <translation>Se verifică conexiunea</translation>
     </message>
@@ -1094,18 +1090,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Salvat</translation>
     </message>
     <message>
-        <source>Connected, and up to date</source>
-        <translation>Conectat și la zi</translation>
-    </message>
-    <message>
-        <source>Connected, sending or syncing messages</source>
-        <translation>Conectat, se trimit sau se sincronizează mesaje</translation>
-    </message>
-    <message>
-        <source>Connecting to the relay</source>
-        <translation>Se conectează la releu</translation>
-    </message>
-    <message>
         <source>%1 used · %2 left of %3</source>
         <extracomment>The mailbox on the relay. %1 used, %2 left, %3 the whole, each a size such as &quot;1.4 GB&quot;.</extracomment>
         <translation>%1 folosit · %2 liber din %3</translation>
@@ -1115,17 +1099,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Releul nu și-a raportat încă cota</translation>
     </message>
     <message>
-        <source>The name on every message you send</source>
-        <translation>Numele de pe fiecare mesaj pe care îl trimiți</translation>
-    </message>
-    <message>
         <source>Both ways: with this off you send none and see none.</source>
         <translation>În ambele sensuri: oprit, nu trimiți niciuna și nu vezi niciuna.</translation>
-    </message>
-    <message>
-        <source>Attachments up to %1</source>
-        <extracomment>The biggest attachment the relay will carry. %1 is a size such as &quot;22.3 MB&quot;.</extracomment>
-        <translation>Atașamente până la %1</translation>
     </message>
     <message>
         <source>Relays</source>
@@ -1151,6 +1126,11 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Add a relay</source>
         <translation>Adaugă un releu</translation>
+    </message>
+    <message>
+        <source>The relay this profile sends from takes attachments up to %1.</source>
+        <extracomment>The biggest attachment the relay the profile sends from will carry. %1 is a size such as &quot;22.3 MB&quot;.</extracomment>
+        <translation>Releul prin care trimite acest profil acceptă atașamente de până la %1.</translation>
     </message>
 </context>
 <context>

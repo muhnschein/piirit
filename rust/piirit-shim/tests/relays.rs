@@ -2,7 +2,8 @@
 //!
 //! A profile can be reached through several relays at once, and sends
 //! from one of them. The page lists them with the one sent from first,
-//! each with its own mailbox off the core's report; a row's menu sends
+//! and reports on each by itself -- the core's own words about its
+//! connection, and its mailbox off the core's report; a row's menu sends
 //! from that relay instead, or removes it after Silica's countdown; the
 //! last relay cannot be removed; and the plus under the rows opens the
 //! page that adds one, whose answer lands back in the list. The core's
@@ -248,7 +249,10 @@ fn the_relays_are_listed_switched_removed_and_added() {
         );
         record!("second", get!("relayRow1", "addr"));
         record!("second-domain", get_in!("relayRow1", "relayDomain", "text"));
-        record!("second-detail", get_in!("relayRow1", "relayDetail", "text"));
+        record!(
+            "second-detail",
+            get_in!("relayRow1", "relayDetail", "visible")
+        );
         record!(
             "second-switch",
             get_in!("relayRow1", "sendFromItem", "visible")
@@ -258,7 +262,33 @@ fn the_relays_are_listed_switched_removed_and_added() {
             get_in!("relayRow1", "removeRelayItem", "enabled")
         );
         record!("address", get!("profile", "address"));
-        record!("quota", get!("quotaBar", "value"));
+        // Reported on in the same order, each relay by itself: the
+        // core's dot and words for its connection, and its own mailbox.
+        record!(
+            "first-report",
+            get_in!("relayReport0", "reportDomain", "text")
+        );
+        record!(
+            "first-status",
+            get_in!("relayReport0", "reportStatus", "text")
+        );
+        record!("quota", get_in!("relayReport0", "reportQuota", "value"));
+        record!(
+            "second-report",
+            get_in!("relayReport1", "reportDomain", "text")
+        );
+        record!(
+            "second-status",
+            get_in!("relayReport1", "reportStatus", "text")
+        );
+        record!(
+            "second-quota",
+            get_in!("relayReport1", "reportQuota", "value")
+        );
+        record!(
+            "second-words",
+            get_in!("relayReport1", "reportQuota", "label")
+        );
         record!(
             "switch",
             call!(
@@ -277,7 +307,14 @@ fn the_relays_are_listed_switched_removed_and_added() {
         record!("switched-first-sends", get!("relayRow0", "sendsFrom"));
         record!("switched-second", get!("relayRow1", "addr"));
         record!("switched-address", get!("profile", "address"));
-        record!("switched-quota", get!("quotaBar", "value"));
+        record!(
+            "switched-report",
+            get_in!("relayReport0", "reportDomain", "text")
+        );
+        record!(
+            "switched-quota",
+            get_in!("relayReport0", "reportQuota", "value")
+        );
         record!(
             "remove",
             call!(
@@ -368,7 +405,14 @@ fn the_relays_are_listed_switched_removed_and_added() {
         record!("added-count", get!("transports", "count"));
         record!("added-first", get!("relayRow0", "addr"));
         record!("added-second", get!("relayRow1", "addr"));
-        record!("added-detail", get_in!("relayRow1", "relayDetail", "text"));
+        record!(
+            "added-report",
+            get_in!("relayReport1", "reportDomain", "text")
+        );
+        record!(
+            "added-quota",
+            get_in!("relayReport1", "reportQuota", "value")
+        );
         record!("navigation", call!("navigation"));
         record!("pushed-account", call!("pushedAccount"));
         (*engine_ptr).quit();
@@ -430,8 +474,30 @@ fn assert_listed(value: &dyn Fn(&str) -> String, context: &str) {
     assert_eq!(value("second-domain"), "old.example.net", "{context}");
     assert_eq!(
         value("second-detail"),
-        "1.9 GiB of 2 GiB used",
-        "the second row's mailbox is not that relay's own. {context}"
+        "false",
+        "a relay not sent from carries a marker. {context}"
+    );
+    assert_eq!(value("first-report"), "example.org", "{context}");
+    assert_eq!(
+        value("first-status"),
+        "Connected",
+        "the relay's connection is not said in the core's own words. {context}"
+    );
+    assert_eq!(value("second-report"), "old.example.net", "{context}");
+    assert_eq!(
+        value("second-status"),
+        "Connecting…",
+        "the second relay's connection is not its own. {context}"
+    );
+    assert_eq!(
+        value("second-quota"),
+        "95",
+        "the second relay's mailbox is not its own. {context}"
+    );
+    assert_eq!(
+        value("second-words"),
+        "2.0 GB used · 107.4 MB left of 2.1 GB",
+        "the second relay's mailbox is not said as used, left and whole. {context}"
     );
     assert_eq!(value("second-switch"), "true", "{context}");
     assert_eq!(value("second-remove"), "true", "{context}");
@@ -439,7 +505,7 @@ fn assert_listed(value: &dyn Fn(&str) -> String, context: &str) {
     assert_eq!(
         value("quota"),
         "67",
-        "the bar is not the mailbox of the relay sent from. {context}"
+        "the first bar is not the mailbox of the relay sent from. {context}"
     );
 }
 
@@ -463,10 +529,11 @@ fn assert_switched(value: &dyn Fn(&str) -> String, context: &str) {
         "ada@old.example.net",
         "the profile's address did not follow the relay it sends from. {context}"
     );
+    assert_eq!(value("switched-report"), "old.example.net", "{context}");
     assert_eq!(
         value("switched-quota"),
         "95",
-        "the bar did not follow the relay the profile sends from. {context}"
+        "the reports did not follow the order of the rows. {context}"
     );
 }
 
@@ -593,9 +660,14 @@ fn assert_added(
         "the added relay is not the one listed. {context}"
     );
     assert_eq!(
-        value("added-detail"),
-        "12 MiB of 1 GiB used",
-        "the added relay's row does not show its own mailbox. {context}"
+        value("added-report"),
+        "mehl.cloud",
+        "the added relay is not reported on. {context}"
+    );
+    assert_eq!(
+        value("added-quota"),
+        "2",
+        "the added relay's report does not show its own mailbox. {context}"
     );
     assert!(
         !calls.iter().any(|(name, _)| name == "remove_account"),

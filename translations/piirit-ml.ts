@@ -39,20 +39,20 @@
         <translation>നിങ്ങളുടെ പേര്</translation>
     </message>
     <message>
-        <source>Relay</source>
-        <translation>റിലേ</translation>
+        <source>Pick a name and a relay. There is nothing else to set up.</source>
+        <translation>ഒരു പേരും ഒരു റിലേയും തിരഞ്ഞെടുക്കുക. വേറൊന്നും സജ്ജീകരിക്കേണ്ടതില്ല.</translation>
     </message>
     <message>
-        <source>Custom server</source>
-        <translation>സ്വന്തം സെർവർ</translation>
+        <source>Select a public chatmail relay</source>
+        <translation>പൊതു chatmail റിലേ തിരഞ്ഞെടുക്കുക</translation>
     </message>
     <message>
-        <source>See &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; for the full list.</source>
-        <translation>മുഴുവൻ പട്ടിക &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; ൽ കാണുക.</translation>
+        <source>Use a custom chatmail relay</source>
+        <translation>സ്വന്തം chatmail റിലേ ഉപയോഗിക്കുക</translation>
     </message>
     <message>
-        <source>The relay gives you an address. The keys are made on this phone.</source>
-        <translation>റിലേ നിങ്ങൾക്ക് ഒരു വിലാസം നൽകുന്നു. താക്കോലുകൾ ഈ ഫോണിൽത്തന്നെ ഉണ്ടാകുന്നു.</translation>
+        <source>Piirit works only with chatmail relays. These are a particular kind of e-mail server; ordinary e-mail servers are not supported. For more, see &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. A full list of public, free-to-use chatmail relays is at &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</source>
+        <translation>Piirit chatmail റിലേകളുമായി മാത്രമേ പ്രവർത്തിക്കൂ. ഇവ ഒരു പ്രത്യേക തരം ഇ-മെയിൽ സെർവറുകളാണ്; സാധാരണ ഇ-മെയിൽ സെർവറുകൾ പിന്തുണയ്ക്കുന്നില്ല. കൂടുതൽ അറിയാൻ &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt; കാണുക. പൊതു, സൗജന്യ chatmail റിലേകളുടെ പൂർണ്ണ പട്ടിക &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;-ൽ ഉണ്ട്.</translation>
     </message>
 </context>
 <context>
@@ -101,18 +101,6 @@
         <translation>ഈ പ്രൊഫൈലിന് മറ്റൊരു റിലേയിൽ ഒരു വിലാസം കൂടി. പ്രൊഫൈൽ ഒരു സമയത്ത് ഒരു റിലേയിൽ നിന്നേ അയയ്ക്കൂ; ഏതെന്ന് അതിന്റെ പേജ് കാണിക്കുകയും മാറ്റാൻ അനുവദിക്കുകയും ചെയ്യുന്നു.</translation>
     </message>
     <message>
-        <source>Relay</source>
-        <translation>റിലേ</translation>
-    </message>
-    <message>
-        <source>Custom server</source>
-        <translation>സ്വന്തം സെർവർ</translation>
-    </message>
-    <message>
-        <source>See &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; for the full list.</source>
-        <translation>മുഴുവൻ പട്ടിക &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; ൽ കാണുക.</translation>
-    </message>
-    <message>
         <source>Add relay</source>
         <translation>റിലേ ചേർക്കുക</translation>
     </message>
@@ -127,6 +115,18 @@
     <message>
         <source>Relays are run by volunteers. Try another one.</source>
         <translation>റിലേകൾ നടത്തുന്നത് സന്നദ്ധപ്രവർത്തകരാണ്. മറ്റൊന്ന് പരീക്ഷിക്കുക.</translation>
+    </message>
+    <message>
+        <source>Select a public chatmail relay</source>
+        <translation>പൊതു chatmail റിലേ തിരഞ്ഞെടുക്കുക</translation>
+    </message>
+    <message>
+        <source>Use a custom chatmail relay</source>
+        <translation>സ്വന്തം chatmail റിലേ ഉപയോഗിക്കുക</translation>
+    </message>
+    <message>
+        <source>Piirit works only with chatmail relays. These are a particular kind of e-mail server; ordinary e-mail servers are not supported. For more, see &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. A full list of public, free-to-use chatmail relays is at &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</source>
+        <translation>Piirit chatmail റിലേകളുമായി മാത്രമേ പ്രവർത്തിക്കൂ. ഇവ ഒരു പ്രത്യേക തരം ഇ-മെയിൽ സെർവറുകളാണ്; സാധാരണ ഇ-മെയിൽ സെർവറുകൾ പിന്തുണയ്ക്കുന്നില്ല. കൂടുതൽ അറിയാൻ &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt; കാണുക. പൊതു, സൗജന്യ chatmail റിലേകളുടെ പൂർണ്ണ പട്ടിക &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;-ൽ ഉണ്ട്.</translation>
     </message>
 </context>
 <context>
@@ -1047,10 +1047,6 @@ Other groups with blocked contacts will still show their messages.</source>
 <context>
     <name>ProfilePage</name>
     <message>
-        <source>Not connected</source>
-        <translation>കണക്റ്റ് ചെയ്തിട്ടില്ല</translation>
-    </message>
-    <message>
         <source>Checking the connection</source>
         <translation>കണക്ഷൻ പരിശോധിക്കുന്നു</translation>
     </message>
@@ -1092,18 +1088,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>സംരക്ഷിച്ചു</translation>
     </message>
     <message>
-        <source>Connected, and up to date</source>
-        <translation>കണക്റ്റ് ചെയ്തു, കാലികമാണ്</translation>
-    </message>
-    <message>
-        <source>Connected, sending or syncing messages</source>
-        <translation>കണക്റ്റ് ചെയ്തു, സന്ദേശങ്ങൾ അയയ്ക്കുകയോ സമന്വയിപ്പിക്കുകയോ ചെയ്യുന്നു</translation>
-    </message>
-    <message>
-        <source>Connecting to the relay</source>
-        <translation>റിലേയിലേക്ക് കണക്റ്റ് ചെയ്യുന്നു</translation>
-    </message>
-    <message>
         <source>%1 used · %2 left of %3</source>
         <extracomment>The mailbox on the relay. %1 used, %2 left, %3 the whole, each a size such as &quot;1.4 GB&quot;.</extracomment>
         <translation>%3-ൽ %1 ഉപയോഗിച്ചു · %2 ബാക്കി</translation>
@@ -1113,17 +1097,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>റിലേ അതിന്റെ ക്വോട്ട ഇതുവരെ അറിയിച്ചിട്ടില്ല</translation>
     </message>
     <message>
-        <source>The name on every message you send</source>
-        <translation>നിങ്ങൾ അയയ്ക്കുന്ന ഓരോ സന്ദേശത്തിലുമുള്ള പേര്</translation>
-    </message>
-    <message>
         <source>Both ways: with this off you send none and see none.</source>
         <translation>രണ്ടു വഴിക്കും: ഓഫാണെങ്കിൽ നിങ്ങൾ ഒന്നും അയയ്ക്കുന്നില്ല, ഒന്നും കാണുന്നുമില്ല.</translation>
-    </message>
-    <message>
-        <source>Attachments up to %1</source>
-        <extracomment>The biggest attachment the relay will carry. %1 is a size such as &quot;22.3 MB&quot;.</extracomment>
-        <translation>%1 വരെയുള്ള അറ്റാച്ച്‌മെന്റുകൾ</translation>
     </message>
     <message>
         <source>Relays</source>
@@ -1149,6 +1124,11 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Add a relay</source>
         <translation>ഒരു റിലേ ചേർക്കുക</translation>
+    </message>
+    <message>
+        <source>The relay this profile sends from takes attachments up to %1.</source>
+        <extracomment>The biggest attachment the relay the profile sends from will carry. %1 is a size such as &quot;22.3 MB&quot;.</extracomment>
+        <translation>ഈ പ്രൊഫൈൽ അയയ്ക്കുന്ന റിലേ %1 വരെയുള്ള അറ്റാച്ച്‌മെന്റുകൾ സ്വീകരിക്കും.</translation>
     </message>
 </context>
 <context>

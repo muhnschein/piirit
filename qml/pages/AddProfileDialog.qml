@@ -72,7 +72,7 @@ Dialog {
                 wrapMode: Text.Wrap
                 font.pixelSize: Theme.fontSizeSmall
                 color: Theme.secondaryHighlightColor
-                text: qsTr("The relay gives you an address. The keys are made on this phone.")
+                text: qsTr("Pick a name and a relay. There is nothing else to set up.")
             }
 
             TextField {
@@ -87,7 +87,10 @@ Dialog {
                 id: relayCombo
                 objectName: "relayCombo"
                 width: parent.width
-                label: qsTr("Relay")
+                // Said as the action it is: with nothing picked, a bare
+                // "Relay" above an empty value read as a line of text
+                // rather than as a list to open.
+                label: qsTr("Select a public chatmail relay")
                 // Nothing to begin with: the reader picks. The label
                 // above the empty value says what is being asked for,
                 // and Create stays dim until it is answered, so the
@@ -112,7 +115,7 @@ Dialog {
                 id: customField
                 objectName: "customField"
                 width: parent.width
-                label: qsTr("Custom server")
+                label: qsTr("Use a custom chatmail relay")
                 placeholderText: label
                 inputMethodHints: Qt.ImhNoAutoUppercase | Qt.ImhNoPredictiveText | Qt.ImhUrlCharactersOnly
             }
@@ -126,7 +129,10 @@ Dialog {
                 color: Theme.secondaryColor
                 linkColor: Theme.highlightColor
                 textFormat: Text.StyledText
-                text: qsTr("See <a href=\"https://chatmail.at/relays\">chatmail.at/relays</a> for the full list.")
+                // What a relay is, for a reader who has an e-mail
+                // account and wonders whether it will do: it will not,
+                // and the page that explains why is the one to point at.
+                text: qsTr("Piirit works only with chatmail relays. These are a particular kind of e-mail server; ordinary e-mail servers are not supported. For more, see <a href=\"https://chatmail.at\">chatmail.at</a>. A full list of public, free-to-use chatmail relays is at <a href=\"https://chatmail.at/relays\">chatmail.at/relays</a>.")
                 onLinkActivated: Qt.openUrlExternally(link)
             }
         }

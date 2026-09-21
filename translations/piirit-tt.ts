@@ -39,20 +39,20 @@
         <translation>Исемегез</translation>
     </message>
     <message>
-        <source>Relay</source>
-        <translation>Реле</translation>
+        <source>Pick a name and a relay. There is nothing else to set up.</source>
+        <translation>Исем һәм реле сайлагыз. Башка бернәрсә көйләргә кирәкми.</translation>
     </message>
     <message>
-        <source>Custom server</source>
-        <translation>Үз серверы</translation>
+        <source>Select a public chatmail relay</source>
+        <translation>Гомуми chatmail релесын сайларга</translation>
     </message>
     <message>
-        <source>See &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; for the full list.</source>
-        <translation>Тулы исемлек: &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
+        <source>Use a custom chatmail relay</source>
+        <translation>Үз chatmail релегызны кулланырга</translation>
     </message>
     <message>
-        <source>The relay gives you an address. The keys are made on this phone.</source>
-        <translation>Реле сезгә адрес бирә. Ачкычлар бу телефонда ясала.</translation>
+        <source>Piirit works only with chatmail relays. These are a particular kind of e-mail server; ordinary e-mail servers are not supported. For more, see &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. A full list of public, free-to-use chatmail relays is at &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</source>
+        <translation>Piirit бары chatmail релелары белән генә эшли. Алар – электрон почта серверларының аерым төре; гадәти электрон почта серверлары кулланылмый. Тулырак: &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. Гомуми, бушлай chatmail релеларының тулы исемлеге &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; адресында.</translation>
     </message>
 </context>
 <context>
@@ -101,18 +101,6 @@
         <translation>Бу профиль өчен башка реледә тагын бер адрес. Профиль бер вакытта бер реле аша гына җибәрә; кайсысы икәнен аның бите күрсәтә һәм үзгәртергә мөмкинлек бирә.</translation>
     </message>
     <message>
-        <source>Relay</source>
-        <translation>Реле</translation>
-    </message>
-    <message>
-        <source>Custom server</source>
-        <translation>Үз серверы</translation>
-    </message>
-    <message>
-        <source>See &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; for the full list.</source>
-        <translation>Тулы исемлек: &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
-    </message>
-    <message>
         <source>Add relay</source>
         <translation>Реле өстәргә</translation>
     </message>
@@ -127,6 +115,18 @@
     <message>
         <source>Relays are run by volunteers. Try another one.</source>
         <translation>Релеларны ирекле кешеләр тота. Башкасын сынап карагыз.</translation>
+    </message>
+    <message>
+        <source>Select a public chatmail relay</source>
+        <translation>Гомуми chatmail релесын сайларга</translation>
+    </message>
+    <message>
+        <source>Use a custom chatmail relay</source>
+        <translation>Үз chatmail релегызны кулланырга</translation>
+    </message>
+    <message>
+        <source>Piirit works only with chatmail relays. These are a particular kind of e-mail server; ordinary e-mail servers are not supported. For more, see &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. A full list of public, free-to-use chatmail relays is at &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</source>
+        <translation>Piirit бары chatmail релелары белән генә эшли. Алар – электрон почта серверларының аерым төре; гадәти электрон почта серверлары кулланылмый. Тулырак: &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. Гомуми, бушлай chatmail релеларының тулы исемлеге &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; адресында.</translation>
     </message>
 </context>
 <context>
@@ -1041,10 +1041,6 @@ Other groups with blocked contacts will still show their messages.</source>
 <context>
     <name>ProfilePage</name>
     <message>
-        <source>Not connected</source>
-        <translation>Тоташмаган</translation>
-    </message>
-    <message>
         <source>Checking the connection</source>
         <translation>Элемтә тикшерелә</translation>
     </message>
@@ -1086,18 +1082,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Сакланды</translation>
     </message>
     <message>
-        <source>Connected, and up to date</source>
-        <translation>Тоташкан һәм яңартылган</translation>
-    </message>
-    <message>
-        <source>Connected, sending or syncing messages</source>
-        <translation>Тоташкан, хәбәрләр җибәрә яки синхронлаштыра</translation>
-    </message>
-    <message>
-        <source>Connecting to the relay</source>
-        <translation>Релега тоташу</translation>
-    </message>
-    <message>
         <source>%1 used · %2 left of %3</source>
         <extracomment>The mailbox on the relay. %1 used, %2 left, %3 the whole, each a size such as &quot;1.4 GB&quot;.</extracomment>
         <translation>%1 кулланылган · %3 эчендә %2 калган</translation>
@@ -1107,17 +1091,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Реле үз квотасын әле хәбәр итмәде</translation>
     </message>
     <message>
-        <source>The name on every message you send</source>
-        <translation>Сез җибәргән һәр хәбәрдәге исем</translation>
-    </message>
-    <message>
         <source>Both ways: with this off you send none and see none.</source>
         <translation>Ике якка да: сүндерелгәндә сез бернәрсә җибәрмисез һәм күрмисез.</translation>
-    </message>
-    <message>
-        <source>Attachments up to %1</source>
-        <extracomment>The biggest attachment the relay will carry. %1 is a size such as &quot;22.3 MB&quot;.</extracomment>
-        <translation>Кушымталар %1 кадәр</translation>
     </message>
     <message>
         <source>Relays</source>
@@ -1143,6 +1118,11 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Add a relay</source>
         <translation>Реле өстәргә</translation>
+    </message>
+    <message>
+        <source>The relay this profile sends from takes attachments up to %1.</source>
+        <extracomment>The biggest attachment the relay the profile sends from will carry. %1 is a size such as &quot;22.3 MB&quot;.</extracomment>
+        <translation>Бу профиль җибәрә торган реле %1 кадәр кушымталар кабул итә.</translation>
     </message>
 </context>
 <context>

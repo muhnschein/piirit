@@ -39,20 +39,20 @@
         <translation>Вашето име</translation>
     </message>
     <message>
-        <source>Relay</source>
-        <translation>Релей</translation>
+        <source>Pick a name and a relay. There is nothing else to set up.</source>
+        <translation>Изберете име и релей. Нищо друго не се настройва.</translation>
     </message>
     <message>
-        <source>Custom server</source>
-        <translation>Собствен сървър</translation>
+        <source>Select a public chatmail relay</source>
+        <translation>Изберете публичен chatmail релей</translation>
     </message>
     <message>
-        <source>See &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; for the full list.</source>
-        <translation>Пълният списък е на &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
+        <source>Use a custom chatmail relay</source>
+        <translation>Използвайте собствен chatmail релей</translation>
     </message>
     <message>
-        <source>The relay gives you an address. The keys are made on this phone.</source>
-        <translation>Релеят ви дава адрес. Ключовете се правят на този телефон.</translation>
+        <source>Piirit works only with chatmail relays. These are a particular kind of e-mail server; ordinary e-mail servers are not supported. For more, see &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. A full list of public, free-to-use chatmail relays is at &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</source>
+        <translation>Piirit работи само с chatmail релеи. Те са особен вид пощенски сървъри; обикновените пощенски сървъри не се поддържат. Повече на &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. Пълен списък с публични, безплатни chatmail релеи има на &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
     </message>
 </context>
 <context>
@@ -101,18 +101,6 @@
         <translation>Още един адрес за този профил, на друг релей. Профилът изпраща само от един релей наведнъж; страницата му показва кой е и позволява да го смените.</translation>
     </message>
     <message>
-        <source>Relay</source>
-        <translation>Релей</translation>
-    </message>
-    <message>
-        <source>Custom server</source>
-        <translation>Собствен сървър</translation>
-    </message>
-    <message>
-        <source>See &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; for the full list.</source>
-        <translation>Пълният списък е на &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
-    </message>
-    <message>
         <source>Add relay</source>
         <translation>Добавяне на релей</translation>
     </message>
@@ -127,6 +115,18 @@
     <message>
         <source>Relays are run by volunteers. Try another one.</source>
         <translation>Релеите се поддържат от доброволци. Опитайте друг.</translation>
+    </message>
+    <message>
+        <source>Select a public chatmail relay</source>
+        <translation>Изберете публичен chatmail релей</translation>
+    </message>
+    <message>
+        <source>Use a custom chatmail relay</source>
+        <translation>Използвайте собствен chatmail релей</translation>
+    </message>
+    <message>
+        <source>Piirit works only with chatmail relays. These are a particular kind of e-mail server; ordinary e-mail servers are not supported. For more, see &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. A full list of public, free-to-use chatmail relays is at &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</source>
+        <translation>Piirit работи само с chatmail релеи. Те са особен вид пощенски сървъри; обикновените пощенски сървъри не се поддържат. Повече на &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. Пълен списък с публични, безплатни chatmail релеи има на &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
     </message>
 </context>
 <context>
@@ -1043,10 +1043,6 @@ Other groups with blocked contacts will still show their messages.</source>
 <context>
     <name>ProfilePage</name>
     <message>
-        <source>Not connected</source>
-        <translation>Няма връзка</translation>
-    </message>
-    <message>
         <source>Checking the connection</source>
         <translation>Проверява се връзката</translation>
     </message>
@@ -1088,18 +1084,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Запазено</translation>
     </message>
     <message>
-        <source>Connected, and up to date</source>
-        <translation>Свързано и актуално</translation>
-    </message>
-    <message>
-        <source>Connected, sending or syncing messages</source>
-        <translation>Свързано, изпраща или синхронизира съобщения</translation>
-    </message>
-    <message>
-        <source>Connecting to the relay</source>
-        <translation>Свързване с релея</translation>
-    </message>
-    <message>
         <source>%1 used · %2 left of %3</source>
         <extracomment>The mailbox on the relay. %1 used, %2 left, %3 the whole, each a size such as &quot;1.4 GB&quot;.</extracomment>
         <translation>%1 използвани · %2 свободни от %3</translation>
@@ -1109,17 +1093,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Релеят още не е съобщил квотата си</translation>
     </message>
     <message>
-        <source>The name on every message you send</source>
-        <translation>Името върху всяко съобщение, което изпращате</translation>
-    </message>
-    <message>
         <source>Both ways: with this off you send none and see none.</source>
         <translation>И в двете посоки: изключено — не изпращате и не виждате нито едно.</translation>
-    </message>
-    <message>
-        <source>Attachments up to %1</source>
-        <extracomment>The biggest attachment the relay will carry. %1 is a size such as &quot;22.3 MB&quot;.</extracomment>
-        <translation>Прикачени файлове до %1</translation>
     </message>
     <message>
         <source>Relays</source>
@@ -1145,6 +1120,11 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Add a relay</source>
         <translation>Добавяне на релей</translation>
+    </message>
+    <message>
+        <source>The relay this profile sends from takes attachments up to %1.</source>
+        <extracomment>The biggest attachment the relay the profile sends from will carry. %1 is a size such as &quot;22.3 MB&quot;.</extracomment>
+        <translation>Релеят, от който този профил изпраща, приема прикачени файлове до %1.</translation>
     </message>
 </context>
 <context>

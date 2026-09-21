@@ -39,20 +39,20 @@
         <translation>Il tuo nome</translation>
     </message>
     <message>
-        <source>Relay</source>
-        <translation>Relay</translation>
+        <source>Pick a name and a relay. There is nothing else to set up.</source>
+        <translation>Scegli un nome e un relay. Non c&apos;è altro da impostare.</translation>
     </message>
     <message>
-        <source>Custom server</source>
-        <translation>Server personalizzato</translation>
+        <source>Select a public chatmail relay</source>
+        <translation>Seleziona un relay chatmail pubblico</translation>
     </message>
     <message>
-        <source>See &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; for the full list.</source>
-        <translation>L&apos;elenco completo è su &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
+        <source>Use a custom chatmail relay</source>
+        <translation>Usa un relay chatmail personalizzato</translation>
     </message>
     <message>
-        <source>The relay gives you an address. The keys are made on this phone.</source>
-        <translation>Il relay ti dà un indirizzo. Le chiavi nascono su questo telefono.</translation>
+        <source>Piirit works only with chatmail relays. These are a particular kind of e-mail server; ordinary e-mail servers are not supported. For more, see &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. A full list of public, free-to-use chatmail relays is at &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</source>
+        <translation>Piirit funziona solo con i relay chatmail. Sono un tipo particolare di server di posta; i comuni server di posta non sono supportati. Per saperne di più vedi &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. L&apos;elenco completo dei relay chatmail pubblici e gratuiti è su &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
     </message>
 </context>
 <context>
@@ -101,18 +101,6 @@
         <translation>Un altro indirizzo per questo profilo, su un altro relay. Il profilo invia da un solo relay alla volta; la sua pagina dice quale e ti lascia cambiarlo.</translation>
     </message>
     <message>
-        <source>Relay</source>
-        <translation>Relay</translation>
-    </message>
-    <message>
-        <source>Custom server</source>
-        <translation>Server personalizzato</translation>
-    </message>
-    <message>
-        <source>See &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; for the full list.</source>
-        <translation>L&apos;elenco completo è su &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
-    </message>
-    <message>
         <source>Add relay</source>
         <translation>Aggiungi relay</translation>
     </message>
@@ -127,6 +115,18 @@
     <message>
         <source>Relays are run by volunteers. Try another one.</source>
         <translation>I relay sono tenuti da volontari. Provane un altro.</translation>
+    </message>
+    <message>
+        <source>Select a public chatmail relay</source>
+        <translation>Seleziona un relay chatmail pubblico</translation>
+    </message>
+    <message>
+        <source>Use a custom chatmail relay</source>
+        <translation>Usa un relay chatmail personalizzato</translation>
+    </message>
+    <message>
+        <source>Piirit works only with chatmail relays. These are a particular kind of e-mail server; ordinary e-mail servers are not supported. For more, see &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. A full list of public, free-to-use chatmail relays is at &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</source>
+        <translation>Piirit funziona solo con i relay chatmail. Sono un tipo particolare di server di posta; i comuni server di posta non sono supportati. Per saperne di più vedi &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. L&apos;elenco completo dei relay chatmail pubblici e gratuiti è su &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
     </message>
 </context>
 <context>
@@ -1047,10 +1047,6 @@ Gli altri gruppi con contatti bloccati continueranno a visualizzare i loro messa
 <context>
     <name>ProfilePage</name>
     <message>
-        <source>Not connected</source>
-        <translation>Non connesso</translation>
-    </message>
-    <message>
         <source>Checking the connection</source>
         <translation>Verifica della connessione</translation>
     </message>
@@ -1092,18 +1088,6 @@ Gli altri gruppi con contatti bloccati continueranno a visualizzare i loro messa
         <translation>Salvato</translation>
     </message>
     <message>
-        <source>Connected, and up to date</source>
-        <translation>Connesso e aggiornato</translation>
-    </message>
-    <message>
-        <source>Connected, sending or syncing messages</source>
-        <translation>Connesso, invio o sincronizzazione dei messaggi in corso</translation>
-    </message>
-    <message>
-        <source>Connecting to the relay</source>
-        <translation>Connessione al relay in corso</translation>
-    </message>
-    <message>
         <source>%1 used · %2 left of %3</source>
         <extracomment>The mailbox on the relay. %1 used, %2 left, %3 the whole, each a size such as &quot;1.4 GB&quot;.</extracomment>
         <translation>%1 usati · %2 liberi su %3</translation>
@@ -1113,17 +1097,8 @@ Gli altri gruppi con contatti bloccati continueranno a visualizzare i loro messa
         <translation>Il relay non ha ancora comunicato la sua quota</translation>
     </message>
     <message>
-        <source>The name on every message you send</source>
-        <translation>Il nome su ogni messaggio che invii</translation>
-    </message>
-    <message>
         <source>Both ways: with this off you send none and see none.</source>
         <translation>In entrambi i sensi: da spento non ne mandi e non ne vedi.</translation>
-    </message>
-    <message>
-        <source>Attachments up to %1</source>
-        <extracomment>The biggest attachment the relay will carry. %1 is a size such as &quot;22.3 MB&quot;.</extracomment>
-        <translation>Allegati fino a %1</translation>
     </message>
     <message>
         <source>Relays</source>
@@ -1149,6 +1124,11 @@ Gli altri gruppi con contatti bloccati continueranno a visualizzare i loro messa
     <message>
         <source>Add a relay</source>
         <translation>Aggiungi un relay</translation>
+    </message>
+    <message>
+        <source>The relay this profile sends from takes attachments up to %1.</source>
+        <extracomment>The biggest attachment the relay the profile sends from will carry. %1 is a size such as &quot;22.3 MB&quot;.</extracomment>
+        <translation>Il relay da cui invia questo profilo accetta allegati fino a %1.</translation>
     </message>
 </context>
 <context>

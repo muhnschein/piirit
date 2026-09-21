@@ -39,20 +39,20 @@
         <translation>Sinu nimi</translation>
     </message>
     <message>
-        <source>Relay</source>
-        <translation>Relee</translation>
+        <source>Pick a name and a relay. There is nothing else to set up.</source>
+        <translation>Vali nimi ja relee. Rohkem pole vaja midagi seadistada.</translation>
     </message>
     <message>
-        <source>Custom server</source>
-        <translation>Oma server</translation>
+        <source>Select a public chatmail relay</source>
+        <translation>Vali avalik chatmail-relee</translation>
     </message>
     <message>
-        <source>See &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; for the full list.</source>
-        <translation>Täielik loend on aadressil &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
+        <source>Use a custom chatmail relay</source>
+        <translation>Kasuta oma chatmail-releed</translation>
     </message>
     <message>
-        <source>The relay gives you an address. The keys are made on this phone.</source>
-        <translation>Relee annab sulle aadressi. Võtmed tehakse selles telefonis.</translation>
+        <source>Piirit works only with chatmail relays. These are a particular kind of e-mail server; ordinary e-mail servers are not supported. For more, see &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. A full list of public, free-to-use chatmail relays is at &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</source>
+        <translation>Piirit töötab ainult chatmail-releedega. Need on eriliik e-posti servereid; tavalisi e-posti servereid ei toetata. Lähemalt &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. Avalike, tasuta chatmail-releede täielik loend on aadressil &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
     </message>
 </context>
 <context>
@@ -101,18 +101,6 @@
         <translation>Veel üks aadress sellele profiilile, teises relees. Profiil saadab korraga ühest releest; tema leht näitab, millisest, ja laseb seda vahetada.</translation>
     </message>
     <message>
-        <source>Relay</source>
-        <translation>Relee</translation>
-    </message>
-    <message>
-        <source>Custom server</source>
-        <translation>Oma server</translation>
-    </message>
-    <message>
-        <source>See &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; for the full list.</source>
-        <translation>Täielik loend on aadressil &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
-    </message>
-    <message>
         <source>Add relay</source>
         <translation>Lisa relee</translation>
     </message>
@@ -127,6 +115,18 @@
     <message>
         <source>Relays are run by volunteers. Try another one.</source>
         <translation>Releesid peavad vabatahtlikud. Proovi teist.</translation>
+    </message>
+    <message>
+        <source>Select a public chatmail relay</source>
+        <translation>Vali avalik chatmail-relee</translation>
+    </message>
+    <message>
+        <source>Use a custom chatmail relay</source>
+        <translation>Kasuta oma chatmail-releed</translation>
+    </message>
+    <message>
+        <source>Piirit works only with chatmail relays. These are a particular kind of e-mail server; ordinary e-mail servers are not supported. For more, see &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. A full list of public, free-to-use chatmail relays is at &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</source>
+        <translation>Piirit töötab ainult chatmail-releedega. Need on eriliik e-posti servereid; tavalisi e-posti servereid ei toetata. Lähemalt &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. Avalike, tasuta chatmail-releede täielik loend on aadressil &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
     </message>
 </context>
 <context>
@@ -1047,10 +1047,6 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
 <context>
     <name>ProfilePage</name>
     <message>
-        <source>Not connected</source>
-        <translation>Pole ühendatud</translation>
-    </message>
-    <message>
         <source>Checking the connection</source>
         <translation>Kontrollin ühendust</translation>
     </message>
@@ -1092,18 +1088,6 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
         <translation>Salvestatud</translation>
     </message>
     <message>
-        <source>Connected, and up to date</source>
-        <translation>Ühendatud ja ajakohane</translation>
-    </message>
-    <message>
-        <source>Connected, sending or syncing messages</source>
-        <translation>Ühendatud, saadab või sünkroonib sõnumeid</translation>
-    </message>
-    <message>
-        <source>Connecting to the relay</source>
-        <translation>Ühendan releega</translation>
-    </message>
-    <message>
         <source>%1 used · %2 left of %3</source>
         <extracomment>The mailbox on the relay. %1 used, %2 left, %3 the whole, each a size such as &quot;1.4 GB&quot;.</extracomment>
         <translation>%1 kasutusel · %2 vaba, kokku %3</translation>
@@ -1113,17 +1097,8 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
         <translation>Relee pole oma mahupiirangut veel teatanud</translation>
     </message>
     <message>
-        <source>The name on every message you send</source>
-        <translation>Nimi igal sõnumil, mille saadad</translation>
-    </message>
-    <message>
         <source>Both ways: with this off you send none and see none.</source>
         <translation>Mõlemat pidi: välja lülitatuna ei saada sa ühtegi ega näe ühtegi.</translation>
-    </message>
-    <message>
-        <source>Attachments up to %1</source>
-        <extracomment>The biggest attachment the relay will carry. %1 is a size such as &quot;22.3 MB&quot;.</extracomment>
-        <translation>Manused kuni %1</translation>
     </message>
     <message>
         <source>Relays</source>
@@ -1149,6 +1124,11 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
     <message>
         <source>Add a relay</source>
         <translation>Lisa relee</translation>
+    </message>
+    <message>
+        <source>The relay this profile sends from takes attachments up to %1.</source>
+        <extracomment>The biggest attachment the relay the profile sends from will carry. %1 is a size such as &quot;22.3 MB&quot;.</extracomment>
+        <translation>Relee, millest see profiil saadab, võtab manuseid kuni %1.</translation>
     </message>
 </context>
 <context>

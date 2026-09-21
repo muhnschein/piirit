@@ -147,7 +147,9 @@ Page {
                 id: relayCombo
                 objectName: "relayCombo"
                 width: parent.width
-                label: qsTr("Relay")
+                // Said as the action it is, as the add-profile dialog
+                // says it.
+                label: qsTr("Select a public chatmail relay")
                 // Nothing to begin with: the reader picks, as they did
                 // for the profile itself.
                 currentIndex: -1
@@ -171,7 +173,7 @@ Page {
                 id: customField
                 objectName: "customField"
                 width: parent.width
-                label: qsTr("Custom server")
+                label: qsTr("Use a custom chatmail relay")
                 placeholderText: label
                 readOnly: page.busy
                 inputMethodHints: Qt.ImhNoAutoUppercase | Qt.ImhNoPredictiveText | Qt.ImhUrlCharactersOnly
@@ -186,7 +188,7 @@ Page {
                 color: Theme.secondaryColor
                 linkColor: Theme.highlightColor
                 textFormat: Text.StyledText
-                text: qsTr("See <a href=\"https://chatmail.at/relays\">chatmail.at/relays</a> for the full list.")
+                text: qsTr("Piirit works only with chatmail relays. These are a particular kind of e-mail server; ordinary e-mail servers are not supported. For more, see <a href=\"https://chatmail.at\">chatmail.at</a>. A full list of public, free-to-use chatmail relays is at <a href=\"https://chatmail.at/relays\">chatmail.at/relays</a>.")
                 onLinkActivated: Qt.openUrlExternally(link)
             }
 

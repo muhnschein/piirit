@@ -26,10 +26,15 @@ relay its profile had left.
 A profile's relays are on its page now, not just the one it sends from.
 
 - The profile page lists every relay the profile is reached through, the
-  one it sends from first and marked as such, each with its own address
-  and what its mailbox holds. A row's menu sends from that relay instead,
-  or removes it after the countdown every other deletion gets; the last
-  relay is not offered for removal, since the core refuses it.
+  one it sends from first and marked as such, each with its own address.
+  A row's menu sends from that relay instead, or removes it after the
+  countdown every other deletion gets; the last relay is not offered for
+  removal, since the core refuses it. The profiles page's row follows
+  the switch, as does everything else that names the address.
+- Storage and connectivity are reported relay by relay: for each, the
+  core's own dot and words about its connection, and its mailbox on a
+  bar. Before them, what the relay sent from will carry in one message
+  and what the profile takes on the phone.
 - One more relay can be added from the plus under the rows, from the same
   list the profile was made from or a typed server, with the same wait,
   Cancel and time-out the first relay had. A relay that answers after the
@@ -37,6 +42,10 @@ A profile's relays are on its page now, not just the one it sends from.
   is theirs, and its page lists what the relay added.
 - The relays follow the other devices the profile is on: the core says
   when they change, and the page reads them again.
+- The relay pickers say what they are for: the list is "Select a public
+  chatmail relay", the field "Use a custom chatmail relay", and the note
+  under them says what a chatmail relay is and where the list of public
+  ones lives. The name field on the profile page has no line under it.
 
 ## 1.0.0 — 2026-09-18
 

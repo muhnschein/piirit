@@ -39,20 +39,20 @@
         <translation>Vaše meno</translation>
     </message>
     <message>
-        <source>Relay</source>
-        <translation>Relay</translation>
+        <source>Pick a name and a relay. There is nothing else to set up.</source>
+        <translation>Vyber si meno a relay. Nič iné netreba nastavovať.</translation>
     </message>
     <message>
-        <source>Custom server</source>
-        <translation>Vlastný server</translation>
+        <source>Select a public chatmail relay</source>
+        <translation>Vybrať verejný chatmail relay</translation>
     </message>
     <message>
-        <source>See &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; for the full list.</source>
-        <translation>Úplný zoznam je na &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
+        <source>Use a custom chatmail relay</source>
+        <translation>Použiť vlastný chatmail relay</translation>
     </message>
     <message>
-        <source>The relay gives you an address. The keys are made on this phone.</source>
-        <translation>Relay ti dá adresu. Kľúče vznikajú v tomto telefóne.</translation>
+        <source>Piirit works only with chatmail relays. These are a particular kind of e-mail server; ordinary e-mail servers are not supported. For more, see &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. A full list of public, free-to-use chatmail relays is at &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</source>
+        <translation>Piirit funguje len s chatmail relay. Je to zvláštny druh e-mailového servera; bežné e-mailové servery nie sú podporované. Viac na &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. Úplný zoznam verejných chatmail relay zdarma je na &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
     </message>
 </context>
 <context>
@@ -101,18 +101,6 @@
         <translation>Ďalšia adresa pre tento profil, na inom relay. Profil odosiela naraz len z jedného relay; jeho stránka ukazuje, z ktorého, a dá sa to tam zmeniť.</translation>
     </message>
     <message>
-        <source>Relay</source>
-        <translation>Relay</translation>
-    </message>
-    <message>
-        <source>Custom server</source>
-        <translation>Vlastný server</translation>
-    </message>
-    <message>
-        <source>See &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; for the full list.</source>
-        <translation>Úplný zoznam je na &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
-    </message>
-    <message>
         <source>Add relay</source>
         <translation>Pridať relay</translation>
     </message>
@@ -127,6 +115,18 @@
     <message>
         <source>Relays are run by volunteers. Try another one.</source>
         <translation>Relay prevádzkujú dobrovoľníci. Skús iný.</translation>
+    </message>
+    <message>
+        <source>Select a public chatmail relay</source>
+        <translation>Vybrať verejný chatmail relay</translation>
+    </message>
+    <message>
+        <source>Use a custom chatmail relay</source>
+        <translation>Použiť vlastný chatmail relay</translation>
+    </message>
+    <message>
+        <source>Piirit works only with chatmail relays. These are a particular kind of e-mail server; ordinary e-mail servers are not supported. For more, see &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. A full list of public, free-to-use chatmail relays is at &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</source>
+        <translation>Piirit funguje len s chatmail relay. Je to zvláštny druh e-mailového servera; bežné e-mailové servery nie sú podporované. Viac na &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. Úplný zoznam verejných chatmail relay zdarma je na &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
     </message>
 </context>
 <context>
@@ -1053,10 +1053,6 @@ Správy od zablokovaných kontaktov v ostatných skupinách sa budú naďalej zo
 <context>
     <name>ProfilePage</name>
     <message>
-        <source>Not connected</source>
-        <translation>Nepripojené</translation>
-    </message>
-    <message>
         <source>Checking the connection</source>
         <translation>Kontroluje sa spojenie</translation>
     </message>
@@ -1098,18 +1094,6 @@ Správy od zablokovaných kontaktov v ostatných skupinách sa budú naďalej zo
         <translation>Uložené</translation>
     </message>
     <message>
-        <source>Connected, and up to date</source>
-        <translation>Pripojené, všetko aktuálne</translation>
-    </message>
-    <message>
-        <source>Connected, sending or syncing messages</source>
-        <translation>Pripojené, odosiela alebo synchronizuje správy</translation>
-    </message>
-    <message>
-        <source>Connecting to the relay</source>
-        <translation>Pripája sa k relay</translation>
-    </message>
-    <message>
         <source>%1 used · %2 left of %3</source>
         <extracomment>The mailbox on the relay. %1 used, %2 left, %3 the whole, each a size such as &quot;1.4 GB&quot;.</extracomment>
         <translation>Využité %1 · zostáva %2 z %3</translation>
@@ -1119,17 +1103,8 @@ Správy od zablokovaných kontaktov v ostatných skupinách sa budú naďalej zo
         <translation>Relay zatiaľ nenahlásil svoju kvótu</translation>
     </message>
     <message>
-        <source>The name on every message you send</source>
-        <translation>Meno na každej správe, ktorú pošlete</translation>
-    </message>
-    <message>
         <source>Both ways: with this off you send none and see none.</source>
         <translation>Oboma smermi: vypnuté žiadne neposielaš a žiadne nevidíš.</translation>
-    </message>
-    <message>
-        <source>Attachments up to %1</source>
-        <extracomment>The biggest attachment the relay will carry. %1 is a size such as &quot;22.3 MB&quot;.</extracomment>
-        <translation>Prílohy do %1</translation>
     </message>
     <message>
         <source>Relays</source>
@@ -1155,6 +1130,11 @@ Správy od zablokovaných kontaktov v ostatných skupinách sa budú naďalej zo
     <message>
         <source>Add a relay</source>
         <translation>Pridať relay</translation>
+    </message>
+    <message>
+        <source>The relay this profile sends from takes attachments up to %1.</source>
+        <extracomment>The biggest attachment the relay the profile sends from will carry. %1 is a size such as &quot;22.3 MB&quot;.</extracomment>
+        <translation>Relay, z ktorého tento profil odosiela, berie prílohy do %1.</translation>
     </message>
 </context>
 <context>

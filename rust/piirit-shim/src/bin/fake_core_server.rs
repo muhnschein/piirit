@@ -890,13 +890,18 @@ async fn import_into(state: &Arc<Mutex<State>>, id: &Value, account: u32, from: 
 /// so a page that reads another relay's bar can be seen to.
 fn transport_block(addr: &str) -> String {
     let domain = addr.rsplit('@').next().unwrap_or(addr);
-    let (words, colour, percent) = match domain {
-        "example.org" => ("1.34 GiB of 2 GiB used", "grey", 67),
-        relay if relay.starts_with("old.") => ("1.9 GiB of 2 GiB used", "red", 95),
-        _ => ("12 MiB of 1 GiB used", "grey", 2),
+    // The older relay is the one the profile has drifted from: still
+    // reached, but not lately, which the real core draws in yellow with
+    // its own words; the rest are connected.
+    let (dot, status, words, colour, percent) = match domain {
+        "example.org" => ("green", "Connected", "1.34 GiB of 2 GiB used", "grey", 67),
+        relay if relay.starts_with("old.") => {
+            ("yellow", "Connecting…", "1.9 GiB of 2 GiB used", "red", 95)
+        }
+        _ => ("green", "Connected", "12 MiB of 1 GiB used", "grey", 2),
     };
     format!(
-        "<li class=\"transport\"><b>{domain}:</b> Connected<br />\
+        "<li class=\"transport\"><span class=\"{dot} dot\"></span> <b>{domain}:</b> {status}<br />\
          <ul class=\"quota-list\"><li>{words}\
          <div class=\"bar\"><div class=\"progress {colour}\" style=\"width: {percent}%\">{percent}%</div></div>\
          </li></ul></li>"

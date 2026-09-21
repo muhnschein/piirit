@@ -39,20 +39,20 @@
         <translation>Το όνομά σας</translation>
     </message>
     <message>
-        <source>Relay</source>
-        <translation>Αναμεταδότης</translation>
+        <source>Pick a name and a relay. There is nothing else to set up.</source>
+        <translation>Διαλέξτε ένα όνομα και έναν αναμεταδότη. Δεν χρειάζεται τίποτα άλλο.</translation>
     </message>
     <message>
-        <source>Custom server</source>
-        <translation>Δικός σας διακομιστής</translation>
+        <source>Select a public chatmail relay</source>
+        <translation>Επιλέξτε δημόσιο αναμεταδότη chatmail</translation>
     </message>
     <message>
-        <source>See &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; for the full list.</source>
-        <translation>Η πλήρης λίστα βρίσκεται στο &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
+        <source>Use a custom chatmail relay</source>
+        <translation>Χρήση δικού σας αναμεταδότη chatmail</translation>
     </message>
     <message>
-        <source>The relay gives you an address. The keys are made on this phone.</source>
-        <translation>Ο αναμεταδότης σας δίνει μια διεύθυνση. Τα κλειδιά φτιάχνονται σε αυτό το τηλέφωνο.</translation>
+        <source>Piirit works only with chatmail relays. These are a particular kind of e-mail server; ordinary e-mail servers are not supported. For more, see &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. A full list of public, free-to-use chatmail relays is at &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</source>
+        <translation>Το Piirit λειτουργεί μόνο με αναμεταδότες chatmail. Είναι ένα ιδιαίτερο είδος διακομιστή e-mail· οι συνηθισμένοι διακομιστές e-mail δεν υποστηρίζονται. Περισσότερα στο &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. Πλήρης λίστα δημόσιων, δωρεάν αναμεταδοτών chatmail υπάρχει στο &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
     </message>
 </context>
 <context>
@@ -101,18 +101,6 @@
         <translation>Μία ακόμη διεύθυνση για αυτό το προφίλ, σε άλλον αναμεταδότη. Το προφίλ στέλνει από έναν αναμεταδότη κάθε φορά· η σελίδα του δείχνει ποιον και σας αφήνει να τον αλλάξετε.</translation>
     </message>
     <message>
-        <source>Relay</source>
-        <translation>Αναμεταδότης</translation>
-    </message>
-    <message>
-        <source>Custom server</source>
-        <translation>Δικός σας διακομιστής</translation>
-    </message>
-    <message>
-        <source>See &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; for the full list.</source>
-        <translation>Η πλήρης λίστα βρίσκεται στο &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
-    </message>
-    <message>
         <source>Add relay</source>
         <translation>Προσθήκη αναμεταδότη</translation>
     </message>
@@ -127,6 +115,18 @@
     <message>
         <source>Relays are run by volunteers. Try another one.</source>
         <translation>Οι αναμεταδότες κρατιούνται από εθελοντές. Δοκιμάστε άλλον.</translation>
+    </message>
+    <message>
+        <source>Select a public chatmail relay</source>
+        <translation>Επιλέξτε δημόσιο αναμεταδότη chatmail</translation>
+    </message>
+    <message>
+        <source>Use a custom chatmail relay</source>
+        <translation>Χρήση δικού σας αναμεταδότη chatmail</translation>
+    </message>
+    <message>
+        <source>Piirit works only with chatmail relays. These are a particular kind of e-mail server; ordinary e-mail servers are not supported. For more, see &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. A full list of public, free-to-use chatmail relays is at &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</source>
+        <translation>Το Piirit λειτουργεί μόνο με αναμεταδότες chatmail. Είναι ένα ιδιαίτερο είδος διακομιστή e-mail· οι συνηθισμένοι διακομιστές e-mail δεν υποστηρίζονται. Περισσότερα στο &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. Πλήρης λίστα δημόσιων, δωρεάν αναμεταδοτών chatmail υπάρχει στο &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
     </message>
 </context>
 <context>
@@ -1043,10 +1043,6 @@ Other groups with blocked contacts will still show their messages.</source>
 <context>
     <name>ProfilePage</name>
     <message>
-        <source>Not connected</source>
-        <translation>Χωρίς σύνδεση</translation>
-    </message>
-    <message>
         <source>Checking the connection</source>
         <translation>Έλεγχος της σύνδεσης</translation>
     </message>
@@ -1088,18 +1084,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Αποθηκεύτηκε</translation>
     </message>
     <message>
-        <source>Connected, and up to date</source>
-        <translation>Συνδεδεμένο και ενημερωμένο</translation>
-    </message>
-    <message>
-        <source>Connected, sending or syncing messages</source>
-        <translation>Συνδεδεμένο, αποστολή ή συγχρονισμός μηνυμάτων</translation>
-    </message>
-    <message>
-        <source>Connecting to the relay</source>
-        <translation>Σύνδεση με τον αναμεταδότη</translation>
-    </message>
-    <message>
         <source>%1 used · %2 left of %3</source>
         <extracomment>The mailbox on the relay. %1 used, %2 left, %3 the whole, each a size such as &quot;1.4 GB&quot;.</extracomment>
         <translation>%1 σε χρήση · %2 ελεύθερα από %3</translation>
@@ -1109,17 +1093,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Ο αναμεταδότης δεν έχει αναφέρει ακόμη το όριό του</translation>
     </message>
     <message>
-        <source>The name on every message you send</source>
-        <translation>Το όνομα σε κάθε μήνυμα που στέλνετε</translation>
-    </message>
-    <message>
         <source>Both ways: with this off you send none and see none.</source>
         <translation>Και προς τις δύο κατευθύνσεις: κλειστό, δεν στέλνετε καμία και δεν βλέπετε καμία.</translation>
-    </message>
-    <message>
-        <source>Attachments up to %1</source>
-        <extracomment>The biggest attachment the relay will carry. %1 is a size such as &quot;22.3 MB&quot;.</extracomment>
-        <translation>Συνημμένα έως %1</translation>
     </message>
     <message>
         <source>Relays</source>
@@ -1145,6 +1120,11 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Add a relay</source>
         <translation>Προσθήκη αναμεταδότη</translation>
+    </message>
+    <message>
+        <source>The relay this profile sends from takes attachments up to %1.</source>
+        <extracomment>The biggest attachment the relay the profile sends from will carry. %1 is a size such as &quot;22.3 MB&quot;.</extracomment>
+        <translation>Ο αναμεταδότης από τον οποίο στέλνει αυτό το προφίλ δέχεται συνημμένα έως %1.</translation>
     </message>
 </context>
 <context>

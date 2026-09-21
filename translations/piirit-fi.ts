@@ -39,20 +39,20 @@
         <translation>Nimesi</translation>
     </message>
     <message>
-        <source>Relay</source>
-        <translation>Välittäjä</translation>
+        <source>Pick a name and a relay. There is nothing else to set up.</source>
+        <translation>Valitse nimi ja välittäjä. Muuta ei tarvitse asettaa.</translation>
     </message>
     <message>
-        <source>Custom server</source>
-        <translation>Oma palvelin</translation>
+        <source>Select a public chatmail relay</source>
+        <translation>Valitse julkinen chatmail-välittäjä</translation>
     </message>
     <message>
-        <source>See &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; for the full list.</source>
-        <translation>Koko luettelo on osoitteessa &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
+        <source>Use a custom chatmail relay</source>
+        <translation>Käytä omaa chatmail-välittäjää</translation>
     </message>
     <message>
-        <source>The relay gives you an address. The keys are made on this phone.</source>
-        <translation>Välittäjä antaa sinulle osoitteen. Avaimet tehdään tässä puhelimessa.</translation>
+        <source>Piirit works only with chatmail relays. These are a particular kind of e-mail server; ordinary e-mail servers are not supported. For more, see &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. A full list of public, free-to-use chatmail relays is at &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</source>
+        <translation>Piirit toimii vain chatmail-välittäjien kanssa. Ne ovat erityinen sähköpostipalvelimien laji; tavallisia sähköpostipalvelimia ei tueta. Lisätietoa: &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. Täydellinen luettelo julkisista, maksutta käytettävistä chatmail-välittäjistä on osoitteessa &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
     </message>
 </context>
 <context>
@@ -101,18 +101,6 @@
         <translation>Toinen osoite tälle profiilille, toisella välittäjällä. Profiili lähettää kerrallaan yhden välittäjän kautta; sen sivu kertoo minkä ja antaa vaihtaa sitä.</translation>
     </message>
     <message>
-        <source>Relay</source>
-        <translation>Välittäjä</translation>
-    </message>
-    <message>
-        <source>Custom server</source>
-        <translation>Oma palvelin</translation>
-    </message>
-    <message>
-        <source>See &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; for the full list.</source>
-        <translation>Koko luettelo on osoitteessa &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
-    </message>
-    <message>
         <source>Add relay</source>
         <translation>Lisää välittäjä</translation>
     </message>
@@ -127,6 +115,18 @@
     <message>
         <source>Relays are run by volunteers. Try another one.</source>
         <translation>Välittäjiä pyörittävät vapaaehtoiset. Kokeile toista.</translation>
+    </message>
+    <message>
+        <source>Select a public chatmail relay</source>
+        <translation>Valitse julkinen chatmail-välittäjä</translation>
+    </message>
+    <message>
+        <source>Use a custom chatmail relay</source>
+        <translation>Käytä omaa chatmail-välittäjää</translation>
+    </message>
+    <message>
+        <source>Piirit works only with chatmail relays. These are a particular kind of e-mail server; ordinary e-mail servers are not supported. For more, see &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. A full list of public, free-to-use chatmail relays is at &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</source>
+        <translation>Piirit toimii vain chatmail-välittäjien kanssa. Ne ovat erityinen sähköpostipalvelimien laji; tavallisia sähköpostipalvelimia ei tueta. Lisätietoa: &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. Täydellinen luettelo julkisista, maksutta käytettävistä chatmail-välittäjistä on osoitteessa &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
     </message>
 </context>
 <context>
@@ -1043,10 +1043,6 @@ Other groups with blocked contacts will still show their messages.</source>
 <context>
     <name>ProfilePage</name>
     <message>
-        <source>Not connected</source>
-        <translation>Ei yhteyttä</translation>
-    </message>
-    <message>
         <source>Checking the connection</source>
         <translation>Tarkistetaan yhteyttä</translation>
     </message>
@@ -1088,18 +1084,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Tallennettu</translation>
     </message>
     <message>
-        <source>Connected, and up to date</source>
-        <translation>Yhdistetty ja ajan tasalla</translation>
-    </message>
-    <message>
-        <source>Connected, sending or syncing messages</source>
-        <translation>Yhdistetty, lähettää tai synkronoi viestejä</translation>
-    </message>
-    <message>
-        <source>Connecting to the relay</source>
-        <translation>Yhdistetään välittäjään</translation>
-    </message>
-    <message>
         <source>%1 used · %2 left of %3</source>
         <extracomment>The mailbox on the relay. %1 used, %2 left, %3 the whole, each a size such as &quot;1.4 GB&quot;.</extracomment>
         <translation>%1 käytössä · %2 jäljellä, yhteensä %3</translation>
@@ -1109,17 +1093,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Välittäjä ei ole vielä ilmoittanut kiintiötään</translation>
     </message>
     <message>
-        <source>The name on every message you send</source>
-        <translation>Nimi jokaisessa lähettämässäsi viestissä</translation>
-    </message>
-    <message>
         <source>Both ways: with this off you send none and see none.</source>
         <translation>Molempiin suuntiin: pois päältä et lähetä etkä näe yhtään.</translation>
-    </message>
-    <message>
-        <source>Attachments up to %1</source>
-        <extracomment>The biggest attachment the relay will carry. %1 is a size such as &quot;22.3 MB&quot;.</extracomment>
-        <translation>Liitteet enintään %1</translation>
     </message>
     <message>
         <source>Relays</source>
@@ -1145,6 +1120,11 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Add a relay</source>
         <translation>Lisää välittäjä</translation>
+    </message>
+    <message>
+        <source>The relay this profile sends from takes attachments up to %1.</source>
+        <extracomment>The biggest attachment the relay the profile sends from will carry. %1 is a size such as &quot;22.3 MB&quot;.</extracomment>
+        <translation>Välittäjä, jonka kautta tämä profiili lähettää, ottaa liitteitä %1 asti.</translation>
     </message>
 </context>
 <context>

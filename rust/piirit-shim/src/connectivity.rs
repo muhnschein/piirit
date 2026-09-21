@@ -9,8 +9,9 @@
 //! beside it, in whatever language the core is in. Nothing here computes
 //! a quota; the core did, and this finds where it put the answer. Once
 //! for the relay the profile sends from (`quota_from_report`), and once
-//! for every relay it has (`quotas_from_report`), which is what the
-//! profile page's relay rows are drawn from.
+//! for every relay it has (`transport_reports`) -- the dot the core
+//! drew for it, its own words about the connection, and the bar --
+//! which is what the profile page's relay rows are drawn from.
 
 // The core's `get_connectivity` bands, which the profile page puts words
 // to: 1000 not connected, 2000 connecting, 3000 connected and working,
@@ -52,16 +53,68 @@ pub(crate) fn quota_from_report(html: &str, address: &str) -> Option<Quota> {
     }
 }
 
-/// Every relay's quota, by the domain the core headed its block with, in
-/// the order the report lists them. A relay whose block carries no bar is
-/// left out, and a report with no transport blocks at all has nothing to
-/// list. What the profile page's relay rows are drawn from: one parse of
-/// the report, rather than a call to the core per row.
-pub(crate) fn quotas_from_report(html: &str) -> Vec<(String, Quota)> {
+/// What the report says about one relay: the block the core headed with
+/// its domain, read for the dot it drew, the words beside it and the
+/// quota bar under it.
+#[derive(Debug, PartialEq, Eq)]
+pub(crate) struct TransportReport {
+    /// The domain the block is headed with.
+    pub domain: String,
+    /// The colour of the dot the core drew before the domain -- `green`,
+    /// `yellow`, `red` or `grey`, as its own stylesheet names them --
+    /// or empty when it drew none.
+    pub dot: String,
+    /// The core's own words after the domain: "Connected", "Connecting…",
+    /// "Not connected: ...". In whatever language the core is in.
+    pub status: String,
+    /// The mailbox, when the relay has said how full it is.
+    pub quota: Option<Quota>,
+}
+
+/// Every relay the report covers, in the order the core lists them,
+/// which is the order they were added. A block the core never headed
+/// with a domain is left out, and a report with no transport blocks at
+/// all -- an older core, or a profile not connected yet -- has nothing
+/// to list. What the profile page's relay rows are drawn from: one parse
+/// of the report, rather than a call to the core per row.
+pub(crate) fn transport_reports(html: &str) -> Vec<TransportReport> {
     transport_blocks(html)
         .into_iter()
-        .filter_map(|block| Some((block_domain(block)?.to_string(), quota_in(block)?)))
+        .filter_map(|block| {
+            let domain = block_domain(block)?.to_string();
+            Some(TransportReport {
+                domain,
+                dot: dot_in(block).to_string(),
+                status: status_in(block),
+                quota: quota_in(block),
+            })
+        })
         .collect()
+}
+
+/// The colour of the first dot in a block: the core writes
+/// `<span class="green dot"></span>` before the domain, the colour first.
+/// Empty when there is no dot. The block itself opens with a class of
+/// its own (`transport`), and the bar under it with more, so it is the
+/// first class list naming `dot` that counts.
+fn dot_in(block: &str) -> &str {
+    block
+        .split("class=\"")
+        .skip(1)
+        .map(|after| after.split('"').next().unwrap_or_default())
+        .find(|classes| classes.split_whitespace().any(|class| class == "dot"))
+        .and_then(|classes| classes.split_whitespace().find(|class| *class != "dot"))
+        .unwrap_or_default()
+}
+
+/// The words after the domain, up to the line break the core ends them
+/// with: its own account of that relay's connection.
+fn status_in(block: &str) -> String {
+    block
+        .split_once(":</b>")
+        .map(|(_, after)| after.split("<br").next().unwrap_or_default())
+        .map(strip_tags)
+        .unwrap_or_default()
 }
 
 /// Where each `<li class="transport">` block starts and ends. The core
@@ -223,7 +276,7 @@ fn decode_entity(rest: &str) -> (&'static str, usize) {
 
 #[cfg(test)]
 mod tests {
-    use super::{amounts, quota_from_report, quotas_from_report, Quota};
+    use super::{amounts, quota_from_report, transport_reports, Quota, TransportReport};
 
     /// The shape the core writes, less the style block.
     const REPORT: &str = "<html><body><h3>Incoming messages</h3><ul>\
@@ -314,54 +367,107 @@ mod tests {
         assert_eq!(quota_from_report(TWO, ""), None);
     }
 
-    /// Every relay's bar, headed with its domain, in the order the core
-    /// listed them: what the relay rows on the profile page draw.
+    /// Every relay's block, headed with its domain, in the order the
+    /// core listed them: the dot it drew, its words, its bar. What the
+    /// relay rows on the profile page draw.
     #[test]
-    fn every_relays_bar_is_listed_under_its_domain() {
-        let listed: Vec<(String, u32)> = quotas_from_report(TWO)
+    fn every_relay_is_listed_under_its_domain_with_its_dot_words_and_bar() {
+        let listed: Vec<(String, String, String, Option<u32>)> = transport_reports(TWO)
             .into_iter()
-            .map(|(domain, quota)| (domain, quota.percent))
+            .map(|report| {
+                (
+                    report.domain,
+                    report.dot,
+                    report.status,
+                    report.quota.map(|quota| quota.percent),
+                )
+            })
             .collect();
         assert_eq!(
             listed,
             vec![
-                ("nine.testrun.org".to_string(), 67),
-                ("chat.example.org".to_string(), 2),
+                (
+                    "nine.testrun.org".to_string(),
+                    "green".to_string(),
+                    "Connected".to_string(),
+                    Some(67)
+                ),
+                (
+                    "chat.example.org".to_string(),
+                    "green".to_string(),
+                    "Connected".to_string(),
+                    Some(2)
+                ),
             ]
         );
         assert_eq!(
-            quotas_from_report(REPORT)
+            transport_reports(REPORT)
                 .into_iter()
-                .map(|(_, quota)| quota.text)
+                .filter_map(|report| report.quota)
+                .map(|quota| quota.text)
                 .collect::<Vec<_>>(),
             vec!["1.34 GiB of 2 GiB used".to_string()]
         );
     }
 
-    /// A relay that has said nothing about its mailbox is not in the
-    /// list, and a report without transport blocks -- an older core, or
-    /// a profile not connected yet -- has nothing to list.
+    /// The shape the pinned core writes for a relay it cannot reach: the
+    /// colour before `dot`, the words after the domain ending at the
+    /// line break, and no bar.
     #[test]
-    fn a_relay_without_a_bar_is_not_listed() {
+    fn a_relay_that_cannot_be_reached_has_a_red_dot_the_words_and_no_bar() {
+        let report = "<html><body><h3>Incoming Messages</h3><ul>\
+            <li class=\"transport\"><span class=\"red dot\"></span> <b>example.invalid:</b> \
+            Error: No IMAP connection candidates provided<br /></li></ul>\
+            <h3>Outgoing Messages</h3><ul><li><span class=\"green dot\"></span> \
+            Your last message was sent successfully.</li></ul></body></html>";
+        assert_eq!(
+            transport_reports(report),
+            vec![TransportReport {
+                domain: "example.invalid".to_string(),
+                dot: "red".to_string(),
+                status: "Error: No IMAP connection candidates provided".to_string(),
+                quota: None,
+            }]
+        );
+    }
+
+    /// A relay that has said nothing about its mailbox is listed with no
+    /// bar, a block with no dot with no colour, and a report without
+    /// transport blocks -- an older core, or a profile not connected yet
+    /// -- has nothing to list.
+    #[test]
+    fn a_relay_without_a_bar_or_a_dot_is_still_listed() {
         let silent = TWO.replace(
             "<ul class=\"quota-list\"><li>12 MiB of 1 GiB used\
              <div class=\"bar\"><div class=\"progress grey\" style=\"width: 2%\">2%</div></div>\
              </li></ul>",
             "",
         );
+        let listed: Vec<(String, bool)> = transport_reports(&silent)
+            .into_iter()
+            .map(|report| (report.domain, report.quota.is_some()))
+            .collect();
         assert_eq!(
-            quotas_from_report(&silent)
-                .into_iter()
-                .map(|(domain, _)| domain)
-                .collect::<Vec<_>>(),
-            vec!["nine.testrun.org".to_string()]
+            listed,
+            vec![
+                ("nine.testrun.org".to_string(), true),
+                ("chat.example.org".to_string(), false)
+            ]
         );
-        assert!(quotas_from_report("<html><body><h3>Not connected</h3></body></html>").is_empty());
-        assert!(quotas_from_report("").is_empty());
+        let undotted = REPORT.replace("<span class=\"dot green\"></span> ", "");
+        assert_eq!(
+            transport_reports(&undotted)
+                .into_iter()
+                .map(|report| (report.dot, report.status))
+                .collect::<Vec<_>>(),
+            vec![(String::new(), "Connected".to_string())]
+        );
+        assert!(transport_reports("<html><body><h3>Not connected</h3></body></html>").is_empty());
+        assert!(transport_reports("").is_empty());
         // A block the core never headed is a block with no relay to
         // list under.
         let unheaded = REPORT.replace("<b>nine.testrun.org:</b>", "");
-        assert!(quotas_from_report(&unheaded).is_empty());
+        assert!(transport_reports(&unheaded).is_empty());
         assert_eq!(
             quota_from_report(&unheaded, "ada@nine.testrun.org").map(|quota| quota.percent),
             Some(67),

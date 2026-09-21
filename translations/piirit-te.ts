@@ -39,20 +39,20 @@
         <translation>మీ పేరు</translation>
     </message>
     <message>
-        <source>Relay</source>
-        <translation>రిలే</translation>
+        <source>Pick a name and a relay. There is nothing else to set up.</source>
+        <translation>ఒక పేరు, ఒక రిలే ఎంచుకోండి. ఇంకేమీ సెటప్ చేయాల్సిన అవసరం లేదు.</translation>
     </message>
     <message>
-        <source>Custom server</source>
-        <translation>సొంత సర్వర్</translation>
+        <source>Select a public chatmail relay</source>
+        <translation>పబ్లిక్ chatmail రిలేను ఎంచుకోండి</translation>
     </message>
     <message>
-        <source>See &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; for the full list.</source>
-        <translation>పూర్తి జాబితా &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; లో చూడండి.</translation>
+        <source>Use a custom chatmail relay</source>
+        <translation>సొంత chatmail రిలేను వాడండి</translation>
     </message>
     <message>
-        <source>The relay gives you an address. The keys are made on this phone.</source>
-        <translation>రిలే మీకు ఒక చిరునామా ఇస్తుంది. తాళాలు ఈ ఫోన్‌లోనే తయారవుతాయి.</translation>
+        <source>Piirit works only with chatmail relays. These are a particular kind of e-mail server; ordinary e-mail servers are not supported. For more, see &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. A full list of public, free-to-use chatmail relays is at &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</source>
+        <translation>Piirit chatmail రిలేలతో మాత్రమే పనిచేస్తుంది. ఇవి ఒక ప్రత్యేక రకమైన ఇ-మెయిల్ సర్వర్లు; సాధారణ ఇ-మెయిల్ సర్వర్లకు మద్దతు లేదు. మరింత సమాచారానికి &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt; చూడండి. పబ్లిక్, ఉచిత chatmail రిలేల పూర్తి జాబితా &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; లో ఉంది.</translation>
     </message>
 </context>
 <context>
@@ -101,18 +101,6 @@
         <translation>ఈ ప్రొఫైల్‌కు మరో రిలేపై ఇంకో చిరునామా. ప్రొఫైల్ ఒకేసారి ఒక రిలే నుండే పంపుతుంది; ఏది అనేది దాని పేజీ చూపిస్తుంది, మార్చనిస్తుంది.</translation>
     </message>
     <message>
-        <source>Relay</source>
-        <translation>రిలే</translation>
-    </message>
-    <message>
-        <source>Custom server</source>
-        <translation>సొంత సర్వర్</translation>
-    </message>
-    <message>
-        <source>See &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; for the full list.</source>
-        <translation>పూర్తి జాబితా &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; లో చూడండి.</translation>
-    </message>
-    <message>
         <source>Add relay</source>
         <translation>రిలే చేర్చు</translation>
     </message>
@@ -127,6 +115,18 @@
     <message>
         <source>Relays are run by volunteers. Try another one.</source>
         <translation>రిలేలను స్వచ్ఛంద సేవకులు నడుపుతారు. మరొకటి చూడండి.</translation>
+    </message>
+    <message>
+        <source>Select a public chatmail relay</source>
+        <translation>పబ్లిక్ chatmail రిలేను ఎంచుకోండి</translation>
+    </message>
+    <message>
+        <source>Use a custom chatmail relay</source>
+        <translation>సొంత chatmail రిలేను వాడండి</translation>
+    </message>
+    <message>
+        <source>Piirit works only with chatmail relays. These are a particular kind of e-mail server; ordinary e-mail servers are not supported. For more, see &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. A full list of public, free-to-use chatmail relays is at &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</source>
+        <translation>Piirit chatmail రిలేలతో మాత్రమే పనిచేస్తుంది. ఇవి ఒక ప్రత్యేక రకమైన ఇ-మెయిల్ సర్వర్లు; సాధారణ ఇ-మెయిల్ సర్వర్లకు మద్దతు లేదు. మరింత సమాచారానికి &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt; చూడండి. పబ్లిక్, ఉచిత chatmail రిలేల పూర్తి జాబితా &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; లో ఉంది.</translation>
     </message>
 </context>
 <context>
@@ -1043,10 +1043,6 @@ Other groups with blocked contacts will still show their messages.</source>
 <context>
     <name>ProfilePage</name>
     <message>
-        <source>Not connected</source>
-        <translation>కనెక్ట్ కాలేదు</translation>
-    </message>
-    <message>
         <source>Checking the connection</source>
         <translation>కనెక్షన్ తనిఖీ చేస్తోంది</translation>
     </message>
@@ -1088,18 +1084,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>సేవ్ చేయబడింది</translation>
     </message>
     <message>
-        <source>Connected, and up to date</source>
-        <translation>కనెక్ట్ అయింది, తాజాగా ఉంది</translation>
-    </message>
-    <message>
-        <source>Connected, sending or syncing messages</source>
-        <translation>కనెక్ట్ అయింది, సందేశాలను పంపుతోంది లేదా సింక్ చేస్తోంది</translation>
-    </message>
-    <message>
-        <source>Connecting to the relay</source>
-        <translation>రిలేకు కనెక్ట్ అవుతోంది</translation>
-    </message>
-    <message>
         <source>%1 used · %2 left of %3</source>
         <extracomment>The mailbox on the relay. %1 used, %2 left, %3 the whole, each a size such as &quot;1.4 GB&quot;.</extracomment>
         <translation>%3లో %1 వాడబడింది · %2 మిగిలింది</translation>
@@ -1109,17 +1093,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>రిలే తన కోటాను ఇంకా తెలియజేయలేదు</translation>
     </message>
     <message>
-        <source>The name on every message you send</source>
-        <translation>మీరు పంపే ప్రతి సందేశంపై ఉండే పేరు</translation>
-    </message>
-    <message>
         <source>Both ways: with this off you send none and see none.</source>
         <translation>రెండు వైపులా: ఆపి ఉంచితే మీరు ఒక్కటీ పంపరు, ఒక్కటీ చూడరు.</translation>
-    </message>
-    <message>
-        <source>Attachments up to %1</source>
-        <extracomment>The biggest attachment the relay will carry. %1 is a size such as &quot;22.3 MB&quot;.</extracomment>
-        <translation>%1 వరకు జోడింపులు</translation>
     </message>
     <message>
         <source>Relays</source>
@@ -1145,6 +1120,11 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Add a relay</source>
         <translation>రిలే చేర్చు</translation>
+    </message>
+    <message>
+        <source>The relay this profile sends from takes attachments up to %1.</source>
+        <extracomment>The biggest attachment the relay the profile sends from will carry. %1 is a size such as &quot;22.3 MB&quot;.</extracomment>
+        <translation>ఈ ప్రొఫైల్ పంపే రిలే %1 వరకు జోడింపులను తీసుకుంటుంది.</translation>
     </message>
 </context>
 <context>

@@ -8,11 +8,12 @@
 //!
 //! The rest of the page is what parla's profile dialog shows: the relays
 //! and the address on each (their own test is `relays.rs`; here only that
-//! the one sent from is listed first), and what the relay and the phone say about the
-//! profile -- the connection band, the mailbox quota read off the core's
-//! own report and said as used, left and whole, and the space taken on
-//! the device. The name is a name under the picture until its badge is
-//! tapped, and a field with a hint under it after.
+//! the one sent from is listed first), and what the relays and the phone
+//! say about the profile -- what the relay sent from will carry, the
+//! space taken on the device, and per relay the connection in the core's
+//! own words and the mailbox quota read off its report, said as used,
+//! left and whole. The name is a field under the picture, with nothing
+//! under it.
 
 // Qt harness: see qml_chat_list.rs.
 #![allow(
@@ -235,10 +236,13 @@ fn the_profile_page_round_trips_the_profile() {
         // the relays now, the one sent from first (tests/relays.rs).
         record!("address", get!("relayRow0", "addr"));
         record!("sends-from", get!("relayRow0", "sendsFrom"));
-        record!("connection", get!("connectivityLabel", "text"));
-        record!("quota-shown", get!("quotaBar", "visible"));
-        record!("quota-words", get!("quotaBar", "label"));
-        record!("quota-value", get!("quotaBar", "value"));
+        // The relay the profile sends from is reported on first: the
+        // core's own words about its connection, and its mailbox.
+        record!("attachments", get!("attachmentLimitLabel", "text"));
+        record!("connection", get!("reportStatus", "text"));
+        record!("quota-shown", get!("reportQuota", "visible"));
+        record!("quota-words", get!("reportQuota", "label"));
+        record!("quota-value", get!("reportQuota", "value"));
         record!("storage", get!("storageLabel", "text"));
         // The name: a name with a badge, and a field with a hint once
         // the badge is tapped.
@@ -512,10 +516,16 @@ fn assert_page_says_what_the_relay_said(steps: &[(&str, String)], context: &str)
         "true",
         "the first relay row is not marked as the one sent from. {context}"
     );
+    assert!(
+        value("attachments")
+            .starts_with("The relay this profile sends from takes attachments up to"),
+        "what the relay sent from will carry is not said first, or not \
+         as the relay's. {context}"
+    );
     assert_eq!(
         value("connection"),
-        "Connected, and up to date",
-        "the core's connectivity band was not put into words. {context}"
+        "Connected",
+        "the relay's connection is not said in the core's own words. {context}"
     );
     assert_eq!(
         value("quota-shown"),
@@ -530,9 +540,11 @@ fn assert_page_says_what_the_relay_said(steps: &[(&str, String)], context: &str)
     );
     for (label, expected) in [
         ("hint-before", "false"),
+        // No hint under the name any more: what read as help to one
+        // reader read as a subtitle to another.
         ("field-before", "true"),
         ("edit", "true"),
-        ("hint-editing", "true"),
+        ("hint-editing", "false"),
         ("field-editing", "true"),
         ("hint-reopened", "false"),
     ] {

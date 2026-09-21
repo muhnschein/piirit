@@ -14,15 +14,15 @@
 //! answer, not this object's guess.
 //!
 //! Each row also carries what the core's connectivity report says about
-//! that relay's mailbox, read off the same page the profile's own quota
-//! is (`connectivity.rs`): the report covers every transport, and one
-//! parse of it fills every row.
+//! that relay -- the dot it drew, its own words, the mailbox -- read off
+//! the same page the profile's own quota is (`connectivity.rs`): the
+//! report covers every transport, and one parse of it fills every row.
 
 use std::cell::RefCell;
 
 use qmetaobject::*;
 
-use crate::connectivity::quotas_from_report;
+use crate::connectivity::transport_reports;
 use crate::core::connection;
 use crate::json;
 use crate::models::{TransportItem, TransportListModel};
@@ -237,25 +237,33 @@ impl Transports {
 /// The rows for what the core listed: the relay sent from first, the
 /// rest in the core's order, each with its mailbox off the report.
 fn rows_from(transports: &[serde_json::Value], primary: &str, report: &str) -> Vec<TransportItem> {
-    let quotas = quotas_from_report(report);
+    let reports = transport_reports(report);
     let mut rows: Vec<TransportItem> = transports
         .iter()
         .map(|transport| json::str_at(transport, "addr"))
         .filter(|addr| !addr.is_empty())
         .map(|addr| {
             let domain = addr.rsplit('@').next().unwrap_or(addr);
-            let quota = quotas
+            let reported = reports
                 .iter()
-                .find(|(name, _)| name.eq_ignore_ascii_case(domain))
-                .map(|(_, quota)| quota);
+                .find(|reported| reported.domain.eq_ignore_ascii_case(domain));
+            let quota = reported.and_then(|reported| reported.quota.as_ref());
+            // Exact to 2^53 bytes, which no mailbox holds.
+            #[allow(clippy::cast_precision_loss)]
             TransportItem {
                 id: row_id(addr),
                 addr: addr.into(),
                 domain: domain.into(),
                 is_primary: addr.eq_ignore_ascii_case(primary),
+                dot: reported
+                    .map_or_else(QString::default, |reported| reported.dot.as_str().into()),
+                status: reported
+                    .map_or_else(QString::default, |reported| reported.status.as_str().into()),
                 has_quota: quota.is_some(),
                 quota_percent: quota.map_or(0, |quota| quota.percent),
                 quota_text: quota.map_or_else(QString::default, |quota| quota.text.as_str().into()),
+                quota_used_bytes: quota.map_or(0.0, |quota| quota.used_bytes as f64),
+                quota_limit_bytes: quota.map_or(0.0, |quota| quota.limit_bytes as f64),
             }
         })
         .collect();
@@ -283,11 +291,11 @@ mod tests {
     use serde_json::json;
 
     const REPORT: &str = "<html><body><h3>Incoming messages</h3><ul>\
-        <li class=\"transport\"><b>old.example.net:</b> Connected<br />\
+        <li class=\"transport\"><span class=\"red dot\"></span> <b>old.example.net:</b> Not connected: timed out<br />\
         <ul class=\"quota-list\"><li>1.9 GiB of 2 GiB used\
         <div class=\"bar\"><div class=\"progress red\" style=\"width: 95%\">95%</div></div>\
         </li></ul></li>\
-        <li class=\"transport\"><b>nine.testrun.org:</b> Connected<br />\
+        <li class=\"transport\"><span class=\"green dot\"></span> <b>nine.testrun.org:</b> Connected<br />\
         <ul class=\"quota-list\"><li>1.34 GiB of 2 GiB used\
         <div class=\"bar\"><div class=\"progress grey\" style=\"width: 67%\">67%</div></div>\
         </li></ul></li></ul></body></html>";
@@ -328,6 +336,18 @@ mod tests {
         );
         assert_eq!(rows[0].addr.to_string(), "ada@nine.testrun.org");
         assert_eq!(rows[0].quota_text.to_string(), "1.34 GiB of 2 GiB used");
+        // Whole bytes through f64, exact at this size: compared as the
+        // integers they are.
+        #[allow(clippy::cast_possible_truncation, clippy::cast_sign_loss)]
+        let bytes = (
+            rows[0].quota_used_bytes as u64,
+            rows[0].quota_limit_bytes as u64,
+        );
+        assert_eq!(bytes, (1_438_814_044, 2_147_483_648));
+        assert_eq!(rows[0].dot.to_string(), "green");
+        assert_eq!(rows[0].status.to_string(), "Connected");
+        assert_eq!(rows[1].dot.to_string(), "red");
+        assert_eq!(rows[1].status.to_string(), "Not connected: timed out");
         // The core lowercases what it stores; what it was configured
         // with need not match its case.
         let rows = rows_from(
@@ -354,6 +374,8 @@ mod tests {
             summary(&rows),
             vec!["old.example.net:-", "nine.testrun.org:-"]
         );
+        assert_eq!(rows[0].dot.to_string(), "");
+        assert_eq!(rows[0].status.to_string(), "");
         assert!(rows_from(&[], "ada@nine.testrun.org", REPORT).is_empty());
     }
 

@@ -39,20 +39,20 @@
         <translation>Dit navn</translation>
     </message>
     <message>
-        <source>Relay</source>
-        <translation>Relæ</translation>
+        <source>Pick a name and a relay. There is nothing else to set up.</source>
+        <translation>Vælg et navn og et relæ. Der er ikke mere at sætte op.</translation>
     </message>
     <message>
-        <source>Custom server</source>
-        <translation>Egen server</translation>
+        <source>Select a public chatmail relay</source>
+        <translation>Vælg et offentligt chatmail-relæ</translation>
     </message>
     <message>
-        <source>See &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; for the full list.</source>
-        <translation>Den fulde liste findes på &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
+        <source>Use a custom chatmail relay</source>
+        <translation>Brug et eget chatmail-relæ</translation>
     </message>
     <message>
-        <source>The relay gives you an address. The keys are made on this phone.</source>
-        <translation>Relæet giver dig en adresse. Nøglerne laves på denne telefon.</translation>
+        <source>Piirit works only with chatmail relays. These are a particular kind of e-mail server; ordinary e-mail servers are not supported. For more, see &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. A full list of public, free-to-use chatmail relays is at &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</source>
+        <translation>Piirit virker kun med chatmail-relæer. Det er en særlig slags e-mail-server; almindelige e-mail-servere understøttes ikke. Læs mere på &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. En fuld liste over offentlige, gratis chatmail-relæer findes på &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
     </message>
 </context>
 <context>
@@ -101,18 +101,6 @@
         <translation>Endnu en adresse til denne profil, på et andet relæ. Profilen sender fra ét relæ ad gangen; dens side viser hvilket og lader dig skifte.</translation>
     </message>
     <message>
-        <source>Relay</source>
-        <translation>Relæ</translation>
-    </message>
-    <message>
-        <source>Custom server</source>
-        <translation>Egen server</translation>
-    </message>
-    <message>
-        <source>See &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; for the full list.</source>
-        <translation>Den fulde liste findes på &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
-    </message>
-    <message>
         <source>Add relay</source>
         <translation>Tilføj relæ</translation>
     </message>
@@ -127,6 +115,18 @@
     <message>
         <source>Relays are run by volunteers. Try another one.</source>
         <translation>Relæer drives af frivillige. Prøv et andet.</translation>
+    </message>
+    <message>
+        <source>Select a public chatmail relay</source>
+        <translation>Vælg et offentligt chatmail-relæ</translation>
+    </message>
+    <message>
+        <source>Use a custom chatmail relay</source>
+        <translation>Brug et eget chatmail-relæ</translation>
+    </message>
+    <message>
+        <source>Piirit works only with chatmail relays. These are a particular kind of e-mail server; ordinary e-mail servers are not supported. For more, see &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. A full list of public, free-to-use chatmail relays is at &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</source>
+        <translation>Piirit virker kun med chatmail-relæer. Det er en særlig slags e-mail-server; almindelige e-mail-servere understøttes ikke. Læs mere på &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. En fuld liste over offentlige, gratis chatmail-relæer findes på &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
     </message>
 </context>
 <context>
@@ -1043,10 +1043,6 @@ Other groups with blocked contacts will still show their messages.</source>
 <context>
     <name>ProfilePage</name>
     <message>
-        <source>Not connected</source>
-        <translation>Ikke forbundet</translation>
-    </message>
-    <message>
         <source>Checking the connection</source>
         <translation>Tjekker forbindelsen</translation>
     </message>
@@ -1088,18 +1084,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Gemt</translation>
     </message>
     <message>
-        <source>Connected, and up to date</source>
-        <translation>Forbundet og opdateret</translation>
-    </message>
-    <message>
-        <source>Connected, sending or syncing messages</source>
-        <translation>Forbundet, sender eller synkroniserer beskeder</translation>
-    </message>
-    <message>
-        <source>Connecting to the relay</source>
-        <translation>Forbinder til relæet</translation>
-    </message>
-    <message>
         <source>%1 used · %2 left of %3</source>
         <extracomment>The mailbox on the relay. %1 used, %2 left, %3 the whole, each a size such as &quot;1.4 GB&quot;.</extracomment>
         <translation>%1 brugt · %2 tilbage af %3</translation>
@@ -1109,17 +1093,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Relæet har endnu ikke oplyst sin kvote</translation>
     </message>
     <message>
-        <source>The name on every message you send</source>
-        <translation>Navnet på hver besked, du sender</translation>
-    </message>
-    <message>
         <source>Both ways: with this off you send none and see none.</source>
         <translation>Begge veje: er det slået fra, sender du ingen og ser ingen.</translation>
-    </message>
-    <message>
-        <source>Attachments up to %1</source>
-        <extracomment>The biggest attachment the relay will carry. %1 is a size such as &quot;22.3 MB&quot;.</extracomment>
-        <translation>Vedhæftninger op til %1</translation>
     </message>
     <message>
         <source>Relays</source>
@@ -1145,6 +1120,11 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Add a relay</source>
         <translation>Tilføj et relæ</translation>
+    </message>
+    <message>
+        <source>The relay this profile sends from takes attachments up to %1.</source>
+        <extracomment>The biggest attachment the relay the profile sends from will carry. %1 is a size such as &quot;22.3 MB&quot;.</extracomment>
+        <translation>Relæet, denne profil sender fra, tager vedhæftninger på op til %1.</translation>
     </message>
 </context>
 <context>
