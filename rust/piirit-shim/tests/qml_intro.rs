@@ -49,7 +49,7 @@ const PICTURES: [&str; 5] = [
 /// bigger than it was painted.
 const SMALLEST_PICTURE: u32 = 400;
 /// The largest, which is a packaging rule rather than a drawing one. A
-/// picture is drawn at `min(width * 0.42, height * 0.30)` (IntroPage),
+/// picture is drawn at `min(width * 0.42, height * 0.30)` (`IntroPage`),
 /// which is 453 px on the tallest phone Sailfish runs on and 614 px on
 /// the Jolla Tablet, and PNG is already compressed, so every pixel past
 /// that is paid for twice: once in the package the reader downloads and
