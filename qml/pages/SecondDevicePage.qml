@@ -136,12 +136,12 @@ Page {
         text: device.code
     }
 
-    // Ended when the page is left, whichever way. The provider is
-    // the core's and outlives this page; left running it would hold the
+    // Ended when the page is left, whichever way. The provider is the
+    // core's and outlives this page; left running it would hold the
     // profile out to whoever asks, with nothing on screen to say so and
-    // nothing left to stop it. Cancel does this and then pops; a swipe
-    // does it here. Harmless on the way to the chats after a hand-over:
-    // by then there is no offer to stop.
+    // nothing left to stop it. Cancel stops it without leaving; this is
+    // the swipe. Harmless on the way to the chats after a hand-over: by
+    // then there is no offer to stop.
     onStatusChanged: {
         if (page.status === PageStatus.Deactivating) {
             device.cancel()

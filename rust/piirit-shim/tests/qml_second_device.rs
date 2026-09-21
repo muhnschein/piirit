@@ -61,13 +61,14 @@ use serde_json::Value;
 
 mod common;
 
-/// Silica's `pageStack`, recorded rather than performed: Cancel pops the
-/// page, and the page has to still be there for the test to read what it
-/// did afterwards.
+/// Silica's `pageStack`, recorded rather than performed: what the page
+/// does to the stack is read off this afterwards -- the chats attached
+/// to the right of a hand-over, and nothing at all from Cancel, which
+/// stops the code without leaving.
 #[derive(QObject, Default)]
 struct PageStackProbe {
     base: qt_base_class!(trait QObject),
-    /// `pop:|attach:ChatListPage.qml:9|...`
+    /// `attach:ChatListPage.qml:9|...`
     log: qt_property!(QString; NOTIFY log_changed),
     log_changed: qt_signal!(),
     push: qt_method!(fn(&mut self, page: QString, properties: QVariantMap)),
