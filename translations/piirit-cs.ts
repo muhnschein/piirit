@@ -1085,18 +1085,8 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
         <translation>Úložiště a připojení</translation>
     </message>
     <message>
-        <source>%1 on this phone</source>
-        <extracomment>How much room the profile takes on the phone. %1 is a size such as &quot;12.3 MB&quot;.</extracomment>
-        <translation>%1 v tomto telefonu</translation>
-    </message>
-    <message>
         <source>Saved</source>
         <translation>Uloženo</translation>
-    </message>
-    <message>
-        <source>%1 used · %2 left of %3</source>
-        <extracomment>The mailbox on the relay. %1 used, %2 left, %3 the whole, each a size such as &quot;1.4 GB&quot;.</extracomment>
-        <translation>Využito %1 · zbývá %2 z %3</translation>
     </message>
     <message>
         <source>The relay has not reported its quota yet</source>
@@ -1132,9 +1122,14 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
         <translation>Přidat relay</translation>
     </message>
     <message>
-        <source>Attachments up to %1 can be sent.</source>
-        <extracomment>The biggest attachment that will be sent, the same for every relay. %1 is a size such as &quot;22.3 MB&quot;.</extracomment>
-        <translation>Přílohy lze posílat do %1.</translation>
+        <source>%1 of %2 used</source>
+        <extracomment>The mailbox on the relay. %1 used, %2 the whole, each a size such as &quot;1.4 GB&quot;.</extracomment>
+        <translation>Využito %1 z %2</translation>
+    </message>
+    <message>
+        <source>Piirit uses %1 of storage on this phone.</source>
+        <extracomment>How much room the profile takes on the phone. %1 is a size such as &quot;12.3 MB&quot;.</extracomment>
+        <translation>Piirit zabírá v tomhle telefonu %1 úložiště.</translation>
     </message>
 </context>
 <context>

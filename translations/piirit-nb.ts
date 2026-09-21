@@ -1075,18 +1075,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Lagring og tilkobling</translation>
     </message>
     <message>
-        <source>%1 on this phone</source>
-        <extracomment>How much room the profile takes on the phone. %1 is a size such as &quot;12.3 MB&quot;.</extracomment>
-        <translation>%1 på denne telefonen</translation>
-    </message>
-    <message>
         <source>Saved</source>
         <translation>Lagret</translation>
-    </message>
-    <message>
-        <source>%1 used · %2 left of %3</source>
-        <extracomment>The mailbox on the relay. %1 used, %2 left, %3 the whole, each a size such as &quot;1.4 GB&quot;.</extracomment>
-        <translation>%1 brukt · %2 igjen av %3</translation>
     </message>
     <message>
         <source>The relay has not reported its quota yet</source>
@@ -1122,9 +1112,14 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Legg til et relé</translation>
     </message>
     <message>
-        <source>Attachments up to %1 can be sent.</source>
-        <extracomment>The biggest attachment that will be sent, the same for every relay. %1 is a size such as &quot;22.3 MB&quot;.</extracomment>
-        <translation>Vedlegg på opptil %1 kan sendes.</translation>
+        <source>%1 of %2 used</source>
+        <extracomment>The mailbox on the relay. %1 used, %2 the whole, each a size such as &quot;1.4 GB&quot;.</extracomment>
+        <translation>%1 av %2 brukt</translation>
+    </message>
+    <message>
+        <source>Piirit uses %1 of storage on this phone.</source>
+        <extracomment>How much room the profile takes on the phone. %1 is a size such as &quot;12.3 MB&quot;.</extracomment>
+        <translation>Piirit bruker %1 lagringsplass på denne telefonen.</translation>
     </message>
 </context>
 <context>

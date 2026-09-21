@@ -1075,18 +1075,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>నిల్వ మరియు కనెక్టివిటీ</translation>
     </message>
     <message>
-        <source>%1 on this phone</source>
-        <extracomment>How much room the profile takes on the phone. %1 is a size such as &quot;12.3 MB&quot;.</extracomment>
-        <translation>ఈ ఫోన్‌లో %1</translation>
-    </message>
-    <message>
         <source>Saved</source>
         <translation>సేవ్ చేయబడింది</translation>
-    </message>
-    <message>
-        <source>%1 used · %2 left of %3</source>
-        <extracomment>The mailbox on the relay. %1 used, %2 left, %3 the whole, each a size such as &quot;1.4 GB&quot;.</extracomment>
-        <translation>%3లో %1 వాడబడింది · %2 మిగిలింది</translation>
     </message>
     <message>
         <source>The relay has not reported its quota yet</source>
@@ -1122,9 +1112,14 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>రిలే చేర్చు</translation>
     </message>
     <message>
-        <source>Attachments up to %1 can be sent.</source>
-        <extracomment>The biggest attachment that will be sent, the same for every relay. %1 is a size such as &quot;22.3 MB&quot;.</extracomment>
-        <translation>%1 వరకు జోడింపులను పంపవచ్చు.</translation>
+        <source>%1 of %2 used</source>
+        <extracomment>The mailbox on the relay. %1 used, %2 the whole, each a size such as &quot;1.4 GB&quot;.</extracomment>
+        <translation>%2 లో %1 వాడకంలో</translation>
+    </message>
+    <message>
+        <source>Piirit uses %1 of storage on this phone.</source>
+        <extracomment>How much room the profile takes on the phone. %1 is a size such as &quot;12.3 MB&quot;.</extracomment>
+        <translation>Piirit ఈ ఫోన్‌లో %1 స్టోరేజ్ వాడుతోంది.</translation>
     </message>
 </context>
 <context>

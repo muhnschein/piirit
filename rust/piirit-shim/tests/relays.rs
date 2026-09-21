@@ -496,8 +496,8 @@ fn assert_listed(value: &dyn Fn(&str) -> String, context: &str) {
     );
     assert_eq!(
         value("second-words"),
-        "2.0 GB used · 107.4 MB left of 2.1 GB",
-        "the second relay's mailbox is not said as used, left and whole. {context}"
+        "2.0 GB of 2.1 GB used",
+        "the second relay's mailbox is not said as used of the whole. {context}"
     );
     assert_eq!(value("second-switch"), "true", "{context}");
     assert_eq!(value("second-remove"), "true", "{context}");

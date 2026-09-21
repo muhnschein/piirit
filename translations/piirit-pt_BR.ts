@@ -1075,18 +1075,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Armazenamento e conectividade</translation>
     </message>
     <message>
-        <source>%1 on this phone</source>
-        <extracomment>How much room the profile takes on the phone. %1 is a size such as &quot;12.3 MB&quot;.</extracomment>
-        <translation>%1 neste telefone</translation>
-    </message>
-    <message>
         <source>Saved</source>
         <translation>Salvo</translation>
-    </message>
-    <message>
-        <source>%1 used · %2 left of %3</source>
-        <extracomment>The mailbox on the relay. %1 used, %2 left, %3 the whole, each a size such as &quot;1.4 GB&quot;.</extracomment>
-        <translation>%1 usados · %2 livres de %3</translation>
     </message>
     <message>
         <source>The relay has not reported its quota yet</source>
@@ -1122,9 +1112,14 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Adicionar um relay</translation>
     </message>
     <message>
-        <source>Attachments up to %1 can be sent.</source>
-        <extracomment>The biggest attachment that will be sent, the same for every relay. %1 is a size such as &quot;22.3 MB&quot;.</extracomment>
-        <translation>Anexos de até %1 podem ser enviados.</translation>
+        <source>%1 of %2 used</source>
+        <extracomment>The mailbox on the relay. %1 used, %2 the whole, each a size such as &quot;1.4 GB&quot;.</extracomment>
+        <translation>%1 de %2 usados</translation>
+    </message>
+    <message>
+        <source>Piirit uses %1 of storage on this phone.</source>
+        <extracomment>How much room the profile takes on the phone. %1 is a size such as &quot;12.3 MB&quot;.</extracomment>
+        <translation>O Piirit usa %1 de armazenamento neste celular.</translation>
     </message>
 </context>
 <context>

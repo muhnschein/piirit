@@ -1085,18 +1085,8 @@ Wiadomości innych grup z zablokowanymi kontaktami nadal będą wyświetlane.</t
         <translation>Pamięć i łączność</translation>
     </message>
     <message>
-        <source>%1 on this phone</source>
-        <extracomment>How much room the profile takes on the phone. %1 is a size such as &quot;12.3 MB&quot;.</extracomment>
-        <translation>%1 na tym telefonie</translation>
-    </message>
-    <message>
         <source>Saved</source>
         <translation>Zapisano</translation>
-    </message>
-    <message>
-        <source>%1 used · %2 left of %3</source>
-        <extracomment>The mailbox on the relay. %1 used, %2 left, %3 the whole, each a size such as &quot;1.4 GB&quot;.</extracomment>
-        <translation>Zajęte %1 · wolne %2 z %3</translation>
     </message>
     <message>
         <source>The relay has not reported its quota yet</source>
@@ -1132,9 +1122,14 @@ Wiadomości innych grup z zablokowanymi kontaktami nadal będą wyświetlane.</t
         <translation>Dodaj przekaźnik</translation>
     </message>
     <message>
-        <source>Attachments up to %1 can be sent.</source>
-        <extracomment>The biggest attachment that will be sent, the same for every relay. %1 is a size such as &quot;22.3 MB&quot;.</extracomment>
-        <translation>Można wysyłać załączniki do %1.</translation>
+        <source>%1 of %2 used</source>
+        <extracomment>The mailbox on the relay. %1 used, %2 the whole, each a size such as &quot;1.4 GB&quot;.</extracomment>
+        <translation>Użyto %1 z %2</translation>
+    </message>
+    <message>
+        <source>Piirit uses %1 of storage on this phone.</source>
+        <extracomment>How much room the profile takes on the phone. %1 is a size such as &quot;12.3 MB&quot;.</extracomment>
+        <translation>Piirit zajmuje %1 miejsca na tym telefonie.</translation>
     </message>
 </context>
 <context>

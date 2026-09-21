@@ -1069,18 +1069,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Lưu trữ và kết nối</translation>
     </message>
     <message>
-        <source>%1 on this phone</source>
-        <extracomment>How much room the profile takes on the phone. %1 is a size such as &quot;12.3 MB&quot;.</extracomment>
-        <translation>%1 trên điện thoại này</translation>
-    </message>
-    <message>
         <source>Saved</source>
         <translation>Đã lưu</translation>
-    </message>
-    <message>
-        <source>%1 used · %2 left of %3</source>
-        <extracomment>The mailbox on the relay. %1 used, %2 left, %3 the whole, each a size such as &quot;1.4 GB&quot;.</extracomment>
-        <translation>Đã dùng %1 · còn %2 trên %3</translation>
     </message>
     <message>
         <source>The relay has not reported its quota yet</source>
@@ -1116,9 +1106,14 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Thêm máy chuyển tiếp</translation>
     </message>
     <message>
-        <source>Attachments up to %1 can be sent.</source>
-        <extracomment>The biggest attachment that will be sent, the same for every relay. %1 is a size such as &quot;22.3 MB&quot;.</extracomment>
-        <translation>Có thể gửi tệp đính kèm tới %1.</translation>
+        <source>%1 of %2 used</source>
+        <extracomment>The mailbox on the relay. %1 used, %2 the whole, each a size such as &quot;1.4 GB&quot;.</extracomment>
+        <translation>Đã dùng %1 trên %2</translation>
+    </message>
+    <message>
+        <source>Piirit uses %1 of storage on this phone.</source>
+        <extracomment>How much room the profile takes on the phone. %1 is a size such as &quot;12.3 MB&quot;.</extracomment>
+        <translation>Piirit dùng %1 dung lượng trên điện thoại này.</translation>
     </message>
 </context>
 <context>

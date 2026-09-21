@@ -1073,18 +1073,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>存储与连接</translation>
     </message>
     <message>
-        <source>%1 on this phone</source>
-        <extracomment>How much room the profile takes on the phone. %1 is a size such as &quot;12.3 MB&quot;.</extracomment>
-        <translation>本手机上占用 %1</translation>
-    </message>
-    <message>
         <source>Saved</source>
         <translation>已保存</translation>
-    </message>
-    <message>
-        <source>%1 used · %2 left of %3</source>
-        <extracomment>The mailbox on the relay. %1 used, %2 left, %3 the whole, each a size such as &quot;1.4 GB&quot;.</extracomment>
-        <translation>已用 %1 · 剩余 %2，共 %3</translation>
     </message>
     <message>
         <source>The relay has not reported its quota yet</source>
@@ -1120,9 +1110,14 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>添加中继</translation>
     </message>
     <message>
-        <source>Attachments up to %1 can be sent.</source>
-        <extracomment>The biggest attachment that will be sent, the same for every relay. %1 is a size such as &quot;22.3 MB&quot;.</extracomment>
-        <translation>可发送最大 %1 的附件。</translation>
+        <source>%1 of %2 used</source>
+        <extracomment>The mailbox on the relay. %1 used, %2 the whole, each a size such as &quot;1.4 GB&quot;.</extracomment>
+        <translation>已用 %1，共 %2</translation>
+    </message>
+    <message>
+        <source>Piirit uses %1 of storage on this phone.</source>
+        <extracomment>How much room the profile takes on the phone. %1 is a size such as &quot;12.3 MB&quot;.</extracomment>
+        <translation>Piirit 在这台手机上占用 %1 存储空间。</translation>
     </message>
 </context>
 <context>

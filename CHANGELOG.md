@@ -33,9 +33,8 @@ A profile's relays are on its page now, not just the one it sends from.
   the switch, as does everything else that names the address.
 - Storage and connectivity are reported relay by relay: for each, the
   core's own dot and words about its connection, and its mailbox on a
-  bar. Before them, what will go in one message -- the core's own
-  ceiling, the same for every relay -- and what the profile takes on
-  the phone.
+  bar with what is used of what there is. Before them, what the profile
+  takes on the phone.
 - One more relay can be added from the plus under the rows, from the same
   list the profile was made from or a typed server, with the same wait,
   Cancel and time-out the first relay had. A relay that answers after the

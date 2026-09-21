@@ -30,9 +30,8 @@ import Piirit 1.0
  * parla), per relay: for each, the dot the core's own report draws for
  * its connection with the core's own words beside it, and the bar for
  * its mailbox, always there, at nothing until the relay has said, with
- * what is used, what is left and what there is under it. Before the
- * relays, what will go in one message and what the profile takes on the
- * phone. What parla's "Details" dialog adds --
+ * what is used of what there is under it. Before the relays, what the
+ * profile takes on the phone. What parla's "Details" dialog adds --
  * the storage per conversation, scanned message by message -- is not
  * here: on a phone that scan is what the reader would be waiting on.
  *
@@ -238,11 +237,9 @@ Page {
     /// not read, and the fact that it has not said yet otherwise.
     function quotaWords(usedBytes, limitBytes, text) {
         if (limitBytes > 0) {
-            var left = Math.max(0, limitBytes - usedBytes)
-            //: The mailbox on the relay. %1 used, %2 left, %3 the whole, each a size such as "1.4 GB".
-            return qsTr("%1 used · %2 left of %3")
+            //: The mailbox on the relay. %1 used, %2 the whole, each a size such as "1.4 GB".
+            return qsTr("%1 of %2 used")
                 .arg(page.size(usedBytes))
-                .arg(page.size(left))
                 .arg(page.size(limitBytes))
         }
         if (text.length > 0) {
@@ -525,26 +522,6 @@ Page {
                 text: qsTr("Storage and connectivity")
             }
 
-            // What will go in one message, first: it is the one thing
-            // here worth knowing before a long video is picked. The
-            // core's own ceiling, the same whichever relay the profile
-            // sends from (media.rs) -- so it is not said as the relay's,
-            // and does not change when the relay does. The conversation
-            // refuses a bigger file on the strength of the same number.
-            Label {
-                objectName: "attachmentLimitLabel"
-                x: Theme.horizontalPageMargin
-                width: parent.width - 2 * Theme.horizontalPageMargin
-                wrapMode: Text.Wrap
-                visible: profile.attachment_limit_bytes > 0
-                font.pixelSize: Theme.fontSizeSmall
-                color: Theme.secondaryHighlightColor
-                textFormat: Text.PlainText
-                //: The biggest attachment that will be sent, the same for every relay. %1 is a size such as "22.3 MB".
-                text: qsTr("Attachments up to %1 can be sent.")
-                      .arg(Format.readableSize(profile.attachment_limit_bytes))
-            }
-
             Label {
                 objectName: "storageLabel"
                 x: Theme.horizontalPageMargin
@@ -555,7 +532,8 @@ Page {
                 color: Theme.secondaryHighlightColor
                 textFormat: Text.PlainText
                 //: How much room the profile takes on the phone. %1 is a size such as "12.3 MB".
-                text: qsTr("%1 on this phone").arg(Format.readableSize(profile.storage_bytes))
+                text: qsTr("Piirit uses %1 of storage on this phone.")
+                      .arg(Format.readableSize(profile.storage_bytes))
             }
 
             // Then each relay, in the order the rows above have them:

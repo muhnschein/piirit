@@ -9,11 +9,10 @@
 //! The rest of the page is what parla's profile dialog shows: the relays
 //! and the address on each (their own test is `relays.rs`; here only that
 //! the one sent from is listed first), and what the relays and the phone
-//! say about the profile -- what will go in one message, the
-//! space taken on the device, and per relay the connection in the core's
-//! own words and the mailbox quota read off its report, said as used,
-//! left and whole. The name is a field under the picture, with nothing
-//! under it.
+//! say about the profile -- the space taken on the device, and per relay
+//! the connection in the core's own words and the mailbox quota read off
+//! its report, said as used of the whole. The name is a field under the
+//! picture, with nothing under it.
 
 // Qt harness: see qml_chat_list.rs.
 #![allow(
@@ -238,7 +237,6 @@ fn the_profile_page_round_trips_the_profile() {
         record!("sends-from", get!("relayRow0", "sendsFrom"));
         // The relay the profile sends from is reported on first: the
         // core's own words about its connection, and its mailbox.
-        record!("attachments", get!("attachmentLimitLabel", "text"));
         record!("connection", get!("reportStatus", "text"));
         record!("quota-shown", get!("reportQuota", "visible"));
         record!("quota-words", get!("reportQuota", "label"));
@@ -516,12 +514,6 @@ fn assert_page_says_what_the_relay_said(steps: &[(&str, String)], context: &str)
         "true",
         "the first relay row is not marked as the one sent from. {context}"
     );
-    assert!(
-        value("attachments").starts_with("Attachments up to "),
-        "what will go in one message is not said first, or is said as the \
-         relay's -- it is the core's own ceiling, the same for every \
-         relay. {context}"
-    );
     assert_eq!(
         value("connection"),
         "Connected",
@@ -534,9 +526,8 @@ fn assert_page_says_what_the_relay_said(steps: &[(&str, String)], context: &str)
     );
     assert_eq!(
         value("quota-words"),
-        "1.4 GB used · 708.7 MB left of 2.1 GB",
-        "the mailbox is not said as used, left and whole, the way parla \
-         says it. {context}"
+        "1.4 GB of 2.1 GB used",
+        "the mailbox is not said as used of the whole. {context}"
     );
     for (label, expected) in [
         ("hint-before", "false"),
@@ -567,7 +558,7 @@ fn assert_page_says_what_the_relay_said(steps: &[(&str, String)], context: &str)
     );
     assert_eq!(
         value("storage"),
-        "123.5 kB on this phone",
+        "Piirit uses 123.5 kB of storage on this phone.",
         "the space the profile takes on the device is not said. {context}"
     );
 }

@@ -1079,18 +1079,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>ಸಂಗ್ರಹಣೆ ಮತ್ತು ಸಂಪರ್ಕ</translation>
     </message>
     <message>
-        <source>%1 on this phone</source>
-        <extracomment>How much room the profile takes on the phone. %1 is a size such as &quot;12.3 MB&quot;.</extracomment>
-        <translation>ಈ ಫೋನ್‌ನಲ್ಲಿ %1</translation>
-    </message>
-    <message>
         <source>Saved</source>
         <translation>ಉಳಿಸಲಾಗಿದೆ</translation>
-    </message>
-    <message>
-        <source>%1 used · %2 left of %3</source>
-        <extracomment>The mailbox on the relay. %1 used, %2 left, %3 the whole, each a size such as &quot;1.4 GB&quot;.</extracomment>
-        <translation>%3 ರಲ್ಲಿ %1 ಬಳಕೆಯಾಗಿದೆ · %2 ಉಳಿದಿದೆ</translation>
     </message>
     <message>
         <source>The relay has not reported its quota yet</source>
@@ -1126,9 +1116,14 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>ರಿಲೇ ಸೇರಿಸಿ</translation>
     </message>
     <message>
-        <source>Attachments up to %1 can be sent.</source>
-        <extracomment>The biggest attachment that will be sent, the same for every relay. %1 is a size such as &quot;22.3 MB&quot;.</extracomment>
-        <translation>%1 ವರೆಗಿನ ಲಗತ್ತುಗಳನ್ನು ಕಳುಹಿಸಬಹುದು.</translation>
+        <source>%1 of %2 used</source>
+        <extracomment>The mailbox on the relay. %1 used, %2 the whole, each a size such as &quot;1.4 GB&quot;.</extracomment>
+        <translation>%2 ರಲ್ಲಿ %1 ಬಳಕೆಯಾಗಿದೆ</translation>
+    </message>
+    <message>
+        <source>Piirit uses %1 of storage on this phone.</source>
+        <extracomment>How much room the profile takes on the phone. %1 is a size such as &quot;12.3 MB&quot;.</extracomment>
+        <translation>Piirit ಈ ಫೋನ್‌ನಲ್ಲಿ %1 ಸಂಗ್ರಹಣೆಯನ್ನು ಬಳಸುತ್ತಿದೆ.</translation>
     </message>
 </context>
 <context>
