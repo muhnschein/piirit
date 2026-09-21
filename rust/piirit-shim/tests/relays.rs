@@ -14,10 +14,7 @@
     unused_unsafe,
     clippy::borrow_as_ptr,
     clippy::disallowed_methods,
-    clippy::expect_used,
-    // qt_method! declarations must match the generated dispatcher's
-    // by-value parameters; see piirit-shim/src/lib.rs.
-    clippy::needless_pass_by_value
+    clippy::expect_used
 )]
 
 use std::time::Duration;
@@ -28,48 +25,33 @@ use serde_json::Value;
 
 mod common;
 
-/// Silica's `pageStack`, recorded rather than performed: which page the
-/// plus opens and with which profile, and that the page that adds a
-/// relay goes away once it has.
-#[derive(QObject, Default)]
-struct PageStackProbe {
-    base: qt_base_class!(trait QObject),
-    /// `push:AddRelayPage.qml|pop|...`
-    log: qt_property!(QString; NOTIFY log_changed),
-    log_changed: qt_signal!(),
-    /// The account the most recent push was handed.
-    pushed_account: qt_property!(i32; NOTIFY log_changed),
-    push: qt_method!(fn(&mut self, page: QString, properties: QVariantMap)),
-    pop: qt_method!(fn(&mut self)),
-}
-
-impl PageStackProbe {
-    fn record(&mut self, entry: &str) {
-        let current = self.log.to_string();
-        self.log = format!("{current}{entry}|").into();
-        self.log_changed();
-    }
-
-    fn push(&mut self, page: QString, properties: QVariantMap) {
-        let page = page.to_string();
-        let name = page.rsplit('/').next().unwrap_or(&page).to_string();
-        self.pushed_account =
-            i32::from_qvariant(properties.value(QString::from("accountId"), QVariant::default()))
-                .unwrap_or(-1);
-        self.record(&format!("push:{name}"));
-    }
-
-    fn pop(&mut self) {
-        self.record("pop");
-    }
-}
-
 /// Two loaders: the profile page, and the page that adds a relay over
 /// it, so that what the second does can be seen landing on the first.
 const PROBE_QML: &str = r"
     import QtQuick 2.0
     import Sailfish.Silica 1.0
     Item {
+        id: probe
+
+        // Silica's `pageStack`, recorded rather than performed: which
+        // page the plus opens and with which profile, and that the page
+        // that adds a relay goes away once it has. In QML rather than as
+        // a QObject on the Rust side, since a page loaded by a Loader
+        // reads `pageStack` off the file the Loader was declared in.
+        property QtObject pageStack: QtObject {
+            // `push:AddRelayPage.qml|pop|...`
+            property string log: ''
+            // The account the most recent push was handed.
+            property int pushedAccount: -1
+            function push(page, properties) {
+                var name = ('' + page).split('/').pop()
+                pushedAccount = properties && properties.accountId !== undefined
+                                ? properties.accountId : -1
+                log = log + 'push:' + name + '|'
+            }
+            function pop() { log = log + 'pop|' }
+        }
+
         Loader { id: loader }
         Loader { id: sub }
         function load(url, accountId) {
@@ -154,6 +136,8 @@ const PROBE_QML: &str = r"
         }
         function pageProperty(property) { return '' + loader.item[property] }
         function subProperty(property) { return '' + sub.item[property] }
+        function navigation() { return probe.pageStack.log }
+        function pushedAccount() { return '' + probe.pageStack.pushedAccount }
         // The wait before a relay goes, turned down from the four
         // seconds a reader gets.
         function hurry() { loader.item.pendingDelay = 100; return 'ok' }
@@ -191,13 +175,11 @@ fn the_relays_are_listed_switched_removed_and_added() {
     piirit_shim::register_qml_types();
 
     let core_box = QObjectBox::new(DeltaChatCore::default());
-    let stack_box = QObjectBox::new(PageStackProbe::default());
     let mut engine = QmlEngine::new();
     engine.add_import_path(QString::from(
         common::stubs_dir().to_string_lossy().into_owned(),
     ));
     engine.set_object_property("core".into(), core_box.pinned());
-    engine.set_object_property("pageStack".into(), stack_box.pinned());
     engine.load_data(QByteArray::from(PROBE_QML));
 
     core_box
@@ -387,6 +369,8 @@ fn the_relays_are_listed_switched_removed_and_added() {
         record!("added-first", get!("relayRow0", "addr"));
         record!("added-second", get!("relayRow1", "addr"));
         record!("added-detail", get_in!("relayRow1", "relayDetail", "text"));
+        record!("navigation", call!("navigation"));
+        record!("pushed-account", call!("pushedAccount"));
         (*engine_ptr).quit();
     });
 
@@ -400,9 +384,9 @@ fn the_relays_are_listed_switched_removed_and_added() {
             .unwrap_or_default()
     };
     let calls = common::calls(&journal);
-    let navigation = stack_box.pinned().borrow().log.to_string();
-    let pushed_account = stack_box.pinned().borrow().pushed_account;
-    let context = format!("steps: {steps:?}\nnavigation: {navigation}");
+    let navigation = value("navigation");
+    let pushed_account = value("pushed-account");
+    let context = format!("steps: {steps:?}");
 
     assert_eq!(
         value("load"),
@@ -419,7 +403,7 @@ fn the_relays_are_listed_switched_removed_and_added() {
         "the core's refusal of an address the profile has no relay for \
          did not reach the page in the core's words. {context}"
     );
-    assert_added(&value, &calls, &navigation, pushed_account, &context);
+    assert_added(&value, &calls, &navigation, &pushed_account, &context);
 }
 
 /// The relay sent from first, marked as such and without the item that
@@ -543,7 +527,7 @@ fn assert_added(
     value: &dyn Fn(&str) -> String,
     calls: &[(String, Value)],
     navigation: &str,
-    pushed_account: i32,
+    pushed_account: &str,
     context: &str,
 ) {
     assert_eq!(value("plus"), "ok", "{context}");
@@ -552,7 +536,7 @@ fn assert_added(
         "the plus did not open the page that adds a relay. {context}"
     );
     assert_eq!(
-        pushed_account, 1,
+        pushed_account, "1",
         "the page that adds a relay was not told which profile. {context}"
     );
     assert_eq!(value("sub-load"), "ok", "{context}");

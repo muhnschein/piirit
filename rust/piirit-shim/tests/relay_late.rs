@@ -14,8 +14,7 @@
     unused_unsafe,
     clippy::borrow_as_ptr,
     clippy::disallowed_methods,
-    clippy::expect_used,
-    clippy::needless_pass_by_value
+    clippy::expect_used
 )]
 
 use std::time::Duration;
@@ -25,23 +24,6 @@ use qmetaobject::*;
 
 mod common;
 
-/// Silica's `pageStack`, recorded rather than performed.
-#[derive(QObject, Default)]
-struct PageStackProbe {
-    base: qt_base_class!(trait QObject),
-    log: qt_property!(QString; NOTIFY log_changed),
-    log_changed: qt_signal!(),
-    pop: qt_method!(fn(&mut self)),
-}
-
-impl PageStackProbe {
-    fn pop(&mut self) {
-        let current = self.log.to_string();
-        self.log = format!("{current}pop|").into();
-        self.log_changed();
-    }
-}
-
 /// The page, and beside it the profile's relays as the shim lists them,
 /// and a count of what the shim signalled.
 const PROBE_QML: &str = r"
@@ -49,6 +31,17 @@ const PROBE_QML: &str = r"
     import Sailfish.Silica 1.0
     import Piirit 1.0
     Item {
+        id: probe
+
+        // Silica's `pageStack`, recorded rather than performed. In QML
+        // rather than as a QObject on the Rust side, since a page loaded
+        // by a Loader reads `pageStack` off the file the Loader was
+        // declared in.
+        property QtObject pageStack: QtObject {
+            property string log: ''
+            function pop() { log = log + 'pop|' }
+        }
+
         Loader { id: loader }
         Transports { id: transports; account_id: 1 }
         property int added: 0
@@ -93,6 +86,7 @@ const PROBE_QML: &str = r"
         function refresh() { transports.reload(); return 'ok' }
         function listed() { return transports.count + ':' + transports.primary }
         function signalled() { return added + '/' + errors }
+        function navigation() { return probe.pageStack.log }
         // No profile to add to: refused here, before the core is asked.
         function nowhere() { core.add_relay(0, 'dcaccount:nine.testrun.org'); return 'ok' }
     }
@@ -119,13 +113,11 @@ fn a_relay_added_after_cancel_is_kept_and_not_announced() {
     piirit_shim::register_qml_types();
 
     let core_box = QObjectBox::new(DeltaChatCore::default());
-    let stack_box = QObjectBox::new(PageStackProbe::default());
     let mut engine = QmlEngine::new();
     engine.add_import_path(QString::from(
         common::stubs_dir().to_string_lossy().into_owned(),
     ));
     engine.set_object_property("core".into(), core_box.pinned());
-    engine.set_object_property("pageStack".into(), stack_box.pinned());
     engine.load_data(QByteArray::from(PROBE_QML));
 
     core_box
@@ -197,6 +189,7 @@ fn a_relay_added_after_cancel_is_kept_and_not_announced() {
 
     single_shot(Duration::from_secs(9), move || unsafe {
         record!("after", call!("listed"));
+        record!("navigation", call!("navigation"));
         (*engine_ptr).quit();
     });
 
@@ -210,8 +203,7 @@ fn a_relay_added_after_cancel_is_kept_and_not_announced() {
             .unwrap_or_default()
     };
     let calls = common::calls(&journal);
-    let navigation = stack_box.pinned().borrow().log.to_string();
-    let context = format!("steps: {steps:?}\nnavigation: {navigation}\ncalls: {calls:?}");
+    let context = format!("steps: {steps:?}\ncalls: {calls:?}");
 
     assert_eq!(value("load"), "ok", "the page did not load. {context}");
     assert_eq!(value("before"), "1:account1@example.org", "{context}");
@@ -253,7 +245,8 @@ fn a_relay_added_after_cancel_is_kept_and_not_announced() {
          profile no longer sends from where it did. {context}"
     );
     assert_eq!(
-        navigation, "",
+        value("navigation"),
+        "",
         "the page went away without a relay having been added while it \
          waited. {context}"
     );
