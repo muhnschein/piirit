@@ -39,20 +39,20 @@
         <translation>Il tuo nome</translation>
     </message>
     <message>
-        <source>Relay</source>
-        <translation>Relay</translation>
+        <source>Select a public chatmail relay</source>
+        <translation>Seleziona un relay chatmail pubblico</translation>
     </message>
     <message>
-        <source>Custom server</source>
-        <translation>Server personalizzato</translation>
+        <source>Use a custom chatmail relay</source>
+        <translation>Usa un relay chatmail personalizzato</translation>
     </message>
     <message>
-        <source>See &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; for the full list.</source>
-        <translation>L&apos;elenco completo è su &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
+        <source>Piirit works only with chatmail relays. These are a particular kind of e-mail server; ordinary e-mail servers are not supported. For more, see &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. A full list of public, free-to-use chatmail relays is at &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</source>
+        <translation>Piirit funziona solo con i relay chatmail. Sono un tipo particolare di server di posta; i comuni server di posta non sono supportati. Per saperne di più vedi &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. L&apos;elenco completo dei relay chatmail pubblici e gratuiti è su &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
     </message>
     <message>
-        <source>The relay gives you an address. The keys are made on this phone.</source>
-        <translation>Il relay ti dà un indirizzo. Le chiavi nascono su questo telefono.</translation>
+        <source>Pick a name and a relay. That&apos;s it! There is nothing else to set up.</source>
+        <translation>Scegli un nome e un relay. Tutto qui! Non c&apos;è altro da impostare.</translation>
     </message>
 </context>
 <context>
@@ -84,6 +84,49 @@
     <message>
         <source>The other device keeps it. Both get everything new.</source>
         <translation>L&apos;altro dispositivo lo tiene. Entrambi ricevono tutto il nuovo.</translation>
+    </message>
+</context>
+<context>
+    <name>AddRelayPage</name>
+    <message>
+        <source>%1 did not answer within %2 seconds.</source>
+        <translation>%1 non ha risposto entro %2 secondi.</translation>
+    </message>
+    <message>
+        <source>Add a relay</source>
+        <translation>Aggiungi un relay</translation>
+    </message>
+    <message>
+        <source>Another address for this profile, on another relay. The profile sends from one relay at a time; its page says which, and lets you change it.</source>
+        <translation>Un altro indirizzo per questo profilo, su un altro relay. Il profilo invia da un solo relay alla volta; la sua pagina dice quale e ti lascia cambiarlo.</translation>
+    </message>
+    <message>
+        <source>Add relay</source>
+        <translation>Aggiungi relay</translation>
+    </message>
+    <message>
+        <source>Contacting %1...</source>
+        <translation>Contatto di %1 in corso...</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Annulla</translation>
+    </message>
+    <message>
+        <source>Relays are run by volunteers. Try another one.</source>
+        <translation>I relay sono tenuti da volontari. Provane un altro.</translation>
+    </message>
+    <message>
+        <source>Select a public chatmail relay</source>
+        <translation>Seleziona un relay chatmail pubblico</translation>
+    </message>
+    <message>
+        <source>Use a custom chatmail relay</source>
+        <translation>Usa un relay chatmail personalizzato</translation>
+    </message>
+    <message>
+        <source>Piirit works only with chatmail relays. These are a particular kind of e-mail server; ordinary e-mail servers are not supported. For more, see &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. A full list of public, free-to-use chatmail relays is at &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</source>
+        <translation>Piirit funziona solo con i relay chatmail. Sono un tipo particolare di server di posta; i comuni server di posta non sono supportati. Per saperne di più vedi &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. L&apos;elenco completo dei relay chatmail pubblici e gratuiti è su &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
     </message>
 </context>
 <context>
@@ -537,13 +580,13 @@ Gli altri gruppi con contatti bloccati continueranno a visualizzare i loro messa
         </translation>
     </message>
     <message>
-        <source>Too big to send: %1. This relay takes %2.</source>
-        <extracomment>Shown above the message field when the attached file is bigger than the relay will carry. %1 is the file&apos;s size and %2 the largest the relay takes, each such as &quot;24 MB&quot;.</extracomment>
-        <translation>Troppo grande da inviare: %1. Questo relay accetta %2.</translation>
-    </message>
-    <message>
         <source>Saved to Downloads</source>
         <translation>Salvato in Download</translation>
+    </message>
+    <message>
+        <source>Too big to send: %1. Attachments go up to %2.</source>
+        <extracomment>Shown above the message field when the attached file is bigger than will be sent. %1 is the file&apos;s size and %2 the largest that goes, each such as &quot;24 MB&quot;.</extracomment>
+        <translation>Troppo grande per essere inviato: %1. Gli allegati possono arrivare fino a %2.</translation>
     </message>
 </context>
 <context>
@@ -1004,10 +1047,6 @@ Gli altri gruppi con contatti bloccati continueranno a visualizzare i loro messa
 <context>
     <name>ProfilePage</name>
     <message>
-        <source>Not connected</source>
-        <translation>Non connesso</translation>
-    </message>
-    <message>
         <source>Checking the connection</source>
         <translation>Verifica della connessione</translation>
     </message>
@@ -1032,10 +1071,6 @@ Gli altri gruppi con contatti bloccati continueranno a visualizzare i loro messa
         <translation>Una riga su di te</translation>
     </message>
     <message>
-        <source>Address</source>
-        <translation>Indirizzo</translation>
-    </message>
-    <message>
         <source>Send read receipts</source>
         <translation>Invia conferme di lettura</translation>
     </message>
@@ -1044,47 +1079,51 @@ Gli altri gruppi con contatti bloccati continueranno a visualizzare i loro messa
         <translation>Archiviazione e connettività</translation>
     </message>
     <message>
-        <source>%1 on this phone</source>
-        <extracomment>How much room the profile takes on the phone. %1 is a size such as &quot;12.3 MB&quot;.</extracomment>
-        <translation>%1 su questo telefono</translation>
-    </message>
-    <message>
         <source>Saved</source>
         <translation>Salvato</translation>
-    </message>
-    <message>
-        <source>Connected, and up to date</source>
-        <translation>Connesso e aggiornato</translation>
-    </message>
-    <message>
-        <source>Connected, sending or syncing messages</source>
-        <translation>Connesso, invio o sincronizzazione dei messaggi in corso</translation>
-    </message>
-    <message>
-        <source>Connecting to the relay</source>
-        <translation>Connessione al relay in corso</translation>
-    </message>
-    <message>
-        <source>%1 used · %2 left of %3</source>
-        <extracomment>The mailbox on the relay. %1 used, %2 left, %3 the whole, each a size such as &quot;1.4 GB&quot;.</extracomment>
-        <translation>%1 usati · %2 liberi su %3</translation>
     </message>
     <message>
         <source>The relay has not reported its quota yet</source>
         <translation>Il relay non ha ancora comunicato la sua quota</translation>
     </message>
     <message>
-        <source>The name on every message you send</source>
-        <translation>Il nome su ogni messaggio che invii</translation>
-    </message>
-    <message>
         <source>Both ways: with this off you send none and see none.</source>
         <translation>In entrambi i sensi: da spento non ne mandi e non ne vedi.</translation>
     </message>
     <message>
-        <source>Attachments up to %1</source>
-        <extracomment>The biggest attachment the relay will carry. %1 is a size such as &quot;22.3 MB&quot;.</extracomment>
-        <translation>Allegati fino a %1</translation>
+        <source>Relays</source>
+        <translation>Relay</translation>
+    </message>
+    <message>
+        <source>Sends from this relay</source>
+        <translation>Il profilo invia da questo relay</translation>
+    </message>
+    <message>
+        <source>Removing relay</source>
+        <extracomment>What Silica&apos;s countdown says it is doing, over a relay the reader has asked to remove.</extracomment>
+        <translation>Rimozione del relay</translation>
+    </message>
+    <message>
+        <source>Send from this relay</source>
+        <translation>Invia da questo relay</translation>
+    </message>
+    <message>
+        <source>Remove relay</source>
+        <translation>Rimuovi relay</translation>
+    </message>
+    <message>
+        <source>Add a relay</source>
+        <translation>Aggiungi un relay</translation>
+    </message>
+    <message>
+        <source>%1 of %2 used</source>
+        <extracomment>The mailbox on the relay. %1 used, %2 the whole, each a size such as &quot;1.4 GB&quot;.</extracomment>
+        <translation>%1 di %2 in uso</translation>
+    </message>
+    <message>
+        <source>Piirit uses %1 of storage on this phone.</source>
+        <extracomment>How much room the profile takes on the phone. %1 is a size such as &quot;12.3 MB&quot;.</extracomment>
+        <translation>Piirit occupa %1 di spazio su questo telefono.</translation>
     </message>
 </context>
 <context>

@@ -39,20 +39,20 @@
         <translation>Vaše ime</translation>
     </message>
     <message>
-        <source>Relay</source>
-        <translation>Posrednik</translation>
+        <source>Select a public chatmail relay</source>
+        <translation>Izberi javnega posrednika chatmail</translation>
     </message>
     <message>
-        <source>Custom server</source>
-        <translation>Lasten strežnik</translation>
+        <source>Use a custom chatmail relay</source>
+        <translation>Uporabi lastnega posrednika chatmail</translation>
     </message>
     <message>
-        <source>See &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; for the full list.</source>
-        <translation>Celoten seznam je na &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
+        <source>Piirit works only with chatmail relays. These are a particular kind of e-mail server; ordinary e-mail servers are not supported. For more, see &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. A full list of public, free-to-use chatmail relays is at &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</source>
+        <translation>Piirit deluje samo s posredniki chatmail. To je posebna vrsta e-poštnih strežnikov; navadni e-poštni strežniki niso podprti. Več na &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. Celoten seznam javnih, brezplačnih posrednikov chatmail je na &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
     </message>
     <message>
-        <source>The relay gives you an address. The keys are made on this phone.</source>
-        <translation>Posrednik ti da naslov. Ključi nastanejo na tem telefonu.</translation>
+        <source>Pick a name and a relay. That&apos;s it! There is nothing else to set up.</source>
+        <translation>Izberi ime in posrednika. To je vse! Ničesar drugega ni treba nastaviti.</translation>
     </message>
 </context>
 <context>
@@ -84,6 +84,49 @@
     <message>
         <source>The other device keeps it. Both get everything new.</source>
         <translation>Druga naprava ga obdrži. Obe dobita vse novo.</translation>
+    </message>
+</context>
+<context>
+    <name>AddRelayPage</name>
+    <message>
+        <source>%1 did not answer within %2 seconds.</source>
+        <translation>%1 ni odgovoril v %2 sekundah.</translation>
+    </message>
+    <message>
+        <source>Add a relay</source>
+        <translation>Dodaj posrednika</translation>
+    </message>
+    <message>
+        <source>Another address for this profile, on another relay. The profile sends from one relay at a time; its page says which, and lets you change it.</source>
+        <translation>Še en naslov za ta profil, pri drugem posredniku. Profil pošilja naenkrat le prek enega posrednika; njegova stran pove, katerega, in ti pusti to spremeniti.</translation>
+    </message>
+    <message>
+        <source>Add relay</source>
+        <translation>Dodaj posrednika</translation>
+    </message>
+    <message>
+        <source>Contacting %1...</source>
+        <translation>Vzpostavljanje stika z %1...</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Prekliči</translation>
+    </message>
+    <message>
+        <source>Relays are run by volunteers. Try another one.</source>
+        <translation>Posrednike vodijo prostovoljci. Poskusi drugega.</translation>
+    </message>
+    <message>
+        <source>Select a public chatmail relay</source>
+        <translation>Izberi javnega posrednika chatmail</translation>
+    </message>
+    <message>
+        <source>Use a custom chatmail relay</source>
+        <translation>Uporabi lastnega posrednika chatmail</translation>
+    </message>
+    <message>
+        <source>Piirit works only with chatmail relays. These are a particular kind of e-mail server; ordinary e-mail servers are not supported. For more, see &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. A full list of public, free-to-use chatmail relays is at &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</source>
+        <translation>Piirit deluje samo s posredniki chatmail. To je posebna vrsta e-poštnih strežnikov; navadni e-poštni strežniki niso podprti. Več na &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. Celoten seznam javnih, brezplačnih posrednikov chatmail je na &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
     </message>
 </context>
 <context>
@@ -541,13 +584,13 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
         </translation>
     </message>
     <message>
-        <source>Too big to send: %1. This relay takes %2.</source>
-        <extracomment>Shown above the message field when the attached file is bigger than the relay will carry. %1 is the file&apos;s size and %2 the largest the relay takes, each such as &quot;24 MB&quot;.</extracomment>
-        <translation>Prevelika za pošiljanje: %1. Ta rele sprejme %2.</translation>
-    </message>
-    <message>
         <source>Saved to Downloads</source>
         <translation>Shranjeno v Prenose</translation>
+    </message>
+    <message>
+        <source>Too big to send: %1. Attachments go up to %2.</source>
+        <extracomment>Shown above the message field when the attached file is bigger than will be sent. %1 is the file&apos;s size and %2 the largest that goes, each such as &quot;24 MB&quot;.</extracomment>
+        <translation>Preveliko za pošiljanje: %1. Priponke so lahko velike do %2.</translation>
     </message>
 </context>
 <context>
@@ -1016,10 +1059,6 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
 <context>
     <name>ProfilePage</name>
     <message>
-        <source>Not connected</source>
-        <translation>Ni povezave</translation>
-    </message>
-    <message>
         <source>Checking the connection</source>
         <translation>Preverjanje povezave</translation>
     </message>
@@ -1044,10 +1083,6 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
         <translation>Vrstica o vas</translation>
     </message>
     <message>
-        <source>Address</source>
-        <translation>Naslov</translation>
-    </message>
-    <message>
         <source>Send read receipts</source>
         <translation>Pošiljaj potrdila o branju</translation>
     </message>
@@ -1056,47 +1091,51 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
         <translation>Shramba in povezljivost</translation>
     </message>
     <message>
-        <source>%1 on this phone</source>
-        <extracomment>How much room the profile takes on the phone. %1 is a size such as &quot;12.3 MB&quot;.</extracomment>
-        <translation>%1 na tem telefonu</translation>
-    </message>
-    <message>
         <source>Saved</source>
         <translation>Shranjeno</translation>
-    </message>
-    <message>
-        <source>Connected, and up to date</source>
-        <translation>Povezano in posodobljeno</translation>
-    </message>
-    <message>
-        <source>Connected, sending or syncing messages</source>
-        <translation>Povezano, pošiljanje ali sinhronizacija sporočil</translation>
-    </message>
-    <message>
-        <source>Connecting to the relay</source>
-        <translation>Povezovanje s posrednikom</translation>
-    </message>
-    <message>
-        <source>%1 used · %2 left of %3</source>
-        <extracomment>The mailbox on the relay. %1 used, %2 left, %3 the whole, each a size such as &quot;1.4 GB&quot;.</extracomment>
-        <translation>%1 porabljeno · %2 prosto od %3</translation>
     </message>
     <message>
         <source>The relay has not reported its quota yet</source>
         <translation>Posrednik še ni sporočil svoje kvote</translation>
     </message>
     <message>
-        <source>The name on every message you send</source>
-        <translation>Ime na vsakem sporočilu, ki ga pošljete</translation>
-    </message>
-    <message>
         <source>Both ways: with this off you send none and see none.</source>
         <translation>V obe smeri: izklopljeno jih ne pošiljaš in jih ne vidiš.</translation>
     </message>
     <message>
-        <source>Attachments up to %1</source>
-        <extracomment>The biggest attachment the relay will carry. %1 is a size such as &quot;22.3 MB&quot;.</extracomment>
-        <translation>Priponke do %1</translation>
+        <source>Relays</source>
+        <translation>Posredniki</translation>
+    </message>
+    <message>
+        <source>Sends from this relay</source>
+        <translation>Pošilja prek tega posrednika</translation>
+    </message>
+    <message>
+        <source>Removing relay</source>
+        <extracomment>What Silica&apos;s countdown says it is doing, over a relay the reader has asked to remove.</extracomment>
+        <translation>Odstranjevanje posrednika</translation>
+    </message>
+    <message>
+        <source>Send from this relay</source>
+        <translation>Pošiljaj prek tega posrednika</translation>
+    </message>
+    <message>
+        <source>Remove relay</source>
+        <translation>Odstrani posrednika</translation>
+    </message>
+    <message>
+        <source>Add a relay</source>
+        <translation>Dodaj posrednika</translation>
+    </message>
+    <message>
+        <source>%1 of %2 used</source>
+        <extracomment>The mailbox on the relay. %1 used, %2 the whole, each a size such as &quot;1.4 GB&quot;.</extracomment>
+        <translation>Porabljeno %1 od %2</translation>
+    </message>
+    <message>
+        <source>Piirit uses %1 of storage on this phone.</source>
+        <extracomment>How much room the profile takes on the phone. %1 is a size such as &quot;12.3 MB&quot;.</extracomment>
+        <translation>Piirit zaseda %1 prostora na tem telefonu.</translation>
     </message>
 </context>
 <context>

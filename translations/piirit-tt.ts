@@ -39,20 +39,20 @@
         <translation>Исемегез</translation>
     </message>
     <message>
-        <source>Relay</source>
-        <translation>Реле</translation>
+        <source>Select a public chatmail relay</source>
+        <translation>Гомуми chatmail релесын сайларга</translation>
     </message>
     <message>
-        <source>Custom server</source>
-        <translation>Үз серверы</translation>
+        <source>Use a custom chatmail relay</source>
+        <translation>Үз chatmail релегызны кулланырга</translation>
     </message>
     <message>
-        <source>See &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; for the full list.</source>
-        <translation>Тулы исемлек: &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
+        <source>Piirit works only with chatmail relays. These are a particular kind of e-mail server; ordinary e-mail servers are not supported. For more, see &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. A full list of public, free-to-use chatmail relays is at &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</source>
+        <translation>Piirit бары chatmail релелары белән генә эшли. Алар – электрон почта серверларының аерым төре; гадәти электрон почта серверлары кулланылмый. Тулырак: &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. Гомуми, бушлай chatmail релеларының тулы исемлеге &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; адресында.</translation>
     </message>
     <message>
-        <source>The relay gives you an address. The keys are made on this phone.</source>
-        <translation>Реле сезгә адрес бирә. Ачкычлар бу телефонда ясала.</translation>
+        <source>Pick a name and a relay. That&apos;s it! There is nothing else to set up.</source>
+        <translation>Исем һәм реле сайлагыз. Шул гына! Башка бернәрсә көйләргә кирәкми.</translation>
     </message>
 </context>
 <context>
@@ -84,6 +84,49 @@
     <message>
         <source>The other device keeps it. Both get everything new.</source>
         <translation>Икенче җиһаз аны саклый. Икесе дә барлык яңалыкны ала.</translation>
+    </message>
+</context>
+<context>
+    <name>AddRelayPage</name>
+    <message>
+        <source>%1 did not answer within %2 seconds.</source>
+        <translation>%1 %2 секунд эчендә җавап бирмәде.</translation>
+    </message>
+    <message>
+        <source>Add a relay</source>
+        <translation>Реле өстәргә</translation>
+    </message>
+    <message>
+        <source>Another address for this profile, on another relay. The profile sends from one relay at a time; its page says which, and lets you change it.</source>
+        <translation>Бу профиль өчен башка реледә тагын бер адрес. Профиль бер вакытта бер реле аша гына җибәрә; кайсысы икәнен аның бите күрсәтә һәм үзгәртергә мөмкинлек бирә.</translation>
+    </message>
+    <message>
+        <source>Add relay</source>
+        <translation>Реле өстәргә</translation>
+    </message>
+    <message>
+        <source>Contacting %1...</source>
+        <translation>%1 белән элемтә...</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Баш тартырга</translation>
+    </message>
+    <message>
+        <source>Relays are run by volunteers. Try another one.</source>
+        <translation>Релеларны ирекле кешеләр тота. Башкасын сынап карагыз.</translation>
+    </message>
+    <message>
+        <source>Select a public chatmail relay</source>
+        <translation>Гомуми chatmail релесын сайларга</translation>
+    </message>
+    <message>
+        <source>Use a custom chatmail relay</source>
+        <translation>Үз chatmail релегызны кулланырга</translation>
+    </message>
+    <message>
+        <source>Piirit works only with chatmail relays. These are a particular kind of e-mail server; ordinary e-mail servers are not supported. For more, see &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. A full list of public, free-to-use chatmail relays is at &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</source>
+        <translation>Piirit бары chatmail релелары белән генә эшли. Алар – электрон почта серверларының аерым төре; гадәти электрон почта серверлары кулланылмый. Тулырак: &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. Гомуми, бушлай chatmail релеларының тулы исемлеге &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; адресында.</translation>
     </message>
 </context>
 <context>
@@ -535,13 +578,13 @@ Other groups with blocked contacts will still show their messages.</source>
         </translation>
     </message>
     <message>
-        <source>Too big to send: %1. This relay takes %2.</source>
-        <extracomment>Shown above the message field when the attached file is bigger than the relay will carry. %1 is the file&apos;s size and %2 the largest the relay takes, each such as &quot;24 MB&quot;.</extracomment>
-        <translation>Җибәрү өчен артык зур: %1. Бу релей %2 кабул итә.</translation>
-    </message>
-    <message>
         <source>Saved to Downloads</source>
         <translation>Йөкләүләргә сакланды</translation>
+    </message>
+    <message>
+        <source>Too big to send: %1. Attachments go up to %2.</source>
+        <extracomment>Shown above the message field when the attached file is bigger than will be sent. %1 is the file&apos;s size and %2 the largest that goes, each such as &quot;24 MB&quot;.</extracomment>
+        <translation>Җибәрү өчен артык зур: %1. Кушымталар иң күбе %2 булырга мөмкин.</translation>
     </message>
 </context>
 <context>
@@ -998,10 +1041,6 @@ Other groups with blocked contacts will still show their messages.</source>
 <context>
     <name>ProfilePage</name>
     <message>
-        <source>Not connected</source>
-        <translation>Тоташмаган</translation>
-    </message>
-    <message>
         <source>Checking the connection</source>
         <translation>Элемтә тикшерелә</translation>
     </message>
@@ -1026,10 +1065,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Үзегез турында бер юл</translation>
     </message>
     <message>
-        <source>Address</source>
-        <translation>Адрес</translation>
-    </message>
-    <message>
         <source>Send read receipts</source>
         <translation>Уку турында белдерүләр җибәрергә</translation>
     </message>
@@ -1038,47 +1073,51 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Саклагыч һәм элемтә</translation>
     </message>
     <message>
-        <source>%1 on this phone</source>
-        <extracomment>How much room the profile takes on the phone. %1 is a size such as &quot;12.3 MB&quot;.</extracomment>
-        <translation>Бу телефонда %1</translation>
-    </message>
-    <message>
         <source>Saved</source>
         <translation>Сакланды</translation>
-    </message>
-    <message>
-        <source>Connected, and up to date</source>
-        <translation>Тоташкан һәм яңартылган</translation>
-    </message>
-    <message>
-        <source>Connected, sending or syncing messages</source>
-        <translation>Тоташкан, хәбәрләр җибәрә яки синхронлаштыра</translation>
-    </message>
-    <message>
-        <source>Connecting to the relay</source>
-        <translation>Релега тоташу</translation>
-    </message>
-    <message>
-        <source>%1 used · %2 left of %3</source>
-        <extracomment>The mailbox on the relay. %1 used, %2 left, %3 the whole, each a size such as &quot;1.4 GB&quot;.</extracomment>
-        <translation>%1 кулланылган · %3 эчендә %2 калган</translation>
     </message>
     <message>
         <source>The relay has not reported its quota yet</source>
         <translation>Реле үз квотасын әле хәбәр итмәде</translation>
     </message>
     <message>
-        <source>The name on every message you send</source>
-        <translation>Сез җибәргән һәр хәбәрдәге исем</translation>
-    </message>
-    <message>
         <source>Both ways: with this off you send none and see none.</source>
         <translation>Ике якка да: сүндерелгәндә сез бернәрсә җибәрмисез һәм күрмисез.</translation>
     </message>
     <message>
-        <source>Attachments up to %1</source>
-        <extracomment>The biggest attachment the relay will carry. %1 is a size such as &quot;22.3 MB&quot;.</extracomment>
-        <translation>Кушымталар %1 кадәр</translation>
+        <source>Relays</source>
+        <translation>Релелар</translation>
+    </message>
+    <message>
+        <source>Sends from this relay</source>
+        <translation>Бу реле аша җибәрә</translation>
+    </message>
+    <message>
+        <source>Removing relay</source>
+        <extracomment>What Silica&apos;s countdown says it is doing, over a relay the reader has asked to remove.</extracomment>
+        <translation>Реле бетерелә</translation>
+    </message>
+    <message>
+        <source>Send from this relay</source>
+        <translation>Бу реле аша җибәрергә</translation>
+    </message>
+    <message>
+        <source>Remove relay</source>
+        <translation>Релене бетерергә</translation>
+    </message>
+    <message>
+        <source>Add a relay</source>
+        <translation>Реле өстәргә</translation>
+    </message>
+    <message>
+        <source>%1 of %2 used</source>
+        <extracomment>The mailbox on the relay. %1 used, %2 the whole, each a size such as &quot;1.4 GB&quot;.</extracomment>
+        <translation>%2 арасыннан %1 кулланылган</translation>
+    </message>
+    <message>
+        <source>Piirit uses %1 of storage on this phone.</source>
+        <extracomment>How much room the profile takes on the phone. %1 is a size such as &quot;12.3 MB&quot;.</extracomment>
+        <translation>Piirit бу телефонда %1 урын били.</translation>
     </message>
 </context>
 <context>

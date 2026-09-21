@@ -39,20 +39,20 @@
         <translation>Az Ön neve</translation>
     </message>
     <message>
-        <source>Relay</source>
-        <translation>Közvetítő</translation>
+        <source>Select a public chatmail relay</source>
+        <translation>Nyilvános chatmail-közvetítő választása</translation>
     </message>
     <message>
-        <source>Custom server</source>
-        <translation>Saját kiszolgáló</translation>
+        <source>Use a custom chatmail relay</source>
+        <translation>Saját chatmail-közvetítő használata</translation>
     </message>
     <message>
-        <source>See &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; for the full list.</source>
-        <translation>A teljes lista itt található: &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
+        <source>Piirit works only with chatmail relays. These are a particular kind of e-mail server; ordinary e-mail servers are not supported. For more, see &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. A full list of public, free-to-use chatmail relays is at &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</source>
+        <translation>A Piirit csak chatmail-közvetítőkkel működik. Ezek különleges fajta e-mail-kiszolgálók; a közönséges e-mail-kiszolgálók nem támogatottak. Bővebben: &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. A nyilvános, ingyenesen használható chatmail-közvetítők teljes listája: &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
     </message>
     <message>
-        <source>The relay gives you an address. The keys are made on this phone.</source>
-        <translation>A közvetítő ad egy címet. A kulcsok ezen a telefonon készülnek.</translation>
+        <source>Pick a name and a relay. That&apos;s it! There is nothing else to set up.</source>
+        <translation>Válassz egy nevet és egy közvetítőt. Ennyi! Mást nem kell beállítani.</translation>
     </message>
 </context>
 <context>
@@ -84,6 +84,49 @@
     <message>
         <source>The other device keeps it. Both get everything new.</source>
         <translation>A másik eszköz megtartja. Mindkettő megkap minden újat.</translation>
+    </message>
+</context>
+<context>
+    <name>AddRelayPage</name>
+    <message>
+        <source>%1 did not answer within %2 seconds.</source>
+        <translation>%1 nem válaszolt %2 másodpercen belül.</translation>
+    </message>
+    <message>
+        <source>Add a relay</source>
+        <translation>Közvetítő hozzáadása</translation>
+    </message>
+    <message>
+        <source>Another address for this profile, on another relay. The profile sends from one relay at a time; its page says which, and lets you change it.</source>
+        <translation>Még egy cím ehhez a profilhoz, egy másik közvetítőn. A profil egyszerre egy közvetítőről küld; az oldala mutatja, melyikről, és ott át is állíthatod.</translation>
+    </message>
+    <message>
+        <source>Add relay</source>
+        <translation>Közvetítő hozzáadása</translation>
+    </message>
+    <message>
+        <source>Contacting %1...</source>
+        <translation>Kapcsolatfelvétel: %1...</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Mégse</translation>
+    </message>
+    <message>
+        <source>Relays are run by volunteers. Try another one.</source>
+        <translation>A közvetítőket önkéntesek üzemeltetik. Próbálj másikat.</translation>
+    </message>
+    <message>
+        <source>Select a public chatmail relay</source>
+        <translation>Nyilvános chatmail-közvetítő választása</translation>
+    </message>
+    <message>
+        <source>Use a custom chatmail relay</source>
+        <translation>Saját chatmail-közvetítő használata</translation>
+    </message>
+    <message>
+        <source>Piirit works only with chatmail relays. These are a particular kind of e-mail server; ordinary e-mail servers are not supported. For more, see &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. A full list of public, free-to-use chatmail relays is at &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</source>
+        <translation>A Piirit csak chatmail-közvetítőkkel működik. Ezek különleges fajta e-mail-kiszolgálók; a közönséges e-mail-kiszolgálók nem támogatottak. Bővebben: &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. A nyilvános, ingyenesen használható chatmail-közvetítők teljes listája: &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
     </message>
 </context>
 <context>
@@ -531,13 +574,13 @@ Other groups with blocked contacts will still show their messages.</source>
         </translation>
     </message>
     <message>
-        <source>Too big to send: %1. This relay takes %2.</source>
-        <extracomment>Shown above the message field when the attached file is bigger than the relay will carry. %1 is the file&apos;s size and %2 the largest the relay takes, each such as &quot;24 MB&quot;.</extracomment>
-        <translation>Túl nagy a küldéshez: %1. Ez a relé %2 méretet fogad el.</translation>
-    </message>
-    <message>
         <source>Saved to Downloads</source>
         <translation>Mentve a Letöltésekbe</translation>
+    </message>
+    <message>
+        <source>Too big to send: %1. Attachments go up to %2.</source>
+        <extracomment>Shown above the message field when the attached file is bigger than will be sent. %1 is the file&apos;s size and %2 the largest that goes, each such as &quot;24 MB&quot;.</extracomment>
+        <translation>Túl nagy a küldéshez: %1. A mellékletek legfeljebb %2 méretűek lehetnek.</translation>
     </message>
 </context>
 <context>
@@ -994,10 +1037,6 @@ Other groups with blocked contacts will still show their messages.</source>
 <context>
     <name>ProfilePage</name>
     <message>
-        <source>Not connected</source>
-        <translation>Nincs kapcsolat</translation>
-    </message>
-    <message>
         <source>Checking the connection</source>
         <translation>Kapcsolat ellenőrzése folyamatban</translation>
     </message>
@@ -1022,10 +1061,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Egy sor Önről</translation>
     </message>
     <message>
-        <source>Address</source>
-        <translation>Cím</translation>
-    </message>
-    <message>
         <source>Send read receipts</source>
         <translation>Olvasási visszaigazolás küldése</translation>
     </message>
@@ -1034,47 +1069,51 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Tárhely és kapcsolat</translation>
     </message>
     <message>
-        <source>%1 on this phone</source>
-        <extracomment>How much room the profile takes on the phone. %1 is a size such as &quot;12.3 MB&quot;.</extracomment>
-        <translation>%1 ezen a telefonon</translation>
-    </message>
-    <message>
         <source>Saved</source>
         <translation>Mentve</translation>
-    </message>
-    <message>
-        <source>Connected, and up to date</source>
-        <translation>Kapcsolódva, naprakész</translation>
-    </message>
-    <message>
-        <source>Connected, sending or syncing messages</source>
-        <translation>Kapcsolódva, üzenetek küldése vagy szinkronizálása</translation>
-    </message>
-    <message>
-        <source>Connecting to the relay</source>
-        <translation>Kapcsolódás a közvetítőhöz</translation>
-    </message>
-    <message>
-        <source>%1 used · %2 left of %3</source>
-        <extracomment>The mailbox on the relay. %1 used, %2 left, %3 the whole, each a size such as &quot;1.4 GB&quot;.</extracomment>
-        <translation>%1 használt · %2 szabad, összesen %3</translation>
     </message>
     <message>
         <source>The relay has not reported its quota yet</source>
         <translation>A közvetítő még nem jelentette a kvótáját</translation>
     </message>
     <message>
-        <source>The name on every message you send</source>
-        <translation>A név minden elküldött üzenetén</translation>
-    </message>
-    <message>
         <source>Both ways: with this off you send none and see none.</source>
         <translation>Mindkét irányban: kikapcsolva egyet sem küldesz és egyet sem látsz.</translation>
     </message>
     <message>
-        <source>Attachments up to %1</source>
-        <extracomment>The biggest attachment the relay will carry. %1 is a size such as &quot;22.3 MB&quot;.</extracomment>
-        <translation>Mellékletek legfeljebb %1</translation>
+        <source>Relays</source>
+        <translation>Közvetítők</translation>
+    </message>
+    <message>
+        <source>Sends from this relay</source>
+        <translation>Erről a közvetítőről küld</translation>
+    </message>
+    <message>
+        <source>Removing relay</source>
+        <extracomment>What Silica&apos;s countdown says it is doing, over a relay the reader has asked to remove.</extracomment>
+        <translation>Közvetítő eltávolítása folyamatban</translation>
+    </message>
+    <message>
+        <source>Send from this relay</source>
+        <translation>Küldés erről a közvetítőről</translation>
+    </message>
+    <message>
+        <source>Remove relay</source>
+        <translation>Közvetítő eltávolítása</translation>
+    </message>
+    <message>
+        <source>Add a relay</source>
+        <translation>Közvetítő hozzáadása</translation>
+    </message>
+    <message>
+        <source>%1 of %2 used</source>
+        <extracomment>The mailbox on the relay. %1 used, %2 the whole, each a size such as &quot;1.4 GB&quot;.</extracomment>
+        <translation>%1 / %2 foglalt</translation>
+    </message>
+    <message>
+        <source>Piirit uses %1 of storage on this phone.</source>
+        <extracomment>How much room the profile takes on the phone. %1 is a size such as &quot;12.3 MB&quot;.</extracomment>
+        <translation>A Piirit %1 tárhelyet foglal ezen a telefonon.</translation>
     </message>
 </context>
 <context>

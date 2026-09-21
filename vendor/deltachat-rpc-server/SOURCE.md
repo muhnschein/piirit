@@ -1,13 +1,13 @@
 # `deltachat-rpc-server` provenance
 
-The `deltachat-rpc-server` binaries bundled by Postivene's RPM (installed
-to `/usr/libexec/harbour-postivene/deltachat-rpc-server`) are **unmodified upstream
-builds**:
+The `deltachat-rpc-server` binaries bundled by Piirit's RPM (installed to
+`/usr/libexec/harbour-piirit/deltachat-rpc-server`) are **unmodified
+upstream builds**:
 
 - **Project:** Delta Chat core (chatmail core library)
 - **Source code:** https://github.com/chatmail/core
 - **Version / tag:** `v2.60.0`
-- **License:** MPL-2.0. Postivene itself is GPL-3.0-or-later; the two sit
+- **License:** MPL-2.0. Piirit itself is GPL-3.0-or-later; the two sit
   side by side in the RPM as separate works, and this file is installed
   with the package to satisfy MPL-2.0 §3.2(a)'s requirement that recipients
   of the Executable Form be told how to obtain the corresponding Source
@@ -35,7 +35,7 @@ vendor/deltachat-rpc-server/
 
 Directory names are Sailfish's architecture names (`%{_target_cpu}` in
 rpm's terms -- not `%{_arch}`, which canonicalises every armv7h* to
-`arm`), which is what `rpm/harbour-postivene.spec` keys its `%install`
+`arm`), which is what `rpm/harbour-piirit.spec` keys its `%install`
 step on. Binaries are not
 committed to git (see `.gitignore`); run the fetch script to populate.
 

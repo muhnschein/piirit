@@ -39,20 +39,20 @@
         <translation>Tu nombre</translation>
     </message>
     <message>
-        <source>Relay</source>
-        <translation>Relé</translation>
+        <source>Select a public chatmail relay</source>
+        <translation>Seleccionar un relé chatmail público</translation>
     </message>
     <message>
-        <source>Custom server</source>
-        <translation>Servidor personalizado</translation>
+        <source>Use a custom chatmail relay</source>
+        <translation>Usar un relé chatmail propio</translation>
     </message>
     <message>
-        <source>See &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; for the full list.</source>
-        <translation>La lista completa está en &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
+        <source>Piirit works only with chatmail relays. These are a particular kind of e-mail server; ordinary e-mail servers are not supported. For more, see &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. A full list of public, free-to-use chatmail relays is at &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</source>
+        <translation>Piirit solo funciona con relés chatmail. Son un tipo particular de servidor de correo; los servidores de correo corrientes no son compatibles. Más información en &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. La lista completa de relés chatmail públicos y gratuitos está en &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
     </message>
     <message>
-        <source>The relay gives you an address. The keys are made on this phone.</source>
-        <translation>El relé te da una dirección. Las claves se crean en este teléfono.</translation>
+        <source>Pick a name and a relay. That&apos;s it! There is nothing else to set up.</source>
+        <translation>Elige un nombre y un relé. ¡Eso es todo! No hay nada más que configurar.</translation>
     </message>
 </context>
 <context>
@@ -84,6 +84,49 @@
     <message>
         <source>The other device keeps it. Both get everything new.</source>
         <translation>El otro dispositivo lo conserva. Los dos reciben todo lo nuevo.</translation>
+    </message>
+</context>
+<context>
+    <name>AddRelayPage</name>
+    <message>
+        <source>%1 did not answer within %2 seconds.</source>
+        <translation>%1 no respondió en %2 segundos.</translation>
+    </message>
+    <message>
+        <source>Add a relay</source>
+        <translation>Añadir un relé</translation>
+    </message>
+    <message>
+        <source>Another address for this profile, on another relay. The profile sends from one relay at a time; its page says which, and lets you change it.</source>
+        <translation>Otra dirección para este perfil, en otro relé. El perfil envía desde un solo relé a la vez; su página dice cuál y te deja cambiarlo.</translation>
+    </message>
+    <message>
+        <source>Add relay</source>
+        <translation>Añadir relé</translation>
+    </message>
+    <message>
+        <source>Contacting %1...</source>
+        <translation>Contactando con %1...</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Cancelar</translation>
+    </message>
+    <message>
+        <source>Relays are run by volunteers. Try another one.</source>
+        <translation>Los relés los llevan voluntarios. Prueba con otro.</translation>
+    </message>
+    <message>
+        <source>Select a public chatmail relay</source>
+        <translation>Seleccionar un relé chatmail público</translation>
+    </message>
+    <message>
+        <source>Use a custom chatmail relay</source>
+        <translation>Usar un relé chatmail propio</translation>
+    </message>
+    <message>
+        <source>Piirit works only with chatmail relays. These are a particular kind of e-mail server; ordinary e-mail servers are not supported. For more, see &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. A full list of public, free-to-use chatmail relays is at &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</source>
+        <translation>Piirit solo funciona con relés chatmail. Son un tipo particular de servidor de correo; los servidores de correo corrientes no son compatibles. Más información en &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. La lista completa de relés chatmail públicos y gratuitos está en &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
     </message>
 </context>
 <context>
@@ -533,13 +576,13 @@ Other groups with blocked contacts will still show their messages.</source>
         </translation>
     </message>
     <message>
-        <source>Too big to send: %1. This relay takes %2.</source>
-        <extracomment>Shown above the message field when the attached file is bigger than the relay will carry. %1 is the file&apos;s size and %2 the largest the relay takes, each such as &quot;24 MB&quot;.</extracomment>
-        <translation>Demasiado grande para enviar: %1. Este relé acepta %2.</translation>
-    </message>
-    <message>
         <source>Saved to Downloads</source>
         <translation>Guardado en Descargas</translation>
+    </message>
+    <message>
+        <source>Too big to send: %1. Attachments go up to %2.</source>
+        <extracomment>Shown above the message field when the attached file is bigger than will be sent. %1 is the file&apos;s size and %2 the largest that goes, each such as &quot;24 MB&quot;.</extracomment>
+        <translation>Demasiado grande para enviar: %1. Los adjuntos pueden ser de hasta %2.</translation>
     </message>
 </context>
 <context>
@@ -1000,10 +1043,6 @@ Other groups with blocked contacts will still show their messages.</source>
 <context>
     <name>ProfilePage</name>
     <message>
-        <source>Not connected</source>
-        <translation>Sin conexión</translation>
-    </message>
-    <message>
         <source>Checking the connection</source>
         <translation>Comprobando la conexión</translation>
     </message>
@@ -1028,10 +1067,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Una línea sobre ti</translation>
     </message>
     <message>
-        <source>Address</source>
-        <translation>Dirección</translation>
-    </message>
-    <message>
         <source>Send read receipts</source>
         <translation>Enviar confirmaciones de lectura</translation>
     </message>
@@ -1040,47 +1075,51 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Almacenamiento y conectividad</translation>
     </message>
     <message>
-        <source>%1 on this phone</source>
-        <extracomment>How much room the profile takes on the phone. %1 is a size such as &quot;12.3 MB&quot;.</extracomment>
-        <translation>%1 en este teléfono</translation>
-    </message>
-    <message>
         <source>Saved</source>
         <translation>Guardado</translation>
-    </message>
-    <message>
-        <source>Connected, and up to date</source>
-        <translation>Conectado y al día</translation>
-    </message>
-    <message>
-        <source>Connected, sending or syncing messages</source>
-        <translation>Conectado, enviando o sincronizando mensajes</translation>
-    </message>
-    <message>
-        <source>Connecting to the relay</source>
-        <translation>Conectando con el relé</translation>
-    </message>
-    <message>
-        <source>%1 used · %2 left of %3</source>
-        <extracomment>The mailbox on the relay. %1 used, %2 left, %3 the whole, each a size such as &quot;1.4 GB&quot;.</extracomment>
-        <translation>%1 usados · %2 libres de %3</translation>
     </message>
     <message>
         <source>The relay has not reported its quota yet</source>
         <translation>El relé aún no ha informado de su cuota</translation>
     </message>
     <message>
-        <source>The name on every message you send</source>
-        <translation>El nombre en cada mensaje que envías</translation>
-    </message>
-    <message>
         <source>Both ways: with this off you send none and see none.</source>
         <translation>En ambos sentidos: con esto apagado no envías ninguna ni ves ninguna.</translation>
     </message>
     <message>
-        <source>Attachments up to %1</source>
-        <extracomment>The biggest attachment the relay will carry. %1 is a size such as &quot;22.3 MB&quot;.</extracomment>
-        <translation>Adjuntos de hasta %1</translation>
+        <source>Relays</source>
+        <translation>Relés</translation>
+    </message>
+    <message>
+        <source>Sends from this relay</source>
+        <translation>Envía desde este relé</translation>
+    </message>
+    <message>
+        <source>Removing relay</source>
+        <extracomment>What Silica&apos;s countdown says it is doing, over a relay the reader has asked to remove.</extracomment>
+        <translation>Quitando relé</translation>
+    </message>
+    <message>
+        <source>Send from this relay</source>
+        <translation>Enviar desde este relé</translation>
+    </message>
+    <message>
+        <source>Remove relay</source>
+        <translation>Quitar relé</translation>
+    </message>
+    <message>
+        <source>Add a relay</source>
+        <translation>Añadir un relé</translation>
+    </message>
+    <message>
+        <source>%1 of %2 used</source>
+        <extracomment>The mailbox on the relay. %1 used, %2 the whole, each a size such as &quot;1.4 GB&quot;.</extracomment>
+        <translation>%1 de %2 usados</translation>
+    </message>
+    <message>
+        <source>Piirit uses %1 of storage on this phone.</source>
+        <extracomment>How much room the profile takes on the phone. %1 is a size such as &quot;12.3 MB&quot;.</extracomment>
+        <translation>Piirit usa %1 de almacenamiento en este teléfono.</translation>
     </message>
 </context>
 <context>

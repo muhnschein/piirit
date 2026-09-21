@@ -45,9 +45,10 @@ pub struct Profile {
     /// Whether the other end is told when a message has been read.
     /// `mdns_enabled` to the core, which defaults it on.
     pub read_receipts: qt_property!(bool; NOTIFY loaded_changed),
-    /// The largest attachment the core recommends for this profile's
-    /// relay, in bytes; 0 until read. Through f64 because QML has no
-    /// 64-bit integer. See `media.rs`.
+    /// The largest attachment the core recommends, in bytes; 0 until
+    /// read. The core's own constant, the same whichever relay the
+    /// profile sends from. Through f64 because QML has no 64-bit
+    /// integer. See `media.rs`.
     pub attachment_limit_bytes: qt_property!(f64; NOTIFY loaded_changed),
 
     /// The core's `get_connectivity` band: 0 until asked, then 1000 not
@@ -194,9 +195,19 @@ impl Profile {
                     .call("get_account_file_size", (account_id,))
                     .await
                     .unwrap_or(0);
+                // Which relay's mailbox to read off the report: a profile
+                // can have more than one transport, and the report covers
+                // them all. Asked here rather than taken from `address`,
+                // which the load fills and may not have yet.
+                let address: String = rpc
+                    .call::<_, Option<String>>("get_config", (account_id, "configured_addr"))
+                    .await
+                    .ok()
+                    .flatten()
+                    .unwrap_or_default();
                 Ok::<_, String>((
                     connectivity,
-                    quota_from_report(&report),
+                    quota_from_report(&report, &address),
                     // Through f64 because QML has no 64-bit integer. Exact
                     // to 2^53 bytes, which no phone holds.
                     #[allow(clippy::cast_precision_loss)]

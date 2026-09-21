@@ -39,20 +39,20 @@
         <translation>તમારું નામ</translation>
     </message>
     <message>
-        <source>Relay</source>
-        <translation>રિલે</translation>
+        <source>Select a public chatmail relay</source>
+        <translation>જાહેર chatmail રિલે પસંદ કરો</translation>
     </message>
     <message>
-        <source>Custom server</source>
-        <translation>પોતાનું સર્વર</translation>
+        <source>Use a custom chatmail relay</source>
+        <translation>પોતાનો chatmail રિલે વાપરો</translation>
     </message>
     <message>
-        <source>See &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; for the full list.</source>
-        <translation>સંપૂર્ણ સૂચિ &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; પર જુઓ.</translation>
+        <source>Piirit works only with chatmail relays. These are a particular kind of e-mail server; ordinary e-mail servers are not supported. For more, see &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. A full list of public, free-to-use chatmail relays is at &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</source>
+        <translation>Piirit ફક્ત chatmail રિલે સાથે જ કામ કરે છે. આ ખાસ પ્રકારના ઈ-મેઇલ સર્વર છે; સામાન્ય ઈ-મેઇલ સર્વર સપોર્ટેડ નથી. વધુ માહિતી માટે જુઓ &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. જાહેર, મફત chatmail રિલેની પૂરી યાદી &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; પર છે.</translation>
     </message>
     <message>
-        <source>The relay gives you an address. The keys are made on this phone.</source>
-        <translation>રિલે તમને સરનામું આપે છે. ચાવીઓ આ જ ફોન પર બને છે.</translation>
+        <source>Pick a name and a relay. That&apos;s it! There is nothing else to set up.</source>
+        <translation>એક નામ અને એક રિલે પસંદ કરો. બસ! બીજું કંઈ સેટ કરવાનું નથી.</translation>
     </message>
 </context>
 <context>
@@ -84,6 +84,49 @@
     <message>
         <source>The other device keeps it. Both get everything new.</source>
         <translation>બીજું ઉપકરણ એને રાખે છે. બંનેને બધું નવું મળે છે.</translation>
+    </message>
+</context>
+<context>
+    <name>AddRelayPage</name>
+    <message>
+        <source>%1 did not answer within %2 seconds.</source>
+        <translation>%1 એ %2 સેકન્ડમાં જવાબ આપ્યો નહીં.</translation>
+    </message>
+    <message>
+        <source>Add a relay</source>
+        <translation>રિલે ઉમેરો</translation>
+    </message>
+    <message>
+        <source>Another address for this profile, on another relay. The profile sends from one relay at a time; its page says which, and lets you change it.</source>
+        <translation>આ પ્રોફાઇલ માટે બીજા રિલે પર બીજું સરનામું. પ્રોફાઇલ એક સમયે એક જ રિલે પરથી મોકલે છે; તેનું પાનું કયો છે તે બતાવે છે અને બદલવા દે છે.</translation>
+    </message>
+    <message>
+        <source>Add relay</source>
+        <translation>રિલે ઉમેરો</translation>
+    </message>
+    <message>
+        <source>Contacting %1...</source>
+        <translation>%1 નો સંપર્ક કરવામાં આવે છે...</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>રદ કરો</translation>
+    </message>
+    <message>
+        <source>Relays are run by volunteers. Try another one.</source>
+        <translation>રિલે સ્વયંસેવકો ચલાવે છે. બીજું અજમાવો.</translation>
+    </message>
+    <message>
+        <source>Select a public chatmail relay</source>
+        <translation>જાહેર chatmail રિલે પસંદ કરો</translation>
+    </message>
+    <message>
+        <source>Use a custom chatmail relay</source>
+        <translation>પોતાનો chatmail રિલે વાપરો</translation>
+    </message>
+    <message>
+        <source>Piirit works only with chatmail relays. These are a particular kind of e-mail server; ordinary e-mail servers are not supported. For more, see &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. A full list of public, free-to-use chatmail relays is at &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</source>
+        <translation>Piirit ફક્ત chatmail રિલે સાથે જ કામ કરે છે. આ ખાસ પ્રકારના ઈ-મેઇલ સર્વર છે; સામાન્ય ઈ-મેઇલ સર્વર સપોર્ટેડ નથી. વધુ માહિતી માટે જુઓ &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. જાહેર, મફત chatmail રિલેની પૂરી યાદી &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; પર છે.</translation>
     </message>
 </context>
 <context>
@@ -537,13 +580,13 @@ Other groups with blocked contacts will still show their messages.</source>
         </translation>
     </message>
     <message>
-        <source>Too big to send: %1. This relay takes %2.</source>
-        <extracomment>Shown above the message field when the attached file is bigger than the relay will carry. %1 is the file&apos;s size and %2 the largest the relay takes, each such as &quot;24 MB&quot;.</extracomment>
-        <translation>મોકલવા માટે ખૂબ મોટું: %1. આ રિલે %2 સુધી લે છે.</translation>
-    </message>
-    <message>
         <source>Saved to Downloads</source>
         <translation>ડાઉનલોડ્સમાં સાચવ્યું</translation>
+    </message>
+    <message>
+        <source>Too big to send: %1. Attachments go up to %2.</source>
+        <extracomment>Shown above the message field when the attached file is bigger than will be sent. %1 is the file&apos;s size and %2 the largest that goes, each such as &quot;24 MB&quot;.</extracomment>
+        <translation>મોકલવા માટે ઘણું મોટું: %1. જોડાણો વધુમાં વધુ %2 સુધીના હોઈ શકે.</translation>
     </message>
 </context>
 <context>
@@ -1004,10 +1047,6 @@ Other groups with blocked contacts will still show their messages.</source>
 <context>
     <name>ProfilePage</name>
     <message>
-        <source>Not connected</source>
-        <translation>જોડાયેલ નથી</translation>
-    </message>
-    <message>
         <source>Checking the connection</source>
         <translation>જોડાણ તપાસાઈ રહ્યું છે</translation>
     </message>
@@ -1032,10 +1071,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>તમારા વિશે એક લીટી</translation>
     </message>
     <message>
-        <source>Address</source>
-        <translation>સરનામું</translation>
-    </message>
-    <message>
         <source>Send read receipts</source>
         <translation>વાંચ્યાની પહોંચ મોકલો</translation>
     </message>
@@ -1044,47 +1079,51 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>સ્ટોરેજ અને કનેક્ટિવિટી</translation>
     </message>
     <message>
-        <source>%1 on this phone</source>
-        <extracomment>How much room the profile takes on the phone. %1 is a size such as &quot;12.3 MB&quot;.</extracomment>
-        <translation>આ ફોન પર %1</translation>
-    </message>
-    <message>
         <source>Saved</source>
         <translation>સાચવ્યું</translation>
-    </message>
-    <message>
-        <source>Connected, and up to date</source>
-        <translation>જોડાયેલ અને અદ્યતન</translation>
-    </message>
-    <message>
-        <source>Connected, sending or syncing messages</source>
-        <translation>જોડાયેલ, સંદેશા મોકલી કે સમન્વયિત કરી રહ્યું છે</translation>
-    </message>
-    <message>
-        <source>Connecting to the relay</source>
-        <translation>રિલે સાથે જોડાઈ રહ્યું છે</translation>
-    </message>
-    <message>
-        <source>%1 used · %2 left of %3</source>
-        <extracomment>The mailbox on the relay. %1 used, %2 left, %3 the whole, each a size such as &quot;1.4 GB&quot;.</extracomment>
-        <translation>%3માંથી %1 વપરાયેલ · %2 બાકી</translation>
     </message>
     <message>
         <source>The relay has not reported its quota yet</source>
         <translation>રિલેએ હજી તેનો ક્વોટા જણાવ્યો નથી</translation>
     </message>
     <message>
-        <source>The name on every message you send</source>
-        <translation>તમે મોકલો છો તે દરેક સંદેશા પરનું નામ</translation>
-    </message>
-    <message>
         <source>Both ways: with this off you send none and see none.</source>
         <translation>બંને બાજુ: બંધ હોય તો તમે એકેય મોકલતા નથી અને એકેય જોતા નથી.</translation>
     </message>
     <message>
-        <source>Attachments up to %1</source>
-        <extracomment>The biggest attachment the relay will carry. %1 is a size such as &quot;22.3 MB&quot;.</extracomment>
-        <translation>%1 સુધીનાં જોડાણો</translation>
+        <source>Relays</source>
+        <translation>રિલે</translation>
+    </message>
+    <message>
+        <source>Sends from this relay</source>
+        <translation>આ રિલે પરથી મોકલે છે</translation>
+    </message>
+    <message>
+        <source>Removing relay</source>
+        <extracomment>What Silica&apos;s countdown says it is doing, over a relay the reader has asked to remove.</extracomment>
+        <translation>રિલે દૂર કરવામાં આવે છે</translation>
+    </message>
+    <message>
+        <source>Send from this relay</source>
+        <translation>આ રિલે પરથી મોકલો</translation>
+    </message>
+    <message>
+        <source>Remove relay</source>
+        <translation>રિલે દૂર કરો</translation>
+    </message>
+    <message>
+        <source>Add a relay</source>
+        <translation>રિલે ઉમેરો</translation>
+    </message>
+    <message>
+        <source>%1 of %2 used</source>
+        <extracomment>The mailbox on the relay. %1 used, %2 the whole, each a size such as &quot;1.4 GB&quot;.</extracomment>
+        <translation>%2 માંથી %1 વપરાયું</translation>
+    </message>
+    <message>
+        <source>Piirit uses %1 of storage on this phone.</source>
+        <extracomment>How much room the profile takes on the phone. %1 is a size such as &quot;12.3 MB&quot;.</extracomment>
+        <translation>Piirit આ ફોન પર %1 સ્ટોરેજ વાપરે છે.</translation>
     </message>
 </context>
 <context>

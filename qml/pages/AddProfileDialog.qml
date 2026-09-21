@@ -1,5 +1,6 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
+import "../js/Relays.js" as Relays
 
 /*
  * Add a profile: a name, and the chatmail relay it lives on. The relay
@@ -8,12 +9,18 @@ import Sailfish.Silica 1.0
  *
  * A dialog rather than a form with a button, the way Silica asks a
  * question: what was typed is on this page, and accepting it goes to
- * ProfileSetupPage, which does the work and shows the progress. The relay
- * list and the shape of the page follow parla's account dialog
- * (github.com/trufae/parla), whose curated list of public relays is
- * copied here; one of them is picked at random each time. Anyone can run
- * a relay, so a custom one can be typed, and takes over from the list
- * while it is.
+ * ProfileSetupPage, which does the work and shows the progress. The shape
+ * of the page follows parla's account dialog (github.com/trufae/parla).
+ * Anyone can run a relay, so a custom one can be typed, and takes over
+ * from the list while it is. The list itself is shared with the page
+ * that adds a relay to a profile (Relays.js).
+ *
+ * Nothing is picked to begin with, and the dialog cannot be accepted
+ * until something is: a relay is where someone's address and their
+ * mailbox live for as long as they keep the profile, so it is a choice
+ * to make rather than one to be handed. An earlier version opened on a
+ * relay of the list at random, which is a choice made for the reader by
+ * a dialog they have not read yet.
  */
 Dialog {
     id: dialog
@@ -24,39 +31,15 @@ Dialog {
                             : (relayCombo.currentIndex >= 0 && relayCombo.currentIndex < relays.length
                                ? relays[relayCombo.currentIndex].domain : "")
     /// What the core is handed: `dcaccount:` and a relay, which it takes
-    /// with or without the `https://.../new` around it.
-    property string providerQr: "dcaccount:" + domain
+    /// with or without the `https://.../new` around it. Empty until a
+    /// relay is chosen: there is nothing to hand over before that.
+    property string providerQr: domain.length > 0 ? "dcaccount:" + domain : ""
 
-    // From chatmail.at/relays, as parla curates it.
-    readonly property var relays: [
-        { domain: "nine.testrun.org", location: "Germany" },
-        { domain: "mehl.cloud", location: "German" },
-        { domain: "mailchat.pl", location: "Poland" },
-        { domain: "chatmail.woodpeckersnest.space", location: "Italy" },
-        { domain: "chatmail.culturanerd.it", location: "Italy" },
-        { domain: "chat.adminforge.de", location: "Falkenstein, Germany" },
-        { domain: "chika.aangat.lahat.computer", location: "Santa Clara, USA" },
-        { domain: "tarpit.fun", location: "Nuremberg, Germany" },
-        { domain: "d.gaufr.es", location: "Roubaix, France" },
-        { domain: "chtml.ca", location: "Quebec, Canada" },
-        { domain: "chatmail.au", location: "Melbourne, Australia" },
-        { domain: "e2ee.wang", location: "Johannesburg, South Africa" },
-        { domain: "chat.privittytech.com", location: "Bangalore, India" },
-        { domain: "e2ee.im", location: "Orastie, Romania" },
-        { domain: "chatmail.email", location: "Warsaw, Poland" },
-        { domain: "danneskjold.de", location: "Helsinki, Finland" },
-        { domain: "chat.in-the.eu", location: "Falkenstein, Germany" },
-        { domain: "chat.nuvon.app", location: "Prague, Czechia" },
-        { domain: "nibblehole.com", location: "Zug, Switzerland" },
-        { domain: "chat.zashm.org", location: "Lviv, Ukraine" },
-        { domain: "chat.sus.fr", location: "Iceland/Japan/Kenya/South Africa" },
-        { domain: "delta.thelab.uno", location: "Gravelines, France" },
-        { domain: "chat.vim.wtf", location: "Frankfurt, Germany" },
-        { domain: "uninterest.ing", location: "Elk Grove Village, USA" },
-        { domain: "sweetfern.net", location: "Ashburn, USA" },
-        { domain: "delta.disobey.net", location: "Roon, Netherlands" }
-    ]
+    // The public relays, as chatmail.at/relays lists them (Relays.js).
+    readonly property var relays: Relays.list
 
+    // A name, and a relay picked or typed: neither is guessed for the
+    // reader.
     canAccept: nameField.text.trim().length > 0 && domain.length > 0
 
     // The setup page does the work, with what was typed here. Silica
@@ -67,11 +50,6 @@ Dialog {
         dialog.acceptDestinationInstance.displayName = nameField.text.trim()
         dialog.acceptDestinationInstance.providerQr = dialog.providerQr
     }
-
-    // Any relay, each time: no one of them is the default, so the
-    // profiles made here spread over the list rather than all landing on
-    // its first entry.
-    Component.onCompleted: relayCombo.currentIndex = Math.floor(Math.random() * relays.length)
 
     SilicaFlickable {
         anchors.fill: parent
@@ -94,7 +72,7 @@ Dialog {
                 wrapMode: Text.Wrap
                 font.pixelSize: Theme.fontSizeSmall
                 color: Theme.secondaryHighlightColor
-                text: qsTr("The relay gives you an address. The keys are made on this phone.")
+                text: qsTr("Pick a name and a relay. That's it! There is nothing else to set up.")
             }
 
             TextField {
@@ -109,8 +87,15 @@ Dialog {
                 id: relayCombo
                 objectName: "relayCombo"
                 width: parent.width
-                label: qsTr("Relay")
-                currentIndex: 0
+                // Said as the action it is: with nothing picked, a bare
+                // "Relay" above an empty value read as a line of text
+                // rather than as a list to open.
+                label: qsTr("Select a public chatmail relay")
+                // Nothing to begin with: the reader picks. The label
+                // above the empty value says what is being asked for,
+                // and Create stays dim until it is answered, so the
+                // dialog asks rather than answers for them.
+                currentIndex: -1
                 // A typed server is the one that counts.
                 enabled: customField.text.trim().length === 0
 
@@ -120,7 +105,7 @@ Dialog {
 
                         MenuItem {
                             objectName: "relayOption" + index
-                            text: modelData.domain + " (" + modelData.location + ")"
+                            text: Relays.label(modelData)
                         }
                     }
                 }
@@ -130,7 +115,7 @@ Dialog {
                 id: customField
                 objectName: "customField"
                 width: parent.width
-                label: qsTr("Custom server")
+                label: qsTr("Use a custom chatmail relay")
                 placeholderText: label
                 inputMethodHints: Qt.ImhNoAutoUppercase | Qt.ImhNoPredictiveText | Qt.ImhUrlCharactersOnly
             }
@@ -144,7 +129,10 @@ Dialog {
                 color: Theme.secondaryColor
                 linkColor: Theme.highlightColor
                 textFormat: Text.StyledText
-                text: qsTr("See <a href=\"https://chatmail.at/relays\">chatmail.at/relays</a> for the full list.")
+                // What a relay is, for a reader who has an e-mail
+                // account and wonders whether it will do: it will not,
+                // and the page that explains why is the one to point at.
+                text: qsTr("Piirit works only with chatmail relays. These are a particular kind of e-mail server; ordinary e-mail servers are not supported. For more, see <a href=\"https://chatmail.at\">chatmail.at</a>. A full list of public, free-to-use chatmail relays is at <a href=\"https://chatmail.at/relays\">chatmail.at/relays</a>.")
                 onLinkActivated: Qt.openUrlExternally(link)
             }
         }

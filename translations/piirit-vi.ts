@@ -39,20 +39,20 @@
         <translation>Tên của bạn</translation>
     </message>
     <message>
-        <source>Relay</source>
-        <translation>Máy chuyển tiếp</translation>
+        <source>Select a public chatmail relay</source>
+        <translation>Chọn máy chuyển tiếp chatmail công cộng</translation>
     </message>
     <message>
-        <source>Custom server</source>
-        <translation>Máy chủ tùy chỉnh</translation>
+        <source>Use a custom chatmail relay</source>
+        <translation>Dùng máy chuyển tiếp chatmail riêng</translation>
     </message>
     <message>
-        <source>See &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; for the full list.</source>
-        <translation>Xem danh sách đầy đủ tại &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
+        <source>Piirit works only with chatmail relays. These are a particular kind of e-mail server; ordinary e-mail servers are not supported. For more, see &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. A full list of public, free-to-use chatmail relays is at &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</source>
+        <translation>Piirit chỉ hoạt động với các máy chuyển tiếp chatmail. Đây là một loại máy chủ e-mail đặc biệt; máy chủ e-mail thông thường không được hỗ trợ. Xem thêm tại &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. Danh sách đầy đủ các máy chuyển tiếp chatmail công cộng, miễn phí có tại &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
     </message>
     <message>
-        <source>The relay gives you an address. The keys are made on this phone.</source>
-        <translation>Máy chuyển tiếp cấp cho bạn một địa chỉ. Khoá được tạo trên điện thoại này.</translation>
+        <source>Pick a name and a relay. That&apos;s it! There is nothing else to set up.</source>
+        <translation>Chọn một tên và một máy chuyển tiếp. Thế là xong! Không cần thiết lập gì thêm.</translation>
     </message>
 </context>
 <context>
@@ -84,6 +84,49 @@
     <message>
         <source>The other device keeps it. Both get everything new.</source>
         <translation>Thiết bị kia vẫn giữ. Cả hai đều nhận mọi thứ mới.</translation>
+    </message>
+</context>
+<context>
+    <name>AddRelayPage</name>
+    <message>
+        <source>%1 did not answer within %2 seconds.</source>
+        <translation>%1 không trả lời trong %2 giây.</translation>
+    </message>
+    <message>
+        <source>Add a relay</source>
+        <translation>Thêm máy chuyển tiếp</translation>
+    </message>
+    <message>
+        <source>Another address for this profile, on another relay. The profile sends from one relay at a time; its page says which, and lets you change it.</source>
+        <translation>Thêm một địa chỉ cho hồ sơ này, trên một máy chuyển tiếp khác. Hồ sơ chỉ gửi từ một máy chuyển tiếp tại một thời điểm; trang của nó cho biết máy nào và cho phép bạn đổi.</translation>
+    </message>
+    <message>
+        <source>Add relay</source>
+        <translation>Thêm máy chuyển tiếp</translation>
+    </message>
+    <message>
+        <source>Contacting %1...</source>
+        <translation>Đang liên hệ %1...</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Hủy</translation>
+    </message>
+    <message>
+        <source>Relays are run by volunteers. Try another one.</source>
+        <translation>Máy chuyển tiếp do tình nguyện viên vận hành. Thử máy khác.</translation>
+    </message>
+    <message>
+        <source>Select a public chatmail relay</source>
+        <translation>Chọn máy chuyển tiếp chatmail công cộng</translation>
+    </message>
+    <message>
+        <source>Use a custom chatmail relay</source>
+        <translation>Dùng máy chuyển tiếp chatmail riêng</translation>
+    </message>
+    <message>
+        <source>Piirit works only with chatmail relays. These are a particular kind of e-mail server; ordinary e-mail servers are not supported. For more, see &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. A full list of public, free-to-use chatmail relays is at &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</source>
+        <translation>Piirit chỉ hoạt động với các máy chuyển tiếp chatmail. Đây là một loại máy chủ e-mail đặc biệt; máy chủ e-mail thông thường không được hỗ trợ. Xem thêm tại &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. Danh sách đầy đủ các máy chuyển tiếp chatmail công cộng, miễn phí có tại &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
     </message>
 </context>
 <context>
@@ -531,13 +574,13 @@ Other groups with blocked contacts will still show their messages.</source>
         </translation>
     </message>
     <message>
-        <source>Too big to send: %1. This relay takes %2.</source>
-        <extracomment>Shown above the message field when the attached file is bigger than the relay will carry. %1 is the file&apos;s size and %2 the largest the relay takes, each such as &quot;24 MB&quot;.</extracomment>
-        <translation>Quá lớn để gửi: %1. Máy chủ chuyển tiếp này nhận %2.</translation>
-    </message>
-    <message>
         <source>Saved to Downloads</source>
         <translation>Đã lưu vào Tải xuống</translation>
+    </message>
+    <message>
+        <source>Too big to send: %1. Attachments go up to %2.</source>
+        <extracomment>Shown above the message field when the attached file is bigger than will be sent. %1 is the file&apos;s size and %2 the largest that goes, each such as &quot;24 MB&quot;.</extracomment>
+        <translation>Quá lớn để gửi: %1. Tệp đính kèm tối đa %2.</translation>
     </message>
 </context>
 <context>
@@ -994,10 +1037,6 @@ Other groups with blocked contacts will still show their messages.</source>
 <context>
     <name>ProfilePage</name>
     <message>
-        <source>Not connected</source>
-        <translation>Chưa kết nối</translation>
-    </message>
-    <message>
         <source>Checking the connection</source>
         <translation>Đang kiểm tra kết nối</translation>
     </message>
@@ -1022,10 +1061,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Một dòng về bạn</translation>
     </message>
     <message>
-        <source>Address</source>
-        <translation>Địa chỉ</translation>
-    </message>
-    <message>
         <source>Send read receipts</source>
         <translation>Gửi xác nhận đã đọc</translation>
     </message>
@@ -1034,47 +1069,51 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Lưu trữ và kết nối</translation>
     </message>
     <message>
-        <source>%1 on this phone</source>
-        <extracomment>How much room the profile takes on the phone. %1 is a size such as &quot;12.3 MB&quot;.</extracomment>
-        <translation>%1 trên điện thoại này</translation>
-    </message>
-    <message>
         <source>Saved</source>
         <translation>Đã lưu</translation>
-    </message>
-    <message>
-        <source>Connected, and up to date</source>
-        <translation>Đã kết nối và cập nhật</translation>
-    </message>
-    <message>
-        <source>Connected, sending or syncing messages</source>
-        <translation>Đã kết nối, đang gửi hoặc đồng bộ tin nhắn</translation>
-    </message>
-    <message>
-        <source>Connecting to the relay</source>
-        <translation>Đang kết nối tới máy chuyển tiếp</translation>
-    </message>
-    <message>
-        <source>%1 used · %2 left of %3</source>
-        <extracomment>The mailbox on the relay. %1 used, %2 left, %3 the whole, each a size such as &quot;1.4 GB&quot;.</extracomment>
-        <translation>Đã dùng %1 · còn %2 trên %3</translation>
     </message>
     <message>
         <source>The relay has not reported its quota yet</source>
         <translation>Máy chuyển tiếp chưa báo hạn mức</translation>
     </message>
     <message>
-        <source>The name on every message you send</source>
-        <translation>Tên trên mỗi tin nhắn bạn gửi</translation>
-    </message>
-    <message>
         <source>Both ways: with this off you send none and see none.</source>
         <translation>Cả hai chiều: tắt thì bạn không gửi và cũng không thấy cái nào.</translation>
     </message>
     <message>
-        <source>Attachments up to %1</source>
-        <extracomment>The biggest attachment the relay will carry. %1 is a size such as &quot;22.3 MB&quot;.</extracomment>
-        <translation>Tệp đính kèm tối đa %1</translation>
+        <source>Relays</source>
+        <translation>Máy chuyển tiếp</translation>
+    </message>
+    <message>
+        <source>Sends from this relay</source>
+        <translation>Đang gửi từ máy chuyển tiếp này</translation>
+    </message>
+    <message>
+        <source>Removing relay</source>
+        <extracomment>What Silica&apos;s countdown says it is doing, over a relay the reader has asked to remove.</extracomment>
+        <translation>Đang gỡ máy chuyển tiếp</translation>
+    </message>
+    <message>
+        <source>Send from this relay</source>
+        <translation>Gửi từ máy chuyển tiếp này</translation>
+    </message>
+    <message>
+        <source>Remove relay</source>
+        <translation>Gỡ máy chuyển tiếp</translation>
+    </message>
+    <message>
+        <source>Add a relay</source>
+        <translation>Thêm máy chuyển tiếp</translation>
+    </message>
+    <message>
+        <source>%1 of %2 used</source>
+        <extracomment>The mailbox on the relay. %1 used, %2 the whole, each a size such as &quot;1.4 GB&quot;.</extracomment>
+        <translation>Đã dùng %1 trên %2</translation>
+    </message>
+    <message>
+        <source>Piirit uses %1 of storage on this phone.</source>
+        <extracomment>How much room the profile takes on the phone. %1 is a size such as &quot;12.3 MB&quot;.</extracomment>
+        <translation>Piirit dùng %1 dung lượng trên điện thoại này.</translation>
     </message>
 </context>
 <context>

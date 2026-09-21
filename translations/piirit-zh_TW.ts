@@ -39,20 +39,20 @@
         <translation>你的名字</translation>
     </message>
     <message>
-        <source>Relay</source>
-        <translation>中繼</translation>
+        <source>Select a public chatmail relay</source>
+        <translation>選擇公共 chatmail 中繼</translation>
     </message>
     <message>
-        <source>Custom server</source>
-        <translation>自訂伺服器</translation>
+        <source>Use a custom chatmail relay</source>
+        <translation>使用自訂 chatmail 中繼</translation>
     </message>
     <message>
-        <source>See &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; for the full list.</source>
-        <translation>完整清單請見 &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;。</translation>
+        <source>Piirit works only with chatmail relays. These are a particular kind of e-mail server; ordinary e-mail servers are not supported. For more, see &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. A full list of public, free-to-use chatmail relays is at &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</source>
+        <translation>Piirit 只能搭配 chatmail 中繼使用。這是一種特殊的電子郵件伺服器；不支援一般的電子郵件伺服器。詳情請見 &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;。公共、免費的 chatmail 中繼完整清單請見 &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;。</translation>
     </message>
     <message>
-        <source>The relay gives you an address. The keys are made on this phone.</source>
-        <translation>中繼給你一個位址。金鑰在這支手機上產生。</translation>
+        <source>Pick a name and a relay. That&apos;s it! There is nothing else to set up.</source>
+        <translation>選一個名字和一個中繼，就這樣！不需要其他設定。</translation>
     </message>
 </context>
 <context>
@@ -84,6 +84,49 @@
     <message>
         <source>The other device keeps it. Both get everything new.</source>
         <translation>另一台裝置仍然留著它。兩台都會收到所有新訊息。</translation>
+    </message>
+</context>
+<context>
+    <name>AddRelayPage</name>
+    <message>
+        <source>%1 did not answer within %2 seconds.</source>
+        <translation>%1 在 %2 秒內沒有回應。</translation>
+    </message>
+    <message>
+        <source>Add a relay</source>
+        <translation>新增中繼</translation>
+    </message>
+    <message>
+        <source>Another address for this profile, on another relay. The profile sends from one relay at a time; its page says which, and lets you change it.</source>
+        <translation>為此個人檔案在另一個中繼上多加一個位址。個人檔案一次只由一個中繼傳送；其頁面會顯示是哪一個，並可以更改。</translation>
+    </message>
+    <message>
+        <source>Add relay</source>
+        <translation>新增中繼</translation>
+    </message>
+    <message>
+        <source>Contacting %1...</source>
+        <translation>正在聯絡 %1...</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>取消</translation>
+    </message>
+    <message>
+        <source>Relays are run by volunteers. Try another one.</source>
+        <translation>中繼由志工維護。試試另一個。</translation>
+    </message>
+    <message>
+        <source>Select a public chatmail relay</source>
+        <translation>選擇公共 chatmail 中繼</translation>
+    </message>
+    <message>
+        <source>Use a custom chatmail relay</source>
+        <translation>使用自訂 chatmail 中繼</translation>
+    </message>
+    <message>
+        <source>Piirit works only with chatmail relays. These are a particular kind of e-mail server; ordinary e-mail servers are not supported. For more, see &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. A full list of public, free-to-use chatmail relays is at &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</source>
+        <translation>Piirit 只能搭配 chatmail 中繼使用。這是一種特殊的電子郵件伺服器；不支援一般的電子郵件伺服器。詳情請見 &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;。公共、免費的 chatmail 中繼完整清單請見 &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;。</translation>
     </message>
 </context>
 <context>
@@ -531,13 +574,13 @@ Other groups with blocked contacts will still show their messages.</source>
         </translation>
     </message>
     <message>
-        <source>Too big to send: %1. This relay takes %2.</source>
-        <extracomment>Shown above the message field when the attached file is bigger than the relay will carry. %1 is the file&apos;s size and %2 the largest the relay takes, each such as &quot;24 MB&quot;.</extracomment>
-        <translation>太大，無法傳送：%1。此中繼最多接受 %2。</translation>
-    </message>
-    <message>
         <source>Saved to Downloads</source>
         <translation>已儲存至下載</translation>
+    </message>
+    <message>
+        <source>Too big to send: %1. Attachments go up to %2.</source>
+        <extracomment>Shown above the message field when the attached file is bigger than will be sent. %1 is the file&apos;s size and %2 the largest that goes, each such as &quot;24 MB&quot;.</extracomment>
+        <translation>太大，無法傳送：%1。附件最大可為 %2。</translation>
     </message>
 </context>
 <context>
@@ -994,10 +1037,6 @@ Other groups with blocked contacts will still show their messages.</source>
 <context>
     <name>ProfilePage</name>
     <message>
-        <source>Not connected</source>
-        <translation>未連線</translation>
-    </message>
-    <message>
         <source>Checking the connection</source>
         <translation>正在檢查連線</translation>
     </message>
@@ -1022,10 +1061,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>一句話介紹你自己</translation>
     </message>
     <message>
-        <source>Address</source>
-        <translation>地址</translation>
-    </message>
-    <message>
         <source>Send read receipts</source>
         <translation>傳送已讀回條</translation>
     </message>
@@ -1034,47 +1069,51 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>儲存空間與連線</translation>
     </message>
     <message>
-        <source>%1 on this phone</source>
-        <extracomment>How much room the profile takes on the phone. %1 is a size such as &quot;12.3 MB&quot;.</extracomment>
-        <translation>本手機上佔用 %1</translation>
-    </message>
-    <message>
         <source>Saved</source>
         <translation>已儲存</translation>
-    </message>
-    <message>
-        <source>Connected, and up to date</source>
-        <translation>已連線，一切最新</translation>
-    </message>
-    <message>
-        <source>Connected, sending or syncing messages</source>
-        <translation>已連線，正在傳送或同步訊息</translation>
-    </message>
-    <message>
-        <source>Connecting to the relay</source>
-        <translation>正在連線至中繼</translation>
-    </message>
-    <message>
-        <source>%1 used · %2 left of %3</source>
-        <extracomment>The mailbox on the relay. %1 used, %2 left, %3 the whole, each a size such as &quot;1.4 GB&quot;.</extracomment>
-        <translation>已用 %1 · 剩餘 %2，共 %3</translation>
     </message>
     <message>
         <source>The relay has not reported its quota yet</source>
         <translation>中繼尚未回報其配額</translation>
     </message>
     <message>
-        <source>The name on every message you send</source>
-        <translation>你傳送的每則訊息上顯示的名字</translation>
-    </message>
-    <message>
         <source>Both ways: with this off you send none and see none.</source>
         <translation>兩個方向：關掉後你不送出，也看不到。</translation>
     </message>
     <message>
-        <source>Attachments up to %1</source>
-        <extracomment>The biggest attachment the relay will carry. %1 is a size such as &quot;22.3 MB&quot;.</extracomment>
-        <translation>附件最大 %1</translation>
+        <source>Relays</source>
+        <translation>中繼</translation>
+    </message>
+    <message>
+        <source>Sends from this relay</source>
+        <translation>由此中繼傳送</translation>
+    </message>
+    <message>
+        <source>Removing relay</source>
+        <extracomment>What Silica&apos;s countdown says it is doing, over a relay the reader has asked to remove.</extracomment>
+        <translation>正在移除中繼</translation>
+    </message>
+    <message>
+        <source>Send from this relay</source>
+        <translation>改由此中繼傳送</translation>
+    </message>
+    <message>
+        <source>Remove relay</source>
+        <translation>移除中繼</translation>
+    </message>
+    <message>
+        <source>Add a relay</source>
+        <translation>新增中繼</translation>
+    </message>
+    <message>
+        <source>%1 of %2 used</source>
+        <extracomment>The mailbox on the relay. %1 used, %2 the whole, each a size such as &quot;1.4 GB&quot;.</extracomment>
+        <translation>已用 %1，共 %2</translation>
+    </message>
+    <message>
+        <source>Piirit uses %1 of storage on this phone.</source>
+        <extracomment>How much room the profile takes on the phone. %1 is a size such as &quot;12.3 MB&quot;.</extracomment>
+        <translation>Piirit 在這支手機上佔用 %1 儲存空間。</translation>
     </message>
 </context>
 <context>

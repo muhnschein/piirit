@@ -39,20 +39,20 @@
         <translation>Twoje imię</translation>
     </message>
     <message>
-        <source>Relay</source>
-        <translation>Przekaźnik</translation>
+        <source>Select a public chatmail relay</source>
+        <translation>Wybierz publiczny przekaźnik chatmail</translation>
     </message>
     <message>
-        <source>Custom server</source>
-        <translation>Własny serwer</translation>
+        <source>Use a custom chatmail relay</source>
+        <translation>Użyj własnego przekaźnika chatmail</translation>
     </message>
     <message>
-        <source>See &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; for the full list.</source>
-        <translation>Pełna lista jest na &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
+        <source>Piirit works only with chatmail relays. These are a particular kind of e-mail server; ordinary e-mail servers are not supported. For more, see &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. A full list of public, free-to-use chatmail relays is at &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</source>
+        <translation>Piirit działa tylko z przekaźnikami chatmail. To szczególny rodzaj serwera pocztowego; zwykłe serwery pocztowe nie są obsługiwane. Więcej na &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. Pełna lista publicznych, darmowych przekaźników chatmail jest na &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
     </message>
     <message>
-        <source>The relay gives you an address. The keys are made on this phone.</source>
-        <translation>Przekaźnik daje ci adres. Klucze powstają na tym telefonie.</translation>
+        <source>Pick a name and a relay. That&apos;s it! There is nothing else to set up.</source>
+        <translation>Wybierz imię i przekaźnik. To wszystko! Nic więcej nie trzeba ustawiać.</translation>
     </message>
 </context>
 <context>
@@ -84,6 +84,49 @@
     <message>
         <source>The other device keeps it. Both get everything new.</source>
         <translation>Drugie urządzenie je zachowuje. Oba dostają wszystko, co nowe.</translation>
+    </message>
+</context>
+<context>
+    <name>AddRelayPage</name>
+    <message>
+        <source>%1 did not answer within %2 seconds.</source>
+        <translation>%1 nie odpowiedział w ciągu %2 sekund.</translation>
+    </message>
+    <message>
+        <source>Add a relay</source>
+        <translation>Dodaj przekaźnik</translation>
+    </message>
+    <message>
+        <source>Another address for this profile, on another relay. The profile sends from one relay at a time; its page says which, and lets you change it.</source>
+        <translation>Kolejny adres tego profilu, na innym przekaźniku. Profil wysyła naraz tylko z jednego przekaźnika; jego strona pokazuje, z którego, i pozwala to zmienić.</translation>
+    </message>
+    <message>
+        <source>Add relay</source>
+        <translation>Dodaj przekaźnik</translation>
+    </message>
+    <message>
+        <source>Contacting %1...</source>
+        <translation>Łączenie z %1...</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Anuluj</translation>
+    </message>
+    <message>
+        <source>Relays are run by volunteers. Try another one.</source>
+        <translation>Przekaźniki prowadzą wolontariusze. Spróbuj innego.</translation>
+    </message>
+    <message>
+        <source>Select a public chatmail relay</source>
+        <translation>Wybierz publiczny przekaźnik chatmail</translation>
+    </message>
+    <message>
+        <source>Use a custom chatmail relay</source>
+        <translation>Użyj własnego przekaźnika chatmail</translation>
+    </message>
+    <message>
+        <source>Piirit works only with chatmail relays. These are a particular kind of e-mail server; ordinary e-mail servers are not supported. For more, see &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. A full list of public, free-to-use chatmail relays is at &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</source>
+        <translation>Piirit działa tylko z przekaźnikami chatmail. To szczególny rodzaj serwera pocztowego; zwykłe serwery pocztowe nie są obsługiwane. Więcej na &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. Pełna lista publicznych, darmowych przekaźników chatmail jest na &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
     </message>
 </context>
 <context>
@@ -539,13 +582,13 @@ Wiadomości innych grup z zablokowanymi kontaktami nadal będą wyświetlane.</t
         </translation>
     </message>
     <message>
-        <source>Too big to send: %1. This relay takes %2.</source>
-        <extracomment>Shown above the message field when the attached file is bigger than the relay will carry. %1 is the file&apos;s size and %2 the largest the relay takes, each such as &quot;24 MB&quot;.</extracomment>
-        <translation>Za duży, aby wysłać: %1. Ten przekaźnik przyjmuje %2.</translation>
-    </message>
-    <message>
         <source>Saved to Downloads</source>
         <translation>Zapisano w Pobranych</translation>
+    </message>
+    <message>
+        <source>Too big to send: %1. Attachments go up to %2.</source>
+        <extracomment>Shown above the message field when the attached file is bigger than will be sent. %1 is the file&apos;s size and %2 the largest that goes, each such as &quot;24 MB&quot;.</extracomment>
+        <translation>Za duży, by wysłać: %1. Załączniki mogą mieć najwyżej %2.</translation>
     </message>
 </context>
 <context>
@@ -1010,10 +1053,6 @@ Wiadomości innych grup z zablokowanymi kontaktami nadal będą wyświetlane.</t
 <context>
     <name>ProfilePage</name>
     <message>
-        <source>Not connected</source>
-        <translation>Brak połączenia</translation>
-    </message>
-    <message>
         <source>Checking the connection</source>
         <translation>Sprawdzanie połączenia</translation>
     </message>
@@ -1038,10 +1077,6 @@ Wiadomości innych grup z zablokowanymi kontaktami nadal będą wyświetlane.</t
         <translation>Jedna linijka o tobie</translation>
     </message>
     <message>
-        <source>Address</source>
-        <translation>Adres</translation>
-    </message>
-    <message>
         <source>Send read receipts</source>
         <translation>Wysyłaj potwierdzenia przeczytania</translation>
     </message>
@@ -1050,47 +1085,51 @@ Wiadomości innych grup z zablokowanymi kontaktami nadal będą wyświetlane.</t
         <translation>Pamięć i łączność</translation>
     </message>
     <message>
-        <source>%1 on this phone</source>
-        <extracomment>How much room the profile takes on the phone. %1 is a size such as &quot;12.3 MB&quot;.</extracomment>
-        <translation>%1 na tym telefonie</translation>
-    </message>
-    <message>
         <source>Saved</source>
         <translation>Zapisano</translation>
-    </message>
-    <message>
-        <source>Connected, and up to date</source>
-        <translation>Połączono, wszystko aktualne</translation>
-    </message>
-    <message>
-        <source>Connected, sending or syncing messages</source>
-        <translation>Połączono, wysyłanie lub synchronizowanie wiadomości</translation>
-    </message>
-    <message>
-        <source>Connecting to the relay</source>
-        <translation>Łączenie z przekaźnikiem</translation>
-    </message>
-    <message>
-        <source>%1 used · %2 left of %3</source>
-        <extracomment>The mailbox on the relay. %1 used, %2 left, %3 the whole, each a size such as &quot;1.4 GB&quot;.</extracomment>
-        <translation>Zajęte %1 · wolne %2 z %3</translation>
     </message>
     <message>
         <source>The relay has not reported its quota yet</source>
         <translation>Przekaźnik nie podał jeszcze swojego limitu</translation>
     </message>
     <message>
-        <source>The name on every message you send</source>
-        <translation>Nazwa na każdej wysyłanej wiadomości</translation>
-    </message>
-    <message>
         <source>Both ways: with this off you send none and see none.</source>
         <translation>W obie strony: wyłączone — nie wysyłasz żadnych i nie widzisz żadnych.</translation>
     </message>
     <message>
-        <source>Attachments up to %1</source>
-        <extracomment>The biggest attachment the relay will carry. %1 is a size such as &quot;22.3 MB&quot;.</extracomment>
-        <translation>Załączniki do %1</translation>
+        <source>Relays</source>
+        <translation>Przekaźniki</translation>
+    </message>
+    <message>
+        <source>Sends from this relay</source>
+        <translation>Wysyła z tego przekaźnika</translation>
+    </message>
+    <message>
+        <source>Removing relay</source>
+        <extracomment>What Silica&apos;s countdown says it is doing, over a relay the reader has asked to remove.</extracomment>
+        <translation>Usuwanie przekaźnika</translation>
+    </message>
+    <message>
+        <source>Send from this relay</source>
+        <translation>Wysyłaj z tego przekaźnika</translation>
+    </message>
+    <message>
+        <source>Remove relay</source>
+        <translation>Usuń przekaźnik</translation>
+    </message>
+    <message>
+        <source>Add a relay</source>
+        <translation>Dodaj przekaźnik</translation>
+    </message>
+    <message>
+        <source>%1 of %2 used</source>
+        <extracomment>The mailbox on the relay. %1 used, %2 the whole, each a size such as &quot;1.4 GB&quot;.</extracomment>
+        <translation>Użyto %1 z %2</translation>
+    </message>
+    <message>
+        <source>Piirit uses %1 of storage on this phone.</source>
+        <extracomment>How much room the profile takes on the phone. %1 is a size such as &quot;12.3 MB&quot;.</extracomment>
+        <translation>Piirit zajmuje %1 miejsca na tym telefonie.</translation>
     </message>
 </context>
 <context>

@@ -15,6 +15,10 @@
 //! back and starts IO. That last call is the long one, and the length of
 //! it is the core's: a relay that does not answer holds the call for as
 //! long as the core's own connection attempts take, which is minutes.
+//! The same call adds a *second* relay to a profile that has one
+//! (`add_transport` below): the account and the name are already there,
+//! so an attempt at that is the transport call alone, with the same
+//! deadline and the same way out.
 //!
 //! Two things follow from that, and both were met on a phone.
 //!
@@ -34,7 +38,11 @@
 //! And an attempt given up on can still succeed -- the relay answers
 //! late, after the reader cancelled -- and its result is not the
 //! reader's any more: the profile it made is removed, and nothing is
-//! signalled for it.
+//! signalled for it. A relay added late to a profile that was there
+//! already is the one exception: the profile is the reader's, and what
+//! the relay answered is one more row on its page, which the page's
+//! own remove takes off again. Removing the profile for it would be
+//! answering a cancelled "add" with a delete.
 
 use std::collections::BTreeSet;
 use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
@@ -198,15 +206,48 @@ impl Attempt {
             });
         }
 
-        // A task of its own, so that giving up on it here leaves it to
-        // finish: the account is held until the core answers, whenever
-        // that is, and a late success is cleaned up by the task itself.
+        self.transport_within_deadline(runtime, rpc, account_id, transport, Made::Here)
+            .await
+    }
+
+    /// Add a relay to a profile that has one: the transport call alone,
+    /// on the account the profile already is, within the deadline. The
+    /// account is held while the call runs, as a signup's is, so that a
+    /// cancel stops the core's process on it and a retry is refused in
+    /// the core's own words rather than started over the first.
+    pub(crate) async fn add_transport(
+        &self,
+        runtime: &CoreRuntime,
+        rpc: Arc<RpcClient>,
+        account_id: u32,
+        transport: Transport,
+    ) -> Outcome {
+        self.shared.busy().insert(account_id);
+        self.transport_within_deadline(runtime, rpc, account_id, transport, Made::Before)
+            .await
+    }
+
+    /// The transport call, given up on at the deadline.
+    ///
+    /// A task of its own, so that giving up on it here leaves it to
+    /// finish: the account is held until the core answers, whenever that
+    /// is, and a late success is dealt with by the task itself -- removed
+    /// when the account was made for it, kept when it was not.
+    async fn transport_within_deadline(
+        &self,
+        runtime: &CoreRuntime,
+        rpc: Arc<RpcClient>,
+        account_id: u32,
+        transport: Transport,
+        made: Made,
+    ) -> Outcome {
         let call = runtime.spawn(transport_call(
             rpc.clone(),
             self.shared.clone(),
             self.wanted.clone(),
             account_id,
             transport,
+            made,
         ));
         match tokio::time::timeout(self.deadline, call).await {
             Ok(Ok(Ok(()))) => Outcome::Created(account_id),
@@ -321,16 +362,30 @@ impl Attempt {
     }
 }
 
+/// Whether the account a transport call runs on was made for it.
+#[derive(Clone, Copy)]
+enum Made {
+    /// A profile being made: the account is this attempt's, and goes
+    /// with it if nobody wants what it made.
+    Here,
+    /// A relay being added: the account is a profile the reader has,
+    /// and stays whatever becomes of the attempt.
+    Before,
+}
+
 /// The transport call, and the account's release once it has returned.
-/// A success nobody is waiting for any more is removed here: the reader
-/// gave up on it, and a profile they did not ask for must not be what
-/// the app opens on next time.
+/// A success nobody is waiting for any more is removed here when the
+/// account was made for it: the reader gave up on it, and a profile they
+/// did not ask for must not be what the app opens on next time. A relay
+/// added late to a profile that was there before is kept; see the
+/// module doc.
 async fn transport_call(
     rpc: Arc<RpcClient>,
     shared: Arc<Attempts>,
     wanted: Arc<AtomicBool>,
     account_id: u32,
     transport: Transport,
+    made: Made,
 ) -> Result<(), String> {
     let result = match transport {
         Transport::Qr(qr) => {
@@ -345,7 +400,7 @@ async fn transport_call(
     }
     .map_err(|err| err.to_string());
     shared.release(account_id);
-    if result.is_ok() && !wanted.load(Ordering::SeqCst) {
+    if result.is_ok() && !wanted.load(Ordering::SeqCst) && matches!(made, Made::Here) {
         discard(&rpc, account_id).await;
     }
     result

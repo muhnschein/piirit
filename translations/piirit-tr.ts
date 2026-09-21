@@ -39,20 +39,20 @@
         <translation>Adınız</translation>
     </message>
     <message>
-        <source>Relay</source>
-        <translation>Aktarıcı</translation>
+        <source>Select a public chatmail relay</source>
+        <translation>Herkese açık bir chatmail aktarıcısı seç</translation>
     </message>
     <message>
-        <source>Custom server</source>
-        <translation>Özel sunucu</translation>
+        <source>Use a custom chatmail relay</source>
+        <translation>Kendi chatmail aktarıcını kullan</translation>
     </message>
     <message>
-        <source>See &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; for the full list.</source>
-        <translation>Tam liste için &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; adresine bakın.</translation>
+        <source>Piirit works only with chatmail relays. These are a particular kind of e-mail server; ordinary e-mail servers are not supported. For more, see &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. A full list of public, free-to-use chatmail relays is at &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</source>
+        <translation>Piirit yalnızca chatmail aktarıcılarıyla çalışır. Bunlar özel bir tür e-posta sunucusudur; sıradan e-posta sunucuları desteklenmez. Daha fazlası için &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt; adresine bak. Herkese açık, ücretsiz chatmail aktarıcılarının tam listesi &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; adresinde.</translation>
     </message>
     <message>
-        <source>The relay gives you an address. The keys are made on this phone.</source>
-        <translation>Aktarıcı sana bir adres verir. Anahtarlar bu telefonda üretilir.</translation>
+        <source>Pick a name and a relay. That&apos;s it! There is nothing else to set up.</source>
+        <translation>Bir ad ve bir aktarıcı seç. Hepsi bu! Başka ayarlanacak bir şey yok.</translation>
     </message>
 </context>
 <context>
@@ -84,6 +84,49 @@
     <message>
         <source>The other device keeps it. Both get everything new.</source>
         <translation>Diğer cihaz onu tutar. İkisi de yeni gelen her şeyi alır.</translation>
+    </message>
+</context>
+<context>
+    <name>AddRelayPage</name>
+    <message>
+        <source>%1 did not answer within %2 seconds.</source>
+        <translation>%1, %2 saniye içinde yanıt vermedi.</translation>
+    </message>
+    <message>
+        <source>Add a relay</source>
+        <translation>Aktarıcı ekle</translation>
+    </message>
+    <message>
+        <source>Another address for this profile, on another relay. The profile sends from one relay at a time; its page says which, and lets you change it.</source>
+        <translation>Bu profil için başka bir aktarıcıda bir adres daha. Profil aynı anda tek bir aktarıcıdan gönderir; hangisi olduğunu sayfası gösterir ve değiştirmene izin verir.</translation>
+    </message>
+    <message>
+        <source>Add relay</source>
+        <translation>Aktarıcı ekle</translation>
+    </message>
+    <message>
+        <source>Contacting %1...</source>
+        <translation>%1 ile iletişim kuruluyor...</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>İptal</translation>
+    </message>
+    <message>
+        <source>Relays are run by volunteers. Try another one.</source>
+        <translation>Aktarıcıları gönüllüler işletir. Bir başkasını dene.</translation>
+    </message>
+    <message>
+        <source>Select a public chatmail relay</source>
+        <translation>Herkese açık bir chatmail aktarıcısı seç</translation>
+    </message>
+    <message>
+        <source>Use a custom chatmail relay</source>
+        <translation>Kendi chatmail aktarıcını kullan</translation>
+    </message>
+    <message>
+        <source>Piirit works only with chatmail relays. These are a particular kind of e-mail server; ordinary e-mail servers are not supported. For more, see &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. A full list of public, free-to-use chatmail relays is at &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</source>
+        <translation>Piirit yalnızca chatmail aktarıcılarıyla çalışır. Bunlar özel bir tür e-posta sunucusudur; sıradan e-posta sunucuları desteklenmez. Daha fazlası için &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt; adresine bak. Herkese açık, ücretsiz chatmail aktarıcılarının tam listesi &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; adresinde.</translation>
     </message>
 </context>
 <context>
@@ -535,13 +578,13 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
         </translation>
     </message>
     <message>
-        <source>Too big to send: %1. This relay takes %2.</source>
-        <extracomment>Shown above the message field when the attached file is bigger than the relay will carry. %1 is the file&apos;s size and %2 the largest the relay takes, each such as &quot;24 MB&quot;.</extracomment>
-        <translation>Göndermek için çok büyük: %1. Bu aktarıcı %2 kabul ediyor.</translation>
-    </message>
-    <message>
         <source>Saved to Downloads</source>
         <translation>İndirilenler&apos;e kaydedildi</translation>
+    </message>
+    <message>
+        <source>Too big to send: %1. Attachments go up to %2.</source>
+        <extracomment>Shown above the message field when the attached file is bigger than will be sent. %1 is the file&apos;s size and %2 the largest that goes, each such as &quot;24 MB&quot;.</extracomment>
+        <translation>Göndermek için çok büyük: %1. Ekler en fazla %2 olabilir.</translation>
     </message>
 </context>
 <context>
@@ -998,10 +1041,6 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
 <context>
     <name>ProfilePage</name>
     <message>
-        <source>Not connected</source>
-        <translation>Bağlı değil</translation>
-    </message>
-    <message>
         <source>Checking the connection</source>
         <translation>Bağlantı denetleniyor</translation>
     </message>
@@ -1026,10 +1065,6 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
         <translation>Sizinle ilgili bir satır</translation>
     </message>
     <message>
-        <source>Address</source>
-        <translation>Adres</translation>
-    </message>
-    <message>
         <source>Send read receipts</source>
         <translation>Okundu bilgisi gönder</translation>
     </message>
@@ -1038,47 +1073,51 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
         <translation>Depolama ve bağlantı</translation>
     </message>
     <message>
-        <source>%1 on this phone</source>
-        <extracomment>How much room the profile takes on the phone. %1 is a size such as &quot;12.3 MB&quot;.</extracomment>
-        <translation>Bu telefonda %1</translation>
-    </message>
-    <message>
         <source>Saved</source>
         <translation>Kaydedildi</translation>
-    </message>
-    <message>
-        <source>Connected, and up to date</source>
-        <translation>Bağlı ve güncel</translation>
-    </message>
-    <message>
-        <source>Connected, sending or syncing messages</source>
-        <translation>Bağlı, mesaj gönderiyor veya eşitliyor</translation>
-    </message>
-    <message>
-        <source>Connecting to the relay</source>
-        <translation>Aktarıcıya bağlanıyor</translation>
-    </message>
-    <message>
-        <source>%1 used · %2 left of %3</source>
-        <extracomment>The mailbox on the relay. %1 used, %2 left, %3 the whole, each a size such as &quot;1.4 GB&quot;.</extracomment>
-        <translation>%3 içinden %1 kullanıldı · %2 kaldı</translation>
     </message>
     <message>
         <source>The relay has not reported its quota yet</source>
         <translation>Aktarıcı kotasını henüz bildirmedi</translation>
     </message>
     <message>
-        <source>The name on every message you send</source>
-        <translation>Gönderdiğiniz her mesajdaki ad</translation>
-    </message>
-    <message>
         <source>Both ways: with this off you send none and see none.</source>
         <translation>Her iki yönde de: kapalıyken ne gönderirsin ne görürsün.</translation>
     </message>
     <message>
-        <source>Attachments up to %1</source>
-        <extracomment>The biggest attachment the relay will carry. %1 is a size such as &quot;22.3 MB&quot;.</extracomment>
-        <translation>En fazla %1 boyutunda ek</translation>
+        <source>Relays</source>
+        <translation>Aktarıcılar</translation>
+    </message>
+    <message>
+        <source>Sends from this relay</source>
+        <translation>Bu aktarıcıdan gönderiyor</translation>
+    </message>
+    <message>
+        <source>Removing relay</source>
+        <extracomment>What Silica&apos;s countdown says it is doing, over a relay the reader has asked to remove.</extracomment>
+        <translation>Aktarıcı kaldırılıyor</translation>
+    </message>
+    <message>
+        <source>Send from this relay</source>
+        <translation>Bu aktarıcıdan gönder</translation>
+    </message>
+    <message>
+        <source>Remove relay</source>
+        <translation>Aktarıcıyı kaldır</translation>
+    </message>
+    <message>
+        <source>Add a relay</source>
+        <translation>Aktarıcı ekle</translation>
+    </message>
+    <message>
+        <source>%1 of %2 used</source>
+        <extracomment>The mailbox on the relay. %1 used, %2 the whole, each a size such as &quot;1.4 GB&quot;.</extracomment>
+        <translation>%2 alanın %1 kadarı kullanıldı</translation>
+    </message>
+    <message>
+        <source>Piirit uses %1 of storage on this phone.</source>
+        <extracomment>How much room the profile takes on the phone. %1 is a size such as &quot;12.3 MB&quot;.</extracomment>
+        <translation>Piirit bu telefonda %1 depolama alanı kullanıyor.</translation>
     </message>
 </context>
 <context>

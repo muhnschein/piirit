@@ -6,11 +6,12 @@ import Piirit 1.0
 
 /*
  * One profile, as everyone else sees it and as this device holds it: the
- * picture, the name on every message, the line under it, the address it
- * writes from, whether the other end is told when something has been
- * read, and how the relay and the phone are doing by it. Reached from the
- * profile's row on the profiles page. The settings that belong to no
- * profile are on the settings page instead (SettingsPage.qml).
+ * picture, the name on every message, the line under it, the relays it
+ * is reached through and the one it writes from, whether the other end
+ * is told when something has been read, and how the relay and the phone
+ * are doing by it. Reached from the profile's row on the profiles page.
+ * The settings that belong to no profile are on the settings page
+ * instead (SettingsPage.qml).
  *
  * This page is a profile's settings, so the two things about a profile
  * that are not settings are not here: the invite code to show and the backup to
@@ -24,16 +25,32 @@ import Piirit 1.0
  * tap. A settings page that needs saving is a settings page that loses
  * what was typed when someone swipes back.
  *
- * The name sits under the picture and wears the same edit badge; a tap
- * turns it into a field (EditableName.qml). The connectivity and the
- * mailbox quota follow parla's profile dialog (github.com/trufae/parla):
- * the core's own band for the connection, with a dot in the colour the
- * core's own report uses; the bar for the mailbox, always there, at
- * nothing until the relay has said; and under it what is used, what is
- * left and what there is, read off the core's report. What parla's
- * "Details" dialog adds -- the storage per conversation, scanned message
- * by message -- is not here: on a phone that scan is what the reader
- * would be waiting on.
+ * The name sits under the picture, a field (EditableName.qml). The
+ * storage section follows parla's profile dialog (github.com/trufae/
+ * parla), per relay: for each, the dot the core's own report draws for
+ * its connection with the core's own words beside it, and the bar for
+ * its mailbox, always there, at nothing until the relay has said, with
+ * what is used of what there is under it. Before the relays, what the
+ * profile takes on the phone. What parla's "Details" dialog adds --
+ * the storage per conversation, scanned message by message -- is not
+ * here: on a phone that scan is what the reader would be waiting on.
+ *
+ * The relays are a list rather than one address: the core lets a profile
+ * be reached through several, each with an address of its own, and sends
+ * from one of them (Transports, transports.rs). The one it sends from is
+ * first and says so. A row's menu is what can be done with that relay --
+ * send from it instead, or remove it, with Silica's countdown to change
+ * one's mind in -- and the plus under the last row adds one
+ * (AddRelayPage.qml). Removing the last relay is not offered: the core
+ * refuses it, and a profile with no relay is not a profile. The profiles
+ * page under this one draws its rows off the core's account list, so a
+ * change here reads that list again, the way a saved name does.
+ *
+ * The countdown lives beside the list rather than on the row
+ * (PendingRemoval), as the profiles page's and a group's do: the rows are
+ * rebuilt whenever the relays are read again, which the core asks for
+ * whenever the connection changes, and a countdown on a row would go
+ * with it.
  */
 Page {
     id: page
@@ -62,15 +79,69 @@ Page {
         }
     }
 
+    Transports {
+        id: transports
+        objectName: "transports"
+        account_id: page.accountId
+        onError: page.errorMessage = message
+        // The profile sends from another relay now, or has one fewer:
+        // its address, what the relay takes and the profiles page's row
+        // follow.
+        onChanged: {
+            profile.reload()
+            profile.refresh_connectivity()
+            core.refresh_accounts()
+        }
+    }
+
+    /// How long a relay waits before it goes, in milliseconds. Nothing
+    /// sets it; a test turns it down rather than waiting.
+    property alias pendingDelay: doomedRelays.delay
+
+    /// The relays the reader has asked to remove, waiting out the moment
+    /// in which they can say they did not mean it. The address travels
+    /// as the tag: the row it was asked on may be gone by the time the
+    /// wait is up.
+    PendingRemoval {
+        id: doomedRelays
+        onRemove: transports.remove(tag)
+    }
+
+    // And as the page is actually destroyed, for the reason the profiles
+    // page gives: "leaving" and "told it is leaving" are not the same
+    // moment. Flushing twice costs nothing.
+    Component.onDestruction: doomedRelays.flush()
+
     Connections {
         target: core
-        // The core says when the connection changes; the mailbox and
-        // the storage are re-read with it.
+        // The core says when the connection changes; the mailbox, the
+        // storage and each relay's own mailbox are re-read with it. It
+        // says when the relays change too -- from here, or from another
+        // device the profile is on -- and the list follows.
         onCore_event: {
             if (kind === "ConnectivityChanged" && context_id === page.accountId) {
                 profile.refresh_connectivity()
+                relayRefresh.restart()
             }
+            // Changed on another device the profile is on: the row on
+            // the profiles page names the relay sent from, and follows.
+            if (kind === "TransportsModified" && context_id === page.accountId) {
+                core.refresh_accounts()
+            }
+            transports.handle_event(context_id, kind, payload_json)
         }
+    }
+
+    // The core says the connection changed several times over when IO
+    // restarts -- which is what sending from another relay does -- and
+    // each time the rows are worth reading again for their mailboxes.
+    // Once, when it has gone quiet: the rows are rebuilt on a read, and a
+    // rebuild per event is a menu closed under the reader's finger per
+    // event.
+    Timer {
+        id: relayRefresh
+        interval: 1000
+        onTriggered: transports.reload()
     }
 
     /// Someone has typed since the load. Guards the refill above.
@@ -106,11 +177,18 @@ Page {
     // Leaving is the other moment worth saving at: a back-swipe within
     // the pause above would otherwise drop what was typed. The cursor
     // leaves the field on the way out, so the keyboard does not follow
-    // the page.
+    // the page. Coming back -- from the page that adds a relay -- is
+    // when the relays are worth reading again: the core announces the
+    // addition as well, and this is the cheap belt to its braces.
     onStatusChanged: {
         if (status === PageStatus.Deactivating) {
             page.applyEdits()
             nameField.done()
+            // Anything still waiting goes now: leaving is exactly when
+            // a timer has not fired yet.
+            doomedRelays.flush()
+        } else if (status === PageStatus.Active) {
+            transports.reload()
         }
     }
 
@@ -131,37 +209,20 @@ Page {
         }
     }
 
-    /// The core's connectivity band in words -- parla's, near enough.
-    /// The bands are the core's (connectivity.rs); 0 is a profile not
-    /// yet asked about.
-    function connectionWords(state) {
-        if (state >= 4000) {
-            return qsTr("Connected, and up to date")
+    /// The dot beside a relay's words, in the colours the core's own
+    /// report draws its dots: green connected, yellow on the way, red
+    /// not, and grey for a relay it has not reported on yet. The dot's
+    /// name is the report's (transports.rs); the colours are the ones
+    /// its stylesheet gives them.
+    function dotColor(dot) {
+        if (dot === "green") {
+            return "#34c759"
         }
-        if (state >= 3000) {
-            return qsTr("Connected, sending or syncing messages")
+        if (dot === "yellow") {
+            return "#fdc625"
         }
-        if (state >= 2000) {
-            return qsTr("Connecting to the relay")
-        }
-        if (state >= 1000) {
-            return qsTr("Not connected")
-        }
-        return qsTr("Checking the connection")
-    }
-
-    /// The dot beside the words, in the colours the core's own report
-    /// draws its dots: green connected, yellow on the way, red not, and
-    /// grey for not yet asked.
-    function connectionColor(state) {
-        if (state >= 4000) {
-            return "#4caf50"
-        }
-        if (state >= 2000) {
-            return "#ffc107"
-        }
-        if (state >= 1000) {
-            return "#f44336"
+        if (dot === "red") {
+            return "#f33b2d"
         }
         return Theme.secondaryColor
     }
@@ -171,20 +232,18 @@ Page {
         return bytes > 0 ? Format.readableSize(bytes) : "0 B"
     }
 
-    /// What is under the bar: the amounts when the relay gave them, the
-    /// core's own sentence when it gave something this could not read,
-    /// and the fact that it has not said yet otherwise.
-    function quotaWords() {
-        if (profile.quota_limit_bytes > 0) {
-            var left = Math.max(0, profile.quota_limit_bytes - profile.quota_used_bytes)
-            //: The mailbox on the relay. %1 used, %2 left, %3 the whole, each a size such as "1.4 GB".
-            return qsTr("%1 used · %2 left of %3")
-                .arg(page.size(profile.quota_used_bytes))
-                .arg(page.size(left))
-                .arg(page.size(profile.quota_limit_bytes))
+    /// What is under a relay's bar: the amounts when the relay gave
+    /// them, the core's own sentence when it gave something this could
+    /// not read, and the fact that it has not said yet otherwise.
+    function quotaWords(usedBytes, limitBytes, text) {
+        if (limitBytes > 0) {
+            //: The mailbox on the relay. %1 used, %2 the whole, each a size such as "1.4 GB".
+            return qsTr("%1 of %2 used")
+                .arg(page.size(usedBytes))
+                .arg(page.size(limitBytes))
         }
-        if (profile.quota_text.length > 0) {
-            return profile.quota_text
+        if (text.length > 0) {
+            return text
         }
         return qsTr("The relay has not reported its quota yet")
     }
@@ -261,13 +320,15 @@ Page {
 
             // The name on every message, under the picture. The field
             // is what is read and written; see EditableName.qml.
+            // No hint under it: what the name is for is what the
+            // heading says, and a line under the field read as a
+            // subtitle to the reader rather than as help.
             EditableName {
                 id: nameField
                 objectName: "profileNameControl"
                 fieldObjectName: "profileNameField"
                 hintObjectName: "nameHint"
                 placeholderText: qsTr("Your name")
-                hint: qsTr("The name on every message you send")
                 onTextChanged: page.noteEdit()
             }
 
@@ -278,41 +339,6 @@ Page {
                 label: qsTr("Bio")
                 placeholderText: qsTr("A line about you")
                 onTextChanged: page.noteEdit()
-            }
-
-            // The reader's own address: what the relay minted, and what
-            // tells two profiles apart. Shown, not edited -- changing it
-            // is a different transport, not a rename. Under its own
-            // caption, at the left edge like everything else on the page.
-            Column {
-                x: Theme.horizontalPageMargin
-                width: parent.width - 2 * Theme.horizontalPageMargin
-
-                Label {
-                    objectName: "addressCaption"
-                    width: parent.width
-                    wrapMode: Text.Wrap
-                    font.pixelSize: Theme.fontSizeExtraSmall
-                    color: Theme.secondaryColor
-                    text: qsTr("Address")
-                }
-
-                Label {
-                    objectName: "addressLabel"
-                    width: parent.width
-                    wrapMode: Text.WrapAnywhere
-                    color: Theme.highlightColor
-                    // The relay's string, pinned to plain.
-                    textFormat: Text.PlainText
-                    text: profile.address
-                }
-            }
-
-            // Room between the address and the switch: the two are not
-            // one thing, and read as one without it.
-            Item {
-                width: 1
-                height: Theme.paddingLarge
             }
 
             TextSwitch {
@@ -336,84 +362,164 @@ Page {
                 onClicked: profile.set_read_receipts(!checked)
             }
 
+            // The relays the profile is reached through: the reader's
+            // own addresses, what the relays minted, and what tells two
+            // profiles apart. The one sent from first. Shown, not edited
+            // -- an address is a relay's, and changing one is adding a
+            // relay and sending from it, which the rows and the plus
+            // under them offer.
+            SectionHeader {
+                text: qsTr("Relays")
+            }
+
+            Repeater {
+                id: relayRows
+                objectName: "relayRows"
+                model: transports.rows
+
+                ListItem {
+                    id: relayRow
+                    // Named by place, so a test can find the first row
+                    // whichever relay stands there now.
+                    objectName: "relayRow" + index
+                    width: column.width
+                    contentHeight: relayBody.height + 2 * Theme.paddingSmall
+
+                    /// The address on this relay, for a test to read.
+                    readonly property string addr: model.addr
+                    readonly property bool sendsFrom: model.is_primary
+                    /// This relay is on its way out.
+                    readonly property bool doomed: doomedRelays.pending(model.id)
+
+                    Column {
+                        id: relayBody
+                        x: Theme.horizontalPageMargin
+                        y: Theme.paddingSmall
+                        width: parent.width - 2 * Theme.horizontalPageMargin
+
+                        Label {
+                            objectName: "relayDomain"
+                            width: parent.width
+                            wrapMode: Text.WrapAnywhere
+                            color: relayRow.highlighted ? Theme.highlightColor
+                                                        : Theme.primaryColor
+                            // The relay's string, pinned to plain.
+                            textFormat: Text.PlainText
+                            text: model.domain
+                        }
+
+                        Label {
+                            objectName: "relayAddress"
+                            width: parent.width
+                            wrapMode: Text.WrapAnywhere
+                            font.pixelSize: Theme.fontSizeSmall
+                            color: Theme.secondaryColor
+                            textFormat: Text.PlainText
+                            text: model.addr
+                        }
+
+                        // What sets the relay sent from apart. What the
+                        // relays hold and how they are doing is in the
+                        // section below, relay by relay.
+                        Label {
+                            objectName: "relayDetail"
+                            width: parent.width
+                            wrapMode: Text.Wrap
+                            visible: model.is_primary
+                            font.pixelSize: Theme.fontSizeSmall
+                            color: Theme.secondaryHighlightColor
+                            textFormat: Text.PlainText
+                            text: qsTr("Sends from this relay")
+                        }
+                    }
+
+                    /// Silica's own countdown, drawn over the relay
+                    /// about to go. The removal is not its business --
+                    /// that belongs to `doomedRelays`, because a remorse
+                    /// item lives in the row it covers and the rows are
+                    /// rebuilt whenever the relays are read again. So it
+                    /// draws, and reports the tap.
+                    function raiseRemorse() {
+                        //: What Silica's countdown says it is doing, over a
+                        //: relay the reader has asked to remove.
+                        relayRemorse.execute(
+                            relayBody, qsTr("Removing relay"), function() {},
+                            doomedRelays.countdownFor(model.id))
+                    }
+
+                    RemorseItem {
+                        id: relayRemorse
+                        objectName: "relayRemorse"
+                        onCanceled: doomedRelays.spare(model.id)
+                    }
+
+                    // A row rebuilt mid-wait comes back with no countdown
+                    // on it.
+                    Component.onCompleted: {
+                        if (relayRow.doomed) {
+                            relayRow.raiseRemorse()
+                        }
+                    }
+
+                    menu: ContextMenu {
+                        // Not on the relay already sent from: there is
+                        // nothing to switch to.
+                        MenuItem {
+                            objectName: "sendFromItem"
+                            visible: !model.is_primary
+                            text: qsTr("Send from this relay")
+                            onClicked: transports.set_primary(model.addr)
+                        }
+
+                        // Dim on the last relay: the core refuses to
+                        // remove it, and a menu item that asks anyway
+                        // is a menu item that fails.
+                        MenuItem {
+                            objectName: "removeRelayItem"
+                            enabled: transports.count > 1
+                            text: qsTr("Remove relay")
+                            // The page is told, not this row: the row is
+                            // rebuilt whenever the list reloads, and a
+                            // wait living on it would go too.
+                            onClicked: {
+                                doomedRelays.ask(model.id, model.addr)
+                                relayRow.raiseRemorse()
+                            }
+                        }
+                    }
+                }
+            }
+
+            // One more relay, from the plus under the last row, where
+            // the profiles page puts "add profile".
+            ListItem {
+                id: addRelayRow
+                objectName: "addRelayButton"
+                width: column.width
+                contentHeight: Theme.itemSizeSmall + 2 * Theme.paddingMedium
+
+                PlusMark {
+                    id: plus
+                    x: Theme.horizontalPageMargin
+                    y: Theme.paddingMedium
+                }
+
+                Label {
+                    x: plus.x + plus.width + Theme.paddingMedium
+                    width: parent.width - x - Theme.horizontalPageMargin
+                    anchors.verticalCenter: plus.verticalCenter
+                    wrapMode: Text.Wrap
+                    color: addRelayRow.highlighted ? Theme.highlightColor
+                                                   : Theme.primaryColor
+                    text: qsTr("Add a relay")
+                }
+
+                onClicked: pageStack.push(Qt.resolvedUrl("AddRelayPage.qml"),
+                                          { accountId: page.accountId })
+            }
+
             SectionHeader {
                 text: qsTr("Storage and connectivity")
-            }
-
-            // The connection: a dot in the core's colour and the band in
-            // words, the row parla's dialog starts its section with.
-            Row {
-                x: Theme.horizontalPageMargin
-                width: parent.width - 2 * Theme.horizontalPageMargin
-                spacing: Theme.paddingMedium
-
-                Rectangle {
-                    objectName: "connectivityDot"
-                    anchors.verticalCenter: parent.verticalCenter
-                    width: Theme.paddingLarge
-                    height: width
-                    radius: width / 2
-                    color: page.connectionColor(profile.connectivity)
-                }
-
-                Label {
-                    objectName: "connectivityLabel"
-                    width: parent.width - Theme.paddingLarge - Theme.paddingMedium
-                    wrapMode: Text.Wrap
-                    color: Theme.highlightColor
-                    // A translated literal, chosen by the core's number.
-                    textFormat: Text.PlainText
-                    text: page.connectionWords(profile.connectivity)
-                }
-            }
-
-            // The mailbox on the relay: the bar is always there, at
-            // nothing until the relay has said how full it is, and the
-            // words under it say what the relay said. Drawn here rather
-            // than Silica's ProgressBar, whose track sits well inside its
-            // own margins: this one runs the width of the text above it.
-            Item {
-                id: quotaBar
-                objectName: "quotaBar"
-                /// Percent used, 0 to 100.
-                property real value: Math.min(100, profile.quota_percent)
-                /// What is said under the bar.
-                property string label: page.quotaWords()
-                x: Theme.horizontalPageMargin
-                width: parent.width - 2 * Theme.horizontalPageMargin
-                height: track.height + Theme.paddingSmall + quotaLabel.height
-
-                Rectangle {
-                    id: track
-                    width: parent.width
-                    height: Theme.paddingSmall
-                    radius: height / 2
-                    color: Theme.rgba(Theme.primaryColor, 0.2)
-
-                    Rectangle {
-                        objectName: "quotaFill"
-                        width: Math.round(parent.width * quotaBar.value / 100)
-                        height: parent.height
-                        radius: height / 2
-                        color: Theme.highlightColor
-                    }
-                }
-
-                Label {
-                    id: quotaLabel
-                    objectName: "quotaLabel"
-                    anchors {
-                        top: track.bottom
-                        topMargin: Theme.paddingSmall
-                    }
-                    width: parent.width
-                    wrapMode: Text.Wrap
-                    font.pixelSize: Theme.fontSizeSmall
-                    color: Theme.secondaryHighlightColor
-                    // The relay's own words, when they are what is shown.
-                    textFormat: Text.PlainText
-                    text: quotaBar.label
-                }
             }
 
             Label {
@@ -423,29 +529,116 @@ Page {
                 wrapMode: Text.Wrap
                 visible: profile.storage_bytes > 0
                 font.pixelSize: Theme.fontSizeSmall
-                color: Theme.secondaryColor
+                color: Theme.secondaryHighlightColor
                 textFormat: Text.PlainText
                 //: How much room the profile takes on the phone. %1 is a size such as "12.3 MB".
-                text: qsTr("%1 on this phone").arg(Format.readableSize(profile.storage_bytes))
+                text: qsTr("Piirit uses %1 of storage on this phone.")
+                      .arg(Format.readableSize(profile.storage_bytes))
             }
 
-            // What the relay will carry in one message, which is the
-            // other thing about it worth knowing before a long video is
-            // picked. The core's own recommendation rather than anything
-            // measured here; the conversation refuses a bigger file on
-            // the strength of the same number.
-            Label {
-                objectName: "attachmentLimitLabel"
-                x: Theme.horizontalPageMargin
-                width: parent.width - 2 * Theme.horizontalPageMargin
-                wrapMode: Text.Wrap
-                visible: profile.attachment_limit_bytes > 0
-                font.pixelSize: Theme.fontSizeSmall
-                color: Theme.secondaryColor
-                textFormat: Text.PlainText
-                //: The biggest attachment the relay will carry. %1 is a size such as "22.3 MB".
-                text: qsTr("Attachments up to %1")
-                      .arg(Format.readableSize(profile.attachment_limit_bytes))
+            // Then each relay, in the order the rows above have them:
+            // the connection, as a dot in the colour the core's own
+            // report draws it and the core's own words beside it; and
+            // the mailbox on the relay, a bar always there, at nothing
+            // until the relay has said how full it is, with the words
+            // under it saying what it said. Drawn here rather than
+            // Silica's ProgressBar, whose track sits well inside its own
+            // margins: this one runs the width of the text above it.
+            Repeater {
+                objectName: "relayReports"
+                model: transports.rows
+
+                Column {
+                    id: relayReport
+                    objectName: "relayReport" + index
+                    x: Theme.horizontalPageMargin
+                    width: column.width - 2 * Theme.horizontalPageMargin
+                    spacing: Theme.paddingSmall
+
+                    /// The relay reported on, for a test to read.
+                    readonly property string domain: model.domain
+
+                    Label {
+                        objectName: "reportDomain"
+                        width: parent.width
+                        wrapMode: Text.WrapAnywhere
+                        color: Theme.highlightColor
+                        // The relay's string, pinned to plain.
+                        textFormat: Text.PlainText
+                        text: model.domain
+                    }
+
+                    Row {
+                        width: parent.width
+                        spacing: Theme.paddingMedium
+
+                        Rectangle {
+                            objectName: "reportDot"
+                            anchors.verticalCenter: parent.verticalCenter
+                            width: Theme.paddingLarge
+                            height: width
+                            radius: width / 2
+                            color: page.dotColor(model.dot)
+                        }
+
+                        Label {
+                            objectName: "reportStatus"
+                            width: parent.width - Theme.paddingLarge - Theme.paddingMedium
+                            wrapMode: Text.Wrap
+                            font.pixelSize: Theme.fontSizeSmall
+                            color: Theme.highlightColor
+                            // The core's own words, when it has said any.
+                            textFormat: Text.PlainText
+                            text: model.status.length > 0 ? model.status
+                                                          : qsTr("Checking the connection")
+                        }
+                    }
+
+                    Item {
+                        id: reportQuota
+                        objectName: "reportQuota"
+                        /// Percent used, 0 to 100.
+                        property real value: Math.min(100, model.quota_percent)
+                        /// What is said under the bar.
+                        property string label: page.quotaWords(model.quota_used_bytes,
+                                                               model.quota_limit_bytes,
+                                                               model.quota_text)
+                        width: parent.width
+                        height: track.height + Theme.paddingSmall + quotaLabel.height
+
+                        Rectangle {
+                            id: track
+                            width: parent.width
+                            height: Theme.paddingSmall
+                            radius: height / 2
+                            color: Theme.rgba(Theme.primaryColor, 0.2)
+
+                            Rectangle {
+                                objectName: "quotaFill"
+                                width: Math.round(parent.width * reportQuota.value / 100)
+                                height: parent.height
+                                radius: height / 2
+                                color: Theme.highlightColor
+                            }
+                        }
+
+                        Label {
+                            id: quotaLabel
+                            objectName: "quotaLabel"
+                            anchors {
+                                top: track.bottom
+                                topMargin: Theme.paddingSmall
+                            }
+                            width: parent.width
+                            wrapMode: Text.Wrap
+                            font.pixelSize: Theme.fontSizeSmall
+                            color: Theme.secondaryHighlightColor
+                            // The relay's own words, when they are what is shown.
+                            textFormat: Text.PlainText
+                            text: reportQuota.label
+                        }
+                    }
+                }
             }
         }
     }

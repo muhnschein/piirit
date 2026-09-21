@@ -39,20 +39,20 @@
         <translation>Το όνομά σας</translation>
     </message>
     <message>
-        <source>Relay</source>
-        <translation>Αναμεταδότης</translation>
+        <source>Select a public chatmail relay</source>
+        <translation>Επιλέξτε δημόσιο αναμεταδότη chatmail</translation>
     </message>
     <message>
-        <source>Custom server</source>
-        <translation>Δικός σας διακομιστής</translation>
+        <source>Use a custom chatmail relay</source>
+        <translation>Χρήση δικού σας αναμεταδότη chatmail</translation>
     </message>
     <message>
-        <source>See &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; for the full list.</source>
-        <translation>Η πλήρης λίστα βρίσκεται στο &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
+        <source>Piirit works only with chatmail relays. These are a particular kind of e-mail server; ordinary e-mail servers are not supported. For more, see &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. A full list of public, free-to-use chatmail relays is at &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</source>
+        <translation>Το Piirit λειτουργεί μόνο με αναμεταδότες chatmail. Είναι ένα ιδιαίτερο είδος διακομιστή e-mail· οι συνηθισμένοι διακομιστές e-mail δεν υποστηρίζονται. Περισσότερα στο &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. Πλήρης λίστα δημόσιων, δωρεάν αναμεταδοτών chatmail υπάρχει στο &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
     </message>
     <message>
-        <source>The relay gives you an address. The keys are made on this phone.</source>
-        <translation>Ο αναμεταδότης σας δίνει μια διεύθυνση. Τα κλειδιά φτιάχνονται σε αυτό το τηλέφωνο.</translation>
+        <source>Pick a name and a relay. That&apos;s it! There is nothing else to set up.</source>
+        <translation>Διαλέξτε ένα όνομα και έναν αναμεταδότη. Αυτό ήταν! Δεν χρειάζεται τίποτα άλλο.</translation>
     </message>
 </context>
 <context>
@@ -84,6 +84,49 @@
     <message>
         <source>The other device keeps it. Both get everything new.</source>
         <translation>Η άλλη συσκευή το κρατά. Και οι δύο παίρνουν ό,τι νέο έρθει.</translation>
+    </message>
+</context>
+<context>
+    <name>AddRelayPage</name>
+    <message>
+        <source>%1 did not answer within %2 seconds.</source>
+        <translation>Το %1 δεν απάντησε μέσα σε %2 δευτερόλεπτα.</translation>
+    </message>
+    <message>
+        <source>Add a relay</source>
+        <translation>Προσθήκη αναμεταδότη</translation>
+    </message>
+    <message>
+        <source>Another address for this profile, on another relay. The profile sends from one relay at a time; its page says which, and lets you change it.</source>
+        <translation>Μία ακόμη διεύθυνση για αυτό το προφίλ, σε άλλον αναμεταδότη. Το προφίλ στέλνει από έναν αναμεταδότη κάθε φορά· η σελίδα του δείχνει ποιον και σας αφήνει να τον αλλάξετε.</translation>
+    </message>
+    <message>
+        <source>Add relay</source>
+        <translation>Προσθήκη αναμεταδότη</translation>
+    </message>
+    <message>
+        <source>Contacting %1...</source>
+        <translation>Επικοινωνία με %1...</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Ακύρωση</translation>
+    </message>
+    <message>
+        <source>Relays are run by volunteers. Try another one.</source>
+        <translation>Οι αναμεταδότες κρατιούνται από εθελοντές. Δοκιμάστε άλλον.</translation>
+    </message>
+    <message>
+        <source>Select a public chatmail relay</source>
+        <translation>Επιλέξτε δημόσιο αναμεταδότη chatmail</translation>
+    </message>
+    <message>
+        <source>Use a custom chatmail relay</source>
+        <translation>Χρήση δικού σας αναμεταδότη chatmail</translation>
+    </message>
+    <message>
+        <source>Piirit works only with chatmail relays. These are a particular kind of e-mail server; ordinary e-mail servers are not supported. For more, see &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. A full list of public, free-to-use chatmail relays is at &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</source>
+        <translation>Το Piirit λειτουργεί μόνο με αναμεταδότες chatmail. Είναι ένα ιδιαίτερο είδος διακομιστή e-mail· οι συνηθισμένοι διακομιστές e-mail δεν υποστηρίζονται. Περισσότερα στο &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. Πλήρης λίστα δημόσιων, δωρεάν αναμεταδοτών chatmail υπάρχει στο &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
     </message>
 </context>
 <context>
@@ -533,13 +576,13 @@ Other groups with blocked contacts will still show their messages.</source>
         </translation>
     </message>
     <message>
-        <source>Too big to send: %1. This relay takes %2.</source>
-        <extracomment>Shown above the message field when the attached file is bigger than the relay will carry. %1 is the file&apos;s size and %2 the largest the relay takes, each such as &quot;24 MB&quot;.</extracomment>
-        <translation>Πολύ μεγάλο για αποστολή: %1. Αυτός ο αναμεταδότης δέχεται %2.</translation>
-    </message>
-    <message>
         <source>Saved to Downloads</source>
         <translation>Αποθηκεύτηκε στις Λήψεις</translation>
+    </message>
+    <message>
+        <source>Too big to send: %1. Attachments go up to %2.</source>
+        <extracomment>Shown above the message field when the attached file is bigger than will be sent. %1 is the file&apos;s size and %2 the largest that goes, each such as &quot;24 MB&quot;.</extracomment>
+        <translation>Πολύ μεγάλο για αποστολή: %1. Τα συνημμένα μπορούν να είναι έως %2.</translation>
     </message>
 </context>
 <context>
@@ -1000,10 +1043,6 @@ Other groups with blocked contacts will still show their messages.</source>
 <context>
     <name>ProfilePage</name>
     <message>
-        <source>Not connected</source>
-        <translation>Χωρίς σύνδεση</translation>
-    </message>
-    <message>
         <source>Checking the connection</source>
         <translation>Έλεγχος της σύνδεσης</translation>
     </message>
@@ -1028,10 +1067,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Μια γραμμή για εσάς</translation>
     </message>
     <message>
-        <source>Address</source>
-        <translation>Διεύθυνση</translation>
-    </message>
-    <message>
         <source>Send read receipts</source>
         <translation>Αποστολή αποδείξεων ανάγνωσης</translation>
     </message>
@@ -1040,47 +1075,51 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Αποθηκευτικός χώρος και συνδεσιμότητα</translation>
     </message>
     <message>
-        <source>%1 on this phone</source>
-        <extracomment>How much room the profile takes on the phone. %1 is a size such as &quot;12.3 MB&quot;.</extracomment>
-        <translation>%1 σε αυτό το τηλέφωνο</translation>
-    </message>
-    <message>
         <source>Saved</source>
         <translation>Αποθηκεύτηκε</translation>
-    </message>
-    <message>
-        <source>Connected, and up to date</source>
-        <translation>Συνδεδεμένο και ενημερωμένο</translation>
-    </message>
-    <message>
-        <source>Connected, sending or syncing messages</source>
-        <translation>Συνδεδεμένο, αποστολή ή συγχρονισμός μηνυμάτων</translation>
-    </message>
-    <message>
-        <source>Connecting to the relay</source>
-        <translation>Σύνδεση με τον αναμεταδότη</translation>
-    </message>
-    <message>
-        <source>%1 used · %2 left of %3</source>
-        <extracomment>The mailbox on the relay. %1 used, %2 left, %3 the whole, each a size such as &quot;1.4 GB&quot;.</extracomment>
-        <translation>%1 σε χρήση · %2 ελεύθερα από %3</translation>
     </message>
     <message>
         <source>The relay has not reported its quota yet</source>
         <translation>Ο αναμεταδότης δεν έχει αναφέρει ακόμη το όριό του</translation>
     </message>
     <message>
-        <source>The name on every message you send</source>
-        <translation>Το όνομα σε κάθε μήνυμα που στέλνετε</translation>
-    </message>
-    <message>
         <source>Both ways: with this off you send none and see none.</source>
         <translation>Και προς τις δύο κατευθύνσεις: κλειστό, δεν στέλνετε καμία και δεν βλέπετε καμία.</translation>
     </message>
     <message>
-        <source>Attachments up to %1</source>
-        <extracomment>The biggest attachment the relay will carry. %1 is a size such as &quot;22.3 MB&quot;.</extracomment>
-        <translation>Συνημμένα έως %1</translation>
+        <source>Relays</source>
+        <translation>Αναμεταδότες</translation>
+    </message>
+    <message>
+        <source>Sends from this relay</source>
+        <translation>Στέλνει από αυτόν τον αναμεταδότη</translation>
+    </message>
+    <message>
+        <source>Removing relay</source>
+        <extracomment>What Silica&apos;s countdown says it is doing, over a relay the reader has asked to remove.</extracomment>
+        <translation>Αφαίρεση αναμεταδότη σε εξέλιξη</translation>
+    </message>
+    <message>
+        <source>Send from this relay</source>
+        <translation>Αποστολή από αυτόν τον αναμεταδότη</translation>
+    </message>
+    <message>
+        <source>Remove relay</source>
+        <translation>Αφαίρεση αναμεταδότη</translation>
+    </message>
+    <message>
+        <source>Add a relay</source>
+        <translation>Προσθήκη αναμεταδότη</translation>
+    </message>
+    <message>
+        <source>%1 of %2 used</source>
+        <extracomment>The mailbox on the relay. %1 used, %2 the whole, each a size such as &quot;1.4 GB&quot;.</extracomment>
+        <translation>%1 από %2 σε χρήση</translation>
+    </message>
+    <message>
+        <source>Piirit uses %1 of storage on this phone.</source>
+        <extracomment>How much room the profile takes on the phone. %1 is a size such as &quot;12.3 MB&quot;.</extracomment>
+        <translation>Το Piirit χρησιμοποιεί %1 αποθηκευτικού χώρου σε αυτό το τηλέφωνο.</translation>
     </message>
 </context>
 <context>

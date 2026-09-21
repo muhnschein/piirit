@@ -39,20 +39,20 @@
         <translation>നിങ്ങളുടെ പേര്</translation>
     </message>
     <message>
-        <source>Relay</source>
-        <translation>റിലേ</translation>
+        <source>Select a public chatmail relay</source>
+        <translation>പൊതു chatmail റിലേ തിരഞ്ഞെടുക്കുക</translation>
     </message>
     <message>
-        <source>Custom server</source>
-        <translation>സ്വന്തം സെർവർ</translation>
+        <source>Use a custom chatmail relay</source>
+        <translation>സ്വന്തം chatmail റിലേ ഉപയോഗിക്കുക</translation>
     </message>
     <message>
-        <source>See &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; for the full list.</source>
-        <translation>മുഴുവൻ പട്ടിക &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; ൽ കാണുക.</translation>
+        <source>Piirit works only with chatmail relays. These are a particular kind of e-mail server; ordinary e-mail servers are not supported. For more, see &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. A full list of public, free-to-use chatmail relays is at &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</source>
+        <translation>Piirit chatmail റിലേകളുമായി മാത്രമേ പ്രവർത്തിക്കൂ. ഇവ ഒരു പ്രത്യേക തരം ഇ-മെയിൽ സെർവറുകളാണ്; സാധാരണ ഇ-മെയിൽ സെർവറുകൾ പിന്തുണയ്ക്കുന്നില്ല. കൂടുതൽ അറിയാൻ &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt; കാണുക. പൊതു, സൗജന്യ chatmail റിലേകളുടെ പൂർണ്ണ പട്ടിക &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;-ൽ ഉണ്ട്.</translation>
     </message>
     <message>
-        <source>The relay gives you an address. The keys are made on this phone.</source>
-        <translation>റിലേ നിങ്ങൾക്ക് ഒരു വിലാസം നൽകുന്നു. താക്കോലുകൾ ഈ ഫോണിൽത്തന്നെ ഉണ്ടാകുന്നു.</translation>
+        <source>Pick a name and a relay. That&apos;s it! There is nothing else to set up.</source>
+        <translation>ഒരു പേരും ഒരു റിലേയും തിരഞ്ഞെടുക്കുക. അത്രമാത്രം! വേറൊന്നും സജ്ജീകരിക്കേണ്ടതില്ല.</translation>
     </message>
 </context>
 <context>
@@ -84,6 +84,49 @@
     <message>
         <source>The other device keeps it. Both get everything new.</source>
         <translation>മറ്റേ ഉപകരണം അത് സൂക്ഷിക്കും. രണ്ടിനും പുതിയതെല്ലാം കിട്ടും.</translation>
+    </message>
+</context>
+<context>
+    <name>AddRelayPage</name>
+    <message>
+        <source>%1 did not answer within %2 seconds.</source>
+        <translation>%1 %2 സെക്കൻഡിനുള്ളിൽ മറുപടി നൽകിയില്ല.</translation>
+    </message>
+    <message>
+        <source>Add a relay</source>
+        <translation>ഒരു റിലേ ചേർക്കുക</translation>
+    </message>
+    <message>
+        <source>Another address for this profile, on another relay. The profile sends from one relay at a time; its page says which, and lets you change it.</source>
+        <translation>ഈ പ്രൊഫൈലിന് മറ്റൊരു റിലേയിൽ ഒരു വിലാസം കൂടി. പ്രൊഫൈൽ ഒരു സമയത്ത് ഒരു റിലേയിൽ നിന്നേ അയയ്ക്കൂ; ഏതെന്ന് അതിന്റെ പേജ് കാണിക്കുകയും മാറ്റാൻ അനുവദിക്കുകയും ചെയ്യുന്നു.</translation>
+    </message>
+    <message>
+        <source>Add relay</source>
+        <translation>റിലേ ചേർക്കുക</translation>
+    </message>
+    <message>
+        <source>Contacting %1...</source>
+        <translation>%1 മായി ബന്ധപ്പെടുന്നു...</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>റദ്ദാക്കുക</translation>
+    </message>
+    <message>
+        <source>Relays are run by volunteers. Try another one.</source>
+        <translation>റിലേകൾ നടത്തുന്നത് സന്നദ്ധപ്രവർത്തകരാണ്. മറ്റൊന്ന് പരീക്ഷിക്കുക.</translation>
+    </message>
+    <message>
+        <source>Select a public chatmail relay</source>
+        <translation>പൊതു chatmail റിലേ തിരഞ്ഞെടുക്കുക</translation>
+    </message>
+    <message>
+        <source>Use a custom chatmail relay</source>
+        <translation>സ്വന്തം chatmail റിലേ ഉപയോഗിക്കുക</translation>
+    </message>
+    <message>
+        <source>Piirit works only with chatmail relays. These are a particular kind of e-mail server; ordinary e-mail servers are not supported. For more, see &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. A full list of public, free-to-use chatmail relays is at &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</source>
+        <translation>Piirit chatmail റിലേകളുമായി മാത്രമേ പ്രവർത്തിക്കൂ. ഇവ ഒരു പ്രത്യേക തരം ഇ-മെയിൽ സെർവറുകളാണ്; സാധാരണ ഇ-മെയിൽ സെർവറുകൾ പിന്തുണയ്ക്കുന്നില്ല. കൂടുതൽ അറിയാൻ &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt; കാണുക. പൊതു, സൗജന്യ chatmail റിലേകളുടെ പൂർണ്ണ പട്ടിക &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;-ൽ ഉണ്ട്.</translation>
     </message>
 </context>
 <context>
@@ -537,13 +580,13 @@ Other groups with blocked contacts will still show their messages.</source>
         </translation>
     </message>
     <message>
-        <source>Too big to send: %1. This relay takes %2.</source>
-        <extracomment>Shown above the message field when the attached file is bigger than the relay will carry. %1 is the file&apos;s size and %2 the largest the relay takes, each such as &quot;24 MB&quot;.</extracomment>
-        <translation>അയയ്ക്കാൻ വളരെ വലുത്: %1. ഈ റിലേ %2 വരെ സ്വീകരിക്കും.</translation>
-    </message>
-    <message>
         <source>Saved to Downloads</source>
         <translation>ഡൗൺലോഡുകളിൽ സൂക്ഷിച്ചു</translation>
+    </message>
+    <message>
+        <source>Too big to send: %1. Attachments go up to %2.</source>
+        <extracomment>Shown above the message field when the attached file is bigger than will be sent. %1 is the file&apos;s size and %2 the largest that goes, each such as &quot;24 MB&quot;.</extracomment>
+        <translation>അയയ്ക്കാൻ വളരെ വലുത്: %1. അറ്റാച്ച്‌മെന്റുകൾ പരമാവധി %2 വരെയാകാം.</translation>
     </message>
 </context>
 <context>
@@ -1004,10 +1047,6 @@ Other groups with blocked contacts will still show their messages.</source>
 <context>
     <name>ProfilePage</name>
     <message>
-        <source>Not connected</source>
-        <translation>കണക്റ്റ് ചെയ്തിട്ടില്ല</translation>
-    </message>
-    <message>
         <source>Checking the connection</source>
         <translation>കണക്ഷൻ പരിശോധിക്കുന്നു</translation>
     </message>
@@ -1032,10 +1071,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>നിങ്ങളെക്കുറിച്ച് ഒരു വരി</translation>
     </message>
     <message>
-        <source>Address</source>
-        <translation>വിലാസം</translation>
-    </message>
-    <message>
         <source>Send read receipts</source>
         <translation>വായിച്ചതിന്റെ രസീതുകൾ അയയ്ക്കുക</translation>
     </message>
@@ -1044,47 +1079,51 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>സ്റ്റോറേജും കണക്റ്റിവിറ്റിയും</translation>
     </message>
     <message>
-        <source>%1 on this phone</source>
-        <extracomment>How much room the profile takes on the phone. %1 is a size such as &quot;12.3 MB&quot;.</extracomment>
-        <translation>ഈ ഫോണിൽ %1</translation>
-    </message>
-    <message>
         <source>Saved</source>
         <translation>സംരക്ഷിച്ചു</translation>
-    </message>
-    <message>
-        <source>Connected, and up to date</source>
-        <translation>കണക്റ്റ് ചെയ്തു, കാലികമാണ്</translation>
-    </message>
-    <message>
-        <source>Connected, sending or syncing messages</source>
-        <translation>കണക്റ്റ് ചെയ്തു, സന്ദേശങ്ങൾ അയയ്ക്കുകയോ സമന്വയിപ്പിക്കുകയോ ചെയ്യുന്നു</translation>
-    </message>
-    <message>
-        <source>Connecting to the relay</source>
-        <translation>റിലേയിലേക്ക് കണക്റ്റ് ചെയ്യുന്നു</translation>
-    </message>
-    <message>
-        <source>%1 used · %2 left of %3</source>
-        <extracomment>The mailbox on the relay. %1 used, %2 left, %3 the whole, each a size such as &quot;1.4 GB&quot;.</extracomment>
-        <translation>%3-ൽ %1 ഉപയോഗിച്ചു · %2 ബാക്കി</translation>
     </message>
     <message>
         <source>The relay has not reported its quota yet</source>
         <translation>റിലേ അതിന്റെ ക്വോട്ട ഇതുവരെ അറിയിച്ചിട്ടില്ല</translation>
     </message>
     <message>
-        <source>The name on every message you send</source>
-        <translation>നിങ്ങൾ അയയ്ക്കുന്ന ഓരോ സന്ദേശത്തിലുമുള്ള പേര്</translation>
-    </message>
-    <message>
         <source>Both ways: with this off you send none and see none.</source>
         <translation>രണ്ടു വഴിക്കും: ഓഫാണെങ്കിൽ നിങ്ങൾ ഒന്നും അയയ്ക്കുന്നില്ല, ഒന്നും കാണുന്നുമില്ല.</translation>
     </message>
     <message>
-        <source>Attachments up to %1</source>
-        <extracomment>The biggest attachment the relay will carry. %1 is a size such as &quot;22.3 MB&quot;.</extracomment>
-        <translation>%1 വരെയുള്ള അറ്റാച്ച്‌മെന്റുകൾ</translation>
+        <source>Relays</source>
+        <translation>റിലേകൾ</translation>
+    </message>
+    <message>
+        <source>Sends from this relay</source>
+        <translation>ഈ റിലേയിൽ നിന്ന് അയയ്ക്കുന്നു</translation>
+    </message>
+    <message>
+        <source>Removing relay</source>
+        <extracomment>What Silica&apos;s countdown says it is doing, over a relay the reader has asked to remove.</extracomment>
+        <translation>റിലേ നീക്കം ചെയ്യുന്നു</translation>
+    </message>
+    <message>
+        <source>Send from this relay</source>
+        <translation>ഈ റിലേയിൽ നിന്ന് അയയ്ക്കുക</translation>
+    </message>
+    <message>
+        <source>Remove relay</source>
+        <translation>റിലേ നീക്കം ചെയ്യുക</translation>
+    </message>
+    <message>
+        <source>Add a relay</source>
+        <translation>ഒരു റിലേ ചേർക്കുക</translation>
+    </message>
+    <message>
+        <source>%1 of %2 used</source>
+        <extracomment>The mailbox on the relay. %1 used, %2 the whole, each a size such as &quot;1.4 GB&quot;.</extracomment>
+        <translation>%2-ൽ %1 ഉപയോഗിച്ചു</translation>
+    </message>
+    <message>
+        <source>Piirit uses %1 of storage on this phone.</source>
+        <extracomment>How much room the profile takes on the phone. %1 is a size such as &quot;12.3 MB&quot;.</extracomment>
+        <translation>Piirit ഈ ഫോണിൽ %1 സ്റ്റോറേജ് ഉപയോഗിക്കുന്നു.</translation>
     </message>
 </context>
 <context>

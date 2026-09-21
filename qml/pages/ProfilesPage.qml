@@ -45,6 +45,15 @@ Page {
     Connections {
         target: core
         onAccount_error: page.errorMessage = message
+        // A row names the relay its profile sends from. The core says
+        // when a profile's relays change -- from its page over this one,
+        // or from another device the profile is on -- and the rows are
+        // read again.
+        onCore_event: {
+            if (kind === "TransportsModified") {
+                core.refresh_accounts()
+            }
+        }
     }
 
     property string errorMessage: ""

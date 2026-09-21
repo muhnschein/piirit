@@ -6,6 +6,47 @@ of the GitHub release, which `scripts/release-notes.sh` cuts out of this
 file when the release is made (`.github/workflows/rpm.yml`;
 docs/BUILDING.md, "Cutting a release").
 
+## Unreleased
+
+A profile can have more than one transport -- a relay set up long ago
+beside the one it sends from now -- and the app took the wrong one of
+them in two places, reported from a phone whose profiles page named a
+relay its profile had left.
+
+- The address under a profile's name on the profiles page is the relay it
+  sends from (`configured_addr`) rather than the account list's `addr`,
+  a key the core deprecated and only falls back to it with.
+- The mailbox figure on the profile page is that same relay's. The core's
+  connectivity report covers every transport, and the first quota bar in
+  it belongs to whichever was set up first.
+- The relay list is the one chatmail.at/relays publishes today, and the
+  dialog no longer opens on a relay of its own choosing: it asks, and
+  Create waits until the answer is there.
+
+A profile's relays are on its page now, not just the one it sends from.
+
+- The profile page lists every relay the profile is reached through, the
+  one it sends from first and marked as such, each with its own address.
+  A row's menu sends from that relay instead, or removes it after the
+  countdown every other deletion gets; the last relay is not offered for
+  removal, since the core refuses it. The profiles page's row follows
+  the switch, as does everything else that names the address.
+- Storage and connectivity are reported relay by relay: for each, the
+  core's own dot and words about its connection, and its mailbox on a
+  bar with what is used of what there is. Before them, what the profile
+  takes on the phone.
+- One more relay can be added from the plus under the rows, from the same
+  list the profile was made from or a typed server, with the same wait,
+  Cancel and time-out the first relay had. A relay that answers after the
+  reader gave up is kept on the profile rather than undone: the profile
+  is theirs, and its page lists what the relay added.
+- The relays follow the other devices the profile is on: the core says
+  when they change, and the page reads them again.
+- The relay pickers say what they are for: the list is "Select a public
+  chatmail relay", the field "Use a custom chatmail relay", and the note
+  under them says what a chatmail relay is and where the list of public
+  ones lives. The name field on the profile page has no line under it.
+
 ## 1.0.0 — 2026-09-18
 
 The first release. Piirit is a native Sailfish OS client for

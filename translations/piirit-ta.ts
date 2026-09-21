@@ -39,20 +39,20 @@
         <translation>உங்கள் பெயர்</translation>
     </message>
     <message>
-        <source>Relay</source>
-        <translation>ரிலே</translation>
+        <source>Select a public chatmail relay</source>
+        <translation>பொது chatmail ரிலேயைத் தேர்ந்தெடு</translation>
     </message>
     <message>
-        <source>Custom server</source>
-        <translation>சொந்த சேவையகம்</translation>
+        <source>Use a custom chatmail relay</source>
+        <translation>சொந்த chatmail ரிலேயைப் பயன்படுத்து</translation>
     </message>
     <message>
-        <source>See &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; for the full list.</source>
-        <translation>முழுப் பட்டியலை &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; இல் காணலாம்.</translation>
+        <source>Piirit works only with chatmail relays. These are a particular kind of e-mail server; ordinary e-mail servers are not supported. For more, see &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. A full list of public, free-to-use chatmail relays is at &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</source>
+        <translation>Piirit chatmail ரிலேக்களுடன் மட்டுமே வேலை செய்யும். இவை ஒரு தனி வகை மின்னஞ்சல் சேவையகங்கள்; சாதாரண மின்னஞ்சல் சேவையகங்கள் ஆதரிக்கப்படுவதில்லை. மேலும் அறிய &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt; பார்க்கவும். பொது, இலவச chatmail ரிலேக்களின் முழுப் பட்டியல் &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;-இல் உள்ளது.</translation>
     </message>
     <message>
-        <source>The relay gives you an address. The keys are made on this phone.</source>
-        <translation>ரிலே உங்களுக்கு ஒரு முகவரியைத் தரும். சாவிகள் இந்தத் தொலைபேசியிலேயே உருவாகும்.</translation>
+        <source>Pick a name and a relay. That&apos;s it! There is nothing else to set up.</source>
+        <translation>ஒரு பெயரையும் ஒரு ரிலேயையும் தேர்ந்தெடுங்கள். அவ்வளவுதான்! வேறு எதையும் அமைக்க வேண்டியதில்லை.</translation>
     </message>
 </context>
 <context>
@@ -84,6 +84,49 @@
     <message>
         <source>The other device keeps it. Both get everything new.</source>
         <translation>மறு சாதனம் அதை வைத்திருக்கும். இரண்டும் புதியதெல்லாம் பெறும்.</translation>
+    </message>
+</context>
+<context>
+    <name>AddRelayPage</name>
+    <message>
+        <source>%1 did not answer within %2 seconds.</source>
+        <translation>%1 %2 வினாடிகளுக்குள் பதிலளிக்கவில்லை.</translation>
+    </message>
+    <message>
+        <source>Add a relay</source>
+        <translation>ரிலே சேர்</translation>
+    </message>
+    <message>
+        <source>Another address for this profile, on another relay. The profile sends from one relay at a time; its page says which, and lets you change it.</source>
+        <translation>இந்தச் சுயவிவரத்திற்கு வேறொரு ரிலேயில் இன்னொரு முகவரி. சுயவிவரம் ஒரு நேரத்தில் ஒரே ரிலேயிலிருந்துதான் அனுப்பும்; எது என்று அதன் பக்கம் காட்டும், மாற்றவும் விடும்.</translation>
+    </message>
+    <message>
+        <source>Add relay</source>
+        <translation>ரிலே சேர்</translation>
+    </message>
+    <message>
+        <source>Contacting %1...</source>
+        <translation>%1 ஐத் தொடர்புகொள்கிறது...</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>ரத்துசெய்</translation>
+    </message>
+    <message>
+        <source>Relays are run by volunteers. Try another one.</source>
+        <translation>ரிலேக்களைத் தன்னார்வலர்கள் நடத்துகிறார்கள். வேறொன்றை முயலுங்கள்.</translation>
+    </message>
+    <message>
+        <source>Select a public chatmail relay</source>
+        <translation>பொது chatmail ரிலேயைத் தேர்ந்தெடு</translation>
+    </message>
+    <message>
+        <source>Use a custom chatmail relay</source>
+        <translation>சொந்த chatmail ரிலேயைப் பயன்படுத்து</translation>
+    </message>
+    <message>
+        <source>Piirit works only with chatmail relays. These are a particular kind of e-mail server; ordinary e-mail servers are not supported. For more, see &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. A full list of public, free-to-use chatmail relays is at &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</source>
+        <translation>Piirit chatmail ரிலேக்களுடன் மட்டுமே வேலை செய்யும். இவை ஒரு தனி வகை மின்னஞ்சல் சேவையகங்கள்; சாதாரண மின்னஞ்சல் சேவையகங்கள் ஆதரிக்கப்படுவதில்லை. மேலும் அறிய &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt; பார்க்கவும். பொது, இலவச chatmail ரிலேக்களின் முழுப் பட்டியல் &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;-இல் உள்ளது.</translation>
     </message>
 </context>
 <context>
@@ -533,13 +576,13 @@ Other groups with blocked contacts will still show their messages.</source>
         </translation>
     </message>
     <message>
-        <source>Too big to send: %1. This relay takes %2.</source>
-        <extracomment>Shown above the message field when the attached file is bigger than the relay will carry. %1 is the file&apos;s size and %2 the largest the relay takes, each such as &quot;24 MB&quot;.</extracomment>
-        <translation>அனுப்ப மிகப் பெரியது: %1. இந்த ரிலே %2 வரை ஏற்கும்.</translation>
-    </message>
-    <message>
         <source>Saved to Downloads</source>
         <translation>பதிவிறக்கங்களில் சேமிக்கப்பட்டது</translation>
+    </message>
+    <message>
+        <source>Too big to send: %1. Attachments go up to %2.</source>
+        <extracomment>Shown above the message field when the attached file is bigger than will be sent. %1 is the file&apos;s size and %2 the largest that goes, each such as &quot;24 MB&quot;.</extracomment>
+        <translation>அனுப்ப மிகப் பெரியது: %1. இணைப்புகள் அதிகபட்சம் %2 வரை இருக்கலாம்.</translation>
     </message>
 </context>
 <context>
@@ -1000,10 +1043,6 @@ Other groups with blocked contacts will still show their messages.</source>
 <context>
     <name>ProfilePage</name>
     <message>
-        <source>Not connected</source>
-        <translation>இணைக்கப்படவில்லை</translation>
-    </message>
-    <message>
         <source>Checking the connection</source>
         <translation>இணைப்பு சரிபார்க்கப்படுகிறது</translation>
     </message>
@@ -1028,10 +1067,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>உங்களைப் பற்றி ஒரு வரி</translation>
     </message>
     <message>
-        <source>Address</source>
-        <translation>முகவரி</translation>
-    </message>
-    <message>
         <source>Send read receipts</source>
         <translation>படித்ததற்கான ரசீதுகளை அனுப்பு</translation>
     </message>
@@ -1040,47 +1075,51 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>சேமிப்பகமும் இணைப்பும்</translation>
     </message>
     <message>
-        <source>%1 on this phone</source>
-        <extracomment>How much room the profile takes on the phone. %1 is a size such as &quot;12.3 MB&quot;.</extracomment>
-        <translation>இந்தத் தொலைபேசியில் %1</translation>
-    </message>
-    <message>
         <source>Saved</source>
         <translation>சேமிக்கப்பட்டது</translation>
-    </message>
-    <message>
-        <source>Connected, and up to date</source>
-        <translation>இணைக்கப்பட்டது, புதுப்பித்த நிலையில் உள்ளது</translation>
-    </message>
-    <message>
-        <source>Connected, sending or syncing messages</source>
-        <translation>இணைக்கப்பட்டது, செய்திகளை அனுப்புகிறது அல்லது ஒத்திசைக்கிறது</translation>
-    </message>
-    <message>
-        <source>Connecting to the relay</source>
-        <translation>ரிலேயுடன் இணைக்கப்படுகிறது</translation>
-    </message>
-    <message>
-        <source>%1 used · %2 left of %3</source>
-        <extracomment>The mailbox on the relay. %1 used, %2 left, %3 the whole, each a size such as &quot;1.4 GB&quot;.</extracomment>
-        <translation>%3-இல் %1 பயன்படுத்தப்பட்டது · %2 மீதம்</translation>
     </message>
     <message>
         <source>The relay has not reported its quota yet</source>
         <translation>ரிலே தனது ஒதுக்கீட்டை இன்னும் தெரிவிக்கவில்லை</translation>
     </message>
     <message>
-        <source>The name on every message you send</source>
-        <translation>நீங்கள் அனுப்பும் ஒவ்வொரு செய்தியிலும் உள்ள பெயர்</translation>
-    </message>
-    <message>
         <source>Both ways: with this off you send none and see none.</source>
         <translation>இரு பக்கமும்: அணைத்திருந்தால் நீங்கள் ஒன்றும் அனுப்புவதில்லை, ஒன்றும் காண்பதில்லை.</translation>
     </message>
     <message>
-        <source>Attachments up to %1</source>
-        <extracomment>The biggest attachment the relay will carry. %1 is a size such as &quot;22.3 MB&quot;.</extracomment>
-        <translation>%1 வரையிலான இணைப்புகள்</translation>
+        <source>Relays</source>
+        <translation>ரிலேக்கள்</translation>
+    </message>
+    <message>
+        <source>Sends from this relay</source>
+        <translation>இந்த ரிலேயிலிருந்து அனுப்புகிறது</translation>
+    </message>
+    <message>
+        <source>Removing relay</source>
+        <extracomment>What Silica&apos;s countdown says it is doing, over a relay the reader has asked to remove.</extracomment>
+        <translation>ரிலே நீக்கப்படுகிறது</translation>
+    </message>
+    <message>
+        <source>Send from this relay</source>
+        <translation>இந்த ரிலேயிலிருந்து அனுப்பு</translation>
+    </message>
+    <message>
+        <source>Remove relay</source>
+        <translation>ரிலேயை நீக்கு</translation>
+    </message>
+    <message>
+        <source>Add a relay</source>
+        <translation>ரிலே சேர்</translation>
+    </message>
+    <message>
+        <source>%1 of %2 used</source>
+        <extracomment>The mailbox on the relay. %1 used, %2 the whole, each a size such as &quot;1.4 GB&quot;.</extracomment>
+        <translation>%2-இல் %1 பயன்பாட்டில்</translation>
+    </message>
+    <message>
+        <source>Piirit uses %1 of storage on this phone.</source>
+        <extracomment>How much room the profile takes on the phone. %1 is a size such as &quot;12.3 MB&quot;.</extracomment>
+        <translation>Piirit இந்தத் தொலைபேசியில் %1 சேமிப்பிடத்தைப் பயன்படுத்துகிறது.</translation>
     </message>
 </context>
 <context>

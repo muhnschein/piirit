@@ -39,20 +39,20 @@
         <translation>Ditt namn</translation>
     </message>
     <message>
-        <source>Relay</source>
-        <translation>Relä</translation>
+        <source>Select a public chatmail relay</source>
+        <translation>Välj ett offentligt chatmail-relä</translation>
     </message>
     <message>
-        <source>Custom server</source>
-        <translation>Egen server</translation>
+        <source>Use a custom chatmail relay</source>
+        <translation>Använd ett eget chatmail-relä</translation>
     </message>
     <message>
-        <source>See &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; for the full list.</source>
-        <translation>Hela listan finns på &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
+        <source>Piirit works only with chatmail relays. These are a particular kind of e-mail server; ordinary e-mail servers are not supported. For more, see &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. A full list of public, free-to-use chatmail relays is at &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</source>
+        <translation>Piirit fungerar bara med chatmail-reläer. Det är en särskild sorts e-postserver; vanliga e-postservrar stöds inte. Läs mer på &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. En fullständig lista över offentliga, kostnadsfria chatmail-reläer finns på &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
     </message>
     <message>
-        <source>The relay gives you an address. The keys are made on this phone.</source>
-        <translation>Reläet ger dig en adress. Nycklarna skapas på den här telefonen.</translation>
+        <source>Pick a name and a relay. That&apos;s it! There is nothing else to set up.</source>
+        <translation>Välj ett namn och ett relä. Det är allt! Det finns inget mer att ställa in.</translation>
     </message>
 </context>
 <context>
@@ -84,6 +84,49 @@
     <message>
         <source>The other device keeps it. Both get everything new.</source>
         <translation>Den andra enheten behåller den. Båda får allt nytt.</translation>
+    </message>
+</context>
+<context>
+    <name>AddRelayPage</name>
+    <message>
+        <source>%1 did not answer within %2 seconds.</source>
+        <translation>%1 svarade inte inom %2 sekunder.</translation>
+    </message>
+    <message>
+        <source>Add a relay</source>
+        <translation>Lägg till ett relä</translation>
+    </message>
+    <message>
+        <source>Another address for this profile, on another relay. The profile sends from one relay at a time; its page says which, and lets you change it.</source>
+        <translation>Ännu en adress för den här profilen, på ett annat relä. Profilen skickar från ett relä i taget; dess sida visar vilket och låter dig byta.</translation>
+    </message>
+    <message>
+        <source>Add relay</source>
+        <translation>Lägg till relä</translation>
+    </message>
+    <message>
+        <source>Contacting %1...</source>
+        <translation>Kontaktar %1...</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Avbryt</translation>
+    </message>
+    <message>
+        <source>Relays are run by volunteers. Try another one.</source>
+        <translation>Reläer drivs av frivilliga. Prova ett annat.</translation>
+    </message>
+    <message>
+        <source>Select a public chatmail relay</source>
+        <translation>Välj ett offentligt chatmail-relä</translation>
+    </message>
+    <message>
+        <source>Use a custom chatmail relay</source>
+        <translation>Använd ett eget chatmail-relä</translation>
+    </message>
+    <message>
+        <source>Piirit works only with chatmail relays. These are a particular kind of e-mail server; ordinary e-mail servers are not supported. For more, see &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. A full list of public, free-to-use chatmail relays is at &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</source>
+        <translation>Piirit fungerar bara med chatmail-reläer. Det är en särskild sorts e-postserver; vanliga e-postservrar stöds inte. Läs mer på &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. En fullständig lista över offentliga, kostnadsfria chatmail-reläer finns på &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
     </message>
 </context>
 <context>
@@ -533,13 +576,13 @@ Other groups with blocked contacts will still show their messages.</source>
         </translation>
     </message>
     <message>
-        <source>Too big to send: %1. This relay takes %2.</source>
-        <extracomment>Shown above the message field when the attached file is bigger than the relay will carry. %1 is the file&apos;s size and %2 the largest the relay takes, each such as &quot;24 MB&quot;.</extracomment>
-        <translation>För stor för att skicka: %1. Reläet tar emot %2.</translation>
-    </message>
-    <message>
         <source>Saved to Downloads</source>
         <translation>Sparat i Hämtningar</translation>
+    </message>
+    <message>
+        <source>Too big to send: %1. Attachments go up to %2.</source>
+        <extracomment>Shown above the message field when the attached file is bigger than will be sent. %1 is the file&apos;s size and %2 the largest that goes, each such as &quot;24 MB&quot;.</extracomment>
+        <translation>För stor för att skickas: %1. Bilagor får vara upp till %2.</translation>
     </message>
 </context>
 <context>
@@ -1000,10 +1043,6 @@ Other groups with blocked contacts will still show their messages.</source>
 <context>
     <name>ProfilePage</name>
     <message>
-        <source>Not connected</source>
-        <translation>Inte ansluten</translation>
-    </message>
-    <message>
         <source>Checking the connection</source>
         <translation>Kontrollerar anslutningen</translation>
     </message>
@@ -1028,10 +1067,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>En rad om dig</translation>
     </message>
     <message>
-        <source>Address</source>
-        <translation>Adress</translation>
-    </message>
-    <message>
         <source>Send read receipts</source>
         <translation>Skicka läskvitton</translation>
     </message>
@@ -1040,47 +1075,51 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Lagring och anslutning</translation>
     </message>
     <message>
-        <source>%1 on this phone</source>
-        <extracomment>How much room the profile takes on the phone. %1 is a size such as &quot;12.3 MB&quot;.</extracomment>
-        <translation>%1 på den här telefonen</translation>
-    </message>
-    <message>
         <source>Saved</source>
         <translation>Sparat</translation>
-    </message>
-    <message>
-        <source>Connected, and up to date</source>
-        <translation>Ansluten och uppdaterad</translation>
-    </message>
-    <message>
-        <source>Connected, sending or syncing messages</source>
-        <translation>Ansluten, skickar eller synkroniserar meddelanden</translation>
-    </message>
-    <message>
-        <source>Connecting to the relay</source>
-        <translation>Ansluter till relät</translation>
-    </message>
-    <message>
-        <source>%1 used · %2 left of %3</source>
-        <extracomment>The mailbox on the relay. %1 used, %2 left, %3 the whole, each a size such as &quot;1.4 GB&quot;.</extracomment>
-        <translation>%1 använt · %2 kvar av %3</translation>
     </message>
     <message>
         <source>The relay has not reported its quota yet</source>
         <translation>Relät har inte rapporterat sin kvot ännu</translation>
     </message>
     <message>
-        <source>The name on every message you send</source>
-        <translation>Namnet på varje meddelande du skickar</translation>
-    </message>
-    <message>
         <source>Both ways: with this off you send none and see none.</source>
         <translation>Åt båda hållen: med detta av skickar du inga och ser inga.</translation>
     </message>
     <message>
-        <source>Attachments up to %1</source>
-        <extracomment>The biggest attachment the relay will carry. %1 is a size such as &quot;22.3 MB&quot;.</extracomment>
-        <translation>Bilagor upp till %1</translation>
+        <source>Relays</source>
+        <translation>Reläer</translation>
+    </message>
+    <message>
+        <source>Sends from this relay</source>
+        <translation>Skickar från det här reläet</translation>
+    </message>
+    <message>
+        <source>Removing relay</source>
+        <extracomment>What Silica&apos;s countdown says it is doing, over a relay the reader has asked to remove.</extracomment>
+        <translation>Tar bort relä</translation>
+    </message>
+    <message>
+        <source>Send from this relay</source>
+        <translation>Skicka från det här reläet</translation>
+    </message>
+    <message>
+        <source>Remove relay</source>
+        <translation>Ta bort relä</translation>
+    </message>
+    <message>
+        <source>Add a relay</source>
+        <translation>Lägg till ett relä</translation>
+    </message>
+    <message>
+        <source>%1 of %2 used</source>
+        <extracomment>The mailbox on the relay. %1 used, %2 the whole, each a size such as &quot;1.4 GB&quot;.</extracomment>
+        <translation>%1 av %2 använt</translation>
+    </message>
+    <message>
+        <source>Piirit uses %1 of storage on this phone.</source>
+        <extracomment>How much room the profile takes on the phone. %1 is a size such as &quot;12.3 MB&quot;.</extracomment>
+        <translation>Piirit använder %1 lagringsutrymme på den här telefonen.</translation>
     </message>
 </context>
 <context>

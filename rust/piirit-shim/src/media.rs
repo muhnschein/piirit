@@ -22,17 +22,19 @@
 //! do, and both are pinned against the real core by
 //! `deltachat-jsonrpc/tests/real_server.rs`.
 //!
-//! The second is whether the relay will take the file at all. The core
-//! answers that with `sys.msgsize_max_recommended`, the largest
-//! attachment it recommends for the profile's relay, and says of it that
-//! a UI may refuse a bigger one. Nothing here refuses a picture: the
-//! core is about to shrink it, and the size on the phone says nothing
-//! about the size that leaves.
+//! The second is whether the file will go at all. The core answers that
+//! with `sys.msgsize_max_recommended`, the largest attachment it
+//! recommends, and says of it that a UI may refuse a bigger one. It is
+//! the core's own constant (`RECOMMENDED_FILE_SIZE`, about 22 MB), the
+//! same whichever relay the profile sends from, so nothing that shows
+//! it should call it the relay's or expect it to change with the relay.
+//! Nothing here refuses a picture: the core is about to shrink it, and
+//! the size on the phone says nothing about the size that leaves.
 
 use deltachat_jsonrpc::RpcClient;
 
-/// The config key the core answers the relay's attachment ceiling with,
-/// in bytes.
+/// The config key the core answers its attachment ceiling with, in
+/// bytes.
 const LIMIT_KEY: &str = "sys.msgsize_max_recommended";
 
 /// The suffixes the core reads as a picture, and so the files it recodes
@@ -77,8 +79,8 @@ pub(crate) fn exceeds_limit(path: &str, limit: u64) -> bool {
     file_bytes(path) > limit
 }
 
-/// The largest attachment the core recommends for this profile's relay,
-/// in bytes; 0 when the core would not say.
+/// The largest attachment the core recommends, in bytes; 0 when the
+/// core would not say. The same for every relay; see the module doc.
 pub(crate) async fn attachment_limit(rpc: &RpcClient, account_id: u32) -> u64 {
     rpc.call::<_, Option<String>>("get_config", (account_id, LIMIT_KEY))
         .await

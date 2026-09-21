@@ -70,6 +70,7 @@ fn real_server() -> Option<String> {
 }
 
 #[test]
+#[allow(clippy::too_many_lines)]
 fn the_real_core_accepts_the_shapes_we_send() {
     let Some(server) = real_server() else {
         return;
@@ -109,6 +110,11 @@ fn the_real_core_accepts_the_shapes_we_send() {
                 // the API, so its failures belong in the same report.
                 onRestore_failed: errors = errors + '|' + message
                 onRestore_refused: errors = errors + '|refused=' + reason
+                // Adding a relay to a profile is the same transport call
+                // on an account that exists, so its failure belongs here
+                // too.
+                onRelay_error: errors = errors + '|relay=' + message
+                onRelay_added: created = created + 1
                 // In the report too: 'not started' from every call says
                 // only that the core never came up; the status says why.
                 onStatus_changed: errors = errors + '|status=' + core.status
@@ -150,11 +156,21 @@ fn the_real_core_accepts_the_shapes_we_send() {
     // offering a profile, so what stands behind that one is the fake
     // core, written from the same reading of the API, and the code check
     // in front of it.
-    let backup = core_ptr;
+    let backup = core_ptr.clone();
     single_shot(Duration::from_secs(11), move || {
         if let Some(this) = backup.as_pinned() {
             this.borrow_mut()
                 .restore_from_file(QString::from("/nonexistent/piirit-test.tar"));
+        }
+    });
+
+    // One more relay for account 1, on the same unreachable host: the
+    // core fails to reach it rather than complaining about the shape.
+    let relay = core_ptr;
+    single_shot(Duration::from_secs(13), move || {
+        if let Some(this) = relay.as_pinned() {
+            this.borrow_mut()
+                .add_relay(1, QString::from("dcaccount:piirit-test.invalid"));
         }
     });
 
@@ -195,6 +211,12 @@ fn the_real_core_accepts_the_shapes_we_send() {
              match its API. Errors were: {errors}"
         );
     }
+
+    assert!(
+        errors.contains("|relay="),
+        "adding a relay to the account answered nothing within the time \
+         budget. Report: {report:?}"
+    );
 
     // A wrong `check_qr` shape would land in `qr_error` and leave this
     // empty.

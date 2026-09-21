@@ -76,6 +76,7 @@ pub const HANDLED_EVENT_KINDS: &[&str] = &[
     "MsgsChanged",
     "MsgsNoticed",
     "ReactionsChanged",
+    "TransportsModified",
     "WebxdcInstanceDeleted",
     "WebxdcStatusUpdate",
 ];
@@ -401,11 +402,22 @@ pub struct DeltaChatCore {
     /// Nothing was taken over, in the core's own words.
     pub restore_failed: qt_signal!(message: QString),
 
-    /// The account's email transports, as a JSON array of upstream
-    /// `EnteredLoginParam`.
-    pub list_transports: qt_method!(fn(&mut self, account_id: u32)),
-    /// The account's transports, as a raw JSON array.
-    pub transports_listed: qt_signal!(account_id: u32, transports_json: QString),
+    /// Add a relay to a profile that has one, from a `dcaccount:`
+    /// payload: the core asks the relay for an address and keeps it
+    /// beside the profile's others, which `Transports` lists. Result via
+    /// `relay_added`, `relay_error` or `relay_timed_out`, for the latest
+    /// attempt only, as `create_profile` answers; the same
+    /// `configure_progress` reports it, keyed by the account; and the
+    /// same `cancel_ongoing` gives up on it. A relay added after the
+    /// reader gave up is kept rather than undone (`signup.rs`).
+    pub add_relay: qt_method!(fn(&mut self, account_id: u32, provider_qr: QString)),
+    /// The relay answered, and `account_id` has one transport more.
+    pub relay_added: qt_signal!(account_id: u32),
+    /// Adding a relay failed. The message is the core's own.
+    pub relay_error: qt_signal!(message: QString),
+    /// The relay did not answer within `seconds`, and the attempt was
+    /// given up on.
+    pub relay_timed_out: qt_signal!(seconds: u32),
 
     /// Classify a QR payload. `qr_checked` carries the upstream `Qr`
     /// object as JSON: `kind` is camelCase, its fields `snake_case`.
@@ -1123,10 +1135,14 @@ impl DeltaChatCore {
                         })
                     })
                     .collect();
-                // One more call per profile, for the badge on its row.
-                // Only the configured ones: an unconfigured account has
-                // no chats to count.
+                // Two more calls per profile, for the address under its
+                // name and the badge on its row. Only the configured
+                // ones: an unconfigured account has neither an address
+                // nor chats to count.
                 for item in items.iter_mut().filter(|item| item.is_configured) {
+                    if let Some(addr) = primary_addr(&rpc, item.account_id).await {
+                        item.addr = addr.into();
+                    }
                     item.unread_count = fresh_count(&rpc, item.account_id).await;
                 }
                 Ok::<_, String>((items, selected))
@@ -1327,11 +1343,7 @@ impl DeltaChatCore {
             self.profile_error(QString::from("not started"));
             return;
         };
-        let deadline = match self.profile_timeout {
-            0 => signup::DEADLINE,
-            seconds => Duration::from_secs(u64::from(seconds)),
-        };
-        let attempt = self.attempts.begin(deadline);
+        let attempt = self.attempts.begin(self.deadline());
         let done = self.profile_callback(attempt.id());
         let task_runtime = runtime.clone();
         runtime.spawn(async move {
@@ -1391,31 +1403,38 @@ impl DeltaChatCore {
         });
     }
 
-    /// List the account's email transports.
-    pub fn list_transports(&mut self, account_id: u32) {
+    /// Add a relay to `account_id` from a `dcaccount:` payload. The same
+    /// bookkeeping as a signup, so that one attempt at a time holds
+    /// across both and `cancel_ongoing` stops whichever is running.
+    pub fn add_relay(&mut self, account_id: u32, provider_qr: QString) {
+        if account_id == 0 {
+            self.relay_error(QString::from("no profile to add a relay to"));
+            return;
+        }
         let Some((rpc, runtime)) = self.connection() else {
-            self.profile_error(QString::from("not started"));
+            self.relay_error(QString::from("not started"));
             return;
         };
-
-        let ptr: QPointer<Self> = QPointer::from(&*self);
-        let done = queued_callback(move |result: (u32, Result<String, String>)| {
-            let Some(this) = ptr.as_pinned() else { return };
-            let (account_id, result) = result;
-            match result {
-                Ok(json) => this.borrow().transports_listed(account_id, json.into()),
-                Err(err) => this.borrow().profile_error(err.into()),
-            }
-        });
-
+        let attempt = self.attempts.begin(self.deadline());
+        let done = self.relay_callback(attempt.id());
+        let task_runtime = runtime.clone();
+        let transport = Transport::Qr(provider_qr.to_string());
         runtime.spawn(async move {
-            let result = rpc
-                .call::<_, serde_json::Value>("list_transports", (account_id,))
-                .await
-                .map(|value| value.to_string())
-                .map_err(|err| err.to_string());
-            done((account_id, result));
+            done(
+                attempt
+                    .add_transport(&task_runtime, rpc, account_id, transport)
+                    .await,
+            );
         });
+    }
+
+    /// How long a relay is given: `profile_timeout` when something set
+    /// it, else the built-in thirty seconds.
+    fn deadline(&self) -> Duration {
+        match self.profile_timeout {
+            0 => signup::DEADLINE,
+            seconds => Duration::from_secs(u64::from(seconds)),
+        }
     }
 
     /// The completion path of `check_qr`: the classification, as the
@@ -1465,6 +1484,25 @@ impl DeltaChatCore {
                     this.borrow().profile_timed_out(seconds);
                 }
                 Outcome::Failed(_) | Outcome::TimedOut(_) => {}
+            }
+        })
+    }
+
+    /// The completion path of `add_relay`: the outcome, signalled if
+    /// `attempt` is still the one the reader is waiting for. Nothing is
+    /// undone for one that is not: the relay a late answer added is on
+    /// a profile the reader has, and its page lists it.
+    fn relay_callback(&self, attempt: u64) -> impl Fn(Outcome) {
+        let ptr: QPointer<Self> = QPointer::from(self);
+        queued_callback(move |outcome: Outcome| {
+            let Some(this) = ptr.as_pinned() else { return };
+            if !this.borrow().attempts.is_current(attempt) {
+                return;
+            }
+            match outcome {
+                Outcome::Created(account_id) => this.borrow().relay_added(account_id),
+                Outcome::Failed(err) => this.borrow().relay_error(err.into()),
+                Outcome::TimedOut(seconds) => this.borrow().relay_timed_out(seconds),
             }
         })
     }
@@ -1556,6 +1594,24 @@ async fn account_ids(rpc: &RpcClient) -> Result<Vec<u32>, String> {
                 .collect()
         })
         .map_err(|err| err.to_string())
+}
+
+/// The address a profile sends from: `configured_addr`, the core's
+/// primary transport, which is what the profile page shows.
+///
+/// The account list's own `addr` is not it. That is the core's `addr`
+/// key, deprecated since 2026-04 and only a fallback to
+/// `configured_addr` when nothing was ever written to it -- a profile
+/// that once had another transport set up keeps that older address
+/// there, and the row would then name a relay the profile no longer
+/// sends from. None when the core cannot say, so the row keeps what the
+/// account list gave it.
+async fn primary_addr(rpc: &RpcClient, account_id: u32) -> Option<String> {
+    rpc.call::<_, Option<String>>("get_config", (account_id, "configured_addr"))
+        .await
+        .ok()
+        .flatten()
+        .filter(|addr| !addr.is_empty())
 }
 
 async fn fresh_count(rpc: &RpcClient, account_id: u32) -> u32 {

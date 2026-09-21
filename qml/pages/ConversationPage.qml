@@ -649,9 +649,9 @@ Page {
         timeout: 0
         text: messages.attachment_too_big
               //: Shown above the message field when the attached file is
-              //: bigger than the relay will carry. %1 is the file's size
-              //: and %2 the largest the relay takes, each such as "24 MB".
-              ? qsTr("Too big to send: %1. This relay takes %2.")
+              //: bigger than will be sent. %1 is the file's size and %2
+              //: the largest that goes, each such as "24 MB".
+              ? qsTr("Too big to send: %1. Attachments go up to %2.")
                 .arg(Format.readableSize(messages.attachment_bytes))
                 .arg(Format.readableSize(messages.attachment_limit))
               : ""

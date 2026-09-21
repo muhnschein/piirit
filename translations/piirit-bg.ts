@@ -39,20 +39,20 @@
         <translation>Вашето име</translation>
     </message>
     <message>
-        <source>Relay</source>
-        <translation>Релей</translation>
+        <source>Select a public chatmail relay</source>
+        <translation>Изберете публичен chatmail релей</translation>
     </message>
     <message>
-        <source>Custom server</source>
-        <translation>Собствен сървър</translation>
+        <source>Use a custom chatmail relay</source>
+        <translation>Използвайте собствен chatmail релей</translation>
     </message>
     <message>
-        <source>See &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; for the full list.</source>
-        <translation>Пълният списък е на &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
+        <source>Piirit works only with chatmail relays. These are a particular kind of e-mail server; ordinary e-mail servers are not supported. For more, see &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. A full list of public, free-to-use chatmail relays is at &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</source>
+        <translation>Piirit работи само с chatmail релеи. Те са особен вид пощенски сървъри; обикновените пощенски сървъри не се поддържат. Повече на &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. Пълен списък с публични, безплатни chatmail релеи има на &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
     </message>
     <message>
-        <source>The relay gives you an address. The keys are made on this phone.</source>
-        <translation>Релеят ви дава адрес. Ключовете се правят на този телефон.</translation>
+        <source>Pick a name and a relay. That&apos;s it! There is nothing else to set up.</source>
+        <translation>Изберете име и релей. Това е всичко! Нищо друго не се настройва.</translation>
     </message>
 </context>
 <context>
@@ -84,6 +84,49 @@
     <message>
         <source>The other device keeps it. Both get everything new.</source>
         <translation>Другото устройство го запазва. И двете получават всичко ново.</translation>
+    </message>
+</context>
+<context>
+    <name>AddRelayPage</name>
+    <message>
+        <source>%1 did not answer within %2 seconds.</source>
+        <translation>%1 не отговори в рамките на %2 секунди.</translation>
+    </message>
+    <message>
+        <source>Add a relay</source>
+        <translation>Добавяне на релей</translation>
+    </message>
+    <message>
+        <source>Another address for this profile, on another relay. The profile sends from one relay at a time; its page says which, and lets you change it.</source>
+        <translation>Още един адрес за този профил, на друг релей. Профилът изпраща само от един релей наведнъж; страницата му показва кой е и позволява да го смените.</translation>
+    </message>
+    <message>
+        <source>Add relay</source>
+        <translation>Добавяне на релей</translation>
+    </message>
+    <message>
+        <source>Contacting %1...</source>
+        <translation>Свързване с %1...</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Отказ</translation>
+    </message>
+    <message>
+        <source>Relays are run by volunteers. Try another one.</source>
+        <translation>Релеите се поддържат от доброволци. Опитайте друг.</translation>
+    </message>
+    <message>
+        <source>Select a public chatmail relay</source>
+        <translation>Изберете публичен chatmail релей</translation>
+    </message>
+    <message>
+        <source>Use a custom chatmail relay</source>
+        <translation>Използвайте собствен chatmail релей</translation>
+    </message>
+    <message>
+        <source>Piirit works only with chatmail relays. These are a particular kind of e-mail server; ordinary e-mail servers are not supported. For more, see &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. A full list of public, free-to-use chatmail relays is at &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</source>
+        <translation>Piirit работи само с chatmail релеи. Те са особен вид пощенски сървъри; обикновените пощенски сървъри не се поддържат. Повече на &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. Пълен списък с публични, безплатни chatmail релеи има на &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
     </message>
 </context>
 <context>
@@ -533,13 +576,13 @@ Other groups with blocked contacts will still show their messages.</source>
         </translation>
     </message>
     <message>
-        <source>Too big to send: %1. This relay takes %2.</source>
-        <extracomment>Shown above the message field when the attached file is bigger than the relay will carry. %1 is the file&apos;s size and %2 the largest the relay takes, each such as &quot;24 MB&quot;.</extracomment>
-        <translation>Твърде голям за изпращане: %1. Това реле приема %2.</translation>
-    </message>
-    <message>
         <source>Saved to Downloads</source>
         <translation>Запазено в „Изтегляния“</translation>
+    </message>
+    <message>
+        <source>Too big to send: %1. Attachments go up to %2.</source>
+        <extracomment>Shown above the message field when the attached file is bigger than will be sent. %1 is the file&apos;s size and %2 the largest that goes, each such as &quot;24 MB&quot;.</extracomment>
+        <translation>Прекалено голям за изпращане: %1. Прикачените файлове могат да са до %2.</translation>
     </message>
 </context>
 <context>
@@ -1000,10 +1043,6 @@ Other groups with blocked contacts will still show their messages.</source>
 <context>
     <name>ProfilePage</name>
     <message>
-        <source>Not connected</source>
-        <translation>Няма връзка</translation>
-    </message>
-    <message>
         <source>Checking the connection</source>
         <translation>Проверява се връзката</translation>
     </message>
@@ -1028,10 +1067,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Един ред за вас</translation>
     </message>
     <message>
-        <source>Address</source>
-        <translation>Адрес</translation>
-    </message>
-    <message>
         <source>Send read receipts</source>
         <translation>Изпращане на потвърждения за прочитане</translation>
     </message>
@@ -1040,47 +1075,51 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Хранилище и свързаност</translation>
     </message>
     <message>
-        <source>%1 on this phone</source>
-        <extracomment>How much room the profile takes on the phone. %1 is a size such as &quot;12.3 MB&quot;.</extracomment>
-        <translation>%1 на този телефон</translation>
-    </message>
-    <message>
         <source>Saved</source>
         <translation>Запазено</translation>
-    </message>
-    <message>
-        <source>Connected, and up to date</source>
-        <translation>Свързано и актуално</translation>
-    </message>
-    <message>
-        <source>Connected, sending or syncing messages</source>
-        <translation>Свързано, изпраща или синхронизира съобщения</translation>
-    </message>
-    <message>
-        <source>Connecting to the relay</source>
-        <translation>Свързване с релея</translation>
-    </message>
-    <message>
-        <source>%1 used · %2 left of %3</source>
-        <extracomment>The mailbox on the relay. %1 used, %2 left, %3 the whole, each a size such as &quot;1.4 GB&quot;.</extracomment>
-        <translation>%1 използвани · %2 свободни от %3</translation>
     </message>
     <message>
         <source>The relay has not reported its quota yet</source>
         <translation>Релеят още не е съобщил квотата си</translation>
     </message>
     <message>
-        <source>The name on every message you send</source>
-        <translation>Името върху всяко съобщение, което изпращате</translation>
-    </message>
-    <message>
         <source>Both ways: with this off you send none and see none.</source>
         <translation>И в двете посоки: изключено — не изпращате и не виждате нито едно.</translation>
     </message>
     <message>
-        <source>Attachments up to %1</source>
-        <extracomment>The biggest attachment the relay will carry. %1 is a size such as &quot;22.3 MB&quot;.</extracomment>
-        <translation>Прикачени файлове до %1</translation>
+        <source>Relays</source>
+        <translation>Релеи</translation>
+    </message>
+    <message>
+        <source>Sends from this relay</source>
+        <translation>Изпраща от този релей</translation>
+    </message>
+    <message>
+        <source>Removing relay</source>
+        <extracomment>What Silica&apos;s countdown says it is doing, over a relay the reader has asked to remove.</extracomment>
+        <translation>Релеят се премахва</translation>
+    </message>
+    <message>
+        <source>Send from this relay</source>
+        <translation>Изпращане от този релей</translation>
+    </message>
+    <message>
+        <source>Remove relay</source>
+        <translation>Премахване на релея</translation>
+    </message>
+    <message>
+        <source>Add a relay</source>
+        <translation>Добавяне на релей</translation>
+    </message>
+    <message>
+        <source>%1 of %2 used</source>
+        <extracomment>The mailbox on the relay. %1 used, %2 the whole, each a size such as &quot;1.4 GB&quot;.</extracomment>
+        <translation>%1 от %2 използвани</translation>
+    </message>
+    <message>
+        <source>Piirit uses %1 of storage on this phone.</source>
+        <extracomment>How much room the profile takes on the phone. %1 is a size such as &quot;12.3 MB&quot;.</extracomment>
+        <translation>Piirit използва %1 място на този телефон.</translation>
     </message>
 </context>
 <context>

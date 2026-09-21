@@ -39,6 +39,7 @@ mod runtime;
 mod saver;
 mod search;
 mod signup;
+mod transports;
 mod truncation;
 mod webxdc;
 mod webxdc_host;
@@ -60,6 +61,7 @@ pub use crate::qr::{QrCode, QrScanner};
 pub use crate::recorder::VoiceRecorder;
 pub use crate::saver::FileSaver;
 pub use crate::search::SearchResults;
+pub use crate::transports::Transports;
 pub use crate::webxdc::{WebxdcApp, WebxdcStore};
 
 /// Register the shim's QML-instantiable types. The app and the tests share
@@ -104,7 +106,10 @@ pub fn register_qml_types() {
     ) else {
         return;
     };
-    let Ok(backup) = std::ffi::CStr::from_bytes_with_nul(b"Backup\0") else {
+    let (Ok(backup), Ok(transports)) = (
+        std::ffi::CStr::from_bytes_with_nul(b"Backup\0"),
+        std::ffi::CStr::from_bytes_with_nul(b"Transports\0"),
+    ) else {
         return;
     };
     qmetaobject::qml_register_type::<ChatMessages>(uri, 1, 0, messages);
@@ -124,8 +129,9 @@ pub fn register_qml_types() {
     qmetaobject::qml_register_type::<WebxdcApp>(uri, 1, 0, webxdc);
     qmetaobject::qml_register_type::<WebxdcStore>(uri, 1, 0, store);
     qmetaobject::qml_register_type::<Backup>(uri, 1, 0, backup);
+    qmetaobject::qml_register_type::<Transports>(uri, 1, 0, transports);
 }
 pub use models::{
     AccountItem, ChatListItem, ChatListModel, ContactItem, ContactListModel, MessageListItem,
-    MessageListModel, SearchItem, SearchListModel,
+    MessageListModel, SearchItem, SearchListModel, TransportItem, TransportListModel,
 };
