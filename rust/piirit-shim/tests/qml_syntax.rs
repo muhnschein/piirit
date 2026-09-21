@@ -125,7 +125,7 @@ fn delegates_bind_only_roles_their_models_have() {
     }
 
     let root = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../..");
-    let cases: [(&str, Vec<String>); 13] = [
+    let cases: [(&str, Vec<String>); 14] = [
         (
             "qml/components/ConversationList.qml",
             names_of::<piirit_shim::MessageListItem>(),
@@ -183,6 +183,11 @@ fn delegates_bind_only_roles_their_models_have() {
         (
             "qml/components/SearchResultsList.qml",
             names_of::<piirit_shim::SearchItem>(),
+        ),
+        // The relay rows on the profile page draw a transport each.
+        (
+            "qml/pages/ProfilePage.qml",
+            names_of::<piirit_shim::TransportItem>(),
         ),
     ];
 

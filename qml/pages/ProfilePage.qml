@@ -6,11 +6,12 @@ import Piirit 1.0
 
 /*
  * One profile, as everyone else sees it and as this device holds it: the
- * picture, the name on every message, the line under it, the address it
- * writes from, whether the other end is told when something has been
- * read, and how the relay and the phone are doing by it. Reached from the
- * profile's row on the profiles page. The settings that belong to no
- * profile are on the settings page instead (SettingsPage.qml).
+ * picture, the name on every message, the line under it, the relays it
+ * is reached through and the one it writes from, whether the other end
+ * is told when something has been read, and how the relay and the phone
+ * are doing by it. Reached from the profile's row on the profiles page.
+ * The settings that belong to no profile are on the settings page
+ * instead (SettingsPage.qml).
  *
  * This page is a profile's settings, so the two things about a profile
  * that are not settings are not here: the invite code to show and the backup to
@@ -34,6 +35,22 @@ import Piirit 1.0
  * "Details" dialog adds -- the storage per conversation, scanned message
  * by message -- is not here: on a phone that scan is what the reader
  * would be waiting on.
+ *
+ * The relays are a list rather than one address: the core lets a profile
+ * be reached through several, each with an address of its own, and sends
+ * from one of them (Transports, transports.rs). The one it sends from is
+ * first and says so; the others say what their mailbox holds, off the
+ * same report the bar below reads. A row's menu is what can be done with
+ * that relay -- send from it instead, or remove it, with Silica's
+ * countdown to change one's mind in -- and the plus under the last row
+ * adds one (AddRelayPage.qml). Removing the last relay is not offered:
+ * the core refuses it, and a profile with no relay is not a profile.
+ *
+ * The countdown lives beside the list rather than on the row
+ * (PendingRemoval), as the profiles page's and a group's do: the rows are
+ * rebuilt whenever the relays are read again, which the core asks for
+ * whenever the connection changes, and a countdown on a row would go
+ * with it.
  */
 Page {
     id: page
@@ -62,15 +79,62 @@ Page {
         }
     }
 
+    Transports {
+        id: transports
+        objectName: "transports"
+        account_id: page.accountId
+        onError: page.errorMessage = message
+        // The profile sends from another relay now, or has one fewer:
+        // its address and the mailbox under the bar follow.
+        onChanged: {
+            profile.reload()
+            profile.refresh_connectivity()
+        }
+    }
+
+    /// How long a relay waits before it goes, in milliseconds. Nothing
+    /// sets it; a test turns it down rather than waiting.
+    property alias pendingDelay: doomedRelays.delay
+
+    /// The relays the reader has asked to remove, waiting out the moment
+    /// in which they can say they did not mean it. The address travels
+    /// as the tag: the row it was asked on may be gone by the time the
+    /// wait is up.
+    PendingRemoval {
+        id: doomedRelays
+        onRemove: transports.remove(tag)
+    }
+
+    // And as the page is actually destroyed, for the reason the profiles
+    // page gives: "leaving" and "told it is leaving" are not the same
+    // moment. Flushing twice costs nothing.
+    Component.onDestruction: doomedRelays.flush()
+
     Connections {
         target: core
-        // The core says when the connection changes; the mailbox and
-        // the storage are re-read with it.
+        // The core says when the connection changes; the mailbox, the
+        // storage and each relay's own mailbox are re-read with it. It
+        // says when the relays change too -- from here, or from another
+        // device the profile is on -- and the list follows.
         onCore_event: {
             if (kind === "ConnectivityChanged" && context_id === page.accountId) {
                 profile.refresh_connectivity()
+                relayRefresh.restart()
             }
+            transports.handle_event(context_id, kind, payload_json)
         }
+    }
+
+    // The core says the connection changed several times over when IO
+    // restarts -- which is what sending from another relay does -- and
+    // each time the rows are worth reading again for their mailboxes.
+    // Once, when it has gone quiet: the rows are rebuilt on a read, and a
+    // rebuild per event is a menu closed under the reader's finger per
+    // event.
+    Timer {
+        id: relayRefresh
+        interval: 1000
+        onTriggered: transports.reload()
     }
 
     /// Someone has typed since the load. Guards the refill above.
@@ -106,11 +170,18 @@ Page {
     // Leaving is the other moment worth saving at: a back-swipe within
     // the pause above would otherwise drop what was typed. The cursor
     // leaves the field on the way out, so the keyboard does not follow
-    // the page.
+    // the page. Coming back -- from the page that adds a relay -- is
+    // when the relays are worth reading again: the core announces the
+    // addition as well, and this is the cheap belt to its braces.
     onStatusChanged: {
         if (status === PageStatus.Deactivating) {
             page.applyEdits()
             nameField.done()
+            // Anything still waiting goes now: leaving is exactly when
+            // a timer has not fired yet.
+            doomedRelays.flush()
+        } else if (status === PageStatus.Active) {
+            transports.reload()
         }
     }
 
@@ -280,41 +351,6 @@ Page {
                 onTextChanged: page.noteEdit()
             }
 
-            // The reader's own address: what the relay minted, and what
-            // tells two profiles apart. Shown, not edited -- changing it
-            // is a different transport, not a rename. Under its own
-            // caption, at the left edge like everything else on the page.
-            Column {
-                x: Theme.horizontalPageMargin
-                width: parent.width - 2 * Theme.horizontalPageMargin
-
-                Label {
-                    objectName: "addressCaption"
-                    width: parent.width
-                    wrapMode: Text.Wrap
-                    font.pixelSize: Theme.fontSizeExtraSmall
-                    color: Theme.secondaryColor
-                    text: qsTr("Address")
-                }
-
-                Label {
-                    objectName: "addressLabel"
-                    width: parent.width
-                    wrapMode: Text.WrapAnywhere
-                    color: Theme.highlightColor
-                    // The relay's string, pinned to plain.
-                    textFormat: Text.PlainText
-                    text: profile.address
-                }
-            }
-
-            // Room between the address and the switch: the two are not
-            // one thing, and read as one without it.
-            Item {
-                width: 1
-                height: Theme.paddingLarge
-            }
-
             TextSwitch {
                 objectName: "readReceiptsSwitch"
                 text: qsTr("Send read receipts")
@@ -334,6 +370,164 @@ Page {
                 checked: profile.read_receipts
                 enabled: profile.loaded
                 onClicked: profile.set_read_receipts(!checked)
+            }
+
+            // The relays the profile is reached through: the reader's
+            // own addresses, what the relays minted, and what tells two
+            // profiles apart. The one sent from first. Shown, not edited
+            // -- an address is a relay's, and changing one is adding a
+            // relay and sending from it, which the rows and the plus
+            // under them offer.
+            SectionHeader {
+                text: qsTr("Relays")
+            }
+
+            Repeater {
+                id: relayRows
+                objectName: "relayRows"
+                model: transports.rows
+
+                ListItem {
+                    id: relayRow
+                    // Named by place, so a test can find the first row
+                    // whichever relay stands there now.
+                    objectName: "relayRow" + index
+                    width: column.width
+                    contentHeight: relayBody.height + 2 * Theme.paddingSmall
+
+                    /// The address on this relay, for a test to read.
+                    readonly property string addr: model.addr
+                    readonly property bool sendsFrom: model.is_primary
+                    /// This relay is on its way out.
+                    readonly property bool doomed: doomedRelays.pending(model.id)
+
+                    Column {
+                        id: relayBody
+                        x: Theme.horizontalPageMargin
+                        y: Theme.paddingSmall
+                        width: parent.width - 2 * Theme.horizontalPageMargin
+
+                        Label {
+                            objectName: "relayDomain"
+                            width: parent.width
+                            wrapMode: Text.WrapAnywhere
+                            color: relayRow.highlighted ? Theme.highlightColor
+                                                        : Theme.primaryColor
+                            // The relay's string, pinned to plain.
+                            textFormat: Text.PlainText
+                            text: model.domain
+                        }
+
+                        Label {
+                            objectName: "relayAddress"
+                            width: parent.width
+                            wrapMode: Text.WrapAnywhere
+                            font.pixelSize: Theme.fontSizeSmall
+                            color: Theme.secondaryColor
+                            textFormat: Text.PlainText
+                            text: model.addr
+                        }
+
+                        // What sets this relay apart: that the profile
+                        // sends from it, or else how full its mailbox is
+                        // in the core's own words. The relay sent from
+                        // has the bar below for that.
+                        Label {
+                            objectName: "relayDetail"
+                            width: parent.width
+                            wrapMode: Text.Wrap
+                            visible: text.length > 0
+                            font.pixelSize: Theme.fontSizeSmall
+                            color: Theme.secondaryHighlightColor
+                            textFormat: Text.PlainText
+                            text: model.is_primary ? qsTr("Sends from this relay")
+                                                   : model.quota_text
+                        }
+                    }
+
+                    /// Silica's own countdown, drawn over the relay
+                    /// about to go. The removal is not its business --
+                    /// that belongs to `doomedRelays`, because a remorse
+                    /// item lives in the row it covers and the rows are
+                    /// rebuilt whenever the relays are read again. So it
+                    /// draws, and reports the tap.
+                    function raiseRemorse() {
+                        //: What Silica's countdown says it is doing, over a
+                        //: relay the reader has asked to remove.
+                        relayRemorse.execute(
+                            relayBody, qsTr("Removing relay"), function() {},
+                            doomedRelays.countdownFor(model.id))
+                    }
+
+                    RemorseItem {
+                        id: relayRemorse
+                        objectName: "relayRemorse"
+                        onCanceled: doomedRelays.spare(model.id)
+                    }
+
+                    // A row rebuilt mid-wait comes back with no countdown
+                    // on it.
+                    Component.onCompleted: {
+                        if (relayRow.doomed) {
+                            relayRow.raiseRemorse()
+                        }
+                    }
+
+                    menu: ContextMenu {
+                        // Not on the relay already sent from: there is
+                        // nothing to switch to.
+                        MenuItem {
+                            objectName: "sendFromItem"
+                            visible: !model.is_primary
+                            text: qsTr("Send from this relay")
+                            onClicked: transports.set_primary(model.addr)
+                        }
+
+                        // Dim on the last relay: the core refuses to
+                        // remove it, and a menu item that asks anyway
+                        // is a menu item that fails.
+                        MenuItem {
+                            objectName: "removeRelayItem"
+                            enabled: transports.count > 1
+                            text: qsTr("Remove relay")
+                            // The page is told, not this row: the row is
+                            // rebuilt whenever the list reloads, and a
+                            // wait living on it would go too.
+                            onClicked: {
+                                doomedRelays.ask(model.id, model.addr)
+                                relayRow.raiseRemorse()
+                            }
+                        }
+                    }
+                }
+            }
+
+            // One more relay, from the plus under the last row, where
+            // the profiles page puts "add profile".
+            ListItem {
+                id: addRelayRow
+                objectName: "addRelayButton"
+                width: column.width
+                contentHeight: Theme.itemSizeSmall + 2 * Theme.paddingMedium
+
+                PlusMark {
+                    id: plus
+                    x: Theme.horizontalPageMargin
+                    y: Theme.paddingMedium
+                }
+
+                Label {
+                    x: plus.x + plus.width + Theme.paddingMedium
+                    width: parent.width - x - Theme.horizontalPageMargin
+                    anchors.verticalCenter: plus.verticalCenter
+                    wrapMode: Text.Wrap
+                    color: addRelayRow.highlighted ? Theme.highlightColor
+                                                   : Theme.primaryColor
+                    text: qsTr("Add a relay")
+                }
+
+                onClicked: pageStack.push(Qt.resolvedUrl("AddRelayPage.qml"),
+                                          { accountId: page.accountId })
             }
 
             SectionHeader {

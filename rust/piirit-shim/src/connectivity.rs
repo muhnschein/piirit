@@ -7,7 +7,10 @@
 //! the way parla reads it (github.com/trufae/parla, `storage_quota.vala`):
 //! the percentage the core wrote on its own bar, and the sentence it wrote
 //! beside it, in whatever language the core is in. Nothing here computes
-//! a quota; the core did, and this finds where it put the answer.
+//! a quota; the core did, and this finds where it put the answer. Once
+//! for the relay the profile sends from (`quota_from_report`), and once
+//! for every relay it has (`quotas_from_report`), which is what the
+//! profile page's relay rows are drawn from.
 
 // The core's `get_connectivity` bands, which the profile page puts words
 // to: 1000 not connected, 2000 connecting, 3000 connected and working,
@@ -49,6 +52,18 @@ pub(crate) fn quota_from_report(html: &str, address: &str) -> Option<Quota> {
     }
 }
 
+/// Every relay's quota, by the domain the core headed its block with, in
+/// the order the report lists them. A relay whose block carries no bar is
+/// left out, and a report with no transport blocks at all has nothing to
+/// list. What the profile page's relay rows are drawn from: one parse of
+/// the report, rather than a call to the core per row.
+pub(crate) fn quotas_from_report(html: &str) -> Vec<(String, Quota)> {
+    transport_blocks(html)
+        .into_iter()
+        .filter_map(|block| Some((block_domain(block)?.to_string(), quota_in(block)?)))
+        .collect()
+}
+
 /// Where each `<li class="transport">` block starts and ends. The core
 /// writes them one after another inside the incoming-messages list, so a
 /// block runs to the next one, or to the end of the report.
@@ -72,13 +87,21 @@ fn block_for<'html>(blocks: &[&'html str], address: &str) -> Option<&'html str> 
     if domain.is_empty() {
         return None;
     }
-    blocks.iter().copied().find(|block| {
-        block
-            .split("<b>")
-            .skip(1)
-            .filter_map(|after| after.split_once(":</b>"))
-            .any(|(name, _)| name.trim().eq_ignore_ascii_case(domain))
-    })
+    blocks
+        .iter()
+        .copied()
+        .find(|block| block_domain(block).is_some_and(|name| name.eq_ignore_ascii_case(domain)))
+}
+
+/// The domain a transport block is headed with: the text of the first
+/// `<b>...:</b>` in it, which is how the core names the relay.
+fn block_domain(block: &str) -> Option<&str> {
+    block
+        .split("<b>")
+        .nth(1)
+        .and_then(|after| after.split_once(":</b>"))
+        .map(|(name, _)| name.trim())
+        .filter(|name| !name.is_empty())
 }
 
 /// The first quota bar in a fragment of the report, if there is one.
@@ -200,7 +223,7 @@ fn decode_entity(rest: &str) -> (&'static str, usize) {
 
 #[cfg(test)]
 mod tests {
-    use super::{amounts, quota_from_report, Quota};
+    use super::{amounts, quota_from_report, quotas_from_report, Quota};
 
     /// The shape the core writes, less the style block.
     const REPORT: &str = "<html><body><h3>Incoming messages</h3><ul>\
@@ -289,6 +312,61 @@ mod tests {
         // Nor is it borrowed for an address no block is headed with.
         assert_eq!(quota_from_report(TWO, "ada@chat.elsewhere.org"), None);
         assert_eq!(quota_from_report(TWO, ""), None);
+    }
+
+    /// Every relay's bar, headed with its domain, in the order the core
+    /// listed them: what the relay rows on the profile page draw.
+    #[test]
+    fn every_relays_bar_is_listed_under_its_domain() {
+        let listed: Vec<(String, u32)> = quotas_from_report(TWO)
+            .into_iter()
+            .map(|(domain, quota)| (domain, quota.percent))
+            .collect();
+        assert_eq!(
+            listed,
+            vec![
+                ("nine.testrun.org".to_string(), 67),
+                ("chat.example.org".to_string(), 2),
+            ]
+        );
+        assert_eq!(
+            quotas_from_report(REPORT)
+                .into_iter()
+                .map(|(_, quota)| quota.text)
+                .collect::<Vec<_>>(),
+            vec!["1.34 GiB of 2 GiB used".to_string()]
+        );
+    }
+
+    /// A relay that has said nothing about its mailbox is not in the
+    /// list, and a report without transport blocks -- an older core, or
+    /// a profile not connected yet -- has nothing to list.
+    #[test]
+    fn a_relay_without_a_bar_is_not_listed() {
+        let silent = TWO.replace(
+            "<ul class=\"quota-list\"><li>12 MiB of 1 GiB used\
+             <div class=\"bar\"><div class=\"progress grey\" style=\"width: 2%\">2%</div></div>\
+             </li></ul>",
+            "",
+        );
+        assert_eq!(
+            quotas_from_report(&silent)
+                .into_iter()
+                .map(|(domain, _)| domain)
+                .collect::<Vec<_>>(),
+            vec!["nine.testrun.org".to_string()]
+        );
+        assert!(quotas_from_report("<html><body><h3>Not connected</h3></body></html>").is_empty());
+        assert!(quotas_from_report("").is_empty());
+        // A block the core never headed is a block with no relay to
+        // list under.
+        let unheaded = REPORT.replace("<b>nine.testrun.org:</b>", "");
+        assert!(quotas_from_report(&unheaded).is_empty());
+        assert_eq!(
+            quota_from_report(&unheaded, "ada@nine.testrun.org").map(|quota| quota.percent),
+            Some(67),
+            "one block is still that profile's, headed or not"
+        );
     }
 
     #[test]

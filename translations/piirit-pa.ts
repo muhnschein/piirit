@@ -87,6 +87,49 @@
     </message>
 </context>
 <context>
+    <name>AddRelayPage</name>
+    <message>
+        <source>%1 did not answer within %2 seconds.</source>
+        <translation>%1 ਨੇ %2 ਸਕਿੰਟਾਂ ਵਿੱਚ ਜਵਾਬ ਨਹੀਂ ਦਿੱਤਾ।</translation>
+    </message>
+    <message>
+        <source>Add a relay</source>
+        <translation>ਰੀਲੇਅ ਸ਼ਾਮਲ ਕਰੋ</translation>
+    </message>
+    <message>
+        <source>Another address for this profile, on another relay. The profile sends from one relay at a time; its page says which, and lets you change it.</source>
+        <translation>ਇਸ ਪ੍ਰੋਫ਼ਾਈਲ ਲਈ ਕਿਸੇ ਹੋਰ ਰੀਲੇਅ ਉੱਤੇ ਇੱਕ ਹੋਰ ਪਤਾ। ਪ੍ਰੋਫ਼ਾਈਲ ਇੱਕ ਵੇਲੇ ਇੱਕੋ ਰੀਲੇਅ ਤੋਂ ਭੇਜਦੀ ਹੈ; ਉਸਦਾ ਪੰਨਾ ਦੱਸਦਾ ਹੈ ਕਿ ਕਿਹੜੇ ਤੋਂ, ਤੇ ਬਦਲਣ ਦਿੰਦਾ ਹੈ।</translation>
+    </message>
+    <message>
+        <source>Relay</source>
+        <translation>ਰੀਲੇਅ</translation>
+    </message>
+    <message>
+        <source>Custom server</source>
+        <translation>ਆਪਣਾ ਸਰਵਰ</translation>
+    </message>
+    <message>
+        <source>See &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; for the full list.</source>
+        <translation>ਪੂਰੀ ਸੂਚੀ &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; ਉੱਤੇ ਵੇਖੋ।</translation>
+    </message>
+    <message>
+        <source>Add relay</source>
+        <translation>ਰੀਲੇਅ ਸ਼ਾਮਲ ਕਰੋ</translation>
+    </message>
+    <message>
+        <source>Contacting %1...</source>
+        <translation>%1 ਨਾਲ ਸੰਪਰਕ ਕੀਤਾ ਜਾ ਰਿਹਾ ਹੈ...</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>ਰੱਦ ਕਰੋ</translation>
+    </message>
+    <message>
+        <source>Relays are run by volunteers. Try another one.</source>
+        <translation>ਰੀਲੇਅ ਵਲੰਟੀਅਰ ਚਲਾਉਂਦੇ ਹਨ। ਕੋਈ ਹੋਰ ਅਜ਼ਮਾਓ।</translation>
+    </message>
+</context>
+<context>
     <name>AttachmentBar</name>
     <message>
         <source>Sending %1</source>
@@ -1032,10 +1075,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>ਆਪਣੇ ਬਾਰੇ ਇੱਕ ਸਤਰ</translation>
     </message>
     <message>
-        <source>Address</source>
-        <translation>ਪਤਾ</translation>
-    </message>
-    <message>
         <source>Send read receipts</source>
         <translation>ਪੜ੍ਹਨ ਦੀਆਂ ਰਸੀਦਾਂ ਭੇਜੋ</translation>
     </message>
@@ -1085,6 +1124,31 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Attachments up to %1</source>
         <extracomment>The biggest attachment the relay will carry. %1 is a size such as &quot;22.3 MB&quot;.</extracomment>
         <translation>%1 ਤੱਕ ਦੇ ਨੱਥੀ</translation>
+    </message>
+    <message>
+        <source>Relays</source>
+        <translation>ਰੀਲੇਅ</translation>
+    </message>
+    <message>
+        <source>Sends from this relay</source>
+        <translation>ਇਸ ਰੀਲੇਅ ਤੋਂ ਭੇਜਦਾ ਹੈ</translation>
+    </message>
+    <message>
+        <source>Removing relay</source>
+        <extracomment>What Silica&apos;s countdown says it is doing, over a relay the reader has asked to remove.</extracomment>
+        <translation>ਰੀਲੇਅ ਹਟਾਇਆ ਜਾ ਰਿਹਾ ਹੈ</translation>
+    </message>
+    <message>
+        <source>Send from this relay</source>
+        <translation>ਇਸ ਰੀਲੇਅ ਤੋਂ ਭੇਜੋ</translation>
+    </message>
+    <message>
+        <source>Remove relay</source>
+        <translation>ਰੀਲੇਅ ਹਟਾਓ</translation>
+    </message>
+    <message>
+        <source>Add a relay</source>
+        <translation>ਰੀਲੇਅ ਸ਼ਾਮਲ ਕਰੋ</translation>
     </message>
 </context>
 <context>

@@ -6,8 +6,9 @@
 //! is cleared with null. A picker hands back a `file://` URL, so the path
 //! has to be unwrapped before it goes anywhere near the core.
 //!
-//! The rest of the page is what parla's profile dialog shows: the address,
-//! the way to the invite, and what the relay and the phone say about the
+//! The rest of the page is what parla's profile dialog shows: the relays
+//! and the address on each (their own test is `relays.rs`; here only that
+//! the one sent from is listed first), and what the relay and the phone say about the
 //! profile -- the connection band, the mailbox quota read off the core's
 //! own report and said as used, left and whole, and the space taken on
 //! the device. The name is a name under the picture until its badge is
@@ -230,7 +231,10 @@ fn the_profile_page_round_trips_the_profile() {
         // The row as it stands before anything is typed.
         record!("listed-before", listed!());
         // What the relay and the phone say, as parla's dialog shows it.
-        record!("address", get!("addressLabel", "text"));
+        // The address is the first relay row's: the profile page lists
+        // the relays now, the one sent from first (tests/relays.rs).
+        record!("address", get!("relayRow0", "addr"));
+        record!("sends-from", get!("relayRow0", "sendsFrom"));
         record!("connection", get!("connectivityLabel", "text"));
         record!("quota-shown", get!("quotaBar", "visible"));
         record!("quota-words", get!("quotaBar", "label"));
@@ -500,8 +504,13 @@ fn assert_page_says_what_the_relay_said(steps: &[(&str, String)], context: &str)
     };
     assert_eq!(
         value("address"),
-        "",
-        "an unconfigured account has no address, and the page showed one. {context}"
+        "account1@example.org",
+        "the first relay row is not the address the profile sends from. {context}"
+    );
+    assert_eq!(
+        value("sends-from"),
+        "true",
+        "the first relay row is not marked as the one sent from. {context}"
     );
     assert_eq!(
         value("connection"),

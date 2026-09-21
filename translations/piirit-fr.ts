@@ -87,6 +87,49 @@
     </message>
 </context>
 <context>
+    <name>AddRelayPage</name>
+    <message>
+        <source>%1 did not answer within %2 seconds.</source>
+        <translation>%1 n’a pas répondu en %2 secondes.</translation>
+    </message>
+    <message>
+        <source>Add a relay</source>
+        <translation>Ajouter un relais</translation>
+    </message>
+    <message>
+        <source>Another address for this profile, on another relay. The profile sends from one relay at a time; its page says which, and lets you change it.</source>
+        <translation>Une autre adresse pour ce profil, sur un autre relais. Le profil envoie depuis un seul relais à la fois ; sa page indique lequel et vous laisse en changer.</translation>
+    </message>
+    <message>
+        <source>Relay</source>
+        <translation>Relais</translation>
+    </message>
+    <message>
+        <source>Custom server</source>
+        <translation>Serveur personnalisé</translation>
+    </message>
+    <message>
+        <source>See &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; for the full list.</source>
+        <translation>La liste complète est sur &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
+    </message>
+    <message>
+        <source>Add relay</source>
+        <translation>Ajouter le relais</translation>
+    </message>
+    <message>
+        <source>Contacting %1...</source>
+        <translation>Contact de %1...</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Annuler</translation>
+    </message>
+    <message>
+        <source>Relays are run by volunteers. Try another one.</source>
+        <translation>Les relais sont tenus par des bénévoles. Essayez-en un autre.</translation>
+    </message>
+</context>
+<context>
     <name>AttachmentBar</name>
     <message>
         <source>Sending %1</source>
@@ -1032,10 +1075,6 @@ Vous continuerez à voir les messages des contacts bloqués dans les autres grou
         <translation>Une ligne à votre sujet</translation>
     </message>
     <message>
-        <source>Address</source>
-        <translation>Adresse</translation>
-    </message>
-    <message>
         <source>Send read receipts</source>
         <translation>Envoyer des accusés de lecture</translation>
     </message>
@@ -1085,6 +1124,31 @@ Vous continuerez à voir les messages des contacts bloqués dans les autres grou
         <source>Attachments up to %1</source>
         <extracomment>The biggest attachment the relay will carry. %1 is a size such as &quot;22.3 MB&quot;.</extracomment>
         <translation>Pièces jointes jusqu’à %1</translation>
+    </message>
+    <message>
+        <source>Relays</source>
+        <translation>Relais</translation>
+    </message>
+    <message>
+        <source>Sends from this relay</source>
+        <translation>Envoie depuis ce relais</translation>
+    </message>
+    <message>
+        <source>Removing relay</source>
+        <extracomment>What Silica&apos;s countdown says it is doing, over a relay the reader has asked to remove.</extracomment>
+        <translation>Retrait du relais</translation>
+    </message>
+    <message>
+        <source>Send from this relay</source>
+        <translation>Envoyer depuis ce relais</translation>
+    </message>
+    <message>
+        <source>Remove relay</source>
+        <translation>Retirer le relais</translation>
+    </message>
+    <message>
+        <source>Add a relay</source>
+        <translation>Ajouter un relais</translation>
     </message>
 </context>
 <context>

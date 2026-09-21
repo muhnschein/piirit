@@ -87,6 +87,49 @@
     </message>
 </context>
 <context>
+    <name>AddRelayPage</name>
+    <message>
+        <source>%1 did not answer within %2 seconds.</source>
+        <translation>%1 nie odpowiedział w ciągu %2 sekund.</translation>
+    </message>
+    <message>
+        <source>Add a relay</source>
+        <translation>Dodaj przekaźnik</translation>
+    </message>
+    <message>
+        <source>Another address for this profile, on another relay. The profile sends from one relay at a time; its page says which, and lets you change it.</source>
+        <translation>Kolejny adres tego profilu, na innym przekaźniku. Profil wysyła naraz tylko z jednego przekaźnika; jego strona pokazuje, z którego, i pozwala to zmienić.</translation>
+    </message>
+    <message>
+        <source>Relay</source>
+        <translation>Przekaźnik</translation>
+    </message>
+    <message>
+        <source>Custom server</source>
+        <translation>Własny serwer</translation>
+    </message>
+    <message>
+        <source>See &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; for the full list.</source>
+        <translation>Pełna lista jest na &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
+    </message>
+    <message>
+        <source>Add relay</source>
+        <translation>Dodaj przekaźnik</translation>
+    </message>
+    <message>
+        <source>Contacting %1...</source>
+        <translation>Łączenie z %1...</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Anuluj</translation>
+    </message>
+    <message>
+        <source>Relays are run by volunteers. Try another one.</source>
+        <translation>Przekaźniki prowadzą wolontariusze. Spróbuj innego.</translation>
+    </message>
+</context>
+<context>
     <name>AttachmentBar</name>
     <message>
         <source>Sending %1</source>
@@ -1038,10 +1081,6 @@ Wiadomości innych grup z zablokowanymi kontaktami nadal będą wyświetlane.</t
         <translation>Jedna linijka o tobie</translation>
     </message>
     <message>
-        <source>Address</source>
-        <translation>Adres</translation>
-    </message>
-    <message>
         <source>Send read receipts</source>
         <translation>Wysyłaj potwierdzenia przeczytania</translation>
     </message>
@@ -1091,6 +1130,31 @@ Wiadomości innych grup z zablokowanymi kontaktami nadal będą wyświetlane.</t
         <source>Attachments up to %1</source>
         <extracomment>The biggest attachment the relay will carry. %1 is a size such as &quot;22.3 MB&quot;.</extracomment>
         <translation>Załączniki do %1</translation>
+    </message>
+    <message>
+        <source>Relays</source>
+        <translation>Przekaźniki</translation>
+    </message>
+    <message>
+        <source>Sends from this relay</source>
+        <translation>Wysyła z tego przekaźnika</translation>
+    </message>
+    <message>
+        <source>Removing relay</source>
+        <extracomment>What Silica&apos;s countdown says it is doing, over a relay the reader has asked to remove.</extracomment>
+        <translation>Usuwanie przekaźnika</translation>
+    </message>
+    <message>
+        <source>Send from this relay</source>
+        <translation>Wysyłaj z tego przekaźnika</translation>
+    </message>
+    <message>
+        <source>Remove relay</source>
+        <translation>Usuń przekaźnik</translation>
+    </message>
+    <message>
+        <source>Add a relay</source>
+        <translation>Dodaj przekaźnik</translation>
     </message>
 </context>
 <context>

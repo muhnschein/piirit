@@ -1,5 +1,6 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
+import "../js/Relays.js" as Relays
 
 /*
  * Add a profile: a name, and the chatmail relay it lives on. The relay
@@ -11,7 +12,8 @@ import Sailfish.Silica 1.0
  * ProfileSetupPage, which does the work and shows the progress. The shape
  * of the page follows parla's account dialog (github.com/trufae/parla).
  * Anyone can run a relay, so a custom one can be typed, and takes over
- * from the list while it is.
+ * from the list while it is. The list itself is shared with the page
+ * that adds a relay to a profile (Relays.js).
  *
  * Nothing is picked to begin with, and the dialog cannot be accepted
  * until something is: a relay is where someone's address and their
@@ -33,37 +35,8 @@ Dialog {
     /// relay is chosen: there is nothing to hand over before that.
     property string providerQr: domain.length > 0 ? "dcaccount:" + domain : ""
 
-    // The public relays chatmail.at/relays listed on 2026-09-20, in its
-    // order, with what it says about each. Anyone may run a relay and
-    // the page is the list that is kept up to date, so this one is a
-    // starting point rather than the whole of it -- the hint under the
-    // field points at the page itself.
-    readonly property var relays: [
-        { domain: "nine.testrun.org", location: "Default for many chatmail apps" },
-        { domain: "mehl.cloud", location: "German speakers" },
-        { domain: "mailchat.pl", location: "Polish speakers" },
-        { domain: "chatmail.woodpeckersnest.space", location: "Italian speakers" },
-        { domain: "chatmail.culturanerd.it", location: "Italian speakers" },
-        { domain: "chat.adminforge.de", location: "Falkenstein, Germany" },
-        { domain: "chika.aangat.lahat.computer", location: "Santa Clara, USA" },
-        { domain: "tarpit.fun", location: "Nuremberg, Germany" },
-        { domain: "d.gaufr.es", location: "Roubaix, France" },
-        { domain: "chtml.ca", location: "Quebec, Canada" },
-        { domain: "e2ee.wang", location: "Johannesburg, South Africa" },
-        { domain: "chat.privittytech.com", location: "Bangalore, India" },
-        { domain: "e2ee.im", location: "Orastie, Romania" },
-        { domain: "chatmail.email", location: "Warsaw, Poland" },
-        { domain: "chat.in-the.eu", location: "Falkenstein, Germany" },
-        { domain: "chat.nuvon.app", location: "Prague, Czechia" },
-        { domain: "nibblehole.com", location: "Zug, Switzerland" },
-        { domain: "chat.zashm.org", location: "Lviv, Ukraine" },
-        { domain: "chat.sus.fr", location: "Iceland/Japan/Kenya/South Africa" },
-        { domain: "delta.thelab.uno", location: "Gravelines, France" },
-        { domain: "chat.vim.wtf", location: "Frankfurt, Germany" },
-        { domain: "uninterest.ing", location: "Elk Grove Village, USA" },
-        { domain: "sweetfern.net", location: "Ashburn, USA" },
-        { domain: "delta.disobey.net", location: "Roon, Netherlands" }
-    ]
+    // The public relays, as chatmail.at/relays lists them (Relays.js).
+    readonly property var relays: Relays.list
 
     // A name, and a relay picked or typed: neither is guessed for the
     // reader.
@@ -129,7 +102,7 @@ Dialog {
 
                         MenuItem {
                             objectName: "relayOption" + index
-                            text: modelData.domain + " (" + modelData.location + ")"
+                            text: Relays.label(modelData)
                         }
                     }
                 }

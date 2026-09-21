@@ -23,6 +23,21 @@ relay its profile had left.
   dialog no longer opens on a relay of its own choosing: it asks, and
   Create waits until the answer is there.
 
+A profile's relays are on its page now, not just the one it sends from.
+
+- The profile page lists every relay the profile is reached through, the
+  one it sends from first and marked as such, each with its own address
+  and what its mailbox holds. A row's menu sends from that relay instead,
+  or removes it after the countdown every other deletion gets; the last
+  relay is not offered for removal, since the core refuses it.
+- One more relay can be added from the plus under the rows, from the same
+  list the profile was made from or a typed server, with the same wait,
+  Cancel and time-out the first relay had. A relay that answers after the
+  reader gave up is kept on the profile rather than undone: the profile
+  is theirs, and its page lists what the relay added.
+- The relays follow the other devices the profile is on: the core says
+  when they change, and the page reads them again.
+
 ## 1.0.0 — 2026-09-18
 
 The first release. Piirit is a native Sailfish OS client for

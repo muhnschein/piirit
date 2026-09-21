@@ -87,6 +87,49 @@
     </message>
 </context>
 <context>
+    <name>AddRelayPage</name>
+    <message>
+        <source>%1 did not answer within %2 seconds.</source>
+        <translation>%1 hat innerhalb von %2 Sekunden nicht geantwortet.</translation>
+    </message>
+    <message>
+        <source>Add a relay</source>
+        <translation>Relay hinzufügen</translation>
+    </message>
+    <message>
+        <source>Another address for this profile, on another relay. The profile sends from one relay at a time; its page says which, and lets you change it.</source>
+        <translation>Eine weitere Adresse für dieses Profil, auf einem anderen Relay. Das Profil sendet immer nur über ein Relay; seine Seite zeigt, welches, und lässt dich wechseln.</translation>
+    </message>
+    <message>
+        <source>Relay</source>
+        <translation>Relay</translation>
+    </message>
+    <message>
+        <source>Custom server</source>
+        <translation>Eigener Server</translation>
+    </message>
+    <message>
+        <source>See &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; for the full list.</source>
+        <translation>Die vollständige Liste steht auf &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
+    </message>
+    <message>
+        <source>Add relay</source>
+        <translation>Relay hinzufügen</translation>
+    </message>
+    <message>
+        <source>Contacting %1...</source>
+        <translation>%1 wird kontaktiert...</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Abbrechen</translation>
+    </message>
+    <message>
+        <source>Relays are run by volunteers. Try another one.</source>
+        <translation>Relays werden von Freiwilligen betrieben. Nimm ein anderes.</translation>
+    </message>
+</context>
+<context>
     <name>AttachmentBar</name>
     <message>
         <source>Sending %1</source>
@@ -1032,10 +1075,6 @@ In anderen Gruppen mit blockierten Kontakten werden deren Nachrichten weiterhin 
         <translation>Eine Zeile über dich</translation>
     </message>
     <message>
-        <source>Address</source>
-        <translation>Adresse</translation>
-    </message>
-    <message>
         <source>Send read receipts</source>
         <translation>Lesebestätigungen senden</translation>
     </message>
@@ -1085,6 +1124,31 @@ In anderen Gruppen mit blockierten Kontakten werden deren Nachrichten weiterhin 
         <source>Attachments up to %1</source>
         <extracomment>The biggest attachment the relay will carry. %1 is a size such as &quot;22.3 MB&quot;.</extracomment>
         <translation>Anhänge bis %1</translation>
+    </message>
+    <message>
+        <source>Relays</source>
+        <translation>Relays</translation>
+    </message>
+    <message>
+        <source>Sends from this relay</source>
+        <translation>Sendet über dieses Relay</translation>
+    </message>
+    <message>
+        <source>Removing relay</source>
+        <extracomment>What Silica&apos;s countdown says it is doing, over a relay the reader has asked to remove.</extracomment>
+        <translation>Relay wird entfernt</translation>
+    </message>
+    <message>
+        <source>Send from this relay</source>
+        <translation>Über dieses Relay senden</translation>
+    </message>
+    <message>
+        <source>Remove relay</source>
+        <translation>Relay entfernen</translation>
+    </message>
+    <message>
+        <source>Add a relay</source>
+        <translation>Relay hinzufügen</translation>
     </message>
 </context>
 <context>

@@ -87,6 +87,49 @@
     </message>
 </context>
 <context>
+    <name>AddRelayPage</name>
+    <message>
+        <source>%1 did not answer within %2 seconds.</source>
+        <translation>%1 %2 సెకన్లలో స్పందించలేదు.</translation>
+    </message>
+    <message>
+        <source>Add a relay</source>
+        <translation>రిలే చేర్చు</translation>
+    </message>
+    <message>
+        <source>Another address for this profile, on another relay. The profile sends from one relay at a time; its page says which, and lets you change it.</source>
+        <translation>ఈ ప్రొఫైల్‌కు మరో రిలేపై ఇంకో చిరునామా. ప్రొఫైల్ ఒకేసారి ఒక రిలే నుండే పంపుతుంది; ఏది అనేది దాని పేజీ చూపిస్తుంది, మార్చనిస్తుంది.</translation>
+    </message>
+    <message>
+        <source>Relay</source>
+        <translation>రిలే</translation>
+    </message>
+    <message>
+        <source>Custom server</source>
+        <translation>సొంత సర్వర్</translation>
+    </message>
+    <message>
+        <source>See &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; for the full list.</source>
+        <translation>పూర్తి జాబితా &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; లో చూడండి.</translation>
+    </message>
+    <message>
+        <source>Add relay</source>
+        <translation>రిలే చేర్చు</translation>
+    </message>
+    <message>
+        <source>Contacting %1...</source>
+        <translation>%1 ను సంప్రదిస్తోంది...</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>రద్దు చేయి</translation>
+    </message>
+    <message>
+        <source>Relays are run by volunteers. Try another one.</source>
+        <translation>రిలేలను స్వచ్ఛంద సేవకులు నడుపుతారు. మరొకటి చూడండి.</translation>
+    </message>
+</context>
+<context>
     <name>AttachmentBar</name>
     <message>
         <source>Sending %1</source>
@@ -1028,10 +1071,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>మీ గురించి ఒక పంక్తి</translation>
     </message>
     <message>
-        <source>Address</source>
-        <translation>చిరునామా</translation>
-    </message>
-    <message>
         <source>Send read receipts</source>
         <translation>చదివిన రసీదులు పంపు</translation>
     </message>
@@ -1081,6 +1120,31 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Attachments up to %1</source>
         <extracomment>The biggest attachment the relay will carry. %1 is a size such as &quot;22.3 MB&quot;.</extracomment>
         <translation>%1 వరకు జోడింపులు</translation>
+    </message>
+    <message>
+        <source>Relays</source>
+        <translation>రిలేలు</translation>
+    </message>
+    <message>
+        <source>Sends from this relay</source>
+        <translation>ఈ రిలే నుండి పంపుతుంది</translation>
+    </message>
+    <message>
+        <source>Removing relay</source>
+        <extracomment>What Silica&apos;s countdown says it is doing, over a relay the reader has asked to remove.</extracomment>
+        <translation>రిలే తొలగిస్తోంది</translation>
+    </message>
+    <message>
+        <source>Send from this relay</source>
+        <translation>ఈ రిలే నుండి పంపు</translation>
+    </message>
+    <message>
+        <source>Remove relay</source>
+        <translation>రిలే తొలగించు</translation>
+    </message>
+    <message>
+        <source>Add a relay</source>
+        <translation>రిలే చేర్చు</translation>
     </message>
 </context>
 <context>

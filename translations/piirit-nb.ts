@@ -87,6 +87,49 @@
     </message>
 </context>
 <context>
+    <name>AddRelayPage</name>
+    <message>
+        <source>%1 did not answer within %2 seconds.</source>
+        <translation>%1 svarte ikke innen %2 sekunder.</translation>
+    </message>
+    <message>
+        <source>Add a relay</source>
+        <translation>Legg til et relé</translation>
+    </message>
+    <message>
+        <source>Another address for this profile, on another relay. The profile sends from one relay at a time; its page says which, and lets you change it.</source>
+        <translation>Enda en adresse for denne profilen, på et annet relé. Profilen sender fra ett relé om gangen; siden dens viser hvilket og lar deg bytte.</translation>
+    </message>
+    <message>
+        <source>Relay</source>
+        <translation>Relé</translation>
+    </message>
+    <message>
+        <source>Custom server</source>
+        <translation>Egen tjener</translation>
+    </message>
+    <message>
+        <source>See &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; for the full list.</source>
+        <translation>Hele listen finnes på &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
+    </message>
+    <message>
+        <source>Add relay</source>
+        <translation>Legg til relé</translation>
+    </message>
+    <message>
+        <source>Contacting %1...</source>
+        <translation>Kontakter %1...</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Avbryt</translation>
+    </message>
+    <message>
+        <source>Relays are run by volunteers. Try another one.</source>
+        <translation>Reléer drives av frivillige. Prøv et annet.</translation>
+    </message>
+</context>
+<context>
     <name>AttachmentBar</name>
     <message>
         <source>Sending %1</source>
@@ -1028,10 +1071,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>En linje om deg</translation>
     </message>
     <message>
-        <source>Address</source>
-        <translation>Adresse</translation>
-    </message>
-    <message>
         <source>Send read receipts</source>
         <translation>Send lesebekreftelser</translation>
     </message>
@@ -1081,6 +1120,31 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Attachments up to %1</source>
         <extracomment>The biggest attachment the relay will carry. %1 is a size such as &quot;22.3 MB&quot;.</extracomment>
         <translation>Vedlegg opptil %1</translation>
+    </message>
+    <message>
+        <source>Relays</source>
+        <translation>Reléer</translation>
+    </message>
+    <message>
+        <source>Sends from this relay</source>
+        <translation>Sender fra dette reléet</translation>
+    </message>
+    <message>
+        <source>Removing relay</source>
+        <extracomment>What Silica&apos;s countdown says it is doing, over a relay the reader has asked to remove.</extracomment>
+        <translation>Fjerner relé</translation>
+    </message>
+    <message>
+        <source>Send from this relay</source>
+        <translation>Send fra dette reléet</translation>
+    </message>
+    <message>
+        <source>Remove relay</source>
+        <translation>Fjern relé</translation>
+    </message>
+    <message>
+        <source>Add a relay</source>
+        <translation>Legg til et relé</translation>
     </message>
 </context>
 <context>

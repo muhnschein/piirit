@@ -87,6 +87,49 @@
     </message>
 </context>
 <context>
+    <name>AddRelayPage</name>
+    <message>
+        <source>%1 did not answer within %2 seconds.</source>
+        <translation>%1 не відповів протягом %2 секунд.</translation>
+    </message>
+    <message>
+        <source>Add a relay</source>
+        <translation>Додати релей</translation>
+    </message>
+    <message>
+        <source>Another address for this profile, on another relay. The profile sends from one relay at a time; its page says which, and lets you change it.</source>
+        <translation>Ще одна адреса для цього профілю, на іншому релеї. Профіль надсилає лише через один релей за раз; його сторінка показує, через який, і дає це змінити.</translation>
+    </message>
+    <message>
+        <source>Relay</source>
+        <translation>Релей</translation>
+    </message>
+    <message>
+        <source>Custom server</source>
+        <translation>Власний сервер</translation>
+    </message>
+    <message>
+        <source>See &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; for the full list.</source>
+        <translation>Повний список — на &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
+    </message>
+    <message>
+        <source>Add relay</source>
+        <translation>Додати релей</translation>
+    </message>
+    <message>
+        <source>Contacting %1...</source>
+        <translation>Зв&apos;язок із %1...</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Скасувати</translation>
+    </message>
+    <message>
+        <source>Relays are run by volunteers. Try another one.</source>
+        <translation>Релеї тримають добровольці. Спробуйте інший.</translation>
+    </message>
+</context>
+<context>
     <name>AttachmentBar</name>
     <message>
         <source>Sending %1</source>
@@ -1038,10 +1081,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Рядок про вас</translation>
     </message>
     <message>
-        <source>Address</source>
-        <translation>Адреса</translation>
-    </message>
-    <message>
         <source>Send read receipts</source>
         <translation>Надсилати сповіщення про прочитання</translation>
     </message>
@@ -1091,6 +1130,31 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Attachments up to %1</source>
         <extracomment>The biggest attachment the relay will carry. %1 is a size such as &quot;22.3 MB&quot;.</extracomment>
         <translation>Вкладення до %1</translation>
+    </message>
+    <message>
+        <source>Relays</source>
+        <translation>Релеї</translation>
+    </message>
+    <message>
+        <source>Sends from this relay</source>
+        <translation>Надсилає через цей релей</translation>
+    </message>
+    <message>
+        <source>Removing relay</source>
+        <extracomment>What Silica&apos;s countdown says it is doing, over a relay the reader has asked to remove.</extracomment>
+        <translation>Релей прибирається</translation>
+    </message>
+    <message>
+        <source>Send from this relay</source>
+        <translation>Надсилати через цей релей</translation>
+    </message>
+    <message>
+        <source>Remove relay</source>
+        <translation>Прибрати релей</translation>
+    </message>
+    <message>
+        <source>Add a relay</source>
+        <translation>Додати релей</translation>
     </message>
 </context>
 <context>

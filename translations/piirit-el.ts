@@ -87,6 +87,49 @@
     </message>
 </context>
 <context>
+    <name>AddRelayPage</name>
+    <message>
+        <source>%1 did not answer within %2 seconds.</source>
+        <translation>Το %1 δεν απάντησε μέσα σε %2 δευτερόλεπτα.</translation>
+    </message>
+    <message>
+        <source>Add a relay</source>
+        <translation>Προσθήκη αναμεταδότη</translation>
+    </message>
+    <message>
+        <source>Another address for this profile, on another relay. The profile sends from one relay at a time; its page says which, and lets you change it.</source>
+        <translation>Μία ακόμη διεύθυνση για αυτό το προφίλ, σε άλλον αναμεταδότη. Το προφίλ στέλνει από έναν αναμεταδότη κάθε φορά· η σελίδα του δείχνει ποιον και σας αφήνει να τον αλλάξετε.</translation>
+    </message>
+    <message>
+        <source>Relay</source>
+        <translation>Αναμεταδότης</translation>
+    </message>
+    <message>
+        <source>Custom server</source>
+        <translation>Δικός σας διακομιστής</translation>
+    </message>
+    <message>
+        <source>See &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; for the full list.</source>
+        <translation>Η πλήρης λίστα βρίσκεται στο &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
+    </message>
+    <message>
+        <source>Add relay</source>
+        <translation>Προσθήκη αναμεταδότη</translation>
+    </message>
+    <message>
+        <source>Contacting %1...</source>
+        <translation>Επικοινωνία με %1...</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Ακύρωση</translation>
+    </message>
+    <message>
+        <source>Relays are run by volunteers. Try another one.</source>
+        <translation>Οι αναμεταδότες κρατιούνται από εθελοντές. Δοκιμάστε άλλον.</translation>
+    </message>
+</context>
+<context>
     <name>AttachmentBar</name>
     <message>
         <source>Sending %1</source>
@@ -1028,10 +1071,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Μια γραμμή για εσάς</translation>
     </message>
     <message>
-        <source>Address</source>
-        <translation>Διεύθυνση</translation>
-    </message>
-    <message>
         <source>Send read receipts</source>
         <translation>Αποστολή αποδείξεων ανάγνωσης</translation>
     </message>
@@ -1081,6 +1120,31 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Attachments up to %1</source>
         <extracomment>The biggest attachment the relay will carry. %1 is a size such as &quot;22.3 MB&quot;.</extracomment>
         <translation>Συνημμένα έως %1</translation>
+    </message>
+    <message>
+        <source>Relays</source>
+        <translation>Αναμεταδότες</translation>
+    </message>
+    <message>
+        <source>Sends from this relay</source>
+        <translation>Στέλνει από αυτόν τον αναμεταδότη</translation>
+    </message>
+    <message>
+        <source>Removing relay</source>
+        <extracomment>What Silica&apos;s countdown says it is doing, over a relay the reader has asked to remove.</extracomment>
+        <translation>Αφαίρεση αναμεταδότη σε εξέλιξη</translation>
+    </message>
+    <message>
+        <source>Send from this relay</source>
+        <translation>Αποστολή από αυτόν τον αναμεταδότη</translation>
+    </message>
+    <message>
+        <source>Remove relay</source>
+        <translation>Αφαίρεση αναμεταδότη</translation>
+    </message>
+    <message>
+        <source>Add a relay</source>
+        <translation>Προσθήκη αναμεταδότη</translation>
     </message>
 </context>
 <context>

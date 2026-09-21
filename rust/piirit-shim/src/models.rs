@@ -192,6 +192,40 @@ pub struct AccountItem {
 /// Account model, for the account switcher.
 pub type AccountListModel = SimpleListModel<AccountItem>;
 
+/// One of a profile's transports, from `list_transports`: a relay the
+/// profile can be reached through, with what the core's connectivity
+/// report says about its mailbox.
+#[derive(Default, Clone, PartialEq, qmetaobject::SimpleListItem)]
+pub struct TransportItem {
+    /// A number standing for the address, the same across reloads, for
+    /// the countdown before a removal (`PendingRemoval.qml`), which
+    /// waits on numbers. Positive, so QML's `int` holds it.
+    pub id: u32,
+    /// The address on this relay. What the core is handed to send from
+    /// it or to remove it.
+    pub addr: QString,
+    /// The relay itself: the part of the address after the `@`, which is
+    /// how the row names it.
+    pub domain: QString,
+    /// The profile sends from this one (`configured_addr`). One row per
+    /// profile, and the first.
+    pub is_primary: bool,
+    /// The relay has said how full the mailbox is. The two fields under
+    /// this mean nothing while it is false: a relay need not report a
+    /// quota, and the report is written only once the relay has been
+    /// reached.
+    pub has_quota: bool,
+    /// How full the mailbox is, in percent, as the core wrote it on its
+    /// own bar.
+    pub quota_percent: u32,
+    /// The core's own sentence about the mailbox -- "1.3 MiB of 2 GiB
+    /// used" -- in whatever language the core is in.
+    pub quota_text: QString,
+}
+
+/// Transport model, for the relay rows on the profile page.
+pub type TransportListModel = SimpleListModel<TransportItem>;
+
 /// One contact from `get_contacts`.
 #[derive(Default, Clone, PartialEq, qmetaobject::SimpleListItem)]
 pub struct ContactItem {

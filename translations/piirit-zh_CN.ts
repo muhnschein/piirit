@@ -87,6 +87,49 @@
     </message>
 </context>
 <context>
+    <name>AddRelayPage</name>
+    <message>
+        <source>%1 did not answer within %2 seconds.</source>
+        <translation>%1 在 %2 秒内没有回应。</translation>
+    </message>
+    <message>
+        <source>Add a relay</source>
+        <translation>添加中继</translation>
+    </message>
+    <message>
+        <source>Another address for this profile, on another relay. The profile sends from one relay at a time; its page says which, and lets you change it.</source>
+        <translation>为此个人资料在另一个中继上再添加一个地址。个人资料一次只从一个中继发送；其页面会显示是哪一个，并可以更改。</translation>
+    </message>
+    <message>
+        <source>Relay</source>
+        <translation>中继</translation>
+    </message>
+    <message>
+        <source>Custom server</source>
+        <translation>自定义服务器</translation>
+    </message>
+    <message>
+        <source>See &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; for the full list.</source>
+        <translation>完整列表见 &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;。</translation>
+    </message>
+    <message>
+        <source>Add relay</source>
+        <translation>添加中继</translation>
+    </message>
+    <message>
+        <source>Contacting %1...</source>
+        <translation>正在联系 %1...</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>取消</translation>
+    </message>
+    <message>
+        <source>Relays are run by volunteers. Try another one.</source>
+        <translation>中继由志愿者运行。换一个试试。</translation>
+    </message>
+</context>
+<context>
     <name>AttachmentBar</name>
     <message>
         <source>Sending %1</source>
@@ -1026,10 +1069,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>一句话介绍你自己</translation>
     </message>
     <message>
-        <source>Address</source>
-        <translation>地址</translation>
-    </message>
-    <message>
         <source>Send read receipts</source>
         <translation>发送已读回执</translation>
     </message>
@@ -1079,6 +1118,31 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Attachments up to %1</source>
         <extracomment>The biggest attachment the relay will carry. %1 is a size such as &quot;22.3 MB&quot;.</extracomment>
         <translation>附件最大 %1</translation>
+    </message>
+    <message>
+        <source>Relays</source>
+        <translation>中继</translation>
+    </message>
+    <message>
+        <source>Sends from this relay</source>
+        <translation>从此中继发送</translation>
+    </message>
+    <message>
+        <source>Removing relay</source>
+        <extracomment>What Silica&apos;s countdown says it is doing, over a relay the reader has asked to remove.</extracomment>
+        <translation>正在移除中继</translation>
+    </message>
+    <message>
+        <source>Send from this relay</source>
+        <translation>改从此中继发送</translation>
+    </message>
+    <message>
+        <source>Remove relay</source>
+        <translation>移除中继</translation>
+    </message>
+    <message>
+        <source>Add a relay</source>
+        <translation>添加中继</translation>
     </message>
 </context>
 <context>

@@ -135,12 +135,80 @@ struct State {
     /// Messages sent from here, in the order they went. Read as the
     /// account's own when a test asks for that; see `full_message`.
     sent: std::collections::BTreeSet<u32>,
+    /// Each account's transports, in the order they were added -- the
+    /// real core's `transports` table, which `list_transports` reads
+    /// oldest first. The one the account sends from is `configured_addr`
+    /// in `config`, as it is there.
+    transports: std::collections::BTreeMap<u32, Vec<String>>,
 }
 
 impl State {
     /// A config value, as the real core would read it back.
     fn config(&self, account: u32, key: &str) -> Option<String> {
         self.config.get(&(account, key.to_string())).cloned()
+    }
+
+    /// The account's transports, oldest first.
+    fn transports_for(&self, account: u32) -> Vec<String> {
+        self.transports.get(&account).cloned().unwrap_or_default()
+    }
+
+    /// Keep a transport the account was just given, as the real core
+    /// does: appended, once, and sent from if the account was not
+    /// sending from anything yet -- a second transport is a second
+    /// address to be reached at, not a change of the first.
+    fn add_transport(&mut self, account: u32, addr: &str) {
+        let list = self.transports.entry(account).or_default();
+        if !list.iter().any(|known| known == addr) {
+            list.push(addr.to_string());
+        }
+        self.config
+            .entry((account, "configured_addr".to_string()))
+            .or_insert_with(|| addr.to_string());
+        self.transports_modified(account);
+    }
+
+    /// Profiles a test wants there from the start, already configured,
+    /// named in `PIIRIT_FAKE_ACCOUNTS`. The onboarding tests leave it
+    /// unset and start from none. Seeded before the first request is
+    /// answered, so that a page asking about a profile before the
+    /// account list has been read finds its transports there.
+    ///
+    /// A profile set up twice keeps the address of the relay it was set
+    /// up on first in the core's deprecated `addr`, while
+    /// `configured_addr` is the relay it sends from now: what
+    /// `PIIRIT_FAKE_OLDER_RELAY` seeds, as the first transport the core
+    /// lists and the one `addr` still names.
+    fn seed_accounts(&mut self) {
+        let older = std::env::var("PIIRIT_FAKE_OLDER_RELAY").ok();
+        for account in env_ids("PIIRIT_FAKE_ACCOUNTS") {
+            let Ok(account) = u32::try_from(account) else {
+                continue;
+            };
+            self.accounts.push(Account {
+                id: account,
+                configured: true,
+            });
+            let list = self.transports.entry(account).or_default();
+            if let Some(older) = &older {
+                self.config
+                    .insert((account, "addr".to_string()), older.clone());
+                list.push(older.clone());
+            }
+            let own = format!("account{account}@example.org");
+            list.push(own.clone());
+            self.config
+                .insert((account, "configured_addr".to_string()), own);
+        }
+    }
+
+    /// Queue the event the real core sends when an account's transports
+    /// change.
+    fn transports_modified(&mut self, account: u32) {
+        self.events.push_back(json!({
+            "contextId": account,
+            "event": {"kind": "TransportsModified"},
+        }));
     }
 
     /// The accounts, shaped as the real core shapes them: a configured
@@ -760,6 +828,16 @@ async fn add_transport_from_qr(
     if stopped {
         return err(id, "Configuration was stopped");
     }
+    // The address the relay minted: this account's name on the relay
+    // the payload names, which is enough for a row to be told apart by.
+    let relay = qr
+        .trim_start_matches("dcaccount:")
+        .trim_start_matches("https://")
+        .split('/')
+        .next()
+        .unwrap_or_default()
+        .to_string();
+    state.add_transport(account, &format!("account{account}@{relay}"));
     state.configure(account);
     ok(id, &Value::Null)
 }
@@ -797,11 +875,32 @@ async fn import_into(state: &Arc<Mutex<State>>, id: &Value, account: u32, from: 
     // all, so the same backup imported twice is the same address twice.
     // Keyed on what the import was handed, which is the one thing two
     // imports of the same profile have in common here.
+    let addr = backup_addr(from);
     state
         .config
-        .insert((account, "configured_addr".to_string()), backup_addr(from));
+        .insert((account, "configured_addr".to_string()), addr.clone());
+    state.add_transport(account, &addr);
     state.configure(account);
     ok(id, &Value::Null)
+}
+
+/// One relay's block of the connectivity report, the shape the real core
+/// writes (pinned in deltachat-jsonrpc/tests/real_server.rs): the domain
+/// in bold, then the mailbox on a bar. Each relay's figure is its own,
+/// so a page that reads another relay's bar can be seen to.
+fn transport_block(addr: &str) -> String {
+    let domain = addr.rsplit('@').next().unwrap_or(addr);
+    let (words, colour, percent) = match domain {
+        "example.org" => ("1.34 GiB of 2 GiB used", "grey", 67),
+        relay if relay.starts_with("old.") => ("1.9 GiB of 2 GiB used", "red", 95),
+        _ => ("12 MiB of 1 GiB used", "grey", 2),
+    };
+    format!(
+        "<li class=\"transport\"><b>{domain}:</b> Connected<br />\
+         <ul class=\"quota-list\"><li>{words}\
+         <div class=\"bar\"><div class=\"progress {colour}\" style=\"width: {percent}%\">{percent}%</div></div>\
+         </li></ul></li>"
+    )
 }
 
 /// The address a backup carries, made up from what names it: the file
@@ -914,7 +1013,11 @@ fn main() {
 
 #[allow(clippy::too_many_lines)]
 async fn serve() {
-    let state = Arc::new(Mutex::new(State::default()));
+    // Seeded before the first request: a page asking about a profile
+    // before anything has read the account list finds it there.
+    let mut seeded = State::default();
+    seeded.seed_accounts();
+    let state = Arc::new(Mutex::new(seeded));
     let stdout = Arc::new(Mutex::new(tokio::io::stdout()));
 
     // Events of whatever kind is asked for, queued before anything else
@@ -995,32 +1098,11 @@ async fn serve() {
                 "get_system_info" => ok(&id, &json!({"name": "fake-core-server"})),
                 "get_all_accounts" => {
                     let mut state = state.lock().await;
-                    // Profiles a test wants there from the start, already
-                    // configured, named in PIIRIT_FAKE_ACCOUNTS. The
-                    // onboarding tests leave it unset and start from none.
+                    // Seeded again when there is nothing left: a test
+                    // that deletes every profile and asks again gets the
+                    // ones it started with, as it always has.
                     if state.accounts.is_empty() {
-                        // A profile set up twice keeps the address of the
-                        // relay it was set up on first in the core's
-                        // deprecated `addr`, while `configured_addr` is
-                        // the relay it sends from now.
-                        let older = std::env::var("PIIRIT_FAKE_OLDER_RELAY").ok();
-                        for account in env_ids("PIIRIT_FAKE_ACCOUNTS") {
-                            if let Ok(account) = u32::try_from(account) {
-                                state.accounts.push(Account {
-                                    id: account,
-                                    configured: true,
-                                });
-                                if let Some(older) = &older {
-                                    state
-                                        .config
-                                        .insert((account, "addr".to_string()), older.clone());
-                                    state.config.insert(
-                                        (account, "configured_addr".to_string()),
-                                        format!("account{account}@example.org"),
-                                    );
-                                }
-                            }
-                        }
+                        state.seed_accounts();
                     }
                     let list = state.account_list();
                     ok(&id, &list)
@@ -1071,14 +1153,34 @@ async fn serve() {
                     // one outright there, which is why the app has to send
                     // null rather than "".
                     match positional(2).as_str() {
+                        // Which transport the account sends from. The
+                        // real core takes only an address it has a
+                        // transport for, in these words -- unless the
+                        // account has none yet, when the write is the
+                        // pre-transport way of configuring one and the
+                        // core makes a transport of it. Both pinned
+                        // offline against the pinned binary.
+                        Some(value) if key == "configured_addr" => {
+                            let known = state.transports_for(account);
+                            if known.is_empty() {
+                                state.add_transport(account, value);
+                                ok(&id, &Value::Null)
+                            } else if known.iter().any(|addr| addr == value) {
+                                state.config.insert((account, key), value.to_string());
+                                ok(&id, &Value::Null)
+                            } else {
+                                err(&id, "Address does not belong to any transport.")
+                            }
+                        }
                         Some(value) => {
                             state.config.insert((account, key), value.to_string());
+                            ok(&id, &Value::Null)
                         }
                         None => {
                             state.config.remove(&(account, key));
+                            ok(&id, &Value::Null)
                         }
                     }
-                    ok(&id, &Value::Null)
                 }
                 "get_config" => {
                     let account = positional(0)
@@ -1236,11 +1338,55 @@ async fn serve() {
                     } else if should_fail(addr) {
                         err(&id, "could not connect to server")
                     } else {
-                        state.lock().await.configure(account_id());
+                        let mut state = state.lock().await;
+                        state.add_transport(account_id(), addr);
+                        state.configure(account_id());
                         ok(&id, &Value::Null)
                     }
                 }
-                "list_transports" => ok(&id, &json!([{"addr": "someone@example.org"}])),
+                // The account's transports, oldest first, in the shape
+                // the real core lists them: an `EnteredLoginParam` each,
+                // of which the app reads `addr`.
+                "list_transports" => {
+                    let listed: Vec<Value> = state
+                        .lock()
+                        .await
+                        .transports_for(account_id())
+                        .into_iter()
+                        .map(|addr| json!({"addr": addr, "password": ""}))
+                        .collect();
+                    ok(&id, &Value::Array(listed))
+                }
+                // One transport fewer. The real core refuses to remove
+                // the last one, in these words, and answers the removal
+                // of the one being sent from by sending from another --
+                // pinned offline against the pinned binary, as far as
+                // one transport allows; the re-election is upstream's
+                // `delete_transport`.
+                "delete_transport" => {
+                    let account = account_id();
+                    let addr = positional(1).as_str().unwrap_or_default().to_string();
+                    let mut state = state.lock().await;
+                    let known = state.transports_for(account);
+                    if known.len() <= 1 {
+                        err(&id, "Cannot remove the last transport")
+                    } else if !known.contains(&addr) {
+                        err(&id, "Address does not belong to any transport.")
+                    } else {
+                        let kept: Vec<String> =
+                            known.into_iter().filter(|kept| *kept != addr).collect();
+                        if state.config(account, "configured_addr").as_deref()
+                            == Some(addr.as_str())
+                        {
+                            state
+                                .config
+                                .insert((account, "configured_addr".to_string()), kept[0].clone());
+                        }
+                        state.transports.insert(account, kept);
+                        state.transports_modified(account);
+                        ok(&id, &Value::Null)
+                    }
+                }
                 "get_contacts" => {
                     let mut state = state.lock().await;
                     state.seed_chats();
@@ -1331,28 +1477,21 @@ async fn serve() {
                 "get_connectivity_html" => {
                     // The core reports every transport, oldest first,
                     // each with its own quota. A profile set up twice
-                    // has the older relay's bar before its own.
-                    let older = std::env::var("PIIRIT_FAKE_OLDER_RELAY")
-                        .ok()
-                        .map(|addr| {
-                            let domain = addr.rsplit('@').next().unwrap_or(&addr).to_string();
-                            format!(
-                                "<li class=\"transport\"><b>{domain}:</b> Connected<br />\
-                                 <ul class=\"quota-list\"><li>1.9 GiB of 2 GiB used\
-                                 <div class=\"bar\"><div class=\"progress red\" style=\"width: 95%\">95%</div></div>\
-                                 </li></ul></li>"
-                            )
-                        })
-                        .unwrap_or_default();
+                    // has the older relay's bar before its own. Each
+                    // relay's figure is its own, so a page that reads
+                    // the wrong bar can be seen to.
+                    let blocks: Vec<String> = state
+                        .lock()
+                        .await
+                        .transports_for(account_id())
+                        .iter()
+                        .map(|addr| transport_block(addr))
+                        .collect();
+                    let blocks = blocks.concat();
                     ok(
                         &id,
                         &json!(format!(
-                            "<html><body><h3>Incoming messages</h3><ul>\
-                             {older}\
-                             <li class=\"transport\"><b>example.org:</b> Connected<br />\
-                             <ul class=\"quota-list\"><li>1.34 GiB of 2 GiB used\
-                             <div class=\"bar\"><div class=\"progress grey\" style=\"width: 67%\">67%</div></div>\
-                             </li></ul></li></ul></body></html>"
+                            "<html><body><h3>Incoming messages</h3><ul>{blocks}</ul></body></html>"
                         )),
                     )
                 }

@@ -87,6 +87,49 @@
     </message>
 </context>
 <context>
+    <name>AddRelayPage</name>
+    <message>
+        <source>%1 did not answer within %2 seconds.</source>
+        <translation>%1 nu a răspuns în %2 secunde.</translation>
+    </message>
+    <message>
+        <source>Add a relay</source>
+        <translation>Adaugă un releu</translation>
+    </message>
+    <message>
+        <source>Another address for this profile, on another relay. The profile sends from one relay at a time; its page says which, and lets you change it.</source>
+        <translation>Încă o adresă pentru acest profil, pe alt releu. Profilul trimite printr-un singur releu odată; pagina lui arată care și te lasă să-l schimbi.</translation>
+    </message>
+    <message>
+        <source>Relay</source>
+        <translation>Releu</translation>
+    </message>
+    <message>
+        <source>Custom server</source>
+        <translation>Server propriu</translation>
+    </message>
+    <message>
+        <source>See &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; for the full list.</source>
+        <translation>Lista completă se află la &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
+    </message>
+    <message>
+        <source>Add relay</source>
+        <translation>Adaugă releul</translation>
+    </message>
+    <message>
+        <source>Contacting %1...</source>
+        <translation>Se contactează %1...</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Anulează</translation>
+    </message>
+    <message>
+        <source>Relays are run by volunteers. Try another one.</source>
+        <translation>Releele sunt ținute de voluntari. Încearcă altul.</translation>
+    </message>
+</context>
+<context>
     <name>AttachmentBar</name>
     <message>
         <source>Sending %1</source>
@@ -1034,10 +1077,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Un rând despre tine</translation>
     </message>
     <message>
-        <source>Address</source>
-        <translation>Adresă</translation>
-    </message>
-    <message>
         <source>Send read receipts</source>
         <translation>Trimite confirmări de citire</translation>
     </message>
@@ -1087,6 +1126,31 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Attachments up to %1</source>
         <extracomment>The biggest attachment the relay will carry. %1 is a size such as &quot;22.3 MB&quot;.</extracomment>
         <translation>Atașamente până la %1</translation>
+    </message>
+    <message>
+        <source>Relays</source>
+        <translation>Relee</translation>
+    </message>
+    <message>
+        <source>Sends from this relay</source>
+        <translation>Profilul trimite prin acest releu</translation>
+    </message>
+    <message>
+        <source>Removing relay</source>
+        <extracomment>What Silica&apos;s countdown says it is doing, over a relay the reader has asked to remove.</extracomment>
+        <translation>Se elimină releul</translation>
+    </message>
+    <message>
+        <source>Send from this relay</source>
+        <translation>Trimite prin acest releu</translation>
+    </message>
+    <message>
+        <source>Remove relay</source>
+        <translation>Elimină releul</translation>
+    </message>
+    <message>
+        <source>Add a relay</source>
+        <translation>Adaugă un releu</translation>
     </message>
 </context>
 <context>

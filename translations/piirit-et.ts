@@ -87,6 +87,49 @@
     </message>
 </context>
 <context>
+    <name>AddRelayPage</name>
+    <message>
+        <source>%1 did not answer within %2 seconds.</source>
+        <translation>%1 ei vastanud %2 sekundi jooksul.</translation>
+    </message>
+    <message>
+        <source>Add a relay</source>
+        <translation>Lisa relee</translation>
+    </message>
+    <message>
+        <source>Another address for this profile, on another relay. The profile sends from one relay at a time; its page says which, and lets you change it.</source>
+        <translation>Veel üks aadress sellele profiilile, teises relees. Profiil saadab korraga ühest releest; tema leht näitab, millisest, ja laseb seda vahetada.</translation>
+    </message>
+    <message>
+        <source>Relay</source>
+        <translation>Relee</translation>
+    </message>
+    <message>
+        <source>Custom server</source>
+        <translation>Oma server</translation>
+    </message>
+    <message>
+        <source>See &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; for the full list.</source>
+        <translation>Täielik loend on aadressil &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
+    </message>
+    <message>
+        <source>Add relay</source>
+        <translation>Lisa relee</translation>
+    </message>
+    <message>
+        <source>Contacting %1...</source>
+        <translation>Võtan ühendust: %1...</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Loobu</translation>
+    </message>
+    <message>
+        <source>Relays are run by volunteers. Try another one.</source>
+        <translation>Releesid peavad vabatahtlikud. Proovi teist.</translation>
+    </message>
+</context>
+<context>
     <name>AttachmentBar</name>
     <message>
         <source>Sending %1</source>
@@ -1032,10 +1075,6 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
         <translation>Üks rida sinust</translation>
     </message>
     <message>
-        <source>Address</source>
-        <translation>Aadress</translation>
-    </message>
-    <message>
         <source>Send read receipts</source>
         <translation>Saada lugemiskinnitusi</translation>
     </message>
@@ -1085,6 +1124,31 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
         <source>Attachments up to %1</source>
         <extracomment>The biggest attachment the relay will carry. %1 is a size such as &quot;22.3 MB&quot;.</extracomment>
         <translation>Manused kuni %1</translation>
+    </message>
+    <message>
+        <source>Relays</source>
+        <translation>Releed</translation>
+    </message>
+    <message>
+        <source>Sends from this relay</source>
+        <translation>Saadab sellest releest</translation>
+    </message>
+    <message>
+        <source>Removing relay</source>
+        <extracomment>What Silica&apos;s countdown says it is doing, over a relay the reader has asked to remove.</extracomment>
+        <translation>Eemaldan releed</translation>
+    </message>
+    <message>
+        <source>Send from this relay</source>
+        <translation>Saada sellest releest</translation>
+    </message>
+    <message>
+        <source>Remove relay</source>
+        <translation>Eemalda relee</translation>
+    </message>
+    <message>
+        <source>Add a relay</source>
+        <translation>Lisa relee</translation>
     </message>
 </context>
 <context>

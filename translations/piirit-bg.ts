@@ -87,6 +87,49 @@
     </message>
 </context>
 <context>
+    <name>AddRelayPage</name>
+    <message>
+        <source>%1 did not answer within %2 seconds.</source>
+        <translation>%1 не отговори в рамките на %2 секунди.</translation>
+    </message>
+    <message>
+        <source>Add a relay</source>
+        <translation>Добавяне на релей</translation>
+    </message>
+    <message>
+        <source>Another address for this profile, on another relay. The profile sends from one relay at a time; its page says which, and lets you change it.</source>
+        <translation>Още един адрес за този профил, на друг релей. Профилът изпраща само от един релей наведнъж; страницата му показва кой е и позволява да го смените.</translation>
+    </message>
+    <message>
+        <source>Relay</source>
+        <translation>Релей</translation>
+    </message>
+    <message>
+        <source>Custom server</source>
+        <translation>Собствен сървър</translation>
+    </message>
+    <message>
+        <source>See &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; for the full list.</source>
+        <translation>Пълният списък е на &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
+    </message>
+    <message>
+        <source>Add relay</source>
+        <translation>Добавяне на релей</translation>
+    </message>
+    <message>
+        <source>Contacting %1...</source>
+        <translation>Свързване с %1...</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Отказ</translation>
+    </message>
+    <message>
+        <source>Relays are run by volunteers. Try another one.</source>
+        <translation>Релеите се поддържат от доброволци. Опитайте друг.</translation>
+    </message>
+</context>
+<context>
     <name>AttachmentBar</name>
     <message>
         <source>Sending %1</source>
@@ -1028,10 +1071,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Един ред за вас</translation>
     </message>
     <message>
-        <source>Address</source>
-        <translation>Адрес</translation>
-    </message>
-    <message>
         <source>Send read receipts</source>
         <translation>Изпращане на потвърждения за прочитане</translation>
     </message>
@@ -1081,6 +1120,31 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Attachments up to %1</source>
         <extracomment>The biggest attachment the relay will carry. %1 is a size such as &quot;22.3 MB&quot;.</extracomment>
         <translation>Прикачени файлове до %1</translation>
+    </message>
+    <message>
+        <source>Relays</source>
+        <translation>Релеи</translation>
+    </message>
+    <message>
+        <source>Sends from this relay</source>
+        <translation>Изпраща от този релей</translation>
+    </message>
+    <message>
+        <source>Removing relay</source>
+        <extracomment>What Silica&apos;s countdown says it is doing, over a relay the reader has asked to remove.</extracomment>
+        <translation>Релеят се премахва</translation>
+    </message>
+    <message>
+        <source>Send from this relay</source>
+        <translation>Изпращане от този релей</translation>
+    </message>
+    <message>
+        <source>Remove relay</source>
+        <translation>Премахване на релея</translation>
+    </message>
+    <message>
+        <source>Add a relay</source>
+        <translation>Добавяне на релей</translation>
     </message>
 </context>
 <context>

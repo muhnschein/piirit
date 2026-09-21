@@ -87,6 +87,49 @@
     </message>
 </context>
 <context>
+    <name>AddRelayPage</name>
+    <message>
+        <source>%1 did not answer within %2 seconds.</source>
+        <translation>%1 %2 வினாடிகளுக்குள் பதிலளிக்கவில்லை.</translation>
+    </message>
+    <message>
+        <source>Add a relay</source>
+        <translation>ரிலே சேர்</translation>
+    </message>
+    <message>
+        <source>Another address for this profile, on another relay. The profile sends from one relay at a time; its page says which, and lets you change it.</source>
+        <translation>இந்தச் சுயவிவரத்திற்கு வேறொரு ரிலேயில் இன்னொரு முகவரி. சுயவிவரம் ஒரு நேரத்தில் ஒரே ரிலேயிலிருந்துதான் அனுப்பும்; எது என்று அதன் பக்கம் காட்டும், மாற்றவும் விடும்.</translation>
+    </message>
+    <message>
+        <source>Relay</source>
+        <translation>ரிலே</translation>
+    </message>
+    <message>
+        <source>Custom server</source>
+        <translation>சொந்த சேவையகம்</translation>
+    </message>
+    <message>
+        <source>See &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; for the full list.</source>
+        <translation>முழுப் பட்டியலை &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; இல் காணலாம்.</translation>
+    </message>
+    <message>
+        <source>Add relay</source>
+        <translation>ரிலே சேர்</translation>
+    </message>
+    <message>
+        <source>Contacting %1...</source>
+        <translation>%1 ஐத் தொடர்புகொள்கிறது...</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>ரத்துசெய்</translation>
+    </message>
+    <message>
+        <source>Relays are run by volunteers. Try another one.</source>
+        <translation>ரிலேக்களைத் தன்னார்வலர்கள் நடத்துகிறார்கள். வேறொன்றை முயலுங்கள்.</translation>
+    </message>
+</context>
+<context>
     <name>AttachmentBar</name>
     <message>
         <source>Sending %1</source>
@@ -1028,10 +1071,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>உங்களைப் பற்றி ஒரு வரி</translation>
     </message>
     <message>
-        <source>Address</source>
-        <translation>முகவரி</translation>
-    </message>
-    <message>
         <source>Send read receipts</source>
         <translation>படித்ததற்கான ரசீதுகளை அனுப்பு</translation>
     </message>
@@ -1081,6 +1120,31 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Attachments up to %1</source>
         <extracomment>The biggest attachment the relay will carry. %1 is a size such as &quot;22.3 MB&quot;.</extracomment>
         <translation>%1 வரையிலான இணைப்புகள்</translation>
+    </message>
+    <message>
+        <source>Relays</source>
+        <translation>ரிலேக்கள்</translation>
+    </message>
+    <message>
+        <source>Sends from this relay</source>
+        <translation>இந்த ரிலேயிலிருந்து அனுப்புகிறது</translation>
+    </message>
+    <message>
+        <source>Removing relay</source>
+        <extracomment>What Silica&apos;s countdown says it is doing, over a relay the reader has asked to remove.</extracomment>
+        <translation>ரிலே நீக்கப்படுகிறது</translation>
+    </message>
+    <message>
+        <source>Send from this relay</source>
+        <translation>இந்த ரிலேயிலிருந்து அனுப்பு</translation>
+    </message>
+    <message>
+        <source>Remove relay</source>
+        <translation>ரிலேயை நீக்கு</translation>
+    </message>
+    <message>
+        <source>Add a relay</source>
+        <translation>ரிலே சேர்</translation>
     </message>
 </context>
 <context>

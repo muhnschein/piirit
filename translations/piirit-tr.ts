@@ -87,6 +87,49 @@
     </message>
 </context>
 <context>
+    <name>AddRelayPage</name>
+    <message>
+        <source>%1 did not answer within %2 seconds.</source>
+        <translation>%1, %2 saniye içinde yanıt vermedi.</translation>
+    </message>
+    <message>
+        <source>Add a relay</source>
+        <translation>Aktarıcı ekle</translation>
+    </message>
+    <message>
+        <source>Another address for this profile, on another relay. The profile sends from one relay at a time; its page says which, and lets you change it.</source>
+        <translation>Bu profil için başka bir aktarıcıda bir adres daha. Profil aynı anda tek bir aktarıcıdan gönderir; hangisi olduğunu sayfası gösterir ve değiştirmene izin verir.</translation>
+    </message>
+    <message>
+        <source>Relay</source>
+        <translation>Aktarıcı</translation>
+    </message>
+    <message>
+        <source>Custom server</source>
+        <translation>Özel sunucu</translation>
+    </message>
+    <message>
+        <source>See &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; for the full list.</source>
+        <translation>Tam liste için &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; adresine bakın.</translation>
+    </message>
+    <message>
+        <source>Add relay</source>
+        <translation>Aktarıcı ekle</translation>
+    </message>
+    <message>
+        <source>Contacting %1...</source>
+        <translation>%1 ile iletişim kuruluyor...</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>İptal</translation>
+    </message>
+    <message>
+        <source>Relays are run by volunteers. Try another one.</source>
+        <translation>Aktarıcıları gönüllüler işletir. Bir başkasını dene.</translation>
+    </message>
+</context>
+<context>
     <name>AttachmentBar</name>
     <message>
         <source>Sending %1</source>
@@ -1026,10 +1069,6 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
         <translation>Sizinle ilgili bir satır</translation>
     </message>
     <message>
-        <source>Address</source>
-        <translation>Adres</translation>
-    </message>
-    <message>
         <source>Send read receipts</source>
         <translation>Okundu bilgisi gönder</translation>
     </message>
@@ -1079,6 +1118,31 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
         <source>Attachments up to %1</source>
         <extracomment>The biggest attachment the relay will carry. %1 is a size such as &quot;22.3 MB&quot;.</extracomment>
         <translation>En fazla %1 boyutunda ek</translation>
+    </message>
+    <message>
+        <source>Relays</source>
+        <translation>Aktarıcılar</translation>
+    </message>
+    <message>
+        <source>Sends from this relay</source>
+        <translation>Bu aktarıcıdan gönderiyor</translation>
+    </message>
+    <message>
+        <source>Removing relay</source>
+        <extracomment>What Silica&apos;s countdown says it is doing, over a relay the reader has asked to remove.</extracomment>
+        <translation>Aktarıcı kaldırılıyor</translation>
+    </message>
+    <message>
+        <source>Send from this relay</source>
+        <translation>Bu aktarıcıdan gönder</translation>
+    </message>
+    <message>
+        <source>Remove relay</source>
+        <translation>Aktarıcıyı kaldır</translation>
+    </message>
+    <message>
+        <source>Add a relay</source>
+        <translation>Aktarıcı ekle</translation>
     </message>
 </context>
 <context>

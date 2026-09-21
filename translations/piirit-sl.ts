@@ -87,6 +87,49 @@
     </message>
 </context>
 <context>
+    <name>AddRelayPage</name>
+    <message>
+        <source>%1 did not answer within %2 seconds.</source>
+        <translation>%1 ni odgovoril v %2 sekundah.</translation>
+    </message>
+    <message>
+        <source>Add a relay</source>
+        <translation>Dodaj posrednika</translation>
+    </message>
+    <message>
+        <source>Another address for this profile, on another relay. The profile sends from one relay at a time; its page says which, and lets you change it.</source>
+        <translation>Še en naslov za ta profil, pri drugem posredniku. Profil pošilja naenkrat le prek enega posrednika; njegova stran pove, katerega, in ti pusti to spremeniti.</translation>
+    </message>
+    <message>
+        <source>Relay</source>
+        <translation>Posrednik</translation>
+    </message>
+    <message>
+        <source>Custom server</source>
+        <translation>Lasten strežnik</translation>
+    </message>
+    <message>
+        <source>See &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; for the full list.</source>
+        <translation>Celoten seznam je na &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
+    </message>
+    <message>
+        <source>Add relay</source>
+        <translation>Dodaj posrednika</translation>
+    </message>
+    <message>
+        <source>Contacting %1...</source>
+        <translation>Vzpostavljanje stika z %1...</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Prekliči</translation>
+    </message>
+    <message>
+        <source>Relays are run by volunteers. Try another one.</source>
+        <translation>Posrednike vodijo prostovoljci. Poskusi drugega.</translation>
+    </message>
+</context>
+<context>
     <name>AttachmentBar</name>
     <message>
         <source>Sending %1</source>
@@ -1044,10 +1087,6 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
         <translation>Vrstica o vas</translation>
     </message>
     <message>
-        <source>Address</source>
-        <translation>Naslov</translation>
-    </message>
-    <message>
         <source>Send read receipts</source>
         <translation>Pošiljaj potrdila o branju</translation>
     </message>
@@ -1097,6 +1136,31 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
         <source>Attachments up to %1</source>
         <extracomment>The biggest attachment the relay will carry. %1 is a size such as &quot;22.3 MB&quot;.</extracomment>
         <translation>Priponke do %1</translation>
+    </message>
+    <message>
+        <source>Relays</source>
+        <translation>Posredniki</translation>
+    </message>
+    <message>
+        <source>Sends from this relay</source>
+        <translation>Pošilja prek tega posrednika</translation>
+    </message>
+    <message>
+        <source>Removing relay</source>
+        <extracomment>What Silica&apos;s countdown says it is doing, over a relay the reader has asked to remove.</extracomment>
+        <translation>Odstranjevanje posrednika</translation>
+    </message>
+    <message>
+        <source>Send from this relay</source>
+        <translation>Pošiljaj prek tega posrednika</translation>
+    </message>
+    <message>
+        <source>Remove relay</source>
+        <translation>Odstrani posrednika</translation>
+    </message>
+    <message>
+        <source>Add a relay</source>
+        <translation>Dodaj posrednika</translation>
     </message>
 </context>
 <context>

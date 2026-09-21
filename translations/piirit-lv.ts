@@ -87,6 +87,49 @@
     </message>
 </context>
 <context>
+    <name>AddRelayPage</name>
+    <message>
+        <source>%1 did not answer within %2 seconds.</source>
+        <translation>%1 neatbildēja %2 sekunžu laikā.</translation>
+    </message>
+    <message>
+        <source>Add a relay</source>
+        <translation>Pievienot releju</translation>
+    </message>
+    <message>
+        <source>Another address for this profile, on another relay. The profile sends from one relay at a time; its page says which, and lets you change it.</source>
+        <translation>Vēl viena adrese šim profilam, citā relejā. Profils sūta vienlaikus tikai no viena releja; tā lapa rāda, no kura, un ļauj to mainīt.</translation>
+    </message>
+    <message>
+        <source>Relay</source>
+        <translation>Relejs</translation>
+    </message>
+    <message>
+        <source>Custom server</source>
+        <translation>Savs serveris</translation>
+    </message>
+    <message>
+        <source>See &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; for the full list.</source>
+        <translation>Pilns saraksts ir &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
+    </message>
+    <message>
+        <source>Add relay</source>
+        <translation>Pievienot releju</translation>
+    </message>
+    <message>
+        <source>Contacting %1...</source>
+        <translation>Sazinās ar %1...</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Atcelt</translation>
+    </message>
+    <message>
+        <source>Relays are run by volunteers. Try another one.</source>
+        <translation>Relejus uztur brīvprātīgie. Pamēģini citu.</translation>
+    </message>
+</context>
+<context>
     <name>AttachmentBar</name>
     <message>
         <source>Sending %1</source>
@@ -1038,10 +1081,6 @@ Citās grupās, kurās ir bloķēti kontakti, viņu ziņas joprojām būs redzam
         <translation>Rindiņa par jums</translation>
     </message>
     <message>
-        <source>Address</source>
-        <translation>Adrese</translation>
-    </message>
-    <message>
         <source>Send read receipts</source>
         <translation>Sūtīt lasīšanas apstiprinājumus</translation>
     </message>
@@ -1091,6 +1130,31 @@ Citās grupās, kurās ir bloķēti kontakti, viņu ziņas joprojām būs redzam
         <source>Attachments up to %1</source>
         <extracomment>The biggest attachment the relay will carry. %1 is a size such as &quot;22.3 MB&quot;.</extracomment>
         <translation>Pielikumi līdz %1</translation>
+    </message>
+    <message>
+        <source>Relays</source>
+        <translation>Releji</translation>
+    </message>
+    <message>
+        <source>Sends from this relay</source>
+        <translation>Sūta no šī releja</translation>
+    </message>
+    <message>
+        <source>Removing relay</source>
+        <extracomment>What Silica&apos;s countdown says it is doing, over a relay the reader has asked to remove.</extracomment>
+        <translation>Noņem releju</translation>
+    </message>
+    <message>
+        <source>Send from this relay</source>
+        <translation>Sūtīt no šī releja</translation>
+    </message>
+    <message>
+        <source>Remove relay</source>
+        <translation>Noņemt releju</translation>
+    </message>
+    <message>
+        <source>Add a relay</source>
+        <translation>Pievienot releju</translation>
     </message>
 </context>
 <context>

@@ -87,6 +87,49 @@
     </message>
 </context>
 <context>
+    <name>AddRelayPage</name>
+    <message>
+        <source>%1 did not answer within %2 seconds.</source>
+        <translation>%1 ei vastannut %2 sekunnin kuluessa.</translation>
+    </message>
+    <message>
+        <source>Add a relay</source>
+        <translation>Lisää välittäjä</translation>
+    </message>
+    <message>
+        <source>Another address for this profile, on another relay. The profile sends from one relay at a time; its page says which, and lets you change it.</source>
+        <translation>Toinen osoite tälle profiilille, toisella välittäjällä. Profiili lähettää kerrallaan yhden välittäjän kautta; sen sivu kertoo minkä ja antaa vaihtaa sitä.</translation>
+    </message>
+    <message>
+        <source>Relay</source>
+        <translation>Välittäjä</translation>
+    </message>
+    <message>
+        <source>Custom server</source>
+        <translation>Oma palvelin</translation>
+    </message>
+    <message>
+        <source>See &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; for the full list.</source>
+        <translation>Koko luettelo on osoitteessa &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
+    </message>
+    <message>
+        <source>Add relay</source>
+        <translation>Lisää välittäjä</translation>
+    </message>
+    <message>
+        <source>Contacting %1...</source>
+        <translation>Otetaan yhteyttä: %1...</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Peruuta</translation>
+    </message>
+    <message>
+        <source>Relays are run by volunteers. Try another one.</source>
+        <translation>Välittäjiä pyörittävät vapaaehtoiset. Kokeile toista.</translation>
+    </message>
+</context>
+<context>
     <name>AttachmentBar</name>
     <message>
         <source>Sending %1</source>
@@ -1028,10 +1071,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Rivi sinusta</translation>
     </message>
     <message>
-        <source>Address</source>
-        <translation>Osoite</translation>
-    </message>
-    <message>
         <source>Send read receipts</source>
         <translation>Lähetä lukukuittaukset</translation>
     </message>
@@ -1081,6 +1120,31 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Attachments up to %1</source>
         <extracomment>The biggest attachment the relay will carry. %1 is a size such as &quot;22.3 MB&quot;.</extracomment>
         <translation>Liitteet enintään %1</translation>
+    </message>
+    <message>
+        <source>Relays</source>
+        <translation>Välittäjät</translation>
+    </message>
+    <message>
+        <source>Sends from this relay</source>
+        <translation>Lähettää tämän välittäjän kautta</translation>
+    </message>
+    <message>
+        <source>Removing relay</source>
+        <extracomment>What Silica&apos;s countdown says it is doing, over a relay the reader has asked to remove.</extracomment>
+        <translation>Poistetaan välittäjää</translation>
+    </message>
+    <message>
+        <source>Send from this relay</source>
+        <translation>Lähetä tämän välittäjän kautta</translation>
+    </message>
+    <message>
+        <source>Remove relay</source>
+        <translation>Poista välittäjä</translation>
+    </message>
+    <message>
+        <source>Add a relay</source>
+        <translation>Lisää välittäjä</translation>
     </message>
 </context>
 <context>

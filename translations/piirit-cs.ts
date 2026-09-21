@@ -87,6 +87,49 @@
     </message>
 </context>
 <context>
+    <name>AddRelayPage</name>
+    <message>
+        <source>%1 did not answer within %2 seconds.</source>
+        <translation>%1 neodpověděl do %2 sekund.</translation>
+    </message>
+    <message>
+        <source>Add a relay</source>
+        <translation>Přidat relay</translation>
+    </message>
+    <message>
+        <source>Another address for this profile, on another relay. The profile sends from one relay at a time; its page says which, and lets you change it.</source>
+        <translation>Další adresa pro tenhle profil, na jiném relay. Profil odesílá vždy jen z jednoho relay; jeho stránka ukazuje ze kterého a dá se to tam změnit.</translation>
+    </message>
+    <message>
+        <source>Relay</source>
+        <translation>Relay</translation>
+    </message>
+    <message>
+        <source>Custom server</source>
+        <translation>Vlastní server</translation>
+    </message>
+    <message>
+        <source>See &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; for the full list.</source>
+        <translation>Úplný seznam je na &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
+    </message>
+    <message>
+        <source>Add relay</source>
+        <translation>Přidat relay</translation>
+    </message>
+    <message>
+        <source>Contacting %1...</source>
+        <translation>Kontaktuje se %1...</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Zrušit</translation>
+    </message>
+    <message>
+        <source>Relays are run by volunteers. Try another one.</source>
+        <translation>Relay provozují dobrovolníci. Zkus jiný.</translation>
+    </message>
+</context>
+<context>
     <name>AttachmentBar</name>
     <message>
         <source>Sending %1</source>
@@ -1038,10 +1081,6 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
         <translation>Řádek o vás</translation>
     </message>
     <message>
-        <source>Address</source>
-        <translation>Adresa</translation>
-    </message>
-    <message>
         <source>Send read receipts</source>
         <translation>Odesílat potvrzení o přečtení</translation>
     </message>
@@ -1091,6 +1130,31 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
         <source>Attachments up to %1</source>
         <extracomment>The biggest attachment the relay will carry. %1 is a size such as &quot;22.3 MB&quot;.</extracomment>
         <translation>Přílohy do %1</translation>
+    </message>
+    <message>
+        <source>Relays</source>
+        <translation>Relay</translation>
+    </message>
+    <message>
+        <source>Sends from this relay</source>
+        <translation>Odesílá z tohoto relay</translation>
+    </message>
+    <message>
+        <source>Removing relay</source>
+        <extracomment>What Silica&apos;s countdown says it is doing, over a relay the reader has asked to remove.</extracomment>
+        <translation>Odebírání relay</translation>
+    </message>
+    <message>
+        <source>Send from this relay</source>
+        <translation>Odesílat z tohoto relay</translation>
+    </message>
+    <message>
+        <source>Remove relay</source>
+        <translation>Odebrat relay</translation>
+    </message>
+    <message>
+        <source>Add a relay</source>
+        <translation>Přidat relay</translation>
     </message>
 </context>
 <context>

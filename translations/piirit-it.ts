@@ -87,6 +87,49 @@
     </message>
 </context>
 <context>
+    <name>AddRelayPage</name>
+    <message>
+        <source>%1 did not answer within %2 seconds.</source>
+        <translation>%1 non ha risposto entro %2 secondi.</translation>
+    </message>
+    <message>
+        <source>Add a relay</source>
+        <translation>Aggiungi un relay</translation>
+    </message>
+    <message>
+        <source>Another address for this profile, on another relay. The profile sends from one relay at a time; its page says which, and lets you change it.</source>
+        <translation>Un altro indirizzo per questo profilo, su un altro relay. Il profilo invia da un solo relay alla volta; la sua pagina dice quale e ti lascia cambiarlo.</translation>
+    </message>
+    <message>
+        <source>Relay</source>
+        <translation>Relay</translation>
+    </message>
+    <message>
+        <source>Custom server</source>
+        <translation>Server personalizzato</translation>
+    </message>
+    <message>
+        <source>See &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; for the full list.</source>
+        <translation>L&apos;elenco completo è su &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
+    </message>
+    <message>
+        <source>Add relay</source>
+        <translation>Aggiungi relay</translation>
+    </message>
+    <message>
+        <source>Contacting %1...</source>
+        <translation>Contatto di %1 in corso...</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Annulla</translation>
+    </message>
+    <message>
+        <source>Relays are run by volunteers. Try another one.</source>
+        <translation>I relay sono tenuti da volontari. Provane un altro.</translation>
+    </message>
+</context>
+<context>
     <name>AttachmentBar</name>
     <message>
         <source>Sending %1</source>
@@ -1032,10 +1075,6 @@ Gli altri gruppi con contatti bloccati continueranno a visualizzare i loro messa
         <translation>Una riga su di te</translation>
     </message>
     <message>
-        <source>Address</source>
-        <translation>Indirizzo</translation>
-    </message>
-    <message>
         <source>Send read receipts</source>
         <translation>Invia conferme di lettura</translation>
     </message>
@@ -1085,6 +1124,31 @@ Gli altri gruppi con contatti bloccati continueranno a visualizzare i loro messa
         <source>Attachments up to %1</source>
         <extracomment>The biggest attachment the relay will carry. %1 is a size such as &quot;22.3 MB&quot;.</extracomment>
         <translation>Allegati fino a %1</translation>
+    </message>
+    <message>
+        <source>Relays</source>
+        <translation>Relay</translation>
+    </message>
+    <message>
+        <source>Sends from this relay</source>
+        <translation>Il profilo invia da questo relay</translation>
+    </message>
+    <message>
+        <source>Removing relay</source>
+        <extracomment>What Silica&apos;s countdown says it is doing, over a relay the reader has asked to remove.</extracomment>
+        <translation>Rimozione del relay</translation>
+    </message>
+    <message>
+        <source>Send from this relay</source>
+        <translation>Invia da questo relay</translation>
+    </message>
+    <message>
+        <source>Remove relay</source>
+        <translation>Rimuovi relay</translation>
+    </message>
+    <message>
+        <source>Add a relay</source>
+        <translation>Aggiungi un relay</translation>
     </message>
 </context>
 <context>
