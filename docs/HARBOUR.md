@@ -112,10 +112,19 @@ Harbour rejects a Silica app whose binary does not export `main()`: the
 symbol up dynamically. C++ apps mark it `Q_DECL_EXPORT`.
 
 Rust has no equivalent. `fn main` becomes an ordinary global symbol, which
-lives only in `.symtab` — and rpmbuild strips `.symtab` on the way into
-the package, so by the time Harbour looks there is nothing there.
+lives only in `.symtab` — and `.symtab` is stripped on the way into the
+package, so by the time Harbour looks there is nothing there.
 `rust/piirit-app/build.rs` passes `--dynamic-list` at link time to put
 `main` in `.dynsym`, where stripping cannot reach it.
+
+Who does the stripping is worth being exact about, because this tree
+assumed rpmbuild did and it does not: every package built before
+`rust/Cargo.toml` grew a `[profile.release]` shipped a binary the
+validator called out as `file is not stripped!`, carrying 2.08 MB of
+symbol tables a phone never reads. `strip = "symbols"` in that profile is
+what removes them now. It is `--strip-all` under the hood and `.dynsym`
+survives it, so the booster still finds `main` — which is the whole
+reason the export is made there rather than left in `.symtab`.
 
 `--dynamic-list` rather than `--export-dynamic-symbol`, which needs
 binutils 2.35 and so may not exist in the SDK, or `--export-dynamic`,

@@ -38,6 +38,28 @@ unwrap_used = "deny"
 expect_used = "deny"
 disallowed_methods = "deny"
 
+# How the packaged binary is built. Each setting is paid for in build
+# time and was measured on the aarch64 package (docs/BUILDING.md, "What a
+# package weighs"):
+#
+# `strip` first, because the assumption it corrects is written down
+# elsewhere in this tree: the SDK's rpmbuild does *not* strip what it
+# packages -- Harbour's own validator says "file is not stripped!" of
+# every build so far -- and the symbol tables were 2.08 MB of a 5.83 MB
+# binary, none of it read on a phone. `main` is not lost with them: it is
+# exported through `--dynamic-list` (piirit-app/build.rs) into `.dynsym`,
+# which `--strip-all` does not touch, and the booster looks it up there.
+# See docs/HARBOUR.md, "Exporting main()".
+#
+# `lto` and `codegen-units` then let rustc inline across crates and stop
+# splitting the work into sixteen units it cannot optimise between. Thin
+# LTO rather than fat: the same shape of win for a fraction of the link
+# time, which under scratchbox2 is the part that hurts.
+[profile.release]
+strip = "symbols"
+lto = "thin"
+codegen-units = 1
+
 # qmetaobject builds its QML engine on QApplication, from QtWidgets, which
 # Harbour does not allow (docs/HARBOUR.md). The vendored copy is upstream
 # 0.2.10 plus third_party/qmetaobject.patch, three lines swapping it for
