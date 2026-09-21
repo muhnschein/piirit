@@ -1377,6 +1377,33 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>SecondDeviceDialog</name>
+    <message>
+        <source>Add a second device</source>
+        <translation>இரண்டாவது சாதனத்தைச் சேர்</translation>
+    </message>
+    <message>
+        <source>Continue</source>
+        <translation>தொடரவும்</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>ரத்துசெய்</translation>
+    </message>
+    <message>
+        <source>This makes a code the other device reads to copy the profile onto itself.</source>
+        <translation>இது ஒரு குறியீட்டை உருவாக்குகிறது; அதைப் படித்து மறு சாதனம் சுயவிவரத்தை நகலெடுத்துக் கொள்ளும்.</translation>
+    </message>
+    <message>
+        <source>Make sure nobody, and no camera, can see the screen that comes next. Whoever reads that code gets the profile, key and all.</source>
+        <translation>அடுத்த திரையை யாரும், எந்தக் கேமராவும் பார்க்கவில்லை என்பதை உறுதி செய்யுங்கள். அந்தக் குறியீட்டைப் படிப்பவருக்குச் சாவியோடு சேர்த்து சுயவிவரமே கிடைக்கும்.</translation>
+    </message>
+    <message>
+        <source>Both phones have to be on the same network, and this profile stops collecting mail while the code is up.</source>
+        <translation>இரு தொலைபேசிகளும் ஒரே வலையமைப்பில் இருக்க வேண்டும், குறியீடு திரையில் இருக்கும் வரை இந்தச் சுயவிவரம் அஞ்சலைப் பெறுவதை நிறுத்தி வைக்கும்.</translation>
+    </message>
+</context>
+<context>
     <name>SecondDevicePage</name>
     <message>
         <source>Nothing took the profile. Both phones have to stay on one network, with this page open.</source>
@@ -1389,10 +1416,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>On the other device: add a profile you have already, then &quot;Add as second device&quot;, and read this code with it. Both phones on one network.</source>
         <translation>மறு சாதனத்தில்: உங்களிடம் ஏற்கனவே உள்ள ஒரு சுயவிவரத்தைச் சேர்க்கவும், பிறகு “இரண்டாவது சாதனமாகச் சேர்”, அதைக் கொண்டு இந்தக் குறியீட்டைப் படிக்கவும். இரு தொலைபேசிகளும் ஒரே வலையமைப்பில்.</translation>
-    </message>
-    <message>
-        <source>Whoever reads this code gets the profile. It stops collecting mail until the code is gone.</source>
-        <translation>இந்தக் குறியீட்டைப் படிப்பவருக்கே சுயவிவரம். குறியீடு இருக்கும் வரை அது அஞ்சலைப் பெறுவதை நிறுத்தி வைக்கும்.</translation>
     </message>
     <message>
         <source>Copy the code</source>
@@ -1417,6 +1440,10 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Swipe on for your chats.</source>
         <translation>முன்னோக்கி இழுத்து உங்கள் உரையாடல்களுக்குச் செல்லுங்கள்.</translation>
+    </message>
+    <message>
+        <source>This profile stops collecting mail until the code is gone.</source>
+        <translation>குறியீடு இருக்கும் வரை இந்தச் சுயவிவரம் அஞ்சலைப் பெறுவதை நிறுத்தி வைக்கும்.</translation>
     </message>
 </context>
 <context>

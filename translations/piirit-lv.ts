@@ -1387,6 +1387,33 @@ Citās grupās, kurās ir bloķēti kontakti, viņu ziņas joprojām būs redzam
     </message>
 </context>
 <context>
+    <name>SecondDeviceDialog</name>
+    <message>
+        <source>Add a second device</source>
+        <translation>Pievienot otru ierīci</translation>
+    </message>
+    <message>
+        <source>Continue</source>
+        <translation>Turpināt</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Atcelt</translation>
+    </message>
+    <message>
+        <source>This makes a code the other device reads to copy the profile onto itself.</source>
+        <translation>Tas izveido kodu, ko otra ierīce nolasa, lai nokopētu profilu.</translation>
+    </message>
+    <message>
+        <source>Make sure nobody, and no camera, can see the screen that comes next. Whoever reads that code gets the profile, key and all.</source>
+        <translation>Pārliecinies, ka nākamo ekrānu neredz neviens un neviena kamera. Kas nolasa šo kodu, dabū profilu ar visu atslēgu.</translation>
+    </message>
+    <message>
+        <source>Both phones have to be on the same network, and this profile stops collecting mail while the code is up.</source>
+        <translation>Abiem tālruņiem jābūt vienā tīklā, un šis profils nesaņem pastu, kamēr kods ir redzams.</translation>
+    </message>
+</context>
+<context>
     <name>SecondDevicePage</name>
     <message>
         <source>Nothing took the profile. Both phones have to stay on one network, with this page open.</source>
@@ -1399,10 +1426,6 @@ Citās grupās, kurās ir bloķēti kontakti, viņu ziņas joprojām būs redzam
     <message>
         <source>On the other device: add a profile you have already, then &quot;Add as second device&quot;, and read this code with it. Both phones on one network.</source>
         <translation>Otrā ierīcē: pievieno profilu, kas tev jau ir, tad „Pievienot kā otru ierīci“, un ar to nolasi šo kodu. Abi tālruņi vienā tīklā.</translation>
-    </message>
-    <message>
-        <source>Whoever reads this code gets the profile. It stops collecting mail until the code is gone.</source>
-        <translation>Kas nolasa šo kodu, tas dabū profilu. Kamēr kods ir redzams, profils pastu nesaņem.</translation>
     </message>
     <message>
         <source>Copy the code</source>
@@ -1427,6 +1450,10 @@ Citās grupās, kurās ir bloķēti kontakti, viņu ziņas joprojām būs redzam
     <message>
         <source>Swipe on for your chats.</source>
         <translation>Pavelc uz priekšu pie savām sarunām.</translation>
+    </message>
+    <message>
+        <source>This profile stops collecting mail until the code is gone.</source>
+        <translation>Šis profils nesaņem pastu, kamēr kods nav pazudis.</translation>
     </message>
 </context>
 <context>

@@ -17,18 +17,23 @@ import Piirit 1.0
  * the code, and the bar the transfer draws once somebody reads it.
  *
  * The offer starts with the page rather than behind a button. There is
- * nothing else to do here -- the reader came from a menu item that says
- * what this is -- and a code is what they came for; the button that is
- * here instead is the one that tries again after a failure. Cancel is
- * the way out while it is up, because leaving would drop the page
- * listening for the answer and leave a provider running behind it.
+ * nothing else to do here -- the reader agreed to this in the dialog in
+ * front of it (SecondDeviceDialog.qml), which is also where the warning
+ * about who can see the code lives -- and a code is what they came for;
+ * the button that is here instead is the one that starts another offer
+ * after one has ended.
  *
- * Two things about the core are said on the page rather than left to be
- * found out. The profile stops fetching mail while the offer is up --
- * the core pauses its IO for as long as the provider runs, and resumes
- * it when the provider ends. And whoever reads the code gets the
- * profile, key and all, which is the same warning the backup file's
- * page carries about the file.
+ * Leaving the page ends the offer. A provider left running behind a
+ * page that is gone holds the profile out with nobody watching and with
+ * its IO paused, so going back does what Cancel does. Only a transfer
+ * actually under way pins the page: a bar that is filling is a second
+ * device part-way through copying the profile, and a stray swipe should
+ * not drop that -- Cancel, which says what it is, still can.
+ *
+ * One thing about the core is said here rather than left to be found
+ * out: the profile stops fetching mail while the offer is up, because
+ * the core pauses its IO for as long as the provider runs and resumes
+ * it when the provider ends.
  *
  * The code is drawn from an Image the shim writes, not a Canvas, for
  * the reason QrPage.qml gives: a Canvas is drawn into the window's GL
@@ -67,10 +72,11 @@ Page {
     /// A device is reading the profile off this one.
     readonly property bool transferring: device.running && device.permille > 0
 
-    // Nothing to go back to while the offer is up: leaving would drop
-    // the page that is listening for the answer, and the core would
-    // carry on holding the profile out with its IO paused.
-    backNavigation: !device.running
+    // The code can always be walked away from; a transfer that is
+    // already running cannot, because a swipe is too easy a way to drop
+    // a second device half-way through copying the profile. Cancel is
+    // the way out of that one, and says so.
+    backNavigation: !page.transferring
 
     // Whose profile, for the row at the top: the name, the picture and
     // the address, as the profiles page and the backup page draw them.
@@ -117,6 +123,18 @@ Page {
     // ready when it was: a page opened while the app is still starting
     // has nothing to ask.
     Component.onCompleted: page.begin()
+
+    // And ended when the page is left, whichever way. The provider is
+    // the core's and outlives this page; left running it would hold the
+    // profile out to whoever asks, with nothing on screen to say so and
+    // nothing left to stop it. Cancel does this and then pops; a swipe
+    // does it here. Harmless on the way to the chats after a hand-over:
+    // by then there is no offer to stop.
+    onStatusChanged: {
+        if (page.status === PageStatus.Deactivating) {
+            device.cancel()
+        }
+    }
 
     // Qt 5.6 handler syntax; see WelcomePage.qml.
     Connections {
@@ -195,9 +213,10 @@ Page {
                 text: qsTr("On the other device: add a profile you have already, then \"Add as second device\", and read this code with it. Both phones on one network.")
             }
 
-            // Two things about the core, said rather than found out: the
-            // profile pauses while the offer is up, and the code is the
-            // profile.
+            // What the core does while the code is up, said rather than
+            // found out. That whoever reads the code gets the profile
+            // was said in the dialog in front of this page, where it
+            // could still be answered with Cancel.
             Label {
                 objectName: "caution"
                 visible: !page.taken
@@ -207,7 +226,7 @@ Page {
                 textFormat: Text.PlainText
                 font.pixelSize: Theme.fontSizeExtraSmall
                 color: Theme.secondaryColor
-                text: qsTr("Whoever reads this code gets the profile. It stops collecting mail until the code is gone.")
+                text: qsTr("This profile stops collecting mail until the code is gone.")
             }
 
             // While the core is getting the provider up there is no code

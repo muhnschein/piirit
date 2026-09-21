@@ -1381,6 +1381,33 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>SecondDeviceDialog</name>
+    <message>
+        <source>Add a second device</source>
+        <translation>दूसरा उपकरण जोड़ें</translation>
+    </message>
+    <message>
+        <source>Continue</source>
+        <translation>आगे बढ़ें</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>रद्द करें</translation>
+    </message>
+    <message>
+        <source>This makes a code the other device reads to copy the profile onto itself.</source>
+        <translation>इससे एक कोड बनता है, जिसे दूसरा उपकरण पढ़कर प्रोफ़ाइल की नकल ले लेता है।</translation>
+    </message>
+    <message>
+        <source>Make sure nobody, and no camera, can see the screen that comes next. Whoever reads that code gets the profile, key and all.</source>
+        <translation>ध्यान रखें कि अगली स्क्रीन कोई और न देखे, न कोई कैमरा। जो वह कोड पढ़ेगा, उसे कुंजी समेत पूरी प्रोफ़ाइल मिल जाएगी।</translation>
+    </message>
+    <message>
+        <source>Both phones have to be on the same network, and this profile stops collecting mail while the code is up.</source>
+        <translation>दोनों फ़ोन एक ही नेटवर्क पर होने चाहिए, और कोड दिखने तक यह प्रोफ़ाइल डाक लेना बंद रखती है।</translation>
+    </message>
+</context>
+<context>
     <name>SecondDevicePage</name>
     <message>
         <source>Nothing took the profile. Both phones have to stay on one network, with this page open.</source>
@@ -1393,10 +1420,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>On the other device: add a profile you have already, then &quot;Add as second device&quot;, and read this code with it. Both phones on one network.</source>
         <translation>दूसरे उपकरण पर: कोई प्रोफ़ाइल जोड़ें जो आपके पास पहले से है, फिर “दूसरे उपकरण के रूप में जोड़ें”, और उससे यह कोड पढ़ें। दोनों फ़ोन एक ही नेटवर्क पर।</translation>
-    </message>
-    <message>
-        <source>Whoever reads this code gets the profile. It stops collecting mail until the code is gone.</source>
-        <translation>जो यह कोड पढ़े, प्रोफ़ाइल उसी की। कोड हटने तक यह डाक लेना बंद रखती है।</translation>
     </message>
     <message>
         <source>Copy the code</source>
@@ -1421,6 +1444,10 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Swipe on for your chats.</source>
         <translation>आगे स्वाइप करके अपनी चैट पर जाएँ।</translation>
+    </message>
+    <message>
+        <source>This profile stops collecting mail until the code is gone.</source>
+        <translation>कोड हटने तक यह प्रोफ़ाइल डाक लेना बंद रखती है।</translation>
     </message>
 </context>
 <context>

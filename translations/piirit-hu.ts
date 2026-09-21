@@ -1371,6 +1371,33 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>SecondDeviceDialog</name>
+    <message>
+        <source>Add a second device</source>
+        <translation>Második eszköz hozzáadása</translation>
+    </message>
+    <message>
+        <source>Continue</source>
+        <translation>Tovább</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Mégse</translation>
+    </message>
+    <message>
+        <source>This makes a code the other device reads to copy the profile onto itself.</source>
+        <translation>Ez egy kódot készít, amit a másik eszköz beolvas, hogy lemásolja a profilt.</translation>
+    </message>
+    <message>
+        <source>Make sure nobody, and no camera, can see the screen that comes next. Whoever reads that code gets the profile, key and all.</source>
+        <translation>Ügyelj rá, hogy a következő képernyőt senki és semmilyen kamera ne lássa. Aki beolvassa azt a kódot, megkapja a profilt, kulcsostul.</translation>
+    </message>
+    <message>
+        <source>Both phones have to be on the same network, and this profile stops collecting mail while the code is up.</source>
+        <translation>Mindkét telefonnak egy hálózaton kell lennie, és ez a profil nem hoz le levelet, amíg a kód a képernyőn van.</translation>
+    </message>
+</context>
+<context>
     <name>SecondDevicePage</name>
     <message>
         <source>Nothing took the profile. Both phones have to stay on one network, with this page open.</source>
@@ -1383,10 +1410,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>On the other device: add a profile you have already, then &quot;Add as second device&quot;, and read this code with it. Both phones on one network.</source>
         <translation>A másik eszközön: adj hozzá egy profilt, ami már megvan, majd „Hozzáadás második eszközként”, és olvasd be vele ezt a kódot. Mindkét telefon egy hálózaton.</translation>
-    </message>
-    <message>
-        <source>Whoever reads this code gets the profile. It stops collecting mail until the code is gone.</source>
-        <translation>Aki beolvassa ezt a kódot, megkapja a profilt. Amíg a kód fent van, a profil nem hoz le levelet.</translation>
     </message>
     <message>
         <source>Copy the code</source>
@@ -1411,6 +1434,10 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Swipe on for your chats.</source>
         <translation>Húzd tovább a csevegéseidhez.</translation>
+    </message>
+    <message>
+        <source>This profile stops collecting mail until the code is gone.</source>
+        <translation>Ez a profil nem hoz le levelet, amíg a kód el nem tűnik.</translation>
     </message>
 </context>
 <context>

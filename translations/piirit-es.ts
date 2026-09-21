@@ -1377,6 +1377,33 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>SecondDeviceDialog</name>
+    <message>
+        <source>Add a second device</source>
+        <translation>Añadir un segundo dispositivo</translation>
+    </message>
+    <message>
+        <source>Continue</source>
+        <translation>Continuar</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Cancelar</translation>
+    </message>
+    <message>
+        <source>This makes a code the other device reads to copy the profile onto itself.</source>
+        <translation>Esto crea un código que el otro dispositivo lee para copiarse el perfil.</translation>
+    </message>
+    <message>
+        <source>Make sure nobody, and no camera, can see the screen that comes next. Whoever reads that code gets the profile, key and all.</source>
+        <translation>Asegúrate de que nadie, ni ninguna cámara, pueda ver la pantalla siguiente. Quien lea ese código se lleva el perfil, con clave y todo.</translation>
+    </message>
+    <message>
+        <source>Both phones have to be on the same network, and this profile stops collecting mail while the code is up.</source>
+        <translation>Ambos teléfonos han de estar en la misma red, y este perfil no recoge correo mientras el código esté en pantalla.</translation>
+    </message>
+</context>
+<context>
     <name>SecondDevicePage</name>
     <message>
         <source>Nothing took the profile. Both phones have to stay on one network, with this page open.</source>
@@ -1389,10 +1416,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>On the other device: add a profile you have already, then &quot;Add as second device&quot;, and read this code with it. Both phones on one network.</source>
         <translation>En el otro dispositivo: añade un perfil que ya tengas, luego “Añadir como segundo dispositivo”, y lee este código con él. Ambos teléfonos en la misma red.</translation>
-    </message>
-    <message>
-        <source>Whoever reads this code gets the profile. It stops collecting mail until the code is gone.</source>
-        <translation>Quien lea este código se lleva el perfil. Mientras el código esté aquí, el perfil no recoge correo.</translation>
     </message>
     <message>
         <source>Copy the code</source>
@@ -1417,6 +1440,10 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Swipe on for your chats.</source>
         <translation>Desliza hacia tus chats.</translation>
+    </message>
+    <message>
+        <source>This profile stops collecting mail until the code is gone.</source>
+        <translation>Este perfil no recoge correo hasta que el código desaparezca.</translation>
     </message>
 </context>
 <context>

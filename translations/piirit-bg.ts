@@ -1377,6 +1377,33 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>SecondDeviceDialog</name>
+    <message>
+        <source>Add a second device</source>
+        <translation>Добавяне на второ устройство</translation>
+    </message>
+    <message>
+        <source>Continue</source>
+        <translation>Напред</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Отказ</translation>
+    </message>
+    <message>
+        <source>This makes a code the other device reads to copy the profile onto itself.</source>
+        <translation>Това прави код, който другото устройство прочита, за да си копира профила.</translation>
+    </message>
+    <message>
+        <source>Make sure nobody, and no camera, can see the screen that comes next. Whoever reads that code gets the profile, key and all.</source>
+        <translation>Уверете се, че никой и никоя камера не вижда следващия екран. Който прочете този код, получава профила, с ключа и всичко останало.</translation>
+    </message>
+    <message>
+        <source>Both phones have to be on the same network, and this profile stops collecting mail while the code is up.</source>
+        <translation>И двата телефона трябва да са в една мрежа, а този профил спира да събира поща, докато кодът е на екрана.</translation>
+    </message>
+</context>
+<context>
     <name>SecondDevicePage</name>
     <message>
         <source>Nothing took the profile. Both phones have to stay on one network, with this page open.</source>
@@ -1389,10 +1416,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>On the other device: add a profile you have already, then &quot;Add as second device&quot;, and read this code with it. Both phones on one network.</source>
         <translation>На другото устройство: добавете профил, който вече имате, после „Добавяне като второ устройство“, и прочетете този код с него. И двата телефона в една мрежа.</translation>
-    </message>
-    <message>
-        <source>Whoever reads this code gets the profile. It stops collecting mail until the code is gone.</source>
-        <translation>Който прочете този код, получава профила. Той спира да събира поща, докато кодът не изчезне.</translation>
     </message>
     <message>
         <source>Copy the code</source>
@@ -1417,6 +1440,10 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Swipe on for your chats.</source>
         <translation>Плъзнете нататък към разговорите си.</translation>
+    </message>
+    <message>
+        <source>This profile stops collecting mail until the code is gone.</source>
+        <translation>Този профил спира да събира поща, докато кодът не изчезне.</translation>
     </message>
 </context>
 <context>

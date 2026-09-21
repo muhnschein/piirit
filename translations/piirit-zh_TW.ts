@@ -1371,6 +1371,33 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>SecondDeviceDialog</name>
+    <message>
+        <source>Add a second device</source>
+        <translation>新增第二台裝置</translation>
+    </message>
+    <message>
+        <source>Continue</source>
+        <translation>繼續</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>取消</translation>
+    </message>
+    <message>
+        <source>This makes a code the other device reads to copy the profile onto itself.</source>
+        <translation>這會產生一個 QR code，另一台裝置讀取它，把這個個人檔案複製過去。</translation>
+    </message>
+    <message>
+        <source>Make sure nobody, and no camera, can see the screen that comes next. Whoever reads that code gets the profile, key and all.</source>
+        <translation>請確認沒有人、也沒有鏡頭能看到下一頁。誰讀取那個 QR code，誰就連金鑰一起拿到這個個人檔案。</translation>
+    </message>
+    <message>
+        <source>Both phones have to be on the same network, and this profile stops collecting mail while the code is up.</source>
+        <translation>兩台手機要在同一個網路裡，QR code 開著的時候這個個人檔案不會收取郵件。</translation>
+    </message>
+</context>
+<context>
     <name>SecondDevicePage</name>
     <message>
         <source>Nothing took the profile. Both phones have to stay on one network, with this page open.</source>
@@ -1383,10 +1410,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>On the other device: add a profile you have already, then &quot;Add as second device&quot;, and read this code with it. Both phones on one network.</source>
         <translation>在另一台裝置上：先新增一個你已經有的個人檔案，然後「新增為第二台裝置」，再用它讀取這個 QR code。兩台手機在同一個網路裡。</translation>
-    </message>
-    <message>
-        <source>Whoever reads this code gets the profile. It stops collecting mail until the code is gone.</source>
-        <translation>誰讀取這個 QR code，誰就拿到這個個人檔案。QR code 開著的時候，它不會收取郵件。</translation>
     </message>
     <message>
         <source>Copy the code</source>
@@ -1411,6 +1434,10 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Swipe on for your chats.</source>
         <translation>向前滑動去看你的聊天。</translation>
+    </message>
+    <message>
+        <source>This profile stops collecting mail until the code is gone.</source>
+        <translation>在 QR code 消失之前，這個個人檔案不會收取郵件。</translation>
     </message>
 </context>
 <context>

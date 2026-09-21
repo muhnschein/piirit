@@ -1387,6 +1387,33 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>SecondDeviceDialog</name>
+    <message>
+        <source>Add a second device</source>
+        <translation>Додати другий пристрій</translation>
+    </message>
+    <message>
+        <source>Continue</source>
+        <translation>Далі</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Скасувати</translation>
+    </message>
+    <message>
+        <source>This makes a code the other device reads to copy the profile onto itself.</source>
+        <translation>Так створюється код, який інший пристрій зчитує, щоб скопіювати собі профіль.</translation>
+    </message>
+    <message>
+        <source>Make sure nobody, and no camera, can see the screen that comes next. Whoever reads that code gets the profile, key and all.</source>
+        <translation>Подбайте, щоб наступного екрана не бачили ні люди, ні камери. Хто зчитає цей код, отримає профіль разом із ключем.</translation>
+    </message>
+    <message>
+        <source>Both phones have to be on the same network, and this profile stops collecting mail while the code is up.</source>
+        <translation>Обидва телефони мають бути в одній мережі, а цей профіль не забирає пошту, доки код на екрані.</translation>
+    </message>
+</context>
+<context>
     <name>SecondDevicePage</name>
     <message>
         <source>Nothing took the profile. Both phones have to stay on one network, with this page open.</source>
@@ -1399,10 +1426,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>On the other device: add a profile you have already, then &quot;Add as second device&quot;, and read this code with it. Both phones on one network.</source>
         <translation>На іншому пристрої: додайте профіль, який у вас уже є, потім «Додати як другий пристрій», і зчитайте ним цей код. Обидва телефони в одній мережі.</translation>
-    </message>
-    <message>
-        <source>Whoever reads this code gets the profile. It stops collecting mail until the code is gone.</source>
-        <translation>Хто зчитає цей код, той отримає профіль. Поки код на екрані, профіль не забирає пошту.</translation>
     </message>
     <message>
         <source>Copy the code</source>
@@ -1427,6 +1450,10 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Swipe on for your chats.</source>
         <translation>Проведіть далі, до своїх чатів.</translation>
+    </message>
+    <message>
+        <source>This profile stops collecting mail until the code is gone.</source>
+        <translation>Цей профіль не забирає пошту, доки код на екрані.</translation>
     </message>
 </context>
 <context>

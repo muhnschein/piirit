@@ -1381,6 +1381,33 @@ Gli altri gruppi con contatti bloccati continueranno a visualizzare i loro messa
     </message>
 </context>
 <context>
+    <name>SecondDeviceDialog</name>
+    <message>
+        <source>Add a second device</source>
+        <translation>Aggiungi un secondo dispositivo</translation>
+    </message>
+    <message>
+        <source>Continue</source>
+        <translation>Continua</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Annulla</translation>
+    </message>
+    <message>
+        <source>This makes a code the other device reads to copy the profile onto itself.</source>
+        <translation>Questo crea un codice che l&apos;altro dispositivo legge per copiarsi il profilo.</translation>
+    </message>
+    <message>
+        <source>Make sure nobody, and no camera, can see the screen that comes next. Whoever reads that code gets the profile, key and all.</source>
+        <translation>Assicurati che nessuno, e nessuna fotocamera, possa vedere la schermata successiva. Chi legge quel codice si prende il profilo, chiave compresa.</translation>
+    </message>
+    <message>
+        <source>Both phones have to be on the same network, and this profile stops collecting mail while the code is up.</source>
+        <translation>Entrambi i telefoni devono essere sulla stessa rete, e questo profilo non ritira la posta finché il codice è sullo schermo.</translation>
+    </message>
+</context>
+<context>
     <name>SecondDevicePage</name>
     <message>
         <source>Nothing took the profile. Both phones have to stay on one network, with this page open.</source>
@@ -1393,10 +1420,6 @@ Gli altri gruppi con contatti bloccati continueranno a visualizzare i loro messa
     <message>
         <source>On the other device: add a profile you have already, then &quot;Add as second device&quot;, and read this code with it. Both phones on one network.</source>
         <translation>Sull&apos;altro dispositivo: aggiungi un profilo che hai già, poi “Aggiungi come secondo dispositivo”, e leggi questo codice con quello. Entrambi i telefoni sulla stessa rete.</translation>
-    </message>
-    <message>
-        <source>Whoever reads this code gets the profile. It stops collecting mail until the code is gone.</source>
-        <translation>Chi legge questo codice si prende il profilo. Finché il codice è qui, il profilo non ritira la posta.</translation>
     </message>
     <message>
         <source>Copy the code</source>
@@ -1421,6 +1444,10 @@ Gli altri gruppi con contatti bloccati continueranno a visualizzare i loro messa
     <message>
         <source>Swipe on for your chats.</source>
         <translation>Scorri avanti verso le tue chat.</translation>
+    </message>
+    <message>
+        <source>This profile stops collecting mail until the code is gone.</source>
+        <translation>Questo profilo non ritira la posta finché il codice è qui.</translation>
     </message>
 </context>
 <context>

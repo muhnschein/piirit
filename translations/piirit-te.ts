@@ -1377,6 +1377,33 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>SecondDeviceDialog</name>
+    <message>
+        <source>Add a second device</source>
+        <translation>రెండో పరికరాన్ని చేర్చు</translation>
+    </message>
+    <message>
+        <source>Continue</source>
+        <translation>కొనసాగించు</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>రద్దు చేయి</translation>
+    </message>
+    <message>
+        <source>This makes a code the other device reads to copy the profile onto itself.</source>
+        <translation>ఇది ఒక కోడ్‌ను తయారుచేస్తుంది; దాన్ని చదివి రెండో పరికరం ప్రొఫైల్‌ను కాపీ చేసుకుంటుంది.</translation>
+    </message>
+    <message>
+        <source>Make sure nobody, and no camera, can see the screen that comes next. Whoever reads that code gets the profile, key and all.</source>
+        <translation>తరువాతి తెరను ఎవరూ, ఏ కెమెరా కూడా చూడకుండా చూసుకోండి. ఆ కోడ్ చదివినవారికి తాళంతో సహా ప్రొఫైల్ దక్కుతుంది.</translation>
+    </message>
+    <message>
+        <source>Both phones have to be on the same network, and this profile stops collecting mail while the code is up.</source>
+        <translation>రెండు ఫోన్లూ ఒకే నెట్‌వర్క్‌లో ఉండాలి, కోడ్ తెరపై ఉన్నంత వరకు ఈ ప్రొఫైల్ తపాలా తీసుకోవడం ఆపేస్తుంది.</translation>
+    </message>
+</context>
+<context>
     <name>SecondDevicePage</name>
     <message>
         <source>Nothing took the profile. Both phones have to stay on one network, with this page open.</source>
@@ -1389,10 +1416,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>On the other device: add a profile you have already, then &quot;Add as second device&quot;, and read this code with it. Both phones on one network.</source>
         <translation>రెండో పరికరంలో: మీ దగ్గర ఇప్పటికే ఉన్న ప్రొఫైల్‌ను చేర్చండి, ఆపై “రెండో పరికరంగా చేర్చు”, దానితో ఈ కోడ్‌ను చదవండి. రెండు ఫోన్లూ ఒకే నెట్‌వర్క్‌లో.</translation>
-    </message>
-    <message>
-        <source>Whoever reads this code gets the profile. It stops collecting mail until the code is gone.</source>
-        <translation>ఈ కోడ్ చదివినవారికే ప్రొఫైల్. కోడ్ ఉన్నంత వరకు అది తపాలా తీసుకోవడం ఆపేస్తుంది.</translation>
     </message>
     <message>
         <source>Copy the code</source>
@@ -1417,6 +1440,10 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Swipe on for your chats.</source>
         <translation>ముందుకు జరిపి మీ సంభాషణలకు వెళ్ళండి.</translation>
+    </message>
+    <message>
+        <source>This profile stops collecting mail until the code is gone.</source>
+        <translation>కోడ్ పోయేవరకు ఈ ప్రొఫైల్ తపాలా తీసుకోవడం ఆపేస్తుంది.</translation>
     </message>
 </context>
 <context>

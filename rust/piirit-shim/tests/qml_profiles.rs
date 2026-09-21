@@ -343,9 +343,9 @@ fn switching_profile_leaves_one_chat_list_on_the_stack() {
          and the core's provider is per profile. {context}"
     );
     assert!(
-        value("offering").ends_with(",SecondDevicePage.qml"),
-        "the row's second-device entry did not open the page that offers \
-         the profile: {}. {context}",
+        value("offering").ends_with(",SecondDeviceDialog.qml"),
+        "the row's second-device entry did not open the dialog that asks \
+         before the code is on screen: {}. {context}",
         value("offering")
     );
     assert_eq!(

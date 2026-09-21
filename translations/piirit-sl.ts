@@ -1393,6 +1393,33 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
     </message>
 </context>
 <context>
+    <name>SecondDeviceDialog</name>
+    <message>
+        <source>Add a second device</source>
+        <translation>Dodaj drugo napravo</translation>
+    </message>
+    <message>
+        <source>Continue</source>
+        <translation>Naprej</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Prekliči</translation>
+    </message>
+    <message>
+        <source>This makes a code the other device reads to copy the profile onto itself.</source>
+        <translation>To ustvari kodo, ki jo druga naprava prebere in si prekopira profil.</translation>
+    </message>
+    <message>
+        <source>Make sure nobody, and no camera, can see the screen that comes next. Whoever reads that code gets the profile, key and all.</source>
+        <translation>Poskrbi, da naslednjega zaslona ne vidi nihče in nobena kamera. Kdor prebere to kodo, dobi profil s ključem vred.</translation>
+    </message>
+    <message>
+        <source>Both phones have to be on the same network, and this profile stops collecting mail while the code is up.</source>
+        <translation>Oba telefona morata biti v istem omrežju, ta profil pa ne pobira pošte, dokler je koda na zaslonu.</translation>
+    </message>
+</context>
+<context>
     <name>SecondDevicePage</name>
     <message>
         <source>Nothing took the profile. Both phones have to stay on one network, with this page open.</source>
@@ -1405,10 +1432,6 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
     <message>
         <source>On the other device: add a profile you have already, then &quot;Add as second device&quot;, and read this code with it. Both phones on one network.</source>
         <translation>Na drugi napravi: dodaj profil, ki ga že imaš, nato „Dodaj kot drugo napravo“, in z njo preberi to kodo. Oba telefona v istem omrežju.</translation>
-    </message>
-    <message>
-        <source>Whoever reads this code gets the profile. It stops collecting mail until the code is gone.</source>
-        <translation>Kdor prebere to kodo, dobi profil. Dokler je koda na zaslonu, profil ne pobira pošte.</translation>
     </message>
     <message>
         <source>Copy the code</source>
@@ -1433,6 +1456,10 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
     <message>
         <source>Swipe on for your chats.</source>
         <translation>Podrsaj naprej do svojih klepetov.</translation>
+    </message>
+    <message>
+        <source>This profile stops collecting mail until the code is gone.</source>
+        <translation>Ta profil ne pobira pošte, dokler koda ne izgine.</translation>
     </message>
 </context>
 <context>

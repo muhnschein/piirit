@@ -1383,6 +1383,33 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>SecondDeviceDialog</name>
+    <message>
+        <source>Add a second device</source>
+        <translation>Pridėti antrą įrenginį</translation>
+    </message>
+    <message>
+        <source>Continue</source>
+        <translation>Tęsti</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Atšaukti</translation>
+    </message>
+    <message>
+        <source>This makes a code the other device reads to copy the profile onto itself.</source>
+        <translation>Taip sukuriamas kodas, kurį kitas įrenginys nuskaito ir pasidaro profilio kopiją.</translation>
+    </message>
+    <message>
+        <source>Make sure nobody, and no camera, can see the screen that comes next. Whoever reads that code gets the profile, key and all.</source>
+        <translation>Pasirūpinkite, kad kito ekrano nematytų niekas ir jokia kamera. Kas nuskaitys tą kodą, gaus profilį su raktu ir viskuo.</translation>
+    </message>
+    <message>
+        <source>Both phones have to be on the same network, and this profile stops collecting mail while the code is up.</source>
+        <translation>Abu telefonai turi būti viename tinkle, o šis profilis neparsiunčia pašto, kol kodas rodomas.</translation>
+    </message>
+</context>
+<context>
     <name>SecondDevicePage</name>
     <message>
         <source>Nothing took the profile. Both phones have to stay on one network, with this page open.</source>
@@ -1395,10 +1422,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>On the other device: add a profile you have already, then &quot;Add as second device&quot;, and read this code with it. Both phones on one network.</source>
         <translation>Kitame įrenginyje: pridėkite profilį, kurį jau turite, tada „Pridėti kaip antrą įrenginį“, ir juo nuskaitykite šį kodą. Abu telefonai viename tinkle.</translation>
-    </message>
-    <message>
-        <source>Whoever reads this code gets the profile. It stops collecting mail until the code is gone.</source>
-        <translation>Kas nuskaitys šį kodą, tas gaus profilį. Kol kodas rodomas, profilis pašto neparsiunčia.</translation>
     </message>
     <message>
         <source>Copy the code</source>
@@ -1423,6 +1446,10 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Swipe on for your chats.</source>
         <translation>Braukite pirmyn į savo pokalbius.</translation>
+    </message>
+    <message>
+        <source>This profile stops collecting mail until the code is gone.</source>
+        <translation>Šis profilis neparsiunčia pašto, kol kodas nedingsta.</translation>
     </message>
 </context>
 <context>

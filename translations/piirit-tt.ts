@@ -1375,6 +1375,33 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>SecondDeviceDialog</name>
+    <message>
+        <source>Add a second device</source>
+        <translation>Икенче җиһаз өстәргә</translation>
+    </message>
+    <message>
+        <source>Continue</source>
+        <translation>Дәвам итәргә</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Баш тартырга</translation>
+    </message>
+    <message>
+        <source>This makes a code the other device reads to copy the profile onto itself.</source>
+        <translation>Бу код ясый; икенче җиһаз аны укып профильнең күчермәсен ала.</translation>
+    </message>
+    <message>
+        <source>Make sure nobody, and no camera, can see the screen that comes next. Whoever reads that code gets the profile, key and all.</source>
+        <translation>Киләсе экранны беркем дә, бернинди камера да күрмәвен тикшерегез. Бу кодны кем укый — ачкычы белән бергә профиль дә шуңа күчә.</translation>
+    </message>
+    <message>
+        <source>Both phones have to be on the same network, and this profile stops collecting mail while the code is up.</source>
+        <translation>Ике телефон да бер челтәрдә булырга тиеш, ә код экранда торган арада бу профиль хат алмый.</translation>
+    </message>
+</context>
+<context>
     <name>SecondDevicePage</name>
     <message>
         <source>Nothing took the profile. Both phones have to stay on one network, with this page open.</source>
@@ -1387,10 +1414,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>On the other device: add a profile you have already, then &quot;Add as second device&quot;, and read this code with it. Both phones on one network.</source>
         <translation>Икенче җиһазда: инде булган профильне өстәгез, аннары «Икенче җиһаз итеп өстәргә», һәм аның белән бу кодны укыгыз. Ике телефон да бер челтәрдә.</translation>
-    </message>
-    <message>
-        <source>Whoever reads this code gets the profile. It stops collecting mail until the code is gone.</source>
-        <translation>Бу кодны кем укый — профиль шуныкы. Код күренеп торган арада профиль хат алмый.</translation>
     </message>
     <message>
         <source>Copy the code</source>
@@ -1415,6 +1438,10 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Swipe on for your chats.</source>
         <translation>Сөйләшүләрегезгә таба сыпырыгыз.</translation>
+    </message>
+    <message>
+        <source>This profile stops collecting mail until the code is gone.</source>
+        <translation>Код юкка чыкканчы бу профиль хат алмый.</translation>
     </message>
 </context>
 <context>

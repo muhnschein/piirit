@@ -10,10 +10,13 @@
 //! - the offer goes out as `provide_backup` on this profile's account,
 //!   with `get_backup_qr` beside it for the text of the code, and the
 //!   code the page draws and prints is the one the core answered with;
-//! - the page cannot be left while the offer is up -- leaving would drop
-//!   the page listening for the answer while the core held the profile
-//!   out with its IO paused -- and Cancel stops the provider in the
-//!   core rather than only on the page;
+//! - the dialog in front of the page carries the warning about who can
+//!   see the code, and hands the profile on when it is accepted;
+//! - the page can be walked away from, and going back ends the offer in
+//!   the core rather than leaving a provider running behind a page that
+//!   is gone; only a transfer already under way pins it;
+//! - Cancel stops the provider in the core rather than only on the
+//!   page;
 //! - an offer the reader stops reports nothing: the core refuses the
 //!   provider it was told to stop, which is the reader's own doing;
 //! - a core that cannot produce a code does not leave a provider
@@ -30,9 +33,10 @@
 //! only thing the core's provider is keyed on is the account -- so that
 //! is what the fake server is keyed on too (`fake_core_server.rs`):
 //! account 3 is the one it will not show a code for, 2 the one it
-//! refuses outright, 4 the one nobody ever comes for, 1 the one a
-//! device turns up to and stays for, and 5 the one whose device starts
-//! and goes away again.
+//! refuses outright, 4 and 6 the ones nobody ever comes for -- given up
+//! on with Cancel and by going back -- 1 the one a device turns up to
+//! and stays for, and 5 the one whose device starts and goes away
+//! again.
 
 // Qt harness: see qml_chat_list.rs.
 #![allow(
@@ -146,6 +150,29 @@ const PROBE_QML: &str = r"
             return '' + item[property]
         }
         function pageProperty(property) { return '' + loader.item[property] }
+        // What Silica makes of a dialog's accept destination as soon as
+        // the dialog is on screen, for the dialog to fill in on accept.
+        QtObject {
+            id: destination
+            property int accountId
+            property int currentAccountId
+        }
+        // Silica accepts a dialog on a tap of its header or a swipe;
+        // the stub's accept() is the same thing.
+        function accept() {
+            loader.item.acceptDestinationInstance = destination
+            loader.item.accept()
+            return 'ok'
+        }
+        function handed() {
+            return destination.accountId + ':' + destination.currentAccountId
+        }
+        // What Silica does to a page on the way off it, whichever way
+        // the reader is going.
+        function leave() {
+            loader.item.status = PageStatus.Deactivating
+            return 'ok'
+        }
         function click(name) {
             var item = findIn(loader.item, name)
             if (!item) { return 'missing:' + name }
@@ -169,8 +196,8 @@ fn the_second_device_page_offers_one_profile_and_hands_it_over() {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_FAKE_JOURNAL", &journal);
         std::env::set_var("PIIRIT_ACCOUNTS_DIR", temp.join("accounts"));
-        // Five profiles, because the provider is keyed on nothing else.
-        std::env::set_var("PIIRIT_FAKE_ACCOUNTS", "1,2,3,4,5");
+        // Six profiles, because the provider is keyed on nothing else.
+        std::env::set_var("PIIRIT_FAKE_ACCOUNTS", "1,2,3,4,5,6");
         // The one a device turns up for, and how long it takes: a step
         // of progress after the first wait, the profile taken after the
         // second.
@@ -228,9 +255,23 @@ fn the_second_device_page_offers_one_profile_and_hands_it_over() {
         };
     }
 
-    // The profile the core will not show a code for. The chats are on
+    // The dialog first: the warning has to be in front of the code, and
+    // accepting it has to carry the profile on to the page. Then the
+    // profile the core will not show a code for. The chats are on
     // another profile throughout: offering one is not switching to it.
     single_shot(Duration::from_secs(1), move || unsafe {
+        record!(
+            "load-dialog",
+            call!(
+                "load",
+                QString::from(common::page_url("SecondDeviceDialog.qml")),
+                4,
+                9
+            )
+        );
+        record!("dialog-warning", get!("warning", "text"));
+        record!("dialog-accept", call!("accept"));
+        record!("dialog-handed", call!("handed"));
         record!(
             "load-no-code",
             call!(
@@ -309,6 +350,31 @@ fn the_second_device_page_offers_one_profile_and_hands_it_over() {
             "cancelled-leavable",
             call!("pageProperty", QString::from("backNavigation"))
         );
+        // The same give-up, by going back instead of by Cancel: the
+        // provider has to end in the core either way.
+        record!(
+            "load-leaving",
+            call!(
+                "load",
+                QString::from(common::page_url("SecondDevicePage.qml")),
+                6,
+                9
+            )
+        );
+    });
+
+    single_shot(Duration::from_secs(11), move || unsafe {
+        record!("leaving-code", get!("device", "code"));
+        record!("leave", call!("leave"));
+    });
+
+    single_shot(Duration::from_secs(13), move || unsafe {
+        record!("left-idle", get!("device", "running"));
+        record!("left-code", get!("device", "code"));
+        record!(
+            "left-said",
+            call!("pageProperty", QString::from("errorMessage"))
+        );
         // And the profile a device really turns up for and stays for.
         record!(
             "load-taken",
@@ -321,7 +387,7 @@ fn the_second_device_page_offers_one_profile_and_hands_it_over() {
         );
     });
 
-    single_shot(Duration::from_secs(13), move || unsafe {
+    single_shot(Duration::from_secs(17), move || unsafe {
         // Mid-transfer: the bar is up, the code is no longer what the
         // page is about, and there is no way off it.
         record!("transfer-permille", get!("device", "permille"));
@@ -333,7 +399,7 @@ fn the_second_device_page_offers_one_profile_and_hands_it_over() {
         );
     });
 
-    single_shot(Duration::from_secs(17), move || unsafe {
+    single_shot(Duration::from_secs(21), move || unsafe {
         record!("taken", call!("pageProperty", QString::from("taken")));
         record!("taken-said", get!("takenLabel", "visible"));
         record!("taken-idle", get!("device", "running"));
@@ -359,7 +425,7 @@ fn the_second_device_page_offers_one_profile_and_hands_it_over() {
         );
     });
 
-    single_shot(Duration::from_secs(24), move || unsafe {
+    single_shot(Duration::from_secs(26), move || unsafe {
         record!(
             "stalled-taken",
             call!("pageProperty", QString::from("taken"))
@@ -391,11 +457,38 @@ fn the_second_device_page_offers_one_profile_and_hands_it_over() {
             value("load-no-code").as_str(),
             value("load-refused").as_str(),
             value("load-waiting").as_str(),
+            value("load-leaving").as_str(),
             value("load-taken").as_str(),
             value("load-stalled").as_str()
         ),
-        ("ok", "ok", "ok", "ok", "ok"),
+        ("ok", "ok", "ok", "ok", "ok", "ok"),
         "the page did not load. {context}"
+    );
+    assert_eq!(
+        value("load-dialog"),
+        "ok",
+        "the dialog in front of the page did not load. {context}"
+    );
+
+    // The warning is the whole reason the dialog is there: a code on
+    // screen is the profile in the room, and that is the last moment it
+    // can be answered with Cancel.
+    let warning = value("dialog-warning");
+    assert!(
+        warning.contains("see the screen") && warning.contains("gets the profile"),
+        "the dialog does not warn who a code on screen hands the profile \
+         to: {warning:?}. {context}"
+    );
+    assert_eq!(
+        value("dialog-accept"),
+        "ok",
+        "the dialog could not be accepted. {context}"
+    );
+    assert_eq!(
+        value("dialog-handed"),
+        "4:9",
+        "accepting the dialog did not carry the profile, and the chats to \
+         swipe on to, through to the page. {context}"
     );
     assert_eq!(
         value("colour"),
@@ -465,9 +558,30 @@ fn the_second_device_page_offers_one_profile_and_hands_it_over() {
             value("waiting-bar").as_str(),
             value("waiting-pinned").as_str()
         ),
-        ("0", "false", "false"),
+        ("0", "false", "true"),
         "a code nobody has read yet should be a code, not a bar, and the \
-         page should not be leavable behind it. {context}"
+         page should be leavable behind it -- the reader has to be able \
+         to walk away from their own code. {context}"
+    );
+
+    // Going back is the other way to give up on an offer, and has to
+    // end it in the core as Cancel does: a provider left running holds
+    // the profile out with nothing on screen to stop it.
+    assert!(
+        value("leaving-code").starts_with("DCBACKUP"),
+        "there was no offer up to leave: {}. {context}",
+        value("leaving-code")
+    );
+    assert_eq!(value("leave"), "ok", "nothing left the page. {context}");
+    assert_eq!(
+        (
+            value("left-idle").as_str(),
+            value("left-code").as_str(),
+            value("left-said").as_str()
+        ),
+        ("false", "", ""),
+        "going back left the offer running, or a code on the page, or \
+         reported the reader's own leaving back to them. {context}"
     );
 
     // Stopped by the reader: nothing reported, nothing left up.
@@ -526,8 +640,9 @@ fn the_second_device_page_offers_one_profile_and_hands_it_over() {
             value("transfer-pinned").as_str()
         ),
         ("true", "false", "false"),
-        "mid-transfer the page should be a bar and no way off it. \
-         {context}"
+        "mid-transfer the page should be a bar and no way off it: a \
+         swipe is too easy a way to drop a second device half-way \
+         through copying the profile. {context}"
     );
     assert_eq!(
         (
@@ -566,9 +681,10 @@ fn the_second_device_page_offers_one_profile_and_hands_it_over() {
 }
 
 /// Every offer went out as `provide_backup` on the profile the page was
-/// given, with `get_backup_qr` beside it for the code, and the two the
-/// reader ended -- the one with no code and the one they cancelled --
-/// were stopped in the core rather than left running.
+/// given, with `get_backup_qr` beside it for the code, and the three
+/// that ended here -- the one with no code to show, the one the reader
+/// cancelled and the one they walked away from -- were stopped in the
+/// core rather than left running.
 fn assert_offers(calls: &[(String, Value)], context: &str) {
     let accounts = |method: &str| -> Vec<u64> {
         calls
@@ -579,20 +695,21 @@ fn assert_offers(calls: &[(String, Value)], context: &str) {
     };
     assert_eq!(
         accounts("provide_backup"),
-        vec![3, 2, 4, 1, 5],
+        vec![3, 2, 4, 6, 1, 5],
         "the offers, in order, each on the profile the page was given. \
          {context}"
     );
     assert_eq!(
         accounts("get_backup_qr"),
-        vec![3, 2, 4, 1, 5],
+        vec![3, 2, 4, 6, 1, 5],
         "the code was not asked for beside every offer, on the same \
          profile. {context}"
     );
     assert_eq!(
         accounts("stop_ongoing_process"),
-        vec![3, 4],
-        "the offers the reader ended were not stopped in the core. \
-         {context}"
+        vec![3, 4, 6],
+        "the offers that ended here -- the one with no code to show, the \
+         one cancelled and the one walked away from -- were not stopped \
+         in the core. {context}"
     );
 }

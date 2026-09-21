@@ -1377,6 +1377,33 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>SecondDeviceDialog</name>
+    <message>
+        <source>Add a second device</source>
+        <translation>Lägg till en andra enhet</translation>
+    </message>
+    <message>
+        <source>Continue</source>
+        <translation>Fortsätt</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Avbryt</translation>
+    </message>
+    <message>
+        <source>This makes a code the other device reads to copy the profile onto itself.</source>
+        <translation>Det här gör en kod som den andra enheten läser för att kopiera profilen.</translation>
+    </message>
+    <message>
+        <source>Make sure nobody, and no camera, can see the screen that comes next. Whoever reads that code gets the profile, key and all.</source>
+        <translation>Se till att ingen, och ingen kamera, kan se nästa skärm. Den som läser den koden får profilen, nyckel och allt.</translation>
+    </message>
+    <message>
+        <source>Both phones have to be on the same network, and this profile stops collecting mail while the code is up.</source>
+        <translation>Båda telefonerna måste vara på samma nätverk, och den här profilen hämtar ingen post så länge koden är framme.</translation>
+    </message>
+</context>
+<context>
     <name>SecondDevicePage</name>
     <message>
         <source>Nothing took the profile. Both phones have to stay on one network, with this page open.</source>
@@ -1389,10 +1416,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>On the other device: add a profile you have already, then &quot;Add as second device&quot;, and read this code with it. Both phones on one network.</source>
         <translation>På den andra enheten: lägg till en profil du redan har, sedan “Lägg till som andra enhet”, och läs den här koden med den. Båda telefonerna på samma nätverk.</translation>
-    </message>
-    <message>
-        <source>Whoever reads this code gets the profile. It stops collecting mail until the code is gone.</source>
-        <translation>Den som läser den här koden får profilen. Så länge koden är framme hämtar den ingen post.</translation>
     </message>
     <message>
         <source>Copy the code</source>
@@ -1417,6 +1440,10 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Swipe on for your chats.</source>
         <translation>Svep vidare till dina chattar.</translation>
+    </message>
+    <message>
+        <source>This profile stops collecting mail until the code is gone.</source>
+        <translation>Den här profilen hämtar ingen post förrän koden är borta.</translation>
     </message>
 </context>
 <context>

@@ -20,11 +20,18 @@ added to.
   picture and as text to send over, and draws the transfer as it runs.
   The other device reads that code with what it already had -- "Add as
   second device" -- and both phones end up with the profile.
+- A dialog comes first, as the other Delta Chat apps put one in front
+  of their QR screen: which profile is about to be held out, and the
+  warning that whoever reads the code gets the profile, key and all, so
+  nobody and no camera should be able to see the screen that follows.
+  Cancel there costs nothing, because no provider has been started yet.
 - The page says what the core does rather than leaving it to be found
-  out: whoever reads the code gets the profile, and the profile stops
-  collecting mail while the code is up. It cannot be left mid-offer,
-  Cancel stops the provider in the core, and a hand-over ends the page
-  with the chats a swipe away.
+  out: the profile stops collecting mail while the code is up. Going
+  back ends the offer in the core, as Cancel does, rather than leaving
+  a provider running behind a page that is gone; only a transfer
+  already under way pins the page, since a swipe is too easy a way to
+  drop a second device half-way through copying the profile. A
+  hand-over ends the page with the chats a swipe away.
 - A profile is only ever reported as handed over when the core says the
   transfer finished. The provider answers the same way whether a device
   took the profile or the offer was stopped, so the progress it reports

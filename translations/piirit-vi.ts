@@ -1371,6 +1371,33 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>SecondDeviceDialog</name>
+    <message>
+        <source>Add a second device</source>
+        <translation>Thêm thiết bị thứ hai</translation>
+    </message>
+    <message>
+        <source>Continue</source>
+        <translation>Tiếp tục</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Hủy</translation>
+    </message>
+    <message>
+        <source>This makes a code the other device reads to copy the profile onto itself.</source>
+        <translation>Việc này tạo một mã để thiết bị kia đọc và chép hồ sơ về.</translation>
+    </message>
+    <message>
+        <source>Make sure nobody, and no camera, can see the screen that comes next. Whoever reads that code gets the profile, key and all.</source>
+        <translation>Hãy chắc rằng không ai, và không máy ảnh nào, nhìn thấy màn hình tiếp theo. Ai đọc mã đó là có cả hồ sơ lẫn khoá.</translation>
+    </message>
+    <message>
+        <source>Both phones have to be on the same network, and this profile stops collecting mail while the code is up.</source>
+        <translation>Cả hai điện thoại phải ở cùng một mạng, và hồ sơ này ngừng lấy thư khi mã còn hiện.</translation>
+    </message>
+</context>
+<context>
     <name>SecondDevicePage</name>
     <message>
         <source>Nothing took the profile. Both phones have to stay on one network, with this page open.</source>
@@ -1383,10 +1410,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>On the other device: add a profile you have already, then &quot;Add as second device&quot;, and read this code with it. Both phones on one network.</source>
         <translation>Trên thiết bị kia: thêm một hồ sơ bạn đã có, rồi “Thêm làm thiết bị thứ hai”, và đọc mã này bằng nó. Cả hai điện thoại trên cùng một mạng.</translation>
-    </message>
-    <message>
-        <source>Whoever reads this code gets the profile. It stops collecting mail until the code is gone.</source>
-        <translation>Ai đọc mã này thì nhận được hồ sơ. Chừng nào mã còn đây, hồ sơ ngừng lấy thư.</translation>
     </message>
     <message>
         <source>Copy the code</source>
@@ -1411,6 +1434,10 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Swipe on for your chats.</source>
         <translation>Vuốt tiếp để đến các cuộc trò chuyện.</translation>
+    </message>
+    <message>
+        <source>This profile stops collecting mail until the code is gone.</source>
+        <translation>Hồ sơ này ngừng lấy thư cho đến khi mã biến mất.</translation>
     </message>
 </context>
 <context>

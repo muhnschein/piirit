@@ -1381,6 +1381,33 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
     </message>
 </context>
 <context>
+    <name>SecondDeviceDialog</name>
+    <message>
+        <source>Add a second device</source>
+        <translation>Lisa teine seade</translation>
+    </message>
+    <message>
+        <source>Continue</source>
+        <translation>Edasi</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Loobu</translation>
+    </message>
+    <message>
+        <source>This makes a code the other device reads to copy the profile onto itself.</source>
+        <translation>See teeb koodi, mille teine seade loeb, et profiil endale kopeerida.</translation>
+    </message>
+    <message>
+        <source>Make sure nobody, and no camera, can see the screen that comes next. Whoever reads that code gets the profile, key and all.</source>
+        <translation>Hoolitse, et järgmist ekraani ei näeks keegi ega ükski kaamera. Kes selle koodi loeb, saab profiili koos võtmega.</translation>
+    </message>
+    <message>
+        <source>Both phones have to be on the same network, and this profile stops collecting mail while the code is up.</source>
+        <translation>Mõlemad telefonid peavad olema samas võrgus ja see profiil ei võta posti vastu, kuni kood on ekraanil.</translation>
+    </message>
+</context>
+<context>
     <name>SecondDevicePage</name>
     <message>
         <source>Nothing took the profile. Both phones have to stay on one network, with this page open.</source>
@@ -1393,10 +1420,6 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
     <message>
         <source>On the other device: add a profile you have already, then &quot;Add as second device&quot;, and read this code with it. Both phones on one network.</source>
         <translation>Teises seadmes: lisa profiil, mis sul juba on, seejärel „Lisa teise seadmena“, ja loe selle koodi sellega. Mõlemad telefonid samas võrgus.</translation>
-    </message>
-    <message>
-        <source>Whoever reads this code gets the profile. It stops collecting mail until the code is gone.</source>
-        <translation>Kes selle koodi loeb, saab profiili. Seni kuni kood on väljas, ei võta profiil posti vastu.</translation>
     </message>
     <message>
         <source>Copy the code</source>
@@ -1421,6 +1444,10 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
     <message>
         <source>Swipe on for your chats.</source>
         <translation>Libista edasi oma vestlustesse.</translation>
+    </message>
+    <message>
+        <source>This profile stops collecting mail until the code is gone.</source>
+        <translation>See profiil ei võta posti vastu, kuni kood on väljas.</translation>
     </message>
 </context>
 <context>

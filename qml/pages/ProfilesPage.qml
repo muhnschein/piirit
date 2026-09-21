@@ -153,8 +153,11 @@ Page {
                 MenuItem {
                     objectName: "secondDeviceItem"
                     text: qsTr("Add a second device")
+                    // The dialog, not the page: the code the page shows
+                    // is the profile, so the warning about who can see
+                    // it has to come before the code is on screen.
                     onClicked: pageStack.push(
-                        Qt.resolvedUrl("SecondDevicePage.qml"), {
+                        Qt.resolvedUrl("SecondDeviceDialog.qml"), {
                             accountId: model.account_id,
                             // Where the forward swipe goes once a
                             // device has taken the profile: the chats

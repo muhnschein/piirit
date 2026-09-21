@@ -1375,6 +1375,33 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>SecondDeviceDialog</name>
+    <message>
+        <source>Add a second device</source>
+        <translation>添加第二台设备</translation>
+    </message>
+    <message>
+        <source>Continue</source>
+        <translation>继续</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>取消</translation>
+    </message>
+    <message>
+        <source>This makes a code the other device reads to copy the profile onto itself.</source>
+        <translation>这会生成一个二维码，另一台设备读取它来把这个个人资料复制过去。</translation>
+    </message>
+    <message>
+        <source>Make sure nobody, and no camera, can see the screen that comes next. Whoever reads that code gets the profile, key and all.</source>
+        <translation>请确认没有人、也没有摄像头能看到下一屏。谁读取那个二维码，谁就连密钥一起拿到这个个人资料。</translation>
+    </message>
+    <message>
+        <source>Both phones have to be on the same network, and this profile stops collecting mail while the code is up.</source>
+        <translation>两台手机要在同一个网络里，二维码开着的时候这个个人资料不会收取邮件。</translation>
+    </message>
+</context>
+<context>
     <name>SecondDevicePage</name>
     <message>
         <source>Nothing took the profile. Both phones have to stay on one network, with this page open.</source>
@@ -1387,10 +1414,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>On the other device: add a profile you have already, then &quot;Add as second device&quot;, and read this code with it. Both phones on one network.</source>
         <translation>在另一台设备上：先添加一个你已经有的个人资料，然后“添加为第二台设备”，再用它读取这个二维码。两台手机在同一个网络里。</translation>
-    </message>
-    <message>
-        <source>Whoever reads this code gets the profile. It stops collecting mail until the code is gone.</source>
-        <translation>谁读取这个二维码，谁就拿到这个个人资料。二维码开着的时候，它不会收取邮件。</translation>
     </message>
     <message>
         <source>Copy the code</source>
@@ -1415,6 +1438,10 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Swipe on for your chats.</source>
         <translation>向前滑动去看你的聊天。</translation>
+    </message>
+    <message>
+        <source>This profile stops collecting mail until the code is gone.</source>
+        <translation>在二维码消失之前，这个个人资料不会收取邮件。</translation>
     </message>
 </context>
 <context>

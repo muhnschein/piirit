@@ -1377,6 +1377,33 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>SecondDeviceDialog</name>
+    <message>
+        <source>Add a second device</source>
+        <translation>Lisää toinen laite</translation>
+    </message>
+    <message>
+        <source>Continue</source>
+        <translation>Jatka</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Peruuta</translation>
+    </message>
+    <message>
+        <source>This makes a code the other device reads to copy the profile onto itself.</source>
+        <translation>Tämä tekee koodin, jonka toinen laite lukee kopioidakseen profiilin itselleen.</translation>
+    </message>
+    <message>
+        <source>Make sure nobody, and no camera, can see the screen that comes next. Whoever reads that code gets the profile, key and all.</source>
+        <translation>Varmista, ettei kukaan eikä mikään kamera näe seuraavaa näyttöä. Joka lukee sen koodin, saa profiilin avaimineen kaikkineen.</translation>
+    </message>
+    <message>
+        <source>Both phones have to be on the same network, and this profile stops collecting mail while the code is up.</source>
+        <translation>Molempien puhelinten on oltava samassa verkossa, eikä tämä profiili hae postia niin kauan kuin koodi on näytöllä.</translation>
+    </message>
+</context>
+<context>
     <name>SecondDevicePage</name>
     <message>
         <source>Nothing took the profile. Both phones have to stay on one network, with this page open.</source>
@@ -1389,10 +1416,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>On the other device: add a profile you have already, then &quot;Add as second device&quot;, and read this code with it. Both phones on one network.</source>
         <translation>Toisella laitteella: lisää profiili, joka sinulla jo on, sitten “Lisää toisena laitteena”, ja lue tämä koodi sillä. Molemmat puhelimet samassa verkossa.</translation>
-    </message>
-    <message>
-        <source>Whoever reads this code gets the profile. It stops collecting mail until the code is gone.</source>
-        <translation>Joka lukee tämän koodin, saa profiilin. Niin kauan kuin koodi on esillä, profiili ei hae postia.</translation>
     </message>
     <message>
         <source>Copy the code</source>
@@ -1417,6 +1440,10 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Swipe on for your chats.</source>
         <translation>Pyyhkäise eteenpäin keskusteluihisi.</translation>
+    </message>
+    <message>
+        <source>This profile stops collecting mail until the code is gone.</source>
+        <translation>Tämä profiili ei hae postia ennen kuin koodi on poissa.</translation>
     </message>
 </context>
 <context>
