@@ -1193,6 +1193,10 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Back up profile</source>
         <translation>Sao lưu hồ sơ</translation>
     </message>
+    <message>
+        <source>Add a second device</source>
+        <translation>Thêm thiết bị thứ hai</translation>
+    </message>
 </context>
 <context>
     <name>QrPage</name>
@@ -1364,6 +1368,53 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Nothing found</source>
         <translation>Không tìm thấy gì</translation>
+    </message>
+</context>
+<context>
+    <name>SecondDevicePage</name>
+    <message>
+        <source>Nothing took the profile. Both phones have to stay on one network, with this page open.</source>
+        <translation>Không ai nhận hồ sơ. Cả hai điện thoại phải ở cùng một mạng, với trang này đang mở.</translation>
+    </message>
+    <message>
+        <source>Add a second device</source>
+        <translation>Thêm thiết bị thứ hai</translation>
+    </message>
+    <message>
+        <source>On the other device: add a profile you have already, then &quot;Add as second device&quot;, and read this code with it. Both phones on one network.</source>
+        <translation>Trên thiết bị kia: thêm một hồ sơ bạn đã có, rồi “Thêm làm thiết bị thứ hai”, và đọc mã này bằng nó. Cả hai điện thoại trên cùng một mạng.</translation>
+    </message>
+    <message>
+        <source>Copy the code</source>
+        <translation>Sao chép mã</translation>
+    </message>
+    <message>
+        <source>Handing the profile over...</source>
+        <translation>Đang bàn giao hồ sơ...</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Hủy</translation>
+    </message>
+    <message>
+        <source>The other device has the profile. Both get everything new from now on.</source>
+        <translation>Thiết bị kia đã có hồ sơ. Từ giờ cả hai đều nhận mọi thứ mới.</translation>
+    </message>
+    <message>
+        <source>Swipe on for your chats.</source>
+        <translation>Vuốt tiếp để đến các cuộc trò chuyện.</translation>
+    </message>
+    <message>
+        <source>Whoever reads this code gets the profile. It stops collecting mail until the code is gone.</source>
+        <translation>Ai đọc mã này thì nhận được hồ sơ. Chừng nào mã còn đây, hồ sơ ngừng lấy thư.</translation>
+    </message>
+    <message>
+        <source>Show code again</source>
+        <translation>Hiện lại mã</translation>
+    </message>
+    <message>
+        <source>Show code</source>
+        <translation>Hiện mã</translation>
     </message>
 </context>
 <context>

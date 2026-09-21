@@ -1205,6 +1205,10 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Back up profile</source>
         <translation>Copie de siguranță a profilului</translation>
     </message>
+    <message>
+        <source>Add a second device</source>
+        <translation>Adaugă un al doilea dispozitiv</translation>
+    </message>
 </context>
 <context>
     <name>QrPage</name>
@@ -1376,6 +1380,53 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Nothing found</source>
         <translation>Nu s-a găsit nimic</translation>
+    </message>
+</context>
+<context>
+    <name>SecondDevicePage</name>
+    <message>
+        <source>Nothing took the profile. Both phones have to stay on one network, with this page open.</source>
+        <translation>Nimeni nu a luat profilul. Ambele telefoane trebuie să rămână în aceeași rețea, cu această pagină deschisă.</translation>
+    </message>
+    <message>
+        <source>Add a second device</source>
+        <translation>Adaugă un al doilea dispozitiv</translation>
+    </message>
+    <message>
+        <source>On the other device: add a profile you have already, then &quot;Add as second device&quot;, and read this code with it. Both phones on one network.</source>
+        <translation>Pe celălalt dispozitiv: adaugă un profil pe care îl ai deja, apoi „Adaugă ca al doilea dispozitiv”, și citește cu el acest cod. Ambele telefoane în aceeași rețea.</translation>
+    </message>
+    <message>
+        <source>Copy the code</source>
+        <translation>Copiază codul</translation>
+    </message>
+    <message>
+        <source>Handing the profile over...</source>
+        <translation>Se predă profilul...</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Anulează</translation>
+    </message>
+    <message>
+        <source>The other device has the profile. Both get everything new from now on.</source>
+        <translation>Celălalt dispozitiv are profilul. De acum amândouă primesc tot ce e nou.</translation>
+    </message>
+    <message>
+        <source>Swipe on for your chats.</source>
+        <translation>Glisează mai departe spre conversațiile tale.</translation>
+    </message>
+    <message>
+        <source>Whoever reads this code gets the profile. It stops collecting mail until the code is gone.</source>
+        <translation>Cine citește acest cod primește profilul. Cât timp codul e aici, profilul nu mai ia poșta.</translation>
+    </message>
+    <message>
+        <source>Show code again</source>
+        <translation>Arată codul din nou</translation>
+    </message>
+    <message>
+        <source>Show code</source>
+        <translation>Arată codul</translation>
     </message>
 </context>
 <context>

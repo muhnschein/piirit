@@ -1193,6 +1193,10 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Back up profile</source>
         <translation>備份個人檔案</translation>
     </message>
+    <message>
+        <source>Add a second device</source>
+        <translation>新增第二部裝置</translation>
+    </message>
 </context>
 <context>
     <name>QrPage</name>
@@ -1364,6 +1368,53 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Nothing found</source>
         <translation>找不到任何內容</translation>
+    </message>
+</context>
+<context>
+    <name>SecondDevicePage</name>
+    <message>
+        <source>Nothing took the profile. Both phones have to stay on one network, with this page open.</source>
+        <translation>沒有人接走這個個人檔案。兩部手機要留在同一個網絡裡，並讓這一頁開著。</translation>
+    </message>
+    <message>
+        <source>Add a second device</source>
+        <translation>新增第二部裝置</translation>
+    </message>
+    <message>
+        <source>On the other device: add a profile you have already, then &quot;Add as second device&quot;, and read this code with it. Both phones on one network.</source>
+        <translation>在另一部裝置上：先新增一個你已經有的個人檔案，然後「新增為第二部裝置」，再用它讀取這個 QR code。兩部手機在同一個網絡裡。</translation>
+    </message>
+    <message>
+        <source>Copy the code</source>
+        <translation>複製代碼</translation>
+    </message>
+    <message>
+        <source>Handing the profile over...</source>
+        <translation>正在交出個人檔案…</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>取消</translation>
+    </message>
+    <message>
+        <source>The other device has the profile. Both get everything new from now on.</source>
+        <translation>另一部裝置已經有這個個人檔案了。從現在起兩部都會收到所有新訊息。</translation>
+    </message>
+    <message>
+        <source>Swipe on for your chats.</source>
+        <translation>向前滑動去看你的聊天。</translation>
+    </message>
+    <message>
+        <source>Whoever reads this code gets the profile. It stops collecting mail until the code is gone.</source>
+        <translation>誰讀取這個 QR code，誰就拿到這個個人檔案。QR code 開著的時候，它不會收取郵件。</translation>
+    </message>
+    <message>
+        <source>Show code again</source>
+        <translation>再顯示一次 QR code</translation>
+    </message>
+    <message>
+        <source>Show code</source>
+        <translation>顯示 QR code</translation>
     </message>
 </context>
 <context>

@@ -1197,6 +1197,10 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Back up profile</source>
         <translation>备份个人资料</translation>
     </message>
+    <message>
+        <source>Add a second device</source>
+        <translation>添加第二台设备</translation>
+    </message>
 </context>
 <context>
     <name>QrPage</name>
@@ -1368,6 +1372,53 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Nothing found</source>
         <translation>未找到任何内容</translation>
+    </message>
+</context>
+<context>
+    <name>SecondDevicePage</name>
+    <message>
+        <source>Nothing took the profile. Both phones have to stay on one network, with this page open.</source>
+        <translation>没有人接走这个个人资料。两台手机要留在同一个网络里，并让这一页开着。</translation>
+    </message>
+    <message>
+        <source>Add a second device</source>
+        <translation>添加第二台设备</translation>
+    </message>
+    <message>
+        <source>On the other device: add a profile you have already, then &quot;Add as second device&quot;, and read this code with it. Both phones on one network.</source>
+        <translation>在另一台设备上：先添加一个你已经有的个人资料，然后“添加为第二台设备”，再用它读取这个二维码。两台手机在同一个网络里。</translation>
+    </message>
+    <message>
+        <source>Copy the code</source>
+        <translation>复制代码</translation>
+    </message>
+    <message>
+        <source>Handing the profile over...</source>
+        <translation>正在交出个人资料…</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>取消</translation>
+    </message>
+    <message>
+        <source>The other device has the profile. Both get everything new from now on.</source>
+        <translation>另一台设备已经有这个个人资料了。从现在起两台都会收到所有新消息。</translation>
+    </message>
+    <message>
+        <source>Swipe on for your chats.</source>
+        <translation>向前滑动去看你的聊天。</translation>
+    </message>
+    <message>
+        <source>Whoever reads this code gets the profile. It stops collecting mail until the code is gone.</source>
+        <translation>谁读取这个二维码，谁就拿到这个个人资料。二维码开着的时候，它不会收取邮件。</translation>
+    </message>
+    <message>
+        <source>Show code again</source>
+        <translation>再显示一次二维码</translation>
+    </message>
+    <message>
+        <source>Show code</source>
+        <translation>显示二维码</translation>
     </message>
 </context>
 <context>

@@ -8,6 +8,39 @@ docs/BUILDING.md, "Cutting a release").
 
 ## Unreleased
 
+Piirit can be the *first* device now, not only the second. A profile on
+this phone could be joined to a setup another Delta Chat was already
+holding, but could not be the device holding it -- so a phone with
+nothing else in the house had a profile no second device could ever be
+added to.
+
+- A profile's row on the profiles page offers "Add a second device",
+  beside its invite code and its backup: the page puts the core's own
+  provider up (`provide_backup`), shows the code it answers with as a
+  picture and as text to send over, and draws the transfer as it runs.
+  The other device reads that code with what it already had -- "Add as
+  second device" -- and both phones end up with the profile.
+- The code waits behind a button, and the line above it says what
+  pressing it puts on screen: whoever reads the code gets the profile,
+  and the profile stops collecting mail until the code is gone. The
+  button says "Show code" until there has been one and "Show code
+  again" after that. A page opened by mistake shows nothing worth
+  reading.
+- Cancel takes the code down and leaves the reader on the page, with
+  the button back. Going back ends the offer in the core too, rather
+  than leaving a provider running behind a page that is gone; only a
+  transfer already under way pins the page, since a swipe is too easy
+  a way to drop a second device half-way through copying the profile.
+  A hand-over ends the page with the chats a swipe away.
+- A profile is only ever reported as handed over when the core says the
+  transfer finished. The provider answers the same way whether a device
+  took the profile or the offer was stopped, so the progress it reports
+  is what decides -- an offer that ended with nobody having taken it says
+  so, and offers to show the code again.
+- The code a device offers is read whatever version the core speaks: the
+  pinned core shows `DCBACKUP5:`, and pasting one in no longer depends on
+  it being the older `DCBACKUP2:`.
+
 A profile can have more than one transport -- a relay set up long ago
 beside the one it sends from now -- and the app took the wrong one of
 them in two places, reported from a phone whose profiles page named a

@@ -196,9 +196,14 @@ Page {
                 // as text beside the code, and it can be sent over.
                 scanLoader.item.linkButtonText = qsTr("Enter the code instead")
                 scanLoader.item.linkLabel = qsTr("Code from the other device")
-                scanLoader.item.linkPlaceholder = "DCBACKUP2:..."
+                scanLoader.item.linkPlaceholder = "DCBACKUP5:..."
                 scanLoader.item.linkActionText = qsTr("Take the profile over")
-                scanLoader.item.linkPrefixes = ["dcbackup:", "dcbackup2:"]
+                // The digit is the core's transfer version -- the
+                // pinned core shows 5 -- so the prefix that decides
+                // whether the clipboard is worth pasting in does not
+                // name one. What the payload means is the core's call
+                // either way (`check_qr`).
+                scanLoader.item.linkPrefixes = ["dcbackup"]
                 scanLoader.item.scanned.connect(page.begin)
                 scanLoader.item.failed.connect(function(message) {
                     page.errorMessage = message

@@ -8,9 +8,9 @@
 //!
 //! The rest of the page's navigation is here too, since the stack is
 //! already being modelled: the one plus under the list, which asks which
-//! of the three ways in the reader wants, and the two things a row's
-//! menu offers about the profile itself -- its invite code and its
-//! backup.
+//! of the three ways in the reader wants, and the three things a row's
+//! menu offers about the profile itself -- its invite code, offering it
+//! to a second device, and its backup.
 
 // Qt harness: see qml_pages.rs.
 #![allow(
@@ -164,7 +164,8 @@ const PROBE_QML: &str = r"
             return 'ok'
         }
         // An entry on the first row's menu, for the things that are
-        // about one profile: its invite code, and its backup.
+        // about one profile: its invite code, the second device it is
+        // offered to, and its backup.
         function clickOnFirstRow(name) {
             var item = findIn(loader.item, name)
             if (!item) { return 'missing:' + name }
@@ -248,14 +249,19 @@ fn switching_profile_leaves_one_chat_list_on_the_stack() {
         // of this page.
         (*steps_ptr).push(("add", call!("addProfile")));
         (*steps_ptr).push(("added", (*stack_ptr).pinned().borrow().stack.to_string()));
-        // The two things a row's menu offers besides the profile's own
-        // page: they are about this profile and nothing else, so they
-        // are where the profile is picked.
+        // The three things a row's menu offers besides the profile's
+        // own page: they are about this profile and nothing else, so
+        // they are where the profile is picked.
         (*steps_ptr).push((
             "invite",
             call!("clickOnFirstRow", QString::from("inviteItem")),
         ));
         (*steps_ptr).push(("invited", (*stack_ptr).pinned().borrow().stack.to_string()));
+        (*steps_ptr).push((
+            "second-device",
+            call!("clickOnFirstRow", QString::from("secondDeviceItem")),
+        ));
+        (*steps_ptr).push(("offering", (*stack_ptr).pinned().borrow().stack.to_string()));
         (*steps_ptr).push((
             "backup",
             call!("clickOnFirstRow", QString::from("backupItem")),
@@ -329,6 +335,18 @@ fn switching_profile_leaves_one_chat_list_on_the_stack() {
         value("invited").ends_with(",QrPage.qml"),
         "the row's invite entry did not open the code: {}. {context}",
         value("invited")
+    );
+    assert_eq!(
+        value("second-device"),
+        "ok",
+        "a profile's row does not offer to put it on a second device, \
+         and the core's provider is per profile. {context}"
+    );
+    assert!(
+        value("offering").ends_with(",SecondDevicePage.qml"),
+        "the row's second-device entry did not open the page that offers \
+         the profile: {}. {context}",
+        value("offering")
     );
     assert_eq!(
         value("backup"),

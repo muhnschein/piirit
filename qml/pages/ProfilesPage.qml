@@ -139,16 +139,29 @@ Page {
                     onClicked: pageStack.push(Qt.resolvedUrl("ProfilePage.qml"),
                                               { accountId: model.account_id })
                 }
-                // The invite code and the backup are about this
-                // profile and nothing else, so they are on the profile
-                // rather than a page deeper in. Both take the row's own
-                // account: the core's export and the core's invite are
-                // each per account.
+                // The invite code, the second device and the backup are
+                // about this profile and nothing else, so they are on
+                // the profile rather than a page deeper in. All three
+                // take the row's own account: the core's invite, its
+                // provider and its export are each per account.
                 MenuItem {
                     objectName: "inviteItem"
                     text: qsTr("Invite code")
                     onClicked: pageStack.push(Qt.resolvedUrl("QrPage.qml"),
                                               { accountId: model.account_id })
+                }
+                MenuItem {
+                    objectName: "secondDeviceItem"
+                    text: qsTr("Add a second device")
+                    onClicked: pageStack.push(
+                        Qt.resolvedUrl("SecondDevicePage.qml"), {
+                            accountId: model.account_id,
+                            // Where the forward swipe goes once a
+                            // device has taken the profile: the chats
+                            // the app is on, which is not necessarily
+                            // the profile being offered.
+                            currentAccountId: page.currentAccountId
+                        })
                 }
                 MenuItem {
                     objectName: "backupItem"

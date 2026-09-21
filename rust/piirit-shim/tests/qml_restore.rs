@@ -313,6 +313,7 @@ fn a_profile_that_exists_already_is_asked_after_and_brought_over() {
             "device-field",
             call!("get", "linkField", "placeholderText"),
         );
+        common::record(&s, "device-prefixes", call!("viewProperty", "linkPrefixes"));
         common::record(
             &s,
             "device-begin",
@@ -489,8 +490,20 @@ fn assert_device_half(steps: &[(String, String)], context: &str) {
     );
     assert_eq!(
         common::value_of(steps, "device-field"),
-        "DCBACKUP2:...",
-        "the field does not show what it is waiting for. {context}"
+        "DCBACKUP5:...",
+        "the field does not show what it is waiting for. The digit is \
+         the core's transfer version, and the pinned core -- the one \
+         this app's own second-device page shows a code from -- speaks \
+         5. {context}"
+    );
+    // What decides whether the clipboard is worth pasting in. Naming a
+    // version there is how a code this app's own provider shows
+    // (`DCBACKUP5:`) came to be refused by the paste it is meant for.
+    assert_eq!(
+        common::value_of(steps, "device-prefixes"),
+        "dcbackup",
+        "the paste check names a transfer version, so a code from a core \
+         speaking another one is not offered to the field. {context}"
     );
     assert_eq!(
         common::value_of(steps, "failed-block"),

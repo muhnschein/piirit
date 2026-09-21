@@ -1203,6 +1203,10 @@ Vous continuerez à voir les messages des contacts bloqués dans les autres grou
         <source>Back up profile</source>
         <translation>Sauvegarder le profil</translation>
     </message>
+    <message>
+        <source>Add a second device</source>
+        <translation>Ajouter un deuxième appareil</translation>
+    </message>
 </context>
 <context>
     <name>QrPage</name>
@@ -1374,6 +1378,53 @@ Vous continuerez à voir les messages des contacts bloqués dans les autres grou
     <message>
         <source>Nothing found</source>
         <translation>Rien trouvé</translation>
+    </message>
+</context>
+<context>
+    <name>SecondDevicePage</name>
+    <message>
+        <source>Nothing took the profile. Both phones have to stay on one network, with this page open.</source>
+        <translation>Personne n&apos;a pris le profil. Les deux téléphones doivent rester sur le même réseau, cette page ouverte.</translation>
+    </message>
+    <message>
+        <source>Add a second device</source>
+        <translation>Ajouter un deuxième appareil</translation>
+    </message>
+    <message>
+        <source>On the other device: add a profile you have already, then &quot;Add as second device&quot;, and read this code with it. Both phones on one network.</source>
+        <translation>Sur l&apos;autre appareil : ajoutez un profil que vous avez déjà, puis « Ajouter comme deuxième appareil », et lisez ce code avec lui. Les deux téléphones sur le même réseau.</translation>
+    </message>
+    <message>
+        <source>Copy the code</source>
+        <translation>Copier le code</translation>
+    </message>
+    <message>
+        <source>Handing the profile over...</source>
+        <translation>Remise du profil...</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Annuler</translation>
+    </message>
+    <message>
+        <source>The other device has the profile. Both get everything new from now on.</source>
+        <translation>L&apos;autre appareil a le profil. À partir de maintenant, les deux reçoivent tout ce qui arrive.</translation>
+    </message>
+    <message>
+        <source>Swipe on for your chats.</source>
+        <translation>Glissez vers vos discussions.</translation>
+    </message>
+    <message>
+        <source>Whoever reads this code gets the profile. It stops collecting mail until the code is gone.</source>
+        <translation>Qui lit ce code reçoit le profil. Tant que le code est affiché, le profil ne relève pas le courrier.</translation>
+    </message>
+    <message>
+        <source>Show code again</source>
+        <translation>Afficher le code à nouveau</translation>
+    </message>
+    <message>
+        <source>Show code</source>
+        <translation>Afficher le code</translation>
     </message>
 </context>
 <context>

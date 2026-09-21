@@ -1199,6 +1199,10 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Back up profile</source>
         <translation>Αντίγραφο ασφαλείας προφίλ</translation>
     </message>
+    <message>
+        <source>Add a second device</source>
+        <translation>Προσθήκη δεύτερης συσκευής</translation>
+    </message>
 </context>
 <context>
     <name>QrPage</name>
@@ -1370,6 +1374,53 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Nothing found</source>
         <translation>Δεν βρέθηκε τίποτα</translation>
+    </message>
+</context>
+<context>
+    <name>SecondDevicePage</name>
+    <message>
+        <source>Nothing took the profile. Both phones have to stay on one network, with this page open.</source>
+        <translation>Κανείς δεν πήρε το προφίλ. Και τα δύο τηλέφωνα πρέπει να μείνουν στο ίδιο δίκτυο, με αυτή τη σελίδα ανοιχτή.</translation>
+    </message>
+    <message>
+        <source>Add a second device</source>
+        <translation>Προσθήκη δεύτερης συσκευής</translation>
+    </message>
+    <message>
+        <source>On the other device: add a profile you have already, then &quot;Add as second device&quot;, and read this code with it. Both phones on one network.</source>
+        <translation>Στην άλλη συσκευή: προσθέστε ένα προφίλ που έχετε ήδη, μετά «Προσθήκη ως δεύτερη συσκευή», και διαβάστε αυτόν τον κωδικό με αυτήν. Και τα δύο τηλέφωνα στο ίδιο δίκτυο.</translation>
+    </message>
+    <message>
+        <source>Copy the code</source>
+        <translation>Αντιγραφή κωδικού</translation>
+    </message>
+    <message>
+        <source>Handing the profile over...</source>
+        <translation>Το προφίλ παραδίδεται...</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Ακύρωση</translation>
+    </message>
+    <message>
+        <source>The other device has the profile. Both get everything new from now on.</source>
+        <translation>Η άλλη συσκευή έχει το προφίλ. Από εδώ και πέρα παίρνουν και οι δύο ό,τι νέο έρθει.</translation>
+    </message>
+    <message>
+        <source>Swipe on for your chats.</source>
+        <translation>Σύρετε παρακάτω για τις συνομιλίες σας.</translation>
+    </message>
+    <message>
+        <source>Whoever reads this code gets the profile. It stops collecting mail until the code is gone.</source>
+        <translation>Όποιος διαβάσει αυτόν τον κωδικό παίρνει το προφίλ. Όσο ο κωδικός είναι εδώ, το προφίλ δεν κατεβάζει αλληλογραφία.</translation>
+    </message>
+    <message>
+        <source>Show code again</source>
+        <translation>Εμφάνιση κωδικού ξανά</translation>
+    </message>
+    <message>
+        <source>Show code</source>
+        <translation>Εμφάνιση κωδικού</translation>
     </message>
 </context>
 <context>

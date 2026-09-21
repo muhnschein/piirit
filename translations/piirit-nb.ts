@@ -1199,6 +1199,10 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Back up profile</source>
         <translation>Sikkerhetskopier profil</translation>
     </message>
+    <message>
+        <source>Add a second device</source>
+        <translation>Legg til en andre enhet</translation>
+    </message>
 </context>
 <context>
     <name>QrPage</name>
@@ -1370,6 +1374,53 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Nothing found</source>
         <translation>Ingenting funnet</translation>
+    </message>
+</context>
+<context>
+    <name>SecondDevicePage</name>
+    <message>
+        <source>Nothing took the profile. Both phones have to stay on one network, with this page open.</source>
+        <translation>Ingen tok profilen. Begge telefonene må bli på samme nettverk, med denne siden åpen.</translation>
+    </message>
+    <message>
+        <source>Add a second device</source>
+        <translation>Legg til en andre enhet</translation>
+    </message>
+    <message>
+        <source>On the other device: add a profile you have already, then &quot;Add as second device&quot;, and read this code with it. Both phones on one network.</source>
+        <translation>På den andre enheten: legg til en profil du har fra før, så “Legg til som andre enhet”, og les denne koden med den. Begge telefonene på samme nettverk.</translation>
+    </message>
+    <message>
+        <source>Copy the code</source>
+        <translation>Kopier koden</translation>
+    </message>
+    <message>
+        <source>Handing the profile over...</source>
+        <translation>Overleverer profilen...</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Avbryt</translation>
+    </message>
+    <message>
+        <source>The other device has the profile. Both get everything new from now on.</source>
+        <translation>Den andre enheten har profilen. Fra nå av får begge alt som er nytt.</translation>
+    </message>
+    <message>
+        <source>Swipe on for your chats.</source>
+        <translation>Sveip videre til chattene dine.</translation>
+    </message>
+    <message>
+        <source>Whoever reads this code gets the profile. It stops collecting mail until the code is gone.</source>
+        <translation>Den som leser denne koden, får profilen. Så lenge koden er framme, henter den ikke post.</translation>
+    </message>
+    <message>
+        <source>Show code again</source>
+        <translation>Vis koden igjen</translation>
+    </message>
+    <message>
+        <source>Show code</source>
+        <translation>Vis koden</translation>
     </message>
 </context>
 <context>

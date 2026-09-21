@@ -984,6 +984,103 @@ async fn export_into(state: &Arc<Mutex<State>>, id: &Value, account: u32, folder
     ok(id, &Value::Null)
 }
 
+/// Offer a profile to a second device, the way the real core's
+/// `provide_backup` does: the call stays open until a device has taken
+/// the profile or the provider is stopped, and reports itself in
+/// `ImexProgress` events -- 1000 once a device has it, 0 when it is
+/// stopped. Only the transfer is reported, so a code sitting on screen
+/// with nobody reading it emits nothing at all.
+///
+/// Keyed on the account rather than on a string, because the call
+/// carries nothing else: `PIIRIT_FAKE_PROVIDE_FAIL` names the accounts
+/// it refuses outright, `PIIRIT_FAKE_TAKEN` the ones a device turns up
+/// for, `PIIRIT_FAKE_SLOW_MS` later, and `PIIRIT_FAKE_STALLED` the ones
+/// a device turns up for and then goes away again. Every other account
+/// waits to be stopped, which is a code left up on a page.
+async fn provide_backup(state: &Arc<Mutex<State>>, id: &Value, account: u32) -> Value {
+    if env_ids("PIIRIT_FAKE_PROVIDE_FAIL").contains(&u64::from(account)) {
+        return err(id, "backup could not be offered");
+    }
+    if !state.lock().await.configuring.insert(account) {
+        return err(id, "There is already another ongoing process running.");
+    }
+    let stalls = env_ids("PIIRIT_FAKE_STALLED").contains(&u64::from(account));
+    let taken = if stalls || env_ids("PIIRIT_FAKE_TAKEN").contains(&u64::from(account)) {
+        // A device turns up half a wait in, and the transfer has a
+        // middle: the bar the page draws has to have something to draw
+        // before the 1000 that ends it, and a test reading the page
+        // mid-transfer needs room on both sides of that.
+        let wait = delay_or("PIIRIT_FAKE_SLOW_MS", 3000);
+        tokio::time::sleep(wait / 2).await;
+        state.lock().await.imex(account, 300);
+        if stalls {
+            false
+        } else {
+            tokio::time::sleep(wait).await;
+            true
+        }
+    } else {
+        wait_for_stop(state, account).await;
+        false
+    };
+    let mut state = state.lock().await;
+    state.configuring.remove(&account);
+    state.stopped.remove(&account);
+    if !taken {
+        state.imex(account, 0);
+        // `Ok`, like the real core: a provider that was stopped, and one
+        // whose device went away, both end with the provider having
+        // finished and nothing to say about it. Only the progress above
+        // tells them from the 1000 below.
+        return ok(id, &Value::Null);
+    }
+    state.imex(account, 1000);
+    ok(id, &Value::Null)
+}
+
+/// Wait for a `stop_ongoing_process` on this account.
+///
+/// The real provider holds its call open for as long as the code is up,
+/// so this one does too rather than answering a page that is still
+/// showing a code. Bounded at half a minute so that a test which never
+/// stops it ends by itself instead of holding a request open until the
+/// process is killed.
+async fn wait_for_stop(state: &Arc<Mutex<State>>, account: u32) {
+    for _ in 0..600 {
+        if state.lock().await.stopped.contains(&account) {
+            return;
+        }
+        tokio::time::sleep(std::time::Duration::from_millis(50)).await;
+    }
+}
+
+/// The code a running provider shows, as the real core's
+/// `get_backup_qr` answers it: a `DCBACKUP5:` payload -- the transfer
+/// version the pinned core speaks -- that means nothing to anything but
+/// the core at the other end. Named for the account, so two profiles
+/// offered in turn do not show one code.
+///
+/// The real call blocks until the provider is ready and fails after a
+/// minute rather than deadlocking; this one waits for the provider to
+/// have started, in much less than a minute, and fails the accounts
+/// named in `PIIRIT_FAKE_NO_QR` outright -- which is a provider running
+/// behind a page with nothing on it to read.
+async fn backup_qr(state: &Arc<Mutex<State>>, id: &Value, account: u32) -> Value {
+    if env_ids("PIIRIT_FAKE_NO_QR").contains(&u64::from(account)) {
+        return err(id, "no backup provider is running");
+    }
+    for _ in 0..100 {
+        if state.lock().await.configuring.contains(&account) {
+            return ok(
+                id,
+                &json!(format!("DCBACKUP5:account{account}-example-org&fake")),
+            );
+        }
+        tokio::time::sleep(std::time::Duration::from_millis(50)).await;
+    }
+    err(id, "no backup provider is running")
+}
+
 /// A reply delay in milliseconds, from `var`, or `default` when unset.
 fn delay_or(var: &str, default: u64) -> std::time::Duration {
     std::time::Duration::from_millis(
@@ -1321,6 +1418,11 @@ async fn serve() {
                     let from = positional(1).as_str().unwrap_or_default().to_string();
                     import_into(&state, &id, account_id(), &from).await
                 }
+                // The other end of `get_backup`: this phone holding
+                // the profile and offering it to a device that reads
+                // the code it shows.
+                "provide_backup" => provide_backup(&state, &id, account_id()).await,
+                "get_backup_qr" => backup_qr(&state, &id, account_id()).await,
                 // The other direction: one profile written to a folder.
                 "export_backup" => {
                     let folder = positional(1).as_str().unwrap_or_default().to_string();

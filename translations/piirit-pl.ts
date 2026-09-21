@@ -1209,6 +1209,10 @@ Wiadomości innych grup z zablokowanymi kontaktami nadal będą wyświetlane.</t
         <source>Back up profile</source>
         <translation>Kopia zapasowa profilu</translation>
     </message>
+    <message>
+        <source>Add a second device</source>
+        <translation>Dodaj drugie urządzenie</translation>
+    </message>
 </context>
 <context>
     <name>QrPage</name>
@@ -1380,6 +1384,53 @@ Wiadomości innych grup z zablokowanymi kontaktami nadal będą wyświetlane.</t
     <message>
         <source>Nothing found</source>
         <translation>Nic nie znaleziono</translation>
+    </message>
+</context>
+<context>
+    <name>SecondDevicePage</name>
+    <message>
+        <source>Nothing took the profile. Both phones have to stay on one network, with this page open.</source>
+        <translation>Nikt nie wziął profilu. Oba telefony muszą zostać w jednej sieci, z tą stroną otwartą.</translation>
+    </message>
+    <message>
+        <source>Add a second device</source>
+        <translation>Dodaj drugie urządzenie</translation>
+    </message>
+    <message>
+        <source>On the other device: add a profile you have already, then &quot;Add as second device&quot;, and read this code with it. Both phones on one network.</source>
+        <translation>Na drugim urządzeniu: dodaj profil, który już masz, potem „Dodaj jako drugie urządzenie”, i odczytaj nim ten kod. Oba telefony w jednej sieci.</translation>
+    </message>
+    <message>
+        <source>Copy the code</source>
+        <translation>Kopiuj kod</translation>
+    </message>
+    <message>
+        <source>Handing the profile over...</source>
+        <translation>Przekazywanie profilu...</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Anuluj</translation>
+    </message>
+    <message>
+        <source>The other device has the profile. Both get everything new from now on.</source>
+        <translation>Drugie urządzenie ma profil. Od teraz oba dostają wszystko, co nowe.</translation>
+    </message>
+    <message>
+        <source>Swipe on for your chats.</source>
+        <translation>Przesuń dalej, do swoich czatów.</translation>
+    </message>
+    <message>
+        <source>Whoever reads this code gets the profile. It stops collecting mail until the code is gone.</source>
+        <translation>Kto odczyta ten kod, dostaje profil. Dopóki kod jest na ekranie, profil nie odbiera poczty.</translation>
+    </message>
+    <message>
+        <source>Show code again</source>
+        <translation>Pokaż kod jeszcze raz</translation>
+    </message>
+    <message>
+        <source>Show code</source>
+        <translation>Pokaż kod</translation>
     </message>
 </context>
 <context>

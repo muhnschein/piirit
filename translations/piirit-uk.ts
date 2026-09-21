@@ -1209,6 +1209,10 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Back up profile</source>
         <translation>Резервна копія профілю</translation>
     </message>
+    <message>
+        <source>Add a second device</source>
+        <translation>Додати другий пристрій</translation>
+    </message>
 </context>
 <context>
     <name>QrPage</name>
@@ -1380,6 +1384,53 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Nothing found</source>
         <translation>Нічого не знайдено</translation>
+    </message>
+</context>
+<context>
+    <name>SecondDevicePage</name>
+    <message>
+        <source>Nothing took the profile. Both phones have to stay on one network, with this page open.</source>
+        <translation>Профіль ніхто не забрав. Обидва телефони мають лишатися в одній мережі, з цією сторінкою відкритою.</translation>
+    </message>
+    <message>
+        <source>Add a second device</source>
+        <translation>Додати другий пристрій</translation>
+    </message>
+    <message>
+        <source>On the other device: add a profile you have already, then &quot;Add as second device&quot;, and read this code with it. Both phones on one network.</source>
+        <translation>На іншому пристрої: додайте профіль, який у вас уже є, потім «Додати як другий пристрій», і зчитайте ним цей код. Обидва телефони в одній мережі.</translation>
+    </message>
+    <message>
+        <source>Copy the code</source>
+        <translation>Копіювати код</translation>
+    </message>
+    <message>
+        <source>Handing the profile over...</source>
+        <translation>Профіль передається...</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Скасувати</translation>
+    </message>
+    <message>
+        <source>The other device has the profile. Both get everything new from now on.</source>
+        <translation>Профіль є й на іншому пристрої. Відтепер обидва отримують усе нове.</translation>
+    </message>
+    <message>
+        <source>Swipe on for your chats.</source>
+        <translation>Проведіть далі, до своїх чатів.</translation>
+    </message>
+    <message>
+        <source>Whoever reads this code gets the profile. It stops collecting mail until the code is gone.</source>
+        <translation>Хто зчитає цей код, той отримає профіль. Поки код на екрані, профіль не забирає пошту.</translation>
+    </message>
+    <message>
+        <source>Show code again</source>
+        <translation>Показати код знову</translation>
+    </message>
+    <message>
+        <source>Show code</source>
+        <translation>Показати код</translation>
     </message>
 </context>
 <context>

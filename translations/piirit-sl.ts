@@ -1215,6 +1215,10 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
         <source>Back up profile</source>
         <translation>Varnostna kopija profila</translation>
     </message>
+    <message>
+        <source>Add a second device</source>
+        <translation>Dodaj drugo napravo</translation>
+    </message>
 </context>
 <context>
     <name>QrPage</name>
@@ -1386,6 +1390,53 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
     <message>
         <source>Nothing found</source>
         <translation>Ni zadetkov</translation>
+    </message>
+</context>
+<context>
+    <name>SecondDevicePage</name>
+    <message>
+        <source>Nothing took the profile. Both phones have to stay on one network, with this page open.</source>
+        <translation>Profila ni nihče vzel. Oba telefona morata ostati v istem omrežju, s to stranjo odprto.</translation>
+    </message>
+    <message>
+        <source>Add a second device</source>
+        <translation>Dodaj drugo napravo</translation>
+    </message>
+    <message>
+        <source>On the other device: add a profile you have already, then &quot;Add as second device&quot;, and read this code with it. Both phones on one network.</source>
+        <translation>Na drugi napravi: dodaj profil, ki ga že imaš, nato „Dodaj kot drugo napravo“, in z njo preberi to kodo. Oba telefona v istem omrežju.</translation>
+    </message>
+    <message>
+        <source>Copy the code</source>
+        <translation>Kopiraj kodo</translation>
+    </message>
+    <message>
+        <source>Handing the profile over...</source>
+        <translation>Predajanje profila...</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Prekliči</translation>
+    </message>
+    <message>
+        <source>The other device has the profile. Both get everything new from now on.</source>
+        <translation>Druga naprava ima profil. Odslej dobita obe vse novo.</translation>
+    </message>
+    <message>
+        <source>Swipe on for your chats.</source>
+        <translation>Podrsaj naprej do svojih klepetov.</translation>
+    </message>
+    <message>
+        <source>Whoever reads this code gets the profile. It stops collecting mail until the code is gone.</source>
+        <translation>Kdor prebere to kodo, dobi profil. Dokler je koda na zaslonu, profil ne pobira pošte.</translation>
+    </message>
+    <message>
+        <source>Show code again</source>
+        <translation>Znova pokaži kodo</translation>
+    </message>
+    <message>
+        <source>Show code</source>
+        <translation>Pokaži kodo</translation>
     </message>
 </context>
 <context>

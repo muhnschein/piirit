@@ -1203,6 +1203,10 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
         <source>Back up profile</source>
         <translation>Profiili varundamine</translation>
     </message>
+    <message>
+        <source>Add a second device</source>
+        <translation>Lisa teine seade</translation>
+    </message>
 </context>
 <context>
     <name>QrPage</name>
@@ -1374,6 +1378,53 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
     <message>
         <source>Nothing found</source>
         <translation>Midagi ei leitud</translation>
+    </message>
+</context>
+<context>
+    <name>SecondDevicePage</name>
+    <message>
+        <source>Nothing took the profile. Both phones have to stay on one network, with this page open.</source>
+        <translation>Keegi ei võtnud profiili. Mõlemad telefonid peavad jääma samasse võrku, see leht lahti.</translation>
+    </message>
+    <message>
+        <source>Add a second device</source>
+        <translation>Lisa teine seade</translation>
+    </message>
+    <message>
+        <source>On the other device: add a profile you have already, then &quot;Add as second device&quot;, and read this code with it. Both phones on one network.</source>
+        <translation>Teises seadmes: lisa profiil, mis sul juba on, seejärel „Lisa teise seadmena“, ja loe selle koodi sellega. Mõlemad telefonid samas võrgus.</translation>
+    </message>
+    <message>
+        <source>Copy the code</source>
+        <translation>Kopeeri kood</translation>
+    </message>
+    <message>
+        <source>Handing the profile over...</source>
+        <translation>Profiili üle andmas...</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Loobu</translation>
+    </message>
+    <message>
+        <source>The other device has the profile. Both get everything new from now on.</source>
+        <translation>Teisel seadmel on profiil. Nüüdsest saavad mõlemad kõik uue.</translation>
+    </message>
+    <message>
+        <source>Swipe on for your chats.</source>
+        <translation>Libista edasi oma vestlustesse.</translation>
+    </message>
+    <message>
+        <source>Whoever reads this code gets the profile. It stops collecting mail until the code is gone.</source>
+        <translation>Kes selle koodi loeb, saab profiili. Seni kuni kood on väljas, ei võta profiil posti vastu.</translation>
+    </message>
+    <message>
+        <source>Show code again</source>
+        <translation>Näita koodi uuesti</translation>
+    </message>
+    <message>
+        <source>Show code</source>
+        <translation>Näita koodi</translation>
     </message>
 </context>
 <context>

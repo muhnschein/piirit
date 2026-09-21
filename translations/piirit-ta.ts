@@ -1199,6 +1199,10 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Back up profile</source>
         <translation>சுயவிவரக் காப்புப் பிரதி</translation>
     </message>
+    <message>
+        <source>Add a second device</source>
+        <translation>இரண்டாவது சாதனத்தைச் சேர்</translation>
+    </message>
 </context>
 <context>
     <name>QrPage</name>
@@ -1370,6 +1374,53 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Nothing found</source>
         <translation>எதுவும் கிடைக்கவில்லை</translation>
+    </message>
+</context>
+<context>
+    <name>SecondDevicePage</name>
+    <message>
+        <source>Nothing took the profile. Both phones have to stay on one network, with this page open.</source>
+        <translation>சுயவிவரத்தை யாரும் எடுக்கவில்லை. இரு தொலைபேசிகளும் ஒரே வலையமைப்பில் இருக்க வேண்டும், இந்தப் பக்கம் திறந்திருக்க வேண்டும்.</translation>
+    </message>
+    <message>
+        <source>Add a second device</source>
+        <translation>இரண்டாவது சாதனத்தைச் சேர்</translation>
+    </message>
+    <message>
+        <source>On the other device: add a profile you have already, then &quot;Add as second device&quot;, and read this code with it. Both phones on one network.</source>
+        <translation>மறு சாதனத்தில்: உங்களிடம் ஏற்கனவே உள்ள ஒரு சுயவிவரத்தைச் சேர்க்கவும், பிறகு “இரண்டாவது சாதனமாகச் சேர்”, அதைக் கொண்டு இந்தக் குறியீட்டைப் படிக்கவும். இரு தொலைபேசிகளும் ஒரே வலையமைப்பில்.</translation>
+    </message>
+    <message>
+        <source>Copy the code</source>
+        <translation>குறியீட்டை நகலெடு</translation>
+    </message>
+    <message>
+        <source>Handing the profile over...</source>
+        <translation>சுயவிவரம் ஒப்படைக்கப்படுகிறது...</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>ரத்துசெய்</translation>
+    </message>
+    <message>
+        <source>The other device has the profile. Both get everything new from now on.</source>
+        <translation>மறு சாதனத்திடம் சுயவிவரம் உள்ளது. இனி இரண்டும் புதியதெல்லாம் பெறும்.</translation>
+    </message>
+    <message>
+        <source>Swipe on for your chats.</source>
+        <translation>முன்னோக்கி இழுத்து உங்கள் உரையாடல்களுக்குச் செல்லுங்கள்.</translation>
+    </message>
+    <message>
+        <source>Whoever reads this code gets the profile. It stops collecting mail until the code is gone.</source>
+        <translation>இந்தக் குறியீட்டைப் படிப்பவருக்கே சுயவிவரம். குறியீடு இருக்கும் வரை அது அஞ்சலைப் பெறுவதை நிறுத்தி வைக்கும்.</translation>
+    </message>
+    <message>
+        <source>Show code again</source>
+        <translation>குறியீட்டை மீண்டும் காட்டு</translation>
+    </message>
+    <message>
+        <source>Show code</source>
+        <translation>குறியீட்டைக் காட்டு</translation>
     </message>
 </context>
 <context>

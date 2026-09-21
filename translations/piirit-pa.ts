@@ -1203,6 +1203,10 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Back up profile</source>
         <translation>ਪ੍ਰੋਫ਼ਾਈਲ ਦਾ ਬੈਕਅੱਪ</translation>
     </message>
+    <message>
+        <source>Add a second device</source>
+        <translation>ਦੂਜਾ ਜੰਤਰ ਸ਼ਾਮਲ ਕਰੋ</translation>
+    </message>
 </context>
 <context>
     <name>QrPage</name>
@@ -1374,6 +1378,53 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Nothing found</source>
         <translation>ਕੁਝ ਨਹੀਂ ਮਿਲਿਆ</translation>
+    </message>
+</context>
+<context>
+    <name>SecondDevicePage</name>
+    <message>
+        <source>Nothing took the profile. Both phones have to stay on one network, with this page open.</source>
+        <translation>ਪ੍ਰੋਫ਼ਾਈਲ ਕਿਸੇ ਨੇ ਨਹੀਂ ਲਈ। ਦੋਵੇਂ ਫ਼ੋਨ ਇੱਕੋ ਨੈੱਟਵਰਕ ਉੱਤੇ ਰਹਿਣੇ ਚਾਹੀਦੇ ਹਨ, ਇਹ ਸਫ਼ਾ ਖੁੱਲ੍ਹਾ ਰੱਖ ਕੇ।</translation>
+    </message>
+    <message>
+        <source>Add a second device</source>
+        <translation>ਦੂਜਾ ਜੰਤਰ ਸ਼ਾਮਲ ਕਰੋ</translation>
+    </message>
+    <message>
+        <source>On the other device: add a profile you have already, then &quot;Add as second device&quot;, and read this code with it. Both phones on one network.</source>
+        <translation>ਦੂਜੇ ਜੰਤਰ ਉੱਤੇ: ਜਿਹੜੀ ਪ੍ਰੋਫ਼ਾਈਲ ਤੁਹਾਡੇ ਕੋਲ ਪਹਿਲਾਂ ਹੀ ਹੈ ਉਹ ਸ਼ਾਮਲ ਕਰੋ, ਫਿਰ “ਦੂਜੇ ਜੰਤਰ ਵਜੋਂ ਸ਼ਾਮਲ ਕਰੋ”, ਤੇ ਉਸ ਨਾਲ ਇਹ ਕੋਡ ਪੜ੍ਹੋ। ਦੋਵੇਂ ਫ਼ੋਨ ਇੱਕੋ ਨੈੱਟਵਰਕ ਉੱਤੇ।</translation>
+    </message>
+    <message>
+        <source>Copy the code</source>
+        <translation>ਕੋਡ ਕਾਪੀ ਕਰੋ</translation>
+    </message>
+    <message>
+        <source>Handing the profile over...</source>
+        <translation>ਪ੍ਰੋਫ਼ਾਈਲ ਸੌਂਪੀ ਜਾ ਰਹੀ ਹੈ...</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>ਰੱਦ ਕਰੋ</translation>
+    </message>
+    <message>
+        <source>The other device has the profile. Both get everything new from now on.</source>
+        <translation>ਦੂਜੇ ਜੰਤਰ ਕੋਲ ਪ੍ਰੋਫ਼ਾਈਲ ਹੈ। ਹੁਣ ਤੋਂ ਦੋਵਾਂ ਨੂੰ ਸਭ ਨਵਾਂ ਮਿਲੇਗਾ।</translation>
+    </message>
+    <message>
+        <source>Swipe on for your chats.</source>
+        <translation>ਅੱਗੇ ਸਵਾਈਪ ਕਰ ਕੇ ਆਪਣੀਆਂ ਗੱਲਾਂ ਉੱਤੇ ਜਾਓ।</translation>
+    </message>
+    <message>
+        <source>Whoever reads this code gets the profile. It stops collecting mail until the code is gone.</source>
+        <translation>ਜਿਹੜਾ ਇਹ ਕੋਡ ਪੜ੍ਹੇ, ਪ੍ਰੋਫ਼ਾਈਲ ਉਸੇ ਦੀ। ਕੋਡ ਹਟਣ ਤੱਕ ਇਹ ਡਾਕ ਲੈਣੀ ਬੰਦ ਰੱਖਦੀ ਹੈ।</translation>
+    </message>
+    <message>
+        <source>Show code again</source>
+        <translation>ਕੋਡ ਮੁੜ ਵਿਖਾਓ</translation>
+    </message>
+    <message>
+        <source>Show code</source>
+        <translation>ਕੋਡ ਵਿਖਾਓ</translation>
     </message>
 </context>
 <context>

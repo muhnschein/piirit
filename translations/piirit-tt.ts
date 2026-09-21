@@ -1197,6 +1197,10 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Back up profile</source>
         <translation>Профильнең резерв күчермәсе</translation>
     </message>
+    <message>
+        <source>Add a second device</source>
+        <translation>Икенче җиһаз өстәргә</translation>
+    </message>
 </context>
 <context>
     <name>QrPage</name>
@@ -1368,6 +1372,53 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Nothing found</source>
         <translation>Бернәрсә дә табылмады</translation>
+    </message>
+</context>
+<context>
+    <name>SecondDevicePage</name>
+    <message>
+        <source>Nothing took the profile. Both phones have to stay on one network, with this page open.</source>
+        <translation>Профильне беркем дә алмады. Ике телефон да бер челтәрдә калырга тиеш, бу бит ачык килеш.</translation>
+    </message>
+    <message>
+        <source>Add a second device</source>
+        <translation>Икенче җиһаз өстәргә</translation>
+    </message>
+    <message>
+        <source>On the other device: add a profile you have already, then &quot;Add as second device&quot;, and read this code with it. Both phones on one network.</source>
+        <translation>Икенче җиһазда: инде булган профильне өстәгез, аннары «Икенче җиһаз итеп өстәргә», һәм аның белән бу кодны укыгыз. Ике телефон да бер челтәрдә.</translation>
+    </message>
+    <message>
+        <source>Copy the code</source>
+        <translation>Кодны күчереп алырга</translation>
+    </message>
+    <message>
+        <source>Handing the profile over...</source>
+        <translation>Профиль тапшырыла...</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Баш тартырга</translation>
+    </message>
+    <message>
+        <source>The other device has the profile. Both get everything new from now on.</source>
+        <translation>Профиль икенче җиһазда да бар. Хәзер икесе дә барлык яңалыкны ала.</translation>
+    </message>
+    <message>
+        <source>Swipe on for your chats.</source>
+        <translation>Сөйләшүләрегезгә таба сыпырыгыз.</translation>
+    </message>
+    <message>
+        <source>Whoever reads this code gets the profile. It stops collecting mail until the code is gone.</source>
+        <translation>Бу кодны кем укый — профиль шуныкы. Код күренеп торган арада профиль хат алмый.</translation>
+    </message>
+    <message>
+        <source>Show code again</source>
+        <translation>Кодны яңадан күрсәтергә</translation>
+    </message>
+    <message>
+        <source>Show code</source>
+        <translation>Кодны күрсәтергә</translation>
     </message>
 </context>
 <context>

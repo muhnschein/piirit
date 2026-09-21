@@ -1209,6 +1209,10 @@ Správy od zablokovaných kontaktov v ostatných skupinách sa budú naďalej zo
         <source>Back up profile</source>
         <translation>Záloha profilu</translation>
     </message>
+    <message>
+        <source>Add a second device</source>
+        <translation>Pridať druhé zariadenie</translation>
+    </message>
 </context>
 <context>
     <name>QrPage</name>
@@ -1380,6 +1384,53 @@ Správy od zablokovaných kontaktov v ostatných skupinách sa budú naďalej zo
     <message>
         <source>Nothing found</source>
         <translation>Nič sa nenašlo</translation>
+    </message>
+</context>
+<context>
+    <name>SecondDevicePage</name>
+    <message>
+        <source>Nothing took the profile. Both phones have to stay on one network, with this page open.</source>
+        <translation>Profil si nikto nevzal. Oba telefóny musia zostať v jednej sieti a táto stránka otvorená.</translation>
+    </message>
+    <message>
+        <source>Add a second device</source>
+        <translation>Pridať druhé zariadenie</translation>
+    </message>
+    <message>
+        <source>On the other device: add a profile you have already, then &quot;Add as second device&quot;, and read this code with it. Both phones on one network.</source>
+        <translation>Na druhom zariadení: pridaj profil, ktorý už máš, potom „Pridať ako druhé zariadenie“, a načítaj ním tento kód. Oba telefóny v jednej sieti.</translation>
+    </message>
+    <message>
+        <source>Copy the code</source>
+        <translation>Kopírovať kód</translation>
+    </message>
+    <message>
+        <source>Handing the profile over...</source>
+        <translation>Odovzdávam profil...</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Zrušiť</translation>
+    </message>
+    <message>
+        <source>The other device has the profile. Both get everything new from now on.</source>
+        <translation>Druhé zariadenie má profil. Odteraz dostanú obe všetko nové.</translation>
+    </message>
+    <message>
+        <source>Swipe on for your chats.</source>
+        <translation>Potiahni ďalej na svoje chaty.</translation>
+    </message>
+    <message>
+        <source>Whoever reads this code gets the profile. It stops collecting mail until the code is gone.</source>
+        <translation>Kto načíta tento kód, má profil. Kým je kód na obrazovke, profil nevyberá poštu.</translation>
+    </message>
+    <message>
+        <source>Show code again</source>
+        <translation>Ukázať kód znova</translation>
+    </message>
+    <message>
+        <source>Show code</source>
+        <translation>Ukázať kód</translation>
     </message>
 </context>
 <context>
