@@ -182,6 +182,14 @@ impl Attempt {
         self.id
     }
 
+    /// Hold `account_id` now, on the caller's thread, before a task is
+    /// spawned for it. Held only inside the task, the account was not
+    /// there yet for a cancel that came in the same turn, and the core's
+    /// process on it was never stopped.
+    pub(crate) fn hold(&self, account_id: u32) {
+        self.shared.busy().insert(account_id);
+    }
+
     /// Do the work: an account, the name, the transport -- the last
     /// within the deadline.
     pub(crate) async fn run(
@@ -222,7 +230,7 @@ impl Attempt {
         account_id: u32,
         transport: Transport,
     ) -> Outcome {
-        self.shared.busy().insert(account_id);
+        self.hold(account_id);
         self.transport_within_deadline(runtime, rpc, account_id, transport, Made::Before)
             .await
     }
@@ -531,5 +539,14 @@ mod tests {
         assert_eq!(attempts.busy().len(), 2);
         attempts.release(7);
         assert_eq!(attempts.busy().iter().copied().collect::<Vec<_>>(), vec![3]);
+    }
+
+    #[test]
+    fn an_account_held_before_its_task_runs_is_named_by_a_cancel() {
+        let attempts = Arc::new(Attempts::default());
+        let attempt = attempts.begin(DEADLINE);
+        attempt.hold(1);
+        // No task has run yet: the cancel still finds the account.
+        assert_eq!(attempts.cancel(), vec![1]);
     }
 }
