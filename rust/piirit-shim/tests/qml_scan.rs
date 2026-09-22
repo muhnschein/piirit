@@ -15,8 +15,7 @@
 
 // Qt harness: needs `unsafe` for `env::set_var` before Qt starts
 // (`unused_unsafe` because it is only unsafe from edition 2024 on),
-// `borrow_as_ptr` for the engine pointer, and `single_shot` with
-// whole-second Durations.
+// `borrow_as_ptr` for the engine pointer, and `single_shot`.
 #![allow(
     unsafe_code,
     unused_unsafe,
@@ -29,7 +28,7 @@
 )]
 
 use std::path::Path;
-use std::time::Duration;
+use std::time::{Duration, Instant};
 
 use qmetaobject::*;
 
@@ -127,6 +126,28 @@ const PROBE_QML: &str = r"
         function heardText() { return heard }
     }
 ";
+
+/// Run `then` once `idle` says so, asking every 100 ms, and at
+/// `deadline` whatever it says. A step that reads what an asynchronous
+/// call left behind waits on the call, not on a guess of how long it
+/// takes: two seconds was such a guess, and under coverage
+/// instrumentation the decoder outran it.
+fn when_idle<I, T>(idle: I, deadline: Instant, then: T)
+where
+    I: Fn() -> bool + 'static,
+    T: FnOnce() + 'static,
+{
+    if idle() || Instant::now() >= deadline {
+        then();
+        return;
+    }
+    let mut pending = Some((idle, then));
+    single_shot(Duration::from_millis(100), move || {
+        if let Some((idle, then)) = pending.take() {
+            when_idle(idle, deadline, then);
+        }
+    });
+}
 
 /// The modules as the page's `QrCode` reports them, drawn into a P5 PGM
 /// with a quiet zone, each module four pixels: what Qt writes for a
@@ -239,60 +260,67 @@ fn a_code_held_up_to_the_page_comes_back_as_its_text() {
         record!("busy", get!("scanner", "busy"));
     });
 
-    single_shot(Duration::from_secs(3), move || unsafe {
-        record!("heard", call!("heardText"));
-        record!("camera-after", get!("camera", "running"));
-        record!("grabbing-after", get!("grabber", "running"));
-        record!("focusing-after", get!("refocus", "running"));
-        record!("acting-after", get!("acting", "running"));
-        // The first search ran as soon as the view came on screen, on
-        // the event loop turn after it did.
-        record!("searches", get!("camera", "searches"));
-        // The other way in, on a fresh view: a link typed rather than
-        // scanned, with the clipboard offering it first.
-        record!(
-            "reload",
-            call!("load", QString::from(common::component_url("ScanView.qml")))
+    // Once the decode is over: read while it runs, `heard` is empty.
+    single_shot(Duration::from_secs(3), move || {
+        when_idle(
+            move || unsafe { get!("scanner", "busy") } != "true",
+            Instant::now() + Duration::from_secs(20),
+            move || unsafe {
+                record!("heard", call!("heardText"));
+                record!("camera-after", get!("camera", "running"));
+                record!("grabbing-after", get!("grabber", "running"));
+                record!("focusing-after", get!("refocus", "running"));
+                record!("acting-after", get!("acting", "running"));
+                // The first search ran as soon as the view came on screen, on
+                // the event loop turn after it did.
+                record!("searches", get!("camera", "searches"));
+                // The other way in, on a fresh view: a link typed rather than
+                // scanned, with the clipboard offering it first.
+                record!(
+                    "reload",
+                    call!("load", QString::from(common::component_url("ScanView.qml")))
+                );
+                call!("setActive", true);
+                record!("panel-before", get!("linkPanel", "visible"));
+                record!(
+                    "shopping",
+                    call!("setClipboard", QString::from("milk, eggs"))
+                );
+                record!("open", call!("click", QString::from("typeLinkButton")));
+                record!("panel-open", get!("linkPanel", "visible"));
+                record!("not-pasted", get!("linkField", "text"));
+                record!(
+                    "reload-again",
+                    call!("load", QString::from(common::component_url("ScanView.qml")))
+                );
+                call!("setActive", true);
+                record!("copied", call!("setClipboard", QString::from(TYPED)));
+                record!(
+                    "open-again",
+                    call!("click", QString::from("typeLinkButton"))
+                );
+                record!("pasted", get!("linkField", "text"));
+                record!("connect", call!("click", QString::from("followButton")));
+                record!("typed-heard", call!("heardText"));
+                record!("typed-camera", get!("camera", "running"));
+                record!("typed-acting", get!("acting", "running"));
+                // A frame is grabbed in the viewfinder's own shape, with its
+                // long side capped, and a viewfinder smaller than the cap is
+                // taken as it is rather than blown up.
+                call!("sizeView", QString::from("1080"), QString::from("1920"));
+                record!("grab-tall", call!("grabShape"));
+                call!("sizeView", QString::from("1920"), QString::from("1080"));
+                record!("grab-wide", call!("grabShape"));
+                call!("sizeView", QString::from("540"), QString::from("800"));
+                record!("grab-small", call!("grabShape"));
+                // The camera was asked for a viewfinder big enough to read a
+                // dense code out of, and is left alone when it offers nothing.
+                record!("asked", call!("askedResolution"));
+                record!("offer-nothing", call!("offerNothing"));
+                record!("asked-after", call!("askedResolution"));
+                (*engine_ptr).quit();
+            },
         );
-        call!("setActive", true);
-        record!("panel-before", get!("linkPanel", "visible"));
-        record!(
-            "shopping",
-            call!("setClipboard", QString::from("milk, eggs"))
-        );
-        record!("open", call!("click", QString::from("typeLinkButton")));
-        record!("panel-open", get!("linkPanel", "visible"));
-        record!("not-pasted", get!("linkField", "text"));
-        record!(
-            "reload-again",
-            call!("load", QString::from(common::component_url("ScanView.qml")))
-        );
-        call!("setActive", true);
-        record!("copied", call!("setClipboard", QString::from(TYPED)));
-        record!(
-            "open-again",
-            call!("click", QString::from("typeLinkButton"))
-        );
-        record!("pasted", get!("linkField", "text"));
-        record!("connect", call!("click", QString::from("followButton")));
-        record!("typed-heard", call!("heardText"));
-        record!("typed-camera", get!("camera", "running"));
-        record!("typed-acting", get!("acting", "running"));
-        // A frame is grabbed in the viewfinder's own shape, with its
-        // long side capped, and a viewfinder smaller than the cap is
-        // taken as it is rather than blown up.
-        call!("sizeView", QString::from("1080"), QString::from("1920"));
-        record!("grab-tall", call!("grabShape"));
-        call!("sizeView", QString::from("1920"), QString::from("1080"));
-        record!("grab-wide", call!("grabShape"));
-        call!("sizeView", QString::from("540"), QString::from("800"));
-        record!("grab-small", call!("grabShape"));
-        // The camera was asked for a viewfinder big enough to read a
-        // dense code out of, and is left alone when it offers nothing.
-        record!("asked", call!("askedResolution"));
-        record!("offer-nothing", call!("offerNothing"));
-        record!("asked-after", call!("askedResolution"));
-        (*engine_ptr).quit();
     });
 
     engine.exec();
