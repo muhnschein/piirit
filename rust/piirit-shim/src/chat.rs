@@ -14,7 +14,7 @@ use qmetaobject::*;
 use crate::core::connection;
 use crate::json;
 use crate::models::{MessageListItem, MessageListModel};
-use crate::{links, markdown, media, truncation, webxdc};
+use crate::{links, markdown, media, webxdc};
 
 /// `DC_STATE_IN_FRESH` and `DC_STATE_IN_NOTICED`: an incoming message the
 /// account has not read yet.
@@ -277,12 +277,6 @@ pub struct ChatMessages {
     /// Fetch the rest of a message the core holds only the header of.
     /// The core announces the result as a change to the message.
     pub download_full: qt_method!(fn(&mut self, message_id: u32)),
-
-    /// Whether the core would cut `text` on the way out and send the
-    /// rest as an HTML part, so the conversation can say so while it is
-    /// still being written. Nothing is sent differently on account of
-    /// the answer; see `truncation.rs`.
-    pub would_truncate: qt_method!(fn(&self, text: QString) -> bool),
 
     /// Send a plain-text message to this chat.
     pub send: qt_method!(fn(&mut self, text: QString)),
@@ -1561,11 +1555,6 @@ impl ChatMessages {
         runtime.spawn(async move {
             done(act_on_message(&rpc, method, account_id, message_id).await);
         });
-    }
-
-    /// Whether the core would cut this text on the way out.
-    pub fn would_truncate(&self, text: QString) -> bool {
-        truncation::would_be_cut(&text.to_string())
     }
 
     /// Send a plain-text message.

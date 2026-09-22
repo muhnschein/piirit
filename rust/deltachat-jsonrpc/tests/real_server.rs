@@ -879,11 +879,10 @@ async fn offline_round_trip_against_real_core() {
 
     // A long message is not sent whole: the core cuts the body and puts
     // the rest in an HTML part, and everything the app does about that
-    // -- the notice while it is being written, the "view full message"
-    // on the row, the page that shows it -- rests on this being true and
-    // on `hasHtml` being how it is announced. The rule the notice uses
-    // is 38 lines of up to 100 characters (`truncation.rs`), so fifty
-    // lines is well past it.
+    // -- the "view full message" on the row, the page that shows it --
+    // rests on this being true and on `hasHtml` being how it is
+    // announced. The core cuts at 38 lines of up to 100 characters, so
+    // fifty lines is well past it.
     let mut long_body = String::new();
     for number in 1..=50 {
         use std::fmt::Write as _;
