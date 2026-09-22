@@ -51,8 +51,8 @@
         <translation>Piirit ફક્ત chatmail રિલે સાથે જ કામ કરે છે. આ ખાસ પ્રકારના ઈ-મેઇલ સર્વર છે; સામાન્ય ઈ-મેઇલ સર્વર સપોર્ટેડ નથી. વધુ માહિતી માટે જુઓ &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. જાહેર, મફત chatmail રિલેની પૂરી યાદી &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; પર છે.</translation>
     </message>
     <message>
-        <source>Pick a name and a relay. That&apos;s it! There is nothing else to set up.</source>
-        <translation>એક નામ અને એક રિલે પસંદ કરો. બસ! બીજું કંઈ સેટ કરવાનું નથી.</translation>
+        <source>Choose a name and a relay. Nothing else is needed.</source>
+        <translation>એક નામ અને એક રિલે પસંદ કરો. આ સિવાય બીજું કશું જરૂરી નથી.</translation>
     </message>
 </context>
 <context>
@@ -66,24 +66,12 @@
         <translation>પ્રોફાઇલ બનાવો</translation>
     </message>
     <message>
-        <source>A new address on a chatmail relay.</source>
-        <translation>કોઈ ચેટમેલ રિલે પર નવું સરનામું.</translation>
-    </message>
-    <message>
         <source>Restore from a backup</source>
         <translation>બેકઅપમાંથી પુનઃસ્થાપિત કરો</translation>
     </message>
     <message>
-        <source>A backup file copied onto this phone.</source>
-        <translation>આ ફોન પર કૉપિ કરેલી બેકઅપ ફાઇલ.</translation>
-    </message>
-    <message>
         <source>Add as second device</source>
         <translation>બીજા ઉપકરણ તરીકે ઉમેરો</translation>
-    </message>
-    <message>
-        <source>The other device keeps it. Both get everything new.</source>
-        <translation>બીજું ઉપકરણ એને રાખે છે. બંનેને બધું નવું મળે છે.</translation>
     </message>
 </context>
 <context>
@@ -97,24 +85,12 @@
         <translation>રિલે ઉમેરો</translation>
     </message>
     <message>
-        <source>Another address for this profile, on another relay. The profile sends from one relay at a time; its page says which, and lets you change it.</source>
-        <translation>આ પ્રોફાઇલ માટે બીજા રિલે પર બીજું સરનામું. પ્રોફાઇલ એક સમયે એક જ રિલે પરથી મોકલે છે; તેનું પાનું કયો છે તે બતાવે છે અને બદલવા દે છે.</translation>
-    </message>
-    <message>
         <source>Add relay</source>
         <translation>રિલે ઉમેરો</translation>
     </message>
     <message>
-        <source>Contacting %1...</source>
-        <translation>%1 નો સંપર્ક કરવામાં આવે છે...</translation>
-    </message>
-    <message>
         <source>Cancel</source>
         <translation>રદ કરો</translation>
-    </message>
-    <message>
-        <source>Relays are run by volunteers. Try another one.</source>
-        <translation>રિલે સ્વયંસેવકો ચલાવે છે. બીજું અજમાવો.</translation>
     </message>
     <message>
         <source>Select a public chatmail relay</source>
@@ -127,6 +103,18 @@
     <message>
         <source>Piirit works only with chatmail relays. These are a particular kind of e-mail server; ordinary e-mail servers are not supported. For more, see &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. A full list of public, free-to-use chatmail relays is at &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</source>
         <translation>Piirit ફક્ત chatmail રિલે સાથે જ કામ કરે છે. આ ખાસ પ્રકારના ઈ-મેઇલ સર્વર છે; સામાન્ય ઈ-મેઇલ સર્વર સપોર્ટેડ નથી. વધુ માહિતી માટે જુઓ &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. જાહેર, મફત chatmail રિલેની પૂરી યાદી &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; પર છે.</translation>
+    </message>
+    <message>
+        <source>Adds another address for this profile on a second relay. The profile sends from one relay at a time; you can change which one on the profile page.</source>
+        <translation>આ પ્રોફાઇલ માટે બીજા રિલે પર વધુ એક સરનામું ઉમેરે છે. પ્રોફાઇલ એક સમયે એક જ રિલે મારફતે મોકલે છે; કયું, તે પ્રોફાઇલ પાના પર બદલી શકાય છે.</translation>
+    </message>
+    <message>
+        <source>Contacting %1…</source>
+        <translation>%1 નો સંપર્ક કરવામાં આવે છે…</translation>
+    </message>
+    <message>
+        <source>Could not reach the relay. Try another one.</source>
+        <translation>રિલે સુધી પહોંચી શકાયું નહીં. બીજું અજમાવો.</translation>
     </message>
 </context>
 <context>
@@ -159,14 +147,6 @@
         <source>Cancel</source>
         <translation>રદ કરો</translation>
     </message>
-    <message numerus="yes">
-        <source>%n message(s) will be deleted now, and from then on every message will be once it is that old.</source>
-        <extracomment>%n is how many messages would be deleted straight away.</extracomment>
-        <translation>
-            <numerusform>%n સંદેશ હમણાં કાઢી નાખવામાં આવશે, અને ત્યારપછી દરેક સંદેશ એટલો જૂનો થાય કે તરત.</numerusform>
-            <numerusform>%n સંદેશ હમણાં કાઢી નાખવામાં આવશે, અને ત્યારપછી દરેક સંદેશ એટલો જૂનો થાય કે તરત.</numerusform>
-        </translation>
-    </message>
     <message>
         <source>This includes pictures, videos and files.</source>
         <translation>આમાં ચિત્રો, વિડિઓ અને ફાઇલો શામેલ છે.</translation>
@@ -184,20 +164,20 @@
         <source>I understand, delete all these messages</source>
         <translation>હું સમજું છું, આ બધા સંદેશ કાઢી નાખો</translation>
     </message>
+    <message numerus="yes">
+        <source>%n message(s) will be deleted now, and every new message will be deleted once it reaches that age.</source>
+        <extracomment>%n is how many messages would be deleted straight away.</extracomment>
+        <translation>
+            <numerusform>%n સંદેશ હમણાં કાઢી નાખવામાં આવશે, અને દરેક નવો સંદેશ તે ઉંમરે પહોંચતાં જ કાઢી નાખવામાં આવશે.</numerusform>
+            <numerusform>%n સંદેશા હમણાં કાઢી નાખવામાં આવશે, અને દરેક નવો સંદેશ તે ઉંમરે પહોંચતાં જ કાઢી નાખવામાં આવશે.</numerusform>
+        </translation>
+    </message>
 </context>
 <context>
     <name>BackupPage</name>
     <message>
         <source>Back up profile</source>
         <translation>પ્રોફાઇલનો બેકઅપ</translation>
-    </message>
-    <message>
-        <source>Write the backup</source>
-        <translation>બેકઅપ લખો</translation>
-    </message>
-    <message>
-        <source>Writing the backup...</source>
-        <translation>બેકઅપ લખાઈ રહ્યો છે...</translation>
     </message>
     <message>
         <source>Cancel</source>
@@ -209,12 +189,20 @@
         <translation>%1 માં સાચવ્યું</translation>
     </message>
     <message>
-        <source>Messages, contacts and key in one file, saved to Documents. Whoever has the file has the profile.</source>
-        <translation>સંદેશા, સંપર્કો અને ચાવી એક જ ફાઇલમાં, દસ્તાવેજોમાં સાચવેલી. જેની પાસે ફાઇલ, તેની પાસે પ્રોફાઇલ.</translation>
-    </message>
-    <message>
         <source>Swipe on for your chats.</source>
         <translation>આગળ સ્વાઇપ કરીને તમારી ચેટ પર જાઓ.</translation>
+    </message>
+    <message>
+        <source>Start backup</source>
+        <translation>બૅકઅપ શરૂ કરો</translation>
+    </message>
+    <message>
+        <source>Backing up…</source>
+        <translation>બૅકઅપ લેવાઈ રહ્યું છે…</translation>
+    </message>
+    <message>
+        <source>Saves your messages, contacts and end-to-end encryption setup to a backup file. Keep this file in a safe place.</source>
+        <translation>તમારા સંદેશા, સંપર્કો અને એન્ડ-ટુ-એન્ડ એન્ક્રિપ્શન સેટઅપને એક બૅકઅપ ફાઇલમાં સાચવે છે. આ ફાઇલ સુરક્ષિત જગ્યાએ રાખો.</translation>
     </message>
 </context>
 <context>
@@ -292,10 +280,6 @@ Other groups with blocked contacts will still show their messages.</source>
 </context>
 <context>
     <name>ChatListPage</name>
-    <message>
-        <source>Lost the connection to the Delta Chat core. Reconnecting...</source>
-        <translation>Delta Chat કોર સાથે જોડાણ તૂટી ગયું. ફરી જોડાઈ રહ્યું છે...</translation>
-    </message>
     <message>
         <source>Lost the connection to the Delta Chat core. Restart Piirit.</source>
         <translation>Delta Chat કોર સાથે જોડાણ તૂટી ગયું. Piirit ફરી શરૂ કરો.</translation>
@@ -404,6 +388,10 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Search</source>
         <translation>શોધો</translation>
+    </message>
+    <message>
+        <source>Lost the connection to the Delta Chat core. Reconnecting…</source>
+        <translation>Delta Chat કોર સાથે જોડાણ તૂટી ગયું. ફરી જોડાઈ રહ્યું છે…</translation>
     </message>
 </context>
 <context>
@@ -534,10 +522,6 @@ Other groups with blocked contacts will still show their messages.</source>
 <context>
     <name>ConversationPage</name>
     <message>
-        <source>Lost the connection to the Delta Chat core. Reconnecting...</source>
-        <translation>Delta Chat કોર સાથે જોડાણ તૂટી ગયું. ફરી જોડાઈ રહ્યું છે...</translation>
-    </message>
-    <message>
         <source>Lost the connection to the Delta Chat core. Restart Piirit.</source>
         <translation>Delta Chat કોર સાથે જોડાણ તૂટી ગયું. Piirit ફરી શરૂ કરો.</translation>
     </message>
@@ -557,11 +541,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Message</source>
         <translation>સંદેશ</translation>
-    </message>
-    <message>
-        <source>Long message: the other end sees a preview and taps to read the rest</source>
-        <extracomment>Shown above the message field while what is being written is long enough that the other end will receive a shortened version with the rest behind a tap.</extracomment>
-        <translation>લાંબો સંદેશ: સામેની બાજુ ઝલક દેખાય છે અને બાકીનું વાંચવા ટૅપ કરવું પડે છે</translation>
     </message>
     <message>
         <source>Saved to Pictures</source>
@@ -584,9 +563,13 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>ડાઉનલોડ્સમાં સાચવ્યું</translation>
     </message>
     <message>
-        <source>Too big to send: %1. Attachments go up to %2.</source>
+        <source>Lost the connection to the Delta Chat core. Reconnecting…</source>
+        <translation>Delta Chat કોર સાથે જોડાણ તૂટી ગયું. ફરી જોડાઈ રહ્યું છે…</translation>
+    </message>
+    <message>
+        <source>%1 is too large to send. Attachments can be up to %2.</source>
         <extracomment>Shown above the message field when the attached file is bigger than will be sent. %1 is the file&apos;s size and %2 the largest that goes, each such as &quot;24 MB&quot;.</extracomment>
-        <translation>મોકલવા માટે ઘણું મોટું: %1. જોડાણો વધુમાં વધુ %2 સુધીના હોઈ શકે.</translation>
+        <translation>%1 મોકલવા માટે ઘણું મોટું છે. જોડાણો %2 સુધીનાં હોઈ શકે છે.</translation>
     </message>
 </context>
 <context>
@@ -624,14 +607,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>How do you want to delete this message? This cannot be undone.</source>
         <translation>તમે આ સંદેશ કેવી રીતે કાઢી નાખવા માંગો છો? આ પાછું લઈ શકાતું નથી.</translation>
-    </message>
-    <message>
-        <source>It goes from your devices. Everybody else keeps their copy.</source>
-        <translation>તે તમારાં ઉપકરણોમાંથી જતો રહે છે. બાકીના બધા પોતાની નકલ રાખે છે.</translation>
-    </message>
-    <message>
-        <source>It goes from your devices, and every other device in this chat is asked to delete it too.</source>
-        <translation>તે તમારાં ઉપકરણોમાંથી જતો રહે છે, અને આ ચેટના બીજા દરેક ઉપકરણને પણ તેને કાઢી નાખવા કહેવામાં આવે છે.</translation>
     </message>
 </context>
 <context>
@@ -693,8 +668,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>%1 સેકન્ડ પછી</translation>
     </message>
     <message>
-        <source>Applies to everyone in the chat. They can still copy and forward.</source>
-        <translation>ચેટમાંના બધા માટે લાગુ. તેઓ તોય કૉપિ અને ફોરવર્ડ કરી શકે છે.</translation>
+        <source>Applies to all members of this chat; they can still copy, save, and forward messages.</source>
+        <translation>આ વાતચીતના બધા સભ્યોને લાગુ પડે છે; તેઓ હજી પણ સંદેશા નકલ, સાચવી અને આગળ મોકલી શકે છે.</translation>
     </message>
 </context>
 <context>
@@ -710,14 +685,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Restore from a backup</source>
         <translation>બેકઅપમાંથી પુનઃસ્થાપિત કરો</translation>
-    </message>
-    <message>
-        <source>The other device keeps it. Both get everything new.</source>
-        <translation>બીજું ઉપકરણ એને રાખે છે. બંનેને બધું નવું મળે છે.</translation>
-    </message>
-    <message>
-        <source>A backup file copied onto this phone.</source>
-        <translation>આ ફોન પર કૉપિ કરેલી બેકઅપ ફાઇલ.</translation>
     </message>
 </context>
 <context>
@@ -802,14 +769,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>તમને કોણ સંપર્ક કરી શકે તે તમે નક્કી કરો છો</translation>
     </message>
     <message>
-        <source>Groups of equals</source>
-        <translation>સમાન હકવાળા જૂથ</translation>
-    </message>
-    <message>
-        <source>The server only passes it on</source>
-        <translation>સર્વર માત્ર આગળ પહોંચાડે છે</translation>
-    </message>
-    <message>
         <source>Keep swiping to set up your profile.</source>
         <translation>પ્રોફાઇલ સેટ કરવા માટે સ્વાઇપ કરતા રહો.</translation>
     </message>
@@ -818,24 +777,32 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>દરેક સંદેશ એન્ક્રિપ્ટ થયેલો છે</translation>
     </message>
     <message>
-        <source>Made here on your phone. No phone number, no account, nothing to sign.</source>
-        <translation>અહીં જ, તમારા ફોન પર બને છે. ફોન નંબર નહીં, ખાતું નહીં, સહી કરવાનું કંઈ નહીં.</translation>
+        <source>Your profile is created on this phone. No phone number and no sign-up are needed.</source>
+        <translation>તમારી પ્રોફાઇલ આ જ ફોન પર બને છે. ન તો ફોન નંબર જોઈએ, ન નોંધણી.</translation>
     </message>
     <message>
-        <source>There is no directory to be found in. Show a friend a code, or send a link.</source>
-        <translation>તમને શોધી શકાય એવી કોઈ યાદી નથી. મિત્રને કોડ બતાવો, કે લિંક મોકલો.</translation>
+        <source>There is no public directory. People reach you by scanning your invite code or opening your invite link.</source>
+        <translation>કોઈ જાહેર નિર્દેશિકા નથી. લોકો તમારો આમંત્રણ કોડ સ્કૅન કરીને કે તમારી આમંત્રણ લિંક ખોલીને તમારા સુધી પહોંચે છે.</translation>
     </message>
     <message>
-        <source>Encrypted the whole way, always. The servers cannot read a word.</source>
-        <translation>હંમેશાં આખા રસ્તે એન્ક્રિપ્ટેડ. સર્વર એક શબ્દ પણ વાંચતા નથી.</translation>
+        <source>Any member can add people, rename the group or leave it.</source>
+        <translation>કોઈ પણ સભ્ય લોકોને ઉમેરી શકે, જૂથનું નામ બદલી શકે કે જૂથ છોડી શકે.</translation>
     </message>
     <message>
-        <source>Anyone can add a friend, rename the group or leave. Nobody is in charge.</source>
-        <translation>કોઈ પણ મિત્રને ઉમેરી શકે, સમૂહનું નામ બદલી શકે કે નીકળી શકે. કોઈ માલિક નથી.</translation>
+        <source>Messages are end-to-end encrypted, so the relays that carry them cannot read them.</source>
+        <translation>સંદેશા એન્ડ-ટુ-એન્ડ એન્ક્રિપ્ટેડ હોય છે, તેથી તેમને વહન કરતા રિલે તેમને વાંચી શકતા નથી.</translation>
     </message>
     <message>
-        <source>It holds a message until the other phone is online, and nothing more.</source>
-        <translation>બીજો ફોન ઑનલાઇન ન થાય ત્યાં સુધી એ સંદેશ રાખે છે, એથી વધુ કંઈ નહીં.</translation>
+        <source>Groups have no admins</source>
+        <translation>જૂથોમાં કોઈ સંચાલક નથી</translation>
+    </message>
+    <message>
+        <source>Relays only pass messages on</source>
+        <translation>રિલે ફક્ત સંદેશા આગળ પહોંચાડે છે</translation>
+    </message>
+    <message>
+        <source>A relay stores a message only until the recipient fetches it.</source>
+        <translation>રિલે સંદેશ ફક્ત ત્યાં સુધી રાખે છે જ્યાં સુધી પ્રાપ્તકર્તા તેને લઈ ન લે.</translation>
     </message>
 </context>
 <context>
@@ -966,12 +933,12 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>હજી કોઈ સંપર્ક નથી</translation>
     </message>
     <message>
-        <source>Scan someone&apos;s invite from the chat list: QR code</source>
-        <translation>ચેટ સૂચિમાંથી કોઈનું આમંત્રણ સ્કૅન કરો: QR કોડ</translation>
-    </message>
-    <message>
         <source>Search</source>
         <translation>શોધો</translation>
+    </message>
+    <message>
+        <source>Use &quot;QR code&quot; in the chat list to add a contact.</source>
+        <translation>સંપર્ક ઉમેરવા માટે વાતચીત યાદીમાં &quot;QR કોડ&quot; વાપરો.</translation>
     </message>
 </context>
 <context>
@@ -979,10 +946,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Please name the group</source>
         <translation>કૃપા કરીને જૂથને નામ આપો</translation>
-    </message>
-    <message>
-        <source>Create Group</source>
-        <translation>જૂથ બનાવો</translation>
     </message>
     <message>
         <source>New group</source>
@@ -1015,6 +978,10 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Add members</source>
         <translation>સભ્યો ઉમેરો</translation>
+    </message>
+    <message>
+        <source>Create group</source>
+        <translation>જૂથ બનાવો</translation>
     </message>
 </context>
 <context>
@@ -1087,10 +1054,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>રિલેએ હજી તેનો ક્વોટા જણાવ્યો નથી</translation>
     </message>
     <message>
-        <source>Both ways: with this off you send none and see none.</source>
-        <translation>બંને બાજુ: બંધ હોય તો તમે એકેય મોકલતા નથી અને એકેય જોતા નથી.</translation>
-    </message>
-    <message>
         <source>Relays</source>
         <translation>રિલે</translation>
     </message>
@@ -1125,16 +1088,16 @@ Other groups with blocked contacts will still show their messages.</source>
         <extracomment>How much room the profile takes on the phone. %1 is a size such as &quot;12.3 MB&quot;.</extracomment>
         <translation>Piirit આ ફોન પર %1 સ્ટોરેજ વાપરે છે.</translation>
     </message>
+    <message>
+        <source>If read receipts are disabled, you won&apos;t be able to see read receipts from others.</source>
+        <translation>વાંચ્યાની પહોંચ બંધ હોય તો તમે બીજાઓની વાંચ્યાની પહોંચ પણ જોઈ શકશો નહીં.</translation>
+    </message>
 </context>
 <context>
     <name>ProfileSetupPage</name>
     <message>
         <source>Add profile</source>
         <translation>પ્રોફાઇલ ઉમેરો</translation>
-    </message>
-    <message>
-        <source>Contacting %1...</source>
-        <translation>%1 નો સંપર્ક કરવામાં આવે છે...</translation>
     </message>
     <message>
         <source>Cancel</source>
@@ -1149,16 +1112,16 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>%1 એ %2 સેકન્ડમાં જવાબ આપ્યો નહીં.</translation>
     </message>
     <message>
-        <source>Relays are run by volunteers. Go back and try another one.</source>
-        <translation>રિલે સ્વયંસેવકો ચલાવે છે. પાછા જઈને બીજું અજમાવો.</translation>
+        <source>Contacting %1…</source>
+        <translation>%1 નો સંપર્ક કરવામાં આવે છે…</translation>
+    </message>
+    <message>
+        <source>Could not reach the relay. Try another one.</source>
+        <translation>રિલે સુધી પહોંચી શકાયું નહીં. બીજું અજમાવો.</translation>
     </message>
 </context>
 <context>
     <name>ProfileStartPage</name>
-    <message>
-        <source>Alright, let&apos;s get you set up.</source>
-        <translation>ચાલો, તમારી પ્રોફાઇલ તૈયાર કરીએ.</translation>
-    </message>
     <message>
         <source>I already have a profile</source>
         <translation>મારી પાસે પહેલેથી પ્રોફાઇલ છે</translation>
@@ -1166,6 +1129,10 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Create a profile</source>
         <translation>પ્રોફાઇલ બનાવો</translation>
+    </message>
+    <message>
+        <source>Set up your profile</source>
+        <translation>તમારી પ્રોફાઇલ સેટ કરો</translation>
     </message>
 </context>
 <context>
@@ -1231,16 +1198,16 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>કોઈને આ કોડ સ્કૅન કરવા દો, અથવા તેમને લિંક મોકલો.</translation>
     </message>
     <message>
-        <source>Fetching...</source>
-        <translation>લાવવામાં આવે છે...</translation>
-    </message>
-    <message>
-        <source>Copy Invite Link</source>
-        <translation>આમંત્રણ લિંક કૉપિ કરો</translation>
-    </message>
-    <message>
         <source>The camera is not available on this device.</source>
         <translation>આ ઉપકરણ પર કૅમેરા ઉપલબ્ધ નથી.</translation>
+    </message>
+    <message>
+        <source>Fetching…</source>
+        <translation>લાવવામાં આવે છે…</translation>
+    </message>
+    <message>
+        <source>Copy invite link</source>
+        <translation>આમંત્રણ લિંક કૉપિ કરો</translation>
     </message>
 </context>
 <context>
@@ -1258,10 +1225,6 @@ Other groups with blocked contacts will still show their messages.</source>
 <context>
     <name>RestoreProfilePage</name>
     <message>
-        <source>That is not the code a device shows while it is offering its profile.</source>
-        <translation>કોઈ ઉપકરણ પોતાની પ્રોફાઇલ આપતી વખતે જે કોડ બતાવે છે, આ તે નથી.</translation>
-    </message>
-    <message>
         <source>Add as second device</source>
         <translation>બીજા ઉપકરણ તરીકે ઉમેરો</translation>
     </message>
@@ -1274,16 +1237,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>બેકઅપ ફાઇલ પસંદ કરો</translation>
     </message>
     <message>
-        <source>Taking the profile over...</source>
-        <translation>પ્રોફાઇલ લેવાઈ રહી છે...</translation>
-    </message>
-    <message>
         <source>Cancel</source>
         <translation>રદ કરો</translation>
-    </message>
-    <message>
-        <source>Hold the phone up to the code it shows</source>
-        <translation>તે જે કોડ બતાવે તેની સામે આ ફોન ધરો</translation>
     </message>
     <message>
         <source>Enter the code instead</source>
@@ -1292,10 +1247,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Code from the other device</source>
         <translation>બીજા ઉપકરણનો કોડ</translation>
-    </message>
-    <message>
-        <source>Take the profile over</source>
-        <translation>પ્રોફાઇલ લો</translation>
     </message>
     <message>
         <source>That did not work</source>
@@ -1310,28 +1261,44 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>બીજી ફાઇલ પસંદ કરો</translation>
     </message>
     <message>
-        <source>The other device runs a newer Delta Chat than this app can read.</source>
-        <translation>બીજા ઉપકરણ પરનું Delta Chat આ ઍપ વાંચી શકે એના કરતાં નવું છે.</translation>
-    </message>
-    <message>
-        <source>The transfer stopped. Both devices have to stay on one network, with this page open.</source>
-        <translation>ફેરબદલી અટકી ગઈ. બંને ઉપકરણો એક જ નેટવર્ક પર રહેવાં જોઈએ, આ પાનું ખુલ્લું રાખીને.</translation>
-    </message>
-    <message>
-        <source>No camera on this device. A backup file works without one.</source>
-        <translation>આ ઉપકરણમાં કૅમેરા નથી. બેકઅપ ફાઇલ કૅમેરા વગર પણ ચાલે છે.</translation>
-    </message>
-    <message>
-        <source>On the other device: Settings, then add a second device. Both on one network.</source>
-        <translation>બીજા ઉપકરણ પર: સેટિંગ્સ, પછી બીજું ઉપકરણ ઉમેરો. બંને એક જ નેટવર્ક પર.</translation>
-    </message>
-    <message>
         <source>Make a backup on the other device, copy the file here, then choose it.</source>
         <translation>બીજા ઉપકરણ પર બેકઅપ લો, ફાઇલ અહીં કૉપિ કરો, પછી એને પસંદ કરો.</translation>
     </message>
     <message>
         <source>That profile is already on this phone. Open it from the profiles list.</source>
         <translation>આ પ્રોફાઇલ આ ફોન પર પહેલેથી જ છે. એને પ્રોફાઇલની યાદીમાંથી ખોલો.</translation>
+    </message>
+    <message>
+        <source>The profile is from a newer Delta Chat version than this app can read.</source>
+        <translation>આ પ્રોફાઇલ Delta Chat ની એવી આવૃત્તિની છે જે આ ઍપ વાંચી શકે તેના કરતાં નવી છે.</translation>
+    </message>
+    <message>
+        <source>The transfer stopped. Both devices must stay on the same network with this page open.</source>
+        <translation>સ્થાનાંતરણ અટકી ગયું. બંને ઉપકરણો એક જ નેટવર્ક પર રહેવાં જોઈએ અને આ પાનું ખુલ્લું રહેવું જોઈએ.</translation>
+    </message>
+    <message>
+        <source>This is not a second-device code. Use the code shown by the other device.</source>
+        <translation>આ બીજા ઉપકરણનો કોડ નથી. બીજા ઉપકરણ પર દેખાતો કોડ વાપરો.</translation>
+    </message>
+    <message>
+        <source>Hold your camera over the QR code</source>
+        <translation>QR કોડ પર કૅમેરા ધરો</translation>
+    </message>
+    <message>
+        <source>Copy the profile</source>
+        <translation>પ્રોફાઇલ નકલ કરો</translation>
+    </message>
+    <message>
+        <source>No camera on this device. You can restore from a backup file instead.</source>
+        <translation>આ ઉપકરણમાં કૅમેરા નથી. તેના બદલે તમે બૅકઅપ ફાઇલમાંથી પુનઃસ્થાપિત કરી શકો છો.</translation>
+    </message>
+    <message>
+        <source>On the other device, go to Settings and tap &quot;Add second device&quot;. Both devices must be on the same network.</source>
+        <translation>બીજા ઉપકરણ પર સેટિંગ્સમાં જાઓ અને &quot;બીજું ઉપકરણ ઉમેરો&quot; પર ટૅપ કરો. બંને ઉપકરણો એક જ નેટવર્ક પર હોવાં જોઈએ.</translation>
+    </message>
+    <message>
+        <source>Transferring…</source>
+        <translation>સ્થાનાંતરણ થઈ રહ્યું છે…</translation>
     </message>
 </context>
 <context>
@@ -1383,40 +1350,20 @@ Other groups with blocked contacts will still show their messages.</source>
 <context>
     <name>SecondDevicePage</name>
     <message>
-        <source>Nothing took the profile. Both phones have to stay on one network, with this page open.</source>
-        <translation>પ્રોફાઇલ કોઈએ લીધી નહીં. બંને ફોન એક જ નેટવર્ક પર રહેવા જોઈએ, આ પાનું ખુલ્લું રાખીને.</translation>
-    </message>
-    <message>
         <source>Add a second device</source>
         <translation>બીજું ઉપકરણ ઉમેરો</translation>
-    </message>
-    <message>
-        <source>On the other device: add a profile you have already, then &quot;Add as second device&quot;, and read this code with it. Both phones on one network.</source>
-        <translation>બીજા ઉપકરણ પર: તમારી પાસે પહેલેથી છે એવી પ્રોફાઇલ ઉમેરો, પછી “બીજા ઉપકરણ તરીકે ઉમેરો”, અને તેનાથી આ કોડ વાંચો. બંને ફોન એક જ નેટવર્ક પર.</translation>
     </message>
     <message>
         <source>Copy the code</source>
         <translation>કોડ કૉપિ કરો</translation>
     </message>
     <message>
-        <source>Handing the profile over...</source>
-        <translation>પ્રોફાઇલ સોંપાઈ રહી છે...</translation>
-    </message>
-    <message>
         <source>Cancel</source>
         <translation>રદ કરો</translation>
     </message>
     <message>
-        <source>The other device has the profile. Both get everything new from now on.</source>
-        <translation>બીજા ઉપકરણ પાસે પ્રોફાઇલ છે. હવેથી બંનેને બધું નવું મળશે.</translation>
-    </message>
-    <message>
         <source>Swipe on for your chats.</source>
         <translation>આગળ સ્વાઇપ કરીને તમારી ચેટ પર જાઓ.</translation>
-    </message>
-    <message>
-        <source>Whoever reads this code gets the profile. It stops collecting mail until the code is gone.</source>
-        <translation>જે આ કોડ વાંચે, પ્રોફાઇલ તેની. કોડ જાય નહીં ત્યાં સુધી એ ટપાલ લેવાનું બંધ રાખે છે.</translation>
     </message>
     <message>
         <source>Show code again</source>
@@ -1425,6 +1372,26 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Show code</source>
         <translation>કોડ બતાવો</translation>
+    </message>
+    <message>
+        <source>No device copied the profile. Both devices must stay on the same network with this page open.</source>
+        <translation>કોઈ ઉપકરણે પ્રોફાઇલ નકલ કરી નથી. બંને ઉપકરણો એક જ નેટવર્ક પર રહેવાં જોઈએ અને આ પાનું ખુલ્લું રહેવું જોઈએ.</translation>
+    </message>
+    <message>
+        <source>Transferring…</source>
+        <translation>સ્થાનાંતરણ થઈ રહ્યું છે…</translation>
+    </message>
+    <message>
+        <source>The profile was transferred to your second device. Both devices now receive all new messages.</source>
+        <translation>પ્રોફાઇલ તમારા બીજા ઉપકરણ પર સ્થાનાંતરિત થઈ. હવે બંને ઉપકરણો બધા નવા સંદેશા મેળવે છે.</translation>
+    </message>
+    <message>
+        <source>On the other device, choose &quot;Add as second device&quot; and scan this code. Both devices must be on the same network.</source>
+        <translation>બીજા ઉપકરણ પર &quot;બીજા ઉપકરણ તરીકે ઉમેરો&quot; પસંદ કરો અને આ કોડ સ્કૅન કરો. બંને ઉપકરણો એક જ નેટવર્ક પર હોવાં જોઈએ.</translation>
+    </message>
+    <message>
+        <source>Make sure no unwanted observer or camera can see this code. This profile does not receive messages while the code is shown.</source>
+        <translation>ધ્યાન રાખો કે કોઈ અનિચ્છનીય જોનાર કે કૅમેરા આ કોડ જોઈ ન શકે. કોડ દેખાતો હોય ત્યાં સુધી આ પ્રોફાઇલ સંદેશા મેળવતી નથી.</translation>
     </message>
 </context>
 <context>
@@ -1478,18 +1445,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>સૂચનાઓ</translation>
     </message>
     <message>
-        <source>Who wrote, and what</source>
-        <translation>કોણે લખ્યું, અને શું</translation>
-    </message>
-    <message>
-        <source>Who wrote</source>
-        <translation>કોણે લખ્યું</translation>
-    </message>
-    <message>
-        <source>Only that something arrived</source>
-        <translation>ફક્ત કે કંઈક આવ્યું છે</translation>
-    </message>
-    <message>
         <source>Apps</source>
         <translation>એપ્સ</translation>
     </message>
@@ -1523,10 +1478,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>ઉપકરણમાંથી સંદેશ કાઢી નાખો</translation>
     </message>
     <message>
-        <source>A new notification shows</source>
-        <translation>નવી સૂચના બતાવે છે</translation>
-    </message>
-    <message>
         <source>Mentions</source>
         <extracomment>A reply to one of the reader&apos;s own messages, arriving in a group they have muted.</extracomment>
         <translation>ઉલ્લેખો</translation>
@@ -1541,49 +1492,12 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>માર્કડાઉન બંધારણ વાપરો</translation>
     </message>
     <message>
-        <source>Otherwise it starts a new line, and the button sends.</source>
-        <translation>નહીંતર એ નવી લીટી શરૂ કરે છે, અને બટન મોકલે છે.</translation>
-    </message>
-    <message>
-        <source>Draws *stars* and `backticks` rather than showing them.</source>
-        <translation>*તારા* અને `બેકટિક` બતાવવાને બદલે દોરે છે.</translation>
-    </message>
-    <message>
-        <source>Bigger ones wait until you ask for them. Every profile, from now on.</source>
-        <translation>મોટી ફાઇલો તમે માંગો ત્યાં સુધી રાહ જુએ છે. દરેક પ્રોફાઇલ, હવેથી.</translation>
-    </message>
-    <message>
-        <source>Every chat of every profile. &quot;Saved messages&quot; are kept.</source>
-        <translation>દરેક પ્રોફાઇલની દરેક ચેટ. “સાચવેલા સંદેશા” રહે છે.</translation>
-    </message>
-    <message>
-        <source>On the lock screen and in the notification area.</source>
-        <translation>લૉક સ્ક્રીન પર અને સૂચના વિસ્તારમાં.</translation>
-    </message>
-    <message>
-        <source>A reply to you gets through a muted group.</source>
-        <translation>તમને આપેલો જવાબ શાંત કરેલા સમૂહમાં પણ પહોંચે છે.</translation>
-    </message>
-    <message>
-        <source>Click ids and campaign tags come out of the links you send.</source>
-        <translation>ક્લિક આઈડી અને ઝુંબેશના ટૅગ તમે મોકલેલી લિંકમાંથી નીકળી જાય છે.</translation>
-    </message>
-    <message>
-        <source>Small apps run inside the chat. Somebody else&apos;s code, and less tested than the rest.</source>
-        <translation>નાની ઍપ ચેટની અંદર જ ચાલે છે. બીજાનો કોડ, અને બાકીના કરતાં ઓછો અજમાવેલો.</translation>
-    </message>
-    <message>
         <source>Privacy</source>
         <translation>ગોપનીયતા</translation>
     </message>
     <message>
         <source>Blocked contacts</source>
         <translation>બ્લૉક કરેલા સંપર્કો</translation>
-    </message>
-    <message>
-        <source>Worse quality, save data</source>
-        <extracomment>Outgoing media quality: smaller pictures and videos, which cost the reader and whoever they write to less data. Both reference clients&apos; words for it.</extracomment>
-        <translation>ઓછી ગુણવત્તા, ઓછો ડેટા</translation>
     </message>
     <message>
         <source>Balanced</source>
@@ -1596,12 +1510,41 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>મોકલવાના મીડિયાની ગુણવત્તા</translation>
     </message>
     <message>
-        <source>Pictures are made smaller before sending, and the camera records at this quality.</source>
-        <translation>ચિત્રો મોકલતા પહેલાં નાનાં કરવામાં આવે છે, અને કૅમેરા આ જ ગુણવત્તામાં રેકોર્ડ કરે છે.</translation>
-    </message>
-    <message>
         <source>Show notifications</source>
         <translation>સૂચનાઓ બતાવો</translation>
+    </message>
+    <message>
+        <source>Lower quality, less data</source>
+        <extracomment>Outgoing media quality: smaller pictures and videos, which cost the reader and whoever they write to less data. Both reference clients&apos; words for it.</extracomment>
+        <translation>ઓછી ગુણવત્તા, ઓછો ડેટા</translation>
+    </message>
+    <message>
+        <source>Notification content</source>
+        <translation>સૂચનાની સામગ્રી</translation>
+    </message>
+    <message>
+        <source>Sender and message</source>
+        <translation>મોકલનાર અને સંદેશ</translation>
+    </message>
+    <message>
+        <source>Sender only</source>
+        <translation>ફક્ત મોકલનાર</translation>
+    </message>
+    <message>
+        <source>No details</source>
+        <translation>કોઈ વિગત નહીં</translation>
+    </message>
+    <message>
+        <source>In muted groups, notify messages directed to you, like replies or reactions</source>
+        <translation>શાંત કરેલા જૂથોમાં તમને ઉદ્દેશીને આવેલા સંદેશા, જેમ કે જવાબ કે પ્રતિક્રિયા, જણાવો</translation>
+    </message>
+    <message>
+        <source>Removes click IDs and campaign tags from links you send.</source>
+        <translation>તમે મોકલેલી લિંકમાંથી ક્લિક આઈડી અને ઝુંબેશ ટૅગ દૂર કરે છે.</translation>
+    </message>
+    <message>
+        <source>Runs small apps inside chats. These features may be unstable and may be changed or removed.</source>
+        <translation>વાતચીતોની અંદર નાની ઍપ ચલાવે છે. આ સુવિધાઓ અસ્થિર હોઈ શકે છે અને બદલાઈ કે દૂર થઈ શકે છે.</translation>
     </message>
 </context>
 <context>
@@ -1674,16 +1617,16 @@ Other groups with blocked contacts will still show their messages.</source>
 <context>
     <name>WelcomePage</name>
     <message>
-        <source>Tell me about Delta Chat</source>
-        <translation>Delta Chat શું છે?</translation>
-    </message>
-    <message>
-        <source>Set up my profile</source>
-        <translation>મારી પ્રોફાઇલ સેટ કરો</translation>
-    </message>
-    <message>
         <source>Secure decentralised chat based on Delta Chat</source>
         <translation>Delta Chat પર આધારિત સુરક્ષિત, વિકેન્દ્રિત ચેટ</translation>
+    </message>
+    <message>
+        <source>About Delta Chat</source>
+        <translation>Delta Chat વિશે</translation>
+    </message>
+    <message>
+        <source>Set up your profile</source>
+        <translation>તમારી પ્રોફાઇલ સેટ કરો</translation>
     </message>
 </context>
 </TS>

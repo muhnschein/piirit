@@ -542,7 +542,7 @@ fn assert_device_half(steps: &[(String, String)], context: &str) {
 
     let hint = common::value_of(steps, "device-hint");
     assert!(
-        hint.contains("code it shows"),
+        hint.contains("QR code"),
         "the view still says it is looking for an invite: {hint:?}. \
          {context}"
     );

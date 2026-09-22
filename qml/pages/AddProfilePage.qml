@@ -54,7 +54,6 @@ Page {
                     name: "createProfile",
                     icon: "icon-m-add",
                     text: qsTr("Create a profile"),
-                    hint: qsTr("A new address on a chatmail relay."),
                     // Nothing to create with until the core is up, and
                     // the relay dialog hands straight over to the setup.
                     enabled: core.status === "ready"
@@ -62,14 +61,12 @@ Page {
                 {
                     name: "backupFile",
                     icon: "icon-m-backup",
-                    text: qsTr("Restore from a backup"),
-                    hint: qsTr("A backup file copied onto this phone.")
+                    text: qsTr("Restore from a backup")
                 },
                 {
                     name: "secondDevice",
                     icon: "icon-m-device",
-                    text: qsTr("Add as second device"),
-                    hint: qsTr("The other device keeps it. Both get everything new.")
+                    text: qsTr("Add as second device")
                 }
             ]
             onChosen: {

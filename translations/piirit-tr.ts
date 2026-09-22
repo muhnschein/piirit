@@ -40,19 +40,19 @@
     </message>
     <message>
         <source>Select a public chatmail relay</source>
-        <translation>Herkese açık bir chatmail aktarıcısı seç</translation>
+        <translation>Herkese açık bir chatmail rölesi seç</translation>
     </message>
     <message>
         <source>Use a custom chatmail relay</source>
-        <translation>Kendi chatmail aktarıcını kullan</translation>
+        <translation>Kendi chatmail röleni kullan</translation>
     </message>
     <message>
         <source>Piirit works only with chatmail relays. These are a particular kind of e-mail server; ordinary e-mail servers are not supported. For more, see &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. A full list of public, free-to-use chatmail relays is at &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</source>
-        <translation>Piirit yalnızca chatmail aktarıcılarıyla çalışır. Bunlar özel bir tür e-posta sunucusudur; sıradan e-posta sunucuları desteklenmez. Daha fazlası için &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt; adresine bak. Herkese açık, ücretsiz chatmail aktarıcılarının tam listesi &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; adresinde.</translation>
+        <translation>Piirit yalnızca chatmail röleleriyle çalışır. Bunlar özel bir tür e-posta sunucusudur; sıradan e-posta sunucuları desteklenmez. Daha fazlası için &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt; adresine bak. Herkese açık, ücretsiz chatmail rölelerinin tam listesi &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; adresinde.</translation>
     </message>
     <message>
-        <source>Pick a name and a relay. That&apos;s it! There is nothing else to set up.</source>
-        <translation>Bir ad ve bir aktarıcı seç. Hepsi bu! Başka ayarlanacak bir şey yok.</translation>
+        <source>Choose a name and a relay. Nothing else is needed.</source>
+        <translation>Bir ad ve bir röle seç. Başka bir şey gerekmez.</translation>
     </message>
 </context>
 <context>
@@ -66,24 +66,12 @@
         <translation>Profil oluştur</translation>
     </message>
     <message>
-        <source>A new address on a chatmail relay.</source>
-        <translation>Bir chatmail aktarıcısında yeni bir adres.</translation>
-    </message>
-    <message>
         <source>Restore from a backup</source>
         <translation>Yedekten geri yükle</translation>
     </message>
     <message>
-        <source>A backup file copied onto this phone.</source>
-        <translation>Bu telefona kopyalanmış bir yedek dosyası.</translation>
-    </message>
-    <message>
         <source>Add as second device</source>
         <translation>İkinci cihaz olarak ekle</translation>
-    </message>
-    <message>
-        <source>The other device keeps it. Both get everything new.</source>
-        <translation>Diğer cihaz onu tutar. İkisi de yeni gelen her şeyi alır.</translation>
     </message>
 </context>
 <context>
@@ -94,39 +82,39 @@
     </message>
     <message>
         <source>Add a relay</source>
-        <translation>Aktarıcı ekle</translation>
-    </message>
-    <message>
-        <source>Another address for this profile, on another relay. The profile sends from one relay at a time; its page says which, and lets you change it.</source>
-        <translation>Bu profil için başka bir aktarıcıda bir adres daha. Profil aynı anda tek bir aktarıcıdan gönderir; hangisi olduğunu sayfası gösterir ve değiştirmene izin verir.</translation>
+        <translation>Röle ekle</translation>
     </message>
     <message>
         <source>Add relay</source>
-        <translation>Aktarıcı ekle</translation>
-    </message>
-    <message>
-        <source>Contacting %1...</source>
-        <translation>%1 ile iletişim kuruluyor...</translation>
+        <translation>Röle ekle</translation>
     </message>
     <message>
         <source>Cancel</source>
         <translation>İptal</translation>
     </message>
     <message>
-        <source>Relays are run by volunteers. Try another one.</source>
-        <translation>Aktarıcıları gönüllüler işletir. Bir başkasını dene.</translation>
-    </message>
-    <message>
         <source>Select a public chatmail relay</source>
-        <translation>Herkese açık bir chatmail aktarıcısı seç</translation>
+        <translation>Herkese açık bir chatmail rölesi seç</translation>
     </message>
     <message>
         <source>Use a custom chatmail relay</source>
-        <translation>Kendi chatmail aktarıcını kullan</translation>
+        <translation>Kendi chatmail röleni kullan</translation>
     </message>
     <message>
         <source>Piirit works only with chatmail relays. These are a particular kind of e-mail server; ordinary e-mail servers are not supported. For more, see &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. A full list of public, free-to-use chatmail relays is at &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</source>
-        <translation>Piirit yalnızca chatmail aktarıcılarıyla çalışır. Bunlar özel bir tür e-posta sunucusudur; sıradan e-posta sunucuları desteklenmez. Daha fazlası için &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt; adresine bak. Herkese açık, ücretsiz chatmail aktarıcılarının tam listesi &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; adresinde.</translation>
+        <translation>Piirit yalnızca chatmail röleleriyle çalışır. Bunlar özel bir tür e-posta sunucusudur; sıradan e-posta sunucuları desteklenmez. Daha fazlası için &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt; adresine bak. Herkese açık, ücretsiz chatmail rölelerinin tam listesi &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; adresinde.</translation>
+    </message>
+    <message>
+        <source>Adds another address for this profile on a second relay. The profile sends from one relay at a time; you can change which one on the profile page.</source>
+        <translation>Bu profile ikinci bir rölede başka bir adres ekler. Profil bir seferde tek bir röle üzerinden gönderir; hangisi olduğunu profil sayfasından değiştirebilirsin.</translation>
+    </message>
+    <message>
+        <source>Contacting %1…</source>
+        <translation>%1 ile iletişim kuruluyor…</translation>
+    </message>
+    <message>
+        <source>Could not reach the relay. Try another one.</source>
+        <translation>Röleye ulaşılamadı. Başka birini dene.</translation>
     </message>
 </context>
 <context>
@@ -159,13 +147,6 @@
         <source>Cancel</source>
         <translation>İptal</translation>
     </message>
-    <message numerus="yes">
-        <source>%n message(s) will be deleted now, and from then on every message will be once it is that old.</source>
-        <extracomment>%n is how many messages would be deleted straight away.</extracomment>
-        <translation>
-            <numerusform>%n mesaj şimdi silinecek, bundan sonra da her mesaj o kadar eskiyince silinecek.</numerusform>
-        </translation>
-    </message>
     <message>
         <source>This includes pictures, videos and files.</source>
         <translation>Buna resimler, videolar ve dosyalar dahildir.</translation>
@@ -183,20 +164,19 @@
         <source>I understand, delete all these messages</source>
         <translation>Anlıyorum, tüm bu mesajları sil</translation>
     </message>
+    <message numerus="yes">
+        <source>%n message(s) will be deleted now, and every new message will be deleted once it reaches that age.</source>
+        <extracomment>%n is how many messages would be deleted straight away.</extracomment>
+        <translation>
+            <numerusform>%n ileti şimdi silinecek ve her yeni ileti bu yaşa ulaştığında silinecek.</numerusform>
+        </translation>
+    </message>
 </context>
 <context>
     <name>BackupPage</name>
     <message>
         <source>Back up profile</source>
         <translation>Profili yedekle</translation>
-    </message>
-    <message>
-        <source>Write the backup</source>
-        <translation>Yedeği yaz</translation>
-    </message>
-    <message>
-        <source>Writing the backup...</source>
-        <translation>Yedek yazılıyor...</translation>
     </message>
     <message>
         <source>Cancel</source>
@@ -208,12 +188,20 @@
         <translation>%1 konumuna kaydedildi</translation>
     </message>
     <message>
-        <source>Messages, contacts and key in one file, saved to Documents. Whoever has the file has the profile.</source>
-        <translation>Mesajlar, kişiler ve anahtar tek bir dosyada, Belgeler&apos;e kaydedilir. Dosya kimdeyse profil de ondadır.</translation>
-    </message>
-    <message>
         <source>Swipe on for your chats.</source>
         <translation>Sohbetlerine doğru kaydır.</translation>
+    </message>
+    <message>
+        <source>Start backup</source>
+        <translation>Yedeklemeyi başlat</translation>
+    </message>
+    <message>
+        <source>Backing up…</source>
+        <translation>Yedekleniyor…</translation>
+    </message>
+    <message>
+        <source>Saves your messages, contacts and end-to-end encryption setup to a backup file. Keep this file in a safe place.</source>
+        <translation>İletilerini, kişilerini ve uçtan uca şifreleme kurulumunu bir yedek dosyasına kaydeder. Bu dosyayı güvenli bir yerde sakla.</translation>
     </message>
 </context>
 <context>
@@ -291,10 +279,6 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
 </context>
 <context>
     <name>ChatListPage</name>
-    <message>
-        <source>Lost the connection to the Delta Chat core. Reconnecting...</source>
-        <translation>Delta Chat çekirdeğiyle bağlantı koptu. Yeniden bağlanılıyor...</translation>
-    </message>
     <message>
         <source>Lost the connection to the Delta Chat core. Restart Piirit.</source>
         <translation>Delta Chat çekirdeğiyle bağlantı koptu. Piirit&apos;yi yeniden başlatın.</translation>
@@ -403,6 +387,10 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
     <message>
         <source>Search</source>
         <translation>Ara</translation>
+    </message>
+    <message>
+        <source>Lost the connection to the Delta Chat core. Reconnecting…</source>
+        <translation>Delta Chat çekirdeğiyle bağlantı koptu. Yeniden bağlanılıyor…</translation>
     </message>
 </context>
 <context>
@@ -533,10 +521,6 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
 <context>
     <name>ConversationPage</name>
     <message>
-        <source>Lost the connection to the Delta Chat core. Reconnecting...</source>
-        <translation>Delta Chat çekirdeğiyle bağlantı koptu. Yeniden bağlanılıyor...</translation>
-    </message>
-    <message>
         <source>Lost the connection to the Delta Chat core. Restart Piirit.</source>
         <translation>Delta Chat çekirdeğiyle bağlantı koptu. Piirit&apos;yi yeniden başlatın.</translation>
     </message>
@@ -558,11 +542,6 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
         <translation>Mesaj</translation>
     </message>
     <message>
-        <source>Long message: the other end sees a preview and taps to read the rest</source>
-        <extracomment>Shown above the message field while what is being written is long enough that the other end will receive a shortened version with the rest behind a tap.</extracomment>
-        <translation>Uzun ileti: karşı taraf bir önizleme görür ve gerisini okumak için dokunur</translation>
-    </message>
-    <message>
         <source>Saved to Pictures</source>
         <translation>Resimler&apos;e kaydedildi</translation>
     </message>
@@ -582,9 +561,13 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
         <translation>İndirilenler&apos;e kaydedildi</translation>
     </message>
     <message>
-        <source>Too big to send: %1. Attachments go up to %2.</source>
+        <source>Lost the connection to the Delta Chat core. Reconnecting…</source>
+        <translation>Delta Chat çekirdeğiyle bağlantı koptu. Yeniden bağlanılıyor…</translation>
+    </message>
+    <message>
+        <source>%1 is too large to send. Attachments can be up to %2.</source>
         <extracomment>Shown above the message field when the attached file is bigger than will be sent. %1 is the file&apos;s size and %2 the largest that goes, each such as &quot;24 MB&quot;.</extracomment>
-        <translation>Göndermek için çok büyük: %1. Ekler en fazla %2 olabilir.</translation>
+        <translation>%1 göndermek için çok büyük. Ekler en fazla %2 olabilir.</translation>
     </message>
 </context>
 <context>
@@ -622,14 +605,6 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
     <message>
         <source>How do you want to delete this message? This cannot be undone.</source>
         <translation>Bu mesajı nasıl silmek istersin? Bu geri alınamaz.</translation>
-    </message>
-    <message>
-        <source>It goes from your devices. Everybody else keeps their copy.</source>
-        <translation>Cihazlarından gider. Diğer herkeste kopyası kalır.</translation>
-    </message>
-    <message>
-        <source>It goes from your devices, and every other device in this chat is asked to delete it too.</source>
-        <translation>Cihazlarından gider ve bu sohbetteki diğer her cihazdan da onu silmesi istenir.</translation>
     </message>
 </context>
 <context>
@@ -691,8 +666,8 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
         <translation>%1 saniye sonra</translation>
     </message>
     <message>
-        <source>Applies to everyone in the chat. They can still copy and forward.</source>
-        <translation>Sohbetteki herkes için geçerli. Yine de kopyalayıp iletebilirler.</translation>
+        <source>Applies to all members of this chat; they can still copy, save, and forward messages.</source>
+        <translation>Bu sohbetin tüm üyelerine uygulanır; onlar hâlâ iletileri kopyalayabilir, kaydedebilir ve iletebilir.</translation>
     </message>
 </context>
 <context>
@@ -708,14 +683,6 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
     <message>
         <source>Restore from a backup</source>
         <translation>Yedekten geri yükle</translation>
-    </message>
-    <message>
-        <source>The other device keeps it. Both get everything new.</source>
-        <translation>Diğer cihaz onu tutar. İkisi de yeni gelen her şeyi alır.</translation>
-    </message>
-    <message>
-        <source>A backup file copied onto this phone.</source>
-        <translation>Bu telefona kopyalanmış bir yedek dosyası.</translation>
     </message>
 </context>
 <context>
@@ -798,14 +765,6 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
         <translation>Size kimin ulaşabileceğine siz karar verirsiniz</translation>
     </message>
     <message>
-        <source>Groups of equals</source>
-        <translation>Eşitlerin grupları</translation>
-    </message>
-    <message>
-        <source>The server only passes it on</source>
-        <translation>Sunucu yalnızca iletir</translation>
-    </message>
-    <message>
         <source>Keep swiping to set up your profile.</source>
         <translation>Profilinizi kurmak için kaydırmaya devam edin.</translation>
     </message>
@@ -814,24 +773,32 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
         <translation>Her ileti şifrelenir</translation>
     </message>
     <message>
-        <source>Made here on your phone. No phone number, no account, nothing to sign.</source>
-        <translation>Burada, telefonunda yapılır. Telefon numarası yok, hesap yok, imzalanacak bir şey yok.</translation>
+        <source>Your profile is created on this phone. No phone number and no sign-up are needed.</source>
+        <translation>Profilin bu telefonda oluşturulur. Ne telefon numarası ne de kayıt gerekir.</translation>
     </message>
     <message>
-        <source>There is no directory to be found in. Show a friend a code, or send a link.</source>
-        <translation>Bulunabileceğin bir rehber yok. Bir arkadaşına kod göster ya da bağlantı yolla.</translation>
+        <source>There is no public directory. People reach you by scanning your invite code or opening your invite link.</source>
+        <translation>Herkese açık bir dizin yoktur. Başkaları sana davet kodunu okutarak ya da davet bağlantını açarak ulaşır.</translation>
     </message>
     <message>
-        <source>Encrypted the whole way, always. The servers cannot read a word.</source>
-        <translation>Her zaman baştan sona şifreli. Sunucular tek kelime okumaz.</translation>
+        <source>Any member can add people, rename the group or leave it.</source>
+        <translation>Her üye kişi ekleyebilir, grubu yeniden adlandırabilir ya da gruptan ayrılabilir.</translation>
     </message>
     <message>
-        <source>Anyone can add a friend, rename the group or leave. Nobody is in charge.</source>
-        <translation>Herkes bir arkadaş ekleyebilir, grubun adını değiştirebilir ya da çıkabilir. Kimse başta değil.</translation>
+        <source>Messages are end-to-end encrypted, so the relays that carry them cannot read them.</source>
+        <translation>İletiler uçtan uca şifrelidir, bu yüzden onları taşıyan röleler okuyamaz.</translation>
     </message>
     <message>
-        <source>It holds a message until the other phone is online, and nothing more.</source>
-        <translation>Diğer telefon çevrimiçi olana kadar mesajı tutar, başka bir şey yapmaz.</translation>
+        <source>Groups have no admins</source>
+        <translation>Grupların yöneticisi yoktur</translation>
+    </message>
+    <message>
+        <source>Relays only pass messages on</source>
+        <translation>Röleler iletileri yalnızca iletir</translation>
+    </message>
+    <message>
+        <source>A relay stores a message only until the recipient fetches it.</source>
+        <translation>Bir röle iletiyi yalnızca alıcı onu alana kadar saklar.</translation>
     </message>
 </context>
 <context>
@@ -962,12 +929,12 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
         <translation>Henüz kişi yok</translation>
     </message>
     <message>
-        <source>Scan someone&apos;s invite from the chat list: QR code</source>
-        <translation>Sohbet listesinden birinin davetini tarayın: QR kodu</translation>
-    </message>
-    <message>
         <source>Search</source>
         <translation>Ara</translation>
+    </message>
+    <message>
+        <source>Use &quot;QR code&quot; in the chat list to add a contact.</source>
+        <translation>Kişi eklemek için sohbet listesindeki &quot;QR kodu&quot; seçeneğini kullan.</translation>
     </message>
 </context>
 <context>
@@ -975,10 +942,6 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
     <message>
         <source>Please name the group</source>
         <translation>Lütfen gruba bir ad verin</translation>
-    </message>
-    <message>
-        <source>Create Group</source>
-        <translation>Grup oluştur</translation>
     </message>
     <message>
         <source>New group</source>
@@ -1010,6 +973,10 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
     <message>
         <source>Add members</source>
         <translation>Üye ekle</translation>
+    </message>
+    <message>
+        <source>Create group</source>
+        <translation>Grup oluştur</translation>
     </message>
 </context>
 <context>
@@ -1078,36 +1045,32 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
     </message>
     <message>
         <source>The relay has not reported its quota yet</source>
-        <translation>Aktarıcı kotasını henüz bildirmedi</translation>
-    </message>
-    <message>
-        <source>Both ways: with this off you send none and see none.</source>
-        <translation>Her iki yönde de: kapalıyken ne gönderirsin ne görürsün.</translation>
+        <translation>Röle kotasını henüz bildirmedi</translation>
     </message>
     <message>
         <source>Relays</source>
-        <translation>Aktarıcılar</translation>
+        <translation>Röleler</translation>
     </message>
     <message>
         <source>Sends from this relay</source>
-        <translation>Bu aktarıcıdan gönderiyor</translation>
+        <translation>Bu röleden gönderiyor</translation>
     </message>
     <message>
         <source>Removing relay</source>
         <extracomment>What Silica&apos;s countdown says it is doing, over a relay the reader has asked to remove.</extracomment>
-        <translation>Aktarıcı kaldırılıyor</translation>
+        <translation>Röle kaldırılıyor</translation>
     </message>
     <message>
         <source>Send from this relay</source>
-        <translation>Bu aktarıcıdan gönder</translation>
+        <translation>Bu röleden gönder</translation>
     </message>
     <message>
         <source>Remove relay</source>
-        <translation>Aktarıcıyı kaldır</translation>
+        <translation>Röleyi kaldır</translation>
     </message>
     <message>
         <source>Add a relay</source>
-        <translation>Aktarıcı ekle</translation>
+        <translation>Röle ekle</translation>
     </message>
     <message>
         <source>%1 of %2 used</source>
@@ -1119,16 +1082,16 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
         <extracomment>How much room the profile takes on the phone. %1 is a size such as &quot;12.3 MB&quot;.</extracomment>
         <translation>Piirit bu telefonda %1 depolama alanı kullanıyor.</translation>
     </message>
+    <message>
+        <source>If read receipts are disabled, you won&apos;t be able to see read receipts from others.</source>
+        <translation>Okundu onayları etkisizleştirilirse, diğerlerinden gelen okundu onaylarını göremeyeceksiniz.</translation>
+    </message>
 </context>
 <context>
     <name>ProfileSetupPage</name>
     <message>
         <source>Add profile</source>
         <translation>Profil ekle</translation>
-    </message>
-    <message>
-        <source>Contacting %1...</source>
-        <translation>%1 ile iletişim kuruluyor...</translation>
     </message>
     <message>
         <source>Cancel</source>
@@ -1143,16 +1106,16 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
         <translation>%1, %2 saniye içinde yanıt vermedi.</translation>
     </message>
     <message>
-        <source>Relays are run by volunteers. Go back and try another one.</source>
-        <translation>Aktarıcıları gönüllüler işletir. Geri dön ve bir başkasını dene.</translation>
+        <source>Contacting %1…</source>
+        <translation>%1 ile iletişim kuruluyor…</translation>
+    </message>
+    <message>
+        <source>Could not reach the relay. Try another one.</source>
+        <translation>Röleye ulaşılamadı. Başka birini dene.</translation>
     </message>
 </context>
 <context>
     <name>ProfileStartPage</name>
-    <message>
-        <source>Alright, let&apos;s get you set up.</source>
-        <translation>Pekâlâ, profilinizi kuralım.</translation>
-    </message>
     <message>
         <source>I already have a profile</source>
         <translation>Zaten bir profilim var</translation>
@@ -1160,6 +1123,10 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
     <message>
         <source>Create a profile</source>
         <translation>Profil oluştur</translation>
+    </message>
+    <message>
+        <source>Set up your profile</source>
+        <translation>Profilini ayarla</translation>
     </message>
 </context>
 <context>
@@ -1225,16 +1192,16 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
         <translation>Birinin bu kodu taramasına izin verin ya da ona bağlantıyı gönderin.</translation>
     </message>
     <message>
-        <source>Fetching...</source>
-        <translation>Alınıyor...</translation>
-    </message>
-    <message>
-        <source>Copy Invite Link</source>
-        <translation>Davet bağlantısını kopyala</translation>
-    </message>
-    <message>
         <source>The camera is not available on this device.</source>
         <translation>Kamera bu cihazda kullanılamıyor.</translation>
+    </message>
+    <message>
+        <source>Fetching…</source>
+        <translation>Alınıyor…</translation>
+    </message>
+    <message>
+        <source>Copy invite link</source>
+        <translation>Davet bağlantısını kopyala</translation>
     </message>
 </context>
 <context>
@@ -1252,10 +1219,6 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
 <context>
     <name>RestoreProfilePage</name>
     <message>
-        <source>That is not the code a device shows while it is offering its profile.</source>
-        <translation>Bu, bir cihazın profilini sunarken gösterdiği kod değil.</translation>
-    </message>
-    <message>
         <source>Add as second device</source>
         <translation>İkinci cihaz olarak ekle</translation>
     </message>
@@ -1268,16 +1231,8 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
         <translation>Bir yedek dosyası seç</translation>
     </message>
     <message>
-        <source>Taking the profile over...</source>
-        <translation>Profil alınıyor...</translation>
-    </message>
-    <message>
         <source>Cancel</source>
         <translation>İptal</translation>
-    </message>
-    <message>
-        <source>Hold the phone up to the code it shows</source>
-        <translation>Bu telefonu gösterilen koda tutun</translation>
     </message>
     <message>
         <source>Enter the code instead</source>
@@ -1286,10 +1241,6 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
     <message>
         <source>Code from the other device</source>
         <translation>Diğer cihazdaki kod</translation>
-    </message>
-    <message>
-        <source>Take the profile over</source>
-        <translation>Profili al</translation>
     </message>
     <message>
         <source>That did not work</source>
@@ -1304,28 +1255,44 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
         <translation>Başka bir dosya seç</translation>
     </message>
     <message>
-        <source>The other device runs a newer Delta Chat than this app can read.</source>
-        <translation>Diğer cihazda, bu uygulamanın okuyabileceğinden daha yeni bir Delta Chat var.</translation>
-    </message>
-    <message>
-        <source>The transfer stopped. Both devices have to stay on one network, with this page open.</source>
-        <translation>Aktarım durdu. İki cihaz da aynı ağda kalmalı, bu sayfa açıkken.</translation>
-    </message>
-    <message>
-        <source>No camera on this device. A backup file works without one.</source>
-        <translation>Bu cihazda kamera yok. Yedek dosyası kamerasız da çalışır.</translation>
-    </message>
-    <message>
-        <source>On the other device: Settings, then add a second device. Both on one network.</source>
-        <translation>Diğer cihazda: Ayarlar, sonra ikinci cihaz ekle. İkisi de aynı ağda.</translation>
-    </message>
-    <message>
         <source>Make a backup on the other device, copy the file here, then choose it.</source>
         <translation>Diğer cihazda bir yedek al, dosyayı buraya kopyala, sonra onu seç.</translation>
     </message>
     <message>
         <source>That profile is already on this phone. Open it from the profiles list.</source>
         <translation>Bu profil bu telefonda zaten var. Onu profiller listesinden aç.</translation>
+    </message>
+    <message>
+        <source>The profile is from a newer Delta Chat version than this app can read.</source>
+        <translation>Profil, bu uygulamanın okuyabileceğinden daha yeni bir Delta Chat sürümünden.</translation>
+    </message>
+    <message>
+        <source>The transfer stopped. Both devices must stay on the same network with this page open.</source>
+        <translation>Aktarım durdu. Her iki cihaz da bu sayfa açıkken aynı ağda kalmalı.</translation>
+    </message>
+    <message>
+        <source>This is not a second-device code. Use the code shown by the other device.</source>
+        <translation>Bu bir ikinci cihaz kodu değil. Diğer cihazın gösterdiği kodu kullan.</translation>
+    </message>
+    <message>
+        <source>Hold your camera over the QR code</source>
+        <translation>Kameranızı QR kodunun üzerinde tutun</translation>
+    </message>
+    <message>
+        <source>Copy the profile</source>
+        <translation>Profili kopyala</translation>
+    </message>
+    <message>
+        <source>No camera on this device. You can restore from a backup file instead.</source>
+        <translation>Bu cihazda kamera yok. Bunun yerine bir yedek dosyasından geri yükleyebilirsin.</translation>
+    </message>
+    <message>
+        <source>On the other device, go to Settings and tap &quot;Add second device&quot;. Both devices must be on the same network.</source>
+        <translation>Diğer cihazda Ayarlar&apos;a git ve &quot;İkinci cihaz ekle&quot; seçeneğine dokun. Her iki cihaz da aynı ağda olmalı.</translation>
+    </message>
+    <message>
+        <source>Transferring…</source>
+        <translation>Aktarılıyor…</translation>
     </message>
 </context>
 <context>
@@ -1377,40 +1344,20 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
 <context>
     <name>SecondDevicePage</name>
     <message>
-        <source>Nothing took the profile. Both phones have to stay on one network, with this page open.</source>
-        <translation>Profili kimse almadı. İki telefon da aynı ağda kalmalı, bu sayfa açıkken.</translation>
-    </message>
-    <message>
         <source>Add a second device</source>
         <translation>İkinci cihaz ekle</translation>
-    </message>
-    <message>
-        <source>On the other device: add a profile you have already, then &quot;Add as second device&quot;, and read this code with it. Both phones on one network.</source>
-        <translation>Diğer cihazda: zaten sahip olduğun bir profili ekle, sonra “İkinci cihaz olarak ekle”, ve bu kodu onunla oku. İki telefon da aynı ağda.</translation>
     </message>
     <message>
         <source>Copy the code</source>
         <translation>Kodu kopyala</translation>
     </message>
     <message>
-        <source>Handing the profile over...</source>
-        <translation>Profil devrediliyor...</translation>
-    </message>
-    <message>
         <source>Cancel</source>
         <translation>İptal</translation>
     </message>
     <message>
-        <source>The other device has the profile. Both get everything new from now on.</source>
-        <translation>Profil diğer cihazda da var. Bundan sonra ikisi de yeni gelen her şeyi alır.</translation>
-    </message>
-    <message>
         <source>Swipe on for your chats.</source>
         <translation>Sohbetlerine doğru kaydır.</translation>
-    </message>
-    <message>
-        <source>Whoever reads this code gets the profile. It stops collecting mail until the code is gone.</source>
-        <translation>Bu kodu kim okursa profil onun olur. Kod ekranda durduğu sürece profil posta almaz.</translation>
     </message>
     <message>
         <source>Show code again</source>
@@ -1419,6 +1366,26 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
     <message>
         <source>Show code</source>
         <translation>Kodu göster</translation>
+    </message>
+    <message>
+        <source>No device copied the profile. Both devices must stay on the same network with this page open.</source>
+        <translation>Hiçbir cihaz profili kopyalamadı. Her iki cihaz da bu sayfa açıkken aynı ağda kalmalı.</translation>
+    </message>
+    <message>
+        <source>Transferring…</source>
+        <translation>Aktarılıyor…</translation>
+    </message>
+    <message>
+        <source>The profile was transferred to your second device. Both devices now receive all new messages.</source>
+        <translation>Profil ikinci cihazına aktarıldı. Her iki cihaz da artık tüm yeni iletileri alıyor.</translation>
+    </message>
+    <message>
+        <source>On the other device, choose &quot;Add as second device&quot; and scan this code. Both devices must be on the same network.</source>
+        <translation>Diğer cihazda &quot;İkinci cihaz olarak ekle&quot; seçeneğini seç ve bu kodu okut. Her iki cihaz da aynı ağda olmalı.</translation>
+    </message>
+    <message>
+        <source>Make sure no unwanted observer or camera can see this code. This profile does not receive messages while the code is shown.</source>
+        <translation>Bu kodu istenmeyen hiçbir gözlemcinin ya da kameranın görmediğinden emin ol. Kod gösterildiği sürece bu profil ileti almaz.</translation>
     </message>
 </context>
 <context>
@@ -1472,18 +1439,6 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
         <translation>Bildirimler</translation>
     </message>
     <message>
-        <source>Who wrote, and what</source>
-        <translation>Kimin yazdığını ve ne yazdığını</translation>
-    </message>
-    <message>
-        <source>Who wrote</source>
-        <translation>Kimin yazdığını</translation>
-    </message>
-    <message>
-        <source>Only that something arrived</source>
-        <translation>Yalnızca bir şey geldiğini</translation>
-    </message>
-    <message>
         <source>Apps</source>
         <translation>Uygulamalar</translation>
     </message>
@@ -1517,10 +1472,6 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
         <translation>Mesajları cihazdan sil</translation>
     </message>
     <message>
-        <source>A new notification shows</source>
-        <translation>Yeni bir bildirim şunu gösterir</translation>
-    </message>
-    <message>
         <source>Mentions</source>
         <extracomment>A reply to one of the reader&apos;s own messages, arriving in a group they have muted.</extracomment>
         <translation>Bahsetmeler</translation>
@@ -1535,49 +1486,12 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
         <translation>Markdown biçimlendirmesini kullan</translation>
     </message>
     <message>
-        <source>Otherwise it starts a new line, and the button sends.</source>
-        <translation>Aksi hâlde yeni bir satır açar, gönderme işini düğme yapar.</translation>
-    </message>
-    <message>
-        <source>Draws *stars* and `backticks` rather than showing them.</source>
-        <translation>*Yıldızları* ve `ters tırnakları` göstermek yerine biçim olarak çizer.</translation>
-    </message>
-    <message>
-        <source>Bigger ones wait until you ask for them. Every profile, from now on.</source>
-        <translation>Daha büyükleri sen isteyene kadar bekler. Tüm profiller, bundan sonrası için.</translation>
-    </message>
-    <message>
-        <source>Every chat of every profile. &quot;Saved messages&quot; are kept.</source>
-        <translation>Her profilin her sohbeti. “Kaydedilen mesajlar” kalır.</translation>
-    </message>
-    <message>
-        <source>On the lock screen and in the notification area.</source>
-        <translation>Kilit ekranında ve bildirim alanında.</translation>
-    </message>
-    <message>
-        <source>A reply to you gets through a muted group.</source>
-        <translation>Sana gelen bir yanıt, sessize alınmış gruptan da geçer.</translation>
-    </message>
-    <message>
-        <source>Click ids and campaign tags come out of the links you send.</source>
-        <translation>Tıklama kimlikleri ve kampanya etiketleri, gönderdiğin bağlantılardan çıkar.</translation>
-    </message>
-    <message>
-        <source>Small apps run inside the chat. Somebody else&apos;s code, and less tested than the rest.</source>
-        <translation>Küçük uygulamalar sohbetin içinde çalışır. Başkasının kodu ve geri kalanı kadar denenmemiş.</translation>
-    </message>
-    <message>
         <source>Privacy</source>
         <translation>Gizlilik</translation>
     </message>
     <message>
         <source>Blocked contacts</source>
         <translation>Engellenen Kişiler</translation>
-    </message>
-    <message>
-        <source>Worse quality, save data</source>
-        <extracomment>Outgoing media quality: smaller pictures and videos, which cost the reader and whoever they write to less data. Both reference clients&apos; words for it.</extracomment>
-        <translation>Daha kötü kalite, küçük boyut</translation>
     </message>
     <message>
         <source>Balanced</source>
@@ -1590,12 +1504,41 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
         <translation>Giden ortam kalitesi</translation>
     </message>
     <message>
-        <source>Pictures are made smaller before sending, and the camera records at this quality.</source>
-        <translation>Resimler gönderilmeden önce küçültülür ve kamera bu kalitede kaydeder.</translation>
-    </message>
-    <message>
         <source>Show notifications</source>
         <translation>Bildirimleri göster</translation>
+    </message>
+    <message>
+        <source>Lower quality, less data</source>
+        <extracomment>Outgoing media quality: smaller pictures and videos, which cost the reader and whoever they write to less data. Both reference clients&apos; words for it.</extracomment>
+        <translation>Daha düşük kalite, daha az veri</translation>
+    </message>
+    <message>
+        <source>Notification content</source>
+        <translation>Bildirim içeriği</translation>
+    </message>
+    <message>
+        <source>Sender and message</source>
+        <translation>Gönderen ve ileti</translation>
+    </message>
+    <message>
+        <source>Sender only</source>
+        <translation>Yalnızca gönderen</translation>
+    </message>
+    <message>
+        <source>No details</source>
+        <translation>Ayrıntı yok</translation>
+    </message>
+    <message>
+        <source>In muted groups, notify messages directed to you, like replies or reactions</source>
+        <translation>Sessize alınan gruplarda, yanıtlar ya da tepkiler gibi size yönlendirilen iletileri bildirin</translation>
+    </message>
+    <message>
+        <source>Removes click IDs and campaign tags from links you send.</source>
+        <translation>Gönderdiğin bağlantılardan tıklama kimliklerini ve kampanya etiketlerini kaldırır.</translation>
+    </message>
+    <message>
+        <source>Runs small apps inside chats. These features may be unstable and may be changed or removed.</source>
+        <translation>Sohbetlerin içinde küçük uygulamalar çalıştırır. Bu özellikler kararsız olabilir ve değiştirilebilir ya da kaldırılabilir.</translation>
     </message>
 </context>
 <context>
@@ -1668,16 +1611,16 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
 <context>
     <name>WelcomePage</name>
     <message>
-        <source>Tell me about Delta Chat</source>
-        <translation>Delta Chat nedir?</translation>
-    </message>
-    <message>
-        <source>Set up my profile</source>
-        <translation>Profilimi kur</translation>
-    </message>
-    <message>
         <source>Secure decentralised chat based on Delta Chat</source>
         <translation>Delta Chat üzerine kurulu güvenli, merkeziyetsiz sohbet</translation>
+    </message>
+    <message>
+        <source>About Delta Chat</source>
+        <translation>Delta Chat hakkında</translation>
+    </message>
+    <message>
+        <source>Set up your profile</source>
+        <translation>Profilini ayarla</translation>
     </message>
 </context>
 </TS>

@@ -51,8 +51,8 @@
         <translation>Piirit funcționează doar cu relee chatmail. Acestea sunt un tip aparte de server de e-mail; serverele de e-mail obișnuite nu sunt acceptate. Mai multe pe &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. Lista completă a releelor chatmail publice, gratuite, este la &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
     </message>
     <message>
-        <source>Pick a name and a relay. That&apos;s it! There is nothing else to set up.</source>
-        <translation>Alege un nume și un releu. Atât! Nu mai e nimic de configurat.</translation>
+        <source>Choose a name and a relay. Nothing else is needed.</source>
+        <translation>Alege un nume și un releu. Nu mai este nevoie de nimic altceva.</translation>
     </message>
 </context>
 <context>
@@ -66,24 +66,12 @@
         <translation>Creează un profil</translation>
     </message>
     <message>
-        <source>A new address on a chatmail relay.</source>
-        <translation>O adresă nouă pe un releu chatmail.</translation>
-    </message>
-    <message>
         <source>Restore from a backup</source>
         <translation>Restaurează dintr-o copie de siguranță</translation>
     </message>
     <message>
-        <source>A backup file copied onto this phone.</source>
-        <translation>Un fișier de copie, copiat pe acest telefon.</translation>
-    </message>
-    <message>
         <source>Add as second device</source>
         <translation>Adaugă ca al doilea dispozitiv</translation>
-    </message>
-    <message>
-        <source>The other device keeps it. Both get everything new.</source>
-        <translation>Celălalt dispozitiv îl păstrează. Amândouă primesc tot ce e nou.</translation>
     </message>
 </context>
 <context>
@@ -97,24 +85,12 @@
         <translation>Adaugă un releu</translation>
     </message>
     <message>
-        <source>Another address for this profile, on another relay. The profile sends from one relay at a time; its page says which, and lets you change it.</source>
-        <translation>Încă o adresă pentru acest profil, pe alt releu. Profilul trimite printr-un singur releu odată; pagina lui arată care și te lasă să-l schimbi.</translation>
-    </message>
-    <message>
         <source>Add relay</source>
         <translation>Adaugă releul</translation>
     </message>
     <message>
-        <source>Contacting %1...</source>
-        <translation>Se contactează %1...</translation>
-    </message>
-    <message>
         <source>Cancel</source>
         <translation>Anulează</translation>
-    </message>
-    <message>
-        <source>Relays are run by volunteers. Try another one.</source>
-        <translation>Releele sunt ținute de voluntari. Încearcă altul.</translation>
     </message>
     <message>
         <source>Select a public chatmail relay</source>
@@ -127,6 +103,18 @@
     <message>
         <source>Piirit works only with chatmail relays. These are a particular kind of e-mail server; ordinary e-mail servers are not supported. For more, see &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. A full list of public, free-to-use chatmail relays is at &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</source>
         <translation>Piirit funcționează doar cu relee chatmail. Acestea sunt un tip aparte de server de e-mail; serverele de e-mail obișnuite nu sunt acceptate. Mai multe pe &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. Lista completă a releelor chatmail publice, gratuite, este la &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
+    </message>
+    <message>
+        <source>Adds another address for this profile on a second relay. The profile sends from one relay at a time; you can change which one on the profile page.</source>
+        <translation>Adaugă acestui profil încă o adresă pe un al doilea releu. Profilul trimite printr-un singur releu o dată; poți schimba care anume în pagina profilului.</translation>
+    </message>
+    <message>
+        <source>Contacting %1…</source>
+        <translation>Se contactează %1…</translation>
+    </message>
+    <message>
+        <source>Could not reach the relay. Try another one.</source>
+        <translation>Releul nu a putut fi contactat. Încearcă altul.</translation>
     </message>
 </context>
 <context>
@@ -159,15 +147,6 @@
         <source>Cancel</source>
         <translation>Anulează</translation>
     </message>
-    <message numerus="yes">
-        <source>%n message(s) will be deleted now, and from then on every message will be once it is that old.</source>
-        <extracomment>%n is how many messages would be deleted straight away.</extracomment>
-        <translation>
-            <numerusform>%n mesaj va fi șters acum, iar de atunci fiecare mesaj de îndată ce va fi atât de vechi.</numerusform>
-            <numerusform>%n mesaje vor fi șterse acum, iar de atunci fiecare mesaj de îndată ce va fi atât de vechi.</numerusform>
-            <numerusform>%n de mesaje vor fi șterse acum, iar de atunci fiecare mesaj de îndată ce va fi atât de vechi.</numerusform>
-        </translation>
-    </message>
     <message>
         <source>This includes pictures, videos and files.</source>
         <translation>Aici intră imaginile, videoclipurile și fișierele.</translation>
@@ -185,20 +164,21 @@
         <source>I understand, delete all these messages</source>
         <translation>Am înțeles, șterge toate aceste mesaje</translation>
     </message>
+    <message numerus="yes">
+        <source>%n message(s) will be deleted now, and every new message will be deleted once it reaches that age.</source>
+        <extracomment>%n is how many messages would be deleted straight away.</extracomment>
+        <translation>
+            <numerusform>%n mesaj va fi șters acum, iar fiecare mesaj nou va fi șters când ajunge la acea vechime.</numerusform>
+            <numerusform>%n mesaje vor fi șterse acum, iar fiecare mesaj nou va fi șters când ajunge la acea vechime.</numerusform>
+            <numerusform>%n de mesaje vor fi șterse acum, iar fiecare mesaj nou va fi șters când ajunge la acea vechime.</numerusform>
+        </translation>
+    </message>
 </context>
 <context>
     <name>BackupPage</name>
     <message>
         <source>Back up profile</source>
         <translation>Copie de siguranță a profilului</translation>
-    </message>
-    <message>
-        <source>Write the backup</source>
-        <translation>Scrie copia</translation>
-    </message>
-    <message>
-        <source>Writing the backup...</source>
-        <translation>Se scrie copia...</translation>
     </message>
     <message>
         <source>Cancel</source>
@@ -210,12 +190,20 @@
         <translation>Salvat în %1</translation>
     </message>
     <message>
-        <source>Messages, contacts and key in one file, saved to Documents. Whoever has the file has the profile.</source>
-        <translation>Mesaje, contacte și cheie într-un singur fișier, salvat în Documente. Cine are fișierul are profilul.</translation>
-    </message>
-    <message>
         <source>Swipe on for your chats.</source>
         <translation>Glisează mai departe spre conversațiile tale.</translation>
+    </message>
+    <message>
+        <source>Start backup</source>
+        <translation>Pornește copia de rezervă</translation>
+    </message>
+    <message>
+        <source>Backing up…</source>
+        <translation>Se creează copia de rezervă…</translation>
+    </message>
+    <message>
+        <source>Saves your messages, contacts and end-to-end encryption setup to a backup file. Keep this file in a safe place.</source>
+        <translation>Salvează mesajele, contactele și configurarea criptării cap-la-cap într-un fișier de rezervă. Păstrează acest fișier într-un loc sigur.</translation>
     </message>
 </context>
 <context>
@@ -289,10 +277,6 @@ Other groups with blocked contacts will still show their messages.</source>
 </context>
 <context>
     <name>ChatListPage</name>
-    <message>
-        <source>Lost the connection to the Delta Chat core. Reconnecting...</source>
-        <translation>S-a pierdut conexiunea cu nucleul Delta Chat. Se reconectează...</translation>
-    </message>
     <message>
         <source>Lost the connection to the Delta Chat core. Restart Piirit.</source>
         <translation>S-a pierdut conexiunea cu nucleul Delta Chat. Repornește Piirit.</translation>
@@ -401,6 +385,10 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Search</source>
         <translation>Caută</translation>
+    </message>
+    <message>
+        <source>Lost the connection to the Delta Chat core. Reconnecting…</source>
+        <translation>S-a pierdut conexiunea cu nucleul Delta Chat. Se reconectează…</translation>
     </message>
 </context>
 <context>
@@ -531,10 +519,6 @@ Other groups with blocked contacts will still show their messages.</source>
 <context>
     <name>ConversationPage</name>
     <message>
-        <source>Lost the connection to the Delta Chat core. Reconnecting...</source>
-        <translation>S-a pierdut conexiunea cu nucleul Delta Chat. Se reconectează...</translation>
-    </message>
-    <message>
         <source>Lost the connection to the Delta Chat core. Restart Piirit.</source>
         <translation>S-a pierdut conexiunea cu nucleul Delta Chat. Repornește Piirit.</translation>
     </message>
@@ -554,11 +538,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Message</source>
         <translation>Mesaj</translation>
-    </message>
-    <message>
-        <source>Long message: the other end sees a preview and taps to read the rest</source>
-        <extracomment>Shown above the message field while what is being written is long enough that the other end will receive a shortened version with the rest behind a tap.</extracomment>
-        <translation>Mesaj lung: celălalt capăt vede o previzualizare și atinge pentru a citi restul</translation>
     </message>
     <message>
         <source>Saved to Pictures</source>
@@ -582,9 +561,13 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Salvat în Descărcări</translation>
     </message>
     <message>
-        <source>Too big to send: %1. Attachments go up to %2.</source>
+        <source>Lost the connection to the Delta Chat core. Reconnecting…</source>
+        <translation>S-a pierdut conexiunea cu nucleul Delta Chat. Se reconectează…</translation>
+    </message>
+    <message>
+        <source>%1 is too large to send. Attachments can be up to %2.</source>
         <extracomment>Shown above the message field when the attached file is bigger than will be sent. %1 is the file&apos;s size and %2 the largest that goes, each such as &quot;24 MB&quot;.</extracomment>
-        <translation>Prea mare pentru a fi trimis: %1. Atașamentele pot avea până la %2.</translation>
+        <translation>%1 este prea mare pentru a fi trimis. Atașamentele pot avea până la %2.</translation>
     </message>
 </context>
 <context>
@@ -622,14 +605,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>How do you want to delete this message? This cannot be undone.</source>
         <translation>Cum vrei să ștergi acest mesaj? Nu se poate anula.</translation>
-    </message>
-    <message>
-        <source>It goes from your devices. Everybody else keeps their copy.</source>
-        <translation>Dispare de pe dispozitivele tale. Toți ceilalți își păstrează copia.</translation>
-    </message>
-    <message>
-        <source>It goes from your devices, and every other device in this chat is asked to delete it too.</source>
-        <translation>Dispare de pe dispozitivele tale, iar fiecare alt dispozitiv din această conversație este rugat să îl șteargă și el.</translation>
     </message>
 </context>
 <context>
@@ -691,8 +666,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>După %1 de secunde</translation>
     </message>
     <message>
-        <source>Applies to everyone in the chat. They can still copy and forward.</source>
-        <translation>Se aplică tuturor din conversație. Tot pot copia și redirecționa.</translation>
+        <source>Applies to all members of this chat; they can still copy, save, and forward messages.</source>
+        <translation>Se aplică tuturor membrilor acestui chat dacă folosesc Delta Chat; aceștia pot în continuare să copieze, să salveze și să redirecționeze mesajele sau să utilizeze alți clienți de e-mail.</translation>
     </message>
 </context>
 <context>
@@ -708,14 +683,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Restore from a backup</source>
         <translation>Restaurează dintr-o copie de siguranță</translation>
-    </message>
-    <message>
-        <source>The other device keeps it. Both get everything new.</source>
-        <translation>Celălalt dispozitiv îl păstrează. Amândouă primesc tot ce e nou.</translation>
-    </message>
-    <message>
-        <source>A backup file copied onto this phone.</source>
-        <translation>Un fișier de copie, copiat pe acest telefon.</translation>
     </message>
 </context>
 <context>
@@ -802,14 +769,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Dumneavoastră alegeți cine vă poate scrie</translation>
     </message>
     <message>
-        <source>Groups of equals</source>
-        <translation>Grupuri între egali</translation>
-    </message>
-    <message>
-        <source>The server only passes it on</source>
-        <translation>Serverul doar îl trece mai departe</translation>
-    </message>
-    <message>
         <source>Keep swiping to set up your profile.</source>
         <translation>Glisați mai departe pentru a vă configura profilul.</translation>
     </message>
@@ -818,24 +777,32 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Fiecare mesaj este criptat</translation>
     </message>
     <message>
-        <source>Made here on your phone. No phone number, no account, nothing to sign.</source>
-        <translation>Se face aici, pe telefonul tău. Fără număr, fără cont, nimic de semnat.</translation>
+        <source>Your profile is created on this phone. No phone number and no sign-up are needed.</source>
+        <translation>Profilul tău este creat pe acest telefon. Nu este nevoie nici de număr de telefon, nici de înregistrare.</translation>
     </message>
     <message>
-        <source>There is no directory to be found in. Show a friend a code, or send a link.</source>
-        <translation>Nu există un director în care să fii găsit. Arată-i unui prieten un cod, sau trimite-i un link.</translation>
+        <source>There is no public directory. People reach you by scanning your invite code or opening your invite link.</source>
+        <translation>Nu există un director public. Ceilalți ajung la tine scanându-ți codul de invitație sau deschizând linkul tău de invitație.</translation>
     </message>
     <message>
-        <source>Encrypted the whole way, always. The servers cannot read a word.</source>
-        <translation>Mereu criptat pe tot drumul. Serverele nu citesc un cuvânt.</translation>
+        <source>Any member can add people, rename the group or leave it.</source>
+        <translation>Orice membru poate adăuga persoane, redenumi grupul sau îl poate părăsi.</translation>
     </message>
     <message>
-        <source>Anyone can add a friend, rename the group or leave. Nobody is in charge.</source>
-        <translation>Oricine poate adăuga un prieten, redenumi grupul sau pleca. Nimeni nu comandă.</translation>
+        <source>Messages are end-to-end encrypted, so the relays that carry them cannot read them.</source>
+        <translation>Mesajele sunt criptate cap-la-cap, așa că releele care le transportă nu le pot citi.</translation>
     </message>
     <message>
-        <source>It holds a message until the other phone is online, and nothing more.</source>
-        <translation>Ține un mesaj până când celălalt telefon e online, și nimic mai mult.</translation>
+        <source>Groups have no admins</source>
+        <translation>Grupurile nu au administratori</translation>
+    </message>
+    <message>
+        <source>Relays only pass messages on</source>
+        <translation>Releele doar transmit mesajele mai departe</translation>
+    </message>
+    <message>
+        <source>A relay stores a message only until the recipient fetches it.</source>
+        <translation>Un releu păstrează un mesaj doar până când destinatarul îl preia.</translation>
     </message>
 </context>
 <context>
@@ -966,12 +933,12 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Niciun contact încă</translation>
     </message>
     <message>
-        <source>Scan someone&apos;s invite from the chat list: QR code</source>
-        <translation>Scanează invitația cuiva din lista de conversații: Cod QR</translation>
-    </message>
-    <message>
         <source>Search</source>
         <translation>Caută</translation>
+    </message>
+    <message>
+        <source>Use &quot;QR code&quot; in the chat list to add a contact.</source>
+        <translation>Folosește „Cod QR” în lista de conversații pentru a adăuga un contact.</translation>
     </message>
 </context>
 <context>
@@ -979,10 +946,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Please name the group</source>
         <translation>Dă un nume grupului</translation>
-    </message>
-    <message>
-        <source>Create Group</source>
-        <translation>Creează grupul</translation>
     </message>
     <message>
         <source>New group</source>
@@ -1016,6 +979,10 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Add members</source>
         <translation>Adaugă membri</translation>
+    </message>
+    <message>
+        <source>Create group</source>
+        <translation>Creează grupul</translation>
     </message>
 </context>
 <context>
@@ -1089,10 +1056,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Releul nu și-a raportat încă cota</translation>
     </message>
     <message>
-        <source>Both ways: with this off you send none and see none.</source>
-        <translation>În ambele sensuri: oprit, nu trimiți niciuna și nu vezi niciuna.</translation>
-    </message>
-    <message>
         <source>Relays</source>
         <translation>Relee</translation>
     </message>
@@ -1127,16 +1090,16 @@ Other groups with blocked contacts will still show their messages.</source>
         <extracomment>How much room the profile takes on the phone. %1 is a size such as &quot;12.3 MB&quot;.</extracomment>
         <translation>Piirit ocupă %1 de spațiu pe acest telefon.</translation>
     </message>
+    <message>
+        <source>If read receipts are disabled, you won&apos;t be able to see read receipts from others.</source>
+        <translation>Dacă sunt dezactivate chitanțele de citire, nu veți putea vedea chitanțele de citire de la alte persoane.</translation>
+    </message>
 </context>
 <context>
     <name>ProfileSetupPage</name>
     <message>
         <source>Add profile</source>
         <translation>Adaugă profil</translation>
-    </message>
-    <message>
-        <source>Contacting %1...</source>
-        <translation>Se contactează %1...</translation>
     </message>
     <message>
         <source>Cancel</source>
@@ -1151,16 +1114,16 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>%1 nu a răspuns în %2 secunde.</translation>
     </message>
     <message>
-        <source>Relays are run by volunteers. Go back and try another one.</source>
-        <translation>Releele sunt ținute de voluntari. Întoarce-te și încearcă altul.</translation>
+        <source>Contacting %1…</source>
+        <translation>Se contactează %1…</translation>
+    </message>
+    <message>
+        <source>Could not reach the relay. Try another one.</source>
+        <translation>Releul nu a putut fi contactat. Încearcă altul.</translation>
     </message>
 </context>
 <context>
     <name>ProfileStartPage</name>
-    <message>
-        <source>Alright, let&apos;s get you set up.</source>
-        <translation>Bine, să vă configurăm profilul.</translation>
-    </message>
     <message>
         <source>I already have a profile</source>
         <translation>Am deja un profil</translation>
@@ -1168,6 +1131,10 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Create a profile</source>
         <translation>Creează un profil</translation>
+    </message>
+    <message>
+        <source>Set up your profile</source>
+        <translation>Configurează-ți profilul</translation>
     </message>
 </context>
 <context>
@@ -1233,16 +1200,16 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Lasă pe cineva să scaneze acest cod sau trimite-i linkul.</translation>
     </message>
     <message>
-        <source>Fetching...</source>
-        <translation>Se preia...</translation>
-    </message>
-    <message>
-        <source>Copy Invite Link</source>
-        <translation>Copiază linkul de invitație</translation>
-    </message>
-    <message>
         <source>The camera is not available on this device.</source>
         <translation>Camera nu este disponibilă pe acest dispozitiv.</translation>
+    </message>
+    <message>
+        <source>Fetching…</source>
+        <translation>Se preia…</translation>
+    </message>
+    <message>
+        <source>Copy invite link</source>
+        <translation>Copiază linkul de invitație</translation>
     </message>
 </context>
 <context>
@@ -1260,10 +1227,6 @@ Other groups with blocked contacts will still show their messages.</source>
 <context>
     <name>RestoreProfilePage</name>
     <message>
-        <source>That is not the code a device shows while it is offering its profile.</source>
-        <translation>Acesta nu este codul pe care un dispozitiv îl arată cât timp își oferă profilul.</translation>
-    </message>
-    <message>
         <source>Add as second device</source>
         <translation>Adaugă ca al doilea dispozitiv</translation>
     </message>
@@ -1276,16 +1239,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Alege un fișier de copie</translation>
     </message>
     <message>
-        <source>Taking the profile over...</source>
-        <translation>Se preia profilul...</translation>
-    </message>
-    <message>
         <source>Cancel</source>
         <translation>Anulează</translation>
-    </message>
-    <message>
-        <source>Hold the phone up to the code it shows</source>
-        <translation>Îndreptați acest telefon spre codul afișat</translation>
     </message>
     <message>
         <source>Enter the code instead</source>
@@ -1294,10 +1249,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Code from the other device</source>
         <translation>Cod de pe celălalt dispozitiv</translation>
-    </message>
-    <message>
-        <source>Take the profile over</source>
-        <translation>Preia profilul</translation>
     </message>
     <message>
         <source>That did not work</source>
@@ -1312,28 +1263,44 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Alege alt fișier</translation>
     </message>
     <message>
-        <source>The other device runs a newer Delta Chat than this app can read.</source>
-        <translation>Celălalt dispozitiv are un Delta Chat mai nou decât poate citi această aplicație.</translation>
-    </message>
-    <message>
-        <source>The transfer stopped. Both devices have to stay on one network, with this page open.</source>
-        <translation>Transferul s-a oprit. Ambele dispozitive trebuie să rămână în aceeași rețea, cu această pagină deschisă.</translation>
-    </message>
-    <message>
-        <source>No camera on this device. A backup file works without one.</source>
-        <translation>Acest dispozitiv nu are cameră. Un fișier de copie merge și fără.</translation>
-    </message>
-    <message>
-        <source>On the other device: Settings, then add a second device. Both on one network.</source>
-        <translation>Pe celălalt dispozitiv: Setări, apoi adaugă un al doilea dispozitiv. Ambele în aceeași rețea.</translation>
-    </message>
-    <message>
         <source>Make a backup on the other device, copy the file here, then choose it.</source>
         <translation>Fă o copie pe celălalt dispozitiv, copiază fișierul aici, apoi alege-l.</translation>
     </message>
     <message>
         <source>That profile is already on this phone. Open it from the profiles list.</source>
         <translation>Acest profil este deja pe acest telefon. Deschide-l din lista de profiluri.</translation>
+    </message>
+    <message>
+        <source>The profile is from a newer Delta Chat version than this app can read.</source>
+        <translation>Profilul provine dintr-o versiune Delta Chat mai nouă decât poate citi această aplicație.</translation>
+    </message>
+    <message>
+        <source>The transfer stopped. Both devices must stay on the same network with this page open.</source>
+        <translation>Transferul s-a oprit. Ambele dispozitive trebuie să rămână în aceeași rețea, cu această pagină deschisă.</translation>
+    </message>
+    <message>
+        <source>This is not a second-device code. Use the code shown by the other device.</source>
+        <translation>Acesta nu este un cod pentru un al doilea dispozitiv. Folosește codul afișat de celălalt dispozitiv.</translation>
+    </message>
+    <message>
+        <source>Hold your camera over the QR code</source>
+        <translation>Ține camera deasupra codului QR</translation>
+    </message>
+    <message>
+        <source>Copy the profile</source>
+        <translation>Copiază profilul</translation>
+    </message>
+    <message>
+        <source>No camera on this device. You can restore from a backup file instead.</source>
+        <translation>Acest dispozitiv nu are cameră. Poți restaura în schimb dintr-un fișier de rezervă.</translation>
+    </message>
+    <message>
+        <source>On the other device, go to Settings and tap &quot;Add second device&quot;. Both devices must be on the same network.</source>
+        <translation>Pe celălalt dispozitiv, mergi la Setări și atinge „Adaugă al doilea dispozitiv”. Ambele dispozitive trebuie să fie în aceeași rețea.</translation>
+    </message>
+    <message>
+        <source>Transferring…</source>
+        <translation>Transferul...</translation>
     </message>
 </context>
 <context>
@@ -1385,40 +1352,20 @@ Other groups with blocked contacts will still show their messages.</source>
 <context>
     <name>SecondDevicePage</name>
     <message>
-        <source>Nothing took the profile. Both phones have to stay on one network, with this page open.</source>
-        <translation>Nimeni nu a luat profilul. Ambele telefoane trebuie să rămână în aceeași rețea, cu această pagină deschisă.</translation>
-    </message>
-    <message>
         <source>Add a second device</source>
         <translation>Adaugă un al doilea dispozitiv</translation>
-    </message>
-    <message>
-        <source>On the other device: add a profile you have already, then &quot;Add as second device&quot;, and read this code with it. Both phones on one network.</source>
-        <translation>Pe celălalt dispozitiv: adaugă un profil pe care îl ai deja, apoi „Adaugă ca al doilea dispozitiv”, și citește cu el acest cod. Ambele telefoane în aceeași rețea.</translation>
     </message>
     <message>
         <source>Copy the code</source>
         <translation>Copiază codul</translation>
     </message>
     <message>
-        <source>Handing the profile over...</source>
-        <translation>Se predă profilul...</translation>
-    </message>
-    <message>
         <source>Cancel</source>
         <translation>Anulează</translation>
     </message>
     <message>
-        <source>The other device has the profile. Both get everything new from now on.</source>
-        <translation>Celălalt dispozitiv are profilul. De acum amândouă primesc tot ce e nou.</translation>
-    </message>
-    <message>
         <source>Swipe on for your chats.</source>
         <translation>Glisează mai departe spre conversațiile tale.</translation>
-    </message>
-    <message>
-        <source>Whoever reads this code gets the profile. It stops collecting mail until the code is gone.</source>
-        <translation>Cine citește acest cod primește profilul. Cât timp codul e aici, profilul nu mai ia poșta.</translation>
     </message>
     <message>
         <source>Show code again</source>
@@ -1427,6 +1374,26 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Show code</source>
         <translation>Arată codul</translation>
+    </message>
+    <message>
+        <source>No device copied the profile. Both devices must stay on the same network with this page open.</source>
+        <translation>Niciun dispozitiv nu a copiat profilul. Ambele dispozitive trebuie să rămână în aceeași rețea, cu această pagină deschisă.</translation>
+    </message>
+    <message>
+        <source>Transferring…</source>
+        <translation>Transferul...</translation>
+    </message>
+    <message>
+        <source>The profile was transferred to your second device. Both devices now receive all new messages.</source>
+        <translation>Profilul a fost transferat pe al doilea dispozitiv. Ambele dispozitive primesc acum toate mesajele noi.</translation>
+    </message>
+    <message>
+        <source>On the other device, choose &quot;Add as second device&quot; and scan this code. Both devices must be on the same network.</source>
+        <translation>Pe celălalt dispozitiv, alege „Adaugă ca al doilea dispozitiv” și scanează acest cod. Ambele dispozitive trebuie să fie în aceeași rețea.</translation>
+    </message>
+    <message>
+        <source>Make sure no unwanted observer or camera can see this code. This profile does not receive messages while the code is shown.</source>
+        <translation>Asigură-te că niciun observator sau cameră nedoriți nu pot vedea acest cod. Acest profil nu primește mesaje cât timp codul este afișat.</translation>
     </message>
 </context>
 <context>
@@ -1480,18 +1447,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Notificări</translation>
     </message>
     <message>
-        <source>Who wrote, and what</source>
-        <translation>Cine a scris, și ce</translation>
-    </message>
-    <message>
-        <source>Who wrote</source>
-        <translation>Cine a scris</translation>
-    </message>
-    <message>
-        <source>Only that something arrived</source>
-        <translation>Doar că a sosit ceva</translation>
-    </message>
-    <message>
         <source>Apps</source>
         <translation>Aplicații</translation>
     </message>
@@ -1525,10 +1480,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Șterge mesajele de pe dispozitiv</translation>
     </message>
     <message>
-        <source>A new notification shows</source>
-        <translation>O notificare nouă arată</translation>
-    </message>
-    <message>
         <source>Mentions</source>
         <extracomment>A reply to one of the reader&apos;s own messages, arriving in a group they have muted.</extracomment>
         <translation>Mențiuni</translation>
@@ -1543,49 +1494,12 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Folosește formatarea Markdown</translation>
     </message>
     <message>
-        <source>Otherwise it starts a new line, and the button sends.</source>
-        <translation>Altfel începe un rând nou, iar butonul trimite.</translation>
-    </message>
-    <message>
-        <source>Draws *stars* and `backticks` rather than showing them.</source>
-        <translation>Desenează *asteriscurile* și `accentele grave` în loc să le arate.</translation>
-    </message>
-    <message>
-        <source>Bigger ones wait until you ask for them. Every profile, from now on.</source>
-        <translation>Cele mai mari așteaptă să le ceri. Toate profilurile, de acum înainte.</translation>
-    </message>
-    <message>
-        <source>Every chat of every profile. &quot;Saved messages&quot; are kept.</source>
-        <translation>Fiecare conversație a fiecărui profil. „Mesajele salvate” rămân.</translation>
-    </message>
-    <message>
-        <source>On the lock screen and in the notification area.</source>
-        <translation>Pe ecranul de blocare și în zona de notificări.</translation>
-    </message>
-    <message>
-        <source>A reply to you gets through a muted group.</source>
-        <translation>Un răspuns către tine trece și printr-un grup amuțit.</translation>
-    </message>
-    <message>
-        <source>Click ids and campaign tags come out of the links you send.</source>
-        <translation>Identificatorii de clic și etichetele de campanie ies din linkurile pe care le trimiți.</translation>
-    </message>
-    <message>
-        <source>Small apps run inside the chat. Somebody else&apos;s code, and less tested than the rest.</source>
-        <translation>Aplicații mici rulează în conversație. Cod străin, și mai puțin încercat decât restul.</translation>
-    </message>
-    <message>
         <source>Privacy</source>
         <translation>Confidențialitate</translation>
     </message>
     <message>
         <source>Blocked contacts</source>
         <translation>Contacte blocate</translation>
-    </message>
-    <message>
-        <source>Worse quality, save data</source>
-        <extracomment>Outgoing media quality: smaller pictures and videos, which cost the reader and whoever they write to less data. Both reference clients&apos; words for it.</extracomment>
-        <translation>Calitate mai proastă, dimensiuni mici</translation>
     </message>
     <message>
         <source>Balanced</source>
@@ -1598,12 +1512,41 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Calitatea mediilor de ieșire</translation>
     </message>
     <message>
-        <source>Pictures are made smaller before sending, and the camera records at this quality.</source>
-        <translation>Imaginile sunt micșorate înainte de trimitere, iar camera înregistrează la această calitate.</translation>
-    </message>
-    <message>
         <source>Show notifications</source>
         <translation>Afișează notificările</translation>
+    </message>
+    <message>
+        <source>Lower quality, less data</source>
+        <extracomment>Outgoing media quality: smaller pictures and videos, which cost the reader and whoever they write to less data. Both reference clients&apos; words for it.</extracomment>
+        <translation>Calitate mai slabă, mai puține date</translation>
+    </message>
+    <message>
+        <source>Notification content</source>
+        <translation>Conținutul notificărilor</translation>
+    </message>
+    <message>
+        <source>Sender and message</source>
+        <translation>Expeditor și mesaj</translation>
+    </message>
+    <message>
+        <source>Sender only</source>
+        <translation>Doar expeditorul</translation>
+    </message>
+    <message>
+        <source>No details</source>
+        <translation>Fără detalii</translation>
+    </message>
+    <message>
+        <source>In muted groups, notify messages directed to you, like replies or reactions</source>
+        <translation>În grupurile amuțite, notifică mesajele adresate ție, precum răspunsuri sau reacții</translation>
+    </message>
+    <message>
+        <source>Removes click IDs and campaign tags from links you send.</source>
+        <translation>Elimină ID-urile de clic și etichetele de campanie din linkurile pe care le trimiți.</translation>
+    </message>
+    <message>
+        <source>Runs small apps inside chats. These features may be unstable and may be changed or removed.</source>
+        <translation>Rulează aplicații mici în conversații. Aceste funcții pot fi instabile și pot fi modificate sau eliminate.</translation>
     </message>
 </context>
 <context>
@@ -1676,16 +1619,16 @@ Other groups with blocked contacts will still show their messages.</source>
 <context>
     <name>WelcomePage</name>
     <message>
-        <source>Tell me about Delta Chat</source>
-        <translation>Ce este Delta Chat?</translation>
-    </message>
-    <message>
-        <source>Set up my profile</source>
-        <translation>Configurează-mi profilul</translation>
-    </message>
-    <message>
         <source>Secure decentralised chat based on Delta Chat</source>
         <translation>Discuții sigure și descentralizate, bazate pe Delta Chat</translation>
+    </message>
+    <message>
+        <source>About Delta Chat</source>
+        <translation>Despre Delta Chat</translation>
+    </message>
+    <message>
+        <source>Set up your profile</source>
+        <translation>Configurează-ți profilul</translation>
     </message>
 </context>
 </TS>

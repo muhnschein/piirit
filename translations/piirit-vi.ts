@@ -51,8 +51,8 @@
         <translation>Piirit chỉ hoạt động với các máy chuyển tiếp chatmail. Đây là một loại máy chủ e-mail đặc biệt; máy chủ e-mail thông thường không được hỗ trợ. Xem thêm tại &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. Danh sách đầy đủ các máy chuyển tiếp chatmail công cộng, miễn phí có tại &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
     </message>
     <message>
-        <source>Pick a name and a relay. That&apos;s it! There is nothing else to set up.</source>
-        <translation>Chọn một tên và một máy chuyển tiếp. Thế là xong! Không cần thiết lập gì thêm.</translation>
+        <source>Choose a name and a relay. Nothing else is needed.</source>
+        <translation>Chọn một tên và một máy chuyển tiếp. Không cần gì thêm.</translation>
     </message>
 </context>
 <context>
@@ -66,24 +66,12 @@
         <translation>Tạo hồ sơ</translation>
     </message>
     <message>
-        <source>A new address on a chatmail relay.</source>
-        <translation>Một địa chỉ mới trên máy chuyển tiếp chatmail.</translation>
-    </message>
-    <message>
         <source>Restore from a backup</source>
         <translation>Khôi phục từ bản sao lưu</translation>
     </message>
     <message>
-        <source>A backup file copied onto this phone.</source>
-        <translation>Một tệp sao lưu đã chép sang điện thoại này.</translation>
-    </message>
-    <message>
         <source>Add as second device</source>
         <translation>Thêm làm thiết bị thứ hai</translation>
-    </message>
-    <message>
-        <source>The other device keeps it. Both get everything new.</source>
-        <translation>Thiết bị kia vẫn giữ. Cả hai đều nhận mọi thứ mới.</translation>
     </message>
 </context>
 <context>
@@ -97,24 +85,12 @@
         <translation>Thêm máy chuyển tiếp</translation>
     </message>
     <message>
-        <source>Another address for this profile, on another relay. The profile sends from one relay at a time; its page says which, and lets you change it.</source>
-        <translation>Thêm một địa chỉ cho hồ sơ này, trên một máy chuyển tiếp khác. Hồ sơ chỉ gửi từ một máy chuyển tiếp tại một thời điểm; trang của nó cho biết máy nào và cho phép bạn đổi.</translation>
-    </message>
-    <message>
         <source>Add relay</source>
         <translation>Thêm máy chuyển tiếp</translation>
     </message>
     <message>
-        <source>Contacting %1...</source>
-        <translation>Đang liên hệ %1...</translation>
-    </message>
-    <message>
         <source>Cancel</source>
         <translation>Hủy</translation>
-    </message>
-    <message>
-        <source>Relays are run by volunteers. Try another one.</source>
-        <translation>Máy chuyển tiếp do tình nguyện viên vận hành. Thử máy khác.</translation>
     </message>
     <message>
         <source>Select a public chatmail relay</source>
@@ -127,6 +103,18 @@
     <message>
         <source>Piirit works only with chatmail relays. These are a particular kind of e-mail server; ordinary e-mail servers are not supported. For more, see &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. A full list of public, free-to-use chatmail relays is at &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</source>
         <translation>Piirit chỉ hoạt động với các máy chuyển tiếp chatmail. Đây là một loại máy chủ e-mail đặc biệt; máy chủ e-mail thông thường không được hỗ trợ. Xem thêm tại &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. Danh sách đầy đủ các máy chuyển tiếp chatmail công cộng, miễn phí có tại &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
+    </message>
+    <message>
+        <source>Adds another address for this profile on a second relay. The profile sends from one relay at a time; you can change which one on the profile page.</source>
+        <translation>Thêm cho hồ sơ này một địa chỉ nữa trên một máy chuyển tiếp khác. Hồ sơ gửi qua một máy chuyển tiếp tại một thời điểm; bạn có thể đổi máy nào ở trang hồ sơ.</translation>
+    </message>
+    <message>
+        <source>Contacting %1…</source>
+        <translation>Đang liên hệ %1…</translation>
+    </message>
+    <message>
+        <source>Could not reach the relay. Try another one.</source>
+        <translation>Không liên hệ được với máy chuyển tiếp. Hãy thử máy khác.</translation>
     </message>
 </context>
 <context>
@@ -159,13 +147,6 @@
         <source>Cancel</source>
         <translation>Hủy</translation>
     </message>
-    <message numerus="yes">
-        <source>%n message(s) will be deleted now, and from then on every message will be once it is that old.</source>
-        <extracomment>%n is how many messages would be deleted straight away.</extracomment>
-        <translation>
-            <numerusform>%n tin nhắn sẽ bị xóa ngay, và từ đó về sau mọi tin nhắn sẽ bị xóa khi đủ cũ như vậy.</numerusform>
-        </translation>
-    </message>
     <message>
         <source>This includes pictures, videos and files.</source>
         <translation>Bao gồm cả hình ảnh, video và tệp.</translation>
@@ -183,20 +164,19 @@
         <source>I understand, delete all these messages</source>
         <translation>Tôi hiểu, xóa tất cả các tin nhắn này</translation>
     </message>
+    <message numerus="yes">
+        <source>%n message(s) will be deleted now, and every new message will be deleted once it reaches that age.</source>
+        <extracomment>%n is how many messages would be deleted straight away.</extracomment>
+        <translation>
+            <numerusform>%n tin nhắn sẽ bị xóa ngay bây giờ, và mọi tin nhắn mới sẽ bị xóa khi đạt đến độ tuổi đó.</numerusform>
+        </translation>
+    </message>
 </context>
 <context>
     <name>BackupPage</name>
     <message>
         <source>Back up profile</source>
         <translation>Sao lưu hồ sơ</translation>
-    </message>
-    <message>
-        <source>Write the backup</source>
-        <translation>Ghi bản sao lưu</translation>
-    </message>
-    <message>
-        <source>Writing the backup...</source>
-        <translation>Đang ghi bản sao lưu...</translation>
     </message>
     <message>
         <source>Cancel</source>
@@ -208,12 +188,20 @@
         <translation>Đã lưu vào %1</translation>
     </message>
     <message>
-        <source>Messages, contacts and key in one file, saved to Documents. Whoever has the file has the profile.</source>
-        <translation>Tin nhắn, danh bạ và khoá trong một tệp, lưu vào Tài liệu. Ai có tệp thì có hồ sơ.</translation>
-    </message>
-    <message>
         <source>Swipe on for your chats.</source>
         <translation>Vuốt tiếp để đến các cuộc trò chuyện.</translation>
+    </message>
+    <message>
+        <source>Start backup</source>
+        <translation>Bắt đầu sao lưu</translation>
+    </message>
+    <message>
+        <source>Backing up…</source>
+        <translation>Đang sao lưu…</translation>
+    </message>
+    <message>
+        <source>Saves your messages, contacts and end-to-end encryption setup to a backup file. Keep this file in a safe place.</source>
+        <translation>Lưu tin nhắn, danh bạ và thiết lập mã hóa đầu cuối của bạn vào một tệp sao lưu. Hãy giữ tệp này ở nơi an toàn.</translation>
     </message>
 </context>
 <context>
@@ -287,10 +275,6 @@ Other groups with blocked contacts will still show their messages.</source>
 </context>
 <context>
     <name>ChatListPage</name>
-    <message>
-        <source>Lost the connection to the Delta Chat core. Reconnecting...</source>
-        <translation>Mất kết nối với lõi Delta Chat. Đang kết nối lại...</translation>
-    </message>
     <message>
         <source>Lost the connection to the Delta Chat core. Restart Piirit.</source>
         <translation>Mất kết nối với lõi Delta Chat. Hãy khởi động lại Piirit.</translation>
@@ -399,6 +383,10 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Search</source>
         <translation>Tìm kiếm</translation>
+    </message>
+    <message>
+        <source>Lost the connection to the Delta Chat core. Reconnecting…</source>
+        <translation>Mất kết nối với lõi Delta Chat. Đang kết nối lại…</translation>
     </message>
 </context>
 <context>
@@ -529,10 +517,6 @@ Other groups with blocked contacts will still show their messages.</source>
 <context>
     <name>ConversationPage</name>
     <message>
-        <source>Lost the connection to the Delta Chat core. Reconnecting...</source>
-        <translation>Mất kết nối với lõi Delta Chat. Đang kết nối lại...</translation>
-    </message>
-    <message>
         <source>Lost the connection to the Delta Chat core. Restart Piirit.</source>
         <translation>Mất kết nối với lõi Delta Chat. Hãy khởi động lại Piirit.</translation>
     </message>
@@ -554,11 +538,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Tin nhắn</translation>
     </message>
     <message>
-        <source>Long message: the other end sees a preview and taps to read the rest</source>
-        <extracomment>Shown above the message field while what is being written is long enough that the other end will receive a shortened version with the rest behind a tap.</extracomment>
-        <translation>Tin nhắn dài: đầu bên kia chỉ thấy một đoạn xem trước và phải chạm để đọc phần còn lại</translation>
-    </message>
-    <message>
         <source>Saved to Pictures</source>
         <translation>Đã lưu vào Hình ảnh</translation>
     </message>
@@ -578,9 +557,13 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Đã lưu vào Tải xuống</translation>
     </message>
     <message>
-        <source>Too big to send: %1. Attachments go up to %2.</source>
+        <source>Lost the connection to the Delta Chat core. Reconnecting…</source>
+        <translation>Mất kết nối với lõi Delta Chat. Đang kết nối lại…</translation>
+    </message>
+    <message>
+        <source>%1 is too large to send. Attachments can be up to %2.</source>
         <extracomment>Shown above the message field when the attached file is bigger than will be sent. %1 is the file&apos;s size and %2 the largest that goes, each such as &quot;24 MB&quot;.</extracomment>
-        <translation>Quá lớn để gửi: %1. Tệp đính kèm tối đa %2.</translation>
+        <translation>%1 quá lớn để gửi. Tệp đính kèm có thể lên tới %2.</translation>
     </message>
 </context>
 <context>
@@ -618,14 +601,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>How do you want to delete this message? This cannot be undone.</source>
         <translation>Bạn muốn xóa tin nhắn này thế nào? Không thể hoàn tác.</translation>
-    </message>
-    <message>
-        <source>It goes from your devices. Everybody else keeps their copy.</source>
-        <translation>Nó biến mất khỏi các thiết bị của bạn. Mọi người khác vẫn giữ bản sao của họ.</translation>
-    </message>
-    <message>
-        <source>It goes from your devices, and every other device in this chat is asked to delete it too.</source>
-        <translation>Nó biến mất khỏi các thiết bị của bạn, và mọi thiết bị khác trong cuộc trò chuyện này cũng được yêu cầu xóa nó.</translation>
     </message>
 </context>
 <context>
@@ -687,8 +662,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Sau %1 giây</translation>
     </message>
     <message>
-        <source>Applies to everyone in the chat. They can still copy and forward.</source>
-        <translation>Áp dụng cho mọi người trong cuộc trò chuyện. Họ vẫn có thể sao chép và chuyển tiếp.</translation>
+        <source>Applies to all members of this chat; they can still copy, save, and forward messages.</source>
+        <translation>Áp dụng cho tất cả thành viên của cuộc trò chuyện này nếu họ sử dụng Delta Chat; họ vẫn có thể sao chép, lưu và chuyển tiếp thư hoặc sử dụng các ứng dụng e-mail khác.</translation>
     </message>
 </context>
 <context>
@@ -704,14 +679,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Restore from a backup</source>
         <translation>Khôi phục từ bản sao lưu</translation>
-    </message>
-    <message>
-        <source>The other device keeps it. Both get everything new.</source>
-        <translation>Thiết bị kia vẫn giữ. Cả hai đều nhận mọi thứ mới.</translation>
-    </message>
-    <message>
-        <source>A backup file copied onto this phone.</source>
-        <translation>Một tệp sao lưu đã chép sang điện thoại này.</translation>
     </message>
 </context>
 <context>
@@ -794,14 +761,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Bạn chọn ai có thể liên lạc với mình</translation>
     </message>
     <message>
-        <source>Groups of equals</source>
-        <translation>Nhóm của những người ngang hàng</translation>
-    </message>
-    <message>
-        <source>The server only passes it on</source>
-        <translation>Máy chủ chỉ chuyển tiếp</translation>
-    </message>
-    <message>
         <source>Keep swiping to set up your profile.</source>
         <translation>Cứ vuốt tiếp để tạo hồ sơ của bạn.</translation>
     </message>
@@ -810,24 +769,32 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Mọi tin nhắn đều được mã hoá</translation>
     </message>
     <message>
-        <source>Made here on your phone. No phone number, no account, nothing to sign.</source>
-        <translation>Tạo ngay tại đây, trên điện thoại của bạn. Không số điện thoại, không tài khoản, không gì để ký.</translation>
+        <source>Your profile is created on this phone. No phone number and no sign-up are needed.</source>
+        <translation>Hồ sơ của bạn được tạo trên điện thoại này. Không cần số điện thoại và không cần đăng ký.</translation>
     </message>
     <message>
-        <source>There is no directory to be found in. Show a friend a code, or send a link.</source>
-        <translation>Không có danh bạ nào để người khác tìm ra bạn. Cho bạn bè xem mã, hoặc gửi liên kết.</translation>
+        <source>There is no public directory. People reach you by scanning your invite code or opening your invite link.</source>
+        <translation>Không có danh bạ công khai. Người khác tìm được bạn bằng cách quét mã mời hoặc mở liên kết mời của bạn.</translation>
     </message>
     <message>
-        <source>Encrypted the whole way, always. The servers cannot read a word.</source>
-        <translation>Luôn mã hoá suốt chặng. Máy chủ không đọc được một chữ.</translation>
+        <source>Any member can add people, rename the group or leave it.</source>
+        <translation>Bất kỳ thành viên nào cũng có thể thêm người, đổi tên nhóm hoặc rời nhóm.</translation>
     </message>
     <message>
-        <source>Anyone can add a friend, rename the group or leave. Nobody is in charge.</source>
-        <translation>Ai cũng có thể thêm bạn bè, đổi tên nhóm hoặc rời đi. Không ai làm chủ.</translation>
+        <source>Messages are end-to-end encrypted, so the relays that carry them cannot read them.</source>
+        <translation>Tin nhắn được mã hóa đầu cuối, nên các máy chuyển tiếp chuyển chúng không thể đọc được.</translation>
     </message>
     <message>
-        <source>It holds a message until the other phone is online, and nothing more.</source>
-        <translation>Nó giữ tin nhắn cho đến khi điện thoại kia lên mạng, chỉ vậy thôi.</translation>
+        <source>Groups have no admins</source>
+        <translation>Nhóm không có quản trị viên</translation>
+    </message>
+    <message>
+        <source>Relays only pass messages on</source>
+        <translation>Máy chuyển tiếp chỉ chuyển tiếp tin nhắn</translation>
+    </message>
+    <message>
+        <source>A relay stores a message only until the recipient fetches it.</source>
+        <translation>Máy chuyển tiếp chỉ lưu tin nhắn cho đến khi người nhận lấy về.</translation>
     </message>
 </context>
 <context>
@@ -958,12 +925,12 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Chưa có liên hệ nào</translation>
     </message>
     <message>
-        <source>Scan someone&apos;s invite from the chat list: QR code</source>
-        <translation>Quét lời mời của ai đó từ danh sách trò chuyện: Mã QR</translation>
-    </message>
-    <message>
         <source>Search</source>
         <translation>Tìm kiếm</translation>
+    </message>
+    <message>
+        <source>Use &quot;QR code&quot; in the chat list to add a contact.</source>
+        <translation>Dùng &quot;Mã QR&quot; trong danh sách trò chuyện để thêm một liên hệ.</translation>
     </message>
 </context>
 <context>
@@ -971,10 +938,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Please name the group</source>
         <translation>Hãy đặt tên cho nhóm</translation>
-    </message>
-    <message>
-        <source>Create Group</source>
-        <translation>Tạo nhóm</translation>
     </message>
     <message>
         <source>New group</source>
@@ -1006,6 +969,10 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Add members</source>
         <translation>Thêm thành viên</translation>
+    </message>
+    <message>
+        <source>Create group</source>
+        <translation>Tạo nhóm</translation>
     </message>
 </context>
 <context>
@@ -1077,10 +1044,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Máy chuyển tiếp chưa báo hạn mức</translation>
     </message>
     <message>
-        <source>Both ways: with this off you send none and see none.</source>
-        <translation>Cả hai chiều: tắt thì bạn không gửi và cũng không thấy cái nào.</translation>
-    </message>
-    <message>
         <source>Relays</source>
         <translation>Máy chuyển tiếp</translation>
     </message>
@@ -1115,16 +1078,16 @@ Other groups with blocked contacts will still show their messages.</source>
         <extracomment>How much room the profile takes on the phone. %1 is a size such as &quot;12.3 MB&quot;.</extracomment>
         <translation>Piirit dùng %1 dung lượng trên điện thoại này.</translation>
     </message>
+    <message>
+        <source>If read receipts are disabled, you won&apos;t be able to see read receipts from others.</source>
+        <translation>Nếu thông báo xác nhận đã đọc bị tắt, bạn sẽ không thể xem thông báo xác nhận đã đọc từ người khác.</translation>
+    </message>
 </context>
 <context>
     <name>ProfileSetupPage</name>
     <message>
         <source>Add profile</source>
         <translation>Thêm hồ sơ</translation>
-    </message>
-    <message>
-        <source>Contacting %1...</source>
-        <translation>Đang liên hệ %1...</translation>
     </message>
     <message>
         <source>Cancel</source>
@@ -1139,16 +1102,16 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>%1 không trả lời trong %2 giây.</translation>
     </message>
     <message>
-        <source>Relays are run by volunteers. Go back and try another one.</source>
-        <translation>Máy chuyển tiếp do tình nguyện viên vận hành. Quay lại và thử máy khác.</translation>
+        <source>Contacting %1…</source>
+        <translation>Đang liên hệ %1…</translation>
+    </message>
+    <message>
+        <source>Could not reach the relay. Try another one.</source>
+        <translation>Không liên hệ được với máy chuyển tiếp. Hãy thử máy khác.</translation>
     </message>
 </context>
 <context>
     <name>ProfileStartPage</name>
-    <message>
-        <source>Alright, let&apos;s get you set up.</source>
-        <translation>Được rồi, hãy tạo hồ sơ cho bạn.</translation>
-    </message>
     <message>
         <source>I already have a profile</source>
         <translation>Tôi đã có hồ sơ</translation>
@@ -1156,6 +1119,10 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Create a profile</source>
         <translation>Tạo hồ sơ</translation>
+    </message>
+    <message>
+        <source>Set up your profile</source>
+        <translation>Thiết lập hồ sơ của bạn</translation>
     </message>
 </context>
 <context>
@@ -1221,16 +1188,16 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Để ai đó quét mã này, hoặc gửi cho họ liên kết.</translation>
     </message>
     <message>
-        <source>Fetching...</source>
-        <translation>Đang lấy...</translation>
-    </message>
-    <message>
-        <source>Copy Invite Link</source>
-        <translation>Sao chép liên kết mời</translation>
-    </message>
-    <message>
         <source>The camera is not available on this device.</source>
         <translation>Máy ảnh không khả dụng trên thiết bị này.</translation>
+    </message>
+    <message>
+        <source>Fetching…</source>
+        <translation>Đang lấy…</translation>
+    </message>
+    <message>
+        <source>Copy invite link</source>
+        <translation>Sao chép liên kết mời</translation>
     </message>
 </context>
 <context>
@@ -1248,10 +1215,6 @@ Other groups with blocked contacts will still show their messages.</source>
 <context>
     <name>RestoreProfilePage</name>
     <message>
-        <source>That is not the code a device shows while it is offering its profile.</source>
-        <translation>Đó không phải mã mà một thiết bị hiện ra khi đang chia sẻ hồ sơ của nó.</translation>
-    </message>
-    <message>
         <source>Add as second device</source>
         <translation>Thêm làm thiết bị thứ hai</translation>
     </message>
@@ -1264,16 +1227,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Chọn một tệp sao lưu</translation>
     </message>
     <message>
-        <source>Taking the profile over...</source>
-        <translation>Đang nhận hồ sơ...</translation>
-    </message>
-    <message>
         <source>Cancel</source>
         <translation>Hủy</translation>
-    </message>
-    <message>
-        <source>Hold the phone up to the code it shows</source>
-        <translation>Hướng điện thoại này vào mã hiện ra</translation>
     </message>
     <message>
         <source>Enter the code instead</source>
@@ -1282,10 +1237,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Code from the other device</source>
         <translation>Mã từ thiết bị kia</translation>
-    </message>
-    <message>
-        <source>Take the profile over</source>
-        <translation>Nhận hồ sơ</translation>
     </message>
     <message>
         <source>That did not work</source>
@@ -1300,28 +1251,44 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Chọn tệp khác</translation>
     </message>
     <message>
-        <source>The other device runs a newer Delta Chat than this app can read.</source>
-        <translation>Thiết bị kia chạy Delta Chat mới hơn mức ứng dụng này đọc được.</translation>
-    </message>
-    <message>
-        <source>The transfer stopped. Both devices have to stay on one network, with this page open.</source>
-        <translation>Việc chuyển đã dừng. Cả hai thiết bị phải ở cùng một mạng, với trang này đang mở.</translation>
-    </message>
-    <message>
-        <source>No camera on this device. A backup file works without one.</source>
-        <translation>Thiết bị này không có máy ảnh. Tệp sao lưu vẫn dùng được.</translation>
-    </message>
-    <message>
-        <source>On the other device: Settings, then add a second device. Both on one network.</source>
-        <translation>Trên thiết bị kia: Cài đặt, rồi thêm thiết bị thứ hai. Cả hai trên cùng một mạng.</translation>
-    </message>
-    <message>
         <source>Make a backup on the other device, copy the file here, then choose it.</source>
         <translation>Sao lưu trên thiết bị kia, chép tệp sang đây rồi chọn nó.</translation>
     </message>
     <message>
         <source>That profile is already on this phone. Open it from the profiles list.</source>
         <translation>Hồ sơ này đã có trên điện thoại này. Hãy mở nó từ danh sách hồ sơ.</translation>
+    </message>
+    <message>
+        <source>The profile is from a newer Delta Chat version than this app can read.</source>
+        <translation>Hồ sơ này thuộc phiên bản Delta Chat mới hơn phiên bản mà ứng dụng này đọc được.</translation>
+    </message>
+    <message>
+        <source>The transfer stopped. Both devices must stay on the same network with this page open.</source>
+        <translation>Quá trình chuyển đã dừng. Cả hai thiết bị phải ở cùng một mạng và giữ trang này mở.</translation>
+    </message>
+    <message>
+        <source>This is not a second-device code. Use the code shown by the other device.</source>
+        <translation>Đây không phải mã thiết bị thứ hai. Hãy dùng mã mà thiết bị kia hiển thị.</translation>
+    </message>
+    <message>
+        <source>Hold your camera over the QR code</source>
+        <translation>Giữ máy ảnh của bạn phía trên mã QR.</translation>
+    </message>
+    <message>
+        <source>Copy the profile</source>
+        <translation>Sao chép hồ sơ</translation>
+    </message>
+    <message>
+        <source>No camera on this device. You can restore from a backup file instead.</source>
+        <translation>Thiết bị này không có máy ảnh. Thay vào đó bạn có thể khôi phục từ một tệp sao lưu.</translation>
+    </message>
+    <message>
+        <source>On the other device, go to Settings and tap &quot;Add second device&quot;. Both devices must be on the same network.</source>
+        <translation>Trên thiết bị kia, vào Cài đặt và chạm &quot;Thêm thiết bị thứ hai&quot;. Cả hai thiết bị phải ở cùng một mạng.</translation>
+    </message>
+    <message>
+        <source>Transferring…</source>
+        <translation>Đang chuyển…</translation>
     </message>
 </context>
 <context>
@@ -1373,40 +1340,20 @@ Other groups with blocked contacts will still show their messages.</source>
 <context>
     <name>SecondDevicePage</name>
     <message>
-        <source>Nothing took the profile. Both phones have to stay on one network, with this page open.</source>
-        <translation>Không ai nhận hồ sơ. Cả hai điện thoại phải ở cùng một mạng, với trang này đang mở.</translation>
-    </message>
-    <message>
         <source>Add a second device</source>
         <translation>Thêm thiết bị thứ hai</translation>
-    </message>
-    <message>
-        <source>On the other device: add a profile you have already, then &quot;Add as second device&quot;, and read this code with it. Both phones on one network.</source>
-        <translation>Trên thiết bị kia: thêm một hồ sơ bạn đã có, rồi “Thêm làm thiết bị thứ hai”, và đọc mã này bằng nó. Cả hai điện thoại trên cùng một mạng.</translation>
     </message>
     <message>
         <source>Copy the code</source>
         <translation>Sao chép mã</translation>
     </message>
     <message>
-        <source>Handing the profile over...</source>
-        <translation>Đang bàn giao hồ sơ...</translation>
-    </message>
-    <message>
         <source>Cancel</source>
         <translation>Hủy</translation>
     </message>
     <message>
-        <source>The other device has the profile. Both get everything new from now on.</source>
-        <translation>Thiết bị kia đã có hồ sơ. Từ giờ cả hai đều nhận mọi thứ mới.</translation>
-    </message>
-    <message>
         <source>Swipe on for your chats.</source>
         <translation>Vuốt tiếp để đến các cuộc trò chuyện.</translation>
-    </message>
-    <message>
-        <source>Whoever reads this code gets the profile. It stops collecting mail until the code is gone.</source>
-        <translation>Ai đọc mã này thì nhận được hồ sơ. Chừng nào mã còn đây, hồ sơ ngừng lấy thư.</translation>
     </message>
     <message>
         <source>Show code again</source>
@@ -1415,6 +1362,26 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Show code</source>
         <translation>Hiện mã</translation>
+    </message>
+    <message>
+        <source>No device copied the profile. Both devices must stay on the same network with this page open.</source>
+        <translation>Không có thiết bị nào sao chép hồ sơ. Cả hai thiết bị phải ở cùng một mạng và giữ trang này mở.</translation>
+    </message>
+    <message>
+        <source>Transferring…</source>
+        <translation>Đang chuyển…</translation>
+    </message>
+    <message>
+        <source>The profile was transferred to your second device. Both devices now receive all new messages.</source>
+        <translation>Hồ sơ đã được chuyển sang thiết bị thứ hai của bạn. Cả hai thiết bị giờ đều nhận mọi tin nhắn mới.</translation>
+    </message>
+    <message>
+        <source>On the other device, choose &quot;Add as second device&quot; and scan this code. Both devices must be on the same network.</source>
+        <translation>Trên thiết bị kia, chọn &quot;Thêm làm thiết bị thứ hai&quot; và quét mã này. Cả hai thiết bị phải ở cùng một mạng.</translation>
+    </message>
+    <message>
+        <source>Make sure no unwanted observer or camera can see this code. This profile does not receive messages while the code is shown.</source>
+        <translation>Hãy chắc chắn không có người hay máy ảnh không mong muốn nào nhìn thấy mã này. Hồ sơ này không nhận tin nhắn trong khi mã đang hiển thị.</translation>
     </message>
 </context>
 <context>
@@ -1468,18 +1435,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Thông báo</translation>
     </message>
     <message>
-        <source>Who wrote, and what</source>
-        <translation>Ai đã viết, và viết gì</translation>
-    </message>
-    <message>
-        <source>Who wrote</source>
-        <translation>Ai đã viết</translation>
-    </message>
-    <message>
-        <source>Only that something arrived</source>
-        <translation>Chỉ là có gì đó đã đến</translation>
-    </message>
-    <message>
         <source>Apps</source>
         <translation>Ứng dụng</translation>
     </message>
@@ -1513,10 +1468,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Xóa tin nhắn khỏi thiết bị</translation>
     </message>
     <message>
-        <source>A new notification shows</source>
-        <translation>Thông báo mới hiển thị</translation>
-    </message>
-    <message>
         <source>Mentions</source>
         <extracomment>A reply to one of the reader&apos;s own messages, arriving in a group they have muted.</extracomment>
         <translation>Nhắc đến</translation>
@@ -1531,49 +1482,12 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Dùng định dạng Markdown</translation>
     </message>
     <message>
-        <source>Otherwise it starts a new line, and the button sends.</source>
-        <translation>Nếu không, nó xuống dòng, và nút gửi.</translation>
-    </message>
-    <message>
-        <source>Draws *stars* and `backticks` rather than showing them.</source>
-        <translation>Vẽ *dấu sao* và `dấu huyền ngược` thay vì hiển thị chúng.</translation>
-    </message>
-    <message>
-        <source>Bigger ones wait until you ask for them. Every profile, from now on.</source>
-        <translation>Tệp lớn hơn chờ đến khi bạn yêu cầu. Mọi hồ sơ, từ giờ trở đi.</translation>
-    </message>
-    <message>
-        <source>Every chat of every profile. &quot;Saved messages&quot; are kept.</source>
-        <translation>Mọi cuộc trò chuyện của mọi hồ sơ. “Tin nhắn đã lưu” được giữ lại.</translation>
-    </message>
-    <message>
-        <source>On the lock screen and in the notification area.</source>
-        <translation>Trên màn hình khoá và trong khu vực thông báo.</translation>
-    </message>
-    <message>
-        <source>A reply to you gets through a muted group.</source>
-        <translation>Trả lời dành cho bạn vẫn lọt qua nhóm đã tắt tiếng.</translation>
-    </message>
-    <message>
-        <source>Click ids and campaign tags come out of the links you send.</source>
-        <translation>Mã nhấp chuột và thẻ chiến dịch bị bỏ khỏi các liên kết bạn gửi.</translation>
-    </message>
-    <message>
-        <source>Small apps run inside the chat. Somebody else&apos;s code, and less tested than the rest.</source>
-        <translation>Ứng dụng nhỏ chạy ngay trong cuộc trò chuyện. Mã của người khác, và ít được thử hơn phần còn lại.</translation>
-    </message>
-    <message>
         <source>Privacy</source>
         <translation>Quyền riêng tư</translation>
     </message>
     <message>
         <source>Blocked contacts</source>
         <translation>Liên hệ bị chặn</translation>
-    </message>
-    <message>
-        <source>Worse quality, save data</source>
-        <extracomment>Outgoing media quality: smaller pictures and videos, which cost the reader and whoever they write to less data. Both reference clients&apos; words for it.</extracomment>
-        <translation>Chất lượng kém hơn, kích thước nhỏ</translation>
     </message>
     <message>
         <source>Balanced</source>
@@ -1586,12 +1500,41 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Chất lượng phương tiện gửi đi</translation>
     </message>
     <message>
-        <source>Pictures are made smaller before sending, and the camera records at this quality.</source>
-        <translation>Ảnh được thu nhỏ trước khi gửi, và máy ảnh quay ở chất lượng này.</translation>
-    </message>
-    <message>
         <source>Show notifications</source>
         <translation>Hiện thông báo</translation>
+    </message>
+    <message>
+        <source>Lower quality, less data</source>
+        <extracomment>Outgoing media quality: smaller pictures and videos, which cost the reader and whoever they write to less data. Both reference clients&apos; words for it.</extracomment>
+        <translation>Chất lượng thấp hơn, ít dữ liệu hơn</translation>
+    </message>
+    <message>
+        <source>Notification content</source>
+        <translation>Nội dung thông báo</translation>
+    </message>
+    <message>
+        <source>Sender and message</source>
+        <translation>Người gửi và tin nhắn</translation>
+    </message>
+    <message>
+        <source>Sender only</source>
+        <translation>Chỉ người gửi</translation>
+    </message>
+    <message>
+        <source>No details</source>
+        <translation>Không chi tiết</translation>
+    </message>
+    <message>
+        <source>In muted groups, notify messages directed to you, like replies or reactions</source>
+        <translation>Trong các nhóm đã tắt tiếng, thông báo tin nhắn gửi đến bạn, như trả lời hoặc biểu cảm</translation>
+    </message>
+    <message>
+        <source>Removes click IDs and campaign tags from links you send.</source>
+        <translation>Loại bỏ ID nhấp chuột và thẻ chiến dịch khỏi các liên kết bạn gửi.</translation>
+    </message>
+    <message>
+        <source>Runs small apps inside chats. These features may be unstable and may be changed or removed.</source>
+        <translation>Chạy các ứng dụng nhỏ bên trong cuộc trò chuyện. Các tính năng này có thể không ổn định và có thể bị thay đổi hoặc gỡ bỏ.</translation>
     </message>
 </context>
 <context>
@@ -1664,16 +1607,16 @@ Other groups with blocked contacts will still show their messages.</source>
 <context>
     <name>WelcomePage</name>
     <message>
-        <source>Tell me about Delta Chat</source>
-        <translation>Delta Chat là gì?</translation>
-    </message>
-    <message>
-        <source>Set up my profile</source>
-        <translation>Thiết lập hồ sơ của tôi</translation>
-    </message>
-    <message>
         <source>Secure decentralised chat based on Delta Chat</source>
         <translation>Trò chuyện an toàn, phi tập trung dựa trên Delta Chat</translation>
+    </message>
+    <message>
+        <source>About Delta Chat</source>
+        <translation>Giới thiệu về Delta Chat</translation>
+    </message>
+    <message>
+        <source>Set up your profile</source>
+        <translation>Thiết lập hồ sơ của bạn</translation>
     </message>
 </context>
 </TS>

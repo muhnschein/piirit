@@ -51,8 +51,8 @@
         <translation>Piirit fungerar bara med chatmail-reläer. Det är en särskild sorts e-postserver; vanliga e-postservrar stöds inte. Läs mer på &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. En fullständig lista över offentliga, kostnadsfria chatmail-reläer finns på &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
     </message>
     <message>
-        <source>Pick a name and a relay. That&apos;s it! There is nothing else to set up.</source>
-        <translation>Välj ett namn och ett relä. Det är allt! Det finns inget mer att ställa in.</translation>
+        <source>Choose a name and a relay. Nothing else is needed.</source>
+        <translation>Välj ett namn och ett relä. Mer behövs inte.</translation>
     </message>
 </context>
 <context>
@@ -66,24 +66,12 @@
         <translation>Skapa en profil</translation>
     </message>
     <message>
-        <source>A new address on a chatmail relay.</source>
-        <translation>En ny adress på ett chatmail-relä.</translation>
-    </message>
-    <message>
         <source>Restore from a backup</source>
         <translation>Återställ från en säkerhetskopia</translation>
     </message>
     <message>
-        <source>A backup file copied onto this phone.</source>
-        <translation>En säkerhetskopiefil, kopierad till den här telefonen.</translation>
-    </message>
-    <message>
         <source>Add as second device</source>
         <translation>Lägg till som andra enhet</translation>
-    </message>
-    <message>
-        <source>The other device keeps it. Both get everything new.</source>
-        <translation>Den andra enheten behåller den. Båda får allt nytt.</translation>
     </message>
 </context>
 <context>
@@ -97,24 +85,12 @@
         <translation>Lägg till ett relä</translation>
     </message>
     <message>
-        <source>Another address for this profile, on another relay. The profile sends from one relay at a time; its page says which, and lets you change it.</source>
-        <translation>Ännu en adress för den här profilen, på ett annat relä. Profilen skickar från ett relä i taget; dess sida visar vilket och låter dig byta.</translation>
-    </message>
-    <message>
         <source>Add relay</source>
         <translation>Lägg till relä</translation>
     </message>
     <message>
-        <source>Contacting %1...</source>
-        <translation>Kontaktar %1...</translation>
-    </message>
-    <message>
         <source>Cancel</source>
         <translation>Avbryt</translation>
-    </message>
-    <message>
-        <source>Relays are run by volunteers. Try another one.</source>
-        <translation>Reläer drivs av frivilliga. Prova ett annat.</translation>
     </message>
     <message>
         <source>Select a public chatmail relay</source>
@@ -127,6 +103,18 @@
     <message>
         <source>Piirit works only with chatmail relays. These are a particular kind of e-mail server; ordinary e-mail servers are not supported. For more, see &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. A full list of public, free-to-use chatmail relays is at &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</source>
         <translation>Piirit fungerar bara med chatmail-reläer. Det är en särskild sorts e-postserver; vanliga e-postservrar stöds inte. Läs mer på &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. En fullständig lista över offentliga, kostnadsfria chatmail-reläer finns på &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
+    </message>
+    <message>
+        <source>Adds another address for this profile on a second relay. The profile sends from one relay at a time; you can change which one on the profile page.</source>
+        <translation>Lägger till ytterligare en adress för den här profilen på ett annat relä. Profilen skickar via ett relä i taget; vilket kan du ändra på profilsidan.</translation>
+    </message>
+    <message>
+        <source>Contacting %1…</source>
+        <translation>Kontaktar %1…</translation>
+    </message>
+    <message>
+        <source>Could not reach the relay. Try another one.</source>
+        <translation>Kunde inte nå reläet. Försök med ett annat.</translation>
     </message>
 </context>
 <context>
@@ -159,14 +147,6 @@
         <source>Cancel</source>
         <translation>Avbryt</translation>
     </message>
-    <message numerus="yes">
-        <source>%n message(s) will be deleted now, and from then on every message will be once it is that old.</source>
-        <extracomment>%n is how many messages would be deleted straight away.</extracomment>
-        <translation>
-            <numerusform>%n meddelande tas bort nu, och därefter varje meddelande så snart det är så gammalt.</numerusform>
-            <numerusform>%n meddelanden tas bort nu, och därefter varje meddelande så snart det är så gammalt.</numerusform>
-        </translation>
-    </message>
     <message>
         <source>This includes pictures, videos and files.</source>
         <translation>Det omfattar bilder, videor och filer.</translation>
@@ -184,20 +164,20 @@
         <source>I understand, delete all these messages</source>
         <translation>Jag förstår, ta bort alla dessa meddelanden</translation>
     </message>
+    <message numerus="yes">
+        <source>%n message(s) will be deleted now, and every new message will be deleted once it reaches that age.</source>
+        <extracomment>%n is how many messages would be deleted straight away.</extracomment>
+        <translation>
+            <numerusform>%n meddelande raderas nu, och varje nytt meddelande raderas när det når den åldern.</numerusform>
+            <numerusform>%n meddelanden raderas nu, och varje nytt meddelande raderas när det når den åldern.</numerusform>
+        </translation>
+    </message>
 </context>
 <context>
     <name>BackupPage</name>
     <message>
         <source>Back up profile</source>
         <translation>Säkerhetskopiera profil</translation>
-    </message>
-    <message>
-        <source>Write the backup</source>
-        <translation>Skriv säkerhetskopian</translation>
-    </message>
-    <message>
-        <source>Writing the backup...</source>
-        <translation>Skriver säkerhetskopian...</translation>
     </message>
     <message>
         <source>Cancel</source>
@@ -209,12 +189,20 @@
         <translation>Sparat i %1</translation>
     </message>
     <message>
-        <source>Messages, contacts and key in one file, saved to Documents. Whoever has the file has the profile.</source>
-        <translation>Meddelanden, kontakter och nyckel i en fil, sparad i Dokument. Den som har filen har profilen.</translation>
-    </message>
-    <message>
         <source>Swipe on for your chats.</source>
         <translation>Svep vidare till dina chattar.</translation>
+    </message>
+    <message>
+        <source>Start backup</source>
+        <translation>Starta säkerhetskopiering</translation>
+    </message>
+    <message>
+        <source>Backing up…</source>
+        <translation>Säkerhetskopierar…</translation>
+    </message>
+    <message>
+        <source>Saves your messages, contacts and end-to-end encryption setup to a backup file. Keep this file in a safe place.</source>
+        <translation>Sparar dina meddelanden, kontakter och änd-till-änd-krypteringen i en säkerhetskopia. Förvara den filen på ett säkert ställe.</translation>
     </message>
 </context>
 <context>
@@ -288,10 +276,6 @@ Other groups with blocked contacts will still show their messages.</source>
 </context>
 <context>
     <name>ChatListPage</name>
-    <message>
-        <source>Lost the connection to the Delta Chat core. Reconnecting...</source>
-        <translation>Anslutningen till Delta Chat-kärnan bröts. Ansluter igen...</translation>
-    </message>
     <message>
         <source>Lost the connection to the Delta Chat core. Restart Piirit.</source>
         <translation>Anslutningen till Delta Chat-kärnan bröts. Starta om Piirit.</translation>
@@ -400,6 +384,10 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Search</source>
         <translation>Sök</translation>
+    </message>
+    <message>
+        <source>Lost the connection to the Delta Chat core. Reconnecting…</source>
+        <translation>Anslutningen till Delta Chat-kärnan bröts. Ansluter igen…</translation>
     </message>
 </context>
 <context>
@@ -530,10 +518,6 @@ Other groups with blocked contacts will still show their messages.</source>
 <context>
     <name>ConversationPage</name>
     <message>
-        <source>Lost the connection to the Delta Chat core. Reconnecting...</source>
-        <translation>Anslutningen till Delta Chat-kärnan bröts. Ansluter igen...</translation>
-    </message>
-    <message>
         <source>Lost the connection to the Delta Chat core. Restart Piirit.</source>
         <translation>Anslutningen till Delta Chat-kärnan bröts. Starta om Piirit.</translation>
     </message>
@@ -553,11 +537,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Message</source>
         <translation>Meddelande</translation>
-    </message>
-    <message>
-        <source>Long message: the other end sees a preview and taps to read the rest</source>
-        <extracomment>Shown above the message field while what is being written is long enough that the other end will receive a shortened version with the rest behind a tap.</extracomment>
-        <translation>Långt meddelande: mottagaren ser ett utdrag och trycker för att läsa resten</translation>
     </message>
     <message>
         <source>Saved to Pictures</source>
@@ -580,9 +559,13 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Sparat i Hämtningar</translation>
     </message>
     <message>
-        <source>Too big to send: %1. Attachments go up to %2.</source>
+        <source>Lost the connection to the Delta Chat core. Reconnecting…</source>
+        <translation>Anslutningen till Delta Chat-kärnan bröts. Ansluter igen…</translation>
+    </message>
+    <message>
+        <source>%1 is too large to send. Attachments can be up to %2.</source>
         <extracomment>Shown above the message field when the attached file is bigger than will be sent. %1 is the file&apos;s size and %2 the largest that goes, each such as &quot;24 MB&quot;.</extracomment>
-        <translation>För stor för att skickas: %1. Bilagor får vara upp till %2.</translation>
+        <translation>%1 är för stor för att skickas. Bilagor får vara upp till %2.</translation>
     </message>
 </context>
 <context>
@@ -620,14 +603,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>How do you want to delete this message? This cannot be undone.</source>
         <translation>Hur vill du ta bort det här meddelandet? Det går inte att ångra.</translation>
-    </message>
-    <message>
-        <source>It goes from your devices. Everybody else keeps their copy.</source>
-        <translation>Det försvinner från dina enheter. Alla andra behåller sin kopia.</translation>
-    </message>
-    <message>
-        <source>It goes from your devices, and every other device in this chat is asked to delete it too.</source>
-        <translation>Det försvinner från dina enheter, och alla andra enheter i den här konversationen ombeds att ta bort det också.</translation>
     </message>
 </context>
 <context>
@@ -689,8 +664,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Efter %1 sekunder</translation>
     </message>
     <message>
-        <source>Applies to everyone in the chat. They can still copy and forward.</source>
-        <translation>Gäller alla i chatten. De kan fortfarande kopiera och vidarebefordra.</translation>
+        <source>Applies to all members of this chat; they can still copy, save, and forward messages.</source>
+        <translation>Dessa inställningar tillämpas för alla deltagare som använder Delta Chat. De kan dock kopiera, spara och vidarebefordra meddelanden eller använda andra e-postklienter.</translation>
     </message>
 </context>
 <context>
@@ -706,14 +681,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Restore from a backup</source>
         <translation>Återställ från en säkerhetskopia</translation>
-    </message>
-    <message>
-        <source>The other device keeps it. Both get everything new.</source>
-        <translation>Den andra enheten behåller den. Båda får allt nytt.</translation>
-    </message>
-    <message>
-        <source>A backup file copied onto this phone.</source>
-        <translation>En säkerhetskopiefil, kopierad till den här telefonen.</translation>
     </message>
 </context>
 <context>
@@ -798,14 +765,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Du väljer vem som kan nå dig</translation>
     </message>
     <message>
-        <source>Groups of equals</source>
-        <translation>Grupper mellan likar</translation>
-    </message>
-    <message>
-        <source>The server only passes it on</source>
-        <translation>Servern skickar bara vidare</translation>
-    </message>
-    <message>
         <source>Keep swiping to set up your profile.</source>
         <translation>Fortsätt svepa för att skapa din profil.</translation>
     </message>
@@ -814,24 +773,32 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Varje meddelande är krypterat</translation>
     </message>
     <message>
-        <source>Made here on your phone. No phone number, no account, nothing to sign.</source>
-        <translation>Skapad här på din telefon. Inget telefonnummer, inget konto, inget att skriva under.</translation>
+        <source>Your profile is created on this phone. No phone number and no sign-up are needed.</source>
+        <translation>Din profil skapas på den här telefonen. Varken telefonnummer eller registrering behövs.</translation>
     </message>
     <message>
-        <source>There is no directory to be found in. Show a friend a code, or send a link.</source>
-        <translation>Det finns ingen katalog att hittas i. Visa en vän en kod, eller skicka en länk.</translation>
+        <source>There is no public directory. People reach you by scanning your invite code or opening your invite link.</source>
+        <translation>Det finns ingen offentlig katalog. Andra når dig genom att skanna din inbjudningskod eller öppna din inbjudningslänk.</translation>
     </message>
     <message>
-        <source>Encrypted the whole way, always. The servers cannot read a word.</source>
-        <translation>Alltid krypterat hela vägen. Servrarna läser inte ett ord.</translation>
+        <source>Any member can add people, rename the group or leave it.</source>
+        <translation>Varje medlem kan lägga till personer, byta namn på gruppen eller lämna den.</translation>
     </message>
     <message>
-        <source>Anyone can add a friend, rename the group or leave. Nobody is in charge.</source>
-        <translation>Vem som helst kan lägga till en vän, byta namn på gruppen eller gå. Ingen bestämmer.</translation>
+        <source>Messages are end-to-end encrypted, so the relays that carry them cannot read them.</source>
+        <translation>Meddelanden är änd-till-änd-krypterade, så reläerna som transporterar dem kan inte läsa dem.</translation>
     </message>
     <message>
-        <source>It holds a message until the other phone is online, and nothing more.</source>
-        <translation>Den håller ett meddelande tills den andra telefonen är uppkopplad, inget mer.</translation>
+        <source>Groups have no admins</source>
+        <translation>Grupper har inga administratörer</translation>
+    </message>
+    <message>
+        <source>Relays only pass messages on</source>
+        <translation>Reläer skickar bara meddelanden vidare</translation>
+    </message>
+    <message>
+        <source>A relay stores a message only until the recipient fetches it.</source>
+        <translation>Ett relä lagrar ett meddelande bara tills mottagaren hämtar det.</translation>
     </message>
 </context>
 <context>
@@ -962,12 +929,12 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Inga kontakter än</translation>
     </message>
     <message>
-        <source>Scan someone&apos;s invite from the chat list: QR code</source>
-        <translation>Skanna någons inbjudan från chattlistan: QR-kod</translation>
-    </message>
-    <message>
         <source>Search</source>
         <translation>Sök</translation>
+    </message>
+    <message>
+        <source>Use &quot;QR code&quot; in the chat list to add a contact.</source>
+        <translation>Använd &quot;QR-kod&quot; i chattlistan för att lägga till en kontakt.</translation>
     </message>
 </context>
 <context>
@@ -975,10 +942,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Please name the group</source>
         <translation>Ge gruppen ett namn</translation>
-    </message>
-    <message>
-        <source>Create Group</source>
-        <translation>Skapa grupp</translation>
     </message>
     <message>
         <source>New group</source>
@@ -1011,6 +974,10 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Add members</source>
         <translation>Lägg till medlemmar</translation>
+    </message>
+    <message>
+        <source>Create group</source>
+        <translation>Skapa grupp</translation>
     </message>
 </context>
 <context>
@@ -1083,10 +1050,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Relät har inte rapporterat sin kvot ännu</translation>
     </message>
     <message>
-        <source>Both ways: with this off you send none and see none.</source>
-        <translation>Åt båda hållen: med detta av skickar du inga och ser inga.</translation>
-    </message>
-    <message>
         <source>Relays</source>
         <translation>Reläer</translation>
     </message>
@@ -1121,16 +1084,16 @@ Other groups with blocked contacts will still show their messages.</source>
         <extracomment>How much room the profile takes on the phone. %1 is a size such as &quot;12.3 MB&quot;.</extracomment>
         <translation>Piirit använder %1 lagringsutrymme på den här telefonen.</translation>
     </message>
+    <message>
+        <source>If read receipts are disabled, you won&apos;t be able to see read receipts from others.</source>
+        <translation>Om läskvittenser är avstängda kan du inte se läskvittenser från andra.</translation>
+    </message>
 </context>
 <context>
     <name>ProfileSetupPage</name>
     <message>
         <source>Add profile</source>
         <translation>Lägg till profil</translation>
-    </message>
-    <message>
-        <source>Contacting %1...</source>
-        <translation>Kontaktar %1...</translation>
     </message>
     <message>
         <source>Cancel</source>
@@ -1145,16 +1108,16 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>%1 svarade inte inom %2 sekunder.</translation>
     </message>
     <message>
-        <source>Relays are run by volunteers. Go back and try another one.</source>
-        <translation>Reläer drivs av frivilliga. Gå tillbaka och prova ett annat.</translation>
+        <source>Contacting %1…</source>
+        <translation>Kontaktar %1…</translation>
+    </message>
+    <message>
+        <source>Could not reach the relay. Try another one.</source>
+        <translation>Kunde inte nå reläet. Försök med ett annat.</translation>
     </message>
 </context>
 <context>
     <name>ProfileStartPage</name>
-    <message>
-        <source>Alright, let&apos;s get you set up.</source>
-        <translation>Okej, då skapar vi din profil.</translation>
-    </message>
     <message>
         <source>I already have a profile</source>
         <translation>Jag har redan en profil</translation>
@@ -1162,6 +1125,10 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Create a profile</source>
         <translation>Skapa en profil</translation>
+    </message>
+    <message>
+        <source>Set up your profile</source>
+        <translation>Ställ in din profil</translation>
     </message>
 </context>
 <context>
@@ -1227,16 +1194,16 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Låt någon skanna den här koden, eller skicka länken.</translation>
     </message>
     <message>
-        <source>Fetching...</source>
-        <translation>Hämtar...</translation>
-    </message>
-    <message>
-        <source>Copy Invite Link</source>
-        <translation>Kopiera inbjudningslänk</translation>
-    </message>
-    <message>
         <source>The camera is not available on this device.</source>
         <translation>Kameran är inte tillgänglig på den här enheten.</translation>
+    </message>
+    <message>
+        <source>Fetching…</source>
+        <translation>Hämtar…</translation>
+    </message>
+    <message>
+        <source>Copy invite link</source>
+        <translation>Kopiera inbjudningslänk</translation>
     </message>
 </context>
 <context>
@@ -1254,10 +1221,6 @@ Other groups with blocked contacts will still show their messages.</source>
 <context>
     <name>RestoreProfilePage</name>
     <message>
-        <source>That is not the code a device shows while it is offering its profile.</source>
-        <translation>Det är inte koden en enhet visar medan den erbjuder sin profil.</translation>
-    </message>
-    <message>
         <source>Add as second device</source>
         <translation>Lägg till som andra enhet</translation>
     </message>
@@ -1270,16 +1233,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Välj en säkerhetskopia</translation>
     </message>
     <message>
-        <source>Taking the profile over...</source>
-        <translation>Tar över profilen...</translation>
-    </message>
-    <message>
         <source>Cancel</source>
         <translation>Avbryt</translation>
-    </message>
-    <message>
-        <source>Hold the phone up to the code it shows</source>
-        <translation>Håll den här telefonen mot koden som visas</translation>
     </message>
     <message>
         <source>Enter the code instead</source>
@@ -1288,10 +1243,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Code from the other device</source>
         <translation>Kod från den andra enheten</translation>
-    </message>
-    <message>
-        <source>Take the profile over</source>
-        <translation>Ta över profilen</translation>
     </message>
     <message>
         <source>That did not work</source>
@@ -1306,28 +1257,44 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Välj en annan fil</translation>
     </message>
     <message>
-        <source>The other device runs a newer Delta Chat than this app can read.</source>
-        <translation>Den andra enheten kör en nyare Delta Chat än den här appen kan läsa.</translation>
-    </message>
-    <message>
-        <source>The transfer stopped. Both devices have to stay on one network, with this page open.</source>
-        <translation>Överföringen stannade. Båda enheterna måste stanna på samma nätverk, med den här sidan öppen.</translation>
-    </message>
-    <message>
-        <source>No camera on this device. A backup file works without one.</source>
-        <translation>Ingen kamera på den här enheten. En säkerhetskopiefil fungerar utan.</translation>
-    </message>
-    <message>
-        <source>On the other device: Settings, then add a second device. Both on one network.</source>
-        <translation>På den andra enheten: Inställningar, och lägg sedan till en andra enhet. Båda på samma nätverk.</translation>
-    </message>
-    <message>
         <source>Make a backup on the other device, copy the file here, then choose it.</source>
         <translation>Gör en säkerhetskopia på den andra enheten, kopiera filen hit och välj den sedan.</translation>
     </message>
     <message>
         <source>That profile is already on this phone. Open it from the profiles list.</source>
         <translation>Den här profilen finns redan på den här telefonen. Öppna den i profillistan.</translation>
+    </message>
+    <message>
+        <source>The profile is from a newer Delta Chat version than this app can read.</source>
+        <translation>Profilen kommer från en nyare Delta Chat-version än den här appen kan läsa.</translation>
+    </message>
+    <message>
+        <source>The transfer stopped. Both devices must stay on the same network with this page open.</source>
+        <translation>Överföringen stoppades. Båda enheterna måste stanna på samma nätverk med den här sidan öppen.</translation>
+    </message>
+    <message>
+        <source>This is not a second-device code. Use the code shown by the other device.</source>
+        <translation>Detta är inte en kod för en andra enhet. Använd koden som den andra enheten visar.</translation>
+    </message>
+    <message>
+        <source>Hold your camera over the QR code</source>
+        <translation>Håll kameran över QR-koden.</translation>
+    </message>
+    <message>
+        <source>Copy the profile</source>
+        <translation>Kopiera profilen</translation>
+    </message>
+    <message>
+        <source>No camera on this device. You can restore from a backup file instead.</source>
+        <translation>Ingen kamera på den här enheten. Du kan i stället återställa från en säkerhetskopia.</translation>
+    </message>
+    <message>
+        <source>On the other device, go to Settings and tap &quot;Add second device&quot;. Both devices must be on the same network.</source>
+        <translation>Gå till Inställningar på den andra enheten och tryck på &quot;Lägg till andra enhet&quot;. Båda enheterna måste vara på samma nätverk.</translation>
+    </message>
+    <message>
+        <source>Transferring…</source>
+        <translation>Överför...</translation>
     </message>
 </context>
 <context>
@@ -1379,40 +1346,20 @@ Other groups with blocked contacts will still show their messages.</source>
 <context>
     <name>SecondDevicePage</name>
     <message>
-        <source>Nothing took the profile. Both phones have to stay on one network, with this page open.</source>
-        <translation>Ingen tog profilen. Båda telefonerna måste stanna på samma nätverk, med den här sidan öppen.</translation>
-    </message>
-    <message>
         <source>Add a second device</source>
         <translation>Lägg till en andra enhet</translation>
-    </message>
-    <message>
-        <source>On the other device: add a profile you have already, then &quot;Add as second device&quot;, and read this code with it. Both phones on one network.</source>
-        <translation>På den andra enheten: lägg till en profil du redan har, sedan “Lägg till som andra enhet”, och läs den här koden med den. Båda telefonerna på samma nätverk.</translation>
     </message>
     <message>
         <source>Copy the code</source>
         <translation>Kopiera koden</translation>
     </message>
     <message>
-        <source>Handing the profile over...</source>
-        <translation>Lämnar över profilen...</translation>
-    </message>
-    <message>
         <source>Cancel</source>
         <translation>Avbryt</translation>
     </message>
     <message>
-        <source>The other device has the profile. Both get everything new from now on.</source>
-        <translation>Den andra enheten har profilen. Från och med nu får båda allt nytt.</translation>
-    </message>
-    <message>
         <source>Swipe on for your chats.</source>
         <translation>Svep vidare till dina chattar.</translation>
-    </message>
-    <message>
-        <source>Whoever reads this code gets the profile. It stops collecting mail until the code is gone.</source>
-        <translation>Den som läser den här koden får profilen. Så länge koden är framme hämtar den ingen post.</translation>
     </message>
     <message>
         <source>Show code again</source>
@@ -1421,6 +1368,26 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Show code</source>
         <translation>Visa koden</translation>
+    </message>
+    <message>
+        <source>No device copied the profile. Both devices must stay on the same network with this page open.</source>
+        <translation>Ingen enhet kopierade profilen. Båda enheterna måste stanna på samma nätverk med den här sidan öppen.</translation>
+    </message>
+    <message>
+        <source>Transferring…</source>
+        <translation>Överför...</translation>
+    </message>
+    <message>
+        <source>The profile was transferred to your second device. Both devices now receive all new messages.</source>
+        <translation>Profilen överfördes till din andra enhet. Båda enheterna tar nu emot alla nya meddelanden.</translation>
+    </message>
+    <message>
+        <source>On the other device, choose &quot;Add as second device&quot; and scan this code. Both devices must be on the same network.</source>
+        <translation>Välj &quot;Lägg till som andra enhet&quot; på den andra enheten och skanna den här koden. Båda enheterna måste vara på samma nätverk.</translation>
+    </message>
+    <message>
+        <source>Make sure no unwanted observer or camera can see this code. This profile does not receive messages while the code is shown.</source>
+        <translation>Se till att inga oönskade åskådare eller kameror kan se den här koden. Den här profilen tar inte emot meddelanden så länge koden visas.</translation>
     </message>
 </context>
 <context>
@@ -1474,18 +1441,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Aviseringar</translation>
     </message>
     <message>
-        <source>Who wrote, and what</source>
-        <translation>Vem som skrev, och vad</translation>
-    </message>
-    <message>
-        <source>Who wrote</source>
-        <translation>Vem som skrev</translation>
-    </message>
-    <message>
-        <source>Only that something arrived</source>
-        <translation>Bara att något har kommit</translation>
-    </message>
-    <message>
         <source>Apps</source>
         <translation>Appar</translation>
     </message>
@@ -1519,10 +1474,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Ta bort meddelanden från enheten</translation>
     </message>
     <message>
-        <source>A new notification shows</source>
-        <translation>En ny avisering visar</translation>
-    </message>
-    <message>
         <source>Mentions</source>
         <extracomment>A reply to one of the reader&apos;s own messages, arriving in a group they have muted.</extracomment>
         <translation>Omnämnanden</translation>
@@ -1537,49 +1488,12 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Använd Markdown-formatering</translation>
     </message>
     <message>
-        <source>Otherwise it starts a new line, and the button sends.</source>
-        <translation>Annars börjar den en ny rad, och knappen skickar.</translation>
-    </message>
-    <message>
-        <source>Draws *stars* and `backticks` rather than showing them.</source>
-        <translation>Ritar *stjärnor* och `bakåtfnuttar` i stället för att visa dem.</translation>
-    </message>
-    <message>
-        <source>Bigger ones wait until you ask for them. Every profile, from now on.</source>
-        <translation>Större väntar tills du ber om dem. Alla profiler, från och med nu.</translation>
-    </message>
-    <message>
-        <source>Every chat of every profile. &quot;Saved messages&quot; are kept.</source>
-        <translation>Varje chatt i varje profil. ”Sparade meddelanden” behålls.</translation>
-    </message>
-    <message>
-        <source>On the lock screen and in the notification area.</source>
-        <translation>På låsskärmen och i aviseringsområdet.</translation>
-    </message>
-    <message>
-        <source>A reply to you gets through a muted group.</source>
-        <translation>Ett svar till dig tar sig igenom en tystad grupp.</translation>
-    </message>
-    <message>
-        <source>Click ids and campaign tags come out of the links you send.</source>
-        <translation>Klick-id:n och kampanjtaggar åker ut ur länkarna du skickar.</translation>
-    </message>
-    <message>
-        <source>Small apps run inside the chat. Somebody else&apos;s code, and less tested than the rest.</source>
-        <translation>Små appar körs inne i chatten. Någon annans kod, och mindre beprövad än resten.</translation>
-    </message>
-    <message>
         <source>Privacy</source>
         <translation>Integritet</translation>
     </message>
     <message>
         <source>Blocked contacts</source>
         <translation>Blockerade kontakter</translation>
-    </message>
-    <message>
-        <source>Worse quality, save data</source>
-        <extracomment>Outgoing media quality: smaller pictures and videos, which cost the reader and whoever they write to less data. Both reference clients&apos; words for it.</extracomment>
-        <translation>Sämre kvalitet, mindre storlek</translation>
     </message>
     <message>
         <source>Balanced</source>
@@ -1592,12 +1506,41 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Kvalitet på utgående media</translation>
     </message>
     <message>
-        <source>Pictures are made smaller before sending, and the camera records at this quality.</source>
-        <translation>Bilder förminskas innan de skickas, och kameran spelar in med den här kvaliteten.</translation>
-    </message>
-    <message>
         <source>Show notifications</source>
         <translation>Visa aviseringar</translation>
+    </message>
+    <message>
+        <source>Lower quality, less data</source>
+        <extracomment>Outgoing media quality: smaller pictures and videos, which cost the reader and whoever they write to less data. Both reference clients&apos; words for it.</extracomment>
+        <translation>Lägre kvalitet, mindre data</translation>
+    </message>
+    <message>
+        <source>Notification content</source>
+        <translation>Aviseringsinnehåll</translation>
+    </message>
+    <message>
+        <source>Sender and message</source>
+        <translation>Avsändare och meddelande</translation>
+    </message>
+    <message>
+        <source>Sender only</source>
+        <translation>Endast avsändare</translation>
+    </message>
+    <message>
+        <source>No details</source>
+        <translation>Inga detaljer</translation>
+    </message>
+    <message>
+        <source>In muted groups, notify messages directed to you, like replies or reactions</source>
+        <translation>Avisera meddelanden som riktas till dig, i tystade grupper, såsom svar eller reaktioner</translation>
+    </message>
+    <message>
+        <source>Removes click IDs and campaign tags from links you send.</source>
+        <translation>Tar bort klick-ID:n och kampanjtaggar från länkar du skickar.</translation>
+    </message>
+    <message>
+        <source>Runs small apps inside chats. These features may be unstable and may be changed or removed.</source>
+        <translation>Kör små appar inuti chattar. Dessa funktioner kan vara instabila och kan ändras eller tas bort.</translation>
     </message>
 </context>
 <context>
@@ -1670,16 +1613,16 @@ Other groups with blocked contacts will still show their messages.</source>
 <context>
     <name>WelcomePage</name>
     <message>
-        <source>Tell me about Delta Chat</source>
-        <translation>Vad är Delta Chat?</translation>
-    </message>
-    <message>
-        <source>Set up my profile</source>
-        <translation>Skapa min profil</translation>
-    </message>
-    <message>
         <source>Secure decentralised chat based on Delta Chat</source>
         <translation>Säker decentraliserad chatt byggd på Delta Chat</translation>
+    </message>
+    <message>
+        <source>About Delta Chat</source>
+        <translation>Om Delta Chat</translation>
+    </message>
+    <message>
+        <source>Set up your profile</source>
+        <translation>Ställ in din profil</translation>
     </message>
 </context>
 </TS>

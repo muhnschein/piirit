@@ -348,7 +348,7 @@ Page {
                 // sent and requested", so this is not one-way: with it
                 // off nothing is asked for either, and read marks stop
                 // coming back from the people who would have sent them.
-                description: qsTr("Both ways: with this off you send none and see none.")
+                description: qsTr("If read receipts are disabled, you won't be able to see read receipts from others.")
                 // Bound to the profile, not held here: the core is what
                 // decides, and a switch that drifts from it is a lie. So
                 // the tap must not flip it either -- Silica does that by

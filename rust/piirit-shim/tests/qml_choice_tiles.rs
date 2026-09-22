@@ -107,8 +107,8 @@ const PROBE_QML: &str = r"
 /// Two ways on, as a page writes them: one of them with a second line
 /// and the other without, one of them off.
 const CHOICES: &str = r#"[
-    { "name": "about", "icon": "icon-m-about", "text": "Tell me about Delta Chat" },
-    { "name": "setup", "mark": "account", "text": "Set up my profile",
+    { "name": "about", "icon": "icon-m-about", "text": "About Delta Chat" },
+    { "name": "setup", "mark": "account", "text": "Set up your profile",
       "hint": "A new address, on a relay that carries chat mail and nothing else at all.",
       "enabled": false }
 ]"#;
@@ -117,11 +117,11 @@ const CHOICES: &str = r#"[
 /// many to stand side by side on a phone.
 const THREE: &str = r#"[
     { "name": "createProfile", "icon": "icon-m-add", "text": "Create a profile",
-      "hint": "A new address on a chatmail relay." },
+      "hint": "An address made on this phone." },
     { "name": "backupFile", "icon": "icon-m-backup", "text": "Restore from a backup",
-      "hint": "A backup file copied onto this phone." },
+      "hint": "A file written by another device." },
     { "name": "secondDevice", "icon": "icon-m-device", "text": "Add as second device",
-      "hint": "The other device keeps it. Both get everything new." }
+      "hint": "A profile another device is offering." }
 ]"#;
 
 type Steps = Rc<RefCell<Vec<(String, String)>>>;
@@ -410,7 +410,7 @@ fn assert_row(steps: &[(String, String)]) {
     );
     assert_eq!(
         value("about-text"),
-        "Tell me about Delta Chat",
+        "About Delta Chat",
         "the tile does not say what it was given to say. {context}"
     );
 

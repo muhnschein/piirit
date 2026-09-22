@@ -183,7 +183,7 @@ Page {
     // while Piirit is already fixing it is worse than none.
     readonly property string coreStatusMessage:
         core.status === "reconnecting"
-        ? qsTr("Lost the connection to the Delta Chat core. Reconnecting...")
+        ? qsTr("Lost the connection to the Delta Chat core. Reconnecting…")
         : core.status === "stopped"
           ? qsTr("Lost the connection to the Delta Chat core. Restart Piirit.")
           : ""

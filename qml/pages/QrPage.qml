@@ -217,13 +217,13 @@ Page {
                     color: Theme.secondaryColor
                     textFormat: Text.PlainText
                     text: page.myInvite.length > 0 ? page.myInvite
-                                                   : qsTr("Fetching...")
+                                                   : qsTr("Fetching…")
                 }
 
                 Button {
                     objectName: "copyButton"
                     anchors.horizontalCenter: parent.horizontalCenter
-                    text: qsTr("Copy Invite Link")
+                    text: qsTr("Copy invite link")
                     enabled: page.myInvite.length > 0
                     onClicked: Clipboard.text = page.myInvite
                 }

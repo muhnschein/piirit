@@ -51,8 +51,8 @@
         <translation>Piirit deluje samo s posredniki chatmail. To je posebna vrsta e-poštnih strežnikov; navadni e-poštni strežniki niso podprti. Več na &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. Celoten seznam javnih, brezplačnih posrednikov chatmail je na &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
     </message>
     <message>
-        <source>Pick a name and a relay. That&apos;s it! There is nothing else to set up.</source>
-        <translation>Izberi ime in posrednika. To je vse! Ničesar drugega ni treba nastaviti.</translation>
+        <source>Choose a name and a relay. Nothing else is needed.</source>
+        <translation>Izberi ime in posrednika. Nič drugega ni potrebno.</translation>
     </message>
 </context>
 <context>
@@ -66,24 +66,12 @@
         <translation>Ustvari profil</translation>
     </message>
     <message>
-        <source>A new address on a chatmail relay.</source>
-        <translation>Nov naslov na posredniku chatmail.</translation>
-    </message>
-    <message>
         <source>Restore from a backup</source>
         <translation>Obnovi iz varnostne kopije</translation>
     </message>
     <message>
-        <source>A backup file copied onto this phone.</source>
-        <translation>Datoteka varnostne kopije, prekopirana na ta telefon.</translation>
-    </message>
-    <message>
         <source>Add as second device</source>
         <translation>Dodaj kot drugo napravo</translation>
-    </message>
-    <message>
-        <source>The other device keeps it. Both get everything new.</source>
-        <translation>Druga naprava ga obdrži. Obe dobita vse novo.</translation>
     </message>
 </context>
 <context>
@@ -97,24 +85,12 @@
         <translation>Dodaj posrednika</translation>
     </message>
     <message>
-        <source>Another address for this profile, on another relay. The profile sends from one relay at a time; its page says which, and lets you change it.</source>
-        <translation>Še en naslov za ta profil, pri drugem posredniku. Profil pošilja naenkrat le prek enega posrednika; njegova stran pove, katerega, in ti pusti to spremeniti.</translation>
-    </message>
-    <message>
         <source>Add relay</source>
         <translation>Dodaj posrednika</translation>
     </message>
     <message>
-        <source>Contacting %1...</source>
-        <translation>Vzpostavljanje stika z %1...</translation>
-    </message>
-    <message>
         <source>Cancel</source>
         <translation>Prekliči</translation>
-    </message>
-    <message>
-        <source>Relays are run by volunteers. Try another one.</source>
-        <translation>Posrednike vodijo prostovoljci. Poskusi drugega.</translation>
     </message>
     <message>
         <source>Select a public chatmail relay</source>
@@ -127,6 +103,18 @@
     <message>
         <source>Piirit works only with chatmail relays. These are a particular kind of e-mail server; ordinary e-mail servers are not supported. For more, see &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. A full list of public, free-to-use chatmail relays is at &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</source>
         <translation>Piirit deluje samo s posredniki chatmail. To je posebna vrsta e-poštnih strežnikov; navadni e-poštni strežniki niso podprti. Več na &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. Celoten seznam javnih, brezplačnih posrednikov chatmail je na &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
+    </message>
+    <message>
+        <source>Adds another address for this profile on a second relay. The profile sends from one relay at a time; you can change which one on the profile page.</source>
+        <translation>Temu profilu doda še en naslov pri drugem posredniku. Profil pošilja prek enega posrednika naenkrat; katerega, lahko spremeniš na strani profila.</translation>
+    </message>
+    <message>
+        <source>Contacting %1…</source>
+        <translation>Vzpostavljanje stika z %1…</translation>
+    </message>
+    <message>
+        <source>Could not reach the relay. Try another one.</source>
+        <translation>Posrednika ni bilo mogoče doseči. Poskusi drugega.</translation>
     </message>
 </context>
 <context>
@@ -159,16 +147,6 @@
         <source>Cancel</source>
         <translation>Prekliči</translation>
     </message>
-    <message numerus="yes">
-        <source>%n message(s) will be deleted now, and from then on every message will be once it is that old.</source>
-        <extracomment>%n is how many messages would be deleted straight away.</extracomment>
-        <translation>
-            <numerusform>%n sporočilo bo izbrisano zdaj, od takrat naprej pa vsako sporočilo, takoj ko bo tako staro.</numerusform>
-            <numerusform>%n sporočili bosta izbrisani zdaj, od takrat naprej pa vsako sporočilo, takoj ko bo tako staro.</numerusform>
-            <numerusform>%n sporočila bodo izbrisana zdaj, od takrat naprej pa vsako sporočilo, takoj ko bo tako staro.</numerusform>
-            <numerusform>%n sporočil bo izbrisanih zdaj, od takrat naprej pa vsako sporočilo, takoj ko bo tako staro.</numerusform>
-        </translation>
-    </message>
     <message>
         <source>This includes pictures, videos and files.</source>
         <translation>To vključuje slike, videoposnetke in datoteke.</translation>
@@ -186,20 +164,22 @@
         <source>I understand, delete all these messages</source>
         <translation>Razumem, izbriši vsa ta sporočila</translation>
     </message>
+    <message numerus="yes">
+        <source>%n message(s) will be deleted now, and every new message will be deleted once it reaches that age.</source>
+        <extracomment>%n is how many messages would be deleted straight away.</extracomment>
+        <translation>
+            <numerusform>%n sporočilo bo zdaj izbrisano, vsako novo sporočilo pa bo izbrisano, ko doseže to starost.</numerusform>
+            <numerusform>%n sporočili bosta zdaj izbrisani, vsako novo sporočilo pa bo izbrisano, ko doseže to starost.</numerusform>
+            <numerusform>%n sporočila bodo zdaj izbrisana, vsako novo sporočilo pa bo izbrisano, ko doseže to starost.</numerusform>
+            <numerusform>%n sporočil bo zdaj izbrisanih, vsako novo sporočilo pa bo izbrisano, ko doseže to starost.</numerusform>
+        </translation>
+    </message>
 </context>
 <context>
     <name>BackupPage</name>
     <message>
         <source>Back up profile</source>
         <translation>Varnostna kopija profila</translation>
-    </message>
-    <message>
-        <source>Write the backup</source>
-        <translation>Zapiši varnostno kopijo</translation>
-    </message>
-    <message>
-        <source>Writing the backup...</source>
-        <translation>Zapisovanje varnostne kopije...</translation>
     </message>
     <message>
         <source>Cancel</source>
@@ -211,12 +191,20 @@
         <translation>Shranjeno v %1</translation>
     </message>
     <message>
-        <source>Messages, contacts and key in one file, saved to Documents. Whoever has the file has the profile.</source>
-        <translation>Sporočila, stiki in ključ v eni datoteki, shranjeni v Dokumente. Kdor ima datoteko, ima profil.</translation>
-    </message>
-    <message>
         <source>Swipe on for your chats.</source>
         <translation>Podrsaj naprej do svojih klepetov.</translation>
+    </message>
+    <message>
+        <source>Start backup</source>
+        <translation>Začni varnostno kopiranje</translation>
+    </message>
+    <message>
+        <source>Backing up…</source>
+        <translation>Varnostno kopiranje…</translation>
+    </message>
+    <message>
+        <source>Saves your messages, contacts and end-to-end encryption setup to a backup file. Keep this file in a safe place.</source>
+        <translation>Shrani tvoja sporočila, stike in nastavitev šifriranja od konca do konca v datoteko varnostne kopije. To datoteko hrani na varnem mestu.</translation>
     </message>
 </context>
 <context>
@@ -294,10 +282,6 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
 </context>
 <context>
     <name>ChatListPage</name>
-    <message>
-        <source>Lost the connection to the Delta Chat core. Reconnecting...</source>
-        <translation>Povezava z jedrom Delta Chat je izgubljena. Ponovno povezovanje...</translation>
-    </message>
     <message>
         <source>Lost the connection to the Delta Chat core. Restart Piirit.</source>
         <translation>Povezava z jedrom Delta Chat je izgubljena. Znova zaženite Piirit.</translation>
@@ -406,6 +390,10 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
     <message>
         <source>Search</source>
         <translation>Išči</translation>
+    </message>
+    <message>
+        <source>Lost the connection to the Delta Chat core. Reconnecting…</source>
+        <translation>Povezava z jedrom Delta Chat je izgubljena. Ponovno povezovanje…</translation>
     </message>
 </context>
 <context>
@@ -536,10 +524,6 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
 <context>
     <name>ConversationPage</name>
     <message>
-        <source>Lost the connection to the Delta Chat core. Reconnecting...</source>
-        <translation>Povezava z jedrom Delta Chat je izgubljena. Ponovno povezovanje...</translation>
-    </message>
-    <message>
         <source>Lost the connection to the Delta Chat core. Restart Piirit.</source>
         <translation>Povezava z jedrom Delta Chat je izgubljena. Znova zaženite Piirit.</translation>
     </message>
@@ -559,11 +543,6 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
     <message>
         <source>Message</source>
         <translation>Sporočilo</translation>
-    </message>
-    <message>
-        <source>Long message: the other end sees a preview and taps to read the rest</source>
-        <extracomment>Shown above the message field while what is being written is long enough that the other end will receive a shortened version with the rest behind a tap.</extracomment>
-        <translation>Dolgo sporočilo: na drugi strani se vidi predogled, ostalo se odpre z dotikom</translation>
     </message>
     <message>
         <source>Saved to Pictures</source>
@@ -588,9 +567,13 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
         <translation>Shranjeno v Prenose</translation>
     </message>
     <message>
-        <source>Too big to send: %1. Attachments go up to %2.</source>
+        <source>Lost the connection to the Delta Chat core. Reconnecting…</source>
+        <translation>Povezava z jedrom Delta Chat je izgubljena. Ponovno povezovanje…</translation>
+    </message>
+    <message>
+        <source>%1 is too large to send. Attachments can be up to %2.</source>
         <extracomment>Shown above the message field when the attached file is bigger than will be sent. %1 is the file&apos;s size and %2 the largest that goes, each such as &quot;24 MB&quot;.</extracomment>
-        <translation>Preveliko za pošiljanje: %1. Priponke so lahko velike do %2.</translation>
+        <translation>%1 je prevelik za pošiljanje. Priloge so lahko velike do %2.</translation>
     </message>
 </context>
 <context>
@@ -628,14 +611,6 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
     <message>
         <source>How do you want to delete this message? This cannot be undone.</source>
         <translation>Kako želiš izbrisati to sporočilo? Tega ni mogoče razveljaviti.</translation>
-    </message>
-    <message>
-        <source>It goes from your devices. Everybody else keeps their copy.</source>
-        <translation>Izgine s tvojih naprav. Vsi drugi obdržijo svojo kopijo.</translation>
-    </message>
-    <message>
-        <source>It goes from your devices, and every other device in this chat is asked to delete it too.</source>
-        <translation>Izgine s tvojih naprav, vse druge naprave v tem pogovoru pa dobijo prošnjo, naj ga izbrišejo tudi.</translation>
     </message>
 </context>
 <context>
@@ -697,8 +672,8 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
         <translation>Po %1 sekundah</translation>
     </message>
     <message>
-        <source>Applies to everyone in the chat. They can still copy and forward.</source>
-        <translation>Velja za vse v klepetu. Kopirati in posredovati še vedno lahko.</translation>
+        <source>Applies to all members of this chat; they can still copy, save, and forward messages.</source>
+        <translation>Velja za vse člane tega klepeta; sporočila lahko še vedno kopirajo, shranijo in posredujejo.</translation>
     </message>
 </context>
 <context>
@@ -714,14 +689,6 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
     <message>
         <source>Restore from a backup</source>
         <translation>Obnovi iz varnostne kopije</translation>
-    </message>
-    <message>
-        <source>The other device keeps it. Both get everything new.</source>
-        <translation>Druga naprava ga obdrži. Obe dobita vse novo.</translation>
-    </message>
-    <message>
-        <source>A backup file copied onto this phone.</source>
-        <translation>Datoteka varnostne kopije, prekopirana na ta telefon.</translation>
     </message>
 </context>
 <context>
@@ -810,14 +777,6 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
         <translation>Vi določite, kdo vas lahko doseže</translation>
     </message>
     <message>
-        <source>Groups of equals</source>
-        <translation>Skupine enakih</translation>
-    </message>
-    <message>
-        <source>The server only passes it on</source>
-        <translation>Strežnik ga samo poda naprej</translation>
-    </message>
-    <message>
         <source>Keep swiping to set up your profile.</source>
         <translation>Podrsajte naprej in ustvarite profil.</translation>
     </message>
@@ -826,24 +785,32 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
         <translation>Vsako sporočilo je šifrirano</translation>
     </message>
     <message>
-        <source>Made here on your phone. No phone number, no account, nothing to sign.</source>
-        <translation>Nastane tu, na tvojem telefonu. Brez številke, brez računa, nič za podpisati.</translation>
+        <source>Your profile is created on this phone. No phone number and no sign-up are needed.</source>
+        <translation>Tvoj profil nastane v tem telefonu. Ne potrebuješ ne telefonske številke ne registracije.</translation>
     </message>
     <message>
-        <source>There is no directory to be found in. Show a friend a code, or send a link.</source>
-        <translation>Ni imenika, v katerem bi te našli. Prijatelju pokaži kodo ali mu pošlji povezavo.</translation>
+        <source>There is no public directory. People reach you by scanning your invite code or opening your invite link.</source>
+        <translation>Javnega imenika ni. Drugi te dosežejo tako, da skenirajo tvojo kodo povabila ali odprejo tvojo povezavo povabila.</translation>
     </message>
     <message>
-        <source>Encrypted the whole way, always. The servers cannot read a word.</source>
-        <translation>Vedno šifrirano vso pot. Strežniki ne preberejo besede.</translation>
+        <source>Any member can add people, rename the group or leave it.</source>
+        <translation>Vsak član lahko dodaja ljudi, preimenuje skupino ali jo zapusti.</translation>
     </message>
     <message>
-        <source>Anyone can add a friend, rename the group or leave. Nobody is in charge.</source>
-        <translation>Kdorkoli lahko doda prijatelja, preimenuje skupino ali odide. Nihče ne ukazuje.</translation>
+        <source>Messages are end-to-end encrypted, so the relays that carry them cannot read them.</source>
+        <translation>Sporočila so šifrirana od konca do konca, zato jih posredniki, ki jih prenašajo, ne morejo brati.</translation>
     </message>
     <message>
-        <source>It holds a message until the other phone is online, and nothing more.</source>
-        <translation>Sporočilo zadrži, dokler drugi telefon ni na zvezi, in nič več.</translation>
+        <source>Groups have no admins</source>
+        <translation>Skupine nimajo skrbnikov</translation>
+    </message>
+    <message>
+        <source>Relays only pass messages on</source>
+        <translation>Posredniki sporočila samo posredujejo naprej</translation>
+    </message>
+    <message>
+        <source>A relay stores a message only until the recipient fetches it.</source>
+        <translation>Posrednik hrani sporočilo samo, dokler ga prejemnik ne prevzame.</translation>
     </message>
 </context>
 <context>
@@ -974,12 +941,12 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
         <translation>Ni še stikov</translation>
     </message>
     <message>
-        <source>Scan someone&apos;s invite from the chat list: QR code</source>
-        <translation>Skenirajte povabilo nekoga s seznama klepetov: Koda QR</translation>
-    </message>
-    <message>
         <source>Search</source>
         <translation>Išči</translation>
+    </message>
+    <message>
+        <source>Use &quot;QR code&quot; in the chat list to add a contact.</source>
+        <translation>Za dodajanje stika uporabi »Koda QR« v seznamu klepetov.</translation>
     </message>
 </context>
 <context>
@@ -987,10 +954,6 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
     <message>
         <source>Please name the group</source>
         <translation>Poimenujte skupino</translation>
-    </message>
-    <message>
-        <source>Create Group</source>
-        <translation>Ustvari skupino</translation>
     </message>
     <message>
         <source>New group</source>
@@ -1025,6 +988,10 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
     <message>
         <source>Add members</source>
         <translation>Dodaj člane</translation>
+    </message>
+    <message>
+        <source>Create group</source>
+        <translation>Ustvari skupino</translation>
     </message>
 </context>
 <context>
@@ -1099,10 +1066,6 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
         <translation>Posrednik še ni sporočil svoje kvote</translation>
     </message>
     <message>
-        <source>Both ways: with this off you send none and see none.</source>
-        <translation>V obe smeri: izklopljeno jih ne pošiljaš in jih ne vidiš.</translation>
-    </message>
-    <message>
         <source>Relays</source>
         <translation>Posredniki</translation>
     </message>
@@ -1137,16 +1100,16 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
         <extracomment>How much room the profile takes on the phone. %1 is a size such as &quot;12.3 MB&quot;.</extracomment>
         <translation>Piirit zaseda %1 prostora na tem telefonu.</translation>
     </message>
+    <message>
+        <source>If read receipts are disabled, you won&apos;t be able to see read receipts from others.</source>
+        <translation>Če so potrdila o branju izklopljena, tudi potrdil drugih ne boš videl.</translation>
+    </message>
 </context>
 <context>
     <name>ProfileSetupPage</name>
     <message>
         <source>Add profile</source>
         <translation>Dodaj profil</translation>
-    </message>
-    <message>
-        <source>Contacting %1...</source>
-        <translation>Vzpostavljanje stika z %1...</translation>
     </message>
     <message>
         <source>Cancel</source>
@@ -1161,16 +1124,16 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
         <translation>%1 ni odgovoril v %2 sekundah.</translation>
     </message>
     <message>
-        <source>Relays are run by volunteers. Go back and try another one.</source>
-        <translation>Posrednike vodijo prostovoljci. Pojdi nazaj in poskusi drugega.</translation>
+        <source>Contacting %1…</source>
+        <translation>Vzpostavljanje stika z %1…</translation>
+    </message>
+    <message>
+        <source>Could not reach the relay. Try another one.</source>
+        <translation>Posrednika ni bilo mogoče doseči. Poskusi drugega.</translation>
     </message>
 </context>
 <context>
     <name>ProfileStartPage</name>
-    <message>
-        <source>Alright, let&apos;s get you set up.</source>
-        <translation>Dobro, ustvarimo vaš profil.</translation>
-    </message>
     <message>
         <source>I already have a profile</source>
         <translation>Profil že imam</translation>
@@ -1178,6 +1141,10 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
     <message>
         <source>Create a profile</source>
         <translation>Ustvari profil</translation>
+    </message>
+    <message>
+        <source>Set up your profile</source>
+        <translation>Nastavi svoj profil</translation>
     </message>
 </context>
 <context>
@@ -1243,16 +1210,16 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
         <translation>Naj nekdo skenira to kodo ali pa mu pošljite povezavo.</translation>
     </message>
     <message>
-        <source>Fetching...</source>
-        <translation>Pridobivanje...</translation>
-    </message>
-    <message>
-        <source>Copy Invite Link</source>
-        <translation>Kopiraj povezavo povabila</translation>
-    </message>
-    <message>
         <source>The camera is not available on this device.</source>
         <translation>Kamera na tej napravi ni na voljo.</translation>
+    </message>
+    <message>
+        <source>Fetching…</source>
+        <translation>Pridobivanje…</translation>
+    </message>
+    <message>
+        <source>Copy invite link</source>
+        <translation>Kopiraj povezavo povabila</translation>
     </message>
 </context>
 <context>
@@ -1270,10 +1237,6 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
 <context>
     <name>RestoreProfilePage</name>
     <message>
-        <source>That is not the code a device shows while it is offering its profile.</source>
-        <translation>To ni koda, ki jo naprava pokaže, medtem ko ponuja svoj profil.</translation>
-    </message>
-    <message>
         <source>Add as second device</source>
         <translation>Dodaj kot drugo napravo</translation>
     </message>
@@ -1286,16 +1249,8 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
         <translation>Izberi datoteko varnostne kopije</translation>
     </message>
     <message>
-        <source>Taking the profile over...</source>
-        <translation>Prevzemanje profila...</translation>
-    </message>
-    <message>
         <source>Cancel</source>
         <translation>Prekliči</translation>
-    </message>
-    <message>
-        <source>Hold the phone up to the code it shows</source>
-        <translation>Ta telefon usmerite v prikazano kodo</translation>
     </message>
     <message>
         <source>Enter the code instead</source>
@@ -1304,10 +1259,6 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
     <message>
         <source>Code from the other device</source>
         <translation>Koda z druge naprave</translation>
-    </message>
-    <message>
-        <source>Take the profile over</source>
-        <translation>Prevzemi profil</translation>
     </message>
     <message>
         <source>That did not work</source>
@@ -1322,28 +1273,44 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
         <translation>Izberi drugo datoteko</translation>
     </message>
     <message>
-        <source>The other device runs a newer Delta Chat than this app can read.</source>
-        <translation>Druga naprava ima novejši Delta Chat, kot ga zna ta aplikacija prebrati.</translation>
-    </message>
-    <message>
-        <source>The transfer stopped. Both devices have to stay on one network, with this page open.</source>
-        <translation>Prenos se je ustavil. Obe napravi morata ostati v istem omrežju, s to stranjo odprto.</translation>
-    </message>
-    <message>
-        <source>No camera on this device. A backup file works without one.</source>
-        <translation>Ta naprava nima kamere. Datoteka varnostne kopije deluje tudi brez nje.</translation>
-    </message>
-    <message>
-        <source>On the other device: Settings, then add a second device. Both on one network.</source>
-        <translation>Na drugi napravi: Nastavitve, nato dodaj drugo napravo. Obe v istem omrežju.</translation>
-    </message>
-    <message>
         <source>Make a backup on the other device, copy the file here, then choose it.</source>
         <translation>Naredi varnostno kopijo na drugi napravi, prekopiraj datoteko sem in jo nato izberi.</translation>
     </message>
     <message>
         <source>That profile is already on this phone. Open it from the profiles list.</source>
         <translation>Ta profil je že v tem telefonu. Odpri ga na seznamu profilov.</translation>
+    </message>
+    <message>
+        <source>The profile is from a newer Delta Chat version than this app can read.</source>
+        <translation>Profil je iz novejše različice Delta Chat, kot jo ta aplikacija zna prebrati.</translation>
+    </message>
+    <message>
+        <source>The transfer stopped. Both devices must stay on the same network with this page open.</source>
+        <translation>Prenos se je ustavil. Obe napravi morata ostati v istem omrežju s to stranjo odprto.</translation>
+    </message>
+    <message>
+        <source>This is not a second-device code. Use the code shown by the other device.</source>
+        <translation>To ni koda za drugo napravo. Uporabi kodo, ki jo prikazuje druga naprava.</translation>
+    </message>
+    <message>
+        <source>Hold your camera over the QR code</source>
+        <translation>Kamero drži nad kodo QR</translation>
+    </message>
+    <message>
+        <source>Copy the profile</source>
+        <translation>Kopiraj profil</translation>
+    </message>
+    <message>
+        <source>No camera on this device. You can restore from a backup file instead.</source>
+        <translation>Ta naprava nima kamere. Namesto tega lahko obnoviš profil iz datoteke varnostne kopije.</translation>
+    </message>
+    <message>
+        <source>On the other device, go to Settings and tap &quot;Add second device&quot;. Both devices must be on the same network.</source>
+        <translation>Na drugi napravi pojdi v Nastavitve in se dotakni »Dodaj drugo napravo«. Obe napravi morata biti v istem omrežju.</translation>
+    </message>
+    <message>
+        <source>Transferring…</source>
+        <translation>Prenašanje…</translation>
     </message>
 </context>
 <context>
@@ -1395,40 +1362,20 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
 <context>
     <name>SecondDevicePage</name>
     <message>
-        <source>Nothing took the profile. Both phones have to stay on one network, with this page open.</source>
-        <translation>Profila ni nihče vzel. Oba telefona morata ostati v istem omrežju, s to stranjo odprto.</translation>
-    </message>
-    <message>
         <source>Add a second device</source>
         <translation>Dodaj drugo napravo</translation>
-    </message>
-    <message>
-        <source>On the other device: add a profile you have already, then &quot;Add as second device&quot;, and read this code with it. Both phones on one network.</source>
-        <translation>Na drugi napravi: dodaj profil, ki ga že imaš, nato „Dodaj kot drugo napravo“, in z njo preberi to kodo. Oba telefona v istem omrežju.</translation>
     </message>
     <message>
         <source>Copy the code</source>
         <translation>Kopiraj kodo</translation>
     </message>
     <message>
-        <source>Handing the profile over...</source>
-        <translation>Predajanje profila...</translation>
-    </message>
-    <message>
         <source>Cancel</source>
         <translation>Prekliči</translation>
     </message>
     <message>
-        <source>The other device has the profile. Both get everything new from now on.</source>
-        <translation>Druga naprava ima profil. Odslej dobita obe vse novo.</translation>
-    </message>
-    <message>
         <source>Swipe on for your chats.</source>
         <translation>Podrsaj naprej do svojih klepetov.</translation>
-    </message>
-    <message>
-        <source>Whoever reads this code gets the profile. It stops collecting mail until the code is gone.</source>
-        <translation>Kdor prebere to kodo, dobi profil. Dokler je koda na zaslonu, profil ne pobira pošte.</translation>
     </message>
     <message>
         <source>Show code again</source>
@@ -1437,6 +1384,26 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
     <message>
         <source>Show code</source>
         <translation>Pokaži kodo</translation>
+    </message>
+    <message>
+        <source>No device copied the profile. Both devices must stay on the same network with this page open.</source>
+        <translation>Nobena naprava ni kopirala profila. Obe napravi morata ostati v istem omrežju s to stranjo odprto.</translation>
+    </message>
+    <message>
+        <source>Transferring…</source>
+        <translation>Prenašanje…</translation>
+    </message>
+    <message>
+        <source>The profile was transferred to your second device. Both devices now receive all new messages.</source>
+        <translation>Profil je bil prenesen na tvojo drugo napravo. Obe napravi zdaj prejemata vsa nova sporočila.</translation>
+    </message>
+    <message>
+        <source>On the other device, choose &quot;Add as second device&quot; and scan this code. Both devices must be on the same network.</source>
+        <translation>Na drugi napravi izberi »Dodaj kot drugo napravo« in skeniraj to kodo. Obe napravi morata biti v istem omrežju.</translation>
+    </message>
+    <message>
+        <source>Make sure no unwanted observer or camera can see this code. This profile does not receive messages while the code is shown.</source>
+        <translation>Poskrbi, da te kode ne vidi noben nezaželen opazovalec ali kamera. Ta profil ne prejema sporočil, dokler je koda prikazana.</translation>
     </message>
 </context>
 <context>
@@ -1490,18 +1457,6 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
         <translation>Obvestila</translation>
     </message>
     <message>
-        <source>Who wrote, and what</source>
-        <translation>Kdo je pisal in kaj</translation>
-    </message>
-    <message>
-        <source>Who wrote</source>
-        <translation>Kdo je pisal</translation>
-    </message>
-    <message>
-        <source>Only that something arrived</source>
-        <translation>Le to, da je nekaj prispelo</translation>
-    </message>
-    <message>
         <source>Apps</source>
         <translation>Aplikacije</translation>
     </message>
@@ -1535,10 +1490,6 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
         <translation>Briši sporočila z naprave</translation>
     </message>
     <message>
-        <source>A new notification shows</source>
-        <translation>Novo obvestilo pokaže</translation>
-    </message>
-    <message>
         <source>Mentions</source>
         <extracomment>A reply to one of the reader&apos;s own messages, arriving in a group they have muted.</extracomment>
         <translation>Omembe</translation>
@@ -1553,49 +1504,12 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
         <translation>Uporabi oblikovanje Markdown</translation>
     </message>
     <message>
-        <source>Otherwise it starts a new line, and the button sends.</source>
-        <translation>Sicer začne novo vrstico, pošlje pa gumb.</translation>
-    </message>
-    <message>
-        <source>Draws *stars* and `backticks` rather than showing them.</source>
-        <translation>Izriše *zvezdice* in `krativce`, namesto da bi jih pokazal.</translation>
-    </message>
-    <message>
-        <source>Bigger ones wait until you ask for them. Every profile, from now on.</source>
-        <translation>Večje počakajo, dokler jih ne zahtevaš. Vsi profili, odslej.</translation>
-    </message>
-    <message>
-        <source>Every chat of every profile. &quot;Saved messages&quot; are kept.</source>
-        <translation>Vsak klepet vsakega profila. »Shranjena sporočila« ostanejo.</translation>
-    </message>
-    <message>
-        <source>On the lock screen and in the notification area.</source>
-        <translation>Na zaklenjenem zaslonu in v območju obvestil.</translation>
-    </message>
-    <message>
-        <source>A reply to you gets through a muted group.</source>
-        <translation>Odgovor tebi pride skozi tudi v utišani skupini.</translation>
-    </message>
-    <message>
-        <source>Click ids and campaign tags come out of the links you send.</source>
-        <translation>Identifikatorji klikov in oznake kampanj izpadejo iz povezav, ki jih pošlješ.</translation>
-    </message>
-    <message>
-        <source>Small apps run inside the chat. Somebody else&apos;s code, and less tested than the rest.</source>
-        <translation>Male aplikacije tečejo znotraj klepeta. Tuja koda, in manj preizkušena kot ostalo.</translation>
-    </message>
-    <message>
         <source>Privacy</source>
         <translation>Zasebnost</translation>
     </message>
     <message>
         <source>Blocked contacts</source>
         <translation>Blokirani stiki</translation>
-    </message>
-    <message>
-        <source>Worse quality, save data</source>
-        <extracomment>Outgoing media quality: smaller pictures and videos, which cost the reader and whoever they write to less data. Both reference clients&apos; words for it.</extracomment>
-        <translation>Slabša kakovost, manjša velikost</translation>
     </message>
     <message>
         <source>Balanced</source>
@@ -1608,12 +1522,41 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
         <translation>Kakovost odhodnih predstavnosti</translation>
     </message>
     <message>
-        <source>Pictures are made smaller before sending, and the camera records at this quality.</source>
-        <translation>Slike se pred pošiljanjem pomanjšajo, kamera pa snema v tej kakovosti.</translation>
-    </message>
-    <message>
         <source>Show notifications</source>
         <translation>Prikaži obvestila</translation>
+    </message>
+    <message>
+        <source>Lower quality, less data</source>
+        <extracomment>Outgoing media quality: smaller pictures and videos, which cost the reader and whoever they write to less data. Both reference clients&apos; words for it.</extracomment>
+        <translation>Nižja kakovost, manj podatkov</translation>
+    </message>
+    <message>
+        <source>Notification content</source>
+        <translation>Vsebina obvestil</translation>
+    </message>
+    <message>
+        <source>Sender and message</source>
+        <translation>Pošiljatelj in sporočilo</translation>
+    </message>
+    <message>
+        <source>Sender only</source>
+        <translation>Samo pošiljatelj</translation>
+    </message>
+    <message>
+        <source>No details</source>
+        <translation>Brez podrobnosti</translation>
+    </message>
+    <message>
+        <source>In muted groups, notify messages directed to you, like replies or reactions</source>
+        <translation>V utišanih skupinah obvesti o sporočilih, namenjenih tebi, kot so odgovori ali odzivi</translation>
+    </message>
+    <message>
+        <source>Removes click IDs and campaign tags from links you send.</source>
+        <translation>Iz povezav, ki jih pošiljaš, odstrani identifikatorje klikov in oznake kampanj.</translation>
+    </message>
+    <message>
+        <source>Runs small apps inside chats. These features may be unstable and may be changed or removed.</source>
+        <translation>Znotraj klepetov poganja majhne aplikacije. Te funkcije so lahko nestabilne ter se lahko spremenijo ali odstranijo.</translation>
     </message>
 </context>
 <context>
@@ -1686,16 +1629,16 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
 <context>
     <name>WelcomePage</name>
     <message>
-        <source>Tell me about Delta Chat</source>
-        <translation>Kaj je Delta Chat?</translation>
-    </message>
-    <message>
-        <source>Set up my profile</source>
-        <translation>Nastavi moj profil</translation>
-    </message>
-    <message>
         <source>Secure decentralised chat based on Delta Chat</source>
         <translation>Varno decentralizirano klepetanje, zgrajeno na Delta Chatu</translation>
+    </message>
+    <message>
+        <source>About Delta Chat</source>
+        <translation>O Delta Chat</translation>
+    </message>
+    <message>
+        <source>Set up your profile</source>
+        <translation>Nastavi svoj profil</translation>
     </message>
 </context>
 </TS>

@@ -55,7 +55,7 @@ Dialog {
             color: Theme.highlightColor
             textFormat: Text.PlainText
             //: %n is how many messages would be deleted straight away.
-            text: qsTr("%n message(s) will be deleted now, and from then on every message will be once it is that old.", "", dialog.count)
+            text: qsTr("%n message(s) will be deleted now, and every new message will be deleted once it reaches that age.", "", dialog.count)
         }
 
         Column {

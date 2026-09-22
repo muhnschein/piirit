@@ -63,14 +63,12 @@ Page {
                 {
                     name: "secondDevice",
                     icon: "icon-m-device",
-                    text: qsTr("Add as second device"),
-                    hint: qsTr("The other device keeps it. Both get everything new.")
+                    text: qsTr("Add as second device")
                 },
                 {
                     name: "backupFile",
                     icon: "icon-m-backup",
-                    text: qsTr("Restore from a backup"),
-                    hint: qsTr("A backup file copied onto this phone.")
+                    text: qsTr("Restore from a backup")
                 }
             ]
             onChosen: page.takeOver(name === "backupFile" ? "file" : "device")

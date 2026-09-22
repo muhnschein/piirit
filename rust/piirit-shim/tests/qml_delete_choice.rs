@@ -144,16 +144,10 @@ fn the_dialog_picks_one_of_the_two_and_accepts_only_then() {
         record!("shows-cancel", call!("has", QString::from("deleteCancel")));
         // Silica's own switch flips itself unless told not to, which
         // would fight the binding that makes these two one answer.
-        // The question, and a line under each way saying who keeps a
-        // copy: the switches are three words each, and neither says that
-        // there is no way back.
+        // The question: the switches are three words each, and neither
+        // says that there is no way back.
         record!("heading", get!("deleteHeader", "title"));
         record!("question", call!("has", QString::from("deleteQuestion")));
-        record!("me-says-more", get!("forMeSwitch", "description"));
-        record!(
-            "everyone-says-more",
-            get!("forEveryoneSwitch", "description")
-        );
         record!("me-manual", get!("forMeSwitch", "automaticCheck"));
         record!(
             "everyone-manual",
@@ -251,19 +245,6 @@ fn the_dialog_picks_one_of_the_two_and_accepts_only_then() {
             "true",
             "nothing says what is being asked, or that neither way can be \
              taken back",
-        ),
-        (
-            "me-says-more",
-            "It goes from your devices. Everybody else keeps their copy.",
-            "the first way does not say who keeps a copy, which is the \
-             whole difference between the two",
-        ),
-        (
-            "everyone-says-more",
-            "It goes from your devices, and every other device in this chat \
-             is asked to delete it too.",
-            "the second way does not say what it does to everybody else's \
-             copy",
         ),
         (
             "me-manual",

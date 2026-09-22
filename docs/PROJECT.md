@@ -44,6 +44,39 @@ signals, QAbstractListModel adapters for chats/messages/accounts
 deltachat-rpc-server (bundled binary, subprocess) = the entire core
 ```
 
+## The words on screen
+
+Every `qsTr()` in `qml/` is translated into 39 languages, so the English
+is not only what a reader sees -- it is the source text a translator
+works from. English that leans on metaphor, ellipsis or an ambiguous
+phrasal verb does not survive that trip, and the damage is invisible from
+here. Three that shipped in 1.0.0 and had to be undone:
+
+- **A figurative verb read literally.** "Draws *stars* and `backticks`
+  rather than showing them" meant *renders*. Finnish, Russian and
+  Hungarian all took it for *sketches*.
+- **An ambiguous phrasal verb resolved three ways.** "Take the profile
+  over" became *assume control of* in German, *receive* in Finnish and
+  *transfer* in Russian -- three meanings for one button.
+- **A verbless fragment kept as a verbless fragment.** "... Every profile,
+  from now on" is fine in English and broken in an inflected language.
+
+So a string says what the thing does, once, in a finished sentence:
+
+- One clause with a subject and a verb. No second fragment as a coda, no
+  epigram, no rule of three.
+- Literal verbs. "Formats", not "draws"; "stores", not "holds".
+- No phrasal verb where a plain one exists. "Copy", not "take over".
+- Delta Chat's noun where Delta Chat has one -- it is the same domain and
+  the same 39 languages. Better still, Delta Chat's whole string: adopt
+  it verbatim and its `values-<lang>/strings.xml` translation comes with
+  it, already proof-read by its community.
+- Sentence case, and `…` rather than three dots.
+
+Changing a source string orphans its translation in every catalog and
+`tests/translation_catalogs.rs` fails until each is refilled, so the cost
+of getting the English wrong is paid 39 times. Write it once.
+
 ## Platform baseline
 
 - Toolchain floor **Rust 1.75.0, Qt 5.6.3** — what Sailfish ships.

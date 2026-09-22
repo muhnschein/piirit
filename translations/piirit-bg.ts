@@ -51,8 +51,8 @@
         <translation>Piirit работи само с chatmail релеи. Те са особен вид пощенски сървъри; обикновените пощенски сървъри не се поддържат. Повече на &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. Пълен списък с публични, безплатни chatmail релеи има на &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
     </message>
     <message>
-        <source>Pick a name and a relay. That&apos;s it! There is nothing else to set up.</source>
-        <translation>Изберете име и релей. Това е всичко! Нищо друго не се настройва.</translation>
+        <source>Choose a name and a relay. Nothing else is needed.</source>
+        <translation>Изберете име и релей. Нищо друго не е необходимо.</translation>
     </message>
 </context>
 <context>
@@ -66,24 +66,12 @@
         <translation>Създаване на профил</translation>
     </message>
     <message>
-        <source>A new address on a chatmail relay.</source>
-        <translation>Нов адрес на релей chatmail.</translation>
-    </message>
-    <message>
         <source>Restore from a backup</source>
         <translation>Възстановяване от резервно копие</translation>
     </message>
     <message>
-        <source>A backup file copied onto this phone.</source>
-        <translation>Файл с резервно копие, копиран на този телефон.</translation>
-    </message>
-    <message>
         <source>Add as second device</source>
         <translation>Добавяне като второ устройство</translation>
-    </message>
-    <message>
-        <source>The other device keeps it. Both get everything new.</source>
-        <translation>Другото устройство го запазва. И двете получават всичко ново.</translation>
     </message>
 </context>
 <context>
@@ -97,24 +85,12 @@
         <translation>Добавяне на релей</translation>
     </message>
     <message>
-        <source>Another address for this profile, on another relay. The profile sends from one relay at a time; its page says which, and lets you change it.</source>
-        <translation>Още един адрес за този профил, на друг релей. Профилът изпраща само от един релей наведнъж; страницата му показва кой е и позволява да го смените.</translation>
-    </message>
-    <message>
         <source>Add relay</source>
         <translation>Добавяне на релей</translation>
     </message>
     <message>
-        <source>Contacting %1...</source>
-        <translation>Свързване с %1...</translation>
-    </message>
-    <message>
         <source>Cancel</source>
         <translation>Отказ</translation>
-    </message>
-    <message>
-        <source>Relays are run by volunteers. Try another one.</source>
-        <translation>Релеите се поддържат от доброволци. Опитайте друг.</translation>
     </message>
     <message>
         <source>Select a public chatmail relay</source>
@@ -127,6 +103,18 @@
     <message>
         <source>Piirit works only with chatmail relays. These are a particular kind of e-mail server; ordinary e-mail servers are not supported. For more, see &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. A full list of public, free-to-use chatmail relays is at &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</source>
         <translation>Piirit работи само с chatmail релеи. Те са особен вид пощенски сървъри; обикновените пощенски сървъри не се поддържат. Повече на &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. Пълен списък с публични, безплатни chatmail релеи има на &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
+    </message>
+    <message>
+        <source>Adds another address for this profile on a second relay. The profile sends from one relay at a time; you can change which one on the profile page.</source>
+        <translation>Добавя към този профил още един адрес на друг релей. Профилът изпраща през един релей в даден момент; кой точно, можете да смените на страницата на профила.</translation>
+    </message>
+    <message>
+        <source>Contacting %1…</source>
+        <translation>Свързване с %1…</translation>
+    </message>
+    <message>
+        <source>Could not reach the relay. Try another one.</source>
+        <translation>Релеят не можа да бъде достигнат. Опитайте друг.</translation>
     </message>
 </context>
 <context>
@@ -159,14 +147,6 @@
         <source>Cancel</source>
         <translation>Отказ</translation>
     </message>
-    <message numerus="yes">
-        <source>%n message(s) will be deleted now, and from then on every message will be once it is that old.</source>
-        <extracomment>%n is how many messages would be deleted straight away.</extracomment>
-        <translation>
-            <numerusform>%n съобщение ще бъде изтрито сега, а оттук нататък всяко съобщение ще бъде изтривано, щом стане толкова старо.</numerusform>
-            <numerusform>%n съобщения ще бъдат изтрити сега, а оттук нататък всяко съобщение ще бъде изтривано, щом стане толкова старо.</numerusform>
-        </translation>
-    </message>
     <message>
         <source>This includes pictures, videos and files.</source>
         <translation>Това включва снимки, видеа и файлове.</translation>
@@ -184,20 +164,20 @@
         <source>I understand, delete all these messages</source>
         <translation>Разбирам, изтрий всички тези съобщения</translation>
     </message>
+    <message numerus="yes">
+        <source>%n message(s) will be deleted now, and every new message will be deleted once it reaches that age.</source>
+        <extracomment>%n is how many messages would be deleted straight away.</extracomment>
+        <translation>
+            <numerusform>%n съобщение ще бъде изтрито сега, а всяко ново съобщение ще бъде изтрито, щом достигне тази възраст.</numerusform>
+            <numerusform>%n съобщения ще бъдат изтрити сега, а всяко ново съобщение ще бъде изтрито, щом достигне тази възраст.</numerusform>
+        </translation>
+    </message>
 </context>
 <context>
     <name>BackupPage</name>
     <message>
         <source>Back up profile</source>
         <translation>Резервно копие на профила</translation>
-    </message>
-    <message>
-        <source>Write the backup</source>
-        <translation>Записване на резервното копие</translation>
-    </message>
-    <message>
-        <source>Writing the backup...</source>
-        <translation>Резервното копие се записва...</translation>
     </message>
     <message>
         <source>Cancel</source>
@@ -209,12 +189,20 @@
         <translation>Запазено в %1</translation>
     </message>
     <message>
-        <source>Messages, contacts and key in one file, saved to Documents. Whoever has the file has the profile.</source>
-        <translation>Съобщения, контакти и ключ в един файл, запазен в „Документи“. Който има файла, има профила.</translation>
-    </message>
-    <message>
         <source>Swipe on for your chats.</source>
         <translation>Плъзнете нататък към разговорите си.</translation>
+    </message>
+    <message>
+        <source>Start backup</source>
+        <translation>Започни резервно копие</translation>
+    </message>
+    <message>
+        <source>Backing up…</source>
+        <translation>Създаване на резервно копие…</translation>
+    </message>
+    <message>
+        <source>Saves your messages, contacts and end-to-end encryption setup to a backup file. Keep this file in a safe place.</source>
+        <translation>Запазва вашите съобщения, контакти и настройката за криптиране от край до край във файл с резервно копие. Съхранявайте този файл на сигурно място.</translation>
     </message>
 </context>
 <context>
@@ -288,10 +276,6 @@ Other groups with blocked contacts will still show their messages.</source>
 </context>
 <context>
     <name>ChatListPage</name>
-    <message>
-        <source>Lost the connection to the Delta Chat core. Reconnecting...</source>
-        <translation>Връзката с ядрото на Delta Chat е загубена. Повторно свързване...</translation>
-    </message>
     <message>
         <source>Lost the connection to the Delta Chat core. Restart Piirit.</source>
         <translation>Връзката с ядрото на Delta Chat е загубена. Рестартирайте Piirit.</translation>
@@ -400,6 +384,10 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Search</source>
         <translation>Търсене</translation>
+    </message>
+    <message>
+        <source>Lost the connection to the Delta Chat core. Reconnecting…</source>
+        <translation>Връзката с ядрото на Delta Chat е загубена. Повторно свързване…</translation>
     </message>
 </context>
 <context>
@@ -530,10 +518,6 @@ Other groups with blocked contacts will still show their messages.</source>
 <context>
     <name>ConversationPage</name>
     <message>
-        <source>Lost the connection to the Delta Chat core. Reconnecting...</source>
-        <translation>Връзката с ядрото на Delta Chat е загубена. Повторно свързване...</translation>
-    </message>
-    <message>
         <source>Lost the connection to the Delta Chat core. Restart Piirit.</source>
         <translation>Връзката с ядрото на Delta Chat е загубена. Рестартирайте Piirit.</translation>
     </message>
@@ -553,11 +537,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Message</source>
         <translation>Съобщение</translation>
-    </message>
-    <message>
-        <source>Long message: the other end sees a preview and taps to read the rest</source>
-        <extracomment>Shown above the message field while what is being written is long enough that the other end will receive a shortened version with the rest behind a tap.</extracomment>
-        <translation>Дълго съобщение: отсрещната страна вижда преглед и докосва, за да прочете останалото</translation>
     </message>
     <message>
         <source>Saved to Pictures</source>
@@ -580,9 +559,13 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Запазено в „Изтегляния“</translation>
     </message>
     <message>
-        <source>Too big to send: %1. Attachments go up to %2.</source>
+        <source>Lost the connection to the Delta Chat core. Reconnecting…</source>
+        <translation>Връзката с ядрото на Delta Chat е загубена. Повторно свързване…</translation>
+    </message>
+    <message>
+        <source>%1 is too large to send. Attachments can be up to %2.</source>
         <extracomment>Shown above the message field when the attached file is bigger than will be sent. %1 is the file&apos;s size and %2 the largest that goes, each such as &quot;24 MB&quot;.</extracomment>
-        <translation>Прекалено голям за изпращане: %1. Прикачените файлове могат да са до %2.</translation>
+        <translation>%1 е твърде голям за изпращане. Прикачените файлове могат да бъдат до %2.</translation>
     </message>
 </context>
 <context>
@@ -620,14 +603,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>How do you want to delete this message? This cannot be undone.</source>
         <translation>Как искате да изтриете това съобщение? Това не може да се отмени.</translation>
-    </message>
-    <message>
-        <source>It goes from your devices. Everybody else keeps their copy.</source>
-        <translation>Изчезва от вашите устройства. Всички останали запазват своето копие.</translation>
-    </message>
-    <message>
-        <source>It goes from your devices, and every other device in this chat is asked to delete it too.</source>
-        <translation>Изчезва от вашите устройства, а всяко друго устройство в този чат получава молба също да го изтрие.</translation>
     </message>
 </context>
 <context>
@@ -689,8 +664,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>След %1 секунди</translation>
     </message>
     <message>
-        <source>Applies to everyone in the chat. They can still copy and forward.</source>
-        <translation>Важи за всички в разговора. Все още могат да копират и препращат.</translation>
+        <source>Applies to all members of this chat; they can still copy, save, and forward messages.</source>
+        <translation>Приложимо за всички членове на този чат, ако използват Delta Chat; в противен случай те пак могат да копират, записват и препращат съобщения или да използват други клиенти за електронна поща.</translation>
     </message>
 </context>
 <context>
@@ -706,14 +681,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Restore from a backup</source>
         <translation>Възстановяване от резервно копие</translation>
-    </message>
-    <message>
-        <source>The other device keeps it. Both get everything new.</source>
-        <translation>Другото устройство го запазва. И двете получават всичко ново.</translation>
-    </message>
-    <message>
-        <source>A backup file copied onto this phone.</source>
-        <translation>Файл с резервно копие, копиран на този телефон.</translation>
     </message>
 </context>
 <context>
@@ -798,14 +765,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Вие избирате кой може да ви пише</translation>
     </message>
     <message>
-        <source>Groups of equals</source>
-        <translation>Групи от равни</translation>
-    </message>
-    <message>
-        <source>The server only passes it on</source>
-        <translation>Сървърът само предава нататък</translation>
-    </message>
-    <message>
         <source>Keep swiping to set up your profile.</source>
         <translation>Плъзгайте нататък, за да настроите профила си.</translation>
     </message>
@@ -814,24 +773,32 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Всяко съобщение е шифровано</translation>
     </message>
     <message>
-        <source>Made here on your phone. No phone number, no account, nothing to sign.</source>
-        <translation>Създава се тук, на телефона ви. Без номер, без регистрация, нищо за подписване.</translation>
+        <source>Your profile is created on this phone. No phone number and no sign-up are needed.</source>
+        <translation>Профилът ви се създава на този телефон. Не са нужни нито телефонен номер, нито регистрация.</translation>
     </message>
     <message>
-        <source>There is no directory to be found in. Show a friend a code, or send a link.</source>
-        <translation>Няма указател, в който да ви открият. Покажете на приятел код или му изпратете връзка.</translation>
+        <source>There is no public directory. People reach you by scanning your invite code or opening your invite link.</source>
+        <translation>Няма публичен указател. Другите стигат до вас, като сканират вашия код за покана или отворят вашата връзка за покана.</translation>
     </message>
     <message>
-        <source>Encrypted the whole way, always. The servers cannot read a word.</source>
-        <translation>Винаги шифровано по целия път. Сървърите не четат и дума.</translation>
+        <source>Any member can add people, rename the group or leave it.</source>
+        <translation>Всеки член може да добавя хора, да преименува групата или да я напусне.</translation>
     </message>
     <message>
-        <source>Anyone can add a friend, rename the group or leave. Nobody is in charge.</source>
-        <translation>Всеки може да добави приятел, да преименува групата или да си тръгне. Никой не командва.</translation>
+        <source>Messages are end-to-end encrypted, so the relays that carry them cannot read them.</source>
+        <translation>Съобщенията са криптирани от край до край, затова релеите, които ги пренасят, не могат да ги четат.</translation>
     </message>
     <message>
-        <source>It holds a message until the other phone is online, and nothing more.</source>
-        <translation>Задържа съобщението, докато другият телефон е на линия, и нищо повече.</translation>
+        <source>Groups have no admins</source>
+        <translation>Групите нямат администратори</translation>
+    </message>
+    <message>
+        <source>Relays only pass messages on</source>
+        <translation>Релеите само предават съобщенията нататък</translation>
+    </message>
+    <message>
+        <source>A relay stores a message only until the recipient fetches it.</source>
+        <translation>Релеят пази съобщението само докато получателят го вземе.</translation>
     </message>
 </context>
 <context>
@@ -962,12 +929,12 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Все още няма контакти</translation>
     </message>
     <message>
-        <source>Scan someone&apos;s invite from the chat list: QR code</source>
-        <translation>Сканирайте нечия покана от списъка с чатове: QR код</translation>
-    </message>
-    <message>
         <source>Search</source>
         <translation>Търсене</translation>
+    </message>
+    <message>
+        <source>Use &quot;QR code&quot; in the chat list to add a contact.</source>
+        <translation>За да добавите контакт, използвайте „QR код“ в списъка с чатове.</translation>
     </message>
 </context>
 <context>
@@ -975,10 +942,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Please name the group</source>
         <translation>Дайте име на групата</translation>
-    </message>
-    <message>
-        <source>Create Group</source>
-        <translation>Създаване на група</translation>
     </message>
     <message>
         <source>New group</source>
@@ -1011,6 +974,10 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Add members</source>
         <translation>Добавяне на членове</translation>
+    </message>
+    <message>
+        <source>Create group</source>
+        <translation>Създаване на група</translation>
     </message>
 </context>
 <context>
@@ -1083,10 +1050,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Релеят още не е съобщил квотата си</translation>
     </message>
     <message>
-        <source>Both ways: with this off you send none and see none.</source>
-        <translation>И в двете посоки: изключено — не изпращате и не виждате нито едно.</translation>
-    </message>
-    <message>
         <source>Relays</source>
         <translation>Релеи</translation>
     </message>
@@ -1121,16 +1084,16 @@ Other groups with blocked contacts will still show their messages.</source>
         <extracomment>How much room the profile takes on the phone. %1 is a size such as &quot;12.3 MB&quot;.</extracomment>
         <translation>Piirit използва %1 място на този телефон.</translation>
     </message>
+    <message>
+        <source>If read receipts are disabled, you won&apos;t be able to see read receipts from others.</source>
+        <translation>Ако известията за прочетена поща са забранени, няма да може да виждате известията, идващи от други потребители.</translation>
+    </message>
 </context>
 <context>
     <name>ProfileSetupPage</name>
     <message>
         <source>Add profile</source>
         <translation>Добавяне на профил</translation>
-    </message>
-    <message>
-        <source>Contacting %1...</source>
-        <translation>Свързване с %1...</translation>
     </message>
     <message>
         <source>Cancel</source>
@@ -1145,16 +1108,16 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>%1 не отговори в рамките на %2 секунди.</translation>
     </message>
     <message>
-        <source>Relays are run by volunteers. Go back and try another one.</source>
-        <translation>Релеите се поддържат от доброволци. Върнете се и опитайте друг.</translation>
+        <source>Contacting %1…</source>
+        <translation>Свързване с %1…</translation>
+    </message>
+    <message>
+        <source>Could not reach the relay. Try another one.</source>
+        <translation>Релеят не можа да бъде достигнат. Опитайте друг.</translation>
     </message>
 </context>
 <context>
     <name>ProfileStartPage</name>
-    <message>
-        <source>Alright, let&apos;s get you set up.</source>
-        <translation>Добре, да настроим профила ви.</translation>
-    </message>
     <message>
         <source>I already have a profile</source>
         <translation>Вече имам профил</translation>
@@ -1162,6 +1125,10 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Create a profile</source>
         <translation>Създаване на профил</translation>
+    </message>
+    <message>
+        <source>Set up your profile</source>
+        <translation>Настройте своя профил</translation>
     </message>
 </context>
 <context>
@@ -1227,16 +1194,16 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Оставете някой да сканира този код или му изпратете връзката.</translation>
     </message>
     <message>
-        <source>Fetching...</source>
-        <translation>Получаване...</translation>
-    </message>
-    <message>
-        <source>Copy Invite Link</source>
-        <translation>Копиране на връзката за покана</translation>
-    </message>
-    <message>
         <source>The camera is not available on this device.</source>
         <translation>Камерата не е налична на това устройство.</translation>
+    </message>
+    <message>
+        <source>Fetching…</source>
+        <translation>Получаване…</translation>
+    </message>
+    <message>
+        <source>Copy invite link</source>
+        <translation>Копиране на връзката за покана</translation>
     </message>
 </context>
 <context>
@@ -1254,10 +1221,6 @@ Other groups with blocked contacts will still show their messages.</source>
 <context>
     <name>RestoreProfilePage</name>
     <message>
-        <source>That is not the code a device shows while it is offering its profile.</source>
-        <translation>Това не е кодът, който устройството показва, докато предлага профила си.</translation>
-    </message>
-    <message>
         <source>Add as second device</source>
         <translation>Добавяне като второ устройство</translation>
     </message>
@@ -1270,16 +1233,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Избор на файл с резервно копие</translation>
     </message>
     <message>
-        <source>Taking the profile over...</source>
-        <translation>Профилът се поема...</translation>
-    </message>
-    <message>
         <source>Cancel</source>
         <translation>Отказ</translation>
-    </message>
-    <message>
-        <source>Hold the phone up to the code it shows</source>
-        <translation>Насочете този телефон към кода, който се показва</translation>
     </message>
     <message>
         <source>Enter the code instead</source>
@@ -1288,10 +1243,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Code from the other device</source>
         <translation>Код от другото устройство</translation>
-    </message>
-    <message>
-        <source>Take the profile over</source>
-        <translation>Поемане на профила</translation>
     </message>
     <message>
         <source>That did not work</source>
@@ -1306,28 +1257,44 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Избор на друг файл</translation>
     </message>
     <message>
-        <source>The other device runs a newer Delta Chat than this app can read.</source>
-        <translation>На другото устройство има по-нов Delta Chat, отколкото това приложение може да прочете.</translation>
-    </message>
-    <message>
-        <source>The transfer stopped. Both devices have to stay on one network, with this page open.</source>
-        <translation>Прехвърлянето спря. И двете устройства трябва да останат в една мрежа, с тази страница отворена.</translation>
-    </message>
-    <message>
-        <source>No camera on this device. A backup file works without one.</source>
-        <translation>Това устройство няма камера. Файл с резервно копие работи и без нея.</translation>
-    </message>
-    <message>
-        <source>On the other device: Settings, then add a second device. Both on one network.</source>
-        <translation>На другото устройство: Настройки, после добавяне като второ устройство. И двете в една мрежа.</translation>
-    </message>
-    <message>
         <source>Make a backup on the other device, copy the file here, then choose it.</source>
         <translation>Направете резервно копие на другото устройство, копирайте файла тук и го изберете.</translation>
     </message>
     <message>
         <source>That profile is already on this phone. Open it from the profiles list.</source>
         <translation>Този профил вече е на този телефон. Отворете го от списъка с профили.</translation>
+    </message>
+    <message>
+        <source>The profile is from a newer Delta Chat version than this app can read.</source>
+        <translation>Профилът е от по-нова версия на Delta Chat, отколкото това приложение може да прочете.</translation>
+    </message>
+    <message>
+        <source>The transfer stopped. Both devices must stay on the same network with this page open.</source>
+        <translation>Прехвърлянето спря. И двете устройства трябва да останат в една и съща мрежа с отворена тази страница.</translation>
+    </message>
+    <message>
+        <source>This is not a second-device code. Use the code shown by the other device.</source>
+        <translation>Това не е код за второ устройство. Използвайте кода, който показва другото устройство.</translation>
+    </message>
+    <message>
+        <source>Hold your camera over the QR code</source>
+        <translation>Задръжте камерата си върху QR кода</translation>
+    </message>
+    <message>
+        <source>Copy the profile</source>
+        <translation>Копирай профила</translation>
+    </message>
+    <message>
+        <source>No camera on this device. You can restore from a backup file instead.</source>
+        <translation>Това устройство няма камера. Вместо това можете да възстановите от файл с резервно копие.</translation>
+    </message>
+    <message>
+        <source>On the other device, go to Settings and tap &quot;Add second device&quot;. Both devices must be on the same network.</source>
+        <translation>На другото устройство отворете Настройки и докоснете „Добави второ устройство“. И двете устройства трябва да са в една и съща мрежа.</translation>
+    </message>
+    <message>
+        <source>Transferring…</source>
+        <translation>Прехвърляне...</translation>
     </message>
 </context>
 <context>
@@ -1379,40 +1346,20 @@ Other groups with blocked contacts will still show their messages.</source>
 <context>
     <name>SecondDevicePage</name>
     <message>
-        <source>Nothing took the profile. Both phones have to stay on one network, with this page open.</source>
-        <translation>Нищо не пое профила. И двата телефона трябва да останат в една мрежа, с тази страница отворена.</translation>
-    </message>
-    <message>
         <source>Add a second device</source>
         <translation>Добавяне на второ устройство</translation>
-    </message>
-    <message>
-        <source>On the other device: add a profile you have already, then &quot;Add as second device&quot;, and read this code with it. Both phones on one network.</source>
-        <translation>На другото устройство: добавете профил, който вече имате, после „Добавяне като второ устройство“, и прочетете този код с него. И двата телефона в една мрежа.</translation>
     </message>
     <message>
         <source>Copy the code</source>
         <translation>Копиране на кода</translation>
     </message>
     <message>
-        <source>Handing the profile over...</source>
-        <translation>Профилът се предава...</translation>
-    </message>
-    <message>
         <source>Cancel</source>
         <translation>Отказ</translation>
     </message>
     <message>
-        <source>The other device has the profile. Both get everything new from now on.</source>
-        <translation>Другото устройство има профила. Отсега и двете получават всичко ново.</translation>
-    </message>
-    <message>
         <source>Swipe on for your chats.</source>
         <translation>Плъзнете нататък към разговорите си.</translation>
-    </message>
-    <message>
-        <source>Whoever reads this code gets the profile. It stops collecting mail until the code is gone.</source>
-        <translation>Който прочете този код, получава профила. Той спира да събира поща, докато кодът не изчезне.</translation>
     </message>
     <message>
         <source>Show code again</source>
@@ -1421,6 +1368,26 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Show code</source>
         <translation>Показване на кода</translation>
+    </message>
+    <message>
+        <source>No device copied the profile. Both devices must stay on the same network with this page open.</source>
+        <translation>Никое устройство не копира профила. И двете устройства трябва да останат в една и съща мрежа с отворена тази страница.</translation>
+    </message>
+    <message>
+        <source>Transferring…</source>
+        <translation>Прехвърляне...</translation>
+    </message>
+    <message>
+        <source>The profile was transferred to your second device. Both devices now receive all new messages.</source>
+        <translation>Профилът беше прехвърлен на вашето второ устройство. И двете устройства вече получават всички нови съобщения.</translation>
+    </message>
+    <message>
+        <source>On the other device, choose &quot;Add as second device&quot; and scan this code. Both devices must be on the same network.</source>
+        <translation>На другото устройство изберете „Добавяне като второ устройство“ и сканирайте този код. И двете устройства трябва да са в една и съща мрежа.</translation>
+    </message>
+    <message>
+        <source>Make sure no unwanted observer or camera can see this code. This profile does not receive messages while the code is shown.</source>
+        <translation>Погрижете се този код да не се вижда от нежелани наблюдатели или камери. Докато кодът се показва, този профил не получава съобщения.</translation>
     </message>
 </context>
 <context>
@@ -1474,18 +1441,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Известия</translation>
     </message>
     <message>
-        <source>Who wrote, and what</source>
-        <translation>Кой е писал и какво</translation>
-    </message>
-    <message>
-        <source>Who wrote</source>
-        <translation>Кой е писал</translation>
-    </message>
-    <message>
-        <source>Only that something arrived</source>
-        <translation>Само че е пристигнало нещо</translation>
-    </message>
-    <message>
         <source>Apps</source>
         <translation>Приложения</translation>
     </message>
@@ -1519,10 +1474,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Изтриване на съобщения от устройството</translation>
     </message>
     <message>
-        <source>A new notification shows</source>
-        <translation>Ново известие показва</translation>
-    </message>
-    <message>
         <source>Mentions</source>
         <extracomment>A reply to one of the reader&apos;s own messages, arriving in a group they have muted.</extracomment>
         <translation>Споменавания</translation>
@@ -1537,49 +1488,12 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Използване на форматиране с Markdown</translation>
     </message>
     <message>
-        <source>Otherwise it starts a new line, and the button sends.</source>
-        <translation>Иначе започва нов ред, а бутонът изпраща.</translation>
-    </message>
-    <message>
-        <source>Draws *stars* and `backticks` rather than showing them.</source>
-        <translation>Изчертава *звездичките* и `обратните апострофи`, вместо да ги показва.</translation>
-    </message>
-    <message>
-        <source>Bigger ones wait until you ask for them. Every profile, from now on.</source>
-        <translation>По-големите чакат, докато ги поискате. Всички профили, отсега нататък.</translation>
-    </message>
-    <message>
-        <source>Every chat of every profile. &quot;Saved messages&quot; are kept.</source>
-        <translation>Всеки разговор на всеки профил. „Запазените съобщения“ остават.</translation>
-    </message>
-    <message>
-        <source>On the lock screen and in the notification area.</source>
-        <translation>На заключения екран и в областта за известия.</translation>
-    </message>
-    <message>
-        <source>A reply to you gets through a muted group.</source>
-        <translation>Отговор до вас минава дори през заглушена група.</translation>
-    </message>
-    <message>
-        <source>Click ids and campaign tags come out of the links you send.</source>
-        <translation>Идентификаторите на кликвания и етикетите на кампании изпадат от връзките, които изпращате.</translation>
-    </message>
-    <message>
-        <source>Small apps run inside the chat. Somebody else&apos;s code, and less tested than the rest.</source>
-        <translation>Малки приложения работят вътре в разговора. Чужд код и по-малко изпитан от останалото.</translation>
-    </message>
-    <message>
         <source>Privacy</source>
         <translation>Поверителност</translation>
     </message>
     <message>
         <source>Blocked contacts</source>
         <translation>Блокирани контакти</translation>
-    </message>
-    <message>
-        <source>Worse quality, save data</source>
-        <extracomment>Outgoing media quality: smaller pictures and videos, which cost the reader and whoever they write to less data. Both reference clients&apos; words for it.</extracomment>
-        <translation>По-ниско качество, малък размер</translation>
     </message>
     <message>
         <source>Balanced</source>
@@ -1592,12 +1506,41 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Качество на изходящата медия</translation>
     </message>
     <message>
-        <source>Pictures are made smaller before sending, and the camera records at this quality.</source>
-        <translation>Снимките се смаляват преди изпращане, а камерата записва с това качество.</translation>
-    </message>
-    <message>
         <source>Show notifications</source>
         <translation>Показване на известия</translation>
+    </message>
+    <message>
+        <source>Lower quality, less data</source>
+        <extracomment>Outgoing media quality: smaller pictures and videos, which cost the reader and whoever they write to less data. Both reference clients&apos; words for it.</extracomment>
+        <translation>По-ниско качество, по-малко данни</translation>
+    </message>
+    <message>
+        <source>Notification content</source>
+        <translation>Съдържание на известията</translation>
+    </message>
+    <message>
+        <source>Sender and message</source>
+        <translation>Подател и съобщение</translation>
+    </message>
+    <message>
+        <source>Sender only</source>
+        <translation>Само подател</translation>
+    </message>
+    <message>
+        <source>No details</source>
+        <translation>Без подробности</translation>
+    </message>
+    <message>
+        <source>In muted groups, notify messages directed to you, like replies or reactions</source>
+        <translation>В заглушени групи известявай за съобщения, насочени към вас, като отговори или реакции</translation>
+    </message>
+    <message>
+        <source>Removes click IDs and campaign tags from links you send.</source>
+        <translation>Премахва идентификатори на кликове и етикети на кампании от връзките, които изпращате.</translation>
+    </message>
+    <message>
+        <source>Runs small apps inside chats. These features may be unstable and may be changed or removed.</source>
+        <translation>Изпълнява малки приложения вътре в чатовете. Тези функции може да са нестабилни и може да бъдат променени или премахнати.</translation>
     </message>
 </context>
 <context>
@@ -1670,16 +1613,16 @@ Other groups with blocked contacts will still show their messages.</source>
 <context>
     <name>WelcomePage</name>
     <message>
-        <source>Tell me about Delta Chat</source>
-        <translation>Какво е Delta Chat?</translation>
-    </message>
-    <message>
-        <source>Set up my profile</source>
-        <translation>Настройване на профил</translation>
-    </message>
-    <message>
         <source>Secure decentralised chat based on Delta Chat</source>
         <translation>Сигурен децентрализиран чат, базиран на Delta Chat</translation>
+    </message>
+    <message>
+        <source>About Delta Chat</source>
+        <translation>Относно Delta Chat</translation>
+    </message>
+    <message>
+        <source>Set up your profile</source>
+        <translation>Настройте своя профил</translation>
     </message>
 </context>
 </TS>

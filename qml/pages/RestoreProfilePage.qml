@@ -120,15 +120,15 @@ Page {
     /// What the shim's reason for refusing means, in words for a reader.
     function reasonText(reason) {
         if (reason === "too-new") {
-            return qsTr("The other device runs a newer Delta Chat than this app can read.")
+            return qsTr("The profile is from a newer Delta Chat version than this app can read.")
         }
         if (reason === "stalled") {
-            return qsTr("The transfer stopped. Both devices have to stay on one network, with this page open.")
+            return qsTr("The transfer stopped. Both devices must stay on the same network with this page open.")
         }
         if (reason === "already-here") {
             return qsTr("That profile is already on this phone. Open it from the profiles list.")
         }
-        return qsTr("That is not the code a device shows while it is offering its profile.")
+        return qsTr("This is not a second-device code. Use the code shown by the other device.")
     }
 
     // Qt 5.6 handler syntax; see WelcomePage.qml.
@@ -190,14 +190,14 @@ Page {
             source: Qt.resolvedUrl("../components/ScanView.qml")
             onLoaded: {
                 scanLoader.item.hintText =
-                    qsTr("Hold the phone up to the code it shows")
+                    qsTr("Hold your camera over the QR code")
                 // The same string the code carries, for a reader whose
                 // camera will not read it -- the other device shows it
                 // as text beside the code, and it can be sent over.
                 scanLoader.item.linkButtonText = qsTr("Enter the code instead")
                 scanLoader.item.linkLabel = qsTr("Code from the other device")
                 scanLoader.item.linkPlaceholder = "DCBACKUP5:..."
-                scanLoader.item.linkActionText = qsTr("Take the profile over")
+                scanLoader.item.linkActionText = qsTr("Copy the profile")
                 // The digit is the core's transfer version -- the
                 // pinned core shows 5 -- so the prefix that decides
                 // whether the clipboard is worth pasting in does not
@@ -236,7 +236,7 @@ Page {
             horizontalAlignment: Text.AlignHCenter
             wrapMode: Text.Wrap
             color: Theme.secondaryHighlightColor
-            text: qsTr("No camera on this device. A backup file works without one.")
+            text: qsTr("No camera on this device. You can restore from a backup file instead.")
         }
 
         // Over the picture rather than above it. A reader still has to
@@ -282,7 +282,7 @@ Page {
                     textFormat: Text.PlainText
                     font.pixelSize: Theme.fontSizeSmall
                     color: Theme.secondaryHighlightColor
-                    text: qsTr("On the other device: Settings, then add a second device. Both on one network.")
+                    text: qsTr("On the other device, go to Settings and tap \"Add second device\". Both devices must be on the same network.")
                 }
             }
         }
@@ -333,7 +333,7 @@ Page {
                 minimumValue: 0
                 maximumValue: 1000
                 value: page.permille
-                label: qsTr("Taking the profile over...")
+                label: qsTr("Transferring…")
             }
 
             Button {

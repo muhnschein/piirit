@@ -140,7 +140,7 @@ Page {
                 wrapMode: Text.Wrap
                 font.pixelSize: Theme.fontSizeSmall
                 color: Theme.secondaryHighlightColor
-                text: qsTr("Another address for this profile, on another relay. The profile sends from one relay at a time; its page says which, and lets you change it.")
+                text: qsTr("Adds another address for this profile on a second relay. The profile sends from one relay at a time; you can change which one on the profile page.")
             }
 
             ComboBox {
@@ -211,7 +211,7 @@ Page {
                 minimumValue: 0
                 maximumValue: 1000
                 value: page.permille
-                label: qsTr("Contacting %1...").arg(page.domain)
+                label: qsTr("Contacting %1…").arg(page.domain)
             }
 
             Button {
@@ -237,7 +237,7 @@ Page {
                 horizontalAlignment: Text.AlignHCenter
                 font.pixelSize: Theme.fontSizeSmall
                 color: Theme.secondaryHighlightColor
-                text: qsTr("Relays are run by volunteers. Try another one.")
+                text: qsTr("Could not reach the relay. Try another one.")
             }
 
             Banner {

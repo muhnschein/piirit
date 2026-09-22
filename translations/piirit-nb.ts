@@ -51,8 +51,8 @@
         <translation>Piirit virker bare med chatmail-reléer. Det er en egen type e-posttjener; vanlige e-posttjenere støttes ikke. Les mer på &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. En full liste over offentlige, gratis chatmail-reléer finnes på &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
     </message>
     <message>
-        <source>Pick a name and a relay. That&apos;s it! There is nothing else to set up.</source>
-        <translation>Velg et navn og et relé. Det var alt! Det er ikke mer å sette opp.</translation>
+        <source>Choose a name and a relay. Nothing else is needed.</source>
+        <translation>Velg et navn og et relé. Mer trengs ikke.</translation>
     </message>
 </context>
 <context>
@@ -66,24 +66,12 @@
         <translation>Opprett en profil</translation>
     </message>
     <message>
-        <source>A new address on a chatmail relay.</source>
-        <translation>En ny adresse på et chatmail-relé.</translation>
-    </message>
-    <message>
         <source>Restore from a backup</source>
         <translation>Gjenopprett fra en sikkerhetskopi</translation>
     </message>
     <message>
-        <source>A backup file copied onto this phone.</source>
-        <translation>En sikkerhetskopifil, kopiert over på denne telefonen.</translation>
-    </message>
-    <message>
         <source>Add as second device</source>
         <translation>Legg til som andre enhet</translation>
-    </message>
-    <message>
-        <source>The other device keeps it. Both get everything new.</source>
-        <translation>Den andre enheten beholder den. Begge får alt som er nytt.</translation>
     </message>
 </context>
 <context>
@@ -97,24 +85,12 @@
         <translation>Legg til et relé</translation>
     </message>
     <message>
-        <source>Another address for this profile, on another relay. The profile sends from one relay at a time; its page says which, and lets you change it.</source>
-        <translation>Enda en adresse for denne profilen, på et annet relé. Profilen sender fra ett relé om gangen; siden dens viser hvilket og lar deg bytte.</translation>
-    </message>
-    <message>
         <source>Add relay</source>
         <translation>Legg til relé</translation>
     </message>
     <message>
-        <source>Contacting %1...</source>
-        <translation>Kontakter %1...</translation>
-    </message>
-    <message>
         <source>Cancel</source>
         <translation>Avbryt</translation>
-    </message>
-    <message>
-        <source>Relays are run by volunteers. Try another one.</source>
-        <translation>Reléer drives av frivillige. Prøv et annet.</translation>
     </message>
     <message>
         <source>Select a public chatmail relay</source>
@@ -127,6 +103,18 @@
     <message>
         <source>Piirit works only with chatmail relays. These are a particular kind of e-mail server; ordinary e-mail servers are not supported. For more, see &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. A full list of public, free-to-use chatmail relays is at &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</source>
         <translation>Piirit virker bare med chatmail-reléer. Det er en egen type e-posttjener; vanlige e-posttjenere støttes ikke. Les mer på &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. En full liste over offentlige, gratis chatmail-reléer finnes på &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
+    </message>
+    <message>
+        <source>Adds another address for this profile on a second relay. The profile sends from one relay at a time; you can change which one on the profile page.</source>
+        <translation>Legger til enda en adresse for denne profilen på et annet relé. Profilen sender via ett relé om gangen; hvilket kan du endre på profilsiden.</translation>
+    </message>
+    <message>
+        <source>Contacting %1…</source>
+        <translation>Kontakter %1…</translation>
+    </message>
+    <message>
+        <source>Could not reach the relay. Try another one.</source>
+        <translation>Kunne ikke nå reléet. Prøv et annet.</translation>
     </message>
 </context>
 <context>
@@ -159,14 +147,6 @@
         <source>Cancel</source>
         <translation>Avbryt</translation>
     </message>
-    <message numerus="yes">
-        <source>%n message(s) will be deleted now, and from then on every message will be once it is that old.</source>
-        <extracomment>%n is how many messages would be deleted straight away.</extracomment>
-        <translation>
-            <numerusform>%n melding slettes nå, og fra da av hver melding så snart den er så gammel.</numerusform>
-            <numerusform>%n meldinger slettes nå, og fra da av hver melding så snart den er så gammel.</numerusform>
-        </translation>
-    </message>
     <message>
         <source>This includes pictures, videos and files.</source>
         <translation>Dette omfatter bilder, videoer og filer.</translation>
@@ -184,20 +164,20 @@
         <source>I understand, delete all these messages</source>
         <translation>Jeg forstår, slett alle disse meldingene</translation>
     </message>
+    <message numerus="yes">
+        <source>%n message(s) will be deleted now, and every new message will be deleted once it reaches that age.</source>
+        <extracomment>%n is how many messages would be deleted straight away.</extracomment>
+        <translation>
+            <numerusform>%n melding slettes nå, og enhver ny melding slettes når den når den alderen.</numerusform>
+            <numerusform>%n meldinger slettes nå, og enhver ny melding slettes når den når den alderen.</numerusform>
+        </translation>
+    </message>
 </context>
 <context>
     <name>BackupPage</name>
     <message>
         <source>Back up profile</source>
         <translation>Sikkerhetskopier profil</translation>
-    </message>
-    <message>
-        <source>Write the backup</source>
-        <translation>Skriv sikkerhetskopien</translation>
-    </message>
-    <message>
-        <source>Writing the backup...</source>
-        <translation>Skriver sikkerhetskopien...</translation>
     </message>
     <message>
         <source>Cancel</source>
@@ -209,12 +189,20 @@
         <translation>Lagret i %1</translation>
     </message>
     <message>
-        <source>Messages, contacts and key in one file, saved to Documents. Whoever has the file has the profile.</source>
-        <translation>Meldinger, kontakter og nøkkel i én fil, lagret i Dokumenter. Den som har filen, har profilen.</translation>
-    </message>
-    <message>
         <source>Swipe on for your chats.</source>
         <translation>Sveip videre til chattene dine.</translation>
+    </message>
+    <message>
+        <source>Start backup</source>
+        <translation>Start sikkerhetskopiering</translation>
+    </message>
+    <message>
+        <source>Backing up…</source>
+        <translation>Sikkerhetskopierer…</translation>
+    </message>
+    <message>
+        <source>Saves your messages, contacts and end-to-end encryption setup to a backup file. Keep this file in a safe place.</source>
+        <translation>Lagrer meldinger, kontakter og ende-til-ende-krypteringen i en sikkerhetskopi. Oppbevar denne filen på et trygt sted.</translation>
     </message>
 </context>
 <context>
@@ -288,10 +276,6 @@ Other groups with blocked contacts will still show their messages.</source>
 </context>
 <context>
     <name>ChatListPage</name>
-    <message>
-        <source>Lost the connection to the Delta Chat core. Reconnecting...</source>
-        <translation>Mistet forbindelsen til Delta Chat-kjernen. Kobler til igjen...</translation>
-    </message>
     <message>
         <source>Lost the connection to the Delta Chat core. Restart Piirit.</source>
         <translation>Mistet forbindelsen til Delta Chat-kjernen. Start Piirit på nytt.</translation>
@@ -400,6 +384,10 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Search</source>
         <translation>Søk</translation>
+    </message>
+    <message>
+        <source>Lost the connection to the Delta Chat core. Reconnecting…</source>
+        <translation>Mistet forbindelsen til Delta Chat-kjernen. Kobler til igjen…</translation>
     </message>
 </context>
 <context>
@@ -530,10 +518,6 @@ Other groups with blocked contacts will still show their messages.</source>
 <context>
     <name>ConversationPage</name>
     <message>
-        <source>Lost the connection to the Delta Chat core. Reconnecting...</source>
-        <translation>Mistet forbindelsen til Delta Chat-kjernen. Kobler til igjen...</translation>
-    </message>
-    <message>
         <source>Lost the connection to the Delta Chat core. Restart Piirit.</source>
         <translation>Mistet forbindelsen til Delta Chat-kjernen. Start Piirit på nytt.</translation>
     </message>
@@ -553,11 +537,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Message</source>
         <translation>Melding</translation>
-    </message>
-    <message>
-        <source>Long message: the other end sees a preview and taps to read the rest</source>
-        <extracomment>Shown above the message field while what is being written is long enough that the other end will receive a shortened version with the rest behind a tap.</extracomment>
-        <translation>Lang melding: mottakeren ser et utdrag og trykker for å lese resten</translation>
     </message>
     <message>
         <source>Saved to Pictures</source>
@@ -580,9 +559,13 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Lagret i Nedlastinger</translation>
     </message>
     <message>
-        <source>Too big to send: %1. Attachments go up to %2.</source>
+        <source>Lost the connection to the Delta Chat core. Reconnecting…</source>
+        <translation>Mistet forbindelsen til Delta Chat-kjernen. Kobler til igjen…</translation>
+    </message>
+    <message>
+        <source>%1 is too large to send. Attachments can be up to %2.</source>
         <extracomment>Shown above the message field when the attached file is bigger than will be sent. %1 is the file&apos;s size and %2 the largest that goes, each such as &quot;24 MB&quot;.</extracomment>
-        <translation>For stor til å sende: %1. Vedlegg kan være opptil %2.</translation>
+        <translation>%1 er for stor til å sendes. Vedlegg kan være opptil %2.</translation>
     </message>
 </context>
 <context>
@@ -620,14 +603,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>How do you want to delete this message? This cannot be undone.</source>
         <translation>Hvordan vil du slette denne meldingen? Dette kan ikke angres.</translation>
-    </message>
-    <message>
-        <source>It goes from your devices. Everybody else keeps their copy.</source>
-        <translation>Den forsvinner fra enhetene dine. Alle andre beholder kopien sin.</translation>
-    </message>
-    <message>
-        <source>It goes from your devices, and every other device in this chat is asked to delete it too.</source>
-        <translation>Den forsvinner fra enhetene dine, og alle andre enheter i denne samtalen blir bedt om å slette den også.</translation>
     </message>
 </context>
 <context>
@@ -689,8 +664,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Etter %1 sekunder</translation>
     </message>
     <message>
-        <source>Applies to everyone in the chat. They can still copy and forward.</source>
-        <translation>Gjelder alle i chatten. De kan fortsatt kopiere og videresende.</translation>
+        <source>Applies to all members of this chat; they can still copy, save, and forward messages.</source>
+        <translation>Disse innstillingene gjelder alle deltakerne som bruker Delta Chat. Men de kan kopiere, lagre og videresende meldinger eller bruke annen e-postklient.</translation>
     </message>
 </context>
 <context>
@@ -706,14 +681,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Restore from a backup</source>
         <translation>Gjenopprett fra en sikkerhetskopi</translation>
-    </message>
-    <message>
-        <source>The other device keeps it. Both get everything new.</source>
-        <translation>Den andre enheten beholder den. Begge får alt som er nytt.</translation>
-    </message>
-    <message>
-        <source>A backup file copied onto this phone.</source>
-        <translation>En sikkerhetskopifil, kopiert over på denne telefonen.</translation>
     </message>
 </context>
 <context>
@@ -798,14 +765,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Du bestemmer hvem som kan nå deg</translation>
     </message>
     <message>
-        <source>Groups of equals</source>
-        <translation>Grupper mellom likemenn</translation>
-    </message>
-    <message>
-        <source>The server only passes it on</source>
-        <translation>Tjeneren bare sender den videre</translation>
-    </message>
-    <message>
         <source>Keep swiping to set up your profile.</source>
         <translation>Sveip videre for å sette opp profilen din.</translation>
     </message>
@@ -814,24 +773,32 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Hver melding er kryptert</translation>
     </message>
     <message>
-        <source>Made here on your phone. No phone number, no account, nothing to sign.</source>
-        <translation>Laget her på telefonen din. Ingen telefonnummer, ingen konto, ingenting å skrive under.</translation>
+        <source>Your profile is created on this phone. No phone number and no sign-up are needed.</source>
+        <translation>Profilen din opprettes på denne telefonen. Verken telefonnummer eller registrering trengs.</translation>
     </message>
     <message>
-        <source>There is no directory to be found in. Show a friend a code, or send a link.</source>
-        <translation>Det finnes ingen katalog å bli funnet i. Vis en venn en kode, eller send en lenke.</translation>
+        <source>There is no public directory. People reach you by scanning your invite code or opening your invite link.</source>
+        <translation>Det finnes ingen offentlig katalog. Andre når deg ved å skanne invitasjonskoden din eller åpne invitasjonslenken din.</translation>
     </message>
     <message>
-        <source>Encrypted the whole way, always. The servers cannot read a word.</source>
-        <translation>Alltid kryptert hele veien. Serverne leser ikke et ord.</translation>
+        <source>Any member can add people, rename the group or leave it.</source>
+        <translation>Ethvert medlem kan legge til folk, gi gruppen nytt navn eller forlate den.</translation>
     </message>
     <message>
-        <source>Anyone can add a friend, rename the group or leave. Nobody is in charge.</source>
-        <translation>Hvem som helst kan legge til en venn, gi gruppen nytt navn eller gå. Ingen bestemmer.</translation>
+        <source>Messages are end-to-end encrypted, so the relays that carry them cannot read them.</source>
+        <translation>Meldinger er ende-til-ende-kryptert, så reléene som frakter dem kan ikke lese dem.</translation>
     </message>
     <message>
-        <source>It holds a message until the other phone is online, and nothing more.</source>
-        <translation>Den holder på en melding til den andre telefonen er på nett, og ikke mer.</translation>
+        <source>Groups have no admins</source>
+        <translation>Grupper har ingen administratorer</translation>
+    </message>
+    <message>
+        <source>Relays only pass messages on</source>
+        <translation>Reléer sender bare meldinger videre</translation>
+    </message>
+    <message>
+        <source>A relay stores a message only until the recipient fetches it.</source>
+        <translation>Et relé lagrer en melding bare til mottakeren henter den.</translation>
     </message>
 </context>
 <context>
@@ -962,12 +929,12 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Ingen kontakter ennå</translation>
     </message>
     <message>
-        <source>Scan someone&apos;s invite from the chat list: QR code</source>
-        <translation>Skann noens invitasjon fra chatlisten: QR-kode</translation>
-    </message>
-    <message>
         <source>Search</source>
         <translation>Søk</translation>
+    </message>
+    <message>
+        <source>Use &quot;QR code&quot; in the chat list to add a contact.</source>
+        <translation>Bruk &quot;QR-kode&quot; i chatlisten for å legge til en kontakt.</translation>
     </message>
 </context>
 <context>
@@ -975,10 +942,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Please name the group</source>
         <translation>Gi gruppen et navn</translation>
-    </message>
-    <message>
-        <source>Create Group</source>
-        <translation>Opprett gruppe</translation>
     </message>
     <message>
         <source>New group</source>
@@ -1011,6 +974,10 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Add members</source>
         <translation>Legg til medlemmer</translation>
+    </message>
+    <message>
+        <source>Create group</source>
+        <translation>Opprett gruppe</translation>
     </message>
 </context>
 <context>
@@ -1083,10 +1050,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Reléet har ikke meldt kvoten sin ennå</translation>
     </message>
     <message>
-        <source>Both ways: with this off you send none and see none.</source>
-        <translation>Begge veier: er dette av, sender du ingen og ser ingen.</translation>
-    </message>
-    <message>
         <source>Relays</source>
         <translation>Reléer</translation>
     </message>
@@ -1121,16 +1084,16 @@ Other groups with blocked contacts will still show their messages.</source>
         <extracomment>How much room the profile takes on the phone. %1 is a size such as &quot;12.3 MB&quot;.</extracomment>
         <translation>Piirit bruker %1 lagringsplass på denne telefonen.</translation>
     </message>
+    <message>
+        <source>If read receipts are disabled, you won&apos;t be able to see read receipts from others.</source>
+        <translation>Hvis du slår av lesebekreftelser, får du heller ikke se lesebekreftelser fra andre.</translation>
+    </message>
 </context>
 <context>
     <name>ProfileSetupPage</name>
     <message>
         <source>Add profile</source>
         <translation>Legg til profil</translation>
-    </message>
-    <message>
-        <source>Contacting %1...</source>
-        <translation>Kontakter %1...</translation>
     </message>
     <message>
         <source>Cancel</source>
@@ -1145,16 +1108,16 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>%1 svarte ikke innen %2 sekunder.</translation>
     </message>
     <message>
-        <source>Relays are run by volunteers. Go back and try another one.</source>
-        <translation>Reléer drives av frivillige. Gå tilbake og prøv et annet.</translation>
+        <source>Contacting %1…</source>
+        <translation>Kontakter %1…</translation>
+    </message>
+    <message>
+        <source>Could not reach the relay. Try another one.</source>
+        <translation>Kunne ikke nå reléet. Prøv et annet.</translation>
     </message>
 </context>
 <context>
     <name>ProfileStartPage</name>
-    <message>
-        <source>Alright, let&apos;s get you set up.</source>
-        <translation>Greit, la oss sette opp profilen din.</translation>
-    </message>
     <message>
         <source>I already have a profile</source>
         <translation>Jeg har allerede en profil</translation>
@@ -1162,6 +1125,10 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Create a profile</source>
         <translation>Opprett en profil</translation>
+    </message>
+    <message>
+        <source>Set up your profile</source>
+        <translation>Sett opp profilen din</translation>
     </message>
 </context>
 <context>
@@ -1227,16 +1194,16 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>La noen skanne denne koden, eller send dem lenken.</translation>
     </message>
     <message>
-        <source>Fetching...</source>
-        <translation>Henter...</translation>
-    </message>
-    <message>
-        <source>Copy Invite Link</source>
-        <translation>Kopier invitasjonslenke</translation>
-    </message>
-    <message>
         <source>The camera is not available on this device.</source>
         <translation>Kameraet er ikke tilgjengelig på denne enheten.</translation>
+    </message>
+    <message>
+        <source>Fetching…</source>
+        <translation>Henter…</translation>
+    </message>
+    <message>
+        <source>Copy invite link</source>
+        <translation>Kopier invitasjonslenke</translation>
     </message>
 </context>
 <context>
@@ -1254,10 +1221,6 @@ Other groups with blocked contacts will still show their messages.</source>
 <context>
     <name>RestoreProfilePage</name>
     <message>
-        <source>That is not the code a device shows while it is offering its profile.</source>
-        <translation>Det er ikke koden en enhet viser mens den tilbyr profilen sin.</translation>
-    </message>
-    <message>
         <source>Add as second device</source>
         <translation>Legg til som andre enhet</translation>
     </message>
@@ -1270,16 +1233,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Velg en sikkerhetskopi</translation>
     </message>
     <message>
-        <source>Taking the profile over...</source>
-        <translation>Overtar profilen...</translation>
-    </message>
-    <message>
         <source>Cancel</source>
         <translation>Avbryt</translation>
-    </message>
-    <message>
-        <source>Hold the phone up to the code it shows</source>
-        <translation>Hold denne telefonen mot koden den viser</translation>
     </message>
     <message>
         <source>Enter the code instead</source>
@@ -1288,10 +1243,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Code from the other device</source>
         <translation>Kode fra den andre enheten</translation>
-    </message>
-    <message>
-        <source>Take the profile over</source>
-        <translation>Overta profilen</translation>
     </message>
     <message>
         <source>That did not work</source>
@@ -1306,28 +1257,44 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Velg en annen fil</translation>
     </message>
     <message>
-        <source>The other device runs a newer Delta Chat than this app can read.</source>
-        <translation>Den andre enheten kjører en nyere Delta Chat enn denne appen kan lese.</translation>
-    </message>
-    <message>
-        <source>The transfer stopped. Both devices have to stay on one network, with this page open.</source>
-        <translation>Overføringen stoppet. Begge enhetene må bli på samme nettverk, med denne siden åpen.</translation>
-    </message>
-    <message>
-        <source>No camera on this device. A backup file works without one.</source>
-        <translation>Ikke noe kamera på denne enheten. En sikkerhetskopifil virker uten.</translation>
-    </message>
-    <message>
-        <source>On the other device: Settings, then add a second device. Both on one network.</source>
-        <translation>På den andre enheten: Innstillinger, og legg så til en andre enhet. Begge på samme nettverk.</translation>
-    </message>
-    <message>
         <source>Make a backup on the other device, copy the file here, then choose it.</source>
         <translation>Lag en sikkerhetskopi på den andre enheten, kopier filen hit, og velg den så.</translation>
     </message>
     <message>
         <source>That profile is already on this phone. Open it from the profiles list.</source>
         <translation>Denne profilen er allerede på denne telefonen. Åpne den fra profillisten.</translation>
+    </message>
+    <message>
+        <source>The profile is from a newer Delta Chat version than this app can read.</source>
+        <translation>Profilen er fra en nyere Delta Chat-versjon enn denne appen kan lese.</translation>
+    </message>
+    <message>
+        <source>The transfer stopped. Both devices must stay on the same network with this page open.</source>
+        <translation>Overføringen stoppet. Begge enheter må være på samme nettverk med denne siden åpen.</translation>
+    </message>
+    <message>
+        <source>This is not a second-device code. Use the code shown by the other device.</source>
+        <translation>Dette er ikke en kode for en ekstra enhet. Bruk koden den andre enheten viser.</translation>
+    </message>
+    <message>
+        <source>Hold your camera over the QR code</source>
+        <translation>Beveg kameraet over QR-koden.</translation>
+    </message>
+    <message>
+        <source>Copy the profile</source>
+        <translation>Kopier profilen</translation>
+    </message>
+    <message>
+        <source>No camera on this device. You can restore from a backup file instead.</source>
+        <translation>Ingen kamera på denne enheten. Du kan i stedet gjenopprette fra en sikkerhetskopi.</translation>
+    </message>
+    <message>
+        <source>On the other device, go to Settings and tap &quot;Add second device&quot;. Both devices must be on the same network.</source>
+        <translation>Gå til Innstillinger på den andre enheten og trykk &quot;Legg til ekstra enhet&quot;. Begge enheter må være på samme nettverk.</translation>
+    </message>
+    <message>
+        <source>Transferring…</source>
+        <translation>Overfører…</translation>
     </message>
 </context>
 <context>
@@ -1379,40 +1346,20 @@ Other groups with blocked contacts will still show their messages.</source>
 <context>
     <name>SecondDevicePage</name>
     <message>
-        <source>Nothing took the profile. Both phones have to stay on one network, with this page open.</source>
-        <translation>Ingen tok profilen. Begge telefonene må bli på samme nettverk, med denne siden åpen.</translation>
-    </message>
-    <message>
         <source>Add a second device</source>
         <translation>Legg til en andre enhet</translation>
-    </message>
-    <message>
-        <source>On the other device: add a profile you have already, then &quot;Add as second device&quot;, and read this code with it. Both phones on one network.</source>
-        <translation>På den andre enheten: legg til en profil du har fra før, så “Legg til som andre enhet”, og les denne koden med den. Begge telefonene på samme nettverk.</translation>
     </message>
     <message>
         <source>Copy the code</source>
         <translation>Kopier koden</translation>
     </message>
     <message>
-        <source>Handing the profile over...</source>
-        <translation>Overleverer profilen...</translation>
-    </message>
-    <message>
         <source>Cancel</source>
         <translation>Avbryt</translation>
     </message>
     <message>
-        <source>The other device has the profile. Both get everything new from now on.</source>
-        <translation>Den andre enheten har profilen. Fra nå av får begge alt som er nytt.</translation>
-    </message>
-    <message>
         <source>Swipe on for your chats.</source>
         <translation>Sveip videre til chattene dine.</translation>
-    </message>
-    <message>
-        <source>Whoever reads this code gets the profile. It stops collecting mail until the code is gone.</source>
-        <translation>Den som leser denne koden, får profilen. Så lenge koden er framme, henter den ikke post.</translation>
     </message>
     <message>
         <source>Show code again</source>
@@ -1421,6 +1368,26 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Show code</source>
         <translation>Vis koden</translation>
+    </message>
+    <message>
+        <source>No device copied the profile. Both devices must stay on the same network with this page open.</source>
+        <translation>Ingen enhet kopierte profilen. Begge enheter må være på samme nettverk med denne siden åpen.</translation>
+    </message>
+    <message>
+        <source>Transferring…</source>
+        <translation>Overfører…</translation>
+    </message>
+    <message>
+        <source>The profile was transferred to your second device. Both devices now receive all new messages.</source>
+        <translation>Profilen ble overført til den ekstra enheten din. Begge enheter mottar nå alle nye meldinger.</translation>
+    </message>
+    <message>
+        <source>On the other device, choose &quot;Add as second device&quot; and scan this code. Both devices must be on the same network.</source>
+        <translation>Velg &quot;Legg til som andre enhet&quot; på den andre enheten, og skann denne koden. Begge enheter må være på samme nettverk.</translation>
+    </message>
+    <message>
+        <source>Make sure no unwanted observer or camera can see this code. This profile does not receive messages while the code is shown.</source>
+        <translation>Pass på at ingen uønskede tilskuere eller kameraer kan se denne koden. Denne profilen mottar ingen meldinger så lenge koden vises.</translation>
     </message>
 </context>
 <context>
@@ -1474,18 +1441,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Varsler</translation>
     </message>
     <message>
-        <source>Who wrote, and what</source>
-        <translation>Hvem som skrev, og hva</translation>
-    </message>
-    <message>
-        <source>Who wrote</source>
-        <translation>Hvem som skrev</translation>
-    </message>
-    <message>
-        <source>Only that something arrived</source>
-        <translation>Bare at noe har kommet</translation>
-    </message>
-    <message>
         <source>Apps</source>
         <translation>Apper</translation>
     </message>
@@ -1519,10 +1474,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Slett meldinger fra enheten</translation>
     </message>
     <message>
-        <source>A new notification shows</source>
-        <translation>Et nytt varsel viser</translation>
-    </message>
-    <message>
         <source>Mentions</source>
         <extracomment>A reply to one of the reader&apos;s own messages, arriving in a group they have muted.</extracomment>
         <translation>Omtaler</translation>
@@ -1537,49 +1488,12 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Bruk Markdown-formatering</translation>
     </message>
     <message>
-        <source>Otherwise it starts a new line, and the button sends.</source>
-        <translation>Ellers begynner den en ny linje, og knappen sender.</translation>
-    </message>
-    <message>
-        <source>Draws *stars* and `backticks` rather than showing them.</source>
-        <translation>Tegner *stjerner* og `backticks` i stedet for å vise dem.</translation>
-    </message>
-    <message>
-        <source>Bigger ones wait until you ask for them. Every profile, from now on.</source>
-        <translation>Større venter til du ber om dem. Alle profiler, fra nå av.</translation>
-    </message>
-    <message>
-        <source>Every chat of every profile. &quot;Saved messages&quot; are kept.</source>
-        <translation>Hver chat i hver profil. «Lagrede meldinger» beholdes.</translation>
-    </message>
-    <message>
-        <source>On the lock screen and in the notification area.</source>
-        <translation>På låseskjermen og i varselområdet.</translation>
-    </message>
-    <message>
-        <source>A reply to you gets through a muted group.</source>
-        <translation>Et svar til deg slipper gjennom en dempet gruppe.</translation>
-    </message>
-    <message>
-        <source>Click ids and campaign tags come out of the links you send.</source>
-        <translation>Klikk-id-er og kampanjemerker faller ut av lenkene du sender.</translation>
-    </message>
-    <message>
-        <source>Small apps run inside the chat. Somebody else&apos;s code, and less tested than the rest.</source>
-        <translation>Små apper kjører inne i chatten. Andres kode, og mindre utprøvd enn resten.</translation>
-    </message>
-    <message>
         <source>Privacy</source>
         <translation>Personvern</translation>
     </message>
     <message>
         <source>Blocked contacts</source>
         <translation>Blokkerte kontakter</translation>
-    </message>
-    <message>
-        <source>Worse quality, save data</source>
-        <extracomment>Outgoing media quality: smaller pictures and videos, which cost the reader and whoever they write to less data. Both reference clients&apos; words for it.</extracomment>
-        <translation>Dårligere kvalitet, mindre størrelse</translation>
     </message>
     <message>
         <source>Balanced</source>
@@ -1592,12 +1506,41 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Kvalitet på utgående media</translation>
     </message>
     <message>
-        <source>Pictures are made smaller before sending, and the camera records at this quality.</source>
-        <translation>Bilder gjøres mindre før de sendes, og kameraet tar opp i denne kvaliteten.</translation>
-    </message>
-    <message>
         <source>Show notifications</source>
         <translation>Vis varsler</translation>
+    </message>
+    <message>
+        <source>Lower quality, less data</source>
+        <extracomment>Outgoing media quality: smaller pictures and videos, which cost the reader and whoever they write to less data. Both reference clients&apos; words for it.</extracomment>
+        <translation>Lavere kvalitet, mindre data</translation>
+    </message>
+    <message>
+        <source>Notification content</source>
+        <translation>Varselinnhold</translation>
+    </message>
+    <message>
+        <source>Sender and message</source>
+        <translation>Avsender og melding</translation>
+    </message>
+    <message>
+        <source>Sender only</source>
+        <translation>Bare avsender</translation>
+    </message>
+    <message>
+        <source>No details</source>
+        <translation>Ingen detaljer</translation>
+    </message>
+    <message>
+        <source>In muted groups, notify messages directed to you, like replies or reactions</source>
+        <translation>I dempede grupper, varsle om meldinger rettet til deg, som svar eller reaksjoner</translation>
+    </message>
+    <message>
+        <source>Removes click IDs and campaign tags from links you send.</source>
+        <translation>Fjerner klikk-ID-er og kampanjemerker fra lenker du sender.</translation>
+    </message>
+    <message>
+        <source>Runs small apps inside chats. These features may be unstable and may be changed or removed.</source>
+        <translation>Kjører små apper inne i chatter. Disse funksjonene kan være ustabile og kan bli endret eller fjernet.</translation>
     </message>
 </context>
 <context>
@@ -1670,16 +1613,16 @@ Other groups with blocked contacts will still show their messages.</source>
 <context>
     <name>WelcomePage</name>
     <message>
-        <source>Tell me about Delta Chat</source>
-        <translation>Hva er Delta Chat?</translation>
-    </message>
-    <message>
-        <source>Set up my profile</source>
-        <translation>Sett opp profilen min</translation>
-    </message>
-    <message>
         <source>Secure decentralised chat based on Delta Chat</source>
         <translation>Sikker desentralisert chat bygd på Delta Chat</translation>
+    </message>
+    <message>
+        <source>About Delta Chat</source>
+        <translation>Om Delta Chat</translation>
+    </message>
+    <message>
+        <source>Set up your profile</source>
+        <translation>Sett opp profilen din</translation>
     </message>
 </context>
 </TS>

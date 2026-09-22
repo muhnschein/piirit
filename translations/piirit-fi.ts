@@ -51,8 +51,8 @@
         <translation>Piirit toimii vain chatmail-välittäjien kanssa. Ne ovat erityinen sähköpostipalvelimien laji; tavallisia sähköpostipalvelimia ei tueta. Lisätietoa: &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. Täydellinen luettelo julkisista, maksutta käytettävistä chatmail-välittäjistä on osoitteessa &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
     </message>
     <message>
-        <source>Pick a name and a relay. That&apos;s it! There is nothing else to set up.</source>
-        <translation>Valitse nimi ja välittäjä. Siinä kaikki! Muuta ei tarvitse asettaa.</translation>
+        <source>Choose a name and a relay. Nothing else is needed.</source>
+        <translation>Valitse nimi ja välittäjä. Muuta ei tarvita.</translation>
     </message>
 </context>
 <context>
@@ -66,24 +66,12 @@
         <translation>Luo profiili</translation>
     </message>
     <message>
-        <source>A new address on a chatmail relay.</source>
-        <translation>Uusi osoite chatmail-välittäjällä.</translation>
-    </message>
-    <message>
         <source>Restore from a backup</source>
         <translation>Palauta varmuuskopiosta</translation>
     </message>
     <message>
-        <source>A backup file copied onto this phone.</source>
-        <translation>Varmuuskopiotiedosto, kopioituna tähän puhelimeen.</translation>
-    </message>
-    <message>
         <source>Add as second device</source>
         <translation>Lisää toisena laitteena</translation>
-    </message>
-    <message>
-        <source>The other device keeps it. Both get everything new.</source>
-        <translation>Toinen laite pitää sen. Molemmat saavat kaiken uuden.</translation>
     </message>
 </context>
 <context>
@@ -97,24 +85,12 @@
         <translation>Lisää välittäjä</translation>
     </message>
     <message>
-        <source>Another address for this profile, on another relay. The profile sends from one relay at a time; its page says which, and lets you change it.</source>
-        <translation>Toinen osoite tälle profiilille, toisella välittäjällä. Profiili lähettää kerrallaan yhden välittäjän kautta; sen sivu kertoo minkä ja antaa vaihtaa sitä.</translation>
-    </message>
-    <message>
         <source>Add relay</source>
         <translation>Lisää välittäjä</translation>
     </message>
     <message>
-        <source>Contacting %1...</source>
-        <translation>Otetaan yhteyttä: %1...</translation>
-    </message>
-    <message>
         <source>Cancel</source>
         <translation>Peruuta</translation>
-    </message>
-    <message>
-        <source>Relays are run by volunteers. Try another one.</source>
-        <translation>Välittäjiä pyörittävät vapaaehtoiset. Kokeile toista.</translation>
     </message>
     <message>
         <source>Select a public chatmail relay</source>
@@ -127,6 +103,18 @@
     <message>
         <source>Piirit works only with chatmail relays. These are a particular kind of e-mail server; ordinary e-mail servers are not supported. For more, see &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. A full list of public, free-to-use chatmail relays is at &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</source>
         <translation>Piirit toimii vain chatmail-välittäjien kanssa. Ne ovat erityinen sähköpostipalvelimien laji; tavallisia sähköpostipalvelimia ei tueta. Lisätietoa: &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. Täydellinen luettelo julkisista, maksutta käytettävistä chatmail-välittäjistä on osoitteessa &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
+    </message>
+    <message>
+        <source>Adds another address for this profile on a second relay. The profile sends from one relay at a time; you can change which one on the profile page.</source>
+        <translation>Lisää tälle profiilille toisen osoitteen toisella välittäjällä. Profiili lähettää yhden välittäjän kautta kerrallaan; voit vaihtaa sen profiilisivulla.</translation>
+    </message>
+    <message>
+        <source>Contacting %1…</source>
+        <translation>Otetaan yhteyttä: %1…</translation>
+    </message>
+    <message>
+        <source>Could not reach the relay. Try another one.</source>
+        <translation>Välittäjää ei tavoitettu. Kokeile toista.</translation>
     </message>
 </context>
 <context>
@@ -159,14 +147,6 @@
         <source>Cancel</source>
         <translation>Peruuta</translation>
     </message>
-    <message numerus="yes">
-        <source>%n message(s) will be deleted now, and from then on every message will be once it is that old.</source>
-        <extracomment>%n is how many messages would be deleted straight away.</extracomment>
-        <translation>
-            <numerusform>%n viesti poistetaan nyt, ja siitä lähtien jokainen viesti, kun se on niin vanha.</numerusform>
-            <numerusform>%n viestiä poistetaan nyt, ja siitä lähtien jokainen viesti, kun se on niin vanha.</numerusform>
-        </translation>
-    </message>
     <message>
         <source>This includes pictures, videos and files.</source>
         <translation>Tämä sisältää kuvat, videot ja tiedostot.</translation>
@@ -184,20 +164,20 @@
         <source>I understand, delete all these messages</source>
         <translation>Ymmärrän, poista kaikki nämä viestit</translation>
     </message>
+    <message numerus="yes">
+        <source>%n message(s) will be deleted now, and every new message will be deleted once it reaches that age.</source>
+        <extracomment>%n is how many messages would be deleted straight away.</extracomment>
+        <translation>
+            <numerusform>%n viesti poistetaan nyt, ja jokainen uusi viesti poistetaan, kun se saavuttaa sen iän.</numerusform>
+            <numerusform>%n viestiä poistetaan nyt, ja jokainen uusi viesti poistetaan, kun se saavuttaa sen iän.</numerusform>
+        </translation>
+    </message>
 </context>
 <context>
     <name>BackupPage</name>
     <message>
         <source>Back up profile</source>
         <translation>Varmuuskopioi profiili</translation>
-    </message>
-    <message>
-        <source>Write the backup</source>
-        <translation>Kirjoita varmuuskopio</translation>
-    </message>
-    <message>
-        <source>Writing the backup...</source>
-        <translation>Kirjoitetaan varmuuskopiota...</translation>
     </message>
     <message>
         <source>Cancel</source>
@@ -209,12 +189,20 @@
         <translation>Tallennettu kohteeseen %1</translation>
     </message>
     <message>
-        <source>Messages, contacts and key in one file, saved to Documents. Whoever has the file has the profile.</source>
-        <translation>Viestit, yhteystiedot ja avain yhdessä tiedostossa, tallennettuna Dokumentteihin. Jolla on tiedosto, sillä on profiili.</translation>
-    </message>
-    <message>
         <source>Swipe on for your chats.</source>
         <translation>Pyyhkäise eteenpäin keskusteluihisi.</translation>
+    </message>
+    <message>
+        <source>Start backup</source>
+        <translation>Aloita varmuuskopiointi</translation>
+    </message>
+    <message>
+        <source>Backing up…</source>
+        <translation>Varmuuskopioidaan…</translation>
+    </message>
+    <message>
+        <source>Saves your messages, contacts and end-to-end encryption setup to a backup file. Keep this file in a safe place.</source>
+        <translation>Tallentaa viestisi, yhteystietosi ja päästä päähän -salauksen asetukset varmuuskopiotiedostoon. Säilytä tämä tiedosto turvallisessa paikassa.</translation>
     </message>
 </context>
 <context>
@@ -288,10 +276,6 @@ Other groups with blocked contacts will still show their messages.</source>
 </context>
 <context>
     <name>ChatListPage</name>
-    <message>
-        <source>Lost the connection to the Delta Chat core. Reconnecting...</source>
-        <translation>Yhteys Delta Chatin ytimeen katkesi. Yhdistetään uudelleen...</translation>
-    </message>
     <message>
         <source>Lost the connection to the Delta Chat core. Restart Piirit.</source>
         <translation>Yhteys Delta Chatin ytimeen katkesi. Käynnistä Piirit uudelleen.</translation>
@@ -400,6 +384,10 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Search</source>
         <translation>Hae</translation>
+    </message>
+    <message>
+        <source>Lost the connection to the Delta Chat core. Reconnecting…</source>
+        <translation>Yhteys Delta Chatin ytimeen katkesi. Yhdistetään uudelleen…</translation>
     </message>
 </context>
 <context>
@@ -530,10 +518,6 @@ Other groups with blocked contacts will still show their messages.</source>
 <context>
     <name>ConversationPage</name>
     <message>
-        <source>Lost the connection to the Delta Chat core. Reconnecting...</source>
-        <translation>Yhteys Delta Chatin ytimeen katkesi. Yhdistetään uudelleen...</translation>
-    </message>
-    <message>
         <source>Lost the connection to the Delta Chat core. Restart Piirit.</source>
         <translation>Yhteys Delta Chatin ytimeen katkesi. Käynnistä Piirit uudelleen.</translation>
     </message>
@@ -553,11 +537,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Message</source>
         <translation>Viesti</translation>
-    </message>
-    <message>
-        <source>Long message: the other end sees a preview and taps to read the rest</source>
-        <extracomment>Shown above the message field while what is being written is long enough that the other end will receive a shortened version with the rest behind a tap.</extracomment>
-        <translation>Pitkä viesti: vastaanottaja näkee esikatselun ja lukee loput napauttamalla</translation>
     </message>
     <message>
         <source>Saved to Pictures</source>
@@ -580,9 +559,13 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Tallennettu Lataukset-kansioon</translation>
     </message>
     <message>
-        <source>Too big to send: %1. Attachments go up to %2.</source>
+        <source>Lost the connection to the Delta Chat core. Reconnecting…</source>
+        <translation>Yhteys Delta Chatin ytimeen katkesi. Yhdistetään uudelleen…</translation>
+    </message>
+    <message>
+        <source>%1 is too large to send. Attachments can be up to %2.</source>
         <extracomment>Shown above the message field when the attached file is bigger than will be sent. %1 is the file&apos;s size and %2 the largest that goes, each such as &quot;24 MB&quot;.</extracomment>
-        <translation>Liian iso lähetettäväksi: %1. Liitteet voivat olla enintään %2.</translation>
+        <translation>%1 on liian suuri lähetettäväksi. Liitteet voivat olla enintään %2.</translation>
     </message>
 </context>
 <context>
@@ -620,14 +603,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>How do you want to delete this message? This cannot be undone.</source>
         <translation>Miten haluat poistaa tämän viestin? Tätä ei voi perua.</translation>
-    </message>
-    <message>
-        <source>It goes from your devices. Everybody else keeps their copy.</source>
-        <translation>Se katoaa laitteiltasi. Kaikki muut säilyttävät oman kopionsa.</translation>
-    </message>
-    <message>
-        <source>It goes from your devices, and every other device in this chat is asked to delete it too.</source>
-        <translation>Se katoaa laitteiltasi, ja jokaista muuta tämän keskustelun laitetta pyydetään poistamaan se myös.</translation>
     </message>
 </context>
 <context>
@@ -689,8 +664,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>%1 sekunnin kuluttua</translation>
     </message>
     <message>
-        <source>Applies to everyone in the chat. They can still copy and forward.</source>
-        <translation>Koskee kaikkia keskustelussa. He voivat yhä kopioida ja välittää.</translation>
+        <source>Applies to all members of this chat; they can still copy, save, and forward messages.</source>
+        <translation>Nämä asetukset pätevät kaikkiin Delta Chat -käyttäjiin. He voivat kuitenkin kopioida, tallentaa ja välittää viestejä tai käyttää toisia sähköpostisovelluksia.</translation>
     </message>
 </context>
 <context>
@@ -706,14 +681,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Restore from a backup</source>
         <translation>Palauta varmuuskopiosta</translation>
-    </message>
-    <message>
-        <source>The other device keeps it. Both get everything new.</source>
-        <translation>Toinen laite pitää sen. Molemmat saavat kaiken uuden.</translation>
-    </message>
-    <message>
-        <source>A backup file copied onto this phone.</source>
-        <translation>Varmuuskopiotiedosto, kopioituna tähän puhelimeen.</translation>
     </message>
 </context>
 <context>
@@ -798,14 +765,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Sinä päätät, kuka voi tavoittaa sinut</translation>
     </message>
     <message>
-        <source>Groups of equals</source>
-        <translation>Ryhmiä vertaisten kesken</translation>
-    </message>
-    <message>
-        <source>The server only passes it on</source>
-        <translation>Palvelin vain välittää sen eteenpäin</translation>
-    </message>
-    <message>
         <source>Keep swiping to set up your profile.</source>
         <translation>Pyyhkäise eteenpäin ja luo profiilisi.</translation>
     </message>
@@ -814,24 +773,32 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Jokainen viesti on salattu</translation>
     </message>
     <message>
-        <source>Made here on your phone. No phone number, no account, nothing to sign.</source>
-        <translation>Tehty täällä puhelimessasi. Ei puhelinnumeroa, ei tiliä, ei mitään allekirjoitettavaa.</translation>
+        <source>Your profile is created on this phone. No phone number and no sign-up are needed.</source>
+        <translation>Profiilisi luodaan tähän puhelimeen. Puhelinnumeroa tai rekisteröitymistä ei tarvita.</translation>
     </message>
     <message>
-        <source>There is no directory to be found in. Show a friend a code, or send a link.</source>
-        <translation>Ei ole hakemistoa, josta sinut löydettäisiin. Näytä ystävälle koodi tai lähetä linkki.</translation>
+        <source>There is no public directory. People reach you by scanning your invite code or opening your invite link.</source>
+        <translation>Julkista hakemistoa ei ole. Muut tavoittavat sinut lukemalla kutsukoodisi tai avaamalla kutsulinkkisi.</translation>
     </message>
     <message>
-        <source>Encrypted the whole way, always. The servers cannot read a word.</source>
-        <translation>Aina päästä päähän salattu. Palvelimet eivät lue sanaakaan.</translation>
+        <source>Any member can add people, rename the group or leave it.</source>
+        <translation>Kuka tahansa jäsen voi lisätä ihmisiä, nimetä ryhmän uudelleen tai poistua siitä.</translation>
     </message>
     <message>
-        <source>Anyone can add a friend, rename the group or leave. Nobody is in charge.</source>
-        <translation>Kuka tahansa voi lisätä ystävän, nimetä ryhmän uudelleen tai lähteä. Kukaan ei määrää.</translation>
+        <source>Messages are end-to-end encrypted, so the relays that carry them cannot read them.</source>
+        <translation>Viestit on salattu päästä päähän, joten niitä välittävät välittäjät eivät voi lukea niitä.</translation>
     </message>
     <message>
-        <source>It holds a message until the other phone is online, and nothing more.</source>
-        <translation>Se pitää viestiä, kunnes toinen puhelin on verkossa, ei muuta.</translation>
+        <source>Groups have no admins</source>
+        <translation>Ryhmillä ei ole ylläpitäjiä</translation>
+    </message>
+    <message>
+        <source>Relays only pass messages on</source>
+        <translation>Välittäjät vain välittävät viestit eteenpäin</translation>
+    </message>
+    <message>
+        <source>A relay stores a message only until the recipient fetches it.</source>
+        <translation>Välittäjä säilyttää viestin vain siihen asti, kunnes vastaanottaja noutaa sen.</translation>
     </message>
 </context>
 <context>
@@ -962,12 +929,12 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Ei vielä yhteystietoja</translation>
     </message>
     <message>
-        <source>Scan someone&apos;s invite from the chat list: QR code</source>
-        <translation>Lue jonkun kutsu keskusteluluettelosta: QR-koodi</translation>
-    </message>
-    <message>
         <source>Search</source>
         <translation>Hae</translation>
+    </message>
+    <message>
+        <source>Use &quot;QR code&quot; in the chat list to add a contact.</source>
+        <translation>Lisää yhteystieto valitsemalla keskustelulistassa &quot;QR-koodi&quot;.</translation>
     </message>
 </context>
 <context>
@@ -975,10 +942,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Please name the group</source>
         <translation>Anna ryhmälle nimi</translation>
-    </message>
-    <message>
-        <source>Create Group</source>
-        <translation>Luo ryhmä</translation>
     </message>
     <message>
         <source>New group</source>
@@ -1011,6 +974,10 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Add members</source>
         <translation>Lisää jäseniä</translation>
+    </message>
+    <message>
+        <source>Create group</source>
+        <translation>Luo ryhmä</translation>
     </message>
 </context>
 <context>
@@ -1083,10 +1050,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Välittäjä ei ole vielä ilmoittanut kiintiötään</translation>
     </message>
     <message>
-        <source>Both ways: with this off you send none and see none.</source>
-        <translation>Molempiin suuntiin: pois päältä et lähetä etkä näe yhtään.</translation>
-    </message>
-    <message>
         <source>Relays</source>
         <translation>Välittäjät</translation>
     </message>
@@ -1121,16 +1084,16 @@ Other groups with blocked contacts will still show their messages.</source>
         <extracomment>How much room the profile takes on the phone. %1 is a size such as &quot;12.3 MB&quot;.</extracomment>
         <translation>Piirit vie tässä puhelimessa %1 tallennustilaa.</translation>
     </message>
+    <message>
+        <source>If read receipts are disabled, you won&apos;t be able to see read receipts from others.</source>
+        <translation>Jos lukukuittaukset eivät ole päällä, et näe niitä muiltakaan.</translation>
+    </message>
 </context>
 <context>
     <name>ProfileSetupPage</name>
     <message>
         <source>Add profile</source>
         <translation>Lisää profiili</translation>
-    </message>
-    <message>
-        <source>Contacting %1...</source>
-        <translation>Otetaan yhteyttä: %1...</translation>
     </message>
     <message>
         <source>Cancel</source>
@@ -1145,16 +1108,16 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>%1 ei vastannut %2 sekunnin kuluessa.</translation>
     </message>
     <message>
-        <source>Relays are run by volunteers. Go back and try another one.</source>
-        <translation>Välittäjiä pyörittävät vapaaehtoiset. Palaa takaisin ja kokeile toista.</translation>
+        <source>Contacting %1…</source>
+        <translation>Otetaan yhteyttä: %1…</translation>
+    </message>
+    <message>
+        <source>Could not reach the relay. Try another one.</source>
+        <translation>Välittäjää ei tavoitettu. Kokeile toista.</translation>
     </message>
 </context>
 <context>
     <name>ProfileStartPage</name>
-    <message>
-        <source>Alright, let&apos;s get you set up.</source>
-        <translation>Selvä, tehdään sinulle profiili.</translation>
-    </message>
     <message>
         <source>I already have a profile</source>
         <translation>Minulla on jo profiili</translation>
@@ -1162,6 +1125,10 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Create a profile</source>
         <translation>Luo profiili</translation>
+    </message>
+    <message>
+        <source>Set up your profile</source>
+        <translation>Määritä profiilisi</translation>
     </message>
 </context>
 <context>
@@ -1227,16 +1194,16 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Anna jonkun lukea tämä koodi tai lähetä hänelle linkki.</translation>
     </message>
     <message>
-        <source>Fetching...</source>
-        <translation>Haetaan...</translation>
-    </message>
-    <message>
-        <source>Copy Invite Link</source>
-        <translation>Kopioi kutsulinkki</translation>
-    </message>
-    <message>
         <source>The camera is not available on this device.</source>
         <translation>Kamera ei ole käytettävissä tällä laitteella.</translation>
+    </message>
+    <message>
+        <source>Fetching…</source>
+        <translation>Haetaan…</translation>
+    </message>
+    <message>
+        <source>Copy invite link</source>
+        <translation>Kopioi kutsulinkki</translation>
     </message>
 </context>
 <context>
@@ -1254,10 +1221,6 @@ Other groups with blocked contacts will still show their messages.</source>
 <context>
     <name>RestoreProfilePage</name>
     <message>
-        <source>That is not the code a device shows while it is offering its profile.</source>
-        <translation>Tämä ei ole se koodi, jonka laite näyttää tarjotessaan profiiliaan.</translation>
-    </message>
-    <message>
         <source>Add as second device</source>
         <translation>Lisää toisena laitteena</translation>
     </message>
@@ -1270,16 +1233,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Valitse varmuuskopiotiedosto</translation>
     </message>
     <message>
-        <source>Taking the profile over...</source>
-        <translation>Otetaan profiilia vastaan...</translation>
-    </message>
-    <message>
         <source>Cancel</source>
         <translation>Peruuta</translation>
-    </message>
-    <message>
-        <source>Hold the phone up to the code it shows</source>
-        <translation>Suuntaa tämä puhelin sen näyttämään koodiin</translation>
     </message>
     <message>
         <source>Enter the code instead</source>
@@ -1288,10 +1243,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Code from the other device</source>
         <translation>Koodi toisesta laitteesta</translation>
-    </message>
-    <message>
-        <source>Take the profile over</source>
-        <translation>Ota profiili vastaan</translation>
     </message>
     <message>
         <source>That did not work</source>
@@ -1306,28 +1257,44 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Valitse toinen tiedosto</translation>
     </message>
     <message>
-        <source>The other device runs a newer Delta Chat than this app can read.</source>
-        <translation>Toisessa laitteessa on uudempi Delta Chat kuin tämä sovellus osaa lukea.</translation>
-    </message>
-    <message>
-        <source>The transfer stopped. Both devices have to stay on one network, with this page open.</source>
-        <translation>Siirto pysähtyi. Molempien laitteiden on pysyttävä samassa verkossa, tämä sivu auki.</translation>
-    </message>
-    <message>
-        <source>No camera on this device. A backup file works without one.</source>
-        <translation>Tässä laitteessa ei ole kameraa. Varmuuskopiotiedosto toimii ilmankin.</translation>
-    </message>
-    <message>
-        <source>On the other device: Settings, then add a second device. Both on one network.</source>
-        <translation>Toisella laitteella: Asetukset, ja sitten lisää toinen laite. Molemmat samassa verkossa.</translation>
-    </message>
-    <message>
         <source>Make a backup on the other device, copy the file here, then choose it.</source>
         <translation>Tee varmuuskopio toisella laitteella, kopioi tiedosto tänne ja valitse se sitten.</translation>
     </message>
     <message>
         <source>That profile is already on this phone. Open it from the profiles list.</source>
         <translation>Tämä profiili on jo tässä puhelimessa. Avaa se profiililuettelosta.</translation>
+    </message>
+    <message>
+        <source>The profile is from a newer Delta Chat version than this app can read.</source>
+        <translation>Profiili on uudemmasta Delta Chat -versiosta kuin tämä sovellus osaa lukea.</translation>
+    </message>
+    <message>
+        <source>The transfer stopped. Both devices must stay on the same network with this page open.</source>
+        <translation>Siirto pysähtyi. Molempien laitteiden on pysyttävä samassa verkossa tämä sivu auki.</translation>
+    </message>
+    <message>
+        <source>This is not a second-device code. Use the code shown by the other device.</source>
+        <translation>Tämä ei ole toisen laitteen koodi. Käytä koodia, jonka toinen laite näyttää.</translation>
+    </message>
+    <message>
+        <source>Hold your camera over the QR code</source>
+        <translation>Näytä QR-koodia kameraan</translation>
+    </message>
+    <message>
+        <source>Copy the profile</source>
+        <translation>Kopioi profiili</translation>
+    </message>
+    <message>
+        <source>No camera on this device. You can restore from a backup file instead.</source>
+        <translation>Tässä laitteessa ei ole kameraa. Voit palauttaa sen sijaan varmuuskopiotiedostosta.</translation>
+    </message>
+    <message>
+        <source>On the other device, go to Settings and tap &quot;Add second device&quot;. Both devices must be on the same network.</source>
+        <translation>Mene toisessa laitteessa Asetuksiin ja napauta &quot;Lisää toinen laite&quot;. Molempien laitteiden on oltava samassa verkossa.</translation>
+    </message>
+    <message>
+        <source>Transferring…</source>
+        <translation>Siirretään...</translation>
     </message>
 </context>
 <context>
@@ -1379,40 +1346,20 @@ Other groups with blocked contacts will still show their messages.</source>
 <context>
     <name>SecondDevicePage</name>
     <message>
-        <source>Nothing took the profile. Both phones have to stay on one network, with this page open.</source>
-        <translation>Kukaan ei ottanut profiilia. Molempien puhelinten on pysyttävä samassa verkossa, tämä sivu auki.</translation>
-    </message>
-    <message>
         <source>Add a second device</source>
         <translation>Lisää toinen laite</translation>
-    </message>
-    <message>
-        <source>On the other device: add a profile you have already, then &quot;Add as second device&quot;, and read this code with it. Both phones on one network.</source>
-        <translation>Toisella laitteella: lisää profiili, joka sinulla jo on, sitten “Lisää toisena laitteena”, ja lue tämä koodi sillä. Molemmat puhelimet samassa verkossa.</translation>
     </message>
     <message>
         <source>Copy the code</source>
         <translation>Kopioi koodi</translation>
     </message>
     <message>
-        <source>Handing the profile over...</source>
-        <translation>Luovutetaan profiilia...</translation>
-    </message>
-    <message>
         <source>Cancel</source>
         <translation>Peruuta</translation>
     </message>
     <message>
-        <source>The other device has the profile. Both get everything new from now on.</source>
-        <translation>Toisella laitteella on profiili. Tästä lähtien molemmat saavat kaiken uuden.</translation>
-    </message>
-    <message>
         <source>Swipe on for your chats.</source>
         <translation>Pyyhkäise eteenpäin keskusteluihisi.</translation>
-    </message>
-    <message>
-        <source>Whoever reads this code gets the profile. It stops collecting mail until the code is gone.</source>
-        <translation>Joka lukee tämän koodin, saa profiilin. Niin kauan kuin koodi on esillä, profiili ei hae postia.</translation>
     </message>
     <message>
         <source>Show code again</source>
@@ -1421,6 +1368,26 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Show code</source>
         <translation>Näytä koodi</translation>
+    </message>
+    <message>
+        <source>No device copied the profile. Both devices must stay on the same network with this page open.</source>
+        <translation>Mikään laite ei kopioinut profiilia. Molempien laitteiden on pysyttävä samassa verkossa tämä sivu auki.</translation>
+    </message>
+    <message>
+        <source>Transferring…</source>
+        <translation>Siirretään...</translation>
+    </message>
+    <message>
+        <source>The profile was transferred to your second device. Both devices now receive all new messages.</source>
+        <translation>Profiili siirrettiin toiseen laitteeseesi. Molemmat laitteet vastaanottavat nyt kaikki uudet viestit.</translation>
+    </message>
+    <message>
+        <source>On the other device, choose &quot;Add as second device&quot; and scan this code. Both devices must be on the same network.</source>
+        <translation>Valitse toisessa laitteessa &quot;Lisää toisena laitteena&quot; ja lue tämä koodi. Molempien laitteiden on oltava samassa verkossa.</translation>
+    </message>
+    <message>
+        <source>Make sure no unwanted observer or camera can see this code. This profile does not receive messages while the code is shown.</source>
+        <translation>Varmista, ettei kukaan ulkopuolinen tai mikään kamera näe tätä koodia. Tämä profiili ei vastaanota viestejä niin kauan kuin koodi on näkyvissä.</translation>
     </message>
 </context>
 <context>
@@ -1474,18 +1441,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Ilmoitukset</translation>
     </message>
     <message>
-        <source>Who wrote, and what</source>
-        <translation>Kuka kirjoitti, ja mitä</translation>
-    </message>
-    <message>
-        <source>Who wrote</source>
-        <translation>Kuka kirjoitti</translation>
-    </message>
-    <message>
-        <source>Only that something arrived</source>
-        <translation>Vain että jotain saapui</translation>
-    </message>
-    <message>
         <source>Apps</source>
         <translation>Sovellukset</translation>
     </message>
@@ -1519,10 +1474,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Poista viestit laitteesta</translation>
     </message>
     <message>
-        <source>A new notification shows</source>
-        <translation>Uusi ilmoitus näyttää</translation>
-    </message>
-    <message>
         <source>Mentions</source>
         <extracomment>A reply to one of the reader&apos;s own messages, arriving in a group they have muted.</extracomment>
         <translation>Maininnat</translation>
@@ -1537,49 +1488,12 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Käytä Markdown-muotoilua</translation>
     </message>
     <message>
-        <source>Otherwise it starts a new line, and the button sends.</source>
-        <translation>Muuten se aloittaa uuden rivin, ja painike lähettää.</translation>
-    </message>
-    <message>
-        <source>Draws *stars* and `backticks` rather than showing them.</source>
-        <translation>Piirtää *tähdet* ja `gravikset` sen sijaan että näyttäisi ne.</translation>
-    </message>
-    <message>
-        <source>Bigger ones wait until you ask for them. Every profile, from now on.</source>
-        <translation>Isommat odottavat, kunnes pyydät niitä. Kaikki profiilit, tästä lähtien.</translation>
-    </message>
-    <message>
-        <source>Every chat of every profile. &quot;Saved messages&quot; are kept.</source>
-        <translation>Jokainen keskustelu jokaisessa profiilissa. ”Tallennetut viestit” säilyvät.</translation>
-    </message>
-    <message>
-        <source>On the lock screen and in the notification area.</source>
-        <translation>Lukitusnäytöllä ja ilmoitusalueella.</translation>
-    </message>
-    <message>
-        <source>A reply to you gets through a muted group.</source>
-        <translation>Sinulle osoitettu vastaus pääsee läpi vaimennetustakin ryhmästä.</translation>
-    </message>
-    <message>
-        <source>Click ids and campaign tags come out of the links you send.</source>
-        <translation>Klikkaustunnisteet ja kampanjamerkinnät lähtevät pois lähettämistäsi linkeistä.</translation>
-    </message>
-    <message>
-        <source>Small apps run inside the chat. Somebody else&apos;s code, and less tested than the rest.</source>
-        <translation>Pienet sovellukset pyörivät keskustelun sisällä. Jonkun toisen koodia, ja vähemmän koeteltua kuin muu.</translation>
-    </message>
-    <message>
         <source>Privacy</source>
         <translation>Yksityisyys</translation>
     </message>
     <message>
         <source>Blocked contacts</source>
         <translation>Estetyt yhteystiedot</translation>
-    </message>
-    <message>
-        <source>Worse quality, save data</source>
-        <extracomment>Outgoing media quality: smaller pictures and videos, which cost the reader and whoever they write to less data. Both reference clients&apos; words for it.</extracomment>
-        <translation>Huonompi laatu, pienempi koko</translation>
     </message>
     <message>
         <source>Balanced</source>
@@ -1592,12 +1506,41 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Lähtevän median laatu</translation>
     </message>
     <message>
-        <source>Pictures are made smaller before sending, and the camera records at this quality.</source>
-        <translation>Kuvia pienennetään ennen lähetystä, ja kamera tallentaa tällä laadulla.</translation>
-    </message>
-    <message>
         <source>Show notifications</source>
         <translation>Näytä ilmoitukset</translation>
+    </message>
+    <message>
+        <source>Lower quality, less data</source>
+        <extracomment>Outgoing media quality: smaller pictures and videos, which cost the reader and whoever they write to less data. Both reference clients&apos; words for it.</extracomment>
+        <translation>Heikompi laatu, vähemmän dataa</translation>
+    </message>
+    <message>
+        <source>Notification content</source>
+        <translation>Ilmoitusten sisältö</translation>
+    </message>
+    <message>
+        <source>Sender and message</source>
+        <translation>Lähettäjä ja viesti</translation>
+    </message>
+    <message>
+        <source>Sender only</source>
+        <translation>Vain lähettäjä</translation>
+    </message>
+    <message>
+        <source>No details</source>
+        <translation>Ei tietoja</translation>
+    </message>
+    <message>
+        <source>In muted groups, notify messages directed to you, like replies or reactions</source>
+        <translation>Mykistetyissä ryhmissä, ilmoita minulle osoitetuista viesteistä, kuten vastauksista tai reaktioista</translation>
+    </message>
+    <message>
+        <source>Removes click IDs and campaign tags from links you send.</source>
+        <translation>Poistaa klikkaustunnisteet ja kampanjamerkinnät lähettämistäsi linkeistä.</translation>
+    </message>
+    <message>
+        <source>Runs small apps inside chats. These features may be unstable and may be changed or removed.</source>
+        <translation>Suorittaa pieniä sovelluksia keskusteluissa. Nämä ominaisuudet voivat olla epävakaita, ja niitä voidaan muuttaa tai poistaa.</translation>
     </message>
 </context>
 <context>
@@ -1670,16 +1613,16 @@ Other groups with blocked contacts will still show their messages.</source>
 <context>
     <name>WelcomePage</name>
     <message>
-        <source>Tell me about Delta Chat</source>
-        <translation>Mikä Delta Chat on?</translation>
-    </message>
-    <message>
-        <source>Set up my profile</source>
-        <translation>Luo profiilini</translation>
-    </message>
-    <message>
         <source>Secure decentralised chat based on Delta Chat</source>
         <translation>Turvallinen hajautettu keskustelu Delta Chatin päällä</translation>
+    </message>
+    <message>
+        <source>About Delta Chat</source>
+        <translation>Tietoja Delta Chatista</translation>
+    </message>
+    <message>
+        <source>Set up your profile</source>
+        <translation>Määritä profiilisi</translation>
     </message>
 </context>
 </TS>

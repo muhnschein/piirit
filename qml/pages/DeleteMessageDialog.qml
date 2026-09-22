@@ -84,9 +84,6 @@ Dialog {
             objectName: "forMeSwitch"
             //: One of the two ways to delete a message.
             text: qsTr("Delete for me")
-            // Who keeps a copy is the whole difference between the two,
-            // and it does not fit in a switch's own three words.
-            description: qsTr("It goes from your devices. Everybody else keeps their copy.")
             automaticCheck: false
             checked: dialog.choice === "me"
             onClicked: dialog.choose("me")
@@ -97,7 +94,6 @@ Dialog {
             //: The other way: every other device in the chat is asked to
             //: delete its copy too.
             text: qsTr("Delete for everyone")
-            description: qsTr("It goes from your devices, and every other device in this chat is asked to delete it too.")
             automaticCheck: false
             checked: dialog.choice === "everyone"
             enabled: dialog.canDeleteForEveryone
