@@ -17,7 +17,7 @@
 .PHONY: check test lint fmt qml-lint packaging-lint lockfile-lint doc-lint \
         msrv deny integration harbour vendor-check fetch-server \
         sonar-report-test apt-install-test sonar-reports translations \
-        clean
+        cover-icons clean
 
 CARGO ?= cargo
 # The shim's tests drive a real Qt event loop, which needs a platform
@@ -123,6 +123,12 @@ fetch-server:
 ## of the app finds them. The RPM does the same in %%build.
 translations:
 	./scripts/release-translations.sh
+
+## Render the quick action icons, icons/cover/*.svg, into the PNGs the
+## cover hands the home screen (qml/art/cover/). Needs rsvg-convert; what
+## it writes is committed, so neither the build nor CI runs it.
+cover-icons:
+	./scripts/render-cover-icons.sh
 
 ## Prove scripts/sonar-report.sh still reports what it claims to, against a
 ## stub server. The real service is unreachable from CI's network and from a

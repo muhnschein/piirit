@@ -7,13 +7,15 @@ import "../components"
  * goes out with a link, how much of a picture or a video leaves with it,
  * how much of an attachment arrives unasked, how long a message is kept,
  * whether anything is announced and how much a notification gives away
- * and whether a muted group can still raise one, and whether webxdc apps
- * are offered at all. Reached from the chat list's pull-down. A
- * profile's own settings -- picture, name, address, read receipts, what
- * the relay says, what it takes -- are on the profile's page,
- * reached from its row on the profiles page; that row also carries the
- * two things about a profile that are not settings, its invite code and
- * its backup, since the core's export does one account at a time.
+ * and whether a muted group can still raise one, and, under Advanced,
+ * the way to the cover's quick actions (set up on a page of their own,
+ * QuickActionsPage.qml) and whether webxdc apps are offered at all.
+ * Reached from the chat list's pull-down. A profile's own settings --
+ * picture, name, address, read receipts, what the relay says, what it
+ * takes -- are on the profile's page, reached from its row on the
+ * profiles page; that row also carries the two things about a profile
+ * that are not settings, its invite code and its backup, since the
+ * core's export does one account at a time.
  *
  * The one exception to that division is the way into the block list,
  * under Privacy with the link cleaning, which is the other setting about
@@ -119,6 +121,12 @@ Page {
 
     function notificationIndex(detail) {
         return detail >= 0 && detail <= 2 ? detail : 0
+    }
+
+    function openQuickActions() {
+        pageStack.push(Qt.resolvedUrl("QuickActionsPage.qml"), {
+            accountId: page.accountId
+        })
     }
 
     /// Put each choice back to what the setting holds. Silica writes
@@ -405,8 +413,33 @@ Page {
                 })
             }
 
+            // What most readers never need: the cover's quick actions,
+            // set up on a page of their own (QuickActionsPage.qml) since
+            // a chat's action brings a chat and a row of icons with it,
+            // and webxdc apps.
             SectionHeader {
-                text: qsTr("Apps")
+                //: The settings most readers never need to change.
+                text: qsTr("Advanced")
+            }
+
+            BackgroundItem {
+                id: quickActionsEntry
+                objectName: "quickActionsEntry"
+                width: parent.width
+                height: Theme.itemSizeSmall
+
+                Label {
+                    objectName: "quickActionsLabel"
+                    x: Theme.horizontalPageMargin
+                    width: parent.width - 2 * Theme.horizontalPageMargin
+                    anchors.verticalCenter: parent.verticalCenter
+                    truncationMode: TruncationMode.Fade
+                    color: quickActionsEntry.highlighted ? Theme.highlightColor
+                                                         : Theme.primaryColor
+                    text: qsTr("Quick actions")
+                }
+
+                onClicked: page.openQuickActions()
             }
 
             // Off until it is asked for, so this is the only place the

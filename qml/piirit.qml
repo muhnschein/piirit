@@ -3,6 +3,7 @@ import Sailfish.Silica 1.0
 import "pages"
 import "cover"
 import "components"
+import "js/QuickActions.js" as QuickActions
 
 ApplicationWindow {
     id: appWindow
@@ -37,10 +38,47 @@ ApplicationWindow {
         ChatListPage { accountId: appWindow.resumeAccountId }
     }
 
-    // Nothing is handled here any more: the cover's action was removed
-    // along with the status label it was drawn on top of, and tapping
-    // the cover already opens the app.
-    cover: Component { CoverPage {} }
+    // The cover offers the quick actions the reader set up, and hands a
+    // tap on one back here.
+    cover: Component {
+        CoverPage {
+            quickActionsAllowed: appWindow.chatList !== null
+                                 && !appWindow.quickActionsPaused
+            onQuickAction: appWindow.quickAction(side)
+        }
+    }
+
+    /// The chat list the app is on, which is where a quick action lands;
+    /// null while there is none -- before the first profile, and on the
+    /// way back to the welcome page after the last. The list says so
+    /// itself.
+    property Item chatList: null
+
+    /// Whether a page is up that a quick action must not jump away from:
+    /// a backup being written or read back, a profile being made, moved
+    /// or joined from another device, a code being shown or read. Each
+    /// such page says so with `pausesQuickActions`.
+    readonly property bool quickActionsPaused: {
+        // Read so this is worked out again whenever the stack moves.
+        var depth = pageStack.depth
+        for (var shown = pageStack.currentPage; shown;
+             shown = pageStack.previousPage(shown)) {
+            if (shown.pausesQuickActions === true) {
+                return true
+            }
+        }
+        return false
+    }
+
+    /// A quick action on the cover was tapped: up comes the app, and the
+    /// chat list does the rest, the way it opens a tapped notification.
+    function quickAction(side) {
+        var action = QuickActions.shown(Settings, side)
+        if (appWindow.chatList === null || action.kind === "") {
+            return
+        }
+        appWindow.chatList.quickAction(action.kind, action.accountId, action.chatId)
+    }
 
     /// The profile the app is on, as the chat list last opened it.
     ///

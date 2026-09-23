@@ -30,6 +30,7 @@ QtObject {
     property real highlightBackgroundOpacity: 0.3
     property int iconSizeSmall: 32
     property int iconSizeMedium: 64
+    property size coverSizeLarge: Qt.size(234, 374)
 
     function rgba(color, opacity) {
         return Qt.rgba(color.r, color.g, color.b, opacity)

@@ -397,6 +397,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Lost the connection to the Delta Chat core. Reconnecting…</source>
         <translation>Mistet forbindelsen til Delta Chat-kjernen. Kobler til igjen…</translation>
     </message>
+    <message>
+        <source>That chat no longer exists.</source>
+        <extracomment>A quick action on the cover was tapped, and the chat it was set up to open has been deleted since.</extracomment>
+        <translation>Den chatten finnes ikke lenger.</translation>
+    </message>
 </context>
 <context>
     <name>ChatMediaPage</name>
@@ -437,6 +442,11 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Search</source>
         <translation>Søk</translation>
+    </message>
+    <message>
+        <source>Profile</source>
+        <extracomment>Over a list of chats to pick from: which profile&apos;s chats they are.</extracomment>
+        <translation>Profil</translation>
     </message>
 </context>
 <context>
@@ -1188,6 +1198,95 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>QuickActionSetting</name>
+    <message>
+        <source>Chat</source>
+        <extracomment>A quick action on the cover that opens one chat.</extracomment>
+        <translation>Chat</translation>
+    </message>
+    <message>
+        <source>Search</source>
+        <extracomment>A quick action on the cover that opens the chat list&apos;s search.</extracomment>
+        <translation>Søk</translation>
+    </message>
+    <message>
+        <source>My QR code</source>
+        <extracomment>A quick action on the cover that shows this profile&apos;s QR code.</extracomment>
+        <translation>Min QR-kode</translation>
+    </message>
+    <message>
+        <source>Scan QR code</source>
+        <extracomment>A quick action on the cover that opens the QR code scanner.</extracomment>
+        <translation>Skann QR-kode</translation>
+    </message>
+    <message>
+        <source>None</source>
+        <extracomment>No quick action on this side of the cover.</extracomment>
+        <translation>Ingen</translation>
+    </message>
+    <message>
+        <source>Choose a chat</source>
+        <extracomment>Over the list of chats, when picking the one a quick action on the cover opens.</extracomment>
+        <translation>Velg en chat</translation>
+    </message>
+    <message>
+        <source>No chats yet</source>
+        <translation>Ingen samtaler ennå</translation>
+    </message>
+    <message>
+        <source>Deleted chat</source>
+        <extracomment>What a quick action says about its chat once that chat has been deleted.</extracomment>
+        <translation>Slettet chat</translation>
+    </message>
+    <message>
+        <source>Chat: %1</source>
+        <extracomment>A quick action on the cover that opens one chat, with the chat&apos;s name.</extracomment>
+        <translation>Chat: %1</translation>
+    </message>
+    <message>
+        <source>Profiles</source>
+        <extracomment>A quick action on the cover that opens the list of profiles.</extracomment>
+        <translation>Profiler</translation>
+    </message>
+</context>
+<context>
+    <name>QuickActionsPage</name>
+    <message>
+        <source>Quick actions</source>
+        <translation>Hurtighandlinger</translation>
+    </message>
+    <message>
+        <source>Piirit&apos;s cover on the home screen can show up to two quick actions.</source>
+        <extracomment>The cover is the app&apos;s thumbnail on the Sailfish home screen while the app runs in the background. Use the same word for &quot;quick actions&quot; as this page&apos;s title.</extracomment>
+        <translation>Piirits cover på startskjermen kan vise opptil to hurtighandlinger.</translation>
+    </message>
+    <message>
+        <source>Left</source>
+        <extracomment>The quick action on the left of the cover.</extracomment>
+        <translation>Venstre</translation>
+    </message>
+    <message>
+        <source>Right</source>
+        <extracomment>The quick action on the right of the cover.</extracomment>
+        <translation>Høyre</translation>
+    </message>
+    <message>
+        <source>One action</source>
+        <extracomment>Under a picture of the cover with room for one quick action; tapping it chooses that.</extracomment>
+        <translation>Én handling</translation>
+    </message>
+    <message>
+        <source>Two actions</source>
+        <extracomment>Under a picture of the cover with room for two quick actions; tapping it chooses that.</extracomment>
+        <translation>To handlinger</translation>
+    </message>
+    <message>
+        <source>Action</source>
+        <extracomment>The one quick action on the cover, when it has room for one.</extracomment>
+        <translation>Handling</translation>
+    </message>
+</context>
+<context>
     <name>ReplyBar</name>
     <message>
         <source>Replying to %1</source>
@@ -1422,10 +1521,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Varsler</translation>
     </message>
     <message>
-        <source>Apps</source>
-        <translation>Apper</translation>
-    </message>
-    <message>
         <source>Enable webxdc apps (experimental)</source>
         <extracomment>A webxdc app is a small program somebody sends into a chat and everyone in it plays with. Keep the name: it is what every other Delta Chat client calls them.</extracomment>
         <translation>Slå på webxdc-apper (eksperimentelt)</translation>
@@ -1517,6 +1612,15 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Runs small apps inside chats. These features may be unstable and may be changed or removed.</source>
         <translation>Kjører små apper inne i samtaler. Disse funksjonene kan være ustabile og kan bli endret eller fjernet.</translation>
+    </message>
+    <message>
+        <source>Quick actions</source>
+        <translation>Hurtighandlinger</translation>
+    </message>
+    <message>
+        <source>Advanced</source>
+        <extracomment>The settings most readers never need to change.</extracomment>
+        <translation>Avansert</translation>
     </message>
 </context>
 <context>

@@ -396,6 +396,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Lost the connection to the Delta Chat core. Reconnecting…</source>
         <translation>Megszakadt a kapcsolat a Delta Chat magjával. Újracsatlakozás…</translation>
     </message>
+    <message>
+        <source>That chat no longer exists.</source>
+        <extracomment>A quick action on the cover was tapped, and the chat it was set up to open has been deleted since.</extracomment>
+        <translation>Ez a csevegés már nem létezik.</translation>
+    </message>
 </context>
 <context>
     <name>ChatMediaPage</name>
@@ -436,6 +441,11 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Search</source>
         <translation>Keresés</translation>
+    </message>
+    <message>
+        <source>Profile</source>
+        <extracomment>Over a list of chats to pick from: which profile&apos;s chats they are.</extracomment>
+        <translation>Profil</translation>
     </message>
 </context>
 <context>
@@ -1182,6 +1192,95 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>QuickActionSetting</name>
+    <message>
+        <source>Chat</source>
+        <extracomment>A quick action on the cover that opens one chat.</extracomment>
+        <translation>Csevegés</translation>
+    </message>
+    <message>
+        <source>Search</source>
+        <extracomment>A quick action on the cover that opens the chat list&apos;s search.</extracomment>
+        <translation>Keresés</translation>
+    </message>
+    <message>
+        <source>My QR code</source>
+        <extracomment>A quick action on the cover that shows this profile&apos;s QR code.</extracomment>
+        <translation>Saját QR-kód</translation>
+    </message>
+    <message>
+        <source>Scan QR code</source>
+        <extracomment>A quick action on the cover that opens the QR code scanner.</extracomment>
+        <translation>QR-kód beolvasása</translation>
+    </message>
+    <message>
+        <source>None</source>
+        <extracomment>No quick action on this side of the cover.</extracomment>
+        <translation>Nincs</translation>
+    </message>
+    <message>
+        <source>Choose a chat</source>
+        <extracomment>Over the list of chats, when picking the one a quick action on the cover opens.</extracomment>
+        <translation>Válassz csevegést</translation>
+    </message>
+    <message>
+        <source>No chats yet</source>
+        <translation>Még nincs csevegés</translation>
+    </message>
+    <message>
+        <source>Deleted chat</source>
+        <extracomment>What a quick action says about its chat once that chat has been deleted.</extracomment>
+        <translation>Törölt csevegés</translation>
+    </message>
+    <message>
+        <source>Chat: %1</source>
+        <extracomment>A quick action on the cover that opens one chat, with the chat&apos;s name.</extracomment>
+        <translation>Csevegés: %1</translation>
+    </message>
+    <message>
+        <source>Profiles</source>
+        <extracomment>A quick action on the cover that opens the list of profiles.</extracomment>
+        <translation>Profilok</translation>
+    </message>
+</context>
+<context>
+    <name>QuickActionsPage</name>
+    <message>
+        <source>Quick actions</source>
+        <translation>Gyorsműveletek</translation>
+    </message>
+    <message>
+        <source>Piirit&apos;s cover on the home screen can show up to two quick actions.</source>
+        <extracomment>The cover is the app&apos;s thumbnail on the Sailfish home screen while the app runs in the background. Use the same word for &quot;quick actions&quot; as this page&apos;s title.</extracomment>
+        <translation>A Piirit borítója a kezdőképernyőn legfeljebb két gyorsműveletet jeleníthet meg.</translation>
+    </message>
+    <message>
+        <source>Left</source>
+        <extracomment>The quick action on the left of the cover.</extracomment>
+        <translation>Bal</translation>
+    </message>
+    <message>
+        <source>Right</source>
+        <extracomment>The quick action on the right of the cover.</extracomment>
+        <translation>Jobb</translation>
+    </message>
+    <message>
+        <source>One action</source>
+        <extracomment>Under a picture of the cover with room for one quick action; tapping it chooses that.</extracomment>
+        <translation>Egy művelet</translation>
+    </message>
+    <message>
+        <source>Two actions</source>
+        <extracomment>Under a picture of the cover with room for two quick actions; tapping it chooses that.</extracomment>
+        <translation>Két művelet</translation>
+    </message>
+    <message>
+        <source>Action</source>
+        <extracomment>The one quick action on the cover, when it has room for one.</extracomment>
+        <translation>Művelet</translation>
+    </message>
+</context>
+<context>
     <name>ReplyBar</name>
     <message>
         <source>Replying to %1</source>
@@ -1416,10 +1515,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Értesítések</translation>
     </message>
     <message>
-        <source>Apps</source>
-        <translation>Alkalmazások</translation>
-    </message>
-    <message>
         <source>Enable webxdc apps (experimental)</source>
         <extracomment>A webxdc app is a small program somebody sends into a chat and everyone in it plays with. Keep the name: it is what every other Delta Chat client calls them.</extracomment>
         <translation>webxdc alkalmazások engedélyezése (kísérleti)</translation>
@@ -1511,6 +1606,15 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Runs small apps inside chats. These features may be unstable and may be changed or removed.</source>
         <translation>Kis alkalmazásokat futtat a csevegéseken belül. Ezek a funkciók instabilak lehetnek, és megváltozhatnak vagy eltávolításra kerülhetnek.</translation>
+    </message>
+    <message>
+        <source>Quick actions</source>
+        <translation>Gyorsműveletek</translation>
+    </message>
+    <message>
+        <source>Advanced</source>
+        <extracomment>The settings most readers never need to change.</extracomment>
+        <translation>Speciális</translation>
     </message>
 </context>
 <context>

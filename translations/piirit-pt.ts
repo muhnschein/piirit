@@ -401,6 +401,11 @@ Mensagens de contactos bloqueados não serão ocultadas noutros grupos.</transla
         <source>Lost the connection to the Delta Chat core. Reconnecting…</source>
         <translation>Perdeu-se a ligação ao núcleo do Delta Chat. A voltar a ligar…</translation>
     </message>
+    <message>
+        <source>That chat no longer exists.</source>
+        <extracomment>A quick action on the cover was tapped, and the chat it was set up to open has been deleted since.</extracomment>
+        <translation>Essa conversa já não existe.</translation>
+    </message>
 </context>
 <context>
     <name>ChatMediaPage</name>
@@ -441,6 +446,11 @@ Mensagens de contactos bloqueados não serão ocultadas noutros grupos.</transla
     <message>
         <source>Search</source>
         <translation>Pesquisar</translation>
+    </message>
+    <message>
+        <source>Profile</source>
+        <extracomment>Over a list of chats to pick from: which profile&apos;s chats they are.</extracomment>
+        <translation>Perfil</translation>
     </message>
 </context>
 <context>
@@ -1192,6 +1202,95 @@ Mensagens de contactos bloqueados não serão ocultadas noutros grupos.</transla
     </message>
 </context>
 <context>
+    <name>QuickActionSetting</name>
+    <message>
+        <source>Chat</source>
+        <extracomment>A quick action on the cover that opens one chat.</extracomment>
+        <translation>Conversa</translation>
+    </message>
+    <message>
+        <source>Search</source>
+        <extracomment>A quick action on the cover that opens the chat list&apos;s search.</extracomment>
+        <translation>Pesquisar</translation>
+    </message>
+    <message>
+        <source>My QR code</source>
+        <extracomment>A quick action on the cover that shows this profile&apos;s QR code.</extracomment>
+        <translation>O meu código QR</translation>
+    </message>
+    <message>
+        <source>Scan QR code</source>
+        <extracomment>A quick action on the cover that opens the QR code scanner.</extracomment>
+        <translation>Ler código QR</translation>
+    </message>
+    <message>
+        <source>None</source>
+        <extracomment>No quick action on this side of the cover.</extracomment>
+        <translation>Nenhuma</translation>
+    </message>
+    <message>
+        <source>Choose a chat</source>
+        <extracomment>Over the list of chats, when picking the one a quick action on the cover opens.</extracomment>
+        <translation>Escolher uma conversa</translation>
+    </message>
+    <message>
+        <source>No chats yet</source>
+        <translation>Ainda sem conversas</translation>
+    </message>
+    <message>
+        <source>Deleted chat</source>
+        <extracomment>What a quick action says about its chat once that chat has been deleted.</extracomment>
+        <translation>Conversa eliminada</translation>
+    </message>
+    <message>
+        <source>Chat: %1</source>
+        <extracomment>A quick action on the cover that opens one chat, with the chat&apos;s name.</extracomment>
+        <translation>Conversa: %1</translation>
+    </message>
+    <message>
+        <source>Profiles</source>
+        <extracomment>A quick action on the cover that opens the list of profiles.</extracomment>
+        <translation>Perfis</translation>
+    </message>
+</context>
+<context>
+    <name>QuickActionsPage</name>
+    <message>
+        <source>Quick actions</source>
+        <translation>Ações rápidas</translation>
+    </message>
+    <message>
+        <source>Piirit&apos;s cover on the home screen can show up to two quick actions.</source>
+        <extracomment>The cover is the app&apos;s thumbnail on the Sailfish home screen while the app runs in the background. Use the same word for &quot;quick actions&quot; as this page&apos;s title.</extracomment>
+        <translation>A capa do Piirit no ecrã inicial pode mostrar até duas ações rápidas.</translation>
+    </message>
+    <message>
+        <source>Left</source>
+        <extracomment>The quick action on the left of the cover.</extracomment>
+        <translation>Esquerda</translation>
+    </message>
+    <message>
+        <source>Right</source>
+        <extracomment>The quick action on the right of the cover.</extracomment>
+        <translation>Direita</translation>
+    </message>
+    <message>
+        <source>One action</source>
+        <extracomment>Under a picture of the cover with room for one quick action; tapping it chooses that.</extracomment>
+        <translation>Uma ação</translation>
+    </message>
+    <message>
+        <source>Two actions</source>
+        <extracomment>Under a picture of the cover with room for two quick actions; tapping it chooses that.</extracomment>
+        <translation>Duas ações</translation>
+    </message>
+    <message>
+        <source>Action</source>
+        <extracomment>The one quick action on the cover, when it has room for one.</extracomment>
+        <translation>Ação</translation>
+    </message>
+</context>
+<context>
     <name>ReplyBar</name>
     <message>
         <source>Replying to %1</source>
@@ -1426,10 +1525,6 @@ Mensagens de contactos bloqueados não serão ocultadas noutros grupos.</transla
         <translation>Notificações</translation>
     </message>
     <message>
-        <source>Apps</source>
-        <translation>Aplicações</translation>
-    </message>
-    <message>
         <source>Enable webxdc apps (experimental)</source>
         <extracomment>A webxdc app is a small program somebody sends into a chat and everyone in it plays with. Keep the name: it is what every other Delta Chat client calls them.</extracomment>
         <translation>Ativar aplicações webxdc (experimental)</translation>
@@ -1521,6 +1616,15 @@ Mensagens de contactos bloqueados não serão ocultadas noutros grupos.</transla
     <message>
         <source>Runs small apps inside chats. These features may be unstable and may be changed or removed.</source>
         <translation>Executa pequenas aplicações dentro das conversas. Estas funcionalidades podem ser instáveis e podem ser alteradas ou removidas.</translation>
+    </message>
+    <message>
+        <source>Quick actions</source>
+        <translation>Ações rápidas</translation>
+    </message>
+    <message>
+        <source>Advanced</source>
+        <extracomment>The settings most readers never need to change.</extracomment>
+        <translation>Avançado</translation>
     </message>
 </context>
 <context>

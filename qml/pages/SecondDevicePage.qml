@@ -51,6 +51,11 @@ import Piirit 1.0
 Page {
     id: page
 
+    /// The cover offers no quick actions while this is up: a jump away
+    /// would leave the other device halfway through taking the profile. See
+    /// piirit.qml.
+    readonly property bool pausesQuickActions: true
+
     /// Whose profile is offered. The core's provider takes an account,
     /// and this is it.
     property int accountId

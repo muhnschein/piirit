@@ -135,17 +135,129 @@ Page {
         onRows_changed: page.chatsLoaded = true
     }
 
-    /// Open a chat from outside the app: a notification was tapped. The
-    /// window is raised first, as lipstick only calls the app and does
-    /// not bring it up; a page loaded on its own in a test has no window.
-    function showChat(chatId) {
+    /// Bring this list to the front of whatever the reader was doing, the
+    /// way a tap from outside the app arrives: the window raised, as
+    /// lipstick only calls the app and does not bring it up, and every
+    /// page above this one gone. A page loaded on its own in a test has
+    /// no window.
+    function comeForward() {
         if (typeof appWindow !== "undefined") {
             appWindow.activate()
         }
         if (pageStack.currentPage !== page) {
             pageStack.pop(page, PageStackAction.Immediate)
         }
+    }
+
+    /// Open a chat from outside the app: a notification was tapped.
+    function showChat(chatId) {
+        page.comeForward()
         page.openChat(chatId, notifier.nameOf(chatId), 0)
+    }
+
+    /// A quick action from the cover (piirit.qml): `kind` is what it does,
+    /// and for a chat, `accountId` and `chatId` say which one.
+    ///
+    /// Everything starts from this list, brought forward over whatever
+    /// was open, the way a tapped notification comes in. A chat is looked
+    /// up before it is opened, so one deleted since the action was set up
+    /// is said to be gone rather than opened empty; with the core away
+    /// there is no asking, and the list is where the action ends.
+    function quickAction(kind, accountId, chatId) {
+        page.comeForward()
+        // A chat still being looked up for an earlier tap is not wanted
+        // any more.
+        page.quickChatPending = false
+        if (kind === "search") {
+            searchField.text = ""
+            page.searchWanted = true
+            page.takeSearch()
+        } else if (kind === "qr" || kind === "scan") {
+            pulleyHost.openPage(Qt.resolvedUrl("QrPage.qml"), {
+                accountId: page.accountId,
+                mode: kind === "scan" ? 1 : 0
+            })
+        } else if (kind === "profiles") {
+            // As the pull-down's own Profiles opens it.
+            pulleyHost.openPage(Qt.resolvedUrl("ProfilesPage.qml"),
+                                { currentAccountId: page.accountId })
+        } else if (kind === "chat" && core.status === "ready") {
+            page.quickChatPending = true
+            // Through 0, so asking for the chat asked for last time asks
+            // again rather than being taken for no change.
+            quickChat.chat_id = 0
+            quickChat.account_id = accountId
+            quickChat.chat_id = chatId
+        }
+    }
+
+    /// A quick action's chat is being looked up.
+    property bool quickChatPending: false
+
+    // The chat a quick action asked for, looked up before it is opened. A
+    // failed lookup answers `loaded` and then `error`, one straight after
+    // the other, so the chat is opened a turn of the event loop after
+    // `loaded`, by which time a failure has had its say.
+    ChatInfo {
+        id: quickChat
+        objectName: "quickChat"
+        onLoaded_changed: {
+            if (quickChat.loaded && page.quickChatPending) {
+                quickChatFound.restart()
+            }
+        }
+        onError: {
+            if (page.quickChatPending) {
+                page.quickChatPending = false
+                //: A quick action on the cover was tapped, and the chat it
+                //: was set up to open has been deleted since.
+                page.errorMessage = qsTr("That chat no longer exists.")
+            }
+        }
+    }
+
+    Timer {
+        id: quickChatFound
+        interval: 0
+        onTriggered: {
+            if (!page.quickChatPending) {
+                return
+            }
+            page.quickChatPending = false
+            if (quickChat.account_id === page.accountId) {
+                page.openChat(quickChat.chat_id, quickChat.name, 0)
+                return
+            }
+            // Another profile's chat: that profile's list, in place of
+            // the whole stack the way the profiles page switches, and the
+            // chat opened from it once it is on screen.
+            pageStack.replaceAbove(null, Qt.resolvedUrl("ChatListPage.qml"), {
+                accountId: quickChat.account_id,
+                arrivingChatId: quickChat.chat_id,
+                arrivingChatName: quickChat.name
+            })
+        }
+    }
+
+    /// A chat to open once this list is on screen, and its name: a quick
+    /// action for another profile's chat put this list here for it. 0 for
+    /// none.
+    property int arrivingChatId: 0
+    property string arrivingChatName: ""
+
+    /// The search field is to take the keyboard as soon as this list is on
+    /// screen with the app in front: a quick action asked for it, and the
+    /// window may still be on its way up.
+    property bool searchWanted: false
+    readonly property bool appActive: Qt.application.state === Qt.ApplicationActive
+    onAppActiveChanged: page.takeSearch()
+
+    function takeSearch() {
+        if (!page.searchWanted || page.status !== PageStatus.Active || !page.appActive) {
+            return
+        }
+        page.searchWanted = false
+        searchField.forceActiveFocus()
     }
 
     // Back on the list means no chat is being read. Going the other way,
@@ -155,6 +267,12 @@ Page {
     onStatusChanged: {
         if (status === PageStatus.Active) {
             notifier.viewingChatId = 0
+            if (page.arrivingChatId !== 0) {
+                var arriving = page.arrivingChatId
+                page.arrivingChatId = 0
+                page.openChat(arriving, page.arrivingChatName, 0)
+            }
+            page.takeSearch()
         } else if (status === PageStatus.Deactivating) {
             doomedChats.flush()
         }
@@ -244,6 +362,8 @@ Page {
             // loaded on its own in a test does not have.
             if (typeof appWindow !== "undefined") {
                 appWindow.accountId = page.accountId
+                // And where the cover's quick actions land.
+                appWindow.chatList = page
             }
         }
     }

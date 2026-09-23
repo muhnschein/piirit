@@ -397,6 +397,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Lost the connection to the Delta Chat core. Reconnecting…</source>
         <translation>Delta Chat కోర్‌తో కనెక్షన్ తెగిపోయింది. మళ్లీ కనెక్ట్ అవుతోంది…</translation>
     </message>
+    <message>
+        <source>That chat no longer exists.</source>
+        <extracomment>A quick action on the cover was tapped, and the chat it was set up to open has been deleted since.</extracomment>
+        <translation>ఈ చాట్ ఇక లేదు.</translation>
+    </message>
 </context>
 <context>
     <name>ChatMediaPage</name>
@@ -437,6 +442,11 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Search</source>
         <translation>వెతకండి</translation>
+    </message>
+    <message>
+        <source>Profile</source>
+        <extracomment>Over a list of chats to pick from: which profile&apos;s chats they are.</extracomment>
+        <translation>ప్రొఫైల్</translation>
     </message>
 </context>
 <context>
@@ -1188,6 +1198,95 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>QuickActionSetting</name>
+    <message>
+        <source>Chat</source>
+        <extracomment>A quick action on the cover that opens one chat.</extracomment>
+        <translation>చాట్</translation>
+    </message>
+    <message>
+        <source>Search</source>
+        <extracomment>A quick action on the cover that opens the chat list&apos;s search.</extracomment>
+        <translation>వెతకండి</translation>
+    </message>
+    <message>
+        <source>My QR code</source>
+        <extracomment>A quick action on the cover that shows this profile&apos;s QR code.</extracomment>
+        <translation>నా QR కోడ్</translation>
+    </message>
+    <message>
+        <source>Scan QR code</source>
+        <extracomment>A quick action on the cover that opens the QR code scanner.</extracomment>
+        <translation>QR కోడ్ స్కాన్ చేయి</translation>
+    </message>
+    <message>
+        <source>None</source>
+        <extracomment>No quick action on this side of the cover.</extracomment>
+        <translation>ఏదీ లేదు</translation>
+    </message>
+    <message>
+        <source>Choose a chat</source>
+        <extracomment>Over the list of chats, when picking the one a quick action on the cover opens.</extracomment>
+        <translation>చాట్‌ను ఎంచుకోండి</translation>
+    </message>
+    <message>
+        <source>No chats yet</source>
+        <translation>ఇంకా చాట్‌లు లేవు</translation>
+    </message>
+    <message>
+        <source>Deleted chat</source>
+        <extracomment>What a quick action says about its chat once that chat has been deleted.</extracomment>
+        <translation>తొలగించిన చాట్</translation>
+    </message>
+    <message>
+        <source>Chat: %1</source>
+        <extracomment>A quick action on the cover that opens one chat, with the chat&apos;s name.</extracomment>
+        <translation>చాట్: %1</translation>
+    </message>
+    <message>
+        <source>Profiles</source>
+        <extracomment>A quick action on the cover that opens the list of profiles.</extracomment>
+        <translation>ప్రొఫైల్‌లు</translation>
+    </message>
+</context>
+<context>
+    <name>QuickActionsPage</name>
+    <message>
+        <source>Quick actions</source>
+        <translation>త్వరిత చర్యలు</translation>
+    </message>
+    <message>
+        <source>Piirit&apos;s cover on the home screen can show up to two quick actions.</source>
+        <extracomment>The cover is the app&apos;s thumbnail on the Sailfish home screen while the app runs in the background. Use the same word for &quot;quick actions&quot; as this page&apos;s title.</extracomment>
+        <translation>హోమ్ స్క్రీన్‌పై Piirit కవర్ గరిష్ఠంగా రెండు త్వరిత చర్యలను చూపించగలదు.</translation>
+    </message>
+    <message>
+        <source>Left</source>
+        <extracomment>The quick action on the left of the cover.</extracomment>
+        <translation>ఎడమ</translation>
+    </message>
+    <message>
+        <source>Right</source>
+        <extracomment>The quick action on the right of the cover.</extracomment>
+        <translation>కుడి</translation>
+    </message>
+    <message>
+        <source>One action</source>
+        <extracomment>Under a picture of the cover with room for one quick action; tapping it chooses that.</extracomment>
+        <translation>ఒక చర్య</translation>
+    </message>
+    <message>
+        <source>Two actions</source>
+        <extracomment>Under a picture of the cover with room for two quick actions; tapping it chooses that.</extracomment>
+        <translation>రెండు చర్యలు</translation>
+    </message>
+    <message>
+        <source>Action</source>
+        <extracomment>The one quick action on the cover, when it has room for one.</extracomment>
+        <translation>చర్య</translation>
+    </message>
+</context>
+<context>
     <name>ReplyBar</name>
     <message>
         <source>Replying to %1</source>
@@ -1422,10 +1521,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>నోటిఫికేషన్‌లు</translation>
     </message>
     <message>
-        <source>Apps</source>
-        <translation>యాప్‌లు</translation>
-    </message>
-    <message>
         <source>Enable webxdc apps (experimental)</source>
         <extracomment>A webxdc app is a small program somebody sends into a chat and everyone in it plays with. Keep the name: it is what every other Delta Chat client calls them.</extracomment>
         <translation>webxdc యాప్‌లను ప్రారంభించు (ప్రయోగాత్మకం)</translation>
@@ -1517,6 +1612,15 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Runs small apps inside chats. These features may be unstable and may be changed or removed.</source>
         <translation>సంభాషణల లోపల చిన్న యాప్‌లను నడుపుతుంది. ఈ సౌకర్యాలు అస్థిరంగా ఉండవచ్చు, మారవచ్చు లేదా తొలగించబడవచ్చు.</translation>
+    </message>
+    <message>
+        <source>Quick actions</source>
+        <translation>త్వరిత చర్యలు</translation>
+    </message>
+    <message>
+        <source>Advanced</source>
+        <extracomment>The settings most readers never need to change.</extracomment>
+        <translation>అధునాతనం</translation>
     </message>
 </context>
 <context>

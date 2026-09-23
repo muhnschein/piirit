@@ -146,9 +146,14 @@ fn delegates_bind_only_roles_their_models_have() {
             "qml/cover/CoverPage.qml",
             names_of::<piirit_shim::AccountItem>(),
         ),
+        // The chats, and the profiles its choice of profile lists.
         (
             "qml/pages/ChatPickerPage.qml",
-            names_of::<piirit_shim::ChatListItem>(),
+            [
+                names_of::<piirit_shim::ChatListItem>(),
+                names_of::<piirit_shim::AccountItem>(),
+            ]
+            .concat(),
         ),
         (
             "qml/pages/ProfilesPage.qml",
@@ -651,6 +656,55 @@ fn only_the_settings_object_names_the_dconf_keys() {
         keys.iter()
             .all(|key| key.starts_with("/apps/harbour-piirit/")),
         "a key is outside the app's own dconf path: {keys:?}"
+    );
+}
+
+/// A file that reads its own directory's singleton imports that directory
+/// by name, with `import "."`.
+///
+/// Qt 5.6 reads a directory's `qmldir` only for an import that names the
+/// directory; the implicit one a file gets for its own directory skips
+/// it. Without the line, `Settings` in a component next to Settings.qml
+/// is the plain type rather than the one object: every read of it throws,
+/// every binding on it keeps its default, and nothing written reaches
+/// dconf. Host Qt 5.15 hands the singleton out either way, so the quick
+/// actions' settings passed every test here and did nothing on a phone.
+#[test]
+fn a_singleton_read_beside_it_is_imported_by_its_directory() {
+    let mut offenders = Vec::new();
+    let mut checked = 0;
+    for file in qml_files() {
+        let dir = file.parent().expect("a file is in a directory");
+        let Ok(qmldir) = fs::read_to_string(dir.join("qmldir")) else {
+            continue;
+        };
+        let text = fs::read_to_string(&file).expect("read qml");
+        let imports_itself = text.lines().any(|line| line.trim() == "import \".\"");
+        let used = tokens(&code_only(&text));
+        for line in qmldir.lines() {
+            let words: Vec<&str> = line.split_whitespace().collect();
+            let ["singleton", name, _, source] = words.as_slice() else {
+                continue;
+            };
+            if dir.join(source) == file {
+                continue;
+            }
+            checked += 1;
+            if used.iter().any(|token| token == name) && !imports_itself {
+                offenders.push(format!("{} reads {name}", file.display()));
+            }
+        }
+    }
+    assert!(
+        checked > 0,
+        "found no file beside a singleton to check; has the qmldir moved?"
+    );
+    assert!(
+        offenders.is_empty(),
+        "these read a singleton declared in their own directory's qmldir \
+         without `import \".\"`, which on Qt 5.6 leaves the name the plain \
+         type:\n  {}",
+        offenders.join("\n  ")
     );
 }
 
