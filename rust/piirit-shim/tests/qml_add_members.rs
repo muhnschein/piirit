@@ -2,7 +2,8 @@
 //!
 //! The picker greys whoever is already in, narrows the list to what is
 //! typed into its search field, adds whoever was ticked through the group
-//! it was handed, and goes back to that group's page.
+//! it was handed, and goes back to that group's page. It says there is
+//! nobody to add only once the core has said so.
 
 // Qt harness: needs `unsafe` for `env::set_var` before Qt starts
 // (`unused_unsafe` because it is only unsafe from edition 2024 on),
@@ -176,6 +177,9 @@ fn the_picker_adds_who_was_ticked_and_greys_who_is_in() {
                 QString::from(common::page_url("AddMembersPage.qml"))
             )
         );
+        // Nothing has been read yet. An empty model means "no answer"
+        // this early and "no contacts" later, and the two are opposite.
+        record!("placeholder-fresh", get!("contactsPlaceholder", "enabled"));
     });
 
     single_shot(Duration::from_secs(4), move || unsafe {
@@ -204,9 +208,21 @@ fn the_picker_adds_who_was_ticked_and_greys_who_is_in() {
         record!("tap-out", call!("click", QString::from("memberRow11")));
         record!("picked", get!("addButton", "enabled"));
         record!("add", call!("click", QString::from("addButton")));
+        // A search no contact answers to, so the list really is empty.
+        record!(
+            "search-nobody",
+            call!(
+                "setText",
+                QString::from("searchField"),
+                QString::from("zzqq-nobody-is-called-this")
+            )
+        );
     });
 
+    // The core has answered and there is nobody to show: now the
+    // placeholder is the one thing that should be on the list.
     single_shot(Duration::from_secs(8), move || unsafe {
+        record!("placeholder-empty", get!("contactsPlaceholder", "enabled"));
         (*engine_ptr).quit();
     });
 
@@ -232,9 +248,28 @@ fn assert_outcome(steps: &[(&str, String)], navigation: &str, calls: &[(String, 
             .unwrap_or_default()
     };
 
-    for label in ["load", "tap-in", "search", "tap-out", "add"] {
+    for label in [
+        "load",
+        "tap-in",
+        "search",
+        "tap-out",
+        "add",
+        "search-nobody",
+    ] {
         assert_eq!(value(label), "ok", "step {label} failed. {context}");
     }
+    assert_eq!(
+        value("placeholder-fresh"),
+        "false",
+        "\"No contacts to add\" is up before the core has said whether \
+         there are any, so it flashes under the rows on the way in. {context}"
+    );
+    assert_eq!(
+        value("placeholder-empty"),
+        "true",
+        "a search nobody answers to says nothing at all, which reads as a \
+         list that has not loaded. {context}"
+    );
     assert!(
         value("ada-hidden").starts_with("missing:"),
         "searching for Grace still lists Ada. {context}"

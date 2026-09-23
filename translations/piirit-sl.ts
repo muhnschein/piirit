@@ -134,6 +134,14 @@
     </message>
 </context>
 <context>
+    <name>AttachmentSaver</name>
+    <message>
+        <source>Saved to Downloads/Piirit</source>
+        <extracomment>Said once a file from a chat has been copied: the folder named Piirit inside Downloads. Keep &quot;Piirit&quot;, which is the folder&apos;s name.</extracomment>
+        <translation>Shranjeno v mapo Prenosi/Piirit</translation>
+    </message>
+</context>
+<context>
     <name>AutoDeleteDialog</name>
     <message>
         <source>Delete messages from device</source>
@@ -421,10 +429,6 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
         <source>Delete</source>
         <translation>Izbriši</translation>
     </message>
-    <message>
-        <source>Saved to Downloads</source>
-        <translation>Shranjeno v Prenose</translation>
-    </message>
 </context>
 <context>
     <name>ChatPickerPage</name>
@@ -544,14 +548,6 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
         <source>Message</source>
         <translation>Sporočilo</translation>
     </message>
-    <message>
-        <source>Saved to Pictures</source>
-        <translation>Shranjeno v Slike</translation>
-    </message>
-    <message>
-        <source>Saved to Videos</source>
-        <translation>Shranjeno v Videoposnetke</translation>
-    </message>
     <message numerus="yes">
         <source>%n member(s)</source>
         <extracomment>Under a group&apos;s name, over its messages. %n is how many people are in the group.</extracomment>
@@ -561,10 +557,6 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
             <numerusform>%n člani</numerusform>
             <numerusform>%n članov</numerusform>
         </translation>
-    </message>
-    <message>
-        <source>Saved to Downloads</source>
-        <translation>Shranjeno v Prenose</translation>
     </message>
     <message>
         <source>Lost the connection to the Delta Chat core. Reconnecting…</source>
@@ -925,6 +917,11 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
         <extracomment>Shown on the full-message page for a message that turns out to have no words in it at all.</extracomment>
         <translation>To sporočilo nima besedila</translation>
     </message>
+    <message>
+        <source>Select text</source>
+        <extracomment>Pull-down entry on the page showing one whole message: shows it as text that can be selected, and copied, a part at a time.</extracomment>
+        <translation>Izberi besedilo</translation>
+    </message>
 </context>
 <context>
     <name>NewChatPage</name>
@@ -1009,10 +1006,6 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
 </context>
 <context>
     <name>PicturePage</name>
-    <message>
-        <source>Saved to Pictures</source>
-        <translation>Shranjeno v Slike</translation>
-    </message>
     <message>
         <source>Open in another app</source>
         <extracomment>Hands the attachment to whatever else on the phone handles files of its kind.</extracomment>
@@ -1495,11 +1488,6 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
         <translation>Omembe</translation>
     </message>
     <message>
-        <source>Enter sends the message</source>
-        <extracomment>The return key on the keyboard.</extracomment>
-        <translation>Enter pošlje sporočilo</translation>
-    </message>
-    <message>
         <source>Use Markdown formatting</source>
         <translation>Uporabi oblikovanje Markdown</translation>
     </message>
@@ -1575,10 +1563,6 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
 <context>
     <name>VideoPage</name>
     <message>
-        <source>Saved to Videos</source>
-        <translation>Shranjeno v Videoposnetke</translation>
-    </message>
-    <message>
         <source>Open in another app</source>
         <extracomment>Hands the attachment to whatever else on the phone handles files of its kind.</extracomment>
         <translation>Odpri v drugi aplikaciji</translation>
@@ -1602,11 +1586,6 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
         <source>Starting the app</source>
         <extracomment>Shown while a webxdc app is being made ready to run.</extracomment>
         <translation>Zaganjanje aplikacije</translation>
-    </message>
-    <message>
-        <source>Saved to Downloads</source>
-        <extracomment>Where a file a webxdc app produced was copied to.</extracomment>
-        <translation>Shranjeno v Prenose</translation>
     </message>
     <message>
         <source>Copied to clipboard</source>

@@ -2,7 +2,6 @@
 import QtQuick 2.5
 import Sailfish.Silica 1.0
 import "../components"
-import Piirit 1.0
 
 /*
  * One picture, as big as the screen will show it.
@@ -24,9 +23,9 @@ import Piirit 1.0
  * GIF's movie, start once the page is in place. Decoding during the
  * transition was the stutter reported on opening a picture.
  *
- * Saving copies the file into the Pictures folder, where the gallery
- * finds it: what the chat holds lives in the core's own directory and
- * goes with the app.
+ * Saving copies the file into Piirit's folder in Downloads, where every
+ * copy goes (AttachmentSaver): what the chat holds lives in the core's
+ * own directory and goes with the app.
  */
 Page {
     id: page
@@ -136,14 +135,14 @@ Page {
         page.zoomAt(page.zoom > 1 ? 1 : 3, viewX, viewY)
     }
 
-    // A copy for the gallery. The folder is the platform's own answer to
-    // where pictures go; the sandbox grants it (Pictures).
-    FileSaver {
+    // A copy the reader keeps, where every copy goes: see
+    // AttachmentSaver.
+    AttachmentSaver {
         id: saver
         objectName: "saver"
         onSaved: {
             notice.tone = "info"
-            notice.show(qsTr("Saved to Pictures"))
+            notice.show(saver.savedText)
         }
         onError: {
             notice.tone = "error"
@@ -178,8 +177,7 @@ Page {
             MenuItem {
                 objectName: "saveToDevice"
                 text: qsTr("Save to device")
-                onClicked: saver.save_as(page.fileUrl, StandardPaths.pictures,
-                                         page.fileName)
+                onClicked: saver.keep(page.fileUrl, page.fileName)
             }
         }
 

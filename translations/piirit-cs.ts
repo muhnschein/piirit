@@ -134,6 +134,14 @@
     </message>
 </context>
 <context>
+    <name>AttachmentSaver</name>
+    <message>
+        <source>Saved to Downloads/Piirit</source>
+        <extracomment>Said once a file from a chat has been copied: the folder named Piirit inside Downloads. Keep &quot;Piirit&quot;, which is the folder&apos;s name.</extracomment>
+        <translation>Uloženo do složky Stažené/Piirit</translation>
+    </message>
+</context>
+<context>
     <name>AutoDeleteDialog</name>
     <message>
         <source>Delete messages from device</source>
@@ -420,10 +428,6 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
         <source>Delete</source>
         <translation>Smazat</translation>
     </message>
-    <message>
-        <source>Saved to Downloads</source>
-        <translation>Uloženo do Stažených</translation>
-    </message>
 </context>
 <context>
     <name>ChatPickerPage</name>
@@ -543,14 +547,6 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
         <source>Message</source>
         <translation>Zpráva</translation>
     </message>
-    <message>
-        <source>Saved to Pictures</source>
-        <translation>Uloženo do Obrázků</translation>
-    </message>
-    <message>
-        <source>Saved to Videos</source>
-        <translation>Uloženo do Videí</translation>
-    </message>
     <message numerus="yes">
         <source>%n member(s)</source>
         <extracomment>Under a group&apos;s name, over its messages. %n is how many people are in the group.</extracomment>
@@ -559,10 +555,6 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
             <numerusform>%n členové</numerusform>
             <numerusform>%n členů</numerusform>
         </translation>
-    </message>
-    <message>
-        <source>Saved to Downloads</source>
-        <translation>Uloženo do Stažených</translation>
     </message>
     <message>
         <source>Lost the connection to the Delta Chat core. Reconnecting…</source>
@@ -921,6 +913,11 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
         <extracomment>Shown on the full-message page for a message that turns out to have no words in it at all.</extracomment>
         <translation>Tato zpráva neobsahuje text</translation>
     </message>
+    <message>
+        <source>Select text</source>
+        <extracomment>Pull-down entry on the page showing one whole message: shows it as text that can be selected, and copied, a part at a time.</extracomment>
+        <translation>Vybrat text</translation>
+    </message>
 </context>
 <context>
     <name>NewChatPage</name>
@@ -1003,10 +1000,6 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
 </context>
 <context>
     <name>PicturePage</name>
-    <message>
-        <source>Saved to Pictures</source>
-        <translation>Uloženo do Obrázků</translation>
-    </message>
     <message>
         <source>Open in another app</source>
         <extracomment>Hands the attachment to whatever else on the phone handles files of its kind.</extracomment>
@@ -1489,11 +1482,6 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
         <translation>Zmínky</translation>
     </message>
     <message>
-        <source>Enter sends the message</source>
-        <extracomment>The return key on the keyboard.</extracomment>
-        <translation>Enter odešle zprávu</translation>
-    </message>
-    <message>
         <source>Use Markdown formatting</source>
         <translation>Používat formátování Markdown</translation>
     </message>
@@ -1569,10 +1557,6 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
 <context>
     <name>VideoPage</name>
     <message>
-        <source>Saved to Videos</source>
-        <translation>Uloženo do Videí</translation>
-    </message>
-    <message>
         <source>Open in another app</source>
         <extracomment>Hands the attachment to whatever else on the phone handles files of its kind.</extracomment>
         <translation>Otevřít v jiné aplikaci</translation>
@@ -1596,11 +1580,6 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
         <source>Starting the app</source>
         <extracomment>Shown while a webxdc app is being made ready to run.</extracomment>
         <translation>Spouštění aplikace</translation>
-    </message>
-    <message>
-        <source>Saved to Downloads</source>
-        <extracomment>Where a file a webxdc app produced was copied to.</extracomment>
-        <translation>Uloženo do Stažených</translation>
     </message>
     <message>
         <source>Copied to clipboard</source>

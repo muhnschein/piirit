@@ -213,10 +213,10 @@ Page {
                 text: page.statusLine
             }
 
-            // The same two facts the chat list marks a row with, said in
-            // words: whether the connection is encrypted, and whether it
-            // was checked in person. A caption under the person, in the
-            // size and colour a caption is drawn in.
+            // Whether the connection is encrypted, and whether it was
+            // checked in person, said in words -- the lists mark only the
+            // first. A caption under the person, in the size and colour a
+            // caption is drawn in.
             Label {
                 objectName: "encryptionLabel"
                 anchors.horizontalCenter: parent.horizontalCenter

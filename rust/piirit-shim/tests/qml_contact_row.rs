@@ -29,6 +29,7 @@ const PROBE_QML: &str = r"
             loader.item[property] = value
             return 'ok'
         }
+        function own(property) { return '' + loader.item[property] }
         function findIn(node, name) {
             if (!node) { return null }
             if (node.objectName === name) { return node }
@@ -96,7 +97,6 @@ fn a_contact_row_marks_who_can_be_written_to_encrypted() {
             QString::from("ada@example.org")
         );
         call!("set", QString::from("isKeyContact"), true);
-        call!("set", QString::from("isVerified"), false);
         record!(
             "key-name",
             call!("get", QString::from("contactName"), QString::from("text"))
@@ -128,18 +128,17 @@ fn a_contact_row_marks_who_can_be_written_to_encrypted() {
             call!("get", QString::from("avatarInitial"), QString::from("text"))
         );
 
-        // Someone the core cannot encrypt to wears the mail mark, and a
-        // contact checked in person wears a tick.
+        // Someone the core cannot encrypt to wears the mail mark. A
+        // contact checked in person wears nothing: a tick in a list is a
+        // pick, so the row has no way to be told to draw one.
         call!("set", QString::from("isKeyContact"), false);
         record!(
             "plain-name",
             call!("get", QString::from("contactName"), QString::from("text"))
         );
-        call!("set", QString::from("isKeyContact"), true);
-        call!("set", QString::from("isVerified"), true);
         record!(
-            "verified-name",
-            call!("get", QString::from("contactName"), QString::from("text"))
+            "verified-property",
+            call!("own", QString::from("isVerified"))
         );
 
         (*engine_ptr).quit();
@@ -193,8 +192,9 @@ fn assert_outcome(steps: &[(&str, String)]) {
          the same as one that can. {context}"
     );
     assert_eq!(
-        value("verified-name"),
-        "Ada ✓",
-        "a contact checked in person is not marked. {context}"
+        value("verified-property"),
+        "undefined",
+        "the row can be told a contact was checked in person, which it \
+         would draw as a tick -- the mark a picker uses for a pick. {context}"
     );
 }

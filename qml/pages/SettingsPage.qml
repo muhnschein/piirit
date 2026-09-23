@@ -3,12 +3,11 @@ import Sailfish.Silica 1.0
 import "../components"
 
 /*
- * The settings that belong to no profile: whether the return key sends,
- * how a message is drawn, what goes out with a link, how much of a
- * picture or a video leaves with it, how much of an attachment arrives
- * unasked, how long a message is kept, whether
- * anything is announced and how much a notification gives away and
- * whether a muted group can still raise one, and whether webxdc apps
+ * The settings that belong to no profile: how a message is drawn, what
+ * goes out with a link, how much of a picture or a video leaves with it,
+ * how much of an attachment arrives unasked, how long a message is kept,
+ * whether anything is announced and how much a notification gives away
+ * and whether a muted group can still raise one, and whether webxdc apps
  * are offered at all. Reached from the chat list's pull-down. A
  * profile's own settings -- picture, name, address, read receipts, what
  * the relay says, what it takes -- are on the profile's page,
@@ -215,31 +214,6 @@ Page {
                 text: qsTr("Messages")
             }
 
-            // First, because it is the one setting the reader meets on
-            // every message: what the biggest key on the keyboard does.
-            // Off, the field is the multi-line one -- it grows with the
-            // message and the button sends -- and the description says
-            // so, since turning this on takes that away without saying.
-            TextSwitch {
-                objectName: "enterSendsSwitch"
-                //: The return key on the keyboard.
-                text: qsTr("Enter sends the message")
-                automaticCheck: false
-                checked: Settings.enterSends === true
-                onClicked: Settings.enterSends = !checked
-            }
-
-            TextSwitch {
-                objectName: "markdownSwitch"
-                text: qsTr("Use Markdown formatting")
-                // Checked follows the setting, so the tap writes the
-                // setting and the setting moves the switch -- the way
-                // the switch above it works.
-                automaticCheck: false
-                checked: Settings.markdownMode === 0
-                onClicked: Settings.markdownMode = checked ? 1 : 0
-            }
-
             // What leaves the phone, above what arrives on it. The core
             // recodes a picture as it sends, and the camera records a
             // video, at whichever of these two the reader picks; both
@@ -307,6 +281,19 @@ Page {
                         }
                     }
                 }
+            }
+
+            // Last under Messages: the three above are what the core does
+            // with a message -- what leaves, what arrives, what stays --
+            // and this is only how the app draws one.
+            TextSwitch {
+                objectName: "markdownSwitch"
+                text: qsTr("Use Markdown formatting")
+                // Checked follows the setting, so the tap writes the
+                // setting and the setting moves the switch.
+                automaticCheck: false
+                checked: Settings.markdownMode === 0
+                onClicked: Settings.markdownMode = checked ? 1 : 0
             }
 
             SectionHeader {
