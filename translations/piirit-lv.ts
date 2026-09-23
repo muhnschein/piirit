@@ -402,6 +402,11 @@ Citās grupās, kurās ir bloķēti kontakti, viņu ziņas joprojām būs redzam
         <source>Lost the connection to the Delta Chat core. Reconnecting…</source>
         <translation>Zudis savienojums ar Delta Chat kodolu. Savienojas atkārtoti…</translation>
     </message>
+    <message>
+        <source>That chat no longer exists.</source>
+        <extracomment>A quick action on the cover was tapped, and the chat it was set up to open has been deleted since.</extracomment>
+        <translation>Šīs sarunas vairs nav.</translation>
+    </message>
 </context>
 <context>
     <name>ChatMediaPage</name>
@@ -1198,6 +1203,48 @@ Citās grupās, kurās ir bloķēti kontakti, viņu ziņas joprojām būs redzam
     </message>
 </context>
 <context>
+    <name>QuickActionSetting</name>
+    <message>
+        <source>Chat</source>
+        <extracomment>A quick action on the cover that opens one chat.</extracomment>
+        <translation>Saruna</translation>
+    </message>
+    <message>
+        <source>Search</source>
+        <extracomment>A quick action on the cover that opens the chat list&apos;s search.</extracomment>
+        <translation>Meklēt</translation>
+    </message>
+    <message>
+        <source>My QR code</source>
+        <extracomment>A quick action on the cover that shows this profile&apos;s QR code.</extracomment>
+        <translation>Mans QR kods</translation>
+    </message>
+    <message>
+        <source>Scan QR code</source>
+        <extracomment>A quick action on the cover that opens the QR code scanner.</extracomment>
+        <translation>Skenēt QR kodu</translation>
+    </message>
+    <message>
+        <source>None</source>
+        <extracomment>No quick action on this side of the cover.</extracomment>
+        <translation>Nav</translation>
+    </message>
+    <message>
+        <source>Choose a chat</source>
+        <extracomment>Over the list of chats, when picking the one a quick action on the cover opens.</extracomment>
+        <translation>Izvēlies sarunu</translation>
+    </message>
+    <message>
+        <source>No chats yet</source>
+        <translation>Vēl nav sarunu</translation>
+    </message>
+    <message>
+        <source>Deleted chat</source>
+        <extracomment>What a quick action says about its chat once that chat has been deleted.</extracomment>
+        <translation>Dzēsta saruna</translation>
+    </message>
+</context>
+<context>
     <name>ReplyBar</name>
     <message>
         <source>Replying to %1</source>
@@ -1527,6 +1574,24 @@ Citās grupās, kurās ir bloķēti kontakti, viņu ziņas joprojām būs redzam
     <message>
         <source>Runs small apps inside chats. These features may be unstable and may be changed or removed.</source>
         <translation>Darbina mazas lietotnes sarakstēs. Šīs funkcijas var būt nestabilas un var tikt mainītas vai noņemtas.</translation>
+    </message>
+    <message>
+        <source>Quick actions</source>
+        <translation>Ātrās darbības</translation>
+    </message>
+    <message>
+        <source>Left</source>
+        <extracomment>The quick action on the left of the cover.</extracomment>
+        <translation>Kreisā</translation>
+    </message>
+    <message>
+        <source>Right</source>
+        <extracomment>The quick action on the right of the cover.</extracomment>
+        <translation>Labā</translation>
+    </message>
+    <message>
+        <source>Piirit&apos;s cover on the home screen can show up to two buttons. Each button opens the chat or view you choose below.</source>
+        <translation>Piirit vāks sākuma ekrānā var rādīt līdz divām pogām. Katra poga atver sarunu vai skatu, ko izvēlies zemāk.</translation>
     </message>
 </context>
 <context>

@@ -7,8 +7,9 @@ import Piirit 1.0
  * QR codes, both ways: this profile's invite drawn as a code, for a phone
  * held up to this one, and the scanner for someone else's -- a switch at
  * the top picks which, the way an inline view switcher does on the
- * desktop. Reached from the chat list's pull-down, and from the profile
- * page's "Show invite code".
+ * desktop. Reached from the chat list's pull-down, from the profile
+ * page's "Show invite code", and from the cover's quick actions, which
+ * open it on either side.
  *
  * The code is how anyone gets in touch with a profile: an address alone
  * cannot be encrypted to (docs/PROJECT.md), and a chatmail address is
@@ -28,6 +29,11 @@ import Piirit 1.0
  */
 Page {
     id: page
+
+    /// The cover offers no quick actions while this is up: a jump away
+    /// would drop a code halfway through being shown or read. See
+    /// piirit.qml.
+    readonly property bool pausesQuickActions: true
 
     property int accountId
     property string errorMessage: ""

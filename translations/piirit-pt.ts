@@ -401,6 +401,11 @@ Mensagens de contactos bloqueados não serão ocultadas noutros grupos.</transla
         <source>Lost the connection to the Delta Chat core. Reconnecting…</source>
         <translation>Perdeu-se a ligação ao núcleo do Delta Chat. A voltar a ligar…</translation>
     </message>
+    <message>
+        <source>That chat no longer exists.</source>
+        <extracomment>A quick action on the cover was tapped, and the chat it was set up to open has been deleted since.</extracomment>
+        <translation>Essa conversa já não existe.</translation>
+    </message>
 </context>
 <context>
     <name>ChatMediaPage</name>
@@ -1192,6 +1197,48 @@ Mensagens de contactos bloqueados não serão ocultadas noutros grupos.</transla
     </message>
 </context>
 <context>
+    <name>QuickActionSetting</name>
+    <message>
+        <source>Chat</source>
+        <extracomment>A quick action on the cover that opens one chat.</extracomment>
+        <translation>Conversa</translation>
+    </message>
+    <message>
+        <source>Search</source>
+        <extracomment>A quick action on the cover that opens the chat list&apos;s search.</extracomment>
+        <translation>Pesquisar</translation>
+    </message>
+    <message>
+        <source>My QR code</source>
+        <extracomment>A quick action on the cover that shows this profile&apos;s QR code.</extracomment>
+        <translation>O meu código QR</translation>
+    </message>
+    <message>
+        <source>Scan QR code</source>
+        <extracomment>A quick action on the cover that opens the QR code scanner.</extracomment>
+        <translation>Ler código QR</translation>
+    </message>
+    <message>
+        <source>None</source>
+        <extracomment>No quick action on this side of the cover.</extracomment>
+        <translation>Nenhuma</translation>
+    </message>
+    <message>
+        <source>Choose a chat</source>
+        <extracomment>Over the list of chats, when picking the one a quick action on the cover opens.</extracomment>
+        <translation>Escolher uma conversa</translation>
+    </message>
+    <message>
+        <source>No chats yet</source>
+        <translation>Ainda sem conversas</translation>
+    </message>
+    <message>
+        <source>Deleted chat</source>
+        <extracomment>What a quick action says about its chat once that chat has been deleted.</extracomment>
+        <translation>Conversa eliminada</translation>
+    </message>
+</context>
+<context>
     <name>ReplyBar</name>
     <message>
         <source>Replying to %1</source>
@@ -1521,6 +1568,24 @@ Mensagens de contactos bloqueados não serão ocultadas noutros grupos.</transla
     <message>
         <source>Runs small apps inside chats. These features may be unstable and may be changed or removed.</source>
         <translation>Executa pequenas aplicações dentro das conversas. Estas funcionalidades podem ser instáveis e podem ser alteradas ou removidas.</translation>
+    </message>
+    <message>
+        <source>Quick actions</source>
+        <translation>Ações rápidas</translation>
+    </message>
+    <message>
+        <source>Left</source>
+        <extracomment>The quick action on the left of the cover.</extracomment>
+        <translation>Esquerda</translation>
+    </message>
+    <message>
+        <source>Right</source>
+        <extracomment>The quick action on the right of the cover.</extracomment>
+        <translation>Direita</translation>
+    </message>
+    <message>
+        <source>Piirit&apos;s cover on the home screen can show up to two buttons. Each button opens the chat or view you choose below.</source>
+        <translation>A capa do Piirit no ecrã inicial pode mostrar até dois botões. Cada botão abre a conversa ou a vista que escolher abaixo.</translation>
     </message>
 </context>
 <context>

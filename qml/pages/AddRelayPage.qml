@@ -28,6 +28,10 @@ import "../js/Relays.js" as Relays
 Page {
     id: page
 
+    /// The cover offers no quick actions while this is up: a jump away
+    /// would leave a relay halfway added. See piirit.qml.
+    readonly property bool pausesQuickActions: true
+
     property int accountId
 
     /// The relay chosen: the custom one if typed, else the picked one.

@@ -397,6 +397,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Lost the connection to the Delta Chat core. Reconnecting…</source>
         <translation>Delta Chat மையத்துடனான இணைப்பு துண்டிக்கப்பட்டது. மீண்டும் இணைக்கப்படுகிறது…</translation>
     </message>
+    <message>
+        <source>That chat no longer exists.</source>
+        <extracomment>A quick action on the cover was tapped, and the chat it was set up to open has been deleted since.</extracomment>
+        <translation>இந்த அரட்டை இனி இல்லை.</translation>
+    </message>
 </context>
 <context>
     <name>ChatMediaPage</name>
@@ -1188,6 +1193,48 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>QuickActionSetting</name>
+    <message>
+        <source>Chat</source>
+        <extracomment>A quick action on the cover that opens one chat.</extracomment>
+        <translation>அரட்டை</translation>
+    </message>
+    <message>
+        <source>Search</source>
+        <extracomment>A quick action on the cover that opens the chat list&apos;s search.</extracomment>
+        <translation>தேடு</translation>
+    </message>
+    <message>
+        <source>My QR code</source>
+        <extracomment>A quick action on the cover that shows this profile&apos;s QR code.</extracomment>
+        <translation>என் QR குறியீடு</translation>
+    </message>
+    <message>
+        <source>Scan QR code</source>
+        <extracomment>A quick action on the cover that opens the QR code scanner.</extracomment>
+        <translation>QR குறியீட்டை ஸ்கேன் செய்</translation>
+    </message>
+    <message>
+        <source>None</source>
+        <extracomment>No quick action on this side of the cover.</extracomment>
+        <translation>எதுவுமில்லை</translation>
+    </message>
+    <message>
+        <source>Choose a chat</source>
+        <extracomment>Over the list of chats, when picking the one a quick action on the cover opens.</extracomment>
+        <translation>அரட்டையைத் தேர்ந்தெடு</translation>
+    </message>
+    <message>
+        <source>No chats yet</source>
+        <translation>இன்னும் அரட்டைகள் இல்லை</translation>
+    </message>
+    <message>
+        <source>Deleted chat</source>
+        <extracomment>What a quick action says about its chat once that chat has been deleted.</extracomment>
+        <translation>நீக்கப்பட்ட அரட்டை</translation>
+    </message>
+</context>
+<context>
     <name>ReplyBar</name>
     <message>
         <source>Replying to %1</source>
@@ -1517,6 +1564,24 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Runs small apps inside chats. These features may be unstable and may be changed or removed.</source>
         <translation>அரட்டைகளுக்குள் சிறு செயலிகளை இயக்குகிறது. இந்த வசதிகள் நிலையற்றவையாக இருக்கலாம், மாற்றப்படலாம் அல்லது நீக்கப்படலாம்.</translation>
+    </message>
+    <message>
+        <source>Quick actions</source>
+        <translation>விரைவுச் செயல்கள்</translation>
+    </message>
+    <message>
+        <source>Left</source>
+        <extracomment>The quick action on the left of the cover.</extracomment>
+        <translation>இடது</translation>
+    </message>
+    <message>
+        <source>Right</source>
+        <extracomment>The quick action on the right of the cover.</extracomment>
+        <translation>வலது</translation>
+    </message>
+    <message>
+        <source>Piirit&apos;s cover on the home screen can show up to two buttons. Each button opens the chat or view you choose below.</source>
+        <translation>முகப்புத் திரையில் உள்ள Piirit அட்டை அதிகபட்சம் இரண்டு பொத்தான்களைக் காட்டலாம். ஒவ்வொரு பொத்தானும் கீழே நீங்கள் தேர்ந்தெடுக்கும் அரட்டையையோ காட்சியையோ திறக்கும்.</translation>
     </message>
 </context>
 <context>

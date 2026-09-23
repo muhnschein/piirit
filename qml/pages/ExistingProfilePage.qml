@@ -19,6 +19,10 @@ import "../components"
 Page {
     id: page
 
+    /// The cover offers no quick actions while this is up: it is the first
+    /// step of bringing a profile over. See piirit.qml.
+    readonly property bool pausesQuickActions: true
+
     allowedOrientations: Orientation.All
 
     function takeOver(from) {

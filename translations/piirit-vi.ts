@@ -396,6 +396,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Lost the connection to the Delta Chat core. Reconnecting…</source>
         <translation>Mất kết nối với lõi Delta Chat. Đang kết nối lại…</translation>
     </message>
+    <message>
+        <source>That chat no longer exists.</source>
+        <extracomment>A quick action on the cover was tapped, and the chat it was set up to open has been deleted since.</extracomment>
+        <translation>Cuộc trò chuyện đó không còn nữa.</translation>
+    </message>
 </context>
 <context>
     <name>ChatMediaPage</name>
@@ -1182,6 +1187,48 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>QuickActionSetting</name>
+    <message>
+        <source>Chat</source>
+        <extracomment>A quick action on the cover that opens one chat.</extracomment>
+        <translation>Trò chuyện</translation>
+    </message>
+    <message>
+        <source>Search</source>
+        <extracomment>A quick action on the cover that opens the chat list&apos;s search.</extracomment>
+        <translation>Tìm kiếm</translation>
+    </message>
+    <message>
+        <source>My QR code</source>
+        <extracomment>A quick action on the cover that shows this profile&apos;s QR code.</extracomment>
+        <translation>Mã QR của tôi</translation>
+    </message>
+    <message>
+        <source>Scan QR code</source>
+        <extracomment>A quick action on the cover that opens the QR code scanner.</extracomment>
+        <translation>Quét mã QR</translation>
+    </message>
+    <message>
+        <source>None</source>
+        <extracomment>No quick action on this side of the cover.</extracomment>
+        <translation>Không có</translation>
+    </message>
+    <message>
+        <source>Choose a chat</source>
+        <extracomment>Over the list of chats, when picking the one a quick action on the cover opens.</extracomment>
+        <translation>Chọn một cuộc trò chuyện</translation>
+    </message>
+    <message>
+        <source>No chats yet</source>
+        <translation>Chưa có cuộc trò chuyện nào</translation>
+    </message>
+    <message>
+        <source>Deleted chat</source>
+        <extracomment>What a quick action says about its chat once that chat has been deleted.</extracomment>
+        <translation>Cuộc trò chuyện đã bị xóa</translation>
+    </message>
+</context>
+<context>
     <name>ReplyBar</name>
     <message>
         <source>Replying to %1</source>
@@ -1511,6 +1558,24 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Runs small apps inside chats. These features may be unstable and may be changed or removed.</source>
         <translation>Chạy các ứng dụng nhỏ bên trong cuộc trò chuyện. Các tính năng này có thể không ổn định và có thể bị thay đổi hoặc gỡ bỏ.</translation>
+    </message>
+    <message>
+        <source>Quick actions</source>
+        <translation>Thao tác nhanh</translation>
+    </message>
+    <message>
+        <source>Left</source>
+        <extracomment>The quick action on the left of the cover.</extracomment>
+        <translation>Trái</translation>
+    </message>
+    <message>
+        <source>Right</source>
+        <extracomment>The quick action on the right of the cover.</extracomment>
+        <translation>Phải</translation>
+    </message>
+    <message>
+        <source>Piirit&apos;s cover on the home screen can show up to two buttons. Each button opens the chat or view you choose below.</source>
+        <translation>Bìa của Piirit trên màn hình chính có thể hiển thị tối đa hai nút. Mỗi nút mở cuộc trò chuyện hoặc màn hình mà bạn chọn bên dưới.</translation>
     </message>
 </context>
 <context>

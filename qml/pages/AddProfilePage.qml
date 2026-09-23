@@ -20,6 +20,10 @@ import "../components"
 Page {
     id: page
 
+    /// The cover offers no quick actions while this is up: it is the first
+    /// step of adding a profile. See piirit.qml.
+    readonly property bool pausesQuickActions: true
+
     function takeOver(from) {
         pageStack.push(Qt.resolvedUrl("RestoreProfilePage.qml"), { from: from })
     }

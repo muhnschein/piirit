@@ -89,6 +89,9 @@ struct State {
     /// Groups this account has left. The real core refuses every change
     /// to one of these.
     left_groups: std::collections::BTreeSet<u32>,
+    /// Chats deleted here. The real core cannot load one any more, and
+    /// says so to whatever asks for it by id.
+    deleted_chats: std::collections::BTreeSet<u32>,
     /// Accounts whose transport call has not been answered yet. The
     /// real core allows one ongoing process per account and refuses a
     /// second; see `add_transport_from_qr`.
@@ -1747,23 +1750,31 @@ async fn serve() {
                     } else {
                         vec![10]
                     };
-                    ok(
-                        &id,
-                        &json!({
-                            "id": chat,
-                            "chatType": if is_group { "Group" } else { "Single" },
-                            "name": state.chat_name(chat),
-                            "profileImage": state.group_images.get(&chat),
-                            "color": "#0071c7",
-                            "contactIds": members,
-                            // Both false once the account has left, as the
-                            // real core answers; a one-to-one chat is not
-                            // a group the account is "in" at all.
-                            "selfInGroup": is_group && !left,
-                            "canSend": !left,
-                            "ephemeralTimer": state.timers.get(&chat).copied().unwrap_or(0),
-                        }),
-                    )
+                    // The real core's words for a chat that is not there.
+                    if state.deleted_chats.contains(&chat) {
+                        err(
+                            &id,
+                            &format!("Failed to load chat {chat} from the database"),
+                        )
+                    } else {
+                        ok(
+                            &id,
+                            &json!({
+                                "id": chat,
+                                "chatType": if is_group { "Group" } else { "Single" },
+                                "name": state.chat_name(chat),
+                                "profileImage": state.group_images.get(&chat),
+                                "color": "#0071c7",
+                                "contactIds": members,
+                                // Both false once the account has left, as
+                                // the real core answers; a one-to-one chat
+                                // is not a group the account is "in" at all.
+                                "selfInGroup": is_group && !left,
+                                "canSend": !left,
+                                "ephemeralTimer": state.timers.get(&chat).copied().unwrap_or(0),
+                            }),
+                        )
+                    }
                 }
                 // Who is in a chat, ids only: what a conversation header
                 // counts. The same members `get_full_chat_by_id` names.
@@ -1991,6 +2002,7 @@ async fn serve() {
                     state.seed_chats();
                     state.chats.remove(&chat);
                     state.chat_order.retain(|id| *id != chat);
+                    state.deleted_chats.insert(chat);
                     ok(&id, &Value::Null)
                 }
                 "get_basic_chat_info" => {

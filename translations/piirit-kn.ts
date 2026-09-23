@@ -401,6 +401,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Lost the connection to the Delta Chat core. Reconnecting…</source>
         <translation>Delta Chat ಕೋರ್‌ನೊಂದಿಗಿನ ಸಂಪರ್ಕ ಕಡಿದುಹೋಗಿದೆ. ಮರುಸಂಪರ್ಕಿಸಲಾಗುತ್ತಿದೆ…</translation>
     </message>
+    <message>
+        <source>That chat no longer exists.</source>
+        <extracomment>A quick action on the cover was tapped, and the chat it was set up to open has been deleted since.</extracomment>
+        <translation>ಈ ಚಾಟ್ ಇನ್ನು ಅಸ್ತಿತ್ವದಲ್ಲಿಲ್ಲ.</translation>
+    </message>
 </context>
 <context>
     <name>ChatMediaPage</name>
@@ -1192,6 +1197,48 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>QuickActionSetting</name>
+    <message>
+        <source>Chat</source>
+        <extracomment>A quick action on the cover that opens one chat.</extracomment>
+        <translation>ಚಾಟ್</translation>
+    </message>
+    <message>
+        <source>Search</source>
+        <extracomment>A quick action on the cover that opens the chat list&apos;s search.</extracomment>
+        <translation>ಹುಡುಕಿ</translation>
+    </message>
+    <message>
+        <source>My QR code</source>
+        <extracomment>A quick action on the cover that shows this profile&apos;s QR code.</extracomment>
+        <translation>ನನ್ನ QR ಕೋಡ್</translation>
+    </message>
+    <message>
+        <source>Scan QR code</source>
+        <extracomment>A quick action on the cover that opens the QR code scanner.</extracomment>
+        <translation>QR ಕೋಡ್ ಸ್ಕ್ಯಾನ್ ಮಾಡಿ</translation>
+    </message>
+    <message>
+        <source>None</source>
+        <extracomment>No quick action on this side of the cover.</extracomment>
+        <translation>ಯಾವುದೂ ಇಲ್ಲ</translation>
+    </message>
+    <message>
+        <source>Choose a chat</source>
+        <extracomment>Over the list of chats, when picking the one a quick action on the cover opens.</extracomment>
+        <translation>ಚಾಟ್ ಆಯ್ಕೆಮಾಡಿ</translation>
+    </message>
+    <message>
+        <source>No chats yet</source>
+        <translation>ಇನ್ನೂ ಚಾಟ್‌ಗಳಿಲ್ಲ</translation>
+    </message>
+    <message>
+        <source>Deleted chat</source>
+        <extracomment>What a quick action says about its chat once that chat has been deleted.</extracomment>
+        <translation>ಅಳಿಸಲಾದ ಚಾಟ್</translation>
+    </message>
+</context>
+<context>
     <name>ReplyBar</name>
     <message>
         <source>Replying to %1</source>
@@ -1521,6 +1568,24 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Runs small apps inside chats. These features may be unstable and may be changed or removed.</source>
         <translation>ಸಂಭಾಷಣೆಗಳ ಒಳಗೆ ಸಣ್ಣ ಅನ್ವಯಗಳನ್ನು ಚಲಾಯಿಸುತ್ತದೆ. ಈ ಸೌಲಭ್ಯಗಳು ಅಸ್ಥಿರವಾಗಿರಬಹುದು ಮತ್ತು ಬದಲಾಗಬಹುದು ಅಥವಾ ತೆಗೆದುಹಾಕಬಹುದು.</translation>
+    </message>
+    <message>
+        <source>Quick actions</source>
+        <translation>ತ್ವರಿತ ಕ್ರಿಯೆಗಳು</translation>
+    </message>
+    <message>
+        <source>Left</source>
+        <extracomment>The quick action on the left of the cover.</extracomment>
+        <translation>ಎಡ</translation>
+    </message>
+    <message>
+        <source>Right</source>
+        <extracomment>The quick action on the right of the cover.</extracomment>
+        <translation>ಬಲ</translation>
+    </message>
+    <message>
+        <source>Piirit&apos;s cover on the home screen can show up to two buttons. Each button opens the chat or view you choose below.</source>
+        <translation>ಮುಖಪುಟ ಪರದೆಯಲ್ಲಿನ Piirit ಕವರ್ ಗರಿಷ್ಠ ಎರಡು ಬಟನ್‌ಗಳನ್ನು ತೋರಿಸಬಹುದು. ಪ್ರತಿ ಬಟನ್ ಕೆಳಗೆ ನೀವು ಆಯ್ಕೆಮಾಡುವ ಚಾಟ್ ಅಥವಾ ನೋಟವನ್ನು ತೆರೆಯುತ್ತದೆ.</translation>
     </message>
 </context>
 <context>

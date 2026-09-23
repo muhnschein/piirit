@@ -18,6 +18,10 @@ import Sailfish.Pickers 1.0
 FilePickerPage {
     id: picker
 
+    /// The cover offers no quick actions while this is up: it is the first
+    /// step of reading a backup back. See piirit.qml.
+    readonly property bool pausesQuickActions: true
+
     /// The absolute path of the chosen backup.
     signal picked(string path)
 

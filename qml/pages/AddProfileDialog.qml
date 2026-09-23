@@ -25,6 +25,10 @@ import "../js/Relays.js" as Relays
 Dialog {
     id: dialog
 
+    /// The cover offers no quick actions while this is up: a profile is
+    /// being made from it. See piirit.qml.
+    readonly property bool pausesQuickActions: true
+
     /// The relay chosen: the custom one if typed, else the picked one.
     property string domain: customField.text.trim().length > 0
                             ? customField.text.trim()

@@ -38,6 +38,11 @@ import "../components"
 Page {
     id: page
 
+    /// The cover offers no quick actions while this is up: a jump away
+    /// would leave a profile halfway through being brought over. See
+    /// piirit.qml.
+    readonly property bool pausesQuickActions: true
+
     allowedOrientations: Orientation.All
 
     /// Where the profile is coming from: `device` or `file`.

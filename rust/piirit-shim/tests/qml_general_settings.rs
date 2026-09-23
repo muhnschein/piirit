@@ -125,6 +125,9 @@ fn the_settings_page_writes_what_the_app_reads() {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
     }
 
+    // The quick actions look their chat up through the shim's own types.
+    piirit_shim::register_qml_types();
+
     // The page asks the core how much a deletion period would take; a
     // core never started answers that it is not there.
     let core_box = QObjectBox::new(DeltaChatCore::default());

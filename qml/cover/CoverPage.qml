@@ -2,6 +2,7 @@ import QtQuick 2.0
 import Sailfish.Silica 1.0
 import Piirit 1.0
 import "../components"
+import "../js/QuickActions.js" as QuickActions
 
 /*
  * What the cover has to say while the app is minimised: who is there,
@@ -29,6 +30,14 @@ import "../components"
  * onboarding. The people come out of each list as one JSON list
  * (`cover_people`): the grid is laid out in a pass over them, which a
  * view over the rows could not do.
+ *
+ * At its foot, up to two quick actions the reader chose in the settings:
+ * a chat, the search, this profile's QR code, or the scanner. The home
+ * screen draws them, in the strip along the bottom edge, and while they
+ * are there the grid sinks away into that strip rather than running
+ * under the icons -- the faces fade out towards the bottom, nothing is
+ * laid over them. What a tap does is the window's (piirit.qml); the cover
+ * only says which one it was.
  */
 CoverBackground {
     id: cover
@@ -74,6 +83,43 @@ CoverBackground {
     property var people: []
     /// Unread messages across every profile.
     property int unreadTotal: 0
+    /// Whether the app can take a quick action now. The window says: not
+    /// before there is a chat list to land on, and not while a page is up
+    /// that must not be jumped away from.
+    property bool quickActionsAllowed: true
+
+    /// A quick action was tapped: `side` is "left" or "right", as Settings
+    /// keeps them.
+    signal quickAction(string side)
+
+    readonly property var leftAction: QuickActions.read(Settings, "left")
+    readonly property var rightAction: QuickActions.read(Settings, "right")
+    /// Whether the home screen is drawing any actions: one set, and the
+    /// app able to take it.
+    readonly property bool actionsShown: cover.quickActionsAllowed
+        && (cover.leftAction.kind !== "" || cover.rightAction.kind !== "")
+
+    /// The picture for an action, as a whole URL: the home screen reads
+    /// the file itself, from outside the app. None for no action.
+    function actionIcon(action) {
+        if (action.kind === "") {
+            return ""
+        }
+        return Qt.resolvedUrl("../" + QuickActions.iconFile(
+            QuickActions.iconName(action), Theme.iconSizeSmall,
+            QuickActions.isLight(Theme.primaryColor)))
+    }
+
+    /// How tall the strip is that the home screen draws the actions in. A
+    /// cover cannot ask, so this is measured rather than derived, the way
+    /// vuo's cover measured it: the icons' tops sit about 18% of the
+    /// cover's height up, which a small item's height clears.
+    readonly property real actionStrip: Theme.itemSizeSmall
+    /// Where the faces stop being seen whole: above the strip while there
+    /// are actions in it, and the bottom edge otherwise.
+    readonly property real floor: cover.actionsShown
+                                  ? cover.height - cover.actionStrip
+                                  : cover.height
     /// What the grid draws: `{person, row, col, loud}` per cell, `person`
     /// null for an empty circle and `loud` on the cell of each person
     /// with something new.
@@ -136,7 +182,8 @@ CoverBackground {
     ///
     /// A cover is glanced at, so a face that matters cannot be one of
     /// the halves the shifted rows leave hanging off an edge, the row the
-    /// top cuts through, or the part-row the bottom cuts through. What is
+    /// top cuts through, or the part-row the bottom cuts through -- or,
+    /// with quick actions, the one fading into their strip. What is
     /// left is ranked by how far down the cover it is and then by how far
     /// out from the middle, which is the order an eye takes them in.
     function prominence(row, col) {
@@ -144,7 +191,7 @@ CoverBackground {
         var x = cover.cellX(row, col)
         var y = cover.cellY(row)
         var whole = x >= 0 && x + size <= cover.width
-                    && y >= 0 && y + size <= cover.height
+                    && y >= 0 && y + size <= cover.floor
         var fromMiddle = Math.abs((x + size / 2) - cover.width / 2) / size
         return (whole ? 0 : 100) + row * 2 + fromMiddle
     }
@@ -274,6 +321,8 @@ CoverBackground {
     }
     onRowsChanged: cover.gather()
     onWidthChanged: cover.gather()
+    // The cells worth having move with the strip.
+    onFloorChanged: cover.gather()
 
     // The grid, filling the cover and running past every edge: half a
     // cell at the sides on the shifted rows, most of a cell at the top,
@@ -283,6 +332,42 @@ CoverBackground {
         objectName: "avatarGrid"
         anchors.fill: parent
         clip: true
+
+        // The room for the actions, made by the grid rather than over it:
+        // towards the bottom edge the faces run out, over a band twice the
+        // strip's height, so the icons sit on the cover's own ground with
+        // the faces nearly gone around them. Eased rather than straight,
+        // as vuo's cover eases its texture away: most of the way down the
+        // band the faces keep their strength, and they give up the rest
+        // near the bottom -- a straight ramp reads as a wash laid over
+        // them. Off while there are no actions, so the faces run whole to
+        // the edge.
+        layer.enabled: cover.actionsShown
+        layer.effect: ShaderEffect {
+            objectName: "actionFade"
+            property real fadeFrom: grid.height - 2 * cover.actionStrip
+            property real fadeTo: grid.height
+            property real gridHeight: Math.max(1, grid.height)
+
+            // highp for the ramp, which runs over a good part of the cover
+            // and would band in steps at lowp.
+            fragmentShader: "
+                varying highp vec2 qt_TexCoord0;
+                uniform sampler2D source;
+                uniform highp float fadeFrom;
+                uniform highp float fadeTo;
+                uniform highp float gridHeight;
+                uniform lowp float qt_Opacity;
+
+                void main() {
+                    highp float y = qt_TexCoord0.y * gridHeight;
+                    highp float sink = clamp((fadeTo - y) / max(1.0, fadeTo - fadeFrom),
+                                             0.0, 1.0);
+                    // Premultiplied, so the whole colour goes with it.
+                    gl_FragColor = texture2D(source, qt_TexCoord0) * (sink * sink)
+                                   * qt_Opacity;
+                }"
+        }
 
         Repeater {
             model: cover.cells
@@ -351,6 +436,40 @@ CoverBackground {
                 text: qsTr("%1 new").arg(cover.unreadTotal > 99 ? "99+"
                                                                   : cover.unreadTotal)
             }
+        }
+    }
+
+    // The quick actions. A list holds what the home screen draws, and a
+    // cover can offer more than one list with only one on: two actions or
+    // one, whichever are set, and none while the app cannot take them.
+    CoverActionList {
+        objectName: "twoActions"
+        enabled: cover.actionsShown && cover.leftAction.kind !== ""
+                 && cover.rightAction.kind !== ""
+
+        CoverAction {
+            objectName: "leftAction"
+            iconSource: cover.actionIcon(cover.leftAction)
+            onTriggered: cover.quickAction("left")
+        }
+        CoverAction {
+            objectName: "rightAction"
+            iconSource: cover.actionIcon(cover.rightAction)
+            onTriggered: cover.quickAction("right")
+        }
+    }
+
+    CoverActionList {
+        objectName: "oneAction"
+        enabled: cover.actionsShown && (cover.leftAction.kind === "")
+                                       !== (cover.rightAction.kind === "")
+
+        CoverAction {
+            objectName: "onlyAction"
+            readonly property string side: cover.leftAction.kind !== "" ? "left" : "right"
+            iconSource: cover.actionIcon(side === "left" ? cover.leftAction
+                                                         : cover.rightAction)
+            onTriggered: cover.quickAction(side)
         }
     }
 }

@@ -23,6 +23,10 @@ import "../components"
 Page {
     id: page
 
+    /// The cover offers no quick actions while this is up: a jump away
+    /// would leave a profile halfway made. See piirit.qml.
+    readonly property bool pausesQuickActions: true
+
     property string displayName
     property string providerQr
     /// The relay's name, for the page to say.

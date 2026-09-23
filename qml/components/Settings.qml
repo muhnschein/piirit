@@ -7,8 +7,9 @@ import Nemo.Configuration 1.0
  * goes out with a link, how much of a picture or a video leaves with it,
  * how much of an attachment arrives unasked, how long a message is kept,
  * whether anything is announced at all and if so how much a notification
- * gives away and whether a muted group can still raise one, and whether
- * webxdc apps are offered at all.
+ * gives away and whether a muted group can still raise one, whether
+ * webxdc apps are offered at all, and which quick actions the cover
+ * offers.
  *
  * They live in dconf under the app's own path, and every page reads
  * them through this one object: the settings page (qml/pages/
@@ -71,6 +72,18 @@ QtObject {
     /// for, and every one of those three reads this rather than deciding
     /// for itself.
     property alias webxdcEnabled: webxdcEnabledValue.value
+    /// The cover's quick actions, the left one and the right: what each
+    /// does -- "" for nothing, "chat", "search", "qr" or "scan" -- and, for
+    /// a chat, the profile and chat it opens and the icon it wears.
+    /// qml/js/QuickActions.js reads them.
+    property alias quickActionLeft: quickActionLeftValue.value
+    property alias quickActionLeftAccount: quickActionLeftAccountValue.value
+    property alias quickActionLeftChat: quickActionLeftChatValue.value
+    property alias quickActionLeftIcon: quickActionLeftIconValue.value
+    property alias quickActionRight: quickActionRightValue.value
+    property alias quickActionRightAccount: quickActionRightAccountValue.value
+    property alias quickActionRightChat: quickActionRightChatValue.value
+    property alias quickActionRightIcon: quickActionRightIconValue.value
 
     // The keys, named here and nowhere else: tests/qml_syntax.rs holds
     // every other file to reading them through this object.
@@ -146,5 +159,55 @@ QtObject {
         // half of it that is ours is new enough to still be finding out
         // what it gets wrong.
         defaultValue: false
+    }
+
+    // None on a phone that has never been asked: the cover is the faces
+    // alone until the reader puts something on it.
+    property ConfigurationValue quickActionLeftConfig: ConfigurationValue {
+        id: quickActionLeftValue
+        key: "/apps/harbour-piirit/quick_action_left"
+        defaultValue: ""
+    }
+
+    property ConfigurationValue quickActionLeftAccountConfig: ConfigurationValue {
+        id: quickActionLeftAccountValue
+        key: "/apps/harbour-piirit/quick_action_left_account"
+        defaultValue: 0
+    }
+
+    property ConfigurationValue quickActionLeftChatConfig: ConfigurationValue {
+        id: quickActionLeftChatValue
+        key: "/apps/harbour-piirit/quick_action_left_chat"
+        defaultValue: 0
+    }
+
+    property ConfigurationValue quickActionLeftIconConfig: ConfigurationValue {
+        id: quickActionLeftIconValue
+        key: "/apps/harbour-piirit/quick_action_left_icon"
+        defaultValue: ""
+    }
+
+    property ConfigurationValue quickActionRightConfig: ConfigurationValue {
+        id: quickActionRightValue
+        key: "/apps/harbour-piirit/quick_action_right"
+        defaultValue: ""
+    }
+
+    property ConfigurationValue quickActionRightAccountConfig: ConfigurationValue {
+        id: quickActionRightAccountValue
+        key: "/apps/harbour-piirit/quick_action_right_account"
+        defaultValue: 0
+    }
+
+    property ConfigurationValue quickActionRightChatConfig: ConfigurationValue {
+        id: quickActionRightChatValue
+        key: "/apps/harbour-piirit/quick_action_right_chat"
+        defaultValue: 0
+    }
+
+    property ConfigurationValue quickActionRightIconConfig: ConfigurationValue {
+        id: quickActionRightIconValue
+        key: "/apps/harbour-piirit/quick_action_right_icon"
+        defaultValue: ""
     }
 }

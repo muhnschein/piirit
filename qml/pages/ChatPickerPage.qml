@@ -4,7 +4,8 @@ import "../components"
 import Piirit 1.0
 
 /*
- * Pick a chat to send something into.
+ * Pick a chat to send something into, or for a quick action on the cover
+ * to open.
  *
  * The list comes from the core with DC_GCL_FOR_FORWARDING, so it leaves
  * out the chats a forward would be refused by rather than offering them
@@ -27,6 +28,12 @@ Page {
     /// page's place -- and a page that popped itself first would take
     /// the chat with it.
     property bool closeOnPick: true
+
+    /// What the header says the chat is being picked for, and what the
+    /// list says when there is nothing in it. Forwarding's words unless
+    /// the page is opened for something else.
+    property string title: qsTr("Forward to")
+    property string emptyText: qsTr("No chats to forward to")
 
     /// The reader picked this chat.
     signal chatPicked(int chatId, string chatName)
@@ -71,7 +78,7 @@ Page {
         }
 
         PageHeader {
-            title: qsTr("Forward to")
+            title: page.title
         }
 
         SearchField {
@@ -127,7 +134,7 @@ Page {
             objectName: "chatsPlaceholder"
             // Not until the core has answered: see `chatsLoaded`.
             enabled: page.chatsLoaded && chats.count === 0
-            text: qsTr("No chats to forward to")
+            text: page.emptyText
         }
     }
 

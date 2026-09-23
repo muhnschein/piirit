@@ -7,13 +7,14 @@ import "../components"
  * goes out with a link, how much of a picture or a video leaves with it,
  * how much of an attachment arrives unasked, how long a message is kept,
  * whether anything is announced and how much a notification gives away
- * and whether a muted group can still raise one, and whether webxdc apps
- * are offered at all. Reached from the chat list's pull-down. A
- * profile's own settings -- picture, name, address, read receipts, what
- * the relay says, what it takes -- are on the profile's page,
- * reached from its row on the profiles page; that row also carries the
- * two things about a profile that are not settings, its invite code and
- * its backup, since the core's export does one account at a time.
+ * and whether a muted group can still raise one, what the cover's quick
+ * actions do, and whether webxdc apps are offered at all. Reached from
+ * the chat list's pull-down. A profile's own settings -- picture, name,
+ * address, read receipts, what the relay says, what it takes -- are on
+ * the profile's page, reached from its row on the profiles page; that
+ * row also carries the two things about a profile that are not settings,
+ * its invite code and its backup, since the core's export does one
+ * account at a time.
  *
  * The one exception to that division is the way into the block list,
  * under Privacy with the link cleaning, which is the other setting about
@@ -403,6 +404,39 @@ Page {
                 onClicked: pageStack.push(Qt.resolvedUrl("BlockedContactsPage.qml"), {
                     accountId: page.accountId
                 })
+            }
+
+            // The cover's quick actions, above Apps, with a line first
+            // saying what they are: nothing else in the app does.
+            SectionHeader {
+                text: qsTr("Quick actions")
+            }
+
+            Label {
+                objectName: "quickActionsExplained"
+                x: Theme.horizontalPageMargin
+                width: parent.width - 2 * Theme.horizontalPageMargin
+                wrapMode: Text.Wrap
+                textFormat: Text.PlainText
+                font.pixelSize: Theme.fontSizeSmall
+                color: Theme.secondaryHighlightColor
+                text: qsTr("Piirit's cover on the home screen can show up to two buttons. Each button opens the chat or view you choose below.")
+            }
+
+            QuickActionSetting {
+                objectName: "leftQuickAction"
+                side: "left"
+                accountId: page.accountId
+                //: The quick action on the left of the cover.
+                label: qsTr("Left")
+            }
+
+            QuickActionSetting {
+                objectName: "rightQuickAction"
+                side: "right"
+                accountId: page.accountId
+                //: The quick action on the right of the cover.
+                label: qsTr("Right")
             }
 
             SectionHeader {
