@@ -349,7 +349,11 @@ upload, and `docs/HARBOUR.md` says what the validator will say about it.
 | Validate against Harbour | 10 s | 10 s |
 | **The whole run** | **284 s** | **190 s** |
 
-Three changes, in the order they pay:
+`rpm.yml` runs one job. Four is faster when it finishes, but at two or
+four cargo stalls inside scratchbox2 often enough that the waiting costs
+more than the parallelism saves (see Spec constraints below).
+
+Two changes, in the order they pay:
 
 - **The SDK image is derived, not upstream's.** `ci/build-sdk-image.sh` takes
 `coderus/sailfishos-platform-sdk` by digest and produces an image with one
@@ -359,7 +363,6 @@ flatten the result rather than layer it, because files deleted in a new
 layer still weigh what they weighed. 5.04 GB of pull becomes about 2.3 GB,
 and `zypper` leaves the critical path.
 - `rust/target` and the crates are carried between runs.
-- cargo runs four jobs inside scratchbox2.
 
 ## What a package weighs
 
@@ -410,16 +413,16 @@ six and a half at one cargo job.
 
 Constraints encoded in `rpm/harbour-piirit.spec`:
 
-- **The cargo job count under sb2 is a define.** At `-j4` cargo can
-  futex-wait forever on an unreaped child while qmetaobject's C++ glue
-  compiles, so `%{jobs}` makes the count a setting rather than a
-  rediscovery: `mb2 build --define "jobs N"`, which
-  is what `rpm.yml`'s `cargo_jobs` input passes. It applies only inside
-  sb2; a native OBS worker lets cargo pick. The same spec also keeps the
-  build's temporaries in the build directory, because a parallel link
-  through the shared `/tmp` under sb2 can lose an object file it has just
-  written. It defaults to **4**. `--define "jobs 1"` is the way back if
-  one ever hangs.
+- **The cargo job count under sb2 is a define, and it is one.** At `-j2`
+  or `-j4` cargo stalls under sb2 -- it has been seen to futex-wait
+  forever on an unreaped child while qmetaobject's C++ glue compiles --
+  so `%{jobs}` defaults to **1**, and `rpm.yml` passes
+  `mb2 build --define "jobs 1"` on every run rather than offering a
+  choice. It applies only inside sb2; a native OBS worker lets cargo
+  pick. The same spec also keeps the build's temporaries in the build
+  directory, because a parallel link through the shared `/tmp` under sb2
+  can lose an object file it has just written. `--define "jobs N"` is
+  still there for a local build that wants to try more.
 - **No `--target` for cargo.** Jolla's cargo pins build scripts to the
   tooling's host triple; `--target` on top makes cargo treat the whole build
   as a cross build. `SB2_RUST_TARGET_TRIPLE` already tells the accelerated
