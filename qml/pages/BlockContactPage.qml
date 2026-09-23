@@ -5,7 +5,7 @@ import Piirit 1.0
 
 /*
  * Pick somebody to block: this profile's contacts, and a search over
- * them. Reached from the pull-down on the blocked contacts page, which
+ * them. Reached from the plus on the blocked contacts page, which
  * is where the reader ends up again once someone is picked.
  *
  * Only the contacts that are not blocked already are here -- that is the

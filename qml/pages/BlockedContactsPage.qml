@@ -18,7 +18,8 @@ import Piirit 1.0
  * A tap on a row lets that person back in, asked about first -- the row
  * is the whole of what a thumb can hit here, and an accidental one
  * undoes a decision the reader made on purpose. Blocking someone new is
- * the pull-down, which opens the contacts to pick from
+ * the plus under the last row -- where the profiles page offers another
+ * profile -- and it opens the contacts to pick from
  * (BlockContactPage.qml): a blocked contact is in neither list the rest
  * of the app offers, so this page is the only way back to them.
  *
@@ -81,82 +82,93 @@ Page {
         }
     }
 
-    // One flickable for the whole page, owning the pulley; see
-    // AddMembersPage.
-    SilicaFlickable {
-        id: pulleyHost
-        anchors.fill: parent
-        contentWidth: width
-        contentHeight: height
+    Column {
+        id: heading
+        anchors {
+            top: parent.top
+            left: parent.left
+            right: parent.right
+        }
 
-        PullDownMenu {
-            MenuItem {
-                objectName: "blockSomeone"
+        PageHeader {
+            title: qsTr("Blocked contacts")
+        }
+
+        Banner {
+            objectName: "errorBanner"
+            width: parent.width
+            text: page.errorMessage
+            onDismissed: page.errorMessage = ""
+        }
+    }
+
+    SilicaListView {
+        id: listView
+        anchors {
+            top: heading.bottom
+            left: parent.left
+            right: parent.right
+            bottom: parent.bottom
+        }
+        // Rows draw outside the list's own box otherwise, and the box
+        // starts under the header; see NewChatPage.
+        clip: true
+        model: blockList.rows
+
+        delegate: ListItem {
+            objectName: "blockedRow" + model.contact_id
+            contentHeight: body.height
+
+            ContactRow {
+                id: body
+                width: parent.width
+                displayName: model.display_name
+                ownColor: model.color
+                picturePath: model.avatar_path
+                isKeyContact: model.is_key_contact
+            }
+
+            onClicked: page.unblock(model.contact_id, model.display_name)
+        }
+
+        // The next one to block, where the next one would be listed: a
+        // row shaped like a contact's, with a plus for a picture, as the
+        // profiles page offers another profile.
+        footer: ListItem {
+            id: blockSomeoneRow
+            objectName: "blockSomeone"
+            width: listView.width
+            contentHeight: Theme.itemSizeSmall + 2 * Theme.paddingMedium
+
+            PlusMark {
+                id: plus
+                x: Theme.horizontalPageMargin
+                y: Theme.paddingMedium
+            }
+
+            Label {
+                x: plus.x + plus.width + Theme.paddingMedium
+                width: parent.width - x - Theme.horizontalPageMargin
+                anchors.verticalCenter: plus.verticalCenter
+                wrapMode: Text.Wrap
+                color: blockSomeoneRow.highlighted ? Theme.highlightColor
+                                                   : Theme.primaryColor
                 //: Opens the contacts, to pick one to block.
                 text: qsTr("Block contact")
-                onClicked: pageStack.push(Qt.resolvedUrl("BlockContactPage.qml"), {
-                    accountId: page.accountId
-                })
             }
+
+            onClicked: pageStack.push(Qt.resolvedUrl("BlockContactPage.qml"), {
+                accountId: page.accountId
+            })
         }
 
-        Column {
-            id: heading
-            anchors {
-                top: parent.top
-                left: parent.left
-                right: parent.right
-            }
-
-            PageHeader {
-                title: qsTr("Blocked contacts")
-            }
-
-            Banner {
-                objectName: "errorBanner"
-                width: parent.width
-                text: page.errorMessage
-                onDismissed: page.errorMessage = ""
-            }
-        }
-
-        SilicaListView {
-            id: listView
-            anchors {
-                top: heading.bottom
-                left: parent.left
-                right: parent.right
-                bottom: parent.bottom
-            }
-            // Rows draw outside the list's own box otherwise, and the box
-            // starts under the header; see NewChatPage.
-            clip: true
-            model: blockList.rows
-
-            delegate: ListItem {
-                objectName: "blockedRow" + model.contact_id
-                contentHeight: body.height
-
-                ContactRow {
-                    id: body
-                    width: parent.width
-                    displayName: model.display_name
-                    ownColor: model.color
-                    picturePath: model.avatar_path
-                    isKeyContact: model.is_key_contact
-                }
-
-                onClicked: page.unblock(model.contact_id, model.display_name)
-            }
-
-            ViewPlaceholder {
-                objectName: "nobodyBlocked"
-                // Not until the core has answered: see `blockListLoaded`.
-                enabled: page.blockListLoaded && blockList.count === 0
-                // deltachat-android's `blocked_empty_hint`, as the words
-                // on this page are its words throughout.
-                text: qsTr("Blocked contacts will appear here.")
-            }
+        ViewPlaceholder {
+            objectName: "nobodyBlocked"
+            // Not until the core has answered: see `blockListLoaded`.
+            enabled: page.blockListLoaded && blockList.count === 0
+            // deltachat-android's `blocked_empty_hint`, as the words
+            // on this page are its words throughout.
+            text: qsTr("Blocked contacts will appear here.")
         }
     }
 }
