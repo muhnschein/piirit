@@ -1632,6 +1632,11 @@ Wiadomości innych grup z zablokowanymi kontaktami nadal będą wyświetlane.</t
         <extracomment>The settings most readers never need to change.</extracomment>
         <translation>Zaawansowane</translation>
     </message>
+    <message>
+        <source>Applies to every chat, regardless of its disappearing messages setting. &quot;Saved messages&quot; are kept.</source>
+        <extracomment>&quot;Saved messages&quot; is the name of the chat with oneself.</extracomment>
+        <translation>Dotyczy każdego czatu, niezależnie od jego ustawienia znikających wiadomości. „Zapisane wiadomości” zostają.</translation>
+    </message>
 </context>
 <context>
     <name>ShareTarget</name>

@@ -1620,6 +1620,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <extracomment>The settings most readers never need to change.</extracomment>
         <translation>高级</translation>
     </message>
+    <message>
+        <source>Applies to every chat, regardless of its disappearing messages setting. &quot;Saved messages&quot; are kept.</source>
+        <extracomment>&quot;Saved messages&quot; is the name of the chat with oneself.</extracomment>
+        <translation>适用于所有聊天，无论其阅后即焚消息设置如何。“已保存的消息”会保留。</translation>
+    </message>
 </context>
 <context>
     <name>ShareTarget</name>

@@ -1626,6 +1626,11 @@ Mensagens de contactos bloqueados não serão ocultadas noutros grupos.</transla
         <extracomment>The settings most readers never need to change.</extracomment>
         <translation>Avançado</translation>
     </message>
+    <message>
+        <source>Applies to every chat, regardless of its disappearing messages setting. &quot;Saved messages&quot; are kept.</source>
+        <extracomment>&quot;Saved messages&quot; is the name of the chat with oneself.</extracomment>
+        <translation>Aplica-se a cada conversa, independentemente da sua definição de mensagens temporárias. &quot;Mensagens guardadas&quot; mantém-se.</translation>
+    </message>
 </context>
 <context>
     <name>ShareTarget</name>

@@ -1626,6 +1626,11 @@ Gli altri gruppi con contatti bloccati continueranno a visualizzare i loro messa
         <extracomment>The settings most readers never need to change.</extracomment>
         <translation>Avanzate</translation>
     </message>
+    <message>
+        <source>Applies to every chat, regardless of its disappearing messages setting. &quot;Saved messages&quot; are kept.</source>
+        <extracomment>&quot;Saved messages&quot; is the name of the chat with oneself.</extracomment>
+        <translation>Si applica a ogni chat, indipendentemente dall&apos;impostazione dei messaggi a scomparsa. &quot;Messaggi salvati&quot; viene conservato.</translation>
+    </message>
 </context>
 <context>
     <name>ShareTarget</name>
