@@ -7,6 +7,10 @@
 //! asked, and the page shows the send button rather than a microphone
 //! that could not work. That the platform's encoders exist is a device
 //! question; docs/HARBOUR.md lists it under what to try on a phone.
+//!
+//! So is the limit: the longest recording the relay takes follows from
+//! the limit and the media quality the strip is handed, and the time on
+//! the strip says nothing of it.
 
 // Qt harness: see qml_chat_list.rs.
 #![allow(
@@ -52,10 +56,21 @@ const PROBE_QML: &str = r"
             var recorder = findIn(loader.item, 'recorder')
             return recorder ? '' + recorder.extension : 'missing:recorder'
         }
+        function limit(bytes, quality) {
+            loader.item.limitBytes = bytes
+            loader.item.mediaQuality = quality
+            var recorder = findIn(loader.item, 'recorder')
+            return recorder ? '' + recorder.limit_ms : 'missing:recorder'
+        }
+        function timeText() {
+            var label = findIn(loader.item, 'recordingTime')
+            return label ? '' + label.text : 'missing:recordingTime'
+        }
     }
 ";
 
 #[test]
+#[allow(clippy::too_many_lines)]
 fn a_machine_that_cannot_record_is_told_so_and_records_nothing() {
     // SAFETY: single-threaded test binary; set before Qt starts.
     unsafe {
@@ -96,6 +111,12 @@ fn a_machine_that_cannot_record_is_told_so_and_records_nothing() {
         (*steps_ptr).push(("hidden", call!("get", QString::from("visible"))));
         (*steps_ptr).push(("height", call!("get", QString::from("height"))));
         (*steps_ptr).push(("start", call!("start")));
+        (*steps_ptr).push(("limit-unknown", call!("limit", 0.0_f64, 0_i32)));
+        // The real core's recommendation, (30 - 1) MiB * 3/4, at both
+        // bit rates.
+        (*steps_ptr).push(("limit-balanced", call!("limit", 22_806_528.0_f64, 0_i32)));
+        (*steps_ptr).push(("limit-less-data", call!("limit", 22_806_528.0_f64, 1_i32)));
+        (*steps_ptr).push(("time", call!("timeText")));
     });
     single_shot(Duration::from_secs(2), move || unsafe {
         (*steps_ptr).push(("heard", call!("heardText")));
@@ -146,5 +167,28 @@ fn a_machine_that_cannot_record_is_told_so_and_records_nothing() {
         value("heard"),
         "",
         "a start that could not happen was reported as something. {context}"
+    );
+
+    // No limit known yet: no end but the reader's.
+    assert_eq!(value("limit-unknown"), "0", "{context}");
+    // At 32 kbit/s every second is 4000 bytes, and at 24 it is 3000: the
+    // limit less a little headroom, as milliseconds of MP3.
+    assert_eq!(
+        value("limit-balanced"),
+        "5697536",
+        "the longest recording at the balanced bit rate is not what the \
+         relay's limit holds. {context}"
+    );
+    assert_eq!(
+        value("limit-less-data"),
+        "7596714",
+        "the lower media quality does not give a longer recording. {context}"
+    );
+    // Over an hour and a half, which nobody records: the recording stops
+    // and is sent there, and the time does not say so.
+    assert_eq!(
+        value("time"),
+        "Recording 0:00",
+        "the time on the strip says something besides the time. {context}"
     );
 }

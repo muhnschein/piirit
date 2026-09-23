@@ -65,6 +65,16 @@ fn one_second_wav() -> Vec<u8> {
     wav
 }
 
+/// A second of silence as the recorder's MP3s are made: MPEG-2 layer III,
+/// 16 kHz, one channel, a constant 32 kbit/s -- so every frame is the same
+/// four-byte header and 140 bytes of nothing, 576 samples, and there are
+/// as many frames as a second takes.
+fn one_second_mp3() -> Vec<u8> {
+    let mut frame = [0_u8; 144];
+    frame[..4].copy_from_slice(&[0xFF, 0xF3, 0x48, 0xC0]);
+    frame.repeat(16_000_usize.div_ceil(576))
+}
+
 /// A plain PNG `side` pixels square, stored rather than compressed.
 ///
 /// Big enough that the core has to recode it: past
@@ -1251,10 +1261,13 @@ async fn offline_round_trip_against_real_core() {
 
     let tone = std::env::temp_dir().join("piirit-real-server-tone.wav");
     std::fs::write(&tone, one_second_wav()).expect("write wav");
+    let recording = std::env::temp_dir().join("piirit-real-server-voice.mp3");
+    std::fs::write(&recording, one_second_mp3()).expect("write mp3");
 
     // A voice message, as ChatMessages::send_voice sends one: `send_msg`
     // with a MessageData naming the view type, since the core would
-    // classify the same file as Audio on its own (below). Answers with the
+    // classify the same file as Audio on its own (below), and an MP3, as
+    // the recorder makes one (piirit-shim/src/voice.rs). Answers with the
     // id alone, and the row read back carries the type asked for.
     let voice_id: u32 = client
         .call(
@@ -1263,7 +1276,7 @@ async fn offline_round_trip_against_real_core() {
                 sender_id,
                 saved,
                 serde_json::json!({
-                    "file": tone.to_string_lossy(),
+                    "file": recording.to_string_lossy(),
                     "viewtype": "Voice",
                     "quotedMessageId": Option::<u32>::None,
                 }),
@@ -1279,6 +1292,15 @@ async fn offline_round_trip_against_real_core() {
         voices[&voice_id].get("viewType").and_then(Value::as_str),
         Some("Voice"),
         "the core did not keep the Voice view type send_msg asked for: {:?}",
+        voices[&voice_id]
+    );
+    // The MIME type is what the other clients decide by, and the core
+    // names it from the file's suffix. The iOS client shows `audio/ogg` as
+    // a file rather than as a voice message; this is the one it plays.
+    assert_eq!(
+        voices[&voice_id].get("fileMime").and_then(Value::as_str),
+        Some("audio/mpeg"),
+        "a recording goes out as something other than MP3: {:?}",
         voices[&voice_id]
     );
     assert!(

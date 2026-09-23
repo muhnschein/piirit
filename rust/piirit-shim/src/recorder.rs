@@ -8,21 +8,27 @@
 //! is Rust. The exception is kept to this module, and to blocks short
 //! enough to be checked by reading.
 //!
-//! What is recorded goes through `GStreamer` on a device, in whatever
-//! codec and container it offers, in the order every client can play:
-//! AAC, which the phone clients record, then MP3 and FLAC, and only
-//! then Opus or Vorbis in Ogg, which the iOS client shows as a file
-//! rather than a voice message (`CODECS` says more). The file lands
-//! in the captures directory (`capture.rs`) and is sent as a voice
-//! message -- the core's `Voice` view type, which is what draws it as one
-//! at the other end rather than as a music file.
+//! What is recorded goes through `GStreamer` on a device, as plain
+//! samples in WAV, and is encoded to MP3 as it lands (`voice.rs`): the
+//! recorder offers nothing on the phone that every other client plays as
+//! a voice message, and that module says why MP3 is. The WAV is scratch
+//! beside the MP3 in the captures directory (`capture.rs`); the MP3 is
+//! sent as a voice message -- the core's `Voice` view type, which is what
+//! draws it as one at the other end rather than as a music file.
+//!
+//! A recording stops itself at the longest the relay takes. The page
+//! hands over the core's attachment limit, the recorder says how long a
+//! recording that fits is (`limit_ms`), and it stops there the way a tap
+//! on send stops it, so that what was said goes out rather than a file
+//! the relay refuses.
 //!
 //! Nothing is connected to the recorder's signals: the page polls, on a
 //! timer it runs only while recording, which is one call rather than a
-//! signal bridge. Stopping is asynchronous in the `GStreamer` backend --
-//! the file is finished a moment after `stop()` returns -- so the
-//! recording is reported once the recorder says it is no longer
-//! finalising, from that same poll.
+//! signal bridge, and each poll encodes what was written since the last.
+//! Stopping is asynchronous in the `GStreamer` backend -- the file is
+//! finished a moment after `stop()` returns -- so the recording is
+//! reported once the recorder says it is no longer finalising, from that
+//! same poll.
 
 // `cpp!` expands to a call across the FFI boundary, which is `unsafe` by
 // construction. Scoped to this file: the workspace denies it everywhere
@@ -30,9 +36,12 @@
 #![allow(unsafe_code)]
 
 use std::ffi::c_void;
+use std::path::PathBuf;
 
 use cpp::cpp;
 use qmetaobject::*;
+
+use crate::voice::{self, Transcoder};
 
 cpp! {{
     #include <QtCore/QCoreApplication>
@@ -44,87 +53,38 @@ cpp! {{
     #include <QtMultimedia/QMediaRecorder>
 }}
 
-/// A codec and container to record in, and what the file is then.
+/// The codec and container to record in, as the recorder names them.
 #[derive(Clone, Debug, PartialEq, Eq)]
 struct Format {
-    /// The codec, as the recorder names it.
+    /// Plain samples.
     codec: String,
-    /// The container, as the recorder names it.
+    /// WAV.
     container: String,
-    /// The extension that names the file, which is what the other end
-    /// goes by.
-    extension: &'static str,
-    /// Samples per second to ask for, or 0 for the backend's default.
-    sample_rate: i32,
 }
 
-/// The codecs worth recording a voice message in, best first: the words
-/// that pick one out of the recorder's list (any of them), the word that
-/// picks its container, the extension, and the sample rate.
+/// Pick plain samples in WAV out of what the recorder offers.
 ///
-/// What the recorder calls them varies: Qt's capture plugin names a
-/// codec `audio/opus` or `audio/FLAC` and a container `ogg` or `raw`,
-/// and a build that reads `GStreamer`'s own names says `audio/x-opus`
-/// and `application/ogg`. So a name is matched on whether it contains
-/// the word, in lower case.
+/// What the recorder calls them varies: Qt's capture plugin on Sailfish
+/// names them `audio/PCM` and `wav`, and a build that reads `GStreamer`'s
+/// own names says `audio/x-raw` and `audio/x-wav`. So a name is matched
+/// on whether it contains the word, in lower case.
 ///
-/// The order is what plays at the other end. Every Delta Chat client
-/// plays AAC and MP3; iOS plays FLAC but shows Ogg -- Opus or Vorbis --
-/// as a file rather than a voice message, so those come after it, and
-/// WAV is the last resort of a phone with no encoder at all.
-const CODECS: [(&[&str], &str, &str, i32); 6] = [
-    // AAC, which GStreamer names as MPEG-4 audio: what the Android and
-    // iOS clients record. Matched on the version, since MP3 is
-    // `audio/mpeg` too.
-    (&["mpegversion=(int)4", "audio/aac"], "mp4", "m4a", 0),
-    // MP3, as an elementary stream -- a file of MPEG audio frames is an
-    // MP3 file -- which is what the desktop client records.
-    (&["audio/mpeg"], "raw", "mp3", 22050),
-    // FLAC, likewise a stream of its own: lossless, so the voice band's
-    // sample rate keeps it small.
-    (&["flac"], "raw", "flac", 16000),
-    (&["opus"], "ogg", "ogg", 0),
-    (&["vorbis"], "ogg", "ogg", 0),
-    // Uncompressed, and large, but a phone with nothing else still
-    // records.
-    (&["pcm", "x-raw"], "wav", "wav", 16000),
-];
-
-/// The word that marks AAC among the `audio/mpeg` names: a codec that
-/// carries it is AAC and nothing else.
-const AAC_MARK: &str = "mpegversion=(int)4";
-
-/// Pick a codec and container from what the recorder offers.
-///
-/// A codec that has no container to go in is skipped, and nothing at
-/// all -- the headless test runner, or a phone with no `GStreamer`
-/// encoders -- is `None`, which the page shows as no microphone button.
+/// Nothing else is taken instead: the recorder's own encoders are what
+/// made voice messages FLAC, and Ogg is a file rather than a voice
+/// message on iOS. Neither offered -- the headless test runner, or a
+/// phone with no `GStreamer` at all -- is `None`, which the page shows as
+/// no microphone button.
 fn choose_format(codecs: &[String], containers: &[String]) -> Option<Format> {
-    let lower = |name: &String| name.to_ascii_lowercase();
-    for (words, container, extension, sample_rate) in CODECS {
-        let wants_aac = words.contains(&AAC_MARK);
-        let Some(found_codec) = codecs.iter().find(|name| {
-            let name = lower(name);
-            words.iter().any(|word| name.contains(word)) && (wants_aac || !name.contains(AAC_MARK))
-        }) else {
-            continue;
-        };
-        let Some(found_container) = containers.iter().find(|name| {
-            let name = lower(name);
-            // "wav" is offered as "audio/x-wav" and as "wav"; "mp4" as
-            // "video/quicktime, variant=(string)iso" as often as not.
-            name.contains(container) || (container == "mp4" && name.contains("quicktime"))
-        }) else {
-            continue;
-        };
-        return Some(Format {
-            codec: found_codec.clone(),
-            container: found_container.clone(),
-            extension,
-            sample_rate,
-        });
-    }
-    None
+    let named = |name: &&String, words: &[&str]| {
+        let name = name.to_ascii_lowercase();
+        words.iter().any(|word| name.contains(word))
+    };
+    let codec = codecs.iter().find(|name| named(name, &["pcm", "x-raw"]))?;
+    let container = containers.iter().find(|name| named(name, &["wav"]))?;
+    Some(Format {
+        codec: codec.clone(),
+        container: container.clone(),
+    })
 }
 
 /// `QMediaRecorder::Status`, as the C++ reports it.
@@ -135,7 +95,8 @@ const RECORDING_STATE: i32 = 1;
 /// Records a voice message.
 ///
 /// ```qml
-/// VoiceRecorder { id: recorder; onRecorded: messages.send_voice(path) }
+/// VoiceRecorder { id: recorder; limit_bytes: messages.attachment_limit
+///                 onRecorded: messages.send_voice(path) }
 /// IconButton { visible: recorder.available; onClicked: recorder.start(path) }
 /// Timer { running: recorder.recording; onTriggered: recorder.poll() }
 /// ```
@@ -152,9 +113,24 @@ pub struct VoiceRecorder {
     /// encoder to write it with. False headlessly, and on a phone with
     /// no encoders, and then the page offers no microphone.
     pub available: qt_property!(bool; READ is_available),
-    /// The extension a recording will have, from the codec chosen:
-    /// `ogg`, `m4a` or `wav`. Empty when nothing can be recorded.
+    /// The extension a recording will have: `mp3`, or empty when nothing
+    /// can be recorded.
     pub extension: qt_property!(QString; READ extension_name),
+
+    /// The largest file the relay takes, in bytes, from the core's
+    /// attachment limit; 0 while it is not known, and then a recording
+    /// has no end but the reader's. A real because QML has no 64-bit
+    /// integer.
+    pub limit_bytes: qt_property!(f64; WRITE set_limit_bytes NOTIFY limit_changed),
+    /// The reader's outgoing media quality, the core's `media_quality`: 0
+    /// balanced, 1 less data. What the MP3's bit rate follows.
+    pub media_quality: qt_property!(u32; WRITE set_media_quality NOTIFY limit_changed),
+    /// The longest a recording can be, in milliseconds, for its MP3 to
+    /// fit in [`Self::limit_bytes`]; 0 when there is no limit. While
+    /// recording, that of the recording under way.
+    pub limit_ms: qt_property!(u32; READ longest NOTIFY limit_changed),
+    /// Emitted when [`Self::limit_ms`] may have changed.
+    pub limit_changed: qt_signal!(),
 
     /// True from `start` until the recording is reported or dropped.
     pub recording: qt_property!(bool; NOTIFY recording_changed),
@@ -165,15 +141,17 @@ pub struct VoiceRecorder {
     /// Emitted when [`Self::duration_ms`] changes.
     pub duration_changed: qt_signal!(),
 
-    /// Start recording into `path`. Answers on `recorded` once `stop`
-    /// has been called and the file is finished, or on `error`.
+    /// Start recording into `path`, an MP3. Answers on `recorded` once
+    /// `stop` has been called, or the limit reached, and the file is
+    /// finished; or on `error`.
     pub start: qt_method!(fn(&mut self, path: QString)),
     /// Stop, and report the file once it is finished.
     pub stop: qt_method!(fn(&mut self)),
     /// Stop, and throw the file away.
     pub cancel: qt_method!(fn(&mut self)),
-    /// Re-read the duration, and finish a stop that is under way. The
-    /// page calls this on a timer while recording.
+    /// Encode what has been recorded since the last call, stop at the
+    /// limit, and finish a stop that is under way. The page calls this on
+    /// a timer while recording.
     pub poll: qt_method!(fn(&mut self)),
 
     /// The recording is finished and at `path`.
@@ -184,8 +162,10 @@ pub struct VoiceRecorder {
     /// The `QAudioRecorder`, made on first use: it needs the application
     /// object, which does not exist when QML builds this.
     handle: usize,
-    /// Where the recording is going.
+    /// Where the MP3 is going.
     path: String,
+    /// The WAV being made into it, while recording.
+    transcoder: Option<Transcoder>,
     /// `stop` has been called and the file is still being finished.
     finishing: bool,
     /// Cached from the recorder, so QML's bindings need not ask C++.
@@ -203,9 +183,51 @@ impl VoiceRecorder {
     /// The extension a recording will have.
     pub fn extension_name(&mut self) -> QString {
         self.probe();
-        self.chosen
-            .as_ref()
-            .map_or_else(QString::default, |format| QString::from(format.extension))
+        if self.chosen.is_some() {
+            QString::from("mp3")
+        } else {
+            QString::default()
+        }
+    }
+
+    /// Take the relay's limit, and hold a recording under way to it too.
+    pub fn set_limit_bytes(&mut self, bytes: f64) {
+        if self.limit_bytes.to_bits() == bytes.to_bits() {
+            return;
+        }
+        self.limit_bytes = bytes;
+        let limit = self.limit();
+        if let Some(transcoder) = self.transcoder.as_mut() {
+            transcoder.set_limit_bytes(limit);
+        }
+        self.limit_changed();
+    }
+
+    /// Take the reader's outgoing media quality, for the next recording.
+    pub fn set_media_quality(&mut self, quality: u32) {
+        if self.media_quality == quality {
+            return;
+        }
+        self.media_quality = quality;
+        self.limit_changed();
+    }
+
+    /// The limit as bytes; 0 while the core has not said.
+    fn limit(&self) -> u64 {
+        // Exact to 2^53 bytes, which no relay takes.
+        #[allow(clippy::cast_sign_loss, clippy::cast_possible_truncation)]
+        {
+            self.limit_bytes.max(0.0) as u64
+        }
+    }
+
+    /// The longest a recording can be, in milliseconds; 0 for no limit.
+    #[must_use]
+    pub fn longest(&self) -> u32 {
+        match &self.transcoder {
+            Some(transcoder) => transcoder.limit_ms(),
+            None => voice::longest_ms(self.limit(), voice::bit_rate(self.media_quality)),
+        }
     }
 
     /// Make the recorder if it is not there yet, and find out what it
@@ -269,10 +291,25 @@ impl VoiceRecorder {
             self.error(QString::from("nothing here can record sound"));
             return;
         }
+        // Beside the MP3, under a name of its own whatever the MP3 is
+        // called.
+        let wav = format!("{path}.wav");
+        let transcoder = match Transcoder::new(
+            PathBuf::from(&wav),
+            PathBuf::from(&path),
+            voice::bit_rate(self.media_quality),
+            self.limit(),
+        ) {
+            Ok(transcoder) => transcoder,
+            Err(message) => {
+                self.error(message.into());
+                return;
+            }
+        };
         let codec = QString::from(format.codec);
         let container = QString::from(format.container);
-        let sample_rate = format.sample_rate;
-        let location = QString::from(path.clone());
+        let sample_rate = i32::try_from(voice::SAMPLE_RATE).unwrap_or(0);
+        let location = QString::from(wav);
         let recorder = handle as *mut c_void;
         // SAFETY: `recorder` is the QAudioRecorder this object made and
         // still owns; the three QStrings are owned by this frame and read
@@ -295,15 +332,18 @@ impl VoiceRecorder {
             return recorder->error() == QMediaRecorder::NoError;
         });
         if !started {
+            transcoder.discard();
             self.error(QString::from(read_error(handle)));
             return;
         }
         self.path = path;
+        self.transcoder = Some(transcoder);
         self.finishing = false;
         self.duration_ms = 0;
         self.duration_changed();
         self.recording = true;
         self.recording_changed();
+        self.limit_changed();
     }
 
     /// Stop, and report the file once it is finished.
@@ -325,14 +365,11 @@ impl VoiceRecorder {
         }
         let handle = self.recorder();
         stop_recording(handle);
-        let _ = std::fs::remove_file(&self.path);
-        self.path.clear();
-        self.finishing = false;
-        self.recording = false;
-        self.recording_changed();
+        self.drop_recording(handle);
     }
 
-    /// Re-read the duration, and finish a stop that is under way.
+    /// Re-read the duration, encode what has been written since the last
+    /// poll, stop at the limit, and finish a stop that is under way.
     pub fn poll(&mut self) {
         if !self.recording {
             return;
@@ -344,39 +381,80 @@ impl VoiceRecorder {
             self.duration_changed();
         }
         if !error.is_empty() {
-            let _ = std::fs::remove_file(&self.path);
-            self.path.clear();
-            self.finishing = false;
-            self.recording = false;
-            self.recording_changed();
+            self.drop_recording(handle);
             self.error(error.into());
             return;
         }
-        if self.finishing && state != RECORDING_STATE && status != FINALIZING_STATUS {
-            // Where the backend put it, which is where it was asked to
-            // unless the backend had its own idea about the extension.
-            let actual = read_actual_location(handle);
-            let path = if actual.is_empty() {
-                std::mem::take(&mut self.path)
-            } else {
-                self.path.clear();
-                actual
-            };
-            self.finishing = false;
-            self.recording = false;
-            self.recording_changed();
-            if std::fs::metadata(&path).map_or(0, |meta| meta.len()) == 0 {
-                let _ = std::fs::remove_file(&path);
-                self.error(QString::from("nothing was recorded"));
-            } else {
-                self.recorded(path.into());
+        if self.finishing {
+            if state != RECORDING_STATE && status != FINALIZING_STATUS {
+                self.finish(handle);
             }
+            return;
         }
+        if let Err(message) = self.transcoder.as_mut().map_or(Ok(()), Transcoder::pump) {
+            stop_recording(handle);
+            self.drop_recording(handle);
+            self.error(message.into());
+            return;
+        }
+        // At the longest the relay takes: stop, and send what there is,
+        // as a tap on send would. The MP3 keeps to the limit whatever the
+        // recorder writes after this.
+        let limit = self.longest();
+        if limit > 0 && duration >= limit {
+            self.stop();
+        }
+    }
+
+    /// The recorder is done: finish the MP3 and report it.
+    fn finish(&mut self, handle: usize) {
+        let path = std::mem::take(&mut self.path);
+        let result = match self.transcoder.take() {
+            Some(mut transcoder) => {
+                // Where the backend put the WAV, which is where it was
+                // asked to unless the backend had its own idea about it.
+                let actual = read_actual_location(handle);
+                if !actual.is_empty() {
+                    transcoder.follow(PathBuf::from(actual));
+                }
+                transcoder.finish()
+            }
+            None => Ok(None),
+        };
+        self.finishing = false;
+        self.recording = false;
+        self.recording_changed();
+        self.limit_changed();
+        match result {
+            Ok(Some(_)) => self.recorded(path.into()),
+            Ok(None) => self.error(QString::from("nothing was recorded")),
+            Err(message) => self.error(message.into()),
+        }
+    }
+
+    /// Forget the recording under way, and remove what it wrote.
+    fn drop_recording(&mut self, handle: usize) {
+        if let Some(transcoder) = self.transcoder.take() {
+            transcoder.discard();
+        }
+        let actual = read_actual_location(handle);
+        if !actual.is_empty() {
+            let _ = std::fs::remove_file(actual);
+        }
+        self.path.clear();
+        self.finishing = false;
+        self.recording = false;
+        self.recording_changed();
+        self.limit_changed();
     }
 }
 
 impl Drop for VoiceRecorder {
     fn drop(&mut self) {
+        // A recording the page was closed on is not going anywhere.
+        if let Some(transcoder) = self.transcoder.take() {
+            transcoder.discard();
+        }
         if self.handle == 0 {
             return;
         }
@@ -521,73 +599,43 @@ mod tests {
         list.iter().map(ToString::to_string).collect()
     }
 
-    fn format(codec: &str, container: &str, extension: &'static str, sample_rate: i32) -> Format {
+    fn format(codec: &str, container: &str) -> Format {
         Format {
             codec: codec.into(),
             container: container.into(),
-            extension,
-            sample_rate,
         }
     }
 
     #[test]
-    fn the_list_is_walked_in_the_order_the_other_end_can_play() {
+    fn plain_samples_in_wav_are_what_is_recorded() {
         // What Qt's capture plugin lists on a Sailfish phone: its own
-        // names, MP3 as plain `audio/mpeg`, and no AAC.
-        let codecs = names(&[
-            "audio/mpeg",
-            "audio/vorbis",
-            "audio/opus",
-            "audio/FLAC",
-            "audio/PCM",
-        ]);
-        let containers = names(&["ogg", "wav", "raw", "matroska"]);
+        // names, FLAC and Ogg among them, and no AAC.
+        let codecs = names(&["audio/vorbis", "audio/PCM", "audio/FLAC", "audio/opus"]);
+        let containers = names(&["matroska", "ogg", "wav", "raw"]);
         assert_eq!(
             choose_format(&codecs, &containers),
-            Some(format("audio/mpeg", "raw", "mp3", 22050))
+            Some(format("audio/PCM", "wav"))
         );
-        // No MP3 encoder: FLAC, still a stream of its own.
-        let without_mp3 = names(&["audio/vorbis", "audio/opus", "audio/FLAC", "audio/PCM"]);
+        // MP3 offered too, where lamemp3enc is installed: still plain
+        // samples, which are made into MP3 at a bit rate of this app's
+        // choosing.
+        let with_mp3 = names(&["audio/mpeg", "audio/PCM", "audio/FLAC"]);
         assert_eq!(
-            choose_format(&without_mp3, &containers),
-            Some(format("audio/FLAC", "raw", "flac", 16000))
+            choose_format(&with_mp3, &containers),
+            Some(format("audio/PCM", "wav"))
         );
-        // Neither: opus in ogg, which plays everywhere but iOS.
-        let ogg_only = names(&["audio/vorbis", "audio/opus"]);
-        assert_eq!(
-            choose_format(&ogg_only, &containers),
-            Some(format("audio/opus", "ogg", "ogg", 0))
-        );
-        // A build that reads GStreamer's own names: AAC first, matched
-        // on its version, and MP3 -- `audio/mpeg` as well -- not taken
-        // for it.
-        let gst = names(&[
-            "audio/mpeg, mpegversion=(int)1, layer=(int)3",
-            "audio/x-flac",
-            "audio/x-opus",
-            "audio/mpeg, mpegversion=(int)4, stream-format=(string)raw",
-        ]);
-        let gst_containers = names(&[
-            "application/ogg",
-            "video/quicktime, variant=(string)iso",
-            "audio/x-wav",
-        ]);
+        // A build that reads GStreamer's own names.
+        let gst = names(&["audio/x-flac", "audio/x-raw", "audio/x-opus"]);
+        let gst_containers = names(&["application/ogg", "audio/x-wav"]);
         assert_eq!(
             choose_format(&gst, &gst_containers),
-            Some(format(
-                "audio/mpeg, mpegversion=(int)4, stream-format=(string)raw",
-                "video/quicktime, variant=(string)iso",
-                "m4a",
-                0
-            ))
+            Some(format("audio/x-raw", "audio/x-wav"))
         );
-        // AAC with no MP4 container is not MP3 in a raw stream either:
-        // it is skipped for the next thing that fits.
-        let no_mp4 = names(&["application/ogg", "audio/x-wav"]);
-        assert_eq!(
-            choose_format(&gst, &no_mp4),
-            Some(format("audio/x-opus", "application/ogg", "ogg", 0))
-        );
+        // Encoders but no plain samples, or no WAV to put them in: nothing,
+        // rather than a voice message iOS shows as a file.
+        let encoders_only = names(&["audio/FLAC", "audio/opus", "audio/vorbis"]);
+        assert_eq!(choose_format(&encoders_only, &containers), None);
+        assert_eq!(choose_format(&codecs, &names(&["ogg", "raw"])), None);
         // Nothing offered, as headlessly: nothing chosen.
         assert_eq!(choose_format(&[], &containers), None);
         assert_eq!(choose_format(&codecs, &[]), None);

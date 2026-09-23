@@ -105,7 +105,7 @@ fn a_recording_is_sent_as_a_voice_message() {
         // directory.
         call!(
             "send",
-            QString::from("/tmp/piirit-fake/captures/voice-20260904-151212.ogg")
+            QString::from("/tmp/piirit-fake/captures/voice-20260904-151212.mp3")
         );
     });
     single_shot(Duration::from_secs(6), move || unsafe {
@@ -153,7 +153,7 @@ fn a_recording_is_sent_as_a_voice_message() {
                     // anyone sees; both slots go over as null, which is
                     // what the core reads as absent.
                     "text": null,
-                    "file": "/tmp/piirit-fake/captures/voice-20260904-151212.ogg",
+                    "file": "/tmp/piirit-fake/captures/voice-20260904-151212.mp3",
                     "filename": null,
                     "viewtype": "Voice",
                     "quotedMessageId": null
