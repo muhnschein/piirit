@@ -1241,6 +1241,28 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>QuickActionsPage</name>
+    <message>
+        <source>Quick actions</source>
+        <translation>Greitieji veiksmai</translation>
+    </message>
+    <message>
+        <source>Piirit&apos;s cover on the home screen can show up to two quick actions.</source>
+        <extracomment>The cover is the app&apos;s thumbnail on the Sailfish home screen while the app runs in the background. Use the same word for &quot;quick actions&quot; as this page&apos;s title.</extracomment>
+        <translation>Piirit viršelis pradžios ekrane gali rodyti iki dviejų greitųjų veiksmų.</translation>
+    </message>
+    <message>
+        <source>Left</source>
+        <extracomment>The quick action on the left of the cover.</extracomment>
+        <translation>Kairė</translation>
+    </message>
+    <message>
+        <source>Right</source>
+        <extracomment>The quick action on the right of the cover.</extracomment>
+        <translation>Dešinė</translation>
+    </message>
+</context>
+<context>
     <name>ReplyBar</name>
     <message>
         <source>Replying to %1</source>
@@ -1586,8 +1608,29 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Dešinė</translation>
     </message>
     <message>
-        <source>Piirit&apos;s cover on the home screen can show up to two buttons. Each button opens the chat or view you choose below.</source>
-        <translation>Piirit viršelis pradžios ekrane gali rodyti iki dviejų mygtukų. Kiekvienas mygtukas atveria pokalbį arba rodinį, kurį pasirinksi žemiau.</translation>
+        <source>Chat</source>
+        <extracomment>A quick action on the cover that opens one chat.</extracomment>
+        <translation>Pokalbis</translation>
+    </message>
+    <message>
+        <source>Search</source>
+        <extracomment>A quick action on the cover that opens the chat list&apos;s search.</extracomment>
+        <translation>Ieškoti</translation>
+    </message>
+    <message>
+        <source>My QR code</source>
+        <extracomment>A quick action on the cover that shows this profile&apos;s QR code.</extracomment>
+        <translation>Mano QR kodas</translation>
+    </message>
+    <message>
+        <source>Scan QR code</source>
+        <extracomment>A quick action on the cover that opens the QR code scanner.</extracomment>
+        <translation>Nuskaityti QR kodą</translation>
+    </message>
+    <message>
+        <source>None</source>
+        <extracomment>No quick action on this side of the cover.</extracomment>
+        <translation>Nėra</translation>
     </message>
 </context>
 <context>

@@ -1,15 +1,22 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
 import Piirit 1.0
+// Settings is this directory's singleton, and Qt 5.6 only hands one out
+// through an import that names the directory: without this line the name
+// is the plain type, every read of it throws, and each binding on it
+// keeps its default -- the phone showed a chat's controls with no chat
+// action and wrote nothing at all.
+import "."
 import "../js/QuickActions.js" as QuickActions
 
 /*
- * One of the cover's two quick actions, as the settings page offers it:
+ * One of the cover's two quick actions, as QuickActionsPage offers it:
  * what it does, and for a chat, which chat and which icon it wears.
  *
  * A chat is picked on the chat picker, from the profile the settings were
- * opened from. Choosing "Chat" opens the picker, and the action is a
- * chat's only once one has been picked: backing out leaves it as it was.
+ * opened from, and the chat and the icons show only for a chat's action.
+ * Choosing "Chat" opens the picker, and the action is a chat's only once
+ * one has been picked: backing out leaves it as it was.
  * The chat's name is looked up rather than kept, so a renamed chat reads
  * as it is called now, and a deleted one says so.
  */

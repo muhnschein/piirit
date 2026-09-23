@@ -1239,6 +1239,28 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>QuickActionsPage</name>
+    <message>
+        <source>Quick actions</source>
+        <translation>ತ್ವರಿತ ಕ್ರಿಯೆಗಳು</translation>
+    </message>
+    <message>
+        <source>Piirit&apos;s cover on the home screen can show up to two quick actions.</source>
+        <extracomment>The cover is the app&apos;s thumbnail on the Sailfish home screen while the app runs in the background. Use the same word for &quot;quick actions&quot; as this page&apos;s title.</extracomment>
+        <translation>ಮುಖಪುಟ ಪರದೆಯಲ್ಲಿನ Piirit ಕವರ್ ಗರಿಷ್ಠ ಎರಡು ತ್ವರಿತ ಕ್ರಿಯೆಗಳನ್ನು ತೋರಿಸಬಹುದು.</translation>
+    </message>
+    <message>
+        <source>Left</source>
+        <extracomment>The quick action on the left of the cover.</extracomment>
+        <translation>ಎಡ</translation>
+    </message>
+    <message>
+        <source>Right</source>
+        <extracomment>The quick action on the right of the cover.</extracomment>
+        <translation>ಬಲ</translation>
+    </message>
+</context>
+<context>
     <name>ReplyBar</name>
     <message>
         <source>Replying to %1</source>
@@ -1584,8 +1606,29 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>ಬಲ</translation>
     </message>
     <message>
-        <source>Piirit&apos;s cover on the home screen can show up to two buttons. Each button opens the chat or view you choose below.</source>
-        <translation>ಮುಖಪುಟ ಪರದೆಯಲ್ಲಿನ Piirit ಕವರ್ ಗರಿಷ್ಠ ಎರಡು ಬಟನ್‌ಗಳನ್ನು ತೋರಿಸಬಹುದು. ಪ್ರತಿ ಬಟನ್ ಕೆಳಗೆ ನೀವು ಆಯ್ಕೆಮಾಡುವ ಚಾಟ್ ಅಥವಾ ನೋಟವನ್ನು ತೆರೆಯುತ್ತದೆ.</translation>
+        <source>Chat</source>
+        <extracomment>A quick action on the cover that opens one chat.</extracomment>
+        <translation>ಚಾಟ್</translation>
+    </message>
+    <message>
+        <source>Search</source>
+        <extracomment>A quick action on the cover that opens the chat list&apos;s search.</extracomment>
+        <translation>ಹುಡುಕಿ</translation>
+    </message>
+    <message>
+        <source>My QR code</source>
+        <extracomment>A quick action on the cover that shows this profile&apos;s QR code.</extracomment>
+        <translation>ನನ್ನ QR ಕೋಡ್</translation>
+    </message>
+    <message>
+        <source>Scan QR code</source>
+        <extracomment>A quick action on the cover that opens the QR code scanner.</extracomment>
+        <translation>QR ಕೋಡ್ ಸ್ಕ್ಯಾನ್ ಮಾಡಿ</translation>
+    </message>
+    <message>
+        <source>None</source>
+        <extracomment>No quick action on this side of the cover.</extracomment>
+        <translation>ಯಾವುದೂ ಇಲ್ಲ</translation>
     </message>
 </context>
 <context>

@@ -1235,6 +1235,28 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>QuickActionsPage</name>
+    <message>
+        <source>Quick actions</source>
+        <translation>Γρήγορες ενέργειες</translation>
+    </message>
+    <message>
+        <source>Piirit&apos;s cover on the home screen can show up to two quick actions.</source>
+        <extracomment>The cover is the app&apos;s thumbnail on the Sailfish home screen while the app runs in the background. Use the same word for &quot;quick actions&quot; as this page&apos;s title.</extracomment>
+        <translation>Το εξώφυλλο του Piirit στην αρχική οθόνη μπορεί να δείχνει έως δύο γρήγορες ενέργειες.</translation>
+    </message>
+    <message>
+        <source>Left</source>
+        <extracomment>The quick action on the left of the cover.</extracomment>
+        <translation>Αριστερά</translation>
+    </message>
+    <message>
+        <source>Right</source>
+        <extracomment>The quick action on the right of the cover.</extracomment>
+        <translation>Δεξιά</translation>
+    </message>
+</context>
+<context>
     <name>ReplyBar</name>
     <message>
         <source>Replying to %1</source>
@@ -1580,8 +1602,29 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Δεξιά</translation>
     </message>
     <message>
-        <source>Piirit&apos;s cover on the home screen can show up to two buttons. Each button opens the chat or view you choose below.</source>
-        <translation>Το εξώφυλλο του Piirit στην αρχική οθόνη μπορεί να δείχνει έως δύο κουμπιά. Κάθε κουμπί ανοίγει τη συνομιλία ή την προβολή που επιλέγεις παρακάτω.</translation>
+        <source>Chat</source>
+        <extracomment>A quick action on the cover that opens one chat.</extracomment>
+        <translation>Συνομιλία</translation>
+    </message>
+    <message>
+        <source>Search</source>
+        <extracomment>A quick action on the cover that opens the chat list&apos;s search.</extracomment>
+        <translation>Αναζήτηση</translation>
+    </message>
+    <message>
+        <source>My QR code</source>
+        <extracomment>A quick action on the cover that shows this profile&apos;s QR code.</extracomment>
+        <translation>Ο κωδικός QR μου</translation>
+    </message>
+    <message>
+        <source>Scan QR code</source>
+        <extracomment>A quick action on the cover that opens the QR code scanner.</extracomment>
+        <translation>Σάρωση κωδικού QR</translation>
+    </message>
+    <message>
+        <source>None</source>
+        <extracomment>No quick action on this side of the cover.</extracomment>
+        <translation>Καμία</translation>
     </message>
 </context>
 <context>

@@ -1,6 +1,7 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
 import "../components"
+import "../js/QuickActions.js" as QuickActions
 
 /*
  * The settings that belong to no profile: how a message is drawn, what
@@ -8,13 +9,13 @@ import "../components"
  * how much of an attachment arrives unasked, how long a message is kept,
  * whether anything is announced and how much a notification gives away
  * and whether a muted group can still raise one, what the cover's quick
- * actions do, and whether webxdc apps are offered at all. Reached from
- * the chat list's pull-down. A profile's own settings -- picture, name,
- * address, read receipts, what the relay says, what it takes -- are on
- * the profile's page, reached from its row on the profiles page; that
- * row also carries the two things about a profile that are not settings,
- * its invite code and its backup, since the core's export does one
- * account at a time.
+ * actions do (set up on a page of their own, QuickActionsPage.qml), and
+ * whether webxdc apps are offered at all. Reached from the chat list's
+ * pull-down. A profile's own settings -- picture, name, address, read
+ * receipts, what the relay says, what it takes -- are on the profile's
+ * page, reached from its row on the profiles page; that row also carries
+ * the two things about a profile that are not settings, its invite code
+ * and its backup, since the core's export does one account at a time.
  *
  * The one exception to that division is the way into the block list,
  * under Privacy with the link cleaning, which is the other setting about
@@ -120,6 +121,29 @@ Page {
 
     function notificationIndex(detail) {
         return detail >= 0 && detail <= 2 ? detail : 0
+    }
+
+    /// What a quick action on the cover does, in the words of the page
+    /// it is set up on (QuickActionSetting.qml).
+    function quickActionLabel(kind) {
+        switch (kind) {
+        //: A quick action on the cover that opens one chat.
+        case "chat": return qsTr("Chat")
+        //: A quick action on the cover that opens the chat list's search.
+        case "search": return qsTr("Search")
+        //: A quick action on the cover that shows this profile's QR code.
+        case "qr": return qsTr("My QR code")
+        //: A quick action on the cover that opens the QR code scanner.
+        case "scan": return qsTr("Scan QR code")
+        //: No quick action on this side of the cover.
+        default: return qsTr("None")
+        }
+    }
+
+    function openQuickActions() {
+        pageStack.push(Qt.resolvedUrl("QuickActionsPage.qml"), {
+            accountId: page.accountId
+        })
     }
 
     /// Put each choice back to what the setting holds. Silica writes
@@ -406,37 +430,29 @@ Page {
                 })
             }
 
-            // The cover's quick actions, above Apps, with a line first
-            // saying what they are: nothing else in the app does.
+            // The cover's quick actions, above Apps: what each side does
+            // now, one row each, and either row opens the page they are
+            // set up on (QuickActionsPage.qml). Not set up here: a chat's
+            // action brings a chat and a row of icons with it, which
+            // crowded this page.
             SectionHeader {
                 text: qsTr("Quick actions")
             }
 
-            Label {
-                objectName: "quickActionsExplained"
-                x: Theme.horizontalPageMargin
-                width: parent.width - 2 * Theme.horizontalPageMargin
-                wrapMode: Text.Wrap
-                textFormat: Text.PlainText
-                font.pixelSize: Theme.fontSizeSmall
-                color: Theme.secondaryHighlightColor
-                text: qsTr("Piirit's cover on the home screen can show up to two buttons. Each button opens the chat or view you choose below.")
-            }
-
-            QuickActionSetting {
-                objectName: "leftQuickAction"
-                side: "left"
-                accountId: page.accountId
+            ValueButton {
+                objectName: "leftQuickActionEntry"
                 //: The quick action on the left of the cover.
                 label: qsTr("Left")
+                value: page.quickActionLabel(QuickActions.read(Settings, "left").kind)
+                onClicked: page.openQuickActions()
             }
 
-            QuickActionSetting {
-                objectName: "rightQuickAction"
-                side: "right"
-                accountId: page.accountId
+            ValueButton {
+                objectName: "rightQuickActionEntry"
                 //: The quick action on the right of the cover.
                 label: qsTr("Right")
+                value: page.quickActionLabel(QuickActions.read(Settings, "right").kind)
+                onClicked: page.openQuickActions()
             }
 
             SectionHeader {

@@ -1,5 +1,7 @@
-//! The settings page's quick actions: a short word on what they are, then
-//! the left one and the right, all above Apps.
+//! The cover's quick actions in the settings: on the settings page, above
+//! Apps, one row a side saying what it does, either opening the page they
+//! are set up on; on that page, a short word on what they are, then the
+//! left one and the right.
 //!
 //! Each writes what it does to the settings, and shows what the settings
 //! hold. A chat is picked on the chat picker, and the action becomes a
@@ -149,7 +151,7 @@ const PROBE_QML: &str = r"
 
 #[test]
 #[allow(clippy::too_many_lines)]
-fn the_settings_page_sets_up_the_quick_actions() {
+fn the_quick_actions_are_set_up_on_a_page_of_their_own() {
     let temp =
         std::env::temp_dir().join(format!("piirit-qml-quick-settings-{}", std::process::id()));
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
@@ -211,15 +213,44 @@ fn the_settings_page_sets_up_the_quick_actions() {
     single_shot(Duration::from_secs(1), move || unsafe {
         record!("clear", call!("clear"));
         record!(
-            "load",
+            "load-settings",
             call!("load", QString::from(common::page_url("SettingsPage.qml")))
         );
 
-        // Where it all is: the word on what they are first, then left,
-        // then right, then Apps.
+        // On the settings page: a row a side, right under their heading
+        // and right above Apps, each saying what that side does.
         record!(
             "under-heading",
             call!("underHeading", QString::from("Quick actions"))
+        );
+        record!(
+            "after-left-entry",
+            call!("after", QString::from("leftQuickActionEntry"))
+        );
+        record!(
+            "after-right-entry",
+            call!("after", QString::from("rightQuickActionEntry"))
+        );
+        record!("left-entry-none", get!("leftQuickActionEntry", "value"));
+        record!("right-entry-none", get!("rightQuickActionEntry", "value"));
+        record!("open-left", click!("leftQuickActionEntry"));
+        record!("opened-left", call!("stackLog"));
+        record!("open-right", click!("rightQuickActionEntry"));
+        record!("opened-right", call!("stackLog"));
+
+        record!(
+            "load",
+            call!(
+                "load",
+                QString::from(common::page_url("QuickActionsPage.qml"))
+            )
+        );
+
+        // On their page: the word on what they are first, then left, then
+        // right.
+        record!(
+            "after-header",
+            call!("after", QString::from("quickActionsHeader"))
         );
         record!(
             "after-words",
@@ -289,6 +320,15 @@ fn the_settings_page_sets_up_the_quick_actions() {
     single_shot(Duration::from_secs(5), move || unsafe {
         record!("gone-name", get!("leftActionChatButton", "value"));
         record!("left-gone", call!("holds", QString::from("left")));
+
+        // Back on the settings page, the rows say what was set up.
+        record!("pick-qr-again", click!("rightAction-qr"));
+        record!(
+            "reload-settings",
+            call!("load", QString::from(common::page_url("SettingsPage.qml")))
+        );
+        record!("left-entry-chat", get!("leftQuickActionEntry", "value"));
+        record!("right-entry-qr", get!("rightQuickActionEntry", "value"));
         (*engine_ptr).quit();
     });
 
@@ -304,22 +344,59 @@ fn the_settings_page_sets_up_the_quick_actions() {
     let context = format!("steps: {steps:?}");
 
     assert_eq!(
-        value("load"),
+        value("load-settings"),
         "ok",
         "the settings page did not load. {context}"
     );
     assert_eq!(
         value("under-heading"),
+        "leftQuickActionEntry",
+        "the left action's row is not right under the quick actions' \
+         heading. {context}"
+    );
+    assert_eq!(
+        value("after-left-entry"),
+        "rightQuickActionEntry",
+        "{context}"
+    );
+    assert_eq!(
+        value("after-right-entry"),
+        "heading:Apps",
+        "the quick actions are not right above Apps. {context}"
+    );
+    for label in ["left-entry-none", "right-entry-none"] {
+        assert_eq!(
+            value(label),
+            "None",
+            "a fresh phone's row does not say there is no action ({label}). \
+             {context}"
+        );
+    }
+    for label in ["opened-left", "opened-right"] {
+        assert_eq!(
+            value(label),
+            "push:QuickActionsPage.qml:1:undefined|",
+            "a row does not open the quick actions' page for this profile \
+             ({label}). {context}"
+        );
+    }
+    assert_eq!(
+        value("load"),
+        "ok",
+        "the quick actions' page did not load. {context}"
+    );
+    assert_eq!(
+        value("after-header"),
         "quickActionsExplained",
-        "the quick actions are not explained right under their heading. \
-         {context}"
+        "the quick actions are not explained right under the page's \
+         header. {context}"
     );
     assert_eq!(value("after-words"), "leftQuickAction", "{context}");
     assert_eq!(value("after-left"), "rightQuickAction", "{context}");
     assert_eq!(
         value("after-right"),
-        "heading:Apps",
-        "the quick actions are not right above Apps. {context}"
+        "nothing",
+        "something follows the right action on its page. {context}"
     );
     assert!(
         !value("words").is_empty(),
@@ -392,5 +469,20 @@ fn the_settings_page_sets_up_the_quick_actions() {
         value("left-gone"),
         "chat|1|1|star",
         "picking another chat lost the icon. {context}"
+    );
+    assert_eq!(
+        value("reload-settings"),
+        "ok",
+        "the settings page did not load again. {context}"
+    );
+    assert_eq!(
+        value("left-entry-chat"),
+        "Chat",
+        "the left row does not say it opens a chat. {context}"
+    );
+    assert_eq!(
+        value("right-entry-qr"),
+        "My QR code",
+        "the right row does not say it shows the QR code. {context}"
     );
 }

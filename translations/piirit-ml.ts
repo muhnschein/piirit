@@ -1239,6 +1239,28 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>QuickActionsPage</name>
+    <message>
+        <source>Quick actions</source>
+        <translation>ദ്രുത പ്രവർത്തനങ്ങൾ</translation>
+    </message>
+    <message>
+        <source>Piirit&apos;s cover on the home screen can show up to two quick actions.</source>
+        <extracomment>The cover is the app&apos;s thumbnail on the Sailfish home screen while the app runs in the background. Use the same word for &quot;quick actions&quot; as this page&apos;s title.</extracomment>
+        <translation>ഹോം സ്ക്രീനിലെ Piirit കവറിന് പരമാവധി രണ്ട് ദ്രുത പ്രവർത്തനങ്ങൾ കാണിക്കാം.</translation>
+    </message>
+    <message>
+        <source>Left</source>
+        <extracomment>The quick action on the left of the cover.</extracomment>
+        <translation>ഇടത്</translation>
+    </message>
+    <message>
+        <source>Right</source>
+        <extracomment>The quick action on the right of the cover.</extracomment>
+        <translation>വലത്</translation>
+    </message>
+</context>
+<context>
     <name>ReplyBar</name>
     <message>
         <source>Replying to %1</source>
@@ -1584,8 +1606,29 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>വലത്</translation>
     </message>
     <message>
-        <source>Piirit&apos;s cover on the home screen can show up to two buttons. Each button opens the chat or view you choose below.</source>
-        <translation>ഹോം സ്ക്രീനിലെ Piirit കവറിന് പരമാവധി രണ്ട് ബട്ടണുകൾ കാണിക്കാം. ഓരോ ബട്ടണും താഴെ നിങ്ങൾ തിരഞ്ഞെടുക്കുന്ന ചാറ്റോ കാഴ്ചയോ തുറക്കുന്നു.</translation>
+        <source>Chat</source>
+        <extracomment>A quick action on the cover that opens one chat.</extracomment>
+        <translation>ചാറ്റ്</translation>
+    </message>
+    <message>
+        <source>Search</source>
+        <extracomment>A quick action on the cover that opens the chat list&apos;s search.</extracomment>
+        <translation>തിരയുക</translation>
+    </message>
+    <message>
+        <source>My QR code</source>
+        <extracomment>A quick action on the cover that shows this profile&apos;s QR code.</extracomment>
+        <translation>എന്റെ QR കോഡ്</translation>
+    </message>
+    <message>
+        <source>Scan QR code</source>
+        <extracomment>A quick action on the cover that opens the QR code scanner.</extracomment>
+        <translation>QR കോഡ് സ്കാൻ ചെയ്യുക</translation>
+    </message>
+    <message>
+        <source>None</source>
+        <extracomment>No quick action on this side of the cover.</extracomment>
+        <translation>ഒന്നുമില്ല</translation>
     </message>
 </context>
 <context>
