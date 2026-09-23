@@ -1632,6 +1632,11 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
         <extracomment>The settings most readers never need to change.</extracomment>
         <translation>Pokročilé</translation>
     </message>
+    <message>
+        <source>Applies to every chat, regardless of its disappearing messages setting. &quot;Saved messages&quot; are kept.</source>
+        <extracomment>&quot;Saved messages&quot; is the name of the chat with oneself.</extracomment>
+        <translation>Platí pro každý chat bez ohledu na jeho nastavení mizejících zpráv. „Uložené zprávy“ zůstávají.</translation>
+    </message>
 </context>
 <context>
     <name>ShareTarget</name>

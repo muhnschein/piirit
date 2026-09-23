@@ -1632,6 +1632,11 @@ Správy od zablokovaných kontaktov v ostatných skupinách sa budú naďalej zo
         <extracomment>The settings most readers never need to change.</extracomment>
         <translation>Rozšírené</translation>
     </message>
+    <message>
+        <source>Applies to every chat, regardless of its disappearing messages setting. &quot;Saved messages&quot; are kept.</source>
+        <extracomment>&quot;Saved messages&quot; is the name of the chat with oneself.</extracomment>
+        <translation>Platí pre každý chat bez ohľadu na jeho nastavenie miznúcich správ. „Uložené správy“ zostávajú.</translation>
+    </message>
 </context>
 <context>
     <name>ShareTarget</name>

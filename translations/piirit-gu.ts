@@ -1626,6 +1626,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <extracomment>The settings most readers never need to change.</extracomment>
         <translation>અદ્યતન</translation>
     </message>
+    <message>
+        <source>Applies to every chat, regardless of its disappearing messages setting. &quot;Saved messages&quot; are kept.</source>
+        <extracomment>&quot;Saved messages&quot; is the name of the chat with oneself.</extracomment>
+        <translation>દરેક ચેટ પર લાગુ થાય છે, ભલે તેની ગાયબ થતા સંદેશની સેટિંગ ગમે તે હોય. &quot;સાચવેલા સંદેશ&quot; રાખવામાં આવે છે.</translation>
+    </message>
 </context>
 <context>
     <name>ShareTarget</name>

@@ -3,7 +3,7 @@
 //! The settings page carries the only row on it that opens a page rather
 //! than setting something, and hands it the profile: the core keeps a
 //! block list per account. Behind it are the blocked contacts, the
-//! picker its pull-down opens, and the question each of them asks before
+//! picker its plus opens, and the question each of them asks before
 //! anything is sent. This drives the whole of that against the fake core,
 //! with a page stack that hands each page a dialog to connect to and lets
 //! the test accept it -- the arrangement `qml_auto_delete_flow` uses.
@@ -197,7 +197,7 @@ fn a_contact_is_blocked_and_let_back_in_from_the_settings() {
         record!("pushed-blocked", call!("pushed"));
     });
 
-    // Nobody is blocked yet, and the pull-down is the way to change that.
+    // Nobody is blocked yet, and the plus is the way to change that.
     single_shot(Duration::from_secs(4), move || unsafe {
         record!(
             "load-blocked",
@@ -221,7 +221,7 @@ fn a_contact_is_blocked_and_let_back_in_from_the_settings() {
                 QString::from("enabled")
             )
         );
-        record!("pull-down", call!("click", QString::from("blockSomeone")));
+        record!("plus", call!("click", QString::from("blockSomeone")));
         record!("pushed-picker", call!("pushed"));
         record!(
             "load-picker",
@@ -304,7 +304,7 @@ fn a_contact_is_blocked_and_let_back_in_from_the_settings() {
         "load-picker",
         "load-blocked-again",
         "open-blocked",
-        "pull-down",
+        "plus",
         "tap-contact",
         "tap-blocked",
         "accept-block",
@@ -332,7 +332,7 @@ fn a_contact_is_blocked_and_let_back_in_from_the_settings() {
     assert_eq!(
         value("pushed-picker"),
         "BlockContactPage.qml:accountId=1",
-        "the pull-down did not open the contacts to pick from. {context}"
+        "the plus did not open the contacts to pick from. {context}"
     );
     assert_eq!(
         value("contacts-before"),

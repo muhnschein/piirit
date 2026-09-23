@@ -1638,6 +1638,11 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
         <extracomment>The settings most readers never need to change.</extracomment>
         <translation>Napredno</translation>
     </message>
+    <message>
+        <source>Applies to every chat, regardless of its disappearing messages setting. &quot;Saved messages&quot; are kept.</source>
+        <extracomment>&quot;Saved messages&quot; is the name of the chat with oneself.</extracomment>
+        <translation>Velja za vsak klepet, ne glede na njegovo nastavitev izginjajočih sporočil. »Shranjena sporočila« ostanejo.</translation>
+    </message>
 </context>
 <context>
     <name>ShareTarget</name>
