@@ -190,7 +190,7 @@
     </message>
     <message>
         <source>Swipe on for your chats.</source>
-        <translation>Sveip videre til chattene dine.</translation>
+        <translation>Sveip videre til samtalene dine.</translation>
     </message>
     <message>
         <source>Start backup</source>
@@ -286,7 +286,7 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
     <message>
         <source>Archived chats</source>
-        <translation>Arkiverte chatter</translation>
+        <translation>Arkiverte samtaler</translation>
     </message>
     <message>
         <source>New chat</source>
@@ -298,7 +298,7 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
     <message>
         <source>Chats</source>
-        <translation>Chatter</translation>
+        <translation>Samtaler</translation>
     </message>
     <message>
         <source>Pinned</source>
@@ -306,7 +306,7 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
     <message>
         <source>Other chats</source>
-        <translation>Andre chatter</translation>
+        <translation>Andre samtaler</translation>
     </message>
     <message>
         <source>Mark as read</source>
@@ -355,11 +355,11 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
     <message>
         <source>No archived chats</source>
-        <translation>Ingen arkiverte chatter</translation>
+        <translation>Ingen arkiverte samtaler</translation>
     </message>
     <message>
         <source>No chats yet</source>
-        <translation>Ingen chatter ennå</translation>
+        <translation>Ingen samtaler ennå</translation>
     </message>
     <message>
         <source>Pull down to start one</source>
@@ -428,7 +428,7 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
     <message>
         <source>No chats to forward to</source>
-        <translation>Ingen chatter å videresende til</translation>
+        <translation>Ingen samtaler å videresende til</translation>
     </message>
     <message>
         <source>Search</source>
@@ -1324,7 +1324,7 @@ Other groups with blocked contacts will still show their messages.</source>
     <name>SearchResultsList</name>
     <message>
         <source>Chats (%1)</source>
-        <translation>Chatter (%1)</translation>
+        <translation>Samtaler (%1)</translation>
     </message>
     <message>
         <source>Contacts (%1)</source>
@@ -1359,7 +1359,7 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
     <message>
         <source>Swipe on for your chats.</source>
-        <translation>Sveip videre til chattene dine.</translation>
+        <translation>Sveip videre til samtalene dine.</translation>
     </message>
     <message>
         <source>Show code again</source>
@@ -1540,7 +1540,7 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
     <message>
         <source>Runs small apps inside chats. These features may be unstable and may be changed or removed.</source>
-        <translation>Kjører små apper inne i chatter. Disse funksjonene kan være ustabile og kan bli endret eller fjernet.</translation>
+        <translation>Kjører små apper inne i samtaler. Disse funksjonene kan være ustabile og kan bli endret eller fjernet.</translation>
     </message>
 </context>
 <context>
