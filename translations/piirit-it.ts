@@ -447,6 +447,11 @@ Gli altri gruppi con contatti bloccati continueranno a visualizzare i loro messa
         <source>Search</source>
         <translation>Cerca</translation>
     </message>
+    <message>
+        <source>Profile</source>
+        <extracomment>Over a list of chats to pick from: which profile&apos;s chats they are.</extracomment>
+        <translation>Profilo</translation>
+    </message>
 </context>
 <context>
     <name>ContactPage</name>
@@ -1241,6 +1246,11 @@ Gli altri gruppi con contatti bloccati continueranno a visualizzare i loro messa
         <source>Chat: %1</source>
         <extracomment>A quick action on the cover that opens one chat, with the chat&apos;s name.</extracomment>
         <translation>Chat: %1</translation>
+    </message>
+    <message>
+        <source>Profiles</source>
+        <extracomment>A quick action on the cover that opens the list of profiles.</extracomment>
+        <translation>Profili</translation>
     </message>
 </context>
 <context>

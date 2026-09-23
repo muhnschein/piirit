@@ -447,6 +447,11 @@ Vous continuerez à voir les messages des contacts bloqués dans les autres grou
         <source>Search</source>
         <translation>Rechercher</translation>
     </message>
+    <message>
+        <source>Profile</source>
+        <extracomment>Over a list of chats to pick from: which profile&apos;s chats they are.</extracomment>
+        <translation>Profil</translation>
+    </message>
 </context>
 <context>
     <name>ContactPage</name>
@@ -1241,6 +1246,11 @@ Vous continuerez à voir les messages des contacts bloqués dans les autres grou
         <source>Chat: %1</source>
         <extracomment>A quick action on the cover that opens one chat, with the chat&apos;s name.</extracomment>
         <translation>Discussion : %1</translation>
+    </message>
+    <message>
+        <source>Profiles</source>
+        <extracomment>A quick action on the cover that opens the list of profiles.</extracomment>
+        <translation>Profils</translation>
     </message>
 </context>
 <context>

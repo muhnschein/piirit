@@ -448,6 +448,11 @@ Správy od zablokovaných kontaktov v ostatných skupinách sa budú naďalej zo
         <source>Search</source>
         <translation>Hľadať</translation>
     </message>
+    <message>
+        <source>Profile</source>
+        <extracomment>Over a list of chats to pick from: which profile&apos;s chats they are.</extracomment>
+        <translation>Profil</translation>
+    </message>
 </context>
 <context>
     <name>ContactPage</name>
@@ -1247,6 +1252,11 @@ Správy od zablokovaných kontaktov v ostatných skupinách sa budú naďalej zo
         <source>Chat: %1</source>
         <extracomment>A quick action on the cover that opens one chat, with the chat&apos;s name.</extracomment>
         <translation>Chat: %1</translation>
+    </message>
+    <message>
+        <source>Profiles</source>
+        <extracomment>A quick action on the cover that opens the list of profiles.</extracomment>
+        <translation>Profily</translation>
     </message>
 </context>
 <context>

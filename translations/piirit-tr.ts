@@ -446,6 +446,11 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
         <source>Search</source>
         <translation>Ara</translation>
     </message>
+    <message>
+        <source>Profile</source>
+        <extracomment>Over a list of chats to pick from: which profile&apos;s chats they are.</extracomment>
+        <translation>Profil</translation>
+    </message>
 </context>
 <context>
     <name>ContactPage</name>
@@ -1235,6 +1240,11 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
         <source>Chat: %1</source>
         <extracomment>A quick action on the cover that opens one chat, with the chat&apos;s name.</extracomment>
         <translation>Sohbet: %1</translation>
+    </message>
+    <message>
+        <source>Profiles</source>
+        <extracomment>A quick action on the cover that opens the list of profiles.</extracomment>
+        <translation>Profiller</translation>
     </message>
 </context>
 <context>

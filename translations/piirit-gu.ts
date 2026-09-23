@@ -447,6 +447,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Search</source>
         <translation>શોધો</translation>
     </message>
+    <message>
+        <source>Profile</source>
+        <extracomment>Over a list of chats to pick from: which profile&apos;s chats they are.</extracomment>
+        <translation>પ્રોફાઇલ</translation>
+    </message>
 </context>
 <context>
     <name>ContactPage</name>
@@ -1241,6 +1246,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Chat: %1</source>
         <extracomment>A quick action on the cover that opens one chat, with the chat&apos;s name.</extracomment>
         <translation>ચેટ: %1</translation>
+    </message>
+    <message>
+        <source>Profiles</source>
+        <extracomment>A quick action on the cover that opens the list of profiles.</extracomment>
+        <translation>પ્રોફાઇલ</translation>
     </message>
 </context>
 <context>

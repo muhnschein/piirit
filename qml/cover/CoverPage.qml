@@ -32,12 +32,12 @@ import "../js/QuickActions.js" as QuickActions
  * view over the rows could not do.
  *
  * At its foot, the one or two quick actions the reader chose in the
- * settings -- with one chosen, the left one alone: a chat, the search,
- * this profile's QR code, or the scanner. The home
- * screen draws them, in the strip along the bottom edge, and while they
- * are there the grid sinks away into that strip rather than running
- * under the icons -- the faces fade out towards the bottom, nothing is
- * laid over them. What a tap does is the window's (piirit.qml); the cover
+ * settings -- with one chosen, the left one alone: a chat of any
+ * profile, the search, this profile's QR code, the scanner, or the list
+ * of profiles. The home screen draws them, in the strip along the bottom
+ * edge, and while they are there the grid sinks away into that strip
+ * rather than running under the icons -- the faces fade out towards the
+ * bottom, nothing is laid over them. What a tap does is the window's (piirit.qml); the cover
  * only says which one it was.
  */
 CoverBackground {

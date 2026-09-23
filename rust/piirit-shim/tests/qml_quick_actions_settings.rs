@@ -9,7 +9,10 @@
 //! on the chat picker, and the action becomes a chat's only once one has
 //! been picked; the choice then says which chat by the name the core has
 //! for it now, lets the icon be chosen, and says so when the chat has been
-//! deleted since. With room for one, the right action is hidden and kept.
+//! deleted since. The chat can be any profile's: the picker opens on the
+//! one the action's chat is in, and the chat is whichever profile's it
+//! was picked from. With room for one, the right action is hidden and
+//! kept.
 
 // Qt harness: see qml_pages.rs.
 #![allow(
@@ -46,13 +49,17 @@ const PROBE_QML: &str = r"
         // The page stack, handing back a picker the probe can answer for.
         property QtObject pageStack: QtObject {
             property string log: ''
+            // Opens on the profile it is handed, as the page does, and
+            // says whether it offers the others.
             property QtObject picker: QtObject {
+                property int accountId: 0
                 signal chatPicked(int chatId, string chatName)
             }
             function name(page) { return ('' + page).split('/').pop() }
             function push(page, properties) {
                 log += 'push:' + name(page) + ':' + properties.accountId + ':'
-                       + properties.title + '|'
+                       + properties.title + ':' + properties.profileChoice + '|'
+                picker.accountId = properties.accountId || 0
                 return picker
             }
         }
@@ -125,6 +132,12 @@ const PROBE_QML: &str = r"
             pageStack.picker.chatPicked(chatId, chatName)
             return 'ok'
         }
+        // The reader turns the picker to another profile first.
+        function pickIn(accountId, chatId, chatName) {
+            pageStack.picker.accountId = accountId
+            pageStack.picker.chatPicked(chatId, chatName)
+            return 'ok'
+        }
         function stackLog() {
             var log = pageStack.log
             pageStack.log = ''
@@ -177,6 +190,8 @@ fn the_quick_actions_are_set_up_on_a_page_of_their_own() {
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_ACCOUNTS_DIR", temp.join("accounts"));
+        // Two profiles, so an action's chat can be the other one's.
+        std::env::set_var("PIIRIT_FAKE_ACCOUNTS", "1,2");
     }
 
     piirit_shim::register_qml_types();
@@ -335,6 +350,17 @@ fn the_quick_actions_are_set_up_on_a_page_of_their_own() {
         record!("pick-none", click!("rightAction-none"));
         record!("right-none-again", call!("holds", QString::from("right")));
         record!("right-none-shown", get!("rightActionCombo", "currentIndex"));
+        // The profiles, with their own icon.
+        record!("pick-profiles", click!("rightAction-profiles"));
+        record!("right-profiles", call!("holds", QString::from("right")));
+        record!(
+            "right-profiles-shown",
+            get!("rightActionCombo", "currentIndex")
+        );
+        record!(
+            "two-right-profiles",
+            call!("previewIcon", QString::from("twoActionsPreview"), 1)
+        );
         record!("pick-qr-again", click!("rightAction-qr"));
 
         // A chat is asked for, and nothing changes until one is picked.
@@ -380,6 +406,24 @@ fn the_quick_actions_are_set_up_on_a_page_of_their_own() {
     single_shot(Duration::from_secs(5), move || unsafe {
         record!("gone-says", get!("leftActionCombo", "value"));
         record!("left-gone", call!("holds", QString::from("left")));
+
+        // A chat of the other profile: the picker opens on this one's,
+        // and is turned to the other's.
+        record!("pick-elsewhere", click!("leftAction-chat"));
+        record!("asked-here", call!("stackLog"));
+        record!(
+            "picked-elsewhere",
+            call!("pickIn", 2, 2, QString::from("chat 2"))
+        );
+        record!("left-elsewhere", call!("holds", QString::from("left")));
+    });
+
+    // By the name the other profile has for it; picked again, the picker
+    // opens on that profile.
+    single_shot(Duration::from_secs(7), move || unsafe {
+        record!("elsewhere-says", get!("leftActionCombo", "value"));
+        record!("pick-again", click!("leftAction-chat"));
+        record!("asked-there", call!("stackLog"));
 
         // Back to room for one: the right hidden, and kept.
         record!("choose-one", click!("oneActionPreview"));
@@ -433,7 +477,7 @@ fn the_quick_actions_are_set_up_on_a_page_of_their_own() {
     );
     assert_eq!(
         value("opened"),
-        "push:QuickActionsPage.qml:1:undefined|",
+        "push:QuickActionsPage.qml:1:undefined:undefined|",
         "the row does not open the quick actions' page for this profile. \
          {context}"
     );
@@ -513,12 +557,18 @@ fn the_quick_actions_are_set_up_on_a_page_of_their_own() {
         "the picture does not follow the right action. {context}"
     );
     assert_eq!(value("right-scan"), "scan|0|0|", "{context}");
+    assert_eq!(value("right-profiles"), "profiles|0|0|", "{context}");
+    assert_eq!(value("right-profiles-shown"), "5", "{context}");
+    assert!(
+        value("two-right-profiles").starts_with("profiles-"),
+        "the picture does not show the profiles' icon. {context}"
+    );
     assert_eq!(value("right-scan-shown"), "4", "{context}");
     assert_eq!(value("right-none-again"), "|0|0|", "{context}");
     assert_eq!(value("right-none-shown"), "0", "{context}");
     assert_eq!(
         value("asked"),
-        "push:ChatPickerPage.qml:1:Choose a chat|",
+        "push:ChatPickerPage.qml:1:Choose a chat:true|",
         "choosing a chat does not ask which, from this profile. {context}"
     );
     assert_eq!(
@@ -561,7 +611,7 @@ fn the_quick_actions_are_set_up_on_a_page_of_their_own() {
     );
     assert_eq!(
         value("asked-again"),
-        "push:ChatPickerPage.qml:1:Choose a chat|",
+        "push:ChatPickerPage.qml:1:Choose a chat:true|",
         "choosing Chat again does not pick again. {context}"
     );
     assert_eq!(
@@ -573,6 +623,28 @@ fn the_quick_actions_are_set_up_on_a_page_of_their_own() {
         value("left-gone"),
         "chat|1|1|dog",
         "picking another chat lost the icon. {context}"
+    );
+    assert_eq!(
+        value("asked-here"),
+        "push:ChatPickerPage.qml:1:Choose a chat:true|",
+        "the picker does not open on the chat's profile, with the others \
+         offered. {context}"
+    );
+    assert_eq!(
+        value("left-elsewhere"),
+        "chat|2|2|dog",
+        "a chat picked in another profile is not that profile's. {context}"
+    );
+    assert_eq!(
+        value("elsewhere-says"),
+        "Chat: chat 2",
+        "another profile's chat is not said by its name. {context}"
+    );
+    assert_eq!(
+        value("asked-there"),
+        "push:ChatPickerPage.qml:2:Choose a chat:true|",
+        "picked again, the picker does not open on the chat's profile. \
+         {context}"
     );
     assert_eq!(value("count-one"), "1", "{context}");
     assert_eq!(value("right-hidden-again"), "false", "{context}");

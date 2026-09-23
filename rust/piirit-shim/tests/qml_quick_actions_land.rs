@@ -2,11 +2,11 @@
 //! the front, doing what the action asks.
 //!
 //! The search empties and asks for the keyboard. The QR code opens on the
-//! side the action names. A chat is looked up before it is opened, so one
-//! deleted since the action was set up is said to be gone rather than
-//! opened empty; a chat in another profile puts that profile's list in
-//! place of the whole stack, and the chat is opened from it once it is on
-//! screen.
+//! side the action names, and the profiles as the pull-down opens them. A
+//! chat is looked up before it is opened, so one deleted since the action
+//! was set up is said to be gone rather than opened empty; a chat in
+//! another profile puts that profile's list in place of the whole stack,
+//! and the chat is opened from it once it is on screen.
 
 // Qt harness: see qml_chat_list.rs.
 #![allow(
@@ -211,6 +211,10 @@ fn a_quick_action_lands_on_the_chat_list_and_does_what_it_says() {
         record!("scan", act!("scan", 0, 0));
         record!("scan-stack", call!("stackLog"));
 
+        // The profiles, as the pull-down opens them.
+        record!("profiles", act!("profiles", 0, 0));
+        record!("profiles-stack", call!("stackLog"));
+
         // Over another page, that page goes first.
         record!("covered", call!("onTop", QString::from("false")));
         record!("qr-over", act!("qr", 0, 0));
@@ -310,6 +314,11 @@ fn a_quick_action_lands_on_the_chat_list_and_does_what_it_says() {
         value("scan-stack"),
         r#"push:QrPage.qml:{"accountId":1,"mode":1}|"#,
         "the scan action does not open the scanner. {context}"
+    );
+    assert_eq!(
+        value("profiles-stack"),
+        r#"push:ProfilesPage.qml:{"currentAccountId":1}|"#,
+        "the profiles action does not open the profiles page. {context}"
     );
     assert_eq!(
         value("qr-over-stack"),

@@ -14,12 +14,50 @@ import Piirit 1.0
  * Reports its answer with a signal rather than acting itself: what happens
  * to the chosen chat is the caller's business, and a picker that forwarded
  * on its own could not be reused for anything else.
+ *
+ * The chats are one profile's, `accountId`. A caller whose chat can be any
+ * profile's -- a quick action -- lets the reader turn the list to another
+ * with `profileChoice`, and reads `accountId` back for whose chat was
+ * picked. Forwarding and sharing do not: they send from the profile they
+ * were started in.
  */
 Page {
     id: page
 
     property int accountId
     property string errorMessage: ""
+
+    /// Whether the reader may turn the list to another profile's chats,
+    /// with a choice of profile over it. Offered only while there is more
+    /// than one profile to choose from.
+    property bool profileChoice: false
+
+    /// How many profiles the list could be turned to: the configured ones.
+    readonly property int profileCount: {
+        var count = 0
+        for (var i = 0; i < profiles.count; i++) {
+            var item = profiles.itemAt(i)
+            if (item && item.configured) {
+                count++
+            }
+        }
+        return count
+    }
+
+    /// What a profile goes by in the choice: its name, or its address
+    /// without one.
+    function profileName(accountId) {
+        for (var i = 0; i < profiles.count; i++) {
+            var item = profiles.itemAt(i)
+            if (item && item.accountId === accountId) {
+                return item.text
+            }
+        }
+        return ""
+    }
+
+    // Another profile's chats are no answer yet either.
+    onAccountIdChanged: page.chatsLoaded = false
 
     /// Whether picking a chat closes this page.
     ///
@@ -79,6 +117,37 @@ Page {
 
         PageHeader {
             title: page.title
+        }
+
+        // Whose chats these are, when there is a choice: every configured
+        // profile, the way the profiles page names it.
+        ComboBox {
+            objectName: "pickerProfileCombo"
+            width: parent.width
+            visible: page.profileChoice && page.profileCount > 1
+            //: Over a list of chats to pick from: which profile's chats
+            //: they are.
+            label: qsTr("Profile")
+            // The profile the list is on, rather than the item Silica last
+            // moved to: see QuickActionSetting.
+            value: page.profileName(page.accountId)
+
+            menu: ContextMenu {
+                Repeater {
+                    id: profiles
+                    model: core.account_list
+
+                    MenuItem {
+                        objectName: "pickerProfile" + model.account_id
+                        readonly property int accountId: model.account_id
+                        readonly property bool configured: model.is_configured
+                        visible: configured
+                        text: model.display_name.length > 0 ? model.display_name
+                                                            : model.addr
+                        onClicked: page.accountId = accountId
+                    }
+                }
+            }
         }
 
         SearchField {

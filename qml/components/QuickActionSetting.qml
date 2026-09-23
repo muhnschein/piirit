@@ -13,9 +13,9 @@ import "../js/QuickActions.js" as QuickActions
  * One of the cover's quick actions, as QuickActionsPage offers it: what it
  * does, and for a chat, which chat and which icon it wears.
  *
- * All of it is one choice. Choosing "Chat" opens the chat picker, on the
- * profile the settings were opened from, and the action is a chat's only
- * once one has been picked: backing out leaves it as it was. The choice
+ * All of it is one choice. Choosing "Chat" opens the chat picker, and the
+ * action is a chat's only once one has been picked: backing out leaves it
+ * as it was. The chat can be any profile's. The choice
  * then says which chat -- "Chat: " and its name -- while the list it is
  * picked from still says "Chat", and choosing that again picks again.
  * The name is looked up rather than kept, so a renamed chat reads as it
@@ -27,7 +27,8 @@ Column {
 
     /// "left" or "right", as Settings keeps them.
     property string side: "left"
-    /// Whose chats the picker lists.
+    /// Whose chats the picker lists first, unless the action's chat is
+    /// another profile's: the profile the settings were opened from.
     property int accountId
     /// What the choice is called.
     property string label
@@ -51,6 +52,8 @@ Column {
         case "qr": return qsTr("My QR code")
         //: A quick action on the cover that opens the QR code scanner.
         case "scan": return qsTr("Scan QR code")
+        //: A quick action on the cover that opens the list of profiles.
+        case "profiles": return qsTr("Profiles")
         //: No quick action on this side of the cover.
         default: return qsTr("None")
         }
@@ -89,10 +92,16 @@ Column {
     }
 
     /// Ask which chat. Until one is picked the choice shows what it was.
+    ///
+    /// The picker opens on the profile the action's chat is in, or on the
+    /// one the settings were opened from, and the reader can turn it to
+    /// any other: the chat is whichever profile's it was picked from.
     function pickChat() {
         setting.refresh()
         var picker = pageStack.push(Qt.resolvedUrl("../pages/ChatPickerPage.qml"), {
-            accountId: setting.accountId,
+            accountId: setting.action.kind === "chat" && setting.action.accountId > 0
+                       ? setting.action.accountId : setting.accountId,
+            profileChoice: true,
             //: Over the list of chats, when picking the one a quick action
             //: on the cover opens.
             title: qsTr("Choose a chat"),
@@ -102,7 +111,7 @@ Column {
             return
         }
         picker.chatPicked.connect(function (chatId) {
-            Settings[setting.prefix + "Account"] = setting.accountId
+            Settings[setting.prefix + "Account"] = picker.accountId
             Settings[setting.prefix + "Chat"] = chatId
             Settings[setting.prefix + "Icon"] = setting.action.icon
             Settings[setting.prefix] = "chat"
@@ -162,6 +171,11 @@ Column {
                 objectName: setting.side + "Action-scan"
                 text: setting.kindLabel("scan")
                 onClicked: setting.choose("scan")
+            }
+            MenuItem {
+                objectName: setting.side + "Action-profiles"
+                text: setting.kindLabel("profiles")
+                onClicked: setting.choose("profiles")
             }
         }
     }

@@ -77,8 +77,9 @@ QtObject {
     /// kept for when there are two again.
     property alias quickActionCount: quickActionCountValue.value
     /// The cover's quick actions, the left one and the right: what each
-    /// does -- "" for nothing, "chat", "search", "qr" or "scan" -- and, for
-    /// a chat, the profile and chat it opens and the icon it wears.
+    /// does -- "" for nothing, "chat", "search", "qr", "scan" or
+    /// "profiles" -- and, for a chat, the profile and chat it opens and the
+    /// icon it wears.
     /// qml/js/QuickActions.js reads them.
     property alias quickActionLeft: quickActionLeftValue.value
     property alias quickActionLeftAccount: quickActionLeftAccountValue.value

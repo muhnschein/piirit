@@ -442,6 +442,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Search</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Profile</source>
+        <extracomment>Over a list of chats to pick from: which profile&apos;s chats they are.</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ContactPage</name>
@@ -1230,6 +1235,11 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Chat: %1</source>
         <extracomment>A quick action on the cover that opens one chat, with the chat&apos;s name.</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Profiles</source>
+        <extracomment>A quick action on the cover that opens the list of profiles.</extracomment>
         <translation type="unfinished"></translation>
     </message>
 </context>

@@ -447,6 +447,11 @@ Mensagens de contactos bloqueados não serão ocultadas noutros grupos.</transla
         <source>Search</source>
         <translation>Pesquisar</translation>
     </message>
+    <message>
+        <source>Profile</source>
+        <extracomment>Over a list of chats to pick from: which profile&apos;s chats they are.</extracomment>
+        <translation>Perfil</translation>
+    </message>
 </context>
 <context>
     <name>ContactPage</name>
@@ -1241,6 +1246,11 @@ Mensagens de contactos bloqueados não serão ocultadas noutros grupos.</transla
         <source>Chat: %1</source>
         <extracomment>A quick action on the cover that opens one chat, with the chat&apos;s name.</extracomment>
         <translation>Conversa: %1</translation>
+    </message>
+    <message>
+        <source>Profiles</source>
+        <extracomment>A quick action on the cover that opens the list of profiles.</extracomment>
+        <translation>Perfis</translation>
     </message>
 </context>
 <context>

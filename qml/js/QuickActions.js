@@ -7,8 +7,9 @@
 .pragma library
 
 /// What an action can do, as Settings keeps it: open a chat, search the
-/// chat list, show this profile's QR code, or read someone else's.
-var kinds = ["chat", "search", "qr", "scan"]
+/// chat list, show this profile's QR code, read someone else's, or open
+/// the list of profiles.
+var kinds = ["chat", "search", "qr", "scan", "profiles"]
 
 /// The icons an action for a chat can wear, in the order the settings page
 /// offers them. The first is the one a new action gets.

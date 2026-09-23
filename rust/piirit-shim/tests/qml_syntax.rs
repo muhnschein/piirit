@@ -146,9 +146,14 @@ fn delegates_bind_only_roles_their_models_have() {
             "qml/cover/CoverPage.qml",
             names_of::<piirit_shim::AccountItem>(),
         ),
+        // The chats, and the profiles its choice of profile lists.
         (
             "qml/pages/ChatPickerPage.qml",
-            names_of::<piirit_shim::ChatListItem>(),
+            [
+                names_of::<piirit_shim::ChatListItem>(),
+                names_of::<piirit_shim::AccountItem>(),
+            ]
+            .concat(),
         ),
         (
             "qml/pages/ProfilesPage.qml",

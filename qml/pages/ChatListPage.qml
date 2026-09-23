@@ -177,6 +177,10 @@ Page {
                 accountId: page.accountId,
                 mode: kind === "scan" ? 1 : 0
             })
+        } else if (kind === "profiles") {
+            // As the pull-down's own Profiles opens it.
+            pulleyHost.openPage(Qt.resolvedUrl("ProfilesPage.qml"),
+                                { currentAccountId: page.accountId })
         } else if (kind === "chat" && core.status === "ready") {
             page.quickChatPending = true
             // Through 0, so asking for the chat asked for last time asks
