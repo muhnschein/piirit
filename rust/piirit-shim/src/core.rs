@@ -1127,7 +1127,10 @@ impl DeltaChatCore {
                         Some(AccountItem {
                             account_id: json::u32_opt(account, "id")?,
                             display_name: json::text(account, "displayName"),
-                            addr: json::text(account, "addr"),
+                            // Filled below for a configured account: the
+                            // core's account list carries no address
+                            // since 2.61.
+                            addr: QString::default(),
                             is_configured: json::str_at(account, "kind") == "Configured",
                             avatar_path: json::text(account, "profileImage"),
                             color: json::text(account, "color"),
@@ -1598,16 +1601,14 @@ async fn account_ids(rpc: &RpcClient) -> Result<Vec<u32>, String> {
         .map_err(|err| err.to_string())
 }
 
-/// The address a profile sends from: `configured_addr`, the core's
-/// primary transport, which is what the profile page shows.
+/// The profile's own address: `configured_addr`, the one its invite
+/// link and its own contact carry, which is what the profile page shows.
 ///
-/// The account list's own `addr` is not it. That is the core's `addr`
-/// key, deprecated since 2026-04 and only a fallback to
-/// `configured_addr` when nothing was ever written to it -- a profile
-/// that once had another transport set up keeps that older address
-/// there, and the row would then name a relay the profile no longer
-/// sends from. None when the core cannot say, so the row keeps what the
-/// account list gave it.
+/// The account list carries no address since core 2.61, and
+/// `list_transports` names every relay the profile has without saying
+/// which of them is its own -- taking the first would name one set up
+/// long ago. None when the core cannot say, which leaves the row
+/// without an address.
 async fn primary_addr(rpc: &RpcClient, account_id: u32) -> Option<String> {
     rpc.call::<_, Option<String>>("get_config", (account_id, "configured_addr"))
         .await

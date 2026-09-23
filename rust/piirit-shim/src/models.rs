@@ -174,7 +174,9 @@ pub struct AccountItem {
     pub account_id: u32,
     /// Profile display name, empty when unset.
     pub display_name: QString,
-    /// The account's email address, empty when unconfigured.
+    /// The profile's own address (`configured_addr`), the one its invite
+    /// link and its own contact carry. Empty when unconfigured or when
+    /// the core cannot say.
     pub addr: QString,
     /// Whether this account has a usable transport.
     pub is_configured: bool,

@@ -174,11 +174,9 @@ impl State {
     /// answered, so that a page asking about a profile before the
     /// account list has been read finds its transports there.
     ///
-    /// A profile set up twice keeps the address of the relay it was set
-    /// up on first in the core's deprecated `addr`, while
-    /// `configured_addr` is the relay it sends from now: what
-    /// `PIIRIT_FAKE_OLDER_RELAY` seeds, as the first transport the core
-    /// lists and the one `addr` still names.
+    /// A profile set up twice has a relay besides the one its own
+    /// address (`configured_addr`) is on: what `PIIRIT_FAKE_OLDER_RELAY`
+    /// seeds, as the first transport the core lists.
     fn seed_accounts(&mut self) {
         let older = std::env::var("PIIRIT_FAKE_OLDER_RELAY").ok();
         for account in env_ids("PIIRIT_FAKE_ACCOUNTS") {
@@ -191,8 +189,6 @@ impl State {
             });
             let list = self.transports.entry(account).or_default();
             if let Some(older) = &older {
-                self.config
-                    .insert((account, "addr".to_string()), older.clone());
                 list.push(older.clone());
             }
             let own = format!("account{account}@example.org");
@@ -212,8 +208,9 @@ impl State {
     }
 
     /// The accounts, shaped as the real core shapes them: a configured
-    /// one carries its profile -- name, address, picture, colour -- and
-    /// an unconfigured one is an id and nothing else.
+    /// one carries its profile -- name, picture, colour -- but no
+    /// address, which the real core dropped in 2.61, and an unconfigured
+    /// one is an id and nothing else.
     fn account_list(&self) -> Value {
         Value::Array(
             self.accounts
@@ -224,15 +221,6 @@ impl State {
                             "id": account.id,
                             "kind": "Configured",
                             "displayName": self.config(account.id, "displayname").unwrap_or_default(),
-                            // The core's own `addr`, which this list
-                            // carries: a key deprecated in 2026-04 that
-                            // falls back to `configured_addr` only while
-                            // nothing was written to it. A profile that
-                            // once had another transport keeps the older
-                            // address here.
-                            "addr": self.config(account.id, "addr")
-                                .or_else(|| self.config(account.id, "configured_addr"))
-                                .unwrap_or_else(|| format!("account{}@example.org", account.id)),
                             "profileImage": self.config(account.id, "selfavatar"),
                             "color": "#4a90d9",
                         })

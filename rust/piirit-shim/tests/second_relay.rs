@@ -1,14 +1,16 @@
 //! A profile with more than one transport says which relay is its own.
 //!
-//! The core lets a profile have several transports, keeps the one it
-//! sends from in `configured_addr`, and reports on all of them at once.
-//! Two places used to take whichever came first instead of that one: the
-//! account list, whose `addr` is the core's deprecated key and holds the
-//! address of a transport set up long ago, and the connectivity report,
-//! whose first quota bar belongs to the oldest transport rather than to
-//! this profile's relay. Reported from a phone whose profiles page named
-//! a relay the profile had stopped sending from, under a mailbox figure
-//! that belonged to a third one.
+//! The core lets a profile have several transports, keeps the profile's
+//! own address -- the one its invite link and its own contact carry --
+//! in `configured_addr`, and reports on all of them at once. Two places
+//! used to take whichever came first instead of that one: the account
+//! list, which carries no address since core 2.61 and before that gave
+//! the core's deprecated `addr` key, holding the address of a transport
+//! set up long ago; and the connectivity report, whose first quota bar
+//! belongs to the oldest transport rather than to this profile's relay.
+//! Reported from a phone whose profiles page named a relay that was no
+//! longer the profile's own, under a mailbox figure that belonged to a
+//! third one.
 
 // Qt harness: see qml_chat_list.rs.
 #![allow(
@@ -42,7 +44,7 @@ const PROBE_QML: &str = r"
 ";
 
 #[test]
-fn the_row_and_the_mailbox_are_the_relay_the_profile_sends_from() {
+fn the_row_and_the_mailbox_are_the_profiles_own_relay() {
     let temp = std::env::temp_dir().join(format!("piirit-second-relay-{}", std::process::id()));
     let journal = common::fresh_journal(&temp);
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
@@ -54,9 +56,9 @@ fn the_row_and_the_mailbox_are_the_relay_the_profile_sends_from() {
         std::env::set_var("PIIRIT_FAKE_JOURNAL", &journal);
         std::env::set_var("PIIRIT_ACCOUNTS_DIR", temp.join("accounts"));
         std::env::set_var("PIIRIT_FAKE_ACCOUNTS", "1");
-        // The profile was on this relay first and is not on it now: it
-        // is what the core's deprecated `addr` still holds, and what the
-        // first quota bar in the report belongs to.
+        // The profile was on this relay first, and its own address is on
+        // another now: it is the first transport the core lists, and what
+        // the first quota bar in the report belongs to.
         std::env::set_var("PIIRIT_FAKE_OLDER_RELAY", "ada@old.example.net");
     }
 
@@ -119,15 +121,15 @@ fn the_row_and_the_mailbox_are_the_relay_the_profile_sends_from() {
     let methods = common::methods(&journal);
     assert_eq!(
         listed, "account1@example.org",
-        "the profiles page's row named a relay the profile no longer \
-         sends from: the account list's `addr` was taken as the address \
-         rather than `configured_addr`. Calls: {methods:?}"
+        "the profiles page's row does not name the profile's own address \
+         (`configured_addr`), the one its invite link and its own contact \
+         carry. Calls: {methods:?}"
     );
     assert_eq!(
         answers.first().map(String::as_str),
         Some("account1@example.org"),
-        "the profile page showed something other than the address the \
-         profile sends from. Calls: {methods:?}"
+        "the profile page showed something other than the profile's own \
+         address. Calls: {methods:?}"
     );
     assert_eq!(
         answers.get(1).map(String::as_str),
