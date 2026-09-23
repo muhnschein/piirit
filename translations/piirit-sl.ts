@@ -917,6 +917,11 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
         <extracomment>Shown on the full-message page for a message that turns out to have no words in it at all.</extracomment>
         <translation>To sporočilo nima besedila</translation>
     </message>
+    <message>
+        <source>Select text</source>
+        <extracomment>Pull-down entry on the page showing one whole message: shows it as text that can be selected, and copied, a part at a time.</extracomment>
+        <translation>Izberi besedilo</translation>
+    </message>
 </context>
 <context>
     <name>NewChatPage</name>

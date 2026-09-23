@@ -909,6 +909,11 @@ In anderen Gruppen mit blockierten Kontakten werden deren Nachrichten weiterhin 
         <extracomment>Shown on the full-message page for a message that turns out to have no words in it at all.</extracomment>
         <translation>Diese Nachricht enthält keinen Text</translation>
     </message>
+    <message>
+        <source>Select text</source>
+        <extracomment>Pull-down entry on the page showing one whole message: shows it as text that can be selected, and copied, a part at a time.</extracomment>
+        <translation>Text auswählen</translation>
+    </message>
 </context>
 <context>
     <name>NewChatPage</name>

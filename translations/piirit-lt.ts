@@ -909,6 +909,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <extracomment>Shown on the full-message page for a message that turns out to have no words in it at all.</extracomment>
         <translation>Šioje žinutėje nėra teksto</translation>
     </message>
+    <message>
+        <source>Select text</source>
+        <extracomment>Pull-down entry on the page showing one whole message: shows it as text that can be selected, and copied, a part at a time.</extracomment>
+        <translation>Pažymėti tekstą</translation>
+    </message>
 </context>
 <context>
     <name>NewChatPage</name>
