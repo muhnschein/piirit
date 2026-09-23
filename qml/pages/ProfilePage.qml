@@ -7,11 +7,10 @@ import Piirit 1.0
 /*
  * One profile, as everyone else sees it and as this device holds it: the
  * picture, the name on every message, the line under it, the relays it
- * is reached through, whether the other end
- * is told when something has been read, and how the relay and the phone
- * are doing by it. Reached from the profile's row on the profiles page.
- * The settings that belong to no profile are on the settings page
- * instead (SettingsPage.qml).
+ * is reached through, whether the other end is told when something has
+ * been read, and how the relay and the phone are doing by it. Reached
+ * from the profile's row on the profiles page. The settings that belong
+ * to no profile are on the settings page instead (SettingsPage.qml).
  *
  * This page is a profile's settings, so the two things about a profile
  * that are not settings are not here: the invite code to show and the backup to
@@ -125,10 +124,13 @@ Page {
                 profile.refresh_connectivity()
                 relayRefresh.restart()
             }
-            // Changed on another device the profile is on: the row on
-            // the profiles page names the profile's own address, and
-            // follows.
+            // Changed on another device the profile is on: the relay
+            // with the profile's own address may be the one that went,
+            // and the core then moves the address to another. The
+            // address under the name and the row on the profiles page
+            // follow.
             if (kind === "TransportsModified" && context_id === page.accountId) {
+                profile.reload()
                 core.refresh_accounts()
             }
             transports.handle_event(context_id, kind, payload_json)

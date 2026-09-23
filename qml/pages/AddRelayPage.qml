@@ -8,12 +8,13 @@ import "../js/Relays.js" as Relays
  * the profile page (ProfilePage.qml).
  *
  * The core lets a profile be reached through several relays at once, each
- * with an address of its own; adding one is the same call that made the profile in the first place, on the account
- * the profile already is (add_transport_from_qr, docs/PROJECT.md). So this
- * page is the relay half of AddProfileDialog -- the same list, the same
- * custom field -- and then the wait ProfileSetupPage shows, on one page:
- * there is no name to ask for, and nowhere to hand over to, since the
- * profile page under this one is where the relay shows up.
+ * with an address of its own; adding one is the same call that made the
+ * profile in the first place, on the account the profile already is
+ * (add_transport_from_qr, docs/PROJECT.md). So this page is the relay
+ * half of AddProfileDialog -- the same list, the same custom field -- and
+ * then the wait ProfileSetupPage shows, on one page: there is no name to
+ * ask for, and nowhere to hand over to, since the profile page under this
+ * one is where the relay shows up.
  *
  * A relay is somebody's spare-time server, and one that is down holds
  * the core for minutes. So the page says as much once the wait has gone
