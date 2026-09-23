@@ -144,15 +144,15 @@ BuildRequires:  qt5-qttools-linguist
 %endif
 
 # How many cargo jobs to run inside scratchbox2, and only there: outside
-# sb2 -- a native OBS worker -- cargo picks its own. Four, which device
-# builds run green on the 5.2 SDK and which takes the build from 142 s to
-# 82 s. It was one for a long time, because cargo was once seen to
-# futex-wait forever on an unreaped child at four while qmetaobject's C++
-# glue compiled; that is why the number is a define rather than a
-# constant, so a build that ever hangs again drops back with
-# --define "jobs 1" instead of a patch. .github/workflows/rpm.yml passes
-# its cargo_jobs input this way, and docs/BUILDING.md has the numbers.
-%{!?jobs: %global jobs 4}
+# sb2 -- a native OBS worker -- cargo picks its own. One. Four takes the
+# build from 142 s to 82 s when it finishes, but at two or four cargo
+# stalls under sb2 -- it has been seen to futex-wait forever on an
+# unreaped child while qmetaobject's C++ glue compiles -- often enough
+# that the waiting costs more than the parallelism saves. It stays a
+# define so a build can try more with --define "jobs N" instead of a
+# patch. .github/workflows/rpm.yml passes one this way on every run, and
+# docs/BUILDING.md has the numbers.
+%{!?jobs: %global jobs 1}
 
 # Where cargo leaves the binary. Under sb2, SB2_RUST_TARGET_TRIPLE (see
 # %%build) makes it write to target/<triple>/release; a native build -- an

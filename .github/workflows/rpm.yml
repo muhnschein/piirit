@@ -31,15 +31,6 @@ on:
           that runs on older phones and that Harbour rejects.
         type: string
         default: "5.2.0.15"
-      cargo_jobs:
-        description: >
-          How many cargo jobs inside scratchbox2. Four is the spec's
-          default and what these builds run; drop to one if a build ever
-          hangs there, which is what the setting is for. See
-          docs/BUILDING.md.
-        type: choice
-        options: ["4", "2", "1"]
-        default: "4"
       release:
         description: >
           Cut a release: the version to publish, which has to be what
@@ -72,8 +63,11 @@ jobs:
     env:
       ARCH: aarch64
       SFOS: ${{ inputs.sfos_version || '5.2.0.15' }}
-      CARGO_JOBS: ${{ inputs.cargo_jobs || '4' }}
       RELEASE: ${{ inputs.release || '' }}
+      # One cargo job inside scratchbox2, on every run. At two or four the
+      # build stalls there often enough to cost more than the parallelism
+      # saves, so this is no longer a dispatch input. See docs/BUILDING.md.
+      CARGO_JOBS: "1"
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
@@ -81,15 +75,12 @@ jobs:
       - name: Fetch deltachat-rpc-server
         run: ./scripts/fetch-rpc-server.sh
 
-      # Both inputs are free text from the dispatch form, and both are
-      # spliced into a command below -- the version into an image tag, the
-      # job count into the build's own shell.
+      # The version is free text from the dispatch form, and it is spliced
+      # into an image tag below.
       - name: Name the SDK image this build wants
         run: |
           [[ $SFOS =~ ^[0-9]+(\.[0-9]+){3}$ ]] || {
             echo "::error::sfos_version '$SFOS' is not a dotted version"; exit 1; }
-          [[ $CARGO_JOBS =~ ^[1-9][0-9]?$ ]] || {
-            echo "::error::cargo_jobs '$CARGO_JOBS' is not a small number"; exit 1; }
           owner=$(echo "${{ github.repository_owner }}" | tr 'A-Z' 'a-z')
           echo "SDK_IMAGE=ghcr.io/$owner/piirit-sdk:$SFOS-$ARCH" >> "$GITHUB_ENV"
 
