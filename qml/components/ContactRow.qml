@@ -23,7 +23,6 @@ Item {
     property string picturePath
     /// An address contact cannot be written to encrypted.
     property bool isKeyContact: true
-    property bool isVerified: false
     /// Room kept free at the right, for whatever the page draws over the
     /// end of the row -- a badge, a mark -- so the text fades before it.
     property real trailingSpace: 0
@@ -53,10 +52,12 @@ Item {
         width: root.width - x - Theme.horizontalPageMargin - root.trailingSpace
         truncationMode: TruncationMode.Fade
         textFormat: Text.PlainText
-        // The same marks the chat list uses: a mail icon for a contact
-        // that cannot be encrypted to, a tick for one checked in person.
+        // The mark the chat list uses: a mail icon for a contact that
+        // cannot be encrypted to. No tick for one checked in person: a
+        // list that picks people ticks the ones picked, and a second
+        // tick meaning something else read as a pick. The contact's own
+        // page says it in words.
         text: (root.isKeyContact ? "" : "✉ ") + root.displayName
-              + (root.isVerified ? " ✓" : "")
     }
 
     Label {

@@ -134,7 +134,6 @@ Page {
                     ownColor: model.color
                     picturePath: model.avatar_path
                     isKeyContact: model.is_key_contact
-                    isVerified: model.is_verified
                 }
 
                 onClicked: page.block(model.contact_id, model.display_name)
