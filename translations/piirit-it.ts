@@ -450,10 +450,6 @@ Gli altri gruppi con contatti bloccati continueranno a visualizzare i loro messa
         <translation>Contatto</translation>
     </message>
     <message>
-        <source>Verified: end-to-end encrypted, and checked in person</source>
-        <translation>Verificato: cifratura end-to-end, controllata di persona</translation>
-    </message>
-    <message>
         <source>End-to-end encrypted</source>
         <translation>Cifratura end-to-end</translation>
     </message>

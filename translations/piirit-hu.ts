@@ -445,10 +445,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Névjegy</translation>
     </message>
     <message>
-        <source>Verified: end-to-end encrypted, and checked in person</source>
-        <translation>Ellenőrzött: végpontok között titkosított, személyesen ellenőrizve</translation>
-    </message>
-    <message>
         <source>End-to-end encrypted</source>
         <translation>Végpontok között titkosított</translation>
     </message>

@@ -96,7 +96,6 @@ fn a_contact_row_marks_who_can_be_written_to_encrypted() {
             QString::from("ada@example.org")
         );
         call!("set", QString::from("isKeyContact"), true);
-        call!("set", QString::from("isVerified"), false);
         record!(
             "key-name",
             call!("get", QString::from("contactName"), QString::from("text"))
@@ -128,17 +127,10 @@ fn a_contact_row_marks_who_can_be_written_to_encrypted() {
             call!("get", QString::from("avatarInitial"), QString::from("text"))
         );
 
-        // Someone the core cannot encrypt to wears the mail mark, and a
-        // contact checked in person wears a tick.
+        // Someone the core cannot encrypt to wears the mail mark.
         call!("set", QString::from("isKeyContact"), false);
         record!(
             "plain-name",
-            call!("get", QString::from("contactName"), QString::from("text"))
-        );
-        call!("set", QString::from("isKeyContact"), true);
-        call!("set", QString::from("isVerified"), true);
-        record!(
-            "verified-name",
             call!("get", QString::from("contactName"), QString::from("text"))
         );
 
@@ -191,10 +183,5 @@ fn assert_outcome(steps: &[(&str, String)]) {
         "✉ Ada",
         "a contact that cannot be encrypted to is not marked, so it looks \
          the same as one that can. {context}"
-    );
-    assert_eq!(
-        value("verified-name"),
-        "Ada ✓",
-        "a contact checked in person is not marked. {context}"
     );
 }

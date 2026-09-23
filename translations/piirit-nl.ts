@@ -446,10 +446,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Contact</translation>
     </message>
     <message>
-        <source>Verified: end-to-end encrypted, and checked in person</source>
-        <translation>Geverifieerd: end-to-end versleuteld en persoonlijk gecontroleerd</translation>
-    </message>
-    <message>
         <source>End-to-end encrypted</source>
         <translation>End-to-end versleuteld</translation>
     </message>

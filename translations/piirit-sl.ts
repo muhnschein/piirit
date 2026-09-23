@@ -452,10 +452,6 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
         <translation>Stik</translation>
     </message>
     <message>
-        <source>Verified: end-to-end encrypted, and checked in person</source>
-        <translation>Preverjeno: šifrirano od konca do konca in osebno preverjeno</translation>
-    </message>
-    <message>
         <source>End-to-end encrypted</source>
         <translation>Šifrirano od konca do konca</translation>
     </message>

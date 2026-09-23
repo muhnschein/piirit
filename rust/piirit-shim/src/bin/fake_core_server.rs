@@ -362,6 +362,9 @@ impl State {
     /// The three names are the real core's: `authName` is what the
     /// contact calls themselves, `name` what was given to them here, and
     /// `displayName` the second when there is one, else the first.
+    ///
+    /// Every key the 2.62 core sends is here, whether the app reads it or
+    /// not, with the values for a contact nobody has seen lately.
     fn contact_object(&self, contact: u32) -> Option<Value> {
         let address = if contact == SELF {
             "me@example.org"
@@ -385,10 +388,15 @@ impl State {
             "authName": auth_name,
             "name": name,
             "displayName": display_name,
-            "isVerified": contact == 10,
             "isKeyContact": true,
+            "e2eeAvail": true,
+            "isBlocked": self.blocked.contains(&contact),
+            "isBot": false,
             "status": if contact == 10 { "Poet and mathematician" } else { "" },
             "color": "#00875a",
+            "profileImage": null,
+            "lastSeen": 0,
+            "freshness": "Normal",
         }))
     }
 
@@ -1895,6 +1903,22 @@ async fn serve() {
                     state.left_groups.insert(chat);
                     state.chat_modified(account, chat);
                     ok(&id, &Value::Null)
+                }
+                // A fingerprint code with neither of an invite's two
+                // secrets in it has had no kind since 2.61: the core looks
+                // for a contact with that key and refuses the code when
+                // there is none, which here is every time.
+                "check_qr"
+                    if positional(1).as_str().is_some_and(|content| {
+                        content.starts_with("OPENPGP4FPR:")
+                            && !(content.contains("i=") && content.contains("s="))
+                    }) =>
+                {
+                    err(
+                        &id,
+                        "failed to decode OPENPGP4FPR QR code: \
+                         Contact matching the fingerprint is not found",
+                    )
                 }
                 "check_qr" => {
                     let content = positional(1).as_str().unwrap_or_default().to_string();

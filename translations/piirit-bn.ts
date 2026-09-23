@@ -450,10 +450,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>পরিচিতি</translation>
     </message>
     <message>
-        <source>Verified: end-to-end encrypted, and checked in person</source>
-        <translation>যাচাইকৃত: এন্ড-টু-এন্ড এনক্রিপ্টেড, এবং সামনাসামনি যাচাই করা</translation>
-    </message>
-    <message>
         <source>End-to-end encrypted</source>
         <translation>এন্ড-টু-এন্ড এনক্রিপ্টেড</translation>
     </message>

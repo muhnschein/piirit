@@ -449,10 +449,6 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
         <translation>Kişi</translation>
     </message>
     <message>
-        <source>Verified: end-to-end encrypted, and checked in person</source>
-        <translation>Doğrulanmış: uçtan uca şifreli ve yüz yüze kontrol edilmiş</translation>
-    </message>
-    <message>
         <source>End-to-end encrypted</source>
         <translation>Uçtan uca şifreli</translation>
     </message>

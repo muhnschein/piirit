@@ -450,10 +450,6 @@ Vous continuerez à voir les messages des contacts bloqués dans les autres grou
         <translation>Contact</translation>
     </message>
     <message>
-        <source>Verified: end-to-end encrypted, and checked in person</source>
-        <translation>Vérifié : chiffré de bout en bout, et contrôlé en personne</translation>
-    </message>
-    <message>
         <source>End-to-end encrypted</source>
         <translation>Chiffré de bout en bout</translation>
     </message>

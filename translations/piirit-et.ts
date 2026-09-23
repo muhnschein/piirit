@@ -450,10 +450,6 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
         <translation>Kontakt</translation>
     </message>
     <message>
-        <source>Verified: end-to-end encrypted, and checked in person</source>
-        <translation>Kinnitatud: otsast otsani krüpteeritud ja isiklikult kontrollitud</translation>
-    </message>
-    <message>
         <source>End-to-end encrypted</source>
         <translation>Otsast otsani krüpteeritud</translation>
     </message>

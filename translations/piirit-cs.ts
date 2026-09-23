@@ -451,10 +451,6 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
         <translation>Kontakt</translation>
     </message>
     <message>
-        <source>Verified: end-to-end encrypted, and checked in person</source>
-        <translation>Ověřeno: šifrováno mezi koncovými body a osobně zkontrolováno</translation>
-    </message>
-    <message>
         <source>End-to-end encrypted</source>
         <translation>Šifrováno mezi koncovými body</translation>
     </message>

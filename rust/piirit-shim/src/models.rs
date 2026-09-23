@@ -258,8 +258,6 @@ pub struct ContactItem {
     pub auth_name: QString,
     /// Email address.
     pub address: QString,
-    /// Verified through a secure-join.
-    pub is_verified: bool,
     /// Reachable with encryption. An address contact is not.
     pub is_key_contact: bool,
     /// This account's own contact, which a group lists among its members.

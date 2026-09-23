@@ -451,10 +451,6 @@ Wiadomości innych grup z zablokowanymi kontaktami nadal będą wyświetlane.</t
         <translation>Kontakt</translation>
     </message>
     <message>
-        <source>Verified: end-to-end encrypted, and checked in person</source>
-        <translation>Zweryfikowany: szyfrowanie od końca do końca, sprawdzone osobiście</translation>
-    </message>
-    <message>
         <source>End-to-end encrypted</source>
         <translation>Szyfrowanie od końca do końca</translation>
     </message>

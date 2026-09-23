@@ -450,10 +450,6 @@ Mensagens de contactos bloqueados não serão ocultadas noutros grupos.</transla
         <translation>Contacto</translation>
     </message>
     <message>
-        <source>Verified: end-to-end encrypted, and checked in person</source>
-        <translation>Verificado: cifrado de ponta a ponta e confirmado pessoalmente</translation>
-    </message>
-    <message>
         <source>End-to-end encrypted</source>
         <translation>Cifrado de ponta a ponta</translation>
     </message>

@@ -128,7 +128,6 @@ Page {
                     ownColor: model.color
                     picturePath: model.avatar_path
                     isKeyContact: model.is_key_contact
-                    isVerified: model.is_verified
                 }
 
                 onClicked: contacts.open_chat_with(model.contact_id)

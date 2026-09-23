@@ -450,10 +450,6 @@ In anderen Gruppen mit blockierten Kontakten werden deren Nachrichten weiterhin 
         <translation>Kontakt</translation>
     </message>
     <message>
-        <source>Verified: end-to-end encrypted, and checked in person</source>
-        <translation>Verifiziert: Ende-zu-Ende-verschlüsselt und persönlich überprüft</translation>
-    </message>
-    <message>
         <source>End-to-end encrypted</source>
         <translation>Ende-zu-Ende-verschlüsselt</translation>
     </message>

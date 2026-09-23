@@ -286,7 +286,6 @@ Page {
                         ownColor: modelData.color
                         picturePath: modelData.avatar_path
                         isKeyContact: modelData.is_key_contact
-                        isVerified: modelData.is_verified
                     }
                 }
             }
@@ -318,7 +317,6 @@ Page {
                         ownColor: modelData.color
                         picturePath: modelData.avatar_path
                         isKeyContact: modelData.is_key_contact
-                        isVerified: modelData.is_verified
                     }
                 }
             }

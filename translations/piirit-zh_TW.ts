@@ -445,10 +445,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>聯絡人</translation>
     </message>
     <message>
-        <source>Verified: end-to-end encrypted, and checked in person</source>
-        <translation>已驗證：端對端加密，並已當面核對</translation>
-    </message>
-    <message>
         <source>End-to-end encrypted</source>
         <translation>端對端加密</translation>
     </message>

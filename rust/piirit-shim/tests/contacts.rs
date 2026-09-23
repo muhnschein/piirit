@@ -28,14 +28,14 @@ const PROBE_QML: &str = r"
     import Piirit 1.0
     Item {
         property string opened: ''
-        property string lastError: ''
+        property string errors: ''
         property string myInvite: ''
         property bool started: false
         ContactList {
             id: contacts
             account_id: 1
             onChat_ready: opened = opened + chat_id + ','
-            onError: lastError = message
+            onError: errors = errors + message + ';'
             // Drive the scenario off the data arriving rather than off a
             // clock: under load the core takes longer to come up, and a
             // fixed tick then reads an empty list.
@@ -46,6 +46,7 @@ const PROBE_QML: &str = r"
                     contacts.create_group('Team', [rows.itemAt(0).cid, rows.itemAt(1).cid], '')
                     contacts.join_by_invite('https://i.delta.chat/#ABC&a=them%40example.org')
                     contacts.join_by_invite('just some text')
+                    contacts.join_by_invite('OPENPGP4FPR:0123456789ABCDEF0123456789ABCDEF01234567')
                     contacts.fetch_invite()
                 }
             }
@@ -71,7 +72,7 @@ const PROBE_QML: &str = r"
             return out
         }
         function firstId() { return rows.count > 0 ? rows.itemAt(0).cid : 0 }
-        function report() { return opened + '#' + lastError + '#' + myInvite }
+        function report() { return opened + '#' + errors + '#' + myInvite }
     }
 ";
 
@@ -140,7 +141,7 @@ fn assert_routes(calls: &[(String, Value)], listed: &str, report: &str) {
 
     let mut parts = report.splitn(3, '#');
     let opened = parts.next().unwrap_or_default();
-    let error = parts.next().unwrap_or_default();
+    let errors = parts.next().unwrap_or_default();
     let invite = parts.next().unwrap_or_default();
     assert_eq!(
         opened.split(',').filter(|part| !part.is_empty()).count(),
@@ -149,7 +150,9 @@ fn assert_routes(calls: &[(String, Value)], listed: &str, report: &str) {
     );
 
     // Following an invite: classified first, then joined. Plain text is
-    // refused before any join is attempted.
+    // refused before any join is attempted, and so is a fingerprint code
+    // with no invite in it, which the core will not read at all. Both are
+    // refused in the same words.
     assert!(
         names.contains(&"secure_join"),
         "the invite link was never followed: {names:?}"
@@ -157,11 +160,19 @@ fn assert_routes(calls: &[(String, Value)], listed: &str, report: &str) {
     assert_eq!(
         names.iter().filter(|name| **name == "secure_join").count(),
         1,
-        "plain text should not have been sent to secure_join: {names:?}"
+        "only the invite should have been sent to secure_join: {names:?}"
+    );
+    let refusals: Vec<&str> = errors.split(';').filter(|part| !part.is_empty()).collect();
+    assert_eq!(
+        refusals.len(),
+        2,
+        "expected plain text and the fingerprint code each refused once, got {refusals:?}"
     );
     assert!(
-        error.contains("not a contact or group invite"),
-        "pasting plain text should have said so, got {error:?}"
+        refusals
+            .iter()
+            .all(|refusal| refusal.starts_with("that link is not a contact or group invite")),
+        "a refusal did not say that what was pasted is not an invite, got {refusals:?}"
     );
     assert!(
         invite.starts_with("https://i.delta.chat/"),

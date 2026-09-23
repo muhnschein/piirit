@@ -446,10 +446,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>పరిచయం</translation>
     </message>
     <message>
-        <source>Verified: end-to-end encrypted, and checked in person</source>
-        <translation>ధృవీకరించబడింది: ఎండ్-టు-ఎండ్ ఎన్‌క్రిప్టెడ్, ముఖాముఖి తనిఖీ చేయబడింది</translation>
-    </message>
-    <message>
         <source>End-to-end encrypted</source>
         <translation>ఎండ్-టు-ఎండ్ ఎన్‌క్రిప్టెడ్</translation>
     </message>
