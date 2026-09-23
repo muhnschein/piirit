@@ -134,6 +134,14 @@
     </message>
 </context>
 <context>
+    <name>AttachmentSaver</name>
+    <message>
+        <source>Saved to Downloads/Piirit</source>
+        <extracomment>Said once a file from a chat has been copied: the folder named Piirit inside Downloads. Keep &quot;Piirit&quot;, which is the folder&apos;s name.</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>AutoDeleteDialog</name>
     <message>
         <source>Delete messages from device</source>
@@ -414,10 +422,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Delete</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <source>Saved to Downloads</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>ChatPickerPage</name>
@@ -537,24 +541,12 @@ Other groups with blocked contacts will still show their messages.</source>
         <extracomment>Message field placeholder. Also the prompt for the caption on a message that is carrying a file.</extracomment>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <source>Saved to Pictures</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Saved to Videos</source>
-        <translation type="unfinished"></translation>
-    </message>
     <message numerus="yes">
         <source>%n member(s)</source>
         <extracomment>Under a group&apos;s name, over its messages. %n is how many people are in the group.</extracomment>
         <translation type="unfinished">
             <numerusform></numerusform>
         </translation>
-    </message>
-    <message>
-        <source>Saved to Downloads</source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Lost the connection to the Delta Chat core. Reconnecting…</source>
@@ -990,10 +982,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Open in another app</source>
         <extracomment>Hands the attachment to whatever else on the phone handles files of its kind.</extracomment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Saved to Pictures</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1553,10 +1541,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Saved to Videos</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Save to device</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1574,11 +1558,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Starting the app</source>
         <extracomment>Shown while a webxdc app is being made ready to run.</extracomment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Saved to Downloads</source>
-        <extracomment>Where a file a webxdc app produced was copied to.</extracomment>
         <translation type="unfinished"></translation>
     </message>
     <message>

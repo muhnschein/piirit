@@ -200,13 +200,13 @@ Page {
         pageStack.pop(below)
     }
 
-    // A copy into Downloads, under the name the sender gave it: what the
-    // conversation's row menu does with a file, and the same words for
-    // it.
-    FileSaver {
+    // A copy under the name the sender gave it, where every copy goes:
+    // what the conversation's row menu does with a file, and the same
+    // words for it. See AttachmentSaver.
+    AttachmentSaver {
         id: saver
         objectName: "saver"
-        onSaved: notice.show(qsTr("Saved to Downloads"))
+        onSaved: notice.show(saver.savedText)
         onError: page.errorMessage = message
     }
 
@@ -479,8 +479,7 @@ Page {
                     MenuItem {
                         objectName: "saveItem"
                         text: qsTr("Save to device")
-                        onClicked: saver.save_as(row.fileUrl, StandardPaths.download,
-                                                 model.file_name)
+                        onClicked: saver.keep(row.fileUrl, model.file_name)
                     }
                     MenuItem {
                         objectName: "deleteItem"

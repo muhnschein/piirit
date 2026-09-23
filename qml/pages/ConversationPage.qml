@@ -496,7 +496,7 @@ Page {
         }
         onOpenRequested: page.openAttachment(fileUrl, fileName, viewType,
                                              previewWidth)
-        onSaveRequested: page.saveAttachment(fileUrl, fileName, viewType)
+        onSaveRequested: attachmentSaver.keep(fileUrl, fileName)
         onFullTextRequested: pageStack.push(Qt.resolvedUrl("MessagePage.qml"), {
             accountId: page.accountId,
             messageId: messageId,
@@ -876,35 +876,12 @@ Page {
         }
     }
 
-    // Where a copy of an attachment goes: for a picture or a video the
-    // folder the gallery indexes, which is where the reader will look
-    // for it; for anything else Downloads, where the file manager looks
-    // and where the platform's own browser puts what it fetches -- no
-    // setting, as tuuli has none. Under the name the sender gave it,
-    // since the core keeps the file under a name of its own. The
-    // sandbox grants all three (UserDirs).
-    function saveAttachment(fileUrl, fileName, viewType) {
-        if (viewType === "Image" || viewType === "Gif"
-                || viewType === "Sticker") {
-            page.savedTo = qsTr("Saved to Pictures")
-            attachmentSaver.save_as(fileUrl, StandardPaths.pictures, fileName)
-        } else if (viewType === "Video") {
-            page.savedTo = qsTr("Saved to Videos")
-            attachmentSaver.save_as(fileUrl, StandardPaths.videos, fileName)
-        } else {
-            page.savedTo = qsTr("Saved to Downloads")
-            attachmentSaver.save_as(fileUrl, StandardPaths.download, fileName)
-        }
-    }
-
-    /// What to say once the copy is made: chosen where the folder is,
-    /// since only here is it known which one it went to.
-    property string savedTo: ""
-
-    FileSaver {
+    // A copy of an attachment, in Piirit's folder in Downloads -- no
+    // setting, as tuuli has none. See AttachmentSaver.
+    AttachmentSaver {
         id: attachmentSaver
         objectName: "attachmentSaver"
-        onSaved: notice.show(page.savedTo)
+        onSaved: notice.show(attachmentSaver.savedText)
         onError: page.errorMessage = message
     }
 

@@ -134,8 +134,8 @@ const PROBE_QML: &str = r"
                 function(fileUrl, fileName, viewType, previewWidth) {
                     raised += 'open:' + fileName + ':' + viewType + ';'
                 })
-            list.item.saveRequested.connect(function(fileUrl, fileName, viewType) {
-                raised += 'save:' + fileUrl + ':' + fileName + ':' + viewType + ';'
+            list.item.saveRequested.connect(function(fileUrl, fileName) {
+                raised += 'save:' + fileUrl + ':' + fileName + ';'
             })
             return 'ok'
         }
@@ -368,9 +368,9 @@ fn a_message_carrying_a_file_offers_to_open_it_and_to_keep_it() {
 
     assert_eq!(
         value("raised"),
-        "open:TODO.md:File;save:file:///tmp/piirit-menu/TODO.md:TODO.md:File;",
+        "open:TODO.md:File;save:file:///tmp/piirit-menu/TODO.md:TODO.md;",
         "the menu did not say which file it meant, what the sender called \
-         it, or what kind it is: the page decides where a copy goes from \
-         the kind, and names it as the sender did. {context}"
+         it, or what kind it is: a page opens a file by its kind, and a \
+         copy is named as the sender named it. {context}"
     );
 }

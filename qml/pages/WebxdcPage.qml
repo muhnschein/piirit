@@ -101,8 +101,8 @@ Page {
     /// Saved rather than asked about. The button an app draws over this
     /// is a download, and a download does not ask -- a chooser between
     /// opening and keeping is two taps in front of the one thing the
-    /// reader has already asked for. The copy goes to
-    /// Downloads, where the file manager looks, and the notice says so.
+    /// reader has already asked for. The copy goes where every copy
+    /// goes (AttachmentSaver), and the notice says so.
     ///
     /// Text with no file has nowhere to be saved, so it goes on the
     /// clipboard instead and the page says that too: the reader asked
@@ -117,7 +117,7 @@ Page {
             return
         }
         handoverSaver.handedOver = filePath
-        handoverSaver.save(page.urlOf(filePath), StandardPaths.download)
+        handoverSaver.keep(page.urlOf(filePath), "")
     }
 
     /// A path as a URL, encoded rather than concatenated: the name is the
@@ -130,8 +130,8 @@ Page {
     }
 
     // Saving is the same copy the conversation makes of an attachment,
-    // into the folder the file manager looks in.
-    FileSaver {
+    // into the same folder.
+    AttachmentSaver {
         id: handoverSaver
         objectName: "handoverSaver"
         /// The file the app handed over: a copy in the cache, waiting to
@@ -141,8 +141,7 @@ Page {
         /// files should not leave a hundred behind.
         property string handedOver
         onSaved: {
-            //: Where a file a webxdc app produced was copied to.
-            notice.show(qsTr("Saved to Downloads"))
+            notice.show(handoverSaver.savedText)
             handoverSaver.forget()
         }
         onError: {

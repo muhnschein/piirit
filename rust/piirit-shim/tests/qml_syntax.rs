@@ -1172,7 +1172,7 @@ fn the_webxdc_page_keeps_a_handed_over_file() {
     );
     let offer = block_of(&code, "function offer(");
     assert!(
-        offer.contains("handoverSaver.save(") && offer.contains("StandardPaths.download"),
+        offer.contains("handoverSaver.keep("),
         "the file is not kept anywhere the reader can find it: {offer:?}"
     );
     assert!(
@@ -1191,6 +1191,55 @@ fn the_webxdc_page_keeps_a_handed_over_file() {
         code.contains("app.discard("),
         "the copy in the cache is never deleted, so every file an app \
          hands over stays on the phone twice"
+    );
+}
+
+/// Every copy the reader keeps goes to the one folder.
+///
+/// `AttachmentSaver` names that folder, and is the only thing that makes
+/// a `FileSaver`: a page that made its own would pick a folder of its
+/// own, and the reader would be looking in several places for what they
+/// kept. A page asks it to `keep` a file, which takes no folder.
+#[test]
+fn every_copy_goes_to_the_one_folder() {
+    let mut makers = Vec::new();
+    let mut keepers = 0;
+    let mut offenders = Vec::new();
+    for file in qml_files() {
+        let code = code_only(&fs::read_to_string(&file).expect("read qml"));
+        if code.contains("FileSaver {") {
+            makers.push(
+                file.file_name()
+                    .map(|name| name.to_string_lossy().into_owned())
+                    .unwrap_or_default(),
+            );
+        }
+        if !code.contains("AttachmentSaver {") {
+            continue;
+        }
+        keepers += 1;
+        if code.contains(".save(") || code.contains(".save_as(") {
+            offenders.push(file.display().to_string());
+        }
+    }
+    assert_eq!(
+        makers,
+        ["AttachmentSaver.qml"],
+        "a FileSaver is made somewhere other than AttachmentSaver, so a \
+         copy can go to a folder of its own"
+    );
+    // Otherwise this passes by finding nothing to check.
+    assert!(
+        keepers >= 5,
+        "only {keepers} files keep a copy through AttachmentSaver; there \
+         should be five -- the conversation, a picture, a video, a chat's \
+         media and a webxdc app's download"
+    );
+    assert!(
+        offenders.is_empty(),
+        "these hand AttachmentSaver a folder rather than asking it to \
+         `keep` a file:\n  {}",
+        offenders.join("\n  ")
     );
 }
 
