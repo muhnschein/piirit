@@ -10,15 +10,17 @@ import "."
 import "../js/QuickActions.js" as QuickActions
 
 /*
- * One of the cover's two quick actions, as QuickActionsPage offers it:
- * what it does, and for a chat, which chat and which icon it wears.
+ * One of the cover's quick actions, as QuickActionsPage offers it: what it
+ * does, and for a chat, which chat and which icon it wears.
  *
- * A chat is picked on the chat picker, from the profile the settings were
- * opened from, and the chat and the icons show only for a chat's action.
- * Choosing "Chat" opens the picker, and the action is a chat's only once
- * one has been picked: backing out leaves it as it was.
- * The chat's name is looked up rather than kept, so a renamed chat reads
- * as it is called now, and a deleted one says so.
+ * All of it is one choice. Choosing "Chat" opens the chat picker, on the
+ * profile the settings were opened from, and the action is a chat's only
+ * once one has been picked: backing out leaves it as it was. The choice
+ * then says which chat -- "Chat: " and its name -- while the list it is
+ * picked from still says "Chat", and choosing that again picks again.
+ * The name is looked up rather than kept, so a renamed chat reads as it
+ * is called now, and a deleted one says so. Under a chat's action, and
+ * only there, are the icons it can wear.
  */
 Column {
     id: setting
@@ -52,6 +54,24 @@ Column {
         //: No quick action on this side of the cover.
         default: return qsTr("None")
         }
+    }
+
+    /// What the choice says it is: a chat's action by its chat.
+    function valueText() {
+        if (setting.action.kind !== "chat") {
+            return setting.kindLabel(setting.action.kind)
+        }
+        if (setting.chatGone) {
+            //: What a quick action says about its chat once that chat has
+            //: been deleted.
+            return qsTr("Deleted chat")
+        }
+        if (chat.name === "") {
+            return setting.kindLabel("chat")
+        }
+        //: A quick action on the cover that opens one chat, with the
+        //: chat's name.
+        return qsTr("Chat: %1").arg(chat.name)
     }
 
     /// Put the choice back to what the setting holds. Silica moves it on
@@ -111,6 +131,9 @@ Column {
         objectName: setting.side + "ActionCombo"
         width: parent.width
         label: setting.label
+        // What the setting holds, a chat's action by its chat's name,
+        // rather than the text of the item Silica last moved to.
+        value: setting.valueText()
 
         // In the order of QuickActions.kinds, after "None": `refresh`
         // counts on it.
@@ -143,31 +166,33 @@ Column {
         }
     }
 
-    ValueButton {
-        objectName: setting.side + "ActionChatButton"
-        visible: setting.action.kind === "chat"
-        label: setting.kindLabel("chat")
-        //: What a quick action says about its chat once that chat has
-        //: been deleted.
-        value: setting.chatGone ? qsTr("Deleted chat") : chat.name
-        onClicked: setting.pickChat()
-    }
-
-    // The icons a chat's action can wear, the one it wears lit. Drawn from
-    // the same files the cover hands the home screen, so what is picked
-    // here is what the cover shows.
-    Row {
+    // The icons a chat's action can wear, the one it wears lit, in rows
+    // that wrap at the page's width. Laid out by bindings rather than a
+    // Grid, for the reason ChoiceTiles gives. Drawn from the same files
+    // the cover hands the home screen, so what is picked here is what the
+    // cover shows.
+    Item {
+        id: icons
         objectName: setting.side + "ActionIcons"
         visible: setting.action.kind === "chat"
-        x: Theme.horizontalPageMargin - Theme.paddingMedium
+        width: parent.width
+        height: icons.visible ? icons.rows * icons.cell + Theme.paddingMedium : 0
+
+        readonly property real cell: Theme.itemSizeSmall
+        readonly property real inset: Theme.horizontalPageMargin - Theme.paddingMedium
+        readonly property int columns: Math.max(1, Math.floor((icons.width - 2 * icons.inset)
+                                                              / icons.cell))
+        readonly property int rows: Math.ceil(QuickActions.chatIcons.length / icons.columns)
 
         Repeater {
             model: QuickActions.chatIcons
 
             BackgroundItem {
                 objectName: setting.side + "Icon-" + modelData
-                width: Theme.itemSizeSmall
-                height: Theme.itemSizeSmall
+                x: icons.inset + (index % icons.columns) * icons.cell
+                y: Math.floor(index / icons.columns) * icons.cell
+                width: icons.cell
+                height: icons.cell
                 highlighted: down || setting.action.icon === modelData
                 onClicked: Settings[setting.prefix + "Icon"] = modelData
 

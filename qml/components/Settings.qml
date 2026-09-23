@@ -8,8 +8,8 @@ import Nemo.Configuration 1.0
  * how much of an attachment arrives unasked, how long a message is kept,
  * whether anything is announced at all and if so how much a notification
  * gives away and whether a muted group can still raise one, whether
- * webxdc apps are offered at all, and which quick actions the cover
- * offers.
+ * webxdc apps are offered at all, and how many quick actions the cover
+ * offers and which.
  *
  * They live in dconf under the app's own path, and every page reads
  * them through this one object: the settings page (qml/pages/
@@ -72,6 +72,10 @@ QtObject {
     /// for, and every one of those three reads this rather than deciding
     /// for itself.
     property alias webxdcEnabled: webxdcEnabledValue.value
+    /// How many quick actions the cover has room for: 1, or 2. With one,
+    /// the left action is the one, and what was set up on the right is
+    /// kept for when there are two again.
+    property alias quickActionCount: quickActionCountValue.value
     /// The cover's quick actions, the left one and the right: what each
     /// does -- "" for nothing, "chat", "search", "qr" or "scan" -- and, for
     /// a chat, the profile and chat it opens and the icon it wears.
@@ -161,8 +165,14 @@ QtObject {
         defaultValue: false
     }
 
-    // None on a phone that has never been asked: the cover is the faces
-    // alone until the reader puts something on it.
+    // One, and that one none, on a phone that has never been asked: the
+    // cover is the faces alone until the reader puts something on it.
+    property ConfigurationValue quickActionCountConfig: ConfigurationValue {
+        id: quickActionCountValue
+        key: "/apps/harbour-piirit/quick_action_count"
+        defaultValue: 1
+    }
+
     property ConfigurationValue quickActionLeftConfig: ConfigurationValue {
         id: quickActionLeftValue
         key: "/apps/harbour-piirit/quick_action_left"

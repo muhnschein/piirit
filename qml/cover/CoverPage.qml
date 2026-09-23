@@ -31,8 +31,9 @@ import "../js/QuickActions.js" as QuickActions
  * (`cover_people`): the grid is laid out in a pass over them, which a
  * view over the rows could not do.
  *
- * At its foot, up to two quick actions the reader chose in the settings:
- * a chat, the search, this profile's QR code, or the scanner. The home
+ * At its foot, the one or two quick actions the reader chose in the
+ * settings -- with one chosen, the left one alone: a chat, the search,
+ * this profile's QR code, or the scanner. The home
  * screen draws them, in the strip along the bottom edge, and while they
  * are there the grid sinks away into that strip rather than running
  * under the icons -- the faces fade out towards the bottom, nothing is
@@ -92,8 +93,8 @@ CoverBackground {
     /// keeps them.
     signal quickAction(string side)
 
-    readonly property var leftAction: QuickActions.read(Settings, "left")
-    readonly property var rightAction: QuickActions.read(Settings, "right")
+    readonly property var leftAction: QuickActions.shown(Settings, "left")
+    readonly property var rightAction: QuickActions.shown(Settings, "right")
     /// Whether the home screen is drawing any actions: one set, and the
     /// app able to take it.
     readonly property bool actionsShown: cover.quickActionsAllowed
@@ -349,24 +350,9 @@ CoverBackground {
             property real fadeTo: grid.height
             property real gridHeight: Math.max(1, grid.height)
 
-            // highp for the ramp, which runs over a good part of the cover
-            // and would band in steps at lowp.
-            fragmentShader: "
-                varying highp vec2 qt_TexCoord0;
-                uniform sampler2D source;
-                uniform highp float fadeFrom;
-                uniform highp float fadeTo;
-                uniform highp float gridHeight;
-                uniform lowp float qt_Opacity;
-
-                void main() {
-                    highp float y = qt_TexCoord0.y * gridHeight;
-                    highp float sink = clamp((fadeTo - y) / max(1.0, fadeTo - fadeFrom),
-                                             0.0, 1.0);
-                    // Premultiplied, so the whole colour goes with it.
-                    gl_FragColor = texture2D(source, qt_TexCoord0) * (sink * sink)
-                                   * qt_Opacity;
-                }"
+            // The shader is shared with the previews on the quick actions'
+            // page, so what is picked there is what the cover shows.
+            fragmentShader: QuickActions.fadeShader
         }
 
         Repeater {

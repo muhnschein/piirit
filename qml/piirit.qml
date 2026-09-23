@@ -73,7 +73,7 @@ ApplicationWindow {
     /// A quick action on the cover was tapped: up comes the app, and the
     /// chat list does the rest, the way it opens a tapped notification.
     function quickAction(side) {
-        var action = QuickActions.read(Settings, side)
+        var action = QuickActions.shown(Settings, side)
         if (appWindow.chatList === null || action.kind === "") {
             return
         }

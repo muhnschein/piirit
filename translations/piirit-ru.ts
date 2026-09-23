@@ -1243,6 +1243,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <extracomment>What a quick action says about its chat once that chat has been deleted.</extracomment>
         <translation>Удалённый чат</translation>
     </message>
+    <message>
+        <source>Chat: %1</source>
+        <extracomment>A quick action on the cover that opens one chat, with the chat&apos;s name.</extracomment>
+        <translation>Чат: %1</translation>
+    </message>
 </context>
 <context>
     <name>QuickActionsPage</name>
@@ -1264,6 +1269,21 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Right</source>
         <extracomment>The quick action on the right of the cover.</extracomment>
         <translation>Справа</translation>
+    </message>
+    <message>
+        <source>One action</source>
+        <extracomment>Under a picture of the cover with room for one quick action; tapping it chooses that.</extracomment>
+        <translation>Одно действие</translation>
+    </message>
+    <message>
+        <source>Two actions</source>
+        <extracomment>Under a picture of the cover with room for two quick actions; tapping it chooses that.</extracomment>
+        <translation>Два действия</translation>
+    </message>
+    <message>
+        <source>Action</source>
+        <extracomment>The one quick action on the cover, when it has room for one.</extracomment>
+        <translation>Действие</translation>
     </message>
 </context>
 <context>
@@ -1501,10 +1521,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Уведомления</translation>
     </message>
     <message>
-        <source>Apps</source>
-        <translation>Приложения</translation>
-    </message>
-    <message>
         <source>Enable webxdc apps (experimental)</source>
         <extracomment>A webxdc app is a small program somebody sends into a chat and everyone in it plays with. Keep the name: it is what every other Delta Chat client calls them.</extracomment>
         <translation>Включить приложения webxdc (эксперимент)</translation>
@@ -1602,39 +1618,9 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Быстрые действия</translation>
     </message>
     <message>
-        <source>Left</source>
-        <extracomment>The quick action on the left of the cover.</extracomment>
-        <translation>Слева</translation>
-    </message>
-    <message>
-        <source>Right</source>
-        <extracomment>The quick action on the right of the cover.</extracomment>
-        <translation>Справа</translation>
-    </message>
-    <message>
-        <source>Chat</source>
-        <extracomment>A quick action on the cover that opens one chat.</extracomment>
-        <translation>Чат</translation>
-    </message>
-    <message>
-        <source>Search</source>
-        <extracomment>A quick action on the cover that opens the chat list&apos;s search.</extracomment>
-        <translation>Поиск</translation>
-    </message>
-    <message>
-        <source>My QR code</source>
-        <extracomment>A quick action on the cover that shows this profile&apos;s QR code.</extracomment>
-        <translation>Мой QR-код</translation>
-    </message>
-    <message>
-        <source>Scan QR code</source>
-        <extracomment>A quick action on the cover that opens the QR code scanner.</extracomment>
-        <translation>Сканировать QR-код</translation>
-    </message>
-    <message>
-        <source>None</source>
-        <extracomment>No quick action on this side of the cover.</extracomment>
-        <translation>Нет</translation>
+        <source>Advanced</source>
+        <extracomment>The settings most readers never need to change.</extracomment>
+        <translation>Дополнительно</translation>
     </message>
 </context>
 <context>

@@ -70,6 +70,7 @@ const PROBE_QML: &str = r"
             }
             return found
         }
+        function count(n) { Settings.quickActionCount = n; return 'ok' }
         function set(side, kind, account, chat, icon) {
             var prefix = side === 'right' ? 'quickActionRight' : 'quickActionLeft'
             Settings[prefix] = kind
@@ -195,6 +196,7 @@ fn the_cover_offers_the_actions_that_are_set_and_makes_room_for_them() {
         // nothing, but say it anyway: nothing is set to start with.
         record!("clear-left", set!("left", "", 0, 0, ""));
         record!("clear-right", set!("right", "", 0, 0, ""));
+        record!("room-for-two", call!("count", 2));
         record!("load", call!("load", QString::from(cover_url())));
         record!("none-lists", call!("lists"));
         record!("none-fade", call!("fade"));
@@ -214,6 +216,16 @@ fn the_cover_offers_the_actions_that_are_set_and_makes_room_for_them() {
         record!("two-left", call!("icon", QString::from("twoActions"), 0));
         record!("two-right", call!("icon", QString::from("twoActions"), 1));
         record!("two-tap", call!("tap", QString::from("twoActions"), 1));
+
+        // Room for one: the left alone, the right kept but not offered.
+        record!("room-for-one", call!("count", 1));
+        record!("held-right-lists", call!("lists"));
+        record!(
+            "held-right-icon",
+            call!("icon", QString::from("oneAction"), 0)
+        );
+        record!("back-to-two", call!("count", 2));
+        record!("both-again", call!("lists"));
 
         // An icon this version does not know is the first one; a kind it
         // does not know is no action at all, which leaves the other alone.
@@ -313,6 +325,20 @@ fn the_cover_offers_the_actions_that_are_set_and_makes_room_for_them() {
         "a tap on the right action does not say so. {context}"
     );
     assert_eq!(
+        value("held-right-lists"),
+        "false|true",
+        "with room for one the cover offers more than one. {context}"
+    );
+    assert!(
+        value("held-right-icon").ends_with("search-32-white.png"),
+        "with room for one the cover does not offer the left action. {context}"
+    );
+    assert_eq!(
+        value("both-again"),
+        "true|false",
+        "the right action is lost once there is room for it again. {context}"
+    );
+    assert_eq!(
         value("odd-lists"),
         "false|true",
         "an action of a kind this version does not know is offered. {context}"
@@ -369,15 +395,14 @@ fn the_cover_offers_the_actions_that_are_set_and_makes_room_for_them() {
     }
 }
 
-/// The strings or numbers in a JavaScript array literal on the line that
-/// starts `var <name> = [`.
+/// The strings or numbers in the JavaScript array literal that a line
+/// starting `var <name> = [` opens, however many lines it runs to.
 fn listed(script: &str, name: &str) -> Vec<String> {
-    let start = format!("var {name} = [");
-    let line = script
-        .lines()
-        .find(|line| line.starts_with(&start))
-        .unwrap_or_else(|| panic!("qml/js/QuickActions.js has no `{start}`"));
-    line[start.len()..]
+    let start = format!("\nvar {name} = [");
+    let at = script
+        .find(&start)
+        .unwrap_or_else(|| panic!("qml/js/QuickActions.js has no `{}`", start.trim()));
+    script[at + start.len()..]
         .split(']')
         .next()
         .unwrap_or_default()
@@ -407,8 +432,8 @@ fn every_quick_action_icon_is_drawn_at_every_size_in_both_inks() {
         .collect();
     assert_eq!(
         icons.len(),
-        9,
-        "the icons are not the nine offered: {icons:?}"
+        16,
+        "the icons are not the sixteen offered: {icons:?}"
     );
     assert_eq!(sizes, [32, 40, 48, 56, 64], "the sizes moved");
 

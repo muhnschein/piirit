@@ -1,13 +1,15 @@
-//! The cover's quick actions in the settings: on the settings page, above
-//! Apps, one row a side saying what it does, either opening the page they
-//! are set up on; on that page, a short word on what they are, then the
-//! left one and the right.
+//! The cover's quick actions in the settings: on the settings page, one
+//! row under Advanced, beside the webxdc switch, opening the page they
+//! are set up on; on that page, a short word on what they are, then two
+//! pictures of the cover to choose between -- room for one action, or for
+//! two -- then what each action does.
 //!
 //! Each writes what it does to the settings, and shows what the settings
-//! hold. A chat is picked on the chat picker, and the action becomes a
-//! chat's only once one has been picked; it then says which chat by the
-//! name the core has for it now, lets the icon be chosen, and says so
-//! when the chat has been deleted since.
+//! hold; the pictures show it too, redrawn as it changes. A chat is picked
+//! on the chat picker, and the action becomes a chat's only once one has
+//! been picked; the choice then says which chat by the name the core has
+//! for it now, lets the icon be chosen, and says so when the chat has been
+//! deleted since. With room for one, the right action is hidden and kept.
 
 // Qt harness: see qml_pages.rs.
 #![allow(
@@ -92,17 +94,31 @@ const PROBE_QML: &str = r"
             return 'ok'
         }
         // What the settings hold for one side, as kind|account|chat|icon.
+        function count() { return '' + Settings.quickActionCount }
         function holds(side) {
             var prefix = side === 'right' ? 'quickActionRight' : 'quickActionLeft'
             return Settings[prefix] + '|' + Settings[prefix + 'Account'] + '|'
                    + Settings[prefix + 'Chat'] + '|' + Settings[prefix + 'Icon']
         }
+        // The icon a picture of the cover shows in an action's place: the
+        // file's name, or '' for the dot of one not chosen yet.
+        function previewIcon(preview, index) {
+            var picture = findIn(loader.item, preview)
+            if (!picture) { return 'missing:' + preview }
+            var spot = findIn(picture, 'previewAction' + index)
+            if (!spot) { return 'missing:previewAction' + index }
+            return ('' + spot.source).split('/').pop()
+        }
         function clear() {
+            Settings.quickActionCount = 1
             Settings.quickActionLeft = ''
             Settings.quickActionLeftAccount = 0
             Settings.quickActionLeftChat = 0
             Settings.quickActionLeftIcon = ''
             Settings.quickActionRight = ''
+            Settings.quickActionRightAccount = 0
+            Settings.quickActionRightChat = 0
+            Settings.quickActionRightIcon = ''
             return 'ok'
         }
         function pick(chatId, chatName) {
@@ -217,26 +233,27 @@ fn the_quick_actions_are_set_up_on_a_page_of_their_own() {
             call!("load", QString::from(common::page_url("SettingsPage.qml")))
         );
 
-        // On the settings page: a row a side, right under their heading
-        // and right above Apps, each saying what that side does.
+        // On the settings page: one row under Advanced, then the webxdc
+        // switch, and nothing after; no heading of their own any more.
         record!(
-            "under-heading",
+            "under-advanced",
+            call!("underHeading", QString::from("Advanced"))
+        );
+        record!(
+            "after-entry",
+            call!("after", QString::from("quickActionsEntry"))
+        );
+        record!(
+            "after-webxdc",
+            call!("after", QString::from("webxdcSwitch"))
+        );
+        record!(
+            "old-heading",
             call!("underHeading", QString::from("Quick actions"))
         );
-        record!(
-            "after-left-entry",
-            call!("after", QString::from("leftQuickActionEntry"))
-        );
-        record!(
-            "after-right-entry",
-            call!("after", QString::from("rightQuickActionEntry"))
-        );
-        record!("left-entry-none", get!("leftQuickActionEntry", "value"));
-        record!("right-entry-none", get!("rightQuickActionEntry", "value"));
-        record!("open-left", click!("leftQuickActionEntry"));
-        record!("opened-left", call!("stackLog"));
-        record!("open-right", click!("rightQuickActionEntry"));
-        record!("opened-right", call!("stackLog"));
+        record!("apps-heading", call!("underHeading", QString::from("Apps")));
+        record!("open", click!("quickActionsEntry"));
+        record!("opened", call!("stackLog"));
 
         record!(
             "load",
@@ -246,8 +263,8 @@ fn the_quick_actions_are_set_up_on_a_page_of_their_own() {
             )
         );
 
-        // On their page: the word on what they are first, then left, then
-        // right.
+        // On their page: the word on what they are, the pictures, then
+        // the actions.
         record!(
             "after-header",
             call!("after", QString::from("quickActionsHeader"))
@@ -257,33 +274,68 @@ fn the_quick_actions_are_set_up_on_a_page_of_their_own() {
             call!("after", QString::from("quickActionsExplained"))
         );
         record!(
+            "after-choices",
+            call!("after", QString::from("quickActionCountChoices"))
+        );
+        record!(
             "after-left",
             call!("after", QString::from("leftQuickAction"))
         );
-        record!(
-            "after-right",
-            call!("after", QString::from("rightQuickAction"))
-        );
         record!("words", get!("quickActionsExplained", "text"));
 
-        // Nothing on a phone that has never been asked.
+        // A phone that has never been asked: room for one, and that one
+        // none.
+        record!("one-chosen", get!("oneActionPreview", "selected"));
+        record!("two-unchosen", get!("twoActionsPreview", "selected"));
+        record!("one-label", get!("leftActionCombo", "label"));
+        record!("right-hidden", get!("rightQuickAction", "visible"));
         record!("left-none", get!("leftActionCombo", "currentIndex"));
-        record!("right-none", get!("rightActionCombo", "currentIndex"));
-        record!("chat-hidden", get!("leftActionChatButton", "visible"));
+        record!("left-none-says", get!("leftActionCombo", "value"));
         record!("icons-hidden", get!("leftActionIcons", "visible"));
+        record!(
+            "one-dot",
+            call!("previewIcon", QString::from("oneActionPreview"), 0)
+        );
 
-        // The kinds that need nothing more are written on the tap.
+        // The kinds that need nothing more are written on the tap, and the
+        // pictures follow.
         record!("pick-search", click!("leftAction-search"));
         record!("left-search", call!("holds", QString::from("left")));
         record!("left-search-shown", get!("leftActionCombo", "currentIndex"));
+        record!("left-search-says", get!("leftActionCombo", "value"));
+        record!(
+            "one-search",
+            call!("previewIcon", QString::from("oneActionPreview"), 0)
+        );
+        record!(
+            "two-left-search",
+            call!("previewIcon", QString::from("twoActionsPreview"), 0)
+        );
+        record!(
+            "two-right-dot",
+            call!("previewIcon", QString::from("twoActionsPreview"), 1)
+        );
+
+        // Room for two: the other picture chosen, a left and a right.
+        record!("choose-two", click!("twoActionsPreview"));
+        record!("count-two", call!("count"));
+        record!("two-chosen", get!("twoActionsPreview", "selected"));
+        record!("one-unchosen", get!("oneActionPreview", "selected"));
+        record!("left-label", get!("leftActionCombo", "label"));
+        record!("right-shown", get!("rightQuickAction", "visible"));
         record!("pick-qr", click!("rightAction-qr"));
         record!("right-qr-shown", get!("rightActionCombo", "currentIndex"));
+        record!(
+            "two-right-qr",
+            call!("previewIcon", QString::from("twoActionsPreview"), 1)
+        );
         record!("pick-scan", click!("rightAction-scan"));
         record!("right-scan", call!("holds", QString::from("right")));
         record!("right-scan-shown", get!("rightActionCombo", "currentIndex"));
         record!("pick-none", click!("rightAction-none"));
         record!("right-none-again", call!("holds", QString::from("right")));
         record!("right-none-shown", get!("rightActionCombo", "currentIndex"));
+        record!("pick-qr-again", click!("rightAction-qr"));
 
         // A chat is asked for, and nothing changes until one is picked.
         record!("pick-chat", click!("leftAction-chat"));
@@ -293,42 +345,48 @@ fn the_quick_actions_are_set_up_on_a_page_of_their_own() {
         record!("picked", call!("pick", 2, QString::from("chat 2")));
         record!("left-chat", call!("holds", QString::from("left")));
         record!("left-chat-shown", get!("leftActionCombo", "currentIndex"));
-        record!("chat-shown", get!("leftActionChatButton", "visible"));
         record!("icons-shown", get!("leftActionIcons", "visible"));
         record!("heart-lit", get!("leftIcon-heart", "highlighted"));
+        record!(
+            "two-left-heart",
+            call!("previewIcon", QString::from("twoActionsPreview"), 0)
+        );
 
-        // Another icon.
-        record!("pick-star", click!("leftIcon-star"));
-        record!("left-star", call!("holds", QString::from("left")));
-        record!("star-lit", get!("leftIcon-star", "highlighted"));
+        // Another icon, one of the later ones.
+        record!("pick-dog", click!("leftIcon-dog"));
+        record!("left-dog", call!("holds", QString::from("left")));
+        record!("dog-lit", get!("leftIcon-dog", "highlighted"));
         record!("heart-unlit", get!("leftIcon-heart", "highlighted"));
+        record!(
+            "two-left-dog",
+            call!("previewIcon", QString::from("twoActionsPreview"), 0)
+        );
     });
 
-    // The chat by the name the core has for it; then it goes.
+    // The chat by the name the core has for it, in the choice itself;
+    // then it goes.
     single_shot(Duration::from_secs(3), move || unsafe {
-        record!("chat-name", get!("leftActionChatButton", "value"));
+        record!("chat-says", get!("leftActionCombo", "value"));
         record!("delete", call!("deleteChat", 1));
     });
 
-    // Picked again, it is one that has gone.
+    // Chosen again, "Chat" picks again: one that has gone.
     single_shot(Duration::from_secs(4), move || unsafe {
-        record!("change-chat", click!("leftActionChatButton"));
+        record!("change-chat", click!("leftAction-chat"));
         record!("asked-again", call!("stackLog"));
         record!("picked-gone", call!("pick", 1, QString::from("chat 1")));
     });
 
     single_shot(Duration::from_secs(5), move || unsafe {
-        record!("gone-name", get!("leftActionChatButton", "value"));
+        record!("gone-says", get!("leftActionCombo", "value"));
         record!("left-gone", call!("holds", QString::from("left")));
 
-        // Back on the settings page, the rows say what was set up.
-        record!("pick-qr-again", click!("rightAction-qr"));
-        record!(
-            "reload-settings",
-            call!("load", QString::from(common::page_url("SettingsPage.qml")))
-        );
-        record!("left-entry-chat", get!("leftQuickActionEntry", "value"));
-        record!("right-entry-qr", get!("rightQuickActionEntry", "value"));
+        // Back to room for one: the right hidden, and kept.
+        record!("choose-one", click!("oneActionPreview"));
+        record!("count-one", call!("count"));
+        record!("right-hidden-again", get!("rightQuickAction", "visible"));
+        record!("right-kept", call!("holds", QString::from("right")));
+        record!("one-label-again", get!("leftActionCombo", "label"));
         (*engine_ptr).quit();
     });
 
@@ -349,37 +407,36 @@ fn the_quick_actions_are_set_up_on_a_page_of_their_own() {
         "the settings page did not load. {context}"
     );
     assert_eq!(
-        value("under-heading"),
-        "leftQuickActionEntry",
-        "the left action's row is not right under the quick actions' \
-         heading. {context}"
+        value("under-advanced"),
+        "quickActionsEntry",
+        "the quick actions are not the first thing under Advanced. {context}"
     );
     assert_eq!(
-        value("after-left-entry"),
-        "rightQuickActionEntry",
-        "{context}"
+        value("after-entry"),
+        "webxdcSwitch",
+        "the webxdc switch is not under Advanced with them. {context}"
     );
     assert_eq!(
-        value("after-right-entry"),
-        "heading:Apps",
-        "the quick actions are not right above Apps. {context}"
+        value("after-webxdc"),
+        "nothing",
+        "something follows Advanced. {context}"
     );
-    for label in ["left-entry-none", "right-entry-none"] {
-        assert_eq!(
-            value(label),
-            "None",
-            "a fresh phone's row does not say there is no action ({label}). \
-             {context}"
-        );
-    }
-    for label in ["opened-left", "opened-right"] {
-        assert_eq!(
-            value(label),
-            "push:QuickActionsPage.qml:1:undefined|",
-            "a row does not open the quick actions' page for this profile \
-             ({label}). {context}"
-        );
-    }
+    assert_eq!(
+        value("old-heading"),
+        "missing:Quick actions",
+        "the quick actions still have a heading of their own. {context}"
+    );
+    assert_eq!(
+        value("apps-heading"),
+        "missing:Apps",
+        "Apps is still a heading of its own. {context}"
+    );
+    assert_eq!(
+        value("opened"),
+        "push:QuickActionsPage.qml:1:undefined|",
+        "the row does not open the quick actions' page for this profile. \
+         {context}"
+    );
     assert_eq!(
         value("load"),
         "ok",
@@ -391,34 +448,70 @@ fn the_quick_actions_are_set_up_on_a_page_of_their_own() {
         "the quick actions are not explained right under the page's \
          header. {context}"
     );
-    assert_eq!(value("after-words"), "leftQuickAction", "{context}");
-    assert_eq!(value("after-left"), "rightQuickAction", "{context}");
     assert_eq!(
-        value("after-right"),
-        "nothing",
-        "something follows the right action on its page. {context}"
+        value("after-words"),
+        "quickActionCountChoices",
+        "the pictures to choose between do not follow the explanation. \
+         {context}"
     );
+    assert_eq!(value("after-choices"), "leftQuickAction", "{context}");
+    assert_eq!(value("after-left"), "rightQuickAction", "{context}");
     assert!(
         !value("words").is_empty(),
         "the explanation says nothing. {context}"
     );
-    for label in ["left-none", "right-none"] {
-        assert_eq!(
-            value(label),
-            "0",
-            "a fresh phone does not show no action ({label}). {context}"
-        );
-    }
-    for label in ["chat-hidden", "icons-hidden"] {
-        assert_eq!(
-            value(label),
-            "false",
-            "a chat's controls show with no chat action ({label}). {context}"
-        );
-    }
+    assert_eq!(
+        value("one-chosen"),
+        "true",
+        "a fresh phone does not have room for one. {context}"
+    );
+    assert_eq!(value("two-unchosen"), "false", "{context}");
+    assert_eq!(
+        value("one-label"),
+        "Action",
+        "the one action is not called the action. {context}"
+    );
+    assert_eq!(
+        value("right-hidden"),
+        "false",
+        "the right action shows with room for one. {context}"
+    );
+    assert_eq!(value("left-none"), "0", "{context}");
+    assert_eq!(value("left-none-says"), "None", "{context}");
+    assert_eq!(
+        value("icons-hidden"),
+        "false",
+        "the icons show with no chat action. {context}"
+    );
+    assert_eq!(
+        value("one-dot"),
+        "",
+        "the picture shows an icon for an action not chosen. {context}"
+    );
     assert_eq!(value("left-search"), "search|0|0|", "{context}");
     assert_eq!(value("left-search-shown"), "2", "{context}");
+    assert_eq!(value("left-search-says"), "Search", "{context}");
+    for label in ["one-search", "two-left-search"] {
+        assert!(
+            value(label).starts_with("search-"),
+            "a picture does not show the search ({label}). {context}"
+        );
+    }
+    assert_eq!(
+        value("two-right-dot"),
+        "",
+        "the picture shows an icon for a right action not chosen. {context}"
+    );
+    assert_eq!(value("count-two"), "2", "{context}");
+    assert_eq!(value("two-chosen"), "true", "{context}");
+    assert_eq!(value("one-unchosen"), "false", "{context}");
+    assert_eq!(value("left-label"), "Left", "{context}");
+    assert_eq!(value("right-shown"), "true", "{context}");
     assert_eq!(value("right-qr-shown"), "3", "{context}");
+    assert!(
+        value("two-right-qr").starts_with("qr-"),
+        "the picture does not follow the right action. {context}"
+    );
     assert_eq!(value("right-scan"), "scan|0|0|", "{context}");
     assert_eq!(value("right-scan-shown"), "4", "{context}");
     assert_eq!(value("right-none-again"), "|0|0|", "{context}");
@@ -444,45 +537,49 @@ fn the_quick_actions_are_set_up_on_a_page_of_their_own() {
         "the picked chat is not the action's, with the first icon. {context}"
     );
     assert_eq!(value("left-chat-shown"), "1", "{context}");
-    assert_eq!(value("chat-shown"), "true", "{context}");
     assert_eq!(value("icons-shown"), "true", "{context}");
     assert_eq!(value("heart-lit"), "true", "{context}");
-    assert_eq!(value("left-star"), "chat|1|2|star", "{context}");
-    assert_eq!(value("star-lit"), "true", "{context}");
-    assert_eq!(value("heart-unlit"), "false", "{context}");
+    assert!(
+        value("two-left-heart").starts_with("heart-"),
+        "the picture does not show the chat's icon. {context}"
+    );
+    assert_eq!(value("left-dog"), "chat|1|2|dog", "{context}");
+    assert_eq!(value("dog-lit"), "true", "{context}");
     assert_eq!(
-        value("chat-name"),
-        "chat 2",
-        "the action does not say which chat it opens. {context}"
+        value("heart-unlit"),
+        "false",
+        "the icon picked before stays lit. {context}"
+    );
+    assert!(
+        value("two-left-dog").starts_with("dog-"),
+        "the picture does not follow the icon. {context}"
+    );
+    assert_eq!(
+        value("chat-says"),
+        "Chat: chat 2",
+        "the choice does not say which chat it opens. {context}"
     );
     assert_eq!(
         value("asked-again"),
         "push:ChatPickerPage.qml:1:Choose a chat|",
-        "the chat cannot be changed. {context}"
+        "choosing Chat again does not pick again. {context}"
     );
     assert_eq!(
-        value("gone-name"),
+        value("gone-says"),
         "Deleted chat",
         "an action whose chat has gone does not say so. {context}"
     );
     assert_eq!(
         value("left-gone"),
-        "chat|1|1|star",
+        "chat|1|1|dog",
         "picking another chat lost the icon. {context}"
     );
+    assert_eq!(value("count-one"), "1", "{context}");
+    assert_eq!(value("right-hidden-again"), "false", "{context}");
     assert_eq!(
-        value("reload-settings"),
-        "ok",
-        "the settings page did not load again. {context}"
+        value("right-kept"),
+        "qr|0|0|",
+        "the right action was lost with room for one. {context}"
     );
-    assert_eq!(
-        value("left-entry-chat"),
-        "Chat",
-        "the left row does not say it opens a chat. {context}"
-    );
-    assert_eq!(
-        value("right-entry-qr"),
-        "My QR code",
-        "the right row does not say it shows the QR code. {context}"
-    );
+    assert_eq!(value("one-label-again"), "Action", "{context}");
 }

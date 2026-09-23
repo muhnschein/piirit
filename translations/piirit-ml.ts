@@ -1237,6 +1237,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <extracomment>What a quick action says about its chat once that chat has been deleted.</extracomment>
         <translation>ഇല്ലാതാക്കിയ ചാറ്റ്</translation>
     </message>
+    <message>
+        <source>Chat: %1</source>
+        <extracomment>A quick action on the cover that opens one chat, with the chat&apos;s name.</extracomment>
+        <translation>ചാറ്റ്: %1</translation>
+    </message>
 </context>
 <context>
     <name>QuickActionsPage</name>
@@ -1258,6 +1263,21 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Right</source>
         <extracomment>The quick action on the right of the cover.</extracomment>
         <translation>വലത്</translation>
+    </message>
+    <message>
+        <source>One action</source>
+        <extracomment>Under a picture of the cover with room for one quick action; tapping it chooses that.</extracomment>
+        <translation>ഒരു പ്രവർത്തനം</translation>
+    </message>
+    <message>
+        <source>Two actions</source>
+        <extracomment>Under a picture of the cover with room for two quick actions; tapping it chooses that.</extracomment>
+        <translation>രണ്ട് പ്രവർത്തനങ്ങൾ</translation>
+    </message>
+    <message>
+        <source>Action</source>
+        <extracomment>The one quick action on the cover, when it has room for one.</extracomment>
+        <translation>പ്രവർത്തനം</translation>
     </message>
 </context>
 <context>
@@ -1495,10 +1515,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>അറിയിപ്പുകൾ</translation>
     </message>
     <message>
-        <source>Apps</source>
-        <translation>ആപ്പുകൾ</translation>
-    </message>
-    <message>
         <source>Enable webxdc apps (experimental)</source>
         <extracomment>A webxdc app is a small program somebody sends into a chat and everyone in it plays with. Keep the name: it is what every other Delta Chat client calls them.</extracomment>
         <translation>webxdc ആപ്പുകൾ പ്രവർത്തനക്ഷമമാക്കുക (പരീക്ഷണാത്മകം)</translation>
@@ -1596,39 +1612,9 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>ദ്രുത പ്രവർത്തനങ്ങൾ</translation>
     </message>
     <message>
-        <source>Left</source>
-        <extracomment>The quick action on the left of the cover.</extracomment>
-        <translation>ഇടത്</translation>
-    </message>
-    <message>
-        <source>Right</source>
-        <extracomment>The quick action on the right of the cover.</extracomment>
-        <translation>വലത്</translation>
-    </message>
-    <message>
-        <source>Chat</source>
-        <extracomment>A quick action on the cover that opens one chat.</extracomment>
-        <translation>ചാറ്റ്</translation>
-    </message>
-    <message>
-        <source>Search</source>
-        <extracomment>A quick action on the cover that opens the chat list&apos;s search.</extracomment>
-        <translation>തിരയുക</translation>
-    </message>
-    <message>
-        <source>My QR code</source>
-        <extracomment>A quick action on the cover that shows this profile&apos;s QR code.</extracomment>
-        <translation>എന്റെ QR കോഡ്</translation>
-    </message>
-    <message>
-        <source>Scan QR code</source>
-        <extracomment>A quick action on the cover that opens the QR code scanner.</extracomment>
-        <translation>QR കോഡ് സ്കാൻ ചെയ്യുക</translation>
-    </message>
-    <message>
-        <source>None</source>
-        <extracomment>No quick action on this side of the cover.</extracomment>
-        <translation>ഒന്നുമില്ല</translation>
+        <source>Advanced</source>
+        <extracomment>The settings most readers never need to change.</extracomment>
+        <translation>വിപുലമായത്</translation>
     </message>
 </context>
 <context>

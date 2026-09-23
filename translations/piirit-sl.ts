@@ -1249,6 +1249,11 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
         <extracomment>What a quick action says about its chat once that chat has been deleted.</extracomment>
         <translation>Izbrisan klepet</translation>
     </message>
+    <message>
+        <source>Chat: %1</source>
+        <extracomment>A quick action on the cover that opens one chat, with the chat&apos;s name.</extracomment>
+        <translation>Klepet: %1</translation>
+    </message>
 </context>
 <context>
     <name>QuickActionsPage</name>
@@ -1270,6 +1275,21 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
         <source>Right</source>
         <extracomment>The quick action on the right of the cover.</extracomment>
         <translation>Desno</translation>
+    </message>
+    <message>
+        <source>One action</source>
+        <extracomment>Under a picture of the cover with room for one quick action; tapping it chooses that.</extracomment>
+        <translation>Eno dejanje</translation>
+    </message>
+    <message>
+        <source>Two actions</source>
+        <extracomment>Under a picture of the cover with room for two quick actions; tapping it chooses that.</extracomment>
+        <translation>Dve dejanji</translation>
+    </message>
+    <message>
+        <source>Action</source>
+        <extracomment>The one quick action on the cover, when it has room for one.</extracomment>
+        <translation>Dejanje</translation>
     </message>
 </context>
 <context>
@@ -1507,10 +1527,6 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
         <translation>Obvestila</translation>
     </message>
     <message>
-        <source>Apps</source>
-        <translation>Aplikacije</translation>
-    </message>
-    <message>
         <source>Enable webxdc apps (experimental)</source>
         <extracomment>A webxdc app is a small program somebody sends into a chat and everyone in it plays with. Keep the name: it is what every other Delta Chat client calls them.</extracomment>
         <translation>Omogoči aplikacije webxdc (poskusno)</translation>
@@ -1608,39 +1624,9 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
         <translation>Hitra dejanja</translation>
     </message>
     <message>
-        <source>Left</source>
-        <extracomment>The quick action on the left of the cover.</extracomment>
-        <translation>Levo</translation>
-    </message>
-    <message>
-        <source>Right</source>
-        <extracomment>The quick action on the right of the cover.</extracomment>
-        <translation>Desno</translation>
-    </message>
-    <message>
-        <source>Chat</source>
-        <extracomment>A quick action on the cover that opens one chat.</extracomment>
-        <translation>Klepet</translation>
-    </message>
-    <message>
-        <source>Search</source>
-        <extracomment>A quick action on the cover that opens the chat list&apos;s search.</extracomment>
-        <translation>Išči</translation>
-    </message>
-    <message>
-        <source>My QR code</source>
-        <extracomment>A quick action on the cover that shows this profile&apos;s QR code.</extracomment>
-        <translation>Moja koda QR</translation>
-    </message>
-    <message>
-        <source>Scan QR code</source>
-        <extracomment>A quick action on the cover that opens the QR code scanner.</extracomment>
-        <translation>Skeniraj kodo QR</translation>
-    </message>
-    <message>
-        <source>None</source>
-        <extracomment>No quick action on this side of the cover.</extracomment>
-        <translation>Brez</translation>
+        <source>Advanced</source>
+        <extracomment>The settings most readers never need to change.</extracomment>
+        <translation>Napredno</translation>
     </message>
 </context>
 <context>

@@ -71,6 +71,7 @@ const PROBE_QML: &str = r"
             loader.item.chatList = there === 'true' ? fakeList : null
             return 'ok'
         }
+        function count(n) { Settings.quickActionCount = n; return 'ok' }
         function set(side, kind, account, chat) {
             var prefix = side === 'right' ? 'quickActionRight' : 'quickActionLeft'
             Settings[prefix] = kind
@@ -173,6 +174,7 @@ fn the_window_offers_quick_actions_when_it_can_take_them_and_passes_them_on() {
 
     // SAFETY: the callbacks fire only while `exec()` runs on this thread.
     single_shot(Duration::from_secs(1), move || unsafe {
+        record!("room-for-two", call!("count", 2));
         record!("set-left", set!("left", "search", 0, 0));
         record!("set-right", set!("right", "chat", 2, 7));
         record!("load", call!("load", QString::from(root.clone())));
@@ -186,6 +188,11 @@ fn the_window_offers_quick_actions_when_it_can_take_them_and_passes_them_on() {
         record!("tap-left", call!("tap", QString::from("left")));
         record!("tap-right", call!("tap", QString::from("right")));
         record!("tap-cover", call!("tapCover", QString::from("left")));
+
+        // With room for one, the right one is not there to be tapped.
+        record!("room-for-one", call!("count", 1));
+        record!("tap-held", call!("tap", QString::from("right")));
+        record!("back-to-two", call!("count", 2));
 
         // A kind this version does not know goes nowhere.
         record!("set-odd", set!("left", "teapot", 0, 0));
@@ -252,6 +259,11 @@ fn the_window_offers_quick_actions_when_it_can_take_them_and_passes_them_on() {
         value("tap-cover"),
         "search|0|0;chat|2|7;search|0|0;",
         "the window does not act on a tap on the cover. {context}"
+    );
+    assert_eq!(
+        value("tap-held"),
+        "search|0|0;chat|2|7;search|0|0;",
+        "the right action was handed on with room for one. {context}"
     );
     assert_eq!(
         value("tap-odd"),
