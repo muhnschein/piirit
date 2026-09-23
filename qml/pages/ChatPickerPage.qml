@@ -37,12 +37,20 @@ Page {
         onTriggered: chats.query = searchField.text
     }
 
+    // The core has said which chats there are, whatever that was. An
+    // empty list before then is no answer rather than no chats: see
+    // ChatListPage.
+    property bool chatsLoaded: false
+
     ChatList {
         id: chats
         objectName: "pickerChats"
         account_id: page.accountId
         for_forwarding: true
         onError: page.errorMessage = message
+        // Emitted once the rows have been set, whether there turned out
+        // to be any or none.
+        onRows_changed: page.chatsLoaded = true
     }
 
     Connections {
@@ -116,7 +124,9 @@ Page {
         }
 
         ViewPlaceholder {
-            enabled: chats.count === 0
+            objectName: "chatsPlaceholder"
+            // Not until the core has answered: see `chatsLoaded`.
+            enabled: page.chatsLoaded && chats.count === 0
             text: qsTr("No chats to forward to")
         }
     }

@@ -348,6 +348,70 @@ fn list_pages_clip_and_leave_room_for_what_sits_below_them() {
     }
 }
 
+/// A list says it is empty only once its model has answered.
+///
+/// An empty model means one of two opposite things: nothing there, or no
+/// answer from the core yet. A placeholder bound to the count alone says
+/// the first while the second is true, so "No contacts" flashed over one
+/// list after another on its way in. Every placeholder that reads a count
+/// also reads whether that count is an answer.
+///
+/// The profiles page is the one exception: its list is the core's own
+/// account list, read before the chat list it is reached from is shown.
+///
+/// One line at a time, so a binding wrapped across two escapes it.
+#[test]
+fn no_list_says_it_is_empty_before_it_has_been_answered() {
+    let mut checked = 0;
+    let mut offenders = Vec::new();
+    for file in qml_files() {
+        if file.ends_with("ProfilesPage.qml") {
+            continue;
+        }
+        let code = code_only(&fs::read_to_string(&file).expect("read qml"));
+        let lines: Vec<&str> = code.lines().collect();
+        for (start, line) in lines.iter().enumerate() {
+            if !line.contains("ViewPlaceholder {") {
+                continue;
+            }
+            // The placeholder's own `enabled`, not one nested inside it.
+            let (mut opened, mut closed) = (0, 0);
+            for (number, inner) in lines.iter().enumerate().skip(start) {
+                let binding = inner.trim();
+                if opened == closed + 1
+                    && binding.starts_with("enabled:")
+                    && binding.contains("count")
+                {
+                    checked += 1;
+                    if !binding.to_lowercase().contains("loaded") {
+                        offenders.push(format!("{}:{}: {binding}", file.display(), number + 1));
+                    }
+                }
+                opened += inner.matches('{').count();
+                closed += inner.matches('}').count();
+                if closed >= opened {
+                    break;
+                }
+            }
+        }
+    }
+    // Otherwise this passes by finding nothing to check.
+    assert!(
+        checked >= 10,
+        "only {checked} placeholders read a count; there should be ten -- \
+         the chat list and its search, the forwarding picker, the \
+         conversation, a chat's media twice, and four contact lists"
+    );
+    assert!(
+        offenders.is_empty(),
+        "these say a list is empty before the core has answered, so the \
+         placeholder flashes over rows about to arrive; read a flag set \
+         once the model has answered, as NewChatPage's `contactsLoaded` \
+         is:\n  {}",
+        offenders.join("\n  ")
+    );
+}
+
 /// Copying a message says so, and the reply bar and jump button are the
 /// components the tests measure rather than one-off items on the page.
 #[test]
