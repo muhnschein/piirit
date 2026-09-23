@@ -7,13 +7,18 @@
 //! (e.g. one extracted from upstream's `PyPI` wheel or GitHub release), so
 //! `cargo test` stays green in environments that don't have one.
 //!
-//! Everything here is offline -- no account is ever configured against a
-//! mail server -- so it runs without network access.
+//! Everything here stays on this machine, so it runs without network
+//! access. The one account that sends is configured against a stub mail
+//! server on 127.0.0.1 (`loopback_mailbox`) and has its IO stopped
+//! straight after, and it only ever sends to Saved Messages, which has
+//! no recipient.
 
+use std::io::{BufRead as _, BufReader, Write as _};
+use std::net::{TcpListener, TcpStream};
 use std::sync::Arc;
 use std::time::Duration;
 
-use deltachat_jsonrpc::{spawn_event_loop, RpcClient};
+use deltachat_jsonrpc::{spawn_event_loop, RpcClient, RpcError};
 use serde_json::Value;
 
 /// A 1x1 PNG, written out so the core reads real pixels rather than
@@ -63,8 +68,11 @@ fn one_second_wav() -> Vec<u8> {
 /// A plain PNG `side` pixels square, stored rather than compressed.
 ///
 /// Big enough that the core has to recode it: past
-/// `BALANCED_IMAGE_BYTES` it scales the picture down and re-encodes it as
-/// JPEG, and that is the difference the assertions below are about. Built
+/// `BALANCED_IMAGE_BYTES` it re-encodes the picture as JPEG, and that is
+/// the difference the assertions below are about. It scales the picture
+/// down only where a side is past the quality's limit, which since core
+/// 2.61 is 1760 pixels at balanced and 640 at worse, so a 1400-pixel
+/// picture keeps its size at balanced and only shrinks at worse. Built
 /// here for the reason `one_second_wav` is -- the sizes are then
 /// arithmetic -- and stored uncompressed because a deflate
 /// implementation is not worth carrying for a test fixture.
@@ -273,6 +281,89 @@ fn base64(bytes: &[u8]) -> String {
         }
     }
     out
+}
+
+/// A mail server that says yes to everything, on two loopback ports:
+/// IMAP's first, then SMTP's.
+///
+/// Since core 2.61 an account can no longer be marked configured by
+/// setting `configured_addr` -- the core refuses an address no transport
+/// has -- and JSON-RPC has no way to add a transport without logging in.
+/// So the account that sends logs in here. Neither side knows its
+/// protocol: IMAP answers every tagged line with `OK`, and SMTP gives
+/// each step the reply that lets it past, which is all the core's login
+/// check asks for. The test stops the account's IO as soon as the
+/// transport is in, so nothing is fetched or sent through either.
+///
+/// The threads are never joined. A connection is dropped after ten
+/// seconds with nothing said on it, and the listeners go when the test
+/// process does.
+fn loopback_mailbox() -> (u16, u16) {
+    let imap = listen("* OK ready\r\n", |line| {
+        let tag = line.split(' ').next().unwrap_or_default();
+        format!("{tag} OK\r\n")
+    });
+    let smtp = listen("220 ready\r\n", |line| {
+        match line.get(..4).map(str::to_ascii_uppercase).as_deref() {
+            Some("EHLO") => "250 AUTH PLAIN\r\n",
+            Some("AUTH") => "235 ok\r\n",
+            Some("QUIT") => "221 bye\r\n",
+            _ => "250 ok\r\n",
+        }
+        .to_string()
+    });
+    (imap, smtp)
+}
+
+/// Take a loopback port and hold a conversation on every connection to
+/// it: `greeting`, then `answer`'s reply to each line, until the other
+/// side hangs up or goes quiet. Hands back the port.
+fn listen(greeting: &'static str, answer: fn(&str) -> String) -> u16 {
+    let listener = TcpListener::bind("127.0.0.1:0")
+        .unwrap_or_else(|err| panic!("no loopback port for the stub mail server: {err}"));
+    let port = listener
+        .local_addr()
+        .unwrap_or_else(|err| panic!("the stub mail server has no address: {err}"))
+        .port();
+    std::thread::spawn(move || {
+        for stream in listener.incoming() {
+            let Ok(stream) = stream else { break };
+            std::thread::spawn(move || converse(&stream, greeting, answer));
+        }
+    });
+    port
+}
+
+/// One connection's worth of `listen`. Any error ends it, the read
+/// timeout among them, and ending it is all an error here is for.
+fn converse(stream: &TcpStream, greeting: &str, answer: fn(&str) -> String) -> std::io::Result<()> {
+    let quiet = Some(Duration::from_secs(10));
+    stream.set_read_timeout(quiet)?;
+    stream.set_write_timeout(quiet)?;
+    let mut out = stream;
+    out.write_all(greeting.as_bytes())?;
+    for line in BufReader::new(stream).lines() {
+        out.write_all(answer(&line?).as_bytes())?;
+    }
+    Ok(())
+}
+
+/// The DCLOGIN code for `addr` on the loopback stub: the call the sign-up
+/// page adds a relay with, pointed at `loopback_mailbox`'s two ports.
+fn dclogin(addr: &str, (imap_port, smtp_port): (u16, u16)) -> String {
+    format!(
+        "dclogin:{addr}?p=x&v=1&ih=127.0.0.1&ip={imap_port}\
+         &is=plain&sh=127.0.0.1&sp={smtp_port}&ss=plain"
+    )
+}
+
+/// The core's words for refusing a call, which the pages show as they
+/// are. A call it takes instead fails the test.
+async fn refusal<P: serde::Serialize>(client: &RpcClient, method: &str, params: P) -> String {
+    match client.call::<_, Value>(method, params).await {
+        Err(RpcError::Remote(refused)) => refused.message,
+        other => panic!("the core did not refuse {method}: {other:?}"),
+    }
 }
 
 /// Resolve the gate's value, treating a relative path as relative to the
@@ -781,21 +872,47 @@ async fn offline_round_trip_against_real_core() {
     // The message object, as the conversation view consumes it. Saved
     // Messages is the one chat that sends offline, so it is where a real
     // message can be made to look at.
-    // A second account, marked configured locally so the core will accept
-    // a send. Nothing leaves the machine: Saved Messages has no recipient.
+    //
+    // A second account to send it from, configured against the loopback
+    // stub with a DCLOGIN code, the call the sign-up page adds a relay
+    // with (signup.rs). Nothing leaves the machine: the stub is on
+    // 127.0.0.1, and Saved Messages has no recipient. `bcc_self` is off,
+    // the core's default and left alone by configuring, so a message
+    // there is not even queued to go out.
     let sender_id: u32 = client
         .call_unit("add_account")
         .await
         .expect("add_account for the message probe");
-    for (key, value) in [
-        ("configured_addr", "self@example.invalid"),
-        ("displayname", "Testy"),
-        ("configured", "1"),
-    ] {
+    client
+        .call::<_, ()>("set_config", (sender_id, "displayname", "Testy"))
+        .await
+        .expect("set_config displayname");
+    let mailbox = loopback_mailbox();
+    client
+        .call::<_, ()>(
+            "add_transport_from_qr",
+            (sender_id, dclogin("self@example.invalid", mailbox)),
+        )
+        .await
+        .expect("add_transport_from_qr against the loopback stub");
+    // Adding a transport starts the account's IO, which would otherwise
+    // keep talking to the stub for the rest of the test.
+    client
+        .call::<_, ()>("stop_io", (sender_id,))
+        .await
+        .expect("stop_io");
+    // Configuring also leaves the core's welcome messages in the device
+    // chat (DC_CONTACT_ID_DEVICE, 5), fresh. Noticed here, so the unread
+    // counts further down start from nothing.
+    let welcome: Option<u32> = client
+        .call("get_chat_id_by_contact_id", (sender_id, 5))
+        .await
+        .expect("get_chat_id_by_contact_id for the device chat");
+    if let Some(device) = welcome {
         client
-            .call::<_, ()>("set_config", (sender_id, key, value))
+            .call::<_, ()>("marknoticed_chat", (sender_id, device))
             .await
-            .expect("set_config");
+            .expect("marknoticed_chat on the device chat");
     }
     let saved: u32 = client
         .call("create_chat_by_contact_id", (sender_id, 1))
@@ -1841,7 +1958,10 @@ async fn offline_round_trip_against_real_core() {
     let _ = std::fs::remove_file(&avatar);
 
     // The account list, as the profiles page draws it: a configured
-    // account carries its picture and its colour.
+    // account carries its name, its picture and its colour, but not its
+    // address, which core 2.61 took off it. The shim asks each configured
+    // account for `configured_addr` instead (core.rs, `primary_addr`), so
+    // whether the list has one again is not pinned: nothing reads it.
     let accounts: Vec<Value> = client
         .call_unit("get_all_accounts")
         .await
@@ -1855,13 +1975,23 @@ async fn offline_round_trip_against_real_core() {
         Some("Configured"),
         "unexpected account shape: {configured:?}"
     );
-    for field in ["displayName", "addr", "profileImage", "color"] {
+    for field in ["displayName", "profileImage", "color"] {
         assert!(
             configured.get(field).is_some(),
             "a configured account lost the {field} field, which the profiles \
              page draws: {configured:?}"
         );
     }
+    let own_addr: Option<String> = client
+        .call("get_config", (sender_id, "configured_addr"))
+        .await
+        .expect("get_config configured_addr");
+    assert_eq!(
+        own_addr.as_deref(),
+        Some("self@example.invalid"),
+        "a configured account does not name the address it was configured \
+         with, so its row on the profiles page would have none"
+    );
 
     // A name of the reader's own for a contact, and the way back to the
     // contact's: an empty name. The contact page is built on the empty
@@ -1981,8 +2111,127 @@ async fn offline_round_trip_against_real_core() {
         "a message sent from here is not marked as fully there: {reply:?}"
     );
 
+    relays_against(&client, mailbox).await;
+
     let _ = std::fs::remove_file(&attachment);
     handle.stop();
     client.shutdown().await.expect("shutdown");
     let _ = std::fs::remove_dir_all(&accounts_dir);
+}
+
+/// A profile's relays, as the profile page and the duplicate check read
+/// and change them (transports.rs, signup.rs), and as the fake core
+/// answers for them. On an account of its own, three relays on the
+/// loopback stub, so the sending account above keeps the one it has.
+async fn relays_against(client: &RpcClient, mailbox: (u16, u16)) {
+    let account: u32 = client
+        .call_unit("add_account")
+        .await
+        .unwrap_or_else(|err| panic!("add_account for the relays probe: {err}"));
+    let addrs = [
+        "one@example.invalid",
+        "two@example.invalid",
+        "three@example.invalid",
+    ];
+    for addr in addrs {
+        client
+            .call::<_, ()>("add_transport_from_qr", (account, dclogin(addr, mailbox)))
+            .await
+            .unwrap_or_else(|err| panic!("add_transport_from_qr {addr}: {err}"));
+    }
+    client
+        .call::<_, ()>("stop_io", (account,))
+        .await
+        .unwrap_or_else(|err| panic!("stop_io on the relays probe: {err}"));
+
+    // Each relay by the address on it, in the order they were added; the
+    // profile's own address is the first one's, and stays that as more
+    // are added.
+    let listed = |transports: &[Value]| -> Vec<String> {
+        transports
+            .iter()
+            .map(|transport| {
+                transport
+                    .get("addr")
+                    .and_then(Value::as_str)
+                    .unwrap_or_else(|| panic!("a transport without an addr: {transport:?}"))
+                    .to_string()
+            })
+            .collect()
+    };
+    let transports: Vec<Value> = client
+        .call("list_transports", (account,))
+        .await
+        .unwrap_or_else(|err| panic!("list_transports: {err}"));
+    assert_eq!(listed(&transports), addrs, "{transports:?}");
+    let own: Option<String> = client
+        .call("get_config", (account, "configured_addr"))
+        .await
+        .unwrap_or_else(|err| panic!("get_config configured_addr: {err}"));
+    assert_eq!(own.as_deref(), Some(addrs[0]));
+
+    // The refusals the profile page shows in the core's words, and the
+    // fake core gives in the same ones.
+    assert_eq!(
+        refusal(
+            client,
+            "set_config",
+            (account, "configured_addr", "nobody@example.invalid")
+        )
+        .await,
+        "Address does not belong to any transport."
+    );
+    assert_eq!(
+        refusal(
+            client,
+            "set_config",
+            (account, "configured_addr", Option::<String>::None)
+        )
+        .await,
+        "Cannot unset configured_addr"
+    );
+    assert_eq!(
+        refusal(
+            client,
+            "delete_transport",
+            (account, "nobody@example.invalid")
+        )
+        .await,
+        "Transport does not exist"
+    );
+
+    // Removing the relay with the profile's own address on it moves the
+    // address to the newest of the rest -- not the oldest, and not left
+    // naming a relay the profile no longer has.
+    client
+        .call::<_, ()>("delete_transport", (account, addrs[0]))
+        .await
+        .unwrap_or_else(|err| panic!("delete_transport of the profile's own relay: {err}"));
+    let own: Option<String> = client
+        .call("get_config", (account, "configured_addr"))
+        .await
+        .unwrap_or_else(|err| panic!("get_config configured_addr after the removal: {err}"));
+    assert_eq!(
+        own.as_deref(),
+        Some(addrs[2]),
+        "the profile's own address did not move to the newest relay left"
+    );
+    client
+        .call::<_, ()>("delete_transport", (account, addrs[1]))
+        .await
+        .unwrap_or_else(|err| panic!("delete_transport of a second relay: {err}"));
+    assert_eq!(
+        refusal(client, "delete_transport", (account, addrs[2])).await,
+        "Cannot remove the last transport"
+    );
+    // The last relay is refused before an unknown one is looked for.
+    assert_eq!(
+        refusal(
+            client,
+            "delete_transport",
+            (account, "nobody@example.invalid")
+        )
+        .await,
+        "Cannot remove the last transport"
+    );
 }

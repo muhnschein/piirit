@@ -45,8 +45,9 @@ Page {
     Connections {
         target: core
         onAccount_error: page.errorMessage = message
-        // A row names the relay its profile sends from. The core says
-        // when a profile's relays change -- from its page over this one,
+        // A row names its profile's own address, which is on one of its
+        // relays and moves when that relay goes. The core says when a
+        // profile's relays change -- from its page over this one,
         // or from another device the profile is on -- and the rows are
         // read again.
         onCore_event: {

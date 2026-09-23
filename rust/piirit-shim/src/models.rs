@@ -174,7 +174,9 @@ pub struct AccountItem {
     pub account_id: u32,
     /// Profile display name, empty when unset.
     pub display_name: QString,
-    /// The account's email address, empty when unconfigured.
+    /// The profile's own address (`configured_addr`), the one its invite
+    /// link and its own contact carry. Empty when unconfigured or when
+    /// the core cannot say.
     pub addr: QString,
     /// Whether this account has a usable transport.
     pub is_configured: bool,
@@ -201,14 +203,16 @@ pub struct TransportItem {
     /// the countdown before a removal (`PendingRemoval.qml`), which
     /// waits on numbers. Positive, so QML's `int` holds it.
     pub id: u32,
-    /// The address on this relay. What the core is handed to send from
-    /// it or to remove it.
+    /// The address on this relay. What the core is handed to remove
+    /// it.
     pub addr: QString,
     /// The relay itself: the part of the address after the `@`, which is
     /// how the row names it.
     pub domain: QString,
-    /// The profile sends from this one (`configured_addr`). One row per
-    /// profile, and the first.
+    /// The profile's own address is this one (`configured_addr`): the
+    /// one its invite link and its own contact carry. One row per
+    /// profile, and the first. Not the relay mail leaves through, which
+    /// the core picks each time it connects and does not say.
     pub is_primary: bool,
     /// The colour of the dot the core's report draws for this relay's
     /// connection -- `green`, `yellow`, `red` or `grey`, as its own
@@ -258,8 +262,6 @@ pub struct ContactItem {
     pub auth_name: QString,
     /// Email address.
     pub address: QString,
-    /// Verified through a secure-join.
-    pub is_verified: bool,
     /// Reachable with encryption. An address contact is not.
     pub is_key_contact: bool,
     /// This account's own contact, which a group lists among its members.

@@ -105,16 +105,16 @@
         <translation>Piirit toimii vain chatmail-välittäjien kanssa. Ne ovat erityinen sähköpostipalvelimien laji; tavallisia sähköpostipalvelimia ei tueta. Lisätietoa: &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. Täydellinen luettelo julkisista, maksutta käytettävistä chatmail-välittäjistä on osoitteessa &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
     </message>
     <message>
-        <source>Adds another address for this profile on a second relay. The profile sends from one relay at a time; you can change which one on the profile page.</source>
-        <translation>Lisää tälle profiilille toisen osoitteen toisella välittäjällä. Profiili lähettää yhden välittäjän kautta kerrallaan; voit vaihtaa sen profiilisivulla.</translation>
-    </message>
-    <message>
         <source>Contacting %1…</source>
         <translation>Otetaan yhteyttä: %1…</translation>
     </message>
     <message>
         <source>Could not reach the relay. Try another one.</source>
         <translation>Välittäjää ei tavoitettu. Kokeile toista.</translation>
+    </message>
+    <message>
+        <source>Adds another address for this profile on a second relay.</source>
+        <translation>Lisää tälle profiilille toisen osoitteen toisella välittäjällä.</translation>
     </message>
 </context>
 <context>
@@ -448,10 +448,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Contact</source>
         <translation>Yhteystieto</translation>
-    </message>
-    <message>
-        <source>Verified: end-to-end encrypted, and checked in person</source>
-        <translation>Vahvistettu: päästä päähän salattu ja tarkistettu kasvotusten</translation>
     </message>
     <message>
         <source>End-to-end encrypted</source>
@@ -1047,17 +1043,9 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Välittäjät</translation>
     </message>
     <message>
-        <source>Sends from this relay</source>
-        <translation>Lähettää tämän välittäjän kautta</translation>
-    </message>
-    <message>
         <source>Removing relay</source>
         <extracomment>What Silica&apos;s countdown says it is doing, over a relay the reader has asked to remove.</extracomment>
         <translation>Poistetaan välittäjää</translation>
-    </message>
-    <message>
-        <source>Send from this relay</source>
-        <translation>Lähetä tämän välittäjän kautta</translation>
     </message>
     <message>
         <source>Remove relay</source>

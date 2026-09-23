@@ -6,7 +6,7 @@ upstream builds**:
 
 - **Project:** Delta Chat core (chatmail core library)
 - **Source code:** https://github.com/chatmail/core
-- **Version / tag:** `v2.60.0`
+- **Version / tag:** `v2.62.0`
 - **License:** MPL-2.0. Piirit itself is GPL-3.0-or-later; the two sit
   side by side in the RPM as separate works, and this file is installed
   with the package to satisfy MPL-2.0 §3.2(a)'s requirement that recipients
@@ -18,7 +18,7 @@ upstream builds**:
   incompatibility", per that workflow). Target triples:
   `aarch64-unknown-linux-musl`, `armv7-unknown-linux-musleabihf`
   (hard-float, matching Sailfish `armv7hl`), `x86_64-unknown-linux-musl`.
-- **Distribution channel used:** the PyPI `deltachat-rpc-server==2.60.0`
+- **Distribution channel used:** the PyPI `deltachat-rpc-server==2.62.0`
   wheels, which contain the same binaries upstream attaches to its GitHub
   release (both are the nix build output). Fetched, checksum-verified, and
   placed here by `scripts/fetch-rpc-server.sh` — that script pins the
@@ -28,9 +28,9 @@ upstream builds**:
 
 ```
 vendor/deltachat-rpc-server/
-  aarch64/deltachat-rpc-server   sha256 ccae50468d5faf15bde7df1b88bd396d5266ee802388f278e64ed4993738b626
-  armv7hl/deltachat-rpc-server   sha256 301a3b65fe9ee309d7d9acfd56a8ba78e1f1ecdd5d87b591d7a24cf3e4b9d488
-  x86_64/deltachat-rpc-server    sha256 360b1ece949dcb6948e25b8a81e6399cdbbcf69b28728fa4ae0c7f14291c8764
+  aarch64/deltachat-rpc-server   sha256 a81a75e2de356c5b0074100aee655a7a1884dcc747c79e2b57e7b6f4316a70ee
+  armv7hl/deltachat-rpc-server   sha256 ec968b307d0e82ba9012e2d194dcdab123ce4c1289b8c756b715e8b27e176973
+  x86_64/deltachat-rpc-server    sha256 62aa375904aeea88f356a20cb5d7bb6b90728f5e14d81c2b0f689c6c7341af2d
 ```
 
 Directory names are Sailfish's architecture names (`%{_target_cpu}` in
@@ -47,8 +47,9 @@ committed to git (see `.gitignore`); run the fetch script to populate.
       test `rust/deltachat-jsonrpc/tests/real_server.rs` (run with
       `DELTACHAT_RPC_SERVER=<path> cargo test -p deltachat-jsonrpc`)
       passes against it — `get_system_info` health check, account
-      creation, config round trip, real event delivery, and the chat/
-      message list wire shapes the UI depends on.
+      creation, config round trip, a transport added against a stub mail
+      server on 127.0.0.1, real event delivery, and the chat/message list
+      wire shapes the UI depends on.
 - [ ] `aarch64`/`armv7hl` binaries exercised on an actual Sailfish device
       or emulator (static musl linking means only the kernel ABI matters,
       so these are expected to run as-is — but this is the one claim that

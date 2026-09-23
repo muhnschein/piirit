@@ -105,16 +105,16 @@
         <translation>Piirit chatmail റിലേകളുമായി മാത്രമേ പ്രവർത്തിക്കൂ. ഇവ ഒരു പ്രത്യേക തരം ഇ-മെയിൽ സെർവറുകളാണ്; സാധാരണ ഇ-മെയിൽ സെർവറുകൾ പിന്തുണയ്ക്കുന്നില്ല. കൂടുതൽ അറിയാൻ &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt; കാണുക. പൊതു, സൗജന്യ chatmail റിലേകളുടെ പൂർണ്ണ പട്ടിക &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;-ൽ ഉണ്ട്.</translation>
     </message>
     <message>
-        <source>Adds another address for this profile on a second relay. The profile sends from one relay at a time; you can change which one on the profile page.</source>
-        <translation>ഈ പ്രൊഫൈലിന് രണ്ടാമത്തൊരു റിലേയിൽ മറ്റൊരു വിലാസം ചേർക്കുന്നു. പ്രൊഫൈൽ ഒരു സമയത്ത് ഒരു റിലേ വഴിയാണ് അയയ്ക്കുന്നത്; ഏതെന്ന് പ്രൊഫൈൽ താളിൽ മാറ്റാം.</translation>
-    </message>
-    <message>
         <source>Contacting %1…</source>
         <translation>%1 മായി ബന്ധപ്പെടുന്നു…</translation>
     </message>
     <message>
         <source>Could not reach the relay. Try another one.</source>
         <translation>റിലേയിൽ എത്താനായില്ല. മറ്റൊന്ന് പരീക്ഷിക്കുക.</translation>
+    </message>
+    <message>
+        <source>Adds another address for this profile on a second relay.</source>
+        <translation>ഈ പ്രൊഫൈലിന് രണ്ടാമത്തൊരു റിലേയിൽ മറ്റൊരു വിലാസം ചേർക്കുന്നു.</translation>
     </message>
 </context>
 <context>
@@ -452,10 +452,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Contact</source>
         <translation>കോൺടാക്റ്റ്</translation>
-    </message>
-    <message>
-        <source>Verified: end-to-end encrypted, and checked in person</source>
-        <translation>പരിശോധിച്ചത്: എൻഡ്-ടു-എൻഡ് എൻക്രിപ്റ്റ് ചെയ്തത്, നേരിട്ട് പരിശോധിച്ചത്</translation>
     </message>
     <message>
         <source>End-to-end encrypted</source>
@@ -1051,17 +1047,9 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>റിലേകൾ</translation>
     </message>
     <message>
-        <source>Sends from this relay</source>
-        <translation>ഈ റിലേയിൽ നിന്ന് അയയ്ക്കുന്നു</translation>
-    </message>
-    <message>
         <source>Removing relay</source>
         <extracomment>What Silica&apos;s countdown says it is doing, over a relay the reader has asked to remove.</extracomment>
         <translation>റിലേ നീക്കം ചെയ്യുന്നു</translation>
-    </message>
-    <message>
-        <source>Send from this relay</source>
-        <translation>ഈ റിലേയിൽ നിന്ന് അയയ്ക്കുക</translation>
     </message>
     <message>
         <source>Remove relay</source>

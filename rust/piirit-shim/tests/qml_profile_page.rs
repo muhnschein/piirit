@@ -8,11 +8,11 @@
 //!
 //! The rest of the page is what parla's profile dialog shows: the relays
 //! and the address on each (their own test is `relays.rs`; here only that
-//! the one sent from is listed first), and what the relays and the phone
-//! say about the profile -- the space taken on the device, and per relay
-//! the connection in the core's own words and the mailbox quota read off
-//! its report, said as used of the whole. The name is a field under the
-//! picture, with nothing under it.
+//! the one with the profile's own address is listed first), and what the
+//! relays and the phone say about the profile -- the space taken on the
+//! device, and per relay the connection in the core's own words and the
+//! mailbox quota read off its report, said as used of the whole. The
+//! name is a field under the picture, with nothing under it.
 
 // Qt harness: see qml_chat_list.rs.
 #![allow(
@@ -232,11 +232,11 @@ fn the_profile_page_round_trips_the_profile() {
         record!("listed-before", listed!());
         // What the relay and the phone say, as parla's dialog shows it.
         // The address is the first relay row's: the profile page lists
-        // the relays now, the one sent from first (tests/relays.rs).
+        // the relays now, the one with the profile's own address first
+        // (tests/relays.rs).
         record!("address", get!("relayRow0", "addr"));
-        record!("sends-from", get!("relayRow0", "sendsFrom"));
-        // The relay the profile sends from is reported on first: the
-        // core's own words about its connection, and its mailbox.
+        // That relay is reported on first: the core's own words about
+        // its connection, and its mailbox.
         record!("connection", get!("reportStatus", "text"));
         record!("quota-shown", get!("reportQuota", "visible"));
         record!("quota-words", get!("reportQuota", "label"));
@@ -507,12 +507,7 @@ fn assert_page_says_what_the_relay_said(steps: &[(&str, String)], context: &str)
     assert_eq!(
         value("address"),
         "account1@example.org",
-        "the first relay row is not the address the profile sends from. {context}"
-    );
-    assert_eq!(
-        value("sends-from"),
-        "true",
-        "the first relay row is not marked as the one sent from. {context}"
+        "the first relay row is not the profile's own address. {context}"
     );
     assert_eq!(
         value("connection"),

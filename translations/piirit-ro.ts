@@ -105,16 +105,16 @@
         <translation>Piirit funcționează doar cu relee chatmail. Acestea sunt un tip aparte de server de e-mail; serverele de e-mail obișnuite nu sunt acceptate. Mai multe pe &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. Lista completă a releelor chatmail publice, gratuite, este la &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
     </message>
     <message>
-        <source>Adds another address for this profile on a second relay. The profile sends from one relay at a time; you can change which one on the profile page.</source>
-        <translation>Adaugă acestui profil încă o adresă pe un al doilea releu. Profilul trimite printr-un singur releu o dată; poți schimba care anume în pagina profilului.</translation>
-    </message>
-    <message>
         <source>Contacting %1…</source>
         <translation>Se contactează %1…</translation>
     </message>
     <message>
         <source>Could not reach the relay. Try another one.</source>
         <translation>Releul nu a putut fi contactat. Încearcă altul.</translation>
+    </message>
+    <message>
+        <source>Adds another address for this profile on a second relay.</source>
+        <translation>Adaugă acestui profil încă o adresă pe un al doilea releu.</translation>
     </message>
 </context>
 <context>
@@ -449,10 +449,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Contact</source>
         <translation>Contact</translation>
-    </message>
-    <message>
-        <source>Verified: end-to-end encrypted, and checked in person</source>
-        <translation>Verificat: criptat de la un capăt la altul și confirmat în persoană</translation>
     </message>
     <message>
         <source>End-to-end encrypted</source>
@@ -1053,17 +1049,9 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Relee</translation>
     </message>
     <message>
-        <source>Sends from this relay</source>
-        <translation>Profilul trimite prin acest releu</translation>
-    </message>
-    <message>
         <source>Removing relay</source>
         <extracomment>What Silica&apos;s countdown says it is doing, over a relay the reader has asked to remove.</extracomment>
         <translation>Se elimină releul</translation>
-    </message>
-    <message>
-        <source>Send from this relay</source>
-        <translation>Trimite prin acest releu</translation>
     </message>
     <message>
         <source>Remove relay</source>

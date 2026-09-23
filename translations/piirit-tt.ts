@@ -105,16 +105,16 @@
         <translation>Piirit бары chatmail релелары белән генә эшли. Алар – электрон почта серверларының аерым төре; гадәти электрон почта серверлары кулланылмый. Тулырак: &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. Гомуми, бушлай chatmail релеларының тулы исемлеге &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; адресында.</translation>
     </message>
     <message>
-        <source>Adds another address for this profile on a second relay. The profile sends from one relay at a time; you can change which one on the profile page.</source>
-        <translation>Бу профильгә икенче реледә тагын бер адрес өсти. Профиль бер вакытта бер реле аша җибәрә; кайсысы икәнен профиль битендә үзгәртә аласыз.</translation>
-    </message>
-    <message>
         <source>Contacting %1…</source>
         <translation>%1 белән элемтә…</translation>
     </message>
     <message>
         <source>Could not reach the relay. Try another one.</source>
         <translation>Реле белән бәйләнешкә кереп булмады. Башкасын сынап карагыз.</translation>
+    </message>
+    <message>
+        <source>Adds another address for this profile on a second relay.</source>
+        <translation>Бу профильгә икенче реледә тагын бер адрес өсти.</translation>
     </message>
 </context>
 <context>
@@ -451,10 +451,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Contact</source>
         <translation>Контакт</translation>
-    </message>
-    <message>
-        <source>Verified: end-to-end encrypted, and checked in person</source>
-        <translation>Расланган: очтан очка шифрланган һәм шәхсән тикшерелгән</translation>
     </message>
     <message>
         <source>End-to-end encrypted</source>
@@ -1045,17 +1041,9 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Релелар</translation>
     </message>
     <message>
-        <source>Sends from this relay</source>
-        <translation>Бу реле аша җибәрә</translation>
-    </message>
-    <message>
         <source>Removing relay</source>
         <extracomment>What Silica&apos;s countdown says it is doing, over a relay the reader has asked to remove.</extracomment>
         <translation>Реле бетерелә</translation>
-    </message>
-    <message>
-        <source>Send from this relay</source>
-        <translation>Бу реле аша җибәрергә</translation>
     </message>
     <message>
         <source>Remove relay</source>

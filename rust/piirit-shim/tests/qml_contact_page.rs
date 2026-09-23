@@ -155,7 +155,7 @@ fn the_contact_page_names_the_contact_and_no_address() {
         };
     }
 
-    // Chat 1 is with Ada, who is verified and has written a line.
+    // Chat 1 is with Ada, who has written a line.
     single_shot(Duration::from_secs(1), move || unsafe {
         record!(
             "load",
@@ -350,9 +350,10 @@ fn assert_page(steps: &[(&str, String)]) {
         "true",
         "a line that was written is hidden. {context}"
     );
-    assert!(
-        value("encryption").starts_with("Verified"),
-        "a verified contact is not said to be. {context}"
+    assert_eq!(
+        value("encryption"),
+        "End-to-end encrypted",
+        "a contact that can be encrypted to is not said to be. {context}"
     );
     assert!(
         !value("texts").contains('@'),

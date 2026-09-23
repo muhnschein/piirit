@@ -105,16 +105,16 @@
         <translation>Piirit 只能与 chatmail 中继配合使用。这是一种特殊的电子邮件服务器；不支持普通的电子邮件服务器。详情见 &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;。公共、免费的 chatmail 中继完整列表见 &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;。</translation>
     </message>
     <message>
-        <source>Adds another address for this profile on a second relay. The profile sends from one relay at a time; you can change which one on the profile page.</source>
-        <translation>为该资料在另一个中继上添加一个地址。该资料每次只通过一个中继发送；具体是哪一个，可以在资料页面上更改。</translation>
-    </message>
-    <message>
         <source>Contacting %1…</source>
         <translation>正在联系 %1…</translation>
     </message>
     <message>
         <source>Could not reach the relay. Try another one.</source>
         <translation>无法连接该中继。请尝试另一个。</translation>
+    </message>
+    <message>
+        <source>Adds another address for this profile on a second relay.</source>
+        <translation>为该资料在另一个中继上添加一个地址。</translation>
     </message>
 </context>
 <context>
@@ -451,10 +451,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Contact</source>
         <translation>联系人</translation>
-    </message>
-    <message>
-        <source>Verified: end-to-end encrypted, and checked in person</source>
-        <translation>已验证：端到端加密，并已当面核对</translation>
     </message>
     <message>
         <source>End-to-end encrypted</source>
@@ -1045,17 +1041,9 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>中继</translation>
     </message>
     <message>
-        <source>Sends from this relay</source>
-        <translation>从此中继发送</translation>
-    </message>
-    <message>
         <source>Removing relay</source>
         <extracomment>What Silica&apos;s countdown says it is doing, over a relay the reader has asked to remove.</extracomment>
         <translation>正在移除中继</translation>
-    </message>
-    <message>
-        <source>Send from this relay</source>
-        <translation>改从此中继发送</translation>
     </message>
     <message>
         <source>Remove relay</source>

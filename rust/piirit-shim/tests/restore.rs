@@ -184,8 +184,9 @@ fn assert_signals(summary: &str, context: &str) {
     let parts: Vec<&str> = summary.split('/').collect();
     assert_eq!(parts.len(), 6, "unexpected summary shape. {context}");
     assert_eq!(parts[0], "2", "two profiles should have arrived. {context}");
+    // Account 3: see assert_imports_and_io.
     assert_eq!(
-        parts[1], "2",
+        parts[1], "3",
         "the second profile is not on its own account. {context}"
     );
     assert!(
@@ -227,11 +228,14 @@ fn assert_imports_and_io(calls: &[(String, Value)], context: &str) {
             })
             .collect()
     };
+    // By account: 1 for the first profile, 2 for the file that failed
+    // and went with it, 3 for the one that arrived, 4 for the transfer
+    // given up on. The core never hands an id out twice.
     assert_eq!(
         of("get_backup"),
         vec![
             (1, "DCBACKUP2:one.example".to_string()),
-            (3, "DCBACKUP2:slow.example".to_string()),
+            (4, "DCBACKUP2:slow.example".to_string()),
         ],
         "the transfers from a device, in order. {context}"
     );
@@ -239,7 +243,7 @@ fn assert_imports_and_io(calls: &[(String, Value)], context: &str) {
         of("import_backup"),
         vec![
             (2, "/tmp/fail-backup.tar".to_string()),
-            (2, "/tmp/holiday-backup.tar".to_string()),
+            (3, "/tmp/holiday-backup.tar".to_string()),
         ],
         "the imports from a file, in order. {context}"
     );
@@ -250,7 +254,7 @@ fn assert_imports_and_io(calls: &[(String, Value)], context: &str) {
         .collect();
     assert_eq!(
         started,
-        vec![1, 2],
+        vec![1, 3],
         "IO was not started on each profile that arrived. {context}"
     );
 }
@@ -282,7 +286,7 @@ fn assert_nothing_half_kept(calls: &[(String, Value)], context: &str) {
         .collect();
     assert_eq!(
         removed,
-        vec![2, 3],
+        vec![2, 4],
         "an account a transfer left behind was kept: the failed import's, \
          and the one the reader gave up on. {context}"
     );
@@ -293,7 +297,7 @@ fn assert_nothing_half_kept(calls: &[(String, Value)], context: &str) {
         .collect();
     assert_eq!(
         stopped,
-        vec![3],
+        vec![4],
         "the transfer given up on was not stopped. {context}"
     );
 }

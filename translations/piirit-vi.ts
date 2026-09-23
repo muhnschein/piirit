@@ -105,16 +105,16 @@
         <translation>Piirit chỉ hoạt động với các máy chuyển tiếp chatmail. Đây là một loại máy chủ e-mail đặc biệt; máy chủ e-mail thông thường không được hỗ trợ. Xem thêm tại &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. Danh sách đầy đủ các máy chuyển tiếp chatmail công cộng, miễn phí có tại &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
     </message>
     <message>
-        <source>Adds another address for this profile on a second relay. The profile sends from one relay at a time; you can change which one on the profile page.</source>
-        <translation>Thêm cho hồ sơ này một địa chỉ nữa trên một máy chuyển tiếp khác. Hồ sơ gửi qua một máy chuyển tiếp tại một thời điểm; bạn có thể đổi máy nào ở trang hồ sơ.</translation>
-    </message>
-    <message>
         <source>Contacting %1…</source>
         <translation>Đang liên hệ %1…</translation>
     </message>
     <message>
         <source>Could not reach the relay. Try another one.</source>
         <translation>Không liên hệ được với máy chuyển tiếp. Hãy thử máy khác.</translation>
+    </message>
+    <message>
+        <source>Adds another address for this profile on a second relay.</source>
+        <translation>Thêm cho hồ sơ này một địa chỉ nữa trên một máy chuyển tiếp khác.</translation>
     </message>
 </context>
 <context>
@@ -447,10 +447,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Contact</source>
         <translation>Liên hệ</translation>
-    </message>
-    <message>
-        <source>Verified: end-to-end encrypted, and checked in person</source>
-        <translation>Đã xác minh: mã hóa đầu cuối và đã kiểm tra trực tiếp</translation>
     </message>
     <message>
         <source>End-to-end encrypted</source>
@@ -1041,17 +1037,9 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Máy chuyển tiếp</translation>
     </message>
     <message>
-        <source>Sends from this relay</source>
-        <translation>Đang gửi từ máy chuyển tiếp này</translation>
-    </message>
-    <message>
         <source>Removing relay</source>
         <extracomment>What Silica&apos;s countdown says it is doing, over a relay the reader has asked to remove.</extracomment>
         <translation>Đang gỡ máy chuyển tiếp</translation>
-    </message>
-    <message>
-        <source>Send from this relay</source>
-        <translation>Gửi từ máy chuyển tiếp này</translation>
     </message>
     <message>
         <source>Remove relay</source>

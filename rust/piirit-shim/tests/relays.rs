@@ -1,13 +1,16 @@
 //! The relays on the profile page, and what can be done with them.
 //!
-//! A profile can be reached through several relays at once, and sends
-//! from one of them. The page lists them with the one sent from first,
-//! and reports on each by itself -- the core's own words about its
-//! connection, and its mailbox off the core's report; a row's menu sends
-//! from that relay instead, or removes it after Silica's countdown; the
+//! A profile can be reached through several relays at once, one of them
+//! carrying the profile's own address. The page lists them with that one
+//! first, and reports on each by itself -- the core's own words about its
+//! connection, and its mailbox off the core's report; a row's menu
+//! removes that relay after Silica's countdown, and removing the one with
+//! the profile's own address on it moves the address to another; the
 //! last relay cannot be removed; and the plus under the rows opens the
 //! page that adds one, whose answer lands back in the list. The core's
-//! refusals reach the page in the core's own words.
+//! refusals reach the page in the core's own words. No row says which
+//! relay mail leaves through: the core picks that each time it connects,
+//! and does not say.
 
 // Qt harness: see qml_chat_list.rs.
 #![allow(
@@ -25,6 +28,10 @@ use qmetaobject::*;
 use serde_json::Value;
 
 mod common;
+
+/// The address `misname` asks the core to remove, which no relay of the
+/// profile's has.
+const MISNAMED: &str = "nobody@nowhere.example";
 
 /// Two loaders: the profile page, and the page that adds a relay over
 /// it, so that what the second does can be seen landing on the first.
@@ -148,7 +155,7 @@ const PROBE_QML: &str = r"
         function misname() {
             var transports = findIn(loader.item, 'transports')
             if (!transports) { return 'missing:transports' }
-            transports.set_primary('nobody@nowhere.example')
+            transports.remove('nobody@nowhere.example')
             return 'ok'
         }
     }
@@ -156,7 +163,7 @@ const PROBE_QML: &str = r"
 
 #[test]
 #[allow(clippy::too_many_lines)]
-fn the_relays_are_listed_switched_removed_and_added() {
+fn the_relays_are_listed_removed_and_added() {
     let temp = std::env::temp_dir().join(format!("piirit-relays-{}", std::process::id()));
     let journal = common::fresh_journal(&temp);
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
@@ -169,7 +176,7 @@ fn the_relays_are_listed_switched_removed_and_added() {
         std::env::set_var("PIIRIT_ACCOUNTS_DIR", temp.join("accounts"));
         std::env::set_var("PIIRIT_FAKE_ACCOUNTS", "1");
         // A profile on two relays: the one it was set up on first, and
-        // the one it sends from now.
+        // the one with its own address on it now.
         std::env::set_var("PIIRIT_FAKE_OLDER_RELAY", "ada@old.example.net");
     }
 
@@ -236,26 +243,21 @@ fn the_relays_are_listed_switched_removed_and_added() {
         record!("hurry", call!("hurry"));
     });
 
-    // The list as the core has it: the relay sent from first, whatever
-    // the core's order, each with its own mailbox.
+    // The list as the core has it: the relay with the profile's own
+    // address first, whatever the core's order, each with its own
+    // mailbox. Nothing on a row claims mail leaves through it.
     single_shot(Duration::from_secs(3), move || unsafe {
         record!("count", get!("transports", "count"));
         record!("first", get!("relayRow0", "addr"));
-        record!("first-sends", get!("relayRow0", "sendsFrom"));
-        record!("first-detail", get_in!("relayRow0", "relayDetail", "text"));
-        record!(
-            "first-switch",
-            get_in!("relayRow0", "sendFromItem", "visible")
-        );
+        record!("first-detail", get!("relayDetail", "objectName"));
+        record!("send-from", get!("sendFromItem", "objectName"));
+        // The same search does reach into a row's menu.
+        record!("menu-found", get!("removeRelayItem", "objectName"));
         record!("second", get!("relayRow1", "addr"));
         record!("second-domain", get_in!("relayRow1", "relayDomain", "text"));
         record!(
-            "second-detail",
-            get_in!("relayRow1", "relayDetail", "visible")
-        );
-        record!(
-            "second-switch",
-            get_in!("relayRow1", "sendFromItem", "visible")
+            "first-remove",
+            get_in!("relayRow0", "removeRelayItem", "enabled")
         );
         record!(
             "second-remove",
@@ -289,44 +291,30 @@ fn the_relays_are_listed_switched_removed_and_added() {
             "second-words",
             get_in!("relayReport1", "reportQuota", "label")
         );
-        record!(
-            "switch",
-            call!(
-                "clickIn",
-                QString::from("relayRow1"),
-                QString::from("sendFromItem")
-            )
-        );
+        // A removal of an address the profile has no relay for, which
+        // the core refuses.
+        record!("misname", call!("misname"));
     });
 
-    // Sent from the older relay now: it is first, the profile's address
-    // is on it, and the bar is its mailbox. Then the other one is asked
-    // to go, and the reader thinks better of it.
+    // The refusal on the page. Then the relay with the profile's own
+    // address on it is asked to go, and the reader thinks better of it.
     single_shot(Duration::from_secs(5), move || unsafe {
-        record!("switched-first", get!("relayRow0", "addr"));
-        record!("switched-first-sends", get!("relayRow0", "sendsFrom"));
-        record!("switched-second", get!("relayRow1", "addr"));
-        record!("switched-address", get!("profile", "address"));
         record!(
-            "switched-report",
-            get_in!("relayReport0", "reportDomain", "text")
-        );
-        record!(
-            "switched-quota",
-            get_in!("relayReport0", "reportQuota", "value")
+            "refused",
+            call!("pageProperty", QString::from("errorMessage"))
         );
         record!(
             "remove",
             call!(
                 "clickIn",
-                QString::from("relayRow1"),
+                QString::from("relayRow0"),
                 QString::from("removeRelayItem")
             )
         );
-        record!("counting", get_in!("relayRow1", "relayRemorse", "active"));
-        record!("doomed", get!("relayRow1", "doomed"));
-        record!("call-off", call!("callOff", QString::from("relayRow1")));
-        record!("spared", get!("relayRow1", "doomed"));
+        record!("counting", get_in!("relayRow0", "relayRemorse", "active"));
+        record!("doomed", get!("relayRow0", "doomed"));
+        record!("call-off", call!("callOff", QString::from("relayRow0")));
+        record!("spared", get!("relayRow0", "doomed"));
     });
 
     // Still two; asked again, and this time let go.
@@ -336,31 +324,36 @@ fn the_relays_are_listed_switched_removed_and_added() {
             "remove-again",
             call!(
                 "clickIn",
-                QString::from("relayRow1"),
+                QString::from("relayRow0"),
                 QString::from("removeRelayItem")
             )
         );
     });
 
-    // One relay, which cannot be removed; and a switch to an address
-    // the profile has no relay for, refused by the core.
+    // One relay, which cannot be removed. The profile's own address went
+    // with the relay it was on, to the one left, and the page and its
+    // report follow.
     single_shot(Duration::from_secs(8), move || unsafe {
         record!("removed-count", get!("transports", "count"));
         record!("remaining", get!("relayRow0", "addr"));
+        record!("moved-address", get!("profile", "address"));
+        record!(
+            "moved-report",
+            get_in!("relayReport0", "reportDomain", "text")
+        );
+        record!(
+            "moved-quota",
+            get_in!("relayReport0", "reportQuota", "value")
+        );
         record!(
             "last-remove",
             get_in!("relayRow0", "removeRelayItem", "enabled")
         );
-        record!("misname", call!("misname"));
     });
 
     // The plus, and the page it opens: nothing to add until a relay is
     // picked, and then the core is asked.
     single_shot(Duration::from_secs(10), move || unsafe {
-        record!(
-            "refused",
-            call!("pageProperty", QString::from("errorMessage"))
-        );
         record!("plus", call!("click", QString::from("addRelayButton")));
         record!(
             "sub-load",
@@ -438,45 +431,42 @@ fn the_relays_are_listed_switched_removed_and_added() {
         "the profile page did not load. {context}"
     );
     assert_listed(&value, &context);
-    assert_switched(&value, &context);
-    assert_removed(&value, &calls, &context);
     // The core's words, behind the transport's own prefix, as every
     // page shows a refusal.
+    assert_eq!(value("misname"), "ok", "{context}");
     assert!(
-        value("refused").ends_with("Address does not belong to any transport."),
+        value("refused").ends_with("Transport does not exist"),
         "the core's refusal of an address the profile has no relay for \
          did not reach the page in the core's words. {context}"
     );
+    assert!(
+        calls.iter().any(|(name, params)| name == "delete_transport"
+            && params.pointer("/1").and_then(Value::as_str) == Some(MISNAMED)),
+        "the refusal was not the core's: the removal never reached it. {calls:?}"
+    );
+    assert_removed(&value, &calls, &context);
     assert_added(&value, &calls, &navigation, &pushed_account, &context);
 }
 
-/// The relay sent from first, marked as such and without the item that
-/// would switch to it; the other with its own mailbox and both items.
+/// The relay with the profile's own address first, the other with its
+/// own mailbox; either may go while there are two; and no row says mail
+/// leaves through it, nor offers to make it.
 fn assert_listed(value: &dyn Fn(&str) -> String, context: &str) {
     assert_eq!(value("count"), "2", "{context}");
     assert_eq!(
         value("first"),
         "account1@example.org",
-        "the relay the profile sends from is not listed first. {context}"
+        "the relay with the profile's own address is not listed first. {context}"
     );
-    assert_eq!(value("first-sends"), "true", "{context}");
+    assert_eq!(value("menu-found"), "removeRelayItem", "{context}");
     assert_eq!(
-        value("first-detail"),
-        "Sends from this relay",
-        "the first row does not say the profile sends from it. {context}"
-    );
-    assert_eq!(
-        value("first-switch"),
-        "false",
-        "the relay already sent from offers to be sent from. {context}"
+        (value("first-detail").as_str(), value("send-from").as_str()),
+        ("missing:relayDetail", "missing:sendFromItem"),
+        "a row still claims to be the relay mail leaves through, or offers \
+         to make it so, which the core no longer lets anyone choose. {context}"
     );
     assert_eq!(value("second"), "ada@old.example.net", "{context}");
     assert_eq!(value("second-domain"), "old.example.net", "{context}");
-    assert_eq!(
-        value("second-detail"),
-        "false",
-        "a relay not sent from carries a marker. {context}"
-    );
     assert_eq!(value("first-report"), "example.org", "{context}");
     assert_eq!(
         value("first-status"),
@@ -499,46 +489,20 @@ fn assert_listed(value: &dyn Fn(&str) -> String, context: &str) {
         "2.0 GB of 2.1 GB used",
         "the second relay's mailbox is not said as used of the whole. {context}"
     );
-    assert_eq!(value("second-switch"), "true", "{context}");
+    assert_eq!(value("first-remove"), "true", "{context}");
     assert_eq!(value("second-remove"), "true", "{context}");
     assert_eq!(value("address"), "account1@example.org", "{context}");
     assert_eq!(
         value("quota"),
         "67",
-        "the first bar is not the mailbox of the relay sent from. {context}"
-    );
-}
-
-/// After "send from this relay" on the second row: it is first, the
-/// profile's address is on it, and the bar is its mailbox.
-fn assert_switched(value: &dyn Fn(&str) -> String, context: &str) {
-    assert_eq!(value("switch"), "ok", "{context}");
-    assert_eq!(
-        value("switched-first"),
-        "ada@old.example.net",
-        "sending from the other relay did not put it first. {context}"
-    );
-    assert_eq!(value("switched-first-sends"), "true", "{context}");
-    assert_eq!(
-        value("switched-second"),
-        "account1@example.org",
-        "{context}"
-    );
-    assert_eq!(
-        value("switched-address"),
-        "ada@old.example.net",
-        "the profile's address did not follow the relay it sends from. {context}"
-    );
-    assert_eq!(value("switched-report"), "old.example.net", "{context}");
-    assert_eq!(
-        value("switched-quota"),
-        "95",
-        "the reports did not follow the order of the rows. {context}"
+        "the first bar is not the mailbox of the relay with the profile's \
+         own address. {context}"
     );
 }
 
 /// The countdown, called off once and let run once; then one relay,
-/// which the menu no longer offers to remove.
+/// which the menu no longer offers to remove, and which the profile's
+/// own address has moved to.
 fn assert_removed(value: &dyn Fn(&str) -> String, calls: &[(String, Value)], context: &str) {
     assert_eq!(value("remove"), "ok", "{context}");
     assert_eq!(
@@ -566,14 +530,29 @@ fn assert_removed(value: &dyn Fn(&str) -> String, calls: &[(String, Value)], con
     );
     assert_eq!(value("remaining"), "ada@old.example.net", "{context}");
     assert_eq!(
+        value("moved-address"),
+        "ada@old.example.net",
+        "the profile's own address did not follow the core to the relay \
+         left. {context}"
+    );
+    assert_eq!(value("moved-report"), "old.example.net", "{context}");
+    assert_eq!(
+        value("moved-quota"),
+        "95",
+        "the reports did not follow the order of the rows. {context}"
+    );
+    assert_eq!(
         value("last-remove"),
         "false",
         "the last relay is offered for removal, which the core refuses. {context}"
     );
+    // The address no relay has went to the core too, to be refused; the
+    // rest are what the menu asked for.
     let deletions: Vec<&Value> = calls
         .iter()
         .filter(|(name, _)| name == "delete_transport")
         .map(|(_, params)| params)
+        .filter(|params| params.pointer("/1").and_then(Value::as_str) != Some(MISNAMED))
         .collect();
     assert_eq!(
         deletions.len(),

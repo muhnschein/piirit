@@ -58,6 +58,9 @@ struct Sent {
 #[derive(Default)]
 struct State {
     accounts: Vec<Account>,
+    /// The highest account id handed out so far. The real core never
+    /// hands one out twice, even once the account has gone.
+    last_account: u32,
     /// The profile the app last said it was showing. The real core keeps
     /// it on disk, selects a newly added account itself, and falls back
     /// to the first that is left when the selected one is removed.
@@ -137,8 +140,8 @@ struct State {
     sent: std::collections::BTreeSet<u32>,
     /// Each account's transports, in the order they were added -- the
     /// real core's `transports` table, which `list_transports` reads
-    /// oldest first. The one the account sends from is `configured_addr`
-    /// in `config`, as it is there.
+    /// oldest first. The one with the account's own address on it is
+    /// `configured_addr` in `config`, as it is there.
     transports: std::collections::BTreeMap<u32, Vec<String>>,
 }
 
@@ -154,9 +157,9 @@ impl State {
     }
 
     /// Keep a transport the account was just given, as the real core
-    /// does: appended, once, and sent from if the account was not
-    /// sending from anything yet -- a second transport is a second
-    /// address to be reached at, not a change of the first.
+    /// does: appended, once, and the account's own address if it had
+    /// none yet -- a second transport is a second address to be reached
+    /// at, not a change of the first.
     fn add_transport(&mut self, account: u32, addr: &str) {
         let list = self.transports.entry(account).or_default();
         if !list.iter().any(|known| known == addr) {
@@ -174,11 +177,9 @@ impl State {
     /// answered, so that a page asking about a profile before the
     /// account list has been read finds its transports there.
     ///
-    /// A profile set up twice keeps the address of the relay it was set
-    /// up on first in the core's deprecated `addr`, while
-    /// `configured_addr` is the relay it sends from now: what
-    /// `PIIRIT_FAKE_OLDER_RELAY` seeds, as the first transport the core
-    /// lists and the one `addr` still names.
+    /// A profile set up twice has a relay besides the one its own
+    /// address (`configured_addr`) is on: what `PIIRIT_FAKE_OLDER_RELAY`
+    /// seeds, as the first transport the core lists.
     fn seed_accounts(&mut self) {
         let older = std::env::var("PIIRIT_FAKE_OLDER_RELAY").ok();
         for account in env_ids("PIIRIT_FAKE_ACCOUNTS") {
@@ -191,8 +192,6 @@ impl State {
             });
             let list = self.transports.entry(account).or_default();
             if let Some(older) = &older {
-                self.config
-                    .insert((account, "addr".to_string()), older.clone());
                 list.push(older.clone());
             }
             let own = format!("account{account}@example.org");
@@ -212,8 +211,9 @@ impl State {
     }
 
     /// The accounts, shaped as the real core shapes them: a configured
-    /// one carries its profile -- name, address, picture, colour -- and
-    /// an unconfigured one is an id and nothing else.
+    /// one carries its profile -- name, picture, colour -- but no
+    /// address, which the real core dropped in 2.61, and an unconfigured
+    /// one is an id and nothing else.
     fn account_list(&self) -> Value {
         Value::Array(
             self.accounts
@@ -224,15 +224,6 @@ impl State {
                             "id": account.id,
                             "kind": "Configured",
                             "displayName": self.config(account.id, "displayname").unwrap_or_default(),
-                            // The core's own `addr`, which this list
-                            // carries: a key deprecated in 2026-04 that
-                            // falls back to `configured_addr` only while
-                            // nothing was written to it. A profile that
-                            // once had another transport keeps the older
-                            // address here.
-                            "addr": self.config(account.id, "addr")
-                                .or_else(|| self.config(account.id, "configured_addr"))
-                                .unwrap_or_else(|| format!("account{}@example.org", account.id)),
                             "profileImage": self.config(account.id, "selfavatar"),
                             "color": "#4a90d9",
                         })
@@ -362,6 +353,9 @@ impl State {
     /// The three names are the real core's: `authName` is what the
     /// contact calls themselves, `name` what was given to them here, and
     /// `displayName` the second when there is one, else the first.
+    ///
+    /// Every key the 2.62 core sends is here, whether the app reads it or
+    /// not, with the values for a contact nobody has seen lately.
     fn contact_object(&self, contact: u32) -> Option<Value> {
         let address = if contact == SELF {
             "me@example.org"
@@ -385,10 +379,15 @@ impl State {
             "authName": auth_name,
             "name": name,
             "displayName": display_name,
-            "isVerified": contact == 10,
             "isKeyContact": true,
+            "e2eeAvail": true,
+            "isBlocked": self.blocked.contains(&contact),
+            "isBot": false,
             "status": if contact == 10 { "Poet and mathematician" } else { "" },
             "color": "#00875a",
+            "profileImage": null,
+            "lastSeen": 0,
+            "freshness": "Normal",
         }))
     }
 
@@ -1214,6 +1213,10 @@ async fn serve() {
                     let gone = positional(0).as_u64().unwrap_or(0);
                     let gone = u32::try_from(gone).unwrap_or(0);
                     state.accounts.retain(|account| account.id != gone);
+                    // The real core deletes the account's directory, and
+                    // its transports and config with it.
+                    state.transports.remove(&gone);
+                    state.config.retain(|(account, _), _| *account != gone);
                     if state.selected == Some(gone) {
                         state.selected = state.accounts.first().map(|account| account.id);
                     }
@@ -1221,7 +1224,13 @@ async fn serve() {
                 }
                 "add_account" => {
                     let mut state = state.lock().await;
-                    let next = u32::try_from(state.accounts.len()).unwrap_or(0) + 1;
+                    let next = state
+                        .accounts
+                        .iter()
+                        .map(|account| account.id)
+                        .fold(state.last_account, u32::max)
+                        + 1;
+                    state.last_account = next;
                     state.accounts.push(Account {
                         id: next,
                         configured: false,
@@ -1255,24 +1264,26 @@ async fn serve() {
                     // one outright there, which is why the app has to send
                     // null rather than "".
                     match positional(2).as_str() {
-                        // Which transport the account sends from. The
-                        // real core takes only an address it has a
-                        // transport for, in these words -- unless the
-                        // account has none yet, when the write is the
-                        // pre-transport way of configuring one and the
-                        // core makes a transport of it. Both pinned
-                        // offline against the pinned binary.
+                        // The profile's own address. The real core takes
+                        // only an address it has a transport for, in
+                        // these words, and since 2.61 even on an account
+                        // with none: writing one is no longer a way of
+                        // making a transport. Nor does it clear one.
+                        // Both pinned offline against the pinned binary.
                         Some(value) if key == "configured_addr" => {
-                            let known = state.transports_for(account);
-                            if known.is_empty() {
-                                state.add_transport(account, value);
-                                ok(&id, &Value::Null)
-                            } else if known.iter().any(|addr| addr == value) {
+                            if state
+                                .transports_for(account)
+                                .iter()
+                                .any(|addr| addr == value)
+                            {
                                 state.config.insert((account, key), value.to_string());
                                 ok(&id, &Value::Null)
                             } else {
                                 err(&id, "Address does not belong to any transport.")
                             }
+                        }
+                        None if key == "configured_addr" => {
+                            err(&id, "Cannot unset configured_addr")
                         }
                         Some(value) => {
                             state.config.insert((account, key), value.to_string());
@@ -1465,11 +1476,11 @@ async fn serve() {
                     ok(&id, &Value::Array(listed))
                 }
                 // One transport fewer. The real core refuses to remove
-                // the last one, in these words, and answers the removal
-                // of the one being sent from by sending from another --
-                // pinned offline against the pinned binary, as far as
-                // one transport allows; the re-election is upstream's
-                // `delete_transport`.
+                // the last one and one it does not have, in these words,
+                // and answers the removal of the one with the account's
+                // own address on it by electing the newest of the rest
+                // -- upstream's `delete_transport` and
+                // `maybe_update_sending_transport`.
                 "delete_transport" => {
                     let account = account_id();
                     let addr = positional(1).as_str().unwrap_or_default().to_string();
@@ -1478,16 +1489,17 @@ async fn serve() {
                     if known.len() <= 1 {
                         err(&id, "Cannot remove the last transport")
                     } else if !known.contains(&addr) {
-                        err(&id, "Address does not belong to any transport.")
+                        err(&id, "Transport does not exist")
                     } else {
                         let kept: Vec<String> =
                             known.into_iter().filter(|kept| *kept != addr).collect();
-                        if state.config(account, "configured_addr").as_deref()
-                            == Some(addr.as_str())
-                        {
+                        if let Some(newest) = kept.last().filter(|_| {
+                            state.config(account, "configured_addr").as_deref()
+                                == Some(addr.as_str())
+                        }) {
                             state
                                 .config
-                                .insert((account, "configured_addr".to_string()), kept[0].clone());
+                                .insert((account, "configured_addr".to_string()), newest.clone());
                         }
                         state.transports.insert(account, kept);
                         state.transports_modified(account);
@@ -1895,6 +1907,22 @@ async fn serve() {
                     state.left_groups.insert(chat);
                     state.chat_modified(account, chat);
                     ok(&id, &Value::Null)
+                }
+                // A fingerprint code with neither of an invite's two
+                // secrets in it has had no kind since 2.61: the core looks
+                // for a contact with that key and refuses the code when
+                // there is none, which here is every time.
+                "check_qr"
+                    if positional(1).as_str().is_some_and(|content| {
+                        content.starts_with("OPENPGP4FPR:")
+                            && !(content.contains("i=") && content.contains("s="))
+                    }) =>
+                {
+                    err(
+                        &id,
+                        "failed to decode OPENPGP4FPR QR code: \
+                         Contact matching the fingerprint is not found",
+                    )
                 }
                 "check_qr" => {
                     let content = positional(1).as_str().unwrap_or_default().to_string();

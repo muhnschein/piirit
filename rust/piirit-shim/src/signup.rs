@@ -440,15 +440,22 @@ async fn import_call(
     result
 }
 
-/// Whether some other account is already configured on the address the
-/// profile just taken over sends from.
+/// Whether some other configured account is reached at any of the
+/// addresses the profile just taken over is.
 ///
-/// Asked of the core's own account list rather than remembered here: a
-/// copy added by an earlier run of the app is as much a duplicate as one
-/// added a moment ago, and the list is where both show up. An account
-/// whose address cannot be read is let through -- refusing a profile on
-/// a question that could not be answered is the worse of the two
-/// mistakes.
+/// Compared by transport (`list_transports`), every address of each:
+/// the core's account list carries no address since 2.61, and the
+/// profile's own address (`configured_addr`) need not be the same on two
+/// copies -- one switched to another of its relays names that one --
+/// while both fetch the same mailboxes. Asked of the core rather than
+/// remembered here: a copy added by an earlier run of the app is as much
+/// a duplicate as one added a moment ago, and the core is where both
+/// show up. An account whose relays cannot be read is let through --
+/// refusing a profile on a question that could not be answered is the
+/// worse of the two mistakes.
+///
+/// A call for each configured profile's relays, up to the first that
+/// shares one: this runs once per profile taken over, not per refresh.
 async fn already_here(rpc: &RpcClient, account_id: u32) -> bool {
     let Ok(accounts) = rpc
         .call_unit::<Vec<serde_json::Value>>("get_all_accounts")
@@ -456,22 +463,45 @@ async fn already_here(rpc: &RpcClient, account_id: u32) -> bool {
     else {
         return false;
     };
-    let addr = accounts
-        .iter()
-        .find(|account| json::u32_opt(account, "id") == Some(account_id))
-        .map(|account| json::str_at(account, "addr").to_string())
-        .unwrap_or_default();
-    if addr.is_empty() {
+    let arrived = transport_addrs(rpc, account_id).await;
+    if arrived.is_empty() {
         return false;
     }
-    accounts.iter().any(|account| {
-        json::u32_opt(account, "id") != Some(account_id)
-            && json::str_at(account, "kind") == "Configured"
-            // The same mailbox written two ways is the same mailbox:
-            // the core lowercases what it configures, but a backup
-            // written by another client need not have.
-            && json::str_at(account, "addr").eq_ignore_ascii_case(&addr)
-    })
+    for account in &accounts {
+        let Some(other) = json::u32_opt(account, "id") else {
+            continue;
+        };
+        if other == account_id || json::str_at(account, "kind") != "Configured" {
+            continue;
+        }
+        // The same mailbox written two ways is the same mailbox: the
+        // core lowercases what it configures, but a backup written by
+        // another client need not have.
+        let theirs = transport_addrs(rpc, other).await;
+        if theirs
+            .iter()
+            .any(|addr| arrived.iter().any(|mine| mine.eq_ignore_ascii_case(addr)))
+        {
+            return true;
+        }
+    }
+    false
+}
+
+/// The addresses of an account's transports, empty when the core cannot
+/// say.
+async fn transport_addrs(rpc: &RpcClient, account_id: u32) -> Vec<String> {
+    rpc.call::<_, Vec<serde_json::Value>>("list_transports", (account_id,))
+        .await
+        .map(|transports| {
+            transports
+                .iter()
+                .map(|transport| json::str_at(transport, "addr"))
+                .filter(|addr| !addr.is_empty())
+                .map(str::to_string)
+                .collect()
+        })
+        .unwrap_or_default()
 }
 
 /// Whether the code read is one another device is offering a profile

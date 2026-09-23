@@ -105,16 +105,16 @@
         <translation>Piirit werkt alleen met chatmail-relays. Dat is een bijzonder soort e-mailserver; gewone e-mailservers worden niet ondersteund. Meer op &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. Een volledige lijst van openbare, gratis te gebruiken chatmail-relays staat op &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
     </message>
     <message>
-        <source>Adds another address for this profile on a second relay. The profile sends from one relay at a time; you can change which one on the profile page.</source>
-        <translation>Voegt dit profiel een tweede adres toe op een andere relay. Het profiel verzendt via één relay tegelijk; welke dat is, kun je op de profielpagina wijzigen.</translation>
-    </message>
-    <message>
         <source>Contacting %1…</source>
         <translation>Contact opnemen met %1…</translation>
     </message>
     <message>
         <source>Could not reach the relay. Try another one.</source>
         <translation>De relay was niet bereikbaar. Probeer een andere.</translation>
+    </message>
+    <message>
+        <source>Adds another address for this profile on a second relay.</source>
+        <translation>Voegt dit profiel een tweede adres toe op een andere relay.</translation>
     </message>
 </context>
 <context>
@@ -448,10 +448,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Contact</source>
         <translation>Contact</translation>
-    </message>
-    <message>
-        <source>Verified: end-to-end encrypted, and checked in person</source>
-        <translation>Geverifieerd: end-to-end versleuteld en persoonlijk gecontroleerd</translation>
     </message>
     <message>
         <source>End-to-end encrypted</source>
@@ -1047,17 +1043,9 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Relays</translation>
     </message>
     <message>
-        <source>Sends from this relay</source>
-        <translation>Verstuurt via deze relay</translation>
-    </message>
-    <message>
         <source>Removing relay</source>
         <extracomment>What Silica&apos;s countdown says it is doing, over a relay the reader has asked to remove.</extracomment>
         <translation>Relay wordt verwijderd</translation>
-    </message>
-    <message>
-        <source>Send from this relay</source>
-        <translation>Via deze relay versturen</translation>
     </message>
     <message>
         <source>Remove relay</source>

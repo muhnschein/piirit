@@ -105,16 +105,16 @@
         <translation>Piirit działa tylko z relay chatmail. To szczególny rodzaj serwera pocztowego; zwykłe serwery pocztowe nie są obsługiwane. Więcej na &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. Pełna lista publicznych, darmowych relay chatmail jest na &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
     </message>
     <message>
-        <source>Adds another address for this profile on a second relay. The profile sends from one relay at a time; you can change which one on the profile page.</source>
-        <translation>Dodaje temu profilowi kolejny adres na drugim relay. Profil wysyła przez jeden relay naraz; który to, możesz zmienić na stronie profilu.</translation>
-    </message>
-    <message>
         <source>Contacting %1…</source>
         <translation>Łączenie z %1…</translation>
     </message>
     <message>
         <source>Could not reach the relay. Try another one.</source>
         <translation>Nie udało się połączyć z relay. Spróbuj innego.</translation>
+    </message>
+    <message>
+        <source>Adds another address for this profile on a second relay.</source>
+        <translation>Dodaje temu profilowi kolejny adres na drugim relay.</translation>
     </message>
 </context>
 <context>
@@ -453,10 +453,6 @@ Wiadomości innych grup z zablokowanymi kontaktami nadal będą wyświetlane.</t
     <message>
         <source>Contact</source>
         <translation>Kontakt</translation>
-    </message>
-    <message>
-        <source>Verified: end-to-end encrypted, and checked in person</source>
-        <translation>Zweryfikowany: szyfrowanie od końca do końca, sprawdzone osobiście</translation>
     </message>
     <message>
         <source>End-to-end encrypted</source>
@@ -1057,17 +1053,9 @@ Wiadomości innych grup z zablokowanymi kontaktami nadal będą wyświetlane.</t
         <translation>Relay</translation>
     </message>
     <message>
-        <source>Sends from this relay</source>
-        <translation>Wysyła z tego relay</translation>
-    </message>
-    <message>
         <source>Removing relay</source>
         <extracomment>What Silica&apos;s countdown says it is doing, over a relay the reader has asked to remove.</extracomment>
         <translation>Usuwanie relay</translation>
-    </message>
-    <message>
-        <source>Send from this relay</source>
-        <translation>Wysyłaj z tego relay</translation>
     </message>
     <message>
         <source>Remove relay</source>

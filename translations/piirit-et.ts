@@ -105,16 +105,16 @@
         <translation>Piirit töötab ainult chatmail-releedega. Need on eriliik e-posti servereid; tavalisi e-posti servereid ei toetata. Lähemalt &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. Avalike, tasuta chatmail-releede täielik loend on aadressil &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
     </message>
     <message>
-        <source>Adds another address for this profile on a second relay. The profile sends from one relay at a time; you can change which one on the profile page.</source>
-        <translation>Lisab sellele profiilile veel ühe aadressi teisel releel. Profiil saadab korraga ühe relee kaudu; millise, saad muuta profiililehel.</translation>
-    </message>
-    <message>
         <source>Contacting %1…</source>
         <translation>Võtan ühendust: %1…</translation>
     </message>
     <message>
         <source>Could not reach the relay. Try another one.</source>
         <translation>Releega ei õnnestunud ühendust saada. Proovi teist.</translation>
+    </message>
+    <message>
+        <source>Adds another address for this profile on a second relay.</source>
+        <translation>Lisab sellele profiilile veel ühe aadressi teisel releel.</translation>
     </message>
 </context>
 <context>
@@ -452,10 +452,6 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
     <message>
         <source>Contact</source>
         <translation>Kontakt</translation>
-    </message>
-    <message>
-        <source>Verified: end-to-end encrypted, and checked in person</source>
-        <translation>Kinnitatud: otsast otsani krüpteeritud ja isiklikult kontrollitud</translation>
     </message>
     <message>
         <source>End-to-end encrypted</source>
@@ -1051,17 +1047,9 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
         <translation>Releed</translation>
     </message>
     <message>
-        <source>Sends from this relay</source>
-        <translation>Saadab sellest releest</translation>
-    </message>
-    <message>
         <source>Removing relay</source>
         <extracomment>What Silica&apos;s countdown says it is doing, over a relay the reader has asked to remove.</extracomment>
         <translation>Eemaldan releed</translation>
-    </message>
-    <message>
-        <source>Send from this relay</source>
-        <translation>Saada sellest releest</translation>
     </message>
     <message>
         <source>Remove relay</source>

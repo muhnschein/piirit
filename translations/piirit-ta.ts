@@ -105,16 +105,16 @@
         <translation>Piirit chatmail ரிலேக்களுடன் மட்டுமே வேலை செய்யும். இவை ஒரு தனி வகை மின்னஞ்சல் சேவையகங்கள்; சாதாரண மின்னஞ்சல் சேவையகங்கள் ஆதரிக்கப்படுவதில்லை. மேலும் அறிய &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt; பார்க்கவும். பொது, இலவச chatmail ரிலேக்களின் முழுப் பட்டியல் &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;-இல் உள்ளது.</translation>
     </message>
     <message>
-        <source>Adds another address for this profile on a second relay. The profile sends from one relay at a time; you can change which one on the profile page.</source>
-        <translation>இந்தச் சுயவிவரத்திற்கு இரண்டாவது ரிலேயில் மற்றொரு முகவரியைச் சேர்க்கிறது. சுயவிவரம் ஒரு நேரத்தில் ஒரு ரிலே வழியாகவே அனுப்புகிறது; எது என்பதைச் சுயவிவரப் பக்கத்தில் மாற்றலாம்.</translation>
-    </message>
-    <message>
         <source>Contacting %1…</source>
         <translation>%1 ஐத் தொடர்புகொள்கிறது…</translation>
     </message>
     <message>
         <source>Could not reach the relay. Try another one.</source>
         <translation>ரிலேயை அடைய முடியவில்லை. வேறொன்றை முயற்சியுங்கள்.</translation>
+    </message>
+    <message>
+        <source>Adds another address for this profile on a second relay.</source>
+        <translation>இந்தச் சுயவிவரத்திற்கு இரண்டாவது ரிலேயில் மற்றொரு முகவரியைச் சேர்க்கிறது.</translation>
     </message>
 </context>
 <context>
@@ -448,10 +448,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Contact</source>
         <translation>தொடர்பு</translation>
-    </message>
-    <message>
-        <source>Verified: end-to-end encrypted, and checked in person</source>
-        <translation>சரிபார்க்கப்பட்டது: முனையிலிருந்து முனை குறியாக்கம், நேரில் சரிபார்க்கப்பட்டது</translation>
     </message>
     <message>
         <source>End-to-end encrypted</source>
@@ -1047,17 +1043,9 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>ரிலேக்கள்</translation>
     </message>
     <message>
-        <source>Sends from this relay</source>
-        <translation>இந்த ரிலேயிலிருந்து அனுப்புகிறது</translation>
-    </message>
-    <message>
         <source>Removing relay</source>
         <extracomment>What Silica&apos;s countdown says it is doing, over a relay the reader has asked to remove.</extracomment>
         <translation>ரிலே நீக்கப்படுகிறது</translation>
-    </message>
-    <message>
-        <source>Send from this relay</source>
-        <translation>இந்த ரிலேயிலிருந்து அனுப்பு</translation>
     </message>
     <message>
         <source>Remove relay</source>

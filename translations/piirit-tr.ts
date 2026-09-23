@@ -105,16 +105,16 @@
         <translation>Piirit yalnızca chatmail röleleriyle çalışır. Bunlar özel bir tür e-posta sunucusudur; sıradan e-posta sunucuları desteklenmez. Daha fazlası için &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt; adresine bak. Herkese açık, ücretsiz chatmail rölelerinin tam listesi &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; adresinde.</translation>
     </message>
     <message>
-        <source>Adds another address for this profile on a second relay. The profile sends from one relay at a time; you can change which one on the profile page.</source>
-        <translation>Bu profile ikinci bir rölede başka bir adres ekler. Profil bir seferde tek bir röle üzerinden gönderir; hangisi olduğunu profil sayfasından değiştirebilirsin.</translation>
-    </message>
-    <message>
         <source>Contacting %1…</source>
         <translation>%1 ile iletişim kuruluyor…</translation>
     </message>
     <message>
         <source>Could not reach the relay. Try another one.</source>
         <translation>Röleye ulaşılamadı. Başka birini dene.</translation>
+    </message>
+    <message>
+        <source>Adds another address for this profile on a second relay.</source>
+        <translation>Bu profile ikinci bir rölede başka bir adres ekler.</translation>
     </message>
 </context>
 <context>
@@ -451,10 +451,6 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
     <message>
         <source>Contact</source>
         <translation>Kişi</translation>
-    </message>
-    <message>
-        <source>Verified: end-to-end encrypted, and checked in person</source>
-        <translation>Doğrulanmış: uçtan uca şifreli ve yüz yüze kontrol edilmiş</translation>
     </message>
     <message>
         <source>End-to-end encrypted</source>
@@ -1045,17 +1041,9 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
         <translation>Röleler</translation>
     </message>
     <message>
-        <source>Sends from this relay</source>
-        <translation>Bu röleden gönderiyor</translation>
-    </message>
-    <message>
         <source>Removing relay</source>
         <extracomment>What Silica&apos;s countdown says it is doing, over a relay the reader has asked to remove.</extracomment>
         <translation>Röle kaldırılıyor</translation>
-    </message>
-    <message>
-        <source>Send from this relay</source>
-        <translation>Bu röleden gönder</translation>
     </message>
     <message>
         <source>Remove relay</source>

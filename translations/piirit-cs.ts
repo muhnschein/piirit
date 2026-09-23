@@ -105,16 +105,16 @@
         <translation>Piirit funguje jen s chatmail relay. Je to zvláštní druh e-mailového serveru; běžné e-mailové servery nejsou podporovány. Víc na &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. Úplný seznam veřejných chatmail relay zdarma je na &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
     </message>
     <message>
-        <source>Adds another address for this profile on a second relay. The profile sends from one relay at a time; you can change which one on the profile page.</source>
-        <translation>Přidá tomuto profilu další adresu na druhém relay. Profil odesílá vždy přes jeden relay; který to je, můžeš změnit na stránce profilu.</translation>
-    </message>
-    <message>
         <source>Contacting %1…</source>
         <translation>Kontaktuje se %1…</translation>
     </message>
     <message>
         <source>Could not reach the relay. Try another one.</source>
         <translation>Relay se nepodařilo kontaktovat. Zkus jiný.</translation>
+    </message>
+    <message>
+        <source>Adds another address for this profile on a second relay.</source>
+        <translation>Přidá tomuto profilu další adresu na druhém relay.</translation>
     </message>
 </context>
 <context>
@@ -453,10 +453,6 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
     <message>
         <source>Contact</source>
         <translation>Kontakt</translation>
-    </message>
-    <message>
-        <source>Verified: end-to-end encrypted, and checked in person</source>
-        <translation>Ověřeno: šifrováno mezi koncovými body a osobně zkontrolováno</translation>
     </message>
     <message>
         <source>End-to-end encrypted</source>
@@ -1057,17 +1053,9 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
         <translation>Relay</translation>
     </message>
     <message>
-        <source>Sends from this relay</source>
-        <translation>Odesílá z tohoto relay</translation>
-    </message>
-    <message>
         <source>Removing relay</source>
         <extracomment>What Silica&apos;s countdown says it is doing, over a relay the reader has asked to remove.</extracomment>
         <translation>Odebírání relay</translation>
-    </message>
-    <message>
-        <source>Send from this relay</source>
-        <translation>Odesílat z tohoto relay</translation>
     </message>
     <message>
         <source>Remove relay</source>

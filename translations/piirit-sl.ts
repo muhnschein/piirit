@@ -105,16 +105,16 @@
         <translation>Piirit deluje samo s posredniki chatmail. To je posebna vrsta e-poštnih strežnikov; navadni e-poštni strežniki niso podprti. Več na &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. Celoten seznam javnih, brezplačnih posrednikov chatmail je na &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
     </message>
     <message>
-        <source>Adds another address for this profile on a second relay. The profile sends from one relay at a time; you can change which one on the profile page.</source>
-        <translation>Temu profilu doda še en naslov pri drugem posredniku. Profil pošilja prek enega posrednika naenkrat; katerega, lahko spremeniš na strani profila.</translation>
-    </message>
-    <message>
         <source>Contacting %1…</source>
         <translation>Vzpostavljanje stika z %1…</translation>
     </message>
     <message>
         <source>Could not reach the relay. Try another one.</source>
         <translation>Posrednika ni bilo mogoče doseči. Poskusi drugega.</translation>
+    </message>
+    <message>
+        <source>Adds another address for this profile on a second relay.</source>
+        <translation>Temu profilu doda še en naslov pri drugem posredniku.</translation>
     </message>
 </context>
 <context>
@@ -454,10 +454,6 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
     <message>
         <source>Contact</source>
         <translation>Stik</translation>
-    </message>
-    <message>
-        <source>Verified: end-to-end encrypted, and checked in person</source>
-        <translation>Preverjeno: šifrirano od konca do konca in osebno preverjeno</translation>
     </message>
     <message>
         <source>End-to-end encrypted</source>
@@ -1063,17 +1059,9 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
         <translation>Posredniki</translation>
     </message>
     <message>
-        <source>Sends from this relay</source>
-        <translation>Pošilja prek tega posrednika</translation>
-    </message>
-    <message>
         <source>Removing relay</source>
         <extracomment>What Silica&apos;s countdown says it is doing, over a relay the reader has asked to remove.</extracomment>
         <translation>Odstranjevanje posrednika</translation>
-    </message>
-    <message>
-        <source>Send from this relay</source>
-        <translation>Pošiljaj prek tega posrednika</translation>
     </message>
     <message>
         <source>Remove relay</source>

@@ -242,7 +242,7 @@ fn a_relay_added_after_cancel_is_kept_and_not_announced() {
         value("after"),
         "2:account1@example.org",
         "the relay the late answer added is not on the profile, or the \
-         profile no longer sends from where it did. {context}"
+         profile's own address moved. {context}"
     );
     assert_eq!(
         value("navigation"),

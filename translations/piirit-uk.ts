@@ -105,16 +105,16 @@
         <translation>Piirit працює лише з chatmail-релеями. Це особливий різновид поштових серверів; звичайні поштові сервери не підтримуються. Докладніше на &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. Повний список публічних, безкоштовних chatmail-релеїв є на &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
     </message>
     <message>
-        <source>Adds another address for this profile on a second relay. The profile sends from one relay at a time; you can change which one on the profile page.</source>
-        <translation>Додає цьому профілю ще одну адресу на іншому релеї. Профіль надсилає через один релей за раз; який саме, можна змінити на сторінці профілю.</translation>
-    </message>
-    <message>
         <source>Contacting %1…</source>
         <translation>Зв&apos;язок із %1…</translation>
     </message>
     <message>
         <source>Could not reach the relay. Try another one.</source>
         <translation>Не вдалося зв&apos;язатися з релеєм. Спробуйте інший.</translation>
+    </message>
+    <message>
+        <source>Adds another address for this profile on a second relay.</source>
+        <translation>Додає цьому профілю ще одну адресу на іншому релеї.</translation>
     </message>
 </context>
 <context>
@@ -453,10 +453,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Contact</source>
         <translation>Контакт</translation>
-    </message>
-    <message>
-        <source>Verified: end-to-end encrypted, and checked in person</source>
-        <translation>Перевірено: наскрізне шифрування, підтверджено особисто</translation>
     </message>
     <message>
         <source>End-to-end encrypted</source>
@@ -1057,17 +1053,9 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Релеї</translation>
     </message>
     <message>
-        <source>Sends from this relay</source>
-        <translation>Надсилає через цей релей</translation>
-    </message>
-    <message>
         <source>Removing relay</source>
         <extracomment>What Silica&apos;s countdown says it is doing, over a relay the reader has asked to remove.</extracomment>
         <translation>Релей прибирається</translation>
-    </message>
-    <message>
-        <source>Send from this relay</source>
-        <translation>Надсилати через цей релей</translation>
     </message>
     <message>
         <source>Remove relay</source>

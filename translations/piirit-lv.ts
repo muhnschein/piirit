@@ -105,16 +105,16 @@
         <translation>Piirit strādā tikai ar chatmail relejiem. Tie ir īpašs e-pasta serveru veids; parasti e-pasta serveri netiek atbalstīti. Vairāk: &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. Pilns publisko, bez maksas lietojamo chatmail releju saraksts ir &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
     </message>
     <message>
-        <source>Adds another address for this profile on a second relay. The profile sends from one relay at a time; you can change which one on the profile page.</source>
-        <translation>Pievieno šim profilam vēl vienu adresi citā relejā. Profils sūta caur vienu releju vienlaikus; kuru, vari mainīt profila lapā.</translation>
-    </message>
-    <message>
         <source>Contacting %1…</source>
         <translation>Sazinās ar %1…</translation>
     </message>
     <message>
         <source>Could not reach the relay. Try another one.</source>
         <translation>Neizdevās sasniegt releju. Mēģini citu.</translation>
+    </message>
+    <message>
+        <source>Adds another address for this profile on a second relay.</source>
+        <translation>Pievieno šim profilam vēl vienu adresi citā relejā.</translation>
     </message>
 </context>
 <context>
@@ -453,10 +453,6 @@ Citās grupās, kurās ir bloķēti kontakti, viņu ziņas joprojām būs redzam
     <message>
         <source>Contact</source>
         <translation>Kontakts</translation>
-    </message>
-    <message>
-        <source>Verified: end-to-end encrypted, and checked in person</source>
-        <translation>Pārbaudīts: pilnībā šifrēts un pārbaudīts klātienē</translation>
     </message>
     <message>
         <source>End-to-end encrypted</source>
@@ -1057,17 +1053,9 @@ Citās grupās, kurās ir bloķēti kontakti, viņu ziņas joprojām būs redzam
         <translation>Releji</translation>
     </message>
     <message>
-        <source>Sends from this relay</source>
-        <translation>Sūta no šī releja</translation>
-    </message>
-    <message>
         <source>Removing relay</source>
         <extracomment>What Silica&apos;s countdown says it is doing, over a relay the reader has asked to remove.</extracomment>
         <translation>Noņem releju</translation>
-    </message>
-    <message>
-        <source>Send from this relay</source>
-        <translation>Sūtīt no šī releja</translation>
     </message>
     <message>
         <source>Remove relay</source>

@@ -5,12 +5,19 @@
 //! copy, a notification arrives once per copy, and a reply is sent from
 //! whichever copy the reader happened to open. Nothing in the core stops
 //! it -- `import_backup` is happy to write the same backup into as many
-//! accounts as it is given -- so the shim reads the address the import
-//! brought over and refuses one it already has.
+//! accounts as it is given -- so the shim reads the relays the import
+//! brought over (`list_transports`) and refuses a profile any of whose
+//! relays another profile already has.
+//!
+//! Every relay, not the profile's own address alone. The core's account
+//! list carries no address since 2.61, and the profile's own address
+//! (`configured_addr`) need not be the same on two copies: a backup made
+//! where the profile had been switched to another of its relays names
+//! that one, and still fetches the same mailboxes.
 //!
 //! The refusal is a `restore_refused` reason rather than the core's
 //! words, as `not-a-backup` and `too-new` are: the page puts it into the
-//! reader's language. And the account the second import wrote is
+//! reader's language. And the account a refused import wrote is
 //! removed, the way a failed import's is -- a second copy is good for
 //! nothing, and the copy already here is untouched.
 //!
@@ -64,6 +71,7 @@ const PROBE_QML: &str = r"
 ";
 
 #[test]
+#[allow(clippy::too_many_lines)]
 fn the_same_backup_is_taken_over_once_and_the_list_hears_about_it() {
     let temp = std::env::temp_dir().join(format!("piirit-restore-dup-{}", std::process::id()));
     let journal = common::fresh_journal(&temp);
@@ -75,6 +83,13 @@ fn the_same_backup_is_taken_over_once_and_the_list_hears_about_it() {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_FAKE_JOURNAL", &journal);
         std::env::set_var("PIIRIT_ACCOUNTS_DIR", temp.join("accounts"));
+        // A profile here from the start, on two relays: the one its own
+        // address is on, and one it was set up on first. The fake core
+        // makes a backup's address from its file name, so the one named
+        // for that first relay below is a copy of this profile, written
+        // in capitals the way another client might have.
+        std::env::set_var("PIIRIT_FAKE_ACCOUNTS", "1");
+        std::env::set_var("PIIRIT_FAKE_OLDER_RELAY", "summer-backup-tar@example.org");
     }
 
     let core_box = QObjectBox::new(DeltaChatCore::default());
@@ -101,9 +116,10 @@ fn the_same_backup_is_taken_over_once_and_the_list_hears_about_it() {
         }};
     }
 
-    // 1s: the backup is read in. 3s: the list knows about the profile
-    // without anything here having asked, and the same file is offered
-    // again. 5s: what came of the second one.
+    // 1s: a backup of a profile the phone does not have is read in. 3s:
+    // the list knows about it without anything here having asked, and
+    // the copy of the profile already here is offered. 5s: the first
+    // backup again. 7s: what came of both.
     // SAFETY: these callbacks fire only while `exec()` is running on this
     // thread, and both boxes outlive it.
     single_shot(Duration::from_secs(1), move || unsafe {
@@ -117,9 +133,15 @@ fn the_same_backup_is_taken_over_once_and_the_list_hears_about_it() {
         (*core_ptr)
             .pinned()
             .borrow_mut()
-            .restore_from_file(QString::from("/tmp/holiday-backup.tar"));
+            .restore_from_file(QString::from("/tmp/Summer-Backup.tar"));
     });
     single_shot(Duration::from_secs(5), move || unsafe {
+        (*core_ptr)
+            .pinned()
+            .borrow_mut()
+            .restore_from_file(QString::from("/tmp/holiday-backup.tar"));
+    });
+    single_shot(Duration::from_secs(7), move || unsafe {
         (*steps_ptr).push(("after", ask!("profiles")));
         (*steps_ptr).push(("summary", ask!("summary")));
         (*engine_ptr).quit();
@@ -139,22 +161,24 @@ fn the_same_backup_is_taken_over_once_and_the_list_hears_about_it() {
 
     assert_eq!(
         value("summary"),
-        "1/already-here|/",
-        "the same backup was not taken over exactly once, and refused the \
-         second time as one this phone already has. {context}"
+        "1/already-here|already-here|/",
+        "the new backup was not taken over exactly once, or a copy of a \
+         profile this phone already has was not refused: first the one \
+         whose own address is another of its relays, then the same \
+         backup a second time. {context}"
     );
 
-    // The import ran both times -- there is nothing to compare addresses
-    // with until it has -- and the second account went with it.
+    // The import ran every time -- there are no relays to compare until
+    // it has -- each into an account of its own, never the profile here,
+    // and each refused account went with it.
     let imported: Vec<u64> = calls
         .iter()
         .filter(|(method, _)| method == "import_backup")
         .filter_map(|(_, params)| params.get(0).and_then(Value::as_u64))
         .collect();
-    assert_eq!(
-        imported,
-        vec![1, 2],
-        "the backup was not read into an account of its own each time. \
+    assert!(
+        imported.len() == 3 && imported[0] == 2 && !imported.contains(&1),
+        "the backups were not each read into an account of their own. \
          {context}"
     );
     let removed: Vec<u64> = calls
@@ -164,23 +188,24 @@ fn the_same_backup_is_taken_over_once_and_the_list_hears_about_it() {
         .collect();
     assert_eq!(
         removed,
-        vec![2],
-        "the second copy was left on the phone. {context}"
+        imported[1..].to_vec(),
+        "a refused copy was left on the phone, or a profile it was a copy \
+         of went instead. {context}"
     );
 
     // The list the profiles page draws, neither asked for by this test
-    // nor by any page: one profile after the import, and still one after
-    // the copy was refused.
+    // nor by any page: the profile here and the one that arrived after
+    // the import, and still those two after both copies were refused.
     assert_eq!(
         value("listed"),
-        "1",
+        "2",
         "the profile that arrived is not in the account list, so the \
          profiles page has nothing to show until the app is restarted. \
          {context}"
     );
     assert_eq!(
         value("after"),
-        "1",
-        "the refused copy left a row behind. {context}"
+        "2",
+        "a refused copy left a row behind. {context}"
     );
 }

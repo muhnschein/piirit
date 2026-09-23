@@ -53,10 +53,7 @@ Item {
         truncationMode: TruncationMode.Fade
         textFormat: Text.PlainText
         // The mark the chat list uses: a mail icon for a contact that
-        // cannot be encrypted to. No tick for one checked in person: a
-        // list that picks people ticks the ones picked, and a second
-        // tick meaning something else read as a pick. The contact's own
-        // page says it in words.
+        // cannot be encrypted to.
         text: (root.isKeyContact ? "" : "✉ ") + root.displayName
     }
 

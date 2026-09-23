@@ -105,16 +105,16 @@
         <translation>Piirit chatmail రిలేలతో మాత్రమే పనిచేస్తుంది. ఇవి ఒక ప్రత్యేక రకమైన ఇ-మెయిల్ సర్వర్లు; సాధారణ ఇ-మెయిల్ సర్వర్లకు మద్దతు లేదు. మరింత సమాచారానికి &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt; చూడండి. పబ్లిక్, ఉచిత chatmail రిలేల పూర్తి జాబితా &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; లో ఉంది.</translation>
     </message>
     <message>
-        <source>Adds another address for this profile on a second relay. The profile sends from one relay at a time; you can change which one on the profile page.</source>
-        <translation>ఈ ప్రొఫైల్‌కు రెండో రిలేలో మరో చిరునామాను జోడిస్తుంది. ప్రొఫైల్ ఒకసారి ఒక రిలే ద్వారానే పంపుతుంది; ఏది అన్నది ప్రొఫైల్ పేజీలో మార్చవచ్చు.</translation>
-    </message>
-    <message>
         <source>Contacting %1…</source>
         <translation>%1 ను సంప్రదిస్తోంది…</translation>
     </message>
     <message>
         <source>Could not reach the relay. Try another one.</source>
         <translation>రిలేను చేరుకోలేకపోయాం. వేరొకదాన్ని ప్రయత్నించండి.</translation>
+    </message>
+    <message>
+        <source>Adds another address for this profile on a second relay.</source>
+        <translation>ఈ ప్రొఫైల్‌కు రెండో రిలేలో మరో చిరునామాను జోడిస్తుంది.</translation>
     </message>
 </context>
 <context>
@@ -448,10 +448,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Contact</source>
         <translation>పరిచయం</translation>
-    </message>
-    <message>
-        <source>Verified: end-to-end encrypted, and checked in person</source>
-        <translation>ధృవీకరించబడింది: ఎండ్-టు-ఎండ్ ఎన్‌క్రిప్టెడ్, ముఖాముఖి తనిఖీ చేయబడింది</translation>
     </message>
     <message>
         <source>End-to-end encrypted</source>
@@ -1047,17 +1043,9 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>రిలేలు</translation>
     </message>
     <message>
-        <source>Sends from this relay</source>
-        <translation>ఈ రిలే నుండి పంపుతుంది</translation>
-    </message>
-    <message>
         <source>Removing relay</source>
         <extracomment>What Silica&apos;s countdown says it is doing, over a relay the reader has asked to remove.</extracomment>
         <translation>రిలే తొలగిస్తోంది</translation>
-    </message>
-    <message>
-        <source>Send from this relay</source>
-        <translation>ఈ రిలే నుండి పంపు</translation>
     </message>
     <message>
         <source>Remove relay</source>

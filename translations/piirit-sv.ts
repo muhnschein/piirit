@@ -105,16 +105,16 @@
         <translation>Piirit fungerar bara med chatmail-reläer. Det är en särskild sorts e-postserver; vanliga e-postservrar stöds inte. Läs mer på &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. En fullständig lista över offentliga, kostnadsfria chatmail-reläer finns på &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
     </message>
     <message>
-        <source>Adds another address for this profile on a second relay. The profile sends from one relay at a time; you can change which one on the profile page.</source>
-        <translation>Lägger till ytterligare en adress för den här profilen på ett annat relä. Profilen skickar via ett relä i taget; vilket kan du ändra på profilsidan.</translation>
-    </message>
-    <message>
         <source>Contacting %1…</source>
         <translation>Kontaktar %1…</translation>
     </message>
     <message>
         <source>Could not reach the relay. Try another one.</source>
         <translation>Kunde inte nå reläet. Försök med ett annat.</translation>
+    </message>
+    <message>
+        <source>Adds another address for this profile on a second relay.</source>
+        <translation>Lägger till ytterligare en adress för den här profilen på ett annat relä.</translation>
     </message>
 </context>
 <context>
@@ -448,10 +448,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Contact</source>
         <translation>Kontakt</translation>
-    </message>
-    <message>
-        <source>Verified: end-to-end encrypted, and checked in person</source>
-        <translation>Verifierad: totalsträckskrypterad och kontrollerad personligen</translation>
     </message>
     <message>
         <source>End-to-end encrypted</source>
@@ -1047,17 +1043,9 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Reläer</translation>
     </message>
     <message>
-        <source>Sends from this relay</source>
-        <translation>Skickar från det här reläet</translation>
-    </message>
-    <message>
         <source>Removing relay</source>
         <extracomment>What Silica&apos;s countdown says it is doing, over a relay the reader has asked to remove.</extracomment>
         <translation>Tar bort relä</translation>
-    </message>
-    <message>
-        <source>Send from this relay</source>
-        <translation>Skicka från det här reläet</translation>
     </message>
     <message>
         <source>Remove relay</source>

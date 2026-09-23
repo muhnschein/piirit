@@ -105,16 +105,16 @@
         <translation>Piirit ફક્ત chatmail રિલે સાથે જ કામ કરે છે. આ ખાસ પ્રકારના ઈ-મેઇલ સર્વર છે; સામાન્ય ઈ-મેઇલ સર્વર સપોર્ટેડ નથી. વધુ માહિતી માટે જુઓ &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. જાહેર, મફત chatmail રિલેની પૂરી યાદી &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; પર છે.</translation>
     </message>
     <message>
-        <source>Adds another address for this profile on a second relay. The profile sends from one relay at a time; you can change which one on the profile page.</source>
-        <translation>આ પ્રોફાઇલ માટે બીજા રિલે પર વધુ એક સરનામું ઉમેરે છે. પ્રોફાઇલ એક સમયે એક જ રિલે મારફતે મોકલે છે; કયું, તે પ્રોફાઇલ પાના પર બદલી શકાય છે.</translation>
-    </message>
-    <message>
         <source>Contacting %1…</source>
         <translation>%1 નો સંપર્ક કરવામાં આવે છે…</translation>
     </message>
     <message>
         <source>Could not reach the relay. Try another one.</source>
         <translation>રિલે સુધી પહોંચી શકાયું નહીં. બીજું અજમાવો.</translation>
+    </message>
+    <message>
+        <source>Adds another address for this profile on a second relay.</source>
+        <translation>આ પ્રોફાઇલ માટે બીજા રિલે પર વધુ એક સરનામું ઉમેરે છે.</translation>
     </message>
 </context>
 <context>
@@ -452,10 +452,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Contact</source>
         <translation>સંપર્ક</translation>
-    </message>
-    <message>
-        <source>Verified: end-to-end encrypted, and checked in person</source>
-        <translation>ચકાસાયેલ: એન્ડ-ટુ-એન્ડ એન્ક્રિપ્ટેડ, અને રૂબરૂ તપાસેલ</translation>
     </message>
     <message>
         <source>End-to-end encrypted</source>
@@ -1051,17 +1047,9 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>રિલે</translation>
     </message>
     <message>
-        <source>Sends from this relay</source>
-        <translation>આ રિલે પરથી મોકલે છે</translation>
-    </message>
-    <message>
         <source>Removing relay</source>
         <extracomment>What Silica&apos;s countdown says it is doing, over a relay the reader has asked to remove.</extracomment>
         <translation>રિલે દૂર કરવામાં આવે છે</translation>
-    </message>
-    <message>
-        <source>Send from this relay</source>
-        <translation>આ રિલે પરથી મોકલો</translation>
     </message>
     <message>
         <source>Remove relay</source>

@@ -105,15 +105,15 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Adds another address for this profile on a second relay. The profile sends from one relay at a time; you can change which one on the profile page.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Contacting %1…</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Could not reach the relay. Try another one.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Adds another address for this profile on a second relay.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -442,10 +442,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <name>ContactPage</name>
     <message>
         <source>Contact</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Verified: end-to-end encrypted, and checked in person</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1041,16 +1037,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Sends from this relay</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Removing relay</source>
         <extracomment>What Silica&apos;s countdown says it is doing, over a relay the reader has asked to remove.</extracomment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Send from this relay</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

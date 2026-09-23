@@ -5,6 +5,7 @@
 
 use std::cell::RefCell;
 
+use deltachat_jsonrpc::RpcError;
 use qmetaobject::*;
 
 use crate::core::connection;
@@ -185,8 +186,7 @@ impl ContactList {
         };
         let query = self.query.to_string();
         // listFlags: 0 is known, unblocked contacts; DC_GCL_ADD_SELF (2)
-        // puts the account's own contact at the end of them. The
-        // "verified only" flag is never wanted here.
+        // puts the account's own contact at the end of them.
         let list_flags: u32 = if self.include_self { 2 } else { 0 };
         let blocked = self.blocked;
         self.generation = self.generation.wrapping_add(1);
@@ -441,15 +441,23 @@ impl ContactList {
                 // Ask the core what the payload is before acting on it: it
                 // knows the formats, and guessing at them here would be the
                 // protocol work docs/PROJECT.md rules out.
+                //
+                // A payload the core will not read is not an invite either,
+                // and is said so in the same words. Since 2.61 that is how
+                // it answers a fingerprint code with no invite in it and a
+                // key it knows no one by, which had a kind of its own
+                // before. A lost connection is not an answer, and is passed
+                // on as it is.
                 let qr: serde_json::Value = rpc
                     .call("check_qr", (account_id, qr_content.clone()))
                     .await
-                    .map_err(|err| err.to_string())?;
+                    .map_err(|err| match err {
+                        RpcError::Remote(refusal) => not_an_invite(&refusal.message),
+                        err => err.to_string(),
+                    })?;
                 let kind = json::str_at(&qr, "kind");
                 if !matches!(kind, "askVerifyContact" | "askVerifyGroup") {
-                    return Err(format!(
-                        "that link is not a contact or group invite ({kind})"
-                    ));
+                    return Err(not_an_invite(kind));
                 }
                 // Returns as soon as the chat exists; the handshake itself
                 // finishes in the background.
@@ -505,6 +513,13 @@ impl ContactList {
     }
 }
 
+/// Why a payload was not followed: it is not an invite. The core's own
+/// word on it goes in brackets -- the kind it named, or why it would not
+/// read it.
+fn not_an_invite(what: &str) -> String {
+    format!("that link is not a contact or group invite ({what})")
+}
+
 /// `DC_CONTACT_ID_SELF`: the account's own contact. Never listed by
 /// `get_contacts`, but a member of every group the account is in.
 pub(crate) const SELF_CONTACT_ID: u32 = 1;
@@ -518,7 +533,6 @@ fn row_map(item: &ContactItem) -> QVariantMap {
     row.insert("contact_id".into(), QVariant::from(item.contact_id));
     row.insert("display_name".into(), QVariant::from(&item.display_name));
     row.insert("address".into(), QVariant::from(&item.address));
-    row.insert("is_verified".into(), QVariant::from(item.is_verified));
     row.insert("is_key_contact".into(), QVariant::from(item.is_key_contact));
     row.insert("is_self".into(), QVariant::from(item.is_self));
     row.insert("color".into(), QVariant::from(&item.color));
@@ -539,7 +553,6 @@ pub(crate) fn contact_row(contact: &serde_json::Value) -> ContactItem {
         name: json::text(contact, "name"),
         auth_name: json::text(contact, "authName"),
         address: address.into(),
-        is_verified: json::flag(contact, "isVerified"),
         is_key_contact: json::flag(contact, "isKeyContact"),
         is_self: contact_id == SELF_CONTACT_ID,
         status: json::text(contact, "status"),
