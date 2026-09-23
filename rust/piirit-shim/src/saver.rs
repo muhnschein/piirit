@@ -3,9 +3,9 @@
 //! Everything a chat receives lives in the core's blob directory, which is
 //! the app's own and goes with it, and where the core names a file by its
 //! content rather than by what the sender called it. Saving is one copy
-//! into a folder the reader looks in -- Pictures, Videos, or Downloads for
-//! anything else -- under the name the sender gave the file, or that name
-//! and a number when it is taken.
+//! into a folder the reader looks in -- Piirit's own in Downloads, which
+//! `qml/components/AttachmentSaver.qml` names -- under the name the sender
+//! gave the file, or that name and a number when it is taken.
 
 use qmetaobject::*;
 
@@ -15,7 +15,7 @@ use crate::chat::local_path;
 ///
 /// ```qml
 /// FileSaver { id: saver; onSaved: notice.show(qsTr("Saved")) }
-/// MenuItem { onClicked: saver.save_as(page.fileUrl, StandardPaths.pictures, page.fileName) }
+/// MenuItem { onClicked: saver.save_as(page.fileUrl, StandardPaths.download, page.fileName) }
 /// ```
 #[derive(QObject, Default)]
 pub struct FileSaver {

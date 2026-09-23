@@ -348,6 +348,70 @@ fn list_pages_clip_and_leave_room_for_what_sits_below_them() {
     }
 }
 
+/// A list says it is empty only once its model has answered.
+///
+/// An empty model means one of two opposite things: nothing there, or no
+/// answer from the core yet. A placeholder bound to the count alone says
+/// the first while the second is true, so "No contacts" flashed over one
+/// list after another on its way in. Every placeholder that reads a count
+/// also reads whether that count is an answer.
+///
+/// The profiles page is the one exception: its list is the core's own
+/// account list, read before the chat list it is reached from is shown.
+///
+/// One line at a time, so a binding wrapped across two escapes it.
+#[test]
+fn no_list_says_it_is_empty_before_it_has_been_answered() {
+    let mut checked = 0;
+    let mut offenders = Vec::new();
+    for file in qml_files() {
+        if file.ends_with("ProfilesPage.qml") {
+            continue;
+        }
+        let code = code_only(&fs::read_to_string(&file).expect("read qml"));
+        let lines: Vec<&str> = code.lines().collect();
+        for (start, line) in lines.iter().enumerate() {
+            if !line.contains("ViewPlaceholder {") {
+                continue;
+            }
+            // The placeholder's own `enabled`, not one nested inside it.
+            let (mut opened, mut closed) = (0, 0);
+            for (number, inner) in lines.iter().enumerate().skip(start) {
+                let binding = inner.trim();
+                if opened == closed + 1
+                    && binding.starts_with("enabled:")
+                    && binding.contains("count")
+                {
+                    checked += 1;
+                    if !binding.to_lowercase().contains("loaded") {
+                        offenders.push(format!("{}:{}: {binding}", file.display(), number + 1));
+                    }
+                }
+                opened += inner.matches('{').count();
+                closed += inner.matches('}').count();
+                if closed >= opened {
+                    break;
+                }
+            }
+        }
+    }
+    // Otherwise this passes by finding nothing to check.
+    assert!(
+        checked >= 10,
+        "only {checked} placeholders read a count; there should be ten -- \
+         the chat list and its search, the forwarding picker, the \
+         conversation, a chat's media twice, and four contact lists"
+    );
+    assert!(
+        offenders.is_empty(),
+        "these say a list is empty before the core has answered, so the \
+         placeholder flashes over rows about to arrive; read a flag set \
+         once the model has answered, as NewChatPage's `contactsLoaded` \
+         is:\n  {}",
+        offenders.join("\n  ")
+    );
+}
+
 /// Copying a message says so, and the reply bar and jump button are the
 /// components the tests measure rather than one-off items on the page.
 #[test]
@@ -404,24 +468,16 @@ fn the_conversation_page_uses_the_pieces_that_are_tested() {
         "the conversation does not make both of the core's deletions, so \
          one of the two answers the reader can give is not the one acted on"
     );
-    // The return key is the reader's to give back to sending, and no test
-    // can see it: every test loads the page with the `EnterKey.` lines
-    // taken out (common::qml_tree_without_enter_key), which is also why
-    // each has to be one line. So the shipped file is held to the shape
-    // here -- the key drawn as the accept key while it sends, greyed with
-    // nothing to send, and its click going to the function
-    // `qml_enter_sends.rs` drives.
-    for line in [
-        "EnterKey.iconSource: page.enterSends ? \"image://theme/icon-m-enter-accept\"",
-        "EnterKey.enabled: !page.enterSends || page.hasSomethingToSend",
-        "EnterKey.onClicked: page.enterPressed()",
-    ] {
-        assert!(
-            text.contains(line),
-            "the message field does not carry `{line}`, so the return key \
-             does not do what the settings page says it does"
-        );
-    }
+    // The return key puts in a line break and nothing else, as in both
+    // reference clients: sending is the button's. No test can press the
+    // key -- every test loads the page with the `EnterKey.` lines taken
+    // out (common::qml_tree_without_enter_key) -- so the shipped file is
+    // held to carrying none.
+    assert!(
+        !text.contains("EnterKey."),
+        "the message field gives the return key a job of its own, when it \
+         is only ever a line break"
+    );
 }
 
 /// Anything showing a string the other end chose has to say it is plain
@@ -1116,7 +1172,7 @@ fn the_webxdc_page_keeps_a_handed_over_file() {
     );
     let offer = block_of(&code, "function offer(");
     assert!(
-        offer.contains("handoverSaver.save(") && offer.contains("StandardPaths.download"),
+        offer.contains("handoverSaver.keep("),
         "the file is not kept anywhere the reader can find it: {offer:?}"
     );
     assert!(
@@ -1135,6 +1191,55 @@ fn the_webxdc_page_keeps_a_handed_over_file() {
         code.contains("app.discard("),
         "the copy in the cache is never deleted, so every file an app \
          hands over stays on the phone twice"
+    );
+}
+
+/// Every copy the reader keeps goes to the one folder.
+///
+/// `AttachmentSaver` names that folder, and is the only thing that makes
+/// a `FileSaver`: a page that made its own would pick a folder of its
+/// own, and the reader would be looking in several places for what they
+/// kept. A page asks it to `keep` a file, which takes no folder.
+#[test]
+fn every_copy_goes_to_the_one_folder() {
+    let mut makers = Vec::new();
+    let mut keepers = 0;
+    let mut offenders = Vec::new();
+    for file in qml_files() {
+        let code = code_only(&fs::read_to_string(&file).expect("read qml"));
+        if code.contains("FileSaver {") {
+            makers.push(
+                file.file_name()
+                    .map(|name| name.to_string_lossy().into_owned())
+                    .unwrap_or_default(),
+            );
+        }
+        if !code.contains("AttachmentSaver {") {
+            continue;
+        }
+        keepers += 1;
+        if code.contains(".save(") || code.contains(".save_as(") {
+            offenders.push(file.display().to_string());
+        }
+    }
+    assert_eq!(
+        makers,
+        ["AttachmentSaver.qml"],
+        "a FileSaver is made somewhere other than AttachmentSaver, so a \
+         copy can go to a folder of its own"
+    );
+    // Otherwise this passes by finding nothing to check.
+    assert!(
+        keepers >= 5,
+        "only {keepers} files keep a copy through AttachmentSaver; there \
+         should be five -- the conversation, a picture, a video, a chat's \
+         media and a webxdc app's download"
+    );
+    assert!(
+        offenders.is_empty(),
+        "these hand AttachmentSaver a folder rather than asking it to \
+         `keep` a file:\n  {}",
+        offenders.join("\n  ")
     );
 }
 

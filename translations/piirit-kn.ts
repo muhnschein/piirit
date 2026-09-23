@@ -134,6 +134,14 @@
     </message>
 </context>
 <context>
+    <name>AttachmentSaver</name>
+    <message>
+        <source>Saved to Downloads/Piirit</source>
+        <extracomment>Said once a file from a chat has been copied: the folder named Piirit inside Downloads. Keep &quot;Piirit&quot;, which is the folder&apos;s name.</extracomment>
+        <translation>ಡೌನ್‌ಲೋಡ್‌ಗಳು/Piirit ಫೋಲ್ಡರ್‌ನಲ್ಲಿ ಉಳಿಸಲಾಗಿದೆ</translation>
+    </message>
+</context>
+<context>
     <name>AutoDeleteDialog</name>
     <message>
         <source>Delete messages from device</source>
@@ -419,10 +427,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Delete</source>
         <translation>ಅಳಿಸಿ</translation>
     </message>
-    <message>
-        <source>Saved to Downloads</source>
-        <translation>ಡೌನ್‌ಲೋಡ್‌ಗಳಲ್ಲಿ ಉಳಿಸಲಾಗಿದೆ</translation>
-    </message>
 </context>
 <context>
     <name>ChatPickerPage</name>
@@ -538,14 +542,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Message</source>
         <translation>ಸಂದೇಶ</translation>
     </message>
-    <message>
-        <source>Saved to Pictures</source>
-        <translation>ಚಿತ್ರಗಳಲ್ಲಿ ಉಳಿಸಲಾಗಿದೆ</translation>
-    </message>
-    <message>
-        <source>Saved to Videos</source>
-        <translation>ವೀಡಿಯೊಗಳಲ್ಲಿ ಉಳಿಸಲಾಗಿದೆ</translation>
-    </message>
     <message numerus="yes">
         <source>%n member(s)</source>
         <extracomment>Under a group&apos;s name, over its messages. %n is how many people are in the group.</extracomment>
@@ -553,10 +549,6 @@ Other groups with blocked contacts will still show their messages.</source>
             <numerusform>%n ಸದಸ್ಯ</numerusform>
             <numerusform>%n ಸದಸ್ಯರು</numerusform>
         </translation>
-    </message>
-    <message>
-        <source>Saved to Downloads</source>
-        <translation>ಡೌನ್‌ಲೋಡ್‌ಗಳಲ್ಲಿ ಉಳಿಸಲಾಗಿದೆ</translation>
     </message>
     <message>
         <source>Lost the connection to the Delta Chat core. Reconnecting…</source>
@@ -913,6 +905,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <extracomment>Shown on the full-message page for a message that turns out to have no words in it at all.</extracomment>
         <translation>ಈ ಸಂದೇಶದಲ್ಲಿ ಪಠ್ಯವಿಲ್ಲ</translation>
     </message>
+    <message>
+        <source>Select text</source>
+        <extracomment>Pull-down entry on the page showing one whole message: shows it as text that can be selected, and copied, a part at a time.</extracomment>
+        <translation>ಪಠ್ಯ ಆಯ್ಕೆಮಾಡಿ</translation>
+    </message>
 </context>
 <context>
     <name>NewChatPage</name>
@@ -993,10 +990,6 @@ Other groups with blocked contacts will still show their messages.</source>
 </context>
 <context>
     <name>PicturePage</name>
-    <message>
-        <source>Saved to Pictures</source>
-        <translation>ಚಿತ್ರಗಳಲ್ಲಿ ಉಳಿಸಲಾಗಿದೆ</translation>
-    </message>
     <message>
         <source>Open in another app</source>
         <extracomment>Hands the attachment to whatever else on the phone handles files of its kind.</extracomment>
@@ -1471,11 +1464,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>ಉಲ್ಲೇಖಗಳು</translation>
     </message>
     <message>
-        <source>Enter sends the message</source>
-        <extracomment>The return key on the keyboard.</extracomment>
-        <translation>Enter ಸಂದೇಶವನ್ನು ಕಳುಹಿಸುತ್ತದೆ</translation>
-    </message>
-    <message>
         <source>Use Markdown formatting</source>
         <translation>ಮಾರ್ಕ್‌ಡೌನ್ ಸ್ವರೂಪ ಬಳಸಿ</translation>
     </message>
@@ -1551,10 +1539,6 @@ Other groups with blocked contacts will still show their messages.</source>
 <context>
     <name>VideoPage</name>
     <message>
-        <source>Saved to Videos</source>
-        <translation>ವೀಡಿಯೊಗಳಲ್ಲಿ ಉಳಿಸಲಾಗಿದೆ</translation>
-    </message>
-    <message>
         <source>Open in another app</source>
         <extracomment>Hands the attachment to whatever else on the phone handles files of its kind.</extracomment>
         <translation>ಬೇರೆ ಆ್ಯಪ್‌ನಲ್ಲಿ ತೆರೆಯಿರಿ</translation>
@@ -1578,11 +1562,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Starting the app</source>
         <extracomment>Shown while a webxdc app is being made ready to run.</extracomment>
         <translation>ಅಪ್ಲಿಕೇಶನ್ ಪ್ರಾರಂಭವಾಗುತ್ತಿದೆ</translation>
-    </message>
-    <message>
-        <source>Saved to Downloads</source>
-        <extracomment>Where a file a webxdc app produced was copied to.</extracomment>
-        <translation>ಡೌನ್‌ಲೋಡ್‌ಗಳಲ್ಲಿ ಉಳಿಸಲಾಗಿದೆ</translation>
     </message>
     <message>
         <source>Copied to clipboard</source>

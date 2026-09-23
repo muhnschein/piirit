@@ -52,8 +52,8 @@ Item {
         width: root.width - x - Theme.horizontalPageMargin - root.trailingSpace
         truncationMode: TruncationMode.Fade
         textFormat: Text.PlainText
-        // The same mark the chat list uses: a mail icon for a contact
-        // that cannot be encrypted to.
+        // The mark the chat list uses: a mail icon for a contact that
+        // cannot be encrypted to.
         text: (root.isKeyContact ? "" : "✉ ") + root.displayName
     }
 

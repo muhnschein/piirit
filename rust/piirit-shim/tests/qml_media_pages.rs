@@ -13,8 +13,8 @@
 //! What a headless run can check is the wiring: which kind gets which page,
 //! that a picture page draws a picture and has somewhere to pan to once it
 //! is zoomed, that the video page's seek bar follows the player without
-//! fighting the reader for it, and that Save to device puts a copy where
-//! the platform says pictures go.
+//! fighting the reader for it, and that Save to device puts a copy in
+//! Piirit's folder in Downloads, where every copy goes.
 
 // Qt harness: see qml_chat_list.rs.
 #![allow(
@@ -75,9 +75,9 @@ const PROBE_QML: &str = r"
     import Sailfish.Silica 1.0
     Item {
         Loader { id: loader }
-        // Where the platform says pictures go, pointed at a directory of
+        // Where the platform says downloads go, pointed at a directory of
         // this test's own.
-        function setPictures(folder) { StandardPaths.pictures = folder; return 'ok' }
+        function setDownloads(folder) { StandardPaths.download = folder; return 'ok' }
         function click(name) {
             var item = findIn(loader.item, name)
             if (!item) { return 'missing:' + name }
@@ -239,8 +239,8 @@ fn pictures_and_video_open_here_and_everything_else_goes_to_the_system() {
             call!("load", QString::from(picture_page.clone()), properties),
         ));
     });
-    let pictures = temp.join("Pictures");
-    let pictures_for_probe = pictures.to_string_lossy().into_owned();
+    let downloads = temp.join("Downloads");
+    let downloads_for_probe = downloads.to_string_lossy().into_owned();
     single_shot(Duration::from_secs(4), move || unsafe {
         (*steps_ptr).push((
             "picture-shown",
@@ -250,8 +250,9 @@ fn pictures_and_video_open_here_and_everything_else_goes_to_the_system() {
                 QString::from("visible")
             ),
         ));
-        // A copy for the gallery, into the folder the platform names.
-        call!("setPictures", QString::from(pictures_for_probe.clone()));
+        // A copy the reader keeps, into Piirit's folder in the one the
+        // platform names for downloads.
+        call!("setDownloads", QString::from(downloads_for_probe.clone()));
         (*steps_ptr).push(("save", call!("click", QString::from("saveToDevice"))));
         (*steps_ptr).push((
             "saved-notice",
@@ -429,12 +430,12 @@ fn pictures_and_video_open_here_and_everything_else_goes_to_the_system() {
     let navigation = stack_box.pinned().borrow().log.to_string();
     assert_outcome(&steps, &navigation);
 
-    let copy = pictures.join("dot.png");
+    let copy = downloads.join("Piirit").join("dot.png");
     assert_eq!(
         std::fs::read(&copy).ok().as_deref(),
         Some(ONE_PIXEL_PNG),
-        "Save to device did not put a copy of the picture in the Pictures \
-         folder: {}",
+        "Save to device did not put a copy of the picture in Piirit's \
+         folder in Downloads: {}",
         copy.display()
     );
     let _ = std::fs::remove_dir_all(&temp);
@@ -485,7 +486,7 @@ fn assert_outcome(steps: &[(&str, String)], navigation: &str) {
     assert_eq!(value("save"), "ok", "no Save to device entry. {context}");
     assert_eq!(
         value("saved-notice"),
-        "Saved to Pictures",
+        "Saved to Downloads/Piirit",
         "saving did not say where the copy went. {context}"
     );
     assert_eq!(

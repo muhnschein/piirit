@@ -459,10 +459,12 @@ fn a_chats_media_has_pages_of_its_own_behind_the_tiles() {
     let navigation = stack_box.pinned().borrow().log.to_string();
     assert_pages(&steps, &navigation, &common::calls(&journal));
     assert_eq!(
-        std::fs::read(downloads.join("notes.pdf")).ok().as_deref(),
+        std::fs::read(downloads.join("Piirit").join("notes.pdf"))
+            .ok()
+            .as_deref(),
         Some(&b"%PDF-1.4 notes"[..]),
         "Save to device did not put a copy of the file, under the name the \
-         sender gave it, in Downloads"
+         sender gave it, in Piirit's folder in Downloads"
     );
     let _ = std::fs::remove_dir_all(&temp);
 }
@@ -605,7 +607,7 @@ fn assert_pages(steps: &[(&str, String)], navigation: &str, calls: &[(String, Va
     );
 
     // The files list: the document, its size, its icon, who sent it, and
-    // a copy in Downloads.
+    // a copy in Piirit's folder in Downloads.
     for (label, expected, complaint) in [
         (
             "files-count",
@@ -616,7 +618,7 @@ fn assert_pages(steps: &[(&str, String)], navigation: &str, calls: &[(String, Va
         ("file-size", "20.5 kB", "the file's size is not said"),
         (
             "saved-notice",
-            "Saved to Downloads",
+            "Saved to Downloads/Piirit",
             "saving did not say where the copy went",
         ),
     ] {

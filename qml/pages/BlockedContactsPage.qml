@@ -31,12 +31,19 @@ Page {
     property int accountId
     property string errorMessage: ""
 
+    // The core has said who is blocked, whatever that was. An empty list
+    // before then is no answer rather than nobody: see NewChatPage.
+    property bool blockListLoaded: false
+
     ContactList {
         id: blockList
         objectName: "blocked"
         account_id: page.accountId
         blocked: true
         onError: page.errorMessage = message
+        // Emitted once the rows have been set, whether there turned out
+        // to be any or none.
+        onRows_changed: page.blockListLoaded = true
     }
 
     Connections {
@@ -144,7 +151,8 @@ Page {
 
             ViewPlaceholder {
                 objectName: "nobodyBlocked"
-                enabled: blockList.count === 0
+                // Not until the core has answered: see `blockListLoaded`.
+                enabled: page.blockListLoaded && blockList.count === 0
                 // deltachat-android's `blocked_empty_hint`, as the words
                 // on this page are its words throughout.
                 text: qsTr("Blocked contacts will appear here.")
