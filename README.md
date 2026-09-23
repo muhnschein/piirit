@@ -39,6 +39,8 @@ See the non-goals in [`docs/PROJECT.md`](docs/PROJECT.md) for more information.
 how a device RPM is built
 - [`docs/HARBOUR.md`](docs/HARBOUR.md) — our understanding of Jolla's store 
 rules, how CI tries to gate them, and the two that still block submission
+- [`docs/AI.md`](docs/AI.md) — whether voice messages can be transcribed and
+pictures tagged on the phone, and what that would cost in battery and effort
 
 ## Building
 
