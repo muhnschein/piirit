@@ -88,6 +88,17 @@ fn probe_qml() -> String {
             }}
             return 'missing:' + heading
         }}
+        // What stands last in the section before a heading: the control
+        // before the header that says `heading`.
+        function lastBefore(heading) {{
+            var header = findText(loader.item, heading)
+            if (!header || !header.parent) {{ return 'missing:' + heading }}
+            var kids = header.parent.children
+            for (var i = 1; i < kids.length; i++) {{
+                if (kids[i] === header) {{ return kids[i - 1].objectName }}
+            }}
+            return 'missing:' + heading
+        }}
         function findText(node, text) {{
             if (!node) {{ return null }}
             if (node.text === text && node.objectName === '') {{ return node }}
@@ -192,10 +203,15 @@ fn the_settings_page_writes_what_the_app_reads() {
             "load",
             call!("load", QString::from(common::page_url("SettingsPage.qml")))
         );
-        // What a fresh phone shows.
+        // What a fresh phone shows. What leaves the phone stands first
+        // under Messages, and how a message is drawn last.
         record!(
             "first-under-messages",
             call!("firstUnder", QString::from("Messages"))
+        );
+        record!(
+            "last-under-messages",
+            call!("lastBefore", QString::from("Notifications"))
         );
         // The return key is a line break and nothing else, so there is
         // no setting for it, on the page or behind it.
@@ -441,7 +457,8 @@ fn the_settings_page_writes_what_the_app_reads() {
         "the settings page did not load. {context}"
     );
     for (label, expected) in [
-        ("first-under-messages", "markdownSwitch"),
+        ("first-under-messages", "qualityCombo"),
+        ("last-under-messages", "markdownSwitch"),
         ("enter-switch", "missing:enterSendsSwitch"),
         ("enter-setting", "undefined"),
         ("markdown-default", "0"),

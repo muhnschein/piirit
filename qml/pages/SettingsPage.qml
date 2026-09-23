@@ -214,16 +214,6 @@ Page {
                 text: qsTr("Messages")
             }
 
-            TextSwitch {
-                objectName: "markdownSwitch"
-                text: qsTr("Use Markdown formatting")
-                // Checked follows the setting, so the tap writes the
-                // setting and the setting moves the switch.
-                automaticCheck: false
-                checked: Settings.markdownMode === 0
-                onClicked: Settings.markdownMode = checked ? 1 : 0
-            }
-
             // What leaves the phone, above what arrives on it. The core
             // recodes a picture as it sends, and the camera records a
             // video, at whichever of these two the reader picks; both
@@ -291,6 +281,19 @@ Page {
                         }
                     }
                 }
+            }
+
+            // Last under Messages: the three above are what the core does
+            // with a message -- what leaves, what arrives, what stays --
+            // and this is only how the app draws one.
+            TextSwitch {
+                objectName: "markdownSwitch"
+                text: qsTr("Use Markdown formatting")
+                // Checked follows the setting, so the tap writes the
+                // setting and the setting moves the switch.
+                automaticCheck: false
+                checked: Settings.markdownMode === 0
+                onClicked: Settings.markdownMode = checked ? 1 : 0
             }
 
             SectionHeader {
