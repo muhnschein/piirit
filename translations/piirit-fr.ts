@@ -1483,11 +1483,6 @@ Vous continuerez à voir les messages des contacts bloqués dans les autres grou
         <translation>Mentions</translation>
     </message>
     <message>
-        <source>Enter sends the message</source>
-        <extracomment>The return key on the keyboard.</extracomment>
-        <translation>Entrée envoie le message</translation>
-    </message>
-    <message>
         <source>Use Markdown formatting</source>
         <translation>Utiliser la mise en forme Markdown</translation>
     </message>

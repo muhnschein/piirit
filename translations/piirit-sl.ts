@@ -1495,11 +1495,6 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
         <translation>Omembe</translation>
     </message>
     <message>
-        <source>Enter sends the message</source>
-        <extracomment>The return key on the keyboard.</extracomment>
-        <translation>Enter pošlje sporočilo</translation>
-    </message>
-    <message>
         <source>Use Markdown formatting</source>
         <translation>Uporabi oblikovanje Markdown</translation>
     </message>

@@ -1483,11 +1483,6 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
         <translation>Mainimised</translation>
     </message>
     <message>
-        <source>Enter sends the message</source>
-        <extracomment>The return key on the keyboard.</extracomment>
-        <translation>Enter saadab sõnumi</translation>
-    </message>
-    <message>
         <source>Use Markdown formatting</source>
         <translation>Kasuta Markdowni vormindust</translation>
     </message>

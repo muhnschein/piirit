@@ -1489,11 +1489,6 @@ Wiadomości innych grup z zablokowanymi kontaktami nadal będą wyświetlane.</t
         <translation>Wzmianki</translation>
     </message>
     <message>
-        <source>Enter sends the message</source>
-        <extracomment>The return key on the keyboard.</extracomment>
-        <translation>Enter wysyła wiadomość</translation>
-    </message>
-    <message>
         <source>Use Markdown formatting</source>
         <translation>Używaj formatowania Markdown</translation>
     </message>

@@ -1477,11 +1477,6 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
         <translation>Bahsetmeler</translation>
     </message>
     <message>
-        <source>Enter sends the message</source>
-        <extracomment>The return key on the keyboard.</extracomment>
-        <translation>Enter mesajı gönderir</translation>
-    </message>
-    <message>
         <source>Use Markdown formatting</source>
         <translation>Markdown biçimlendirmesini kullan</translation>
     </message>

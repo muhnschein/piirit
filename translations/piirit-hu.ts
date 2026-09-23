@@ -1473,11 +1473,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Említések</translation>
     </message>
     <message>
-        <source>Enter sends the message</source>
-        <extracomment>The return key on the keyboard.</extracomment>
-        <translation>Az Enter elküldi az üzenetet</translation>
-    </message>
-    <message>
         <source>Use Markdown formatting</source>
         <translation>Markdown-formázás használata</translation>
     </message>

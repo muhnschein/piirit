@@ -1479,11 +1479,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>ప్రస్తావనలు</translation>
     </message>
     <message>
-        <source>Enter sends the message</source>
-        <extracomment>The return key on the keyboard.</extracomment>
-        <translation>Enter సందేశాన్ని పంపుతుంది</translation>
-    </message>
-    <message>
         <source>Use Markdown formatting</source>
         <translation>మార్క్‌డౌన్ ఆకృతీకరణ వాడు</translation>
     </message>

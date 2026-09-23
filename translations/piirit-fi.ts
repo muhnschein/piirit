@@ -1479,11 +1479,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Maininnat</translation>
     </message>
     <message>
-        <source>Enter sends the message</source>
-        <extracomment>The return key on the keyboard.</extracomment>
-        <translation>Enter lähettää viestin</translation>
-    </message>
-    <message>
         <source>Use Markdown formatting</source>
         <translation>Käytä Markdown-muotoilua</translation>
     </message>

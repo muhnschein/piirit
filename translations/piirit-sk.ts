@@ -1489,11 +1489,6 @@ Správy od zablokovaných kontaktov v ostatných skupinách sa budú naďalej zo
         <translation>Zmienky</translation>
     </message>
     <message>
-        <source>Enter sends the message</source>
-        <extracomment>The return key on the keyboard.</extracomment>
-        <translation>Enter odošle správu</translation>
-    </message>
-    <message>
         <source>Use Markdown formatting</source>
         <translation>Používať formátovanie Markdown</translation>
     </message>

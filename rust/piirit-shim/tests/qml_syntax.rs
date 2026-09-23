@@ -404,24 +404,16 @@ fn the_conversation_page_uses_the_pieces_that_are_tested() {
         "the conversation does not make both of the core's deletions, so \
          one of the two answers the reader can give is not the one acted on"
     );
-    // The return key is the reader's to give back to sending, and no test
-    // can see it: every test loads the page with the `EnterKey.` lines
-    // taken out (common::qml_tree_without_enter_key), which is also why
-    // each has to be one line. So the shipped file is held to the shape
-    // here -- the key drawn as the accept key while it sends, greyed with
-    // nothing to send, and its click going to the function
-    // `qml_enter_sends.rs` drives.
-    for line in [
-        "EnterKey.iconSource: page.enterSends ? \"image://theme/icon-m-enter-accept\"",
-        "EnterKey.enabled: !page.enterSends || page.hasSomethingToSend",
-        "EnterKey.onClicked: page.enterPressed()",
-    ] {
-        assert!(
-            text.contains(line),
-            "the message field does not carry `{line}`, so the return key \
-             does not do what the settings page says it does"
-        );
-    }
+    // The return key puts in a line break and nothing else, as in both
+    // reference clients: sending is the button's. No test can press the
+    // key -- every test loads the page with the `EnterKey.` lines taken
+    // out (common::qml_tree_without_enter_key) -- so the shipped file is
+    // held to carrying none.
+    assert!(
+        !text.contains("EnterKey."),
+        "the message field gives the return key a job of its own, when it \
+         is only ever a line break"
+    );
 }
 
 /// Anything showing a string the other end chose has to say it is plain

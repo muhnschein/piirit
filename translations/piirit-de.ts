@@ -1483,11 +1483,6 @@ In anderen Gruppen mit blockierten Kontakten werden deren Nachrichten weiterhin 
         <translation>Erwähnungen</translation>
     </message>
     <message>
-        <source>Enter sends the message</source>
-        <extracomment>The return key on the keyboard.</extracomment>
-        <translation>Enter sendet die Nachricht</translation>
-    </message>
-    <message>
         <source>Use Markdown formatting</source>
         <translation>Markdown-Formatierung verwenden</translation>
     </message>

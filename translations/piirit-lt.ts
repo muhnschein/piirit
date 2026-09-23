@@ -1485,11 +1485,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Paminėjimai</translation>
     </message>
     <message>
-        <source>Enter sends the message</source>
-        <extracomment>The return key on the keyboard.</extracomment>
-        <translation>„Enter“ siunčia žinutę</translation>
-    </message>
-    <message>
         <source>Use Markdown formatting</source>
         <translation>Naudoti Markdown formatavimą</translation>
     </message>

@@ -690,11 +690,6 @@ Page {
         && (textField.text.trim().length > 0
             || (!page.editing && page.attachmentPath.length > 0))
 
-    /// Whether the return key sends, from the settings page. Off, it
-    /// puts in a line break and the button sends. `=== true` because
-    /// dconf hands back `undefined` before it has read the key.
-    readonly property bool enterSends: Settings.enterSends === true
-
     // A tap anywhere but the tray closes the tray: over everything
     // declared above -- the list, the bars -- and under the input row,
     // which is declared after it. Silica's own menus close the same way.
@@ -763,9 +758,8 @@ Page {
         // long. This is an area: return puts in a newline, the field
         // grows as the message does, and send is the button -- which is
         // what every other client on this phone does with a message
-        // longer than a remark. Unless the reader turns the key back
-        // into send on the settings page, when a message is one line by
-        // construction again, and knowingly.
+        // longer than a remark, and the only way both reference clients
+        // offer.
         TextArea {
             id: textField
             objectName: "messageField"
@@ -787,15 +781,6 @@ Page {
             // Silica's own label sits above the text and says the same
             // thing the placeholder does.
             labelVisible: false
-            // The return key: a line break, unless the reader has asked
-            // for it to send, when the keyboard draws it as the accept
-            // key and greys it while there is nothing to send, as the
-            // button is. Each on one line of its own: the tests load
-            // this page with these lines taken out, since the attached
-            // type has no stub (common::qml_tree_without_enter_key).
-            EnterKey.iconSource: page.enterSends ? "image://theme/icon-m-enter-accept" : "image://theme/icon-m-enter"
-            EnterKey.enabled: !page.enterSends || page.hasSomethingToSend
-            EnterKey.onClicked: page.enterPressed()
             // It grows with what is in it, up to a point: past a third
             // of the screen the conversation it is written in would be
             // gone, so the area keeps that height and scrolls inside it.
@@ -951,16 +936,6 @@ Page {
         })
     }
 
-    /// The return key, once the reader has made it send. Only then: the
-    /// key is the field's otherwise, and puts in a line break. What
-    /// Silica does with the break the key would have put in is Silica's;
-    /// the text goes out trimmed either way.
-    function enterPressed() {
-        if (page.enterSends) {
-            page.sendCurrentText()
-        }
-    }
-
     function sendCurrentText() {
         // The model refuses a second send while one is outstanding and the
         // button is disabled meanwhile; this says so a third time,
@@ -993,8 +968,8 @@ Page {
         // and a trailing newline from the keyboard is not part of one.
         var text = textField.text.trim()
         if (page.attachmentPath.length > 0) {
-            // The button is already off and the bar says why; this is the
-            // same rule for a send that arrives by the return key.
+            // The button is already off and the bar says why; this says
+            // so a second time, as the check on `sending` above does.
             if (messages.attachment_too_big) {
                 return
             }

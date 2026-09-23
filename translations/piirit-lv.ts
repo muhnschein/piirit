@@ -1489,11 +1489,6 @@ Citās grupās, kurās ir bloķēti kontakti, viņu ziņas joprojām būs redzam
         <translation>Pieminējumi</translation>
     </message>
     <message>
-        <source>Enter sends the message</source>
-        <extracomment>The return key on the keyboard.</extracomment>
-        <translation>Enter nosūta ziņu</translation>
-    </message>
-    <message>
         <source>Use Markdown formatting</source>
         <translation>Lietot Markdown noformējumu</translation>
     </message>

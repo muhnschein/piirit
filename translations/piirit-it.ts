@@ -1483,11 +1483,6 @@ Gli altri gruppi con contatti bloccati continueranno a visualizzare i loro messa
         <translation>Menzioni</translation>
     </message>
     <message>
-        <source>Enter sends the message</source>
-        <extracomment>The return key on the keyboard.</extracomment>
-        <translation>Invio manda il messaggio</translation>
-    </message>
-    <message>
         <source>Use Markdown formatting</source>
         <translation>Usa la formattazione Markdown</translation>
     </message>

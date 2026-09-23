@@ -1479,11 +1479,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Αναφορές</translation>
     </message>
     <message>
-        <source>Enter sends the message</source>
-        <extracomment>The return key on the keyboard.</extracomment>
-        <translation>Το Enter στέλνει το μήνυμα</translation>
-    </message>
-    <message>
         <source>Use Markdown formatting</source>
         <translation>Χρήση μορφοποίησης Markdown</translation>
     </message>

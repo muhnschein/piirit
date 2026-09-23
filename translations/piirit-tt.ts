@@ -1477,11 +1477,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Искә алулар</translation>
     </message>
     <message>
-        <source>Enter sends the message</source>
-        <extracomment>The return key on the keyboard.</extracomment>
-        <translation>Enter хәбәрне җибәрә</translation>
-    </message>
-    <message>
         <source>Use Markdown formatting</source>
         <translation>Markdown форматлавын кулланырга</translation>
     </message>

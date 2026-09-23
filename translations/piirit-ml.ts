@@ -1483,11 +1483,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>പരാമർശങ്ങൾ</translation>
     </message>
     <message>
-        <source>Enter sends the message</source>
-        <extracomment>The return key on the keyboard.</extracomment>
-        <translation>Enter സന്ദേശം അയയ്ക്കുന്നു</translation>
-    </message>
-    <message>
         <source>Use Markdown formatting</source>
         <translation>മാർക്ക്ഡൗൺ രൂപപ്പെടുത്തൽ ഉപയോഗിക്കുക</translation>
     </message>

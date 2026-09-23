@@ -153,10 +153,6 @@ fn the_settings_page_writes_what_the_app_reads() {
     single_shot(Duration::from_secs(1), move || unsafe {
         // The keys, under the app's own path.
         record!(
-            "app-enter-key",
-            call!("appKey", QString::from("enterSendsConfig"))
-        );
-        record!(
             "app-markdown-key",
             call!("appKey", QString::from("markdownConfig"))
         );
@@ -196,18 +192,18 @@ fn the_settings_page_writes_what_the_app_reads() {
             "load",
             call!("load", QString::from(common::page_url("SettingsPage.qml")))
         );
-        // What a fresh phone shows. The return key is the first thing
-        // under Messages, and puts in a line break until it is asked to
-        // send.
+        // What a fresh phone shows.
         record!(
             "first-under-messages",
             call!("firstUnder", QString::from("Messages"))
         );
+        // The return key is a line break and nothing else, so there is
+        // no setting for it, on the page or behind it.
+        record!("enter-switch", get!("enterSendsSwitch", "checked"));
         record!(
-            "enter-default",
+            "enter-setting",
             call!("appReads", QString::from("enterSends"))
         );
-        record!("enter-switch", get!("enterSendsSwitch", "checked"));
         record!(
             "markdown-default",
             call!("appReads", QString::from("markdownMode"))
@@ -254,17 +250,6 @@ fn the_settings_page_writes_what_the_app_reads() {
         );
         record!("apps-switch", get!("webxdcSwitch", "checked"));
         // Each control writes its setting, and the choice shown follows it.
-        record!(
-            "flip-enter",
-            call!("click", QString::from("enterSendsSwitch"))
-        );
-        record!("enter-on", call!("appReads", QString::from("enterSends")));
-        record!("enter-switch-on", get!("enterSendsSwitch", "checked"));
-        record!(
-            "flip-enter-back",
-            call!("click", QString::from("enterSendsSwitch"))
-        );
-        record!("enter-off", call!("appReads", QString::from("enterSends")));
         record!(
             "pick-markdown",
             call!("click", QString::from("markdownSwitch"))
@@ -456,15 +441,9 @@ fn the_settings_page_writes_what_the_app_reads() {
         "the settings page did not load. {context}"
     );
     for (label, expected) in [
-        ("first-under-messages", "enterSendsSwitch"),
-        ("app-enter-key", "/apps/harbour-piirit/enter_sends"),
-        ("enter-default", "false"),
-        ("enter-switch", "false"),
-        ("flip-enter", "ok"),
-        ("enter-on", "true"),
-        ("enter-switch-on", "true"),
-        ("flip-enter-back", "ok"),
-        ("enter-off", "false"),
+        ("first-under-messages", "markdownSwitch"),
+        ("enter-switch", "missing:enterSendsSwitch"),
+        ("enter-setting", "undefined"),
         ("markdown-default", "0"),
         ("markdown-switch", "true"),
         ("app-quality-key", "/apps/harbour-piirit/media_quality"),

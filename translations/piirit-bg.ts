@@ -1479,11 +1479,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Споменавания</translation>
     </message>
     <message>
-        <source>Enter sends the message</source>
-        <extracomment>The return key on the keyboard.</extracomment>
-        <translation>Enter изпраща съобщението</translation>
-    </message>
-    <message>
         <source>Use Markdown formatting</source>
         <translation>Използване на форматиране с Markdown</translation>
     </message>

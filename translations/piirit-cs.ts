@@ -1489,11 +1489,6 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
         <translation>Zmínky</translation>
     </message>
     <message>
-        <source>Enter sends the message</source>
-        <extracomment>The return key on the keyboard.</extracomment>
-        <translation>Enter odešle zprávu</translation>
-    </message>
-    <message>
         <source>Use Markdown formatting</source>
         <translation>Používat formátování Markdown</translation>
     </message>

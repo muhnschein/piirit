@@ -1473,11 +1473,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Nhắc đến</translation>
     </message>
     <message>
-        <source>Enter sends the message</source>
-        <extracomment>The return key on the keyboard.</extracomment>
-        <translation>Enter gửi tin nhắn</translation>
-    </message>
-    <message>
         <source>Use Markdown formatting</source>
         <translation>Dùng định dạng Markdown</translation>
     </message>
