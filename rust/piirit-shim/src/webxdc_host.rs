@@ -838,20 +838,41 @@ fn fill(script: &str, shared: &Shared) -> String {
 ///
 /// Inside `<head>` where there is one, since that is where a document's
 /// scripts are expected and where anything the app runs on load comes
-/// after it. A document without a head gets it at the front, which is
-/// still before every script in the body.
+/// after it. HTML lets a page leave its head tag out, and one that does
+/// gets the API after `<html>`, or after the doctype -- where the parser
+/// opens the head itself -- and only with neither at the very front. In
+/// front of a doctype is not a harmless place to be: the page is then
+/// drawn in quirks mode, and a game sized to the window is not.
 fn inject(html: &str) -> String {
     const TAG: &str = "<script src=\"webxdc.js\"></script>";
-    let lower = html.to_lowercase();
-    let at = lower
-        .find("<head")
-        .and_then(|start| lower[start..].find('>').map(|end| start + end + 1))
+    // ASCII only. Lowercasing anything else can change how many bytes it
+    // takes, and the offset found here is used on the page as it was.
+    let lower = html.to_ascii_lowercase();
+    let at = after_tag(&lower, "<head")
+        .or_else(|| after_tag(&lower, "<html"))
+        .or_else(|| after_tag(&lower, "<!doctype"))
         .unwrap_or(0);
     let mut out = String::with_capacity(html.len() + TAG.len());
     out.push_str(&html[..at]);
     out.push_str(TAG);
     out.push_str(&html[at..]);
     out
+}
+
+/// Just past the first tag named `name` (given with its `<`). A tag, not
+/// a prefix of one: `<header>` is not a `<head>`, and a page with no head
+/// tag and a header in its body was having the API put after its own
+/// scripts.
+fn after_tag(lower: &str, name: &str) -> Option<usize> {
+    lower.match_indices(name).find_map(|(start, _)| {
+        let rest = &lower[start + name.len()..];
+        match rest.bytes().next() {
+            Some(b'>' | b'/') => {}
+            Some(next) if next.is_ascii_whitespace() => {}
+            _ => return None,
+        }
+        rest.find('>').map(|end| start + name.len() + end + 1)
+    })
 }
 
 /// The name of a file inside the archive, from the path a request asked
@@ -1099,8 +1120,46 @@ mod tests {
         // A head that carries attributes is still a head.
         assert!(inject("<HEAD lang=\"en\">a")
             .starts_with("<HEAD lang=\"en\"><script src=\"webxdc.js\"></script>"));
-        // And a document without one gets the API first of all.
+        // And a document with nothing to go by gets the API first of all.
         assert!(inject("<p>hi</p>").starts_with("<script src=\"webxdc.js\"></script>"));
+    }
+
+    #[test]
+    fn a_page_without_a_head_tag_still_gets_the_api_before_its_scripts() {
+        // A header is not a head. Found as one, the API went in after the
+        // header -- and after the script ahead of it, which then ran with
+        // no `window.webxdc` to call.
+        assert_eq!(
+            inject(
+                "<!DOCTYPE html><html><meta charset=utf-8>\
+                 <script src=game.js></script><body><header>x</header>"
+            ),
+            "<!DOCTYPE html><html><script src=\"webxdc.js\"></script>\
+             <meta charset=utf-8><script src=game.js></script>\
+             <body><header>x</header>"
+        );
+        // Behind the doctype, never in front of it: in front is quirks
+        // mode for the whole page.
+        assert_eq!(
+            inject("<!doctype html><title>x</title><script src=a.js></script>"),
+            "<!doctype html><script src=\"webxdc.js\"></script>\
+             <title>x</title><script src=a.js></script>"
+        );
+        // An `<html>` is not an `<htmlfoo>` either.
+        assert!(inject("<htmlfoo><p>hi</p>").starts_with("<script src=\"webxdc.js\"></script>"));
+    }
+
+    #[test]
+    fn text_ahead_of_the_head_does_not_move_where_the_api_goes() {
+        // U+0130 is two bytes and lowercases to three. Lowercased the
+        // Unicode way, the page was cut three bytes past its head tag --
+        // or, a character over, in the middle of one, which is a panic.
+        let page = "<!-- \u{130}\u{130}\u{130} --><head><title>x</title></head>";
+        assert_eq!(
+            inject(page),
+            "<!-- \u{130}\u{130}\u{130} --><head><script src=\"webxdc.js\"></script>\
+             <title>x</title></head>"
+        );
     }
 
     #[test]
