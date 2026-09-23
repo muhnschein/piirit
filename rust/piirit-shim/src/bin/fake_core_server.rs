@@ -58,6 +58,9 @@ struct Sent {
 #[derive(Default)]
 struct State {
     accounts: Vec<Account>,
+    /// The highest account id handed out so far. The real core never
+    /// hands one out twice, even once the account has gone.
+    last_account: u32,
     /// The profile the app last said it was showing. The real core keeps
     /// it on disk, selects a newly added account itself, and falls back
     /// to the first that is left when the selected one is removed.
@@ -1210,6 +1213,10 @@ async fn serve() {
                     let gone = positional(0).as_u64().unwrap_or(0);
                     let gone = u32::try_from(gone).unwrap_or(0);
                     state.accounts.retain(|account| account.id != gone);
+                    // The real core deletes the account's directory, and
+                    // its transports and config with it.
+                    state.transports.remove(&gone);
+                    state.config.retain(|(account, _), _| *account != gone);
                     if state.selected == Some(gone) {
                         state.selected = state.accounts.first().map(|account| account.id);
                     }
@@ -1217,7 +1224,13 @@ async fn serve() {
                 }
                 "add_account" => {
                     let mut state = state.lock().await;
-                    let next = u32::try_from(state.accounts.len()).unwrap_or(0) + 1;
+                    let next = state
+                        .accounts
+                        .iter()
+                        .map(|account| account.id)
+                        .fold(state.last_account, u32::max)
+                        + 1;
+                    state.last_account = next;
                     state.accounts.push(Account {
                         id: next,
                         configured: false,
