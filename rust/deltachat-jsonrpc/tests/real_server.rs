@@ -18,7 +18,7 @@ use std::net::{TcpListener, TcpStream};
 use std::sync::Arc;
 use std::time::Duration;
 
-use deltachat_jsonrpc::{spawn_event_loop, RpcClient};
+use deltachat_jsonrpc::{spawn_event_loop, RpcClient, RpcError};
 use serde_json::Value;
 
 /// A 1x1 PNG, written out so the core reads real pixels rather than
@@ -346,6 +346,24 @@ fn converse(stream: &TcpStream, greeting: &str, answer: fn(&str) -> String) -> s
         out.write_all(answer(&line?).as_bytes())?;
     }
     Ok(())
+}
+
+/// The DCLOGIN code for `addr` on the loopback stub: the call the sign-up
+/// page adds a relay with, pointed at `loopback_mailbox`'s two ports.
+fn dclogin(addr: &str, (imap_port, smtp_port): (u16, u16)) -> String {
+    format!(
+        "dclogin:{addr}?p=x&v=1&ih=127.0.0.1&ip={imap_port}\
+         &is=plain&sh=127.0.0.1&sp={smtp_port}&ss=plain"
+    )
+}
+
+/// The core's words for refusing a call, which the pages show as they
+/// are. A call it takes instead fails the test.
+async fn refusal<P: serde::Serialize>(client: &RpcClient, method: &str, params: P) -> String {
+    match client.call::<_, Value>(method, params).await {
+        Err(RpcError::Remote(refused)) => refused.message,
+        other => panic!("the core did not refuse {method}: {other:?}"),
+    }
 }
 
 /// Resolve the gate's value, treating a relative path as relative to the
@@ -869,17 +887,11 @@ async fn offline_round_trip_against_real_core() {
         .call::<_, ()>("set_config", (sender_id, "displayname", "Testy"))
         .await
         .expect("set_config displayname");
-    let (imap_port, smtp_port) = loopback_mailbox();
+    let mailbox = loopback_mailbox();
     client
         .call::<_, ()>(
             "add_transport_from_qr",
-            (
-                sender_id,
-                format!(
-                    "dclogin:self@example.invalid?p=x&v=1&ih=127.0.0.1&ip={imap_port}\
-                     &is=plain&sh=127.0.0.1&sp={smtp_port}&ss=plain"
-                ),
-            ),
+            (sender_id, dclogin("self@example.invalid", mailbox)),
         )
         .await
         .expect("add_transport_from_qr against the loopback stub");
@@ -1948,7 +1960,8 @@ async fn offline_round_trip_against_real_core() {
     // The account list, as the profiles page draws it: a configured
     // account carries its name, its picture and its colour, but not its
     // address, which core 2.61 took off it. The shim asks each configured
-    // account for `configured_addr` instead (core.rs, `primary_addr`).
+    // account for `configured_addr` instead (core.rs, `primary_addr`), so
+    // whether the list has one again is not pinned: nothing reads it.
     let accounts: Vec<Value> = client
         .call_unit("get_all_accounts")
         .await
@@ -1969,11 +1982,6 @@ async fn offline_round_trip_against_real_core() {
              page draws: {configured:?}"
         );
     }
-    assert!(
-        configured.get("addr").is_none(),
-        "the account list carries an address again, so the per-profile \
-         `configured_addr` call is one the shim could drop: {configured:?}"
-    );
     let own_addr: Option<String> = client
         .call("get_config", (sender_id, "configured_addr"))
         .await
@@ -2103,8 +2111,127 @@ async fn offline_round_trip_against_real_core() {
         "a message sent from here is not marked as fully there: {reply:?}"
     );
 
+    relays_against(&client, mailbox).await;
+
     let _ = std::fs::remove_file(&attachment);
     handle.stop();
     client.shutdown().await.expect("shutdown");
     let _ = std::fs::remove_dir_all(&accounts_dir);
+}
+
+/// A profile's relays, as the profile page and the duplicate check read
+/// and change them (transports.rs, signup.rs), and as the fake core
+/// answers for them. On an account of its own, three relays on the
+/// loopback stub, so the sending account above keeps the one it has.
+async fn relays_against(client: &RpcClient, mailbox: (u16, u16)) {
+    let account: u32 = client
+        .call_unit("add_account")
+        .await
+        .unwrap_or_else(|err| panic!("add_account for the relays probe: {err}"));
+    let addrs = [
+        "one@example.invalid",
+        "two@example.invalid",
+        "three@example.invalid",
+    ];
+    for addr in addrs {
+        client
+            .call::<_, ()>("add_transport_from_qr", (account, dclogin(addr, mailbox)))
+            .await
+            .unwrap_or_else(|err| panic!("add_transport_from_qr {addr}: {err}"));
+    }
+    client
+        .call::<_, ()>("stop_io", (account,))
+        .await
+        .unwrap_or_else(|err| panic!("stop_io on the relays probe: {err}"));
+
+    // Each relay by the address on it, in the order they were added; the
+    // profile's own address is the first one's, and stays that as more
+    // are added.
+    let listed = |transports: &[Value]| -> Vec<String> {
+        transports
+            .iter()
+            .map(|transport| {
+                transport
+                    .get("addr")
+                    .and_then(Value::as_str)
+                    .unwrap_or_else(|| panic!("a transport without an addr: {transport:?}"))
+                    .to_string()
+            })
+            .collect()
+    };
+    let transports: Vec<Value> = client
+        .call("list_transports", (account,))
+        .await
+        .unwrap_or_else(|err| panic!("list_transports: {err}"));
+    assert_eq!(listed(&transports), addrs, "{transports:?}");
+    let own: Option<String> = client
+        .call("get_config", (account, "configured_addr"))
+        .await
+        .unwrap_or_else(|err| panic!("get_config configured_addr: {err}"));
+    assert_eq!(own.as_deref(), Some(addrs[0]));
+
+    // The refusals the profile page shows in the core's words, and the
+    // fake core gives in the same ones.
+    assert_eq!(
+        refusal(
+            client,
+            "set_config",
+            (account, "configured_addr", "nobody@example.invalid")
+        )
+        .await,
+        "Address does not belong to any transport."
+    );
+    assert_eq!(
+        refusal(
+            client,
+            "set_config",
+            (account, "configured_addr", Option::<String>::None)
+        )
+        .await,
+        "Cannot unset configured_addr"
+    );
+    assert_eq!(
+        refusal(
+            client,
+            "delete_transport",
+            (account, "nobody@example.invalid")
+        )
+        .await,
+        "Transport does not exist"
+    );
+
+    // Removing the relay with the profile's own address on it moves the
+    // address to the newest of the rest -- not the oldest, and not left
+    // naming a relay the profile no longer has.
+    client
+        .call::<_, ()>("delete_transport", (account, addrs[0]))
+        .await
+        .unwrap_or_else(|err| panic!("delete_transport of the profile's own relay: {err}"));
+    let own: Option<String> = client
+        .call("get_config", (account, "configured_addr"))
+        .await
+        .unwrap_or_else(|err| panic!("get_config configured_addr after the removal: {err}"));
+    assert_eq!(
+        own.as_deref(),
+        Some(addrs[2]),
+        "the profile's own address did not move to the newest relay left"
+    );
+    client
+        .call::<_, ()>("delete_transport", (account, addrs[1]))
+        .await
+        .unwrap_or_else(|err| panic!("delete_transport of a second relay: {err}"));
+    assert_eq!(
+        refusal(client, "delete_transport", (account, addrs[2])).await,
+        "Cannot remove the last transport"
+    );
+    // The last relay is refused before an unknown one is looked for.
+    assert_eq!(
+        refusal(
+            client,
+            "delete_transport",
+            (account, "nobody@example.invalid")
+        )
+        .await,
+        "Cannot remove the last transport"
+    );
 }
