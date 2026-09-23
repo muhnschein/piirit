@@ -253,6 +253,14 @@ it would cost.
 | `chrono` | the viewer's timezone, for the day headings | `std` has none, and the alternative is `localtime_r`, which `unsafe_code` denies |
 | `qrcode` | an invite drawn as a code | one crate, no dependencies |
 | `rqrr` (+ `g2p`, `lru`) | a code read off the camera | a QR decoder is not a small thing to vendor |
+| `mp3lame-encoder` (+ `mp3lame-sys`, `autotools`) | a voice message as MP3 (`voice.rs`) | the phone's recorder offers no encoder the iOS client plays as a voice message; LAME is what the desktop client encodes with, and the pure-Rust encoders want a Rust past the 1.75 floor or are ports of shine, which has no psychoacoustic model |
+
+`mp3lame-sys` carries LAME 3.100's C source and builds it with LAME's own
+`configure` and `make`, so a host build needs both, which a machine that
+builds the C++ above already has. It is the one C dependency in the tree
+that is not Qt, and the reason `rust/deny.toml` allows LGPL-3.0 for its
+two crates and nothing else: LGPL code may be conveyed as part of a GPLv3
+work.
 
 `tokio`'s `net` feature is what the webxdc host binds its loopback socket
 with, and it brings `socket2` -- tokio's own platform layer for sockets,

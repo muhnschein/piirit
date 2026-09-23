@@ -32,6 +32,14 @@ allow = [
     "Zlib",
 ]
 confidence-threshold = 0.9
+# LAME, which a voice message is encoded with (piirit-shim/src/voice.rs),
+# and its bindings. LGPL code may be conveyed as part of a GPLv3 work; an
+# exception for these two rather than an entry above, so that the next
+# LGPL crate is reviewed on its own. docs/BUILDING.md says why LAME.
+exceptions = [
+    { allow = ["LGPL-3.0"], crate = "mp3lame-sys" },
+    { allow = ["LGPL-3.0"], crate = "mp3lame-encoder" },
+]
 
 [bans]
 multiple-versions = "warn"

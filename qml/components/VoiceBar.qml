@@ -17,6 +17,11 @@ import Piirit 1.0
  * recording, the strip is a red dot, the time, a cross to throw the
  * recording away, and the send button where it always is. The page
  * hides its field and attach button meanwhile.
+ *
+ * A recording can be as long as the relay takes and no longer: the time
+ * says how far it can go ("0:07 / 94:57"), turns red for the last ten
+ * seconds, and at the end the recording stops and is sent, as a tap on
+ * send would have done.
  */
 Item {
     id: root
@@ -25,6 +30,13 @@ Item {
     readonly property bool available: recorder.available
     /// A recording is running, or being finished.
     readonly property bool recording: recorder.recording
+    /// The largest file the relay takes, in bytes: the core's attachment
+    /// limit, 0 until it has said. A recording stops at the longest that
+    /// fits.
+    property real limitBytes: 0
+    /// The reader's outgoing media quality, 0 balanced and 1 less data,
+    /// which the recording's bit rate follows as a picture's size does.
+    property int mediaQuality: 0
     /// The recording is finished and at `path`: send it.
     signal recorded(string path)
     /// Recording failed. The message is the platform's own.
@@ -58,6 +70,16 @@ Item {
         return Math.floor(total / 60) + ":" + (seconds < 10 ? "0" : "") + seconds
     }
 
+    /// The time so far, and the longest the recording can be when there
+    /// is a limit: "0:07 / 94:57", or "0:07". Never past the limit, which
+    /// the time can be for the moment the recorder takes to stop.
+    function progress(elapsed, longest) {
+        if (longest <= 0) {
+            return root.clock(elapsed)
+        }
+        return root.clock(Math.min(elapsed, longest)) + " / " + root.clock(longest)
+    }
+
     Captures {
         id: captures
         objectName: "captures"
@@ -67,9 +89,15 @@ Item {
     VoiceRecorder {
         id: recorder
         objectName: "recorder"
+        limit_bytes: root.limitBytes
+        media_quality: root.mediaQuality
         onRecorded: root.recorded(path)
         onError: root.failed(message)
     }
+
+    /// Ten seconds or less to go before the recording stops by itself.
+    readonly property bool nearLimit: recorder.limit_ms > 0
+                                      && recorder.limit_ms - recorder.duration_ms <= 10000
 
     // The recorder is polled rather than connected to: one call a few
     // times a second while recording, and nothing at all otherwise.
@@ -122,9 +150,11 @@ Item {
             verticalCenter: parent.verticalCenter
         }
         truncationMode: TruncationMode.Fade
-        color: Theme.primaryColor
-        //: Shown while a voice message records. %1 is the time so far, such as "0:07".
-        text: qsTr("Recording %1").arg(root.clock(recorder.duration_ms))
+        color: root.nearLimit ? Theme.errorColor : Theme.primaryColor
+        //: Shown while a voice message records. %1 is the time so far and
+        //: the longest the recording can be, such as "0:07 / 94:57", or
+        //: the time alone, such as "0:07".
+        text: qsTr("Recording %1").arg(root.progress(recorder.duration_ms, recorder.limit_ms))
     }
 
     IconButton {

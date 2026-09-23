@@ -741,6 +741,12 @@ Page {
             objectName: "voiceBar"
             width: parent.width - sendButton.width
             anchors.verticalCenter: sendButton.verticalCenter
+            // A recording stops at the longest the relay takes -- the
+            // limit a file on the attachment bar is held to -- and is
+            // made at the bit rate the reader's outgoing media quality
+            // says.
+            limitBytes: messages.attachment_limit
+            mediaQuality: Settings.mediaQuality === 1 ? 1 : 0
             onRecorded: {
                 page.errorMessage = ""
                 page.pendingVoice = path

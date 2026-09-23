@@ -3,10 +3,12 @@
 # Modeled on real-world prior art for Rust+Qt5/QML Sailfish apps -- notably
 # Whisperfish's rpm/harbour-whisperfish.spec, which docs/PROJECT.md names as
 # the architectural and build-tooling template -- but simplified: Piirit
-# has no C/C++ vendored dependencies of its own
-# (no sqlcipher, no protobuf, etc.), just the Rust workspace under rust/,
-# the qml/ tree, and a *separately obtained* deltachat-rpc-server binary
-# (scripts/fetch-rpc-server.sh, see vendor/deltachat-rpc-server/).
+# vendors no C/C++ of its own (no sqlcipher, no protobuf, etc.), just the
+# Rust workspace under rust/, the qml/ tree, and a *separately obtained*
+# deltachat-rpc-server binary (scripts/fetch-rpc-server.sh, see
+# vendor/deltachat-rpc-server/). The one C library linked in, LAME, comes
+# as the source inside the mp3lame-sys crate, whose build script runs its
+# configure and make with the target's compiler (docs/BUILDING.md).
 #
 # Two build modes:
 #   sfdk build                  -- crates are fetched from crates.io by the
