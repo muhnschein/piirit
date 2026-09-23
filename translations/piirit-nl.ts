@@ -51,8 +51,8 @@
         <translation>Piirit werkt alleen met chatmail-relays. Dat is een bijzonder soort e-mailserver; gewone e-mailservers worden niet ondersteund. Meer op &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. Een volledige lijst van openbare, gratis te gebruiken chatmail-relays staat op &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
     </message>
     <message>
-        <source>Pick a name and a relay. That&apos;s it! There is nothing else to set up.</source>
-        <translation>Kies een naam en een relay. Dat is alles! Meer valt er niet in te stellen.</translation>
+        <source>Choose a name and a relay. Nothing else is needed.</source>
+        <translation>Kies een naam en een relay. Meer is niet nodig.</translation>
     </message>
 </context>
 <context>
@@ -66,24 +66,12 @@
         <translation>Een profiel aanmaken</translation>
     </message>
     <message>
-        <source>A new address on a chatmail relay.</source>
-        <translation>Een nieuw adres op een chatmail-relay.</translation>
-    </message>
-    <message>
         <source>Restore from a backup</source>
         <translation>Herstellen uit een back-up</translation>
     </message>
     <message>
-        <source>A backup file copied onto this phone.</source>
-        <translation>Een back-upbestand, naar deze telefoon gekopieerd.</translation>
-    </message>
-    <message>
         <source>Add as second device</source>
         <translation>Toevoegen als tweede apparaat</translation>
-    </message>
-    <message>
-        <source>The other device keeps it. Both get everything new.</source>
-        <translation>Het andere apparaat houdt het. Allebei krijgen ze alles wat nieuw is.</translation>
     </message>
 </context>
 <context>
@@ -97,24 +85,12 @@
         <translation>Relay toevoegen</translation>
     </message>
     <message>
-        <source>Another address for this profile, on another relay. The profile sends from one relay at a time; its page says which, and lets you change it.</source>
-        <translation>Nog een adres voor dit profiel, op een andere relay. Het profiel verstuurt via één relay tegelijk; de profielpagina laat zien welke en laat je wisselen.</translation>
-    </message>
-    <message>
         <source>Add relay</source>
         <translation>Relay toevoegen</translation>
     </message>
     <message>
-        <source>Contacting %1...</source>
-        <translation>Contact opnemen met %1...</translation>
-    </message>
-    <message>
         <source>Cancel</source>
         <translation>Annuleren</translation>
-    </message>
-    <message>
-        <source>Relays are run by volunteers. Try another one.</source>
-        <translation>Relays worden door vrijwilligers gedraaid. Probeer een andere.</translation>
     </message>
     <message>
         <source>Select a public chatmail relay</source>
@@ -127,6 +103,18 @@
     <message>
         <source>Piirit works only with chatmail relays. These are a particular kind of e-mail server; ordinary e-mail servers are not supported. For more, see &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. A full list of public, free-to-use chatmail relays is at &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</source>
         <translation>Piirit werkt alleen met chatmail-relays. Dat is een bijzonder soort e-mailserver; gewone e-mailservers worden niet ondersteund. Meer op &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. Een volledige lijst van openbare, gratis te gebruiken chatmail-relays staat op &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
+    </message>
+    <message>
+        <source>Adds another address for this profile on a second relay. The profile sends from one relay at a time; you can change which one on the profile page.</source>
+        <translation>Voegt dit profiel een tweede adres toe op een andere relay. Het profiel verzendt via één relay tegelijk; welke dat is, kun je op de profielpagina wijzigen.</translation>
+    </message>
+    <message>
+        <source>Contacting %1…</source>
+        <translation>Contact opnemen met %1…</translation>
+    </message>
+    <message>
+        <source>Could not reach the relay. Try another one.</source>
+        <translation>De relay was niet bereikbaar. Probeer een andere.</translation>
     </message>
 </context>
 <context>
@@ -159,14 +147,6 @@
         <source>Cancel</source>
         <translation>Annuleren</translation>
     </message>
-    <message numerus="yes">
-        <source>%n message(s) will be deleted now, and from then on every message will be once it is that old.</source>
-        <extracomment>%n is how many messages would be deleted straight away.</extracomment>
-        <translation>
-            <numerusform>%n bericht wordt nu verwijderd, en daarna elk bericht zodra het zo oud is.</numerusform>
-            <numerusform>%n berichten worden nu verwijderd, en daarna elk bericht zodra het zo oud is.</numerusform>
-        </translation>
-    </message>
     <message>
         <source>This includes pictures, videos and files.</source>
         <translation>Dit omvat afbeeldingen, video&apos;s en bestanden.</translation>
@@ -184,20 +164,20 @@
         <source>I understand, delete all these messages</source>
         <translation>Ik begrijp het, verwijder al deze berichten</translation>
     </message>
+    <message numerus="yes">
+        <source>%n message(s) will be deleted now, and every new message will be deleted once it reaches that age.</source>
+        <extracomment>%n is how many messages would be deleted straight away.</extracomment>
+        <translation>
+            <numerusform>%n bericht wordt nu verwijderd, en elk nieuw bericht wordt verwijderd zodra het die leeftijd bereikt.</numerusform>
+            <numerusform>%n berichten worden nu verwijderd, en elk nieuw bericht wordt verwijderd zodra het die leeftijd bereikt.</numerusform>
+        </translation>
+    </message>
 </context>
 <context>
     <name>BackupPage</name>
     <message>
         <source>Back up profile</source>
         <translation>Profiel back-uppen</translation>
-    </message>
-    <message>
-        <source>Write the backup</source>
-        <translation>Back-up schrijven</translation>
-    </message>
-    <message>
-        <source>Writing the backup...</source>
-        <translation>Back-up wordt geschreven...</translation>
     </message>
     <message>
         <source>Cancel</source>
@@ -209,12 +189,20 @@
         <translation>Opgeslagen in %1</translation>
     </message>
     <message>
-        <source>Messages, contacts and key in one file, saved to Documents. Whoever has the file has the profile.</source>
-        <translation>Berichten, contacten en sleutel in één bestand, opgeslagen in Documenten. Wie het bestand heeft, heeft het profiel.</translation>
-    </message>
-    <message>
         <source>Swipe on for your chats.</source>
         <translation>Veeg door naar je chats.</translation>
+    </message>
+    <message>
+        <source>Start backup</source>
+        <translation>Back-up starten</translation>
+    </message>
+    <message>
+        <source>Backing up…</source>
+        <translation>Bezig met back-up…</translation>
+    </message>
+    <message>
+        <source>Saves your messages, contacts and end-to-end encryption setup to a backup file. Keep this file in a safe place.</source>
+        <translation>Slaat je berichten, contacten en eind-tot-eindversleuteling op in een back-upbestand. Bewaar dit bestand op een veilige plek.</translation>
     </message>
 </context>
 <context>
@@ -288,10 +276,6 @@ Other groups with blocked contacts will still show their messages.</source>
 </context>
 <context>
     <name>ChatListPage</name>
-    <message>
-        <source>Lost the connection to the Delta Chat core. Reconnecting...</source>
-        <translation>Verbinding met de Delta Chat-kern verloren. Opnieuw verbinden...</translation>
-    </message>
     <message>
         <source>Lost the connection to the Delta Chat core. Restart Piirit.</source>
         <translation>Verbinding met de Delta Chat-kern verloren. Start Piirit opnieuw.</translation>
@@ -400,6 +384,10 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Search</source>
         <translation>Zoeken</translation>
+    </message>
+    <message>
+        <source>Lost the connection to the Delta Chat core. Reconnecting…</source>
+        <translation>Verbinding met de Delta Chat-kern verloren. Opnieuw verbinden…</translation>
     </message>
 </context>
 <context>
@@ -530,10 +518,6 @@ Other groups with blocked contacts will still show their messages.</source>
 <context>
     <name>ConversationPage</name>
     <message>
-        <source>Lost the connection to the Delta Chat core. Reconnecting...</source>
-        <translation>Verbinding met de Delta Chat-kern verloren. Opnieuw verbinden...</translation>
-    </message>
-    <message>
         <source>Lost the connection to the Delta Chat core. Restart Piirit.</source>
         <translation>Verbinding met de Delta Chat-kern verloren. Start Piirit opnieuw.</translation>
     </message>
@@ -553,11 +537,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Message</source>
         <translation>Bericht</translation>
-    </message>
-    <message>
-        <source>Long message: the other end sees a preview and taps to read the rest</source>
-        <extracomment>Shown above the message field while what is being written is long enough that the other end will receive a shortened version with the rest behind a tap.</extracomment>
-        <translation>Lang bericht: de andere kant ziet een voorbeeld en tikt om de rest te lezen</translation>
     </message>
     <message>
         <source>Saved to Pictures</source>
@@ -580,9 +559,13 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Opgeslagen in Downloads</translation>
     </message>
     <message>
-        <source>Too big to send: %1. Attachments go up to %2.</source>
+        <source>Lost the connection to the Delta Chat core. Reconnecting…</source>
+        <translation>Verbinding met de Delta Chat-kern verloren. Opnieuw verbinden…</translation>
+    </message>
+    <message>
+        <source>%1 is too large to send. Attachments can be up to %2.</source>
         <extracomment>Shown above the message field when the attached file is bigger than will be sent. %1 is the file&apos;s size and %2 the largest that goes, each such as &quot;24 MB&quot;.</extracomment>
-        <translation>Te groot om te versturen: %1. Bijlagen mogen tot %2 groot zijn.</translation>
+        <translation>%1 is te groot om te verzenden. Bijlagen mogen tot %2 groot zijn.</translation>
     </message>
 </context>
 <context>
@@ -620,14 +603,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>How do you want to delete this message? This cannot be undone.</source>
         <translation>Hoe wil je dit bericht verwijderen? Dit kan niet ongedaan worden gemaakt.</translation>
-    </message>
-    <message>
-        <source>It goes from your devices. Everybody else keeps their copy.</source>
-        <translation>Het verdwijnt van jouw apparaten. Alle anderen houden hun kopie.</translation>
-    </message>
-    <message>
-        <source>It goes from your devices, and every other device in this chat is asked to delete it too.</source>
-        <translation>Het verdwijnt van jouw apparaten, en elk ander apparaat in dit gesprek wordt gevraagd het ook te verwijderen.</translation>
     </message>
 </context>
 <context>
@@ -689,8 +664,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Na %1 seconden</translation>
     </message>
     <message>
-        <source>Applies to everyone in the chat. They can still copy and forward.</source>
-        <translation>Geldt voor iedereen in de chat. Kopiëren en doorsturen kan nog steeds.</translation>
+        <source>Applies to all members of this chat; they can still copy, save, and forward messages.</source>
+        <translation>Deze instellingen zijn van toepassing op alle deelnemers. Ze kunnen berichten kopiëren, opslaan of doorsturen middels andere e-mailapps.</translation>
     </message>
 </context>
 <context>
@@ -706,14 +681,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Restore from a backup</source>
         <translation>Herstellen uit een back-up</translation>
-    </message>
-    <message>
-        <source>The other device keeps it. Both get everything new.</source>
-        <translation>Het andere apparaat houdt het. Allebei krijgen ze alles wat nieuw is.</translation>
-    </message>
-    <message>
-        <source>A backup file copied onto this phone.</source>
-        <translation>Een back-upbestand, naar deze telefoon gekopieerd.</translation>
     </message>
 </context>
 <context>
@@ -798,14 +765,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Jij bepaalt wie je kan bereiken</translation>
     </message>
     <message>
-        <source>Groups of equals</source>
-        <translation>Groepen van gelijken</translation>
-    </message>
-    <message>
-        <source>The server only passes it on</source>
-        <translation>De server geeft het alleen maar door</translation>
-    </message>
-    <message>
         <source>Keep swiping to set up your profile.</source>
         <translation>Blijf vegen om je profiel in te stellen.</translation>
     </message>
@@ -814,24 +773,32 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Elk bericht is versleuteld</translation>
     </message>
     <message>
-        <source>Made here on your phone. No phone number, no account, nothing to sign.</source>
-        <translation>Hier op je telefoon gemaakt. Geen telefoonnummer, geen account, niets te tekenen.</translation>
+        <source>Your profile is created on this phone. No phone number and no sign-up are needed.</source>
+        <translation>Je profiel wordt op deze telefoon aangemaakt. Er is geen telefoonnummer en geen registratie nodig.</translation>
     </message>
     <message>
-        <source>There is no directory to be found in. Show a friend a code, or send a link.</source>
-        <translation>Er is geen gids om in gevonden te worden. Laat een vriend een code zien, of stuur een link.</translation>
+        <source>There is no public directory. People reach you by scanning your invite code or opening your invite link.</source>
+        <translation>Er is geen openbare gids. Anderen bereiken je door je uitnodigingscode te scannen of je uitnodigingslink te openen.</translation>
     </message>
     <message>
-        <source>Encrypted the whole way, always. The servers cannot read a word.</source>
-        <translation>Altijd end-to-end versleuteld. De servers lezen er geen woord van.</translation>
+        <source>Any member can add people, rename the group or leave it.</source>
+        <translation>Elk lid kan mensen toevoegen, de groep hernoemen of hem verlaten.</translation>
     </message>
     <message>
-        <source>Anyone can add a friend, rename the group or leave. Nobody is in charge.</source>
-        <translation>Iedereen kan een vriend toevoegen, de groep hernoemen of vertrekken. Niemand heeft de leiding.</translation>
+        <source>Messages are end-to-end encrypted, so the relays that carry them cannot read them.</source>
+        <translation>Berichten zijn eind-tot-eind versleuteld, dus de relays die ze doorgeven kunnen ze niet lezen.</translation>
     </message>
     <message>
-        <source>It holds a message until the other phone is online, and nothing more.</source>
-        <translation>Hij bewaart een bericht tot de andere telefoon online is, meer niet.</translation>
+        <source>Groups have no admins</source>
+        <translation>Groepen hebben geen beheerders</translation>
+    </message>
+    <message>
+        <source>Relays only pass messages on</source>
+        <translation>Relays geven berichten alleen door</translation>
+    </message>
+    <message>
+        <source>A relay stores a message only until the recipient fetches it.</source>
+        <translation>Een relay bewaart een bericht alleen totdat de ontvanger het ophaalt.</translation>
     </message>
 </context>
 <context>
@@ -962,12 +929,12 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Nog geen contacten</translation>
     </message>
     <message>
-        <source>Scan someone&apos;s invite from the chat list: QR code</source>
-        <translation>Scan iemands uitnodiging vanuit de chatlijst: QR-code</translation>
-    </message>
-    <message>
         <source>Search</source>
         <translation>Zoeken</translation>
+    </message>
+    <message>
+        <source>Use &quot;QR code&quot; in the chat list to add a contact.</source>
+        <translation>Gebruik &quot;QR-code&quot; in de chatlijst om een contact toe te voegen.</translation>
     </message>
 </context>
 <context>
@@ -975,10 +942,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Please name the group</source>
         <translation>Geef de groep een naam</translation>
-    </message>
-    <message>
-        <source>Create Group</source>
-        <translation>Groep aanmaken</translation>
     </message>
     <message>
         <source>New group</source>
@@ -1011,6 +974,10 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Add members</source>
         <translation>Leden toevoegen</translation>
+    </message>
+    <message>
+        <source>Create group</source>
+        <translation>Groep aanmaken</translation>
     </message>
 </context>
 <context>
@@ -1083,10 +1050,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>De relay heeft zijn quotum nog niet gemeld</translation>
     </message>
     <message>
-        <source>Both ways: with this off you send none and see none.</source>
-        <translation>Beide kanten op: uit stuur je er geen en zie je er geen.</translation>
-    </message>
-    <message>
         <source>Relays</source>
         <translation>Relays</translation>
     </message>
@@ -1121,16 +1084,16 @@ Other groups with blocked contacts will still show their messages.</source>
         <extracomment>How much room the profile takes on the phone. %1 is a size such as &quot;12.3 MB&quot;.</extracomment>
         <translation>Piirit gebruikt %1 opslag op deze telefoon.</translation>
     </message>
+    <message>
+        <source>If read receipts are disabled, you won&apos;t be able to see read receipts from others.</source>
+        <translation>Als je leesbevestigingen uitschakelt, zie je geen leesbevestigingen van anderen.</translation>
+    </message>
 </context>
 <context>
     <name>ProfileSetupPage</name>
     <message>
         <source>Add profile</source>
         <translation>Profiel toevoegen</translation>
-    </message>
-    <message>
-        <source>Contacting %1...</source>
-        <translation>Contact opnemen met %1...</translation>
     </message>
     <message>
         <source>Cancel</source>
@@ -1145,16 +1108,16 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>%1 heeft niet binnen %2 seconden geantwoord.</translation>
     </message>
     <message>
-        <source>Relays are run by volunteers. Go back and try another one.</source>
-        <translation>Relays worden door vrijwilligers gedraaid. Ga terug en probeer een andere.</translation>
+        <source>Contacting %1…</source>
+        <translation>Contact opnemen met %1…</translation>
+    </message>
+    <message>
+        <source>Could not reach the relay. Try another one.</source>
+        <translation>De relay was niet bereikbaar. Probeer een andere.</translation>
     </message>
 </context>
 <context>
     <name>ProfileStartPage</name>
-    <message>
-        <source>Alright, let&apos;s get you set up.</source>
-        <translation>Goed, laten we je profiel instellen.</translation>
-    </message>
     <message>
         <source>I already have a profile</source>
         <translation>Ik heb al een profiel</translation>
@@ -1162,6 +1125,10 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Create a profile</source>
         <translation>Een profiel aanmaken</translation>
+    </message>
+    <message>
+        <source>Set up your profile</source>
+        <translation>Stel je profiel in</translation>
     </message>
 </context>
 <context>
@@ -1227,16 +1194,16 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Laat iemand deze code scannen, of stuur diegene de link.</translation>
     </message>
     <message>
-        <source>Fetching...</source>
-        <translation>Ophalen...</translation>
-    </message>
-    <message>
-        <source>Copy Invite Link</source>
-        <translation>Uitnodigingslink kopiëren</translation>
-    </message>
-    <message>
         <source>The camera is not available on this device.</source>
         <translation>De camera is op dit apparaat niet beschikbaar.</translation>
+    </message>
+    <message>
+        <source>Fetching…</source>
+        <translation>Ophalen…</translation>
+    </message>
+    <message>
+        <source>Copy invite link</source>
+        <translation>Uitnodigingslink kopiëren</translation>
     </message>
 </context>
 <context>
@@ -1254,10 +1221,6 @@ Other groups with blocked contacts will still show their messages.</source>
 <context>
     <name>RestoreProfilePage</name>
     <message>
-        <source>That is not the code a device shows while it is offering its profile.</source>
-        <translation>Dat is niet de code die een apparaat toont terwijl het zijn profiel aanbiedt.</translation>
-    </message>
-    <message>
         <source>Add as second device</source>
         <translation>Toevoegen als tweede apparaat</translation>
     </message>
@@ -1270,16 +1233,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Kies een back-upbestand</translation>
     </message>
     <message>
-        <source>Taking the profile over...</source>
-        <translation>Profiel wordt overgenomen...</translation>
-    </message>
-    <message>
         <source>Cancel</source>
         <translation>Annuleren</translation>
-    </message>
-    <message>
-        <source>Hold the phone up to the code it shows</source>
-        <translation>Houd deze telefoon voor de code die het toont</translation>
     </message>
     <message>
         <source>Enter the code instead</source>
@@ -1288,10 +1243,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Code from the other device</source>
         <translation>Code van het andere apparaat</translation>
-    </message>
-    <message>
-        <source>Take the profile over</source>
-        <translation>Profiel overnemen</translation>
     </message>
     <message>
         <source>That did not work</source>
@@ -1306,28 +1257,44 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Ander bestand kiezen</translation>
     </message>
     <message>
-        <source>The other device runs a newer Delta Chat than this app can read.</source>
-        <translation>Het andere apparaat draait een nieuwere Delta Chat dan deze app kan lezen.</translation>
-    </message>
-    <message>
-        <source>The transfer stopped. Both devices have to stay on one network, with this page open.</source>
-        <translation>De overdracht is gestopt. Beide apparaten moeten op hetzelfde netwerk blijven, met deze pagina open.</translation>
-    </message>
-    <message>
-        <source>No camera on this device. A backup file works without one.</source>
-        <translation>Geen camera op dit apparaat. Een back-upbestand werkt ook zonder.</translation>
-    </message>
-    <message>
-        <source>On the other device: Settings, then add a second device. Both on one network.</source>
-        <translation>Op het andere apparaat: Instellingen, dan een tweede apparaat toevoegen. Allebei op hetzelfde netwerk.</translation>
-    </message>
-    <message>
         <source>Make a backup on the other device, copy the file here, then choose it.</source>
         <translation>Maak een back-up op het andere apparaat, kopieer het bestand hierheen en kies het dan.</translation>
     </message>
     <message>
         <source>That profile is already on this phone. Open it from the profiles list.</source>
         <translation>Dit profiel staat al op deze telefoon. Open het via de profielenlijst.</translation>
+    </message>
+    <message>
+        <source>The profile is from a newer Delta Chat version than this app can read.</source>
+        <translation>Het profiel komt van een nieuwere Delta Chat-versie dan deze app kan lezen.</translation>
+    </message>
+    <message>
+        <source>The transfer stopped. Both devices must stay on the same network with this page open.</source>
+        <translation>De overdracht is gestopt. Beide apparaten moeten op hetzelfde netwerk blijven met deze pagina open.</translation>
+    </message>
+    <message>
+        <source>This is not a second-device code. Use the code shown by the other device.</source>
+        <translation>Dit is geen code voor een tweede apparaat. Gebruik de code die het andere apparaat toont.</translation>
+    </message>
+    <message>
+        <source>Hold your camera over the QR code</source>
+        <translation>Houd je camera boven de QR-code</translation>
+    </message>
+    <message>
+        <source>Copy the profile</source>
+        <translation>Profiel kopiëren</translation>
+    </message>
+    <message>
+        <source>No camera on this device. You can restore from a backup file instead.</source>
+        <translation>Geen camera op dit apparaat. Je kunt in plaats daarvan herstellen vanuit een back-upbestand.</translation>
+    </message>
+    <message>
+        <source>On the other device, go to Settings and tap &quot;Add second device&quot;. Both devices must be on the same network.</source>
+        <translation>Ga op het andere apparaat naar Instellingen en tik op &quot;Tweede apparaat toevoegen&quot;. Beide apparaten moeten op hetzelfde netwerk zitten.</translation>
+    </message>
+    <message>
+        <source>Transferring…</source>
+        <translation>Bezig met overdragen…</translation>
     </message>
 </context>
 <context>
@@ -1379,40 +1346,20 @@ Other groups with blocked contacts will still show their messages.</source>
 <context>
     <name>SecondDevicePage</name>
     <message>
-        <source>Nothing took the profile. Both phones have to stay on one network, with this page open.</source>
-        <translation>Niemand heeft het profiel opgehaald. Beide telefoons moeten op hetzelfde netwerk blijven, met deze pagina open.</translation>
-    </message>
-    <message>
         <source>Add a second device</source>
         <translation>Een tweede apparaat toevoegen</translation>
-    </message>
-    <message>
-        <source>On the other device: add a profile you have already, then &quot;Add as second device&quot;, and read this code with it. Both phones on one network.</source>
-        <translation>Op het andere apparaat: voeg een profiel toe dat je al hebt, dan “Toevoegen als tweede apparaat”, en lees deze code ermee. Allebei op hetzelfde netwerk.</translation>
     </message>
     <message>
         <source>Copy the code</source>
         <translation>Code kopiëren</translation>
     </message>
     <message>
-        <source>Handing the profile over...</source>
-        <translation>Profiel wordt overgedragen...</translation>
-    </message>
-    <message>
         <source>Cancel</source>
         <translation>Annuleren</translation>
     </message>
     <message>
-        <source>The other device has the profile. Both get everything new from now on.</source>
-        <translation>Het andere apparaat heeft het profiel. Vanaf nu krijgen ze allebei alles wat nieuw is.</translation>
-    </message>
-    <message>
         <source>Swipe on for your chats.</source>
         <translation>Veeg door naar je chats.</translation>
-    </message>
-    <message>
-        <source>Whoever reads this code gets the profile. It stops collecting mail until the code is gone.</source>
-        <translation>Wie deze code leest, krijgt het profiel. Zolang de code er staat, haalt het geen post op.</translation>
     </message>
     <message>
         <source>Show code again</source>
@@ -1421,6 +1368,26 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Show code</source>
         <translation>Code tonen</translation>
+    </message>
+    <message>
+        <source>No device copied the profile. Both devices must stay on the same network with this page open.</source>
+        <translation>Geen enkel apparaat heeft het profiel gekopieerd. Beide apparaten moeten op hetzelfde netwerk blijven met deze pagina open.</translation>
+    </message>
+    <message>
+        <source>Transferring…</source>
+        <translation>Bezig met overdragen…</translation>
+    </message>
+    <message>
+        <source>The profile was transferred to your second device. Both devices now receive all new messages.</source>
+        <translation>Het profiel is naar je tweede apparaat overgezet. Beide apparaten ontvangen nu alle nieuwe berichten.</translation>
+    </message>
+    <message>
+        <source>On the other device, choose &quot;Add as second device&quot; and scan this code. Both devices must be on the same network.</source>
+        <translation>Kies op het andere apparaat &quot;Toevoegen als tweede apparaat&quot; en scan deze code. Beide apparaten moeten op hetzelfde netwerk zitten.</translation>
+    </message>
+    <message>
+        <source>Make sure no unwanted observer or camera can see this code. This profile does not receive messages while the code is shown.</source>
+        <translation>Zorg dat geen ongewenste toeschouwer of camera deze code kan zien. Dit profiel ontvangt geen berichten zolang de code getoond wordt.</translation>
     </message>
 </context>
 <context>
@@ -1474,18 +1441,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Meldingen</translation>
     </message>
     <message>
-        <source>Who wrote, and what</source>
-        <translation>Wie schreef, en wat</translation>
-    </message>
-    <message>
-        <source>Who wrote</source>
-        <translation>Wie schreef</translation>
-    </message>
-    <message>
-        <source>Only that something arrived</source>
-        <translation>Alleen dat er iets is binnengekomen</translation>
-    </message>
-    <message>
         <source>Apps</source>
         <translation>Apps</translation>
     </message>
@@ -1519,10 +1474,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Berichten van apparaat verwijderen</translation>
     </message>
     <message>
-        <source>A new notification shows</source>
-        <translation>Een nieuwe melding toont</translation>
-    </message>
-    <message>
         <source>Mentions</source>
         <extracomment>A reply to one of the reader&apos;s own messages, arriving in a group they have muted.</extracomment>
         <translation>Vermeldingen</translation>
@@ -1537,49 +1488,12 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Markdown-opmaak gebruiken</translation>
     </message>
     <message>
-        <source>Otherwise it starts a new line, and the button sends.</source>
-        <translation>Anders begint hij een nieuwe regel, en de knop verstuurt.</translation>
-    </message>
-    <message>
-        <source>Draws *stars* and `backticks` rather than showing them.</source>
-        <translation>Tekent *sterretjes* en `backticks` in plaats van ze te tonen.</translation>
-    </message>
-    <message>
-        <source>Bigger ones wait until you ask for them. Every profile, from now on.</source>
-        <translation>Grotere wachten tot je erom vraagt. Alle profielen, vanaf nu.</translation>
-    </message>
-    <message>
-        <source>Every chat of every profile. &quot;Saved messages&quot; are kept.</source>
-        <translation>Elke chat van elk profiel. „Opgeslagen berichten” blijven.</translation>
-    </message>
-    <message>
-        <source>On the lock screen and in the notification area.</source>
-        <translation>Op het vergrendelscherm en in het meldingengebied.</translation>
-    </message>
-    <message>
-        <source>A reply to you gets through a muted group.</source>
-        <translation>Een antwoord aan jou komt ook door een gedempte groep.</translation>
-    </message>
-    <message>
-        <source>Click ids and campaign tags come out of the links you send.</source>
-        <translation>Klik-id&apos;s en campagnetags gaan uit de links die je stuurt.</translation>
-    </message>
-    <message>
-        <source>Small apps run inside the chat. Somebody else&apos;s code, and less tested than the rest.</source>
-        <translation>Kleine apps draaien in de chat. Andermans code, en minder beproefd dan de rest.</translation>
-    </message>
-    <message>
         <source>Privacy</source>
         <translation>Privacy</translation>
     </message>
     <message>
         <source>Blocked contacts</source>
         <translation>Geblokkeerde contactpersonen</translation>
-    </message>
-    <message>
-        <source>Worse quality, save data</source>
-        <extracomment>Outgoing media quality: smaller pictures and videos, which cost the reader and whoever they write to less data. Both reference clients&apos; words for it.</extracomment>
-        <translation>Lagere kwaliteit, kleinere bestanden</translation>
     </message>
     <message>
         <source>Balanced</source>
@@ -1592,12 +1506,41 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Kwaliteit van verstuurde media</translation>
     </message>
     <message>
-        <source>Pictures are made smaller before sending, and the camera records at this quality.</source>
-        <translation>Foto’s worden voor het versturen verkleind, en de camera neemt op in deze kwaliteit.</translation>
-    </message>
-    <message>
         <source>Show notifications</source>
         <translation>Meldingen tonen</translation>
+    </message>
+    <message>
+        <source>Lower quality, less data</source>
+        <extracomment>Outgoing media quality: smaller pictures and videos, which cost the reader and whoever they write to less data. Both reference clients&apos; words for it.</extracomment>
+        <translation>Lagere kwaliteit, minder data</translation>
+    </message>
+    <message>
+        <source>Notification content</source>
+        <translation>Inhoud van meldingen</translation>
+    </message>
+    <message>
+        <source>Sender and message</source>
+        <translation>Afzender en bericht</translation>
+    </message>
+    <message>
+        <source>Sender only</source>
+        <translation>Alleen afzender</translation>
+    </message>
+    <message>
+        <source>No details</source>
+        <translation>Geen details</translation>
+    </message>
+    <message>
+        <source>In muted groups, notify messages directed to you, like replies or reactions</source>
+        <translation>Toon berichten gericht aan jou in genegeerde groepen</translation>
+    </message>
+    <message>
+        <source>Removes click IDs and campaign tags from links you send.</source>
+        <translation>Verwijdert click-ID&apos;s en campagnetags uit links die je verstuurt.</translation>
+    </message>
+    <message>
+        <source>Runs small apps inside chats. These features may be unstable and may be changed or removed.</source>
+        <translation>Voert kleine apps uit in chats. Deze functies kunnen instabiel zijn en gewijzigd of verwijderd worden.</translation>
     </message>
 </context>
 <context>
@@ -1670,16 +1613,16 @@ Other groups with blocked contacts will still show their messages.</source>
 <context>
     <name>WelcomePage</name>
     <message>
-        <source>Tell me about Delta Chat</source>
-        <translation>Wat is Delta Chat?</translation>
-    </message>
-    <message>
-        <source>Set up my profile</source>
-        <translation>Mijn profiel instellen</translation>
-    </message>
-    <message>
         <source>Secure decentralised chat based on Delta Chat</source>
         <translation>Veilig, gedecentraliseerd chatten op basis van Delta Chat</translation>
+    </message>
+    <message>
+        <source>About Delta Chat</source>
+        <translation>Over Delta Chat</translation>
+    </message>
+    <message>
+        <source>Set up your profile</source>
+        <translation>Stel je profiel in</translation>
     </message>
 </context>
 </TS>

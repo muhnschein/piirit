@@ -1416,6 +1416,8 @@ impl DeltaChatCore {
             return;
         };
         let attempt = self.attempts.begin(self.deadline());
+        // Before the task, so a Cancel in the same turn finds the account.
+        attempt.hold(account_id);
         let done = self.relay_callback(attempt.id());
         let task_runtime = runtime.clone();
         let transport = Transport::Qr(provider_qr.to_string());

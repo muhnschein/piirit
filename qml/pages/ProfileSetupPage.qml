@@ -135,7 +135,7 @@ Page {
             minimumValue: 0
             maximumValue: 1000
             value: page.permille
-            label: qsTr("Contacting %1...").arg(page.relay)
+            label: qsTr("Contacting %1…").arg(page.relay)
         }
 
         Button {
@@ -163,7 +163,7 @@ Page {
             horizontalAlignment: Text.AlignHCenter
             font.pixelSize: Theme.fontSizeSmall
             color: Theme.secondaryHighlightColor
-            text: qsTr("Relays are run by volunteers. Go back and try another one.")
+            text: qsTr("Could not reach the relay. Try another one.")
         }
 
         Banner {

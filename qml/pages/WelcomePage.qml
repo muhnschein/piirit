@@ -253,12 +253,12 @@ Page {
                 {
                     name: "about",
                     icon: "icon-m-about",
-                    text: qsTr("Tell me about Delta Chat")
+                    text: qsTr("About Delta Chat")
                 },
                 {
                     name: "setup",
                     mark: "account",
-                    text: qsTr("Set up my profile"),
+                    text: qsTr("Set up your profile"),
                     enabled: core.status === "ready"
                 }
             ]

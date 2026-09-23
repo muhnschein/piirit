@@ -141,7 +141,7 @@ Page {
                 textFormat: Text.PlainText
                 font.pixelSize: Theme.fontSizeSmall
                 color: Theme.secondaryHighlightColor
-                text: qsTr("Messages, contacts and key in one file, saved to Documents. Whoever has the file has the profile.")
+                text: qsTr("Saves your messages, contacts and end-to-end encryption setup to a backup file. Keep this file in a safe place.")
             }
 
             Button {
@@ -151,7 +151,7 @@ Page {
                 // out twice in a row is not what anybody came here for,
                 // and the swipe below is what is left to do.
                 visible: !backup.running && page.writtenPath.length === 0
-                text: qsTr("Write the backup")
+                text: qsTr("Start backup")
                 onClicked: page.begin()
             }
 
@@ -162,7 +162,7 @@ Page {
                 minimumValue: 0
                 maximumValue: 1000
                 value: backup.permille
-                label: qsTr("Writing the backup...")
+                label: qsTr("Backing up…")
             }
 
             Button {

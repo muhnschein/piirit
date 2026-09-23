@@ -154,7 +154,7 @@ mod tests {
             r"
             import QtQuick 2.0
             Item {
-                function plain() { return qsTranslate('WelcomePage', 'Set up my profile') }
+                function plain() { return qsTranslate('WelcomePage', 'Set up your profile') }
                 function one() { return qsTranslate('GroupPage', '%n member(s)', '', 1) }
                 function many() { return qsTranslate('GroupPage', '%n member(s)', '', 3) }
                 function untranslated() { return qsTranslate('Nowhere', 'not in any catalog') }

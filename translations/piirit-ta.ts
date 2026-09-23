@@ -51,8 +51,8 @@
         <translation>Piirit chatmail ரிலேக்களுடன் மட்டுமே வேலை செய்யும். இவை ஒரு தனி வகை மின்னஞ்சல் சேவையகங்கள்; சாதாரண மின்னஞ்சல் சேவையகங்கள் ஆதரிக்கப்படுவதில்லை. மேலும் அறிய &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt; பார்க்கவும். பொது, இலவச chatmail ரிலேக்களின் முழுப் பட்டியல் &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;-இல் உள்ளது.</translation>
     </message>
     <message>
-        <source>Pick a name and a relay. That&apos;s it! There is nothing else to set up.</source>
-        <translation>ஒரு பெயரையும் ஒரு ரிலேயையும் தேர்ந்தெடுங்கள். அவ்வளவுதான்! வேறு எதையும் அமைக்க வேண்டியதில்லை.</translation>
+        <source>Choose a name and a relay. Nothing else is needed.</source>
+        <translation>ஒரு பெயரையும் ஒரு ரிலேயையும் தேர்ந்தெடுங்கள். இதைத் தவிர வேறு எதுவும் தேவையில்லை.</translation>
     </message>
 </context>
 <context>
@@ -66,24 +66,12 @@
         <translation>சுயவிவரத்தை உருவாக்கு</translation>
     </message>
     <message>
-        <source>A new address on a chatmail relay.</source>
-        <translation>ஒரு chatmail ரிலேயில் புதிய முகவரி.</translation>
-    </message>
-    <message>
         <source>Restore from a backup</source>
         <translation>காப்புப் பிரதியிலிருந்து மீட்டெடு</translation>
     </message>
     <message>
-        <source>A backup file copied onto this phone.</source>
-        <translation>இந்தத் தொலைபேசிக்கு நகலெடுக்கப்பட்ட ஒரு காப்புப் பிரதிக் கோப்பு.</translation>
-    </message>
-    <message>
         <source>Add as second device</source>
         <translation>இரண்டாவது சாதனமாகச் சேர்</translation>
-    </message>
-    <message>
-        <source>The other device keeps it. Both get everything new.</source>
-        <translation>மறு சாதனம் அதை வைத்திருக்கும். இரண்டும் புதியதெல்லாம் பெறும்.</translation>
     </message>
 </context>
 <context>
@@ -97,24 +85,12 @@
         <translation>ரிலே சேர்</translation>
     </message>
     <message>
-        <source>Another address for this profile, on another relay. The profile sends from one relay at a time; its page says which, and lets you change it.</source>
-        <translation>இந்தச் சுயவிவரத்திற்கு வேறொரு ரிலேயில் இன்னொரு முகவரி. சுயவிவரம் ஒரு நேரத்தில் ஒரே ரிலேயிலிருந்துதான் அனுப்பும்; எது என்று அதன் பக்கம் காட்டும், மாற்றவும் விடும்.</translation>
-    </message>
-    <message>
         <source>Add relay</source>
         <translation>ரிலே சேர்</translation>
     </message>
     <message>
-        <source>Contacting %1...</source>
-        <translation>%1 ஐத் தொடர்புகொள்கிறது...</translation>
-    </message>
-    <message>
         <source>Cancel</source>
         <translation>ரத்துசெய்</translation>
-    </message>
-    <message>
-        <source>Relays are run by volunteers. Try another one.</source>
-        <translation>ரிலேக்களைத் தன்னார்வலர்கள் நடத்துகிறார்கள். வேறொன்றை முயலுங்கள்.</translation>
     </message>
     <message>
         <source>Select a public chatmail relay</source>
@@ -127,6 +103,18 @@
     <message>
         <source>Piirit works only with chatmail relays. These are a particular kind of e-mail server; ordinary e-mail servers are not supported. For more, see &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. A full list of public, free-to-use chatmail relays is at &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</source>
         <translation>Piirit chatmail ரிலேக்களுடன் மட்டுமே வேலை செய்யும். இவை ஒரு தனி வகை மின்னஞ்சல் சேவையகங்கள்; சாதாரண மின்னஞ்சல் சேவையகங்கள் ஆதரிக்கப்படுவதில்லை. மேலும் அறிய &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt; பார்க்கவும். பொது, இலவச chatmail ரிலேக்களின் முழுப் பட்டியல் &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;-இல் உள்ளது.</translation>
+    </message>
+    <message>
+        <source>Adds another address for this profile on a second relay. The profile sends from one relay at a time; you can change which one on the profile page.</source>
+        <translation>இந்தச் சுயவிவரத்திற்கு இரண்டாவது ரிலேயில் மற்றொரு முகவரியைச் சேர்க்கிறது. சுயவிவரம் ஒரு நேரத்தில் ஒரு ரிலே வழியாகவே அனுப்புகிறது; எது என்பதைச் சுயவிவரப் பக்கத்தில் மாற்றலாம்.</translation>
+    </message>
+    <message>
+        <source>Contacting %1…</source>
+        <translation>%1 ஐத் தொடர்புகொள்கிறது…</translation>
+    </message>
+    <message>
+        <source>Could not reach the relay. Try another one.</source>
+        <translation>ரிலேயை அடைய முடியவில்லை. வேறொன்றை முயற்சியுங்கள்.</translation>
     </message>
 </context>
 <context>
@@ -159,14 +147,6 @@
         <source>Cancel</source>
         <translation>ரத்துசெய்</translation>
     </message>
-    <message numerus="yes">
-        <source>%n message(s) will be deleted now, and from then on every message will be once it is that old.</source>
-        <extracomment>%n is how many messages would be deleted straight away.</extracomment>
-        <translation>
-            <numerusform>%n செய்தி இப்போது நீக்கப்படும், அதன் பிறகு ஒவ்வொரு செய்தியும் அவ்வளவு பழையதானதும் நீக்கப்படும்.</numerusform>
-            <numerusform>%n செய்திகள் இப்போது நீக்கப்படும், அதன் பிறகு ஒவ்வொரு செய்தியும் அவ்வளவு பழையதானதும் நீக்கப்படும்.</numerusform>
-        </translation>
-    </message>
     <message>
         <source>This includes pictures, videos and files.</source>
         <translation>இதில் படங்கள், வீடியோக்கள் மற்றும் கோப்புகள் அடங்கும்.</translation>
@@ -184,20 +164,20 @@
         <source>I understand, delete all these messages</source>
         <translation>எனக்குப் புரிகிறது, இந்த எல்லா செய்திகளையும் நீக்கு</translation>
     </message>
+    <message numerus="yes">
+        <source>%n message(s) will be deleted now, and every new message will be deleted once it reaches that age.</source>
+        <extracomment>%n is how many messages would be deleted straight away.</extracomment>
+        <translation>
+            <numerusform>%n செய்தி இப்போது நீக்கப்படும், மேலும் ஒவ்வொரு புதிய செய்தியும் அந்த வயதை அடைந்தவுடன் நீக்கப்படும்.</numerusform>
+            <numerusform>%n செய்திகள் இப்போது நீக்கப்படும், மேலும் ஒவ்வொரு புதிய செய்தியும் அந்த வயதை அடைந்தவுடன் நீக்கப்படும்.</numerusform>
+        </translation>
+    </message>
 </context>
 <context>
     <name>BackupPage</name>
     <message>
         <source>Back up profile</source>
         <translation>சுயவிவரக் காப்புப் பிரதி</translation>
-    </message>
-    <message>
-        <source>Write the backup</source>
-        <translation>காப்புப் பிரதியை எழுது</translation>
-    </message>
-    <message>
-        <source>Writing the backup...</source>
-        <translation>காப்புப் பிரதி எழுதப்படுகிறது...</translation>
     </message>
     <message>
         <source>Cancel</source>
@@ -209,12 +189,20 @@
         <translation>%1 இல் சேமிக்கப்பட்டது</translation>
     </message>
     <message>
-        <source>Messages, contacts and key in one file, saved to Documents. Whoever has the file has the profile.</source>
-        <translation>செய்திகள், தொடர்புகள், சாவி ஆகியவை ஒரே கோப்பில், ஆவணங்களில் சேமிக்கப்படும். கோப்பு யாரிடம் உள்ளதோ சுயவிவரமும் அவரிடமே.</translation>
-    </message>
-    <message>
         <source>Swipe on for your chats.</source>
         <translation>முன்னோக்கி இழுத்து உங்கள் உரையாடல்களுக்குச் செல்லுங்கள்.</translation>
+    </message>
+    <message>
+        <source>Start backup</source>
+        <translation>காப்புப் பிரதியைத் தொடங்கு</translation>
+    </message>
+    <message>
+        <source>Backing up…</source>
+        <translation>காப்புப் பிரதி எடுக்கிறது…</translation>
+    </message>
+    <message>
+        <source>Saves your messages, contacts and end-to-end encryption setup to a backup file. Keep this file in a safe place.</source>
+        <translation>உங்கள் செய்திகள், தொடர்புகள் மற்றும் முனை-முதல்-முனை மறையாக்க அமைப்பை ஒரு காப்புப் படிவில் சேமிக்கிறது. இந்தப் படிவை பாதுகாப்பான இடத்தில் வையுங்கள்.</translation>
     </message>
 </context>
 <context>
@@ -288,10 +276,6 @@ Other groups with blocked contacts will still show their messages.</source>
 </context>
 <context>
     <name>ChatListPage</name>
-    <message>
-        <source>Lost the connection to the Delta Chat core. Reconnecting...</source>
-        <translation>Delta Chat மையத்துடனான இணைப்பு துண்டிக்கப்பட்டது. மீண்டும் இணைக்கப்படுகிறது...</translation>
-    </message>
     <message>
         <source>Lost the connection to the Delta Chat core. Restart Piirit.</source>
         <translation>Delta Chat மையத்துடனான இணைப்பு துண்டிக்கப்பட்டது. Piirit ஐ மீண்டும் தொடங்கவும்.</translation>
@@ -400,6 +384,10 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Search</source>
         <translation>தேடு</translation>
+    </message>
+    <message>
+        <source>Lost the connection to the Delta Chat core. Reconnecting…</source>
+        <translation>Delta Chat மையத்துடனான இணைப்பு துண்டிக்கப்பட்டது. மீண்டும் இணைக்கப்படுகிறது…</translation>
     </message>
 </context>
 <context>
@@ -530,10 +518,6 @@ Other groups with blocked contacts will still show their messages.</source>
 <context>
     <name>ConversationPage</name>
     <message>
-        <source>Lost the connection to the Delta Chat core. Reconnecting...</source>
-        <translation>Delta Chat மையத்துடனான இணைப்பு துண்டிக்கப்பட்டது. மீண்டும் இணைக்கப்படுகிறது...</translation>
-    </message>
-    <message>
         <source>Lost the connection to the Delta Chat core. Restart Piirit.</source>
         <translation>Delta Chat மையத்துடனான இணைப்பு துண்டிக்கப்பட்டது. Piirit ஐ மீண்டும் தொடங்கவும்.</translation>
     </message>
@@ -553,11 +537,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Message</source>
         <translation>செய்தி</translation>
-    </message>
-    <message>
-        <source>Long message: the other end sees a preview and taps to read the rest</source>
-        <extracomment>Shown above the message field while what is being written is long enough that the other end will receive a shortened version with the rest behind a tap.</extracomment>
-        <translation>நீண்ட செய்தி: மறுமுனையில் ஒரு துணுக்கு மட்டுமே தெரியும், மீதியைப் படிக்கத் தட்ட வேண்டும்</translation>
     </message>
     <message>
         <source>Saved to Pictures</source>
@@ -580,9 +559,13 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>பதிவிறக்கங்களில் சேமிக்கப்பட்டது</translation>
     </message>
     <message>
-        <source>Too big to send: %1. Attachments go up to %2.</source>
+        <source>Lost the connection to the Delta Chat core. Reconnecting…</source>
+        <translation>Delta Chat மையத்துடனான இணைப்பு துண்டிக்கப்பட்டது. மீண்டும் இணைக்கப்படுகிறது…</translation>
+    </message>
+    <message>
+        <source>%1 is too large to send. Attachments can be up to %2.</source>
         <extracomment>Shown above the message field when the attached file is bigger than will be sent. %1 is the file&apos;s size and %2 the largest that goes, each such as &quot;24 MB&quot;.</extracomment>
-        <translation>அனுப்ப மிகப் பெரியது: %1. இணைப்புகள் அதிகபட்சம் %2 வரை இருக்கலாம்.</translation>
+        <translation>%1 அனுப்ப மிகப் பெரியது. இணைப்புகள் %2 வரை இருக்கலாம்.</translation>
     </message>
 </context>
 <context>
@@ -620,14 +603,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>How do you want to delete this message? This cannot be undone.</source>
         <translation>இந்தச் செய்தியை எப்படி நீக்க வேண்டும்? இதைத் திரும்பப் பெற முடியாது.</translation>
-    </message>
-    <message>
-        <source>It goes from your devices. Everybody else keeps their copy.</source>
-        <translation>இது உங்கள் சாதனங்களிலிருந்து போய்விடும். மற்ற அனைவரும் தங்கள் நகலை வைத்திருப்பார்கள்.</translation>
-    </message>
-    <message>
-        <source>It goes from your devices, and every other device in this chat is asked to delete it too.</source>
-        <translation>இது உங்கள் சாதனங்களிலிருந்து போய்விடும், இந்த உரையாடலில் உள்ள மற்ற ஒவ்வொரு சாதனத்திடமும் அதை நீக்கும்படி கேட்கப்படும்.</translation>
     </message>
 </context>
 <context>
@@ -689,8 +664,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>%1 வினாடிகளுக்குப் பிறகு</translation>
     </message>
     <message>
-        <source>Applies to everyone in the chat. They can still copy and forward.</source>
-        <translation>உரையாடலில் உள்ள அனைவருக்கும் பொருந்தும். அவர்கள் இன்னும் நகலெடுக்கவும் அனுப்பவும் முடியும்.</translation>
+        <source>Applies to all members of this chat; they can still copy, save, and forward messages.</source>
+        <translation>இந்த அரட்டையின் எல்லா உறுப்பினர்களுக்கும் பொருந்தும்; அவர்கள் இன்னும் செய்திகளை நகலெடுக்க, சேமிக்க, முன்னனுப்ப முடியும்.</translation>
     </message>
 </context>
 <context>
@@ -706,14 +681,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Restore from a backup</source>
         <translation>காப்புப் பிரதியிலிருந்து மீட்டெடு</translation>
-    </message>
-    <message>
-        <source>The other device keeps it. Both get everything new.</source>
-        <translation>மறு சாதனம் அதை வைத்திருக்கும். இரண்டும் புதியதெல்லாம் பெறும்.</translation>
-    </message>
-    <message>
-        <source>A backup file copied onto this phone.</source>
-        <translation>இந்தத் தொலைபேசிக்கு நகலெடுக்கப்பட்ட ஒரு காப்புப் பிரதிக் கோப்பு.</translation>
     </message>
 </context>
 <context>
@@ -798,14 +765,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>உங்களை யார் தொடர்பு கொள்ளலாம் என்பதை நீங்களே தேர்வு செய்கிறீர்கள்</translation>
     </message>
     <message>
-        <source>Groups of equals</source>
-        <translation>சமமானவர்களின் குழுக்கள்</translation>
-    </message>
-    <message>
-        <source>The server only passes it on</source>
-        <translation>சேவையகம் அதை அனுப்பி வைப்பது மட்டுமே</translation>
-    </message>
-    <message>
         <source>Keep swiping to set up your profile.</source>
         <translation>சுயவிவரத்தை அமைக்கத் தொடர்ந்து விரலை இழுக்கவும்.</translation>
     </message>
@@ -814,24 +773,32 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>ஒவ்வொரு செய்தியும் மறையாக்கம் செய்யப்படுகிறது</translation>
     </message>
     <message>
-        <source>Made here on your phone. No phone number, no account, nothing to sign.</source>
-        <translation>இங்கேயே, உங்கள் தொலைபேசியில் உருவாகிறது. தொலைபேசி எண் இல்லை, கணக்கு இல்லை, கையொப்பமிட ஒன்றுமில்லை.</translation>
+        <source>Your profile is created on this phone. No phone number and no sign-up are needed.</source>
+        <translation>உங்கள் சுயவிவரம் இந்தத் தொலைபேசியிலேயே உருவாக்கப்படுகிறது. தொலைபேசி எண்ணும் தேவையில்லை, பதிவும் தேவையில்லை.</translation>
     </message>
     <message>
-        <source>There is no directory to be found in. Show a friend a code, or send a link.</source>
-        <translation>உங்களைக் கண்டறியும் பட்டியல் எதுவும் இல்லை. நண்பருக்குக் குறியீட்டைக் காட்டுங்கள், அல்லது இணைப்பை அனுப்புங்கள்.</translation>
+        <source>There is no public directory. People reach you by scanning your invite code or opening your invite link.</source>
+        <translation>பொது அடைவு எதுவும் இல்லை. மற்றவர்கள் உங்கள் அழைப்புக் குறியீட்டை வருடியோ உங்கள் அழைப்பு இணைப்பைத் திறந்தோ உங்களை அடைகிறார்கள்.</translation>
     </message>
     <message>
-        <source>Encrypted the whole way, always. The servers cannot read a word.</source>
-        <translation>எப்போதும் முழுவழியும் மறைகுறியாக்கம். சேவையகங்கள் ஒரு சொல்லும் படிக்காது.</translation>
+        <source>Any member can add people, rename the group or leave it.</source>
+        <translation>எந்த உறுப்பினரும் ஆட்களைச் சேர்க்கலாம், குழுவின் பெயரை மாற்றலாம் அல்லது குழுவை விட்டு வெளியேறலாம்.</translation>
     </message>
     <message>
-        <source>Anyone can add a friend, rename the group or leave. Nobody is in charge.</source>
-        <translation>யார் வேண்டுமானாலும் நண்பரைச் சேர்க்கலாம், குழுவின் பெயரை மாற்றலாம் அல்லது விலகலாம். யாரும் தலைவர் இல்லை.</translation>
+        <source>Messages are end-to-end encrypted, so the relays that carry them cannot read them.</source>
+        <translation>செய்திகள் முனை-முதல்-முனை மறையாக்கம் செய்யப்படுகின்றன, எனவே அவற்றைச் சுமக்கும் ரிலேக்களால் அவற்றைப் படிக்க முடியாது.</translation>
     </message>
     <message>
-        <source>It holds a message until the other phone is online, and nothing more.</source>
-        <translation>மறு தொலைபேசி இணையும் வரை செய்தியை வைத்திருக்கும், அவ்வளவுதான்.</translation>
+        <source>Groups have no admins</source>
+        <translation>குழுக்களுக்கு நிர்வாகிகள் இல்லை</translation>
+    </message>
+    <message>
+        <source>Relays only pass messages on</source>
+        <translation>ரிலேக்கள் செய்திகளை அனுப்பி வைப்பது மட்டுமே செய்கின்றன</translation>
+    </message>
+    <message>
+        <source>A relay stores a message only until the recipient fetches it.</source>
+        <translation>பெறுநர் எடுத்துக்கொள்ளும் வரை மட்டுமே ரிலே செய்தியை வைத்திருக்கும்.</translation>
     </message>
 </context>
 <context>
@@ -962,12 +929,12 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>இன்னும் தொடர்புகள் இல்லை</translation>
     </message>
     <message>
-        <source>Scan someone&apos;s invite from the chat list: QR code</source>
-        <translation>அரட்டைப் பட்டியலிலிருந்து ஒருவரின் அழைப்பை ஸ்கேன் செய்யவும்: QR குறியீடு</translation>
-    </message>
-    <message>
         <source>Search</source>
         <translation>தேடு</translation>
+    </message>
+    <message>
+        <source>Use &quot;QR code&quot; in the chat list to add a contact.</source>
+        <translation>தொடர்பைச் சேர்க்க, அரட்டைப் பட்டியலில் &quot;QR குறியீடு&quot; ஐப் பயன்படுத்துங்கள்.</translation>
     </message>
 </context>
 <context>
@@ -975,10 +942,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Please name the group</source>
         <translation>குழுவிற்கு ஒரு பெயர் இடவும்</translation>
-    </message>
-    <message>
-        <source>Create Group</source>
-        <translation>குழுவை உருவாக்கு</translation>
     </message>
     <message>
         <source>New group</source>
@@ -1011,6 +974,10 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Add members</source>
         <translation>உறுப்பினர்களைச் சேர்</translation>
+    </message>
+    <message>
+        <source>Create group</source>
+        <translation>குழுவை உருவாக்கு</translation>
     </message>
 </context>
 <context>
@@ -1083,10 +1050,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>ரிலே தனது ஒதுக்கீட்டை இன்னும் தெரிவிக்கவில்லை</translation>
     </message>
     <message>
-        <source>Both ways: with this off you send none and see none.</source>
-        <translation>இரு பக்கமும்: அணைத்திருந்தால் நீங்கள் ஒன்றும் அனுப்புவதில்லை, ஒன்றும் காண்பதில்லை.</translation>
-    </message>
-    <message>
         <source>Relays</source>
         <translation>ரிலேக்கள்</translation>
     </message>
@@ -1121,16 +1084,16 @@ Other groups with blocked contacts will still show their messages.</source>
         <extracomment>How much room the profile takes on the phone. %1 is a size such as &quot;12.3 MB&quot;.</extracomment>
         <translation>Piirit இந்தத் தொலைபேசியில் %1 சேமிப்பிடத்தைப் பயன்படுத்துகிறது.</translation>
     </message>
+    <message>
+        <source>If read receipts are disabled, you won&apos;t be able to see read receipts from others.</source>
+        <translation>வாசிப்பு ரசீதுகள் முடக்கப்பட்டிருந்தால், மற்றவர்களிடமிருந்து வாசிப்பு ரசீதுகளை நீங்கள்</translation>
+    </message>
 </context>
 <context>
     <name>ProfileSetupPage</name>
     <message>
         <source>Add profile</source>
         <translation>சுயவிவரத்தைச் சேர்</translation>
-    </message>
-    <message>
-        <source>Contacting %1...</source>
-        <translation>%1 ஐத் தொடர்புகொள்கிறது...</translation>
     </message>
     <message>
         <source>Cancel</source>
@@ -1145,16 +1108,16 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>%1 %2 வினாடிகளுக்குள் பதிலளிக்கவில்லை.</translation>
     </message>
     <message>
-        <source>Relays are run by volunteers. Go back and try another one.</source>
-        <translation>ரிலேக்களைத் தன்னார்வலர்கள் நடத்துகிறார்கள். பின்செல்லுங்கள், வேறொன்றை முயலுங்கள்.</translation>
+        <source>Contacting %1…</source>
+        <translation>%1 ஐத் தொடர்புகொள்கிறது…</translation>
+    </message>
+    <message>
+        <source>Could not reach the relay. Try another one.</source>
+        <translation>ரிலேயை அடைய முடியவில்லை. வேறொன்றை முயற்சியுங்கள்.</translation>
     </message>
 </context>
 <context>
     <name>ProfileStartPage</name>
-    <message>
-        <source>Alright, let&apos;s get you set up.</source>
-        <translation>சரி, உங்கள் சுயவிவரத்தை அமைப்போம்.</translation>
-    </message>
     <message>
         <source>I already have a profile</source>
         <translation>என்னிடம் ஏற்கனவே சுயவிவரம் உள்ளது</translation>
@@ -1162,6 +1125,10 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Create a profile</source>
         <translation>சுயவிவரத்தை உருவாக்கு</translation>
+    </message>
+    <message>
+        <source>Set up your profile</source>
+        <translation>உங்கள் சுயவிவரத்தை அமையுங்கள்</translation>
     </message>
 </context>
 <context>
@@ -1227,16 +1194,16 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>இந்தக் குறியீட்டை யாரையாவது ஸ்கேன் செய்ய விடுங்கள், அல்லது அவர்களுக்கு இணைப்பை அனுப்புங்கள்.</translation>
     </message>
     <message>
-        <source>Fetching...</source>
-        <translation>பெறப்படுகிறது...</translation>
-    </message>
-    <message>
-        <source>Copy Invite Link</source>
-        <translation>அழைப்பு இணைப்பை நகலெடு</translation>
-    </message>
-    <message>
         <source>The camera is not available on this device.</source>
         <translation>இந்தச் சாதனத்தில் கேமரா கிடைக்கவில்லை.</translation>
+    </message>
+    <message>
+        <source>Fetching…</source>
+        <translation>பெறப்படுகிறது…</translation>
+    </message>
+    <message>
+        <source>Copy invite link</source>
+        <translation>அழைப்பு இணைப்பை நகலெடு</translation>
     </message>
 </context>
 <context>
@@ -1254,10 +1221,6 @@ Other groups with blocked contacts will still show their messages.</source>
 <context>
     <name>RestoreProfilePage</name>
     <message>
-        <source>That is not the code a device shows while it is offering its profile.</source>
-        <translation>ஒரு சாதனம் தன் சுயவிவரத்தை வழங்கும்போது காட்டும் குறியீடு இதுவல்ல.</translation>
-    </message>
-    <message>
         <source>Add as second device</source>
         <translation>இரண்டாவது சாதனமாகச் சேர்</translation>
     </message>
@@ -1270,16 +1233,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>காப்புக் கோப்பைத் தேர்ந்தெடு</translation>
     </message>
     <message>
-        <source>Taking the profile over...</source>
-        <translation>சுயவிவரம் பெறப்படுகிறது...</translation>
-    </message>
-    <message>
         <source>Cancel</source>
         <translation>ரத்துசெய்</translation>
-    </message>
-    <message>
-        <source>Hold the phone up to the code it shows</source>
-        <translation>அது காட்டும் குறியீட்டை நோக்கி இந்தத் தொலைபேசியைப் பிடிக்கவும்</translation>
     </message>
     <message>
         <source>Enter the code instead</source>
@@ -1288,10 +1243,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Code from the other device</source>
         <translation>மற்ற சாதனத்தின் குறியீடு</translation>
-    </message>
-    <message>
-        <source>Take the profile over</source>
-        <translation>சுயவிவரத்தைப் பெறு</translation>
     </message>
     <message>
         <source>That did not work</source>
@@ -1306,28 +1257,44 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>வேறு கோப்பைத் தேர்ந்தெடு</translation>
     </message>
     <message>
-        <source>The other device runs a newer Delta Chat than this app can read.</source>
-        <translation>மறு சாதனத்தில் உள்ள Delta Chat, இந்தச் செயலியால் படிக்க முடியாத அளவுக்குப் புதியது.</translation>
-    </message>
-    <message>
-        <source>The transfer stopped. Both devices have to stay on one network, with this page open.</source>
-        <translation>இடமாற்றம் நின்றுவிட்டது. இரு சாதனங்களும் ஒரே வலையமைப்பில் இருக்க வேண்டும், இந்தப் பக்கம் திறந்திருக்க வேண்டும்.</translation>
-    </message>
-    <message>
-        <source>No camera on this device. A backup file works without one.</source>
-        <translation>இந்தச் சாதனத்தில் கேமரா இல்லை. காப்புப் பிரதிக் கோப்பு அது இல்லாமலும் வேலை செய்யும்.</translation>
-    </message>
-    <message>
-        <source>On the other device: Settings, then add a second device. Both on one network.</source>
-        <translation>மறு சாதனத்தில்: அமைப்புகள், பிறகு இரண்டாவது சாதனத்தைச் சேர்க்கவும். இரண்டும் ஒரே வலையமைப்பில்.</translation>
-    </message>
-    <message>
         <source>Make a backup on the other device, copy the file here, then choose it.</source>
         <translation>மறு சாதனத்தில் காப்புப் பிரதி எடுத்து, கோப்பை இங்கே நகலெடுத்து, பிறகு அதைத் தேர்ந்தெடுங்கள்.</translation>
     </message>
     <message>
         <source>That profile is already on this phone. Open it from the profiles list.</source>
         <translation>இந்தச் சுயவிவரம் ஏற்கெனவே இந்தத் தொலைபேசியில் உள்ளது. சுயவிவரங்கள் பட்டியலில் இருந்து அதைத் திறங்கள்.</translation>
+    </message>
+    <message>
+        <source>The profile is from a newer Delta Chat version than this app can read.</source>
+        <translation>இந்தச் சுயவிவரம், இந்தச் செயலியால் படிக்க முடிந்ததை விடப் புதிய Delta Chat பதிப்பைச் சேர்ந்தது.</translation>
+    </message>
+    <message>
+        <source>The transfer stopped. Both devices must stay on the same network with this page open.</source>
+        <translation>பரிமாற்றம் நின்றுவிட்டது. இரண்டு சாதனங்களும் ஒரே வலையமைப்பில் இருக்க வேண்டும், இந்தப் பக்கமும் திறந்திருக்க வேண்டும்.</translation>
+    </message>
+    <message>
+        <source>This is not a second-device code. Use the code shown by the other device.</source>
+        <translation>இது இரண்டாவது சாதனத்தின் குறியீடு அல்ல. மற்ற சாதனம் காட்டும் குறியீட்டைப் பயன்படுத்துங்கள்.</translation>
+    </message>
+    <message>
+        <source>Hold your camera over the QR code</source>
+        <translation>உங்கள் கேமராவை QR குறியீட்டின் மேல் பிடியுங்கள்</translation>
+    </message>
+    <message>
+        <source>Copy the profile</source>
+        <translation>சுயவிவரத்தை நகலெடு</translation>
+    </message>
+    <message>
+        <source>No camera on this device. You can restore from a backup file instead.</source>
+        <translation>இந்தச் சாதனத்தில் கேமரா இல்லை. அதற்குப் பதிலாக காப்புப் படிவிலிருந்து மீட்டெடுக்கலாம்.</translation>
+    </message>
+    <message>
+        <source>On the other device, go to Settings and tap &quot;Add second device&quot;. Both devices must be on the same network.</source>
+        <translation>மற்ற சாதனத்தில் அமைப்புகளுக்குச் சென்று &quot;இரண்டாவது சாதனத்தைச் சேர்&quot; என்பதைத் தட்டுங்கள். இரண்டு சாதனங்களும் ஒரே வலையமைப்பில் இருக்க வேண்டும்.</translation>
+    </message>
+    <message>
+        <source>Transferring…</source>
+        <translation>பரிமாற்றம்…</translation>
     </message>
 </context>
 <context>
@@ -1379,40 +1346,20 @@ Other groups with blocked contacts will still show their messages.</source>
 <context>
     <name>SecondDevicePage</name>
     <message>
-        <source>Nothing took the profile. Both phones have to stay on one network, with this page open.</source>
-        <translation>சுயவிவரத்தை யாரும் எடுக்கவில்லை. இரு தொலைபேசிகளும் ஒரே வலையமைப்பில் இருக்க வேண்டும், இந்தப் பக்கம் திறந்திருக்க வேண்டும்.</translation>
-    </message>
-    <message>
         <source>Add a second device</source>
         <translation>இரண்டாவது சாதனத்தைச் சேர்</translation>
-    </message>
-    <message>
-        <source>On the other device: add a profile you have already, then &quot;Add as second device&quot;, and read this code with it. Both phones on one network.</source>
-        <translation>மறு சாதனத்தில்: உங்களிடம் ஏற்கனவே உள்ள ஒரு சுயவிவரத்தைச் சேர்க்கவும், பிறகு “இரண்டாவது சாதனமாகச் சேர்”, அதைக் கொண்டு இந்தக் குறியீட்டைப் படிக்கவும். இரு தொலைபேசிகளும் ஒரே வலையமைப்பில்.</translation>
     </message>
     <message>
         <source>Copy the code</source>
         <translation>குறியீட்டை நகலெடு</translation>
     </message>
     <message>
-        <source>Handing the profile over...</source>
-        <translation>சுயவிவரம் ஒப்படைக்கப்படுகிறது...</translation>
-    </message>
-    <message>
         <source>Cancel</source>
         <translation>ரத்துசெய்</translation>
     </message>
     <message>
-        <source>The other device has the profile. Both get everything new from now on.</source>
-        <translation>மறு சாதனத்திடம் சுயவிவரம் உள்ளது. இனி இரண்டும் புதியதெல்லாம் பெறும்.</translation>
-    </message>
-    <message>
         <source>Swipe on for your chats.</source>
         <translation>முன்னோக்கி இழுத்து உங்கள் உரையாடல்களுக்குச் செல்லுங்கள்.</translation>
-    </message>
-    <message>
-        <source>Whoever reads this code gets the profile. It stops collecting mail until the code is gone.</source>
-        <translation>இந்தக் குறியீட்டைப் படிப்பவருக்கே சுயவிவரம். குறியீடு இருக்கும் வரை அது அஞ்சலைப் பெறுவதை நிறுத்தி வைக்கும்.</translation>
     </message>
     <message>
         <source>Show code again</source>
@@ -1421,6 +1368,26 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Show code</source>
         <translation>குறியீட்டைக் காட்டு</translation>
+    </message>
+    <message>
+        <source>No device copied the profile. Both devices must stay on the same network with this page open.</source>
+        <translation>எந்தச் சாதனமும் சுயவிவரத்தை நகலெடுக்கவில்லை. இரண்டு சாதனங்களும் ஒரே வலையமைப்பில் இருக்க வேண்டும், இந்தப் பக்கமும் திறந்திருக்க வேண்டும்.</translation>
+    </message>
+    <message>
+        <source>Transferring…</source>
+        <translation>பரிமாற்றம்…</translation>
+    </message>
+    <message>
+        <source>The profile was transferred to your second device. Both devices now receive all new messages.</source>
+        <translation>சுயவிவரம் உங்கள் இரண்டாவது சாதனத்திற்கு மாற்றப்பட்டது. இப்போது இரண்டு சாதனங்களும் எல்லா புதிய செய்திகளையும் பெறுகின்றன.</translation>
+    </message>
+    <message>
+        <source>On the other device, choose &quot;Add as second device&quot; and scan this code. Both devices must be on the same network.</source>
+        <translation>மற்ற சாதனத்தில் &quot;இரண்டாவது சாதனமாகச் சேர்&quot; என்பதைத் தேர்ந்தெடுத்து, இந்தக் குறியீட்டை வருடுங்கள். இரண்டு சாதனங்களும் ஒரே வலையமைப்பில் இருக்க வேண்டும்.</translation>
+    </message>
+    <message>
+        <source>Make sure no unwanted observer or camera can see this code. This profile does not receive messages while the code is shown.</source>
+        <translation>விரும்பத்தகாத எவரும், எந்தக் கேமராவும் இந்தக் குறியீட்டைப் பார்க்க முடியாதபடி பார்த்துக்கொள்ளுங்கள். குறியீடு காட்டப்படும் வரை இந்தச் சுயவிவரம் செய்திகளைப் பெறாது.</translation>
     </message>
 </context>
 <context>
@@ -1474,18 +1441,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>அறிவிப்புகள்</translation>
     </message>
     <message>
-        <source>Who wrote, and what</source>
-        <translation>யார் எழுதினார், என்ன எழுதினார்</translation>
-    </message>
-    <message>
-        <source>Who wrote</source>
-        <translation>யார் எழுதினார்</translation>
-    </message>
-    <message>
-        <source>Only that something arrived</source>
-        <translation>ஏதோ வந்தது என்பது மட்டும்</translation>
-    </message>
-    <message>
         <source>Apps</source>
         <translation>செயலிகள்</translation>
     </message>
@@ -1519,10 +1474,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>சாதனத்திலிருந்து செய்திகளை நீக்கு</translation>
     </message>
     <message>
-        <source>A new notification shows</source>
-        <translation>புதிய அறிவிப்பு காட்டுவது</translation>
-    </message>
-    <message>
         <source>Mentions</source>
         <extracomment>A reply to one of the reader&apos;s own messages, arriving in a group they have muted.</extracomment>
         <translation>குறிப்பிடல்கள்</translation>
@@ -1537,49 +1488,12 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>மார்க்டௌன் வடிவமைப்பைப் பயன்படுத்து</translation>
     </message>
     <message>
-        <source>Otherwise it starts a new line, and the button sends.</source>
-        <translation>இல்லையெனில் அது புதிய வரியைத் தொடங்கும், பொத்தான் அனுப்பும்.</translation>
-    </message>
-    <message>
-        <source>Draws *stars* and `backticks` rather than showing them.</source>
-        <translation>*நட்சத்திரங்களையும்* `பின்மேற்கோள்களையும்` காட்டாமல் வடிவமாக வரையும்.</translation>
-    </message>
-    <message>
-        <source>Bigger ones wait until you ask for them. Every profile, from now on.</source>
-        <translation>பெரியவை நீங்கள் கேட்கும் வரை காத்திருக்கும். எல்லாச் சுயவிவரங்களும், இனிமேல்.</translation>
-    </message>
-    <message>
-        <source>Every chat of every profile. &quot;Saved messages&quot; are kept.</source>
-        <translation>ஒவ்வொரு சுயவிவரத்தின் ஒவ்வொரு உரையாடலும். “சேமித்த செய்திகள்” இருக்கும்.</translation>
-    </message>
-    <message>
-        <source>On the lock screen and in the notification area.</source>
-        <translation>பூட்டுத் திரையிலும் அறிவிப்புப் பகுதியிலும்.</translation>
-    </message>
-    <message>
-        <source>A reply to you gets through a muted group.</source>
-        <translation>உங்களுக்கான பதில் அமைதியாக்கிய குழுவிலிருந்தும் வந்து சேரும்.</translation>
-    </message>
-    <message>
-        <source>Click ids and campaign tags come out of the links you send.</source>
-        <translation>கிளிக் அடையாளங்களும் பிரச்சாரக் குறிச்சொற்களும் நீங்கள் அனுப்பும் இணைப்புகளிலிருந்து விலகும்.</translation>
-    </message>
-    <message>
-        <source>Small apps run inside the chat. Somebody else&apos;s code, and less tested than the rest.</source>
-        <translation>சிறு செயலிகள் உரையாடலுக்குள்ளேயே இயங்கும். பிறரின் நிரல், மற்றவற்றை விடச் சோதிக்கப்படாதது.</translation>
-    </message>
-    <message>
         <source>Privacy</source>
         <translation>தனியுரிமை</translation>
     </message>
     <message>
         <source>Blocked contacts</source>
         <translation>தடுக்கபட்ட தொடர்புகள்</translation>
-    </message>
-    <message>
-        <source>Worse quality, save data</source>
-        <extracomment>Outgoing media quality: smaller pictures and videos, which cost the reader and whoever they write to less data. Both reference clients&apos; words for it.</extracomment>
-        <translation>குறைந்த தரம், குறைந்த தரவு</translation>
     </message>
     <message>
         <source>Balanced</source>
@@ -1592,12 +1506,41 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>அனுப்பப்படும் ஊடகத்தின் தரம்</translation>
     </message>
     <message>
-        <source>Pictures are made smaller before sending, and the camera records at this quality.</source>
-        <translation>படங்கள் அனுப்பும் முன் சிறிதாக்கப்படும், கேமராவும் இதே தரத்தில் பதிவு செய்யும்.</translation>
-    </message>
-    <message>
         <source>Show notifications</source>
         <translation>அறிவிப்புகளைக் காட்டு</translation>
+    </message>
+    <message>
+        <source>Lower quality, less data</source>
+        <extracomment>Outgoing media quality: smaller pictures and videos, which cost the reader and whoever they write to less data. Both reference clients&apos; words for it.</extracomment>
+        <translation>குறைந்த தரம், குறைந்த தரவு</translation>
+    </message>
+    <message>
+        <source>Notification content</source>
+        <translation>அறிவிப்பின் உள்ளடக்கம்</translation>
+    </message>
+    <message>
+        <source>Sender and message</source>
+        <translation>அனுப்புநரும் செய்தியும்</translation>
+    </message>
+    <message>
+        <source>Sender only</source>
+        <translation>அனுப்புநர் மட்டும்</translation>
+    </message>
+    <message>
+        <source>No details</source>
+        <translation>விவரங்கள் இல்லை</translation>
+    </message>
+    <message>
+        <source>In muted groups, notify messages directed to you, like replies or reactions</source>
+        <translation>ஒலியடக்கிய குழுக்களில் உங்களுக்கு நேராக வந்த செய்திகளை, பதில்கள் அல்லது எதிர்வினைகள் போன்றவற்றை, அறிவி</translation>
+    </message>
+    <message>
+        <source>Removes click IDs and campaign tags from links you send.</source>
+        <translation>நீங்கள் அனுப்பும் இணைப்புகளிலிருந்து சொடுக்கு ஐடிகளையும் பிரச்சாரக் குறிச்சொற்களையும் நீக்குகிறது.</translation>
+    </message>
+    <message>
+        <source>Runs small apps inside chats. These features may be unstable and may be changed or removed.</source>
+        <translation>அரட்டைகளுக்குள் சிறு செயலிகளை இயக்குகிறது. இந்த வசதிகள் நிலையற்றவையாக இருக்கலாம், மாற்றப்படலாம் அல்லது நீக்கப்படலாம்.</translation>
     </message>
 </context>
 <context>
@@ -1670,16 +1613,16 @@ Other groups with blocked contacts will still show their messages.</source>
 <context>
     <name>WelcomePage</name>
     <message>
-        <source>Tell me about Delta Chat</source>
-        <translation>Delta Chat என்றால் என்ன?</translation>
-    </message>
-    <message>
-        <source>Set up my profile</source>
-        <translation>என் சுயவிவரத்தை அமை</translation>
-    </message>
-    <message>
         <source>Secure decentralised chat based on Delta Chat</source>
         <translation>Delta Chat அடிப்படையிலான பாதுகாப்பான, பரவலாக்கப்பட்ட அரட்டை</translation>
+    </message>
+    <message>
+        <source>About Delta Chat</source>
+        <translation>Delta Chat பற்றி</translation>
+    </message>
+    <message>
+        <source>Set up your profile</source>
+        <translation>உங்கள் சுயவிவரத்தை அமையுங்கள்</translation>
     </message>
 </context>
 </TS>

@@ -51,8 +51,8 @@
         <translation>Piirit бары chatmail релелары белән генә эшли. Алар – электрон почта серверларының аерым төре; гадәти электрон почта серверлары кулланылмый. Тулырак: &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. Гомуми, бушлай chatmail релеларының тулы исемлеге &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; адресында.</translation>
     </message>
     <message>
-        <source>Pick a name and a relay. That&apos;s it! There is nothing else to set up.</source>
-        <translation>Исем һәм реле сайлагыз. Шул гына! Башка бернәрсә көйләргә кирәкми.</translation>
+        <source>Choose a name and a relay. Nothing else is needed.</source>
+        <translation>Исем һәм реле сайлагыз. Башка бернәрсә дә кирәкми.</translation>
     </message>
 </context>
 <context>
@@ -66,24 +66,12 @@
         <translation>Профиль ясарга</translation>
     </message>
     <message>
-        <source>A new address on a chatmail relay.</source>
-        <translation>Chatmail реледа яңа адрес.</translation>
-    </message>
-    <message>
         <source>Restore from a backup</source>
         <translation>Резерв күчермәдән торгызырга</translation>
     </message>
     <message>
-        <source>A backup file copied onto this phone.</source>
-        <translation>Бу телефонга күчерелгән резерв күчермә файлы.</translation>
-    </message>
-    <message>
         <source>Add as second device</source>
         <translation>Икенче җиһаз итеп өстәргә</translation>
-    </message>
-    <message>
-        <source>The other device keeps it. Both get everything new.</source>
-        <translation>Икенче җиһаз аны саклый. Икесе дә барлык яңалыкны ала.</translation>
     </message>
 </context>
 <context>
@@ -97,24 +85,12 @@
         <translation>Реле өстәргә</translation>
     </message>
     <message>
-        <source>Another address for this profile, on another relay. The profile sends from one relay at a time; its page says which, and lets you change it.</source>
-        <translation>Бу профиль өчен башка реледә тагын бер адрес. Профиль бер вакытта бер реле аша гына җибәрә; кайсысы икәнен аның бите күрсәтә һәм үзгәртергә мөмкинлек бирә.</translation>
-    </message>
-    <message>
         <source>Add relay</source>
         <translation>Реле өстәргә</translation>
     </message>
     <message>
-        <source>Contacting %1...</source>
-        <translation>%1 белән элемтә...</translation>
-    </message>
-    <message>
         <source>Cancel</source>
         <translation>Баш тартырга</translation>
-    </message>
-    <message>
-        <source>Relays are run by volunteers. Try another one.</source>
-        <translation>Релеларны ирекле кешеләр тота. Башкасын сынап карагыз.</translation>
     </message>
     <message>
         <source>Select a public chatmail relay</source>
@@ -127,6 +103,18 @@
     <message>
         <source>Piirit works only with chatmail relays. These are a particular kind of e-mail server; ordinary e-mail servers are not supported. For more, see &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. A full list of public, free-to-use chatmail relays is at &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</source>
         <translation>Piirit бары chatmail релелары белән генә эшли. Алар – электрон почта серверларының аерым төре; гадәти электрон почта серверлары кулланылмый. Тулырак: &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. Гомуми, бушлай chatmail релеларының тулы исемлеге &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; адресында.</translation>
+    </message>
+    <message>
+        <source>Adds another address for this profile on a second relay. The profile sends from one relay at a time; you can change which one on the profile page.</source>
+        <translation>Бу профильгә икенче реледә тагын бер адрес өсти. Профиль бер вакытта бер реле аша җибәрә; кайсысы икәнен профиль битендә үзгәртә аласыз.</translation>
+    </message>
+    <message>
+        <source>Contacting %1…</source>
+        <translation>%1 белән элемтә…</translation>
+    </message>
+    <message>
+        <source>Could not reach the relay. Try another one.</source>
+        <translation>Реле белән бәйләнешкә кереп булмады. Башкасын сынап карагыз.</translation>
     </message>
 </context>
 <context>
@@ -159,13 +147,6 @@
         <source>Cancel</source>
         <translation>Баш тартырга</translation>
     </message>
-    <message numerus="yes">
-        <source>%n message(s) will be deleted now, and from then on every message will be once it is that old.</source>
-        <extracomment>%n is how many messages would be deleted straight away.</extracomment>
-        <translation>
-            <numerusform>%n хәбәр хәзер бетереләчәк, аннары һәр хәбәр шулкадәр искергәч бетереләчәк.</numerusform>
-        </translation>
-    </message>
     <message>
         <source>This includes pictures, videos and files.</source>
         <translation>Моңа рәсемнәр, видеолар һәм файллар да керә.</translation>
@@ -183,20 +164,19 @@
         <source>I understand, delete all these messages</source>
         <translation>Аңлыйм, бу хәбәрләрнең барысын да бетерергә</translation>
     </message>
+    <message numerus="yes">
+        <source>%n message(s) will be deleted now, and every new message will be deleted once it reaches that age.</source>
+        <extracomment>%n is how many messages would be deleted straight away.</extracomment>
+        <translation>
+            <numerusform>%n хәбәр хәзер бетереләчәк, һәм һәр яңа хәбәр шул яшькә җиткәч бетереләчәк.</numerusform>
+        </translation>
+    </message>
 </context>
 <context>
     <name>BackupPage</name>
     <message>
         <source>Back up profile</source>
         <translation>Профильнең резерв күчермәсе</translation>
-    </message>
-    <message>
-        <source>Write the backup</source>
-        <translation>Резерв күчермә язарга</translation>
-    </message>
-    <message>
-        <source>Writing the backup...</source>
-        <translation>Резерв күчермә языла...</translation>
     </message>
     <message>
         <source>Cancel</source>
@@ -208,12 +188,20 @@
         <translation>%1 эченә сакланды</translation>
     </message>
     <message>
-        <source>Messages, contacts and key in one file, saved to Documents. Whoever has the file has the profile.</source>
-        <translation>Хатлар, контактлар һәм ачкыч бер файлда, «Документлар»га сакланган. Файл кемдә — профиль дә шунда.</translation>
-    </message>
-    <message>
         <source>Swipe on for your chats.</source>
         <translation>Сөйләшүләрегезгә таба сыпырыгыз.</translation>
+    </message>
+    <message>
+        <source>Start backup</source>
+        <translation>Резерв күчермә ясауны башлау</translation>
+    </message>
+    <message>
+        <source>Backing up…</source>
+        <translation>Резерв күчермә ясала…</translation>
+    </message>
+    <message>
+        <source>Saves your messages, contacts and end-to-end encryption setup to a backup file. Keep this file in a safe place.</source>
+        <translation>Хәбәрләрегезне, контактларыгызны һәм очтан-очка шифрлау көйләүләрен резерв күчермә файлына саклый. Бу файлны ышанычлы урында тотыгыз.</translation>
     </message>
 </context>
 <context>
@@ -291,10 +279,6 @@ Other groups with blocked contacts will still show their messages.</source>
 </context>
 <context>
     <name>ChatListPage</name>
-    <message>
-        <source>Lost the connection to the Delta Chat core. Reconnecting...</source>
-        <translation>Delta Chat үзәге белән элемтә өзелде. Яңадан тоташу...</translation>
-    </message>
     <message>
         <source>Lost the connection to the Delta Chat core. Restart Piirit.</source>
         <translation>Delta Chat үзәге белән элемтә өзелде. Piirit&apos;ны яңадан җибәрегез.</translation>
@@ -403,6 +387,10 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Search</source>
         <translation>Эзләү</translation>
+    </message>
+    <message>
+        <source>Lost the connection to the Delta Chat core. Reconnecting…</source>
+        <translation>Delta Chat үзәге белән элемтә өзелде. Яңадан тоташу…</translation>
     </message>
 </context>
 <context>
@@ -533,10 +521,6 @@ Other groups with blocked contacts will still show their messages.</source>
 <context>
     <name>ConversationPage</name>
     <message>
-        <source>Lost the connection to the Delta Chat core. Reconnecting...</source>
-        <translation>Delta Chat үзәге белән элемтә өзелде. Яңадан тоташу...</translation>
-    </message>
-    <message>
         <source>Lost the connection to the Delta Chat core. Restart Piirit.</source>
         <translation>Delta Chat үзәге белән элемтә өзелде. Piirit&apos;ны яңадан җибәрегез.</translation>
     </message>
@@ -558,11 +542,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Хәбәр</translation>
     </message>
     <message>
-        <source>Long message: the other end sees a preview and taps to read the rest</source>
-        <extracomment>Shown above the message field while what is being written is long enough that the other end will receive a shortened version with the rest behind a tap.</extracomment>
-        <translation>Озын хат: икенче якта өземтә генә күренә, калганын уку өчен басарга кирәк</translation>
-    </message>
-    <message>
         <source>Saved to Pictures</source>
         <translation>Рәсемнәргә сакланды</translation>
     </message>
@@ -582,9 +561,13 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Йөкләүләргә сакланды</translation>
     </message>
     <message>
-        <source>Too big to send: %1. Attachments go up to %2.</source>
+        <source>Lost the connection to the Delta Chat core. Reconnecting…</source>
+        <translation>Delta Chat үзәге белән элемтә өзелде. Яңадан тоташу…</translation>
+    </message>
+    <message>
+        <source>%1 is too large to send. Attachments can be up to %2.</source>
         <extracomment>Shown above the message field when the attached file is bigger than will be sent. %1 is the file&apos;s size and %2 the largest that goes, each such as &quot;24 MB&quot;.</extracomment>
-        <translation>Җибәрү өчен артык зур: %1. Кушымталар иң күбе %2 булырга мөмкин.</translation>
+        <translation>%1 җибәрү өчен артык зур. Кушымталар %2 кадәр була ала.</translation>
     </message>
 </context>
 <context>
@@ -622,14 +605,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>How do you want to delete this message? This cannot be undone.</source>
         <translation>Бу хәбәрне ничек бетерергә телисез? Моны кире кайтарып булмый.</translation>
-    </message>
-    <message>
-        <source>It goes from your devices. Everybody else keeps their copy.</source>
-        <translation>Ул сезнең җиһазлардан юкка чыга. Калганнарның һәрберсендә күчермә кала.</translation>
-    </message>
-    <message>
-        <source>It goes from your devices, and every other device in this chat is asked to delete it too.</source>
-        <translation>Ул сезнең җиһазлардан юкка чыга, ә бу әңгәмәдәге башка һәр җиһазга аны бетерергә сорау җибәрелә.</translation>
     </message>
 </context>
 <context>
@@ -691,8 +666,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>%1 секундтан соң</translation>
     </message>
     <message>
-        <source>Applies to everyone in the chat. They can still copy and forward.</source>
-        <translation>Сөйләшүдәге барысына да кагыла. Алар барыбер күчерә һәм җибәрә ала.</translation>
+        <source>Applies to all members of this chat; they can still copy, save, and forward messages.</source>
+        <translation>Бу әңгәмәнең барлык әгъзаларына кагыла; алар һаман да хәбәрләрне күчерә, саклый һәм алга җибәрә ала.</translation>
     </message>
 </context>
 <context>
@@ -708,14 +683,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Restore from a backup</source>
         <translation>Резерв күчермәдән торгызырга</translation>
-    </message>
-    <message>
-        <source>The other device keeps it. Both get everything new.</source>
-        <translation>Икенче җиһаз аны саклый. Икесе дә барлык яңалыкны ала.</translation>
-    </message>
-    <message>
-        <source>A backup file copied onto this phone.</source>
-        <translation>Бу телефонга күчерелгән резерв күчермә файлы.</translation>
     </message>
 </context>
 <context>
@@ -798,14 +765,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Сезгә кем яза ала, шуны сез хәл итәсез</translation>
     </message>
     <message>
-        <source>Groups of equals</source>
-        <translation>Тигезләр төркеме</translation>
-    </message>
-    <message>
-        <source>The server only passes it on</source>
-        <translation>Сервер аны алга тапшыра гына</translation>
-    </message>
-    <message>
         <source>Keep swiping to set up your profile.</source>
         <translation>Профиль ясау өчен свайп итүне дәвам итегез.</translation>
     </message>
@@ -814,24 +773,32 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Һәр хәбәр шифрлана</translation>
     </message>
     <message>
-        <source>Made here on your phone. No phone number, no account, nothing to sign.</source>
-        <translation>Монда, сезнең телефонда ясала. Телефон номеры юк, хисап юк, имзаларга бернәрсә дә юк.</translation>
+        <source>Your profile is created on this phone. No phone number and no sign-up are needed.</source>
+        <translation>Профилегез шушы телефонда ясала. Телефон номеры да, теркәлү дә кирәкми.</translation>
     </message>
     <message>
-        <source>There is no directory to be found in. Show a friend a code, or send a link.</source>
-        <translation>Сезне табар өчен белешмәлек юк. Дустыгызга код күрсәтегез яки сылтама җибәрегез.</translation>
+        <source>There is no public directory. People reach you by scanning your invite code or opening your invite link.</source>
+        <translation>Ачык белешмәлек юк. Башкалар сезне чакыру кодыгызны сканерлап яки чакыру сылтамагызны ачып таба.</translation>
     </message>
     <message>
-        <source>Encrypted the whole way, always. The servers cannot read a word.</source>
-        <translation>Һәрвакыт башыннан ахырына кадәр шифрлы. Серверлар бер сүз дә укымый.</translation>
+        <source>Any member can add people, rename the group or leave it.</source>
+        <translation>Теләсә кайсы әгъза кеше өсти, төркемнең исемен үзгәртә яки аннан чыга ала.</translation>
     </message>
     <message>
-        <source>Anyone can add a friend, rename the group or leave. Nobody is in charge.</source>
-        <translation>Теләсә кем дус өсти, төркемне яңадан атый яки китә ала. Беркем дә баш түгел.</translation>
+        <source>Messages are end-to-end encrypted, so the relays that carry them cannot read them.</source>
+        <translation>Хәбәрләр очтан-очка шифрлана, шуңа күрә аларны ташучы реле аларны укый алмый.</translation>
     </message>
     <message>
-        <source>It holds a message until the other phone is online, and nothing more.</source>
-        <translation>Ул хатны икенче телефон эләккәнче саклый, башка бернәрсә дә түгел.</translation>
+        <source>Groups have no admins</source>
+        <translation>Төркемнәрдә администраторлар юк</translation>
+    </message>
+    <message>
+        <source>Relays only pass messages on</source>
+        <translation>Реле хәбәрләрне тик алга гына тапшыра</translation>
+    </message>
+    <message>
+        <source>A relay stores a message only until the recipient fetches it.</source>
+        <translation>Реле хәбәрне алучы аны алганчы гына саклый.</translation>
     </message>
 </context>
 <context>
@@ -962,12 +929,12 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Контактлар әлегә юк</translation>
     </message>
     <message>
-        <source>Scan someone&apos;s invite from the chat list: QR code</source>
-        <translation>Кемнеңдер чакыруын чатлар исемлегеннән сканерлагыз: QR-код</translation>
-    </message>
-    <message>
         <source>Search</source>
         <translation>Эзләү</translation>
+    </message>
+    <message>
+        <source>Use &quot;QR code&quot; in the chat list to add a contact.</source>
+        <translation>Контакт өстәү өчен әңгәмәләр исемлегендәге «QR-код»ны кулланыгыз.</translation>
     </message>
 </context>
 <context>
@@ -975,10 +942,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Please name the group</source>
         <translation>Төркемгә исем бирегез</translation>
-    </message>
-    <message>
-        <source>Create Group</source>
-        <translation>Төркем булдырырга</translation>
     </message>
     <message>
         <source>New group</source>
@@ -1010,6 +973,10 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Add members</source>
         <translation>Әгъзалар өстәргә</translation>
+    </message>
+    <message>
+        <source>Create group</source>
+        <translation>Төркем булдырырга</translation>
     </message>
 </context>
 <context>
@@ -1081,10 +1048,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Реле үз квотасын әле хәбәр итмәде</translation>
     </message>
     <message>
-        <source>Both ways: with this off you send none and see none.</source>
-        <translation>Ике якка да: сүндерелгәндә сез бернәрсә җибәрмисез һәм күрмисез.</translation>
-    </message>
-    <message>
         <source>Relays</source>
         <translation>Релелар</translation>
     </message>
@@ -1119,16 +1082,16 @@ Other groups with blocked contacts will still show their messages.</source>
         <extracomment>How much room the profile takes on the phone. %1 is a size such as &quot;12.3 MB&quot;.</extracomment>
         <translation>Piirit бу телефонда %1 урын били.</translation>
     </message>
+    <message>
+        <source>If read receipts are disabled, you won&apos;t be able to see read receipts from others.</source>
+        <translation>Уку турында белдерүләр сүндерелгән булса, сез башкаларның уку белдерүләрен дә күрмәячәксез.</translation>
+    </message>
 </context>
 <context>
     <name>ProfileSetupPage</name>
     <message>
         <source>Add profile</source>
         <translation>Профиль өстәргә</translation>
-    </message>
-    <message>
-        <source>Contacting %1...</source>
-        <translation>%1 белән элемтә...</translation>
     </message>
     <message>
         <source>Cancel</source>
@@ -1143,16 +1106,16 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>%1 %2 секунд эчендә җавап бирмәде.</translation>
     </message>
     <message>
-        <source>Relays are run by volunteers. Go back and try another one.</source>
-        <translation>Релеларны ирекле кешеләр тота. Кире кайтыгыз да башкасын сынап карагыз.</translation>
+        <source>Contacting %1…</source>
+        <translation>%1 белән элемтә…</translation>
+    </message>
+    <message>
+        <source>Could not reach the relay. Try another one.</source>
+        <translation>Реле белән бәйләнешкә кереп булмады. Башкасын сынап карагыз.</translation>
     </message>
 </context>
 <context>
     <name>ProfileStartPage</name>
-    <message>
-        <source>Alright, let&apos;s get you set up.</source>
-        <translation>Ярый, профилегезне ясыйк.</translation>
-    </message>
     <message>
         <source>I already have a profile</source>
         <translation>Минем профилем инде бар</translation>
@@ -1160,6 +1123,10 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Create a profile</source>
         <translation>Профиль ясарга</translation>
+    </message>
+    <message>
+        <source>Set up your profile</source>
+        <translation>Профилегезне көйләгез</translation>
     </message>
 </context>
 <context>
@@ -1225,16 +1192,16 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Кемгәдер бу кодны сканерларга бирегез яки аңа сылтаманы җибәрегез.</translation>
     </message>
     <message>
-        <source>Fetching...</source>
-        <translation>Алына...</translation>
-    </message>
-    <message>
-        <source>Copy Invite Link</source>
-        <translation>Чакыру сылтамасын күчереп алырга</translation>
-    </message>
-    <message>
         <source>The camera is not available on this device.</source>
         <translation>Бу җайланмада камера юк.</translation>
+    </message>
+    <message>
+        <source>Fetching…</source>
+        <translation>Алына…</translation>
+    </message>
+    <message>
+        <source>Copy invite link</source>
+        <translation>Чакыру сылтамасын күчереп алырга</translation>
     </message>
 </context>
 <context>
@@ -1252,10 +1219,6 @@ Other groups with blocked contacts will still show their messages.</source>
 <context>
     <name>RestoreProfilePage</name>
     <message>
-        <source>That is not the code a device shows while it is offering its profile.</source>
-        <translation>Җиһаз үз профилен тәкъдим иткәндә күрсәтә торган код түгел бу.</translation>
-    </message>
-    <message>
         <source>Add as second device</source>
         <translation>Икенче җиһаз итеп өстәргә</translation>
     </message>
@@ -1268,16 +1231,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Резерв күчермә файлын сайларга</translation>
     </message>
     <message>
-        <source>Taking the profile over...</source>
-        <translation>Профиль алына...</translation>
-    </message>
-    <message>
         <source>Cancel</source>
         <translation>Баш тартырга</translation>
-    </message>
-    <message>
-        <source>Hold the phone up to the code it shows</source>
-        <translation>Ул күрсәткән кодка бу телефонны тотыгыз</translation>
     </message>
     <message>
         <source>Enter the code instead</source>
@@ -1286,10 +1241,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Code from the other device</source>
         <translation>Икенче җиһаздагы код</translation>
-    </message>
-    <message>
-        <source>Take the profile over</source>
-        <translation>Профильне алырга</translation>
     </message>
     <message>
         <source>That did not work</source>
@@ -1304,28 +1255,44 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Башка файл сайларга</translation>
     </message>
     <message>
-        <source>The other device runs a newer Delta Chat than this app can read.</source>
-        <translation>Икенче җиһазда Delta Chat бу кушымта укый алганнан яңарак.</translation>
-    </message>
-    <message>
-        <source>The transfer stopped. Both devices have to stay on one network, with this page open.</source>
-        <translation>Күчерү туктады. Ике җиһаз да бер челтәрдә калырга тиеш, бу бит ачык килеш.</translation>
-    </message>
-    <message>
-        <source>No camera on this device. A backup file works without one.</source>
-        <translation>Бу җиһазда камера юк. Резерв күчермә файлы аннан башка да эшли.</translation>
-    </message>
-    <message>
-        <source>On the other device: Settings, then add a second device. Both on one network.</source>
-        <translation>Икенче җиһазда: Көйләүләр, аннары икенче җиһаз итеп өстәү. Икесе дә бер челтәрдә.</translation>
-    </message>
-    <message>
         <source>Make a backup on the other device, copy the file here, then choose it.</source>
         <translation>Икенче җиһазда резерв күчермә ясагыз, файлны монда күчерегез, аннары аны сайлагыз.</translation>
     </message>
     <message>
         <source>That profile is already on this phone. Open it from the profiles list.</source>
         <translation>Бу профиль бу телефонда инде бар. Аны профильләр исемлегеннән ачыгыз.</translation>
+    </message>
+    <message>
+        <source>The profile is from a newer Delta Chat version than this app can read.</source>
+        <translation>Профиль бу кушымта укый алганнан яңарак Delta Chat версиясеннән.</translation>
+    </message>
+    <message>
+        <source>The transfer stopped. Both devices must stay on the same network with this page open.</source>
+        <translation>Тапшыру туктады. Ике җиһаз да бер үк челтәрдә калырга, бу бит ачык торырга тиеш.</translation>
+    </message>
+    <message>
+        <source>This is not a second-device code. Use the code shown by the other device.</source>
+        <translation>Бу икенче җиһаз коды түгел. Икенче җиһаз күрсәткән кодны кулланыгыз.</translation>
+    </message>
+    <message>
+        <source>Hold your camera over the QR code</source>
+        <translation>Камераны QR код өстендә тотыгыз</translation>
+    </message>
+    <message>
+        <source>Copy the profile</source>
+        <translation>Профильне күчерү</translation>
+    </message>
+    <message>
+        <source>No camera on this device. You can restore from a backup file instead.</source>
+        <translation>Бу җиһазда камера юк. Аның урынына резерв күчермә файлыннан торгыза аласыз.</translation>
+    </message>
+    <message>
+        <source>On the other device, go to Settings and tap &quot;Add second device&quot;. Both devices must be on the same network.</source>
+        <translation>Икенче җиһазда «Көйләүләр»гә керегез һәм «Икенче җиһаз өстәү»гә басыгыз. Ике җиһаз да бер үк челтәрдә булырга тиеш.</translation>
+    </message>
+    <message>
+        <source>Transferring…</source>
+        <translation>Тапшырыла…</translation>
     </message>
 </context>
 <context>
@@ -1377,40 +1344,20 @@ Other groups with blocked contacts will still show their messages.</source>
 <context>
     <name>SecondDevicePage</name>
     <message>
-        <source>Nothing took the profile. Both phones have to stay on one network, with this page open.</source>
-        <translation>Профильне беркем дә алмады. Ике телефон да бер челтәрдә калырга тиеш, бу бит ачык килеш.</translation>
-    </message>
-    <message>
         <source>Add a second device</source>
         <translation>Икенче җиһаз өстәргә</translation>
-    </message>
-    <message>
-        <source>On the other device: add a profile you have already, then &quot;Add as second device&quot;, and read this code with it. Both phones on one network.</source>
-        <translation>Икенче җиһазда: инде булган профильне өстәгез, аннары «Икенче җиһаз итеп өстәргә», һәм аның белән бу кодны укыгыз. Ике телефон да бер челтәрдә.</translation>
     </message>
     <message>
         <source>Copy the code</source>
         <translation>Кодны күчереп алырга</translation>
     </message>
     <message>
-        <source>Handing the profile over...</source>
-        <translation>Профиль тапшырыла...</translation>
-    </message>
-    <message>
         <source>Cancel</source>
         <translation>Баш тартырга</translation>
     </message>
     <message>
-        <source>The other device has the profile. Both get everything new from now on.</source>
-        <translation>Профиль икенче җиһазда да бар. Хәзер икесе дә барлык яңалыкны ала.</translation>
-    </message>
-    <message>
         <source>Swipe on for your chats.</source>
         <translation>Сөйләшүләрегезгә таба сыпырыгыз.</translation>
-    </message>
-    <message>
-        <source>Whoever reads this code gets the profile. It stops collecting mail until the code is gone.</source>
-        <translation>Бу кодны кем укый — профиль шуныкы. Код күренеп торган арада профиль хат алмый.</translation>
     </message>
     <message>
         <source>Show code again</source>
@@ -1419,6 +1366,26 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Show code</source>
         <translation>Кодны күрсәтергә</translation>
+    </message>
+    <message>
+        <source>No device copied the profile. Both devices must stay on the same network with this page open.</source>
+        <translation>Бер җиһаз да профильне күчермәде. Ике җиһаз да бер үк челтәрдә калырга, бу бит ачык торырга тиеш.</translation>
+    </message>
+    <message>
+        <source>Transferring…</source>
+        <translation>Тапшырыла…</translation>
+    </message>
+    <message>
+        <source>The profile was transferred to your second device. Both devices now receive all new messages.</source>
+        <translation>Профиль икенче җиһазыгызга күчерелде. Ике җиһаз да хәзер барлык яңа хәбәрләрне ала.</translation>
+    </message>
+    <message>
+        <source>On the other device, choose &quot;Add as second device&quot; and scan this code. Both devices must be on the same network.</source>
+        <translation>Икенче җиһазда «Икенче җиһаз итеп өстәргә»не сайлагыз һәм бу кодны сканерлагыз. Ике җиһаз да бер үк челтәрдә булырга тиеш.</translation>
+    </message>
+    <message>
+        <source>Make sure no unwanted observer or camera can see this code. This profile does not receive messages while the code is shown.</source>
+        <translation>Бу кодны кирәкмәгән күзәтүче яки камера күрмәвен тәэмин итегез. Код күрсәтелгән вакытта бу профиль хәбәрләр алмый.</translation>
     </message>
 </context>
 <context>
@@ -1472,18 +1439,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Белдерүләр</translation>
     </message>
     <message>
-        <source>Who wrote, and what</source>
-        <translation>Кем язган һәм нәрсә</translation>
-    </message>
-    <message>
-        <source>Who wrote</source>
-        <translation>Кем язган</translation>
-    </message>
-    <message>
-        <source>Only that something arrived</source>
-        <translation>Нәрсәдер килгәнен генә</translation>
-    </message>
-    <message>
         <source>Apps</source>
         <translation>Кушымталар</translation>
     </message>
@@ -1517,10 +1472,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Хәбәрләрне җайланмадан бетерергә</translation>
     </message>
     <message>
-        <source>A new notification shows</source>
-        <translation>Яңа белдерү күрсәтә</translation>
-    </message>
-    <message>
         <source>Mentions</source>
         <extracomment>A reply to one of the reader&apos;s own messages, arriving in a group they have muted.</extracomment>
         <translation>Искә алулар</translation>
@@ -1535,49 +1486,12 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Markdown форматлавын кулланырга</translation>
     </message>
     <message>
-        <source>Otherwise it starts a new line, and the button sends.</source>
-        <translation>Юкса ул яңа юл башлый, ә төймә җибәрә.</translation>
-    </message>
-    <message>
-        <source>Draws *stars* and `backticks` rather than showing them.</source>
-        <translation>*Йолдызчыкларны* һәм `кире тырнакларны` күрсәтү урынына сыза.</translation>
-    </message>
-    <message>
-        <source>Bigger ones wait until you ask for them. Every profile, from now on.</source>
-        <translation>Зурраклары сез сорагангача көтә. Барлык профильләр, хәзердән башлап.</translation>
-    </message>
-    <message>
-        <source>Every chat of every profile. &quot;Saved messages&quot; are kept.</source>
-        <translation>Һәр профильнең һәр сөйләшүе. «Сакланган хатлар» кала.</translation>
-    </message>
-    <message>
-        <source>On the lock screen and in the notification area.</source>
-        <translation>Бикле экранда һәм хәбәрләр өлкәсендә.</translation>
-    </message>
-    <message>
-        <source>A reply to you gets through a muted group.</source>
-        <translation>Сезгә җавап тавышсыз төркемнән дә үтә.</translation>
-    </message>
-    <message>
-        <source>Click ids and campaign tags come out of the links you send.</source>
-        <translation>Басу идентификаторлары һәм кампания билгеләре сез җибәргән сылтамалардан чыга.</translation>
-    </message>
-    <message>
-        <source>Small apps run inside the chat. Somebody else&apos;s code, and less tested than the rest.</source>
-        <translation>Кечкенә кушымталар сөйләшү эчендә эшли. Кеше коды, һәм калганнарга караганда азрак сыналган.</translation>
-    </message>
-    <message>
         <source>Privacy</source>
         <translation>Хосусыйлык</translation>
     </message>
     <message>
         <source>Blocked contacts</source>
         <translation>Блокланган контактлар</translation>
-    </message>
-    <message>
-        <source>Worse quality, save data</source>
-        <extracomment>Outgoing media quality: smaller pictures and videos, which cost the reader and whoever they write to less data. Both reference clients&apos; words for it.</extracomment>
-        <translation>Начаррак сыйфат, кечкенә күләм</translation>
     </message>
     <message>
         <source>Balanced</source>
@@ -1590,12 +1504,41 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Җибәрелә торган медиа сыйфаты</translation>
     </message>
     <message>
-        <source>Pictures are made smaller before sending, and the camera records at this quality.</source>
-        <translation>Рәсемнәр җибәрү алдыннан кечерәйтелә, ә камера шушы сыйфатта яза.</translation>
-    </message>
-    <message>
         <source>Show notifications</source>
         <translation>Белдерүләрне күрсәтү</translation>
+    </message>
+    <message>
+        <source>Lower quality, less data</source>
+        <extracomment>Outgoing media quality: smaller pictures and videos, which cost the reader and whoever they write to less data. Both reference clients&apos; words for it.</extracomment>
+        <translation>Түбәнрәк сыйфат, азрак трафик</translation>
+    </message>
+    <message>
+        <source>Notification content</source>
+        <translation>Белдерү эчтәлеге</translation>
+    </message>
+    <message>
+        <source>Sender and message</source>
+        <translation>Җибәрүче һәм хәбәр</translation>
+    </message>
+    <message>
+        <source>Sender only</source>
+        <translation>Тик җибәрүче</translation>
+    </message>
+    <message>
+        <source>No details</source>
+        <translation>Тәфсилләрсез</translation>
+    </message>
+    <message>
+        <source>In muted groups, notify messages directed to you, like replies or reactions</source>
+        <translation>Тавышсыз төркемнәрдә сезгә юнәлтелгән хәбәрләр, җаваплар яки реакцияләр кебек, турында хәбәр итү</translation>
+    </message>
+    <message>
+        <source>Removes click IDs and campaign tags from links you send.</source>
+        <translation>Сез җибәргән сылтамалардан басу идентификаторларын һәм кампания билгеләрен бетерә.</translation>
+    </message>
+    <message>
+        <source>Runs small apps inside chats. These features may be unstable and may be changed or removed.</source>
+        <translation>Әңгәмәләр эчендә кечкенә кушымталар эшләтә. Бу мөмкинлекләр тотрыксыз булырга, үзгәртелергә яки бетерелергә мөмкин.</translation>
     </message>
 </context>
 <context>
@@ -1668,16 +1611,16 @@ Other groups with blocked contacts will still show their messages.</source>
 <context>
     <name>WelcomePage</name>
     <message>
-        <source>Tell me about Delta Chat</source>
-        <translation>Delta Chat нәрсә ул?</translation>
-    </message>
-    <message>
-        <source>Set up my profile</source>
-        <translation>Профилемне көйләргә</translation>
-    </message>
-    <message>
         <source>Secure decentralised chat based on Delta Chat</source>
         <translation>Delta Chat нигезендәге куркынычсыз, үзәксезләндерелгән чат</translation>
+    </message>
+    <message>
+        <source>About Delta Chat</source>
+        <translation>Delta Chat турында</translation>
+    </message>
+    <message>
+        <source>Set up your profile</source>
+        <translation>Профилегезне көйләгез</translation>
     </message>
 </context>
 </TS>

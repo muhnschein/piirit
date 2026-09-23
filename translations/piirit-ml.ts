@@ -51,8 +51,8 @@
         <translation>Piirit chatmail റിലേകളുമായി മാത്രമേ പ്രവർത്തിക്കൂ. ഇവ ഒരു പ്രത്യേക തരം ഇ-മെയിൽ സെർവറുകളാണ്; സാധാരണ ഇ-മെയിൽ സെർവറുകൾ പിന്തുണയ്ക്കുന്നില്ല. കൂടുതൽ അറിയാൻ &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt; കാണുക. പൊതു, സൗജന്യ chatmail റിലേകളുടെ പൂർണ്ണ പട്ടിക &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;-ൽ ഉണ്ട്.</translation>
     </message>
     <message>
-        <source>Pick a name and a relay. That&apos;s it! There is nothing else to set up.</source>
-        <translation>ഒരു പേരും ഒരു റിലേയും തിരഞ്ഞെടുക്കുക. അത്രമാത്രം! വേറൊന്നും സജ്ജീകരിക്കേണ്ടതില്ല.</translation>
+        <source>Choose a name and a relay. Nothing else is needed.</source>
+        <translation>ഒരു പേരും ഒരു റിലേയും തിരഞ്ഞെടുക്കുക. ഇതിനപ്പുറം ഒന്നും വേണ്ട.</translation>
     </message>
 </context>
 <context>
@@ -66,24 +66,12 @@
         <translation>പ്രൊഫൈൽ ഉണ്ടാക്കുക</translation>
     </message>
     <message>
-        <source>A new address on a chatmail relay.</source>
-        <translation>ഏതെങ്കിലും chatmail റിലേയിൽ ഒരു പുതിയ വിലാസം.</translation>
-    </message>
-    <message>
         <source>Restore from a backup</source>
         <translation>ബാക്കപ്പിൽനിന്ന് വീണ്ടെടുക്കുക</translation>
     </message>
     <message>
-        <source>A backup file copied onto this phone.</source>
-        <translation>ഈ ഫോണിലേക്ക് പകർത്തിയ ഒരു ബാക്കപ്പ് ഫയൽ.</translation>
-    </message>
-    <message>
         <source>Add as second device</source>
         <translation>രണ്ടാമത്തെ ഉപകരണമായി ചേർക്കുക</translation>
-    </message>
-    <message>
-        <source>The other device keeps it. Both get everything new.</source>
-        <translation>മറ്റേ ഉപകരണം അത് സൂക്ഷിക്കും. രണ്ടിനും പുതിയതെല്ലാം കിട്ടും.</translation>
     </message>
 </context>
 <context>
@@ -97,24 +85,12 @@
         <translation>ഒരു റിലേ ചേർക്കുക</translation>
     </message>
     <message>
-        <source>Another address for this profile, on another relay. The profile sends from one relay at a time; its page says which, and lets you change it.</source>
-        <translation>ഈ പ്രൊഫൈലിന് മറ്റൊരു റിലേയിൽ ഒരു വിലാസം കൂടി. പ്രൊഫൈൽ ഒരു സമയത്ത് ഒരു റിലേയിൽ നിന്നേ അയയ്ക്കൂ; ഏതെന്ന് അതിന്റെ പേജ് കാണിക്കുകയും മാറ്റാൻ അനുവദിക്കുകയും ചെയ്യുന്നു.</translation>
-    </message>
-    <message>
         <source>Add relay</source>
         <translation>റിലേ ചേർക്കുക</translation>
     </message>
     <message>
-        <source>Contacting %1...</source>
-        <translation>%1 മായി ബന്ധപ്പെടുന്നു...</translation>
-    </message>
-    <message>
         <source>Cancel</source>
         <translation>റദ്ദാക്കുക</translation>
-    </message>
-    <message>
-        <source>Relays are run by volunteers. Try another one.</source>
-        <translation>റിലേകൾ നടത്തുന്നത് സന്നദ്ധപ്രവർത്തകരാണ്. മറ്റൊന്ന് പരീക്ഷിക്കുക.</translation>
     </message>
     <message>
         <source>Select a public chatmail relay</source>
@@ -127,6 +103,18 @@
     <message>
         <source>Piirit works only with chatmail relays. These are a particular kind of e-mail server; ordinary e-mail servers are not supported. For more, see &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. A full list of public, free-to-use chatmail relays is at &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</source>
         <translation>Piirit chatmail റിലേകളുമായി മാത്രമേ പ്രവർത്തിക്കൂ. ഇവ ഒരു പ്രത്യേക തരം ഇ-മെയിൽ സെർവറുകളാണ്; സാധാരണ ഇ-മെയിൽ സെർവറുകൾ പിന്തുണയ്ക്കുന്നില്ല. കൂടുതൽ അറിയാൻ &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt; കാണുക. പൊതു, സൗജന്യ chatmail റിലേകളുടെ പൂർണ്ണ പട്ടിക &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;-ൽ ഉണ്ട്.</translation>
+    </message>
+    <message>
+        <source>Adds another address for this profile on a second relay. The profile sends from one relay at a time; you can change which one on the profile page.</source>
+        <translation>ഈ പ്രൊഫൈലിന് രണ്ടാമത്തൊരു റിലേയിൽ മറ്റൊരു വിലാസം ചേർക്കുന്നു. പ്രൊഫൈൽ ഒരു സമയത്ത് ഒരു റിലേ വഴിയാണ് അയയ്ക്കുന്നത്; ഏതെന്ന് പ്രൊഫൈൽ താളിൽ മാറ്റാം.</translation>
+    </message>
+    <message>
+        <source>Contacting %1…</source>
+        <translation>%1 മായി ബന്ധപ്പെടുന്നു…</translation>
+    </message>
+    <message>
+        <source>Could not reach the relay. Try another one.</source>
+        <translation>റിലേയിൽ എത്താനായില്ല. മറ്റൊന്ന് പരീക്ഷിക്കുക.</translation>
     </message>
 </context>
 <context>
@@ -159,14 +147,6 @@
         <source>Cancel</source>
         <translation>റദ്ദാക്കുക</translation>
     </message>
-    <message numerus="yes">
-        <source>%n message(s) will be deleted now, and from then on every message will be once it is that old.</source>
-        <extracomment>%n is how many messages would be deleted straight away.</extracomment>
-        <translation>
-            <numerusform>%n സന്ദേശം ഇപ്പോൾ ഇല്ലാതാക്കും, അതിനുശേഷം ഓരോ സന്ദേശവും അത്ര പഴയതാകുമ്പോൾ.</numerusform>
-            <numerusform>%n സന്ദേശങ്ങൾ ഇപ്പോൾ ഇല്ലാതാക്കും, അതിനുശേഷം ഓരോ സന്ദേശവും അത്ര പഴയതാകുമ്പോൾ.</numerusform>
-        </translation>
-    </message>
     <message>
         <source>This includes pictures, videos and files.</source>
         <translation>ഇതിൽ ചിത്രങ്ങളും വീഡിയോകളും ഫയലുകളും ഉൾപ്പെടുന്നു.</translation>
@@ -184,20 +164,20 @@
         <source>I understand, delete all these messages</source>
         <translation>എനിക്കു മനസ്സിലായി, ഈ സന്ദേശങ്ങളെല്ലാം ഇല്ലാതാക്കുക</translation>
     </message>
+    <message numerus="yes">
+        <source>%n message(s) will be deleted now, and every new message will be deleted once it reaches that age.</source>
+        <extracomment>%n is how many messages would be deleted straight away.</extracomment>
+        <translation>
+            <numerusform>%n സന്ദേശം ഇപ്പോൾ ഇല്ലാതാക്കും, കൂടാതെ ഓരോ പുതിയ സന്ദേശവും ആ പ്രായത്തിലെത്തുമ്പോൾ ഇല്ലാതാക്കും.</numerusform>
+            <numerusform>%n സന്ദേശങ്ങൾ ഇപ്പോൾ ഇല്ലാതാക്കും, കൂടാതെ ഓരോ പുതിയ സന്ദേശവും ആ പ്രായത്തിലെത്തുമ്പോൾ ഇല്ലാതാക്കും.</numerusform>
+        </translation>
+    </message>
 </context>
 <context>
     <name>BackupPage</name>
     <message>
         <source>Back up profile</source>
         <translation>പ്രൊഫൈൽ ബാക്കപ്പ്</translation>
-    </message>
-    <message>
-        <source>Write the backup</source>
-        <translation>ബാക്കപ്പ് എഴുതുക</translation>
-    </message>
-    <message>
-        <source>Writing the backup...</source>
-        <translation>ബാക്കപ്പ് എഴുതുന്നു...</translation>
     </message>
     <message>
         <source>Cancel</source>
@@ -209,12 +189,20 @@
         <translation>%1 എന്നതിൽ സൂക്ഷിച്ചു</translation>
     </message>
     <message>
-        <source>Messages, contacts and key in one file, saved to Documents. Whoever has the file has the profile.</source>
-        <translation>സന്ദേശങ്ങളും വിലാസങ്ങളും താക്കോലും ഒറ്റ ഫയലിൽ, രേഖകളിൽ സൂക്ഷിക്കുന്നു. ഫയൽ ആരുടെ കൈയിലാണോ പ്രൊഫൈലും അവരുടേതാണ്.</translation>
-    </message>
-    <message>
         <source>Swipe on for your chats.</source>
         <translation>മുന്നോട്ട് നീക്കി നിങ്ങളുടെ സംഭാഷണങ്ങളിലേക്കു പോകുക.</translation>
+    </message>
+    <message>
+        <source>Start backup</source>
+        <translation>ബാക്കപ്പ് തുടങ്ങുക</translation>
+    </message>
+    <message>
+        <source>Backing up…</source>
+        <translation>ബാക്കപ്പ് എടുക്കുന്നു…</translation>
+    </message>
+    <message>
+        <source>Saves your messages, contacts and end-to-end encryption setup to a backup file. Keep this file in a safe place.</source>
+        <translation>നിങ്ങളുടെ സന്ദേശങ്ങൾ, ബന്ധങ്ങൾ, എൻഡ്-ടു-എൻഡ് എൻക്രിപ്ഷൻ സജ്ജീകരണം എന്നിവ ഒരു ബാക്കപ്പ് ഫയലിൽ സൂക്ഷിക്കുന്നു. ഈ ഫയൽ സുരക്ഷിതമായ സ്ഥലത്ത് വയ്ക്കുക.</translation>
     </message>
 </context>
 <context>
@@ -292,10 +280,6 @@ Other groups with blocked contacts will still show their messages.</source>
 </context>
 <context>
     <name>ChatListPage</name>
-    <message>
-        <source>Lost the connection to the Delta Chat core. Reconnecting...</source>
-        <translation>Delta Chat കോറുമായുള്ള കണക്ഷൻ നഷ്ടപ്പെട്ടു. വീണ്ടും കണക്റ്റ് ചെയ്യുന്നു...</translation>
-    </message>
     <message>
         <source>Lost the connection to the Delta Chat core. Restart Piirit.</source>
         <translation>Delta Chat കോറുമായുള്ള കണക്ഷൻ നഷ്ടപ്പെട്ടു. Piirit പുനരാരംഭിക്കുക.</translation>
@@ -404,6 +388,10 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Search</source>
         <translation>തിരയുക</translation>
+    </message>
+    <message>
+        <source>Lost the connection to the Delta Chat core. Reconnecting…</source>
+        <translation>Delta Chat കോറുമായുള്ള കണക്ഷൻ നഷ്ടപ്പെട്ടു. വീണ്ടും കണക്റ്റ് ചെയ്യുന്നു…</translation>
     </message>
 </context>
 <context>
@@ -534,10 +522,6 @@ Other groups with blocked contacts will still show their messages.</source>
 <context>
     <name>ConversationPage</name>
     <message>
-        <source>Lost the connection to the Delta Chat core. Reconnecting...</source>
-        <translation>Delta Chat കോറുമായുള്ള കണക്ഷൻ നഷ്ടപ്പെട്ടു. വീണ്ടും കണക്റ്റ് ചെയ്യുന്നു...</translation>
-    </message>
-    <message>
         <source>Lost the connection to the Delta Chat core. Restart Piirit.</source>
         <translation>Delta Chat കോറുമായുള്ള കണക്ഷൻ നഷ്ടപ്പെട്ടു. Piirit പുനരാരംഭിക്കുക.</translation>
     </message>
@@ -557,11 +541,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Message</source>
         <translation>സന്ദേശം</translation>
-    </message>
-    <message>
-        <source>Long message: the other end sees a preview and taps to read the rest</source>
-        <extracomment>Shown above the message field while what is being written is long enough that the other end will receive a shortened version with the rest behind a tap.</extracomment>
-        <translation>നീണ്ട സന്ദേശം: മറുവശത്ത് ഒരു തുണ്ട് മാത്രം കാണും, ബാക്കി വായിക്കാൻ തൊടണം</translation>
     </message>
     <message>
         <source>Saved to Pictures</source>
@@ -584,9 +563,13 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>ഡൗൺലോഡുകളിൽ സൂക്ഷിച്ചു</translation>
     </message>
     <message>
-        <source>Too big to send: %1. Attachments go up to %2.</source>
+        <source>Lost the connection to the Delta Chat core. Reconnecting…</source>
+        <translation>Delta Chat കോറുമായുള്ള കണക്ഷൻ നഷ്ടപ്പെട്ടു. വീണ്ടും കണക്റ്റ് ചെയ്യുന്നു…</translation>
+    </message>
+    <message>
+        <source>%1 is too large to send. Attachments can be up to %2.</source>
         <extracomment>Shown above the message field when the attached file is bigger than will be sent. %1 is the file&apos;s size and %2 the largest that goes, each such as &quot;24 MB&quot;.</extracomment>
-        <translation>അയയ്ക്കാൻ വളരെ വലുത്: %1. അറ്റാച്ച്‌മെന്റുകൾ പരമാവധി %2 വരെയാകാം.</translation>
+        <translation>%1 അയയ്ക്കാൻ വളരെ വലുതാണ്. അറ്റാച്ച്മെന്റുകൾ %2 വരെ ആകാം.</translation>
     </message>
 </context>
 <context>
@@ -624,14 +607,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>How do you want to delete this message? This cannot be undone.</source>
         <translation>ഈ സന്ദേശം എങ്ങനെ ഇല്ലാതാക്കണം? ഇത് പിന്നീട് പഴയപടിയാക്കാൻ കഴിയില്ല.</translation>
-    </message>
-    <message>
-        <source>It goes from your devices. Everybody else keeps their copy.</source>
-        <translation>ഇത് നിങ്ങളുടെ ഉപകരണങ്ങളിൽ നിന്ന് പോകും. മറ്റുള്ളവരെല്ലാം അവരുടെ പകർപ്പ് സൂക്ഷിക്കും.</translation>
-    </message>
-    <message>
-        <source>It goes from your devices, and every other device in this chat is asked to delete it too.</source>
-        <translation>ഇത് നിങ്ങളുടെ ഉപകരണങ്ങളിൽ നിന്ന് പോകും, ഈ ചാറ്റിലെ മറ്റെല്ലാ ഉപകരണങ്ങളോടും ഇത് ഇല്ലാതാക്കാൻ ആവശ്യപ്പെടും.</translation>
     </message>
 </context>
 <context>
@@ -693,8 +668,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>%1 സെക്കൻഡിനു ശേഷം</translation>
     </message>
     <message>
-        <source>Applies to everyone in the chat. They can still copy and forward.</source>
-        <translation>സംഭാഷണത്തിലെ എല്ലാവർക്കും ബാധകം. അവർക്ക് ഇപ്പോഴും പകർത്താനും കൈമാറാനും കഴിയും.</translation>
+        <source>Applies to all members of this chat; they can still copy, save, and forward messages.</source>
+        <translation>ഈ സംഭാഷണത്തിലെ എല്ലാ അംഗങ്ങൾക്കും ബാധകം; അവർക്ക് ഇപ്പോഴും സന്ദേശങ്ങൾ പകർത്താനും സൂക്ഷിക്കാനും കൈമാറാനും കഴിയും.</translation>
     </message>
 </context>
 <context>
@@ -710,14 +685,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Restore from a backup</source>
         <translation>ബാക്കപ്പിൽനിന്ന് വീണ്ടെടുക്കുക</translation>
-    </message>
-    <message>
-        <source>The other device keeps it. Both get everything new.</source>
-        <translation>മറ്റേ ഉപകരണം അത് സൂക്ഷിക്കും. രണ്ടിനും പുതിയതെല്ലാം കിട്ടും.</translation>
-    </message>
-    <message>
-        <source>A backup file copied onto this phone.</source>
-        <translation>ഈ ഫോണിലേക്ക് പകർത്തിയ ഒരു ബാക്കപ്പ് ഫയൽ.</translation>
     </message>
 </context>
 <context>
@@ -802,14 +769,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>ആർക്കു നിങ്ങളെ ബന്ധപ്പെടാമെന്ന് നിങ്ങൾ തീരുമാനിക്കുന്നു</translation>
     </message>
     <message>
-        <source>Groups of equals</source>
-        <translation>തുല്യരുടെ കൂട്ടങ്ങൾ</translation>
-    </message>
-    <message>
-        <source>The server only passes it on</source>
-        <translation>സെർവർ അത് കൈമാറുക മാത്രം ചെയ്യുന്നു</translation>
-    </message>
-    <message>
         <source>Keep swiping to set up your profile.</source>
         <translation>പ്രൊഫൈൽ ഒരുക്കാൻ സ്വൈപ്പ് ചെയ്തുകൊണ്ടിരിക്കുക.</translation>
     </message>
@@ -818,24 +777,32 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>ഓരോ സന്ദേശവും എൻക്രിപ്റ്റ് ചെയ്തിരിക്കുന്നു</translation>
     </message>
     <message>
-        <source>Made here on your phone. No phone number, no account, nothing to sign.</source>
-        <translation>ഇവിടെത്തന്നെ, നിങ്ങളുടെ ഫോണിൽ ഉണ്ടാകുന്നു. ഫോൺ നമ്പറില്ല, അക്കൗണ്ടില്ല, ഒപ്പിടാൻ ഒന്നുമില്ല.</translation>
+        <source>Your profile is created on this phone. No phone number and no sign-up are needed.</source>
+        <translation>നിങ്ങളുടെ പ്രൊഫൈൽ ഈ ഫോണിൽത്തന്നെ ഉണ്ടാക്കുന്നു. ഫോൺ നമ്പറും വേണ്ട, രജിസ്ട്രേഷനും വേണ്ട.</translation>
     </message>
     <message>
-        <source>There is no directory to be found in. Show a friend a code, or send a link.</source>
-        <translation>നിങ്ങളെ കണ്ടെത്താൻ ഒരു പട്ടികയുമില്ല. ഒരു സുഹൃത്തിന് കോഡ് കാണിക്കുക, അല്ലെങ്കിൽ കണ്ണി അയയ്ക്കുക.</translation>
+        <source>There is no public directory. People reach you by scanning your invite code or opening your invite link.</source>
+        <translation>പൊതുവായ ഒരു പട്ടികയില്ല. മറ്റുള്ളവർ നിങ്ങളുടെ ക്ഷണക്കോഡ് സ്കാൻ ചെയ്തോ ക്ഷണലിങ്ക് തുറന്നോ നിങ്ങളിലേക്ക് എത്തുന്നു.</translation>
     </message>
     <message>
-        <source>Encrypted the whole way, always. The servers cannot read a word.</source>
-        <translation>എപ്പോഴും വഴിനീളെ എൻക്രിപ്റ്റ് ചെയ്തത്. സെർവറുകൾ ഒരു വാക്കുപോലും വായിക്കില്ല.</translation>
+        <source>Any member can add people, rename the group or leave it.</source>
+        <translation>ഏതു അംഗത്തിനും ആളുകളെ ചേർക്കാം, കൂട്ടത്തിന്റെ പേര് മാറ്റാം അല്ലെങ്കിൽ അതിൽ നിന്ന് പുറത്തുപോകാം.</translation>
     </message>
     <message>
-        <source>Anyone can add a friend, rename the group or leave. Nobody is in charge.</source>
-        <translation>ആർക്കും ഒരു സുഹൃത്തിനെ ചേർക്കാം, കൂട്ടത്തിന്റെ പേര് മാറ്റാം അല്ലെങ്കിൽ പോകാം. ആരും മേലാളനല്ല.</translation>
+        <source>Messages are end-to-end encrypted, so the relays that carry them cannot read them.</source>
+        <translation>സന്ദേശങ്ങൾ എൻഡ്-ടു-എൻഡ് എൻക്രിപ്റ്റ് ചെയ്തവയാണ്, അതിനാൽ അവ വഹിക്കുന്ന റിലേകൾക്ക് അവ വായിക്കാനാകില്ല.</translation>
     </message>
     <message>
-        <source>It holds a message until the other phone is online, and nothing more.</source>
-        <translation>മറ്റേ ഫോൺ ഓൺലൈനാകുന്നതുവരെ അത് സന്ദേശം സൂക്ഷിക്കും, അതിൽ കൂടുതലൊന്നുമില്ല.</translation>
+        <source>Groups have no admins</source>
+        <translation>കൂട്ടങ്ങൾക്ക് അഡ്മിൻമാരില്ല</translation>
+    </message>
+    <message>
+        <source>Relays only pass messages on</source>
+        <translation>റിലേകൾ സന്ദേശങ്ങൾ കൈമാറുക മാത്രമേ ചെയ്യൂ</translation>
+    </message>
+    <message>
+        <source>A relay stores a message only until the recipient fetches it.</source>
+        <translation>സ്വീകർത്താവ് എടുക്കുന്നതുവരെ മാത്രമേ റിലേ സന്ദേശം സൂക്ഷിക്കൂ.</translation>
     </message>
 </context>
 <context>
@@ -966,12 +933,12 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>ഇതുവരെ കോൺടാക്റ്റുകളില്ല</translation>
     </message>
     <message>
-        <source>Scan someone&apos;s invite from the chat list: QR code</source>
-        <translation>ചാറ്റ് പട്ടികയിൽ നിന്ന് ഒരാളുടെ ക്ഷണം സ്കാൻ ചെയ്യുക: QR കോഡ്</translation>
-    </message>
-    <message>
         <source>Search</source>
         <translation>തിരയുക</translation>
+    </message>
+    <message>
+        <source>Use &quot;QR code&quot; in the chat list to add a contact.</source>
+        <translation>ഒരു ബന്ധം ചേർക്കാൻ സംഭാഷണപ്പട്ടികയിലെ &quot;QR കോഡ്&quot; ഉപയോഗിക്കുക.</translation>
     </message>
 </context>
 <context>
@@ -979,10 +946,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Please name the group</source>
         <translation>ദയവായി ഗ്രൂപ്പിന് പേര് നൽകുക</translation>
-    </message>
-    <message>
-        <source>Create Group</source>
-        <translation>ഗ്രൂപ്പ് സൃഷ്ടിക്കുക</translation>
     </message>
     <message>
         <source>New group</source>
@@ -1015,6 +978,10 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Add members</source>
         <translation>അംഗങ്ങളെ ചേർക്കുക</translation>
+    </message>
+    <message>
+        <source>Create group</source>
+        <translation>ഗ്രൂപ്പ് സൃഷ്ടിക്കുക</translation>
     </message>
 </context>
 <context>
@@ -1087,10 +1054,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>റിലേ അതിന്റെ ക്വോട്ട ഇതുവരെ അറിയിച്ചിട്ടില്ല</translation>
     </message>
     <message>
-        <source>Both ways: with this off you send none and see none.</source>
-        <translation>രണ്ടു വഴിക്കും: ഓഫാണെങ്കിൽ നിങ്ങൾ ഒന്നും അയയ്ക്കുന്നില്ല, ഒന്നും കാണുന്നുമില്ല.</translation>
-    </message>
-    <message>
         <source>Relays</source>
         <translation>റിലേകൾ</translation>
     </message>
@@ -1125,16 +1088,16 @@ Other groups with blocked contacts will still show their messages.</source>
         <extracomment>How much room the profile takes on the phone. %1 is a size such as &quot;12.3 MB&quot;.</extracomment>
         <translation>Piirit ഈ ഫോണിൽ %1 സ്റ്റോറേജ് ഉപയോഗിക്കുന്നു.</translation>
     </message>
+    <message>
+        <source>If read receipts are disabled, you won&apos;t be able to see read receipts from others.</source>
+        <translation>വായനാ രസീതുകൾ ഓഫാണെങ്കിൽ, മറ്റുള്ളവരുടെ വായനാ രസീതുകളും നിങ്ങൾക്ക് കാണാനാകില്ല.</translation>
+    </message>
 </context>
 <context>
     <name>ProfileSetupPage</name>
     <message>
         <source>Add profile</source>
         <translation>പ്രൊഫൈൽ ചേർക്കുക</translation>
-    </message>
-    <message>
-        <source>Contacting %1...</source>
-        <translation>%1 മായി ബന്ധപ്പെടുന്നു...</translation>
     </message>
     <message>
         <source>Cancel</source>
@@ -1149,16 +1112,16 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>%1 %2 സെക്കൻഡിനുള്ളിൽ മറുപടി നൽകിയില്ല.</translation>
     </message>
     <message>
-        <source>Relays are run by volunteers. Go back and try another one.</source>
-        <translation>റിലേകൾ നടത്തുന്നത് സന്നദ്ധപ്രവർത്തകരാണ്. തിരികെ പോയി മറ്റൊന്ന് പരീക്ഷിക്കുക.</translation>
+        <source>Contacting %1…</source>
+        <translation>%1 മായി ബന്ധപ്പെടുന്നു…</translation>
+    </message>
+    <message>
+        <source>Could not reach the relay. Try another one.</source>
+        <translation>റിലേയിൽ എത്താനായില്ല. മറ്റൊന്ന് പരീക്ഷിക്കുക.</translation>
     </message>
 </context>
 <context>
     <name>ProfileStartPage</name>
-    <message>
-        <source>Alright, let&apos;s get you set up.</source>
-        <translation>ശരി, നിങ്ങളുടെ പ്രൊഫൈൽ ഒരുക്കാം.</translation>
-    </message>
     <message>
         <source>I already have a profile</source>
         <translation>എനിക്ക് ഇതിനകം പ്രൊഫൈൽ ഉണ്ട്</translation>
@@ -1166,6 +1129,10 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Create a profile</source>
         <translation>പ്രൊഫൈൽ ഉണ്ടാക്കുക</translation>
+    </message>
+    <message>
+        <source>Set up your profile</source>
+        <translation>നിങ്ങളുടെ പ്രൊഫൈൽ ക്രമീകരിക്കുക</translation>
     </message>
 </context>
 <context>
@@ -1231,16 +1198,16 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>ആരെയെങ്കിലും ഈ കോഡ് സ്കാൻ ചെയ്യാൻ അനുവദിക്കുക, അല്ലെങ്കിൽ അവർക്ക് ലിങ്ക് അയയ്ക്കുക.</translation>
     </message>
     <message>
-        <source>Fetching...</source>
-        <translation>ലഭ്യമാക്കുന്നു...</translation>
-    </message>
-    <message>
-        <source>Copy Invite Link</source>
-        <translation>ക്ഷണ ലിങ്ക് പകർത്തുക</translation>
-    </message>
-    <message>
         <source>The camera is not available on this device.</source>
         <translation>ഈ ഉപകരണത്തിൽ ക്യാമറ ലഭ്യമല്ല.</translation>
+    </message>
+    <message>
+        <source>Fetching…</source>
+        <translation>ലഭ്യമാക്കുന്നു…</translation>
+    </message>
+    <message>
+        <source>Copy invite link</source>
+        <translation>ക്ഷണ ലിങ്ക് പകർത്തുക</translation>
     </message>
 </context>
 <context>
@@ -1258,10 +1225,6 @@ Other groups with blocked contacts will still show their messages.</source>
 <context>
     <name>RestoreProfilePage</name>
     <message>
-        <source>That is not the code a device shows while it is offering its profile.</source>
-        <translation>ഒരു ഉപകരണം തന്റെ പ്രൊഫൈൽ നൽകുമ്പോൾ കാണിക്കുന്ന കോഡ് ഇതല്ല.</translation>
-    </message>
-    <message>
         <source>Add as second device</source>
         <translation>രണ്ടാമത്തെ ഉപകരണമായി ചേർക്കുക</translation>
     </message>
@@ -1274,16 +1237,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>ബാക്കപ്പ് ഫയൽ തിരഞ്ഞെടുക്കുക</translation>
     </message>
     <message>
-        <source>Taking the profile over...</source>
-        <translation>പ്രൊഫൈൽ ഏറ്റെടുക്കുന്നു...</translation>
-    </message>
-    <message>
         <source>Cancel</source>
         <translation>റദ്ദാക്കുക</translation>
-    </message>
-    <message>
-        <source>Hold the phone up to the code it shows</source>
-        <translation>അത് കാണിക്കുന്ന കോഡിന് നേരെ ഈ ഫോൺ പിടിക്കുക</translation>
     </message>
     <message>
         <source>Enter the code instead</source>
@@ -1292,10 +1247,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Code from the other device</source>
         <translation>മറ്റേ ഉപകരണത്തിലെ കോഡ്</translation>
-    </message>
-    <message>
-        <source>Take the profile over</source>
-        <translation>പ്രൊഫൈൽ ഏറ്റെടുക്കുക</translation>
     </message>
     <message>
         <source>That did not work</source>
@@ -1310,28 +1261,44 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>മറ്റൊരു ഫയൽ തിരഞ്ഞെടുക്കുക</translation>
     </message>
     <message>
-        <source>The other device runs a newer Delta Chat than this app can read.</source>
-        <translation>മറ്റേ ഉപകരണത്തിലെ Delta Chat ഈ ആപ്പിന് വായിക്കാനാവുന്നതിലും പുതിയതാണ്.</translation>
-    </message>
-    <message>
-        <source>The transfer stopped. Both devices have to stay on one network, with this page open.</source>
-        <translation>കൈമാറ്റം നിന്നു. രണ്ട് ഉപകരണങ്ങളും ഒരേ ശൃംഖലയിൽ തുടരണം, ഈ താൾ തുറന്നിരിക്കണം.</translation>
-    </message>
-    <message>
-        <source>No camera on this device. A backup file works without one.</source>
-        <translation>ഈ ഉപകരണത്തിൽ ക്യാമറയില്ല. ബാക്കപ്പ് ഫയൽ അതില്ലാതെയും പ്രവർത്തിക്കും.</translation>
-    </message>
-    <message>
-        <source>On the other device: Settings, then add a second device. Both on one network.</source>
-        <translation>മറ്റേ ഉപകരണത്തിൽ: ക്രമീകരണങ്ങൾ, പിന്നെ രണ്ടാമത്തെ ഉപകരണമായി ചേർക്കുക. രണ്ടും ഒരേ ശൃംഖലയിൽ.</translation>
-    </message>
-    <message>
         <source>Make a backup on the other device, copy the file here, then choose it.</source>
         <translation>മറ്റേ ഉപകരണത്തിൽ ഒരു ബാക്കപ്പ് എടുക്കുക, ഫയൽ ഇവിടേക്കു പകർത്തുക, പിന്നെ അത് തിരഞ്ഞെടുക്കുക.</translation>
     </message>
     <message>
         <source>That profile is already on this phone. Open it from the profiles list.</source>
         <translation>ഈ പ്രൊഫൈൽ ഈ ഫോണിൽ ഇതിനകം ഉണ്ട്. പ്രൊഫൈലുകളുടെ പട്ടികയിൽ നിന്ന് അത് തുറക്കുക.</translation>
+    </message>
+    <message>
+        <source>The profile is from a newer Delta Chat version than this app can read.</source>
+        <translation>ഈ പ്രൊഫൈൽ, ഈ ആപ്പിന് വായിക്കാനാകുന്നതിലും പുതിയ Delta Chat പതിപ്പിൽ നിന്നുള്ളതാണ്.</translation>
+    </message>
+    <message>
+        <source>The transfer stopped. Both devices must stay on the same network with this page open.</source>
+        <translation>കൈമാറ്റം നിന്നു. രണ്ട് ഉപകരണങ്ങളും ഒരേ ശൃംഖലയിൽ നിൽക്കണം, ഈ താളും തുറന്നിരിക്കണം.</translation>
+    </message>
+    <message>
+        <source>This is not a second-device code. Use the code shown by the other device.</source>
+        <translation>ഇത് രണ്ടാമത്തെ ഉപകരണത്തിന്റെ കോഡല്ല. മറ്റേ ഉപകരണം കാണിക്കുന്ന കോഡ് ഉപയോഗിക്കുക.</translation>
+    </message>
+    <message>
+        <source>Hold your camera over the QR code</source>
+        <translation>നിങ്ങളുടെ ക്യാമറ QR കോഡിനു മുകളിൽ പിടിക്കുക</translation>
+    </message>
+    <message>
+        <source>Copy the profile</source>
+        <translation>പ്രൊഫൈൽ പകർത്തുക</translation>
+    </message>
+    <message>
+        <source>No camera on this device. You can restore from a backup file instead.</source>
+        <translation>ഈ ഉപകരണത്തിൽ ക്യാമറയില്ല. പകരം ഒരു ബാക്കപ്പ് ഫയലിൽ നിന്ന് പുനഃസ്ഥാപിക്കാം.</translation>
+    </message>
+    <message>
+        <source>On the other device, go to Settings and tap &quot;Add second device&quot;. Both devices must be on the same network.</source>
+        <translation>മറ്റേ ഉപകരണത്തിൽ ക്രമീകരണങ്ങളിൽ പോയി &quot;രണ്ടാമത്തെ ഉപകരണം ചേർക്കുക&quot; തൊടുക. രണ്ട് ഉപകരണങ്ങളും ഒരേ ശൃംഖലയിൽ ആയിരിക്കണം.</translation>
+    </message>
+    <message>
+        <source>Transferring…</source>
+        <translation>കൈമാറുന്നു…</translation>
     </message>
 </context>
 <context>
@@ -1383,40 +1350,20 @@ Other groups with blocked contacts will still show their messages.</source>
 <context>
     <name>SecondDevicePage</name>
     <message>
-        <source>Nothing took the profile. Both phones have to stay on one network, with this page open.</source>
-        <translation>പ്രൊഫൈൽ ആരും എടുത്തില്ല. രണ്ട് ഫോണുകളും ഒരേ ശൃംഖലയിൽ തുടരണം, ഈ താൾ തുറന്നിരിക്കണം.</translation>
-    </message>
-    <message>
         <source>Add a second device</source>
         <translation>രണ്ടാമത്തെ ഉപകരണം ചേർക്കുക</translation>
-    </message>
-    <message>
-        <source>On the other device: add a profile you have already, then &quot;Add as second device&quot;, and read this code with it. Both phones on one network.</source>
-        <translation>മറ്റേ ഉപകരണത്തിൽ: നിങ്ങൾക്കു നേരത്തേയുള്ള ഒരു പ്രൊഫൈൽ ചേർക്കുക, പിന്നെ “രണ്ടാമത്തെ ഉപകരണമായി ചേർക്കുക”, എന്നിട്ട് അതുകൊണ്ട് ഈ കോഡ് വായിക്കുക. രണ്ട് ഫോണുകളും ഒരേ ശൃംഖലയിൽ.</translation>
     </message>
     <message>
         <source>Copy the code</source>
         <translation>കോഡ് പകർത്തുക</translation>
     </message>
     <message>
-        <source>Handing the profile over...</source>
-        <translation>പ്രൊഫൈൽ കൈമാറുന്നു...</translation>
-    </message>
-    <message>
         <source>Cancel</source>
         <translation>റദ്ദാക്കുക</translation>
     </message>
     <message>
-        <source>The other device has the profile. Both get everything new from now on.</source>
-        <translation>മറ്റേ ഉപകരണത്തിനു പ്രൊഫൈൽ ഉണ്ട്. ഇനി മുതൽ രണ്ടിനും പുതിയതെല്ലാം കിട്ടും.</translation>
-    </message>
-    <message>
         <source>Swipe on for your chats.</source>
         <translation>മുന്നോട്ട് നീക്കി നിങ്ങളുടെ സംഭാഷണങ്ങളിലേക്കു പോകുക.</translation>
-    </message>
-    <message>
-        <source>Whoever reads this code gets the profile. It stops collecting mail until the code is gone.</source>
-        <translation>ഈ കോഡ് വായിക്കുന്നയാൾക്കു പ്രൊഫൈൽ കിട്ടും. കോഡ് പോകുംവരെ അതു തപാൽ എടുക്കുന്നത് നിർത്തിവയ്ക്കും.</translation>
     </message>
     <message>
         <source>Show code again</source>
@@ -1425,6 +1372,26 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Show code</source>
         <translation>കോഡ് കാണിക്കുക</translation>
+    </message>
+    <message>
+        <source>No device copied the profile. Both devices must stay on the same network with this page open.</source>
+        <translation>ഒരു ഉപകരണവും പ്രൊഫൈൽ പകർത്തിയില്ല. രണ്ട് ഉപകരണങ്ങളും ഒരേ ശൃംഖലയിൽ നിൽക്കണം, ഈ താളും തുറന്നിരിക്കണം.</translation>
+    </message>
+    <message>
+        <source>Transferring…</source>
+        <translation>കൈമാറുന്നു…</translation>
+    </message>
+    <message>
+        <source>The profile was transferred to your second device. Both devices now receive all new messages.</source>
+        <translation>പ്രൊഫൈൽ നിങ്ങളുടെ രണ്ടാമത്തെ ഉപകരണത്തിലേക്ക് കൈമാറി. ഇപ്പോൾ രണ്ട് ഉപകരണങ്ങളും എല്ലാ പുതിയ സന്ദേശങ്ങളും സ്വീകരിക്കുന്നു.</translation>
+    </message>
+    <message>
+        <source>On the other device, choose &quot;Add as second device&quot; and scan this code. Both devices must be on the same network.</source>
+        <translation>മറ്റേ ഉപകരണത്തിൽ &quot;രണ്ടാമത്തെ ഉപകരണമായി ചേർക്കുക&quot; തിരഞ്ഞെടുത്ത് ഈ കോഡ് സ്കാൻ ചെയ്യുക. രണ്ട് ഉപകരണങ്ങളും ഒരേ ശൃംഖലയിൽ ആയിരിക്കണം.</translation>
+    </message>
+    <message>
+        <source>Make sure no unwanted observer or camera can see this code. This profile does not receive messages while the code is shown.</source>
+        <translation>അനാവശ്യമായ ആരും, ഒരു ക്യാമറയും ഈ കോഡ് കാണുന്നില്ലെന്ന് ഉറപ്പാക്കുക. കോഡ് കാണിക്കുന്നിടത്തോളം ഈ പ്രൊഫൈൽ സന്ദേശങ്ങൾ സ്വീകരിക്കില്ല.</translation>
     </message>
 </context>
 <context>
@@ -1478,18 +1445,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>അറിയിപ്പുകൾ</translation>
     </message>
     <message>
-        <source>Who wrote, and what</source>
-        <translation>ആരെഴുതി, എന്തെഴുതി</translation>
-    </message>
-    <message>
-        <source>Who wrote</source>
-        <translation>ആരെഴുതി</translation>
-    </message>
-    <message>
-        <source>Only that something arrived</source>
-        <translation>എന്തോ വന്നു എന്നു മാത്രം</translation>
-    </message>
-    <message>
         <source>Apps</source>
         <translation>ആപ്പുകൾ</translation>
     </message>
@@ -1523,10 +1478,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>ഉപകരണത്തിൽ നിന്ന് സന്ദേശങ്ങൾ ഇല്ലാതാക്കുക</translation>
     </message>
     <message>
-        <source>A new notification shows</source>
-        <translation>പുതിയ അറിയിപ്പ് കാണിക്കുന്നത്</translation>
-    </message>
-    <message>
         <source>Mentions</source>
         <extracomment>A reply to one of the reader&apos;s own messages, arriving in a group they have muted.</extracomment>
         <translation>പരാമർശങ്ങൾ</translation>
@@ -1541,49 +1492,12 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>മാർക്ക്ഡൗൺ രൂപപ്പെടുത്തൽ ഉപയോഗിക്കുക</translation>
     </message>
     <message>
-        <source>Otherwise it starts a new line, and the button sends.</source>
-        <translation>അല്ലെങ്കിൽ അത് പുതിയ വരി തുടങ്ങും, അയയ്ക്കുന്നത് ബട്ടണാണ്.</translation>
-    </message>
-    <message>
-        <source>Draws *stars* and `backticks` rather than showing them.</source>
-        <translation>*നക്ഷത്രങ്ങളും* `ബാക്ക്ടിക്കുകളും` കാണിക്കുന്നതിനു പകരം വരയ്ക്കുന്നു.</translation>
-    </message>
-    <message>
-        <source>Bigger ones wait until you ask for them. Every profile, from now on.</source>
-        <translation>വലുതായവ നിങ്ങൾ ചോദിക്കുന്നതുവരെ കാത്തിരിക്കും. എല്ലാ പ്രൊഫൈലുകളും, ഇനി മുതൽ.</translation>
-    </message>
-    <message>
-        <source>Every chat of every profile. &quot;Saved messages&quot; are kept.</source>
-        <translation>ഓരോ പ്രൊഫൈലിന്റെയും ഓരോ സംഭാഷണവും. “സൂക്ഷിച്ച സന്ദേശങ്ങൾ” നിലനിൽക്കും.</translation>
-    </message>
-    <message>
-        <source>On the lock screen and in the notification area.</source>
-        <translation>പൂട്ടിയ സ്ക്രീനിലും അറിയിപ്പ് ഭാഗത്തും.</translation>
-    </message>
-    <message>
-        <source>A reply to you gets through a muted group.</source>
-        <translation>നിങ്ങൾക്കുള്ള മറുപടി നിശ്ശബ്ദമാക്കിയ കൂട്ടത്തിൽനിന്നും എത്തും.</translation>
-    </message>
-    <message>
-        <source>Click ids and campaign tags come out of the links you send.</source>
-        <translation>ക്ലിക്ക് ഐഡികളും പ്രചാരണ ടാഗുകളും നിങ്ങൾ അയയ്ക്കുന്ന കണ്ണികളിൽനിന്ന് ഒഴിവാകും.</translation>
-    </message>
-    <message>
-        <source>Small apps run inside the chat. Somebody else&apos;s code, and less tested than the rest.</source>
-        <translation>ചെറിയ ആപ്പുകൾ സംഭാഷണത്തിനുള്ളിൽത്തന്നെ പ്രവർത്തിക്കുന്നു. മറ്റൊരാളുടെ കോഡ്, ബാക്കിയുള്ളതിനെക്കാൾ കുറവ് പരീക്ഷിച്ചത്.</translation>
-    </message>
-    <message>
         <source>Privacy</source>
         <translation>സ്വകാര്യത</translation>
     </message>
     <message>
         <source>Blocked contacts</source>
         <translation>ബ്ലോക്ക് ചെയ്ത കോൺടാക്റ്റുകൾ</translation>
-    </message>
-    <message>
-        <source>Worse quality, save data</source>
-        <extracomment>Outgoing media quality: smaller pictures and videos, which cost the reader and whoever they write to less data. Both reference clients&apos; words for it.</extracomment>
-        <translation>കുറഞ്ഞ നിലവാരം, കുറഞ്ഞ ഡാറ്റ</translation>
     </message>
     <message>
         <source>Balanced</source>
@@ -1596,12 +1510,41 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>അയയ്ക്കുന്ന മീഡിയയുടെ നിലവാരം</translation>
     </message>
     <message>
-        <source>Pictures are made smaller before sending, and the camera records at this quality.</source>
-        <translation>ചിത്രങ്ങൾ അയയ്ക്കുന്നതിന് മുൻപ് ചെറുതാക്കുന്നു, ക്യാമറയും ഈ നിലവാരത്തിൽ റെക്കോർഡ് ചെയ്യുന്നു.</translation>
-    </message>
-    <message>
         <source>Show notifications</source>
         <translation>അറിയിപ്പുകൾ കാണിക്കുക</translation>
+    </message>
+    <message>
+        <source>Lower quality, less data</source>
+        <extracomment>Outgoing media quality: smaller pictures and videos, which cost the reader and whoever they write to less data. Both reference clients&apos; words for it.</extracomment>
+        <translation>കുറഞ്ഞ ഗുണനിലവാരം, കുറഞ്ഞ ഡാറ്റ</translation>
+    </message>
+    <message>
+        <source>Notification content</source>
+        <translation>അറിയിപ്പിന്റെ ഉള്ളടക്കം</translation>
+    </message>
+    <message>
+        <source>Sender and message</source>
+        <translation>അയച്ചയാളും സന്ദേശവും</translation>
+    </message>
+    <message>
+        <source>Sender only</source>
+        <translation>അയച്ചയാൾ മാത്രം</translation>
+    </message>
+    <message>
+        <source>No details</source>
+        <translation>വിശദാംശങ്ങളില്ല</translation>
+    </message>
+    <message>
+        <source>In muted groups, notify messages directed to you, like replies or reactions</source>
+        <translation>നിശ്ശബ്ദമാക്കിയ കൂട്ടങ്ങളിൽ നിങ്ങൾക്കായുള്ള സന്ദേശങ്ങൾ, മറുപടികളോ പ്രതികരണങ്ങളോ പോലെ, അറിയിക്കുക</translation>
+    </message>
+    <message>
+        <source>Removes click IDs and campaign tags from links you send.</source>
+        <translation>നിങ്ങൾ അയയ്ക്കുന്ന ലിങ്കുകളിൽ നിന്ന് ക്ലിക്ക് ഐഡികളും പ്രചാരണ ടാഗുകളും നീക്കം ചെയ്യുന്നു.</translation>
+    </message>
+    <message>
+        <source>Runs small apps inside chats. These features may be unstable and may be changed or removed.</source>
+        <translation>സംഭാഷണങ്ങൾക്കുള്ളിൽ ചെറിയ ആപ്പുകൾ പ്രവർത്തിപ്പിക്കുന്നു. ഈ സൗകര്യങ്ങൾ അസ്ഥിരമാകാം, മാറ്റുകയോ നീക്കം ചെയ്യുകയോ ചെയ്യാം.</translation>
     </message>
 </context>
 <context>
@@ -1674,16 +1617,16 @@ Other groups with blocked contacts will still show their messages.</source>
 <context>
     <name>WelcomePage</name>
     <message>
-        <source>Tell me about Delta Chat</source>
-        <translation>Delta Chat എന്താണ്?</translation>
-    </message>
-    <message>
-        <source>Set up my profile</source>
-        <translation>എന്റെ പ്രൊഫൈൽ ഒരുക്കുക</translation>
-    </message>
-    <message>
         <source>Secure decentralised chat based on Delta Chat</source>
         <translation>Delta Chat അടിസ്ഥാനമാക്കിയ സുരക്ഷിതവും വികേന്ദ്രീകൃതവുമായ ചാറ്റ്</translation>
+    </message>
+    <message>
+        <source>About Delta Chat</source>
+        <translation>Delta Chat -നെക്കുറിച്ച്</translation>
+    </message>
+    <message>
+        <source>Set up your profile</source>
+        <translation>നിങ്ങളുടെ പ്രൊഫൈൽ ക്രമീകരിക്കുക</translation>
     </message>
 </context>
 </TS>

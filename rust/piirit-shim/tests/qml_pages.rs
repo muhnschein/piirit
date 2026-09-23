@@ -453,7 +453,7 @@ fn assert_welcome_and_navigation(
     assert_eq!(common::value_of(steps, "welcome-click"), "ok", "{context}");
     assert!(
         navigation.contains("push:ProfileStartPage.qml"),
-        "Set up my profile did not start the profile path. {context}"
+        "Set up your profile did not start the profile path. {context}"
     );
     assert!(
         navigation.contains("push:ExistingProfilePage.qml"),

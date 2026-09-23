@@ -54,7 +54,7 @@ Page {
             //: Outgoing media quality: smaller pictures and videos,
             //: which cost the reader and whoever they write to less
             //: data. Both reference clients' words for it.
-            return qsTr("Worse quality, save data")
+            return qsTr("Lower quality, less data")
         }
         //: Outgoing media quality: what the core picks by default.
         return qsTr("Balanced")
@@ -224,7 +224,6 @@ Page {
                 objectName: "enterSendsSwitch"
                 //: The return key on the keyboard.
                 text: qsTr("Enter sends the message")
-                description: qsTr("Otherwise it starts a new line, and the button sends.")
                 automaticCheck: false
                 checked: Settings.enterSends === true
                 onClicked: Settings.enterSends = !checked
@@ -233,7 +232,6 @@ Page {
             TextSwitch {
                 objectName: "markdownSwitch"
                 text: qsTr("Use Markdown formatting")
-                description: qsTr("Draws *stars* and `backticks` rather than showing them.")
                 // Checked follows the setting, so the tap writes the
                 // setting and the setting moves the switch -- the way
                 // the switch above it works.
@@ -252,7 +250,6 @@ Page {
                 width: parent.width
                 //: Pictures and videos on their way out of the phone.
                 label: qsTr("Outgoing media quality")
-                description: qsTr("Pictures are made smaller before sending, and the camera records at this quality.")
 
                 menu: ContextMenu {
                     MenuItem {
@@ -273,7 +270,6 @@ Page {
                 objectName: "downloadCombo"
                 width: parent.width
                 label: qsTr("Auto-download attachments")
-                description: qsTr("Bigger ones wait until you ask for them. Every profile, from now on.")
 
                 menu: ContextMenu {
                     Repeater {
@@ -299,7 +295,6 @@ Page {
                 objectName: "deletionCombo"
                 width: parent.width
                 label: qsTr("Delete messages from device")
-                description: qsTr("Every chat of every profile. \"Saved messages\" are kept.")
 
                 menu: ContextMenu {
                     Repeater {
@@ -336,23 +331,22 @@ Page {
                 objectName: "notificationCombo"
                 width: parent.width
                 enabled: Settings.notificationsEnabled === true
-                label: qsTr("A new notification shows")
-                description: qsTr("On the lock screen and in the notification area.")
+                label: qsTr("Notification content")
 
                 menu: ContextMenu {
                     MenuItem {
                         objectName: "notificationOption0"
-                        text: qsTr("Who wrote, and what")
+                        text: qsTr("Sender and message")
                         onClicked: Settings.notificationDetail = 0
                     }
                     MenuItem {
                         objectName: "notificationOption1"
-                        text: qsTr("Who wrote")
+                        text: qsTr("Sender only")
                         onClicked: Settings.notificationDetail = 1
                     }
                     MenuItem {
                         objectName: "notificationOption2"
-                        text: qsTr("Only that something arrived")
+                        text: qsTr("No details")
                         onClicked: Settings.notificationDetail = 2
                     }
                 }
@@ -366,7 +360,7 @@ Page {
                 //: A reply to one of the reader's own messages, arriving
                 //: in a group they have muted.
                 text: qsTr("Mentions")
-                description: qsTr("A reply to you gets through a muted group.")
+                description: qsTr("In muted groups, notify messages directed to you, like replies or reactions")
                 enabled: Settings.notificationsEnabled === true
                 automaticCheck: false
                 checked: Settings.mentionNotifications === true
@@ -384,7 +378,7 @@ Page {
             TextSwitch {
                 objectName: "cleanLinksSwitch"
                 text: qsTr("Remove tracking from links")
-                description: qsTr("Click ids and campaign tags come out of the links you send.")
+                description: qsTr("Removes click IDs and campaign tags from links you send.")
                 // Bound to the setting, not held here, so the switch cannot
                 // drift from what the app will read.
                 automaticCheck: false
@@ -440,7 +434,7 @@ Page {
                 //: chat and everyone in it plays with. Keep the name:
                 //: it is what every other Delta Chat client calls them.
                 text: qsTr("Enable webxdc apps (experimental)")
-                description: qsTr("Small apps run inside the chat. Somebody else's code, and less tested than the rest.")
+                description: qsTr("Runs small apps inside chats. These features may be unstable and may be changed or removed.")
                 automaticCheck: false
                 checked: Settings.webxdcEnabled === true
                 onClicked: Settings.webxdcEnabled = !checked

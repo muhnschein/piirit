@@ -287,7 +287,7 @@ Page {
     // while Piirit is already fixing it is worse than none.
     readonly property string coreStatusMessage:
         core.status === "reconnecting"
-        ? qsTr("Lost the connection to the Delta Chat core. Reconnecting...")
+        ? qsTr("Lost the connection to the Delta Chat core. Reconnecting…")
         : core.status === "stopped"
           ? qsTr("Lost the connection to the Delta Chat core. Restart Piirit.")
           : ""
@@ -644,52 +644,16 @@ Page {
         objectName: "tooBigBar"
         labelObjectName: "tooBigLabel"
         tone: "error"
-        // Not transient, for the reason the long-message notice is not:
-        // it is true for as long as the file is on the bar.
+        // Not transient: it is true for as long as the file is on the
+        // bar.
         timeout: 0
         text: messages.attachment_too_big
               //: Shown above the message field when the attached file is
               //: bigger than will be sent. %1 is the file's size and %2
               //: the largest that goes, each such as "24 MB".
-              ? qsTr("Too big to send: %1. Attachments go up to %2.")
+              ? qsTr("%1 is too large to send. Attachments can be up to %2.")
                 .arg(Format.readableSize(messages.attachment_bytes))
                 .arg(Format.readableSize(messages.attachment_limit))
-              : ""
-        anchors {
-            left: parent.left
-            right: parent.right
-            bottom: longMessageBar.top
-        }
-    }
-
-    /// Whether what is in the field is long enough that the core will
-    /// cut it on the way out. Asked of the shim, which holds the core's
-    /// own rule (`truncation.rs`).
-    readonly property bool sendingLongMessage:
-        messages.would_truncate(textField.text)
-
-    // Said while the message is still being written, because afterwards
-    // there is nothing to be done about it: past a certain length the
-    // core sends a shortened version with the rest attached, and what
-    // arrives at the other end is a preview with something to tap. Worth
-    // knowing before pressing send, and not worth a dialog. parla says
-    // the same thing in the same place, which is where this app learnt
-    // that it was worth saying at all.
-    Banner {
-        id: longMessageBar
-        objectName: "longMessageBar"
-        labelObjectName: "longMessageLabel"
-        tone: "info"
-        // Not transient: it is true for as long as the draft is long,
-        // and a notice that faded out would be a notice the writer was
-        // told once and then had to remember.
-        timeout: 0
-        text: page.sendingLongMessage
-              //: Shown above the message field while what is being
-              //: written is long enough that the other end will receive a
-              //: shortened version with the rest behind a tap.
-              ? qsTr("Long message: the other end sees a preview and taps "
-                     + "to read the rest")
               : ""
         anchors {
             left: parent.left

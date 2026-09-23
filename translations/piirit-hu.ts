@@ -40,19 +40,19 @@
     </message>
     <message>
         <source>Select a public chatmail relay</source>
-        <translation>Nyilvános chatmail-közvetítő választása</translation>
+        <translation>Nyilvános chatmail-relé választása</translation>
     </message>
     <message>
         <source>Use a custom chatmail relay</source>
-        <translation>Saját chatmail-közvetítő használata</translation>
+        <translation>Saját chatmail-relé használata</translation>
     </message>
     <message>
         <source>Piirit works only with chatmail relays. These are a particular kind of e-mail server; ordinary e-mail servers are not supported. For more, see &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. A full list of public, free-to-use chatmail relays is at &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</source>
-        <translation>A Piirit csak chatmail-közvetítőkkel működik. Ezek különleges fajta e-mail-kiszolgálók; a közönséges e-mail-kiszolgálók nem támogatottak. Bővebben: &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. A nyilvános, ingyenesen használható chatmail-közvetítők teljes listája: &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
+        <translation>A Piirit csak chatmail-relékkel működik. Ezek különleges fajta e-mail-kiszolgálók; a közönséges e-mail-kiszolgálók nem támogatottak. Bővebben: &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. A nyilvános, ingyenesen használható chatmail-relék teljes listája: &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
     </message>
     <message>
-        <source>Pick a name and a relay. That&apos;s it! There is nothing else to set up.</source>
-        <translation>Válassz egy nevet és egy közvetítőt. Ennyi! Mást nem kell beállítani.</translation>
+        <source>Choose a name and a relay. Nothing else is needed.</source>
+        <translation>Válassz nevet és relét. Másra nincs szükség.</translation>
     </message>
 </context>
 <context>
@@ -66,24 +66,12 @@
         <translation>Profil létrehozása</translation>
     </message>
     <message>
-        <source>A new address on a chatmail relay.</source>
-        <translation>Új cím egy chatmail közvetítőn.</translation>
-    </message>
-    <message>
         <source>Restore from a backup</source>
         <translation>Visszaállítás mentésből</translation>
     </message>
     <message>
-        <source>A backup file copied onto this phone.</source>
-        <translation>Egy mentésfájl, erre a telefonra másolva.</translation>
-    </message>
-    <message>
         <source>Add as second device</source>
         <translation>Hozzáadás második eszközként</translation>
-    </message>
-    <message>
-        <source>The other device keeps it. Both get everything new.</source>
-        <translation>A másik eszköz megtartja. Mindkettő megkap minden újat.</translation>
     </message>
 </context>
 <context>
@@ -94,39 +82,39 @@
     </message>
     <message>
         <source>Add a relay</source>
-        <translation>Közvetítő hozzáadása</translation>
-    </message>
-    <message>
-        <source>Another address for this profile, on another relay. The profile sends from one relay at a time; its page says which, and lets you change it.</source>
-        <translation>Még egy cím ehhez a profilhoz, egy másik közvetítőn. A profil egyszerre egy közvetítőről küld; az oldala mutatja, melyikről, és ott át is állíthatod.</translation>
+        <translation>Relé hozzáadása</translation>
     </message>
     <message>
         <source>Add relay</source>
-        <translation>Közvetítő hozzáadása</translation>
-    </message>
-    <message>
-        <source>Contacting %1...</source>
-        <translation>Kapcsolatfelvétel: %1...</translation>
+        <translation>Relé hozzáadása</translation>
     </message>
     <message>
         <source>Cancel</source>
         <translation>Mégse</translation>
     </message>
     <message>
-        <source>Relays are run by volunteers. Try another one.</source>
-        <translation>A közvetítőket önkéntesek üzemeltetik. Próbálj másikat.</translation>
-    </message>
-    <message>
         <source>Select a public chatmail relay</source>
-        <translation>Nyilvános chatmail-közvetítő választása</translation>
+        <translation>Nyilvános chatmail-relé választása</translation>
     </message>
     <message>
         <source>Use a custom chatmail relay</source>
-        <translation>Saját chatmail-közvetítő használata</translation>
+        <translation>Saját chatmail-relé használata</translation>
     </message>
     <message>
         <source>Piirit works only with chatmail relays. These are a particular kind of e-mail server; ordinary e-mail servers are not supported. For more, see &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. A full list of public, free-to-use chatmail relays is at &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</source>
-        <translation>A Piirit csak chatmail-közvetítőkkel működik. Ezek különleges fajta e-mail-kiszolgálók; a közönséges e-mail-kiszolgálók nem támogatottak. Bővebben: &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. A nyilvános, ingyenesen használható chatmail-közvetítők teljes listája: &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
+        <translation>A Piirit csak chatmail-relékkel működik. Ezek különleges fajta e-mail-kiszolgálók; a közönséges e-mail-kiszolgálók nem támogatottak. Bővebben: &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. A nyilvános, ingyenesen használható chatmail-relék teljes listája: &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
+    </message>
+    <message>
+        <source>Adds another address for this profile on a second relay. The profile sends from one relay at a time; you can change which one on the profile page.</source>
+        <translation>Egy további címet ad ehhez a profilhoz egy másik relén. A profil egyszerre egy relén keresztül küld; hogy melyiken, azt a profil oldalán módosíthatod.</translation>
+    </message>
+    <message>
+        <source>Contacting %1…</source>
+        <translation>Kapcsolatfelvétel: %1…</translation>
+    </message>
+    <message>
+        <source>Could not reach the relay. Try another one.</source>
+        <translation>A relé nem volt elérhető. Próbálj meg egy másikat.</translation>
     </message>
 </context>
 <context>
@@ -159,13 +147,6 @@
         <source>Cancel</source>
         <translation>Mégse</translation>
     </message>
-    <message numerus="yes">
-        <source>%n message(s) will be deleted now, and from then on every message will be once it is that old.</source>
-        <extracomment>%n is how many messages would be deleted straight away.</extracomment>
-        <translation>
-            <numerusform>%n üzenet törlődik most, és ezután minden üzenet, amint ilyen régi lesz.</numerusform>
-        </translation>
-    </message>
     <message>
         <source>This includes pictures, videos and files.</source>
         <translation>Ez a képeket, videókat és fájlokat is jelenti.</translation>
@@ -183,20 +164,19 @@
         <source>I understand, delete all these messages</source>
         <translation>Értem, törlöm mindezeket az üzeneteket</translation>
     </message>
+    <message numerus="yes">
+        <source>%n message(s) will be deleted now, and every new message will be deleted once it reaches that age.</source>
+        <extracomment>%n is how many messages would be deleted straight away.</extracomment>
+        <translation>
+            <numerusform>%n üzenet törlődik most, és minden új üzenet törlődik, amint eléri ezt a kort.</numerusform>
+        </translation>
+    </message>
 </context>
 <context>
     <name>BackupPage</name>
     <message>
         <source>Back up profile</source>
         <translation>Profil mentése</translation>
-    </message>
-    <message>
-        <source>Write the backup</source>
-        <translation>Mentés írása</translation>
-    </message>
-    <message>
-        <source>Writing the backup...</source>
-        <translation>Mentés írása folyamatban...</translation>
     </message>
     <message>
         <source>Cancel</source>
@@ -208,12 +188,20 @@
         <translation>Mentve ide: %1</translation>
     </message>
     <message>
-        <source>Messages, contacts and key in one file, saved to Documents. Whoever has the file has the profile.</source>
-        <translation>Üzenetek, névjegyek és kulcs egyetlen fájlban, a Dokumentumokba mentve. Akinél a fájl van, annál a profil van.</translation>
-    </message>
-    <message>
         <source>Swipe on for your chats.</source>
         <translation>Húzd tovább a csevegéseidhez.</translation>
+    </message>
+    <message>
+        <source>Start backup</source>
+        <translation>Biztonsági mentés indítása</translation>
+    </message>
+    <message>
+        <source>Backing up…</source>
+        <translation>Biztonsági mentés készítése…</translation>
+    </message>
+    <message>
+        <source>Saves your messages, contacts and end-to-end encryption setup to a backup file. Keep this file in a safe place.</source>
+        <translation>Az üzeneteidet, névjegyeidet és a végpontok közötti titkosítás beállítását biztonsági mentés fájlba menti. Ezt a fájlt tartsd biztonságos helyen.</translation>
     </message>
 </context>
 <context>
@@ -287,10 +275,6 @@ Other groups with blocked contacts will still show their messages.</source>
 </context>
 <context>
     <name>ChatListPage</name>
-    <message>
-        <source>Lost the connection to the Delta Chat core. Reconnecting...</source>
-        <translation>Megszakadt a kapcsolat a Delta Chat magjával. Újracsatlakozás...</translation>
-    </message>
     <message>
         <source>Lost the connection to the Delta Chat core. Restart Piirit.</source>
         <translation>Megszakadt a kapcsolat a Delta Chat magjával. Indítsa újra a Postivenét.</translation>
@@ -399,6 +383,10 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Search</source>
         <translation>Keresés</translation>
+    </message>
+    <message>
+        <source>Lost the connection to the Delta Chat core. Reconnecting…</source>
+        <translation>Megszakadt a kapcsolat a Delta Chat magjával. Újracsatlakozás…</translation>
     </message>
 </context>
 <context>
@@ -529,10 +517,6 @@ Other groups with blocked contacts will still show their messages.</source>
 <context>
     <name>ConversationPage</name>
     <message>
-        <source>Lost the connection to the Delta Chat core. Reconnecting...</source>
-        <translation>Megszakadt a kapcsolat a Delta Chat magjával. Újracsatlakozás...</translation>
-    </message>
-    <message>
         <source>Lost the connection to the Delta Chat core. Restart Piirit.</source>
         <translation>Megszakadt a kapcsolat a Delta Chat magjával. Indítsa újra a Postivenét.</translation>
     </message>
@@ -554,11 +538,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Üzenet</translation>
     </message>
     <message>
-        <source>Long message: the other end sees a preview and taps to read the rest</source>
-        <extracomment>Shown above the message field while what is being written is long enough that the other end will receive a shortened version with the rest behind a tap.</extracomment>
-        <translation>Hosszú üzenet: a másik oldalon előnézet látszik, a többit koppintással lehet elolvasni</translation>
-    </message>
-    <message>
         <source>Saved to Pictures</source>
         <translation>Mentve a Képek közé</translation>
     </message>
@@ -578,9 +557,13 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Mentve a Letöltésekbe</translation>
     </message>
     <message>
-        <source>Too big to send: %1. Attachments go up to %2.</source>
+        <source>Lost the connection to the Delta Chat core. Reconnecting…</source>
+        <translation>Megszakadt a kapcsolat a Delta Chat magjával. Újracsatlakozás…</translation>
+    </message>
+    <message>
+        <source>%1 is too large to send. Attachments can be up to %2.</source>
         <extracomment>Shown above the message field when the attached file is bigger than will be sent. %1 is the file&apos;s size and %2 the largest that goes, each such as &quot;24 MB&quot;.</extracomment>
-        <translation>Túl nagy a küldéshez: %1. A mellékletek legfeljebb %2 méretűek lehetnek.</translation>
+        <translation>%1 túl nagy a küldéshez. A mellékletek legfeljebb %2 méretűek lehetnek.</translation>
     </message>
 </context>
 <context>
@@ -618,14 +601,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>How do you want to delete this message? This cannot be undone.</source>
         <translation>Hogyan szeretnéd törölni ezt az üzenetet? Ezt nem lehet visszavonni.</translation>
-    </message>
-    <message>
-        <source>It goes from your devices. Everybody else keeps their copy.</source>
-        <translation>Eltűnik az eszközeidről. Mindenki más megtartja a saját másolatát.</translation>
-    </message>
-    <message>
-        <source>It goes from your devices, and every other device in this chat is asked to delete it too.</source>
-        <translation>Eltűnik az eszközeidről, és a beszélgetés minden más eszköze is felkérést kap a törlésére.</translation>
     </message>
 </context>
 <context>
@@ -687,8 +662,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>%1 másodperc után</translation>
     </message>
     <message>
-        <source>Applies to everyone in the chat. They can still copy and forward.</source>
-        <translation>Mindenkire vonatkozik a csevegésben. Másolni és továbbítani továbbra is tudnak.</translation>
+        <source>Applies to all members of this chat; they can still copy, save, and forward messages.</source>
+        <translation>A csevegés összes tagjára vonatkozik; az üzeneteket továbbra is másolhatják, menthetik és továbbíthatják.</translation>
     </message>
 </context>
 <context>
@@ -704,14 +679,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Restore from a backup</source>
         <translation>Visszaállítás mentésből</translation>
-    </message>
-    <message>
-        <source>The other device keeps it. Both get everything new.</source>
-        <translation>A másik eszköz megtartja. Mindkettő megkap minden újat.</translation>
-    </message>
-    <message>
-        <source>A backup file copied onto this phone.</source>
-        <translation>Egy mentésfájl, erre a telefonra másolva.</translation>
     </message>
 </context>
 <context>
@@ -794,14 +761,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Ön dönti el, ki érheti el</translation>
     </message>
     <message>
-        <source>Groups of equals</source>
-        <translation>Egyenlők csoportjai</translation>
-    </message>
-    <message>
-        <source>The server only passes it on</source>
-        <translation>A kiszolgáló csak továbbadja</translation>
-    </message>
-    <message>
         <source>Keep swiping to set up your profile.</source>
         <translation>Lapozzon tovább a profil beállításához.</translation>
     </message>
@@ -810,24 +769,32 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Minden üzenet titkosítva van</translation>
     </message>
     <message>
-        <source>Made here on your phone. No phone number, no account, nothing to sign.</source>
-        <translation>Itt készül, a telefonodon. Nincs telefonszám, nincs fiók, nincs mit aláírni.</translation>
+        <source>Your profile is created on this phone. No phone number and no sign-up are needed.</source>
+        <translation>A profilod ezen a telefonon jön létre. Sem telefonszám, sem regisztráció nem kell hozzá.</translation>
     </message>
     <message>
-        <source>There is no directory to be found in. Show a friend a code, or send a link.</source>
-        <translation>Nincs névjegyzék, amelyben megtalálhatnának. Mutass egy barátodnak kódot, vagy küldj neki hivatkozást.</translation>
+        <source>There is no public directory. People reach you by scanning your invite code or opening your invite link.</source>
+        <translation>Nincs nyilvános névjegyzék. Mások úgy érnek el, hogy beolvassák a meghívókódodat vagy megnyitják a meghívólinkedet.</translation>
     </message>
     <message>
-        <source>Encrypted the whole way, always. The servers cannot read a word.</source>
-        <translation>Mindig végig titkosítva. A kiszolgálók egy szót sem olvasnak.</translation>
+        <source>Any member can add people, rename the group or leave it.</source>
+        <translation>Bármelyik tag hozzáadhat embereket, átnevezheti a csoportot vagy kiléphet belőle.</translation>
     </message>
     <message>
-        <source>Anyone can add a friend, rename the group or leave. Nobody is in charge.</source>
-        <translation>Bárki hozzáadhat egy barátot, átnevezheti a csoportot vagy kiléphet. Senki sem parancsol.</translation>
+        <source>Messages are end-to-end encrypted, so the relays that carry them cannot read them.</source>
+        <translation>Az üzenetek végpontok között titkosítottak, így az őket továbbító relék nem tudják elolvasni azokat.</translation>
     </message>
     <message>
-        <source>It holds a message until the other phone is online, and nothing more.</source>
-        <translation>Addig őrzi az üzenetet, amíg a másik telefon elérhető nem lesz, és semmi több.</translation>
+        <source>Groups have no admins</source>
+        <translation>A csoportoknak nincs rendszergazdájuk</translation>
+    </message>
+    <message>
+        <source>Relays only pass messages on</source>
+        <translation>A relék csak továbbítják az üzeneteket</translation>
+    </message>
+    <message>
+        <source>A relay stores a message only until the recipient fetches it.</source>
+        <translation>A relé csak addig őrzi meg az üzenetet, amíg a címzett le nem tölti.</translation>
     </message>
 </context>
 <context>
@@ -958,12 +925,12 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Még nincs névjegy</translation>
     </message>
     <message>
-        <source>Scan someone&apos;s invite from the chat list: QR code</source>
-        <translation>Olvassa be valaki meghívóját a csevegéslistából: QR-kód</translation>
-    </message>
-    <message>
         <source>Search</source>
         <translation>Keresés</translation>
+    </message>
+    <message>
+        <source>Use &quot;QR code&quot; in the chat list to add a contact.</source>
+        <translation>Névjegy hozzáadásához használd a csevegéslistában a „QR-kód” menüpontot.</translation>
     </message>
 </context>
 <context>
@@ -971,10 +938,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Please name the group</source>
         <translation>Adjon nevet a csoportnak</translation>
-    </message>
-    <message>
-        <source>Create Group</source>
-        <translation>Csoport létrehozása</translation>
     </message>
     <message>
         <source>New group</source>
@@ -1006,6 +969,10 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Add members</source>
         <translation>Tagok hozzáadása</translation>
+    </message>
+    <message>
+        <source>Create group</source>
+        <translation>Csoport létrehozása</translation>
     </message>
 </context>
 <context>
@@ -1074,36 +1041,32 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
     <message>
         <source>The relay has not reported its quota yet</source>
-        <translation>A közvetítő még nem jelentette a kvótáját</translation>
-    </message>
-    <message>
-        <source>Both ways: with this off you send none and see none.</source>
-        <translation>Mindkét irányban: kikapcsolva egyet sem küldesz és egyet sem látsz.</translation>
+        <translation>A relé még nem jelentette a kvótáját</translation>
     </message>
     <message>
         <source>Relays</source>
-        <translation>Közvetítők</translation>
+        <translation>Relék</translation>
     </message>
     <message>
         <source>Sends from this relay</source>
-        <translation>Erről a közvetítőről küld</translation>
+        <translation>Erről a reléről küld</translation>
     </message>
     <message>
         <source>Removing relay</source>
         <extracomment>What Silica&apos;s countdown says it is doing, over a relay the reader has asked to remove.</extracomment>
-        <translation>Közvetítő eltávolítása folyamatban</translation>
+        <translation>Relé eltávolítása folyamatban</translation>
     </message>
     <message>
         <source>Send from this relay</source>
-        <translation>Küldés erről a közvetítőről</translation>
+        <translation>Küldés erről a reléről</translation>
     </message>
     <message>
         <source>Remove relay</source>
-        <translation>Közvetítő eltávolítása</translation>
+        <translation>Relé eltávolítása</translation>
     </message>
     <message>
         <source>Add a relay</source>
-        <translation>Közvetítő hozzáadása</translation>
+        <translation>Relé hozzáadása</translation>
     </message>
     <message>
         <source>%1 of %2 used</source>
@@ -1115,16 +1078,16 @@ Other groups with blocked contacts will still show their messages.</source>
         <extracomment>How much room the profile takes on the phone. %1 is a size such as &quot;12.3 MB&quot;.</extracomment>
         <translation>A Piirit %1 tárhelyet foglal ezen a telefonon.</translation>
     </message>
+    <message>
+        <source>If read receipts are disabled, you won&apos;t be able to see read receipts from others.</source>
+        <translation>Ha az olvasási visszaigazolásokat letiltja, akkor Ön sem fogja látni mások olvasási visszaigazolásait.</translation>
+    </message>
 </context>
 <context>
     <name>ProfileSetupPage</name>
     <message>
         <source>Add profile</source>
         <translation>Profil hozzáadása</translation>
-    </message>
-    <message>
-        <source>Contacting %1...</source>
-        <translation>Kapcsolatfelvétel: %1...</translation>
     </message>
     <message>
         <source>Cancel</source>
@@ -1139,16 +1102,16 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>%1 nem válaszolt %2 másodpercen belül.</translation>
     </message>
     <message>
-        <source>Relays are run by volunteers. Go back and try another one.</source>
-        <translation>A közvetítőket önkéntesek üzemeltetik. Menj vissza és próbálj másikat.</translation>
+        <source>Contacting %1…</source>
+        <translation>Kapcsolatfelvétel: %1…</translation>
+    </message>
+    <message>
+        <source>Could not reach the relay. Try another one.</source>
+        <translation>A relé nem volt elérhető. Próbálj meg egy másikat.</translation>
     </message>
 </context>
 <context>
     <name>ProfileStartPage</name>
-    <message>
-        <source>Alright, let&apos;s get you set up.</source>
-        <translation>Rendben, állítsuk be a profilját.</translation>
-    </message>
     <message>
         <source>I already have a profile</source>
         <translation>Már van profilom</translation>
@@ -1156,6 +1119,10 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Create a profile</source>
         <translation>Profil létrehozása</translation>
+    </message>
+    <message>
+        <source>Set up your profile</source>
+        <translation>Állítsd be a profilodat</translation>
     </message>
 </context>
 <context>
@@ -1221,16 +1188,16 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Olvastassa be valakivel ezt a kódot, vagy küldje el neki a hivatkozást.</translation>
     </message>
     <message>
-        <source>Fetching...</source>
-        <translation>Lekérés...</translation>
-    </message>
-    <message>
-        <source>Copy Invite Link</source>
-        <translation>Meghívó hivatkozás másolása</translation>
-    </message>
-    <message>
         <source>The camera is not available on this device.</source>
         <translation>A kamera nem érhető el ezen az eszközön.</translation>
+    </message>
+    <message>
+        <source>Fetching…</source>
+        <translation>Lekérés…</translation>
+    </message>
+    <message>
+        <source>Copy invite link</source>
+        <translation>Meghívó hivatkozás másolása</translation>
     </message>
 </context>
 <context>
@@ -1248,10 +1215,6 @@ Other groups with blocked contacts will still show their messages.</source>
 <context>
     <name>RestoreProfilePage</name>
     <message>
-        <source>That is not the code a device shows while it is offering its profile.</source>
-        <translation>Ez nem az a kód, amit egy eszköz mutat, amíg a profilját felkínálja.</translation>
-    </message>
-    <message>
         <source>Add as second device</source>
         <translation>Hozzáadás második eszközként</translation>
     </message>
@@ -1264,16 +1227,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Mentésfájl kiválasztása</translation>
     </message>
     <message>
-        <source>Taking the profile over...</source>
-        <translation>A profil átvétele...</translation>
-    </message>
-    <message>
         <source>Cancel</source>
         <translation>Mégse</translation>
-    </message>
-    <message>
-        <source>Hold the phone up to the code it shows</source>
-        <translation>Tartsa ezt a telefont a megjelenő kód elé</translation>
     </message>
     <message>
         <source>Enter the code instead</source>
@@ -1282,10 +1237,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Code from the other device</source>
         <translation>Kód a másik eszközről</translation>
-    </message>
-    <message>
-        <source>Take the profile over</source>
-        <translation>A profil átvétele</translation>
     </message>
     <message>
         <source>That did not work</source>
@@ -1300,28 +1251,44 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Másik fájl választása</translation>
     </message>
     <message>
-        <source>The other device runs a newer Delta Chat than this app can read.</source>
-        <translation>A másik eszközön újabb Delta Chat fut, mint amit ez az alkalmazás el tud olvasni.</translation>
-    </message>
-    <message>
-        <source>The transfer stopped. Both devices have to stay on one network, with this page open.</source>
-        <translation>Az átvitel megállt. Mindkét eszköznek egy hálózaton kell maradnia, ezzel az oldallal nyitva.</translation>
-    </message>
-    <message>
-        <source>No camera on this device. A backup file works without one.</source>
-        <translation>Ezen az eszközön nincs kamera. A mentésfájl kamera nélkül is működik.</translation>
-    </message>
-    <message>
-        <source>On the other device: Settings, then add a second device. Both on one network.</source>
-        <translation>A másik eszközön: Beállítások, majd második eszköz hozzáadása. Mindkettő egy hálózaton.</translation>
-    </message>
-    <message>
         <source>Make a backup on the other device, copy the file here, then choose it.</source>
         <translation>Készíts mentést a másik eszközön, másold ide a fájlt, majd válaszd ki.</translation>
     </message>
     <message>
         <source>That profile is already on this phone. Open it from the profiles list.</source>
         <translation>Ez a profil már rajta van ezen a telefonon. Nyisd meg a profilok listájából.</translation>
+    </message>
+    <message>
+        <source>The profile is from a newer Delta Chat version than this app can read.</source>
+        <translation>A profil újabb Delta Chat verzióból származik, mint amit ez az alkalmazás olvasni tud.</translation>
+    </message>
+    <message>
+        <source>The transfer stopped. Both devices must stay on the same network with this page open.</source>
+        <translation>Az átvitel leállt. Mindkét eszköznek ugyanazon a hálózaton kell maradnia, nyitott oldallal.</translation>
+    </message>
+    <message>
+        <source>This is not a second-device code. Use the code shown by the other device.</source>
+        <translation>Ez nem második eszközhöz tartozó kód. Használd a másik eszköz által mutatott kódot.</translation>
+    </message>
+    <message>
+        <source>Hold your camera over the QR code</source>
+        <translation>Tartsa a kamerát a QR-kód fölé</translation>
+    </message>
+    <message>
+        <source>Copy the profile</source>
+        <translation>Profil másolása</translation>
+    </message>
+    <message>
+        <source>No camera on this device. You can restore from a backup file instead.</source>
+        <translation>Ezen az eszközön nincs kamera. Helyette visszaállíthatsz egy biztonsági mentés fájlból.</translation>
+    </message>
+    <message>
+        <source>On the other device, go to Settings and tap &quot;Add second device&quot;. Both devices must be on the same network.</source>
+        <translation>A másik eszközön nyisd meg a Beállításokat, és koppints a „Második eszköz hozzáadása” lehetőségre. Mindkét eszköznek ugyanazon a hálózaton kell lennie.</translation>
+    </message>
+    <message>
+        <source>Transferring…</source>
+        <translation>Átvitel…</translation>
     </message>
 </context>
 <context>
@@ -1373,40 +1340,20 @@ Other groups with blocked contacts will still show their messages.</source>
 <context>
     <name>SecondDevicePage</name>
     <message>
-        <source>Nothing took the profile. Both phones have to stay on one network, with this page open.</source>
-        <translation>A profilt nem vitte el senki. Mindkét telefonnak egy hálózaton kell maradnia, ezzel az oldallal nyitva.</translation>
-    </message>
-    <message>
         <source>Add a second device</source>
         <translation>Második eszköz hozzáadása</translation>
-    </message>
-    <message>
-        <source>On the other device: add a profile you have already, then &quot;Add as second device&quot;, and read this code with it. Both phones on one network.</source>
-        <translation>A másik eszközön: adj hozzá egy profilt, ami már megvan, majd „Hozzáadás második eszközként”, és olvasd be vele ezt a kódot. Mindkét telefon egy hálózaton.</translation>
     </message>
     <message>
         <source>Copy the code</source>
         <translation>Kód másolása</translation>
     </message>
     <message>
-        <source>Handing the profile over...</source>
-        <translation>A profil átadása...</translation>
-    </message>
-    <message>
         <source>Cancel</source>
         <translation>Mégse</translation>
     </message>
     <message>
-        <source>The other device has the profile. Both get everything new from now on.</source>
-        <translation>A másik eszközön megvan a profil. Mostantól mindkettő megkap minden újat.</translation>
-    </message>
-    <message>
         <source>Swipe on for your chats.</source>
         <translation>Húzd tovább a csevegéseidhez.</translation>
-    </message>
-    <message>
-        <source>Whoever reads this code gets the profile. It stops collecting mail until the code is gone.</source>
-        <translation>Aki beolvassa ezt a kódot, megkapja a profilt. Amíg a kód fent van, a profil nem hoz le levelet.</translation>
     </message>
     <message>
         <source>Show code again</source>
@@ -1415,6 +1362,26 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Show code</source>
         <translation>Kód megmutatása</translation>
+    </message>
+    <message>
+        <source>No device copied the profile. Both devices must stay on the same network with this page open.</source>
+        <translation>Egyik eszköz sem másolta le a profilt. Mindkét eszköznek ugyanazon a hálózaton kell maradnia, nyitott oldallal.</translation>
+    </message>
+    <message>
+        <source>Transferring…</source>
+        <translation>Átvitel…</translation>
+    </message>
+    <message>
+        <source>The profile was transferred to your second device. Both devices now receive all new messages.</source>
+        <translation>A profil átkerült a második eszközödre. Mindkét eszköz megkapja mostantól az összes új üzenetet.</translation>
+    </message>
+    <message>
+        <source>On the other device, choose &quot;Add as second device&quot; and scan this code. Both devices must be on the same network.</source>
+        <translation>A másik eszközön válaszd a „Hozzáadás második eszközként” lehetőséget, és olvasd be ezt a kódot. Mindkét eszköznek ugyanazon a hálózaton kell lennie.</translation>
+    </message>
+    <message>
+        <source>Make sure no unwanted observer or camera can see this code. This profile does not receive messages while the code is shown.</source>
+        <translation>Ügyelj arra, hogy illetéktelen szemlélő vagy kamera ne láthassa ezt a kódot. Ez a profil nem fogad üzeneteket, amíg a kód látható.</translation>
     </message>
 </context>
 <context>
@@ -1468,18 +1435,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Értesítések</translation>
     </message>
     <message>
-        <source>Who wrote, and what</source>
-        <translation>Ki írt, és mit</translation>
-    </message>
-    <message>
-        <source>Who wrote</source>
-        <translation>Ki írt</translation>
-    </message>
-    <message>
-        <source>Only that something arrived</source>
-        <translation>Csak azt, hogy érkezett valami</translation>
-    </message>
-    <message>
         <source>Apps</source>
         <translation>Alkalmazások</translation>
     </message>
@@ -1513,10 +1468,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Üzenetek törlése az eszközről</translation>
     </message>
     <message>
-        <source>A new notification shows</source>
-        <translation>Egy új értesítés mutatja</translation>
-    </message>
-    <message>
         <source>Mentions</source>
         <extracomment>A reply to one of the reader&apos;s own messages, arriving in a group they have muted.</extracomment>
         <translation>Említések</translation>
@@ -1531,49 +1482,12 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Markdown-formázás használata</translation>
     </message>
     <message>
-        <source>Otherwise it starts a new line, and the button sends.</source>
-        <translation>Különben új sort kezd, és a gomb küld.</translation>
-    </message>
-    <message>
-        <source>Draws *stars* and `backticks` rather than showing them.</source>
-        <translation>A *csillagokat* és a `visszafelé aposztrófokat` megrajzolja, nem mutatja.</translation>
-    </message>
-    <message>
-        <source>Bigger ones wait until you ask for them. Every profile, from now on.</source>
-        <translation>A nagyobbak megvárják, amíg kéred őket. Minden profil, mostantól.</translation>
-    </message>
-    <message>
-        <source>Every chat of every profile. &quot;Saved messages&quot; are kept.</source>
-        <translation>Minden profil minden csevegése. A „mentett üzenetek” megmaradnak.</translation>
-    </message>
-    <message>
-        <source>On the lock screen and in the notification area.</source>
-        <translation>A zárolási képernyőn és az értesítési területen.</translation>
-    </message>
-    <message>
-        <source>A reply to you gets through a muted group.</source>
-        <translation>A neked szóló válasz a némított csoportból is átjut.</translation>
-    </message>
-    <message>
-        <source>Click ids and campaign tags come out of the links you send.</source>
-        <translation>A kattintásazonosítók és a kampánycímkék kiesnek az általad küldött hivatkozásokból.</translation>
-    </message>
-    <message>
-        <source>Small apps run inside the chat. Somebody else&apos;s code, and less tested than the rest.</source>
-        <translation>Kis alkalmazások futnak a csevegésen belül. Más kódja, és a többinél kevésbé kipróbált.</translation>
-    </message>
-    <message>
         <source>Privacy</source>
         <translation>Adatvédelem</translation>
     </message>
     <message>
         <source>Blocked contacts</source>
         <translation>Letiltott névjegyek</translation>
-    </message>
-    <message>
-        <source>Worse quality, save data</source>
-        <extracomment>Outgoing media quality: smaller pictures and videos, which cost the reader and whoever they write to less data. Both reference clients&apos; words for it.</extracomment>
-        <translation>Rosszabb minőség, kis méret</translation>
     </message>
     <message>
         <source>Balanced</source>
@@ -1586,12 +1500,41 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Kimenő média minősége</translation>
     </message>
     <message>
-        <source>Pictures are made smaller before sending, and the camera records at this quality.</source>
-        <translation>A képek küldés előtt kisebbek lesznek, a kamera pedig ebben a minőségben rögzít.</translation>
-    </message>
-    <message>
         <source>Show notifications</source>
         <translation>Értesítések megjelenítése</translation>
+    </message>
+    <message>
+        <source>Lower quality, less data</source>
+        <extracomment>Outgoing media quality: smaller pictures and videos, which cost the reader and whoever they write to less data. Both reference clients&apos; words for it.</extracomment>
+        <translation>Gyengébb minőség, kevesebb adat</translation>
+    </message>
+    <message>
+        <source>Notification content</source>
+        <translation>Az értesítés tartalma</translation>
+    </message>
+    <message>
+        <source>Sender and message</source>
+        <translation>Feladó és üzenet</translation>
+    </message>
+    <message>
+        <source>Sender only</source>
+        <translation>Csak a feladó</translation>
+    </message>
+    <message>
+        <source>No details</source>
+        <translation>Nincsenek részletek</translation>
+    </message>
+    <message>
+        <source>In muted groups, notify messages directed to you, like replies or reactions</source>
+        <translation>A némított csoportokban csak az Önnek címzett üzenetek, (például válaszok vagy reakciók) esetén küld értesítést.</translation>
+    </message>
+    <message>
+        <source>Removes click IDs and campaign tags from links you send.</source>
+        <translation>Eltávolítja a kattintásazonosítókat és kampánycímkéket az általad küldött linkekből.</translation>
+    </message>
+    <message>
+        <source>Runs small apps inside chats. These features may be unstable and may be changed or removed.</source>
+        <translation>Kis alkalmazásokat futtat a csevegéseken belül. Ezek a funkciók instabilak lehetnek, és megváltozhatnak vagy eltávolításra kerülhetnek.</translation>
     </message>
 </context>
 <context>
@@ -1664,16 +1607,16 @@ Other groups with blocked contacts will still show their messages.</source>
 <context>
     <name>WelcomePage</name>
     <message>
-        <source>Tell me about Delta Chat</source>
-        <translation>Mi az a Delta Chat?</translation>
-    </message>
-    <message>
-        <source>Set up my profile</source>
-        <translation>Profil beállítása</translation>
-    </message>
-    <message>
         <source>Secure decentralised chat based on Delta Chat</source>
         <translation>Biztonságos, decentralizált csevegés a Delta Chatre építve</translation>
+    </message>
+    <message>
+        <source>About Delta Chat</source>
+        <translation>A Delta Chatról</translation>
+    </message>
+    <message>
+        <source>Set up your profile</source>
+        <translation>Állítsd be a profilodat</translation>
     </message>
 </context>
 </TS>

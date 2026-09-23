@@ -51,8 +51,8 @@
         <translation>Piirit 只能与 chatmail 中继配合使用。这是一种特殊的电子邮件服务器；不支持普通的电子邮件服务器。详情见 &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;。公共、免费的 chatmail 中继完整列表见 &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;。</translation>
     </message>
     <message>
-        <source>Pick a name and a relay. That&apos;s it! There is nothing else to set up.</source>
-        <translation>选一个名字和一个中继，就这样！无需其他设置。</translation>
+        <source>Choose a name and a relay. Nothing else is needed.</source>
+        <translation>选择一个名称和一个中继。除此之外无需其他设置。</translation>
     </message>
 </context>
 <context>
@@ -66,24 +66,12 @@
         <translation>创建个人资料</translation>
     </message>
     <message>
-        <source>A new address on a chatmail relay.</source>
-        <translation>chatmail 中继上的一个新地址。</translation>
-    </message>
-    <message>
         <source>Restore from a backup</source>
         <translation>从备份恢复</translation>
     </message>
     <message>
-        <source>A backup file copied onto this phone.</source>
-        <translation>已复制到这台手机上的备份文件。</translation>
-    </message>
-    <message>
         <source>Add as second device</source>
         <translation>添加为第二台设备</translation>
-    </message>
-    <message>
-        <source>The other device keeps it. Both get everything new.</source>
-        <translation>另一台设备仍然留着它。两台都会收到所有新消息。</translation>
     </message>
 </context>
 <context>
@@ -97,24 +85,12 @@
         <translation>添加中继</translation>
     </message>
     <message>
-        <source>Another address for this profile, on another relay. The profile sends from one relay at a time; its page says which, and lets you change it.</source>
-        <translation>为此个人资料在另一个中继上再添加一个地址。个人资料一次只从一个中继发送；其页面会显示是哪一个，并可以更改。</translation>
-    </message>
-    <message>
         <source>Add relay</source>
         <translation>添加中继</translation>
     </message>
     <message>
-        <source>Contacting %1...</source>
-        <translation>正在联系 %1...</translation>
-    </message>
-    <message>
         <source>Cancel</source>
         <translation>取消</translation>
-    </message>
-    <message>
-        <source>Relays are run by volunteers. Try another one.</source>
-        <translation>中继由志愿者运行。换一个试试。</translation>
     </message>
     <message>
         <source>Select a public chatmail relay</source>
@@ -127,6 +103,18 @@
     <message>
         <source>Piirit works only with chatmail relays. These are a particular kind of e-mail server; ordinary e-mail servers are not supported. For more, see &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. A full list of public, free-to-use chatmail relays is at &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</source>
         <translation>Piirit 只能与 chatmail 中继配合使用。这是一种特殊的电子邮件服务器；不支持普通的电子邮件服务器。详情见 &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;。公共、免费的 chatmail 中继完整列表见 &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;。</translation>
+    </message>
+    <message>
+        <source>Adds another address for this profile on a second relay. The profile sends from one relay at a time; you can change which one on the profile page.</source>
+        <translation>为该资料在另一个中继上添加一个地址。该资料每次只通过一个中继发送；具体是哪一个，可以在资料页面上更改。</translation>
+    </message>
+    <message>
+        <source>Contacting %1…</source>
+        <translation>正在联系 %1…</translation>
+    </message>
+    <message>
+        <source>Could not reach the relay. Try another one.</source>
+        <translation>无法连接该中继。请尝试另一个。</translation>
     </message>
 </context>
 <context>
@@ -159,13 +147,6 @@
         <source>Cancel</source>
         <translation>取消</translation>
     </message>
-    <message numerus="yes">
-        <source>%n message(s) will be deleted now, and from then on every message will be once it is that old.</source>
-        <extracomment>%n is how many messages would be deleted straight away.</extracomment>
-        <translation>
-            <numerusform>现在将删除 %n 条消息，此后每条消息一到这个时间也会被删除。</numerusform>
-        </translation>
-    </message>
     <message>
         <source>This includes pictures, videos and files.</source>
         <translation>这包括图片、视频和文件。</translation>
@@ -183,20 +164,19 @@
         <source>I understand, delete all these messages</source>
         <translation>我明白，删除所有这些消息</translation>
     </message>
+    <message numerus="yes">
+        <source>%n message(s) will be deleted now, and every new message will be deleted once it reaches that age.</source>
+        <extracomment>%n is how many messages would be deleted straight away.</extracomment>
+        <translation>
+            <numerusform>现在将删除 %n 条消息，之后每条新消息在达到该时长后都会被删除。</numerusform>
+        </translation>
+    </message>
 </context>
 <context>
     <name>BackupPage</name>
     <message>
         <source>Back up profile</source>
         <translation>备份个人资料</translation>
-    </message>
-    <message>
-        <source>Write the backup</source>
-        <translation>写入备份</translation>
-    </message>
-    <message>
-        <source>Writing the backup...</source>
-        <translation>正在写入备份...</translation>
     </message>
     <message>
         <source>Cancel</source>
@@ -208,12 +188,20 @@
         <translation>已保存到 %1</translation>
     </message>
     <message>
-        <source>Messages, contacts and key in one file, saved to Documents. Whoever has the file has the profile.</source>
-        <translation>消息、联系人和密钥在一个文件里，保存到“文档”。谁拿到文件，谁就拿到这个个人资料。</translation>
-    </message>
-    <message>
         <source>Swipe on for your chats.</source>
         <translation>向前滑动去看你的聊天。</translation>
+    </message>
+    <message>
+        <source>Start backup</source>
+        <translation>开始备份</translation>
+    </message>
+    <message>
+        <source>Backing up…</source>
+        <translation>正在备份…</translation>
+    </message>
+    <message>
+        <source>Saves your messages, contacts and end-to-end encryption setup to a backup file. Keep this file in a safe place.</source>
+        <translation>将你的消息、联系人和端到端加密设置保存到一个备份文件中。请将此文件存放在安全的地方。</translation>
     </message>
 </context>
 <context>
@@ -291,10 +279,6 @@ Other groups with blocked contacts will still show their messages.</source>
 </context>
 <context>
     <name>ChatListPage</name>
-    <message>
-        <source>Lost the connection to the Delta Chat core. Reconnecting...</source>
-        <translation>与 Delta Chat 核心的连接已断开。正在重新连接...</translation>
-    </message>
     <message>
         <source>Lost the connection to the Delta Chat core. Restart Piirit.</source>
         <translation>与 Delta Chat 核心的连接已断开。请重新启动 Piirit。</translation>
@@ -403,6 +387,10 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Search</source>
         <translation>搜索</translation>
+    </message>
+    <message>
+        <source>Lost the connection to the Delta Chat core. Reconnecting…</source>
+        <translation>与 Delta Chat 核心的连接已断开。正在重新连接…</translation>
     </message>
 </context>
 <context>
@@ -533,10 +521,6 @@ Other groups with blocked contacts will still show their messages.</source>
 <context>
     <name>ConversationPage</name>
     <message>
-        <source>Lost the connection to the Delta Chat core. Reconnecting...</source>
-        <translation>与 Delta Chat 核心的连接已断开。正在重新连接...</translation>
-    </message>
-    <message>
         <source>Lost the connection to the Delta Chat core. Restart Piirit.</source>
         <translation>与 Delta Chat 核心的连接已断开。请重新启动 Piirit。</translation>
     </message>
@@ -558,11 +542,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>消息</translation>
     </message>
     <message>
-        <source>Long message: the other end sees a preview and taps to read the rest</source>
-        <extracomment>Shown above the message field while what is being written is long enough that the other end will receive a shortened version with the rest behind a tap.</extracomment>
-        <translation>长消息：对方只看到预览，点按才能读到其余部分</translation>
-    </message>
-    <message>
         <source>Saved to Pictures</source>
         <translation>已保存到图片</translation>
     </message>
@@ -582,9 +561,13 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>已保存到下载</translation>
     </message>
     <message>
-        <source>Too big to send: %1. Attachments go up to %2.</source>
+        <source>Lost the connection to the Delta Chat core. Reconnecting…</source>
+        <translation>与 Delta Chat 核心的连接已断开。正在重新连接…</translation>
+    </message>
+    <message>
+        <source>%1 is too large to send. Attachments can be up to %2.</source>
         <extracomment>Shown above the message field when the attached file is bigger than will be sent. %1 is the file&apos;s size and %2 the largest that goes, each such as &quot;24 MB&quot;.</extracomment>
-        <translation>太大，无法发送：%1。附件最大可为 %2。</translation>
+        <translation>%1 过大，无法发送。附件最大可为 %2。</translation>
     </message>
 </context>
 <context>
@@ -622,14 +605,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>How do you want to delete this message? This cannot be undone.</source>
         <translation>你想怎么删除这条消息？此操作无法撤销。</translation>
-    </message>
-    <message>
-        <source>It goes from your devices. Everybody else keeps their copy.</source>
-        <translation>它会从你的设备上消失，其他所有人仍保留各自的副本。</translation>
-    </message>
-    <message>
-        <source>It goes from your devices, and every other device in this chat is asked to delete it too.</source>
-        <translation>它会从你的设备上消失，这个聊天里的其他每台设备也会收到删除它的请求。</translation>
     </message>
 </context>
 <context>
@@ -691,8 +666,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>%1 秒后</translation>
     </message>
     <message>
-        <source>Applies to everyone in the chat. They can still copy and forward.</source>
-        <translation>对聊天中的所有人生效。他们仍然可以复制和转发。</translation>
+        <source>Applies to all members of this chat; they can still copy, save, and forward messages.</source>
+        <translation>适用于此聊天的所有成员；他们仍然可以复制、保存和转发消息。</translation>
     </message>
 </context>
 <context>
@@ -708,14 +683,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Restore from a backup</source>
         <translation>从备份恢复</translation>
-    </message>
-    <message>
-        <source>The other device keeps it. Both get everything new.</source>
-        <translation>另一台设备仍然留着它。两台都会收到所有新消息。</translation>
-    </message>
-    <message>
-        <source>A backup file copied onto this phone.</source>
-        <translation>已复制到这台手机上的备份文件。</translation>
     </message>
 </context>
 <context>
@@ -798,14 +765,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>谁能联系你，由你决定</translation>
     </message>
     <message>
-        <source>Groups of equals</source>
-        <translation>人人平等的群组</translation>
-    </message>
-    <message>
-        <source>The server only passes it on</source>
-        <translation>服务器只负责转交</translation>
-    </message>
-    <message>
         <source>Keep swiping to set up your profile.</source>
         <translation>继续滑动即可创建个人资料。</translation>
     </message>
@@ -814,24 +773,32 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>每条消息都是加密的</translation>
     </message>
     <message>
-        <source>Made here on your phone. No phone number, no account, nothing to sign.</source>
-        <translation>就在你的手机上创建。不用电话号码，不用账户，没什么要签。</translation>
+        <source>Your profile is created on this phone. No phone number and no sign-up are needed.</source>
+        <translation>你的资料在本机上创建。无需电话号码，也无需注册。</translation>
     </message>
     <message>
-        <source>There is no directory to be found in. Show a friend a code, or send a link.</source>
-        <translation>没有可以被找到的名录。给朋友看个码，或者发个链接。</translation>
+        <source>There is no public directory. People reach you by scanning your invite code or opening your invite link.</source>
+        <translation>没有公开的目录。别人通过扫描你的邀请码或打开你的邀请链接来找到你。</translation>
     </message>
     <message>
-        <source>Encrypted the whole way, always. The servers cannot read a word.</source>
-        <translation>始终全程加密。服务器一个字也读不到。</translation>
+        <source>Any member can add people, rename the group or leave it.</source>
+        <translation>任何成员都可以添加他人、重命名群组或退出群组。</translation>
     </message>
     <message>
-        <source>Anyone can add a friend, rename the group or leave. Nobody is in charge.</source>
-        <translation>谁都可以添加朋友、改名或离开。没有人说了算。</translation>
+        <source>Messages are end-to-end encrypted, so the relays that carry them cannot read them.</source>
+        <translation>消息经过端到端加密，因此传输它们的中继无法读取。</translation>
     </message>
     <message>
-        <source>It holds a message until the other phone is online, and nothing more.</source>
-        <translation>它只是把消息留着，直到对方手机上线，仅此而已。</translation>
+        <source>Groups have no admins</source>
+        <translation>群组没有管理员</translation>
+    </message>
+    <message>
+        <source>Relays only pass messages on</source>
+        <translation>中继只负责转发消息</translation>
+    </message>
+    <message>
+        <source>A relay stores a message only until the recipient fetches it.</source>
+        <translation>中继只在收件人取走消息之前保存它。</translation>
     </message>
 </context>
 <context>
@@ -962,12 +929,12 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>还没有联系人</translation>
     </message>
     <message>
-        <source>Scan someone&apos;s invite from the chat list: QR code</source>
-        <translation>从聊天列表扫描对方的邀请：二维码</translation>
-    </message>
-    <message>
         <source>Search</source>
         <translation>搜索</translation>
+    </message>
+    <message>
+        <source>Use &quot;QR code&quot; in the chat list to add a contact.</source>
+        <translation>在聊天列表中使用“二维码”来添加联系人。</translation>
     </message>
 </context>
 <context>
@@ -975,10 +942,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Please name the group</source>
         <translation>请为群组命名</translation>
-    </message>
-    <message>
-        <source>Create Group</source>
-        <translation>创建群组</translation>
     </message>
     <message>
         <source>New group</source>
@@ -1010,6 +973,10 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Add members</source>
         <translation>添加成员</translation>
+    </message>
+    <message>
+        <source>Create group</source>
+        <translation>创建群组</translation>
     </message>
 </context>
 <context>
@@ -1081,10 +1048,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>中继尚未报告其配额</translation>
     </message>
     <message>
-        <source>Both ways: with this off you send none and see none.</source>
-        <translation>两个方向：关掉后你不发送，也看不到。</translation>
-    </message>
-    <message>
         <source>Relays</source>
         <translation>中继</translation>
     </message>
@@ -1119,16 +1082,16 @@ Other groups with blocked contacts will still show their messages.</source>
         <extracomment>How much room the profile takes on the phone. %1 is a size such as &quot;12.3 MB&quot;.</extracomment>
         <translation>Piirit 在这台手机上占用 %1 存储空间。</translation>
     </message>
+    <message>
+        <source>If read receipts are disabled, you won&apos;t be able to see read receipts from others.</source>
+        <translation>禁用已读回执后，您将无法看到其他人的已读回执。</translation>
+    </message>
 </context>
 <context>
     <name>ProfileSetupPage</name>
     <message>
         <source>Add profile</source>
         <translation>添加个人资料</translation>
-    </message>
-    <message>
-        <source>Contacting %1...</source>
-        <translation>正在联系 %1...</translation>
     </message>
     <message>
         <source>Cancel</source>
@@ -1143,16 +1106,16 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>%1 在 %2 秒内没有回应。</translation>
     </message>
     <message>
-        <source>Relays are run by volunteers. Go back and try another one.</source>
-        <translation>中继由志愿者运行。返回再试一个别的。</translation>
+        <source>Contacting %1…</source>
+        <translation>正在联系 %1…</translation>
+    </message>
+    <message>
+        <source>Could not reach the relay. Try another one.</source>
+        <translation>无法连接该中继。请尝试另一个。</translation>
     </message>
 </context>
 <context>
     <name>ProfileStartPage</name>
-    <message>
-        <source>Alright, let&apos;s get you set up.</source>
-        <translation>好，我们来创建你的个人资料。</translation>
-    </message>
     <message>
         <source>I already have a profile</source>
         <translation>我已经有个人资料了</translation>
@@ -1160,6 +1123,10 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Create a profile</source>
         <translation>创建个人资料</translation>
+    </message>
+    <message>
+        <source>Set up your profile</source>
+        <translation>设置你的资料</translation>
     </message>
 </context>
 <context>
@@ -1225,16 +1192,16 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>让对方扫描此二维码，或将链接发给对方。</translation>
     </message>
     <message>
-        <source>Fetching...</source>
-        <translation>正在获取...</translation>
-    </message>
-    <message>
-        <source>Copy Invite Link</source>
-        <translation>复制邀请链接</translation>
-    </message>
-    <message>
         <source>The camera is not available on this device.</source>
         <translation>此设备上相机不可用。</translation>
+    </message>
+    <message>
+        <source>Fetching…</source>
+        <translation>正在获取…</translation>
+    </message>
+    <message>
+        <source>Copy invite link</source>
+        <translation>复制邀请链接</translation>
     </message>
 </context>
 <context>
@@ -1252,10 +1219,6 @@ Other groups with blocked contacts will still show their messages.</source>
 <context>
     <name>RestoreProfilePage</name>
     <message>
-        <source>That is not the code a device shows while it is offering its profile.</source>
-        <translation>这不是设备在提供个人资料时显示的那个码。</translation>
-    </message>
-    <message>
         <source>Add as second device</source>
         <translation>添加为第二台设备</translation>
     </message>
@@ -1268,16 +1231,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>选择备份文件</translation>
     </message>
     <message>
-        <source>Taking the profile over...</source>
-        <translation>正在接收个人资料…</translation>
-    </message>
-    <message>
         <source>Cancel</source>
         <translation>取消</translation>
-    </message>
-    <message>
-        <source>Hold the phone up to the code it shows</source>
-        <translation>把这部手机对准它显示的码</translation>
     </message>
     <message>
         <source>Enter the code instead</source>
@@ -1286,10 +1241,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Code from the other device</source>
         <translation>另一台设备上的代码</translation>
-    </message>
-    <message>
-        <source>Take the profile over</source>
-        <translation>接收个人资料</translation>
     </message>
     <message>
         <source>That did not work</source>
@@ -1304,28 +1255,44 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>选择另一个文件</translation>
     </message>
     <message>
-        <source>The other device runs a newer Delta Chat than this app can read.</source>
-        <translation>另一台设备上的 Delta Chat 比这个应用能读的还新。</translation>
-    </message>
-    <message>
-        <source>The transfer stopped. Both devices have to stay on one network, with this page open.</source>
-        <translation>传输停止了。两台设备要留在同一个网络里，并让这一页开着。</translation>
-    </message>
-    <message>
-        <source>No camera on this device. A backup file works without one.</source>
-        <translation>这台设备没有相机。备份文件不用相机也行。</translation>
-    </message>
-    <message>
-        <source>On the other device: Settings, then add a second device. Both on one network.</source>
-        <translation>在另一台设备上：设置，然后添加第二台设备。两台在同一个网络里。</translation>
-    </message>
-    <message>
         <source>Make a backup on the other device, copy the file here, then choose it.</source>
         <translation>在另一台设备上做备份，把文件复制到这里，然后选它。</translation>
     </message>
     <message>
         <source>That profile is already on this phone. Open it from the profiles list.</source>
         <translation>这个个人资料已经在这台手机上了。请从个人资料列表中打开它。</translation>
+    </message>
+    <message>
+        <source>The profile is from a newer Delta Chat version than this app can read.</source>
+        <translation>该资料来自比本应用能读取的版本更新的 Delta Chat。</translation>
+    </message>
+    <message>
+        <source>The transfer stopped. Both devices must stay on the same network with this page open.</source>
+        <translation>传输已停止。两台设备必须保持在同一网络，并让此页面保持打开。</translation>
+    </message>
+    <message>
+        <source>This is not a second-device code. Use the code shown by the other device.</source>
+        <translation>这不是第二设备的代码。请使用另一台设备显示的代码。</translation>
+    </message>
+    <message>
+        <source>Hold your camera over the QR code</source>
+        <translation>将摄像头对准二维码。</translation>
+    </message>
+    <message>
+        <source>Copy the profile</source>
+        <translation>复制资料</translation>
+    </message>
+    <message>
+        <source>No camera on this device. You can restore from a backup file instead.</source>
+        <translation>本设备没有摄像头。你可以改用备份文件恢复。</translation>
+    </message>
+    <message>
+        <source>On the other device, go to Settings and tap &quot;Add second device&quot;. Both devices must be on the same network.</source>
+        <translation>在另一台设备上进入“设置”，点按“添加第二设备”。两台设备必须在同一网络中。</translation>
+    </message>
+    <message>
+        <source>Transferring…</source>
+        <translation>传输中…</translation>
     </message>
 </context>
 <context>
@@ -1377,40 +1344,20 @@ Other groups with blocked contacts will still show their messages.</source>
 <context>
     <name>SecondDevicePage</name>
     <message>
-        <source>Nothing took the profile. Both phones have to stay on one network, with this page open.</source>
-        <translation>没有人接走这个个人资料。两台手机要留在同一个网络里，并让这一页开着。</translation>
-    </message>
-    <message>
         <source>Add a second device</source>
         <translation>添加第二台设备</translation>
-    </message>
-    <message>
-        <source>On the other device: add a profile you have already, then &quot;Add as second device&quot;, and read this code with it. Both phones on one network.</source>
-        <translation>在另一台设备上：先添加一个你已经有的个人资料，然后“添加为第二台设备”，再用它读取这个二维码。两台手机在同一个网络里。</translation>
     </message>
     <message>
         <source>Copy the code</source>
         <translation>复制代码</translation>
     </message>
     <message>
-        <source>Handing the profile over...</source>
-        <translation>正在交出个人资料…</translation>
-    </message>
-    <message>
         <source>Cancel</source>
         <translation>取消</translation>
     </message>
     <message>
-        <source>The other device has the profile. Both get everything new from now on.</source>
-        <translation>另一台设备已经有这个个人资料了。从现在起两台都会收到所有新消息。</translation>
-    </message>
-    <message>
         <source>Swipe on for your chats.</source>
         <translation>向前滑动去看你的聊天。</translation>
-    </message>
-    <message>
-        <source>Whoever reads this code gets the profile. It stops collecting mail until the code is gone.</source>
-        <translation>谁读取这个二维码，谁就拿到这个个人资料。二维码开着的时候，它不会收取邮件。</translation>
     </message>
     <message>
         <source>Show code again</source>
@@ -1419,6 +1366,26 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Show code</source>
         <translation>显示二维码</translation>
+    </message>
+    <message>
+        <source>No device copied the profile. Both devices must stay on the same network with this page open.</source>
+        <translation>没有设备复制该资料。两台设备必须保持在同一网络，并让此页面保持打开。</translation>
+    </message>
+    <message>
+        <source>Transferring…</source>
+        <translation>传输中…</translation>
+    </message>
+    <message>
+        <source>The profile was transferred to your second device. Both devices now receive all new messages.</source>
+        <translation>资料已传输到你的第二设备。两台设备现在都会收到所有新消息。</translation>
+    </message>
+    <message>
+        <source>On the other device, choose &quot;Add as second device&quot; and scan this code. Both devices must be on the same network.</source>
+        <translation>在另一台设备上选择“添加为第二台设备”，并扫描此代码。两台设备必须在同一网络中。</translation>
+    </message>
+    <message>
+        <source>Make sure no unwanted observer or camera can see this code. This profile does not receive messages while the code is shown.</source>
+        <translation>请确保没有不相干的旁观者或摄像头能看到此代码。在显示此代码期间，该资料不会接收消息。</translation>
     </message>
 </context>
 <context>
@@ -1472,18 +1439,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>通知</translation>
     </message>
     <message>
-        <source>Who wrote, and what</source>
-        <translation>谁写的，以及写了什么</translation>
-    </message>
-    <message>
-        <source>Who wrote</source>
-        <translation>谁写的</translation>
-    </message>
-    <message>
-        <source>Only that something arrived</source>
-        <translation>只显示有消息到达</translation>
-    </message>
-    <message>
         <source>Apps</source>
         <translation>应用</translation>
     </message>
@@ -1517,10 +1472,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>从设备删除消息</translation>
     </message>
     <message>
-        <source>A new notification shows</source>
-        <translation>新通知显示</translation>
-    </message>
-    <message>
         <source>Mentions</source>
         <extracomment>A reply to one of the reader&apos;s own messages, arriving in a group they have muted.</extracomment>
         <translation>提及</translation>
@@ -1535,49 +1486,12 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>使用 Markdown 格式</translation>
     </message>
     <message>
-        <source>Otherwise it starts a new line, and the button sends.</source>
-        <translation>否则它换行，由按钮发送。</translation>
-    </message>
-    <message>
-        <source>Draws *stars* and `backticks` rather than showing them.</source>
-        <translation>把 *星号* 和 `反引号` 画出来，而不是照原样显示。</translation>
-    </message>
-    <message>
-        <source>Bigger ones wait until you ask for them. Every profile, from now on.</source>
-        <translation>更大的会等你主动要。所有个人资料，从现在起。</translation>
-    </message>
-    <message>
-        <source>Every chat of every profile. &quot;Saved messages&quot; are kept.</source>
-        <translation>每个个人资料的每个聊天。“已保存的消息”会保留。</translation>
-    </message>
-    <message>
-        <source>On the lock screen and in the notification area.</source>
-        <translation>在锁屏和通知区域里。</translation>
-    </message>
-    <message>
-        <source>A reply to you gets through a muted group.</source>
-        <translation>发给你的回复，在静音群组里也会通知你。</translation>
-    </message>
-    <message>
-        <source>Click ids and campaign tags come out of the links you send.</source>
-        <translation>点击标识和广告活动标签会从你发出的链接里去掉。</translation>
-    </message>
-    <message>
-        <source>Small apps run inside the chat. Somebody else&apos;s code, and less tested than the rest.</source>
-        <translation>小应用在聊天里运行。别人的代码，也比其余部分少经检验。</translation>
-    </message>
-    <message>
         <source>Privacy</source>
         <translation>隐私</translation>
     </message>
     <message>
         <source>Blocked contacts</source>
         <translation>已屏蔽联系人</translation>
-    </message>
-    <message>
-        <source>Worse quality, save data</source>
-        <extracomment>Outgoing media quality: smaller pictures and videos, which cost the reader and whoever they write to less data. Both reference clients&apos; words for it.</extracomment>
-        <translation>质量较差，节省数据</translation>
     </message>
     <message>
         <source>Balanced</source>
@@ -1590,12 +1504,41 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>发出媒体质量</translation>
     </message>
     <message>
-        <source>Pictures are made smaller before sending, and the camera records at this quality.</source>
-        <translation>图片在发送前会被压缩，摄像头也按此质量录制。</translation>
-    </message>
-    <message>
         <source>Show notifications</source>
         <translation>显示通知</translation>
+    </message>
+    <message>
+        <source>Lower quality, less data</source>
+        <extracomment>Outgoing media quality: smaller pictures and videos, which cost the reader and whoever they write to less data. Both reference clients&apos; words for it.</extracomment>
+        <translation>较低画质，较少流量</translation>
+    </message>
+    <message>
+        <source>Notification content</source>
+        <translation>通知内容</translation>
+    </message>
+    <message>
+        <source>Sender and message</source>
+        <translation>发件人和消息</translation>
+    </message>
+    <message>
+        <source>Sender only</source>
+        <translation>仅发件人</translation>
+    </message>
+    <message>
+        <source>No details</source>
+        <translation>不显示详情</translation>
+    </message>
+    <message>
+        <source>In muted groups, notify messages directed to you, like replies or reactions</source>
+        <translation>在静音群中，通知直接与你相关的消息，比如回复或回应</translation>
+    </message>
+    <message>
+        <source>Removes click IDs and campaign tags from links you send.</source>
+        <translation>从你发送的链接中移除点击 ID 和营销标签。</translation>
+    </message>
+    <message>
+        <source>Runs small apps inside chats. These features may be unstable and may be changed or removed.</source>
+        <translation>在聊天中运行小应用。这些功能可能不稳定，并且可能被更改或移除。</translation>
     </message>
 </context>
 <context>
@@ -1668,16 +1611,16 @@ Other groups with blocked contacts will still show their messages.</source>
 <context>
     <name>WelcomePage</name>
     <message>
-        <source>Tell me about Delta Chat</source>
-        <translation>Delta Chat 是什么？</translation>
-    </message>
-    <message>
-        <source>Set up my profile</source>
-        <translation>设置我的个人资料</translation>
-    </message>
-    <message>
         <source>Secure decentralised chat based on Delta Chat</source>
         <translation>基于 Delta Chat 的安全去中心化聊天</translation>
+    </message>
+    <message>
+        <source>About Delta Chat</source>
+        <translation>关于 Delta Chat</translation>
+    </message>
+    <message>
+        <source>Set up your profile</source>
+        <translation>设置你的资料</translation>
     </message>
 </context>
 </TS>

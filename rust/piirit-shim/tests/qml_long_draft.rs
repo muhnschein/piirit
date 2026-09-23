@@ -1,15 +1,10 @@
-//! Writing a message longer than one line, and longer than the core
-//! will carry whole.
+//! Writing a message longer than one line.
 //!
-//! Two things about the field a message is written in. It takes more than
-//! a line: with the return key sending, a message written here would be
-//! one line however long it ran and a paragraph could not be typed at all.
-//! And it says when what is in it has grown past the point where
-//! the core cuts a body in two -- past that, what arrives at the other
-//! end is a preview with something to tap, which is worth knowing before
-//! pressing send and not worth a dialog afterwards. parla says the same
-//! thing in the same place; the rule itself is pinned against the real
-//! core in `deltachat-jsonrpc/tests/real_server.rs`.
+//! The field a message is written in takes more than a line: with the
+//! return key sending, a message written here would be one line however
+//! long it ran, and a paragraph could not be typed at all. It grows with
+//! the draft and stops growing before it has eaten the conversation
+//! above it.
 //!
 //! And where the row sits: off the bottom edge rather than on it, with
 //! the two round buttons level with the field rather than floating
@@ -104,7 +99,7 @@ fn a_long_draft() -> String {
 
 #[test]
 #[allow(clippy::too_many_lines)]
-fn the_field_takes_more_than_a_line_and_says_when_a_message_is_too_long() {
+fn the_field_takes_more_than_a_line_and_sits_above_the_edge() {
     let temp = std::env::temp_dir().join(format!("piirit-long-draft-{}", std::process::id()));
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
     let tree = common::qml_tree_without_enter_key();
@@ -159,14 +154,6 @@ fn the_field_takes_more_than_a_line_and_says_when_a_message_is_too_long() {
     });
 
     single_shot(Duration::from_secs(2), move || unsafe {
-        record!(
-            "quiet",
-            call!(
-                "get",
-                QString::from("longMessageBar"),
-                QString::from("visible")
-            )
-        );
         record!("one-line-height", call!("fieldHeight"));
         // A paragraph: three lines, which the old field could not hold
         // at all.
@@ -175,49 +162,17 @@ fn the_field_takes_more_than_a_line_and_says_when_a_message_is_too_long() {
 
     single_shot(Duration::from_secs(3), move || unsafe {
         record!("three-line-height", call!("fieldHeight"));
-        record!(
-            "still-quiet",
-            call!(
-                "get",
-                QString::from("longMessageBar"),
-                QString::from("visible")
-            )
-        );
         record!("long", call!("type", QString::from(long.clone())));
     });
 
     single_shot(Duration::from_secs(4), move || unsafe {
-        record!(
-            "warned",
-            call!(
-                "get",
-                QString::from("longMessageBar"),
-                QString::from("visible")
-            )
-        );
-        record!(
-            "warning",
-            call!(
-                "get",
-                QString::from("longMessageLabel"),
-                QString::from("text")
-            )
-        );
         record!("capped-height", call!("fieldHeight"));
-        // Taken back out again: the notice follows the draft rather than
-        // staying once it has been shown.
+        // Back to a short draft, so the row below is measured at its
+        // ordinary height rather than at the cap.
         record!("shortened", call!("type", QString::from("never mind")));
     });
 
     single_shot(Duration::from_secs(5), move || unsafe {
-        record!(
-            "quiet-again",
-            call!(
-                "get",
-                QString::from("longMessageBar"),
-                QString::from("visible")
-            )
-        );
         record!("field-lift", call!("liftOf", QString::from("messageField")));
         record!("send-lift", call!("liftOf", QString::from("sendButton")));
         record!(
@@ -247,16 +202,6 @@ fn the_field_takes_more_than_a_line_and_says_when_a_message_is_too_long() {
         "ok",
         "the conversation page did not load. {context}"
     );
-    assert_eq!(
-        value("quiet"),
-        "false",
-        "an empty field was told its message was too long. {context}"
-    );
-    assert_eq!(
-        value("still-quiet"),
-        "false",
-        "three lines were called a long message. {context}"
-    );
 
     let one_line = number("one-line-height");
     let three_lines = number("three-line-height");
@@ -273,23 +218,6 @@ fn the_field_takes_more_than_a_line_and_says_when_a_message_is_too_long() {
         "a forty-line draft grew the field to {} on a 960-tall page, \
          which leaves nothing of the chat above it. {context}",
         number("capped-height")
-    );
-
-    assert_eq!(
-        value("warned"),
-        "true",
-        "a forty-line draft said nothing about being cut on the way out, \
-         so the reader finds out from the other end. {context}"
-    );
-    assert!(
-        value("warning").contains("Long message"),
-        "the notice does not say what it is about: {:?}. {context}",
-        value("warning")
-    );
-    assert_eq!(
-        value("quiet-again"),
-        "false",
-        "the notice stayed after the draft was shortened. {context}"
     );
 
     // Where the row sits. Measured as a rule rather than as pixels: what

@@ -51,8 +51,8 @@
         <translation>Piirit funziona solo con i relay chatmail. Sono un tipo particolare di server di posta; i comuni server di posta non sono supportati. Per saperne di più vedi &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. L&apos;elenco completo dei relay chatmail pubblici e gratuiti è su &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
     </message>
     <message>
-        <source>Pick a name and a relay. That&apos;s it! There is nothing else to set up.</source>
-        <translation>Scegli un nome e un relay. Tutto qui! Non c&apos;è altro da impostare.</translation>
+        <source>Choose a name and a relay. Nothing else is needed.</source>
+        <translation>Scegli un nome e un relay. Non serve altro.</translation>
     </message>
 </context>
 <context>
@@ -66,24 +66,12 @@
         <translation>Crea un profilo</translation>
     </message>
     <message>
-        <source>A new address on a chatmail relay.</source>
-        <translation>Un nuovo indirizzo su un relay chatmail.</translation>
-    </message>
-    <message>
         <source>Restore from a backup</source>
         <translation>Ripristina da un backup</translation>
     </message>
     <message>
-        <source>A backup file copied onto this phone.</source>
-        <translation>Un file di backup copiato su questo telefono.</translation>
-    </message>
-    <message>
         <source>Add as second device</source>
         <translation>Aggiungi come secondo dispositivo</translation>
-    </message>
-    <message>
-        <source>The other device keeps it. Both get everything new.</source>
-        <translation>L&apos;altro dispositivo lo tiene. Entrambi ricevono tutto il nuovo.</translation>
     </message>
 </context>
 <context>
@@ -97,24 +85,12 @@
         <translation>Aggiungi un relay</translation>
     </message>
     <message>
-        <source>Another address for this profile, on another relay. The profile sends from one relay at a time; its page says which, and lets you change it.</source>
-        <translation>Un altro indirizzo per questo profilo, su un altro relay. Il profilo invia da un solo relay alla volta; la sua pagina dice quale e ti lascia cambiarlo.</translation>
-    </message>
-    <message>
         <source>Add relay</source>
         <translation>Aggiungi relay</translation>
     </message>
     <message>
-        <source>Contacting %1...</source>
-        <translation>Contatto di %1 in corso...</translation>
-    </message>
-    <message>
         <source>Cancel</source>
         <translation>Annulla</translation>
-    </message>
-    <message>
-        <source>Relays are run by volunteers. Try another one.</source>
-        <translation>I relay sono tenuti da volontari. Provane un altro.</translation>
     </message>
     <message>
         <source>Select a public chatmail relay</source>
@@ -127,6 +103,18 @@
     <message>
         <source>Piirit works only with chatmail relays. These are a particular kind of e-mail server; ordinary e-mail servers are not supported. For more, see &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. A full list of public, free-to-use chatmail relays is at &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</source>
         <translation>Piirit funziona solo con i relay chatmail. Sono un tipo particolare di server di posta; i comuni server di posta non sono supportati. Per saperne di più vedi &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. L&apos;elenco completo dei relay chatmail pubblici e gratuiti è su &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
+    </message>
+    <message>
+        <source>Adds another address for this profile on a second relay. The profile sends from one relay at a time; you can change which one on the profile page.</source>
+        <translation>Aggiunge a questo profilo un altro indirizzo su un secondo relay. Il profilo invia tramite un relay alla volta; puoi cambiare quale nella pagina del profilo.</translation>
+    </message>
+    <message>
+        <source>Contacting %1…</source>
+        <translation>Contatto di %1 in corso…</translation>
+    </message>
+    <message>
+        <source>Could not reach the relay. Try another one.</source>
+        <translation>Non è stato possibile raggiungere il relay. Provane un altro.</translation>
     </message>
 </context>
 <context>
@@ -159,14 +147,6 @@
         <source>Cancel</source>
         <translation>Annulla</translation>
     </message>
-    <message numerus="yes">
-        <source>%n message(s) will be deleted now, and from then on every message will be once it is that old.</source>
-        <extracomment>%n is how many messages would be deleted straight away.</extracomment>
-        <translation>
-            <numerusform>%n messaggio sarà eliminato adesso, e da allora in poi ogni messaggio appena avrà quell&apos;età.</numerusform>
-            <numerusform>%n messaggi saranno eliminati adesso, e da allora in poi ogni messaggio appena avrà quell&apos;età.</numerusform>
-        </translation>
-    </message>
     <message>
         <source>This includes pictures, videos and files.</source>
         <translation>Questo include immagini, video e file.</translation>
@@ -184,20 +164,20 @@
         <source>I understand, delete all these messages</source>
         <translation>Ho capito, elimina tutti questi messaggi</translation>
     </message>
+    <message numerus="yes">
+        <source>%n message(s) will be deleted now, and every new message will be deleted once it reaches that age.</source>
+        <extracomment>%n is how many messages would be deleted straight away.</extracomment>
+        <translation>
+            <numerusform>%n messaggio verrà eliminato ora, e ogni nuovo messaggio verrà eliminato una volta raggiunta quell&apos;età.</numerusform>
+            <numerusform>%n messaggi verranno eliminati ora, e ogni nuovo messaggio verrà eliminato una volta raggiunta quell&apos;età.</numerusform>
+        </translation>
+    </message>
 </context>
 <context>
     <name>BackupPage</name>
     <message>
         <source>Back up profile</source>
         <translation>Backup del profilo</translation>
-    </message>
-    <message>
-        <source>Write the backup</source>
-        <translation>Scrivi il backup</translation>
-    </message>
-    <message>
-        <source>Writing the backup...</source>
-        <translation>Scrittura del backup...</translation>
     </message>
     <message>
         <source>Cancel</source>
@@ -209,12 +189,20 @@
         <translation>Salvato in %1</translation>
     </message>
     <message>
-        <source>Messages, contacts and key in one file, saved to Documents. Whoever has the file has the profile.</source>
-        <translation>Messaggi, contatti e chiave in un solo file, salvato in Documenti. Chi ha il file ha il profilo.</translation>
-    </message>
-    <message>
         <source>Swipe on for your chats.</source>
         <translation>Scorri avanti verso le tue chat.</translation>
+    </message>
+    <message>
+        <source>Start backup</source>
+        <translation>Avvia backup</translation>
+    </message>
+    <message>
+        <source>Backing up…</source>
+        <translation>Backup in corso…</translation>
+    </message>
+    <message>
+        <source>Saves your messages, contacts and end-to-end encryption setup to a backup file. Keep this file in a safe place.</source>
+        <translation>Salva i tuoi messaggi, contatti e la configurazione di crittografia end-to-end in un file di backup. Conserva questo file in un luogo sicuro.</translation>
     </message>
 </context>
 <context>
@@ -292,10 +280,6 @@ Gli altri gruppi con contatti bloccati continueranno a visualizzare i loro messa
 </context>
 <context>
     <name>ChatListPage</name>
-    <message>
-        <source>Lost the connection to the Delta Chat core. Reconnecting...</source>
-        <translation>Connessione al core di Delta Chat persa. Riconnessione...</translation>
-    </message>
     <message>
         <source>Lost the connection to the Delta Chat core. Restart Piirit.</source>
         <translation>Connessione al core di Delta Chat persa. Riavvia Piirit.</translation>
@@ -404,6 +388,10 @@ Gli altri gruppi con contatti bloccati continueranno a visualizzare i loro messa
     <message>
         <source>Search</source>
         <translation>Cerca</translation>
+    </message>
+    <message>
+        <source>Lost the connection to the Delta Chat core. Reconnecting…</source>
+        <translation>Connessione al core di Delta Chat persa. Riconnessione…</translation>
     </message>
 </context>
 <context>
@@ -534,10 +522,6 @@ Gli altri gruppi con contatti bloccati continueranno a visualizzare i loro messa
 <context>
     <name>ConversationPage</name>
     <message>
-        <source>Lost the connection to the Delta Chat core. Reconnecting...</source>
-        <translation>Connessione al core di Delta Chat persa. Riconnessione...</translation>
-    </message>
-    <message>
         <source>Lost the connection to the Delta Chat core. Restart Piirit.</source>
         <translation>Connessione al core di Delta Chat persa. Riavvia Piirit.</translation>
     </message>
@@ -557,11 +541,6 @@ Gli altri gruppi con contatti bloccati continueranno a visualizzare i loro messa
     <message>
         <source>Message</source>
         <translation>Messaggio</translation>
-    </message>
-    <message>
-        <source>Long message: the other end sees a preview and taps to read the rest</source>
-        <extracomment>Shown above the message field while what is being written is long enough that the other end will receive a shortened version with the rest behind a tap.</extracomment>
-        <translation>Messaggio lungo: dall&apos;altra parte si vede un&apos;anteprima e si tocca per leggere il resto</translation>
     </message>
     <message>
         <source>Saved to Pictures</source>
@@ -584,9 +563,13 @@ Gli altri gruppi con contatti bloccati continueranno a visualizzare i loro messa
         <translation>Salvato in Download</translation>
     </message>
     <message>
-        <source>Too big to send: %1. Attachments go up to %2.</source>
+        <source>Lost the connection to the Delta Chat core. Reconnecting…</source>
+        <translation>Connessione al core di Delta Chat persa. Riconnessione…</translation>
+    </message>
+    <message>
+        <source>%1 is too large to send. Attachments can be up to %2.</source>
         <extracomment>Shown above the message field when the attached file is bigger than will be sent. %1 is the file&apos;s size and %2 the largest that goes, each such as &quot;24 MB&quot;.</extracomment>
-        <translation>Troppo grande per essere inviato: %1. Gli allegati possono arrivare fino a %2.</translation>
+        <translation>%1 è troppo grande per essere inviato. Gli allegati possono arrivare a %2.</translation>
     </message>
 </context>
 <context>
@@ -624,14 +607,6 @@ Gli altri gruppi con contatti bloccati continueranno a visualizzare i loro messa
     <message>
         <source>How do you want to delete this message? This cannot be undone.</source>
         <translation>Come vuoi eliminare questo messaggio? Non si può annullare.</translation>
-    </message>
-    <message>
-        <source>It goes from your devices. Everybody else keeps their copy.</source>
-        <translation>Sparisce dai tuoi dispositivi. Tutti gli altri tengono la loro copia.</translation>
-    </message>
-    <message>
-        <source>It goes from your devices, and every other device in this chat is asked to delete it too.</source>
-        <translation>Sparisce dai tuoi dispositivi, e a ogni altro dispositivo in questa chat viene chiesto di eliminarlo.</translation>
     </message>
 </context>
 <context>
@@ -693,8 +668,8 @@ Gli altri gruppi con contatti bloccati continueranno a visualizzare i loro messa
         <translation>Dopo %1 secondi</translation>
     </message>
     <message>
-        <source>Applies to everyone in the chat. They can still copy and forward.</source>
-        <translation>Vale per tutti nella chat. Possono comunque copiare e inoltrare.</translation>
+        <source>Applies to all members of this chat; they can still copy, save, and forward messages.</source>
+        <translation>Si applica a tutti i membri di questa chat; possono comunque copiare, salvare e inoltrare i messaggi.</translation>
     </message>
 </context>
 <context>
@@ -710,14 +685,6 @@ Gli altri gruppi con contatti bloccati continueranno a visualizzare i loro messa
     <message>
         <source>Restore from a backup</source>
         <translation>Ripristina da un backup</translation>
-    </message>
-    <message>
-        <source>The other device keeps it. Both get everything new.</source>
-        <translation>L&apos;altro dispositivo lo tiene. Entrambi ricevono tutto il nuovo.</translation>
-    </message>
-    <message>
-        <source>A backup file copied onto this phone.</source>
-        <translation>Un file di backup copiato su questo telefono.</translation>
     </message>
 </context>
 <context>
@@ -802,14 +769,6 @@ Gli altri gruppi con contatti bloccati continueranno a visualizzare i loro messa
         <translation>Sei tu a scegliere chi può scriverti</translation>
     </message>
     <message>
-        <source>Groups of equals</source>
-        <translation>Gruppi tra pari</translation>
-    </message>
-    <message>
-        <source>The server only passes it on</source>
-        <translation>Il server si limita a passarlo</translation>
-    </message>
-    <message>
         <source>Keep swiping to set up your profile.</source>
         <translation>Continua a scorrere per creare il tuo profilo.</translation>
     </message>
@@ -818,24 +777,32 @@ Gli altri gruppi con contatti bloccati continueranno a visualizzare i loro messa
         <translation>Ogni messaggio è cifrato</translation>
     </message>
     <message>
-        <source>Made here on your phone. No phone number, no account, nothing to sign.</source>
-        <translation>Creato qui, sul tuo telefono. Nessun numero, nessun account, niente da firmare.</translation>
+        <source>Your profile is created on this phone. No phone number and no sign-up are needed.</source>
+        <translation>Il tuo profilo viene creato su questo telefono. Non servono né numero di telefono né registrazione.</translation>
     </message>
     <message>
-        <source>There is no directory to be found in. Show a friend a code, or send a link.</source>
-        <translation>Non c&apos;è un elenco in cui farsi trovare. Mostra un codice a un amico, o mandagli un link.</translation>
+        <source>There is no public directory. People reach you by scanning your invite code or opening your invite link.</source>
+        <translation>Non esiste un elenco pubblico. Gli altri ti raggiungono scansionando il tuo codice di invito o aprendo il tuo link di invito.</translation>
     </message>
     <message>
-        <source>Encrypted the whole way, always. The servers cannot read a word.</source>
-        <translation>Cifrato da un capo all&apos;altro, sempre. I server non ne leggono una parola.</translation>
+        <source>Any member can add people, rename the group or leave it.</source>
+        <translation>Ogni membro può aggiungere persone, rinominare il gruppo o lasciarlo.</translation>
     </message>
     <message>
-        <source>Anyone can add a friend, rename the group or leave. Nobody is in charge.</source>
-        <translation>Chiunque può aggiungere un amico, rinominare il gruppo o andarsene. Nessuno comanda.</translation>
+        <source>Messages are end-to-end encrypted, so the relays that carry them cannot read them.</source>
+        <translation>I messaggi sono cifrati end-to-end, quindi i relay che li trasportano non possono leggerli.</translation>
     </message>
     <message>
-        <source>It holds a message until the other phone is online, and nothing more.</source>
-        <translation>Tiene un messaggio finché l&apos;altro telefono non è in linea, nient&apos;altro.</translation>
+        <source>Groups have no admins</source>
+        <translation>I gruppi non hanno amministratori</translation>
+    </message>
+    <message>
+        <source>Relays only pass messages on</source>
+        <translation>I relay si limitano a inoltrare i messaggi</translation>
+    </message>
+    <message>
+        <source>A relay stores a message only until the recipient fetches it.</source>
+        <translation>Un relay conserva un messaggio solo finché il destinatario non lo preleva.</translation>
     </message>
 </context>
 <context>
@@ -966,12 +933,12 @@ Gli altri gruppi con contatti bloccati continueranno a visualizzare i loro messa
         <translation>Ancora nessun contatto</translation>
     </message>
     <message>
-        <source>Scan someone&apos;s invite from the chat list: QR code</source>
-        <translation>Scansiona l&apos;invito di qualcuno dall&apos;elenco delle chat: Codice QR</translation>
-    </message>
-    <message>
         <source>Search</source>
         <translation>Cerca</translation>
+    </message>
+    <message>
+        <source>Use &quot;QR code&quot; in the chat list to add a contact.</source>
+        <translation>Usa «Codice QR» nella lista chat per aggiungere un contatto.</translation>
     </message>
 </context>
 <context>
@@ -979,10 +946,6 @@ Gli altri gruppi con contatti bloccati continueranno a visualizzare i loro messa
     <message>
         <source>Please name the group</source>
         <translation>Dai un nome al gruppo</translation>
-    </message>
-    <message>
-        <source>Create Group</source>
-        <translation>Crea gruppo</translation>
     </message>
     <message>
         <source>New group</source>
@@ -1015,6 +978,10 @@ Gli altri gruppi con contatti bloccati continueranno a visualizzare i loro messa
     <message>
         <source>Add members</source>
         <translation>Aggiungi membri</translation>
+    </message>
+    <message>
+        <source>Create group</source>
+        <translation>Crea gruppo</translation>
     </message>
 </context>
 <context>
@@ -1087,10 +1054,6 @@ Gli altri gruppi con contatti bloccati continueranno a visualizzare i loro messa
         <translation>Il relay non ha ancora comunicato la sua quota</translation>
     </message>
     <message>
-        <source>Both ways: with this off you send none and see none.</source>
-        <translation>In entrambi i sensi: da spento non ne mandi e non ne vedi.</translation>
-    </message>
-    <message>
         <source>Relays</source>
         <translation>Relay</translation>
     </message>
@@ -1125,16 +1088,16 @@ Gli altri gruppi con contatti bloccati continueranno a visualizzare i loro messa
         <extracomment>How much room the profile takes on the phone. %1 is a size such as &quot;12.3 MB&quot;.</extracomment>
         <translation>Piirit occupa %1 di spazio su questo telefono.</translation>
     </message>
+    <message>
+        <source>If read receipts are disabled, you won&apos;t be able to see read receipts from others.</source>
+        <translation>Se le conferme di lettura sono disattivate, non potrai vedere le conferme di lettura degli altri.</translation>
+    </message>
 </context>
 <context>
     <name>ProfileSetupPage</name>
     <message>
         <source>Add profile</source>
         <translation>Aggiungi profilo</translation>
-    </message>
-    <message>
-        <source>Contacting %1...</source>
-        <translation>Contatto di %1 in corso...</translation>
     </message>
     <message>
         <source>Cancel</source>
@@ -1149,16 +1112,16 @@ Gli altri gruppi con contatti bloccati continueranno a visualizzare i loro messa
         <translation>%1 non ha risposto entro %2 secondi.</translation>
     </message>
     <message>
-        <source>Relays are run by volunteers. Go back and try another one.</source>
-        <translation>I relay sono tenuti da volontari. Torna indietro e provane un altro.</translation>
+        <source>Contacting %1…</source>
+        <translation>Contatto di %1 in corso…</translation>
+    </message>
+    <message>
+        <source>Could not reach the relay. Try another one.</source>
+        <translation>Non è stato possibile raggiungere il relay. Provane un altro.</translation>
     </message>
 </context>
 <context>
     <name>ProfileStartPage</name>
-    <message>
-        <source>Alright, let&apos;s get you set up.</source>
-        <translation>Bene, prepariamo il tuo profilo.</translation>
-    </message>
     <message>
         <source>I already have a profile</source>
         <translation>Ho già un profilo</translation>
@@ -1166,6 +1129,10 @@ Gli altri gruppi con contatti bloccati continueranno a visualizzare i loro messa
     <message>
         <source>Create a profile</source>
         <translation>Crea un profilo</translation>
+    </message>
+    <message>
+        <source>Set up your profile</source>
+        <translation>Configura il tuo profilo</translation>
     </message>
 </context>
 <context>
@@ -1231,16 +1198,16 @@ Gli altri gruppi con contatti bloccati continueranno a visualizzare i loro messa
         <translation>Fai scansionare questo codice a qualcuno, oppure inviagli il link.</translation>
     </message>
     <message>
-        <source>Fetching...</source>
-        <translation>Recupero...</translation>
-    </message>
-    <message>
-        <source>Copy Invite Link</source>
-        <translation>Copia link di invito</translation>
-    </message>
-    <message>
         <source>The camera is not available on this device.</source>
         <translation>La fotocamera non è disponibile su questo dispositivo.</translation>
+    </message>
+    <message>
+        <source>Fetching…</source>
+        <translation>Recupero…</translation>
+    </message>
+    <message>
+        <source>Copy invite link</source>
+        <translation>Copia link di invito</translation>
     </message>
 </context>
 <context>
@@ -1258,10 +1225,6 @@ Gli altri gruppi con contatti bloccati continueranno a visualizzare i loro messa
 <context>
     <name>RestoreProfilePage</name>
     <message>
-        <source>That is not the code a device shows while it is offering its profile.</source>
-        <translation>Questo non è il codice che un dispositivo mostra mentre offre il suo profilo.</translation>
-    </message>
-    <message>
         <source>Add as second device</source>
         <translation>Aggiungi come secondo dispositivo</translation>
     </message>
@@ -1274,16 +1237,8 @@ Gli altri gruppi con contatti bloccati continueranno a visualizzare i loro messa
         <translation>Scegli un file di backup</translation>
     </message>
     <message>
-        <source>Taking the profile over...</source>
-        <translation>Sto riprendendo il profilo...</translation>
-    </message>
-    <message>
         <source>Cancel</source>
         <translation>Annulla</translation>
-    </message>
-    <message>
-        <source>Hold the phone up to the code it shows</source>
-        <translation>Punta questo telefono sul codice che mostra</translation>
     </message>
     <message>
         <source>Enter the code instead</source>
@@ -1292,10 +1247,6 @@ Gli altri gruppi con contatti bloccati continueranno a visualizzare i loro messa
     <message>
         <source>Code from the other device</source>
         <translation>Codice dall&apos;altro dispositivo</translation>
-    </message>
-    <message>
-        <source>Take the profile over</source>
-        <translation>Riprendi il profilo</translation>
     </message>
     <message>
         <source>That did not work</source>
@@ -1310,28 +1261,44 @@ Gli altri gruppi con contatti bloccati continueranno a visualizzare i loro messa
         <translation>Scegli un altro file</translation>
     </message>
     <message>
-        <source>The other device runs a newer Delta Chat than this app can read.</source>
-        <translation>L&apos;altro dispositivo ha un Delta Chat più recente di quanto questa app sappia leggere.</translation>
-    </message>
-    <message>
-        <source>The transfer stopped. Both devices have to stay on one network, with this page open.</source>
-        <translation>Il trasferimento si è fermato. Entrambi i dispositivi devono restare sulla stessa rete, con questa pagina aperta.</translation>
-    </message>
-    <message>
-        <source>No camera on this device. A backup file works without one.</source>
-        <translation>Nessuna fotocamera su questo dispositivo. Un file di backup funziona lo stesso.</translation>
-    </message>
-    <message>
-        <source>On the other device: Settings, then add a second device. Both on one network.</source>
-        <translation>Sull&apos;altro dispositivo: Impostazioni, poi aggiungi un secondo dispositivo. Entrambi sulla stessa rete.</translation>
-    </message>
-    <message>
         <source>Make a backup on the other device, copy the file here, then choose it.</source>
         <translation>Fai un backup sull&apos;altro dispositivo, copia il file qui, poi scegli quello.</translation>
     </message>
     <message>
         <source>That profile is already on this phone. Open it from the profiles list.</source>
         <translation>Questo profilo è già su questo telefono. Aprilo dall&apos;elenco dei profili.</translation>
+    </message>
+    <message>
+        <source>The profile is from a newer Delta Chat version than this app can read.</source>
+        <translation>Il profilo proviene da una versione di Delta Chat più recente di quella che questa app può leggere.</translation>
+    </message>
+    <message>
+        <source>The transfer stopped. Both devices must stay on the same network with this page open.</source>
+        <translation>Il trasferimento si è interrotto. Entrambi i dispositivi devono restare sulla stessa rete con questa pagina aperta.</translation>
+    </message>
+    <message>
+        <source>This is not a second-device code. Use the code shown by the other device.</source>
+        <translation>Questo non è un codice per un secondo dispositivo. Usa il codice mostrato dall&apos;altro dispositivo.</translation>
+    </message>
+    <message>
+        <source>Hold your camera over the QR code</source>
+        <translation>Posiziona la camera sopra il codice QR</translation>
+    </message>
+    <message>
+        <source>Copy the profile</source>
+        <translation>Copia il profilo</translation>
+    </message>
+    <message>
+        <source>No camera on this device. You can restore from a backup file instead.</source>
+        <translation>Nessuna fotocamera su questo dispositivo. In alternativa puoi ripristinare da un file di backup.</translation>
+    </message>
+    <message>
+        <source>On the other device, go to Settings and tap &quot;Add second device&quot;. Both devices must be on the same network.</source>
+        <translation>Sull&apos;altro dispositivo, vai in Impostazioni e tocca «Aggiungi secondo dispositivo». Entrambi i dispositivi devono essere sulla stessa rete.</translation>
+    </message>
+    <message>
+        <source>Transferring…</source>
+        <translation>Trasferimento…</translation>
     </message>
 </context>
 <context>
@@ -1383,40 +1350,20 @@ Gli altri gruppi con contatti bloccati continueranno a visualizzare i loro messa
 <context>
     <name>SecondDevicePage</name>
     <message>
-        <source>Nothing took the profile. Both phones have to stay on one network, with this page open.</source>
-        <translation>Nessuno ha preso il profilo. Entrambi i telefoni devono restare sulla stessa rete, con questa pagina aperta.</translation>
-    </message>
-    <message>
         <source>Add a second device</source>
         <translation>Aggiungi un secondo dispositivo</translation>
-    </message>
-    <message>
-        <source>On the other device: add a profile you have already, then &quot;Add as second device&quot;, and read this code with it. Both phones on one network.</source>
-        <translation>Sull&apos;altro dispositivo: aggiungi un profilo che hai già, poi “Aggiungi come secondo dispositivo”, e leggi questo codice con quello. Entrambi i telefoni sulla stessa rete.</translation>
     </message>
     <message>
         <source>Copy the code</source>
         <translation>Copia il codice</translation>
     </message>
     <message>
-        <source>Handing the profile over...</source>
-        <translation>Sto consegnando il profilo...</translation>
-    </message>
-    <message>
         <source>Cancel</source>
         <translation>Annulla</translation>
     </message>
     <message>
-        <source>The other device has the profile. Both get everything new from now on.</source>
-        <translation>L&apos;altro dispositivo ha il profilo. Da ora entrambi ricevono tutto il nuovo.</translation>
-    </message>
-    <message>
         <source>Swipe on for your chats.</source>
         <translation>Scorri avanti verso le tue chat.</translation>
-    </message>
-    <message>
-        <source>Whoever reads this code gets the profile. It stops collecting mail until the code is gone.</source>
-        <translation>Chi legge questo codice si prende il profilo. Finché il codice è qui, il profilo non ritira la posta.</translation>
     </message>
     <message>
         <source>Show code again</source>
@@ -1425,6 +1372,26 @@ Gli altri gruppi con contatti bloccati continueranno a visualizzare i loro messa
     <message>
         <source>Show code</source>
         <translation>Mostra il codice</translation>
+    </message>
+    <message>
+        <source>No device copied the profile. Both devices must stay on the same network with this page open.</source>
+        <translation>Nessun dispositivo ha copiato il profilo. Entrambi i dispositivi devono restare sulla stessa rete con questa pagina aperta.</translation>
+    </message>
+    <message>
+        <source>Transferring…</source>
+        <translation>Trasferimento…</translation>
+    </message>
+    <message>
+        <source>The profile was transferred to your second device. Both devices now receive all new messages.</source>
+        <translation>Il profilo è stato trasferito al tuo secondo dispositivo. Entrambi i dispositivi ricevono ora tutti i nuovi messaggi.</translation>
+    </message>
+    <message>
+        <source>On the other device, choose &quot;Add as second device&quot; and scan this code. Both devices must be on the same network.</source>
+        <translation>Sull&apos;altro dispositivo, scegli «Aggiungi come secondo dispositivo» e scansiona questo codice. Entrambi i dispositivi devono essere sulla stessa rete.</translation>
+    </message>
+    <message>
+        <source>Make sure no unwanted observer or camera can see this code. This profile does not receive messages while the code is shown.</source>
+        <translation>Assicurati che nessun osservatore o fotocamera indesiderati possano vedere questo codice. Questo profilo non riceve messaggi finché il codice è mostrato.</translation>
     </message>
 </context>
 <context>
@@ -1478,18 +1445,6 @@ Gli altri gruppi con contatti bloccati continueranno a visualizzare i loro messa
         <translation>Notifiche</translation>
     </message>
     <message>
-        <source>Who wrote, and what</source>
-        <translation>Chi ha scritto, e cosa</translation>
-    </message>
-    <message>
-        <source>Who wrote</source>
-        <translation>Chi ha scritto</translation>
-    </message>
-    <message>
-        <source>Only that something arrived</source>
-        <translation>Solo che è arrivato qualcosa</translation>
-    </message>
-    <message>
         <source>Apps</source>
         <translation>App</translation>
     </message>
@@ -1523,10 +1478,6 @@ Gli altri gruppi con contatti bloccati continueranno a visualizzare i loro messa
         <translation>Elimina i messaggi dal dispositivo</translation>
     </message>
     <message>
-        <source>A new notification shows</source>
-        <translation>Una nuova notifica mostra</translation>
-    </message>
-    <message>
         <source>Mentions</source>
         <extracomment>A reply to one of the reader&apos;s own messages, arriving in a group they have muted.</extracomment>
         <translation>Menzioni</translation>
@@ -1541,49 +1492,12 @@ Gli altri gruppi con contatti bloccati continueranno a visualizzare i loro messa
         <translation>Usa la formattazione Markdown</translation>
     </message>
     <message>
-        <source>Otherwise it starts a new line, and the button sends.</source>
-        <translation>Altrimenti va a capo, e il pulsante manda.</translation>
-    </message>
-    <message>
-        <source>Draws *stars* and `backticks` rather than showing them.</source>
-        <translation>Disegna *asterischi* e `apici inversi` invece di mostrarli.</translation>
-    </message>
-    <message>
-        <source>Bigger ones wait until you ask for them. Every profile, from now on.</source>
-        <translation>Quelli più grandi aspettano che tu li chieda. Tutti i profili, da ora in poi.</translation>
-    </message>
-    <message>
-        <source>Every chat of every profile. &quot;Saved messages&quot; are kept.</source>
-        <translation>Ogni chat di ogni profilo. I «messaggi salvati» restano.</translation>
-    </message>
-    <message>
-        <source>On the lock screen and in the notification area.</source>
-        <translation>Sulla schermata di blocco e nell&apos;area di notifica.</translation>
-    </message>
-    <message>
-        <source>A reply to you gets through a muted group.</source>
-        <translation>Una risposta a te passa anche in un gruppo silenziato.</translation>
-    </message>
-    <message>
-        <source>Click ids and campaign tags come out of the links you send.</source>
-        <translation>Gli id di clic e i tag di campagna escono dai link che mandi.</translation>
-    </message>
-    <message>
-        <source>Small apps run inside the chat. Somebody else&apos;s code, and less tested than the rest.</source>
-        <translation>Piccole app girano dentro la chat. Codice di altri, e meno collaudato del resto.</translation>
-    </message>
-    <message>
         <source>Privacy</source>
         <translation>Riservatezza</translation>
     </message>
     <message>
         <source>Blocked contacts</source>
         <translation>Contatti Bloccati</translation>
-    </message>
-    <message>
-        <source>Worse quality, save data</source>
-        <extracomment>Outgoing media quality: smaller pictures and videos, which cost the reader and whoever they write to less data. Both reference clients&apos; words for it.</extracomment>
-        <translation>Qualità peggiore, dimensione ridotta</translation>
     </message>
     <message>
         <source>Balanced</source>
@@ -1596,12 +1510,41 @@ Gli altri gruppi con contatti bloccati continueranno a visualizzare i loro messa
         <translation>Qualità media in uscita</translation>
     </message>
     <message>
-        <source>Pictures are made smaller before sending, and the camera records at this quality.</source>
-        <translation>Le immagini vengono ridotte prima dell’invio e la fotocamera registra con questa qualità.</translation>
-    </message>
-    <message>
         <source>Show notifications</source>
         <translation>Mostra le notifiche</translation>
+    </message>
+    <message>
+        <source>Lower quality, less data</source>
+        <extracomment>Outgoing media quality: smaller pictures and videos, which cost the reader and whoever they write to less data. Both reference clients&apos; words for it.</extracomment>
+        <translation>Qualità inferiore, meno dati</translation>
+    </message>
+    <message>
+        <source>Notification content</source>
+        <translation>Contenuto delle notifiche</translation>
+    </message>
+    <message>
+        <source>Sender and message</source>
+        <translation>Mittente e messaggio</translation>
+    </message>
+    <message>
+        <source>Sender only</source>
+        <translation>Solo mittente</translation>
+    </message>
+    <message>
+        <source>No details</source>
+        <translation>Nessun dettaglio</translation>
+    </message>
+    <message>
+        <source>In muted groups, notify messages directed to you, like replies or reactions</source>
+        <translation>Nei gruppi silenziati notifica i messaggi indirizzati a te, come risposte o reazioni</translation>
+    </message>
+    <message>
+        <source>Removes click IDs and campaign tags from links you send.</source>
+        <translation>Rimuove gli ID di clic e i tag di campagna dai link che invii.</translation>
+    </message>
+    <message>
+        <source>Runs small apps inside chats. These features may be unstable and may be changed or removed.</source>
+        <translation>Esegue piccole app all&apos;interno delle chat. Queste funzioni possono essere instabili e possono essere modificate o rimosse.</translation>
     </message>
 </context>
 <context>
@@ -1674,16 +1617,16 @@ Gli altri gruppi con contatti bloccati continueranno a visualizzare i loro messa
 <context>
     <name>WelcomePage</name>
     <message>
-        <source>Tell me about Delta Chat</source>
-        <translation>Che cos’è Delta Chat?</translation>
-    </message>
-    <message>
-        <source>Set up my profile</source>
-        <translation>Configura il mio profilo</translation>
-    </message>
-    <message>
         <source>Secure decentralised chat based on Delta Chat</source>
         <translation>Chat sicura e decentralizzata basata su Delta Chat</translation>
+    </message>
+    <message>
+        <source>About Delta Chat</source>
+        <translation>Informazioni su Delta Chat</translation>
+    </message>
+    <message>
+        <source>Set up your profile</source>
+        <translation>Configura il tuo profilo</translation>
     </message>
 </context>
 </TS>

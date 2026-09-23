@@ -40,27 +40,27 @@ Page {
         {
             picture: "../art/intro-profile.png",
             title: qsTr("No sign-up, no phone number"),
-            body: qsTr("Made here on your phone. No phone number, no account, nothing to sign.")
+            body: qsTr("Your profile is created on this phone. No phone number and no sign-up are needed.")
         },
         {
             picture: "../art/intro-invite.png",
             title: qsTr("You choose who can reach you"),
-            body: qsTr("There is no directory to be found in. Show a friend a code, or send a link.")
+            body: qsTr("There is no public directory. People reach you by scanning your invite code or opening your invite link.")
         },
         {
             picture: "../art/intro-lock.png",
             title: qsTr("Every message is encrypted"),
-            body: qsTr("Encrypted the whole way, always. The servers cannot read a word.")
+            body: qsTr("Messages are end-to-end encrypted, so the relays that carry them cannot read them.")
         },
         {
             picture: "../art/intro-group.png",
-            title: qsTr("Groups of equals"),
-            body: qsTr("Anyone can add a friend, rename the group or leave. Nobody is in charge.")
+            title: qsTr("Groups have no admins"),
+            body: qsTr("Any member can add people, rename the group or leave it.")
         },
         {
             picture: "../art/intro-relay.png",
-            title: qsTr("The server only passes it on"),
-            body: qsTr("It holds a message until the other phone is online, and nothing more.")
+            title: qsTr("Relays only pass messages on"),
+            body: qsTr("A relay stores a message only until the recipient fetches it.")
         }
     ]
 

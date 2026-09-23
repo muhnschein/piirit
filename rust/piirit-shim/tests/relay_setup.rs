@@ -271,7 +271,7 @@ fn a_slow_relay_is_explained_and_given_up_on() {
     );
     assert_eq!(
         value("early-label"),
-        "Contacting slow.example...",
+        "Contacting slow.example…",
         "the progress bar does not name the relay, trimmed. {context}"
     );
     assert_eq!(value("early-cancel"), "true", "{context}");

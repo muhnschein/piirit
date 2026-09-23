@@ -35,7 +35,7 @@ Page {
             horizontalAlignment: Text.AlignHCenter
             wrapMode: Text.Wrap
             textFormat: Text.PlainText
-            text: qsTr("Alright, let's get you set up.")
+            text: qsTr("Set up your profile")
             font.family: Theme.fontFamilyHeading
             font.pixelSize: Theme.fontSizeLarge
             color: Theme.highlightColor

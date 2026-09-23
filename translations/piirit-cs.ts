@@ -51,8 +51,8 @@
         <translation>Piirit funguje jen s chatmail relay. Je to zvláštní druh e-mailového serveru; běžné e-mailové servery nejsou podporovány. Víc na &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. Úplný seznam veřejných chatmail relay zdarma je na &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
     </message>
     <message>
-        <source>Pick a name and a relay. That&apos;s it! There is nothing else to set up.</source>
-        <translation>Vyber si jméno a relay. A to je vše! Nic dalšího není potřeba nastavovat.</translation>
+        <source>Choose a name and a relay. Nothing else is needed.</source>
+        <translation>Zvol název a relay. Nic dalšího není potřeba.</translation>
     </message>
 </context>
 <context>
@@ -66,24 +66,12 @@
         <translation>Vytvořit profil</translation>
     </message>
     <message>
-        <source>A new address on a chatmail relay.</source>
-        <translation>Nová adresa na chatmail relay.</translation>
-    </message>
-    <message>
         <source>Restore from a backup</source>
         <translation>Obnovit ze zálohy</translation>
     </message>
     <message>
-        <source>A backup file copied onto this phone.</source>
-        <translation>Soubor zálohy zkopírovaný do tohoto telefonu.</translation>
-    </message>
-    <message>
         <source>Add as second device</source>
         <translation>Přidat jako druhé zařízení</translation>
-    </message>
-    <message>
-        <source>The other device keeps it. Both get everything new.</source>
-        <translation>Druhé zařízení si ho nechá. Obě dostanou všechno nové.</translation>
     </message>
 </context>
 <context>
@@ -97,24 +85,12 @@
         <translation>Přidat relay</translation>
     </message>
     <message>
-        <source>Another address for this profile, on another relay. The profile sends from one relay at a time; its page says which, and lets you change it.</source>
-        <translation>Další adresa pro tenhle profil, na jiném relay. Profil odesílá vždy jen z jednoho relay; jeho stránka ukazuje ze kterého a dá se to tam změnit.</translation>
-    </message>
-    <message>
         <source>Add relay</source>
         <translation>Přidat relay</translation>
     </message>
     <message>
-        <source>Contacting %1...</source>
-        <translation>Kontaktuje se %1...</translation>
-    </message>
-    <message>
         <source>Cancel</source>
         <translation>Zrušit</translation>
-    </message>
-    <message>
-        <source>Relays are run by volunteers. Try another one.</source>
-        <translation>Relay provozují dobrovolníci. Zkus jiný.</translation>
     </message>
     <message>
         <source>Select a public chatmail relay</source>
@@ -127,6 +103,18 @@
     <message>
         <source>Piirit works only with chatmail relays. These are a particular kind of e-mail server; ordinary e-mail servers are not supported. For more, see &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. A full list of public, free-to-use chatmail relays is at &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</source>
         <translation>Piirit funguje jen s chatmail relay. Je to zvláštní druh e-mailového serveru; běžné e-mailové servery nejsou podporovány. Víc na &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. Úplný seznam veřejných chatmail relay zdarma je na &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
+    </message>
+    <message>
+        <source>Adds another address for this profile on a second relay. The profile sends from one relay at a time; you can change which one on the profile page.</source>
+        <translation>Přidá tomuto profilu další adresu na druhém relay. Profil odesílá vždy přes jeden relay; který to je, můžeš změnit na stránce profilu.</translation>
+    </message>
+    <message>
+        <source>Contacting %1…</source>
+        <translation>Kontaktuje se %1…</translation>
+    </message>
+    <message>
+        <source>Could not reach the relay. Try another one.</source>
+        <translation>Relay se nepodařilo kontaktovat. Zkus jiný.</translation>
     </message>
 </context>
 <context>
@@ -159,15 +147,6 @@
         <source>Cancel</source>
         <translation>Zrušit</translation>
     </message>
-    <message numerus="yes">
-        <source>%n message(s) will be deleted now, and from then on every message will be once it is that old.</source>
-        <extracomment>%n is how many messages would be deleted straight away.</extracomment>
-        <translation>
-            <numerusform>%n zpráva bude smazána nyní a od té doby každá zpráva, jakmile bude takto stará.</numerusform>
-            <numerusform>%n zprávy budou smazány nyní a od té doby každá zpráva, jakmile bude takto stará.</numerusform>
-            <numerusform>%n zpráv bude smazáno nyní a od té doby každá zpráva, jakmile bude takto stará.</numerusform>
-        </translation>
-    </message>
     <message>
         <source>This includes pictures, videos and files.</source>
         <translation>Včetně obrázků, videí a souborů.</translation>
@@ -185,20 +164,21 @@
         <source>I understand, delete all these messages</source>
         <translation>Rozumím, smazat všechny tyto zprávy</translation>
     </message>
+    <message numerus="yes">
+        <source>%n message(s) will be deleted now, and every new message will be deleted once it reaches that age.</source>
+        <extracomment>%n is how many messages would be deleted straight away.</extracomment>
+        <translation>
+            <numerusform>%n zpráva bude nyní smazána a každá nová zpráva bude smazána, jakmile dosáhne tohoto stáří.</numerusform>
+            <numerusform>%n zprávy budou nyní smazány a každá nová zpráva bude smazána, jakmile dosáhne tohoto stáří.</numerusform>
+            <numerusform>%n zpráv bude nyní smazáno a každá nová zpráva bude smazána, jakmile dosáhne tohoto stáří.</numerusform>
+        </translation>
+    </message>
 </context>
 <context>
     <name>BackupPage</name>
     <message>
         <source>Back up profile</source>
         <translation>Zálohovat profil</translation>
-    </message>
-    <message>
-        <source>Write the backup</source>
-        <translation>Zapsat zálohu</translation>
-    </message>
-    <message>
-        <source>Writing the backup...</source>
-        <translation>Zapisuje se záloha...</translation>
     </message>
     <message>
         <source>Cancel</source>
@@ -210,12 +190,20 @@
         <translation>Uloženo do %1</translation>
     </message>
     <message>
-        <source>Messages, contacts and key in one file, saved to Documents. Whoever has the file has the profile.</source>
-        <translation>Zprávy, kontakty a klíč v jednom souboru, uloženém do Dokumentů. Kdo má soubor, má profil.</translation>
-    </message>
-    <message>
         <source>Swipe on for your chats.</source>
         <translation>Přejeď dál na své chaty.</translation>
+    </message>
+    <message>
+        <source>Start backup</source>
+        <translation>Spustit zálohu</translation>
+    </message>
+    <message>
+        <source>Backing up…</source>
+        <translation>Zálohování…</translation>
+    </message>
+    <message>
+        <source>Saves your messages, contacts and end-to-end encryption setup to a backup file. Keep this file in a safe place.</source>
+        <translation>Uloží tvé zprávy, kontakty a nastavení koncového šifrování do souboru zálohy. Tento soubor uchovávej na bezpečném místě.</translation>
     </message>
 </context>
 <context>
@@ -293,10 +281,6 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
 </context>
 <context>
     <name>ChatListPage</name>
-    <message>
-        <source>Lost the connection to the Delta Chat core. Reconnecting...</source>
-        <translation>Spojení s jádrem Delta Chatu bylo ztraceno. Znovu se připojuje...</translation>
-    </message>
     <message>
         <source>Lost the connection to the Delta Chat core. Restart Piirit.</source>
         <translation>Spojení s jádrem Delta Chatu bylo ztraceno. Restartujte Piirit.</translation>
@@ -405,6 +389,10 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
     <message>
         <source>Search</source>
         <translation>Hledat</translation>
+    </message>
+    <message>
+        <source>Lost the connection to the Delta Chat core. Reconnecting…</source>
+        <translation>Spojení s jádrem Delta Chatu bylo ztraceno. Znovu se připojuje…</translation>
     </message>
 </context>
 <context>
@@ -535,10 +523,6 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
 <context>
     <name>ConversationPage</name>
     <message>
-        <source>Lost the connection to the Delta Chat core. Reconnecting...</source>
-        <translation>Spojení s jádrem Delta Chatu bylo ztraceno. Znovu se připojuje...</translation>
-    </message>
-    <message>
         <source>Lost the connection to the Delta Chat core. Restart Piirit.</source>
         <translation>Spojení s jádrem Delta Chatu bylo ztraceno. Restartujte Piirit.</translation>
     </message>
@@ -558,11 +542,6 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
     <message>
         <source>Message</source>
         <translation>Zpráva</translation>
-    </message>
-    <message>
-        <source>Long message: the other end sees a preview and taps to read the rest</source>
-        <extracomment>Shown above the message field while what is being written is long enough that the other end will receive a shortened version with the rest behind a tap.</extracomment>
-        <translation>Dlouhá zpráva: druhá strana uvidí náhled a zbytek si zobrazí klepnutím</translation>
     </message>
     <message>
         <source>Saved to Pictures</source>
@@ -586,9 +565,13 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
         <translation>Uloženo do Stažených</translation>
     </message>
     <message>
-        <source>Too big to send: %1. Attachments go up to %2.</source>
+        <source>Lost the connection to the Delta Chat core. Reconnecting…</source>
+        <translation>Spojení s jádrem Delta Chatu bylo ztraceno. Znovu se připojuje…</translation>
+    </message>
+    <message>
+        <source>%1 is too large to send. Attachments can be up to %2.</source>
         <extracomment>Shown above the message field when the attached file is bigger than will be sent. %1 is the file&apos;s size and %2 the largest that goes, each such as &quot;24 MB&quot;.</extracomment>
-        <translation>Příliš velké na odeslání: %1. Přílohy mohou mít nejvýš %2.</translation>
+        <translation>%1 je příliš velký pro odeslání. Přílohy mohou mít až %2.</translation>
     </message>
 </context>
 <context>
@@ -626,14 +609,6 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
     <message>
         <source>How do you want to delete this message? This cannot be undone.</source>
         <translation>Jak chceš tuto zprávu smazat? Tohle nejde vzít zpět.</translation>
-    </message>
-    <message>
-        <source>It goes from your devices. Everybody else keeps their copy.</source>
-        <translation>Zmizí z tvých zařízení. Všem ostatním jejich kopie zůstane.</translation>
-    </message>
-    <message>
-        <source>It goes from your devices, and every other device in this chat is asked to delete it too.</source>
-        <translation>Zmizí z tvých zařízení a každé další zařízení v tomto chatu je požádáno, aby ji smazalo také.</translation>
     </message>
 </context>
 <context>
@@ -695,8 +670,8 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
         <translation>Po %1 sekundách</translation>
     </message>
     <message>
-        <source>Applies to everyone in the chat. They can still copy and forward.</source>
-        <translation>Platí pro všechny v chatu. Kopírovat a přeposílat můžou dál.</translation>
+        <source>Applies to all members of this chat; they can still copy, save, and forward messages.</source>
+        <translation>Volba platí pro všechny členy tohoto chatu, kteří používají Delta Chat; stále ale mohou kopírovat, ukládat a přeposílat zprávy nebo používat jiné e-mailové klienty, které tuto volbu nerespektují.</translation>
     </message>
 </context>
 <context>
@@ -712,14 +687,6 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
     <message>
         <source>Restore from a backup</source>
         <translation>Obnovit ze zálohy</translation>
-    </message>
-    <message>
-        <source>The other device keeps it. Both get everything new.</source>
-        <translation>Druhé zařízení si ho nechá. Obě dostanou všechno nové.</translation>
-    </message>
-    <message>
-        <source>A backup file copied onto this phone.</source>
-        <translation>Soubor zálohy zkopírovaný do tohoto telefonu.</translation>
     </message>
 </context>
 <context>
@@ -806,14 +773,6 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
         <translation>Vy určujete, kdo se vám ozve</translation>
     </message>
     <message>
-        <source>Groups of equals</source>
-        <translation>Skupiny rovných</translation>
-    </message>
-    <message>
-        <source>The server only passes it on</source>
-        <translation>Server ji jen předá dál</translation>
-    </message>
-    <message>
         <source>Keep swiping to set up your profile.</source>
         <translation>Přejeďte dál a nastavte si profil.</translation>
     </message>
@@ -822,24 +781,32 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
         <translation>Každá zpráva je šifrovaná</translation>
     </message>
     <message>
-        <source>Made here on your phone. No phone number, no account, nothing to sign.</source>
-        <translation>Vzniká tady, v tvém telefonu. Žádné číslo, žádný účet, nic k podpisu.</translation>
+        <source>Your profile is created on this phone. No phone number and no sign-up are needed.</source>
+        <translation>Tvůj profil vzniká v tomto telefonu. Není potřeba ani telefonní číslo, ani registrace.</translation>
     </message>
     <message>
-        <source>There is no directory to be found in. Show a friend a code, or send a link.</source>
-        <translation>Není žádný seznam, ve kterém by se tě dalo najít. Ukaž kamarádovi kód nebo pošli odkaz.</translation>
+        <source>There is no public directory. People reach you by scanning your invite code or opening your invite link.</source>
+        <translation>Neexistuje žádný veřejný adresář. Ostatní se k tobě dostanou naskenováním tvého kódu pozvánky nebo otevřením tvého odkazu pozvánky.</translation>
     </message>
     <message>
-        <source>Encrypted the whole way, always. The servers cannot read a word.</source>
-        <translation>Vždy šifrováno celou cestu. Servery nepřečtou ani slovo.</translation>
+        <source>Any member can add people, rename the group or leave it.</source>
+        <translation>Každý člen může přidávat lidi, přejmenovat skupinu nebo ji opustit.</translation>
     </message>
     <message>
-        <source>Anyone can add a friend, rename the group or leave. Nobody is in charge.</source>
-        <translation>Kdokoli může přidat kamaráda, přejmenovat skupinu nebo odejít. Nikdo tu nevelí.</translation>
+        <source>Messages are end-to-end encrypted, so the relays that carry them cannot read them.</source>
+        <translation>Zprávy jsou koncově šifrované, takže relaye, které je přenášejí, je nemohou číst.</translation>
     </message>
     <message>
-        <source>It holds a message until the other phone is online, and nothing more.</source>
-        <translation>Podrží zprávu, dokud druhý telefon není online, a nic víc.</translation>
+        <source>Groups have no admins</source>
+        <translation>Skupiny nemají správce</translation>
+    </message>
+    <message>
+        <source>Relays only pass messages on</source>
+        <translation>Relaye zprávy pouze předávají dál</translation>
+    </message>
+    <message>
+        <source>A relay stores a message only until the recipient fetches it.</source>
+        <translation>Relay uchová zprávu jen do chvíle, než si ji příjemce vyzvedne.</translation>
     </message>
 </context>
 <context>
@@ -970,12 +937,12 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
         <translation>Zatím žádné kontakty</translation>
     </message>
     <message>
-        <source>Scan someone&apos;s invite from the chat list: QR code</source>
-        <translation>Naskenujte něčí pozvánku ze seznamu chatů: QR kód</translation>
-    </message>
-    <message>
         <source>Search</source>
         <translation>Hledat</translation>
+    </message>
+    <message>
+        <source>Use &quot;QR code&quot; in the chat list to add a contact.</source>
+        <translation>Kontakt přidáš pomocí „QR kód“ v seznamu chatů.</translation>
     </message>
 </context>
 <context>
@@ -983,10 +950,6 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
     <message>
         <source>Please name the group</source>
         <translation>Pojmenujte prosím skupinu</translation>
-    </message>
-    <message>
-        <source>Create Group</source>
-        <translation>Vytvořit skupinu</translation>
     </message>
     <message>
         <source>New group</source>
@@ -1020,6 +983,10 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
     <message>
         <source>Add members</source>
         <translation>Přidat členy</translation>
+    </message>
+    <message>
+        <source>Create group</source>
+        <translation>Vytvořit skupinu</translation>
     </message>
 </context>
 <context>
@@ -1093,10 +1060,6 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
         <translation>Relay zatím nenahlásil svou kvótu</translation>
     </message>
     <message>
-        <source>Both ways: with this off you send none and see none.</source>
-        <translation>Oběma směry: vypnuto žádné neposíláš a žádné nevidíš.</translation>
-    </message>
-    <message>
         <source>Relays</source>
         <translation>Relay</translation>
     </message>
@@ -1131,16 +1094,16 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
         <extracomment>How much room the profile takes on the phone. %1 is a size such as &quot;12.3 MB&quot;.</extracomment>
         <translation>Piirit zabírá v tomhle telefonu %1 úložiště.</translation>
     </message>
+    <message>
+        <source>If read receipts are disabled, you won&apos;t be able to see read receipts from others.</source>
+        <translation>Při vypnutém čtení potvrzení se nezobrazí potvrzení o příjetí od ostatních.</translation>
+    </message>
 </context>
 <context>
     <name>ProfileSetupPage</name>
     <message>
         <source>Add profile</source>
         <translation>Přidat profil</translation>
-    </message>
-    <message>
-        <source>Contacting %1...</source>
-        <translation>Kontaktuje se %1...</translation>
     </message>
     <message>
         <source>Cancel</source>
@@ -1155,16 +1118,16 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
         <translation>%1 neodpověděl do %2 sekund.</translation>
     </message>
     <message>
-        <source>Relays are run by volunteers. Go back and try another one.</source>
-        <translation>Relay provozují dobrovolníci. Vrať se a zkus jiný.</translation>
+        <source>Contacting %1…</source>
+        <translation>Kontaktuje se %1…</translation>
+    </message>
+    <message>
+        <source>Could not reach the relay. Try another one.</source>
+        <translation>Relay se nepodařilo kontaktovat. Zkus jiný.</translation>
     </message>
 </context>
 <context>
     <name>ProfileStartPage</name>
-    <message>
-        <source>Alright, let&apos;s get you set up.</source>
-        <translation>Dobrá, pojďme vám nastavit profil.</translation>
-    </message>
     <message>
         <source>I already have a profile</source>
         <translation>Profil už mám</translation>
@@ -1172,6 +1135,10 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
     <message>
         <source>Create a profile</source>
         <translation>Vytvořit profil</translation>
+    </message>
+    <message>
+        <source>Set up your profile</source>
+        <translation>Nastav si profil</translation>
     </message>
 </context>
 <context>
@@ -1237,16 +1204,16 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
         <translation>Nechte někoho naskenovat tento kód, nebo mu pošlete odkaz.</translation>
     </message>
     <message>
-        <source>Fetching...</source>
-        <translation>Načítá se...</translation>
-    </message>
-    <message>
-        <source>Copy Invite Link</source>
-        <translation>Kopírovat odkaz pozvánky</translation>
-    </message>
-    <message>
         <source>The camera is not available on this device.</source>
         <translation>Fotoaparát není na tomto zařízení k dispozici.</translation>
+    </message>
+    <message>
+        <source>Fetching…</source>
+        <translation>Načítá se…</translation>
+    </message>
+    <message>
+        <source>Copy invite link</source>
+        <translation>Kopírovat odkaz pozvánky</translation>
     </message>
 </context>
 <context>
@@ -1264,10 +1231,6 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
 <context>
     <name>RestoreProfilePage</name>
     <message>
-        <source>That is not the code a device shows while it is offering its profile.</source>
-        <translation>Tohle není kód, který zařízení ukazuje, když nabízí svůj profil.</translation>
-    </message>
-    <message>
         <source>Add as second device</source>
         <translation>Přidat jako druhé zařízení</translation>
     </message>
@@ -1280,16 +1243,8 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
         <translation>Vybrat soubor se zálohou</translation>
     </message>
     <message>
-        <source>Taking the profile over...</source>
-        <translation>Přebírám profil...</translation>
-    </message>
-    <message>
         <source>Cancel</source>
         <translation>Zrušit</translation>
-    </message>
-    <message>
-        <source>Hold the phone up to the code it shows</source>
-        <translation>Namiřte tento telefon na kód, který ukáže</translation>
     </message>
     <message>
         <source>Enter the code instead</source>
@@ -1298,10 +1253,6 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
     <message>
         <source>Code from the other device</source>
         <translation>Kód z druhého zařízení</translation>
-    </message>
-    <message>
-        <source>Take the profile over</source>
-        <translation>Převzít profil</translation>
     </message>
     <message>
         <source>That did not work</source>
@@ -1316,28 +1267,44 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
         <translation>Vybrat jiný soubor</translation>
     </message>
     <message>
-        <source>The other device runs a newer Delta Chat than this app can read.</source>
-        <translation>Druhé zařízení má novější Delta Chat, než tahle aplikace umí přečíst.</translation>
-    </message>
-    <message>
-        <source>The transfer stopped. Both devices have to stay on one network, with this page open.</source>
-        <translation>Přenos se zastavil. Obě zařízení musí zůstat v jedné síti a tahle stránka otevřená.</translation>
-    </message>
-    <message>
-        <source>No camera on this device. A backup file works without one.</source>
-        <translation>Toto zařízení nemá fotoaparát. Soubor zálohy funguje i bez něj.</translation>
-    </message>
-    <message>
-        <source>On the other device: Settings, then add a second device. Both on one network.</source>
-        <translation>Na druhém zařízení: Nastavení, pak přidat druhé zařízení. Obě v jedné síti.</translation>
-    </message>
-    <message>
         <source>Make a backup on the other device, copy the file here, then choose it.</source>
         <translation>Udělej na druhém zařízení zálohu, zkopíruj soubor sem a pak ho vyber.</translation>
     </message>
     <message>
         <source>That profile is already on this phone. Open it from the profiles list.</source>
         <translation>Tento profil už v tomto telefonu je. Otevři ho v seznamu profilů.</translation>
+    </message>
+    <message>
+        <source>The profile is from a newer Delta Chat version than this app can read.</source>
+        <translation>Profil pochází z novější verze Delta Chat, než jakou tato aplikace dokáže přečíst.</translation>
+    </message>
+    <message>
+        <source>The transfer stopped. Both devices must stay on the same network with this page open.</source>
+        <translation>Přenos se zastavil. Obě zařízení musí zůstat ve stejné síti s otevřenou touto stránkou.</translation>
+    </message>
+    <message>
+        <source>This is not a second-device code. Use the code shown by the other device.</source>
+        <translation>Toto není kód druhého zařízení. Použij kód, který ukazuje druhé zařízení.</translation>
+    </message>
+    <message>
+        <source>Hold your camera over the QR code</source>
+        <translation>Namiřte kameru na QR kód</translation>
+    </message>
+    <message>
+        <source>Copy the profile</source>
+        <translation>Zkopírovat profil</translation>
+    </message>
+    <message>
+        <source>No camera on this device. You can restore from a backup file instead.</source>
+        <translation>Toto zařízení nemá fotoaparát. Místo toho můžeš obnovit profil ze souboru zálohy.</translation>
+    </message>
+    <message>
+        <source>On the other device, go to Settings and tap &quot;Add second device&quot;. Both devices must be on the same network.</source>
+        <translation>Na druhém zařízení přejdi do Nastavení a klepni na „Přidat druhé zařízení“. Obě zařízení musí být ve stejné síti.</translation>
+    </message>
+    <message>
+        <source>Transferring…</source>
+        <translation>Přenášení...</translation>
     </message>
 </context>
 <context>
@@ -1389,40 +1356,20 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
 <context>
     <name>SecondDevicePage</name>
     <message>
-        <source>Nothing took the profile. Both phones have to stay on one network, with this page open.</source>
-        <translation>Profil si nikdo nevzal. Oba telefony musí zůstat v jedné síti a tahle stránka otevřená.</translation>
-    </message>
-    <message>
         <source>Add a second device</source>
         <translation>Přidat druhé zařízení</translation>
-    </message>
-    <message>
-        <source>On the other device: add a profile you have already, then &quot;Add as second device&quot;, and read this code with it. Both phones on one network.</source>
-        <translation>Na druhém zařízení: přidej profil, který už máš, pak „Přidat jako druhé zařízení“, a načti s ním tenhle kód. Oba telefony v jedné síti.</translation>
     </message>
     <message>
         <source>Copy the code</source>
         <translation>Kopírovat kód</translation>
     </message>
     <message>
-        <source>Handing the profile over...</source>
-        <translation>Předávám profil...</translation>
-    </message>
-    <message>
         <source>Cancel</source>
         <translation>Zrušit</translation>
     </message>
     <message>
-        <source>The other device has the profile. Both get everything new from now on.</source>
-        <translation>Druhé zařízení má profil. Od teď dostanou obě všechno nové.</translation>
-    </message>
-    <message>
         <source>Swipe on for your chats.</source>
         <translation>Přejeď dál na své chaty.</translation>
-    </message>
-    <message>
-        <source>Whoever reads this code gets the profile. It stops collecting mail until the code is gone.</source>
-        <translation>Kdo načte tenhle kód, má profil. Do té doby, než kód zmizí, profil nevybírá poštu.</translation>
     </message>
     <message>
         <source>Show code again</source>
@@ -1431,6 +1378,26 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
     <message>
         <source>Show code</source>
         <translation>Ukázat kód</translation>
+    </message>
+    <message>
+        <source>No device copied the profile. Both devices must stay on the same network with this page open.</source>
+        <translation>Profil si nezkopírovalo žádné zařízení. Obě zařízení musí zůstat ve stejné síti s otevřenou touto stránkou.</translation>
+    </message>
+    <message>
+        <source>Transferring…</source>
+        <translation>Přenášení...</translation>
+    </message>
+    <message>
+        <source>The profile was transferred to your second device. Both devices now receive all new messages.</source>
+        <translation>Profil byl přenesen na tvé druhé zařízení. Obě zařízení nyní dostávají všechny nové zprávy.</translation>
+    </message>
+    <message>
+        <source>On the other device, choose &quot;Add as second device&quot; and scan this code. Both devices must be on the same network.</source>
+        <translation>Na druhém zařízení zvol „Přidat jako druhé zařízení“ a naskenuj tento kód. Obě zařízení musí být ve stejné síti.</translation>
+    </message>
+    <message>
+        <source>Make sure no unwanted observer or camera can see this code. This profile does not receive messages while the code is shown.</source>
+        <translation>Dbej na to, aby tento kód neviděl žádný nežádoucí pozorovatel ani fotoaparát. Tento profil nepřijímá zprávy, dokud je kód zobrazen.</translation>
     </message>
 </context>
 <context>
@@ -1484,18 +1451,6 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
         <translation>Oznámení</translation>
     </message>
     <message>
-        <source>Who wrote, and what</source>
-        <translation>Kdo psal a co</translation>
-    </message>
-    <message>
-        <source>Who wrote</source>
-        <translation>Kdo psal</translation>
-    </message>
-    <message>
-        <source>Only that something arrived</source>
-        <translation>Jen že něco přišlo</translation>
-    </message>
-    <message>
         <source>Apps</source>
         <translation>Aplikace</translation>
     </message>
@@ -1529,10 +1484,6 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
         <translation>Mazat zprávy ze zařízení</translation>
     </message>
     <message>
-        <source>A new notification shows</source>
-        <translation>Nové oznámení ukazuje</translation>
-    </message>
-    <message>
         <source>Mentions</source>
         <extracomment>A reply to one of the reader&apos;s own messages, arriving in a group they have muted.</extracomment>
         <translation>Zmínky</translation>
@@ -1547,49 +1498,12 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
         <translation>Používat formátování Markdown</translation>
     </message>
     <message>
-        <source>Otherwise it starts a new line, and the button sends.</source>
-        <translation>Jinak začne nový řádek a odesílá tlačítko.</translation>
-    </message>
-    <message>
-        <source>Draws *stars* and `backticks` rather than showing them.</source>
-        <translation>Vykreslí *hvězdičky* a `zpětné apostrofy` místo toho, aby je ukazoval.</translation>
-    </message>
-    <message>
-        <source>Bigger ones wait until you ask for them. Every profile, from now on.</source>
-        <translation>Větší počkají, až si o ně řekneš. Všechny profily, od teď.</translation>
-    </message>
-    <message>
-        <source>Every chat of every profile. &quot;Saved messages&quot; are kept.</source>
-        <translation>Každý chat každého profilu. „Uložené zprávy“ zůstávají.</translation>
-    </message>
-    <message>
-        <source>On the lock screen and in the notification area.</source>
-        <translation>Na zamykací obrazovce a v oznamovací oblasti.</translation>
-    </message>
-    <message>
-        <source>A reply to you gets through a muted group.</source>
-        <translation>Odpověď tobě projde i ztlumenou skupinou.</translation>
-    </message>
-    <message>
-        <source>Click ids and campaign tags come out of the links you send.</source>
-        <translation>Identifikátory kliknutí a značky kampaní vypadnou z odkazů, které posíláš.</translation>
-    </message>
-    <message>
-        <source>Small apps run inside the chat. Somebody else&apos;s code, and less tested than the rest.</source>
-        <translation>Malé aplikace běží uvnitř chatu. Cizí kód, a méně vyzkoušený než zbytek.</translation>
-    </message>
-    <message>
         <source>Privacy</source>
         <translation>Soukromí</translation>
     </message>
     <message>
         <source>Blocked contacts</source>
         <translation>Blokované kontakty</translation>
-    </message>
-    <message>
-        <source>Worse quality, save data</source>
-        <extracomment>Outgoing media quality: smaller pictures and videos, which cost the reader and whoever they write to less data. Both reference clients&apos; words for it.</extracomment>
-        <translation>Horší kvalita, malá velikost</translation>
     </message>
     <message>
         <source>Balanced</source>
@@ -1602,12 +1516,41 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
         <translation>Kvalita odesílaných multimédií</translation>
     </message>
     <message>
-        <source>Pictures are made smaller before sending, and the camera records at this quality.</source>
-        <translation>Obrázky se před odesláním zmenší a kamera nahrává v této kvalitě.</translation>
-    </message>
-    <message>
         <source>Show notifications</source>
         <translation>Zobrazovat oznámení</translation>
+    </message>
+    <message>
+        <source>Lower quality, less data</source>
+        <extracomment>Outgoing media quality: smaller pictures and videos, which cost the reader and whoever they write to less data. Both reference clients&apos; words for it.</extracomment>
+        <translation>Nižší kvalita, méně dat</translation>
+    </message>
+    <message>
+        <source>Notification content</source>
+        <translation>Obsah oznámení</translation>
+    </message>
+    <message>
+        <source>Sender and message</source>
+        <translation>Odesílatel a zpráva</translation>
+    </message>
+    <message>
+        <source>Sender only</source>
+        <translation>Pouze odesílatel</translation>
+    </message>
+    <message>
+        <source>No details</source>
+        <translation>Bez podrobností</translation>
+    </message>
+    <message>
+        <source>In muted groups, notify messages directed to you, like replies or reactions</source>
+        <translation>Ve ztlumených skupinách oznamovat zprávy směřované na vás, např. odpovědi či reakce</translation>
+    </message>
+    <message>
+        <source>Removes click IDs and campaign tags from links you send.</source>
+        <translation>Odstraňuje z odkazů, které odesíláš, identifikátory kliknutí a kampaňové značky.</translation>
+    </message>
+    <message>
+        <source>Runs small apps inside chats. These features may be unstable and may be changed or removed.</source>
+        <translation>Spouští malé aplikace uvnitř chatů. Tyto funkce mohou být nestabilní a mohou být změněny nebo odstraněny.</translation>
     </message>
 </context>
 <context>
@@ -1680,16 +1623,16 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
 <context>
     <name>WelcomePage</name>
     <message>
-        <source>Tell me about Delta Chat</source>
-        <translation>Co je Delta Chat?</translation>
-    </message>
-    <message>
-        <source>Set up my profile</source>
-        <translation>Nastavit profil</translation>
-    </message>
-    <message>
         <source>Secure decentralised chat based on Delta Chat</source>
         <translation>Bezpečný decentralizovaný chat postavený na Delta Chatu</translation>
+    </message>
+    <message>
+        <source>About Delta Chat</source>
+        <translation>O Delta Chat</translation>
+    </message>
+    <message>
+        <source>Set up your profile</source>
+        <translation>Nastav si profil</translation>
     </message>
 </context>
 </TS>

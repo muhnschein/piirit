@@ -139,7 +139,7 @@ Page {
                 // Not until the core has answered: see `contactsLoaded`.
                 enabled: page.contactsLoaded && contacts.count === 0
                 text: qsTr("No contacts yet")
-                hintText: qsTr("Scan someone's invite from the chat list: QR code")
+                hintText: qsTr("Use \"QR code\" in the chat list to add a contact.")
             }
         }
     }

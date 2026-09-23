@@ -627,7 +627,7 @@ fn the_second_device_page_offers_one_profile_and_hands_it_over() {
         "an offer that ended was left running. {context}"
     );
     assert!(
-        value("stalled-said").contains("Nothing took the profile"),
+        value("stalled-said").contains("No device copied the profile"),
         "an offer nothing took said nothing about it: {}. {context}",
         value("stalled-said")
     );

@@ -186,7 +186,7 @@ Page {
             }
             MenuItem {
                 objectName: "createButton"
-                text: qsTr("Create Group")
+                text: qsTr("Create group")
                 enabled: !page.creating && nameField.text.trim().length > 0
                 onClicked: page.createGroup()
             }

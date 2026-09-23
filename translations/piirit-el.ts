@@ -51,8 +51,8 @@
         <translation>Το Piirit λειτουργεί μόνο με αναμεταδότες chatmail. Είναι ένα ιδιαίτερο είδος διακομιστή e-mail· οι συνηθισμένοι διακομιστές e-mail δεν υποστηρίζονται. Περισσότερα στο &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. Πλήρης λίστα δημόσιων, δωρεάν αναμεταδοτών chatmail υπάρχει στο &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
     </message>
     <message>
-        <source>Pick a name and a relay. That&apos;s it! There is nothing else to set up.</source>
-        <translation>Διαλέξτε ένα όνομα και έναν αναμεταδότη. Αυτό ήταν! Δεν χρειάζεται τίποτα άλλο.</translation>
+        <source>Choose a name and a relay. Nothing else is needed.</source>
+        <translation>Επίλεξε ένα όνομα και έναν αναμεταδότη. Τίποτα άλλο δεν χρειάζεται.</translation>
     </message>
 </context>
 <context>
@@ -66,24 +66,12 @@
         <translation>Δημιουργία προφίλ</translation>
     </message>
     <message>
-        <source>A new address on a chatmail relay.</source>
-        <translation>Μια νέα διεύθυνση σε έναν αναμεταδότη chatmail.</translation>
-    </message>
-    <message>
         <source>Restore from a backup</source>
         <translation>Επαναφορά από αντίγραφο ασφαλείας</translation>
     </message>
     <message>
-        <source>A backup file copied onto this phone.</source>
-        <translation>Ένα αρχείο αντιγράφου, αντιγραμμένο σε αυτό το τηλέφωνο.</translation>
-    </message>
-    <message>
         <source>Add as second device</source>
         <translation>Προσθήκη ως δεύτερη συσκευή</translation>
-    </message>
-    <message>
-        <source>The other device keeps it. Both get everything new.</source>
-        <translation>Η άλλη συσκευή το κρατά. Και οι δύο παίρνουν ό,τι νέο έρθει.</translation>
     </message>
 </context>
 <context>
@@ -97,24 +85,12 @@
         <translation>Προσθήκη αναμεταδότη</translation>
     </message>
     <message>
-        <source>Another address for this profile, on another relay. The profile sends from one relay at a time; its page says which, and lets you change it.</source>
-        <translation>Μία ακόμη διεύθυνση για αυτό το προφίλ, σε άλλον αναμεταδότη. Το προφίλ στέλνει από έναν αναμεταδότη κάθε φορά· η σελίδα του δείχνει ποιον και σας αφήνει να τον αλλάξετε.</translation>
-    </message>
-    <message>
         <source>Add relay</source>
         <translation>Προσθήκη αναμεταδότη</translation>
     </message>
     <message>
-        <source>Contacting %1...</source>
-        <translation>Επικοινωνία με %1...</translation>
-    </message>
-    <message>
         <source>Cancel</source>
         <translation>Ακύρωση</translation>
-    </message>
-    <message>
-        <source>Relays are run by volunteers. Try another one.</source>
-        <translation>Οι αναμεταδότες κρατιούνται από εθελοντές. Δοκιμάστε άλλον.</translation>
     </message>
     <message>
         <source>Select a public chatmail relay</source>
@@ -127,6 +103,18 @@
     <message>
         <source>Piirit works only with chatmail relays. These are a particular kind of e-mail server; ordinary e-mail servers are not supported. For more, see &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. A full list of public, free-to-use chatmail relays is at &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</source>
         <translation>Το Piirit λειτουργεί μόνο με αναμεταδότες chatmail. Είναι ένα ιδιαίτερο είδος διακομιστή e-mail· οι συνηθισμένοι διακομιστές e-mail δεν υποστηρίζονται. Περισσότερα στο &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. Πλήρης λίστα δημόσιων, δωρεάν αναμεταδοτών chatmail υπάρχει στο &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
+    </message>
+    <message>
+        <source>Adds another address for this profile on a second relay. The profile sends from one relay at a time; you can change which one on the profile page.</source>
+        <translation>Προσθέτει σε αυτό το προφίλ μία ακόμη διεύθυνση σε δεύτερο αναμεταδότη. Το προφίλ στέλνει μέσω ενός αναμεταδότη κάθε φορά· ποιου, μπορείς να το αλλάξεις στη σελίδα του προφίλ.</translation>
+    </message>
+    <message>
+        <source>Contacting %1…</source>
+        <translation>Επικοινωνία με %1…</translation>
+    </message>
+    <message>
+        <source>Could not reach the relay. Try another one.</source>
+        <translation>Δεν ήταν δυνατή η επικοινωνία με τον αναμεταδότη. Δοκίμασε άλλον.</translation>
     </message>
 </context>
 <context>
@@ -159,14 +147,6 @@
         <source>Cancel</source>
         <translation>Ακύρωση</translation>
     </message>
-    <message numerus="yes">
-        <source>%n message(s) will be deleted now, and from then on every message will be once it is that old.</source>
-        <extracomment>%n is how many messages would be deleted straight away.</extracomment>
-        <translation>
-            <numerusform>%n μήνυμα θα διαγραφεί τώρα, και από εδώ και πέρα κάθε μήνυμα θα διαγράφεται μόλις γίνει τόσο παλιό.</numerusform>
-            <numerusform>%n μηνύματα θα διαγραφούν τώρα, και από εδώ και πέρα κάθε μήνυμα θα διαγράφεται μόλις γίνει τόσο παλιό.</numerusform>
-        </translation>
-    </message>
     <message>
         <source>This includes pictures, videos and files.</source>
         <translation>Αυτό περιλαμβάνει εικόνες, βίντεο και αρχεία.</translation>
@@ -184,20 +164,20 @@
         <source>I understand, delete all these messages</source>
         <translation>Καταλαβαίνω, διαγραφή όλων αυτών των μηνυμάτων</translation>
     </message>
+    <message numerus="yes">
+        <source>%n message(s) will be deleted now, and every new message will be deleted once it reaches that age.</source>
+        <extracomment>%n is how many messages would be deleted straight away.</extracomment>
+        <translation>
+            <numerusform>%n μήνυμα θα διαγραφεί τώρα, και κάθε νέο μήνυμα θα διαγράφεται μόλις φτάσει αυτή την ηλικία.</numerusform>
+            <numerusform>%n μηνύματα θα διαγραφούν τώρα, και κάθε νέο μήνυμα θα διαγράφεται μόλις φτάσει αυτή την ηλικία.</numerusform>
+        </translation>
+    </message>
 </context>
 <context>
     <name>BackupPage</name>
     <message>
         <source>Back up profile</source>
         <translation>Αντίγραφο ασφαλείας προφίλ</translation>
-    </message>
-    <message>
-        <source>Write the backup</source>
-        <translation>Δημιουργία αντιγράφου</translation>
-    </message>
-    <message>
-        <source>Writing the backup...</source>
-        <translation>Δημιουργία αντιγράφου...</translation>
     </message>
     <message>
         <source>Cancel</source>
@@ -209,12 +189,20 @@
         <translation>Αποθηκεύτηκε στο %1</translation>
     </message>
     <message>
-        <source>Messages, contacts and key in one file, saved to Documents. Whoever has the file has the profile.</source>
-        <translation>Μηνύματα, επαφές και κλειδί σε ένα αρχείο, αποθηκευμένο στα Έγγραφα. Όποιος έχει το αρχείο έχει το προφίλ.</translation>
-    </message>
-    <message>
         <source>Swipe on for your chats.</source>
         <translation>Σύρετε παρακάτω για τις συνομιλίες σας.</translation>
+    </message>
+    <message>
+        <source>Start backup</source>
+        <translation>Έναρξη αντιγράφου ασφαλείας</translation>
+    </message>
+    <message>
+        <source>Backing up…</source>
+        <translation>Δημιουργία αντιγράφου ασφαλείας…</translation>
+    </message>
+    <message>
+        <source>Saves your messages, contacts and end-to-end encryption setup to a backup file. Keep this file in a safe place.</source>
+        <translation>Αποθηκεύει τα μηνύματα, τις επαφές και τη ρύθμιση κρυπτογράφησης από άκρο σε άκρο σε ένα αρχείο αντιγράφου ασφαλείας. Φύλαξε αυτό το αρχείο σε ασφαλές μέρος.</translation>
     </message>
 </context>
 <context>
@@ -288,10 +276,6 @@ Other groups with blocked contacts will still show their messages.</source>
 </context>
 <context>
     <name>ChatListPage</name>
-    <message>
-        <source>Lost the connection to the Delta Chat core. Reconnecting...</source>
-        <translation>Χάθηκε η σύνδεση με τον πυρήνα του Delta Chat. Επανασύνδεση...</translation>
-    </message>
     <message>
         <source>Lost the connection to the Delta Chat core. Restart Piirit.</source>
         <translation>Χάθηκε η σύνδεση με τον πυρήνα του Delta Chat. Επανεκκινήστε το Piirit.</translation>
@@ -400,6 +384,10 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Search</source>
         <translation>Αναζήτηση</translation>
+    </message>
+    <message>
+        <source>Lost the connection to the Delta Chat core. Reconnecting…</source>
+        <translation>Χάθηκε η σύνδεση με τον πυρήνα του Delta Chat. Επανασύνδεση…</translation>
     </message>
 </context>
 <context>
@@ -530,10 +518,6 @@ Other groups with blocked contacts will still show their messages.</source>
 <context>
     <name>ConversationPage</name>
     <message>
-        <source>Lost the connection to the Delta Chat core. Reconnecting...</source>
-        <translation>Χάθηκε η σύνδεση με τον πυρήνα του Delta Chat. Επανασύνδεση...</translation>
-    </message>
-    <message>
         <source>Lost the connection to the Delta Chat core. Restart Piirit.</source>
         <translation>Χάθηκε η σύνδεση με τον πυρήνα του Delta Chat. Επανεκκινήστε το Piirit.</translation>
     </message>
@@ -553,11 +537,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Message</source>
         <translation>Μήνυμα</translation>
-    </message>
-    <message>
-        <source>Long message: the other end sees a preview and taps to read the rest</source>
-        <extracomment>Shown above the message field while what is being written is long enough that the other end will receive a shortened version with the rest behind a tap.</extracomment>
-        <translation>Μεγάλο μήνυμα: η άλλη πλευρά βλέπει μια προεπισκόπηση και πατά για να διαβάσει τα υπόλοιπα</translation>
     </message>
     <message>
         <source>Saved to Pictures</source>
@@ -580,9 +559,13 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Αποθηκεύτηκε στις Λήψεις</translation>
     </message>
     <message>
-        <source>Too big to send: %1. Attachments go up to %2.</source>
+        <source>Lost the connection to the Delta Chat core. Reconnecting…</source>
+        <translation>Χάθηκε η σύνδεση με τον πυρήνα του Delta Chat. Επανασύνδεση…</translation>
+    </message>
+    <message>
+        <source>%1 is too large to send. Attachments can be up to %2.</source>
         <extracomment>Shown above the message field when the attached file is bigger than will be sent. %1 is the file&apos;s size and %2 the largest that goes, each such as &quot;24 MB&quot;.</extracomment>
-        <translation>Πολύ μεγάλο για αποστολή: %1. Τα συνημμένα μπορούν να είναι έως %2.</translation>
+        <translation>Το %1 είναι πολύ μεγάλο για αποστολή. Τα συνημμένα μπορούν να φτάνουν τα %2.</translation>
     </message>
 </context>
 <context>
@@ -620,14 +603,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>How do you want to delete this message? This cannot be undone.</source>
         <translation>Πώς θέλετε να διαγράψετε αυτό το μήνυμα; Δεν μπορεί να αναιρεθεί.</translation>
-    </message>
-    <message>
-        <source>It goes from your devices. Everybody else keeps their copy.</source>
-        <translation>Φεύγει από τις συσκευές σας. Όλοι οι άλλοι κρατούν το αντίγραφό τους.</translation>
-    </message>
-    <message>
-        <source>It goes from your devices, and every other device in this chat is asked to delete it too.</source>
-        <translation>Φεύγει από τις συσκευές σας και κάθε άλλη συσκευή σε αυτή τη συνομιλία καλείται να το διαγράψει επίσης.</translation>
     </message>
 </context>
 <context>
@@ -689,8 +664,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Μετά από %1 δευτερόλεπτα</translation>
     </message>
     <message>
-        <source>Applies to everyone in the chat. They can still copy and forward.</source>
-        <translation>Ισχύει για όλους στη συνομιλία. Μπορούν ακόμη να αντιγράψουν και να προωθήσουν.</translation>
+        <source>Applies to all members of this chat; they can still copy, save, and forward messages.</source>
+        <translation>Ισχύει για όλα τα μέλη της συνομιλίας αν χρησιμοποιούν Delta Chat: έχουν την δυνατότητα αντιγραφής, αποθήκευσης, και κοινοποίησης μηνυμάτων ή χρήση άλλων e-mail πελατών.</translation>
     </message>
 </context>
 <context>
@@ -706,14 +681,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Restore from a backup</source>
         <translation>Επαναφορά από αντίγραφο ασφαλείας</translation>
-    </message>
-    <message>
-        <source>The other device keeps it. Both get everything new.</source>
-        <translation>Η άλλη συσκευή το κρατά. Και οι δύο παίρνουν ό,τι νέο έρθει.</translation>
-    </message>
-    <message>
-        <source>A backup file copied onto this phone.</source>
-        <translation>Ένα αρχείο αντιγράφου, αντιγραμμένο σε αυτό το τηλέφωνο.</translation>
     </message>
 </context>
 <context>
@@ -798,14 +765,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Εσείς επιλέγετε ποιος μπορεί να σας γράψει</translation>
     </message>
     <message>
-        <source>Groups of equals</source>
-        <translation>Ομάδες ίσων</translation>
-    </message>
-    <message>
-        <source>The server only passes it on</source>
-        <translation>Ο διακομιστής απλώς το προωθεί</translation>
-    </message>
-    <message>
         <source>Keep swiping to set up your profile.</source>
         <translation>Συνεχίστε να σύρετε για να ρυθμίσετε το προφίλ σας.</translation>
     </message>
@@ -814,24 +773,32 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Κάθε μήνυμα είναι κρυπτογραφημένο</translation>
     </message>
     <message>
-        <source>Made here on your phone. No phone number, no account, nothing to sign.</source>
-        <translation>Φτιάχνεται εδώ, στο τηλέφωνό σας. Χωρίς αριθμό, χωρίς λογαριασμό, τίποτα να υπογράψετε.</translation>
+        <source>Your profile is created on this phone. No phone number and no sign-up are needed.</source>
+        <translation>Το προφίλ σου δημιουργείται σε αυτό το τηλέφωνο. Δεν χρειάζεται ούτε αριθμός τηλεφώνου ούτε εγγραφή.</translation>
     </message>
     <message>
-        <source>There is no directory to be found in. Show a friend a code, or send a link.</source>
-        <translation>Δεν υπάρχει κατάλογος για να σας βρουν. Δείξτε σε έναν φίλο έναν κώδικα ή στείλτε του σύνδεσμο.</translation>
+        <source>There is no public directory. People reach you by scanning your invite code or opening your invite link.</source>
+        <translation>Δεν υπάρχει δημόσιος κατάλογος. Οι άλλοι σε βρίσκουν σαρώνοντας τον κωδικό πρόσκλησής σου ή ανοίγοντας τον σύνδεσμο πρόσκλησής σου.</translation>
     </message>
     <message>
-        <source>Encrypted the whole way, always. The servers cannot read a word.</source>
-        <translation>Πάντα κρυπτογραφημένο σε όλη τη διαδρομή. Οι διακομιστές δεν διαβάζουν λέξη.</translation>
+        <source>Any member can add people, rename the group or leave it.</source>
+        <translation>Κάθε μέλος μπορεί να προσθέτει άτομα, να μετονομάζει την ομάδα ή να την αφήνει.</translation>
     </message>
     <message>
-        <source>Anyone can add a friend, rename the group or leave. Nobody is in charge.</source>
-        <translation>Οποιοσδήποτε μπορεί να προσθέσει φίλο, να μετονομάσει την ομάδα ή να φύγει. Κανείς δεν διατάζει.</translation>
+        <source>Messages are end-to-end encrypted, so the relays that carry them cannot read them.</source>
+        <translation>Τα μηνύματα είναι κρυπτογραφημένα από άκρο σε άκρο, οπότε οι αναμεταδότες που τα μεταφέρουν δεν μπορούν να τα διαβάσουν.</translation>
     </message>
     <message>
-        <source>It holds a message until the other phone is online, and nothing more.</source>
-        <translation>Κρατά ένα μήνυμα μέχρι να συνδεθεί το άλλο τηλέφωνο, τίποτε άλλο.</translation>
+        <source>Groups have no admins</source>
+        <translation>Οι ομάδες δεν έχουν διαχειριστές</translation>
+    </message>
+    <message>
+        <source>Relays only pass messages on</source>
+        <translation>Οι αναμεταδότες απλώς προωθούν τα μηνύματα</translation>
+    </message>
+    <message>
+        <source>A relay stores a message only until the recipient fetches it.</source>
+        <translation>Ένας αναμεταδότης κρατά ένα μήνυμα μόνο μέχρι να το παραλάβει ο παραλήπτης.</translation>
     </message>
 </context>
 <context>
@@ -962,12 +929,12 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Δεν υπάρχουν ακόμη επαφές</translation>
     </message>
     <message>
-        <source>Scan someone&apos;s invite from the chat list: QR code</source>
-        <translation>Σαρώστε την πρόσκληση κάποιου από τη λίστα συνομιλιών: Κωδικός QR</translation>
-    </message>
-    <message>
         <source>Search</source>
         <translation>Αναζήτηση</translation>
+    </message>
+    <message>
+        <source>Use &quot;QR code&quot; in the chat list to add a contact.</source>
+        <translation>Για να προσθέσεις επαφή, χρησιμοποίησε το «Κωδικός QR» στη λίστα συνομιλιών.</translation>
     </message>
 </context>
 <context>
@@ -975,10 +942,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Please name the group</source>
         <translation>Δώστε όνομα στην ομάδα</translation>
-    </message>
-    <message>
-        <source>Create Group</source>
-        <translation>Δημιουργία ομάδας</translation>
     </message>
     <message>
         <source>New group</source>
@@ -1011,6 +974,10 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Add members</source>
         <translation>Προσθήκη μελών</translation>
+    </message>
+    <message>
+        <source>Create group</source>
+        <translation>Δημιουργία ομάδας</translation>
     </message>
 </context>
 <context>
@@ -1083,10 +1050,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Ο αναμεταδότης δεν έχει αναφέρει ακόμη το όριό του</translation>
     </message>
     <message>
-        <source>Both ways: with this off you send none and see none.</source>
-        <translation>Και προς τις δύο κατευθύνσεις: κλειστό, δεν στέλνετε καμία και δεν βλέπετε καμία.</translation>
-    </message>
-    <message>
         <source>Relays</source>
         <translation>Αναμεταδότες</translation>
     </message>
@@ -1121,16 +1084,16 @@ Other groups with blocked contacts will still show their messages.</source>
         <extracomment>How much room the profile takes on the phone. %1 is a size such as &quot;12.3 MB&quot;.</extracomment>
         <translation>Το Piirit χρησιμοποιεί %1 αποθηκευτικού χώρου σε αυτό το τηλέφωνο.</translation>
     </message>
+    <message>
+        <source>If read receipts are disabled, you won&apos;t be able to see read receipts from others.</source>
+        <translation>Αν τα αποδεικτικά ανάγνωσης είναι απενεργοποιημένα, δε θα μπορείς να δεις αποδεικτικά ανάγνωσης από άλλους/ες.</translation>
+    </message>
 </context>
 <context>
     <name>ProfileSetupPage</name>
     <message>
         <source>Add profile</source>
         <translation>Προσθήκη προφίλ</translation>
-    </message>
-    <message>
-        <source>Contacting %1...</source>
-        <translation>Επικοινωνία με %1...</translation>
     </message>
     <message>
         <source>Cancel</source>
@@ -1145,16 +1108,16 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Το %1 δεν απάντησε μέσα σε %2 δευτερόλεπτα.</translation>
     </message>
     <message>
-        <source>Relays are run by volunteers. Go back and try another one.</source>
-        <translation>Οι αναμεταδότες κρατιούνται από εθελοντές. Γυρίστε πίσω και δοκιμάστε άλλον.</translation>
+        <source>Contacting %1…</source>
+        <translation>Επικοινωνία με %1…</translation>
+    </message>
+    <message>
+        <source>Could not reach the relay. Try another one.</source>
+        <translation>Δεν ήταν δυνατή η επικοινωνία με τον αναμεταδότη. Δοκίμασε άλλον.</translation>
     </message>
 </context>
 <context>
     <name>ProfileStartPage</name>
-    <message>
-        <source>Alright, let&apos;s get you set up.</source>
-        <translation>Ωραία, ας ετοιμάσουμε το προφίλ σας.</translation>
-    </message>
     <message>
         <source>I already have a profile</source>
         <translation>Έχω ήδη προφίλ</translation>
@@ -1162,6 +1125,10 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Create a profile</source>
         <translation>Δημιουργία προφίλ</translation>
+    </message>
+    <message>
+        <source>Set up your profile</source>
+        <translation>Ρύθμισε το προφίλ σου</translation>
     </message>
 </context>
 <context>
@@ -1227,16 +1194,16 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Αφήστε κάποιον να σαρώσει αυτόν τον κωδικό ή στείλτε του τον σύνδεσμο.</translation>
     </message>
     <message>
-        <source>Fetching...</source>
-        <translation>Λήψη...</translation>
-    </message>
-    <message>
-        <source>Copy Invite Link</source>
-        <translation>Αντιγραφή συνδέσμου πρόσκλησης</translation>
-    </message>
-    <message>
         <source>The camera is not available on this device.</source>
         <translation>Η κάμερα δεν είναι διαθέσιμη σε αυτή τη συσκευή.</translation>
+    </message>
+    <message>
+        <source>Fetching…</source>
+        <translation>Λήψη…</translation>
+    </message>
+    <message>
+        <source>Copy invite link</source>
+        <translation>Αντιγραφή συνδέσμου πρόσκλησης</translation>
     </message>
 </context>
 <context>
@@ -1254,10 +1221,6 @@ Other groups with blocked contacts will still show their messages.</source>
 <context>
     <name>RestoreProfilePage</name>
     <message>
-        <source>That is not the code a device shows while it is offering its profile.</source>
-        <translation>Αυτός δεν είναι ο κωδικός που δείχνει μια συσκευή όσο προσφέρει το προφίλ της.</translation>
-    </message>
-    <message>
         <source>Add as second device</source>
         <translation>Προσθήκη ως δεύτερη συσκευή</translation>
     </message>
@@ -1270,16 +1233,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Επιλογή αρχείου αντιγράφου</translation>
     </message>
     <message>
-        <source>Taking the profile over...</source>
-        <translation>Το προφίλ μεταφέρεται...</translation>
-    </message>
-    <message>
         <source>Cancel</source>
         <translation>Ακύρωση</translation>
-    </message>
-    <message>
-        <source>Hold the phone up to the code it shows</source>
-        <translation>Στρέψτε αυτό το τηλέφωνο στον κωδικό που εμφανίζει</translation>
     </message>
     <message>
         <source>Enter the code instead</source>
@@ -1288,10 +1243,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Code from the other device</source>
         <translation>Κωδικός από την άλλη συσκευή</translation>
-    </message>
-    <message>
-        <source>Take the profile over</source>
-        <translation>Μεταφορά του προφίλ</translation>
     </message>
     <message>
         <source>That did not work</source>
@@ -1306,28 +1257,44 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Επιλογή άλλου αρχείου</translation>
     </message>
     <message>
-        <source>The other device runs a newer Delta Chat than this app can read.</source>
-        <translation>Η άλλη συσκευή τρέχει νεότερο Delta Chat απ&apos; ό,τι μπορεί να διαβάσει αυτή η εφαρμογή.</translation>
-    </message>
-    <message>
-        <source>The transfer stopped. Both devices have to stay on one network, with this page open.</source>
-        <translation>Η μεταφορά σταμάτησε. Και οι δύο συσκευές πρέπει να μείνουν στο ίδιο δίκτυο, με αυτή τη σελίδα ανοιχτή.</translation>
-    </message>
-    <message>
-        <source>No camera on this device. A backup file works without one.</source>
-        <translation>Καμία κάμερα σε αυτή τη συσκευή. Ένα αρχείο αντιγράφου δουλεύει και χωρίς.</translation>
-    </message>
-    <message>
-        <source>On the other device: Settings, then add a second device. Both on one network.</source>
-        <translation>Στην άλλη συσκευή: Ρυθμίσεις, μετά προσθήκη δεύτερης συσκευής. Και οι δύο στο ίδιο δίκτυο.</translation>
-    </message>
-    <message>
         <source>Make a backup on the other device, copy the file here, then choose it.</source>
         <translation>Κάντε αντίγραφο στην άλλη συσκευή, αντιγράψτε το αρχείο εδώ και μετά επιλέξτε το.</translation>
     </message>
     <message>
         <source>That profile is already on this phone. Open it from the profiles list.</source>
         <translation>Αυτό το προφίλ υπάρχει ήδη σε αυτό το τηλέφωνο. Ανοίξτε το από τη λίστα προφίλ.</translation>
+    </message>
+    <message>
+        <source>The profile is from a newer Delta Chat version than this app can read.</source>
+        <translation>Το προφίλ προέρχεται από νεότερη έκδοση του Delta Chat από αυτή που μπορεί να διαβάσει η εφαρμογή.</translation>
+    </message>
+    <message>
+        <source>The transfer stopped. Both devices must stay on the same network with this page open.</source>
+        <translation>Η μεταφορά σταμάτησε. Και οι δύο συσκευές πρέπει να παραμείνουν στο ίδιο δίκτυο με αυτή τη σελίδα ανοιχτή.</translation>
+    </message>
+    <message>
+        <source>This is not a second-device code. Use the code shown by the other device.</source>
+        <translation>Αυτός δεν είναι κωδικός δεύτερης συσκευής. Χρησιμοποίησε τον κωδικό που δείχνει η άλλη συσκευή.</translation>
+    </message>
+    <message>
+        <source>Hold your camera over the QR code</source>
+        <translation>Κρατήστε την κάμερά σας πάνω από τον κωδικό QR.</translation>
+    </message>
+    <message>
+        <source>Copy the profile</source>
+        <translation>Αντιγραφή προφίλ</translation>
+    </message>
+    <message>
+        <source>No camera on this device. You can restore from a backup file instead.</source>
+        <translation>Δεν υπάρχει κάμερα σε αυτή τη συσκευή. Μπορείς αντ&apos; αυτού να κάνεις επαναφορά από αρχείο αντιγράφου ασφαλείας.</translation>
+    </message>
+    <message>
+        <source>On the other device, go to Settings and tap &quot;Add second device&quot;. Both devices must be on the same network.</source>
+        <translation>Στην άλλη συσκευή, πήγαινε στις Ρυθμίσεις και πάτα «Προσθήκη δεύτερης συσκευής». Και οι δύο συσκευές πρέπει να είναι στο ίδιο δίκτυο.</translation>
+    </message>
+    <message>
+        <source>Transferring…</source>
+        <translation>Μεταφορά…</translation>
     </message>
 </context>
 <context>
@@ -1379,40 +1346,20 @@ Other groups with blocked contacts will still show their messages.</source>
 <context>
     <name>SecondDevicePage</name>
     <message>
-        <source>Nothing took the profile. Both phones have to stay on one network, with this page open.</source>
-        <translation>Κανείς δεν πήρε το προφίλ. Και τα δύο τηλέφωνα πρέπει να μείνουν στο ίδιο δίκτυο, με αυτή τη σελίδα ανοιχτή.</translation>
-    </message>
-    <message>
         <source>Add a second device</source>
         <translation>Προσθήκη δεύτερης συσκευής</translation>
-    </message>
-    <message>
-        <source>On the other device: add a profile you have already, then &quot;Add as second device&quot;, and read this code with it. Both phones on one network.</source>
-        <translation>Στην άλλη συσκευή: προσθέστε ένα προφίλ που έχετε ήδη, μετά «Προσθήκη ως δεύτερη συσκευή», και διαβάστε αυτόν τον κωδικό με αυτήν. Και τα δύο τηλέφωνα στο ίδιο δίκτυο.</translation>
     </message>
     <message>
         <source>Copy the code</source>
         <translation>Αντιγραφή κωδικού</translation>
     </message>
     <message>
-        <source>Handing the profile over...</source>
-        <translation>Το προφίλ παραδίδεται...</translation>
-    </message>
-    <message>
         <source>Cancel</source>
         <translation>Ακύρωση</translation>
     </message>
     <message>
-        <source>The other device has the profile. Both get everything new from now on.</source>
-        <translation>Η άλλη συσκευή έχει το προφίλ. Από εδώ και πέρα παίρνουν και οι δύο ό,τι νέο έρθει.</translation>
-    </message>
-    <message>
         <source>Swipe on for your chats.</source>
         <translation>Σύρετε παρακάτω για τις συνομιλίες σας.</translation>
-    </message>
-    <message>
-        <source>Whoever reads this code gets the profile. It stops collecting mail until the code is gone.</source>
-        <translation>Όποιος διαβάσει αυτόν τον κωδικό παίρνει το προφίλ. Όσο ο κωδικός είναι εδώ, το προφίλ δεν κατεβάζει αλληλογραφία.</translation>
     </message>
     <message>
         <source>Show code again</source>
@@ -1421,6 +1368,26 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Show code</source>
         <translation>Εμφάνιση κωδικού</translation>
+    </message>
+    <message>
+        <source>No device copied the profile. Both devices must stay on the same network with this page open.</source>
+        <translation>Καμία συσκευή δεν αντέγραψε το προφίλ. Και οι δύο συσκευές πρέπει να παραμείνουν στο ίδιο δίκτυο με αυτή τη σελίδα ανοιχτή.</translation>
+    </message>
+    <message>
+        <source>Transferring…</source>
+        <translation>Μεταφορά…</translation>
+    </message>
+    <message>
+        <source>The profile was transferred to your second device. Both devices now receive all new messages.</source>
+        <translation>Το προφίλ μεταφέρθηκε στη δεύτερη συσκευή σου. Και οι δύο συσκευές λαμβάνουν τώρα όλα τα νέα μηνύματα.</translation>
+    </message>
+    <message>
+        <source>On the other device, choose &quot;Add as second device&quot; and scan this code. Both devices must be on the same network.</source>
+        <translation>Στην άλλη συσκευή, επίλεξε «Προσθήκη ως δεύτερη συσκευή» και σάρωσε αυτόν τον κωδικό. Και οι δύο συσκευές πρέπει να είναι στο ίδιο δίκτυο.</translation>
+    </message>
+    <message>
+        <source>Make sure no unwanted observer or camera can see this code. This profile does not receive messages while the code is shown.</source>
+        <translation>Βεβαιώσου ότι κανένας ανεπιθύμητος παρατηρητής ή κάμερα δεν βλέπει αυτόν τον κωδικό. Αυτό το προφίλ δεν λαμβάνει μηνύματα όσο εμφανίζεται ο κωδικός.</translation>
     </message>
 </context>
 <context>
@@ -1474,18 +1441,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Ειδοποιήσεις</translation>
     </message>
     <message>
-        <source>Who wrote, and what</source>
-        <translation>Ποιος έγραψε, και τι</translation>
-    </message>
-    <message>
-        <source>Who wrote</source>
-        <translation>Ποιος έγραψε</translation>
-    </message>
-    <message>
-        <source>Only that something arrived</source>
-        <translation>Μόνο ότι κάτι έφτασε</translation>
-    </message>
-    <message>
         <source>Apps</source>
         <translation>Εφαρμογές</translation>
     </message>
@@ -1519,10 +1474,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Διαγραφή μηνυμάτων από τη συσκευή</translation>
     </message>
     <message>
-        <source>A new notification shows</source>
-        <translation>Μια νέα ειδοποίηση δείχνει</translation>
-    </message>
-    <message>
         <source>Mentions</source>
         <extracomment>A reply to one of the reader&apos;s own messages, arriving in a group they have muted.</extracomment>
         <translation>Αναφορές</translation>
@@ -1537,49 +1488,12 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Χρήση μορφοποίησης Markdown</translation>
     </message>
     <message>
-        <source>Otherwise it starts a new line, and the button sends.</source>
-        <translation>Αλλιώς ξεκινά νέα γραμμή, και στέλνει το κουμπί.</translation>
-    </message>
-    <message>
-        <source>Draws *stars* and `backticks` rather than showing them.</source>
-        <translation>Σχεδιάζει τα *αστεράκια* και τα `ανάποδα εισαγωγικά` αντί να τα δείχνει.</translation>
-    </message>
-    <message>
-        <source>Bigger ones wait until you ask for them. Every profile, from now on.</source>
-        <translation>Τα μεγαλύτερα περιμένουν να τα ζητήσετε. Όλα τα προφίλ, από τώρα και στο εξής.</translation>
-    </message>
-    <message>
-        <source>Every chat of every profile. &quot;Saved messages&quot; are kept.</source>
-        <translation>Κάθε συνομιλία κάθε προφίλ. Τα «αποθηκευμένα μηνύματα» μένουν.</translation>
-    </message>
-    <message>
-        <source>On the lock screen and in the notification area.</source>
-        <translation>Στην οθόνη κλειδώματος και στην περιοχή ειδοποιήσεων.</translation>
-    </message>
-    <message>
-        <source>A reply to you gets through a muted group.</source>
-        <translation>Μια απάντηση προς εσάς περνά ακόμη και από σιωπηλή ομάδα.</translation>
-    </message>
-    <message>
-        <source>Click ids and campaign tags come out of the links you send.</source>
-        <translation>Τα αναγνωριστικά κλικ και οι ετικέτες καμπάνιας φεύγουν από τους συνδέσμους που στέλνετε.</translation>
-    </message>
-    <message>
-        <source>Small apps run inside the chat. Somebody else&apos;s code, and less tested than the rest.</source>
-        <translation>Μικρές εφαρμογές τρέχουν μέσα στη συνομιλία. Κώδικας άλλου, και λιγότερο δοκιμασμένος από τα υπόλοιπα.</translation>
-    </message>
-    <message>
         <source>Privacy</source>
         <translation>Ιδιωτικότητα</translation>
     </message>
     <message>
         <source>Blocked contacts</source>
         <translation>Αποκλεισμένες Επαφές</translation>
-    </message>
-    <message>
-        <source>Worse quality, save data</source>
-        <extracomment>Outgoing media quality: smaller pictures and videos, which cost the reader and whoever they write to less data. Both reference clients&apos; words for it.</extracomment>
-        <translation>Χειρότερη ποιότητα, μικρό μέγεθος</translation>
     </message>
     <message>
         <source>Balanced</source>
@@ -1592,12 +1506,41 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Ποιότητα εξερχόμενων μέσων</translation>
     </message>
     <message>
-        <source>Pictures are made smaller before sending, and the camera records at this quality.</source>
-        <translation>Οι εικόνες σμικρύνονται πριν σταλούν και η κάμερα καταγράφει σε αυτήν την ποιότητα.</translation>
-    </message>
-    <message>
         <source>Show notifications</source>
         <translation>Εμφάνιση ειδοποιήσεων</translation>
+    </message>
+    <message>
+        <source>Lower quality, less data</source>
+        <extracomment>Outgoing media quality: smaller pictures and videos, which cost the reader and whoever they write to less data. Both reference clients&apos; words for it.</extracomment>
+        <translation>Χαμηλότερη ποιότητα, λιγότερα δεδομένα</translation>
+    </message>
+    <message>
+        <source>Notification content</source>
+        <translation>Περιεχόμενο ειδοποιήσεων</translation>
+    </message>
+    <message>
+        <source>Sender and message</source>
+        <translation>Αποστολέας και μήνυμα</translation>
+    </message>
+    <message>
+        <source>Sender only</source>
+        <translation>Μόνο ο αποστολέας</translation>
+    </message>
+    <message>
+        <source>No details</source>
+        <translation>Χωρίς λεπτομέρειες</translation>
+    </message>
+    <message>
+        <source>In muted groups, notify messages directed to you, like replies or reactions</source>
+        <translation>Σε σιωπηλές ομάδες, ειδοποίηση για μηνύματα που απευθύνονται σε εσένα, όπως απαντήσεις ή αντιδράσεις</translation>
+    </message>
+    <message>
+        <source>Removes click IDs and campaign tags from links you send.</source>
+        <translation>Αφαιρεί αναγνωριστικά κλικ και ετικέτες καμπάνιας από τους συνδέσμους που στέλνεις.</translation>
+    </message>
+    <message>
+        <source>Runs small apps inside chats. These features may be unstable and may be changed or removed.</source>
+        <translation>Εκτελεί μικρές εφαρμογές μέσα στις συνομιλίες. Αυτές οι λειτουργίες μπορεί να είναι ασταθείς και να αλλάξουν ή να αφαιρεθούν.</translation>
     </message>
 </context>
 <context>
@@ -1670,16 +1613,16 @@ Other groups with blocked contacts will still show their messages.</source>
 <context>
     <name>WelcomePage</name>
     <message>
-        <source>Tell me about Delta Chat</source>
-        <translation>Τι είναι το Delta Chat;</translation>
-    </message>
-    <message>
-        <source>Set up my profile</source>
-        <translation>Ρύθμιση του προφίλ μου</translation>
-    </message>
-    <message>
         <source>Secure decentralised chat based on Delta Chat</source>
         <translation>Ασφαλής αποκεντρωμένη συνομιλία βασισμένη στο Delta Chat</translation>
+    </message>
+    <message>
+        <source>About Delta Chat</source>
+        <translation>Σχετικά με το Delta Chat</translation>
+    </message>
+    <message>
+        <source>Set up your profile</source>
+        <translation>Ρύθμισε το προφίλ σου</translation>
     </message>
 </context>
 </TS>

@@ -288,7 +288,7 @@ fn assert_hint_timing(steps: &[(String, String)], context: &str) {
     );
     assert_eq!(
         common::value_of(steps, "early-label"),
-        "Contacting slow.example...",
+        "Contacting slow.example…",
         "the progress bar does not name the relay. {context}"
     );
     assert_eq!(

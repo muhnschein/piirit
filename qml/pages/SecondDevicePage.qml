@@ -107,7 +107,7 @@ Page {
         // words for that, so they are here. Same shape as the restore
         // page's "stalled", and for the same reason -- both ends of one
         // transfer, both giving up on the same silence.
-        onStalled: page.errorMessage = qsTr("Nothing took the profile. Both phones have to stay on one network, with this page open.")
+        onStalled: page.errorMessage = qsTr("No device copied the profile. Both devices must stay on the same network with this page open.")
         onError: page.errorMessage = message
         // What the button says next time depends on whether there has
         // ever been a code to look at, rather than on whether an offer
@@ -215,7 +215,7 @@ Page {
                 textFormat: Text.PlainText
                 font.pixelSize: Theme.fontSizeSmall
                 color: Theme.secondaryHighlightColor
-                text: qsTr("On the other device: add a profile you have already, then \"Add as second device\", and read this code with it. Both phones on one network.")
+                text: qsTr("On the other device, choose \"Add as second device\" and scan this code. Both devices must be on the same network.")
             }
 
             // What pressing the button puts on screen, said before it
@@ -230,7 +230,7 @@ Page {
                 textFormat: Text.PlainText
                 font.pixelSize: Theme.fontSizeExtraSmall
                 color: Theme.secondaryColor
-                text: qsTr("Whoever reads this code gets the profile. It stops collecting mail until the code is gone.")
+                text: qsTr("Make sure no unwanted observer or camera can see this code. This profile does not receive messages while the code is shown.")
             }
 
             // While the core is getting the provider up there is no code
@@ -292,7 +292,7 @@ Page {
                 minimumValue: 0
                 maximumValue: 1000
                 value: device.permille
-                label: qsTr("Handing the profile over...")
+                label: qsTr("Transferring…")
             }
 
             // Stops the offer and stays: the page is where the button
@@ -330,7 +330,7 @@ Page {
                 wrapMode: Text.Wrap
                 textFormat: Text.PlainText
                 color: Theme.highlightColor
-                text: qsTr("The other device has the profile. Both get everything new from now on.")
+                text: qsTr("The profile was transferred to your second device. Both devices now receive all new messages.")
             }
 
             // The way on, said in words as well as by the indicator:
