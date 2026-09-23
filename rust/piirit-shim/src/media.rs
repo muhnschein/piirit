@@ -26,7 +26,7 @@
 //! with `sys.msgsize_max_recommended`, the largest attachment it
 //! recommends, and says of it that a UI may refuse a bigger one. It is
 //! the core's own constant (`RECOMMENDED_FILE_SIZE`, about 22 MB), the
-//! same whichever relay the profile sends from, so nothing that shows
+//! same whichever relay mail leaves through, so nothing that shows
 //! it should call it the relay's or expect it to change with the relay.
 //! Nothing here refuses a picture: the core is about to shrink it, and
 //! the size on the phone says nothing about the size that leaves.

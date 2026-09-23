@@ -105,16 +105,16 @@
         <translation>Piirit solo funciona con relés chatmail. Son un tipo particular de servidor de correo; los servidores de correo corrientes no son compatibles. Más información en &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. La lista completa de relés chatmail públicos y gratuitos está en &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
     </message>
     <message>
-        <source>Adds another address for this profile on a second relay. The profile sends from one relay at a time; you can change which one on the profile page.</source>
-        <translation>Añade a este perfil otra dirección en un segundo relé. El perfil envía por un relé a la vez; puedes cambiar cuál en la página del perfil.</translation>
-    </message>
-    <message>
         <source>Contacting %1…</source>
         <translation>Contactando con %1…</translation>
     </message>
     <message>
         <source>Could not reach the relay. Try another one.</source>
         <translation>No se pudo contactar con el relé. Prueba con otro.</translation>
+    </message>
+    <message>
+        <source>Adds another address for this profile on a second relay.</source>
+        <translation>Añade a este perfil otra dirección en un segundo relé.</translation>
     </message>
 </context>
 <context>
@@ -1050,17 +1050,9 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Relés</translation>
     </message>
     <message>
-        <source>Sends from this relay</source>
-        <translation>Envía desde este relé</translation>
-    </message>
-    <message>
         <source>Removing relay</source>
         <extracomment>What Silica&apos;s countdown says it is doing, over a relay the reader has asked to remove.</extracomment>
         <translation>Quitando relé</translation>
-    </message>
-    <message>
-        <source>Send from this relay</source>
-        <translation>Enviar desde este relé</translation>
     </message>
     <message>
         <source>Remove relay</source>

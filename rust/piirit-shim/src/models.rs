@@ -203,14 +203,16 @@ pub struct TransportItem {
     /// the countdown before a removal (`PendingRemoval.qml`), which
     /// waits on numbers. Positive, so QML's `int` holds it.
     pub id: u32,
-    /// The address on this relay. What the core is handed to send from
-    /// it or to remove it.
+    /// The address on this relay. What the core is handed to remove
+    /// it.
     pub addr: QString,
     /// The relay itself: the part of the address after the `@`, which is
     /// how the row names it.
     pub domain: QString,
-    /// The profile sends from this one (`configured_addr`). One row per
-    /// profile, and the first.
+    /// The profile's own address is this one (`configured_addr`): the
+    /// one its invite link and its own contact carry. One row per
+    /// profile, and the first. Not the relay mail leaves through, which
+    /// the core picks each time it connects and does not say.
     pub is_primary: bool,
     /// The colour of the dot the core's report draws for this relay's
     /// connection -- `green`, `yellow`, `red` or `grey`, as its own

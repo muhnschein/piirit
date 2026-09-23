@@ -8,10 +8,11 @@
 //! the percentage the core wrote on its own bar, and the sentence it wrote
 //! beside it, in whatever language the core is in. Nothing here computes
 //! a quota; the core did, and this finds where it put the answer. Once
-//! for the relay the profile sends from (`quota_from_report`), and once
-//! for every relay it has (`transport_reports`) -- the dot the core
-//! drew for it, its own words about the connection, and the bar --
-//! which is what the profile page's relay rows are drawn from.
+//! for the relay with the profile's own address on it
+//! (`quota_from_report`), and once for every relay it has
+//! (`transport_reports`) -- the dot the core drew for it, its own words
+//! about the connection, and the bar -- which is what the profile page's
+//! relay rows are drawn from.
 
 // The core's `get_connectivity` bands, which the profile page puts words
 // to: 1000 not connected, 2000 connecting, 3000 connected and working,
@@ -37,18 +38,19 @@ pub(crate) struct Quota {
 /// A profile can have several transports, and the core writes one
 /// `<li class="transport">` per transport, in the order they were added,
 /// each with its own quota. Reading the first bar in the report would
-/// give whichever relay was set up first rather than the one the profile
-/// sends from, so the block is picked by the address before the bar is
-/// read. A report with one transport block has only one relay to report
-/// on, whatever the block is headed with, and a report with none of them
-/// at all -- an older core -- is read as it always was.
+/// give whichever relay was set up first rather than the one with the
+/// profile's own address on it, so the block is picked by the address
+/// before the bar is read. A report with one transport block has only
+/// one relay to report on, whatever the block is headed with, and a
+/// report with none of them at all -- an older core -- is read as it
+/// always was.
 pub(crate) fn quota_from_report(html: &str, address: &str) -> Option<Quota> {
     let blocks = transport_blocks(html);
     match blocks.len() {
         0 => quota_in(html),
         1 => quota_in(blocks[0]),
-        // Several relays and none of them this profile's primary: no
-        // quota rather than another relay's.
+        // Several relays and none of them with the profile's own
+        // address on it: no quota rather than another relay's.
         _ => quota_in(block_for(&blocks, address)?),
     }
 }
@@ -133,7 +135,7 @@ fn transport_blocks(html: &str) -> Vec<&str> {
         .collect()
 }
 
-/// The block for the relay `address` sends from: the core heads each one
+/// The block for the relay `address` is on: the core heads each one
 /// with `<b>domain:</b>`, the domain of that transport's address.
 fn block_for<'html>(blocks: &[&'html str], address: &str) -> Option<&'html str> {
     let domain = address.rsplit('@').next()?.trim();
@@ -326,10 +328,10 @@ mod tests {
     }
 
     /// The bug behind this: with a second transport, the first bar in the
-    /// report is the first relay ever set up, not the one the profile
-    /// sends from.
+    /// report is the first relay ever set up, not the one with the
+    /// profile's own address on it.
     #[test]
-    fn the_quota_is_the_relay_the_profile_sends_from() {
+    fn the_quota_is_the_one_on_the_profiles_own_relay() {
         assert_eq!(
             quota_from_report(TWO, "ada@chat.example.org"),
             Some(Quota {

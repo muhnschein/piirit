@@ -1,17 +1,18 @@
-//! The relays a profile is reached through, and which of them it sends
-//! from.
+//! The relays a profile is reached through.
 //!
 //! The core lets a profile have several transports at once
 //! (`list_transports`): each is a relay with an address on it, and mail
-//! to any of them arrives. One of them is the one the profile sends from,
-//! kept in `configured_addr`, and switching it is a `set_config` of that
-//! key -- the core refuses an address that is not one of the profile's
-//! transports, re-signs the key with the new address and restarts IO.
-//! Removing one is `delete_transport`, which the core refuses for the
-//! last transport and, for the one being sent from, answers by picking
-//! another. So the list is read back after each, rather than edited
-//! here: which relay the profile sends from afterwards is the core's
-//! answer, not this object's guess.
+//! to any of them arrives. Which one mail leaves through is the core's
+//! own choice, made each time it connects -- the newest relay that
+//! answers, since 2.61 -- and nothing over JSON-RPC names it or picks
+//! it. What one of them does still carry is the profile's own address,
+//! `configured_addr`: the one its invite link and its own contact
+//! carry. That row comes first. Removing one is `delete_transport`,
+//! which the core refuses for the last transport and, for the one with
+//! the profile's own address on it, answers by picking another. So the
+//! list is read back after each removal, rather than edited here: which
+//! address is the profile's own afterwards is the core's answer, not
+//! this object's guess.
 //!
 //! Each row also carries what the core's connectivity report says about
 //! that relay -- the dot it drew, its own words, the mailbox -- read off
@@ -27,7 +28,7 @@ use crate::core::connection;
 use crate::json;
 use crate::models::{TransportItem, TransportListModel};
 
-/// One profile's relays, primary first.
+/// One profile's relays, the one with its own address first.
 ///
 /// ```qml
 /// Transports { id: transports; account_id: page.accountId }
@@ -42,8 +43,9 @@ pub struct Transports {
     /// Emitted when the account changes.
     pub account_changed: qt_signal!(),
 
-    /// The rows: the relay the profile sends from first, the rest in the
-    /// order the core lists them, which is the order they were added.
+    /// The rows: the relay with the profile's own address first, the
+    /// rest in the order the core lists them, which is the order they
+    /// were added.
     /// Reset whole on each load, as a `Repeater`'s model is elsewhere
     /// (`chat_info.rs`): the rows are few, and a row counting down to
     /// its removal keeps its countdown beside the list rather than on
@@ -55,41 +57,39 @@ pub struct Transports {
     /// is a menu item that fails. A field rather than a count of `rows`:
     /// a row's bindings read it while the rows are being rebuilt.
     pub count: qt_property!(u32; NOTIFY rows_changed),
-    /// The address the profile sends from, empty until loaded.
+    /// The profile's own address (`configured_addr`), empty until
+    /// loaded.
     pub primary: qt_property!(QString; NOTIFY rows_changed),
     /// Emitted after any change to `rows`.
     pub rows_changed: qt_signal!(),
 
     /// Something failed. The message is the core's own -- "Cannot remove
-    /// the last transport", "Address does not belong to any transport".
+    /// the last transport", "Transport does not exist".
     pub error: qt_signal!(message: QString),
-    /// A change was applied and the rows read back: the profile sends
-    /// from another relay, or has one relay fewer. The page re-reads the
-    /// profile on it, whose address has changed with the first.
+    /// A relay was removed and the rows read back. The page re-reads
+    /// the profile on it, whose own address may have gone with the
+    /// relay.
     pub changed: qt_signal!(),
 
     /// Read the relays from the core.
     pub reload: qt_method!(fn(&mut self)),
-    /// Send from the relay `addr` is on, from now on. The core restarts
-    /// IO and re-signs the key for the new address; the rows are read
-    /// back once it has.
-    pub set_primary: qt_method!(fn(&mut self, addr: QString)),
     /// Remove the relay `addr` is on. Refused by the core for the last
-    /// one. Removing the relay the profile sends from leaves the core to
-    /// pick another, and the rows say which once they are read back.
+    /// one. Removing the relay with the profile's own address on it
+    /// leaves the core to pick another, and the rows say which once they
+    /// are read back.
     pub remove: qt_method!(fn(&mut self, addr: QString)),
     /// Feed a `core_event` in. Events for other accounts are ignored.
     pub handle_event:
         qt_method!(fn(&mut self, context_id: u32, kind: QString, payload_json: QString)),
 
     /// Counts loads, so a slow answer to an older question cannot land on
-    /// top of a newer one: switching the relay reloads, and the core's
-    /// `TransportsModified` for the same switch reloads again.
+    /// top of a newer one: removing a relay reloads, and the core's
+    /// `TransportsModified` for the same removal reloads again.
     generation: u64,
 }
 
 /// What one load brings back: the transports as the core lists them, the
-/// address the profile sends from, and the connectivity report.
+/// profile's own address, and the connectivity report.
 type Listed = (Vec<serde_json::Value>, String, String);
 
 impl Transports {
@@ -160,27 +160,6 @@ impl Transports {
         });
     }
 
-    /// Send from the relay `addr` is on.
-    pub fn set_primary(&mut self, addr: QString) {
-        let account_id = self.account_id;
-        let addr = addr.to_string();
-        if account_id == 0 || addr.is_empty() {
-            return;
-        }
-        let Some((rpc, runtime)) = connection() else {
-            self.error(QString::from("not started"));
-            return;
-        };
-        let done = self.applied_callback();
-        runtime.spawn(async move {
-            let result = rpc
-                .call::<_, ()>("set_config", (account_id, "configured_addr", Some(addr)))
-                .await
-                .map_err(|err| err.to_string());
-            done(result);
-        });
-    }
-
     /// Remove the relay `addr` is on.
     pub fn remove(&mut self, addr: QString) {
         let account_id = self.account_id;
@@ -217,8 +196,8 @@ impl Transports {
         }
     }
 
-    /// Report a change applied, and read the rows back: which relay the
-    /// profile sends from after a removal is the core's decision.
+    /// Report a removal applied, and read the rows back: which address
+    /// is the profile's own after it is the core's decision.
     fn applied_callback(&self) -> impl Fn(Result<(), String>) {
         let ptr: QPointer<Self> = QPointer::from(self);
         queued_callback(move |result: Result<(), String>| {
@@ -234,8 +213,9 @@ impl Transports {
     }
 }
 
-/// The rows for what the core listed: the relay sent from first, the
-/// rest in the core's order, each with its mailbox off the report.
+/// The rows for what the core listed: the relay with the profile's own
+/// address first, the rest in the core's order, each with its mailbox
+/// off the report.
 fn rows_from(transports: &[serde_json::Value], primary: &str, report: &str) -> Vec<TransportItem> {
     let reports = transport_reports(report);
     let mut rows: Vec<TransportItem> = transports
@@ -321,10 +301,10 @@ mod tests {
             .collect()
     }
 
-    /// The relay sent from comes first whatever the core's order, and
-    /// each row's mailbox is its own relay's.
+    /// The relay with the profile's own address comes first whatever
+    /// the core's order, and each row's mailbox is its own relay's.
     #[test]
-    fn the_relay_sent_from_is_first_and_each_has_its_own_mailbox() {
+    fn the_profiles_own_relay_is_first_and_each_has_its_own_mailbox() {
         let rows = rows_from(
             &listed(&["ada@old.example.net", "ada@nine.testrun.org"]),
             "ada@nine.testrun.org",
@@ -361,8 +341,8 @@ mod tests {
         );
     }
 
-    /// Nothing sent from, nothing reported: still the relays, in the
-    /// core's order, with no mailbox to show.
+    /// No address of its own, nothing reported: still the relays, in
+    /// the core's order, with no mailbox to show.
     #[test]
     fn rows_stand_without_a_primary_or_a_report() {
         let rows = rows_from(

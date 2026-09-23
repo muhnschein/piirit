@@ -105,16 +105,16 @@
         <translation>Piirit virker bare med chatmail-reléer. Det er en egen type e-posttjener; vanlige e-posttjenere støttes ikke. Les mer på &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. En full liste over offentlige, gratis chatmail-reléer finnes på &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
     </message>
     <message>
-        <source>Adds another address for this profile on a second relay. The profile sends from one relay at a time; you can change which one on the profile page.</source>
-        <translation>Legger til enda en adresse for denne profilen på et annet relé. Profilen sender via ett relé om gangen; hvilket kan du endre på profilsiden.</translation>
-    </message>
-    <message>
         <source>Contacting %1…</source>
         <translation>Kontakter %1…</translation>
     </message>
     <message>
         <source>Could not reach the relay. Try another one.</source>
         <translation>Kunne ikke nå reléet. Prøv et annet.</translation>
+    </message>
+    <message>
+        <source>Adds another address for this profile on a second relay.</source>
+        <translation>Legger til enda en adresse for denne profilen på et annet relé.</translation>
     </message>
 </context>
 <context>
@@ -1050,17 +1050,9 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Reléer</translation>
     </message>
     <message>
-        <source>Sends from this relay</source>
-        <translation>Sender fra dette reléet</translation>
-    </message>
-    <message>
         <source>Removing relay</source>
         <extracomment>What Silica&apos;s countdown says it is doing, over a relay the reader has asked to remove.</extracomment>
         <translation>Fjerner relé</translation>
-    </message>
-    <message>
-        <source>Send from this relay</source>
-        <translation>Send fra dette reléet</translation>
     </message>
     <message>
         <source>Remove relay</source>

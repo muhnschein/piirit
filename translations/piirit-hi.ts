@@ -105,16 +105,16 @@
         <translation>Piirit केवल chatmail रिले के साथ काम करता है। ये एक ख़ास तरह के ई-मेल सर्वर हैं; साधारण ई-मेल सर्वर समर्थित नहीं हैं। अधिक जानकारी के लिए &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt; देखें। सार्वजनिक, मुफ़्त chatmail रिले की पूरी सूची &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; पर है।</translation>
     </message>
     <message>
-        <source>Adds another address for this profile on a second relay. The profile sends from one relay at a time; you can change which one on the profile page.</source>
-        <translation>इस प्रोफ़ाइल के लिए दूसरे रिले पर एक और पता जोड़ता है। प्रोफ़ाइल एक समय में एक ही रिले से भेजती है; कौन-सा, यह प्रोफ़ाइल पेज पर बदला जा सकता है।</translation>
-    </message>
-    <message>
         <source>Contacting %1…</source>
         <translation>%1 से संपर्क किया जा रहा है…</translation>
     </message>
     <message>
         <source>Could not reach the relay. Try another one.</source>
         <translation>रिले तक नहीं पहुँचा जा सका। कोई दूसरा आज़माएँ।</translation>
+    </message>
+    <message>
+        <source>Adds another address for this profile on a second relay.</source>
+        <translation>इस प्रोफ़ाइल के लिए दूसरे रिले पर एक और पता जोड़ता है।</translation>
     </message>
 </context>
 <context>
@@ -1054,17 +1054,9 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>रिले</translation>
     </message>
     <message>
-        <source>Sends from this relay</source>
-        <translation>इस रिले से भेजता है</translation>
-    </message>
-    <message>
         <source>Removing relay</source>
         <extracomment>What Silica&apos;s countdown says it is doing, over a relay the reader has asked to remove.</extracomment>
         <translation>रिले हटाया जा रहा है</translation>
-    </message>
-    <message>
-        <source>Send from this relay</source>
-        <translation>इस रिले से भेजें</translation>
     </message>
     <message>
         <source>Remove relay</source>

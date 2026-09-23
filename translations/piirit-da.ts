@@ -105,16 +105,16 @@
         <translation>Piirit virker kun med chatmail-relæer. Det er en særlig slags e-mail-server; almindelige e-mail-servere understøttes ikke. Læs mere på &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. En fuld liste over offentlige, gratis chatmail-relæer findes på &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
     </message>
     <message>
-        <source>Adds another address for this profile on a second relay. The profile sends from one relay at a time; you can change which one on the profile page.</source>
-        <translation>Tilføjer denne profil endnu en adresse på et andet relæ. Profilen sender via ét relæ ad gangen; hvilket kan du ændre på profilsiden.</translation>
-    </message>
-    <message>
         <source>Contacting %1…</source>
         <translation>Kontakter %1…</translation>
     </message>
     <message>
         <source>Could not reach the relay. Try another one.</source>
         <translation>Kunne ikke nå relæet. Prøv et andet.</translation>
+    </message>
+    <message>
+        <source>Adds another address for this profile on a second relay.</source>
+        <translation>Tilføjer denne profil endnu en adresse på et andet relæ.</translation>
     </message>
 </context>
 <context>
@@ -1050,17 +1050,9 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Relæer</translation>
     </message>
     <message>
-        <source>Sends from this relay</source>
-        <translation>Sender fra dette relæ</translation>
-    </message>
-    <message>
         <source>Removing relay</source>
         <extracomment>What Silica&apos;s countdown says it is doing, over a relay the reader has asked to remove.</extracomment>
         <translation>Fjerner relæ</translation>
-    </message>
-    <message>
-        <source>Send from this relay</source>
-        <translation>Send fra dette relæ</translation>
     </message>
     <message>
         <source>Remove relay</source>

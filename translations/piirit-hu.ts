@@ -105,16 +105,16 @@
         <translation>A Piirit csak chatmail-relékkel működik. Ezek különleges fajta e-mail-kiszolgálók; a közönséges e-mail-kiszolgálók nem támogatottak. Bővebben: &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. A nyilvános, ingyenesen használható chatmail-relék teljes listája: &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
     </message>
     <message>
-        <source>Adds another address for this profile on a second relay. The profile sends from one relay at a time; you can change which one on the profile page.</source>
-        <translation>Egy további címet ad ehhez a profilhoz egy másik relén. A profil egyszerre egy relén keresztül küld; hogy melyiken, azt a profil oldalán módosíthatod.</translation>
-    </message>
-    <message>
         <source>Contacting %1…</source>
         <translation>Kapcsolatfelvétel: %1…</translation>
     </message>
     <message>
         <source>Could not reach the relay. Try another one.</source>
         <translation>A relé nem volt elérhető. Próbálj meg egy másikat.</translation>
+    </message>
+    <message>
+        <source>Adds another address for this profile on a second relay.</source>
+        <translation>Egy további címet ad ehhez a profilhoz egy másik relén.</translation>
     </message>
 </context>
 <context>
@@ -1044,17 +1044,9 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Relék</translation>
     </message>
     <message>
-        <source>Sends from this relay</source>
-        <translation>Erről a reléről küld</translation>
-    </message>
-    <message>
         <source>Removing relay</source>
         <extracomment>What Silica&apos;s countdown says it is doing, over a relay the reader has asked to remove.</extracomment>
         <translation>Relé eltávolítása folyamatban</translation>
-    </message>
-    <message>
-        <source>Send from this relay</source>
-        <translation>Küldés erről a reléről</translation>
     </message>
     <message>
         <source>Remove relay</source>

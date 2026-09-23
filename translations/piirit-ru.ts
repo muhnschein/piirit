@@ -105,16 +105,16 @@
         <translation>Piirit работает только с chatmail-релеями. Это особый вид почтовых серверов; обычные почтовые серверы не поддерживаются. Подробнее на &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. Полный список публичных, бесплатных chatmail-релеев есть на &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
     </message>
     <message>
-        <source>Adds another address for this profile on a second relay. The profile sends from one relay at a time; you can change which one on the profile page.</source>
-        <translation>Добавляет этому профилю ещё один адрес на другом релее. Профиль отправляет через один релей за раз; какой именно, можно изменить на странице профиля.</translation>
-    </message>
-    <message>
         <source>Contacting %1…</source>
         <translation>Связь с %1…</translation>
     </message>
     <message>
         <source>Could not reach the relay. Try another one.</source>
         <translation>Не удалось связаться с релеем. Попробуйте другой.</translation>
+    </message>
+    <message>
+        <source>Adds another address for this profile on a second relay.</source>
+        <translation>Добавляет этому профилю ещё один адрес на другом релее.</translation>
     </message>
 </context>
 <context>
@@ -1060,17 +1060,9 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Релеи</translation>
     </message>
     <message>
-        <source>Sends from this relay</source>
-        <translation>Отправляет через этот релей</translation>
-    </message>
-    <message>
         <source>Removing relay</source>
         <extracomment>What Silica&apos;s countdown says it is doing, over a relay the reader has asked to remove.</extracomment>
         <translation>Релей убирается</translation>
-    </message>
-    <message>
-        <source>Send from this relay</source>
-        <translation>Отправлять через этот релей</translation>
     </message>
     <message>
         <source>Remove relay</source>

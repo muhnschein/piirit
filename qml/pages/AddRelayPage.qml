@@ -8,8 +8,7 @@ import "../js/Relays.js" as Relays
  * the profile page (ProfilePage.qml).
  *
  * The core lets a profile be reached through several relays at once, each
- * with an address of its own, and sends from one of them; adding one is
- * the same call that made the profile in the first place, on the account
+ * with an address of its own; adding one is the same call that made the profile in the first place, on the account
  * the profile already is (add_transport_from_qr, docs/PROJECT.md). So this
  * page is the relay half of AddProfileDialog -- the same list, the same
  * custom field -- and then the wait ProfileSetupPage shows, on one page:
@@ -140,7 +139,7 @@ Page {
                 wrapMode: Text.Wrap
                 font.pixelSize: Theme.fontSizeSmall
                 color: Theme.secondaryHighlightColor
-                text: qsTr("Adds another address for this profile on a second relay. The profile sends from one relay at a time; you can change which one on the profile page.")
+                text: qsTr("Adds another address for this profile on a second relay.")
             }
 
             ComboBox {

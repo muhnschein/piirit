@@ -105,16 +105,16 @@
         <translation>Piirit फक्त chatmail रिलेंसोबतच काम करते. हे विशेष प्रकारचे ई-मेल सर्व्हर आहेत; सामान्य ई-मेल सर्व्हर समर्थित नाहीत. अधिक माहितीसाठी &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt; पाहा. सार्वजनिक, मोफत chatmail रिलेंची पूर्ण यादी &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; वर आहे.</translation>
     </message>
     <message>
-        <source>Adds another address for this profile on a second relay. The profile sends from one relay at a time; you can change which one on the profile page.</source>
-        <translation>या प्रोफाइलसाठी दुसऱ्या रिलेवर आणखी एक पत्ता जोडते. प्रोफाइल एका वेळी एकाच रिलेमधून पाठवते; कोणता, ते प्रोफाइल पानावर बदलता येते.</translation>
-    </message>
-    <message>
         <source>Contacting %1…</source>
         <translation>%1 शी संपर्क साधत आहे…</translation>
     </message>
     <message>
         <source>Could not reach the relay. Try another one.</source>
         <translation>रिलेपर्यंत पोहोचता आले नाही. दुसरा वापरून पहा.</translation>
+    </message>
+    <message>
+        <source>Adds another address for this profile on a second relay.</source>
+        <translation>या प्रोफाइलसाठी दुसऱ्या रिलेवर आणखी एक पत्ता जोडते.</translation>
     </message>
 </context>
 <context>
@@ -1054,17 +1054,9 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>रिले</translation>
     </message>
     <message>
-        <source>Sends from this relay</source>
-        <translation>या रिलेवरून पाठवते</translation>
-    </message>
-    <message>
         <source>Removing relay</source>
         <extracomment>What Silica&apos;s countdown says it is doing, over a relay the reader has asked to remove.</extracomment>
         <translation>रिले काढत आहे</translation>
-    </message>
-    <message>
-        <source>Send from this relay</source>
-        <translation>या रिलेवरून पाठवा</translation>
     </message>
     <message>
         <source>Remove relay</source>

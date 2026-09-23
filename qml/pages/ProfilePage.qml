@@ -7,7 +7,7 @@ import Piirit 1.0
 /*
  * One profile, as everyone else sees it and as this device holds it: the
  * picture, the name on every message, the line under it, the relays it
- * is reached through and the one it writes from, whether the other end
+ * is reached through, whether the other end
  * is told when something has been read, and how the relay and the phone
  * are doing by it. Reached from the profile's row on the profiles page.
  * The settings that belong to no profile are on the settings page
@@ -36,11 +36,13 @@ import Piirit 1.0
  * here: on a phone that scan is what the reader would be waiting on.
  *
  * The relays are a list rather than one address: the core lets a profile
- * be reached through several, each with an address of its own, and sends
- * from one of them (Transports, transports.rs). The one it sends from is
- * first and says so. A row's menu is what can be done with that relay --
- * send from it instead, or remove it, with Silica's countdown to change
- * one's mind in -- and the plus under the last row adds one
+ * be reached through several, each with an address of its own
+ * (Transports, transports.rs). The one with the profile's own address on
+ * it -- the one its invite link carries -- is first. Which relay mail
+ * leaves through is the core's choice each time it connects, and not
+ * something it says or takes, so no row claims it. A row's menu removes
+ * that relay, with Silica's countdown to change one's mind in, and the
+ * plus under the last row adds one
  * (AddRelayPage.qml). Removing the last relay is not offered: the core
  * refuses it, and a profile with no relay is not a profile. The profiles
  * page under this one draws its rows off the core's account list, so a
@@ -84,8 +86,8 @@ Page {
         objectName: "transports"
         account_id: page.accountId
         onError: page.errorMessage = message
-        // The profile sends from another relay now, or has one fewer:
-        // its address, what the relay takes and the profiles page's row
+        // The profile has one relay fewer: its address, if it went with
+        // the relay, what the relay takes and the profiles page's row
         // follow.
         onChanged: {
             profile.reload()
@@ -124,7 +126,8 @@ Page {
                 relayRefresh.restart()
             }
             // Changed on another device the profile is on: the row on
-            // the profiles page names the relay sent from, and follows.
+            // the profiles page names the profile's own address, and
+            // follows.
             if (kind === "TransportsModified" && context_id === page.accountId) {
                 core.refresh_accounts()
             }
@@ -133,8 +136,8 @@ Page {
     }
 
     // The core says the connection changed several times over when IO
-    // restarts -- which is what sending from another relay does -- and
-    // each time the rows are worth reading again for their mailboxes.
+    // restarts -- which is what removing a relay does -- and each time
+    // the rows are worth reading again for their mailboxes.
     // Once, when it has gone quiet: the rows are rebuilt on a read, and a
     // rebuild per event is a menu closed under the reader's finger per
     // event.
@@ -364,10 +367,10 @@ Page {
 
             // The relays the profile is reached through: the reader's
             // own addresses, what the relays minted, and what tells two
-            // profiles apart. The one sent from first. Shown, not edited
-            // -- an address is a relay's, and changing one is adding a
-            // relay and sending from it, which the rows and the plus
-            // under them offer.
+            // profiles apart. The one with the profile's own address
+            // first. Shown, not edited -- an address is a relay's, and
+            // changing one is adding a relay and removing the old one,
+            // which the plus under the rows and their menus offer.
             SectionHeader {
                 text: qsTr("Relays")
             }
@@ -387,7 +390,6 @@ Page {
 
                     /// The address on this relay, for a test to read.
                     readonly property string addr: model.addr
-                    readonly property bool sendsFrom: model.is_primary
                     /// This relay is on its way out.
                     readonly property bool doomed: doomedRelays.pending(model.id)
 
@@ -416,20 +418,6 @@ Page {
                             color: Theme.secondaryColor
                             textFormat: Text.PlainText
                             text: model.addr
-                        }
-
-                        // What sets the relay sent from apart. What the
-                        // relays hold and how they are doing is in the
-                        // section below, relay by relay.
-                        Label {
-                            objectName: "relayDetail"
-                            width: parent.width
-                            wrapMode: Text.Wrap
-                            visible: model.is_primary
-                            font.pixelSize: Theme.fontSizeSmall
-                            color: Theme.secondaryHighlightColor
-                            textFormat: Text.PlainText
-                            text: qsTr("Sends from this relay")
                         }
                     }
 
@@ -462,15 +450,6 @@ Page {
                     }
 
                     menu: ContextMenu {
-                        // Not on the relay already sent from: there is
-                        // nothing to switch to.
-                        MenuItem {
-                            objectName: "sendFromItem"
-                            visible: !model.is_primary
-                            text: qsTr("Send from this relay")
-                            onClicked: transports.set_primary(model.addr)
-                        }
-
                         // Dim on the last relay: the core refuses to
                         // remove it, and a menu item that asks anyway
                         // is a menu item that fails.

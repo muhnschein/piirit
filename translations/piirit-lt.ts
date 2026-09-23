@@ -105,16 +105,16 @@
         <translation>Piirit veikia tik su chatmail retransliatoriais. Tai ypatinga el. pašto serverių rūšis; įprasti el. pašto serveriai nepalaikomi. Daugiau – &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. Visas viešų, nemokamų chatmail retransliatorių sąrašas yra &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
     </message>
     <message>
-        <source>Adds another address for this profile on a second relay. The profile sends from one relay at a time; you can change which one on the profile page.</source>
-        <translation>Prideda šiam profiliui dar vieną adresą kitame retransliatoriuje. Profilis siunčia per vieną retransliatorių vienu metu; kurį, gali pakeisti profilio puslapyje.</translation>
-    </message>
-    <message>
         <source>Contacting %1…</source>
         <translation>Susisiekiama su %1…</translation>
     </message>
     <message>
         <source>Could not reach the relay. Try another one.</source>
         <translation>Nepavyko pasiekti retransliatoriaus. Pabandyk kitą.</translation>
+    </message>
+    <message>
+        <source>Adds another address for this profile on a second relay.</source>
+        <translation>Prideda šiam profiliui dar vieną adresą kitame retransliatoriuje.</translation>
     </message>
 </context>
 <context>
@@ -1056,17 +1056,9 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Retransliatoriai</translation>
     </message>
     <message>
-        <source>Sends from this relay</source>
-        <translation>Siunčia iš šio retransliatoriaus</translation>
-    </message>
-    <message>
         <source>Removing relay</source>
         <extracomment>What Silica&apos;s countdown says it is doing, over a relay the reader has asked to remove.</extracomment>
         <translation>Šalinamas retransliatorius</translation>
-    </message>
-    <message>
-        <source>Send from this relay</source>
-        <translation>Siųsti iš šio retransliatoriaus</translation>
     </message>
     <message>
         <source>Remove relay</source>

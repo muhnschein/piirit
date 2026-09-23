@@ -35,7 +35,8 @@ pub struct Profile {
     /// Absolute path to the picture inside the core's blob directory,
     /// empty when there is none.
     pub avatar_path: qt_property!(QString; NOTIFY loaded_changed),
-    /// The address this profile sends from. Not editable: changing it is
+    /// The profile's own address (`configured_addr`), the one its invite
+    /// link and its own contact carry. Not editable: changing it is
     /// setting up a different transport, not renaming this one.
     pub address: qt_property!(QString; NOTIFY loaded_changed),
     /// The colour the core gives the reader's own contact, `#rrggbb`, for
@@ -46,8 +47,8 @@ pub struct Profile {
     /// `mdns_enabled` to the core, which defaults it on.
     pub read_receipts: qt_property!(bool; NOTIFY loaded_changed),
     /// The largest attachment the core recommends, in bytes; 0 until
-    /// read. The core's own constant, the same whichever relay the
-    /// profile sends from. Through f64 because QML has no 64-bit
+    /// read. The core's own constant, the same whichever relay mail
+    /// leaves through. Through f64 because QML has no 64-bit
     /// integer. See `media.rs`.
     pub attachment_limit_bytes: qt_property!(f64; NOTIFY loaded_changed),
 

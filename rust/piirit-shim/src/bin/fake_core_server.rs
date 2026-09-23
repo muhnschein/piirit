@@ -137,8 +137,8 @@ struct State {
     sent: std::collections::BTreeSet<u32>,
     /// Each account's transports, in the order they were added -- the
     /// real core's `transports` table, which `list_transports` reads
-    /// oldest first. The one the account sends from is `configured_addr`
-    /// in `config`, as it is there.
+    /// oldest first. The one with the account's own address on it is
+    /// `configured_addr` in `config`, as it is there.
     transports: std::collections::BTreeMap<u32, Vec<String>>,
 }
 
@@ -154,9 +154,9 @@ impl State {
     }
 
     /// Keep a transport the account was just given, as the real core
-    /// does: appended, once, and sent from if the account was not
-    /// sending from anything yet -- a second transport is a second
-    /// address to be reached at, not a change of the first.
+    /// does: appended, once, and the account's own address if it had
+    /// none yet -- a second transport is a second address to be reached
+    /// at, not a change of the first.
     fn add_transport(&mut self, account: u32, addr: &str) {
         let list = self.transports.entry(account).or_default();
         if !list.iter().any(|known| known == addr) {
@@ -1251,24 +1251,26 @@ async fn serve() {
                     // one outright there, which is why the app has to send
                     // null rather than "".
                     match positional(2).as_str() {
-                        // Which transport the account sends from. The
-                        // real core takes only an address it has a
-                        // transport for, in these words -- unless the
-                        // account has none yet, when the write is the
-                        // pre-transport way of configuring one and the
-                        // core makes a transport of it. Both pinned
-                        // offline against the pinned binary.
+                        // The profile's own address. The real core takes
+                        // only an address it has a transport for, in
+                        // these words, and since 2.61 even on an account
+                        // with none: writing one is no longer a way of
+                        // making a transport. Nor does it clear one.
+                        // Both pinned offline against the pinned binary.
                         Some(value) if key == "configured_addr" => {
-                            let known = state.transports_for(account);
-                            if known.is_empty() {
-                                state.add_transport(account, value);
-                                ok(&id, &Value::Null)
-                            } else if known.iter().any(|addr| addr == value) {
+                            if state
+                                .transports_for(account)
+                                .iter()
+                                .any(|addr| addr == value)
+                            {
                                 state.config.insert((account, key), value.to_string());
                                 ok(&id, &Value::Null)
                             } else {
                                 err(&id, "Address does not belong to any transport.")
                             }
+                        }
+                        None if key == "configured_addr" => {
+                            err(&id, "Cannot unset configured_addr")
                         }
                         Some(value) => {
                             state.config.insert((account, key), value.to_string());
@@ -1461,11 +1463,11 @@ async fn serve() {
                     ok(&id, &Value::Array(listed))
                 }
                 // One transport fewer. The real core refuses to remove
-                // the last one, in these words, and answers the removal
-                // of the one being sent from by sending from another --
-                // pinned offline against the pinned binary, as far as
-                // one transport allows; the re-election is upstream's
-                // `delete_transport`.
+                // the last one and one it does not have, in these words,
+                // and answers the removal of the one with the account's
+                // own address on it by electing the newest of the rest
+                // -- upstream's `delete_transport` and
+                // `maybe_update_sending_transport`.
                 "delete_transport" => {
                     let account = account_id();
                     let addr = positional(1).as_str().unwrap_or_default().to_string();
@@ -1474,16 +1476,17 @@ async fn serve() {
                     if known.len() <= 1 {
                         err(&id, "Cannot remove the last transport")
                     } else if !known.contains(&addr) {
-                        err(&id, "Address does not belong to any transport.")
+                        err(&id, "Transport does not exist")
                     } else {
                         let kept: Vec<String> =
                             known.into_iter().filter(|kept| *kept != addr).collect();
-                        if state.config(account, "configured_addr").as_deref()
-                            == Some(addr.as_str())
-                        {
+                        if let Some(newest) = kept.last().filter(|_| {
+                            state.config(account, "configured_addr").as_deref()
+                                == Some(addr.as_str())
+                        }) {
                             state
                                 .config
-                                .insert((account, "configured_addr".to_string()), kept[0].clone());
+                                .insert((account, "configured_addr".to_string()), newest.clone());
                         }
                         state.transports.insert(account, kept);
                         state.transports_modified(account);

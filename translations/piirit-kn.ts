@@ -105,16 +105,16 @@
         <translation>Piirit chatmail ರಿಲೇಗಳೊಂದಿಗೆ ಮಾತ್ರ ಕೆಲಸ ಮಾಡುತ್ತದೆ. ಇವು ವಿಶೇಷ ರೀತಿಯ ಇ-ಮೇಲ್ ಸರ್ವರ್‌ಗಳು; ಸಾಮಾನ್ಯ ಇ-ಮೇಲ್ ಸರ್ವರ್‌ಗಳಿಗೆ ಬೆಂಬಲವಿಲ್ಲ. ಹೆಚ್ಚಿನ ಮಾಹಿತಿಗೆ &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt; ನೋಡಿ. ಸಾರ್ವಜನಿಕ, ಉಚಿತ chatmail ರಿಲೇಗಳ ಪೂರ್ಣ ಪಟ್ಟಿ &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; ನಲ್ಲಿದೆ.</translation>
     </message>
     <message>
-        <source>Adds another address for this profile on a second relay. The profile sends from one relay at a time; you can change which one on the profile page.</source>
-        <translation>ಈ ಪ್ರೊಫೈಲಿಗೆ ಎರಡನೇ ರಿಲೇಯಲ್ಲಿ ಇನ್ನೊಂದು ವಿಳಾಸವನ್ನು ಸೇರಿಸುತ್ತದೆ. ಪ್ರೊಫೈಲ್ ಒಂದು ಬಾರಿಗೆ ಒಂದೇ ರಿಲೇ ಮೂಲಕ ಕಳುಹಿಸುತ್ತದೆ; ಯಾವುದು ಎಂಬುದನ್ನು ಪ್ರೊಫೈಲ್ ಪುಟದಲ್ಲಿ ಬದಲಾಯಿಸಬಹುದು.</translation>
-    </message>
-    <message>
         <source>Contacting %1…</source>
         <translation>%1 ಅನ್ನು ಸಂಪರ್ಕಿಸಲಾಗುತ್ತಿದೆ…</translation>
     </message>
     <message>
         <source>Could not reach the relay. Try another one.</source>
         <translation>ರಿಲೇಯನ್ನು ತಲುಪಲಾಗಲಿಲ್ಲ. ಬೇರೊಂದನ್ನು ಪ್ರಯತ್ನಿಸಿ.</translation>
+    </message>
+    <message>
+        <source>Adds another address for this profile on a second relay.</source>
+        <translation>ಈ ಪ್ರೊಫೈಲಿಗೆ ಎರಡನೇ ರಿಲೇಯಲ್ಲಿ ಇನ್ನೊಂದು ವಿಳಾಸವನ್ನು ಸೇರಿಸುತ್ತದೆ.</translation>
     </message>
 </context>
 <context>
@@ -1054,17 +1054,9 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>ರಿಲೇಗಳು</translation>
     </message>
     <message>
-        <source>Sends from this relay</source>
-        <translation>ಈ ರಿಲೇಯಿಂದ ಕಳುಹಿಸುತ್ತದೆ</translation>
-    </message>
-    <message>
         <source>Removing relay</source>
         <extracomment>What Silica&apos;s countdown says it is doing, over a relay the reader has asked to remove.</extracomment>
         <translation>ರಿಲೇ ತೆಗೆದುಹಾಕಲಾಗುತ್ತಿದೆ</translation>
-    </message>
-    <message>
-        <source>Send from this relay</source>
-        <translation>ಈ ರಿಲೇಯಿಂದ ಕಳುಹಿಸಿ</translation>
     </message>
     <message>
         <source>Remove relay</source>
