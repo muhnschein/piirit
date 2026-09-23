@@ -1564,7 +1564,7 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
     <name>VoiceBar</name>
     <message>
         <source>Recording %1</source>
-        <extracomment>Shown while a voice message records. %1 is the time so far and the longest the recording can be, such as &quot;0:07 / 94:57&quot;, or the time alone, such as &quot;0:07&quot;.</extracomment>
+        <extracomment>Shown while a voice message records. %1 is the time so far, such as &quot;0:07&quot;.</extracomment>
         <translation>Salvestan %1</translation>
     </message>
 </context>

@@ -18,10 +18,11 @@ import Piirit 1.0
  * recording away, and the send button where it always is. The page
  * hides its field and attach button meanwhile.
  *
- * A recording can be as long as the relay takes and no longer: the time
- * says how far it can go ("0:07 / 94:57"), turns red for the last ten
- * seconds, and at the end the recording stops and is sent, as a tap on
- * send would have done.
+ * A recording can be as long as the relay takes and no longer: at the end
+ * it stops and is sent, as a tap on send would have done. Nothing here
+ * says so. At the relay's size that is over an hour and a half, which
+ * nobody records, and a limit on the screen would raise more questions
+ * than it answers.
  */
 Item {
     id: root
@@ -70,16 +71,6 @@ Item {
         return Math.floor(total / 60) + ":" + (seconds < 10 ? "0" : "") + seconds
     }
 
-    /// The time so far, and the longest the recording can be when there
-    /// is a limit: "0:07 / 94:57", or "0:07". Never past the limit, which
-    /// the time can be for the moment the recorder takes to stop.
-    function progress(elapsed, longest) {
-        if (longest <= 0) {
-            return root.clock(elapsed)
-        }
-        return root.clock(Math.min(elapsed, longest)) + " / " + root.clock(longest)
-    }
-
     Captures {
         id: captures
         objectName: "captures"
@@ -94,10 +85,6 @@ Item {
         onRecorded: root.recorded(path)
         onError: root.failed(message)
     }
-
-    /// Ten seconds or less to go before the recording stops by itself.
-    readonly property bool nearLimit: recorder.limit_ms > 0
-                                      && recorder.limit_ms - recorder.duration_ms <= 10000
 
     // The recorder is polled rather than connected to: one call a few
     // times a second while recording, and nothing at all otherwise.
@@ -150,11 +137,9 @@ Item {
             verticalCenter: parent.verticalCenter
         }
         truncationMode: TruncationMode.Fade
-        color: root.nearLimit ? Theme.errorColor : Theme.primaryColor
-        //: Shown while a voice message records. %1 is the time so far and
-        //: the longest the recording can be, such as "0:07 / 94:57", or
-        //: the time alone, such as "0:07".
-        text: qsTr("Recording %1").arg(root.progress(recorder.duration_ms, recorder.limit_ms))
+        color: Theme.primaryColor
+        //: Shown while a voice message records. %1 is the time so far, such as "0:07".
+        text: qsTr("Recording %1").arg(root.clock(recorder.duration_ms))
     }
 
     IconButton {

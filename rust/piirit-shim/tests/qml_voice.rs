@@ -9,8 +9,8 @@
 //! question; docs/HARBOUR.md lists it under what to try on a phone.
 //!
 //! So is the limit: the longest recording the relay takes follows from
-//! the limit and the media quality the strip is handed, and the strip
-//! says it beside the time.
+//! the limit and the media quality the strip is handed, and the time on
+//! the strip says nothing of it.
 
 // Qt harness: see qml_chat_list.rs.
 #![allow(
@@ -62,8 +62,9 @@ const PROBE_QML: &str = r"
             var recorder = findIn(loader.item, 'recorder')
             return recorder ? '' + recorder.limit_ms : 'missing:recorder'
         }
-        function progress(elapsed, longest) {
-            return '' + loader.item.progress(elapsed, longest)
+        function timeText() {
+            var label = findIn(loader.item, 'recordingTime')
+            return label ? '' + label.text : 'missing:recordingTime'
         }
     }
 ";
@@ -115,12 +116,7 @@ fn a_machine_that_cannot_record_is_told_so_and_records_nothing() {
         // bit rates.
         (*steps_ptr).push(("limit-balanced", call!("limit", 22_806_528.0_f64, 0_i32)));
         (*steps_ptr).push(("limit-less-data", call!("limit", 22_806_528.0_f64, 1_i32)));
-        (*steps_ptr).push(("progress", call!("progress", 7000_i32, 5_697_536_i32)));
-        (*steps_ptr).push((
-            "progress-past",
-            call!("progress", 5_699_000_i32, 5_697_536_i32),
-        ));
-        (*steps_ptr).push(("progress-open", call!("progress", 7000_i32, 0_i32)));
+        (*steps_ptr).push(("time", call!("timeText")));
     });
     single_shot(Duration::from_secs(2), move || unsafe {
         (*steps_ptr).push(("heard", call!("heardText")));
@@ -188,11 +184,11 @@ fn a_machine_that_cannot_record_is_told_so_and_records_nothing() {
         "7596714",
         "the lower media quality does not give a longer recording. {context}"
     );
-    assert_eq!(value("progress"), "0:07 / 94:57", "{context}");
+    // Over an hour and a half, which nobody records: the recording stops
+    // and is sent there, and the time does not say so.
     assert_eq!(
-        value("progress-past"),
-        "94:57 / 94:57",
-        "the time ran past the limit while the recorder stopped. {context}"
+        value("time"),
+        "Recording 0:00",
+        "the time on the strip says something besides the time. {context}"
     );
-    assert_eq!(value("progress-open"), "0:07", "{context}");
 }
