@@ -77,12 +77,6 @@ Column {
         return qsTr("Chat: %1").arg(chat.name)
     }
 
-    /// Put the choice back to what the setting holds. Silica moves it on
-    /// the tap, which detaches a binding; see SettingsPage.
-    function refresh() {
-        combo.currentIndex = QuickActions.kinds.indexOf(setting.action.kind) + 1
-    }
-
     function choose(kind) {
         if (kind === "chat") {
             setting.pickChat()
@@ -97,7 +91,6 @@ Column {
     /// one the settings were opened from, and the reader can turn it to
     /// any other: the chat is whichever profile's it was picked from.
     function pickChat() {
-        setting.refresh()
         var picker = pageStack.push(Qt.resolvedUrl("../pages/ChatPickerPage.qml"), {
             accountId: setting.action.kind === "chat" && setting.action.accountId > 0
                        ? setting.action.accountId : setting.accountId,
@@ -118,14 +111,6 @@ Column {
         })
     }
 
-    Connections {
-        target: Settings
-        onQuickActionLeftChanged: setting.refresh()
-        onQuickActionRightChanged: setting.refresh()
-    }
-
-    Component.onCompleted: setting.refresh()
-
     ChatInfo {
         id: chat
         objectName: "quickActionChat"
@@ -135,17 +120,42 @@ Column {
         onError: setting.chatGone = true
     }
 
-    ComboBox {
-        id: combo
-        objectName: setting.side + "ActionCombo"
+    // The choice: what the action is called, and what it does now, in a
+    // row drawn the way Silica draws a ComboBox, with the kinds in a menu
+    // that opens under it on a tap. Not a ComboBox: Silica shows one's
+    // choices on a page of their own once there are more than five of
+    // them, and there are six. A row's context menu opens where it is,
+    // however many items it holds -- the conversation's own holds eight.
+    ListItem {
+        id: choice
+        objectName: setting.side + "ActionChoice"
         width: parent.width
-        label: setting.label
-        // What the setting holds, a chat's action by its chat's name,
-        // rather than the text of the item Silica last moved to.
-        value: setting.valueText()
+        contentHeight: Theme.itemSizeSmall
+        onClicked: choice.openMenu()
 
-        // In the order of QuickActions.kinds, after "None": `refresh`
-        // counts on it.
+        Label {
+            id: choiceLabel
+            objectName: setting.side + "ActionLabel"
+            x: Theme.horizontalPageMargin
+            anchors.verticalCenter: parent.verticalCenter
+            color: choice.highlighted ? Theme.highlightColor : Theme.primaryColor
+            text: setting.label
+        }
+
+        Label {
+            objectName: setting.side + "ActionValue"
+            anchors {
+                left: choiceLabel.right
+                leftMargin: Theme.paddingMedium
+                right: parent.right
+                rightMargin: Theme.horizontalPageMargin
+                verticalCenter: parent.verticalCenter
+            }
+            color: Theme.highlightColor
+            truncationMode: TruncationMode.Fade
+            text: setting.valueText()
+        }
+
         menu: ContextMenu {
             MenuItem {
                 objectName: setting.side + "Action-none"

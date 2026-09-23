@@ -128,8 +128,8 @@ Page {
             //: Over a list of chats to pick from: which profile's chats
             //: they are.
             label: qsTr("Profile")
-            // The profile the list is on, rather than the item Silica last
-            // moved to: see QuickActionSetting.
+            // The profile the list is on, whichever item Silica last moved
+            // the choice to.
             value: page.profileName(page.accountId)
 
             menu: ContextMenu {

@@ -302,10 +302,12 @@ fn the_quick_actions_are_set_up_on_a_page_of_their_own() {
         // none.
         record!("one-chosen", get!("oneActionPreview", "selected"));
         record!("two-unchosen", get!("twoActionsPreview", "selected"));
-        record!("one-label", get!("leftActionCombo", "label"));
+        record!("one-label", get!("leftActionLabel", "text"));
         record!("right-hidden", get!("rightQuickAction", "visible"));
-        record!("left-none", get!("leftActionCombo", "currentIndex"));
-        record!("left-none-says", get!("leftActionCombo", "value"));
+        record!("left-none-says", get!("leftActionValue", "text"));
+        // The kinds are in a menu that opens under the row, on a tap.
+        record!("open-menu", click!("leftActionChoice"));
+        record!("menu-open", get!("leftActionChoice", "menuOpen"));
         record!("icons-hidden", get!("leftActionIcons", "visible"));
         record!(
             "one-dot",
@@ -316,8 +318,7 @@ fn the_quick_actions_are_set_up_on_a_page_of_their_own() {
         // pictures follow.
         record!("pick-search", click!("leftAction-search"));
         record!("left-search", call!("holds", QString::from("left")));
-        record!("left-search-shown", get!("leftActionCombo", "currentIndex"));
-        record!("left-search-says", get!("leftActionCombo", "value"));
+        record!("left-search-says", get!("leftActionValue", "text"));
         record!(
             "one-search",
             call!("previewIcon", QString::from("oneActionPreview"), 0)
@@ -336,27 +337,24 @@ fn the_quick_actions_are_set_up_on_a_page_of_their_own() {
         record!("count-two", call!("count"));
         record!("two-chosen", get!("twoActionsPreview", "selected"));
         record!("one-unchosen", get!("oneActionPreview", "selected"));
-        record!("left-label", get!("leftActionCombo", "label"));
+        record!("left-label", get!("leftActionLabel", "text"));
         record!("right-shown", get!("rightQuickAction", "visible"));
         record!("pick-qr", click!("rightAction-qr"));
-        record!("right-qr-shown", get!("rightActionCombo", "currentIndex"));
+        record!("right-qr-shown", get!("rightActionValue", "text"));
         record!(
             "two-right-qr",
             call!("previewIcon", QString::from("twoActionsPreview"), 1)
         );
         record!("pick-scan", click!("rightAction-scan"));
         record!("right-scan", call!("holds", QString::from("right")));
-        record!("right-scan-shown", get!("rightActionCombo", "currentIndex"));
+        record!("right-scan-shown", get!("rightActionValue", "text"));
         record!("pick-none", click!("rightAction-none"));
         record!("right-none-again", call!("holds", QString::from("right")));
-        record!("right-none-shown", get!("rightActionCombo", "currentIndex"));
+        record!("right-none-shown", get!("rightActionValue", "text"));
         // The profiles, with their own icon.
         record!("pick-profiles", click!("rightAction-profiles"));
         record!("right-profiles", call!("holds", QString::from("right")));
-        record!(
-            "right-profiles-shown",
-            get!("rightActionCombo", "currentIndex")
-        );
+        record!("right-profiles-shown", get!("rightActionValue", "text"));
         record!(
             "two-right-profiles",
             call!("previewIcon", QString::from("twoActionsPreview"), 1)
@@ -367,10 +365,9 @@ fn the_quick_actions_are_set_up_on_a_page_of_their_own() {
         record!("pick-chat", click!("leftAction-chat"));
         record!("asked", call!("stackLog"));
         record!("unpicked", call!("holds", QString::from("left")));
-        record!("unpicked-shown", get!("leftActionCombo", "currentIndex"));
+        record!("unpicked-shown", get!("leftActionValue", "text"));
         record!("picked", call!("pick", 2, QString::from("chat 2")));
         record!("left-chat", call!("holds", QString::from("left")));
-        record!("left-chat-shown", get!("leftActionCombo", "currentIndex"));
         record!("icons-shown", get!("leftActionIcons", "visible"));
         record!("heart-lit", get!("leftIcon-heart", "highlighted"));
         record!(
@@ -392,7 +389,7 @@ fn the_quick_actions_are_set_up_on_a_page_of_their_own() {
     // The chat by the name the core has for it, in the choice itself;
     // then it goes.
     single_shot(Duration::from_secs(3), move || unsafe {
-        record!("chat-says", get!("leftActionCombo", "value"));
+        record!("chat-says", get!("leftActionValue", "text"));
         record!("delete", call!("deleteChat", 1));
     });
 
@@ -404,7 +401,7 @@ fn the_quick_actions_are_set_up_on_a_page_of_their_own() {
     });
 
     single_shot(Duration::from_secs(5), move || unsafe {
-        record!("gone-says", get!("leftActionCombo", "value"));
+        record!("gone-says", get!("leftActionValue", "text"));
         record!("left-gone", call!("holds", QString::from("left")));
 
         // A chat of the other profile: the picker opens on this one's,
@@ -421,7 +418,7 @@ fn the_quick_actions_are_set_up_on_a_page_of_their_own() {
     // By the name the other profile has for it; picked again, the picker
     // opens on that profile.
     single_shot(Duration::from_secs(7), move || unsafe {
-        record!("elsewhere-says", get!("leftActionCombo", "value"));
+        record!("elsewhere-says", get!("leftActionValue", "text"));
         record!("pick-again", click!("leftAction-chat"));
         record!("asked-there", call!("stackLog"));
 
@@ -430,7 +427,7 @@ fn the_quick_actions_are_set_up_on_a_page_of_their_own() {
         record!("count-one", call!("count"));
         record!("right-hidden-again", get!("rightQuickAction", "visible"));
         record!("right-kept", call!("holds", QString::from("right")));
-        record!("one-label-again", get!("leftActionCombo", "label"));
+        record!("one-label-again", get!("leftActionLabel", "text"));
         (*engine_ptr).quit();
     });
 
@@ -520,8 +517,12 @@ fn the_quick_actions_are_set_up_on_a_page_of_their_own() {
         "false",
         "the right action shows with room for one. {context}"
     );
-    assert_eq!(value("left-none"), "0", "{context}");
     assert_eq!(value("left-none-says"), "None", "{context}");
+    assert_eq!(
+        value("menu-open"),
+        "true",
+        "a tap on the action does not open its menu. {context}"
+    );
     assert_eq!(
         value("icons-hidden"),
         "false",
@@ -533,7 +534,6 @@ fn the_quick_actions_are_set_up_on_a_page_of_their_own() {
         "the picture shows an icon for an action not chosen. {context}"
     );
     assert_eq!(value("left-search"), "search|0|0|", "{context}");
-    assert_eq!(value("left-search-shown"), "2", "{context}");
     assert_eq!(value("left-search-says"), "Search", "{context}");
     for label in ["one-search", "two-left-search"] {
         assert!(
@@ -551,21 +551,21 @@ fn the_quick_actions_are_set_up_on_a_page_of_their_own() {
     assert_eq!(value("one-unchosen"), "false", "{context}");
     assert_eq!(value("left-label"), "Left", "{context}");
     assert_eq!(value("right-shown"), "true", "{context}");
-    assert_eq!(value("right-qr-shown"), "3", "{context}");
+    assert_eq!(value("right-qr-shown"), "My QR code", "{context}");
     assert!(
         value("two-right-qr").starts_with("qr-"),
         "the picture does not follow the right action. {context}"
     );
     assert_eq!(value("right-scan"), "scan|0|0|", "{context}");
     assert_eq!(value("right-profiles"), "profiles|0|0|", "{context}");
-    assert_eq!(value("right-profiles-shown"), "5", "{context}");
+    assert_eq!(value("right-profiles-shown"), "Profiles", "{context}");
     assert!(
         value("two-right-profiles").starts_with("profiles-"),
         "the picture does not show the profiles' icon. {context}"
     );
-    assert_eq!(value("right-scan-shown"), "4", "{context}");
+    assert_eq!(value("right-scan-shown"), "Scan QR code", "{context}");
     assert_eq!(value("right-none-again"), "|0|0|", "{context}");
-    assert_eq!(value("right-none-shown"), "0", "{context}");
+    assert_eq!(value("right-none-shown"), "None", "{context}");
     assert_eq!(
         value("asked"),
         "push:ChatPickerPage.qml:1:Choose a chat:true|",
@@ -578,7 +578,7 @@ fn the_quick_actions_are_set_up_on_a_page_of_their_own() {
     );
     assert_eq!(
         value("unpicked-shown"),
-        "2",
+        "Search",
         "the choice shows a chat before one was picked. {context}"
     );
     assert_eq!(
@@ -586,7 +586,6 @@ fn the_quick_actions_are_set_up_on_a_page_of_their_own() {
         "chat|1|2|heart",
         "the picked chat is not the action's, with the first icon. {context}"
     );
-    assert_eq!(value("left-chat-shown"), "1", "{context}");
     assert_eq!(value("icons-shown"), "true", "{context}");
     assert_eq!(value("heart-lit"), "true", "{context}");
     assert!(
