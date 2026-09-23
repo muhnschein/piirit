@@ -13,6 +13,11 @@
 //! is pointed at. The alternative -- a Gecko frame script -- would put
 //! the bridge on chrome-privileged ground this app cannot test.
 //!
+//! The realtime channel travels the same way. What the app sends is a
+//! POST; what the others in the chat send arrives as a core event, which
+//! is handed to the running host before it ever reaches Qt
+//! ([`realtime_event`]) and waits there for the app's next long poll.
+//!
 //! The app is served from the root of that address, as every other
 //! client serves one. It has to be: an app built with a bundler's
 //! default settings asks for `/assets/index-1a2b.js`, and a host that
@@ -38,15 +43,21 @@
 //!   this origin and nothing else, so a webxdc cannot reach the network
 //!   even though it is on one.
 
+use std::collections::VecDeque;
 use std::io::Read;
 use std::net::{Ipv4Addr, SocketAddr};
 use std::sync::atomic::{AtomicBool, Ordering};
-use std::sync::Arc;
+use std::sync::{Arc, Mutex, Weak};
+use std::time::Duration;
 
-use deltachat_jsonrpc::RpcClient;
+use deltachat_jsonrpc::{CoreEvent, RpcClient};
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
 use tokio::net::{TcpListener, TcpStream};
+use tokio::runtime::Handle;
+use tokio::sync::Notify;
 use tokio::task::JoinHandle;
+
+use crate::json;
 
 /// The API the app sees, as JavaScript. Compiled in rather than installed
 /// beside the QML: it is served, not loaded by the engine, and a file the
@@ -92,6 +103,24 @@ const MAX_BODY: usize = 512 * 1024;
 /// really an app's mistake and small enough not to sit here forever.
 const MAX_DRAIN: usize = 256 * 1024 * 1024;
 
+/// The most one piece of realtime data may be. The specification's own
+/// number: the core puts its sequence number and key on the end and the
+/// channel under it takes 128 KiB, which this leaves room for.
+const MAX_REALTIME: usize = 128_000;
+
+/// The most realtime data kept for an app that has not collected it yet.
+///
+/// Realtime data is what peers are saying *now*, and a channel promises
+/// nothing about what arrives: past this the oldest goes, which is the
+/// piece of it that matters least. What it bounds is an app that joined
+/// and stopped listening, on a chat that did not stop talking.
+const MAX_REALTIME_QUEUED: usize = 4 * 1024 * 1024;
+
+/// How long a request for realtime data waits for some before answering
+/// with none. The app asks again at once, so this only decides how often
+/// a quiet channel costs a request.
+const REALTIME_WAIT: Duration = Duration::from_secs(20);
+
 /// Which app is being served, and what it is told about itself.
 pub(crate) struct Instance {
     /// The account the message belongs to.
@@ -135,7 +164,17 @@ struct Shared {
     authority: String,
     /// Cleared when the app is closed. A connection accepted just before
     /// that stops rather than reaching the core.
-    running: Arc<AtomicBool>,
+    running: AtomicBool,
+    /// What the others in the chat have sent over the realtime channel
+    /// and the app has not collected yet.
+    inbox: Arc<Inbox>,
+    /// Whether the app is in the realtime channel.
+    ///
+    /// A lock rather than a flag because it is also what puts the core's
+    /// realtime calls in order: a send holds it for as long as its call
+    /// takes, so leaving -- which the core requires to come after the
+    /// last send -- cannot overtake one that is still on its way.
+    joined: tokio::sync::Mutex<bool>,
 }
 
 /// A served app: the URL to point a `WebView` at, and the task serving it.
@@ -144,8 +183,11 @@ struct Shared {
 pub(crate) struct Host {
     /// Where the app is. What `WebxdcApp.url` hands to QML.
     url: String,
-    running: Arc<AtomicBool>,
+    shared: Arc<Shared>,
     task: JoinHandle<()>,
+    /// Where leaving the realtime channel runs once the page has gone.
+    /// A drop is not async and happens on the Qt thread.
+    runtime: Handle,
 }
 
 impl Host {
@@ -159,9 +201,175 @@ impl Drop for Host {
     fn drop(&mut self) {
         // Both: the flag stops a connection already accepted, and the
         // abort closes the listener so no more arrive.
-        self.running.store(false, Ordering::SeqCst);
+        self.shared.running.store(false, Ordering::SeqCst);
         self.task.abort();
+        // A request waiting on the realtime channel answers now, rather
+        // than holding its connection open for an app that has gone.
+        self.shared.inbox.close();
+        // The core is told the app has left, or the chat goes on sending
+        // it realtime data for as long as the phone is up. After whatever
+        // send is still on its way; see `Shared::joined`.
+        let shared = Arc::clone(&self.shared);
+        drop(
+            self.runtime
+                .spawn(async move { leave_realtime(&shared).await }),
+        );
     }
+}
+
+/// Realtime data on its way to one running app.
+///
+/// Filled from the core's event stream, emptied by the app's long poll.
+/// Bounded; see [`MAX_REALTIME_QUEUED`].
+struct Inbox {
+    state: Mutex<InboxState>,
+    /// Woken when there is data to collect, when the channel is joined or
+    /// left, and when the app is closed: everything a waiting request
+    /// has to answer.
+    changed: Notify,
+}
+
+#[derive(Default)]
+struct InboxState {
+    queue: VecDeque<Vec<u8>>,
+    /// The bytes in `queue`.
+    size: usize,
+    /// Moved on by joining and leaving, so a request that was waiting for
+    /// the channel as it was answers rather than taking what arrives for
+    /// the next one.
+    epoch: u64,
+    /// The app has been closed.
+    closed: bool,
+}
+
+impl Inbox {
+    fn new() -> Self {
+        Self {
+            state: Mutex::new(InboxState::default()),
+            changed: Notify::new(),
+        }
+    }
+
+    fn lock(&self) -> std::sync::MutexGuard<'_, InboxState> {
+        self.state
+            .lock()
+            .unwrap_or_else(std::sync::PoisonError::into_inner)
+    }
+
+    /// Keep one piece of data for the app, dropping the oldest to make
+    /// room.
+    fn push(&self, data: Vec<u8>) {
+        {
+            let mut state = self.lock();
+            if state.closed {
+                return;
+            }
+            state.size += data.len();
+            state.queue.push_back(data);
+            while state.size > MAX_REALTIME_QUEUED {
+                let Some(dropped) = state.queue.pop_front() else {
+                    break;
+                };
+                state.size -= dropped.len();
+            }
+        }
+        self.changed.notify_waiters();
+    }
+
+    /// Everything waiting, if the channel is still the one `epoch` was.
+    fn take(&self, epoch: u64) -> Option<Vec<Vec<u8>>> {
+        let mut state = self.lock();
+        if state.closed || state.epoch != epoch {
+            return None;
+        }
+        state.size = 0;
+        Some(state.queue.drain(..).collect())
+    }
+
+    fn epoch(&self) -> u64 {
+        self.lock().epoch
+    }
+
+    /// Start again: what was waiting was said to the channel as it was.
+    fn reset(&self) {
+        {
+            let mut state = self.lock();
+            state.queue.clear();
+            state.size = 0;
+            state.epoch = state.epoch.wrapping_add(1);
+        }
+        self.changed.notify_waiters();
+    }
+
+    fn close(&self) {
+        {
+            let mut state = self.lock();
+            state.queue.clear();
+            state.size = 0;
+            state.closed = true;
+        }
+        self.changed.notify_waiters();
+    }
+}
+
+/// Every running app's inbox, by account and message.
+///
+/// Weak, so that it is the [`Host`] that decides how long an inbox lives:
+/// a host that is gone leaves an entry that no longer upgrades, and the
+/// next registration clears it out.
+static INBOXES: Mutex<Vec<(u32, u32, Weak<Inbox>)>> = Mutex::new(Vec::new());
+
+fn inboxes() -> std::sync::MutexGuard<'static, Vec<(u32, u32, Weak<Inbox>)>> {
+    INBOXES
+        .lock()
+        .unwrap_or_else(std::sync::PoisonError::into_inner)
+}
+
+fn register(account_id: u32, message_id: u32, inbox: &Arc<Inbox>) {
+    let mut all = inboxes();
+    all.retain(|(_, _, kept)| kept.strong_count() > 0);
+    all.push((account_id, message_id, Arc::downgrade(inbox)));
+}
+
+/// Hand a realtime event to the app it is for.
+///
+/// Called with every event off the core's stream, on the runtime, before
+/// the rest go to the Qt thread. `true` for realtime data, which is taken
+/// here whether or not its app is still open: it is for that app and
+/// nothing else, a game can send a great deal of it, and each piece that
+/// went on to Qt would be a queued callback for nothing to read.
+pub(crate) fn realtime_event(event: &CoreEvent) -> bool {
+    if json::str_at(&event.event, "kind") != "WebxdcRealtimeData" {
+        return false;
+    }
+    let Some(message_id) = json::u32_opt(&event.event, "msgId") else {
+        return true;
+    };
+    // The core's bytes as a JSON array of numbers. One that is not is
+    // not data from this core, and is dropped whole rather than passed
+    // on with pieces missing.
+    let data: Option<Vec<u8>> = event
+        .event
+        .get("data")
+        .and_then(serde_json::Value::as_array)
+        .and_then(|items| {
+            items
+                .iter()
+                .map(|item| item.as_u64().and_then(|byte| u8::try_from(byte).ok()))
+                .collect()
+        });
+    let Some(data) = data else {
+        return true;
+    };
+    let receivers: Vec<Arc<Inbox>> = inboxes()
+        .iter()
+        .filter(|(account, message, _)| *account == event.context_id && *message == message_id)
+        .filter_map(|(_, _, inbox)| inbox.upgrade())
+        .collect();
+    for inbox in receivers {
+        inbox.push(data.clone());
+    }
+    true
 }
 
 /// Serve `instance` on the loopback interface until the [`Host`] is
@@ -186,19 +394,27 @@ pub(crate) async fn start(
     // The app's front page, at the root: what it asks for next is its
     // own business, and half of what apps ask for is absolute.
     let url = format!("http://{authority}/index.html");
-    let running = Arc::new(AtomicBool::new(true));
     // Whatever the last run left behind; see `empty_outbox`.
     empty_outbox(instance.message_id);
+    let inbox = Arc::new(Inbox::new());
+    register(instance.account_id, instance.message_id, &inbox);
     let shared = Arc::new(Shared {
         rpc,
         instance,
         to_chat,
         api: format!("/webxdc-api/{token}"),
         authority,
-        running: Arc::clone(&running),
+        running: AtomicBool::new(true),
+        inbox,
+        joined: tokio::sync::Mutex::new(false),
     });
-    let task = tokio::spawn(accept(listener, shared));
-    Ok(Host { url, running, task })
+    let task = tokio::spawn(accept(listener, Arc::clone(&shared)));
+    Ok(Host {
+        url,
+        shared,
+        task,
+        runtime: Handle::current(),
+    })
 }
 
 /// One connection at a time is not enough: a page loads its script, its
@@ -466,6 +682,13 @@ async fn route(shared: &Shared, request: &Request) -> Response {
         return match (request.method.as_str(), rest) {
             ("GET", "/updates") => updates(shared, query).await,
             ("POST", "/send") => send(shared, &request.body).await,
+            ("POST", "/realtime/join") => join_realtime(shared).await,
+            ("POST", "/realtime/send") => send_realtime(shared, &request.body).await,
+            ("POST", "/realtime/leave") => {
+                leave_realtime(shared).await;
+                Response::empty("204 No Content")
+            }
+            ("GET", "/realtime/receive") => receive_realtime(shared).await,
             _ => Response::empty("404 Not Found"),
         };
     }
@@ -561,6 +784,110 @@ async fn send(shared: &Shared, body: &[u8]) -> Response {
         Ok(_) => Response::empty("204 No Content"),
         Err(_) => Response::empty("502 Bad Gateway"),
     }
+}
+
+/// The app joins the chat's realtime channel.
+///
+/// The core is asked to advertise it, which is how the others in the chat
+/// learn there is someone to connect to. The app is in the channel
+/// whatever the core answers: a send asks the core to join again on its
+/// own, and the app is owed a `leave` either way.
+async fn join_realtime(shared: &Shared) -> Response {
+    let mut joined = shared.joined.lock().await;
+    if !shared.running.load(Ordering::SeqCst) {
+        return Response::empty("404 Not Found");
+    }
+    *joined = true;
+    // Ephemeral by definition: anything still waiting from before was
+    // said to a channel the app has since left.
+    shared.inbox.reset();
+    let answer: Result<serde_json::Value, _> = shared
+        .rpc
+        .call(
+            "send_webxdc_realtime_advertisement",
+            (shared.instance.account_id, shared.instance.message_id),
+        )
+        .await;
+    match answer {
+        Ok(_) => Response::empty("204 No Content"),
+        Err(_) => Response::empty("502 Bad Gateway"),
+    }
+}
+
+/// One piece of realtime data from the app, on its way to whoever is in
+/// the channel. The body is the bytes, as the app gave them.
+async fn send_realtime(shared: &Shared, body: &[u8]) -> Response {
+    if body.len() > MAX_REALTIME {
+        return Response::empty("413 Payload Too Large");
+    }
+    // Held across the call; see `Shared::joined`.
+    let joined = shared.joined.lock().await;
+    if !*joined || !shared.running.load(Ordering::SeqCst) {
+        return Response::empty("409 Conflict");
+    }
+    let answer: Result<serde_json::Value, _> = shared
+        .rpc
+        .call(
+            "send_webxdc_realtime_data",
+            (shared.instance.account_id, shared.instance.message_id, body),
+        )
+        .await;
+    match answer {
+        Ok(_) => Response::empty("204 No Content"),
+        Err(_) => Response::empty("502 Bad Gateway"),
+    }
+}
+
+/// The app leaves the realtime channel, or has been closed while in it.
+///
+/// Only once: leaving a channel the app is not in is nothing to tell the
+/// core about.
+async fn leave_realtime(shared: &Shared) {
+    let mut joined = shared.joined.lock().await;
+    if !*joined {
+        return;
+    }
+    *joined = false;
+    shared.inbox.reset();
+    let _: Result<serde_json::Value, _> = shared
+        .rpc
+        .call(
+            "leave_webxdc_realtime",
+            (shared.instance.account_id, shared.instance.message_id),
+        )
+        .await;
+}
+
+/// What has arrived on the realtime channel since the app last asked, as
+/// a JSON array of byte arrays -- the shape the core hands it over in.
+///
+/// A long poll: with nothing waiting this holds on until something
+/// arrives or [`REALTIME_WAIT`] has passed, so data reaches the app as it
+/// arrives rather than at the next tick of a timer. It answers at once,
+/// with nothing, when the channel it was waiting on is left or joined
+/// again, and when the app is closed.
+async fn receive_realtime(shared: &Shared) -> Response {
+    let deadline = tokio::time::Instant::now() + REALTIME_WAIT;
+    let epoch = shared.inbox.epoch();
+    let batch = loop {
+        // Listening before looking, so that what arrives between the two
+        // still wakes this.
+        let changed = shared.inbox.changed.notified();
+        let mut changed = std::pin::pin!(changed);
+        changed.as_mut().enable();
+        match shared.inbox.take(epoch) {
+            None => break Vec::new(),
+            Some(batch) if !batch.is_empty() => break batch,
+            Some(_) => {}
+        }
+        if tokio::time::timeout_at(deadline, changed).await.is_err() {
+            break Vec::new();
+        }
+    };
+    Response::new(
+        "application/json; charset=utf-8",
+        serde_json::to_vec(&batch).unwrap_or_else(|_| b"[]".to_vec()),
+    )
 }
 
 /// Whether this request is an app handing something over.

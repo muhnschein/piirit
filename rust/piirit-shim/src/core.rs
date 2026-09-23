@@ -777,6 +777,11 @@ impl DeltaChatCore {
         runtime.spawn(async move {
             let (mut events, _handle) = spawn_event_loop(rpc.clone());
             while let Some(event) = events.recv().await {
+                // Realtime data goes to the running app from here, and
+                // no further: see `webxdc_host::realtime_event`.
+                if crate::webxdc_host::realtime_event(&event) {
+                    continue;
+                }
                 emit(event);
             }
             // The stream ends only when the transport does (see

@@ -2599,6 +2599,34 @@ async fn serve() {
                         ok(&id, &Value::Null)
                     }
                 }
+                // The realtime channel. The real core advertises the app
+                // to the chat and gossips with whoever answers; here a
+                // peer is always in the channel, and answers every piece
+                // of data with the same bytes backwards -- so a test sees
+                // its data went through the core and came back as an
+                // event, rather than being handed straight back.
+                "send_webxdc_realtime_advertisement" | "leave_webxdc_realtime" => {
+                    ok(&id, &Value::Null)
+                }
+                "send_webxdc_realtime_data" => {
+                    let account = account_id();
+                    let msg = positional(1)
+                        .as_u64()
+                        .and_then(|value| u32::try_from(value).ok())
+                        .unwrap_or_default();
+                    let mut data: Vec<Value> =
+                        positional(2).as_array().cloned().unwrap_or_default();
+                    data.reverse();
+                    state.lock().await.events.push_back(json!({
+                        "contextId": account,
+                        "event": {
+                            "kind": "WebxdcRealtimeData",
+                            "msgId": msg,
+                            "data": data,
+                        },
+                    }));
+                    ok(&id, &Value::Null)
+                }
                 "get_next_event_batch" => {
                     // Blocks when empty, like the real long poll.
                     loop {
