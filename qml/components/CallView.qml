@@ -88,7 +88,6 @@ Item {
         if (origin.length === 0) {
             return
         }
-        root.granted = origin
         WebEngine.notifyObservers("embedui:perms", {
             "msg": "add",
             "uri": "http://" + origin,
@@ -97,6 +96,7 @@ Item {
             "permission": 1,
             "expireType": 1
         })
+        root.granted = origin
     }
 
     function revoke() {
@@ -113,9 +113,24 @@ Item {
 
     /// Grant the page's origin, then point the view at the page: before
     /// the page is there, it cannot ask.
+    ///
+    /// Not before the engine is up. It starts on the event loop after
+    /// this file first imports it -- on the first call of a run, that is
+    /// now -- and until then it drops what it is told, with a warning
+    /// and nothing else: the grant would be lost, and the call would open
+    /// on the engine's own microphone prompt.
     function go() {
+        if (!WebEngine.isInitialized()) {
+            return
+        }
         root.grant(root.authorityOf(root.url))
         root.target = root.url
+    }
+
+    Connections {
+        target: WebEngine
+        // Qt 5.6 handler syntax; see WelcomePage.qml.
+        onInitialized: root.go()
     }
 
     onUrlChanged: root.go()
