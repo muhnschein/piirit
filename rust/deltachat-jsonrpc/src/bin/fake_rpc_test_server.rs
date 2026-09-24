@@ -87,10 +87,9 @@ async fn serve() {
                     // A run of answers the client cannot use. The real
                     // core would do this by changing an event's shape
                     // across a version; here an error object does the same
-                    // job. Six of them, one more than the tolerance the
-                    // loop used to give up after: what matters is that
-                    // none of them is the transport closing, so the stream
-                    // has to carry on past all of them.
+                    // job. Six in a row, none of them the transport
+                    // closing, so the stream has to carry on past all of
+                    // them rather than treat them as a dead core.
                     if (2..=7).contains(&*count) {
                         err(id, -32000, "no events for you")
                     } else if *count <= 8 {

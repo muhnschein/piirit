@@ -19,7 +19,7 @@ import Nemo.DBus 2.0
  *
  * A tap on a notification comes back over D-Bus. Sailjail lets the app
  * own the name made of its desktop file's OrganizationName and
- * ApplicationName, which is `postivene.postivene`; the adaptor below owns
+ * ApplicationName, which is `piirit.piirit`; the adaptor below owns
  * it and the notification's remote action names it, so lipstick's call
  * lands here and is passed on as `openRequested`.
  */
@@ -40,6 +40,16 @@ Item {
     /// A notification was tapped: the chat to open.
     signal openRequested(int chatId)
 
+    // `enabled` is the Item's own, put to use: off, nothing arriving is
+    // announced and whatever is up comes down, since a reader who turned
+    // notifications off did not mean the ones already there to stay. The
+    // page binds it to the setting; the component itself reads none.
+    onEnabledChanged: {
+        if (!enabled) {
+            notifier.clearAll()
+        }
+    }
+
     /// chatId -> Notification.
     property var notes: ({})
     /// chatId -> the chat's name, kept apart from the notification, which
@@ -51,7 +61,7 @@ Item {
     /// The D-Bus name a tap calls back to; see the note above. One string
     /// for the service and the interface, as the reference for Nemo's
     /// remote actions shows it.
-    readonly property string busName: "postivene.postivene"
+    readonly property string busName: "piirit.piirit"
     readonly property string busPath: "/"
 
     // Reading a chat is the answer to "have I seen this", so drop the
@@ -73,7 +83,7 @@ Item {
         service: notifier.busName
         path: notifier.busPath
         iface: notifier.busName
-        xml: "  <interface name=\"postivene.postivene\">\n" +
+        xml: "  <interface name=\"piirit.piirit\">\n" +
              "    <method name=\"showChat\">\n" +
              "      <arg name=\"chatId\" type=\"i\" direction=\"in\"/>\n" +
              "    </method>\n" +
@@ -90,8 +100,8 @@ Item {
     property Component noteComponent: Component {
         Notification {
             category: "x-nemo.messaging.im"
-            appName: "Postivene"
-            appIcon: "harbour-postivene"
+            appName: "Piirit"
+            appIcon: "harbour-piirit"
         }
     }
 
@@ -121,6 +131,9 @@ Item {
 
     /// Announce a message, unless the reader is already looking at it.
     function arrived(chatId, chatName, sender, preview) {
+        if (!notifier.enabled) {
+            return
+        }
         if (appActive && chatId === viewingChatId) {
             return
         }
@@ -165,6 +178,13 @@ Item {
     }
 
     /// How many chats are currently speaking for themselves. For tests.
+    /// Every notification down, and every count back to nothing.
+    function clearAll() {
+        for (var id in notifier.notes) {
+            notifier.clear(parseInt(id, 10))
+        }
+    }
+
     function publishedCount() {
         var total = 0
         for (var id in notifier.notes) {

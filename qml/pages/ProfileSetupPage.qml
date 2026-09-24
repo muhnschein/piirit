@@ -23,6 +23,10 @@ import "../components"
 Page {
     id: page
 
+    /// The cover offers no quick actions while this is up: a jump away
+    /// would leave a profile halfway made. See piirit.qml.
+    readonly property bool pausesQuickActions: true
+
     property string displayName
     property string providerQr
     /// The relay's name, for the page to say.
@@ -135,7 +139,7 @@ Page {
             minimumValue: 0
             maximumValue: 1000
             value: page.permille
-            label: qsTr("Contacting %1...").arg(page.relay)
+            label: qsTr("Contacting %1…").arg(page.relay)
         }
 
         Button {
@@ -163,7 +167,7 @@ Page {
             horizontalAlignment: Text.AlignHCenter
             font.pixelSize: Theme.fontSizeSmall
             color: Theme.secondaryHighlightColor
-            text: qsTr("Chatmail relays are run by volunteers in their spare time. If this one does not seem to work, go back and try another one.")
+            text: qsTr("Could not reach the relay. Try another one.")
         }
 
         Banner {

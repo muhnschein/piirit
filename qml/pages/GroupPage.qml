@@ -1,7 +1,7 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
 import "../components"
-import Postivene 1.0
+import Piirit 1.0
 
 /*
  * A group after it has been made: its picture, its name, and who is in it.
@@ -193,7 +193,13 @@ Page {
         anchors.fill: parent
         contentHeight: column.height + Theme.paddingLarge
 
+        // Both entries belong to a member, so for a reader who has left
+        // the group -- or was removed from it -- the menu would be empty,
+        // and an empty pull-down is a pull that does nothing.
         PullDownMenu {
+            objectName: "groupMenu"
+            visible: chat.can_edit
+
             MenuItem {
                 objectName: "leaveButton"
                 visible: chat.can_edit
@@ -373,37 +379,17 @@ Page {
                         ownColor: model.color
                         picturePath: model.avatar_path
                         isKeyContact: model.is_key_contact
-                        isVerified: model.is_verified
                     }
 
                 }
             }
 
-            // The way to more members, where the next one would be listed:
-            // a row shaped like a member's, with a plus for a picture.
-            ListItem {
-                id: addMembersRow
+            // The way to more members.
+            PlusRow {
                 objectName: "addMembersButton"
                 visible: chat.can_edit
                 width: column.width
-                contentHeight: Theme.itemSizeSmall + 2 * Theme.paddingMedium
-
-                PlusMark {
-                    id: plus
-                    x: Theme.horizontalPageMargin
-                    y: Theme.paddingMedium
-                }
-
-                Label {
-                    x: plus.x + plus.width + Theme.paddingMedium
-                    width: parent.width - x - Theme.horizontalPageMargin
-                    anchors.verticalCenter: plus.verticalCenter
-                    wrapMode: Text.Wrap
-                    color: addMembersRow.highlighted ? Theme.highlightColor
-                                                     : Theme.primaryColor
-                    text: qsTr("Add members")
-                }
-
+                text: qsTr("Add members")
                 onClicked: page.addMembers()
             }
         }

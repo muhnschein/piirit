@@ -93,11 +93,10 @@ pub fn spawn_event_loop(
                 Err(RpcError::TransportClosed) => return,
                 // Anything else is one bad answer, not a dead core: an
                 // event shape we could not read, or a call the core
-                // refused. Giving up here used to end the stream after a
-                // handful of these, which the shim read as the server
-                // having died -- and it then killed a server that was
-                // running to start another. So: wait, longer each time,
-                // and ask again.
+                // refused. Giving up after a handful of these would end the
+                // stream, which the shim reads as the server having died --
+                // and it would kill a running server to start another. So:
+                // wait, longer each time, and ask again.
                 Err(_) => {
                     failures = failures.saturating_add(1);
                     tokio::time::sleep(error_backoff(failures)).await;

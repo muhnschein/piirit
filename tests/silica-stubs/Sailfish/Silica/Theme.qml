@@ -17,6 +17,7 @@ QtObject {
     property int fontSizeSmall: 12
     property int fontSizeMedium: 18
     property int fontSizeLarge: 24
+    property int fontSizeTiny: 10
     property int fontSizeHuge: 48
     property string fontFamilyHeading: "Sans Serif"
     property color primaryColor: "#ffffff"
@@ -29,6 +30,7 @@ QtObject {
     property real highlightBackgroundOpacity: 0.3
     property int iconSizeSmall: 32
     property int iconSizeMedium: 64
+    property size coverSizeLarge: Qt.size(234, 374)
 
     function rgba(color, opacity) {
         return Qt.rgba(color.r, color.g, color.b, opacity)

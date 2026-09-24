@@ -1,7 +1,7 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
 import "../components"
-import Postivene 1.0
+import Piirit 1.0
 
 Page {
     id: page
@@ -109,28 +109,155 @@ Page {
     Notifier {
         id: notifier
         objectName: "notifier"
+        // Off, nothing is announced and what was is taken down; the
+        // model still says what arrived, for the list's own sake.
+        enabled: Settings.notificationsEnabled === true
         detail: Settings.notificationDetail
         // A tap on a notification: back to the list, then into the chat,
         // in front of whatever the reader was doing.
         onOpenRequested: page.showChat(chatId)
     }
 
+    /// The core has said what is in this profile, whatever that was.
+    ///
+    /// An empty model means one of two things and they are opposite: no
+    /// chats, or no answer yet. On a phone that resumes onto this page
+    /// the second is what is true for the first moment, and saying "No
+    /// chats yet" over a list that is about to fill is the app telling
+    /// the reader something it does not know.
+    property bool chatsLoaded: false
+
     Connections {
         target: chats
         onMessage_arrived: notifier.arrived(chat_id, chat_name, sender, preview)
+        // Emitted once the rows have been set, whether there turned out
+        // to be any or none.
+        onRows_changed: page.chatsLoaded = true
     }
 
-    /// Open a chat from outside the app: a notification was tapped. The
-    /// window is raised first, as lipstick only calls the app and does
-    /// not bring it up; a page loaded on its own in a test has no window.
-    function showChat(chatId) {
+    /// Bring this list to the front of whatever the reader was doing, the
+    /// way a tap from outside the app arrives: the window raised, as
+    /// lipstick only calls the app and does not bring it up, and every
+    /// page above this one gone. A page loaded on its own in a test has
+    /// no window.
+    function comeForward() {
         if (typeof appWindow !== "undefined") {
             appWindow.activate()
         }
         if (pageStack.currentPage !== page) {
             pageStack.pop(page, PageStackAction.Immediate)
         }
+    }
+
+    /// Open a chat from outside the app: a notification was tapped.
+    function showChat(chatId) {
+        page.comeForward()
         page.openChat(chatId, notifier.nameOf(chatId), 0)
+    }
+
+    /// A quick action from the cover (piirit.qml): `kind` is what it does,
+    /// and for a chat, `accountId` and `chatId` say which one.
+    ///
+    /// Everything starts from this list, brought forward over whatever
+    /// was open, the way a tapped notification comes in. A chat is looked
+    /// up before it is opened, so one deleted since the action was set up
+    /// is said to be gone rather than opened empty; with the core away
+    /// there is no asking, and the list is where the action ends.
+    function quickAction(kind, accountId, chatId) {
+        page.comeForward()
+        // A chat still being looked up for an earlier tap is not wanted
+        // any more.
+        page.quickChatPending = false
+        if (kind === "search") {
+            searchField.text = ""
+            page.searchWanted = true
+            page.takeSearch()
+        } else if (kind === "qr" || kind === "scan") {
+            pulleyHost.openPage(Qt.resolvedUrl("QrPage.qml"), {
+                accountId: page.accountId,
+                mode: kind === "scan" ? 1 : 0
+            })
+        } else if (kind === "profiles") {
+            // As the pull-down's own Profiles opens it.
+            pulleyHost.openPage(Qt.resolvedUrl("ProfilesPage.qml"),
+                                { currentAccountId: page.accountId })
+        } else if (kind === "chat" && core.status === "ready") {
+            page.quickChatPending = true
+            // Through 0, so asking for the chat asked for last time asks
+            // again rather than being taken for no change.
+            quickChat.chat_id = 0
+            quickChat.account_id = accountId
+            quickChat.chat_id = chatId
+        }
+    }
+
+    /// A quick action's chat is being looked up.
+    property bool quickChatPending: false
+
+    // The chat a quick action asked for, looked up before it is opened. A
+    // failed lookup answers `loaded` and then `error`, one straight after
+    // the other, so the chat is opened a turn of the event loop after
+    // `loaded`, by which time a failure has had its say.
+    ChatInfo {
+        id: quickChat
+        objectName: "quickChat"
+        onLoaded_changed: {
+            if (quickChat.loaded && page.quickChatPending) {
+                quickChatFound.restart()
+            }
+        }
+        onError: {
+            if (page.quickChatPending) {
+                page.quickChatPending = false
+                //: A quick action on the cover was tapped, and the chat it
+                //: was set up to open has been deleted since.
+                page.errorMessage = qsTr("That chat no longer exists.")
+            }
+        }
+    }
+
+    Timer {
+        id: quickChatFound
+        interval: 0
+        onTriggered: {
+            if (!page.quickChatPending) {
+                return
+            }
+            page.quickChatPending = false
+            if (quickChat.account_id === page.accountId) {
+                page.openChat(quickChat.chat_id, quickChat.name, 0)
+                return
+            }
+            // Another profile's chat: that profile's list, in place of
+            // the whole stack the way the profiles page switches, and the
+            // chat opened from it once it is on screen.
+            pageStack.replaceAbove(null, Qt.resolvedUrl("ChatListPage.qml"), {
+                accountId: quickChat.account_id,
+                arrivingChatId: quickChat.chat_id,
+                arrivingChatName: quickChat.name
+            })
+        }
+    }
+
+    /// A chat to open once this list is on screen, and its name: a quick
+    /// action for another profile's chat put this list here for it. 0 for
+    /// none.
+    property int arrivingChatId: 0
+    property string arrivingChatName: ""
+
+    /// The search field is to take the keyboard as soon as this list is on
+    /// screen with the app in front: a quick action asked for it, and the
+    /// window may still be on its way up.
+    property bool searchWanted: false
+    readonly property bool appActive: Qt.application.state === Qt.ApplicationActive
+    onAppActiveChanged: page.takeSearch()
+
+    function takeSearch() {
+        if (!page.searchWanted || page.status !== PageStatus.Active || !page.appActive) {
+            return
+        }
+        page.searchWanted = false
+        searchField.forceActiveFocus()
     }
 
     // Back on the list means no chat is being read. Going the other way,
@@ -140,6 +267,12 @@ Page {
     onStatusChanged: {
         if (status === PageStatus.Active) {
             notifier.viewingChatId = 0
+            if (page.arrivingChatId !== 0) {
+                var arriving = page.arrivingChatId
+                page.arrivingChatId = 0
+                page.openChat(arriving, page.arrivingChatName, 0)
+            }
+            page.takeSearch()
         } else if (status === PageStatus.Deactivating) {
             doomedChats.flush()
         }
@@ -164,13 +297,13 @@ Page {
 
     property string errorMessage: ""
     // Three states, not two: the core going away is now something the app
-    // does something about, and a banner that says "restart Postivene"
-    // while Postivene is already fixing it is worse than none.
+    // does something about, and a banner that says "restart Piirit"
+    // while Piirit is already fixing it is worse than none.
     readonly property string coreStatusMessage:
         core.status === "reconnecting"
-        ? qsTr("Lost the connection to the Delta Chat core. Reconnecting...")
+        ? qsTr("Lost the connection to the Delta Chat core. Reconnecting…")
         : core.status === "stopped"
-          ? qsTr("Lost the connection to the Delta Chat core. Restart Postivene.")
+          ? qsTr("Lost the connection to the Delta Chat core. Restart Piirit.")
           : ""
 
     Connections {
@@ -180,14 +313,29 @@ Page {
         onCore_event: chats.handle_event(context_id, kind, payload_json)
         onStatus_changed: {
             if (core.status === "ready") {
+                // On a phone that resumes onto its chat list, this page
+                // is the first one made and the core was not up when it
+                // was: what it asked for then reached nobody, so it is
+                // asked again here. Idempotent, which is what makes it
+                // safe on a later reconnection too.
+                core.refresh_accounts()
+                if (!page.archived) {
+                    core.select_account(page.accountId)
+                }
                 chats.reload()
                 // A search typed before the core was up found nothing and
                 // had nothing to answer with; this is when it can.
                 searchModel.reload()
             }
         }
-        // Failures that used to reach no one.
+        // How many profiles there are, which is what decides whether
+        // this page offers switching at all. An account list with none
+        // left in it is the window's business rather than this page's:
+        // it comes in while this page is being replaced or the one above
+        // it popped, and a page in the middle of a transition is the one
+        // thing on the phone that cannot move the stack. piirit.qml.
         onAccounts_refreshed: page.accountCount = configured_count
+        // Failures that would otherwise reach no one.
         onCore_error: page.errorMessage = message
         onIo_started: {
             if (!success) {
@@ -205,12 +353,17 @@ Page {
         // this page. The archived list is the same profile's.
         if (!page.archived) {
             core.select_account(page.accountId)
+            // And on this side of the core, where the next launch can
+            // read it without waiting for the core to start.
+            Settings.lastAccountId = page.accountId
             // And the window, which is where a share arrives: it has no
             // page of its own to read the profile off. Behind the check
             // this page already needs for `appWindow`, which a page
             // loaded on its own in a test does not have.
             if (typeof appWindow !== "undefined") {
                 appWindow.accountId = page.accountId
+                // And where the cover's quick actions land.
+                appWindow.chatList = page
             }
         }
     }
@@ -232,6 +385,23 @@ Page {
         contentWidth: width
         contentHeight: height
 
+        // Silica builds a pushed page before it starts the transition
+        // to it, so the tap sits on a still screen for however long the
+        // page and everything it imports take to compile -- which on the
+        // group page, with its avatar, its field and its rows, is long
+        // enough to read as the app having missed the tap. `animatorPush`
+        // is Silica's own answer: the transition starts first and the
+        // page is built behind it. Asked for rather than assumed, with
+        // the plain push as the fallback, so a Silica without it still
+        // opens the page.
+        function openPage(url, properties) {
+            if (pageStack.animatorPush) {
+                pageStack.animatorPush(url, properties)
+            } else {
+                pageStack.push(url, properties)
+            }
+        }
+
         PullDownMenu {
             objectName: "chatListPulley"
             visible: !page.archived
@@ -245,7 +415,10 @@ Page {
                 objectName: "settingsMenuItem"
                 visible: !page.archived
                 text: qsTr("Settings")
-                onClicked: pageStack.push(Qt.resolvedUrl("SettingsPage.qml"), {})
+                // The profile goes in for the one row there that is a
+                // profile's: the block list the core keeps per account.
+                onClicked: pulleyHost.openPage(Qt.resolvedUrl("SettingsPage.qml"),
+                                          { accountId: page.accountId })
             }
             MenuItem {
                 objectName: "profilesMenuItem"
@@ -254,7 +427,7 @@ Page {
                 // there are two leaves no way to make one.
                 visible: !page.archived
                 text: qsTr("Profiles")
-                onClicked: pageStack.push(Qt.resolvedUrl("ProfilesPage.qml"),
+                onClicked: pulleyHost.openPage(Qt.resolvedUrl("ProfilesPage.qml"),
                                           { currentAccountId: page.accountId })
             }
             MenuItem {
@@ -264,7 +437,7 @@ Page {
                 objectName: "archivedMenuItem"
                 visible: !page.archived
                 text: qsTr("Archived chats")
-                onClicked: pageStack.push(Qt.resolvedUrl("ChatListPage.qml"), {
+                onClicked: pulleyHost.openPage(Qt.resolvedUrl("ChatListPage.qml"), {
                     accountId: page.accountId,
                     archived: true
                 })
@@ -277,21 +450,21 @@ Page {
                 objectName: "qrMenuItem"
                 visible: !page.archived
                 text: qsTr("QR code")
-                onClicked: pageStack.push(Qt.resolvedUrl("QrPage.qml"),
+                onClicked: pulleyHost.openPage(Qt.resolvedUrl("QrPage.qml"),
                                           { accountId: page.accountId })
             }
             MenuItem {
                 objectName: "newGroupMenuItem"
                 visible: !page.archived
                 text: qsTr("New group")
-                onClicked: pageStack.push(Qt.resolvedUrl("NewGroupPage.qml"),
+                onClicked: pulleyHost.openPage(Qt.resolvedUrl("NewGroupPage.qml"),
                                           { accountId: page.accountId })
             }
             MenuItem {
                 objectName: "newChatMenuItem"
                 visible: !page.archived
                 text: qsTr("New chat")
-                onClicked: pageStack.push(Qt.resolvedUrl("NewChatPage.qml"),
+                onClicked: pulleyHost.openPage(Qt.resolvedUrl("NewChatPage.qml"),
                                           { accountId: page.accountId })
             }
         }
@@ -533,7 +706,8 @@ Page {
 
             ViewPlaceholder {
                 objectName: "chatListPlaceholder"
-                enabled: chats.count === 0
+                // Not until the core has answered: see `chatsLoaded`.
+                enabled: page.chatsLoaded && chats.count === 0
                 text: page.archived ? qsTr("No archived chats")
                                     : qsTr("No chats yet")
                 // Nothing here makes an archived chat: a chat is archived

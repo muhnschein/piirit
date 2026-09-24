@@ -21,6 +21,19 @@ QtObject {
     property CameraRecorder videoRecorder: CameraRecorder {}
     /// How many focus searches were asked for.
     property int searches: 0
+    // What the camera can run its viewfinder at, and what it was asked
+    // for. A real camera answers this only once it is loaded, and some
+    // answer with nothing at all, so a test can empty the list to check
+    // that the view carries on regardless.
+    property var viewfinderResolutions: [
+        Qt.size(640, 480),
+        Qt.size(1280, 960),
+        Qt.size(1920, 1440)
+    ]
+    property CameraViewfinder viewfinder: CameraViewfinder {}
+    // QCamera::Status values: UnloadedStatus 1, LoadedStatus 3.
+    property int cameraStatus: 3
+    function supportedViewfinderResolutions() { return viewfinderResolutions }
     function start() { running = true }
     // Stopping the camera stops a recording with it, finished or not: what
     // the page falls back on when the recorder ignores its own stop.

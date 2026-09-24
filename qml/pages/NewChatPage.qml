@@ -1,7 +1,7 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
 import "../components"
-import Postivene 1.0
+import Piirit 1.0
 
 /*
  * Pick someone to talk to: the known contacts, and a search over them.
@@ -18,6 +18,15 @@ Page {
     property int accountId
     property string errorMessage: ""
 
+    // The core has said who is in this profile, whatever that was.
+    //
+    // An empty model means one of two things and they are opposite: no
+    // contacts, or no answer yet. For the first moment after the page
+    // opens the second is what is true, and "No contacts yet" over a
+    // list about to fill is the app telling the reader something it
+    // does not know. It flashed under the rows on every visit.
+    property bool contactsLoaded: false
+
     // Not bound straight to the field: a round trip per keystroke asks the
     // core four times to type "anna", and only the last answer is wanted.
     Timer {
@@ -31,6 +40,9 @@ Page {
         objectName: "contacts"
         account_id: page.accountId
         onError: page.errorMessage = message
+        // Emitted once the rows have been set, whether there turned out
+        // to be any or none.
+        onRows_changed: page.contactsLoaded = true
         // Open the chat that now exists, above the page that opened this
         // one: this page has done its job.
         onChat_ready: pageStack.replaceAbove(pageStack.previousPage(page),
@@ -97,8 +109,11 @@ Page {
                 right: parent.right
                 bottom: parent.bottom
             }
+            // Rows draw outside the list's own box otherwise, and the
+            // box starts under the search field: without this a flick
+            // ran the contacts up over the field.
+            clip: true
             model: contacts.rows
-
 
             // No context menu: picking a contact is the only thing to do
             // with one here.
@@ -113,16 +128,17 @@ Page {
                     ownColor: model.color
                     picturePath: model.avatar_path
                     isKeyContact: model.is_key_contact
-                    isVerified: model.is_verified
                 }
 
                 onClicked: contacts.open_chat_with(model.contact_id)
             }
 
             ViewPlaceholder {
-                enabled: contacts.count === 0
+                objectName: "contactsPlaceholder"
+                // Not until the core has answered: see `contactsLoaded`.
+                enabled: page.contactsLoaded && contacts.count === 0
                 text: qsTr("No contacts yet")
-                hintText: qsTr("Scan someone's invite from the chat list: QR code")
+                hintText: qsTr("Use \"QR code\" in the chat list to add a contact.")
             }
         }
     }

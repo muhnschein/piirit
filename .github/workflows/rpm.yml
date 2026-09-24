@@ -31,35 +31,43 @@ on:
           that runs on older phones and that Harbour rejects.
         type: string
         default: "5.2.0.15"
-      cargo_jobs:
+      release:
         description: >
-          How many cargo jobs inside scratchbox2. Four is the spec's
-          default and what these builds run; drop to one if a build ever
-          hangs there, which is what the setting is for. See
-          docs/BUILDING.md.
-        type: choice
-        options: ["4", "2", "1"]
-        default: "4"
+          Cut a release: the version to publish, which has to be what
+          rpm/harbour-piirit.spec says, run on main. The commit is tagged
+          v<version> and a GitHub release goes up with the package and
+          CHANGELOG.md's section for it. Leave empty for an ordinary
+          build. See docs/BUILDING.md.
+        type: string
+        default: ""
   push:
     # `v*` for a release. `build-*` is a throwaway handle for running this
     # before it reaches the default branch, since workflow_dispatch only
     # becomes available once a workflow is on main.
     tags: ["v*", "build-*"]
 
+# Reading the tree is all the workflow as a whole needs; each job says what
+# more it holds, so neither holds the other's.
 permissions:
   contents: read
-  # The derived SDK image lives in this repository's registry, and a run
-  # that finds none there publishes the one it had to build.
-  packages: write
 
 jobs:
   rpm:
     runs-on: ubuntu-latest
     timeout-minutes: 120
+    permissions:
+      contents: read
+      # The derived SDK image lives in this repository's registry, and a
+      # run that finds none there publishes the one it had to build.
+      packages: write
     env:
       ARCH: aarch64
       SFOS: ${{ inputs.sfos_version || '5.2.0.15' }}
-      CARGO_JOBS: ${{ inputs.cargo_jobs || '4' }}
+      RELEASE: ${{ inputs.release || '' }}
+      # One cargo job inside scratchbox2, on every run. At two or four the
+      # build stalls there often enough to cost more than the parallelism
+      # saves, so this is no longer a dispatch input. See docs/BUILDING.md.
+      CARGO_JOBS: "1"
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
@@ -67,17 +75,14 @@ jobs:
       - name: Fetch deltachat-rpc-server
         run: ./scripts/fetch-rpc-server.sh
 
-      # Both inputs are free text from the dispatch form, and both are
-      # spliced into a command below -- the version into an image tag, the
-      # job count into the build's own shell.
+      # The version is free text from the dispatch form, and it is spliced
+      # into an image tag below.
       - name: Name the SDK image this build wants
         run: |
           [[ $SFOS =~ ^[0-9]+(\.[0-9]+){3}$ ]] || {
             echo "::error::sfos_version '$SFOS' is not a dotted version"; exit 1; }
-          [[ $CARGO_JOBS =~ ^[1-9][0-9]?$ ]] || {
-            echo "::error::cargo_jobs '$CARGO_JOBS' is not a small number"; exit 1; }
           owner=$(echo "${{ github.repository_owner }}" | tr 'A-Z' 'a-z')
-          echo "SDK_IMAGE=ghcr.io/$owner/postivene-sdk:$SFOS-$ARCH" >> "$GITHUB_ENV"
+          echo "SDK_IMAGE=ghcr.io/$owner/piirit-sdk:$SFOS-$ARCH" >> "$GITHUB_ENV"
 
       - name: Sign in to the registry
         run: |
@@ -122,7 +127,7 @@ jobs:
           echo "Building against $target"
           echo "TARGET=$target" >> "$GITHUB_ENV"
 
-      # Every build used to produce harbour-postivene-0.1.0-1.aarch64.rpm,
+      # Every build used to produce harbour-piirit-0.1.0-1.aarch64.rpm,
       # because the spec pins both fields and mb2 runs with -X so nothing derives
       # them from git. Same name, same NEVRA, every time -- so `rpm -U`
       # and `pkcon install-local` saw a package that was already installed
@@ -130,8 +135,16 @@ jobs:
       # the file said it was new.
       #
       # The run number is monotonic, so each build is an upgrade of the
-      # last. The spec keeps Release: 1 in the tree, which is what a tagged
-      # release should be.
+      # last. The spec keeps Release: 1 in the tree, and a release builds
+      # exactly that: the package a release page offers is the spec as
+      # committed, not stamped with a run number nobody can find again.
+      #
+      # A release is a `v*` tag, or a dispatch on main with the version in
+      # `release`. Either has to say what the spec says, or the package
+      # would carry one version and the release another; a tag pushed or
+      # a version typed before the bump stops here. A dispatch is held to
+      # main because the job below tags the commit it runs on, and a tag
+      # on a branch is a release of something main may never carry.
       #
       # Digits and periods only: Harbour rejects any other character in
       # Release, so the short SHA that used to be appended here would have
@@ -139,9 +152,25 @@ jobs:
       - name: Stamp the build so each one is its own package
         run: |
           short=$(git rev-parse --short HEAD)
-          release="1.${GITHUB_RUN_NUMBER}"
-          sed -i "s/^Release:.*/Release:    ${release}/" rpm/harbour-postivene.spec
-          grep '^Version:\|^Release:' rpm/harbour-postivene.spec
+          version=$(sed -n 's/^Version:[[:space:]]*//p' rpm/harbour-piirit.spec)
+          wanted=""
+          case "$GITHUB_REF" in
+            refs/tags/v*) wanted=${GITHUB_REF#refs/tags/v} ;;
+          esac
+          if [ -n "$RELEASE" ]; then
+            [ "$GITHUB_REF" = "refs/heads/main" ] || {
+              echo "::error::a release is cut on main, not on $GITHUB_REF"; exit 1; }
+            wanted=$RELEASE
+          fi
+          if [ -n "$wanted" ]; then
+            [ "$wanted" = "$version" ] || {
+              echo "::error::release $wanted, but rpm/harbour-piirit.spec says Version: $version"; exit 1; }
+            release="1"
+          else
+            release="1.${GITHUB_RUN_NUMBER}"
+          fi
+          sed -i "s/^Release:.*/Release:    ${release}/" rpm/harbour-piirit.spec
+          grep '^Version:\|^Release:' rpm/harbour-piirit.spec
           echo "SHORT_SHA=$short" >> "$GITHUB_ENV"
           echo "RPM_RELEASE=$release" >> "$GITHUB_ENV"
 
@@ -169,7 +198,7 @@ jobs:
       - name: Restore the crates
         uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
         with:
-          path: ~/.cache/postivene-cargo
+          path: ~/.cache/piirit-cargo
           key: rpm-cargo-${{ hashFiles('rust/Cargo.lock') }}
           restore-keys: rpm-cargo-
 
@@ -182,23 +211,23 @@ jobs:
           gid=$(docker run --rm "$SDK_IMAGE" id -g)
           home=$(docker run --rm "$SDK_IMAGE" sh -c 'echo $HOME')
           echo "SDK builds as uid=$uid gid=$gid, HOME=$home"
-          echo "BUILDDIR=$home/harbour-postivene" >> "$GITHUB_ENV"
-          mkdir -p ~/.cache/postivene-cargo
-          sudo chown -R "$uid:$gid" "$PWD" ~/.cache/postivene-cargo
+          echo "BUILDDIR=$home/harbour-piirit" >> "$GITHUB_ENV"
+          mkdir -p ~/.cache/piirit-cargo
+          sudo chown -R "$uid:$gid" "$PWD" ~/.cache/piirit-cargo
 
       # Mounted inside the SDK user's home, and that placement is the
       # whole fix. rpm runs under scratchbox2, which redirects absolute
       # paths it does not recognise into the target rootfs -- so with the
-      # tree at /build/harbour-postivene, mb2 wrote .mb2/spec (it is right
+      # tree at /build/harbour-piirit, mb2 wrote .mb2/spec (it is right
       # there afterwards, 10 KB of it) and rpm then looked for the same
       # path inside the target and found nothing:
       #
-      #   error: Unable to open /build/harbour-postivene/.mb2/spec: No such file
+      #   error: Unable to open /build/harbour-piirit/.mb2/spec: No such file
       #
       # A file that exists and cannot be opened is two different roots.
       # docs/BUILDING.md bind-mounted under /home/mersdk for this
       # reason. The directory keeps the project's name either way: mb2
-      # derives the package from it, so rpm/harbour-postivene.spec is found.
+      # derives the package from it, so rpm/harbour-piirit.spec is found.
       #
       # `build-init` because mb2's help says a build directory is
       # initialised before it is built in, and `-X` (--no-fix-version)
@@ -220,7 +249,7 @@ jobs:
           docker run --rm --privileged \
             -e TARGET -e CARGO_JOBS \
             -v "$PWD:$BUILDDIR" -w "$BUILDDIR" \
-            -v "$HOME/.cache/postivene-cargo:/home/mersdk/.cargo" \
+            -v "$HOME/.cache/piirit-cargo:/home/mersdk/.cargo" \
             "$SDK_IMAGE" \
             /bin/bash -c 'set -e
               since=$(date +%s)
@@ -248,8 +277,8 @@ jobs:
       - name: Take the tree back
         if: always()
         run: |
-          mkdir -p ~/.cache/postivene-cargo
-          sudo chown -R "$(id -u):$(id -g)" "$PWD" ~/.cache/postivene-cargo
+          mkdir -p ~/.cache/piirit-cargo
+          sudo chown -R "$(id -u):$(id -g)" "$PWD" ~/.cache/piirit-cargo
 
       - name: Show what was built
         run: |
@@ -258,7 +287,7 @@ jobs:
 
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: harbour-postivene-${{ env.ARCH }}-sfos${{ env.SFOS }}-${{ env.SHORT_SHA }}
+          name: harbour-piirit-${{ env.ARCH }}-sfos${{ env.SFOS }}-${{ env.SHORT_SHA }}
           path: |
             RPMS/**/*.rpm
             **/*.rpm
@@ -279,8 +308,64 @@ jobs:
       - name: Validate the RPM against Harbour's rules
         run: |
           ./ci/apt-install.sh binutils rpm cpio file
-          rpm=$(find . -name 'harbour-postivene-*.rpm' ! -name '*debug*' \
+          rpm=$(find . -name 'harbour-piirit-*.rpm' ! -name '*debug*' \
                        ! -name '*.src.rpm' | head -1)
           [ -n "$rpm" ] || { echo "::error::no RPM to validate"; exit 1; }
           echo "Validating $rpm"
           ./ci/harbour-validate-rpm.sh "$rpm"
+
+  # A release: the package the job above built goes on a GitHub release
+  # named v<version>, with that version's section of CHANGELOG.md as its
+  # text. Its own job so that `contents: write` is held only here, by
+  # three commands, and never by the build running an SDK image with
+  # `--privileged`.
+  #
+  # From a `v*` tag the tag is there already and `--verify-tag` refuses to
+  # invent one; from a dispatch the release is what makes the tag, on the
+  # commit this run checked out. A version whose changelog section is
+  # missing fails in scripts/release-notes.sh before anything is published.
+  # `gh` is the runner's own; the token is the job's.
+  release:
+    needs: rpm
+    if: startsWith(github.ref, 'refs/tags/v') || inputs.release != ''
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+      actions: read
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+      RELEASE: ${{ inputs.release || '' }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Fetch the package this run built
+        run: gh run download "$GITHUB_RUN_ID" --dir rpms
+
+      # The device package and its checksum, and nothing else: the debug
+      # and source RPMs are for a developer with the tree, not a phone.
+      - name: Gather the assets
+        run: |
+          mkdir -p assets
+          find rpms -name 'harbour-piirit-*.rpm' ! -name '*debug*' \
+               ! -name '*.src.rpm' -exec cp {} assets/ \;
+          [ -n "$(ls assets)" ] || { echo "::error::no device RPM to release"; exit 1; }
+          (cd assets && sha256sum -- * > SHA256SUMS)
+          cat assets/SHA256SUMS
+
+      - name: Publish the release
+        run: |
+          if [ -n "$RELEASE" ]; then
+            version=$RELEASE
+            where="--target $GITHUB_SHA"
+          else
+            version=${GITHUB_REF_NAME#v}
+            where="--verify-tag"
+          fi
+          ./scripts/release-notes.sh "$version" > notes.md
+          # shellcheck disable=SC2086  # $where is one flag, or a flag and a SHA
+          gh release create "v$version" $where \
+            --title "Piirit $version" \
+            --notes-file notes.md \
+            assets/*

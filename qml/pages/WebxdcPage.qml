@@ -2,7 +2,7 @@ import QtQuick 2.0
 import Sailfish.Silica 1.0
 import Sailfish.WebView 1.0
 import "../components"
-import Postivene 1.0
+import Piirit 1.0
 
 /*
  * A webxdc app, running.
@@ -100,9 +100,9 @@ Page {
     ///
     /// Saved rather than asked about. The button an app draws over this
     /// is a download, and a download does not ask -- a chooser between
-    /// opening and keeping was tried here and was two taps in front of
-    /// the one thing the reader had already asked for. The copy goes to
-    /// Downloads, where the file manager looks, and the notice says so.
+    /// opening and keeping is two taps in front of the one thing the
+    /// reader has already asked for. The copy goes where every copy
+    /// goes (AttachmentSaver), and the notice says so.
     ///
     /// Text with no file has nowhere to be saved, so it goes on the
     /// clipboard instead and the page says that too: the reader asked
@@ -117,7 +117,7 @@ Page {
             return
         }
         handoverSaver.handedOver = filePath
-        handoverSaver.save(page.urlOf(filePath), StandardPaths.download)
+        handoverSaver.keep(page.urlOf(filePath), "")
     }
 
     /// A path as a URL, encoded rather than concatenated: the name is the
@@ -130,8 +130,8 @@ Page {
     }
 
     // Saving is the same copy the conversation makes of an attachment,
-    // into the folder the file manager looks in.
-    FileSaver {
+    // into the same folder.
+    AttachmentSaver {
         id: handoverSaver
         objectName: "handoverSaver"
         /// The file the app handed over: a copy in the cache, waiting to
@@ -141,8 +141,7 @@ Page {
         /// files should not leave a hundred behind.
         property string handedOver
         onSaved: {
-            //: Where a file a webxdc app produced was copied to.
-            notice.show(qsTr("Saved to Downloads"))
+            notice.show(handoverSaver.savedText)
             handoverSaver.forget()
         }
         onError: {
@@ -176,12 +175,10 @@ Page {
 
     // Leaving stops the app; being covered by another page does not.
     //
-    // This used to stop on Deactivating, which fires for both -- and
-    // `sendToChat` opens the chat picker *over* the app, at the app's own
-    // request. So asking to send a file stopped the host in the middle of
-    // the very request that asked, the app's fetch was answered by a
-    // closed socket, and the app reported that it could not reach its
-    // host. Nothing was ever sent.
+    // Not `Deactivating`, which fires for both: `sendToChat` opens the
+    // chat picker *over* the app at the app's own request, so stopping
+    // there would kill the host in the middle of the request that asked,
+    // and the app's fetch would be answered by a closed socket.
     //
     // Destruction is the honest signal for leaving: a popped page is
     // destroyed, and a stack that is replaced takes the page with it.

@@ -28,7 +28,7 @@
      * name is this app's, so nothing the engine sends can be mistaken for
      * it: every message the engine defines begins with "embed:".
      */
-    var MESSAGE = "postivene:app";
+    var MESSAGE = "piirit:app";
 
     /*
      * The address of the link a click landed in, or "" for a click that

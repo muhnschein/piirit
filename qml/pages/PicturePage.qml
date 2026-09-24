@@ -2,15 +2,14 @@
 import QtQuick 2.5
 import Sailfish.Silica 1.0
 import "../components"
-import Postivene 1.0
 
 /*
  * One picture, as big as the screen will show it.
  *
- * Tapping an image used to hand it to whatever the system thought handled
- * the type, which left Postivene and, on a device, failed there. Showing it
- * here is a page and a Flickable; the way out to another app stays in the
- * pull-down for the cases this cannot do anything with.
+ * Shown here rather than handed to whatever the system thinks handles the
+ * type, which leaves Piirit and fails on a device. A page and a
+ * Flickable; the way out to another app stays in the pull-down for the
+ * cases this cannot do anything with.
  *
  * The picture is fitted at zoom 1 and multiplied from there, and the
  * flickable's content is the larger of the picture and the view -- so
@@ -24,9 +23,9 @@ import Postivene 1.0
  * GIF's movie, start once the page is in place. Decoding during the
  * transition was the stutter reported on opening a picture.
  *
- * Saving copies the file into the Pictures folder, where the gallery
- * finds it: what the chat holds lives in the core's own directory and
- * goes with the app.
+ * Saving copies the file into Piirit's folder in Downloads, where every
+ * copy goes (AttachmentSaver): what the chat holds lives in the core's
+ * own directory and goes with the app.
  */
 Page {
     id: page
@@ -136,14 +135,14 @@ Page {
         page.zoomAt(page.zoom > 1 ? 1 : 3, viewX, viewY)
     }
 
-    // A copy for the gallery. The folder is the platform's own answer to
-    // where pictures go; the sandbox grants it (Pictures).
-    FileSaver {
+    // A copy the reader keeps, where every copy goes: see
+    // AttachmentSaver.
+    AttachmentSaver {
         id: saver
         objectName: "saver"
         onSaved: {
             notice.tone = "info"
-            notice.show(qsTr("Saved to Pictures"))
+            notice.show(saver.savedText)
         }
         onError: {
             notice.tone = "error"
@@ -178,7 +177,7 @@ Page {
             MenuItem {
                 objectName: "saveToDevice"
                 text: qsTr("Save to device")
-                onClicked: saver.save(page.fileUrl, StandardPaths.pictures)
+                onClicked: saver.keep(page.fileUrl, page.fileName)
             }
         }
 

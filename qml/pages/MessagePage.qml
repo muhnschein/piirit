@@ -1,6 +1,6 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
-import Postivene 1.0
+import Piirit 1.0
 import "../components"
 
 /*
@@ -15,6 +15,11 @@ import "../components"
  * The reader's Markdown setting applies as it does in the conversation,
  * and for the same reason the body is pinned to plain text unless the
  * shim rendered it: see the note at the top of MessageDelegate.qml.
+ *
+ * A Label cannot be selected in, so "Select text" in the pull-down puts
+ * the message as written in a field that can, and copies each selection
+ * as it is made. The label stays until then because the formatting and
+ * the links are its own, and a field draws neither.
  */
 Page {
     id: page
@@ -32,6 +37,9 @@ Page {
     /// than shown and cleared: a page with nothing on it and no reason
     /// for it is the very thing this page exists to stop being.
     property string errorMessage: ""
+
+    /// Whether the body is the selectable field rather than the label.
+    property bool selecting: false
 
     allowedOrientations: Orientation.All
 
@@ -52,6 +60,18 @@ Page {
                                         ? whole.styled_text
                                         : whole.text
 
+    /// Swap the label for the selectable field, focused and with all of
+    /// it selected, so the handles are there to be moved.
+    ///
+    /// Selected from the end back to the start, which leaves the cursor
+    /// at the start: a focused field keeps its cursor in view, and one at
+    /// the end of a long message would scroll the page down to it.
+    function beginSelecting() {
+        page.selecting = true
+        selectableBody.forceActiveFocus()
+        selectableBody.select(selectableBody.text.length, 0)
+    }
+
     SilicaFlickable {
         id: flickable
         objectName: "messageFlickable"
@@ -59,6 +79,17 @@ Page {
         contentHeight: column.height + Theme.paddingLarge
 
         PullDownMenu {
+            MenuItem {
+                objectName: "selectItem"
+                // Once the field is up there is nothing left to switch.
+                visible: !page.selecting
+                enabled: whole.text.length > 0
+                //: Pull-down entry on the page showing one whole message:
+                //: shows it as text that can be selected, and copied, a
+                //: part at a time.
+                text: qsTr("Select text")
+                onClicked: page.beginSelecting()
+            }
             MenuItem {
                 objectName: "copyItem"
                 enabled: whole.text.length > 0
@@ -111,7 +142,7 @@ Page {
             Label {
                 id: bodyLabel
                 objectName: "bodyLabel"
-                visible: page.shownText.length > 0
+                visible: page.shownText.length > 0 && !page.selecting
                 x: Theme.horizontalPageMargin
                 width: parent.width - 2 * Theme.horizontalPageMargin
                 wrapMode: Text.Wrap
@@ -121,6 +152,31 @@ Page {
                 textFormat: page.drawsStyled ? Text.StyledText : Text.PlainText
                 text: page.shownText
                 onLinkActivated: Qt.openUrlExternally(link)
+            }
+
+            // The message as written, as Copy copies it, in a field whose
+            // text can be selected. Silica's read-only field takes no
+            // focus and cannot be selected in without it: `focusOnClick`
+            // is its own gallery's "read only, but focusable". Plain text,
+            // since a TextEdit reads no markup unless told to.
+            TextArea {
+                id: selectableBody
+                objectName: "selectableBody"
+                visible: page.selecting
+                width: parent.width
+                readOnly: true
+                focusOnClick: true
+                labelVisible: false
+                color: Theme.primaryColor
+                text: whole.text
+                // Each selection goes on the clipboard as it is made, as
+                // Silica does with one, and the notice says so.
+                onSelectedTextChanged: {
+                    if (selectableBody.selectedText.length > 0) {
+                        Clipboard.text = selectableBody.selectedText
+                        notice.show(qsTr("Copied"))
+                    }
+                }
             }
 
             Label {

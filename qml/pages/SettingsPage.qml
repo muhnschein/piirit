@@ -3,14 +3,29 @@ import Sailfish.Silica 1.0
 import "../components"
 
 /*
- * The settings that belong to no profile: whether the return key sends,
- * how a message is drawn, what goes out with a link, how much of an
- * attachment arrives unasked, how long a message is kept, how much a
- * notification gives away and whether a muted group can still raise one,
- * and whether webxdc apps are offered at all. Reached from the chat
- * list's pull-down. A profile's own
- * settings -- picture, name, address, read receipts, what the relay says
- * -- are on the profile's page, reached from its row on the profiles page.
+ * The settings that belong to no profile: how a message is drawn, what
+ * goes out with a link, how much of a picture or a video leaves with it,
+ * how much of an attachment arrives unasked, how long a message is kept,
+ * whether anything is announced and how much a notification gives away
+ * and whether a muted group can still raise one, and, under Advanced,
+ * the way to the cover's quick actions (set up on a page of their own,
+ * QuickActionsPage.qml) and whether webxdc apps are offered at all.
+ * Reached from the chat list's pull-down. A profile's own settings --
+ * picture, name, address, read receipts, what the relay says, what it
+ * takes -- are on the profile's page, reached from its row on the
+ * profiles page; that row also carries the two things about a profile
+ * that are not settings, its invite code and its backup, since the
+ * core's export does one account at a time.
+ *
+ * The one exception to that division is the way into the block list,
+ * under Privacy with the link cleaning, which is the other setting about
+ * what the reader gives away. Blocking is the core's, and the core keeps it per
+ * account, so the page it opens (BlockedContactsPage.qml) is a profile's
+ * -- it is here because that is where both reference clients keep it,
+ * and because a reader looking for it looks in the app's settings rather
+ * than in a profile's. The profile is `accountId`, handed in by the chat
+ * list this was pulled down from, which is the profile whose chats the
+ * reader was looking at.
  *
  * The values live in dconf, behind the `Settings` singleton every page
  * reads (qml/components/Settings.qml); this page writes the same object,
@@ -21,12 +36,36 @@ import "../components"
  * that entry to appear at all.
  *
  * Nothing here needs saving: each control writes its setting on the tap.
- * The one exception is the deletion period, which deletes messages the
- * moment it is set, so that one asks first -- on a page of its own, with
+ * One is chosen on a page of its own instead: the deletion period
+ * deletes messages the moment it is set, so that one asks first, with
  * the count of what would go.
  */
 Page {
     id: page
+
+    /// Whose block list the Privacy row opens. Nothing else on this page
+    /// belongs to a profile; see the note above.
+    property int accountId
+
+    /// The outgoing media qualities, as the core numbers them and as
+    /// both reference clients offer them: balanced, or smaller and
+    /// worse.
+    function qualityLabel(index) {
+        if (index === 1) {
+            //: Outgoing media quality: smaller pictures and videos,
+            //: which cost the reader and whoever they write to less
+            //: data. Both reference clients' words for it.
+            return qsTr("Lower quality, less data")
+        }
+        //: Outgoing media quality: what the core picks by default.
+        return qsTr("Balanced")
+    }
+
+    /// Which choice a quality is. Anything the core does not know is
+    /// balanced, which is what it falls back to itself.
+    function qualityIndex(quality) {
+        return quality === 1 ? 1 : 0
+    }
 
     /// The download limits offered, in bytes, as parla offers them. The
     /// first is the smallest the core accepts, which is as near to never
@@ -52,12 +91,6 @@ Page {
             }
         }
         return 3
-    }
-
-    /// 0 draws Markdown; anything else -- including the 1 that once took
-    /// the markers out and kept the words -- shows a message as written.
-    function markdownIndex(mode) {
-        return mode === 0 ? 0 : 1
     }
 
     /// The deletion periods offered, in seconds, as deltachat-android
@@ -90,12 +123,18 @@ Page {
         return detail >= 0 && detail <= 2 ? detail : 0
     }
 
+    function openQuickActions() {
+        pageStack.push(Qt.resolvedUrl("QuickActionsPage.qml"), {
+            accountId: page.accountId
+        })
+    }
+
     /// Put each choice back to what the setting holds. Silica writes
     /// currentIndex itself on a tap, which detaches a binding, so the
     /// choice is put back from the setting each time it changes -- the
     /// arrangement DisappearingMessages uses.
     function refresh() {
-        markdownCombo.currentIndex = page.markdownIndex(Settings.markdownMode)
+        qualityCombo.currentIndex = page.qualityIndex(Settings.mediaQuality)
         downloadCombo.currentIndex = page.limitIndex(Settings.downloadLimit)
         deletionCombo.currentIndex = page.periodIndex(Settings.deleteDeviceAfter)
         notificationCombo.currentIndex =
@@ -104,7 +143,7 @@ Page {
 
     Connections {
         target: Settings
-        onMarkdownModeChanged: page.refresh()
+        onMediaQualityChanged: page.refresh()
         onDownloadLimitChanged: page.refresh()
         onDeleteDeviceAfterChanged: page.refresh()
         onNotificationDetailChanged: page.refresh()
@@ -183,38 +222,27 @@ Page {
                 text: qsTr("Messages")
             }
 
-            // First, because it is the one setting the reader meets on
-            // every message: what the biggest key on the keyboard does.
-            // Off, the field is the multi-line one -- it grows with the
-            // message and the button sends -- and the description says
-            // so, since turning this on takes that away without saying.
-            TextSwitch {
-                objectName: "enterSendsSwitch"
-                //: The return key on the keyboard.
-                text: qsTr("Enter sends the message")
-                description: qsTr("Off, the return key starts a new line, the message field grows with what is written, and the send button sends.")
-                automaticCheck: false
-                checked: Settings.enterSends === true
-                onClicked: Settings.enterSends = !checked
-            }
-
+            // What leaves the phone, above what arrives on it. The core
+            // recodes a picture as it sends, and the camera records a
+            // video, at whichever of these two the reader picks; both
+            // reference clients offer the same pair under the same name.
             ComboBox {
-                id: markdownCombo
-                objectName: "markdownCombo"
+                id: qualityCombo
+                objectName: "qualityCombo"
                 width: parent.width
-                label: qsTr("Markdown")
-                description: qsTr("How a message written with *stars* and `backticks` is shown.")
+                //: Pictures and videos on their way out of the phone.
+                label: qsTr("Outgoing media quality")
 
                 menu: ContextMenu {
                     MenuItem {
-                        objectName: "markdownOption0"
-                        text: qsTr("Drawn: bold, italics, links")
-                        onClicked: Settings.markdownMode = 0
+                        objectName: "qualityOption0"
+                        text: page.qualityLabel(0)
+                        onClicked: Settings.mediaQuality = 0
                     }
                     MenuItem {
-                        objectName: "markdownOption1"
-                        text: qsTr("As written")
-                        onClicked: Settings.markdownMode = 1
+                        objectName: "qualityOption1"
+                        text: page.qualityLabel(1)
+                        onClicked: Settings.mediaQuality = 1
                     }
                 }
             }
@@ -224,7 +252,6 @@ Page {
                 objectName: "downloadCombo"
                 width: parent.width
                 label: qsTr("Auto-download attachments")
-                description: qsTr("Bigger ones wait until you ask for them. Applies to every profile and to messages that arrive from now on.")
 
                 menu: ContextMenu {
                     Repeater {
@@ -250,7 +277,9 @@ Page {
                 objectName: "deletionCombo"
                 width: parent.width
                 label: qsTr("Delete messages from device")
-                description: qsTr("Older messages go from this phone, in every chat of every profile, whatever a chat's own disappearing messages setting says. \"Saved messages\" are kept.")
+                //: Under "Delete messages from device". "Disappearing
+                //: messages" is each chat's own setting of that name.
+                description: qsTr("This applies to every profile, whatever a chat's own disappearing messages setting is.")
 
                 menu: ContextMenu {
                     Repeater {
@@ -265,8 +294,32 @@ Page {
                 }
             }
 
+            // Last under Messages: the three above are what the core does
+            // with a message -- what leaves, what arrives, what stays --
+            // and this is only how the app draws one.
+            TextSwitch {
+                objectName: "markdownSwitch"
+                text: qsTr("Use Markdown formatting")
+                // Checked follows the setting, so the tap writes the
+                // setting and the setting moves the switch.
+                automaticCheck: false
+                checked: Settings.markdownMode === 0
+                onClicked: Settings.markdownMode = checked ? 1 : 0
+            }
+
             SectionHeader {
                 text: qsTr("Notifications")
+            }
+
+            // First, because it decides whether the two below it mean
+            // anything: off, nothing is announced and they are greyed out
+            // rather than hidden, so the reader sees what comes back.
+            TextSwitch {
+                objectName: "notificationsSwitch"
+                text: qsTr("Show notifications")
+                automaticCheck: false
+                checked: Settings.notificationsEnabled === true
+                onClicked: Settings.notificationsEnabled = !checked
             }
 
             // What a notification says is what the lock screen shows to
@@ -275,23 +328,23 @@ Page {
                 id: notificationCombo
                 objectName: "notificationCombo"
                 width: parent.width
-                label: qsTr("A new notification shows")
-                description: qsTr("On the lock screen and in the notification area. The chat it is from opens on a tap either way.")
+                enabled: Settings.notificationsEnabled === true
+                label: qsTr("Notification content")
 
                 menu: ContextMenu {
                     MenuItem {
                         objectName: "notificationOption0"
-                        text: qsTr("Who wrote, and what")
+                        text: qsTr("Sender and message")
                         onClicked: Settings.notificationDetail = 0
                     }
                     MenuItem {
                         objectName: "notificationOption1"
-                        text: qsTr("Who wrote")
+                        text: qsTr("Sender only")
                         onClicked: Settings.notificationDetail = 1
                     }
                     MenuItem {
                         objectName: "notificationOption2"
-                        text: qsTr("Only that something arrived")
+                        text: qsTr("No details")
                         onClicked: Settings.notificationDetail = 2
                     }
                 }
@@ -305,20 +358,25 @@ Page {
                 //: A reply to one of the reader's own messages, arriving
                 //: in a group they have muted.
                 text: qsTr("Mentions")
-                description: qsTr("In a muted group, a reply to one of your messages still notifies you.")
+                description: qsTr("In muted groups, notify messages directed to you, like replies or reactions")
+                enabled: Settings.notificationsEnabled === true
                 automaticCheck: false
                 checked: Settings.mentionNotifications === true
                 onClicked: Settings.mentionNotifications = !checked
             }
 
+            // What the reader gives away, in one place: what leaves with
+            // a link they send, and who is not heard from at all. The
+            // link switch had a heading of its own with nothing else
+            // under it.
             SectionHeader {
-                text: qsTr("Links")
+                text: qsTr("Privacy")
             }
 
             TextSwitch {
                 objectName: "cleanLinksSwitch"
                 text: qsTr("Remove tracking from links")
-                description: qsTr("Known tracking parameters -- click ids, campaign tags, the sharer's account -- are taken out of the links in the messages you send. The rest of the link is left as it was.")
+                description: qsTr("Removes click IDs and campaign tags from links you send.")
                 // Bound to the setting, not held here, so the switch cannot
                 // drift from what the app will read.
                 automaticCheck: false
@@ -326,8 +384,65 @@ Page {
                 onClicked: Settings.cleanLinks = !checked
             }
 
+            // The one row on this page that leads somewhere rather than
+            // setting something, so it goes under the switches: the block
+            // list is a list of people, and that is a page
+            // (BlockedContactsPage.qml). It is where the reference clients
+            // put it -- both keep it in the app's settings -- and it is
+            // the one thing here that belongs to a profile rather than to
+            // the phone, since the core keeps a block list per account. No
+            // line under it saying which profile: this is pulled down from
+            // that profile's chats, and every other page reached that way
+            // is that profile's too.
+            BackgroundItem {
+                id: blockedEntry
+                objectName: "blockedContactsEntry"
+                width: parent.width
+                height: Theme.itemSizeSmall
+
+                Label {
+                    objectName: "blockedContactsLabel"
+                    x: Theme.horizontalPageMargin
+                    width: parent.width - 2 * Theme.horizontalPageMargin
+                    anchors.verticalCenter: parent.verticalCenter
+                    truncationMode: TruncationMode.Fade
+                    color: blockedEntry.highlighted ? Theme.highlightColor
+                                                    : Theme.primaryColor
+                    text: qsTr("Blocked contacts")
+                }
+
+                onClicked: pageStack.push(Qt.resolvedUrl("BlockedContactsPage.qml"), {
+                    accountId: page.accountId
+                })
+            }
+
+            // What most readers never need: the cover's quick actions,
+            // set up on a page of their own (QuickActionsPage.qml) since
+            // a chat's action brings a chat and a row of icons with it,
+            // and webxdc apps.
             SectionHeader {
-                text: qsTr("Apps")
+                //: The settings most readers never need to change.
+                text: qsTr("Advanced")
+            }
+
+            BackgroundItem {
+                id: quickActionsEntry
+                objectName: "quickActionsEntry"
+                width: parent.width
+                height: Theme.itemSizeSmall
+
+                Label {
+                    objectName: "quickActionsLabel"
+                    x: Theme.horizontalPageMargin
+                    width: parent.width - 2 * Theme.horizontalPageMargin
+                    anchors.verticalCenter: parent.verticalCenter
+                    truncationMode: TruncationMode.Fade
+                    color: quickActionsEntry.highlighted ? Theme.highlightColor
+                                                         : Theme.primaryColor
+                    text: qsTr("Quick actions")
+                }
+
+                onClicked: page.openQuickActions()
             }
 
             // Off until it is asked for, so this is the only place the
@@ -342,7 +457,7 @@ Page {
                 //: chat and everyone in it plays with. Keep the name:
                 //: it is what every other Delta Chat client calls them.
                 text: qsTr("Enable webxdc apps (experimental)")
-                description: qsTr("Apps somebody sends run inside the chat, and the attach tray offers a store to take new ones from. An app is somebody else's code, and this part is not yet as tested as the rest.")
+                description: qsTr("Runs small apps inside chats. These features may be unstable and may be changed or removed.")
                 automaticCheck: false
                 checked: Settings.webxdcEnabled === true
                 onClicked: Settings.webxdcEnabled = !checked

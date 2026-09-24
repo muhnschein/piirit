@@ -1,6 +1,6 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
-import Postivene 1.0
+import Piirit 1.0
 
 /*
  * A voice message being recorded, where the message field was.
@@ -17,6 +17,12 @@ import Postivene 1.0
  * recording, the strip is a red dot, the time, a cross to throw the
  * recording away, and the send button where it always is. The page
  * hides its field and attach button meanwhile.
+ *
+ * A recording can be as long as the relay takes and no longer: at the end
+ * it stops and is sent, as a tap on send would have done. Nothing here
+ * says so. At the relay's size that is over an hour and a half, which
+ * nobody records, and a limit on the screen would raise more questions
+ * than it answers.
  */
 Item {
     id: root
@@ -25,6 +31,13 @@ Item {
     readonly property bool available: recorder.available
     /// A recording is running, or being finished.
     readonly property bool recording: recorder.recording
+    /// The largest file the relay takes, in bytes: the core's attachment
+    /// limit, 0 until it has said. A recording stops at the longest that
+    /// fits.
+    property real limitBytes: 0
+    /// The reader's outgoing media quality, 0 balanced and 1 less data,
+    /// which the recording's bit rate follows as a picture's size does.
+    property int mediaQuality: 0
     /// The recording is finished and at `path`: send it.
     signal recorded(string path)
     /// Recording failed. The message is the platform's own.
@@ -67,6 +80,8 @@ Item {
     VoiceRecorder {
         id: recorder
         objectName: "recorder"
+        limit_bytes: root.limitBytes
+        media_quality: root.mediaQuality
         onRecorded: root.recorded(path)
         onError: root.failed(message)
     }

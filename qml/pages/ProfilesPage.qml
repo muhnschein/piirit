@@ -10,10 +10,18 @@ import "../components"
  * on all of them, so switching is a matter of pointing the chat list at a
  * different one rather than starting anything up; the chat list tells the
  * core which it is on, and that is the profile the app opens on next
- * time. Picking the profile already shown does nothing. A row's
- * menu leads to the profile's page -- picture, name, address, the rest --
- * and to deleting it. Another profile is made from the plus under the
- * last row, where the group pages put "add members".
+ * time. Picking the profile already shown does nothing. A row's menu is
+ * everything to do with that profile: its own page -- picture, name,
+ * address, the rest -- its invite code, writing it out to a backup file,
+ * and deleting it. The code and the backup are here, where the profile is
+ * picked, rather than on the profile's own page: a reader who wants to
+ * show their code does not want to read a settings page first.
+ *
+ * Another profile is added from the plus under the last row, where the
+ * group pages put "add members". One plus, not three: the three ways in
+ * -- a new profile, a backup file, another device -- are the question the
+ * page behind it asks (AddProfilePage.qml), and three pluses under a
+ * list of profiles read as three more profiles.
  *
  * Deleting counts down beside the list rather than on the row
  * (PendingRemoval): the row goes whenever the list reloads, and it used
@@ -29,30 +37,24 @@ Page {
     /// The profile the chat list is currently on.
     property int currentAccountId: 0
 
-    /// True once a deletion has been asked for, so the empty list that
-    /// follows is read as "the last profile is gone" rather than as the
-    /// list simply not having loaded yet.
-    property bool deleting: false
-
+    // Deleting the last profile leaves the app with nothing to show, and
+    // the way back to where a first profile is made belongs to the window
+    // (piirit.qml) rather than to this page: this page is destroyed by
+    // the same swipe that asks for the deletion, so a move made from here
+    // would be a move by a page that is no longer there.
     Connections {
         target: core
-        // Deleting the last profile leaves the app with nothing to show,
-        // so it goes back to where a first profile is made. Replacing the
-        // whole stack, not pushing: there is no chat list to return to.
-        onAccounts_refreshed: {
-            if (page.deleting && configured_count === 0) {
-                page.deleting = false
-                // The empty properties are passed rather than left
-                // out: Silica's own replaceAbove takes them, and the
-                // two-argument form errors out under a stack that
-                // declares all three -- which is what the test harness
-                // does, so the branch was never actually run there.
-                pageStack.replaceAbove(null,
-                                       Qt.resolvedUrl("WelcomePage.qml"),
-                                       {})
+        onAccount_error: page.errorMessage = message
+        // A row names its profile's own address, which is on one of its
+        // relays and moves when that relay goes. The core says when a
+        // profile's relays change -- from its page over this one,
+        // or from another device the profile is on -- and the rows are
+        // read again.
+        onCore_event: {
+            if (kind === "TransportsModified") {
+                core.refresh_accounts()
             }
         }
-        onAccount_error: page.errorMessage = message
     }
 
     property string errorMessage: ""
@@ -65,10 +67,7 @@ Page {
     /// moment in which they can say they did not mean it.
     PendingRemoval {
         id: doomedProfiles
-        onRemove: {
-            page.deleting = true
-            core.remove_account(id)
-        }
+        onRemove: core.remove_account(id)
     }
 
     // A profile page pushed over this one, or a swipe back to the chats:
@@ -79,6 +78,15 @@ Page {
             doomedProfiles.flush()
         }
     }
+
+    // And again as the page is actually destroyed, because "leaving" and
+    // "told it is leaving" are not the same moment. A profile tapped for
+    // deletion while the back gesture is already under way is asked for
+    // after this page has had its `Deactivating`, and the wait it armed
+    // then dies with the page and the timer on it: the reader asked for
+    // a profile to go and it quietly stayed. Flushing twice costs
+    // nothing -- the first one leaves nothing behind.
+    Component.onDestruction: doomedProfiles.flush()
 
     SilicaListView {
         id: listView
@@ -131,6 +139,41 @@ Page {
                     text: qsTr("Profile settings")
                     onClicked: pageStack.push(Qt.resolvedUrl("ProfilePage.qml"),
                                               { accountId: model.account_id })
+                }
+                // The invite code, the second device and the backup are
+                // about this profile and nothing else, so they are on
+                // the profile rather than a page deeper in. All three
+                // take the row's own account: the core's invite, its
+                // provider and its export are each per account.
+                MenuItem {
+                    objectName: "inviteItem"
+                    text: qsTr("Invite code")
+                    onClicked: pageStack.push(Qt.resolvedUrl("QrPage.qml"),
+                                              { accountId: model.account_id })
+                }
+                MenuItem {
+                    objectName: "secondDeviceItem"
+                    text: qsTr("Add a second device")
+                    onClicked: pageStack.push(
+                        Qt.resolvedUrl("SecondDevicePage.qml"), {
+                            accountId: model.account_id,
+                            // Where the forward swipe goes once a
+                            // device has taken the profile: the chats
+                            // the app is on, which is not necessarily
+                            // the profile being offered.
+                            currentAccountId: page.currentAccountId
+                        })
+                }
+                MenuItem {
+                    objectName: "backupItem"
+                    text: qsTr("Back up profile")
+                    onClicked: pageStack.push(Qt.resolvedUrl("BackupPage.qml"), {
+                        accountId: model.account_id,
+                        // Where the forward swipe goes once the backup
+                        // is written: the chats the app is on, which is
+                        // not necessarily the profile being backed up.
+                        currentAccountId: page.currentAccountId
+                    })
                 }
                 MenuItem {
                     objectName: "deleteProfileItem"
@@ -238,38 +281,15 @@ Page {
             }
         }
 
-        // The way to another profile, where the next one would be
-        // listed: a row shaped like a profile's, with a plus for a
-        // picture, as the group pages offer another member. Under the
-        // last row rather than in the pulley, which is where a reader
-        // who has just read the list is already looking.
-        //
-        // What it opens is the welcome page's own flow, which replaces
-        // the stack with the new profile's chat list once the core has
-        // it.
-        footer: ListItem {
-            id: addProfileRow
+        // The way to another profile. One row, and the three ways in are
+        // behind it. Three pluses in a column -- make one, read a backup
+        // file, join from another device -- would put three answers under
+        // a list of profiles before the reader had been asked anything.
+        footer: PlusRow {
             objectName: "addProfileButton"
             width: listView.width
-            contentHeight: Theme.itemSizeSmall + 2 * Theme.paddingMedium
-
-            PlusMark {
-                id: plus
-                x: Theme.horizontalPageMargin
-                y: Theme.paddingMedium
-            }
-
-            Label {
-                x: plus.x + plus.width + Theme.paddingMedium
-                width: parent.width - x - Theme.horizontalPageMargin
-                anchors.verticalCenter: plus.verticalCenter
-                wrapMode: Text.Wrap
-                color: addProfileRow.highlighted ? Theme.highlightColor
-                                                 : Theme.primaryColor
-                text: qsTr("Add profile")
-            }
-
-            onClicked: pageStack.push(Qt.resolvedUrl("AddProfileDialog.qml"), {})
+            text: qsTr("Add profile")
+            onClicked: pageStack.push(Qt.resolvedUrl("AddProfilePage.qml"), {})
         }
 
         // Counted off the model, not off what is drawn: the plus is the

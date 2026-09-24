@@ -2,16 +2,16 @@ import QtQuick 2.0
 import QtMultimedia 5.6
 import Sailfish.Silica 1.0
 import "../components"
-import Postivene 1.0
 
 /*
  * One video, played here.
  *
- * Tapping a video used to hand it to whatever the system thought played
- * video, which left Postivene and, on a device, failed there. QtMultimedia
- * is already how a voice message plays in its own row; this is the same
+ * Played here rather than handed to whatever the system thinks plays
+ * video, which leaves Piirit and fails on a device. QtMultimedia is
+ * already how a voice message plays in its own row; this is the same
  * player with a picture. The way out to another app stays in the pull-down,
- * and so does a copy into the Videos folder, where the gallery finds it.
+ * and so does a copy into Piirit's folder in Downloads, where every copy
+ * goes (AttachmentSaver).
  */
 Page {
     id: page
@@ -56,14 +56,14 @@ Page {
         autoPlay: true
     }
 
-    // A copy for the gallery. The folder is the platform's own answer to
-    // where videos go; the sandbox grants it (UserDirs).
-    FileSaver {
+    // A copy the reader keeps, where every copy goes: see
+    // AttachmentSaver.
+    AttachmentSaver {
         id: saver
         objectName: "saver"
         onSaved: {
             notice.tone = "info"
-            notice.show(qsTr("Saved to Videos"))
+            notice.show(saver.savedText)
         }
         onError: {
             notice.tone = "error"
@@ -100,7 +100,7 @@ Page {
             MenuItem {
                 objectName: "saveToDevice"
                 text: qsTr("Save to device")
-                onClicked: saver.save(page.fileUrl, StandardPaths.videos)
+                onClicked: saver.keep(page.fileUrl, page.fileName)
             }
         }
 

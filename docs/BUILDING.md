@@ -25,8 +25,8 @@ outside tests, `missing_docs` and `unsafe_code` denied.
 `env::set_var` before Qt initialises, and because two things the app does
 have no safe binding: installing a `QTranslator`, and recording a voice
 message through `QAudioRecorder`, neither of which qmetaobject wraps.
-Those are the two `cpp!` files in the tree, `postivene-app/src/translations.rs`
-and `postivene-shim/src/recorder.rs`, and the C++ build step in each
+Those are the two `cpp!` files in the tree, `piirit-app/src/translations.rs`
+and `piirit-shim/src/recorder.rs`, and the C++ build step in each
 crate's `build.rs` exists for them alone. Every exception is at the
 narrowest scope and says why, and every block is short enough to be
 checked by reading.
@@ -41,7 +41,7 @@ failures: `tokio::runtime::Runtime::new` (must go through `CoreRuntime`) and
 
 ## Testing
 
-Postivene parses almost nothing — protocol and crypto are the core's, and
+Piirit parses almost nothing — protocol and crypto are the core's, and
 the subprocess we talk to is one we spawned. The failure mode is misreading
 the core's JSON, or calling it wrongly, with nothing noticing until the app
 is on a phone. The tests aim at that.
@@ -134,12 +134,11 @@ laptop is a green CI.
 The scanner **imports** coverage; it does not measure it. `make
 sonar-reports` writes `rust/target/sonar/lcov.info` with `cargo llvm-cov`
 over the whole workspace, and the workflow runs it before the scan. Without
-it the reading is a confident 0.0% rather than "no data", which is what it
-read for as long as nothing wrote a report. The target needs
+it the reading is a confident 0.0% rather than "no data". The target needs
 `cargo-llvm-cov`, so it is opt-in rather than part of `make check`. It runs
 the suite under `cargo-nextest` when that is installed too, for the reason
-`make test` does: cargo-llvm-cov's own runner is `cargo test`, one binary
-at a time, and instrumented that was ten minutes of the scan job. Without
+`make test` does: cargo-llvm-cov's own runner is `cargo test`, one binary at
+a time, which instrumented costs the scan job about ten minutes. Without
 nextest the report is still written, the slow way.
 
 ```
@@ -154,16 +153,15 @@ invokes cargo where it finds the project, and this workspace is under
 `rust/`, not at the root, so it would run a different clippy from the one
 that gates this project -- or none. And a report of our own would be empty:
 `make lint` denies warnings, so a warning in this project's code fails the
-gate and never reaches a branch Sonar analyses. One was produced and held
-four diagnostics, all in `third_party/qmetaobject`, which is excluded
-anyway. Producing it cost a `cargo clean` and a full recompile inside the
-scan job.
+gate and never reaches a branch Sonar analyses, leaving only findings in
+`third_party/qmetaobject`, which is excluded anyway. Producing one costs a
+`cargo clean` and a full recompile inside the scan job.
 
 `sonar.tests` separates the fixtures from the application, so coverage and
 duplication are measured on what ships. That matters more here than in most
-trees, because the rule above is that test volume exceeds source volume:
-indexed as main sources, the fixtures were most of what every ratio was
-computed over. `sonar.exclusions` drops the vendored crates, the patched
+trees, because test volume exceeds source volume: indexed as main sources,
+the fixtures would be most of what every ratio was computed over.
+`sonar.exclusions` drops the vendored crates, the patched
 qmetaobject, the rendered icons, and `translations/` -- a Qt catalog is
 named `.ts`, so the scanner reads thirty-nine of them as TypeScript.
 `sonar.coverage.exclusions` keeps `qml/` out of the coverage arithmetic
@@ -188,27 +186,25 @@ the runners are worth knowing.
 
 **Packages come through `ci/apt-install.sh`**, not a bare `apt-get`.
 `apt-get update` exits non-zero when *any* configured repository fails, and
-the runner image ships several this project never installs from. On
-2026-09-09 Google Chrome's index served a hash that did not match its own
-Release file, and every job died before installing anything or running a
-test; nothing in this repository had changed. The script drops the
+the runner image ships several this project never installs from -- so one
+of them serving a bad index kills every job before a test runs, with
+nothing in this repository having changed. The script drops the
 third-party lists first, keeping Ubuntu's wherever the image puts them --
 a list survives only if something in it names an `ubuntu.com` host, which
 is what stops it deleting the archive it is about to install from.
 
 **The Rust jobs cache their `target/`** (`Swatinem/rust-cache`, scoped to
-the `rust` workspace). Every job used to compile the whole dependency
+the `rust` workspace); without it every job compiles the whole dependency
 graph from nothing on every push. `msrv` carries a cache key of its own
 because it builds with `+1.75.0` while the action keys on the default
 toolchain, and without it the two would share a slot and neither would
 ever hit. `CARGO_INCREMENTAL: 0` because a runner compiles once and throws
 the machine away, so incremental state is written, cached and never read.
 
-Caching was measured and is worth less than it looks: with a warm cache
-clippy compiles the workspace in about twenty seconds, but the `test` job
-barely moved, because compilation was never its cost. Ten of its twelve
-minutes were the suite waiting on timers, which is what nextest addresses
-above.
+Caching is worth less than it looks: with a warm cache clippy compiles the
+workspace in about twenty seconds, but the `test` job barely moves, because
+compilation is not its cost -- most of its time is the suite waiting on
+timers, which is what nextest addresses above.
 
 **The test job installs `cargo-nextest`** and runs the suite under the
 `ci` profile, which differs from a laptop's in two ways: `fail-fast` is
@@ -216,23 +212,10 @@ off, because CI is asked once and should report everything it knows; and
 failures are printed where they happen and again at the end, because in a
 two-hundred-line log the summary is what anyone reads.
 
-## The field of faces
-
-The first screen draws a field of made-up avatars (`docs/PROJECT.md`),
-and what it draws is two PNG masks in `qml/art/`, one per orientation,
-painted by `tools/faces/faces.py` and **committed**: like the compiled
-catalogs they are generated but tracked, so a build needs neither the
-painter nor a display. `make faces` repaints them -- Python 3 and its
-standard library, nothing to install -- and the painter is deterministic,
-so the masks change only when it does. Run it when the painter changes,
-look at what it wrote (the masks are red and green on black; the app
-tints them), and commit the result. `tests/qml_welcome.rs` checks that
-they are there in the shape the shader reads.
-
 ## Translations
 
-The strings are the `qsTr()` calls in `qml/`; `translations/postivene.ts`
-is the untranslated source catalog and `translations/postivene-<lang>.ts`
+The strings are the `qsTr()` calls in `qml/`; `translations/piirit.ts`
+is the untranslated source catalog and `translations/piirit-<lang>.ts`
 one catalog per language Sailfish ships in. `scripts/update-translations.sh`
 regenerates all of them from the source in one `lupdate` run, so a new
 string turns up as `unfinished` in every language at once, and
@@ -241,7 +224,7 @@ that run produces. `tests/translation_catalogs.rs` fails when a string in
 any language is left untranslated, so a new string is not done until every
 catalog has it.
 
-The app loads `postivene-<lang>.qm`, which `scripts/release-translations.sh`
+The app loads `piirit-<lang>.qm`, which `scripts/release-translations.sh`
 compiles with `lrelease` -- in the RPM's `%build`, and locally with
 `make translations`, which leaves them beside the `.ts` files where a
 source-tree run finds them. `lupdate` and `lrelease` are Debian's
@@ -253,7 +236,7 @@ the most specific form down: `de` serves every German locale, `pt_BR`
 only Brazil, and a language with no catalog gets the English one -- the
 strings are English already, and that catalog holds their plural forms.
 To add one, write the three-line header `update-translations.sh` documents to
-`translations/postivene-<lang>.ts` and run the script; `lupdate` fills in
+`translations/piirit-<lang>.ts` and run the script; `lupdate` fills in
 every string with as many plural forms as that language has.
 
 ## Dependencies
@@ -270,25 +253,20 @@ it would cost.
 | `chrono` | the viewer's timezone, for the day headings | `std` has none, and the alternative is `localtime_r`, which `unsafe_code` denies |
 | `qrcode` | an invite drawn as a code | one crate, no dependencies |
 | `rqrr` (+ `g2p`, `lru`) | a code read off the camera | a QR decoder is not a small thing to vendor |
+| `mp3lame-encoder` (+ `mp3lame-sys`, `autotools`) | a voice message as MP3 (`voice.rs`) | the phone's recorder offers no encoder the iOS client plays as a voice message; LAME is what the desktop client encodes with, and the pure-Rust encoders want a Rust past the 1.75 floor or are ports of shine, which has no psychoacoustic model |
+
+`mp3lame-sys` carries LAME 3.100's C source and builds it with LAME's own
+`configure` and `make`, so a host build needs both, which a machine that
+builds the C++ above already has. It is the one C dependency in the tree
+that is not Qt, and the reason `rust/deny.toml` allows LGPL-3.0 for its
+two crates and nothing else: LGPL code may be conveyed as part of a GPLv3
+work.
 
 `tokio`'s `net` feature is what the webxdc host binds its loopback socket
 with, and it brings `socket2` -- tokio's own platform layer for sockets,
 and the only crate the whole feature adds. The alternative was a zip
 reader and an inflate implementation, to unpack an app the core can
 already read.
-
-What is not there any more, and where the line is: `thiserror` was two
-crates for a dozen lines of `Display`, so the transport's errors are
-written out; the fake servers build their tokio runtime by hand, so
-`macros` is a dev-dependency and the app's build carries no
-`tokio-macros`; qmetaobject's `log` feature is off. `serde`'s `derive`
-could go the same way for one crate less, at the cost of hand-written
-`Deserialize` for the four wire types -- more code than it saves, so it
-stays. Everything else is either the vendored qmetaobject's own
-(`lazy_static`, `syn 1`) or a build script's (`cc`, `regex`, `semver`,
-`rustversion`), and the platform-gated crates in `Cargo.lock` --
-`windows-*`, `wasm-bindgen`, `js-sys` -- are resolved for other targets
-and never built here.
 
 ## Comments
 
@@ -339,79 +317,112 @@ Environment requirements, each of which cost an attempt:
 
 `scripts/build-rpm.sh` wraps the ordinary developer path, `sfdk build`.
 
+## Cutting a release
+
+A release is `rpm.yml` run for a version, on `main`:
+
+1. Put the version in `rpm/harbour-piirit.spec` (`Version:`) and in the
+   three crates' `Cargo.toml`, refresh `Cargo.lock` (`cargo check`), and
+   write the version's section in `CHANGELOG.md`. Merge that.
+2. Either dispatch `rpm.yml` on `main` from the Actions tab with the
+   version in its `release` input, which tags the commit `v<version>`
+   itself; or tag the merge commit `v<version>` by hand and push the tag,
+   which runs the same workflow.
+
+The workflow builds the package with the spec's own `Release: 1` rather
+than the run-number stamp an ordinary build gets, refuses a version that
+is not what the spec says (and a dispatch that is not on `main`), and then
+publishes a GitHub release named `v<version>`: the device RPM, a
+`SHA256SUMS`, and that version's section of `CHANGELOG.md` as the text
+(`scripts/release-notes.sh`, which fails the run if the section is
+missing). The debug and source RPMs stay on the run's artifact.
+
+Harbour intake is by hand: the RPM on the release page is the one to
+upload, and `docs/HARBOUR.md` says what the validator will say about it.
+
 ## What a device build costs
 
-Seven and a quarter minutes before this, and a little over three now. The
-before column is run 89, the last one built the old way; the two after it
-are runs 98 and 99, both against a published SDK image and a warm cache.
+| Step | One job | Four jobs |
+|---|---|---|
+| Pull the SDK image | 105 s | 80 s |
+| Build the RPM |142 s | 82 s |
+| Validate against Harbour | 10 s | 10 s |
+| **The whole run** | **284 s** | **190 s** |
 
-| Step | Before | One job | Four jobs |
-|---|---|---|---|
-| Pull the SDK image | 144 s | 105 s | 80 s |
-| Build the RPM | 270 s | 142 s | 82 s |
-| Validate against Harbour | 12 s | 10 s | 10 s |
-| **The whole run** | **437 s** | **284 s** | **190 s** |
+`rpm.yml` runs one job. Four is faster when it finishes, but at two or
+four cargo stalls inside scratchbox2 often enough that the waiting costs
+more than the parallelism saves (see Spec constraints below).
 
-Three changes, in the order they pay:
+Two changes, in the order they pay:
 
-**The SDK image is derived, not upstream's.** `ci/build-sdk-image.sh` takes
+- **The SDK image is derived, not upstream's.** `ci/build-sdk-image.sh` takes
 `coderus/sailfishos-platform-sdk` by digest and produces an image with one
 architecture instead of three, this package's `BuildRequires` already
 installed, and the i686 rustlib already at `/usr/lib/rustlib`. It has to
 flatten the result rather than layer it, because files deleted in a new
 layer still weigh what they weighed. 5.04 GB of pull becomes about 2.3 GB,
-and `zypper` leaves the critical path: `build-init` and `build-requires`
-together took 30 s and now take 3.
+and `zypper` leaves the critical path.
+- `rust/target` and the crates are carried between runs.
 
-A target here is two rootfs -- the pristine one, and the `<target>.default`
-snapshot that mb2 actually builds in and that `build-requires` installs
-into. Both are kept. Deleting the snapshot as a redundant copy is what
-made the first derived image come out with no rust in it.
+## What a package weighs
 
-`sdk-image.yml` publishes the image to the repository's registry; `rpm.yml`
-derives and publishes one itself when it finds none, so a new SDK version
-needs a pinned digest in `ci/build-sdk-image.sh` and nothing else. That
-first run pays for it: run 97 took 850 s, of which 576 was deriving and
-pushing.
+The aarch64 package, built against SDK 5.2.0.15. "In the package" is what
+a file costs inside the zstd payload, which is the number that matters for
+a download; raw is what it costs on the phone.
 
-**`rust/target` and the crates are carried between runs.** Keyed on the
-lockfile and on the image, because they are artifacts for one target triple
-built by the rust that image ships. It is worth 103 s: the same build cold
-took 245 s and warm 142 s. Of the 56 crates, 52 come from the lockfile and
-change only when it does. A fresh `actions/checkout` gives every file a new
-mtime and does *not* defeat this -- cargo fingerprints registry crates by
-content, so only the path crates rebuild. The two caches are small, 112 MB
-and 12 MB.
+Taken apart at 1.0.0 (`rpm/harbour-piirit.spec` 1.0.0-1, run 152):
 
-**cargo runs four jobs inside scratchbox2**, which is worth another 60 s.
-See the job count under "Spec constraints" below for what that setting is
-and why it was one for so long.
+| raw | in the package | what |
+|---|---|---|
+| 20.42 MB | 9.38 MB | `%{_libexecdir}/%{name}/deltachat-rpc-server` |
+| 5.83 MB | 1.46 MB | `%{_bindir}/%{name}` |
+| 3.05 MB | 3.01 MB | `qml/art/intro-*.png` |
+| 1.42 MB | ~0.1 MB | the 41 `.qm` catalogs |
+| ~0.7 MB | ~0.6 MB | the rest of `qml/`, the icons, `LICENSE`, `SOURCE.md` |
+
+The bundled server is a fixed cost: upstream's stripped static-musl build,
+and Harbour leaves nowhere else to put the core (`HARBOUR.md`). The other
+rows are this tree's to answer for, and two of them were answered:
+
+- **The pictures are painted at the size a phone draws them.** `IntroPage`
+shows one at `min(width * 0.42, height * 0.30)` -- 453 px on the tallest
+phone, 614 px on the Jolla Tablet -- and PNG is already compressed, so a
+1254 px master was carried whole into the download and scaled away on the
+device. At 640 px the five of them are 0.75 MB instead of 3.05 MB.
+`the_intro_pictures_are_the_shape_the_shader_reads` pins both ends of that
+range now, so they cannot regrow without a test saying so.
+- **The binary is stripped by `[profile.release]`, not by rpmbuild.**
+rpmbuild here does not strip what it packages -- the validator said `file
+is not stripped!` of every build up to 1.0.0, which carried 2.08 MB of
+symbol tables. `strip = "symbols"` removes them; `main` stays reachable
+because `build.rs` exports it into `.dynsym` (`HARBOUR.md`). `lto = "thin"`
+and `codegen-units = 1` are in the same block.
+
+Measured either side of those three settings, on `main` and on the branch
+that introduced them:
+
+| | before (run 160) | after (run 161) |
+|---|---|---|
+| Download | 15,027,710 B (14.33 MiB) | 12,254,749 B (11.69 MiB) |
+| Installed | 65126 blocks (31.80 MiB) | 55270 blocks (26.99 MiB) |
+
+The build pays about a minute for the LTO: five and a half minutes became
+six and a half at one cargo job.
 
 ## Spec constraints
 
-Landmines encoded in `rpm/harbour-postivene.spec`, each found the hard way:
+Constraints encoded in `rpm/harbour-piirit.spec`:
 
-- **The cargo job count under sb2 is a define.** At `-j4`
-  cargo was seen to futex-wait forever on an unreaped child while
-  qmetaobject's C++ glue compiled, and `%{jobs}` exists so that is a
-  setting rather than a rediscovery: `mb2 build --define "jobs N"`, which
-  is what `rpm.yml`'s `cargo_jobs` input passes. It applies only inside
-  sb2; a native OBS worker lets cargo pick. The same spec also keeps the
-  build's temporaries in the build directory, because a parallel link
-  through the shared `/tmp` under sb2 can lose an object file it has just
-  written -- Whisperfish's spec does the same.
-
-  It defaults to **4**, which device builds have run green on the 5.2 SDK
-  (runs 99 and 100) and which takes the `Build the RPM` step from 142 s to
-  82 s. If one ever hangs there again, `--define "jobs 1"` is the way
-  back, and that is the whole reason the number is a setting.
-
-  Why it is worth so much: CPU time equals wall time at `-j1`, because
-  cargo hands rustc its codegen threads from the same jobserver, so one
-  job is one thread through the entire build. On a host, against the same
-  crate graph and the same rustc 1.75 the SDK ships, a cold build takes
-  144 s at `-j1` and 39 s at `-j4`; one file changed in the shim takes
-  72 s at `-j1`, 41 s at `-j2` and 27 s at `-j4`.
+- **The cargo job count under sb2 is a define, and it is one.** At `-j2`
+  or `-j4` cargo stalls under sb2 -- it has been seen to futex-wait
+  forever on an unreaped child while qmetaobject's C++ glue compiles --
+  so `%{jobs}` defaults to **1**, and `rpm.yml` passes
+  `mb2 build --define "jobs 1"` on every run rather than offering a
+  choice. It applies only inside sb2; a native OBS worker lets cargo
+  pick. The same spec also keeps the build's temporaries in the build
+  directory, because a parallel link through the shared `/tmp` under sb2
+  can lose an object file it has just written. `--define "jobs N"` is
+  still there for a local build that wants to try more.
 - **No `--target` for cargo.** Jolla's cargo pins build scripts to the
   tooling's host triple; `--target` on top makes cargo treat the whole build
   as a cross build. `SB2_RUST_TARGET_TRIPLE` already tells the accelerated
@@ -426,7 +437,7 @@ Landmines encoded in `rpm/harbour-postivene.spec`, each found the hard way:
   cannot exec the target `qmake` under sb2. `QT_LIBRARY_PATH` uses
   `%{_libdir}` — Qt is in `/usr/lib64` on aarch64, not `/usr/lib`.
 - **`%{_target_cpu}`, not `%{_arch}`**, for the bundled server path.
-- **`Exec=harbour-postivene`** in the desktop file: the invoker does not
+- **`Exec=harbour-piirit`** in the desktop file: the invoker does not
   honour an `Exec=env FOO=bar` wrapper, so the bundled server path is a
   fallback inside the binary.
 - **Harbour constrains the name, the paths and every `Requires:`.**
@@ -435,5 +446,5 @@ Landmines encoded in `rpm/harbour-postivene.spec`, each found the hard way:
 - **No bare `%` in a spec comment.** rpm expands macros inside comments, and
   on the SDK's older rpm a comment mentioning `%build` expands to a preamble
   starting `LANG=C`, which rpm reads as a tag. Host rpm 4.18 leaves comments
-  alone and had parsed the same file through an entire successful build.
+  alone, so such a spec parses locally and fails only on the SDK.
   `ci/packaging-lint.sh` checks for this directly.

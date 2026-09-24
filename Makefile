@@ -1,4 +1,4 @@
-# postivene -- developer targets.
+# piirit -- developer targets.
 #
 # `make check` is what CI runs, minus what needs the Sailfish SDK or a
 # phone. It is not entirely offline: `msrv` fetches a toolchain the first
@@ -16,8 +16,8 @@
 
 .PHONY: check test lint fmt qml-lint packaging-lint lockfile-lint doc-lint \
         msrv deny integration harbour vendor-check fetch-server \
-        sonar-report-test apt-install-test sonar-reports translations faces \
-        clean
+        sonar-report-test apt-install-test sonar-reports translations \
+        cover-icons clean
 
 CARGO ?= cargo
 # The shim's tests drive a real Qt event loop, which needs a platform
@@ -44,8 +44,8 @@ check: fmt lint test doc-lint msrv qml-lint lockfile-lint packaging-lint harbour
 ##   cargo install --locked cargo-nextest
 ##
 ## nextest does not run doctests, so `--doc` runs beside it either way.
-## There are none today, which is exactly how one would get added and never
-## run again; ci/packaging-lint.sh fails a tree that drops it.
+## There are none today, so ci/packaging-lint.sh fails a tree that drops it
+## rather than let the first one be added and silently never run.
 test:
 	@command -v cargo-nextest >/dev/null 2>&1 || \
 		echo "test: cargo-nextest is not installed; running the slow way \
@@ -108,9 +108,8 @@ vendor-check:
 ## Licences and advisories, as CI's `deny` job runs them. Needs
 ## `cargo install cargo-deny`, and the advisory database (network).
 ##
-## A missing tool is a skip; a finding is a failure. The two used to share
-## one `||`, which printed SKIP over a real advisory and let `make check`
-## exit 0 on it.
+## A missing tool is a skip; a finding is a failure. Two separate commands
+## rather than one `||`, so a SKIP can never be printed over an advisory.
 deny:
 	@command -v cargo-deny >/dev/null 2>&1 || \
 		{ echo "deny: SKIP (cargo-deny not installed)"; exit 0; }
@@ -125,12 +124,11 @@ fetch-server:
 translations:
 	./scripts/release-translations.sh
 
-## Repaint the field of faces the first screen draws (qml/art/) from
-## tools/faces/. Python 3 and nothing else; the results are committed,
-## so a build needs neither this nor a display. Run it when the painter
-## changes, and look at what it made.
-faces:
-	python3 tools/faces/faces.py
+## Render the quick action icons, icons/cover/*.svg, into the PNGs the
+## cover hands the home screen (qml/art/cover/). Needs rsvg-convert; what
+## it writes is committed, so neither the build nor CI runs it.
+cover-icons:
+	./scripts/render-cover-icons.sh
 
 ## Prove scripts/sonar-report.sh still reports what it claims to, against a
 ## stub server. The real service is unreachable from CI's network and from a
@@ -152,30 +150,25 @@ SONAR_COV_ARGS = --workspace \
 
 ## sonar-reports: the coverage report SonarQube Cloud imports, written to
 ## rust/target/sonar/lcov.info. The scanner does not measure coverage; it
-## only imports what someone else measured, which is why the reading was
-## 0.0% for as long as nothing wrote this.
+## only imports what someone else measured, so without this target the
+## reading is 0.0%.
 ##
-## Through cargo-nextest when it is installed, for the reason `test` is.
-## cargo-llvm-cov's own runner is `cargo test`, one binary at a time, and
-## this suite is over a hundred binaries that mostly sit waiting on Qt
-## timers: instrumented, that was ten and a half minutes of the scan job,
-## most of them tests finishing one after another, while ci.yml's `test`
-## job runs the same tests under nextest in about two, and the whole of
-## ci.yml in under five. `cargo llvm-cov nextest` is the same
-## instrumented build under nextest's scheduler, and
-## rust/.config/nextest.toml applies to it as it does to `test`. Without
-## nextest the report is still written, the slow way.
+## Through cargo-nextest when it is installed, for the reason `test` is:
+## cargo-llvm-cov's own runner is `cargo test`, one binary at a time, which
+## costs this suite about ten and a half minutes against roughly two.
+## `cargo llvm-cov nextest` is the same instrumented build under nextest's
+## scheduler, and rust/.config/nextest.toml applies to it as it does to
+## `test`. Without nextest the report is still written, the slow way.
 ##
 ## No `cargo test --doc` beside it, unlike `test`: cargo-llvm-cov leaves
 ## doctests out on either runner (instrumenting them needs nightly), and
 ## this target measures rather than gates. `test` is what runs them.
 ##
-## Clippy findings are deliberately NOT handed over. `make lint` runs clippy
-## with `-D warnings`, so a warning in this project's own code fails the gate
-## and never reaches a branch Sonar analyses -- the report was empty of our
-## code every time, and producing it cost a `cargo clean` and a full
-## recompile inside the scan job. Sonar's own clippy pass stays off for a
-## different reason; sonar-project.properties says which.
+## Clippy findings are deliberately NOT handed over: `make lint` denies
+## warnings, so nothing Sonar could report survives to a branch it analyses,
+## and gathering them costs a `cargo clean` and a full recompile in the scan
+## job. Sonar's own clippy pass stays off for a different reason;
+## sonar-project.properties says which.
 ##
 ## Needs cargo-llvm-cov, so it is opt-in rather than part of `check`:
 ##   rustup component add llvm-tools-preview

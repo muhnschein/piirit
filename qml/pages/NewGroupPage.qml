@@ -1,7 +1,7 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
 import "../components"
-import Postivene 1.0
+import Piirit 1.0
 
 /*
  * Name a group, give it a picture and pick its members, laid out the way
@@ -12,6 +12,13 @@ import Postivene 1.0
  * on the page and handed to the core in one go when the group is made.
  * Groups are created encrypted, which is what the reference client's
  * "New Group" does.
+ *
+ * The members are asked for by id (`ContactList.picked_rows`) rather than
+ * drawn by hiding everybody else. A Repeater over every contact built a
+ * row -- and an avatar, and the two effects behind it -- for each one,
+ * twice over, the moment the contacts landed, which is the moment this
+ * page was arriving over the chat list; what it cost to open was the
+ * size of an address book that had nothing to do with the group.
  */
 Page {
     id: page
@@ -23,6 +30,25 @@ Page {
     property bool creating: false
     /// Contact ids picked so far, besides the reader's own.
     property var members: []
+
+    /// The reader's own row, as a list of one -- or of none, until the
+    /// contacts have arrived. A list because that is what a Repeater
+    /// takes, and the row is drawn apart from the picked ones: there is
+    /// nothing to do with oneself here, so it carries no menu.
+    property var selfRow: []
+    /// The picked members' rows, in the order they were picked.
+    property var pickedRows: []
+
+    /// Ask the contact list for the rows to draw, and split off the
+    /// reader's own. Run whenever either half can have changed: the
+    /// picks, and the contacts they are looked up in.
+    function refreshMemberRows() {
+        var rows = contacts.picked_rows(page.members)
+        var mine = rows.length > 0 && rows[0].is_self ? [rows[0]] : []
+        page.selfRow = mine
+        page.pickedRows = rows.slice(mine.length)
+    }
+
     /// The picture chosen for the group, empty for none. Held as a path:
     /// the core takes a picture only for a chat that exists.
     property string picturePath: ""
@@ -119,6 +145,9 @@ Page {
         contacts.create_group(name, page.members, page.picturePath)
     }
 
+    // Picking somebody, or taking them off again, changes what is drawn.
+    onMembersChanged: page.refreshMemberRows()
+
     // The name is what a new group needs first, so the cursor is in the
     // field when the page arrives.
     onStatusChanged: {
@@ -137,6 +166,13 @@ Page {
         }
     }
 
+    Connections {
+        target: contacts
+        // The contacts arrive after the page does, and the reader's own
+        // row is among them.
+        onRows_changed: page.refreshMemberRows()
+    }
+
     SilicaFlickable {
         anchors.fill: parent
         contentHeight: column.height + Theme.paddingLarge
@@ -150,7 +186,7 @@ Page {
             }
             MenuItem {
                 objectName: "createButton"
-                text: qsTr("Create Group")
+                text: qsTr("Create group")
                 enabled: !page.creating && nameField.text.trim().length > 0
                 onClicked: page.createGroup()
             }
@@ -231,47 +267,37 @@ Page {
                 text: qsTr("%n member(s)", "", page.members.length + 1)
             }
 
-            // The reader first, then whoever was picked, each drawn from
-            // the contact rows. A Repeater over every contact, showing
-            // only the members: a Column takes no room for a row that is
-            // not shown, and a model of the members alone would be these
-            // rows copied.
+            // The reader, who is in the group by being the one making
+            // it. No menu: leaving a group one is making is not making
+            // it.
             Repeater {
-                model: contacts.rows
+                model: page.selfRow
 
                 delegate: ListItem {
-                    // Named only where it is drawn: the other rows of this
-                    // Repeater are nobody, and must not answer for the
-                    // members drawn below.
-                    objectName: model.is_self ? "memberRow" + model.contact_id : ""
-                    visible: model.is_self
+                    objectName: "memberRow" + modelData.contact_id
                     width: column.width
                     contentHeight: body.height
-                    // Nothing to do with oneself here: not being in the
-                    // group is not creating it.
                     menu: null
 
                     ContactRow {
                         id: body
                         width: parent.width
-                        displayName: model.display_name
-                        ownColor: model.color
-                        picturePath: model.avatar_path
-                        isKeyContact: model.is_key_contact
-                        isVerified: model.is_verified
+                        displayName: modelData.display_name
+                        ownColor: modelData.color
+                        picturePath: modelData.avatar_path
+                        isKeyContact: modelData.is_key_contact
                     }
                 }
             }
 
+            // Then whoever was picked, in the order they were picked.
             Repeater {
-                model: contacts.rows
+                model: page.pickedRows
 
                 delegate: ListItem {
-                    id: memberRow
-                    objectName: model.is_self ? "" : "memberRow" + model.contact_id
-                    visible: !model.is_self && page.isMember(model.contact_id)
+                    objectName: "memberRow" + modelData.contact_id
                     width: column.width
-                    contentHeight: body.height
+                    contentHeight: picked.height
 
                     // Taking someone off the list again, from the row,
                     // as the group's page offers it. No countdown: nothing
@@ -280,46 +306,26 @@ Page {
                         MenuItem {
                             objectName: "removeItem"
                             text: qsTr("Remove from group")
-                            onClicked: page.removeMember(model.contact_id)
+                            onClicked: page.removeMember(modelData.contact_id)
                         }
                     }
 
                     ContactRow {
-                        id: body
+                        id: picked
                         width: parent.width
-                        displayName: model.display_name
-                        ownColor: model.color
-                        picturePath: model.avatar_path
-                        isKeyContact: model.is_key_contact
-                        isVerified: model.is_verified
+                        displayName: modelData.display_name
+                        ownColor: modelData.color
+                        picturePath: modelData.avatar_path
+                        isKeyContact: modelData.is_key_contact
                     }
                 }
             }
 
-            // The way to more members, where the next one would be listed:
-            // a row shaped like a member's, with a plus for a picture.
-            ListItem {
-                id: addMembersRow
+            // The way to more members.
+            PlusRow {
                 objectName: "addMembersButton"
                 width: column.width
-                contentHeight: Theme.itemSizeSmall + 2 * Theme.paddingMedium
-
-                PlusMark {
-                    id: plus
-                    x: Theme.horizontalPageMargin
-                    y: Theme.paddingMedium
-                }
-
-                Label {
-                    x: plus.x + plus.width + Theme.paddingMedium
-                    width: parent.width - x - Theme.horizontalPageMargin
-                    anchors.verticalCenter: plus.verticalCenter
-                    wrapMode: Text.Wrap
-                    color: addMembersRow.highlighted ? Theme.highlightColor
-                                                     : Theme.primaryColor
-                    text: qsTr("Add members")
-                }
-
+                text: qsTr("Add members")
                 onClicked: page.pickMembers()
             }
         }

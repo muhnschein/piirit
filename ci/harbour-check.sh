@@ -672,13 +672,13 @@ fi
 #
 # The cargo bin has to be named for the package, since %install copies it
 # straight to /usr/bin/<NAME>.
-cargo_bin=$(sed -n '/^\[\[bin\]\]/,/^\[/p' "$root/rust/postivene-app/Cargo.toml" |
+cargo_bin=$(sed -n '/^\[\[bin\]\]/,/^\[/p' "$root/rust/piirit-app/Cargo.toml" |
     sed -n 's/^name = "\(.*\)"/\1/p' | head -1)
 if [[ "$cargo_bin" = "$name" ]]; then
     note "[1.2.3] the cargo binary is named '$name'"
 else
     fail 1.2.3 "$cargo_bin" \
-        "postivene-app's [[bin]] name must be '$name', the name the spec installs to /usr/bin"
+        "piirit-app's [[bin]] name must be '$name', the name the spec installs to /usr/bin"
 fi
 
 binary=""
@@ -687,7 +687,7 @@ for candidate in "$root/rust/target/release/$name" "$root/rust/target/debug/$nam
 done
 
 if [[ -z "$binary" ]]; then
-    skip 1.7.3 "no built binary (run: cd rust && cargo build -p postivene-app)"
+    skip 1.7.3 "no built binary (run: cd rust && cargo build -p piirit-app)"
 elif ! command -v readelf >/dev/null 2>&1; then
     skip 1.7.3 "readelf not found (install binutils)"
 else

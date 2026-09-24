@@ -12,10 +12,9 @@ import Sailfish.Silica 1.0
  * itself on a tap, which detaches the binding, so the page puts it back on
  * every load.
  *
- * A duration another client set that is not on the list is still said in
- * the largest unit that fits it, rather than as a count of seconds: a year
- * set from a desktop showed as "After 31536000 second(s)" before this had
- * a year on its list, and the next odd value would do the same.
+ * A duration another client set that is not on the list is said in the
+ * largest unit that fits it, so it reads as "After 1 year" rather than as
+ * a count of seconds.
  */
 Column {
     id: root
@@ -112,6 +111,6 @@ Column {
         wrapMode: Text.Wrap
         font.pixelSize: Theme.fontSizeExtraSmall
         color: Theme.secondaryColor
-        text: qsTr("Applies to all members of this chat, they can still copy, save, and forward messages.")
+        text: qsTr("Applies to all members of this chat; they can still copy, save, and forward messages.")
     }
 }

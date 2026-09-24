@@ -1,7 +1,7 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
 import "../components"
-import Postivene 1.0
+import Piirit 1.0
 
 /*
  * Pick who to add to a group: everyone already in is greyed, and so is
@@ -25,11 +25,19 @@ Page {
     // Contact ids the user has ticked.
     property var members: []
 
+    // The core has said who is in this profile, whatever that was. An
+    // empty list before then is no answer rather than no contacts: see
+    // NewChatPage.
+    property bool contactsLoaded: false
+
     ContactList {
         id: contacts
         objectName: "contacts"
         account_id: page.accountId
         onError: page.errorMessage = message
+        // Emitted once the rows have been set, whether there turned out
+        // to be any or none.
+        onRows_changed: page.contactsLoaded = true
     }
 
     // A keystroke's worth of quiet before the core is asked, so typing
@@ -157,7 +165,6 @@ Page {
                     ownColor: model.color
                     picturePath: model.avatar_path
                     isKeyContact: model.is_key_contact
-                    isVerified: model.is_verified
                     opacity: addable ? 1.0 : 0.4
                 }
 
@@ -178,7 +185,9 @@ Page {
             }
 
             ViewPlaceholder {
-                enabled: contacts.count === 0
+                objectName: "contactsPlaceholder"
+                // Not until the core has answered: see `contactsLoaded`.
+                enabled: page.contactsLoaded && contacts.count === 0
                 text: searchField.text.trim().length > 0 ? qsTr("Nobody matches")
                                                           : qsTr("No contacts to add")
             }

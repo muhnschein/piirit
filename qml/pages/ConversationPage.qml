@@ -1,7 +1,8 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
 import "../components"
-import Postivene 1.0
+import "../js/Format.js" as Format
+import Piirit 1.0
 
 /*
  * One conversation. The messages come from a ChatMessages instance owned by
@@ -26,6 +27,11 @@ Page {
         // The reader's setting, from the settings page: known tracking
         // parameters come out of links on the way out.
         clean_links: Settings.cleanLinks === true
+        // What is waiting on the attachment bar, so the model can weigh
+        // it against what this profile's relay takes. Put aside with the
+        // bar itself while a message is being edited, since an edit
+        // carries no file.
+        pending_file: page.editing ? "" : page.attachmentPath
         onError: {
             page.errorMessage = message
             // A voice message that could not be sent is still on the
@@ -75,11 +81,11 @@ Page {
     // already in the model before the transition starts and the page comes
     // in with its messages rather than filling in behind itself.
     //
-    // This used to wait for PageStatus.Active. It had to: a chat was
-    // fetched whole, and building every row of a long history in one go on
-    // the Qt thread froze the transition. A chat now opens on one page of
-    // fifty, and the prefetch has usually built those rows already -- the
-    // handover is then a move, with no core round trip in it at all.
+    // Not deferred to PageStatus.Active: a chat opens on one page of fifty
+    // rather than whole, so there is no long history to build on the Qt
+    // thread and freeze the transition with. The prefetch has usually built
+    // those rows already, leaving the handover a move with no core round
+    // trip in it at all.
     //
     // In `Component.onCompleted` rather than a binding on the declaration
     // above, because the order matters: this must run after
@@ -277,13 +283,13 @@ Page {
 
     property string errorMessage: ""
     // Three states, not two: the core going away is now something the app
-    // does something about, and a banner that says "restart Postivene"
-    // while Postivene is already fixing it is worse than none.
+    // does something about, and a banner that says "restart Piirit"
+    // while Piirit is already fixing it is worse than none.
     readonly property string coreStatusMessage:
         core.status === "reconnecting"
-        ? qsTr("Lost the connection to the Delta Chat core. Reconnecting...")
+        ? qsTr("Lost the connection to the Delta Chat core. Reconnecting…")
         : core.status === "stopped"
-          ? qsTr("Lost the connection to the Delta Chat core. Restart Postivene.")
+          ? qsTr("Lost the connection to the Delta Chat core. Restart Piirit.")
           : ""
 
     // Qt 5.6 handler syntax; see WelcomePage.qml.
@@ -388,6 +394,17 @@ Page {
         id: conversationHeader
         objectName: "conversationHeader"
         title: page.chatName
+        // Under a group's name, where PageHeader puts a description:
+        // how many people are in it. Nothing under a one-to-one chat's
+        // name, where the count would say "2" about a conversation with
+        // one other person, and nothing until the chat's shape has
+        // arrived -- a "0 members" that turns into seven reads as the
+        // group having been empty a moment ago.
+        //: Under a group's name, over its messages. %n is how many
+        //: people are in the group.
+        subtitle: messages.is_group && messages.member_count > 0
+                  ? qsTr("%n member(s)", "", messages.member_count)
+                  : ""
         // White once the info page is attached, as a PageHeader is on a
         // page that can navigate forward.
         interactive: page.canNavigateForward
@@ -479,7 +496,7 @@ Page {
         }
         onOpenRequested: page.openAttachment(fileUrl, fileName, viewType,
                                              previewWidth)
-        onSaveRequested: page.saveAttachment(fileUrl, viewType)
+        onSaveRequested: attachmentSaver.keep(fileUrl, fileName)
         onFullTextRequested: pageStack.push(Qt.resolvedUrl("MessagePage.qml"), {
             accountId: page.accountId,
             messageId: messageId,
@@ -491,7 +508,34 @@ Page {
         // On or off is the model's call: it knows what the reader already
         // sent, and the core takes the whole list either way.
         onReactionRequested: messages.react(messageId, emoji)
-        onDeleteRequested: messages.delete_message(messageId)
+        // Which kind of delete was picked on the page the menu led to,
+        // and the wait is up: the message goes from this account's
+        // devices, or from everybody's.
+        onDeleteRequested: {
+            if (forEveryone) {
+                messages.delete_message_for_all(messageId)
+            } else {
+                messages.delete_message(messageId)
+            }
+        }
+        // The menu asks for a deletion; which kind is a dialog, and
+        // pushing it is the page's business rather than the list's.
+        // Nothing is deleted until that dialog is accepted and the wait
+        // after it is up, so leaving by the back edge deletes nothing.
+        onDeleteChoiceRequested: {
+            // Taken now rather than in the callback: choosing takes a
+            // page push, and the row may be gone by the time the answer
+            // comes back -- the same reason Forward hoists its id.
+            var doomed = messageId
+            var chooser = pageStack.push(
+                Qt.resolvedUrl("DeleteMessageDialog.qml"),
+                { canDeleteForEveryone: canDeleteForEveryone })
+            if (chooser) {
+                chooser.picked.connect(function(forEveryone) {
+                    listView.confirmDelete(doomed, forEveryone)
+                })
+            }
+        }
         onResendRequested: messages.resend_message(messageId)
         onForwardRequested: {
             // The picker reports back rather than acting, so the
@@ -579,7 +623,7 @@ Page {
         anchors {
             left: parent.left
             right: parent.right
-            bottom: longMessageBar.top
+            bottom: tooBigBar.top
         }
         // Put aside with the draft while a message is edited: an edit
         // carries no file, and a bar saying one is about to be sent would
@@ -589,34 +633,27 @@ Page {
         onCancelled: page.dropAttachment()
     }
 
-    /// Whether what is in the field is long enough that the core will
-    /// cut it on the way out. Asked of the shim, which holds the core's
-    /// own rule (`truncation.rs`).
-    readonly property bool sendingLongMessage:
-        messages.would_truncate(textField.text)
-
-    // Said while the message is still being written, because afterwards
-    // there is nothing to be done about it: past a certain length the
-    // core sends a shortened version with the rest attached, and what
-    // arrives at the other end is a preview with something to tap. Worth
-    // knowing before pressing send, and not worth a dialog. parla says
-    // the same thing in the same place, which is where this app learnt
-    // that it was worth saying at all.
+    // Under the file it is about: this one the relay will not take, so
+    // there is nothing to do but pick something smaller. Said here rather
+    // than after a send that failed, and the send button is off while it
+    // stands -- a picture is never this, since the core shrinks those on
+    // the way out. The limit is the core's own recommendation for the
+    // profile's relay; see rust/piirit-shim/src/media.rs.
     Banner {
-        id: longMessageBar
-        objectName: "longMessageBar"
-        labelObjectName: "longMessageLabel"
-        tone: "info"
-        // Not transient: it is true for as long as the draft is long,
-        // and a notice that faded out would be a notice the writer was
-        // told once and then had to remember.
+        id: tooBigBar
+        objectName: "tooBigBar"
+        labelObjectName: "tooBigLabel"
+        tone: "error"
+        // Not transient: it is true for as long as the file is on the
+        // bar.
         timeout: 0
-        text: page.sendingLongMessage
-              //: Shown above the message field while what is being
-              //: written is long enough that the other end will receive a
-              //: shortened version with the rest behind a tap.
-              ? qsTr("Long message: the other end sees a preview and taps "
-                     + "to read the rest")
+        text: messages.attachment_too_big
+              //: Shown above the message field when the attached file is
+              //: bigger than will be sent. %1 is the file's size and %2
+              //: the largest that goes, each such as "24 MB".
+              ? qsTr("%1 is too large to send. Attachments can be up to %2.")
+                .arg(Format.readableSize(messages.attachment_bytes))
+                .arg(Format.readableSize(messages.attachment_limit))
               : ""
         anchors {
             left: parent.left
@@ -643,14 +680,15 @@ Page {
 
     /// The text and the file: what send has to send. While a message is
     /// being edited the file is put aside, and only the text counts.
+    ///
+    /// Nothing at all while the file on the bar is bigger than the relay
+    /// takes, text included: the caption belongs to the file, and sending
+    /// it on its own would drop the file without saying so. The way on is
+    /// to take the file off the bar.
     readonly property bool hasSomethingToSend:
-        textField.text.trim().length > 0
-        || (!page.editing && page.attachmentPath.length > 0)
-
-    /// Whether the return key sends, from the settings page. Off, it
-    /// puts in a line break and the button sends. `=== true` because
-    /// dconf hands back `undefined` before it has read the key.
-    readonly property bool enterSends: Settings.enterSends === true
+        !(!page.editing && messages.attachment_too_big)
+        && (textField.text.trim().length > 0
+            || (!page.editing && page.attachmentPath.length > 0))
 
     // A tap anywhere but the tray closes the tray: over everything
     // declared above -- the list, the bars -- and under the input row,
@@ -672,10 +710,9 @@ Page {
             // same on this side the send button sits nearer the edge.
             rightMargin: Theme.horizontalPageMargin
             bottom: parent.bottom
-            // Off the edge of the screen. The field used to sit on it:
-            // a TextField carries room under its text and a TextArea
-            // does not, so what was a comfortable gap became none. The
-            // recording strip carries less still.
+            // Off the edge of the screen rather than on it: a TextArea
+            // carries no room under its text the way a TextField does,
+            // and the recording strip carries less still.
             bottomMargin: Theme.paddingLarge
         }
         spacing: Theme.paddingSmall
@@ -704,6 +741,12 @@ Page {
             objectName: "voiceBar"
             width: parent.width - sendButton.width
             anchors.verticalCenter: sendButton.verticalCenter
+            // A recording stops at the longest the relay takes -- the
+            // limit a file on the attachment bar is held to -- and is
+            // made at the bit rate the reader's outgoing media quality
+            // says.
+            limitBytes: messages.attachment_limit
+            mediaQuality: Settings.mediaQuality === 1 ? 1 : 0
             onRecorded: {
                 page.errorMessage = ""
                 page.pendingVoice = path
@@ -721,9 +764,8 @@ Page {
         // long. This is an area: return puts in a newline, the field
         // grows as the message does, and send is the button -- which is
         // what every other client on this phone does with a message
-        // longer than a remark. Unless the reader turns the key back
-        // into send on the settings page, when a message is one line by
-        // construction again, and knowingly.
+        // longer than a remark, and the only way both reference clients
+        // offer.
         TextArea {
             id: textField
             objectName: "messageField"
@@ -745,15 +787,6 @@ Page {
             // Silica's own label sits above the text and says the same
             // thing the placeholder does.
             labelVisible: false
-            // The return key: a line break, unless the reader has asked
-            // for it to send, when the keyboard draws it as the accept
-            // key and greys it while there is nothing to send, as the
-            // button is. Each on one line of its own: the tests load
-            // this page with these lines taken out, since the attached
-            // type has no stub (common::qml_tree_without_enter_key).
-            EnterKey.iconSource: page.enterSends ? "image://theme/icon-m-enter-accept" : "image://theme/icon-m-enter"
-            EnterKey.enabled: !page.enterSends || page.hasSomethingToSend
-            EnterKey.onClicked: page.enterPressed()
             // It grows with what is in it, up to a point: past a third
             // of the screen the conversation it is written in would be
             // gone, so the area keeps that height and scrolls inside it.
@@ -820,17 +853,15 @@ Page {
         }
     }
 
-    // Which kinds Postivene shows itself, and which it hands on. Handing a
+    // Which kinds Piirit shows itself, and which it hands on. Handing a
     // picture or a video to the system took the reader out of the app to
     // something that then failed to play it; everything else is still
     // somebody else's file to open, and a page here that could only say
     // "cannot show this" would be worse than the handover.
     //
-    // A page of its own for a file was tried and taken out again: the
-    // reader's own answer was that there should be no such thing, and
-    // that a page for reading belongs to a long message rather than to
-    // an attachment. What a file still needs and a tap cannot give is a
-    // copy, and that is on the row's menu.
+    // No page of its own for a file: a page for reading belongs to a long
+    // message rather than to an attachment. What a file needs and a tap
+    // cannot give is a copy, and that is on the row's menu.
     function openAttachment(fileUrl, fileName, viewType, previewWidth) {
         if (viewType === "Image" || viewType === "Gif"
                 || viewType === "Sticker") {
@@ -851,31 +882,12 @@ Page {
         }
     }
 
-    // Where a copy of an attachment goes: the folder the platform
-    // indexes for its kind, which is the one the reader will look in.
-    // The sandbox grants all three (Pictures, Videos, Downloads).
-    function saveAttachment(fileUrl, viewType) {
-        if (viewType === "Image" || viewType === "Gif"
-                || viewType === "Sticker") {
-            page.savedTo = qsTr("Saved to Pictures")
-            attachmentSaver.save(fileUrl, StandardPaths.pictures)
-        } else if (viewType === "Video") {
-            page.savedTo = qsTr("Saved to Videos")
-            attachmentSaver.save(fileUrl, StandardPaths.videos)
-        } else {
-            page.savedTo = qsTr("Saved to Downloads")
-            attachmentSaver.save(fileUrl, StandardPaths.download)
-        }
-    }
-
-    /// What to say once the copy is made: chosen where the folder is,
-    /// since only here is it known which one it went to.
-    property string savedTo: ""
-
-    FileSaver {
+    // A copy of an attachment, in Piirit's folder in Downloads -- no
+    // setting, as tuuli has none. See AttachmentSaver.
+    AttachmentSaver {
         id: attachmentSaver
         objectName: "attachmentSaver"
-        onSaved: notice.show(page.savedTo)
+        onSaved: notice.show(attachmentSaver.savedText)
         onError: page.errorMessage = message
     }
 
@@ -905,16 +917,6 @@ Page {
             accountId: page.accountId,
             messageId: messageId
         })
-    }
-
-    /// The return key, once the reader has made it send. Only then: the
-    /// key is the field's otherwise, and puts in a line break. What
-    /// Silica does with the break the key would have put in is Silica's;
-    /// the text goes out trimmed either way.
-    function enterPressed() {
-        if (page.enterSends) {
-            page.sendCurrentText()
-        }
     }
 
     function sendCurrentText() {
@@ -949,6 +951,11 @@ Page {
         // and a trailing newline from the keyboard is not part of one.
         var text = textField.text.trim()
         if (page.attachmentPath.length > 0) {
+            // The button is already off and the bar says why; this says
+            // so a second time, as the check on `sending` above does.
+            if (messages.attachment_too_big) {
+                return
+            }
             page.errorMessage = ""
             messages.send_file(text, page.attachmentPath)
         } else if (text.length > 0) {

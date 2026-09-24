@@ -1,13 +1,13 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
 import "../components"
-import Postivene 1.0
+import Piirit 1.0
 
 /*
  * Who a one-to-one chat is with: their picture, their name, the line they
- * wrote about themselves, and whether the connection is checked and
- * encrypted. Reached by swiping left from the conversation, the way the
- * group page is from a group.
+ * wrote about themselves, and whether the connection is encrypted.
+ * Reached by swiping left from the conversation, the way the group page
+ * is from a group.
  *
  * Nothing here is an address. A reader of a chatmail app has no use for
  * one, and the core's own words for a contact are the name, the picture
@@ -69,7 +69,6 @@ Page {
     property string avatarPath: ""
     /// What they wrote about themselves, when they did.
     property string statusLine: ""
-    property bool isVerified: false
     property bool isKeyContact: true
 
     /// Someone has typed since the load. Guards the refill below.
@@ -151,7 +150,6 @@ Page {
             Binding { target: page; property: "contactColor"; value: model.color }
             Binding { target: page; property: "avatarPath"; value: model.avatar_path }
             Binding { target: page; property: "statusLine"; value: model.status }
-            Binding { target: page; property: "isVerified"; value: model.is_verified }
             Binding { target: page; property: "isKeyContact"; value: model.is_key_contact }
         }
     }
@@ -213,10 +211,9 @@ Page {
                 text: page.statusLine
             }
 
-            // The same two facts the chat list marks a row with, said in
-            // words: whether the connection is encrypted, and whether it
-            // was checked in person. A caption under the person, in the
-            // size and colour a caption is drawn in.
+            // The fact the chat list marks a row with, said in words:
+            // whether the connection is encrypted. A caption under the
+            // person, in the size and colour a caption is drawn in.
             Label {
                 objectName: "encryptionLabel"
                 anchors.horizontalCenter: parent.horizontalCenter
@@ -228,11 +225,9 @@ Page {
                 // Translated literals, but pinned all the same: the
                 // binding reads the page to choose one.
                 textFormat: Text.PlainText
-                text: page.isVerified
-                      ? qsTr("Verified: end-to-end encrypted, and checked in person")
-                      : page.isKeyContact
-                        ? qsTr("End-to-end encrypted")
-                        : qsTr("Not encrypted: a plain email contact")
+                text: page.isKeyContact
+                      ? qsTr("End-to-end encrypted")
+                      : qsTr("Not encrypted: a plain email contact")
             }
 
             // What the chat holds besides words, a tile per kind, each a
