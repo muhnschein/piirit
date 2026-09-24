@@ -56,9 +56,9 @@ here more than in most workspaces: there are over a hundred test binaries,
 almost every one starts a Qt engine and then waits on real timers, so under
 `cargo test` the suite spent about ten minutes mostly idle and serialised.
 The same 207 tests take about two and a half minutes on four cores. Nothing
-is shared between them — the webxdc host binds port 0 and lets the kernel
-choose, and the QML probes copy the tree into a directory named for their
-own pid — which is what makes running them at once safe.
+is shared between them — the webxdc and call hosts bind port 0 and let
+the kernel choose, and the QML probes copy the tree into a directory named
+for their own pid — which is what makes running them at once safe.
 
 ```
 cargo install --locked cargo-nextest
@@ -266,7 +266,11 @@ work.
 with, and it brings `socket2` -- tokio's own platform layer for sockets,
 and the only crate the whole feature adds. The alternative was a zip
 reader and an inflate implementation, to unpack an app the core can
-already read.
+already read. The call host (`call_host.rs`) is the same socket again,
+and adds nothing: the page a call runs in is upstream's calls-webapp,
+committed as the one file it is released as and compiled in
+(`vendor/calls-webapp/`), so no node toolchain comes anywhere near this
+build.
 
 ## Comments
 
