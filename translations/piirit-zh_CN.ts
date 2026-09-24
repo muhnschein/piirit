@@ -279,6 +279,83 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>CallCenter</name>
+    <message>
+        <source>Incoming call</source>
+        <translation>来电</translation>
+    </message>
+    <message>
+        <source>Decline</source>
+        <translation>拒接</translation>
+    </message>
+    <message>
+        <source>Answer</source>
+        <translation>接听</translation>
+    </message>
+    <message>
+        <source>Missed call</source>
+        <translation>未接来电</translation>
+    </message>
+    <message>
+        <source>Call back</source>
+        <translation>回拨</translation>
+    </message>
+</context>
+<context>
+    <name>CallPage</name>
+    <message>
+        <source>Incoming call</source>
+        <translation>来电</translation>
+    </message>
+    <message>
+        <source>Ringing…</source>
+        <translation>正在响铃…</translation>
+    </message>
+    <message>
+        <source>Connecting…</source>
+        <translation>正在连接…</translation>
+    </message>
+    <message>
+        <source>Reconnecting…</source>
+        <translation>正在重新连接…</translation>
+    </message>
+    <message>
+        <source>Call answered on another device</source>
+        <translation>已在其他设备上接听</translation>
+    </message>
+    <message>
+        <source>Call failed</source>
+        <translation>通话失败</translation>
+    </message>
+    <message>
+        <source>Missed call</source>
+        <translation>未接来电</translation>
+    </message>
+    <message>
+        <source>Declined call</source>
+        <translation>已拒接来电</translation>
+    </message>
+    <message>
+        <source>Call ended</source>
+        <translation>通话已结束</translation>
+    </message>
+    <message>
+        <source>Decline</source>
+        <extracomment>Declines a call that is ringing. A verb.</extracomment>
+        <translation>拒接</translation>
+    </message>
+    <message>
+        <source>Answer</source>
+        <extracomment>Answers a call that is ringing. A verb.</extracomment>
+        <translation>接听</translation>
+    </message>
+    <message>
+        <source>End call</source>
+        <extracomment>Ends a call in progress.</extracomment>
+        <translation>结束通话</translation>
+    </message>
+</context>
+<context>
     <name>CapturePage</name>
     <message>
         <source>The video could not be saved</source>
@@ -889,6 +966,46 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Edited</source>
         <translation>已编辑</translation>
+    </message>
+    <message>
+        <source>Missed call</source>
+        <translation>未接来电</translation>
+    </message>
+    <message>
+        <source>Declined call</source>
+        <translation>已拒接来电</translation>
+    </message>
+    <message>
+        <source>Canceled call</source>
+        <translation>已取消通话</translation>
+    </message>
+    <message>
+        <source>Video call</source>
+        <translation>视频通话</translation>
+    </message>
+    <message>
+        <source>Audio call</source>
+        <translation>语音通话</translation>
+    </message>
+    <message>
+        <source>Less than 1 minute</source>
+        <extracomment>How long a call lasted, when it was shorter than a minute.</extracomment>
+        <translation>不到 1 分钟</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n minute(s) duration</source>
+        <extracomment>How long a call lasted. %n is whole minutes.</extracomment>
+        <translation>
+            <numerusform>时长：%n 分钟</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Ringing…</source>
+        <translation>正在响铃…</translation>
+    </message>
+    <message>
+        <source>Incoming call</source>
+        <translation>来电</translation>
     </message>
 </context>
 <context>
@@ -1624,6 +1741,23 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>This applies to every profile, whatever a chat&apos;s own disappearing messages setting is.</source>
         <extracomment>Under &quot;Delete messages from device&quot;. &quot;Disappearing messages&quot; is each chat&apos;s own setting of that name.</extracomment>
         <translation>适用于所有个人资料，无论各聊天自身的阅后即焚消息设置如何。</translation>
+    </message>
+    <message>
+        <source>Calls</source>
+        <extracomment>Whether calls ring. A plural noun, not a verb.</extracomment>
+        <translation>通话</translation>
+    </message>
+    <message>
+        <source>Show call screen for accepted contacts</source>
+        <translation>为已接受的联系人显示通话界面</translation>
+    </message>
+    <message>
+        <source>Enable calls (experimental)</source>
+        <translation>启用通话（实验性）</translation>
+    </message>
+    <message>
+        <source>Makes and answers voice calls in one-to-one chats. These features may be unstable and may be changed or removed.</source>
+        <translation>在一对一聊天中拨打和接听语音通话。这些功能可能不稳定，并且可能被更改或移除。</translation>
     </message>
 </context>
 <context>

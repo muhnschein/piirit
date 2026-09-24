@@ -280,6 +280,83 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
     </message>
 </context>
 <context>
+    <name>CallCenter</name>
+    <message>
+        <source>Incoming call</source>
+        <translation>Sissetulev kõne</translation>
+    </message>
+    <message>
+        <source>Decline</source>
+        <translation>Keeldu</translation>
+    </message>
+    <message>
+        <source>Answer</source>
+        <translation>Vasta</translation>
+    </message>
+    <message>
+        <source>Missed call</source>
+        <translation>Vastamata kõne</translation>
+    </message>
+    <message>
+        <source>Call back</source>
+        <translation>Helista tagasi</translation>
+    </message>
+</context>
+<context>
+    <name>CallPage</name>
+    <message>
+        <source>Incoming call</source>
+        <translation>Sissetulev kõne</translation>
+    </message>
+    <message>
+        <source>Ringing…</source>
+        <translation>Heliseb…</translation>
+    </message>
+    <message>
+        <source>Connecting…</source>
+        <translation>Ühendan…</translation>
+    </message>
+    <message>
+        <source>Reconnecting…</source>
+        <translation>Ühendan uuesti…</translation>
+    </message>
+    <message>
+        <source>Call answered on another device</source>
+        <translation>Kõnele vastati teises seadmes</translation>
+    </message>
+    <message>
+        <source>Call failed</source>
+        <translation>Kõne ebaõnnestus</translation>
+    </message>
+    <message>
+        <source>Missed call</source>
+        <translation>Vastamata kõne</translation>
+    </message>
+    <message>
+        <source>Declined call</source>
+        <translation>Tagasi lükatud kõne</translation>
+    </message>
+    <message>
+        <source>Call ended</source>
+        <translation>Kõne lõppes</translation>
+    </message>
+    <message>
+        <source>Decline</source>
+        <extracomment>Declines a call that is ringing. A verb.</extracomment>
+        <translation>Keeldu</translation>
+    </message>
+    <message>
+        <source>Answer</source>
+        <extracomment>Answers a call that is ringing. A verb.</extracomment>
+        <translation>Vasta</translation>
+    </message>
+    <message>
+        <source>End call</source>
+        <extracomment>Ends a call in progress.</extracomment>
+        <translation>Lõpeta kõne</translation>
+    </message>
+</context>
+<context>
     <name>CapturePage</name>
     <message>
         <source>The video could not be saved</source>
@@ -893,6 +970,47 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
     <message>
         <source>Edited</source>
         <translation>Muudetud</translation>
+    </message>
+    <message>
+        <source>Missed call</source>
+        <translation>Vastamata kõne</translation>
+    </message>
+    <message>
+        <source>Declined call</source>
+        <translation>Tagasi lükatud kõne</translation>
+    </message>
+    <message>
+        <source>Canceled call</source>
+        <translation>Katkestatud kõne</translation>
+    </message>
+    <message>
+        <source>Video call</source>
+        <translation>Videokõne</translation>
+    </message>
+    <message>
+        <source>Audio call</source>
+        <translation>Häälkõne</translation>
+    </message>
+    <message>
+        <source>Less than 1 minute</source>
+        <extracomment>How long a call lasted, when it was shorter than a minute.</extracomment>
+        <translation>Alla 1 minuti</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n minute(s) duration</source>
+        <extracomment>How long a call lasted. %n is whole minutes.</extracomment>
+        <translation>
+            <numerusform>Kestus %n minut</numerusform>
+            <numerusform>Kestus %n minutit</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Ringing…</source>
+        <translation>Heliseb…</translation>
+    </message>
+    <message>
+        <source>Incoming call</source>
+        <translation>Sissetulev kõne</translation>
     </message>
 </context>
 <context>
@@ -1630,6 +1748,23 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
         <source>This applies to every profile, whatever a chat&apos;s own disappearing messages setting is.</source>
         <extracomment>Under &quot;Delete messages from device&quot;. &quot;Disappearing messages&quot; is each chat&apos;s own setting of that name.</extracomment>
         <translation>Kehtib igas profiilis, olenemata vestluse enda kaduvate sõnumite seadest.</translation>
+    </message>
+    <message>
+        <source>Calls</source>
+        <extracomment>Whether calls ring. A plural noun, not a verb.</extracomment>
+        <translation>Kõned</translation>
+    </message>
+    <message>
+        <source>Show call screen for accepted contacts</source>
+        <translation>Näita kinnitatud kontaktide kõnede puhul kõneakent</translation>
+    </message>
+    <message>
+        <source>Enable calls (experimental)</source>
+        <translation>Luba kõned (katseline)</translation>
+    </message>
+    <message>
+        <source>Makes and answers voice calls in one-to-one chats. These features may be unstable and may be changed or removed.</source>
+        <translation>Teeb ja võtab vastu häälkõnesid üks-ühele vestlustes. Need funktsioonid võivad olla ebastabiilsed ning neid võidakse muuta või eemaldada.</translation>
     </message>
 </context>
 <context>

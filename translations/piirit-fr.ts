@@ -280,6 +280,83 @@ Vous continuerez à voir les messages des contacts bloqués dans les autres grou
     </message>
 </context>
 <context>
+    <name>CallCenter</name>
+    <message>
+        <source>Incoming call</source>
+        <translation>Appel entrant</translation>
+    </message>
+    <message>
+        <source>Decline</source>
+        <translation>Refuser</translation>
+    </message>
+    <message>
+        <source>Answer</source>
+        <translation>Décrocher</translation>
+    </message>
+    <message>
+        <source>Missed call</source>
+        <translation>Appel manqué</translation>
+    </message>
+    <message>
+        <source>Call back</source>
+        <translation>Rappeler</translation>
+    </message>
+</context>
+<context>
+    <name>CallPage</name>
+    <message>
+        <source>Incoming call</source>
+        <translation>Appel entrant</translation>
+    </message>
+    <message>
+        <source>Ringing…</source>
+        <translation>Sonnerie…</translation>
+    </message>
+    <message>
+        <source>Connecting…</source>
+        <translation>Connexion…</translation>
+    </message>
+    <message>
+        <source>Reconnecting…</source>
+        <translation>Reconnexion…</translation>
+    </message>
+    <message>
+        <source>Call answered on another device</source>
+        <translation>Appel décroché sur un autre appareil</translation>
+    </message>
+    <message>
+        <source>Call failed</source>
+        <translation>L’appel a échoué</translation>
+    </message>
+    <message>
+        <source>Missed call</source>
+        <translation>Appel manqué</translation>
+    </message>
+    <message>
+        <source>Declined call</source>
+        <translation>Appel refusé</translation>
+    </message>
+    <message>
+        <source>Call ended</source>
+        <translation>Appel terminé</translation>
+    </message>
+    <message>
+        <source>Decline</source>
+        <extracomment>Declines a call that is ringing. A verb.</extracomment>
+        <translation>Refuser</translation>
+    </message>
+    <message>
+        <source>Answer</source>
+        <extracomment>Answers a call that is ringing. A verb.</extracomment>
+        <translation>Décrocher</translation>
+    </message>
+    <message>
+        <source>End call</source>
+        <extracomment>Ends a call in progress.</extracomment>
+        <translation>Raccrocher</translation>
+    </message>
+</context>
+<context>
     <name>CapturePage</name>
     <message>
         <source>The video could not be saved</source>
@@ -893,6 +970,47 @@ Vous continuerez à voir les messages des contacts bloqués dans les autres grou
     <message>
         <source>Edited</source>
         <translation>Modifié</translation>
+    </message>
+    <message>
+        <source>Missed call</source>
+        <translation>Appel manqué</translation>
+    </message>
+    <message>
+        <source>Declined call</source>
+        <translation>Appel refusé</translation>
+    </message>
+    <message>
+        <source>Canceled call</source>
+        <translation>Appel annulé</translation>
+    </message>
+    <message>
+        <source>Video call</source>
+        <translation>Appel vidéo</translation>
+    </message>
+    <message>
+        <source>Audio call</source>
+        <translation>Appel audio</translation>
+    </message>
+    <message>
+        <source>Less than 1 minute</source>
+        <extracomment>How long a call lasted, when it was shorter than a minute.</extracomment>
+        <translation>Moins d’une minute</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n minute(s) duration</source>
+        <extracomment>How long a call lasted. %n is whole minutes.</extracomment>
+        <translation>
+            <numerusform>Durée : %n minute</numerusform>
+            <numerusform>Durée : %n minutes</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Ringing…</source>
+        <translation>Sonnerie…</translation>
+    </message>
+    <message>
+        <source>Incoming call</source>
+        <translation>Appel entrant</translation>
     </message>
 </context>
 <context>
@@ -1630,6 +1748,23 @@ Vous continuerez à voir les messages des contacts bloqués dans les autres grou
         <source>This applies to every profile, whatever a chat&apos;s own disappearing messages setting is.</source>
         <extracomment>Under &quot;Delete messages from device&quot;. &quot;Disappearing messages&quot; is each chat&apos;s own setting of that name.</extracomment>
         <translation>S&apos;applique à tous les profils, quel que soit le réglage de messages éphémères de chaque discussion.</translation>
+    </message>
+    <message>
+        <source>Calls</source>
+        <extracomment>Whether calls ring. A plural noun, not a verb.</extracomment>
+        <translation>Appels</translation>
+    </message>
+    <message>
+        <source>Show call screen for accepted contacts</source>
+        <translation>Afficher l’écran d’appel pour les contacts acceptés</translation>
+    </message>
+    <message>
+        <source>Enable calls (experimental)</source>
+        <translation>Activer les appels (expérimental)</translation>
+    </message>
+    <message>
+        <source>Makes and answers voice calls in one-to-one chats. These features may be unstable and may be changed or removed.</source>
+        <translation>Passe et reçoit des appels vocaux dans les discussions individuelles. Ces fonctionnalités peuvent être instables et être modifiées ou supprimées.</translation>
     </message>
 </context>
 <context>

@@ -140,18 +140,30 @@ Page {
     /// lipstick only calls the app and does not bring it up, and every
     /// page above this one gone. A page loaded on its own in a test has
     /// no window.
+    ///
+    /// Not during a call. Its page is one of those above, and popping it
+    /// would take the call's sound with it: the app comes forward onto the
+    /// call, and whatever was tapped waits until it is over. False then,
+    /// so the caller goes no further.
     function comeForward() {
         if (typeof appWindow !== "undefined") {
             appWindow.activate()
+            if (appWindow.callBusy === true) {
+                appWindow.showCall()
+                return false
+            }
         }
         if (pageStack.currentPage !== page) {
             pageStack.pop(page, PageStackAction.Immediate)
         }
+        return true
     }
 
     /// Open a chat from outside the app: a notification was tapped.
     function showChat(chatId) {
-        page.comeForward()
+        if (!page.comeForward()) {
+            return
+        }
         page.openChat(chatId, notifier.nameOf(chatId), 0)
     }
 
@@ -164,7 +176,9 @@ Page {
     /// is said to be gone rather than opened empty; with the core away
     /// there is no asking, and the list is where the action ends.
     function quickAction(kind, accountId, chatId) {
-        page.comeForward()
+        if (!page.comeForward()) {
+            return
+        }
         // A chat still being looked up for an earlier tap is not wanted
         // any more.
         page.quickChatPending = false

@@ -277,6 +277,83 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>CallCenter</name>
+    <message>
+        <source>Incoming call</source>
+        <translation>Apel primit</translation>
+    </message>
+    <message>
+        <source>Decline</source>
+        <translation>Respinge</translation>
+    </message>
+    <message>
+        <source>Answer</source>
+        <translation>Răspunde</translation>
+    </message>
+    <message>
+        <source>Missed call</source>
+        <translation>Apel pierdut</translation>
+    </message>
+    <message>
+        <source>Call back</source>
+        <translation>Sună înapoi</translation>
+    </message>
+</context>
+<context>
+    <name>CallPage</name>
+    <message>
+        <source>Incoming call</source>
+        <translation>Apel primit</translation>
+    </message>
+    <message>
+        <source>Ringing…</source>
+        <translation>Sună…</translation>
+    </message>
+    <message>
+        <source>Connecting…</source>
+        <translation>Se conectează…</translation>
+    </message>
+    <message>
+        <source>Reconnecting…</source>
+        <translation>Se reconectează…</translation>
+    </message>
+    <message>
+        <source>Call answered on another device</source>
+        <translation>Apel preluat pe alt dispozitiv</translation>
+    </message>
+    <message>
+        <source>Call failed</source>
+        <translation>Apelul a eșuat</translation>
+    </message>
+    <message>
+        <source>Missed call</source>
+        <translation>Apel pierdut</translation>
+    </message>
+    <message>
+        <source>Declined call</source>
+        <translation>Apel respins</translation>
+    </message>
+    <message>
+        <source>Call ended</source>
+        <translation>Apel încheiat</translation>
+    </message>
+    <message>
+        <source>Decline</source>
+        <extracomment>Declines a call that is ringing. A verb.</extracomment>
+        <translation>Respinge</translation>
+    </message>
+    <message>
+        <source>Answer</source>
+        <extracomment>Answers a call that is ringing. A verb.</extracomment>
+        <translation>Răspunde</translation>
+    </message>
+    <message>
+        <source>End call</source>
+        <extracomment>Ends a call in progress.</extracomment>
+        <translation>Închide apelul</translation>
+    </message>
+</context>
+<context>
     <name>CapturePage</name>
     <message>
         <source>The video could not be saved</source>
@@ -893,6 +970,48 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Edited</source>
         <translation>Editat</translation>
+    </message>
+    <message>
+        <source>Missed call</source>
+        <translation>Apel pierdut</translation>
+    </message>
+    <message>
+        <source>Declined call</source>
+        <translation>Apel respins</translation>
+    </message>
+    <message>
+        <source>Canceled call</source>
+        <translation>Apel anulat</translation>
+    </message>
+    <message>
+        <source>Video call</source>
+        <translation>Apel video</translation>
+    </message>
+    <message>
+        <source>Audio call</source>
+        <translation>Apel vocal</translation>
+    </message>
+    <message>
+        <source>Less than 1 minute</source>
+        <extracomment>How long a call lasted, when it was shorter than a minute.</extracomment>
+        <translation>Mai puțin de 1 minut</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n minute(s) duration</source>
+        <extracomment>How long a call lasted. %n is whole minutes.</extracomment>
+        <translation>
+            <numerusform>Durată: %n minut</numerusform>
+            <numerusform>Durată: %n minute</numerusform>
+            <numerusform>Durată: %n de minute</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Ringing…</source>
+        <translation>Sună…</translation>
+    </message>
+    <message>
+        <source>Incoming call</source>
+        <translation>Apel primit</translation>
     </message>
 </context>
 <context>
@@ -1632,6 +1751,23 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>This applies to every profile, whatever a chat&apos;s own disappearing messages setting is.</source>
         <extracomment>Under &quot;Delete messages from device&quot;. &quot;Disappearing messages&quot; is each chat&apos;s own setting of that name.</extracomment>
         <translation>Se aplică fiecărui profil, indiferent de setarea pentru mesaje care dispar a fiecărei conversații.</translation>
+    </message>
+    <message>
+        <source>Calls</source>
+        <extracomment>Whether calls ring. A plural noun, not a verb.</extracomment>
+        <translation>Apeluri</translation>
+    </message>
+    <message>
+        <source>Show call screen for accepted contacts</source>
+        <translation>Afișează ecranul de apel pentru contactele acceptate</translation>
+    </message>
+    <message>
+        <source>Enable calls (experimental)</source>
+        <translation>Activează apelurile (experimental)</translation>
+    </message>
+    <message>
+        <source>Makes and answers voice calls in one-to-one chats. These features may be unstable and may be changed or removed.</source>
+        <translation>Efectuează și primește apeluri vocale în conversațiile unu-la-unu. Aceste funcții pot fi instabile și pot fi modificate sau eliminate.</translation>
     </message>
 </context>
 <context>

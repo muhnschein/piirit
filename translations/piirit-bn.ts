@@ -280,6 +280,83 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>CallCenter</name>
+    <message>
+        <source>Incoming call</source>
+        <translation>আগত কল</translation>
+    </message>
+    <message>
+        <source>Decline</source>
+        <translation>প্রত্যাখ্যান করুন</translation>
+    </message>
+    <message>
+        <source>Answer</source>
+        <translation>উত্তর দিন</translation>
+    </message>
+    <message>
+        <source>Missed call</source>
+        <translation>মিস করা কল</translation>
+    </message>
+    <message>
+        <source>Call back</source>
+        <translation>কল ব্যাক করুন</translation>
+    </message>
+</context>
+<context>
+    <name>CallPage</name>
+    <message>
+        <source>Incoming call</source>
+        <translation>আগত কল</translation>
+    </message>
+    <message>
+        <source>Ringing…</source>
+        <translation>রিং হচ্ছে…</translation>
+    </message>
+    <message>
+        <source>Connecting…</source>
+        <translation>সংযোগ করা হচ্ছে…</translation>
+    </message>
+    <message>
+        <source>Reconnecting…</source>
+        <translation>পুনরায় সংযোগ করা হচ্ছে…</translation>
+    </message>
+    <message>
+        <source>Call answered on another device</source>
+        <translation>অন্য ডিভাইসে কলের উত্তর দেওয়া হয়েছে</translation>
+    </message>
+    <message>
+        <source>Call failed</source>
+        <translation>কল ব্যর্থ হয়েছে</translation>
+    </message>
+    <message>
+        <source>Missed call</source>
+        <translation>মিস করা কল</translation>
+    </message>
+    <message>
+        <source>Declined call</source>
+        <translation>প্রত্যাখ্যাত কল</translation>
+    </message>
+    <message>
+        <source>Call ended</source>
+        <translation>কল শেষ হয়েছে</translation>
+    </message>
+    <message>
+        <source>Decline</source>
+        <extracomment>Declines a call that is ringing. A verb.</extracomment>
+        <translation>প্রত্যাখ্যান করুন</translation>
+    </message>
+    <message>
+        <source>Answer</source>
+        <extracomment>Answers a call that is ringing. A verb.</extracomment>
+        <translation>উত্তর দিন</translation>
+    </message>
+    <message>
+        <source>End call</source>
+        <extracomment>Ends a call in progress.</extracomment>
+        <translation>কল শেষ করুন</translation>
+    </message>
+</context>
+<context>
     <name>CapturePage</name>
     <message>
         <source>The video could not be saved</source>
@@ -893,6 +970,47 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Edited</source>
         <translation>সম্পাদিত</translation>
+    </message>
+    <message>
+        <source>Missed call</source>
+        <translation>মিস করা কল</translation>
+    </message>
+    <message>
+        <source>Declined call</source>
+        <translation>প্রত্যাখ্যাত কল</translation>
+    </message>
+    <message>
+        <source>Canceled call</source>
+        <translation>বাতিল করা কল</translation>
+    </message>
+    <message>
+        <source>Video call</source>
+        <translation>ভিডিও কল</translation>
+    </message>
+    <message>
+        <source>Audio call</source>
+        <translation>অডিও কল</translation>
+    </message>
+    <message>
+        <source>Less than 1 minute</source>
+        <extracomment>How long a call lasted, when it was shorter than a minute.</extracomment>
+        <translation>1 মিনিটের কম</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n minute(s) duration</source>
+        <extracomment>How long a call lasted. %n is whole minutes.</extracomment>
+        <translation>
+            <numerusform>স্থায়িত্ব %n মিনিট</numerusform>
+            <numerusform>স্থায়িত্ব %n মিনিট</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Ringing…</source>
+        <translation>রিং হচ্ছে…</translation>
+    </message>
+    <message>
+        <source>Incoming call</source>
+        <translation>আগত কল</translation>
     </message>
 </context>
 <context>
@@ -1630,6 +1748,23 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>This applies to every profile, whatever a chat&apos;s own disappearing messages setting is.</source>
         <extracomment>Under &quot;Delete messages from device&quot;. &quot;Disappearing messages&quot; is each chat&apos;s own setting of that name.</extracomment>
         <translation>প্রতিটি প্রোফাইলে প্রযোজ্য, কোনো চ্যাটের নিজস্ব অদৃশ্য হওয়া বার্তার সেটিং যা-ই হোক।</translation>
+    </message>
+    <message>
+        <source>Calls</source>
+        <extracomment>Whether calls ring. A plural noun, not a verb.</extracomment>
+        <translation>কল</translation>
+    </message>
+    <message>
+        <source>Show call screen for accepted contacts</source>
+        <translation>গৃহীত পরিচিতিদের জন্য কল স্ক্রিন দেখান</translation>
+    </message>
+    <message>
+        <source>Enable calls (experimental)</source>
+        <translation>কল চালু করুন (পরীক্ষামূলক)</translation>
+    </message>
+    <message>
+        <source>Makes and answers voice calls in one-to-one chats. These features may be unstable and may be changed or removed.</source>
+        <translation>একক চ্যাটে ভয়েস কল করে ও তার উত্তর দেয়। এই বৈশিষ্ট্যগুলি অস্থিতিশীল হতে পারে এবং বদলানো বা সরিয়ে ফেলা হতে পারে।</translation>
     </message>
 </context>
 <context>

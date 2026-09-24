@@ -249,7 +249,8 @@ fn the_quick_actions_are_set_up_on_a_page_of_their_own() {
         );
 
         // On the settings page: one row under Advanced, then the webxdc
-        // switch, and nothing after; no heading of their own any more.
+        // and calls switches, and nothing after; no heading of their own
+        // any more.
         record!(
             "under-advanced",
             call!("underHeading", QString::from("Advanced"))
@@ -262,6 +263,7 @@ fn the_quick_actions_are_set_up_on_a_page_of_their_own() {
             "after-webxdc",
             call!("after", QString::from("webxdcSwitch"))
         );
+        record!("after-calls", call!("after", QString::from("callsSwitch")));
         record!(
             "old-heading",
             call!("underHeading", QString::from("Quick actions"))
@@ -459,6 +461,11 @@ fn the_quick_actions_are_set_up_on_a_page_of_their_own() {
     );
     assert_eq!(
         value("after-webxdc"),
+        "callsSwitch",
+        "the calls switch is not under Advanced with them. {context}"
+    );
+    assert_eq!(
+        value("after-calls"),
         "nothing",
         "something follows Advanced. {context}"
     );

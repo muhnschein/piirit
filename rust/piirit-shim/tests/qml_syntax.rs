@@ -966,18 +966,19 @@ fn only_the_picker_pages_import_sailfish_pickers() {
     );
 }
 
-/// The two webxdc pages are the only files naming a `Sailfish.WebView`
-/// type.
+/// The two webxdc pages and the call's view are the only files naming a
+/// `Sailfish.WebView` type.
 ///
 /// The same rule as the pickers above, for the same reason and a sharper
 /// case: the browser engine is a separate package, and a release without
 /// it -- or a device where it is not installed -- would take down every
 /// file naming the type. Here that is the page that runs one app, pushed
 /// by URL from the conversation, so a chat still opens and every other
-/// attachment still works.
+/// attachment still works; and the view a call's media runs in, loaded
+/// by the call page, so a call that rings can still be seen and declined.
 #[test]
 fn only_the_webxdc_pages_import_sailfish_webview() {
-    const ALLOWED: [&str; 2] = ["WebxdcPage.qml", "WebxdcStorePage.qml"];
+    const ALLOWED: [&str; 3] = ["WebxdcPage.qml", "WebxdcStorePage.qml", "CallView.qml"];
     let mut offenders = Vec::new();
     for file in qml_files() {
         let name = file
@@ -1027,6 +1028,34 @@ fn the_webxdc_pages_leave_the_views_activation_alone() {
             offender.map_or(0, |(number, _)| number + 1)
         );
     }
+}
+
+/// The call's view decides when its `WebView` is active, and only after
+/// the page has come up.
+///
+/// The opposite of the rule above, and for a reason of its own: an
+/// inactive view is a hidden document, and the engine pauses a hidden
+/// document's media -- which for a call is the other end's voice, gone
+/// the moment the reader looks at another app. So the view is held
+/// active for as long as the call lasts. Until the page has come up it
+/// follows what `WebView.qml` itself would follow, handed in as `shown`,
+/// since a view that is never activated by its page's transition draws
+/// nothing.
+#[test]
+fn the_call_view_holds_its_page_running_only_once_it_has_come_up() {
+    let file = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../qml/components/CallView.qml");
+    let code = code_only(&fs::read_to_string(file).expect("read the call view"));
+    let active: Vec<&str> = code
+        .lines()
+        .map(str::trim)
+        .filter(|line| line.starts_with("active:"))
+        .collect();
+    assert_eq!(
+        active,
+        vec!["active: root.shown || (root.holding && view.loaded)"],
+        "the call view's `active` is not the page's own condition, held \
+         once the page has come up"
+    );
 }
 
 /// The share methods the desktop file offers are the ones the app

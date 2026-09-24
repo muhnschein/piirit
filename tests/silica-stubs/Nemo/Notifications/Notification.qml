@@ -12,6 +12,8 @@ QtObject {
     property string previewSummary
     property string previewBody
     property string category
+    // Notification.Normal; the call rings at 2, Critical.
+    property int urgency: 1
     property int itemCount: 1
     property var timestamp
     property var remoteActions: []

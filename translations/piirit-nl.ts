@@ -276,6 +276,83 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>CallCenter</name>
+    <message>
+        <source>Incoming call</source>
+        <translation>Inkomende oproep</translation>
+    </message>
+    <message>
+        <source>Decline</source>
+        <translation>Weigeren</translation>
+    </message>
+    <message>
+        <source>Answer</source>
+        <translation>Opnemen</translation>
+    </message>
+    <message>
+        <source>Missed call</source>
+        <translation>Gemiste oproep</translation>
+    </message>
+    <message>
+        <source>Call back</source>
+        <translation>Terugbellen</translation>
+    </message>
+</context>
+<context>
+    <name>CallPage</name>
+    <message>
+        <source>Incoming call</source>
+        <translation>Inkomende oproep</translation>
+    </message>
+    <message>
+        <source>Ringing…</source>
+        <translation>Gaat over…</translation>
+    </message>
+    <message>
+        <source>Connecting…</source>
+        <translation>Verbinden…</translation>
+    </message>
+    <message>
+        <source>Reconnecting…</source>
+        <translation>Opnieuw verbinden…</translation>
+    </message>
+    <message>
+        <source>Call answered on another device</source>
+        <translation>Opgenomen op een ander apparaat</translation>
+    </message>
+    <message>
+        <source>Call failed</source>
+        <translation>Oproep mislukt</translation>
+    </message>
+    <message>
+        <source>Missed call</source>
+        <translation>Gemiste oproep</translation>
+    </message>
+    <message>
+        <source>Declined call</source>
+        <translation>Geweigerde oproep</translation>
+    </message>
+    <message>
+        <source>Call ended</source>
+        <translation>Oproep beëindigd</translation>
+    </message>
+    <message>
+        <source>Decline</source>
+        <extracomment>Declines a call that is ringing. A verb.</extracomment>
+        <translation>Weigeren</translation>
+    </message>
+    <message>
+        <source>Answer</source>
+        <extracomment>Answers a call that is ringing. A verb.</extracomment>
+        <translation>Opnemen</translation>
+    </message>
+    <message>
+        <source>End call</source>
+        <extracomment>Ends a call in progress.</extracomment>
+        <translation>Oproep beëindigen</translation>
+    </message>
+</context>
+<context>
     <name>CapturePage</name>
     <message>
         <source>The video could not be saved</source>
@@ -889,6 +966,47 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Edited</source>
         <translation>Bewerkt</translation>
+    </message>
+    <message>
+        <source>Missed call</source>
+        <translation>Gemiste oproep</translation>
+    </message>
+    <message>
+        <source>Declined call</source>
+        <translation>Geweigerde oproep</translation>
+    </message>
+    <message>
+        <source>Canceled call</source>
+        <translation>Geannuleerde oproep</translation>
+    </message>
+    <message>
+        <source>Video call</source>
+        <translation>Video-oproep</translation>
+    </message>
+    <message>
+        <source>Audio call</source>
+        <translation>Spraakoproep</translation>
+    </message>
+    <message>
+        <source>Less than 1 minute</source>
+        <extracomment>How long a call lasted, when it was shorter than a minute.</extracomment>
+        <translation>Minder dan een minuut</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n minute(s) duration</source>
+        <extracomment>How long a call lasted. %n is whole minutes.</extracomment>
+        <translation>
+            <numerusform>Duur: %n minuut</numerusform>
+            <numerusform>Duur: %n minuten</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Ringing…</source>
+        <translation>Gaat over…</translation>
+    </message>
+    <message>
+        <source>Incoming call</source>
+        <translation>Inkomende oproep</translation>
     </message>
 </context>
 <context>
@@ -1626,6 +1744,23 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>This applies to every profile, whatever a chat&apos;s own disappearing messages setting is.</source>
         <extracomment>Under &quot;Delete messages from device&quot;. &quot;Disappearing messages&quot; is each chat&apos;s own setting of that name.</extracomment>
         <translation>Geldt voor elk profiel, ongeacht de eigen instelling voor verdwijnende berichten van een chat.</translation>
+    </message>
+    <message>
+        <source>Calls</source>
+        <extracomment>Whether calls ring. A plural noun, not a verb.</extracomment>
+        <translation>Oproepen</translation>
+    </message>
+    <message>
+        <source>Show call screen for accepted contacts</source>
+        <translation>Belscherm tonen voor geaccepteerde contacten</translation>
+    </message>
+    <message>
+        <source>Enable calls (experimental)</source>
+        <translation>Oproepen inschakelen (experimenteel)</translation>
+    </message>
+    <message>
+        <source>Makes and answers voice calls in one-to-one chats. These features may be unstable and may be changed or removed.</source>
+        <translation>Plaatst en beantwoordt spraakoproepen in één-op-éénchats. Deze functies kunnen instabiel zijn en gewijzigd of verwijderd worden.</translation>
     </message>
 </context>
 <context>

@@ -282,6 +282,83 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
     </message>
 </context>
 <context>
+    <name>CallCenter</name>
+    <message>
+        <source>Incoming call</source>
+        <translation>Dohodni klic</translation>
+    </message>
+    <message>
+        <source>Decline</source>
+        <translation>Zavrni</translation>
+    </message>
+    <message>
+        <source>Answer</source>
+        <translation>Sprejmi</translation>
+    </message>
+    <message>
+        <source>Missed call</source>
+        <translation>Zgrešen klic</translation>
+    </message>
+    <message>
+        <source>Call back</source>
+        <translation>Pokliči nazaj</translation>
+    </message>
+</context>
+<context>
+    <name>CallPage</name>
+    <message>
+        <source>Incoming call</source>
+        <translation>Dohodni klic</translation>
+    </message>
+    <message>
+        <source>Ringing…</source>
+        <translation>Zvoni…</translation>
+    </message>
+    <message>
+        <source>Connecting…</source>
+        <translation>Povezovanje…</translation>
+    </message>
+    <message>
+        <source>Reconnecting…</source>
+        <translation>Ponovno povezovanje…</translation>
+    </message>
+    <message>
+        <source>Call answered on another device</source>
+        <translation>Klic je bil sprejet v drugi napravi</translation>
+    </message>
+    <message>
+        <source>Call failed</source>
+        <translation>Klic ni uspel</translation>
+    </message>
+    <message>
+        <source>Missed call</source>
+        <translation>Zgrešen klic</translation>
+    </message>
+    <message>
+        <source>Declined call</source>
+        <translation>Zavrnjen klic</translation>
+    </message>
+    <message>
+        <source>Call ended</source>
+        <translation>Klic je končan</translation>
+    </message>
+    <message>
+        <source>Decline</source>
+        <extracomment>Declines a call that is ringing. A verb.</extracomment>
+        <translation>Zavrni</translation>
+    </message>
+    <message>
+        <source>Answer</source>
+        <extracomment>Answers a call that is ringing. A verb.</extracomment>
+        <translation>Sprejmi</translation>
+    </message>
+    <message>
+        <source>End call</source>
+        <extracomment>Ends a call in progress.</extracomment>
+        <translation>Končaj klic</translation>
+    </message>
+</context>
+<context>
     <name>CapturePage</name>
     <message>
         <source>The video could not be saved</source>
@@ -901,6 +978,49 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
     <message>
         <source>Edited</source>
         <translation>Urejeno</translation>
+    </message>
+    <message>
+        <source>Missed call</source>
+        <translation>Zgrešen klic</translation>
+    </message>
+    <message>
+        <source>Declined call</source>
+        <translation>Zavrnjen klic</translation>
+    </message>
+    <message>
+        <source>Canceled call</source>
+        <translation>Preklican klic</translation>
+    </message>
+    <message>
+        <source>Video call</source>
+        <translation>Videoklic</translation>
+    </message>
+    <message>
+        <source>Audio call</source>
+        <translation>Glasovni klic</translation>
+    </message>
+    <message>
+        <source>Less than 1 minute</source>
+        <extracomment>How long a call lasted, when it was shorter than a minute.</extracomment>
+        <translation>Manj kot 1 minuta</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n minute(s) duration</source>
+        <extracomment>How long a call lasted. %n is whole minutes.</extracomment>
+        <translation>
+            <numerusform>Trajanje: %n minuta</numerusform>
+            <numerusform>Trajanje: %n minuti</numerusform>
+            <numerusform>Trajanje: %n minute</numerusform>
+            <numerusform>Trajanje: %n minut</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Ringing…</source>
+        <translation>Zvoni…</translation>
+    </message>
+    <message>
+        <source>Incoming call</source>
+        <translation>Dohodni klic</translation>
     </message>
 </context>
 <context>
@@ -1642,6 +1762,23 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
         <source>This applies to every profile, whatever a chat&apos;s own disappearing messages setting is.</source>
         <extracomment>Under &quot;Delete messages from device&quot;. &quot;Disappearing messages&quot; is each chat&apos;s own setting of that name.</extracomment>
         <translation>Velja za vsak profil, ne glede na nastavitev izginjajočih sporočil posameznega klepeta.</translation>
+    </message>
+    <message>
+        <source>Calls</source>
+        <extracomment>Whether calls ring. A plural noun, not a verb.</extracomment>
+        <translation>Klici</translation>
+    </message>
+    <message>
+        <source>Show call screen for accepted contacts</source>
+        <translation>Prikaži zaslon za klic za sprejete stike</translation>
+    </message>
+    <message>
+        <source>Enable calls (experimental)</source>
+        <translation>Omogoči klice (poskusno)</translation>
+    </message>
+    <message>
+        <source>Makes and answers voice calls in one-to-one chats. These features may be unstable and may be changed or removed.</source>
+        <translation>Opravlja in sprejema glasovne klice v klepetih z eno osebo. Te funkcije so lahko nestabilne ter se lahko spremenijo ali odstranijo.</translation>
     </message>
 </context>
 <context>

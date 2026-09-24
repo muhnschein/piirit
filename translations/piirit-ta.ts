@@ -276,6 +276,83 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>CallCenter</name>
+    <message>
+        <source>Incoming call</source>
+        <translation>உள்வரும் அழைப்பு</translation>
+    </message>
+    <message>
+        <source>Decline</source>
+        <translation>நிராகரி</translation>
+    </message>
+    <message>
+        <source>Answer</source>
+        <translation>பதிலளி</translation>
+    </message>
+    <message>
+        <source>Missed call</source>
+        <translation>தவறிய அழைப்பு</translation>
+    </message>
+    <message>
+        <source>Call back</source>
+        <translation>திரும்ப அழை</translation>
+    </message>
+</context>
+<context>
+    <name>CallPage</name>
+    <message>
+        <source>Incoming call</source>
+        <translation>உள்வரும் அழைப்பு</translation>
+    </message>
+    <message>
+        <source>Ringing…</source>
+        <translation>அழைக்கிறது…</translation>
+    </message>
+    <message>
+        <source>Connecting…</source>
+        <translation>இணைக்கிறது…</translation>
+    </message>
+    <message>
+        <source>Reconnecting…</source>
+        <translation>மீண்டும் இணைக்கிறது…</translation>
+    </message>
+    <message>
+        <source>Call answered on another device</source>
+        <translation>அழைப்புக்கு வேறொரு சாதனத்தில் பதிலளிக்கப்பட்டது</translation>
+    </message>
+    <message>
+        <source>Call failed</source>
+        <translation>அழைப்பு தோல்வியடைந்தது</translation>
+    </message>
+    <message>
+        <source>Missed call</source>
+        <translation>தவறிய அழைப்பு</translation>
+    </message>
+    <message>
+        <source>Declined call</source>
+        <translation>நிராகரிக்கப்பட்ட அழைப்பு</translation>
+    </message>
+    <message>
+        <source>Call ended</source>
+        <translation>அழைப்பு முடிந்தது</translation>
+    </message>
+    <message>
+        <source>Decline</source>
+        <extracomment>Declines a call that is ringing. A verb.</extracomment>
+        <translation>நிராகரி</translation>
+    </message>
+    <message>
+        <source>Answer</source>
+        <extracomment>Answers a call that is ringing. A verb.</extracomment>
+        <translation>பதிலளி</translation>
+    </message>
+    <message>
+        <source>End call</source>
+        <extracomment>Ends a call in progress.</extracomment>
+        <translation>அழைப்பை முடி</translation>
+    </message>
+</context>
+<context>
     <name>CapturePage</name>
     <message>
         <source>The video could not be saved</source>
@@ -889,6 +966,47 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Edited</source>
         <translation>திருத்தப்பட்டது</translation>
+    </message>
+    <message>
+        <source>Missed call</source>
+        <translation>தவறிய அழைப்பு</translation>
+    </message>
+    <message>
+        <source>Declined call</source>
+        <translation>நிராகரிக்கப்பட்ட அழைப்பு</translation>
+    </message>
+    <message>
+        <source>Canceled call</source>
+        <translation>ரத்துசெய்யப்பட்ட அழைப்பு</translation>
+    </message>
+    <message>
+        <source>Video call</source>
+        <translation>வீடியோ அழைப்பு</translation>
+    </message>
+    <message>
+        <source>Audio call</source>
+        <translation>குரல் அழைப்பு</translation>
+    </message>
+    <message>
+        <source>Less than 1 minute</source>
+        <extracomment>How long a call lasted, when it was shorter than a minute.</extracomment>
+        <translation>1 நிமிடத்திற்கும் குறைவு</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n minute(s) duration</source>
+        <extracomment>How long a call lasted. %n is whole minutes.</extracomment>
+        <translation>
+            <numerusform>கால அளவு %n நிமிடம்</numerusform>
+            <numerusform>கால அளவு %n நிமிடங்கள்</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Ringing…</source>
+        <translation>அழைக்கிறது…</translation>
+    </message>
+    <message>
+        <source>Incoming call</source>
+        <translation>உள்வரும் அழைப்பு</translation>
     </message>
 </context>
 <context>
@@ -1626,6 +1744,23 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>This applies to every profile, whatever a chat&apos;s own disappearing messages setting is.</source>
         <extracomment>Under &quot;Delete messages from device&quot;. &quot;Disappearing messages&quot; is each chat&apos;s own setting of that name.</extracomment>
         <translation>ஒவ்வொரு சுயவிவரத்துக்கும் பொருந்தும், ஒரு அரட்டையின் சொந்த மறையும் செய்திகள் அமைப்பு எதுவாக இருந்தாலும்.</translation>
+    </message>
+    <message>
+        <source>Calls</source>
+        <extracomment>Whether calls ring. A plural noun, not a verb.</extracomment>
+        <translation>அழைப்புகள்</translation>
+    </message>
+    <message>
+        <source>Show call screen for accepted contacts</source>
+        <translation>ஏற்கப்பட்ட தொடர்புகளுக்கு அழைப்புத் திரையைக் காட்டு</translation>
+    </message>
+    <message>
+        <source>Enable calls (experimental)</source>
+        <translation>அழைப்புகளை இயக்கு (சோதனை முறை)</translation>
+    </message>
+    <message>
+        <source>Makes and answers voice calls in one-to-one chats. These features may be unstable and may be changed or removed.</source>
+        <translation>தனிநபர் அரட்டைகளில் குரல் அழைப்புகளைச் செய்கிறது, அவற்றுக்குப் பதிலளிக்கிறது. இந்த வசதிகள் நிலையற்றவையாக இருக்கலாம், மாற்றப்படலாம் அல்லது நீக்கப்படலாம்.</translation>
     </message>
 </context>
 <context>

@@ -276,6 +276,83 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>CallCenter</name>
+    <message>
+        <source>Incoming call</source>
+        <translation>ఇన్‌కమింగ్ కాల్</translation>
+    </message>
+    <message>
+        <source>Decline</source>
+        <translation>తిరస్కరించు</translation>
+    </message>
+    <message>
+        <source>Answer</source>
+        <translation>సమాధానం ఇవ్వు</translation>
+    </message>
+    <message>
+        <source>Missed call</source>
+        <translation>మిస్డ్ కాల్</translation>
+    </message>
+    <message>
+        <source>Call back</source>
+        <translation>తిరిగి కాల్ చేయి</translation>
+    </message>
+</context>
+<context>
+    <name>CallPage</name>
+    <message>
+        <source>Incoming call</source>
+        <translation>ఇన్‌కమింగ్ కాల్</translation>
+    </message>
+    <message>
+        <source>Ringing…</source>
+        <translation>రింగ్ అవుతోంది…</translation>
+    </message>
+    <message>
+        <source>Connecting…</source>
+        <translation>కనెక్ట్ అవుతోంది…</translation>
+    </message>
+    <message>
+        <source>Reconnecting…</source>
+        <translation>మళ్లీ కనెక్ట్ అవుతోంది…</translation>
+    </message>
+    <message>
+        <source>Call answered on another device</source>
+        <translation>కాల్‌కు మరో పరికరంలో సమాధానం ఇవ్వబడింది</translation>
+    </message>
+    <message>
+        <source>Call failed</source>
+        <translation>కాల్ విఫలమైంది</translation>
+    </message>
+    <message>
+        <source>Missed call</source>
+        <translation>మిస్డ్ కాల్</translation>
+    </message>
+    <message>
+        <source>Declined call</source>
+        <translation>తిరస్కరించిన కాల్</translation>
+    </message>
+    <message>
+        <source>Call ended</source>
+        <translation>కాల్ ముగిసింది</translation>
+    </message>
+    <message>
+        <source>Decline</source>
+        <extracomment>Declines a call that is ringing. A verb.</extracomment>
+        <translation>తిరస్కరించు</translation>
+    </message>
+    <message>
+        <source>Answer</source>
+        <extracomment>Answers a call that is ringing. A verb.</extracomment>
+        <translation>సమాధానం ఇవ్వు</translation>
+    </message>
+    <message>
+        <source>End call</source>
+        <extracomment>Ends a call in progress.</extracomment>
+        <translation>కాల్ ముగించు</translation>
+    </message>
+</context>
+<context>
     <name>CapturePage</name>
     <message>
         <source>The video could not be saved</source>
@@ -889,6 +966,47 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Edited</source>
         <translation>సవరించబడింది</translation>
+    </message>
+    <message>
+        <source>Missed call</source>
+        <translation>మిస్డ్ కాల్</translation>
+    </message>
+    <message>
+        <source>Declined call</source>
+        <translation>తిరస్కరించిన కాల్</translation>
+    </message>
+    <message>
+        <source>Canceled call</source>
+        <translation>రద్దు చేసిన కాల్</translation>
+    </message>
+    <message>
+        <source>Video call</source>
+        <translation>వీడియో కాల్</translation>
+    </message>
+    <message>
+        <source>Audio call</source>
+        <translation>ఆడియో కాల్</translation>
+    </message>
+    <message>
+        <source>Less than 1 minute</source>
+        <extracomment>How long a call lasted, when it was shorter than a minute.</extracomment>
+        <translation>1 నిమిషం కంటే తక్కువ</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n minute(s) duration</source>
+        <extracomment>How long a call lasted. %n is whole minutes.</extracomment>
+        <translation>
+            <numerusform>వ్యవధి %n నిమిషం</numerusform>
+            <numerusform>వ్యవధి %n నిమిషాలు</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Ringing…</source>
+        <translation>రింగ్ అవుతోంది…</translation>
+    </message>
+    <message>
+        <source>Incoming call</source>
+        <translation>ఇన్‌కమింగ్ కాల్</translation>
     </message>
 </context>
 <context>
@@ -1626,6 +1744,23 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>This applies to every profile, whatever a chat&apos;s own disappearing messages setting is.</source>
         <extracomment>Under &quot;Delete messages from device&quot;. &quot;Disappearing messages&quot; is each chat&apos;s own setting of that name.</extracomment>
         <translation>ప్రతి ప్రొఫైల్‌కూ వర్తిస్తుంది, ఒక చాట్ సొంత అదృశ్యమయ్యే సందేశాల సెట్టింగ్ ఏదైనా సరే.</translation>
+    </message>
+    <message>
+        <source>Calls</source>
+        <extracomment>Whether calls ring. A plural noun, not a verb.</extracomment>
+        <translation>కాల్స్</translation>
+    </message>
+    <message>
+        <source>Show call screen for accepted contacts</source>
+        <translation>ఆమోదించిన పరిచయాలకు కాల్ స్క్రీన్ చూపించు</translation>
+    </message>
+    <message>
+        <source>Enable calls (experimental)</source>
+        <translation>కాల్స్‌ను ప్రారంభించు (ప్రయోగాత్మకం)</translation>
+    </message>
+    <message>
+        <source>Makes and answers voice calls in one-to-one chats. These features may be unstable and may be changed or removed.</source>
+        <translation>ఒకరితో ఒకరు సంభాషణలలో వాయిస్ కాల్స్ చేస్తుంది, వాటికి సమాధానం ఇస్తుంది. ఈ సౌకర్యాలు అస్థిరంగా ఉండవచ్చు, మారవచ్చు లేదా తొలగించబడవచ్చు.</translation>
     </message>
 </context>
 <context>

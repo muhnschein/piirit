@@ -410,6 +410,40 @@ Page {
         interactive: page.canNavigateForward
         // The name goes the same way the swipe does.
         onClicked: page.openInfo()
+        // A chat that takes a call, while calls are on. `=== true`
+        // because dconf hands back `undefined` before it has read the key.
+        callable: Settings.callsEnabled === true && messages.can_call
+        onCallClicked: page.placeCall()
+    }
+
+    /// Call this chat, or go back to the call there is.
+    ///
+    /// One call at a time, as both reference clients have it: asking for
+    /// a second brings the first back to the front, which is where the
+    /// reader can see that it is still going.
+    function placeCall() {
+        if (typeof appWindow === "undefined") {
+            return
+        }
+        if (!appWindow.placeCall(page.accountId, page.chatId)) {
+            appWindow.showCall()
+        }
+    }
+
+    /// A call's row was tapped. One still ringing is answered from here,
+    /// as the reference clients have it -- it may have rung while nothing
+    /// here was listening -- and any other is called back.
+    function callFromRow(messageId, outgoing, callState) {
+        if (Settings.callsEnabled !== true || typeof appWindow === "undefined") {
+            return
+        }
+        if (!outgoing && callState === "Alerting") {
+            appWindow.pickUpCall(page.accountId, page.chatId, messageId)
+            return
+        }
+        if (messages.can_call) {
+            page.placeCall()
+        }
     }
 
     // What this chat is -- the group, or the contact -- sits to the right,
@@ -504,6 +538,7 @@ Page {
             markdownMode: Settings.markdownMode
         })
         onAppRequested: page.openApp(messageId)
+        onCallRequested: page.callFromRow(messageId, outgoing, callState)
         onDownloadRequested: messages.download_full(messageId)
         // On or off is the model's call: it knows what the reader already
         // sent, and the core takes the whole list either way.

@@ -21,6 +21,10 @@ import Sailfish.Silica 1.0
  * height, and a reader whose fonts are big enough to fill it with the
  * name alone keeps the name rather than getting a header over the first
  * message.
+ *
+ * A call button at the other end of the line, for a chat that takes a
+ * call: where both reference clients keep theirs, in the bar over the
+ * conversation, and where a page on this platform keeps nothing else.
  */
 Item {
     id: root
@@ -43,8 +47,18 @@ Item {
         subtitleLabel.text.length > 0
         && titleLabel.height + subtitleLabel.height <= root.height
 
+    /// Whether a call button is drawn, at the left end of the header.
+    property bool callable: false
+
     /// The header was tapped. What that opens is the page's to decide.
     signal clicked()
+
+    /// The call button was tapped.
+    signal callClicked()
+
+    /// The room the call button takes from the title, when it is there.
+    readonly property real callRoom: root.callable
+                                     ? callButton.width + Theme.paddingMedium : 0
 
     width: parent ? parent.width : 0
     height: Theme.itemSizeLarge
@@ -59,8 +73,9 @@ Item {
         id: titleLabel
         objectName: "headerTitle"
         // No wider than its text, and no wider than the page less its
-        // margins.
-        width: Math.min(implicitWidth, root.width - 2 * Theme.horizontalPageMargin)
+        // margins and the call button.
+        width: Math.min(implicitWidth,
+                        root.width - 2 * Theme.horizontalPageMargin - root.callRoom)
         // The line PageHeader puts its first line on: it measures one
         // line of its font, and a single-line label is that tall. With a
         // second line under it the pair is centred instead, so the block
@@ -84,7 +99,8 @@ Item {
         id: subtitleLabel
         objectName: "headerSubtitle"
         visible: root.showsSubtitle
-        width: Math.min(implicitWidth, root.width - 2 * Theme.horizontalPageMargin)
+        width: Math.min(implicitWidth,
+                        root.width - 2 * Theme.horizontalPageMargin - root.callRoom)
         y: titleLabel.y + titleLabel.height
         anchors {
             right: parent.right
@@ -98,5 +114,19 @@ Item {
         font.pixelSize: Theme.fontSizeExtraSmall
         truncationMode: TruncationMode.Fade
         textFormat: Text.PlainText
+    }
+
+    // Over the header's own tap, which is the rest of the line.
+    IconButton {
+        id: callButton
+        objectName: "callButton"
+        visible: root.callable
+        anchors {
+            left: parent.left
+            leftMargin: Theme.horizontalPageMargin - Theme.paddingMedium
+            verticalCenter: parent.verticalCenter
+        }
+        icon.source: "image://theme/icon-m-call"
+        onClicked: root.callClicked()
     }
 }

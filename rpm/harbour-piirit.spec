@@ -89,6 +89,10 @@ Requires:   nemo-qml-plugin-dbus-qt5
 # Nemo.Configuration, for the settings that belong to no profile: they
 # live in dconf, so a change on the settings page reaches every open page.
 Requires:   nemo-qml-plugin-configuration-qt5
+# Nemo.KeepAlive, which keeps the phone awake while a call is up and its
+# screen on while one rings (qml/components/CallCenter.qml). The package
+# carries the QML module beside the library.
+Requires:   libkeepalive
 # Sailfish.WebView, for running a webxdc app and for the store it comes
 # from (qml/pages/Webxdc*Page.qml). The only two pages that name the type,
 # so a device without the browser engine loses those and nothing else --

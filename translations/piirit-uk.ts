@@ -281,6 +281,83 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>CallCenter</name>
+    <message>
+        <source>Incoming call</source>
+        <translation>Вхідний виклик</translation>
+    </message>
+    <message>
+        <source>Decline</source>
+        <translation>Відхилити</translation>
+    </message>
+    <message>
+        <source>Answer</source>
+        <translation>Відповісти</translation>
+    </message>
+    <message>
+        <source>Missed call</source>
+        <translation>Пропущений виклик</translation>
+    </message>
+    <message>
+        <source>Call back</source>
+        <translation>Передзвонити</translation>
+    </message>
+</context>
+<context>
+    <name>CallPage</name>
+    <message>
+        <source>Incoming call</source>
+        <translation>Вхідний виклик</translation>
+    </message>
+    <message>
+        <source>Ringing…</source>
+        <translation>Виклик…</translation>
+    </message>
+    <message>
+        <source>Connecting…</source>
+        <translation>Підключення…</translation>
+    </message>
+    <message>
+        <source>Reconnecting…</source>
+        <translation>Перепідключення…</translation>
+    </message>
+    <message>
+        <source>Call answered on another device</source>
+        <translation>На виклик відповіли на іншому пристрої</translation>
+    </message>
+    <message>
+        <source>Call failed</source>
+        <translation>Виклик не вдався</translation>
+    </message>
+    <message>
+        <source>Missed call</source>
+        <translation>Пропущений виклик</translation>
+    </message>
+    <message>
+        <source>Declined call</source>
+        <translation>Відхилений виклик</translation>
+    </message>
+    <message>
+        <source>Call ended</source>
+        <translation>Виклик завершено</translation>
+    </message>
+    <message>
+        <source>Decline</source>
+        <extracomment>Declines a call that is ringing. A verb.</extracomment>
+        <translation>Відхилити</translation>
+    </message>
+    <message>
+        <source>Answer</source>
+        <extracomment>Answers a call that is ringing. A verb.</extracomment>
+        <translation>Відповісти</translation>
+    </message>
+    <message>
+        <source>End call</source>
+        <extracomment>Ends a call in progress.</extracomment>
+        <translation>Завершити виклик</translation>
+    </message>
+</context>
+<context>
     <name>CapturePage</name>
     <message>
         <source>The video could not be saved</source>
@@ -897,6 +974,48 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Edited</source>
         <translation>Змінено</translation>
+    </message>
+    <message>
+        <source>Missed call</source>
+        <translation>Пропущений виклик</translation>
+    </message>
+    <message>
+        <source>Declined call</source>
+        <translation>Відхилений виклик</translation>
+    </message>
+    <message>
+        <source>Canceled call</source>
+        <translation>Скасований виклик</translation>
+    </message>
+    <message>
+        <source>Video call</source>
+        <translation>Відеовиклик</translation>
+    </message>
+    <message>
+        <source>Audio call</source>
+        <translation>Аудіовиклик</translation>
+    </message>
+    <message>
+        <source>Less than 1 minute</source>
+        <extracomment>How long a call lasted, when it was shorter than a minute.</extracomment>
+        <translation>Менше 1 хвилини</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n minute(s) duration</source>
+        <extracomment>How long a call lasted. %n is whole minutes.</extracomment>
+        <translation>
+            <numerusform>Тривалість: %n хвилина</numerusform>
+            <numerusform>Тривалість: %n хвилини</numerusform>
+            <numerusform>Тривалість: %n хвилин</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Ringing…</source>
+        <translation>Виклик…</translation>
+    </message>
+    <message>
+        <source>Incoming call</source>
+        <translation>Вхідний виклик</translation>
     </message>
 </context>
 <context>
@@ -1636,6 +1755,23 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>This applies to every profile, whatever a chat&apos;s own disappearing messages setting is.</source>
         <extracomment>Under &quot;Delete messages from device&quot;. &quot;Disappearing messages&quot; is each chat&apos;s own setting of that name.</extracomment>
         <translation>Діє для кожного профілю незалежно від налаштування зникаючих повідомлень у самому чаті.</translation>
+    </message>
+    <message>
+        <source>Calls</source>
+        <extracomment>Whether calls ring. A plural noun, not a verb.</extracomment>
+        <translation>Виклики</translation>
+    </message>
+    <message>
+        <source>Show call screen for accepted contacts</source>
+        <translation>Показувати екран виклику для прийнятих контактів</translation>
+    </message>
+    <message>
+        <source>Enable calls (experimental)</source>
+        <translation>Увімкнути виклики (експериментально)</translation>
+    </message>
+    <message>
+        <source>Makes and answers voice calls in one-to-one chats. These features may be unstable and may be changed or removed.</source>
+        <translation>Здійснює голосові виклики та відповідає на них в особистих чатах. Ці функції можуть бути нестабільними, а також змінюватися чи вилучатися.</translation>
     </message>
 </context>
 <context>

@@ -1,2 +1,3 @@
 module QtSensors
 OrientationSensor 5.0 OrientationSensor.qml
+ProximitySensor 5.0 ProximitySensor.qml

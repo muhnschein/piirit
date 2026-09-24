@@ -279,6 +279,83 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>CallCenter</name>
+    <message>
+        <source>Incoming call</source>
+        <translation>Керүче шалтырату</translation>
+    </message>
+    <message>
+        <source>Decline</source>
+        <translation>Кире кагу</translation>
+    </message>
+    <message>
+        <source>Answer</source>
+        <translation>Җавап бирү</translation>
+    </message>
+    <message>
+        <source>Missed call</source>
+        <translation>Җавапсыз шалтырату</translation>
+    </message>
+    <message>
+        <source>Call back</source>
+        <translation>Кире шалтырату</translation>
+    </message>
+</context>
+<context>
+    <name>CallPage</name>
+    <message>
+        <source>Incoming call</source>
+        <translation>Керүче шалтырату</translation>
+    </message>
+    <message>
+        <source>Ringing…</source>
+        <translation>Шалтырата…</translation>
+    </message>
+    <message>
+        <source>Connecting…</source>
+        <translation>Тоташу…</translation>
+    </message>
+    <message>
+        <source>Reconnecting…</source>
+        <translation>Кабат тоташу…</translation>
+    </message>
+    <message>
+        <source>Call answered on another device</source>
+        <translation>Шалтыратуга башка җайланмада җавап бирелде</translation>
+    </message>
+    <message>
+        <source>Call failed</source>
+        <translation>Шалтырату барып чыкмады</translation>
+    </message>
+    <message>
+        <source>Missed call</source>
+        <translation>Җавапсыз шалтырату</translation>
+    </message>
+    <message>
+        <source>Declined call</source>
+        <translation>Кире кагылган шалтырату</translation>
+    </message>
+    <message>
+        <source>Call ended</source>
+        <translation>Шалтырату тәмамланды</translation>
+    </message>
+    <message>
+        <source>Decline</source>
+        <extracomment>Declines a call that is ringing. A verb.</extracomment>
+        <translation>Кире кагу</translation>
+    </message>
+    <message>
+        <source>Answer</source>
+        <extracomment>Answers a call that is ringing. A verb.</extracomment>
+        <translation>Җавап бирү</translation>
+    </message>
+    <message>
+        <source>End call</source>
+        <extracomment>Ends a call in progress.</extracomment>
+        <translation>Шалтыратуны тәмамлау</translation>
+    </message>
+</context>
+<context>
     <name>CapturePage</name>
     <message>
         <source>The video could not be saved</source>
@@ -889,6 +966,46 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Edited</source>
         <translation>Үзгәртелгән</translation>
+    </message>
+    <message>
+        <source>Missed call</source>
+        <translation>Җавапсыз шалтырату</translation>
+    </message>
+    <message>
+        <source>Declined call</source>
+        <translation>Кире кагылган шалтырату</translation>
+    </message>
+    <message>
+        <source>Canceled call</source>
+        <translation>Юкка чыгарылган шалтырату</translation>
+    </message>
+    <message>
+        <source>Video call</source>
+        <translation>Видеошалтырату</translation>
+    </message>
+    <message>
+        <source>Audio call</source>
+        <translation>Тавышлы шалтырату</translation>
+    </message>
+    <message>
+        <source>Less than 1 minute</source>
+        <extracomment>How long a call lasted, when it was shorter than a minute.</extracomment>
+        <translation>1 минуттан кимрәк</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n minute(s) duration</source>
+        <extracomment>How long a call lasted. %n is whole minutes.</extracomment>
+        <translation>
+            <numerusform>Дәвамлылык: %n минут</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Ringing…</source>
+        <translation>Шалтырата…</translation>
+    </message>
+    <message>
+        <source>Incoming call</source>
+        <translation>Керүче шалтырату</translation>
     </message>
 </context>
 <context>
@@ -1624,6 +1741,23 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>This applies to every profile, whatever a chat&apos;s own disappearing messages setting is.</source>
         <extracomment>Under &quot;Delete messages from device&quot;. &quot;Disappearing messages&quot; is each chat&apos;s own setting of that name.</extracomment>
         <translation>Һәр профильгә кагыла, чатның үз юкка чыга торган хәбәрләр көйләвенә карамастан.</translation>
+    </message>
+    <message>
+        <source>Calls</source>
+        <extracomment>Whether calls ring. A plural noun, not a verb.</extracomment>
+        <translation>Шалтыратулар</translation>
+    </message>
+    <message>
+        <source>Show call screen for accepted contacts</source>
+        <translation>Кабул ителгән контактлар өчен шалтырату экранын күрсәтү</translation>
+    </message>
+    <message>
+        <source>Enable calls (experimental)</source>
+        <translation>Шалтыратуларны кабызу (сынау режимы)</translation>
+    </message>
+    <message>
+        <source>Makes and answers voice calls in one-to-one chats. These features may be unstable and may be changed or removed.</source>
+        <translation>Шәхси әңгәмәләрдә тавышлы шалтыратулар ясый һәм аларга җавап бирә. Бу мөмкинлекләр тотрыксыз булырга, үзгәртелергә яки бетерелергә мөмкин.</translation>
     </message>
 </context>
 <context>

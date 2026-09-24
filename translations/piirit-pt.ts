@@ -280,6 +280,83 @@ Mensagens de contactos bloqueados não serão ocultadas noutros grupos.</transla
     </message>
 </context>
 <context>
+    <name>CallCenter</name>
+    <message>
+        <source>Incoming call</source>
+        <translation>Chamada recebida</translation>
+    </message>
+    <message>
+        <source>Decline</source>
+        <translation>Recusar</translation>
+    </message>
+    <message>
+        <source>Answer</source>
+        <translation>Atender</translation>
+    </message>
+    <message>
+        <source>Missed call</source>
+        <translation>Chamada não atendida</translation>
+    </message>
+    <message>
+        <source>Call back</source>
+        <translation>Ligar de volta</translation>
+    </message>
+</context>
+<context>
+    <name>CallPage</name>
+    <message>
+        <source>Incoming call</source>
+        <translation>Chamada recebida</translation>
+    </message>
+    <message>
+        <source>Ringing…</source>
+        <translation>A chamar…</translation>
+    </message>
+    <message>
+        <source>Connecting…</source>
+        <translation>A ligar…</translation>
+    </message>
+    <message>
+        <source>Reconnecting…</source>
+        <translation>A restabelecer a ligação…</translation>
+    </message>
+    <message>
+        <source>Call answered on another device</source>
+        <translation>Chamada atendida noutro dispositivo</translation>
+    </message>
+    <message>
+        <source>Call failed</source>
+        <translation>A chamada falhou</translation>
+    </message>
+    <message>
+        <source>Missed call</source>
+        <translation>Chamada não atendida</translation>
+    </message>
+    <message>
+        <source>Declined call</source>
+        <translation>Chamada recusada</translation>
+    </message>
+    <message>
+        <source>Call ended</source>
+        <translation>Chamada terminada</translation>
+    </message>
+    <message>
+        <source>Decline</source>
+        <extracomment>Declines a call that is ringing. A verb.</extracomment>
+        <translation>Recusar</translation>
+    </message>
+    <message>
+        <source>Answer</source>
+        <extracomment>Answers a call that is ringing. A verb.</extracomment>
+        <translation>Atender</translation>
+    </message>
+    <message>
+        <source>End call</source>
+        <extracomment>Ends a call in progress.</extracomment>
+        <translation>Terminar chamada</translation>
+    </message>
+</context>
+<context>
     <name>CapturePage</name>
     <message>
         <source>The video could not be saved</source>
@@ -893,6 +970,47 @@ Mensagens de contactos bloqueados não serão ocultadas noutros grupos.</transla
     <message>
         <source>Edited</source>
         <translation>Editada</translation>
+    </message>
+    <message>
+        <source>Missed call</source>
+        <translation>Chamada não atendida</translation>
+    </message>
+    <message>
+        <source>Declined call</source>
+        <translation>Chamada recusada</translation>
+    </message>
+    <message>
+        <source>Canceled call</source>
+        <translation>Chamada cancelada</translation>
+    </message>
+    <message>
+        <source>Video call</source>
+        <translation>Videochamada</translation>
+    </message>
+    <message>
+        <source>Audio call</source>
+        <translation>Chamada de voz</translation>
+    </message>
+    <message>
+        <source>Less than 1 minute</source>
+        <extracomment>How long a call lasted, when it was shorter than a minute.</extracomment>
+        <translation>Menos de 1 minuto</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n minute(s) duration</source>
+        <extracomment>How long a call lasted. %n is whole minutes.</extracomment>
+        <translation>
+            <numerusform>Duração: %n minuto</numerusform>
+            <numerusform>Duração: %n minutos</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Ringing…</source>
+        <translation>A chamar…</translation>
+    </message>
+    <message>
+        <source>Incoming call</source>
+        <translation>Chamada recebida</translation>
     </message>
 </context>
 <context>
@@ -1630,6 +1748,23 @@ Mensagens de contactos bloqueados não serão ocultadas noutros grupos.</transla
         <source>This applies to every profile, whatever a chat&apos;s own disappearing messages setting is.</source>
         <extracomment>Under &quot;Delete messages from device&quot;. &quot;Disappearing messages&quot; is each chat&apos;s own setting of that name.</extracomment>
         <translation>Aplica-se a todos os perfis, independentemente da definição de mensagens temporárias de cada conversa.</translation>
+    </message>
+    <message>
+        <source>Calls</source>
+        <extracomment>Whether calls ring. A plural noun, not a verb.</extracomment>
+        <translation>Chamadas</translation>
+    </message>
+    <message>
+        <source>Show call screen for accepted contacts</source>
+        <translation>Mostrar ecrã de chamadas para contactos aceites</translation>
+    </message>
+    <message>
+        <source>Enable calls (experimental)</source>
+        <translation>Ativar chamadas (experimental)</translation>
+    </message>
+    <message>
+        <source>Makes and answers voice calls in one-to-one chats. These features may be unstable and may be changed or removed.</source>
+        <translation>Faz e atende chamadas de voz em conversas individuais. Estas funcionalidades podem ser instáveis e podem ser alteradas ou removidas.</translation>
     </message>
 </context>
 <context>

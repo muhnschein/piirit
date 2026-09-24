@@ -276,6 +276,83 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>CallCenter</name>
+    <message>
+        <source>Incoming call</source>
+        <translation>Innkommende anrop</translation>
+    </message>
+    <message>
+        <source>Decline</source>
+        <translation>Avvis</translation>
+    </message>
+    <message>
+        <source>Answer</source>
+        <translation>Svar</translation>
+    </message>
+    <message>
+        <source>Missed call</source>
+        <translation>Ubesvart anrop</translation>
+    </message>
+    <message>
+        <source>Call back</source>
+        <translation>Ring tilbake</translation>
+    </message>
+</context>
+<context>
+    <name>CallPage</name>
+    <message>
+        <source>Incoming call</source>
+        <translation>Innkommende anrop</translation>
+    </message>
+    <message>
+        <source>Ringing…</source>
+        <translation>Ringer…</translation>
+    </message>
+    <message>
+        <source>Connecting…</source>
+        <translation>Kobler til…</translation>
+    </message>
+    <message>
+        <source>Reconnecting…</source>
+        <translation>Kobler til på nytt…</translation>
+    </message>
+    <message>
+        <source>Call answered on another device</source>
+        <translation>Anropet ble besvart på en annen enhet</translation>
+    </message>
+    <message>
+        <source>Call failed</source>
+        <translation>Anropet mislyktes</translation>
+    </message>
+    <message>
+        <source>Missed call</source>
+        <translation>Ubesvart anrop</translation>
+    </message>
+    <message>
+        <source>Declined call</source>
+        <translation>Avvist anrop</translation>
+    </message>
+    <message>
+        <source>Call ended</source>
+        <translation>Anropet er avsluttet</translation>
+    </message>
+    <message>
+        <source>Decline</source>
+        <extracomment>Declines a call that is ringing. A verb.</extracomment>
+        <translation>Avvis</translation>
+    </message>
+    <message>
+        <source>Answer</source>
+        <extracomment>Answers a call that is ringing. A verb.</extracomment>
+        <translation>Svar</translation>
+    </message>
+    <message>
+        <source>End call</source>
+        <extracomment>Ends a call in progress.</extracomment>
+        <translation>Avslutt anrop</translation>
+    </message>
+</context>
+<context>
     <name>CapturePage</name>
     <message>
         <source>The video could not be saved</source>
@@ -889,6 +966,47 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Edited</source>
         <translation>Redigert</translation>
+    </message>
+    <message>
+        <source>Missed call</source>
+        <translation>Ubesvart anrop</translation>
+    </message>
+    <message>
+        <source>Declined call</source>
+        <translation>Avvist anrop</translation>
+    </message>
+    <message>
+        <source>Canceled call</source>
+        <translation>Avbrutt anrop</translation>
+    </message>
+    <message>
+        <source>Video call</source>
+        <translation>Videoanrop</translation>
+    </message>
+    <message>
+        <source>Audio call</source>
+        <translation>Lydanrop</translation>
+    </message>
+    <message>
+        <source>Less than 1 minute</source>
+        <extracomment>How long a call lasted, when it was shorter than a minute.</extracomment>
+        <translation>Mindre enn 1 minutt</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n minute(s) duration</source>
+        <extracomment>How long a call lasted. %n is whole minutes.</extracomment>
+        <translation>
+            <numerusform>Varighet: %n minutt</numerusform>
+            <numerusform>Varighet: %n minutter</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Ringing…</source>
+        <translation>Ringer…</translation>
+    </message>
+    <message>
+        <source>Incoming call</source>
+        <translation>Innkommende anrop</translation>
     </message>
 </context>
 <context>
@@ -1626,6 +1744,23 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>This applies to every profile, whatever a chat&apos;s own disappearing messages setting is.</source>
         <extracomment>Under &quot;Delete messages from device&quot;. &quot;Disappearing messages&quot; is each chat&apos;s own setting of that name.</extracomment>
         <translation>Gjelder for hver profil, uavhengig av en chats egen innstilling for forsvinnende meldinger.</translation>
+    </message>
+    <message>
+        <source>Calls</source>
+        <extracomment>Whether calls ring. A plural noun, not a verb.</extracomment>
+        <translation>Anrop</translation>
+    </message>
+    <message>
+        <source>Show call screen for accepted contacts</source>
+        <translation>Vis anropsskjerm for godkjente kontakter</translation>
+    </message>
+    <message>
+        <source>Enable calls (experimental)</source>
+        <translation>Slå på anrop (eksperimentelt)</translation>
+    </message>
+    <message>
+        <source>Makes and answers voice calls in one-to-one chats. These features may be unstable and may be changed or removed.</source>
+        <translation>Ringer og besvarer taleanrop i samtaler med én person. Disse funksjonene kan være ustabile og kan bli endret eller fjernet.</translation>
     </message>
 </context>
 <context>
