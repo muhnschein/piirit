@@ -14,7 +14,7 @@ use qmetaobject::*;
 use crate::core::connection;
 use crate::json;
 use crate::models::{MessageListItem, MessageListModel};
-use crate::{links, markdown, media, webxdc};
+use crate::{calls, links, markdown, media, webxdc};
 
 /// `DC_STATE_IN_FRESH` and `DC_STATE_IN_NOTICED`: an incoming message the
 /// account has not read yet.
@@ -114,11 +114,12 @@ fn rows_for(entries: &[Entry], items: Vec<MessageListItem>) -> Vec<MessageListIt
 /// SilicaListView { model: messages.rows }
 /// ```
 #[derive(QObject, Default)]
-// `loaded`, `is_group`, `can_send`, `is_encrypted`, `reading_history` and
-// `sending` are six bools, and clippy would rather they were a state enum.
+// `loaded`, `is_group`, `can_send`, `is_encrypted`, `can_call`,
+// `reading_history` and `sending` are seven bools, and clippy would rather
+// they were a state enum.
 // They are not states of one thing: each is an independent fact QML binds
 // to on its own, and any combination of them is legitimate. Collapsing them
-// would mean inventing a state machine that does not exist and hiding six
+// would mean inventing a state machine that does not exist and hiding seven
 // bindings behind it.
 #[allow(clippy::struct_excessive_bools)]
 pub struct ChatMessages {
@@ -166,6 +167,13 @@ pub struct ChatMessages {
     pub is_encrypted: qt_property!(bool; NOTIFY is_encrypted_changed),
     /// Emitted once the chat's encryption is known.
     pub is_encrypted_changed: qt_signal!(),
+    /// Whether a call can be placed from this chat: one other person, an
+    /// encrypted chat, one the account can write into, and not "Saved
+    /// messages". The reference clients' own rule for their call button,
+    /// and the core refuses a call anywhere else.
+    pub can_call: qt_property!(bool; NOTIFY can_call_changed),
+    /// Emitted once it is known whether the chat takes a call.
+    pub can_call_changed: qt_signal!(),
     /// The chat's name as the core shows it: the group's, or the contact's
     /// display name. Empty until read. Re-read on every event that could
     /// have changed it, so the header over the messages follows a rename
@@ -755,10 +763,12 @@ impl ChatMessages {
         self.is_group = shape.is_group;
         self.can_send = shape.can_send;
         self.is_encrypted = shape.is_encrypted;
+        self.can_call = shape.can_call;
         self.member_count = shape.member_count;
         self.is_group_changed();
         self.can_send_changed();
         self.is_encrypted_changed();
+        self.can_call_changed();
         self.member_count_changed();
     }
 
@@ -2026,6 +2036,7 @@ pub(crate) async fn fetch_messages(
         .collect();
     for row in &mut rows {
         with_webxdc(rpc, account_id, row).await;
+        with_call(rpc, account_id, row).await;
     }
     Ok(rows)
 }
@@ -2044,6 +2055,27 @@ async fn with_webxdc(rpc: &RpcClient, account_id: u32, row: &mut MessageListItem
     row.webxdc_document = extras.document.into();
     row.webxdc_summary = extras.summary.into();
     row.webxdc_icon = extras.icon_path.into();
+}
+
+/// Fill in where a call stands, for the rows that are one.
+///
+/// A second round trip per call, as for an app, and for the same reason:
+/// the core's text for a call is an English sentence, and the state it
+/// was written from is what the row is drawn from instead. The core says
+/// `MsgsChanged` for the message whenever that state moves, which is what
+/// re-reads the row.
+async fn with_call(rpc: &RpcClient, account_id: u32, row: &mut MessageListItem) {
+    if row.view_type.to_string() != "Call" {
+        return;
+    }
+    // A call the core cannot say anything about draws as its text, which
+    // is still the core's own sentence about it.
+    let Ok(call) = calls::summary(rpc, account_id, row.message_id).await else {
+        return;
+    };
+    row.call_state = call.state.into();
+    row.call_has_video = call.has_video;
+    row.call_duration = call.duration;
 }
 
 /// Whether a row is an incoming message the account has not read.
@@ -2089,8 +2121,11 @@ fn is_group_info(info: &serde_json::Value) -> bool {
 
 /// What a conversation needs to know about its chat besides the messages:
 /// whether a message has to say who sent it, whether the account can
-/// write into it, and whether it is encrypted.
+/// write into it, whether it is encrypted, and whether it takes a call.
 #[derive(Clone, Copy, Default)]
+// Four facts, each read on its own by a binding of its own; see
+// `ChatMessages`.
+#[allow(clippy::struct_excessive_bools)]
 pub(crate) struct ChatShape {
     /// A group, mailing list or broadcast.
     pub is_group: bool,
@@ -2099,6 +2134,8 @@ pub(crate) struct ChatShape {
     pub can_send: bool,
     /// End-to-end encrypted, which every chatmail chat is.
     pub is_encrypted: bool,
+    /// A call can be placed here; see `ChatMessages::can_call`.
+    pub can_call: bool,
     /// How many people are in the chat, the reader among them. Asked for
     /// only where it is worth saying -- a group's header carries it, a
     /// one-to-one chat's would say "2" about a chat with one other person
@@ -2119,10 +2156,18 @@ pub(crate) async fn chat_shape(rpc: &RpcClient, account_id: u32, chat_id: u32) -
         .await
         .unwrap_or(false);
     let is_group = is_group_info(&info);
+    let is_encrypted = json::flag(&info, "isEncrypted");
     ChatShape {
         is_group,
         can_send,
-        is_encrypted: json::flag(&info, "isEncrypted"),
+        is_encrypted,
+        // `can_send` already rules out the device chat and a contact
+        // request; the rest is the core's own refusal, asked in advance.
+        can_call: !is_group
+            && can_send
+            && is_encrypted
+            && !json::flag(&info, "isSelfTalk")
+            && !json::flag(&info, "isDeviceChat"),
         member_count: if is_group {
             member_count(rpc, account_id, chat_id).await
         } else {

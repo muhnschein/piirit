@@ -333,15 +333,16 @@ fn escape(text: &str) -> String {
         .replace('>', "&gt;")
 }
 
-/// The head of one request: everything before its body.
-struct Head {
-    method: String,
-    target: String,
-    host: String,
+/// The head of one request: everything before its body. Shared with the
+/// call host (`call_host.rs`), which reads requests the same way.
+pub(crate) struct Head {
+    pub(crate) method: String,
+    pub(crate) target: String,
+    pub(crate) host: String,
     /// What `Content-Length` said, or 0 when it said nothing.
-    length: usize,
+    pub(crate) length: usize,
     /// The body's first bytes, which arrived with the head.
-    started: Vec<u8>,
+    pub(crate) started: Vec<u8>,
 }
 
 /// Read the head, or `None` for something that does not parse as one.
@@ -349,7 +350,7 @@ struct Head {
 /// The body is left on the socket. What it is for decides how it is
 /// read: a file an app is handing over is written out as it arrives and
 /// never held, and everything else on this host is short enough to keep.
-async fn read_head(stream: &mut TcpStream) -> std::io::Result<Option<Head>> {
+pub(crate) async fn read_head(stream: &mut TcpStream) -> std::io::Result<Option<Head>> {
     let mut head = Vec::new();
     let mut chunk = [0_u8; 2048];
     let body_at = loop {
@@ -408,7 +409,10 @@ async fn read_head(stream: &mut TcpStream) -> std::io::Result<Option<Head>> {
 /// closing on a client that is still writing resets the connection, and a
 /// reset is not an answer -- the app sees a host it could not reach and
 /// has no idea why.
-async fn read_body(stream: &mut TcpStream, head: Head) -> std::io::Result<Option<Vec<u8>>> {
+pub(crate) async fn read_body(
+    stream: &mut TcpStream,
+    head: Head,
+) -> std::io::Result<Option<Vec<u8>>> {
     let mut chunk = [0_u8; 2048];
     if head.length > MAX_BODY {
         let mut dropped = head.started.len();
@@ -909,7 +913,7 @@ fn percent_decode(text: &str) -> String {
 
 /// What to call a file, by its extension. Only what a page is built from;
 /// anything else is handed over as bytes, which is what a download is.
-fn content_type(name: &str) -> &'static str {
+pub(crate) fn content_type(name: &str) -> &'static str {
     let extension = name
         .rsplit_once('.')
         .map(|(_, extension)| extension.to_ascii_lowercase())
@@ -981,7 +985,7 @@ const HEX: &[u8; 16] = b"0123456789abcdef";
 /// fallback is not a secret worth relying on, and does not have to be:
 /// what it guards is one app's files on a socket only this device can
 /// reach, and the app is open for as long as somebody is looking at it.
-fn token() -> String {
+pub(crate) fn token() -> String {
     let mut bytes = [0_u8; 16];
     let read = std::fs::File::open("/dev/urandom")
         .and_then(|mut file| file.read_exact(&mut bytes))

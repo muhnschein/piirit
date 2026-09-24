@@ -162,6 +162,17 @@ pub struct MessageListItem {
     /// A path to the app's icon, written into the cache the first time a
     /// row asks for it. Empty when the app has none.
     pub webxdc_icon: QString,
+    /// Where a call stands, empty for every other kind of message: the
+    /// core's own name for its state (`call_info`) -- `Alerting` while it
+    /// rings, `Active`, `Completed`, `Missed`, `Declined` or `Canceled`.
+    /// The row is drawn from this rather than from `text`, which is the
+    /// core's English sentence for the same thing.
+    pub call_state: QString,
+    /// The call was started as a video call.
+    pub call_has_video: bool,
+    /// How long a completed call lasted, in seconds. 0 for one that
+    /// never connected.
+    pub call_duration: i32,
 }
 
 /// Conversation model bound to a `SilicaListView` from QML.
