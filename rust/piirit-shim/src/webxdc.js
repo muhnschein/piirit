@@ -11,6 +11,8 @@
  * Updates travel over the same host: sending is a POST, receiving is a
  * poll. Nothing here talks to Qt -- a page cannot -- and nothing here
  * knows the core; both are on the other side of those two requests.
+ * The realtime channel is the same again, with a long poll for what the
+ * others send, since a game cannot wait out a timer for every move.
  *
  * XMLHttpRequest rather than fetch: Gecko has both, and this one is
  * older than every release this could run on.
@@ -27,6 +29,12 @@
     var MAX_SIZE = __MAX_SIZE__;
     /* Milliseconds between polls for updates from the other end. */
     var POLL = __POLL__;
+    /* The largest piece of realtime data, per the specification. */
+    var MAX_REALTIME = 128000;
+    /* Realtime sends that may wait behind the one in flight. Past this
+     * the oldest goes: a channel promises no delivery, and what a game
+     * sends is its state now, which the newest says best. */
+    var MAX_REALTIME_WAITING = 256;
 
     /* What setUpdateListener was given, and how far it has been fed. */
     var listener = null;
@@ -38,6 +46,15 @@
      * not race the timer's. */
     var polling = false;
     var timer = null;
+
+    /* The realtime channel, while the app is in it. */
+    var channel = null;
+    /* Joining, sending and leaving, in the order the app asked for them
+     * and one at a time: each is a request of its own, and requests on
+     * separate connections can reach the host in any order -- a send
+     * overtaking the join it followed, or a join the leave before it. */
+    var realtimeQueue = [];
+    var realtimeBusy = false;
 
     function request(method, path, body, onDone, onFail, type) {
         var xhr = new XMLHttpRequest();
@@ -129,6 +146,138 @@
             });
     }
 
+    /* Queue one realtime request; `done` runs once the host has answered
+     * it, however it answered. */
+    function realtime(path, body, done) {
+        if (path === "/realtime/send") {
+            var waiting = 0;
+            var oldest = -1;
+            for (var i = 0; i < realtimeQueue.length; i++) {
+                if (realtimeQueue[i].path === path) {
+                    waiting++;
+                    if (oldest < 0) {
+                        oldest = i;
+                    }
+                }
+            }
+            if (waiting >= MAX_REALTIME_WAITING) {
+                realtimeQueue.splice(oldest, 1);
+            }
+        }
+        realtimeQueue.push({ path: path, body: body, done: done });
+        nextRealtime();
+    }
+
+    function nextRealtime() {
+        if (realtimeBusy || realtimeQueue.length === 0) {
+            return;
+        }
+        realtimeBusy = true;
+        var next = realtimeQueue.shift();
+        function finished() {
+            realtimeBusy = false;
+            if (next.done) {
+                next.done();
+            }
+            nextRealtime();
+        }
+        request("POST", next.path, next.body, finished, function (err) {
+            if (window.console) {
+                window.console.error(err);
+            }
+            finished();
+        }, "application/octet-stream");
+    }
+
+    /*
+     * One stay in the realtime channel, from joinRealtimeChannel to
+     * leave(). A new object for every stay, as the specification has it:
+     * once left, this one is spent, and joining again is a new one.
+     */
+    function RealtimeChannel() {
+        var self = this;
+        var listener = null;
+        var left = false;
+
+        /* Collect what the others have sent, and ask again: the host
+         * holds each request until there is something to answer it
+         * with, so this is not the busy loop it looks like. */
+        function listen() {
+            if (left) {
+                return;
+            }
+            request("GET", "/realtime/receive", null,
+                function (text) {
+                    var items = [];
+                    try {
+                        items = JSON.parse(text) || [];
+                    } catch (err) {
+                        items = [];
+                    }
+                    for (var i = 0; i < items.length && !left; i++) {
+                        if (listener) {
+                            try {
+                                listener(new Uint8Array(items[i]));
+                            } catch (err) {
+                                /* As for updates: the app's handler
+                                 * throwing is no reason to stop
+                                 * listening. */
+                                if (window.console) {
+                                    window.console.error(err);
+                                }
+                            }
+                        }
+                    }
+                    listen();
+                },
+                function () {
+                    /* The host is gone or failed: ask again, but not
+                     * at once, or a closed app spins here. */
+                    if (!left) {
+                        window.setTimeout(listen, POLL);
+                    }
+                });
+        }
+
+        /* Replaces the one before, if there was one. */
+        this.setListener = function (callback) {
+            listener = callback;
+        };
+
+        /* Send to whoever is in the channel. Nobody may be. */
+        this.send = function (data) {
+            if (left) {
+                throw new Error("webxdc: the realtime channel has been left");
+            }
+            if (!(data instanceof Uint8Array)) {
+                throw new Error("webxdc: realtime data must be a Uint8Array");
+            }
+            if (data.length > MAX_REALTIME) {
+                throw new Error("webxdc: realtime data is larger than "
+                                + MAX_REALTIME + " bytes");
+            }
+            /* A copy: the app may well fill the same array again for
+             * its next send before this one has gone. */
+            realtime("/realtime/send", new Uint8Array(data), null);
+        };
+
+        this.leave = function () {
+            if (left) {
+                return;
+            }
+            left = true;
+            listener = null;
+            if (channel === self) {
+                channel = null;
+            }
+            realtime("/realtime/leave", "", null);
+        };
+
+        /* Listening starts once the host has the join, so the first
+         * request is one for this stay and not the last one's. */
+        realtime("/realtime/join", "", listen);
+    }
+
     window.webxdc = {
         selfAddr: SELF_ADDR,
         selfName: SELF_NAME,
@@ -175,6 +324,33 @@
                 caughtUp = resolve;
                 poll();
             });
+        },
+
+        /*
+         * Deprecated in favour of setUpdateListener, and still what apps
+         * from before it call first thing: absent, that call throws and
+         * the app never draws. Empty, as every other messenger answers
+         * it: such an app pairs it with setUpdateListener, which hands
+         * over everything from the start anyway, and a real list here
+         * would have it apply each update twice.
+         */
+        getAllUpdates: function () {
+            return Promise.resolve([]);
+        },
+
+        /*
+         * Join the chat's realtime channel: data that reaches whoever
+         * has the app open right now and nobody else, which is what a
+         * game played together sends its moves over. One at a time, as
+         * the specification says -- joining again without leaving is
+         * an error.
+         */
+        joinRealtimeChannel: function () {
+            if (channel !== null) {
+                throw new Error("webxdc: already in the realtime channel; leave it first");
+            }
+            channel = new RealtimeChannel();
+            return channel;
         },
 
         /*
@@ -259,7 +435,7 @@
         return new Blob([bytes]);
     }
 
-    /* Nothing else is offered: importFiles and joinRealtimeChannel are
-     * absent rather than present and failing, so an app that
-     * feature-tests for them takes its own other path. */
+    /* Nothing else is offered: importFiles is absent rather than present
+     * and failing, so an app that feature-tests for it takes its own
+     * other path. */
 }());

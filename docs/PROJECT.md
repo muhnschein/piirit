@@ -102,6 +102,6 @@ In order of what matters:
 2. **Message polish**: avatars on bubbles, and a way to react with an
    emoji the quick row does not offer.
 3. **The rest of the webxdc API.** Apps are sent, shown and run
-   (`webxdc.rs`, `WebxdcPage.qml`), and status updates go both ways. What
-   is not offered is the newer calls -- `importFiles`, realtime channels.
-   Nor is an app's `source_code_url` shown anywhere.
+   (`webxdc.rs`, `WebxdcPage.qml`), and status updates and the realtime
+   channel go both ways. What is not offered is `importFiles`. Nor is an
+   app's `source_code_url` shown anywhere.
