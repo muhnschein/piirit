@@ -12,7 +12,10 @@ QtObject {
     property string previewSummary
     property string previewBody
     property string category
-    // Notification.Normal; the call rings at 2, Critical.
+    // The real type's enum, on its C++ class there, so that
+    // `Notification.Critical` resolves here as it does on a device.
+    enum Urgency { Low, Normal, Critical }
+    // Normal.
     property int urgency: 1
     property int itemCount: 1
     property var timestamp

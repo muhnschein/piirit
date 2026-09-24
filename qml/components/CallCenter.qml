@@ -349,9 +349,10 @@ Item {
         objectName: "ringNote"
         appName: "Piirit"
         appIcon: "harbour-piirit"
-        // Notification.Critical, by value: see NetworkWatch.qml on enums
-        // a stub cannot carry.
-        urgency: 2
+        // By name. Qt 5.6 checks a number bound to an enum property
+        // against the enum's names, finds none called "2", and refuses the
+        // file -- and this file is the window's, so the window with it.
+        urgency: Notification.Critical
 
         function ring() {
             ringNote.summary = call.peer_name
