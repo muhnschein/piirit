@@ -8,7 +8,7 @@ use std::cell::RefCell;
 use deltachat_jsonrpc::RpcError;
 use qmetaobject::*;
 
-use crate::core::connection;
+use crate::core::{connection, reconcile_rows};
 use crate::json;
 use crate::models::{ContactItem, ContactListModel};
 
@@ -133,6 +133,19 @@ pub struct ContactList {
     generation: u64,
 }
 
+/// How an answer from the core lands in the rows.
+#[derive(Clone, Copy)]
+enum Fill {
+    /// Another list -- another account, query or kind -- so the rows are
+    /// replaced, and the view starts again from its top.
+    Replace,
+    /// The same list read again, after the core said it changed or a page
+    /// asked: only the rows that changed are touched, so the view stays
+    /// where the reader left it. Replacing them would take it back to its
+    /// top, away from whatever the reader had scrolled to.
+    InPlace,
+}
+
 impl ContactList {
     /// How many rows there are.
     pub fn count(&self) -> u32 {
@@ -144,7 +157,7 @@ impl ContactList {
         if self.account_id != account_id {
             self.account_id = account_id;
             self.account_changed();
-            self.reload();
+            self.load(Fill::Replace);
         }
     }
 
@@ -153,7 +166,7 @@ impl ContactList {
         if self.query.to_string() != query.to_string() {
             self.query = query;
             self.query_changed();
-            self.reload();
+            self.load(Fill::Replace);
         }
     }
 
@@ -162,7 +175,7 @@ impl ContactList {
         if self.include_self != include_self {
             self.include_self = include_self;
             self.include_self_changed();
-            self.reload();
+            self.load(Fill::Replace);
         }
     }
 
@@ -171,12 +184,17 @@ impl ContactList {
         if self.blocked != blocked {
             self.blocked = blocked;
             self.blocked_changed();
-            self.reload();
+            self.load(Fill::Replace);
         }
     }
 
     /// Reload the list.
     pub fn reload(&mut self) {
+        self.load(Fill::InPlace);
+    }
+
+    /// Ask the core for the list, and put what it answers in `rows`.
+    fn load(&mut self, fill: Fill) {
         let account_id = self.account_id;
         if account_id == 0 {
             return;
@@ -202,7 +220,16 @@ impl ContactList {
             }
             match result {
                 Ok(items) => {
-                    this.borrow_mut().rows.borrow_mut().reset_data(items);
+                    {
+                        let this_ref = this.borrow();
+                        let mut rows = this_ref.rows.borrow_mut();
+                        match fill {
+                            Fill::Replace => rows.reset_data(items),
+                            Fill::InPlace => {
+                                reconcile_rows(&mut rows, items, |item| item.contact_id);
+                            }
+                        }
+                    }
                     this.borrow().rows_changed();
                 }
                 Err(err) => this.borrow().error(err.into()),

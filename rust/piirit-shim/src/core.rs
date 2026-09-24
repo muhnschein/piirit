@@ -1662,11 +1662,31 @@ fn resume_account(items: &[AccountItem], selected: Option<u32>) -> u32 {
 /// changed in place instead, so a row that is still there keeps its
 /// delegate and whatever that delegate is in the middle of.
 fn reconcile_accounts(rows: &mut AccountListModel, wanted: Vec<AccountItem>) {
-    let wanted_ids: BTreeSet<u32> = wanted.iter().map(|item| item.account_id).collect();
+    reconcile_rows(rows, wanted, |item| item.account_id);
+}
+
+/// Remove, insert and change rows until `rows` holds `wanted`, a row
+/// matched to the one it replaces by `id`. A row that is still there
+/// keeps its delegate, and the view keeps its place.
+pub(crate) fn reconcile_rows<T, K>(
+    rows: &mut SimpleListModel<T>,
+    wanted: Vec<T>,
+    id: impl Fn(&T) -> K,
+) where
+    T: SimpleListItem + PartialEq,
+    K: Ord,
+{
+    // Nothing to keep: one reset rather than a row at a time, which for
+    // a first load of a long list is a view laid out once, not per row.
+    if rows.iter().next().is_none() {
+        rows.reset_data(wanted);
+        return;
+    }
+    let wanted_ids: BTreeSet<K> = wanted.iter().map(&id).collect();
     let gone: Vec<usize> = rows
         .iter()
         .enumerate()
-        .filter(|(_, row)| !wanted_ids.contains(&row.account_id))
+        .filter(|(_, row)| !wanted_ids.contains(&id(row)))
         .map(|(index, _)| index)
         .collect();
     // Backwards, so each index still means what it did when it was found.
@@ -1677,9 +1697,9 @@ fn reconcile_accounts(rows: &mut AccountListModel, wanted: Vec<AccountItem>) {
     for (index, item) in wanted.into_iter().enumerate() {
         // Read before the match: the iterator borrows the rows, and the
         // arms write to them.
-        let current = rows.iter().nth(index).map(|row| row.account_id);
+        let current = rows.iter().nth(index).map(&id);
         match current {
-            Some(id) if id == item.account_id => {
+            Some(current) if current == id(&item) => {
                 if rows[index] != item {
                     rows.change_line(index, item);
                 }
