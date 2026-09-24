@@ -70,9 +70,43 @@
      * prototype keeps `instanceof` true.
      */
     var Native = window.RTCPeerConnection;
+
+    /*
+     * Gecko before 115 -- ESR 91, which Sailfish OS 5.0 ships -- has no
+     * setConfiguration. The page makes its connection with no servers and
+     * sets them once getIceServers answers; without the method that
+     * throws, and both placing and answering wait on it, so no call would
+     * ever start. There, the servers go in when the connection is made --
+     * asked for there and then, the host being on the same machine -- and
+     * the page's later setConfiguration does nothing, the connection
+     * already having what it would have set.
+     */
+    var fixedServers = Native && !Native.prototype.setConfiguration;
+    function iceServersNow() {
+        try {
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET", API + "/ice", false);
+            xhr.send();
+            return xhr.status === 200 ? JSON.parse(xhr.responseText) : [];
+        } catch (err) {
+            return [];
+        }
+    }
+
     if (Native) {
         var Watched = function (configuration) {
-            var connection = new Native(configuration);
+            var settings = configuration;
+            if (fixedServers) {
+                settings = {};
+                for (var key in configuration || {}) {
+                    settings[key] = configuration[key];
+                }
+                settings.iceServers = iceServersNow();
+            }
+            var connection = new Native(settings);
+            if (fixedServers) {
+                connection.setConfiguration = function () {};
+            }
             connection.addEventListener("iceconnectionstatechange", function () {
                 post("/state", connection.iceConnectionState);
             });
