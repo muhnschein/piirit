@@ -27,29 +27,23 @@ use qmetaobject::*;
 
 mod common;
 
-/// Silica's `pageStack` as the call page uses it: it pops itself once
-/// the call is over. Recorded rather than performed.
-#[derive(QObject, Default)]
-struct StackProbe {
-    base: qt_base_class!(trait QObject),
-    log: qt_property!(QString; NOTIFY log_changed),
-    log_changed: qt_signal!(),
-    pop: qt_method!(fn(&mut self)),
-}
-
-impl StackProbe {
-    fn pop(&mut self) {
-        let current = self.log.to_string();
-        self.log = format!("{current}pop;").into();
-        self.log_changed();
-    }
-}
-
 const PROBE_QML: &str = r"
     import QtQuick 2.0
     import Sailfish.Silica 1.0
     import Sailfish.WebEngine 1.0
     Item {
+        id: probe
+
+        // Silica's `pageStack` as the call page uses it: it pops itself
+        // once the call is over. Recorded rather than performed, and in
+        // QML rather than as a QObject on the Rust side, since a page
+        // loaded by a Loader reads `pageStack` off the file the Loader
+        // was declared in.
+        property QtObject pageStack: QtObject {
+            property string log: ''
+            function pop() { log = log + 'pop;' }
+        }
+
         Loader { id: centerLoader }
         Loader { id: pageHolder; width: 540; height: 960 }
         // The stack the call page is pushed onto.
@@ -109,6 +103,7 @@ const PROBE_QML: &str = r"
             return names.join(',')
         }
         function pushes() { return '' + stack.pushes }
+        function popped() { return probe.pageStack.log }
         function engine() { return WebEngine.notified }
         function callState() {
             var call = centerLoader.item.call
@@ -159,13 +154,11 @@ fn a_call_rings_is_answered_on_its_page_and_ends_with_the_platform_told() {
     common::register_dbus_enum();
 
     let core_box = QObjectBox::new(DeltaChatCore::default());
-    let stack_box = QObjectBox::new(StackProbe::default());
     let mut engine = QmlEngine::new();
     engine.add_import_path(QString::from(
         common::stubs_dir().to_string_lossy().into_owned(),
     ));
     engine.set_object_property("core".into(), core_box.pinned());
-    engine.set_object_property("pageStack".into(), stack_box.pinned());
     engine.load_data(QByteArray::from(PROBE_QML));
 
     core_box
@@ -174,7 +167,6 @@ fn a_call_rings_is_answered_on_its_page_and_ends_with_the_platform_told() {
         .start(QString::from(env!("CARGO_BIN_EXE_fake-core-server")));
 
     let engine_ptr = std::ptr::addr_of_mut!(engine);
-    let stack_ptr = std::ptr::addr_of!(stack_box);
     let mut steps: Vec<(&str, String)> = Vec::new();
     let steps_ptr: *mut Vec<(&str, String)> = std::ptr::addr_of_mut!(steps);
 
@@ -255,7 +247,7 @@ fn a_call_rings_is_answered_on_its_page_and_ends_with_the_platform_told() {
 
     // Said for a moment, then gone.
     single_shot(Duration::from_secs(7), move || unsafe {
-        record!("popped", (*stack_ptr).pinned().borrow().log.to_string());
+        record!("popped", call!("popped"));
         record!("after", call!("callState"));
         record!("after-mce", get!("mce", "called"));
         record!("after-awake", get!("callKeepAlive", "enabled"));
