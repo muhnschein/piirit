@@ -1633,9 +1633,9 @@ Správy od zablokovaných kontaktov v ostatných skupinách sa budú naďalej zo
         <translation>Rozšírené</translation>
     </message>
     <message>
-        <source>Applies to every chat, regardless of its disappearing messages setting. &quot;Saved messages&quot; are kept.</source>
-        <extracomment>&quot;Saved messages&quot; is the name of the chat with oneself.</extracomment>
-        <translation>Platí pre každý chat bez ohľadu na jeho nastavenie miznúcich správ. „Uložené správy“ zostávajú.</translation>
+        <source>This applies to every profile, whatever a chat&apos;s own disappearing messages setting is.</source>
+        <extracomment>Under &quot;Delete messages from device&quot;. &quot;Disappearing messages&quot; is each chat&apos;s own setting of that name.</extracomment>
+        <translation>Platí pre každý profil bez ohľadu na nastavenie miznúcich správ v jednotlivých chatoch.</translation>
     </message>
 </context>
 <context>

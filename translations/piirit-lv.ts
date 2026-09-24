@@ -1633,9 +1633,9 @@ Citās grupās, kurās ir bloķēti kontakti, viņu ziņas joprojām būs redzam
         <translation>Papildu</translation>
     </message>
     <message>
-        <source>Applies to every chat, regardless of its disappearing messages setting. &quot;Saved messages&quot; are kept.</source>
-        <extracomment>&quot;Saved messages&quot; is the name of the chat with oneself.</extracomment>
-        <translation>Attiecas uz katru sarunu neatkarīgi no tās pazūdošo ziņu iestatījuma. „Saglabātās ziņas“ paliek.</translation>
+        <source>This applies to every profile, whatever a chat&apos;s own disappearing messages setting is.</source>
+        <extracomment>Under &quot;Delete messages from device&quot;. &quot;Disappearing messages&quot; is each chat&apos;s own setting of that name.</extracomment>
+        <translation>Attiecas uz katru profilu neatkarīgi no sarunas pazūdošo ziņu iestatījuma.</translation>
     </message>
 </context>
 <context>

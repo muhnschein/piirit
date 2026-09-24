@@ -277,8 +277,9 @@ Page {
                 objectName: "deletionCombo"
                 width: parent.width
                 label: qsTr("Delete messages from device")
-                //: "Saved messages" is the name of the chat with oneself.
-                description: qsTr("Applies to every chat, regardless of its disappearing messages setting. \"Saved messages\" are kept.")
+                //: Under "Delete messages from device". "Disappearing
+                //: messages" is each chat's own setting of that name.
+                description: qsTr("This applies to every profile, whatever a chat's own disappearing messages setting is.")
 
                 menu: ContextMenu {
                     Repeater {

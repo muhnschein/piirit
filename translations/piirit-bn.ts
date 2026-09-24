@@ -1627,9 +1627,9 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>উন্নত</translation>
     </message>
     <message>
-        <source>Applies to every chat, regardless of its disappearing messages setting. &quot;Saved messages&quot; are kept.</source>
-        <extracomment>&quot;Saved messages&quot; is the name of the chat with oneself.</extracomment>
-        <translation>চ্যাটের অদৃশ্য হওয়া বার্তার সেটিং নির্বিশেষে প্রতিটি চ্যাটে প্রযোজ্য। &quot;সংরক্ষিত বার্তা&quot; রাখা হয়।</translation>
+        <source>This applies to every profile, whatever a chat&apos;s own disappearing messages setting is.</source>
+        <extracomment>Under &quot;Delete messages from device&quot;. &quot;Disappearing messages&quot; is each chat&apos;s own setting of that name.</extracomment>
+        <translation>প্রতিটি প্রোফাইলে প্রযোজ্য, কোনো চ্যাটের নিজস্ব অদৃশ্য হওয়া বার্তার সেটিং যা-ই হোক।</translation>
     </message>
 </context>
 <context>

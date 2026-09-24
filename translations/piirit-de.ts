@@ -1627,9 +1627,9 @@ In anderen Gruppen mit blockierten Kontakten werden deren Nachrichten weiterhin 
         <translation>Erweitert</translation>
     </message>
     <message>
-        <source>Applies to every chat, regardless of its disappearing messages setting. &quot;Saved messages&quot; are kept.</source>
-        <extracomment>&quot;Saved messages&quot; is the name of the chat with oneself.</extracomment>
-        <translation>Gilt für jeden Chat, unabhängig von dessen Einstellung für verschwindende Nachrichten. „Gespeicherte Nachrichten“ bleiben erhalten.</translation>
+        <source>This applies to every profile, whatever a chat&apos;s own disappearing messages setting is.</source>
+        <extracomment>Under &quot;Delete messages from device&quot;. &quot;Disappearing messages&quot; is each chat&apos;s own setting of that name.</extracomment>
+        <translation>Gilt für jedes Profil, unabhängig von der Einstellung eines Chats für verschwindende Nachrichten.</translation>
     </message>
 </context>
 <context>

@@ -471,30 +471,11 @@ Page {
                 }
             }
 
-            // One more relay, from the plus under the last row, where
-            // the profiles page puts "add profile".
-            ListItem {
-                id: addRelayRow
+            // One more relay.
+            PlusRow {
                 objectName: "addRelayButton"
                 width: column.width
-                contentHeight: Theme.itemSizeSmall + 2 * Theme.paddingMedium
-
-                PlusMark {
-                    id: plus
-                    x: Theme.horizontalPageMargin
-                    y: Theme.paddingMedium
-                }
-
-                Label {
-                    x: plus.x + plus.width + Theme.paddingMedium
-                    width: parent.width - x - Theme.horizontalPageMargin
-                    anchors.verticalCenter: plus.verticalCenter
-                    wrapMode: Text.Wrap
-                    color: addRelayRow.highlighted ? Theme.highlightColor
-                                                   : Theme.primaryColor
-                    text: qsTr("Add a relay")
-                }
-
+                text: qsTr("Add a relay")
                 onClicked: pageStack.push(Qt.resolvedUrl("AddRelayPage.qml"),
                                           { accountId: page.accountId })
             }

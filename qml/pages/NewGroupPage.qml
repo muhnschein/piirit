@@ -321,30 +321,11 @@ Page {
                 }
             }
 
-            // The way to more members, where the next one would be listed:
-            // a row shaped like a member's, with a plus for a picture.
-            ListItem {
-                id: addMembersRow
+            // The way to more members.
+            PlusRow {
                 objectName: "addMembersButton"
                 width: column.width
-                contentHeight: Theme.itemSizeSmall + 2 * Theme.paddingMedium
-
-                PlusMark {
-                    id: plus
-                    x: Theme.horizontalPageMargin
-                    y: Theme.paddingMedium
-                }
-
-                Label {
-                    x: plus.x + plus.width + Theme.paddingMedium
-                    width: parent.width - x - Theme.horizontalPageMargin
-                    anchors.verticalCenter: plus.verticalCenter
-                    wrapMode: Text.Wrap
-                    color: addMembersRow.highlighted ? Theme.highlightColor
-                                                     : Theme.primaryColor
-                    text: qsTr("Add members")
-                }
-
+                text: qsTr("Add members")
                 onClicked: page.pickMembers()
             }
         }

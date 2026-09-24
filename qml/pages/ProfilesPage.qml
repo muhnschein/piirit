@@ -281,38 +281,14 @@ Page {
             }
         }
 
-        // The way to another profile, where the next one would be
-        // listed: a row shaped like a profile's, with a plus for a
-        // picture, as the group pages offer another member. Under the
-        // last row rather than in the pulley, which is where a reader
-        // who has just read the list is already looking.
-        //
-        // One row, and the three ways in are behind it. Three pluses in a
-        // column -- make one, read a backup file, join from another device
-        // -- would put three answers under a list of profiles before the
-        // reader had been asked anything.
-        footer: ListItem {
-            id: addProfileRow
+        // The way to another profile. One row, and the three ways in are
+        // behind it. Three pluses in a column -- make one, read a backup
+        // file, join from another device -- would put three answers under
+        // a list of profiles before the reader had been asked anything.
+        footer: PlusRow {
             objectName: "addProfileButton"
             width: listView.width
-            contentHeight: Theme.itemSizeSmall + 2 * Theme.paddingMedium
-
-            PlusMark {
-                id: plus
-                x: Theme.horizontalPageMargin
-                y: Theme.paddingMedium
-            }
-
-            Label {
-                x: plus.x + plus.width + Theme.paddingMedium
-                width: parent.width - x - Theme.horizontalPageMargin
-                anchors.verticalCenter: plus.verticalCenter
-                wrapMode: Text.Wrap
-                color: addProfileRow.highlighted ? Theme.highlightColor
-                                                 : Theme.primaryColor
-                text: qsTr("Add profile")
-            }
-
+            text: qsTr("Add profile")
             onClicked: pageStack.push(Qt.resolvedUrl("AddProfilePage.qml"), {})
         }
 

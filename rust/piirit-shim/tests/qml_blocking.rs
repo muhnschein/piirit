@@ -110,6 +110,22 @@ fn probe_qml() -> String {
             item.clicked()
             return 'ok'
         }}
+        /// A row held on to, to tell later whether it is still the same
+        /// row or one built again in its place.
+        property var kept: null
+        function keep(name) {{
+            kept = findIn(loader.item, name)
+            return kept ? 'ok' : 'missing:' + name
+        }}
+        function same(name) {{
+            return '' + (kept !== null && findIn(loader.item, name) === kept)
+        }}
+        function reload(name) {{
+            var list = findIn(loader.item, name)
+            if (!list) {{ return 'missing:' + name }}
+            list.reload()
+            return 'ok'
+        }}
     }}
 ",
         components.display()
@@ -197,7 +213,9 @@ fn a_contact_is_blocked_and_let_back_in_from_the_settings() {
         record!("pushed-blocked", call!("pushed"));
     });
 
-    // Nobody is blocked yet, and the plus is the way to change that.
+    // Nobody is blocked yet, and the plus is the way to change that --
+    // once the core has said so, and not while the list is still empty
+    // for want of an answer.
     single_shot(Duration::from_secs(4), move || unsafe {
         record!(
             "load-blocked",
@@ -205,6 +223,14 @@ fn a_contact_is_blocked_and_let_back_in_from_the_settings() {
                 "load",
                 QString::from(common::page_url("BlockedContactsPage.qml")),
                 1
+            )
+        );
+        record!(
+            "plus-before-answer",
+            call!(
+                "get",
+                QString::from("blockSomeone"),
+                QString::from("visible")
             )
         );
     });
@@ -219,6 +245,14 @@ fn a_contact_is_blocked_and_let_back_in_from_the_settings() {
                 "get",
                 QString::from("nobodyBlocked"),
                 QString::from("enabled")
+            )
+        );
+        record!(
+            "plus-shown",
+            call!(
+                "get",
+                QString::from("blockSomeone"),
+                QString::from("visible")
             )
         );
         record!("plus", call!("click", QString::from("blockSomeone")));
@@ -264,16 +298,40 @@ fn a_contact_is_blocked_and_let_back_in_from_the_settings() {
             )
         );
     });
+    // The plus stays under the last row once there is one, and reading
+    // the list again leaves the rows where they are: rebuilt, they would
+    // take the view back to its top, away from the plus.
     single_shot(Duration::from_secs(12), move || unsafe {
         record!(
             "blocked-count",
             call!("get", QString::from("blocked"), QString::from("count"))
         );
+        record!(
+            "plus-with-rows",
+            call!(
+                "get",
+                QString::from("blockSomeone"),
+                QString::from("visible")
+            )
+        );
+        record!(
+            "plus-y",
+            call!("get", QString::from("blockSomeone"), QString::from("y"))
+        );
+        record!(
+            "row-y",
+            call!("get", QString::from("blockedRow10"), QString::from("y"))
+        );
+        record!("keep-row", call!("keep", QString::from("blockedRow10")));
+        record!("reload-blocked", call!("reload", QString::from("blocked")));
+    });
+    single_shot(Duration::from_secs(14), move || unsafe {
+        record!("row-kept", call!("same", QString::from("blockedRow10")));
         record!("tap-blocked", call!("click", QString::from("blockedRow10")));
         record!("pushed-unblock", call!("pushed"));
         record!("accept-unblock", call!("acceptDialog"));
     });
-    single_shot(Duration::from_secs(14), move || unsafe {
+    single_shot(Duration::from_secs(16), move || unsafe {
         record!(
             "blocked-after",
             call!("get", QString::from("blocked"), QString::from("count"))
@@ -306,6 +364,8 @@ fn a_contact_is_blocked_and_let_back_in_from_the_settings() {
         "open-blocked",
         "plus",
         "tap-contact",
+        "keep-row",
+        "reload-blocked",
         "tap-blocked",
         "accept-block",
         "accept-unblock",
@@ -328,6 +388,12 @@ fn a_contact_is_blocked_and_let_back_in_from_the_settings() {
         (value("blocked-empty"), value("placeholder")),
         ("0".to_string(), "true".to_string()),
         "a profile that has blocked nobody did not say so. {context}"
+    );
+    assert_eq!(
+        (value("plus-before-answer"), value("plus-shown")),
+        ("false".to_string(), "true".to_string()),
+        "the plus was offered before the core had said who is blocked, or not \
+         once it had. {context}"
     );
     assert_eq!(
         value("pushed-picker"),
@@ -359,6 +425,18 @@ fn a_contact_is_blocked_and_let_back_in_from_the_settings() {
         value("blocked-count"),
         "1",
         "the blocked contact is not on the blocked list. {context}"
+    );
+    let y = |label: &str| value(label).parse::<f64>().unwrap_or(f64::NAN);
+    assert!(
+        value("plus-with-rows") == "true" && y("plus-y") > y("row-y"),
+        "the plus is not under the blocked contacts once there are some. \
+         {context}"
+    );
+    assert_eq!(
+        value("row-kept"),
+        "true",
+        "reading the block list again built its rows anew, which takes the \
+         view back to its top. {context}"
     );
     assert_eq!(
         value("pushed-unblock"),

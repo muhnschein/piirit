@@ -1621,9 +1621,9 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
         <translation>Gelişmiş</translation>
     </message>
     <message>
-        <source>Applies to every chat, regardless of its disappearing messages setting. &quot;Saved messages&quot; are kept.</source>
-        <extracomment>&quot;Saved messages&quot; is the name of the chat with oneself.</extracomment>
-        <translation>Kaybolan mesajlar ayarından bağımsız olarak her sohbete uygulanır. &quot;Kaydedilen mesajlar&quot; tutulur.</translation>
+        <source>This applies to every profile, whatever a chat&apos;s own disappearing messages setting is.</source>
+        <extracomment>Under &quot;Delete messages from device&quot;. &quot;Disappearing messages&quot; is each chat&apos;s own setting of that name.</extracomment>
+        <translation>Sohbetin kendi kaybolan mesajlar ayarından bağımsız olarak her profile uygulanır.</translation>
     </message>
 </context>
 <context>
