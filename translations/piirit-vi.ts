@@ -1617,9 +1617,9 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Nâng cao</translation>
     </message>
     <message>
-        <source>Applies to every chat, regardless of its disappearing messages setting. &quot;Saved messages&quot; are kept.</source>
-        <extracomment>&quot;Saved messages&quot; is the name of the chat with oneself.</extracomment>
-        <translation>Áp dụng cho mọi cuộc trò chuyện, bất kể cài đặt tin nhắn tự hủy của cuộc trò chuyện đó. &quot;Tin nhắn đã lưu&quot; được giữ lại.</translation>
+        <source>This applies to every profile, whatever a chat&apos;s own disappearing messages setting is.</source>
+        <extracomment>Under &quot;Delete messages from device&quot;. &quot;Disappearing messages&quot; is each chat&apos;s own setting of that name.</extracomment>
+        <translation>Áp dụng cho mọi hồ sơ, bất kể cài đặt tin nhắn tự hủy riêng của từng cuộc trò chuyện.</translation>
     </message>
 </context>
 <context>

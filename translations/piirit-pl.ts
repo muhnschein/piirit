@@ -1633,9 +1633,9 @@ Wiadomości innych grup z zablokowanymi kontaktami nadal będą wyświetlane.</t
         <translation>Zaawansowane</translation>
     </message>
     <message>
-        <source>Applies to every chat, regardless of its disappearing messages setting. &quot;Saved messages&quot; are kept.</source>
-        <extracomment>&quot;Saved messages&quot; is the name of the chat with oneself.</extracomment>
-        <translation>Dotyczy każdego czatu, niezależnie od jego ustawienia znikających wiadomości. „Zapisane wiadomości” zostają.</translation>
+        <source>This applies to every profile, whatever a chat&apos;s own disappearing messages setting is.</source>
+        <extracomment>Under &quot;Delete messages from device&quot;. &quot;Disappearing messages&quot; is each chat&apos;s own setting of that name.</extracomment>
+        <translation>Dotyczy każdego profilu, niezależnie od ustawienia znikających wiadomości w danym czacie.</translation>
     </message>
 </context>
 <context>

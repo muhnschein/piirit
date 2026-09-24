@@ -1621,9 +1621,9 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>高级</translation>
     </message>
     <message>
-        <source>Applies to every chat, regardless of its disappearing messages setting. &quot;Saved messages&quot; are kept.</source>
-        <extracomment>&quot;Saved messages&quot; is the name of the chat with oneself.</extracomment>
-        <translation>适用于所有聊天，无论其阅后即焚消息设置如何。“已保存的消息”会保留。</translation>
+        <source>This applies to every profile, whatever a chat&apos;s own disappearing messages setting is.</source>
+        <extracomment>Under &quot;Delete messages from device&quot;. &quot;Disappearing messages&quot; is each chat&apos;s own setting of that name.</extracomment>
+        <translation>适用于所有个人资料，无论各聊天自身的阅后即焚消息设置如何。</translation>
     </message>
 </context>
 <context>

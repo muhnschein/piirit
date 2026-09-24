@@ -1633,9 +1633,9 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Дополнительно</translation>
     </message>
     <message>
-        <source>Applies to every chat, regardless of its disappearing messages setting. &quot;Saved messages&quot; are kept.</source>
-        <extracomment>&quot;Saved messages&quot; is the name of the chat with oneself.</extracomment>
-        <translation>Действует для каждого чата независимо от его настройки исчезающих сообщений. «Сохранённые сообщения» остаются.</translation>
+        <source>This applies to every profile, whatever a chat&apos;s own disappearing messages setting is.</source>
+        <extracomment>Under &quot;Delete messages from device&quot;. &quot;Disappearing messages&quot; is each chat&apos;s own setting of that name.</extracomment>
+        <translation>Действует для каждого профиля независимо от настройки исчезающих сообщений в самом чате.</translation>
     </message>
 </context>
 <context>
