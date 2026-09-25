@@ -3,6 +3,9 @@ import Nemo.Notifications 1.0
 import Nemo.DBus 2.0
 import Nemo.KeepAlive 1.2
 import Piirit 1.0
+// Settings, the singleton beside this file: on Qt 5.6 a file reads one
+// declared in its own directory's qmldir only through an explicit import.
+import "."
 
 /*
  * The app's one call: the window's, because a call belongs to no page.
