@@ -16,6 +16,7 @@
 //! - [`Call`], the one call the app can be in: ringing, answered, placed,
 //!   and ended, with the page it runs in.
 
+use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
 
 use deltachat_jsonrpc::RpcClient;
@@ -196,6 +197,13 @@ pub struct Call {
     /// not naming a known call is a call that never connects. Read again
     /// once the id is known; see `take_report`.
     early: Vec<(String, String)>,
+    /// Set once the core needs telling nothing more about this call: it
+    /// ended the call itself, or another of this account's devices took
+    /// it. A host let go after that -- the one up now, or one still
+    /// coming up -- goes without `end_call`, which for a call answered
+    /// elsewhere would end it on the device that answered. One per call,
+    /// so a host coming up late reads the flag of the call it was for.
+    settled: Arc<AtomicBool>,
 }
 
 /// The most early events kept for one call. They are for a moment that
@@ -222,6 +230,7 @@ impl Call {
         self.generation = self.generation.wrapping_add(1);
         self.host = None;
         self.early.clear();
+        self.settled = Arc::new(AtomicBool::new(false));
         self.account_id = account_id;
         self.chat_id = chat_id;
         self.message_id = message_id;
@@ -364,6 +373,15 @@ impl Call {
         self.ended(reason.into());
     }
 
+    /// The core needs telling nothing more about this call; see
+    /// `settled`.
+    fn settle(&self) {
+        self.settled.store(true, Ordering::SeqCst);
+        if let Some(host) = &self.host {
+            host.settle();
+        }
+    }
+
     /// Tell the core to end the call, without waiting for it.
     fn end_call(&self) {
         let (account_id, message_id) = (self.account_id, self.message_id);
@@ -447,12 +465,17 @@ impl Call {
         });
         let report: call_host::Reporter = Arc::new(raise);
 
+        let settled = Arc::clone(&self.settled);
         let ptr: QPointer<Self> = QPointer::from(&*self);
         let done = queued_callback(move |result: Result<Host, String>| {
             let Some(this) = ptr.as_pinned() else { return };
             // A call hung up while its page was coming up: dropping the
-            // host here is what lets it go.
+            // host here is what lets it go -- quietly, for a call the
+            // core has nothing more to hear about.
             if this.borrow().generation != generation {
+                if let (Ok(host), true) = (&result, settled.load(Ordering::SeqCst)) {
+                    host.settle();
+                }
                 return;
             }
             match result {
@@ -594,10 +617,14 @@ impl Call {
                 self.ringing();
             }
             // Answered: here, which the host has reported already, or on
-            // another device, where it rings no longer.
+            // another device. The core says the latter only of a call
+            // this device has not accepted itself, and turns this
+            // device's own accept into nothing once it has -- so from any
+            // state short of over, answered here or not, the call is that
+            // device's now, and letting it go must not end it there.
             "IncomingCallAccepted" if ours => {
-                if !json::flag(&payload, "from_this_device") && self.state.to_string() == "ringing"
-                {
+                if !json::flag(&payload, "from_this_device") && self.busy() {
+                    self.settle();
                     self.finish("answered-elsewhere");
                 }
             }
@@ -615,9 +642,7 @@ impl Call {
             }
             "CallEnded" if ours && self.busy() => {
                 // Nothing to tell the core: it is the one saying so.
-                if let Some(host) = &self.host {
-                    host.settle();
-                }
+                self.settle();
                 if self.state.to_string() == "ringing" {
                     self.finish_unanswered();
                 } else {
