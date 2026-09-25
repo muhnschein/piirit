@@ -149,14 +149,21 @@ ApplicationWindow {
         property: "delete_device_after"
         value: Settings.deleteDeviceAfter
     }
-    // Whose calls ring here: contacts' while calls are on and ringing is,
-    // nobody's otherwise -- the core's own 1 and 2. A call from somebody
-    // who may not ring is still kept, and can still be answered from its
-    // chat.
+    // Whose calls ring here: nobody's once the reader has switched
+    // ringing off, contacts' otherwise -- the core's own 2 and 1. A call
+    // from somebody who may not ring is still kept, and can still be
+    // answered from its chat.
+    //
+    // Only the reader's own choice writes 2. With calls off the core is
+    // left at its default, 1: the key is in the profile's database and
+    // goes wherever the profile does -- a backup, a second device -- and a
+    // "nobody" written for a feature switched off here made a Delta Chat
+    // set up from it ring for nobody, never having been asked. With calls
+    // off nothing here rings anyway: CallCenter does not listen.
     Binding {
         target: core
         property: "who_can_call_me"
-        value: Settings.callsEnabled === true && Settings.callsRing !== false ? 1 : 2
+        value: Settings.callsEnabled === true && Settings.callsRing === false ? 2 : 1
     }
 
     /// The app's one call, which belongs to no page: see

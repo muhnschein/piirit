@@ -46,6 +46,10 @@ of it the app reads against the binary itself.
   the media the client's problem and nothing else.
 - **A call rings for 120 seconds**, then goes stale at both ends. The
   core's own timer ends it: incoming as Missed, outgoing as Declined.
+  That timer lives only in the server that heard the call, and says
+  `CallEnded` once; a restarted server or an overflowed event channel
+  loses it, so a call ringing here also stops by itself after 125
+  seconds (`calls.rs`, `RING_LIMIT`), by when the core counts it stale.
 - **A ringing call raises no `IncomingMsg`**, and one that rings out
   says only `MsgsChanged` and `CallEnded`. A missed call's notification
   is the client's to raise; the chat list's message notifications never
@@ -55,7 +59,11 @@ of it the app reads against the binary itself.
   self"), and a chat without the other end's key cannot send.
 - **`who_can_call_me`**, per device, not synced: 0 everybody, 1
   contacts (the default), 2 nobody. A call from somebody who may not ring
-  is still stored, and can still be answered from its chat.
+  is still stored, and can still be answered from its chat. Not synced,
+  but kept in the profile's database, so a backup or a second device
+  takes it along: Piirit writes 2 only when the reader switches ringing
+  off, and leaves the default otherwise -- calls being off here is not a
+  choice for a client the profile is copied to.
 
 ## How a call works here
 
