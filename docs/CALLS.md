@@ -74,6 +74,20 @@ The drawing is not behind the switch -- it is what a call from another
 client looks like whether or not calls are on -- but the tap is: with
 calls off, a call's row does nothing.
 
+### Placing one
+
+From the contact: their page's tiles (`MediaKinds.qml`) have a **Calls**
+tile while calls are on and the chat is one a call can be placed in --
+one-to-one, encrypted, taking messages, the core's own conditions asked
+in advance (`chat.rs`'s `takes_calls`). Behind it, `CallsPage.qml`
+lists the chat's calls from the chat's own media index (`chat_media.rs`,
+kind `calls`, the core's `Call` view type), newest first -- which way
+each went, what became of it, when -- under a first row, *Call Ada*, to
+place one from. A tap on a listed call does what a tap on its row in the
+chat does. The chat's header has no call button: both ends of that line
+are taken, the left by the back gesture and the right by the way to the
+contact's page.
+
 ### The call
 
 One `Call` object (`calls.rs`) for the whole window, held by
@@ -86,11 +100,10 @@ another device, missed, failed. One call at a time, as both reference
 clients have it: a second rings nowhere and is a missed call once the
 core gives up on it.
 
-`CallPage.qml` shows it: who, and how it stands, in the phone's language;
-Decline and Answer while it rings; then the call's page. The page cannot
-be swiped away while a call is up -- that would take the call's sound
-with it -- and a tap on a notification or a cover quick action brings
-the call back to the front rather than popping it.
+`CallPage.qml` shows it (below). The page cannot be swiped away while a
+call is up -- that would take the call's sound with it -- and a tap on a
+notification or a cover quick action brings the call back to the front
+rather than popping it.
 
 ### The page
 
@@ -150,13 +163,20 @@ then trickle" -- so a call from here reaches either of them.
 ### The screen
 
 The call page (`qml/pages/CallPage.qml`) is laid out as the phone's own
-call screen: who, top left, and the time of day, top right; how long, in
-hours, minutes and seconds, large, under them; the switches under that;
-and *End call* at the foot. The other end's picture, where they have one
-of their own, fills the screen behind it, blurred and dimmed. Of the
-phone screen's four switches the microphone is the one a call here has:
-the keypad and recording are a phone call's, and the loudspeaker is the
-earpiece question below.
+call screens. The other end's picture, where they have one of their own,
+fills the screen behind both, blurred and dimmed.
+
+- **Ringing**: who, large and centred at the top, and the handset in the
+  middle (`CallSwipe.qml`). Dragged to either side it answers; dragged up
+  it silences the ringtone and offers *Message* -- decline, and open the
+  chat -- *Decline*, and *Remind me* -- decline, and be reminded to call
+  back ten minutes later, by a notification with *Call back* on it. The
+  reminder is the app's own timer: it comes only if the app is still
+  running, which a call needs anyway to ring at all.
+- **In a call**: who, top left, and the time of day, top right; how
+  long, in hours, minutes and seconds, large, under them; the
+  loudspeaker and the microphone switches under that; and *End call* at
+  the foot. The phone screen's keypad and recording are a phone call's.
 
 The page the media runs in draws controls of its own, in English. It is
 kept running under the call screen, unseen and behind a catch that takes
@@ -182,17 +202,13 @@ What is here is the rest of it:
 | **Lock screen** | a Critical notification with Decline and Answer on it, and the app brought forward | `Nemo.Notifications` |
 | **Missed calls** | left in the notification area in the phone's own category for one, `x-nemo.call.missed`, with Call back on it | `Nemo.Notifications` |
 | **Staying awake** | the CPU kept up while a call is up: a phone that suspends takes the call's sound with it | `Nemo.KeepAlive` |
+| **Earpiece** | a call carrying sound is on the earpiece, as a phone call is: ohm's route manager is asked to prefer it, unless the loudspeaker switch is on or something is plugged in or paired -- a headset, headphones, Bluetooth, USB -- in which case it goes there, or to the loudspeaker over it when the switch says so. What is plugged in is asked every two seconds during a call, because a preference holds whatever is plugged in later. The preference is let go of the moment the call is over, and on the way out; it outlives the app, so it is also written down (`Settings.callRoute`), and one a run did not get to let go of is let go of by the next as it starts | ohm's `org.nemomobile.Route.Manager` on the system bus, which sailjail's `Audio` permission opens; not a listed Harbour API |
 | **At the ear** | the proximity sensor puts a black screen that takes no touch over the call while it is held there -- an app cannot switch the display off | `QtSensors` |
 | **In the background** | the call's `WebView` is held active once its page is up: an inactive view is a hidden document, and the engine pauses a hidden document's media | `Sailfish.WebView` |
 | **Microphone** | granted to the call's own page, for the session, before it asks -- the engine's prompt would otherwise open every call, since the origin is a new port each time. Never engine-wide: that would grant it to every webxdc app too | `Sailfish.WebEngine` |
 
 Left out on purpose:
 
-- **The earpiece.** ohm's `Route.Manager.Prefer("earpiece")` is open to an
-  app with the Audio permission, and would make a voice call sound like
-  one. It is also kept after the app has gone: a crash mid-call would
-  leave every sound the phone makes on the earpiece. Calls are on the
-  speaker until that can be made safe on a device.
 - **Being a call to the audio policy.** The `call` resource class is
   voicecall's. `libaudioresource`, which Harbour allows, would put the
   app's streams in the `player` class -- pausing music, and keeping the
@@ -230,11 +246,11 @@ of Piirit: two phones, a calls-enabled build, and an afternoon.
   included, inside the core's 120 seconds. Anything else is a missed
   call's row.
 - **Harbour.** Calls add no executable, no library off the list and no
-  permission that was not already asked for. They add two system-bus
-  services Harbour does not list -- ngfd and mce -- which its validator
-  cannot see and its QA may or may not accept; both are one
-  `DBusInterface` each in `CallCenter.qml`, and a call works without
-  either. And they promote the browser engine, a separate package on
+  permission that was not already asked for. They add three system-bus
+  services Harbour does not list -- ngfd, mce and ohm's route manager --
+  which its validator cannot see and its QA may or may not accept; each
+  is one `DBusInterface` in `CallCenter.qml`, and a call works without
+  any of them. And they promote the browser engine, a separate package on
   this platform, from a webxdc feature to the load-bearing part of a
   headline one.
 
@@ -243,9 +259,7 @@ of Piirit: two phones, a calls-enabled build, and an afternoon.
 1. **The phone questions above**, before anything else.
 2. **Video**: `?noOutgoingVideoInitially`, the camera granted as the
    microphone is, and the page's own camera button.
-3. **The earpiece**, once it can be released even when the app is not
-   there to release it.
-4. **The chat list's preview** of a call is still the core's English
+3. **The chat list's preview** of a call is still the core's English
    sentence (`📞 Outgoing audio call`). The reference clients hand the
    core translations of its call strings (`set_stock_strings`); Piirit
    hands it none of any kind yet.

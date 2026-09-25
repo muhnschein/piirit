@@ -27,7 +27,7 @@ use qmetaobject::*;
 
 mod common;
 
-const PROBE_QML: &str = r"
+const PROBE_QML: &str = r#"
     import QtQuick 2.0
     import Sailfish.Silica 1.0
     import Sailfish.WebEngine 1.0
@@ -57,13 +57,47 @@ const PROBE_QML: &str = r"
                 return pageHolder.item
             }
         }
-        function load(url) {
+        property string chats: ''
+        // The app's own settings, as a file in the components directory
+        // reads them: a route an earlier run left preferred, before the
+        // call handling starts.
+        function setSetting(dir, name, value) {
+            var writer = Qt.createQmlObject('import QtQuick 2.0; import "' + dir + '"; '
+                + 'QtObject { function set(n, v) { Settings[n] = v } '
+                + 'function get(n) { return \'\' + Settings[n] } }', probe)
+            writer.set(name, value)
+            return writer.get(name)
+        }
+        function setting(dir, name) {
+            var reader = Qt.createQmlObject('import QtQuick 2.0; import "' + dir + '"; '
+                + 'QtObject { function get(n) { return \'\' + Settings[n] } }', probe)
+            return reader.get(name)
+        }
+        function load(url, dir) {
+            setSetting(dir, 'callRoute', 'earpiece')
             centerLoader.setSource(url, { stack: stack, enabled: true })
             if (centerLoader.status !== Loader.Ready) { return 'load-failed' }
-            // ngfd numbers the event it plays.
+            // ngfd numbers the event it plays; the route manager lists
+            // nothing plugged in.
             find(centerLoader.item, 'feedback').reply = 42
+            find(centerLoader.item, 'routes').reply = []
+            centerLoader.item.chatRequested.connect(function (accountId, chatId) {
+                chats += accountId + ':' + chatId + ';'
+            })
             return 'ok'
         }
+        // A drag on the ringing handset, let go of at dx, dy.
+        function swipe(dx, dy) {
+            var hit = findIn(pageHolder.item, 'callSwipe')
+            if (!hit) { return 'missing:callSwipe' }
+            return hit.release(dx, dy)
+        }
+        function remind() {
+            var timer = find(centerLoader.item, 'reminder')
+            timer.triggered()
+            return 'ok'
+        }
+        function requested() { return chats }
         function findIn(node, name) {
             if (!node) { return null }
             if (node.objectName === name) { return node }
@@ -133,7 +167,7 @@ const PROBE_QML: &str = r"
         // The page going, as a pop takes it.
         function dropPage() { pageHolder.setSource('', {}); return 'ok' }
     }
-";
+"#;
 
 #[test]
 #[allow(clippy::too_many_lines)]
@@ -195,12 +229,17 @@ fn a_call_rings_is_answered_on_its_page_and_ends_with_the_platform_told() {
     // SAFETY for every block: these fire only while `exec()` runs on this
     // thread, and everything they point at outlives it.
     single_shot(Duration::from_secs(1), move || unsafe {
+        let center = common::component_url("CallCenter.qml");
+        let dir = center.trim_end_matches("CallCenter.qml").to_string();
         record!(
             "load",
-            call!(
-                "load",
-                QString::from(common::component_url("CallCenter.qml"))
-            )
+            call!("load", QString::from(center), QString::from(dir.clone()))
+        );
+        // Let go of at once: the earlier run's preference.
+        record!("stale-routes", get!("routes", "called"));
+        record!(
+            "stale-setting",
+            call!("setting", QString::from(dir), QString::from("callRoute"))
         );
         // Nothing yet: nothing rings, nothing is kept awake, and mce is
         // not told about a call that is not there.
@@ -212,7 +251,16 @@ fn a_call_rings_is_answered_on_its_page_and_ends_with_the_platform_told() {
     single_shot(Duration::from_secs(3), move || unsafe {
         record!("pushes", call!("pushes"));
         record!("status", get!("callStatus", "text"));
-        record!("ringing-buttons", get!("ringingButtons", "visible"));
+        record!("ringing-buttons", get!("ringingView", "visible"));
+        record!("ring-name", get!("ringName", "text"));
+        record!("options-before", get!("ringingOptions", "visible"));
+        // Short of the mark: nothing.
+        record!("short", call!("swipe", 20.0_f64, -20.0_f64));
+        // Up: silenced, and what comes instead is offered.
+        record!("silence", call!("swipe", 0.0_f64, -400.0_f64));
+        record!("silenced-feedback", get!("feedback", "called"));
+        record!("options-after", get!("ringingOptions", "visible"));
+        record!("silenced-state", call!("callState"));
         record!("hang-up-button", get!("hangUpButton", "visible"));
         record!("ring-published", get!("ringNote", "isPublished"));
         record!("ring-urgency", get!("ringNote", "urgency"));
@@ -224,7 +272,8 @@ fn a_call_rings_is_answered_on_its_page_and_ends_with_the_platform_told() {
         record!("ringing-lit", get!("callDisplay", "preventBlanking"));
         record!("clock", get!("callClock", "text"));
         record!("mute-ringing", get!("muteSwitch", "visible"));
-        record!("answer", call!("tap", QString::from("answerButton")));
+        // Across: answered.
+        record!("answer", call!("swipe", 400.0_f64, 0.0_f64));
     });
 
     // Answered: the page is up, granted the microphone, and nothing rings.
@@ -237,11 +286,16 @@ fn a_call_rings_is_answered_on_its_page_and_ends_with_the_platform_told() {
         record!("ring-after", get!("ringNote", "isPublished"));
         record!("answered-lit", get!("callDisplay", "preventBlanking"));
         record!("answered-awake", get!("callKeepAlive", "enabled"));
-        record!("ringing-buttons-after", get!("ringingButtons", "visible"));
+        record!("ringing-buttons-after", get!("ringingView", "visible"));
         record!("hang-up-answered", get!("hangUpButton", "visible"));
         record!("mute-answered", get!("muteSwitch", "visible"));
         record!("mute-tap", call!("tap", QString::from("muteSwitch")));
         record!("muted", get!("muteSwitch", "checked"));
+        // On the earpiece, with nothing plugged in.
+        record!("earpiece", get!("routes", "called"));
+        record!("speaker-tap", call!("tap", QString::from("speakerSwitch")));
+        record!("speaker", get!("speakerSwitch", "checked"));
+        record!("loudspeaker", get!("routes", "called"));
         // Unseen, and under a shield: a stray tap reaches none of the
         // call page's own controls.
         record!("view-opacity", get!("callViewLoader", "opacity"));
@@ -283,6 +337,45 @@ fn a_call_rings_is_answered_on_its_page_and_ends_with_the_platform_told() {
             call!("actions", QString::from("missedNote"))
         );
         record!("missed-ring", get!("ringNote", "isPublished"));
+        call!("dropPage");
+    });
+
+    // A third call, silenced and declined with a message instead.
+    // Straight after the last page was taken away, while it may still be
+    // on its way out: the call is shown once it has gone.
+    single_shot(Duration::from_millis(10_100), move || unsafe {
+        record!("ring-message", call!("ring", 9200));
+    });
+
+    single_shot(Duration::from_millis(11_500), move || unsafe {
+        record!("message-silence", call!("swipe", 0.0_f64, -400.0_f64));
+        record!("message-tap", call!("tap", QString::from("messageOption")));
+        record!("message-state", call!("callState"));
+    });
+
+    single_shot(Duration::from_millis(12_500), move || unsafe {
+        record!("message-chat", call!("requested"));
+        call!("dropPage");
+    });
+
+    // And a fourth, declined with a reminder to call back.
+    single_shot(Duration::from_secs(13), move || unsafe {
+        record!("ring-remind", call!("ring", 9300));
+    });
+
+    single_shot(Duration::from_secs(14), move || unsafe {
+        record!("remind-silence", call!("swipe", 0.0_f64, -400.0_f64));
+        record!("remind-tap", call!("tap", QString::from("remindOption")));
+        record!("remind-state", call!("callState"));
+        record!("remind-pending", get!("reminder", "running"));
+        record!("remind-early", get!("remindNote", "isPublished"));
+        call!("remind");
+        record!("remind-note", get!("remindNote", "isPublished"));
+        record!("remind-body", get!("remindNote", "body"));
+        record!(
+            "remind-actions",
+            call!("actions", QString::from("remindNote"))
+        );
         (*engine_ptr).quit();
     });
 
@@ -302,6 +395,14 @@ fn a_call_rings_is_answered_on_its_page_and_ends_with_the_platform_told() {
         "ok",
         "the call center did not load. {context}"
     );
+    assert!(
+        value("stale-routes").contains(
+            "Prefer [{\"type\":\"s\",\"value\":\"earpiece\"},{\"type\":\"u\",\"value\":1},{\"type\":\"u\",\"value\":0}]"
+        ),
+        "a route an earlier run left preferred was not let go of: {}. {context}",
+        value("stale-routes")
+    );
+    assert_eq!(value("stale-setting"), "", "{context}");
     assert_eq!(value("idle-awake"), "false", "{context}");
     assert_eq!(
         value("idle-mce"),
@@ -316,6 +417,25 @@ fn a_call_rings_is_answered_on_its_page_and_ends_with_the_platform_told() {
     );
     assert_eq!(value("status"), "Incoming call", "{context}");
     assert_eq!(value("ringing-buttons"), "true", "{context}");
+    assert!(!value("ring-name").is_empty(), "{context}");
+    assert_eq!(value("options-before"), "false", "{context}");
+    assert_eq!(value("short"), "back", "{context}");
+    assert_eq!(value("silence"), "silenced", "{context}");
+    assert!(
+        value("silenced-feedback").contains("Stop [{\"type\":\"u\",\"value\":42}]"),
+        "swiping up did not stop the ringtone: {}. {context}",
+        value("silenced-feedback")
+    );
+    assert_eq!(
+        value("options-after"),
+        "true",
+        "a silenced call does not offer what to do instead. {context}"
+    );
+    assert!(
+        value("silenced-state").starts_with("ringing|"),
+        "silencing a call did more than silence it: {}. {context}",
+        value("silenced-state")
+    );
     assert_eq!(value("hang-up-button"), "false", "{context}");
     assert_eq!(
         value("ring-published"),
@@ -351,7 +471,7 @@ fn a_call_rings_is_answered_on_its_page_and_ends_with_the_platform_told() {
         "false",
         "a call not yet answered offers a microphone to switch. {context}"
     );
-    assert_eq!(value("answer"), "ok", "{context}");
+    assert_eq!(value("answer"), "answered", "{context}");
 
     assert!(
         value("answered").starts_with("starting|") || value("answered").starts_with("connecting|"),
@@ -408,6 +528,26 @@ fn a_call_rings_is_answered_on_its_page_and_ends_with_the_platform_told() {
         value("muted"),
         "true",
         "the microphone switch did not switch the call's microphone off. {context}"
+    );
+    let prefer = |name: &str, set: u8| {
+        format!(
+            "Prefer [{{\"type\":\"s\",\"value\":\"{name}\"}},{{\"type\":\"u\",\"value\":1}},{{\"type\":\"u\",\"value\":{set}}}]"
+        )
+    };
+    assert!(
+        value("earpiece").contains("Routes []")
+            && value("earpiece").contains(&prefer("earpiece", 1)),
+        "a call with nothing plugged in was not put on the earpiece: {}. {context}",
+        value("earpiece")
+    );
+    assert_eq!(value("speaker-tap"), "ok", "{context}");
+    assert_eq!(value("speaker"), "true", "{context}");
+    assert!(
+        value("loudspeaker")
+            .trim_end()
+            .ends_with(&prefer("earpiece", 0)),
+        "the loudspeaker switch did not let go of the earpiece: {}. {context}",
+        value("loudspeaker")
     );
     assert_eq!(
         value("view-opacity"),
@@ -471,4 +611,32 @@ fn a_call_rings_is_answered_on_its_page_and_ends_with_the_platform_told() {
     assert_eq!(value("missed-body"), "\u{1f4de} Missed call", "{context}");
     assert_eq!(value("missed-actions"), "default,callBack", "{context}");
     assert_eq!(value("missed-ring"), "false", "{context}");
+
+    assert_eq!(value("ring-message"), "ringing", "{context}");
+    assert_eq!(value("message-silence"), "silenced", "{context}");
+    assert_eq!(value("message-tap"), "ok", "{context}");
+    assert_eq!(
+        value("message-state"),
+        "|",
+        "declining with a message did not decline and let the call go. {context}"
+    );
+    assert_eq!(
+        value("message-chat"),
+        "1:1;",
+        "declining with a message did not open the caller's chat. {context}"
+    );
+
+    assert_eq!(value("ring-remind"), "ringing", "{context}");
+    assert_eq!(value("remind-silence"), "silenced", "{context}");
+    assert_eq!(value("remind-tap"), "ok", "{context}");
+    assert_eq!(value("remind-state"), "ended|declined", "{context}");
+    assert_eq!(
+        value("remind-pending"),
+        "true",
+        "declining with a reminder set no reminder. {context}"
+    );
+    assert_eq!(value("remind-early"), "false", "{context}");
+    assert_eq!(value("remind-note"), "true", "{context}");
+    assert_eq!(value("remind-body"), "\u{1f4de} Call back", "{context}");
+    assert_eq!(value("remind-actions"), "default,callBack", "{context}");
 }

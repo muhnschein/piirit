@@ -299,6 +299,7 @@ Vous continuerez à voir les messages des contacts bloqués dans les autres grou
     </message>
     <message>
         <source>Call back</source>
+        <extracomment>A reminder, a while after a call was declined, to call back.</extracomment>
         <translation>Rappeler</translation>
     </message>
 </context>
@@ -346,14 +347,93 @@ Vous continuerez à voir les messages des contacts bloqués dans les autres grou
         <translation>Refuser</translation>
     </message>
     <message>
-        <source>Answer</source>
-        <extracomment>Answers a call that is ringing. A verb.</extracomment>
-        <translation>Décrocher</translation>
-    </message>
-    <message>
         <source>End call</source>
         <extracomment>Ends a call in progress.</extracomment>
         <translation>Raccrocher</translation>
+    </message>
+    <message>
+        <source>Audio call</source>
+        <translation>Appel audio</translation>
+    </message>
+    <message>
+        <source>Call silenced</source>
+        <extracomment>A ringing call whose ringtone has been stopped.</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Message</source>
+        <extracomment>Declines a ringing call and opens its chat, to write instead.</extracomment>
+        <translation>Message</translation>
+    </message>
+    <message>
+        <source>Remind me</source>
+        <extracomment>Declines a ringing call, and reminds the reader to call back later.</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>Calls</name>
+    <message>
+        <source>Missed call</source>
+        <translation>Appel manqué</translation>
+    </message>
+    <message>
+        <source>Declined call</source>
+        <translation>Appel refusé</translation>
+    </message>
+    <message>
+        <source>Canceled call</source>
+        <translation>Appel annulé</translation>
+    </message>
+    <message>
+        <source>Video call</source>
+        <translation>Appel vidéo</translation>
+    </message>
+    <message>
+        <source>Audio call</source>
+        <translation>Appel audio</translation>
+    </message>
+    <message>
+        <source>Less than 1 minute</source>
+        <extracomment>How long a call lasted, when it was shorter than a minute.</extracomment>
+        <translation>Moins d’une minute</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n minute(s) duration</source>
+        <extracomment>How long a call lasted. %n is whole minutes.</extracomment>
+        <translation>
+            <numerusform>Durée : %n minute</numerusform>
+            <numerusform>Durée : %n minutes</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Ringing…</source>
+        <translation>Sonnerie…</translation>
+    </message>
+    <message>
+        <source>Incoming call</source>
+        <translation>Appel entrant</translation>
+    </message>
+</context>
+<context>
+    <name>CallsPage</name>
+    <message>
+        <source>Outgoing call</source>
+        <extracomment>A call this account placed, in a list of calls.</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Incoming call</source>
+        <translation>Appel entrant</translation>
+    </message>
+    <message>
+        <source>Ringing…</source>
+        <translation>Sonnerie…</translation>
+    </message>
+    <message>
+        <source>Call %1</source>
+        <extracomment>Places a call. %1 is the name of whoever is called.</extracomment>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -938,6 +1018,15 @@ Vous continuerez à voir les messages des contacts bloqués dans les autres grou
         <source>No apps yet</source>
         <translation>Pas encore d’applications</translation>
     </message>
+    <message>
+        <source>Calls</source>
+        <extracomment>The calls made and received in a chat: a tile, and a page heading.</extracomment>
+        <translation>Appels</translation>
+    </message>
+    <message>
+        <source>No calls yet</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>MessageDelegate</name>
@@ -970,47 +1059,6 @@ Vous continuerez à voir les messages des contacts bloqués dans les autres grou
     <message>
         <source>Edited</source>
         <translation>Modifié</translation>
-    </message>
-    <message>
-        <source>Missed call</source>
-        <translation>Appel manqué</translation>
-    </message>
-    <message>
-        <source>Declined call</source>
-        <translation>Appel refusé</translation>
-    </message>
-    <message>
-        <source>Canceled call</source>
-        <translation>Appel annulé</translation>
-    </message>
-    <message>
-        <source>Video call</source>
-        <translation>Appel vidéo</translation>
-    </message>
-    <message>
-        <source>Audio call</source>
-        <translation>Appel audio</translation>
-    </message>
-    <message>
-        <source>Less than 1 minute</source>
-        <extracomment>How long a call lasted, when it was shorter than a minute.</extracomment>
-        <translation>Moins d’une minute</translation>
-    </message>
-    <message numerus="yes">
-        <source>%n minute(s) duration</source>
-        <extracomment>How long a call lasted. %n is whole minutes.</extracomment>
-        <translation>
-            <numerusform>Durée : %n minute</numerusform>
-            <numerusform>Durée : %n minutes</numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>Ringing…</source>
-        <translation>Sonnerie…</translation>
-    </message>
-    <message>
-        <source>Incoming call</source>
-        <translation>Appel entrant</translation>
     </message>
 </context>
 <context>

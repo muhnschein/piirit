@@ -1,5 +1,5 @@
-//! The pictures, sounds, files or apps of one chat: what the pages behind
-//! the tiles on a contact's or a group's page list.
+//! The pictures, sounds, files, apps or calls of one chat: what the pages
+//! behind the tiles on a contact's or a group's page list.
 //!
 //! The core keeps the index. `get_chat_media` answers with the ids of
 //! every message of up to three kinds in a chat, oldest first, and its
@@ -47,6 +47,7 @@ fn view_types(kind: &str) -> Option<(&'static str, Option<&'static str>, Option<
         "audio" => Some(("Audio", Some("Voice"), None)),
         "files" => Some(("File", Some("Vcard"), None)),
         "apps" => Some(("Webxdc", None, None)),
+        "calls" => Some(("Call", None, None)),
         _ => None,
     }
 }
@@ -79,8 +80,8 @@ pub struct ChatMedia {
     pub chat_id: qt_property!(u32; WRITE set_chat_id NOTIFY source_changed),
     /// Which kind of message: `gallery` for pictures and videos, `audio`
     /// for voice messages and music, `files` for what was sent as a file
-    /// and for shared contacts, `apps` for webxdc apps. Setting it
-    /// reloads.
+    /// and for shared contacts, `apps` for webxdc apps, `calls` for
+    /// calls. Setting it reloads.
     pub kind: qt_property!(QString; WRITE set_kind NOTIFY source_changed),
     /// Emitted when the account, the chat or the kind changes.
     pub source_changed: qt_signal!(),
@@ -469,6 +470,7 @@ mod tests {
         assert_eq!(view_types("audio"), Some(("Audio", Some("Voice"), None)));
         assert_eq!(view_types("files"), Some(("File", Some("Vcard"), None)));
         assert_eq!(view_types("apps"), Some(("Webxdc", None, None)));
+        assert_eq!(view_types("calls"), Some(("Call", None, None)));
         assert_eq!(view_types("stickers"), None);
         assert_eq!(view_types(""), None);
     }

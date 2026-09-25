@@ -298,6 +298,7 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
     </message>
     <message>
         <source>Call back</source>
+        <extracomment>A reminder, a while after a call was declined, to call back.</extracomment>
         <translation>Geri ara</translation>
     </message>
 </context>
@@ -345,14 +346,92 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
         <translation>Reddet</translation>
     </message>
     <message>
-        <source>Answer</source>
-        <extracomment>Answers a call that is ringing. A verb.</extracomment>
-        <translation>Yanıtla</translation>
-    </message>
-    <message>
         <source>End call</source>
         <extracomment>Ends a call in progress.</extracomment>
         <translation>Aramayı bitir</translation>
+    </message>
+    <message>
+        <source>Audio call</source>
+        <translation>Sesli arama</translation>
+    </message>
+    <message>
+        <source>Call silenced</source>
+        <extracomment>A ringing call whose ringtone has been stopped.</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Message</source>
+        <extracomment>Declines a ringing call and opens its chat, to write instead.</extracomment>
+        <translation>Mesaj</translation>
+    </message>
+    <message>
+        <source>Remind me</source>
+        <extracomment>Declines a ringing call, and reminds the reader to call back later.</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>Calls</name>
+    <message>
+        <source>Missed call</source>
+        <translation>Cevapsız arama</translation>
+    </message>
+    <message>
+        <source>Declined call</source>
+        <translation>Reddedilen arama</translation>
+    </message>
+    <message>
+        <source>Canceled call</source>
+        <translation>İptal edilen arama</translation>
+    </message>
+    <message>
+        <source>Video call</source>
+        <translation>Görüntülü arama</translation>
+    </message>
+    <message>
+        <source>Audio call</source>
+        <translation>Sesli arama</translation>
+    </message>
+    <message>
+        <source>Less than 1 minute</source>
+        <extracomment>How long a call lasted, when it was shorter than a minute.</extracomment>
+        <translation>1 dakikadan az</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n minute(s) duration</source>
+        <extracomment>How long a call lasted. %n is whole minutes.</extracomment>
+        <translation>
+            <numerusform>Süre: %n dakika</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Ringing…</source>
+        <translation>Çalıyor…</translation>
+    </message>
+    <message>
+        <source>Incoming call</source>
+        <translation>Gelen arama</translation>
+    </message>
+</context>
+<context>
+    <name>CallsPage</name>
+    <message>
+        <source>Outgoing call</source>
+        <extracomment>A call this account placed, in a list of calls.</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Incoming call</source>
+        <translation>Gelen arama</translation>
+    </message>
+    <message>
+        <source>Ringing…</source>
+        <translation>Çalıyor…</translation>
+    </message>
+    <message>
+        <source>Call %1</source>
+        <extracomment>Places a call. %1 is the name of whoever is called.</extracomment>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -934,6 +1013,15 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
         <source>No apps yet</source>
         <translation>Henüz uygulama yok</translation>
     </message>
+    <message>
+        <source>Calls</source>
+        <extracomment>The calls made and received in a chat: a tile, and a page heading.</extracomment>
+        <translation>Aramalar</translation>
+    </message>
+    <message>
+        <source>No calls yet</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>MessageDelegate</name>
@@ -966,46 +1054,6 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
     <message>
         <source>Edited</source>
         <translation>Düzenlendi</translation>
-    </message>
-    <message>
-        <source>Missed call</source>
-        <translation>Cevapsız arama</translation>
-    </message>
-    <message>
-        <source>Declined call</source>
-        <translation>Reddedilen arama</translation>
-    </message>
-    <message>
-        <source>Canceled call</source>
-        <translation>İptal edilen arama</translation>
-    </message>
-    <message>
-        <source>Video call</source>
-        <translation>Görüntülü arama</translation>
-    </message>
-    <message>
-        <source>Audio call</source>
-        <translation>Sesli arama</translation>
-    </message>
-    <message>
-        <source>Less than 1 minute</source>
-        <extracomment>How long a call lasted, when it was shorter than a minute.</extracomment>
-        <translation>1 dakikadan az</translation>
-    </message>
-    <message numerus="yes">
-        <source>%n minute(s) duration</source>
-        <extracomment>How long a call lasted. %n is whole minutes.</extracomment>
-        <translation>
-            <numerusform>Süre: %n dakika</numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>Ringing…</source>
-        <translation>Çalıyor…</translation>
-    </message>
-    <message>
-        <source>Incoming call</source>
-        <translation>Gelen arama</translation>
     </message>
 </context>
 <context>

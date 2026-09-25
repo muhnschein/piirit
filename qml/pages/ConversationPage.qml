@@ -410,10 +410,6 @@ Page {
         interactive: page.canNavigateForward
         // The name goes the same way the swipe does.
         onClicked: page.openInfo()
-        // A chat that takes a call, while calls are on. `=== true`
-        // because dconf hands back `undefined` before it has read the key.
-        callable: Settings.callsEnabled === true && messages.can_call
-        onCallClicked: page.placeCall()
     }
 
     /// Call this chat, or go back to the call there is.

@@ -5,7 +5,8 @@ import "../js/Media.js" as Media
 /*
  * What a chat holds besides words, as a row of tiles on the page that
  * says who the chat is with: pictures and videos, sounds, files, and --
- * where apps are on -- apps. Each tile is the way into the page that
+ * where apps are on -- apps; on a contact's page, where calls are on,
+ * the calls with them too. Each tile is the way into the page that
  * lists that kind (pages/ChatMediaPage.qml), which is where
  * deltachat-android and deltachat-ios keep theirs as well.
  *
@@ -37,11 +38,15 @@ Item {
     /// the attach tray has no app entry then.
     property bool appsAvailable: false
 
-    /// The reader tapped a kind: gallery, audio, files or apps.
+    /// Whether there is a Calls tile: calls are on, and the chat is one a
+    /// call can be placed in. A contact's page sets it; a group's never.
+    property bool callsAvailable: false
+
+    /// The reader tapped a kind: gallery, audio, files, apps or calls.
     signal kindRequested(string kind)
 
     /// The kinds on offer, in tile order.
-    readonly property var kinds: Media.kinds(root.appsAvailable)
+    readonly property var kinds: Media.kinds(root.appsAvailable, root.callsAvailable)
     /// How wide one tile is: the row shared out between them, inside the
     /// page margins.
     readonly property real tileWidth: root.kinds.length > 0

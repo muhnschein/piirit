@@ -300,6 +300,7 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
     </message>
     <message>
         <source>Call back</source>
+        <extracomment>A reminder, a while after a call was declined, to call back.</extracomment>
         <translation>Zavolat zpět</translation>
     </message>
 </context>
@@ -347,14 +348,94 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
         <translation>Odmítnout</translation>
     </message>
     <message>
-        <source>Answer</source>
-        <extracomment>Answers a call that is ringing. A verb.</extracomment>
-        <translation>Přijmout</translation>
-    </message>
-    <message>
         <source>End call</source>
         <extracomment>Ends a call in progress.</extracomment>
         <translation>Ukončit hovor</translation>
+    </message>
+    <message>
+        <source>Audio call</source>
+        <translation>Hlasový hovor</translation>
+    </message>
+    <message>
+        <source>Call silenced</source>
+        <extracomment>A ringing call whose ringtone has been stopped.</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Message</source>
+        <extracomment>Declines a ringing call and opens its chat, to write instead.</extracomment>
+        <translation>Zpráva</translation>
+    </message>
+    <message>
+        <source>Remind me</source>
+        <extracomment>Declines a ringing call, and reminds the reader to call back later.</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>Calls</name>
+    <message>
+        <source>Missed call</source>
+        <translation>Zmeškaný hovor</translation>
+    </message>
+    <message>
+        <source>Declined call</source>
+        <translation>Odmítnutý hovor</translation>
+    </message>
+    <message>
+        <source>Canceled call</source>
+        <translation>Zrušený hovor</translation>
+    </message>
+    <message>
+        <source>Video call</source>
+        <translation>Videohovor</translation>
+    </message>
+    <message>
+        <source>Audio call</source>
+        <translation>Hlasový hovor</translation>
+    </message>
+    <message>
+        <source>Less than 1 minute</source>
+        <extracomment>How long a call lasted, when it was shorter than a minute.</extracomment>
+        <translation>Méně než 1 minuta</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n minute(s) duration</source>
+        <extracomment>How long a call lasted. %n is whole minutes.</extracomment>
+        <translation>
+            <numerusform>Trvání %n minuta</numerusform>
+            <numerusform>Trvání %n minuty</numerusform>
+            <numerusform>Trvání %n minut</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Ringing…</source>
+        <translation>Vyzvání…</translation>
+    </message>
+    <message>
+        <source>Incoming call</source>
+        <translation>Příchozí hovor</translation>
+    </message>
+</context>
+<context>
+    <name>CallsPage</name>
+    <message>
+        <source>Outgoing call</source>
+        <extracomment>A call this account placed, in a list of calls.</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Incoming call</source>
+        <translation>Příchozí hovor</translation>
+    </message>
+    <message>
+        <source>Ringing…</source>
+        <translation>Vyzvání…</translation>
+    </message>
+    <message>
+        <source>Call %1</source>
+        <extracomment>Places a call. %1 is the name of whoever is called.</extracomment>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -942,6 +1023,15 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
         <source>No apps yet</source>
         <translation>Zatím žádné aplikace</translation>
     </message>
+    <message>
+        <source>Calls</source>
+        <extracomment>The calls made and received in a chat: a tile, and a page heading.</extracomment>
+        <translation>Hovory</translation>
+    </message>
+    <message>
+        <source>No calls yet</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>MessageDelegate</name>
@@ -974,48 +1064,6 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
     <message>
         <source>Edited</source>
         <translation>Upraveno</translation>
-    </message>
-    <message>
-        <source>Missed call</source>
-        <translation>Zmeškaný hovor</translation>
-    </message>
-    <message>
-        <source>Declined call</source>
-        <translation>Odmítnutý hovor</translation>
-    </message>
-    <message>
-        <source>Canceled call</source>
-        <translation>Zrušený hovor</translation>
-    </message>
-    <message>
-        <source>Video call</source>
-        <translation>Videohovor</translation>
-    </message>
-    <message>
-        <source>Audio call</source>
-        <translation>Hlasový hovor</translation>
-    </message>
-    <message>
-        <source>Less than 1 minute</source>
-        <extracomment>How long a call lasted, when it was shorter than a minute.</extracomment>
-        <translation>Méně než 1 minuta</translation>
-    </message>
-    <message numerus="yes">
-        <source>%n minute(s) duration</source>
-        <extracomment>How long a call lasted. %n is whole minutes.</extracomment>
-        <translation>
-            <numerusform>Trvání %n minuta</numerusform>
-            <numerusform>Trvání %n minuty</numerusform>
-            <numerusform>Trvání %n minut</numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>Ringing…</source>
-        <translation>Vyzvání…</translation>
-    </message>
-    <message>
-        <source>Incoming call</source>
-        <translation>Příchozí hovor</translation>
     </message>
 </context>
 <context>

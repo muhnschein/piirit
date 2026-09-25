@@ -722,6 +722,15 @@ async fn offline_round_trip_against_real_core() {
         Some("Group"),
         "unexpected chat shape: {full:?}"
     );
+    // What a contact's page reads, with the chat's kind and `canSend`,
+    // to say whether a call can be placed there (piirit-shim's
+    // `takes_calls`): the same flags `get_basic_chat_info` carries.
+    for flag in ["isEncrypted", "isSelfTalk", "isDeviceChat", "canSend"] {
+        assert!(
+            full.get(flag).is_some_and(Value::is_boolean),
+            "the full chat carries no {flag}: {full:?}"
+        );
+    }
     let member_ids: Vec<u32> =
         serde_json::from_value(full["contactIds"].clone()).expect("contactIds is a list of ids");
     assert_eq!(
@@ -1375,6 +1384,25 @@ async fn offline_round_trip_against_real_core() {
     assert!(
         !pictures.contains(&tone_id) && !pictures.contains(&voice_id),
         "a sound is listed among the chat's pictures: {pictures:?}"
+    );
+    // Calls are a view type of their own, which the index takes like any
+    // other: what the contact page's Calls tile lists. None here.
+    let calls: Vec<u32> = client
+        .call(
+            "get_chat_media",
+            (
+                sender_id,
+                Some(saved),
+                "Call",
+                Option::<&str>::None,
+                Option::<&str>::None,
+            ),
+        )
+        .await
+        .expect("get_chat_media for the calls in a chat");
+    assert!(
+        calls.is_empty(),
+        "a chat with no calls lists some: {calls:?}"
     );
 
     // A shared contact. The core parses the card and hands back the pieces

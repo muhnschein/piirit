@@ -299,6 +299,7 @@ In anderen Gruppen mit blockierten Kontakten werden deren Nachrichten weiterhin 
     </message>
     <message>
         <source>Call back</source>
+        <extracomment>A reminder, a while after a call was declined, to call back.</extracomment>
         <translation>Zurückrufen</translation>
     </message>
 </context>
@@ -346,14 +347,93 @@ In anderen Gruppen mit blockierten Kontakten werden deren Nachrichten weiterhin 
         <translation>Ablehnen</translation>
     </message>
     <message>
-        <source>Answer</source>
-        <extracomment>Answers a call that is ringing. A verb.</extracomment>
-        <translation>Annehmen</translation>
-    </message>
-    <message>
         <source>End call</source>
         <extracomment>Ends a call in progress.</extracomment>
         <translation>Anruf beenden</translation>
+    </message>
+    <message>
+        <source>Audio call</source>
+        <translation>Sprachanruf</translation>
+    </message>
+    <message>
+        <source>Call silenced</source>
+        <extracomment>A ringing call whose ringtone has been stopped.</extracomment>
+        <translation>Anruf stummgeschaltet</translation>
+    </message>
+    <message>
+        <source>Message</source>
+        <extracomment>Declines a ringing call and opens its chat, to write instead.</extracomment>
+        <translation>Nachricht</translation>
+    </message>
+    <message>
+        <source>Remind me</source>
+        <extracomment>Declines a ringing call, and reminds the reader to call back later.</extracomment>
+        <translation>Erinnere mich</translation>
+    </message>
+</context>
+<context>
+    <name>Calls</name>
+    <message>
+        <source>Missed call</source>
+        <translation>Verpasster Anruf</translation>
+    </message>
+    <message>
+        <source>Declined call</source>
+        <translation>Abgelehnter Anruf</translation>
+    </message>
+    <message>
+        <source>Canceled call</source>
+        <translation>Abgebrochener Anruf</translation>
+    </message>
+    <message>
+        <source>Video call</source>
+        <translation>Videoanruf</translation>
+    </message>
+    <message>
+        <source>Audio call</source>
+        <translation>Sprachanruf</translation>
+    </message>
+    <message>
+        <source>Less than 1 minute</source>
+        <extracomment>How long a call lasted, when it was shorter than a minute.</extracomment>
+        <translation>Weniger als 1 Minute</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n minute(s) duration</source>
+        <extracomment>How long a call lasted. %n is whole minutes.</extracomment>
+        <translation>
+            <numerusform>Dauer: %n Minute</numerusform>
+            <numerusform>Dauer: %n Minuten</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Ringing…</source>
+        <translation>Klingelt…</translation>
+    </message>
+    <message>
+        <source>Incoming call</source>
+        <translation>Eingehender Anruf</translation>
+    </message>
+</context>
+<context>
+    <name>CallsPage</name>
+    <message>
+        <source>Outgoing call</source>
+        <extracomment>A call this account placed, in a list of calls.</extracomment>
+        <translation>Ausgehender Anruf</translation>
+    </message>
+    <message>
+        <source>Incoming call</source>
+        <translation>Eingehender Anruf</translation>
+    </message>
+    <message>
+        <source>Ringing…</source>
+        <translation>Klingelt…</translation>
+    </message>
+    <message>
+        <source>Call %1</source>
+        <extracomment>Places a call. %1 is the name of whoever is called.</extracomment>
+        <translation>%1 anrufen</translation>
     </message>
 </context>
 <context>
@@ -938,6 +1018,15 @@ In anderen Gruppen mit blockierten Kontakten werden deren Nachrichten weiterhin 
         <source>No apps yet</source>
         <translation>Noch keine Apps</translation>
     </message>
+    <message>
+        <source>Calls</source>
+        <extracomment>The calls made and received in a chat: a tile, and a page heading.</extracomment>
+        <translation>Anrufe</translation>
+    </message>
+    <message>
+        <source>No calls yet</source>
+        <translation>Noch keine Anrufe</translation>
+    </message>
 </context>
 <context>
     <name>MessageDelegate</name>
@@ -970,47 +1059,6 @@ In anderen Gruppen mit blockierten Kontakten werden deren Nachrichten weiterhin 
     <message>
         <source>Edited</source>
         <translation>Bearbeitet</translation>
-    </message>
-    <message>
-        <source>Missed call</source>
-        <translation>Verpasster Anruf</translation>
-    </message>
-    <message>
-        <source>Declined call</source>
-        <translation>Abgelehnter Anruf</translation>
-    </message>
-    <message>
-        <source>Canceled call</source>
-        <translation>Abgebrochener Anruf</translation>
-    </message>
-    <message>
-        <source>Video call</source>
-        <translation>Videoanruf</translation>
-    </message>
-    <message>
-        <source>Audio call</source>
-        <translation>Sprachanruf</translation>
-    </message>
-    <message>
-        <source>Less than 1 minute</source>
-        <extracomment>How long a call lasted, when it was shorter than a minute.</extracomment>
-        <translation>Weniger als 1 Minute</translation>
-    </message>
-    <message numerus="yes">
-        <source>%n minute(s) duration</source>
-        <extracomment>How long a call lasted. %n is whole minutes.</extracomment>
-        <translation>
-            <numerusform>Dauer: %n Minute</numerusform>
-            <numerusform>Dauer: %n Minuten</numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>Ringing…</source>
-        <translation>Klingelt…</translation>
-    </message>
-    <message>
-        <source>Incoming call</source>
-        <translation>Eingehender Anruf</translation>
     </message>
 </context>
 <context>

@@ -1893,6 +1893,10 @@ async fn serve() {
                                 // is not a group the account is "in" at all.
                                 "selfInGroup": is_group && !left,
                                 "canSend": !left,
+                                // Every chat here is a chatmail chat.
+                                "isEncrypted": true,
+                                "isSelfTalk": false,
+                                "isDeviceChat": false,
                                 "ephemeralTimer": state.timers.get(&chat).copied().unwrap_or(0),
                             }),
                         )

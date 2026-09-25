@@ -299,6 +299,7 @@ Gli altri gruppi con contatti bloccati continueranno a visualizzare i loro messa
     </message>
     <message>
         <source>Call back</source>
+        <extracomment>A reminder, a while after a call was declined, to call back.</extracomment>
         <translation>Richiama</translation>
     </message>
 </context>
@@ -346,14 +347,93 @@ Gli altri gruppi con contatti bloccati continueranno a visualizzare i loro messa
         <translation>Rifiuta</translation>
     </message>
     <message>
-        <source>Answer</source>
-        <extracomment>Answers a call that is ringing. A verb.</extracomment>
-        <translation>Rispondi</translation>
-    </message>
-    <message>
         <source>End call</source>
         <extracomment>Ends a call in progress.</extracomment>
         <translation>Termina chiamata</translation>
+    </message>
+    <message>
+        <source>Audio call</source>
+        <translation>Chiamata audio</translation>
+    </message>
+    <message>
+        <source>Call silenced</source>
+        <extracomment>A ringing call whose ringtone has been stopped.</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Message</source>
+        <extracomment>Declines a ringing call and opens its chat, to write instead.</extracomment>
+        <translation>Messaggio</translation>
+    </message>
+    <message>
+        <source>Remind me</source>
+        <extracomment>Declines a ringing call, and reminds the reader to call back later.</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>Calls</name>
+    <message>
+        <source>Missed call</source>
+        <translation>Chiamata persa</translation>
+    </message>
+    <message>
+        <source>Declined call</source>
+        <translation>Chiamata rifiutata</translation>
+    </message>
+    <message>
+        <source>Canceled call</source>
+        <translation>Chiamata annullata</translation>
+    </message>
+    <message>
+        <source>Video call</source>
+        <translation>Videochiamata</translation>
+    </message>
+    <message>
+        <source>Audio call</source>
+        <translation>Chiamata audio</translation>
+    </message>
+    <message>
+        <source>Less than 1 minute</source>
+        <extracomment>How long a call lasted, when it was shorter than a minute.</extracomment>
+        <translation>Meno di 1 minuto</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n minute(s) duration</source>
+        <extracomment>How long a call lasted. %n is whole minutes.</extracomment>
+        <translation>
+            <numerusform>Durata %n minuto</numerusform>
+            <numerusform>Durata %n minuti</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Ringing…</source>
+        <translation>Squilla…</translation>
+    </message>
+    <message>
+        <source>Incoming call</source>
+        <translation>Chiamata in arrivo</translation>
+    </message>
+</context>
+<context>
+    <name>CallsPage</name>
+    <message>
+        <source>Outgoing call</source>
+        <extracomment>A call this account placed, in a list of calls.</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Incoming call</source>
+        <translation>Chiamata in arrivo</translation>
+    </message>
+    <message>
+        <source>Ringing…</source>
+        <translation>Squilla…</translation>
+    </message>
+    <message>
+        <source>Call %1</source>
+        <extracomment>Places a call. %1 is the name of whoever is called.</extracomment>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -938,6 +1018,15 @@ Gli altri gruppi con contatti bloccati continueranno a visualizzare i loro messa
         <source>No apps yet</source>
         <translation>Ancora nessuna app</translation>
     </message>
+    <message>
+        <source>Calls</source>
+        <extracomment>The calls made and received in a chat: a tile, and a page heading.</extracomment>
+        <translation>Chiamate</translation>
+    </message>
+    <message>
+        <source>No calls yet</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>MessageDelegate</name>
@@ -970,47 +1059,6 @@ Gli altri gruppi con contatti bloccati continueranno a visualizzare i loro messa
     <message>
         <source>Edited</source>
         <translation>Modificato</translation>
-    </message>
-    <message>
-        <source>Missed call</source>
-        <translation>Chiamata persa</translation>
-    </message>
-    <message>
-        <source>Declined call</source>
-        <translation>Chiamata rifiutata</translation>
-    </message>
-    <message>
-        <source>Canceled call</source>
-        <translation>Chiamata annullata</translation>
-    </message>
-    <message>
-        <source>Video call</source>
-        <translation>Videochiamata</translation>
-    </message>
-    <message>
-        <source>Audio call</source>
-        <translation>Chiamata audio</translation>
-    </message>
-    <message>
-        <source>Less than 1 minute</source>
-        <extracomment>How long a call lasted, when it was shorter than a minute.</extracomment>
-        <translation>Meno di 1 minuto</translation>
-    </message>
-    <message numerus="yes">
-        <source>%n minute(s) duration</source>
-        <extracomment>How long a call lasted. %n is whole minutes.</extracomment>
-        <translation>
-            <numerusform>Durata %n minuto</numerusform>
-            <numerusform>Durata %n minuti</numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>Ringing…</source>
-        <translation>Squilla…</translation>
-    </message>
-    <message>
-        <source>Incoming call</source>
-        <translation>Chiamata in arrivo</translation>
     </message>
 </context>
 <context>

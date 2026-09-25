@@ -295,6 +295,7 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
     <message>
         <source>Call back</source>
+        <extracomment>A reminder, a while after a call was declined, to call back.</extracomment>
         <translation>Ring tilbake</translation>
     </message>
 </context>
@@ -342,14 +343,93 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Avvis</translation>
     </message>
     <message>
-        <source>Answer</source>
-        <extracomment>Answers a call that is ringing. A verb.</extracomment>
-        <translation>Svar</translation>
-    </message>
-    <message>
         <source>End call</source>
         <extracomment>Ends a call in progress.</extracomment>
         <translation>Avslutt anrop</translation>
+    </message>
+    <message>
+        <source>Audio call</source>
+        <translation>Lydanrop</translation>
+    </message>
+    <message>
+        <source>Call silenced</source>
+        <extracomment>A ringing call whose ringtone has been stopped.</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Message</source>
+        <extracomment>Declines a ringing call and opens its chat, to write instead.</extracomment>
+        <translation>Melding</translation>
+    </message>
+    <message>
+        <source>Remind me</source>
+        <extracomment>Declines a ringing call, and reminds the reader to call back later.</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>Calls</name>
+    <message>
+        <source>Missed call</source>
+        <translation>Ubesvart anrop</translation>
+    </message>
+    <message>
+        <source>Declined call</source>
+        <translation>Avvist anrop</translation>
+    </message>
+    <message>
+        <source>Canceled call</source>
+        <translation>Avbrutt anrop</translation>
+    </message>
+    <message>
+        <source>Video call</source>
+        <translation>Videoanrop</translation>
+    </message>
+    <message>
+        <source>Audio call</source>
+        <translation>Lydanrop</translation>
+    </message>
+    <message>
+        <source>Less than 1 minute</source>
+        <extracomment>How long a call lasted, when it was shorter than a minute.</extracomment>
+        <translation>Mindre enn 1 minutt</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n minute(s) duration</source>
+        <extracomment>How long a call lasted. %n is whole minutes.</extracomment>
+        <translation>
+            <numerusform>Varighet: %n minutt</numerusform>
+            <numerusform>Varighet: %n minutter</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Ringing…</source>
+        <translation>Ringer…</translation>
+    </message>
+    <message>
+        <source>Incoming call</source>
+        <translation>Innkommende anrop</translation>
+    </message>
+</context>
+<context>
+    <name>CallsPage</name>
+    <message>
+        <source>Outgoing call</source>
+        <extracomment>A call this account placed, in a list of calls.</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Incoming call</source>
+        <translation>Innkommende anrop</translation>
+    </message>
+    <message>
+        <source>Ringing…</source>
+        <translation>Ringer…</translation>
+    </message>
+    <message>
+        <source>Call %1</source>
+        <extracomment>Places a call. %1 is the name of whoever is called.</extracomment>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -934,6 +1014,15 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>No apps yet</source>
         <translation>Ingen apper ennå</translation>
     </message>
+    <message>
+        <source>Calls</source>
+        <extracomment>The calls made and received in a chat: a tile, and a page heading.</extracomment>
+        <translation>Anrop</translation>
+    </message>
+    <message>
+        <source>No calls yet</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>MessageDelegate</name>
@@ -966,47 +1055,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Edited</source>
         <translation>Redigert</translation>
-    </message>
-    <message>
-        <source>Missed call</source>
-        <translation>Ubesvart anrop</translation>
-    </message>
-    <message>
-        <source>Declined call</source>
-        <translation>Avvist anrop</translation>
-    </message>
-    <message>
-        <source>Canceled call</source>
-        <translation>Avbrutt anrop</translation>
-    </message>
-    <message>
-        <source>Video call</source>
-        <translation>Videoanrop</translation>
-    </message>
-    <message>
-        <source>Audio call</source>
-        <translation>Lydanrop</translation>
-    </message>
-    <message>
-        <source>Less than 1 minute</source>
-        <extracomment>How long a call lasted, when it was shorter than a minute.</extracomment>
-        <translation>Mindre enn 1 minutt</translation>
-    </message>
-    <message numerus="yes">
-        <source>%n minute(s) duration</source>
-        <extracomment>How long a call lasted. %n is whole minutes.</extracomment>
-        <translation>
-            <numerusform>Varighet: %n minutt</numerusform>
-            <numerusform>Varighet: %n minutter</numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>Ringing…</source>
-        <translation>Ringer…</translation>
-    </message>
-    <message>
-        <source>Incoming call</source>
-        <translation>Innkommende anrop</translation>
     </message>
 </context>
 <context>

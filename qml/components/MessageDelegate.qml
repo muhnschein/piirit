@@ -1,6 +1,7 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
 import "../js/Format.js" as Format
+import "../js/Calls.js" as Calls
 
 /*
  * One message. Its own component so it can be loaded and measured on its
@@ -154,41 +155,12 @@ Item {
     /// This row is a call, drawn as one.
     readonly property bool isCall: root.viewType === "Call"
                                    && root.callState.length > 0
-    /// What a call row says first: what kind of call, or what became of
-    /// it. Delta Chat's own words, so its translations apply.
-    readonly property string callTitle: {
-        if (root.callState === "Missed") {
-            return qsTr("Missed call")
-        }
-        if (root.callState === "Declined") {
-            return qsTr("Declined call")
-        }
-        if (root.callState === "Canceled") {
-            return qsTr("Canceled call")
-        }
-        return root.callHasVideo ? qsTr("Video call") : qsTr("Audio call")
-    }
-    /// The line under it: how long a call lasted, or that one is still
-    /// ringing. Nothing for a call that never connected, whose title
-    /// already says so.
-    readonly property string callDetail: {
-        if (root.callState === "Completed") {
-            if (root.callDuration < 60) {
-                //: How long a call lasted, when it was shorter than a minute.
-                return qsTr("Less than 1 minute")
-            }
-            //: How long a call lasted. %n is whole minutes.
-            return qsTr("%n minute(s) duration", "", Math.floor(root.callDuration / 60))
-        }
-        if (root.callState === "Alerting") {
-            return root.isOutgoing ? qsTr("Ringing…") : qsTr("Incoming call")
-        }
-        return ""
-    }
+    /// What a call row says first, and the line under it; see Calls.js.
+    readonly property string callTitle: Calls.title(root.callState, root.callHasVideo)
+    readonly property string callDetail: Calls.detail(root.callState, root.callDuration,
+                                                      root.isOutgoing)
     /// A call that did not happen, drawn in the colour that says so.
-    readonly property bool callFailed: root.callState === "Missed"
-                                       || root.callState === "Declined"
-                                       || root.callState === "Canceled"
+    readonly property bool callFailed: Calls.failed(root.callState)
 
     property bool hasFile: filePath.length > 0
     // A sticker is a picture with no bubble behind it, which is the whole

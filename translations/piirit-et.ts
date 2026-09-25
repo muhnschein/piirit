@@ -299,6 +299,7 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
     </message>
     <message>
         <source>Call back</source>
+        <extracomment>A reminder, a while after a call was declined, to call back.</extracomment>
         <translation>Helista tagasi</translation>
     </message>
 </context>
@@ -346,14 +347,93 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
         <translation>Keeldu</translation>
     </message>
     <message>
-        <source>Answer</source>
-        <extracomment>Answers a call that is ringing. A verb.</extracomment>
-        <translation>Vasta</translation>
-    </message>
-    <message>
         <source>End call</source>
         <extracomment>Ends a call in progress.</extracomment>
         <translation>Lõpeta kõne</translation>
+    </message>
+    <message>
+        <source>Audio call</source>
+        <translation>Häälkõne</translation>
+    </message>
+    <message>
+        <source>Call silenced</source>
+        <extracomment>A ringing call whose ringtone has been stopped.</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Message</source>
+        <extracomment>Declines a ringing call and opens its chat, to write instead.</extracomment>
+        <translation>Sõnum</translation>
+    </message>
+    <message>
+        <source>Remind me</source>
+        <extracomment>Declines a ringing call, and reminds the reader to call back later.</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>Calls</name>
+    <message>
+        <source>Missed call</source>
+        <translation>Vastamata kõne</translation>
+    </message>
+    <message>
+        <source>Declined call</source>
+        <translation>Tagasi lükatud kõne</translation>
+    </message>
+    <message>
+        <source>Canceled call</source>
+        <translation>Katkestatud kõne</translation>
+    </message>
+    <message>
+        <source>Video call</source>
+        <translation>Videokõne</translation>
+    </message>
+    <message>
+        <source>Audio call</source>
+        <translation>Häälkõne</translation>
+    </message>
+    <message>
+        <source>Less than 1 minute</source>
+        <extracomment>How long a call lasted, when it was shorter than a minute.</extracomment>
+        <translation>Alla 1 minuti</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n minute(s) duration</source>
+        <extracomment>How long a call lasted. %n is whole minutes.</extracomment>
+        <translation>
+            <numerusform>Kestus %n minut</numerusform>
+            <numerusform>Kestus %n minutit</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Ringing…</source>
+        <translation>Heliseb…</translation>
+    </message>
+    <message>
+        <source>Incoming call</source>
+        <translation>Sissetulev kõne</translation>
+    </message>
+</context>
+<context>
+    <name>CallsPage</name>
+    <message>
+        <source>Outgoing call</source>
+        <extracomment>A call this account placed, in a list of calls.</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Incoming call</source>
+        <translation>Sissetulev kõne</translation>
+    </message>
+    <message>
+        <source>Ringing…</source>
+        <translation>Heliseb…</translation>
+    </message>
+    <message>
+        <source>Call %1</source>
+        <extracomment>Places a call. %1 is the name of whoever is called.</extracomment>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -938,6 +1018,15 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
         <source>No apps yet</source>
         <translation>Rakendusi veel pole</translation>
     </message>
+    <message>
+        <source>Calls</source>
+        <extracomment>The calls made and received in a chat: a tile, and a page heading.</extracomment>
+        <translation>Kõned</translation>
+    </message>
+    <message>
+        <source>No calls yet</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>MessageDelegate</name>
@@ -970,47 +1059,6 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
     <message>
         <source>Edited</source>
         <translation>Muudetud</translation>
-    </message>
-    <message>
-        <source>Missed call</source>
-        <translation>Vastamata kõne</translation>
-    </message>
-    <message>
-        <source>Declined call</source>
-        <translation>Tagasi lükatud kõne</translation>
-    </message>
-    <message>
-        <source>Canceled call</source>
-        <translation>Katkestatud kõne</translation>
-    </message>
-    <message>
-        <source>Video call</source>
-        <translation>Videokõne</translation>
-    </message>
-    <message>
-        <source>Audio call</source>
-        <translation>Häälkõne</translation>
-    </message>
-    <message>
-        <source>Less than 1 minute</source>
-        <extracomment>How long a call lasted, when it was shorter than a minute.</extracomment>
-        <translation>Alla 1 minuti</translation>
-    </message>
-    <message numerus="yes">
-        <source>%n minute(s) duration</source>
-        <extracomment>How long a call lasted. %n is whole minutes.</extracomment>
-        <translation>
-            <numerusform>Kestus %n minut</numerusform>
-            <numerusform>Kestus %n minutit</numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>Ringing…</source>
-        <translation>Heliseb…</translation>
-    </message>
-    <message>
-        <source>Incoming call</source>
-        <translation>Sissetulev kõne</translation>
     </message>
 </context>
 <context>

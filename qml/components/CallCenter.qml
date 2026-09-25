@@ -31,6 +31,12 @@ import Piirit 1.0
  * - A call that rang unanswered stays behind in the notification area as
  *   a missed call, in the phone's own category for one, with Call back
  *   on it.
+ * - While a call is carrying sound it is on the earpiece, as a phone call
+ *   is, unless the reader switches it to the loudspeaker or something is
+ *   plugged in to take it -- asked of the phone's audio policy (ohm), and
+ *   let go of the moment the call is over.
+ * - A ringing call can be silenced, and then declined with a message, or
+ *   with a reminder to call back.
  *
  * Only while calls are on (`enabled`, which the window binds to the
  * setting); a call already under way is followed to its end whatever
@@ -57,6 +63,10 @@ Item {
 
     /// The ringtone playing, as ngfd numbers it; 0 for none.
     property int ringId: 0
+
+    /// The ringing has been silenced, for the call ringing now: it still
+    /// rings on the screen, and nothing sounds.
+    property bool quiet: false
 
     /// Bring the app forward. The window connects this to `activate`.
     signal raise()
@@ -119,17 +129,43 @@ Item {
 
     /// A call came in: ring, and show it.
     function ring() {
+        center.quiet = false
         center.raise()
         center.show()
         ringNote.ring()
         center.startRinging()
     }
 
+    /// Stop the ringing, and leave the call ringing on the screen: the
+    /// phone's swipe up.
+    function silence() {
+        center.quiet = true
+        center.stopRinging()
+    }
+
+    /// Decline the call, and open its chat to say why: the phone's
+    /// Message. Opened once this turn is over -- going to the chat takes
+    /// the call's page off the stack, and this is called from that page.
+    function messageInstead() {
+        messageLater.accountId = call.account_id
+        messageLater.chatId = call.chat_id
+        call.hang_up()
+        call.reset()
+        messageLater.restart()
+    }
+
+    /// Decline the call, and be reminded to call back: the phone's Remind
+    /// me.
+    function remindLater() {
+        reminder.set(call.account_id, call.chat_id, call.peer_name)
+        call.hang_up()
+    }
+
     /// Have the phone ring. `voip_ringtone` is the event the phone's own
     /// call handling plays for a call that is not a phone call, and it
     /// repeats until it is stopped.
     function startRinging() {
-        if (center.ringId !== 0) {
+        if (center.ringId !== 0 || center.quiet) {
             return
         }
         feedback.typedCall("Play", [
@@ -137,7 +173,7 @@ Item {
             { "type": "a{sv}", "value": {} }
         ], function (id) {
             // Stopped before ngfd had answered: stopped at once.
-            if (call.state === "ringing") {
+            if (call.state === "ringing" && !center.quiet) {
                 center.ringId = id
             } else {
                 center.stopRinging(id)
@@ -171,6 +207,7 @@ Item {
     /// unanswered is left behind as a missed call.
     function over(reason) {
         center.stopRinging()
+        center.quiet = false
         ringNote.close()
         if (reason === "missed") {
             missedNote.missed(call.account_id, call.chat_id, call.peer_name)
@@ -196,7 +233,7 @@ Item {
             }
             pushLater.stop()
             var shown = center.stack.push(Qt.resolvedUrl("../pages/CallPage.qml"),
-                                          { call: call })
+                                          { call: call, center: center })
             if (shown) {
                 center.page = shown
             }
@@ -208,6 +245,16 @@ Item {
         target: center.page
         ignoreUnknownSignals: true
         onDestroyed: center.page = null
+    }
+
+    // And pushed now, for a call that came in while the last page was on
+    // its way out: it was not shown then, the old page being there. A
+    // page that has gone reads as null here whether or not the handler
+    // above ran.
+    onPageChanged: {
+        if (center.page === null && center.busy) {
+            center.show()
+        }
     }
 
     Connections {
@@ -225,6 +272,174 @@ Item {
                 // rung: shown, and nothing more.
                 center.show()
             }
+        }
+    }
+
+    Timer {
+        id: messageLater
+        objectName: "messageLater"
+        interval: 0
+        property int accountId: 0
+        property int chatId: 0
+        onTriggered: center.chatRequested(messageLater.accountId, messageLater.chatId)
+    }
+
+    // A call declined with a reminder, brought back in a while as a
+    // notification with Call back on it. Held by the app, which a call
+    // needs running anyway to ring at all; one at a time, the latest.
+    Timer {
+        id: reminder
+        objectName: "reminder"
+        interval: 10 * 60 * 1000
+        property int accountId: 0
+        property int chatId: 0
+        property string name: ""
+
+        function set(accountId, chatId, name) {
+            reminder.accountId = accountId
+            reminder.chatId = chatId
+            reminder.name = name
+            reminder.restart()
+        }
+
+        onTriggered: remindNote.remind(reminder.accountId, reminder.chatId, reminder.name)
+    }
+
+    // Where the call's sound goes. The phone's audio policy (ohm) sends
+    // an app's sound to the loudspeaker, or to whatever is plugged in;
+    // the earpiece is for phone calls, and for a route an app asks it to
+    // prefer. A preference holds for every sound the phone makes, and
+    // outlives the app that asked -- so it is asked for only while a call
+    // is carrying sound, let go of the moment it is not, and one a run
+    // did not get to let go of is let go of by the next.
+
+    /// The reader has switched the call to the loudspeaker. Back to the
+    /// earpiece for every call, as a phone call starts there.
+    property bool speaker: false
+
+    /// Something is plugged in, or paired, that the call would go to
+    /// rather than the earpiece or the loudspeaker: a headset,
+    /// headphones, a Bluetooth or USB device. Asked of the policy while a
+    /// call is up.
+    property bool accessory: false
+
+    /// Whether the policy has said what is plugged in, for this call.
+    /// Until it has, nothing is asked for: a phone without the route
+    /// manager keeps the call where it always was.
+    property bool routesKnown: false
+
+    /// A call is carrying sound: answered or placed, and not over.
+    readonly property bool talking: center.busy && call.state !== "ringing"
+
+    /// The route to prefer: the earpiece, unless the reader wants the
+    /// loudspeaker or something is plugged in; the loudspeaker when the
+    /// reader wants it over what is plugged in; otherwise none -- where
+    /// the sound would go anyway.
+    readonly property string route: !center.talking || !center.routesKnown ? ""
+                                    : center.speaker ? (center.accessory ? "speaker" : "")
+                                    : (center.accessory ? "" : "earpiece")
+
+    /// What the policy has been asked to prefer, "" for nothing.
+    property string preferred: ""
+
+    // Route types, from ohm's route interface (ohm-ext/route.h).
+    readonly property int routeOutput: 1
+    readonly property int routeBuiltin: 4
+    readonly property int routeAvailable: 33554432
+
+    onRouteChanged: center.applyRoute()
+
+    onTalkingChanged: {
+        if (center.talking) {
+            center.speaker = false
+            center.routesKnown = false
+            center.lookAtRoutes()
+        }
+    }
+
+    /// Ask for the route there should be, or let go of the one there is.
+    function applyRoute() {
+        if (center.route === center.preferred) {
+            return
+        }
+        if (center.preferred.length > 0) {
+            center.letGo(center.preferred)
+        }
+        if (center.route.length > 0) {
+            routes.typedCall("Prefer", [
+                { "type": "s", "value": center.route },
+                { "type": "u", "value": center.routeOutput },
+                { "type": "u", "value": 1 }
+            ], function () {}, function () {})
+            Settings.callRoute = center.route
+        }
+        center.preferred = center.route
+    }
+
+    /// Let go of a preference. Letting go of any clears them all: the
+    /// policy holds one at a time.
+    function letGo(name) {
+        routes.typedCall("Prefer", [
+            { "type": "s", "value": name },
+            { "type": "u", "value": center.routeOutput },
+            { "type": "u", "value": 0 }
+        ], function () {}, function () {})
+        Settings.callRoute = ""
+    }
+
+    /// What is plugged in: any output that is available and not built
+    /// in.
+    function lookAtRoutes() {
+        routes.typedCall("Routes", [], function (found) {
+            var plugged = false
+            for (var i = 0; found && i < found.length; i++) {
+                var type = found[i][1]
+                if ((type & center.routeOutput) && (type & center.routeAvailable)
+                        && !(type & center.routeBuiltin)) {
+                    plugged = true
+                }
+            }
+            center.accessory = plugged
+            center.routesKnown = true
+        }, function () {})
+    }
+
+    // A headset plugged in while a call is on the earpiece: the policy
+    // keeps to a preference whatever is plugged in, so what is plugged
+    // in is looked at again every moment the call is up.
+    Timer {
+        objectName: "routeWatch"
+        interval: 2000
+        repeat: true
+        running: center.talking
+        onTriggered: center.lookAtRoutes()
+    }
+
+    // ohm's route manager, on the system bus: which outputs there are,
+    // and which one to prefer. Open to an app with the Audio permission.
+    DBusInterface {
+        id: routes
+        objectName: "routes"
+        bus: DBus.SystemBus
+        service: "org.nemomobile.Route.Manager"
+        path: "/org/nemomobile/Route/Manager"
+        iface: "org.nemomobile.Route.Manager"
+    }
+
+    // A preference an earlier run did not get to let go of: it would
+    // still have every sound the phone makes on the earpiece.
+    Component.onCompleted: {
+        if (typeof Settings.callRoute === "string" && Settings.callRoute.length > 0) {
+            center.letGo(Settings.callRoute)
+        }
+    }
+
+    // And this run's, on the way out, if a call is still up. The next run
+    // is the net under this: a message sent while the app goes may not
+    // get out.
+    Component.onDestruction: {
+        if (center.preferred.length > 0) {
+            center.letGo(center.preferred)
         }
     }
 
@@ -317,11 +532,13 @@ Item {
         }
         function showChat(accountId, chatId) {
             missedNote.close()
+            remindNote.close()
             center.raise()
             center.chatRequested(accountId, chatId)
         }
         function callBack(accountId, chatId) {
             missedNote.close()
+            remindNote.close()
             center.raise()
             center.place(accountId, chatId)
         }
@@ -391,6 +608,29 @@ Item {
                 center.action("callBack", qsTr("Call back"), "callBack", [accountId, chatId])
             ]
             missedNote.publish()
+        }
+    }
+
+    // A call declined with Remind me, come round again: who, and Call
+    // back on it, as a missed call has.
+    Notification {
+        id: remindNote
+        objectName: "remindNote"
+        appName: "Piirit"
+        appIcon: "harbour-piirit"
+
+        function remind(accountId, chatId, name) {
+            remindNote.summary = name
+            //: A reminder, a while after a call was declined, to call back.
+            remindNote.body = "📞 " + qsTr("Call back")
+            remindNote.previewSummary = remindNote.summary
+            remindNote.previewBody = remindNote.body
+            remindNote.timestamp = new Date()
+            remindNote.remoteActions = [
+                center.action("default", "", "showChat", [accountId, chatId]),
+                center.action("callBack", qsTr("Call back"), "callBack", [accountId, chatId])
+            ]
+            remindNote.publish()
         }
     }
 }

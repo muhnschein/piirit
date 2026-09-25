@@ -2161,19 +2161,26 @@ pub(crate) async fn chat_shape(rpc: &RpcClient, account_id: u32, chat_id: u32) -
         is_group,
         can_send,
         is_encrypted,
-        // `can_send` already rules out the device chat and a contact
-        // request; the rest is the core's own refusal, asked in advance.
-        can_call: !is_group
-            && can_send
-            && is_encrypted
-            && !json::flag(&info, "isSelfTalk")
-            && !json::flag(&info, "isDeviceChat"),
+        can_call: takes_calls(&info, is_group, can_send),
         member_count: if is_group {
             member_count(rpc, account_id, chat_id).await
         } else {
             0
         },
     }
+}
+
+/// Whether a call can be placed in a chat, read off the core's own
+/// description of it -- `get_basic_chat_info` and `get_full_chat_by_id`
+/// both carry the flags. `can_send` already rules out the device chat and
+/// a contact request; the rest is the core's own refusal, asked in
+/// advance.
+pub(crate) fn takes_calls(info: &serde_json::Value, is_group: bool, can_send: bool) -> bool {
+    !is_group
+        && can_send
+        && json::flag(info, "isEncrypted")
+        && !json::flag(info, "isSelfTalk")
+        && !json::flag(info, "isDeviceChat")
 }
 
 /// How many people are in the chat, or 0 for a chat the core would not
