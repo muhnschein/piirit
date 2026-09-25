@@ -13,7 +13,9 @@
 //! event -- is a hash command the page reads (`#onAnswer=...`). The
 //! [`Call`](crate::calls::Call) object hears the event on the Qt thread
 //! and hands the command here with [`Host::command`]; the bridge collects
-//! it with a long poll and sets it on the page.
+//! it with a long poll and sets it on the page. The app's own microphone
+//! switch goes the same way ([`mute_command`]), and the bridge has the
+//! page press its switch rather than setting anything.
 //!
 //! What keeps it from being a hole in the phone is what keeps the webxdc
 //! host from being one: 127.0.0.1 on a port the kernel picks, a `Host:`
@@ -195,7 +197,8 @@ impl Host {
         format!("{}?{options}&key={}#{command}", self.page, self.shared.key)
     }
 
-    /// Hand the page a hash command, which the bridge collects.
+    /// Hand the page a command, which the bridge collects: a hash
+    /// command, or one of the bridge's own.
     pub(crate) fn command(&self, command: String) {
         self.shared.queue().push_back(command);
         self.shared.changed.notify_waiters();
@@ -502,6 +505,13 @@ fn ice_servers(shared: &Shared) -> Response {
 /// is also what separates the command from its payload.
 pub(crate) fn command(name: &str, sdp: &str) -> String {
     format!("{name}={}", percent_encode(&encode_base64(sdp.as_bytes())))
+}
+
+/// The command that has the page switch its microphone off, or on.
+/// Not a hash command: the bridge (`calls.js`) takes these two for
+/// itself, and has the page press its own switch.
+pub(crate) fn mute_command(on: bool) -> String {
+    (if on { "mute" } else { "unmute" }).to_string()
 }
 
 /// Standard base64 with padding: what the page's `atob` reads.

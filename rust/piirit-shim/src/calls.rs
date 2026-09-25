@@ -141,6 +141,12 @@ pub struct Call {
     /// Emitted when the state, its reason or its clock changes.
     pub state_changed: qt_signal!(),
 
+    /// The microphone is off: the other end hears nothing from here.
+    /// On again for every new call.
+    pub muted: qt_property!(bool; NOTIFY muted_changed),
+    /// Emitted when the microphone goes off or on.
+    pub muted_changed: qt_signal!(),
+
     /// Where the call's page is, with the command it opens on. Empty
     /// until the host is up, and again once the call is over. What a
     /// `WebView` is pointed at.
@@ -170,6 +176,8 @@ pub struct Call {
     pub hang_up: qt_method!(fn(&mut self)),
     /// Forget an ended call, so the next one can start.
     pub reset: qt_method!(fn(&mut self)),
+    /// Turn the microphone off, or back on, for the call under way.
+    pub mute: qt_method!(fn(&mut self, on: bool)),
     /// Apply one core event. Only the four call events are acted on.
     pub handle_event:
         qt_method!(fn(&mut self, context_id: u32, kind: QString, payload_json: QString)),
@@ -224,6 +232,10 @@ impl Call {
         self.end_reason = QString::default();
         self.connected_at = 0.0;
         self.call_changed();
+        if self.muted {
+            self.muted = false;
+            self.muted_changed();
+        }
         self.load_peer();
     }
 
@@ -294,6 +306,21 @@ impl Call {
             }
             // Dropping the host is what tells the core; see its `Drop`.
             _ => self.finish("hung-up"),
+        }
+    }
+
+    /// The microphone, off or on. The page has a switch of its own for
+    /// it, and is told to press it: it is the page that keeps whether the
+    /// microphone is on, and tells the other end. A page not up yet is
+    /// told once it is; see `serve`.
+    pub fn mute(&mut self, on: bool) {
+        if !self.busy() || self.muted == on {
+            return;
+        }
+        self.muted = on;
+        self.muted_changed();
+        if let Some(host) = &self.host {
+            host.command(call_host::mute_command(on));
         }
     }
 
@@ -433,6 +460,10 @@ impl Call {
                     {
                         let mut this_mut = this.borrow_mut();
                         this_mut.url = host.url(PAGE_OPTIONS, &command).into();
+                        // Muted before there was a page to tell.
+                        if this_mut.muted {
+                            host.command(call_host::mute_command(true));
+                        }
                         this_mut.host = Some(host);
                     }
                     this.borrow().url_changed();

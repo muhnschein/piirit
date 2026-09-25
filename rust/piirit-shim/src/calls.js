@@ -120,9 +120,45 @@
     }
 
     /*
-     * What the host has for the page: hash commands, in order. A long
-     * poll -- the host holds the request until it has something -- so
-     * the other end's answer arrives as it arrives.
+     * The microphone, switched from the app's own screen, which is the
+     * one the reader sees: the page runs unseen under it. The page keeps
+     * whether its microphone is on and tells the other end, and it does
+     * both from its own switch -- labelled with what a press would do --
+     * so that switch is pressed, rather than the track turned off behind
+     * the page's back. Before the page has drawn it there is nothing to
+     * press, and it is looked for again until there is.
+     */
+    var MUTE_LABEL = "Mute microphone";
+    var UNMUTE_LABEL = "Unmute microphone";
+    var wantMuted = null;
+    var lookingAgain = false;
+    function labelled(label) {
+        return document.querySelector("[aria-label=\"" + label + "\"]");
+    }
+    function applyMute() {
+        if (wantMuted === null) {
+            return;
+        }
+        var press = labelled(wantMuted ? MUTE_LABEL : UNMUTE_LABEL);
+        if (press) {
+            press.click();
+            return;
+        }
+        if (labelled(wantMuted ? UNMUTE_LABEL : MUTE_LABEL) || lookingAgain) {
+            return;
+        }
+        lookingAgain = true;
+        window.setTimeout(function () {
+            lookingAgain = false;
+            applyMute();
+        }, 250);
+    }
+
+    /*
+     * What the host has for the page, in order: hash commands, and the
+     * two above for the microphone. A long poll -- the host holds the
+     * request until it has something -- so the other end's answer
+     * arrives as it arrives.
      */
     var waiting = [];
     function apply() {
@@ -145,10 +181,20 @@
                 } catch (err) {
                     commands = [];
                 }
+                var switched = false;
                 for (var i = 0; i < commands.length; i++) {
-                    waiting.push(commands[i]);
+                    if (commands[i] === "mute" || commands[i] === "unmute") {
+                        wantMuted = commands[i] === "mute";
+                        switched = true;
+                    } else {
+                        waiting.push(commands[i]);
+                    }
                 }
                 apply();
+                /* The last word only: a press each would undo itself. */
+                if (switched) {
+                    applyMute();
+                }
                 listen();
             } else if (xhr.status !== 404) {
                 window.setTimeout(listen, RETRY);

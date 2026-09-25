@@ -216,12 +216,14 @@ fn a_call_rings_is_answered_on_its_page_and_ends_with_the_platform_told() {
         record!("hang-up-button", get!("hangUpButton", "visible"));
         record!("ring-published", get!("ringNote", "isPublished"));
         record!("ring-urgency", get!("ringNote", "urgency"));
+        record!("ring-body", get!("ringNote", "body"));
         record!("ring-actions", call!("actions", QString::from("ringNote")));
         record!("ringing-feedback", get!("feedback", "called"));
         record!("ringing-mce", get!("mce", "called"));
         record!("ringing-awake", get!("callKeepAlive", "enabled"));
         record!("ringing-lit", get!("callDisplay", "preventBlanking"));
-        record!("back", get!("callWho", "visible"));
+        record!("clock", get!("callClock", "text"));
+        record!("mute-ringing", get!("muteSwitch", "visible"));
         record!("answer", call!("tap", QString::from("answerButton")));
     });
 
@@ -236,6 +238,13 @@ fn a_call_rings_is_answered_on_its_page_and_ends_with_the_platform_told() {
         record!("answered-lit", get!("callDisplay", "preventBlanking"));
         record!("answered-awake", get!("callKeepAlive", "enabled"));
         record!("ringing-buttons-after", get!("ringingButtons", "visible"));
+        record!("hang-up-answered", get!("hangUpButton", "visible"));
+        record!("mute-answered", get!("muteSwitch", "visible"));
+        record!("mute-tap", call!("tap", QString::from("muteSwitch")));
+        record!("muted", get!("muteSwitch", "checked"));
+        // Unseen, and under a shield: a stray tap reaches none of the
+        // call page's own controls.
+        record!("view-opacity", get!("callViewLoader", "opacity"));
     });
 
     single_shot(Duration::from_secs(5), move || unsafe {
@@ -318,6 +327,7 @@ fn a_call_rings_is_answered_on_its_page_and_ends_with_the_platform_told() {
         "2",
         "a ringing call is not the critical notification a ringing phone is. {context}"
     );
+    assert_eq!(value("ring-body"), "\u{1f4de} Incoming call", "{context}");
     assert_eq!(value("ring-actions"), "default,decline,answer", "{context}");
     assert!(
         value("ringing-feedback").contains("Play [{\"type\":\"s\",\"value\":\"voip_ringtone\"}"),
@@ -331,6 +341,16 @@ fn a_call_rings_is_answered_on_its_page_and_ends_with_the_platform_told() {
     );
     assert_eq!(value("ringing-awake"), "true", "{context}");
     assert_eq!(value("ringing-lit"), "true", "{context}");
+    assert!(
+        value("clock").len() == 5 && value("clock").as_bytes()[2] == b':',
+        "the time of day is not on the call screen: {}. {context}",
+        value("clock")
+    );
+    assert_eq!(
+        value("mute-ringing"),
+        "false",
+        "a call not yet answered offers a microphone to switch. {context}"
+    );
     assert_eq!(value("answer"), "ok", "{context}");
 
     assert!(
@@ -381,6 +401,19 @@ fn a_call_rings_is_answered_on_its_page_and_ends_with_the_platform_told() {
         "the phone may sleep through a call. {context}"
     );
     assert_eq!(value("ringing-buttons-after"), "false", "{context}");
+    assert_eq!(value("hang-up-answered"), "true", "{context}");
+    assert_eq!(value("mute-answered"), "true", "{context}");
+    assert_eq!(value("mute-tap"), "ok", "{context}");
+    assert_eq!(
+        value("muted"),
+        "true",
+        "the microphone switch did not switch the call's microphone off. {context}"
+    );
+    assert_eq!(
+        value("view-opacity"),
+        "0",
+        "the call's own page, controls and all, is drawn over the call screen. {context}"
+    );
 
     assert_eq!(value("ended"), "ended", "{context}");
     assert_eq!(value("ended-status"), "Call ended", "{context}");
@@ -435,7 +468,7 @@ fn a_call_rings_is_answered_on_its_page_and_ends_with_the_platform_told() {
         "x-nemo.call.missed",
         "a missed call is not in the phone's own category for one. {context}"
     );
-    assert_eq!(value("missed-body"), "Missed call", "{context}");
+    assert_eq!(value("missed-body"), "\u{1f4de} Missed call", "{context}");
     assert_eq!(value("missed-actions"), "default,callBack", "{context}");
     assert_eq!(value("missed-ring"), "false", "{context}");
 }

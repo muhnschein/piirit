@@ -1,6 +1,7 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
 import QtSensors 5.0
+import QtGraphicalEffects 1.0
 import "../components"
 
 /*
@@ -9,11 +10,17 @@ import "../components"
  *
  * The call itself is the window's (`CallCenter.qml`), not this page's --
  * a call comes in whatever is on screen -- and this is where it is shown.
- * Who is at the other end and how the call stands are drawn here, in
- * the phone's language; while it rings, answering and declining are
- * here too. Once answered, the rest is the call's own page, running in
- * the browser engine (`CallView.qml`), which carries the controls a call
- * needs while it lasts: the red button and the microphone.
+ * Laid out as the phone's own call screen lays out a call: who, at the
+ * top on the left, and the time on the right; how long, large, under
+ * them; the switches under that; and the red button at the foot. Their
+ * picture, where they have one of their own, fills the screen behind it
+ * all, out of focus.
+ *
+ * The media runs in the browser engine, in upstream's call page
+ * (`CallView.qml`), which draws controls of its own. They are not shown:
+ * the page is kept running unseen, and what its controls did is done
+ * from here -- the microphone through the call, which has the page press
+ * its own switch, and hanging up through the call as it always was.
  *
  * That page is loaded rather than declared, so a phone without the
  * browser engine loses the call and keeps this page -- a call that rings
@@ -45,15 +52,30 @@ Page {
 
     backNavigation: !page.busy
 
-    /// How long the call has been connected, as the phone app shows it.
+    /// The call is connected, and its clock is running.
+    readonly property bool connected: page.call !== null && page.call.state === "connected"
+
+    /// How long the call has been connected, as the phone app shows it:
+    /// hours, minutes and seconds, two digits each.
     function elapsed() {
         if (!page.call || page.call.connected_at <= 0) {
             return ""
         }
         var seconds = Math.max(0, Math.floor(page.now / 1000 - page.call.connected_at))
-        var minutes = Math.floor(seconds / 60)
-        var rest = seconds % 60
-        return minutes + ":" + (rest < 10 ? "0" : "") + rest
+        var parts = [Math.floor(seconds / 3600), Math.floor(seconds / 60) % 60, seconds % 60]
+        return parts.map(function (part) { return (part < 10 ? "0" : "") + part }).join(":")
+    }
+
+    /// The same, with the groups that are still nothing but zeros drawn
+    /// quieter, as the phone app draws them: what is counting stands out.
+    function elapsedMarkup() {
+        var text = page.elapsed()
+        var lead = /^(00:){0,2}/.exec(text)[0]
+        if (lead.length === 0) {
+            return text
+        }
+        return "<font color=\"" + Theme.secondaryHighlightColor + "\">" + lead + "</font>"
+                + text.substring(lead.length)
     }
 
     /// How the call stands, in words. Delta Chat's own wherever it has
@@ -98,11 +120,12 @@ Page {
         return ""
     }
 
+    // For the call's clock and the time of day, both.
     Timer {
         objectName: "clock"
         interval: 1000
         repeat: true
-        running: page.call !== null && page.call.state === "connected"
+        running: page.call !== null && page.call.state !== ""
         triggeredOnStart: true
         onTriggered: page.now = Date.now()
     }
@@ -164,67 +187,51 @@ Page {
         }
     }
 
-    // Who, and how it stands. Over the call's page rather than inside
-    // it: the page draws its own words in English only.
-    Column {
-        id: who
-        objectName: "callWho"
-        anchors {
-            top: parent.top
-            topMargin: page.inCall && view.status === Loader.Ready
-                       ? Theme.paddingLarge : Theme.itemSizeExtraLarge
-        }
-        width: parent.width
-        spacing: Theme.paddingMedium
+    // Their picture, when they have one of their own: the whole screen,
+    // out of focus, and dimmed under what is drawn over it. Nothing where
+    // they have none, and the ambience shows through as on every page.
+    Item {
+        id: backdrop
+        objectName: "callBackdrop"
+        anchors.fill: parent
+        visible: picture.status === Image.Ready
 
-        Avatar {
-            objectName: "callAvatar"
-            anchors.horizontalCenter: parent.horizontalCenter
-            // Small once the call's page is up and draws its own.
-            visible: !(page.inCall && view.status === Loader.Ready)
-            width: 2 * Theme.itemSizeExtraLarge
-            initial: page.call ? page.call.peer_name : ""
-            ownColor: page.call ? page.call.peer_color : ""
-            picturePath: page.call ? page.call.peer_avatar : ""
-        }
-
-        Label {
-            objectName: "callName"
-            x: Theme.horizontalPageMargin
-            width: parent.width - 2 * Theme.horizontalPageMargin
-            horizontalAlignment: Text.AlignHCenter
-            truncationMode: TruncationMode.Fade
-            font.pixelSize: Theme.fontSizeExtraLarge
-            font.family: Theme.fontFamilyHeading
-            color: Theme.highlightColor
-            // The other end's own name for themselves.
-            textFormat: Text.PlainText
-            text: page.call ? page.call.peer_name : ""
+        Image {
+            id: picture
+            anchors.fill: parent
+            visible: false
+            fillMode: Image.PreserveAspectCrop
+            asynchronous: true
+            // Small: a blur this wide keeps nothing a larger one would.
+            sourceSize.width: 256
+            sourceSize.height: 256
+            // Encoded per segment; see AttachmentPreview.qml's fileUrl.
+            source: page.call && page.call.peer_avatar.length > 0
+                    ? Qt.resolvedUrl("file://" + page.call.peer_avatar.split("/")
+                                                     .map(encodeURIComponent).join("/"))
+                    : ""
         }
 
-        Label {
-            objectName: "callStatus"
-            x: Theme.horizontalPageMargin
-            width: parent.width - 2 * Theme.horizontalPageMargin
-            horizontalAlignment: Text.AlignHCenter
-            wrapMode: Text.Wrap
-            color: Theme.secondaryHighlightColor
-            textFormat: Text.PlainText
-            text: page.describe()
+        FastBlur {
+            anchors.fill: parent
+            source: picture
+            radius: 64
+        }
+
+        Rectangle {
+            anchors.fill: parent
+            color: Theme.rgba(Theme.highlightDimmerColor, 0.6)
         }
     }
 
-    // The call's page, once there is one to show.
+    // The call's page: the media, and nothing on screen. Its own controls
+    // are this page's to draw, so it runs unseen -- running, not hidden,
+    // which the engine would pause -- under what is drawn here.
     Loader {
         id: view
         objectName: "callViewLoader"
-        anchors {
-            top: who.bottom
-            topMargin: Theme.paddingLarge
-            left: parent.left
-            right: parent.right
-            bottom: parent.bottom
-        }
+        anchors.fill: parent
+        opacity: 0
         active: page.call !== null && page.call.url.length > 0
         source: Qt.resolvedUrl("../components/CallView.qml")
         onLoaded: {
@@ -239,6 +246,107 @@ Page {
                 return page.call ? page.call.url : ""
             })
         }
+    }
+
+    // Unseen is not untouchable: a tap anywhere the page's own buttons
+    // are not would land on one of that page's, drawn or not. Taken here.
+    MouseArea {
+        objectName: "callViewShield"
+        anchors.fill: parent
+    }
+
+    // Who, on the left, and the time of day, on the right: the line the
+    // phone's own call screen opens with.
+    Item {
+        id: who
+        objectName: "callWho"
+        anchors {
+            top: parent.top
+            topMargin: 2 * Theme.paddingLarge
+            left: parent.left
+            leftMargin: Theme.horizontalPageMargin
+            right: parent.right
+            rightMargin: Theme.horizontalPageMargin
+        }
+        height: name.height
+
+        Label {
+            id: name
+            objectName: "callName"
+            width: parent.width - clock.width - Theme.paddingLarge
+            truncationMode: TruncationMode.Fade
+            font.pixelSize: Theme.fontSizeLarge
+            color: Theme.primaryColor
+            // The other end's own name for themselves.
+            textFormat: Text.PlainText
+            text: page.call ? page.call.peer_name : ""
+        }
+
+        Label {
+            id: clock
+            objectName: "callClock"
+            anchors.right: parent.right
+            font.pixelSize: Theme.fontSizeLarge
+            color: Theme.secondaryColor
+            textFormat: Text.PlainText
+            // The same form as a message's time.
+            text: Qt.formatTime(new Date(page.now), "hh:mm")
+        }
+    }
+
+    // How long, once the two can hear each other; how it stands until
+    // then, and once it is over. On a line as tall as the clock's
+    // whatever it says, so the switches under it stay where they are.
+    Item {
+        id: statusLine
+        anchors {
+            top: who.bottom
+            topMargin: Theme.itemSizeLarge
+        }
+        width: parent.width
+        height: clockMetric.height
+
+        // One line of the clock's font, measured.
+        Label {
+            id: clockMetric
+            visible: false
+            font.family: Theme.fontFamilyHeading
+            font.pixelSize: Theme.fontSizeHuge
+            text: "00:00:00"
+        }
+
+        Label {
+            objectName: "callStatus"
+            anchors.verticalCenter: parent.verticalCenter
+            x: Theme.horizontalPageMargin
+            width: parent.width - 2 * Theme.horizontalPageMargin
+            horizontalAlignment: Text.AlignHCenter
+            wrapMode: Text.Wrap
+            font.family: Theme.fontFamilyHeading
+            font.pixelSize: page.connected ? Theme.fontSizeHuge : Theme.fontSizeLarge
+            color: Theme.highlightColor
+            // Markup only for the clock, which is made here of digits.
+            textFormat: page.connected ? Text.StyledText : Text.PlainText
+            text: page.connected ? page.elapsedMarkup() : page.describe()
+        }
+    }
+
+    // The switches, under the clock. The microphone is the one a call
+    // here has: the phone's own screen also has the loudspeaker, the
+    // keypad and recording, which belong to a phone call.
+    Switch {
+        id: mute
+        objectName: "muteSwitch"
+        visible: page.inCall
+        anchors {
+            top: statusLine.bottom
+            topMargin: 2 * Theme.paddingLarge
+            horizontalCenter: parent.horizontalCenter
+        }
+        icon.source: "image://theme/icon-m-mic-mute"
+        automaticCheck: false
+        checked: page.call !== null && page.call.muted
+        onClicked: page.call.mute(!page.call.muted)
     }
 
     // Answering and declining, while it rings. Declining is on the left
@@ -270,17 +378,15 @@ Page {
         }
     }
 
-    // Hanging up while there is no call page to do it from: before it
-    // has come up, and on a phone where it cannot.
+    // Hanging up, at the foot of the screen, where the phone's own is.
     Button {
         objectName: "hangUpButton"
-        visible: page.inCall && view.status !== Loader.Ready
+        visible: page.inCall
         anchors {
             bottom: parent.bottom
             bottomMargin: Theme.itemSizeLarge
             horizontalCenter: parent.horizontalCenter
         }
-        color: Theme.errorColor
         //: Ends a call in progress.
         text: qsTr("End call")
         onClicked: page.call.hang_up()

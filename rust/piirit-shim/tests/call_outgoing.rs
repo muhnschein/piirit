@@ -69,6 +69,7 @@ const PROBE_QML: &str = r"
                    + '|' + (call.connected_at > 0 ? 'clock' : 'no-clock')
         }
         function url() { return call.url }
+        function mute(on) { call.mute(on); return '' + call.muted }
         function hangUp() { call.hang_up(); return call.state + '|' + call.url }
         function reset() { call.reset(); return call.state }
         function lastRow() {
@@ -113,8 +114,11 @@ fn a_call_is_placed_answered_connected_and_hung_up() {
     let url_ptr: *mut String = std::ptr::addr_of_mut!(page_url);
 
     macro_rules! call {
-        ($name:expr) => {{
-            let result = (*engine_ptr).invoke_method($name.into(), &[]);
+        ($name:expr $(, $arg:expr)*) => {{
+            let result = (*engine_ptr).invoke_method(
+                $name.into(),
+                &[$(QVariant::from($arg)),*],
+            );
             QString::from_qvariant(result)
                 .map(|value| value.to_string())
                 .unwrap_or_default()
@@ -133,8 +137,12 @@ fn a_call_is_placed_answered_connected_and_hung_up() {
     });
 
     single_shot(Duration::from_secs(2), move || unsafe {
+        // No call, no microphone to switch.
+        record!("mute-idle", call!("mute", true));
         record!("place", call!("place"));
         record!("placing", call!("state"));
+        // Switched off before the page is up to be told.
+        record!("mute-early", call!("mute", true));
         // One call at a time.
         record!("again", call!("again"));
     });
@@ -216,12 +224,21 @@ fn a_call_is_placed_answered_connected_and_hung_up() {
         let api = api_of(&(*url_ptr));
         let commands = get(&authority, &format!("{api}/commands"));
         let list: Vec<String> = serde_json::from_str(body_of(&commands)).unwrap_or_default();
+        record!("page-muted", list.first().cloned().unwrap_or_default());
         record!(
             "answer",
-            list.first().map_or_else(
-                || format!("no command: {commands}"),
-                |command| payload_of(command, "onAnswer")
-            )
+            list.iter()
+                .find(|command| command.starts_with("onAnswer="))
+                .map_or_else(
+                    || format!("no command: {commands}"),
+                    |command| payload_of(command, "onAnswer")
+                )
+        );
+        // And on again, told at once now that the page is up.
+        record!("unmute", call!("mute", false));
+        record!(
+            "page-unmuted",
+            body_of(&get(&authority, &format!("{api}/commands"))).to_string()
         );
         // The peer connection says it is through.
         record!(
@@ -263,10 +280,16 @@ fn a_call_is_placed_answered_connected_and_hung_up() {
     let context = format!("steps: {steps:?}");
 
     assert_eq!(
+        value("mute-idle"),
+        "false",
+        "a microphone was switched off with no call to switch it in. {context}"
+    );
+    assert_eq!(
         value("place"),
         "placed",
         "the call was not placed. {context}"
     );
+    assert_eq!(value("mute-early"), "true", "{context}");
     assert!(
         value("placing").starts_with("starting|"),
         "a call being placed does not say so: {}. {context}",
@@ -353,9 +376,21 @@ fn a_call_is_placed_answered_connected_and_hung_up() {
         value("row-ringing")
     );
     assert_eq!(
+        value("page-muted"),
+        "mute",
+        "a microphone switched off before the page was up was not switched \
+         off on it once it was. {context}"
+    );
+    assert_eq!(
         value("answer"),
         "v=0 fake-answer",
         "the other end's answer did not reach the page as sent. {context}"
+    );
+    assert_eq!(value("unmute"), "false", "{context}");
+    assert_eq!(
+        value("page-unmuted"),
+        "[\"unmute\"]",
+        "the microphone switched back on was not passed to the page. {context}"
     );
     assert!(value("connected").starts_with("HTTP/1.1 204"), "{context}");
     assert!(

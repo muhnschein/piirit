@@ -5,9 +5,9 @@ an app can have, and what only a phone can still answer.*
 
 **Voice calls are built, and experimental**: off until *Settings →
 Advanced → Enable calls (experimental)* is switched on. Video calls are
-not built. Nothing here has run on a phone yet -- every test in this tree
-passes without one, and the questions at the end are the ones a source
-tree cannot answer.
+not built. Voice calls have been made on a phone, Sailfish OS 5.2; the
+questions at the end are the ones a source tree cannot answer, and the
+ones still open say so.
 
 The shape of it: **the core does the call, Gecko does the media, and
 Piirit is the glue.** The core places, rings, accepts and ends a call, and
@@ -120,6 +120,10 @@ across origins -- finds no key and reaches nothing. What the bridge does:
   served from the host;
 - the other end's answer arrives as the page's own hash command,
   `#onAnswer=`, which the bridge collects with a long poll;
+- the app's microphone switch arrives on the same poll, as `mute` or
+  `unmute`, and the bridge presses the page's own switch -- found by its
+  label -- rather than turning the track off behind it: the page keeps
+  whether its microphone is on, and tells the other end;
 - the page says nothing about how its connection is doing, so the bridge
   watches the peer connection and reports ICE's own states -- which is
   where *Connected* and the clock come from, and what ends a call whose
@@ -142,6 +146,21 @@ applied once it does (`tests/call_early_answer.rs`).
 The same page speaks the protocol the native Android and iOS clients
 reimplemented -- the same negotiated data channels, the same "enough ICE,
 then trickle" -- so a call from here reaches either of them.
+
+### The screen
+
+The call page (`qml/pages/CallPage.qml`) is laid out as the phone's own
+call screen: who, top left, and the time of day, top right; how long, in
+hours, minutes and seconds, large, under them; the switches under that;
+and *End call* at the foot. The other end's picture, where they have one
+of their own, fills the screen behind it, blurred and dimmed. Of the
+phone screen's four switches the microphone is the one a call here has:
+the keypad and recording are a phone call's, and the loudspeaker is the
+earpiece question below.
+
+The page the media runs in draws controls of its own, in English. It is
+kept running under the call screen, unseen and behind a catch that takes
+every tap, and what its controls did is done from the screen.
 
 ## What the phone gives a call
 
@@ -189,12 +208,7 @@ Ranked by what would sink the feature. None of them needs another line
 of Piirit: two phones, a calls-enabled build, and an afternoon.
 
 1. **Does a peer connection complete on the device, with the
-   microphone?** WebRTC is built into the engine and on by default, and
-   camera frames are known to reach a page ([blue-tinted][blue-tint], on
-   4.4 and 4.5). A voice call is a lighter page than the video conference
-   that has been seen to crash the browser ([4.5.0.19][conf-crash]), and
-   the engine is newer than either report. That is a reason to try, not
-   an answer.
+   microphone?** Yes: calls have gone through on 5.2.
 2. **Does the other end's voice keep playing with the app in the
    background?** The view is held active for it; that this is enough is
    the claim.
@@ -275,5 +289,3 @@ Read rather than remembered, at these versions:
 [ohm]: https://github.com/sailfishos/ohm-plugins-misc
 [embedlite]: https://github.com/sailfishos/embedlite-components
 [webview]: https://github.com/sailfishos/sailfish-components-webview
-[blue-tint]: https://forum.sailfishos.org/t/browser-webview-camera-video-has-a-blue-tint/14878
-[conf-crash]: https://forum.sailfishos.org/t/xperia-x-4-5-0-19-browser-crashes-when-connecting-to-video-conference/15456

@@ -356,7 +356,8 @@ Item {
 
         function ring() {
             ringNote.summary = call.peer_name
-            ringNote.body = qsTr("Incoming call")
+            // A phone first: the line says it is a call before it is read.
+            ringNote.body = "📞 " + qsTr("Incoming call")
             ringNote.previewSummary = ringNote.summary
             ringNote.previewBody = ringNote.body
             ringNote.timestamp = new Date()
@@ -381,7 +382,7 @@ Item {
 
         function missed(accountId, chatId, name) {
             missedNote.summary = name
-            missedNote.body = qsTr("Missed call")
+            missedNote.body = "📞 " + qsTr("Missed call")
             missedNote.previewSummary = missedNote.summary
             missedNote.previewBody = missedNote.body
             missedNote.timestamp = new Date()
