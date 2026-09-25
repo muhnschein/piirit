@@ -15,6 +15,15 @@ import Piirit 1.0
 Page {
     id: page
 
+    // A move the core asked for, held until this page is the one on
+    // screen: a call's page may be over it, and a move made then would
+    // take that page instead (PendingNavigation.qml).
+    PendingNavigation {
+        id: navigation
+        stack: pageStack
+        ready: page.status === PageStatus.Active
+    }
+
     property int accountId
     property string errorMessage: ""
 
@@ -45,8 +54,8 @@ Page {
         onRows_changed: page.contactsLoaded = true
         // Open the chat that now exists, above the page that opened this
         // one: this page has done its job.
-        onChat_ready: pageStack.replaceAbove(pageStack.previousPage(page),
-                                             Qt.resolvedUrl("ConversationPage.qml"), {
+        onChat_ready: navigation.replaceAbove(pageStack.previousPage(page),
+                                              Qt.resolvedUrl("ConversationPage.qml"), {
             accountId: page.accountId,
             chatId: chat_id,
             chatName: qsTr("Chat")

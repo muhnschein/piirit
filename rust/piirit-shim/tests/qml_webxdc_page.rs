@@ -120,6 +120,11 @@ const PROBE_QML: &str = r"
             loader.item.status = PageStatus.Deactivating
             return 'ok'
         }
+        // And back on screen, the page over it gone.
+        function uncover() {
+            loader.item.status = PageStatus.Active
+            return 'ok'
+        }
         // Leaving for good: a popped page is destroyed, and so is one
         // whose stack was replaced.
         function leave() {
@@ -323,6 +328,12 @@ fn the_page_runs_the_app_the_shim_serves_and_stops_it_on_the_way_out() {
     });
 
     single_shot(Duration::from_secs(6), move || unsafe {
+        // Not while covered: the page on top is the one a pop would take.
+        record!(
+            "popped-covered",
+            (*stack_ptr).pinned().borrow().log.to_string()
+        );
+        call!("uncover");
         record!("popped", (*stack_ptr).pinned().borrow().log.to_string());
         record!("leave", call!("leave"));
     });
@@ -471,6 +482,12 @@ fn the_page_runs_the_app_the_shim_serves_and_stops_it_on_the_way_out() {
         value("served-after"),
         "no",
         "the app is still being served after the page was left. {context}"
+    );
+    assert_eq!(
+        value("popped-covered"),
+        "",
+        "a page running an app that was deleted while another page was over \
+         it popped that page instead of itself. {context}"
     );
     assert_eq!(
         value("popped"),

@@ -238,6 +238,13 @@ Page {
                 return
             }
             page.quickChatPending = false
+            // Only while this is the page on screen: a call that came in
+            // while the chat was looked up has its page over this one, and
+            // the replace below would take it. The tap is dropped, as a
+            // tapped chat is (`openLoadedChat`).
+            if (page.status !== PageStatus.Active) {
+                return
+            }
             if (quickChat.account_id === page.accountId) {
                 page.openChat(quickChat.chat_id, quickChat.name, 0)
                 return

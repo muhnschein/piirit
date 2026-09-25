@@ -69,6 +69,15 @@ Page {
     // answer, leaving the core on the relay with nobody waiting.
     backNavigation: !page.busy
 
+    // A move the core asked for, held until this page is the one on
+    // screen: a call's page may be over it, and a move made then would
+    // take that page instead (PendingNavigation.qml).
+    PendingNavigation {
+        id: navigation
+        stack: pageStack
+        ready: page.status === PageStatus.Active
+    }
+
     function begin() {
         if (page.busy || page.providerQr.length === 0) {
             return
@@ -91,7 +100,7 @@ Page {
                 return
             }
             page.busy = false
-            pageStack.pop()
+            navigation.pop()
         }
 
         onRelay_error: {
