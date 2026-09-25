@@ -722,6 +722,15 @@ async fn offline_round_trip_against_real_core() {
         Some("Group"),
         "unexpected chat shape: {full:?}"
     );
+    // What a contact's page reads, with the chat's kind and `canSend`,
+    // to say whether a call can be placed there (piirit-shim's
+    // `takes_calls`): the same flags `get_basic_chat_info` carries.
+    for flag in ["isEncrypted", "isSelfTalk", "isDeviceChat", "canSend"] {
+        assert!(
+            full.get(flag).is_some_and(Value::is_boolean),
+            "the full chat carries no {flag}: {full:?}"
+        );
+    }
     let member_ids: Vec<u32> =
         serde_json::from_value(full["contactIds"].clone()).expect("contactIds is a list of ids");
     assert_eq!(
@@ -1375,6 +1384,25 @@ async fn offline_round_trip_against_real_core() {
     assert!(
         !pictures.contains(&tone_id) && !pictures.contains(&voice_id),
         "a sound is listed among the chat's pictures: {pictures:?}"
+    );
+    // Calls are a view type of their own, which the index takes like any
+    // other: what the contact page's Calls tile lists. None here.
+    let calls: Vec<u32> = client
+        .call(
+            "get_chat_media",
+            (
+                sender_id,
+                Some(saved),
+                "Call",
+                Option::<&str>::None,
+                Option::<&str>::None,
+            ),
+        )
+        .await
+        .expect("get_chat_media for the calls in a chat");
+    assert!(
+        calls.is_empty(),
+        "a chat with no calls lists some: {calls:?}"
     );
 
     // A shared contact. The core parses the card and hands back the pieces
@@ -2134,6 +2162,7 @@ async fn offline_round_trip_against_real_core() {
     );
 
     relays_against(&client, mailbox).await;
+    calls_against(&client, mailbox).await;
 
     let _ = std::fs::remove_file(&attachment);
     handle.stop();
@@ -2256,4 +2285,158 @@ async fn relays_against(client: &RpcClient, mailbox: (u16, u16)) {
         .await,
         "Cannot remove the last transport"
     );
+}
+
+/// A call, as the shim places, reads and ends one (`calls.rs`,
+/// `call_host.rs`), and as the fake core answers for it -- with no media
+/// anywhere: the SDP the core carries is opaque to it, and a sentence
+/// stands in for one here.
+///
+/// Two accounts on the loopback stub, each knowing the other's key from a
+/// vCard, since a call needs an encrypted chat and nothing else. Nothing
+/// is delivered -- the stub drops whatever is sent -- so the other end
+/// never rings; what is pinned is this end's side of the core.
+async fn calls_against(client: &RpcClient, mailbox: (u16, u16)) {
+    let mut accounts = Vec::new();
+    for addr in ["caller@example.invalid", "callee@example.invalid"] {
+        let account: u32 = client
+            .call_unit("add_account")
+            .await
+            .unwrap_or_else(|err| panic!("add_account for the calls probe: {err}"));
+        client
+            .call::<_, ()>("add_transport_from_qr", (account, dclogin(addr, mailbox)))
+            .await
+            .unwrap_or_else(|err| panic!("add_transport_from_qr {addr}: {err}"));
+        client
+            .call::<_, ()>("stop_io", (account,))
+            .await
+            .unwrap_or_else(|err| panic!("stop_io on the calls probe: {err}"));
+        accounts.push(account);
+    }
+    let (caller, other_end) = (accounts[0], accounts[1]);
+    // DC_CONTACT_ID_SELF: the other end's own contact, as a vCard with its
+    // key.
+    let card: String = client
+        .call("make_vcard", (other_end, vec![1_u32]))
+        .await
+        .unwrap_or_else(|err| panic!("make_vcard: {err}"));
+    let imported: Vec<u32> = client
+        .call("import_vcard_contents", (caller, card))
+        .await
+        .unwrap_or_else(|err| panic!("import_vcard_contents: {err}"));
+    let contact = imported[0];
+    let chat: u32 = client
+        .call("create_chat_by_contact_id", (caller, contact))
+        .await
+        .unwrap_or_else(|err| panic!("create_chat_by_contact_id: {err}"));
+    a_call_is_placed_and_hung_up(client, caller, chat).await;
+    calls_are_refused_where_the_core_refuses_them(client, caller, chat).await;
+}
+
+/// Placed, read back, and hung up before the other end answered.
+async fn a_call_is_placed_and_hung_up(client: &RpcClient, caller: u32, chat: u32) {
+    // The ICE servers are a JSON string inside the answer, not an array:
+    // the bridge hands the string to the page as it is (calls.js).
+    let ice: String = client
+        .call("ice_servers", (caller,))
+        .await
+        .unwrap_or_else(|err| panic!("ice_servers: {err}"));
+    assert!(
+        serde_json::from_str::<Vec<Value>>(&ice).is_ok(),
+        "ice_servers is not a JSON array in a string: {ice}"
+    );
+
+    // Placed: the call is a message, and its id is what `call_info` and
+    // `end_call` are asked about.
+    let placed: u32 = client
+        .call(
+            "place_outgoing_call",
+            (caller, chat, "v=0 offer from a test", false),
+        )
+        .await
+        .unwrap_or_else(|err| panic!("place_outgoing_call: {err}"));
+    let info: Value = client
+        .call("call_info", (caller, placed))
+        .await
+        .unwrap_or_else(|err| panic!("call_info: {err}"));
+    assert_eq!(
+        info,
+        serde_json::json!({
+            "sdpOffer": "v=0 offer from a test",
+            "hasVideo": false,
+            "state": {"kind": "Alerting"},
+        }),
+        "call_info is not the camelCase object, state tagged by kind, that \
+         calls.rs reads"
+    );
+    let message: Value = client
+        .call("get_message", (caller, placed))
+        .await
+        .unwrap_or_else(|err| panic!("get_message for the call: {err}"));
+    assert_eq!(
+        message["viewType"],
+        serde_json::json!("Call"),
+        "{message:?}"
+    );
+    assert_eq!(message["fromId"], serde_json::json!(1), "{message:?}");
+
+    // Hung up before the other end answered: canceled, and saying so
+    // twice is not an error.
+    client
+        .call::<_, Value>("end_call", (caller, placed))
+        .await
+        .unwrap_or_else(|err| panic!("end_call: {err}"));
+    let info: Value = client
+        .call("call_info", (caller, placed))
+        .await
+        .unwrap_or_else(|err| panic!("call_info after end_call: {err}"));
+    assert_eq!(
+        info["state"],
+        serde_json::json!({"kind": "Canceled"}),
+        "{info:?}"
+    );
+    client
+        .call::<_, Value>("end_call", (caller, placed))
+        .await
+        .unwrap_or_else(|err| panic!("end_call on an ended call: {err}"));
+}
+
+/// The core's own refusals, which `can_call` and the fake core keep to,
+/// and the one setting.
+async fn calls_are_refused_where_the_core_refuses_them(client: &RpcClient, caller: u32, chat: u32) {
+    let text: u32 = client
+        .call("misc_send_text_message", (caller, chat, "not a call"))
+        .await
+        .unwrap_or_else(|err| panic!("misc_send_text_message: {err}"));
+    assert_eq!(
+        refusal(client, "call_info", (caller, text)).await,
+        format!("Attempting to get call state of non-call message Msg#{text}")
+    );
+    let saved: u32 = client
+        .call("create_chat_by_contact_id", (caller, 1_u32))
+        .await
+        .unwrap_or_else(|err| panic!("create_chat_by_contact_id for Saved messages: {err}"));
+    assert_eq!(
+        refusal(client, "place_outgoing_call", (caller, saved, "v=0", false)).await,
+        "Cannot call self"
+    );
+    let group: u32 = client
+        .call("create_group_chat", (caller, "Calls", true))
+        .await
+        .unwrap_or_else(|err| panic!("create_group_chat: {err}"));
+    assert_eq!(
+        refusal(client, "place_outgoing_call", (caller, group, "v=0", false)).await,
+        "Can only place calls in single chats"
+    );
+
+    // Whose calls ring here, as the settings write it.
+    client
+        .call::<_, ()>("set_config", (caller, "who_can_call_me", "2"))
+        .await
+        .unwrap_or_else(|err| panic!("set_config who_can_call_me: {err}"));
+    let who: Option<String> = client
+        .call("get_config", (caller, "who_can_call_me"))
+        .await
+        .unwrap_or_else(|err| panic!("get_config who_can_call_me: {err}"));
+    assert_eq!(who.as_deref(), Some("2"));
 }

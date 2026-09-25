@@ -59,6 +59,7 @@ pub const BUNDLED_SERVER: &str = "/usr/libexec/harbour-piirit/deltachat-rpc-serv
 ///
 /// Sorted, so the list can be read at a glance.
 pub const HANDLED_EVENT_KINDS: &[&str] = &[
+    "CallEnded",
     "ChatDeleted",
     "ChatEphemeralTimerModified",
     "ChatModified",
@@ -68,6 +69,8 @@ pub const HANDLED_EVENT_KINDS: &[&str] = &[
     "ContactsChanged",
     "EventChannelOverflow",
     "ImexProgress",
+    "IncomingCall",
+    "IncomingCallAccepted",
     "IncomingMsg",
     "MsgDeleted",
     "MsgDelivered",
@@ -75,6 +78,7 @@ pub const HANDLED_EVENT_KINDS: &[&str] = &[
     "MsgRead",
     "MsgsChanged",
     "MsgsNoticed",
+    "OutgoingCallAccepted",
     "ReactionsChanged",
     "TransportsModified",
     "WebxdcInstanceDeleted",
@@ -201,10 +205,10 @@ fn restart_delay(attempt: u32) -> Duration {
 /// Only a slice of the core's ~100 JSON-RPC methods is exposed; add more
 /// the same way as the UI needs them.
 #[derive(QObject, Default)]
-// `io_all`, `supervising` and the two `_set` flags are independent facts,
-// not states of one thing: what IO was asked for, whether a spawn has ever
-// succeeded, and whether QML has handed each of two settings over. A state
-// machine would be invented for them, not found.
+// `io_all`, `supervising` and the `_set` flags are independent facts, not
+// states of one thing: what IO was asked for, whether a spawn has ever
+// succeeded, and whether QML has handed each setting over. A state machine
+// would be invented for them, not found.
 #[allow(clippy::struct_excessive_bools)]
 pub struct DeltaChatCore {
     base: qt_base_class!(trait QObject),
@@ -265,6 +269,15 @@ pub struct DeltaChatCore {
     pub media_quality: qt_property!(u32; WRITE set_media_quality NOTIFY media_quality_changed),
     /// Emitted when [`DeltaChatCore::media_quality`] changes.
     pub media_quality_changed: qt_signal!(),
+
+    /// Whose calls ring here: 0 everybody, 1 contacts, 2 nobody. The
+    /// reader's setting, applied to every account the way the download
+    /// limit is. The core's `who_can_call_me`, which it reads as a call
+    /// arrives: a call it would not ring for is still kept, and can
+    /// still be answered from its chat, but says nothing when it comes.
+    pub who_can_call_me: qt_property!(u32; WRITE set_who_can_call_me NOTIFY who_can_call_me_changed),
+    /// Emitted when [`DeltaChatCore::who_can_call_me`] changes.
+    pub who_can_call_me_changed: qt_signal!(),
 
     /// Messages older than this many seconds are deleted from this
     /// device; 0 keeps them. The reader's setting, applied to every
@@ -462,6 +475,8 @@ pub struct DeltaChatCore {
     delete_device_after_set: bool,
     /// The same, for the outgoing media quality.
     media_quality_set: bool,
+    /// The same, for whose calls ring here.
+    who_can_call_me_set: bool,
     /// The attempts at a profile there have been, shared with the tasks
     /// that carry each one out.
     attempts: Arc<Attempts>,
@@ -959,6 +974,17 @@ impl DeltaChatCore {
         self.spread("media_quality", quality.to_string());
     }
 
+    /// Set whose calls ring here and apply it to every account.
+    pub fn set_who_can_call_me(&mut self, who: u32) {
+        if self.who_can_call_me_set && self.who_can_call_me == who {
+            return;
+        }
+        self.who_can_call_me = who;
+        self.who_can_call_me_set = true;
+        self.who_can_call_me_changed();
+        self.spread("who_can_call_me", who.to_string());
+    }
+
     /// Set the deletion period and apply it to every account.
     pub fn set_delete_device_after(&mut self, seconds: u32) {
         if self.delete_device_after_set && self.delete_device_after == seconds {
@@ -1005,6 +1031,9 @@ impl DeltaChatCore {
         }
         if self.media_quality_set {
             self.write_config(ids, "media_quality", self.media_quality.to_string());
+        }
+        if self.who_can_call_me_set {
+            self.write_config(ids, "who_can_call_me", self.who_can_call_me.to_string());
         }
     }
 

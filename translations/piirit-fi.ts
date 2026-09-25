@@ -276,6 +276,148 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>CallCenter</name>
+    <message>
+        <source>Incoming call</source>
+        <translation>Saapuva puhelu</translation>
+    </message>
+    <message>
+        <source>Decline</source>
+        <translation>Hylkää</translation>
+    </message>
+    <message>
+        <source>Answer</source>
+        <translation>Vastaa</translation>
+    </message>
+    <message>
+        <source>Missed call</source>
+        <translation>Vastaamaton puhelu</translation>
+    </message>
+    <message>
+        <source>Call back</source>
+        <translation>Soita takaisin</translation>
+    </message>
+</context>
+<context>
+    <name>CallPage</name>
+    <message>
+        <source>Incoming call</source>
+        <translation>Saapuva puhelu</translation>
+    </message>
+    <message>
+        <source>Ringing…</source>
+        <translation>Hälyttää…</translation>
+    </message>
+    <message>
+        <source>Connecting…</source>
+        <translation>Yhdistetään…</translation>
+    </message>
+    <message>
+        <source>Reconnecting…</source>
+        <translation>Yhdistetään uudelleen…</translation>
+    </message>
+    <message>
+        <source>Call answered on another device</source>
+        <translation>Puheluun vastattiin toisella laitteella</translation>
+    </message>
+    <message>
+        <source>Call failed</source>
+        <translation>Puhelu epäonnistui</translation>
+    </message>
+    <message>
+        <source>Missed call</source>
+        <translation>Vastaamaton puhelu</translation>
+    </message>
+    <message>
+        <source>Declined call</source>
+        <translation>Hylätty puhelu</translation>
+    </message>
+    <message>
+        <source>Call ended</source>
+        <translation>Puhelu päättyi</translation>
+    </message>
+    <message>
+        <source>Decline</source>
+        <extracomment>Declines a call that is ringing. A verb.</extracomment>
+        <translation>Hylkää</translation>
+    </message>
+    <message>
+        <source>End call</source>
+        <extracomment>Ends a call in progress.</extracomment>
+        <translation>Lopeta puhelu</translation>
+    </message>
+    <message>
+        <source>Answer</source>
+        <extracomment>Answers a call that is ringing. A verb.</extracomment>
+        <translation>Vastaa</translation>
+    </message>
+</context>
+<context>
+    <name>Calls</name>
+    <message>
+        <source>Missed call</source>
+        <translation>Vastaamaton puhelu</translation>
+    </message>
+    <message>
+        <source>Declined call</source>
+        <translation>Hylätty puhelu</translation>
+    </message>
+    <message>
+        <source>Canceled call</source>
+        <translation>Peruttu puhelu</translation>
+    </message>
+    <message>
+        <source>Video call</source>
+        <translation>Videopuhelu</translation>
+    </message>
+    <message>
+        <source>Audio call</source>
+        <translation>Äänipuhelu</translation>
+    </message>
+    <message>
+        <source>Less than 1 minute</source>
+        <extracomment>How long a call lasted, when it was shorter than a minute.</extracomment>
+        <translation>Alle minuutti</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n minute(s) duration</source>
+        <extracomment>How long a call lasted. %n is whole minutes.</extracomment>
+        <translation>
+            <numerusform>Kesto %n minuutti</numerusform>
+            <numerusform>Kesto %n minuuttia</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Ringing…</source>
+        <translation>Hälyttää…</translation>
+    </message>
+    <message>
+        <source>Incoming call</source>
+        <translation>Saapuva puhelu</translation>
+    </message>
+</context>
+<context>
+    <name>CallsPage</name>
+    <message>
+        <source>Outgoing call</source>
+        <extracomment>A call this account placed, in a list of calls.</extracomment>
+        <translation>Lähtevä puhelu</translation>
+    </message>
+    <message>
+        <source>Incoming call</source>
+        <translation>Saapuva puhelu</translation>
+    </message>
+    <message>
+        <source>Ringing…</source>
+        <translation>Hälyttää…</translation>
+    </message>
+    <message>
+        <source>Call %1</source>
+        <extracomment>Places a call. %1 is the name of whoever is called.</extracomment>
+        <translation>Soita: %1</translation>
+    </message>
+</context>
+<context>
     <name>CapturePage</name>
     <message>
         <source>The video could not be saved</source>
@@ -856,6 +998,15 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>No apps yet</source>
         <translation>Ei vielä sovelluksia</translation>
+    </message>
+    <message>
+        <source>Calls</source>
+        <extracomment>The calls made and received in a chat: a tile, and a page heading.</extracomment>
+        <translation>Puhelut</translation>
+    </message>
+    <message>
+        <source>No calls yet</source>
+        <translation>Ei vielä puheluita</translation>
     </message>
 </context>
 <context>
@@ -1626,6 +1777,23 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>This applies to every profile, whatever a chat&apos;s own disappearing messages setting is.</source>
         <extracomment>Under &quot;Delete messages from device&quot;. &quot;Disappearing messages&quot; is each chat&apos;s own setting of that name.</extracomment>
         <translation>Koskee jokaista profiilia keskustelun omasta katoavien viestien asetuksesta riippumatta.</translation>
+    </message>
+    <message>
+        <source>Calls</source>
+        <extracomment>Whether calls ring. A plural noun, not a verb.</extracomment>
+        <translation>Puhelut</translation>
+    </message>
+    <message>
+        <source>Show call screen for accepted contacts</source>
+        <translation>Näytä puhelunäkymä hyväksytyiltä yhteystiedoilta</translation>
+    </message>
+    <message>
+        <source>Enable calls (experimental)</source>
+        <translation>Ota puhelut käyttöön (kokeellinen)</translation>
+    </message>
+    <message>
+        <source>Makes and answers voice calls in one-to-one chats. These features may be unstable and may be changed or removed.</source>
+        <translation>Soittaa ja vastaa äänipuheluihin kahdenkeskisissä keskusteluissa. Nämä ominaisuudet voivat olla epävakaita, ja niitä voidaan muuttaa tai poistaa.</translation>
     </message>
 </context>
 <context>

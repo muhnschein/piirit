@@ -1,0 +1,2 @@
+module Sailfish.WebEngine
+singleton WebEngine 1.0 WebEngine.qml

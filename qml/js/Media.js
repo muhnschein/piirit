@@ -1,17 +1,19 @@
-// What a chat holds besides words, in the four kinds the media pages
-// list them by -- gallery, audio, files, apps -- named and drawn in one
-// place, so the tile on a contact's or a group's page and the page
-// behind it say the same word for the same thing.
+// What a chat holds besides words, in the kinds the media pages list
+// them by -- gallery, audio, files, apps, and a contact's calls -- named
+// and drawn in one place, so the tile on a contact's or a group's page
+// and the page behind it say the same word for the same thing.
 //
 // No `.pragma library`, for the reason Format.js gives: qsTr() translates
 // in the context of the file it is written in, and a shared library has
 // none.
 
 /// The kinds, in the order the tiles stand in: apps first, as the sketch
-/// this was built from has them, and only where apps are on.
-function kinds(appsAvailable) {
-    return appsAvailable ? ["apps", "gallery", "audio", "files"]
-                         : ["gallery", "audio", "files"]
+/// this was built from has them, and only where apps are on; calls last,
+/// and only where calls are on and the chat is one a call can be in.
+function kinds(appsAvailable, callsAvailable) {
+    return (appsAvailable ? ["apps", "gallery", "audio", "files"]
+                          : ["gallery", "audio", "files"])
+        .concat(callsAvailable ? ["calls"] : [])
 }
 
 /// What a kind is called: the tile's word, and the page's heading.
@@ -32,6 +34,10 @@ function kindName(kind) {
         //: The webxdc apps of a chat.
         return qsTr("Apps")
     }
+    if (kind === "calls") {
+        //: The calls made and received in a chat: a tile, and a page heading.
+        return qsTr("Calls")
+    }
     return ""
 }
 
@@ -49,6 +55,9 @@ function emptyText(kind) {
     if (kind === "apps") {
         return qsTr("No apps yet")
     }
+    if (kind === "calls") {
+        return qsTr("No calls yet")
+    }
     return ""
 }
 
@@ -63,6 +72,9 @@ function kindIcon(kind) {
     }
     if (kind === "files") {
         return "icon-m-file-document"
+    }
+    if (kind === "calls") {
+        return "icon-m-call"
     }
     return ""
 }

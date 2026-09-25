@@ -275,6 +275,147 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>CallCenter</name>
+    <message>
+        <source>Incoming call</source>
+        <translation>Cuộc gọi đến</translation>
+    </message>
+    <message>
+        <source>Decline</source>
+        <translation>Từ chối</translation>
+    </message>
+    <message>
+        <source>Answer</source>
+        <translation>Trả lời</translation>
+    </message>
+    <message>
+        <source>Missed call</source>
+        <translation>Cuộc gọi nhỡ</translation>
+    </message>
+    <message>
+        <source>Call back</source>
+        <translation>Gọi lại</translation>
+    </message>
+</context>
+<context>
+    <name>CallPage</name>
+    <message>
+        <source>Incoming call</source>
+        <translation>Cuộc gọi đến</translation>
+    </message>
+    <message>
+        <source>Ringing…</source>
+        <translation>Đang đổ chuông…</translation>
+    </message>
+    <message>
+        <source>Connecting…</source>
+        <translation>Đang kết nối…</translation>
+    </message>
+    <message>
+        <source>Reconnecting…</source>
+        <translation>Đang kết nối lại…</translation>
+    </message>
+    <message>
+        <source>Call answered on another device</source>
+        <translation>Cuộc gọi đã được trả lời trên thiết bị khác</translation>
+    </message>
+    <message>
+        <source>Call failed</source>
+        <translation>Cuộc gọi không thành công</translation>
+    </message>
+    <message>
+        <source>Missed call</source>
+        <translation>Cuộc gọi nhỡ</translation>
+    </message>
+    <message>
+        <source>Declined call</source>
+        <translation>Cuộc gọi bị từ chối</translation>
+    </message>
+    <message>
+        <source>Call ended</source>
+        <translation>Cuộc gọi đã kết thúc</translation>
+    </message>
+    <message>
+        <source>Decline</source>
+        <extracomment>Declines a call that is ringing. A verb.</extracomment>
+        <translation>Từ chối</translation>
+    </message>
+    <message>
+        <source>End call</source>
+        <extracomment>Ends a call in progress.</extracomment>
+        <translation>Kết thúc cuộc gọi</translation>
+    </message>
+    <message>
+        <source>Answer</source>
+        <extracomment>Answers a call that is ringing. A verb.</extracomment>
+        <translation>Trả lời</translation>
+    </message>
+</context>
+<context>
+    <name>Calls</name>
+    <message>
+        <source>Missed call</source>
+        <translation>Cuộc gọi nhỡ</translation>
+    </message>
+    <message>
+        <source>Declined call</source>
+        <translation>Cuộc gọi bị từ chối</translation>
+    </message>
+    <message>
+        <source>Canceled call</source>
+        <translation>Cuộc gọi đã hủy</translation>
+    </message>
+    <message>
+        <source>Video call</source>
+        <translation>Cuộc gọi video</translation>
+    </message>
+    <message>
+        <source>Audio call</source>
+        <translation>Cuộc gọi thoại</translation>
+    </message>
+    <message>
+        <source>Less than 1 minute</source>
+        <extracomment>How long a call lasted, when it was shorter than a minute.</extracomment>
+        <translation>Dưới 1 phút</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n minute(s) duration</source>
+        <extracomment>How long a call lasted. %n is whole minutes.</extracomment>
+        <translation>
+            <numerusform>Thời lượng %n phút</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Ringing…</source>
+        <translation>Đang đổ chuông…</translation>
+    </message>
+    <message>
+        <source>Incoming call</source>
+        <translation>Cuộc gọi đến</translation>
+    </message>
+</context>
+<context>
+    <name>CallsPage</name>
+    <message>
+        <source>Outgoing call</source>
+        <extracomment>A call this account placed, in a list of calls.</extracomment>
+        <translation>Cuộc gọi đi</translation>
+    </message>
+    <message>
+        <source>Incoming call</source>
+        <translation>Cuộc gọi đến</translation>
+    </message>
+    <message>
+        <source>Ringing…</source>
+        <translation>Đang đổ chuông…</translation>
+    </message>
+    <message>
+        <source>Call %1</source>
+        <extracomment>Places a call. %1 is the name of whoever is called.</extracomment>
+        <translation>Gọi %1</translation>
+    </message>
+</context>
+<context>
     <name>CapturePage</name>
     <message>
         <source>The video could not be saved</source>
@@ -852,6 +993,15 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>No apps yet</source>
         <translation>Chưa có ứng dụng nào</translation>
+    </message>
+    <message>
+        <source>Calls</source>
+        <extracomment>The calls made and received in a chat: a tile, and a page heading.</extracomment>
+        <translation>Cuộc gọi</translation>
+    </message>
+    <message>
+        <source>No calls yet</source>
+        <translation>Chưa có cuộc gọi nào</translation>
     </message>
 </context>
 <context>
@@ -1620,6 +1770,23 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>This applies to every profile, whatever a chat&apos;s own disappearing messages setting is.</source>
         <extracomment>Under &quot;Delete messages from device&quot;. &quot;Disappearing messages&quot; is each chat&apos;s own setting of that name.</extracomment>
         <translation>Áp dụng cho mọi hồ sơ, bất kể cài đặt tin nhắn tự hủy riêng của từng cuộc trò chuyện.</translation>
+    </message>
+    <message>
+        <source>Calls</source>
+        <extracomment>Whether calls ring. A plural noun, not a verb.</extracomment>
+        <translation>Cuộc gọi</translation>
+    </message>
+    <message>
+        <source>Show call screen for accepted contacts</source>
+        <translation>Hiện màn hình cuộc gọi cho các liên hệ đã chấp nhận</translation>
+    </message>
+    <message>
+        <source>Enable calls (experimental)</source>
+        <translation>Bật cuộc gọi (thử nghiệm)</translation>
+    </message>
+    <message>
+        <source>Makes and answers voice calls in one-to-one chats. These features may be unstable and may be changed or removed.</source>
+        <translation>Thực hiện và trả lời cuộc gọi thoại trong cuộc trò chuyện một-một. Các tính năng này có thể không ổn định và có thể bị thay đổi hoặc gỡ bỏ.</translation>
     </message>
 </context>
 <context>

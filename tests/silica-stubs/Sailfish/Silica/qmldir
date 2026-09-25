@@ -28,6 +28,7 @@ SilicaFlickable 1.0 SilicaFlickable.qml
 SilicaGridView 1.0 SilicaGridView.qml
 SilicaListView 1.0 SilicaListView.qml
 Slider 1.0 Slider.qml
+Switch 1.0 Switch.qml
 TextArea 1.0 TextArea.qml
 TextField 1.0 TextField.qml
 TextSwitch 1.0 TextSwitch.qml

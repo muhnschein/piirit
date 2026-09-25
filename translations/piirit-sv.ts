@@ -276,6 +276,148 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>CallCenter</name>
+    <message>
+        <source>Incoming call</source>
+        <translation>Inkommande samtal</translation>
+    </message>
+    <message>
+        <source>Decline</source>
+        <translation>Avböj</translation>
+    </message>
+    <message>
+        <source>Answer</source>
+        <translation>Svara</translation>
+    </message>
+    <message>
+        <source>Missed call</source>
+        <translation>Missat samtal</translation>
+    </message>
+    <message>
+        <source>Call back</source>
+        <translation>Ring upp</translation>
+    </message>
+</context>
+<context>
+    <name>CallPage</name>
+    <message>
+        <source>Incoming call</source>
+        <translation>Inkommande samtal</translation>
+    </message>
+    <message>
+        <source>Ringing…</source>
+        <translation>Ringer…</translation>
+    </message>
+    <message>
+        <source>Connecting…</source>
+        <translation>Ansluter…</translation>
+    </message>
+    <message>
+        <source>Reconnecting…</source>
+        <translation>Återansluter…</translation>
+    </message>
+    <message>
+        <source>Call answered on another device</source>
+        <translation>Samtalet besvarades på en annan enhet</translation>
+    </message>
+    <message>
+        <source>Call failed</source>
+        <translation>Samtalet misslyckades</translation>
+    </message>
+    <message>
+        <source>Missed call</source>
+        <translation>Missat samtal</translation>
+    </message>
+    <message>
+        <source>Declined call</source>
+        <translation>Nekat samtal</translation>
+    </message>
+    <message>
+        <source>Call ended</source>
+        <translation>Samtalet avslutades</translation>
+    </message>
+    <message>
+        <source>Decline</source>
+        <extracomment>Declines a call that is ringing. A verb.</extracomment>
+        <translation>Avböj</translation>
+    </message>
+    <message>
+        <source>End call</source>
+        <extracomment>Ends a call in progress.</extracomment>
+        <translation>Avsluta samtal</translation>
+    </message>
+    <message>
+        <source>Answer</source>
+        <extracomment>Answers a call that is ringing. A verb.</extracomment>
+        <translation>Svara</translation>
+    </message>
+</context>
+<context>
+    <name>Calls</name>
+    <message>
+        <source>Missed call</source>
+        <translation>Missat samtal</translation>
+    </message>
+    <message>
+        <source>Declined call</source>
+        <translation>Nekat samtal</translation>
+    </message>
+    <message>
+        <source>Canceled call</source>
+        <translation>Avbrutet samtal</translation>
+    </message>
+    <message>
+        <source>Video call</source>
+        <translation>Videosamtal</translation>
+    </message>
+    <message>
+        <source>Audio call</source>
+        <translation>Röstsamtal</translation>
+    </message>
+    <message>
+        <source>Less than 1 minute</source>
+        <extracomment>How long a call lasted, when it was shorter than a minute.</extracomment>
+        <translation>Mindre än 1 minut</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n minute(s) duration</source>
+        <extracomment>How long a call lasted. %n is whole minutes.</extracomment>
+        <translation>
+            <numerusform>Längd: %n minut</numerusform>
+            <numerusform>Längd: %n minuter</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Ringing…</source>
+        <translation>Ringer…</translation>
+    </message>
+    <message>
+        <source>Incoming call</source>
+        <translation>Inkommande samtal</translation>
+    </message>
+</context>
+<context>
+    <name>CallsPage</name>
+    <message>
+        <source>Outgoing call</source>
+        <extracomment>A call this account placed, in a list of calls.</extracomment>
+        <translation>Utgående samtal</translation>
+    </message>
+    <message>
+        <source>Incoming call</source>
+        <translation>Inkommande samtal</translation>
+    </message>
+    <message>
+        <source>Ringing…</source>
+        <translation>Ringer…</translation>
+    </message>
+    <message>
+        <source>Call %1</source>
+        <extracomment>Places a call. %1 is the name of whoever is called.</extracomment>
+        <translation>Ring %1</translation>
+    </message>
+</context>
+<context>
     <name>CapturePage</name>
     <message>
         <source>The video could not be saved</source>
@@ -856,6 +998,15 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>No apps yet</source>
         <translation>Inga appar ännu</translation>
+    </message>
+    <message>
+        <source>Calls</source>
+        <extracomment>The calls made and received in a chat: a tile, and a page heading.</extracomment>
+        <translation>Samtal</translation>
+    </message>
+    <message>
+        <source>No calls yet</source>
+        <translation>Inga samtal än</translation>
     </message>
 </context>
 <context>
@@ -1626,6 +1777,23 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>This applies to every profile, whatever a chat&apos;s own disappearing messages setting is.</source>
         <extracomment>Under &quot;Delete messages from device&quot;. &quot;Disappearing messages&quot; is each chat&apos;s own setting of that name.</extracomment>
         <translation>Gäller för varje profil, oavsett en chatts egen inställning för försvinnande meddelanden.</translation>
+    </message>
+    <message>
+        <source>Calls</source>
+        <extracomment>Whether calls ring. A plural noun, not a verb.</extracomment>
+        <translation>Samtal</translation>
+    </message>
+    <message>
+        <source>Show call screen for accepted contacts</source>
+        <translation>Visa samtalsskärm för godkända kontakter</translation>
+    </message>
+    <message>
+        <source>Enable calls (experimental)</source>
+        <translation>Aktivera samtal (experimentellt)</translation>
+    </message>
+    <message>
+        <source>Makes and answers voice calls in one-to-one chats. These features may be unstable and may be changed or removed.</source>
+        <translation>Ringer och besvarar röstsamtal i chattar med en person. Dessa funktioner kan vara instabila och kan ändras eller tas bort.</translation>
     </message>
 </context>
 <context>

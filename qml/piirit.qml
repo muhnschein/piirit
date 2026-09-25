@@ -149,6 +149,54 @@ ApplicationWindow {
         property: "delete_device_after"
         value: Settings.deleteDeviceAfter
     }
+    // Whose calls ring here: contacts' while calls are on and ringing is,
+    // nobody's otherwise -- the core's own 1 and 2. A call from somebody
+    // who may not ring is still kept, and can still be answered from its
+    // chat.
+    Binding {
+        target: core
+        property: "who_can_call_me"
+        value: Settings.callsEnabled === true && Settings.callsRing !== false ? 1 : 2
+    }
+
+    /// The app's one call, which belongs to no page: see
+    /// components/CallCenter.qml.
+    CallCenter {
+        id: callCenter
+        objectName: "callCenter"
+        // `=== true` because dconf hands back `undefined` before it has
+        // read the key.
+        enabled: Settings.callsEnabled === true
+        stack: pageStack
+        onRaise: appWindow.activate()
+        // A missed call's notification, tapped: its chat, the way a
+        // quick action opens one, whichever profile it is in.
+        onChatRequested: {
+            if (appWindow.chatList !== null) {
+                appWindow.chatList.quickAction("chat", accountId, chatId)
+            }
+        }
+    }
+
+    /// Whether a call is under way. What keeps the call's page where it
+    /// is: a tap on a notification or a quick action brings the app
+    /// forward, and does not take the reader out of a call.
+    readonly property bool callBusy: callCenter.busy
+
+    /// Call a chat. False when the app is in a call already.
+    function placeCall(accountId, chatId) {
+        return callCenter.place(accountId, chatId)
+    }
+
+    /// Bring the call there is back to the front.
+    function showCall() {
+        callCenter.show()
+    }
+
+    /// Take up a call still ringing, from its row in the chat.
+    function pickUpCall(accountId, chatId, messageId) {
+        callCenter.pickUp(accountId, chatId, messageId)
+    }
 
     /// IO has been asked for. Once, however long the app runs.
     property bool askedForIo: false

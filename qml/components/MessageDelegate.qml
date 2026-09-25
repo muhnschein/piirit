@@ -1,6 +1,7 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
 import "../js/Format.js" as Format
+import "../js/Calls.js" as Calls
 
 /*
  * One message. Its own component so it can be loaded and measured on its
@@ -41,6 +42,10 @@ Item {
     /// or take it off again when it is already theirs. The model decides
     /// which; the row only says what was tapped.
     signal reactionRequested(string emoji)
+    /// The reader tapped a call. What that means -- going back to one
+    /// that is still ringing, or calling back -- is the page's to decide:
+    /// it knows whether a call is up and whether this chat can take one.
+    signal callRequested()
     /// A long press landed on a control that takes presses for itself --
     /// a chip, the download offer, the play button -- and the row's menu
     /// is what a long press means anywhere on a message.
@@ -53,6 +58,10 @@ Item {
     /// surface now -- a tap opens what there is to open, a long press
     /// opens the menu -- and the two cannot fight over a pixel.
     function tapped() {
+        if (root.isCall) {
+            root.callRequested()
+            return
+        }
         // Null for a message with no file, which has nothing to open.
         var preview = attachment.item
         if (preview && preview.isApp) {
@@ -134,6 +143,24 @@ Item {
     /// asks the attachment rather than reading this itself, so there is
     /// one answer rather than two.
     property bool appsEnabled: false
+    /// Where a call stands, as the core names it: Alerting, Active,
+    /// Completed, Missed, Declined or Canceled. Empty for anything that
+    /// is not a call, and for a call the core would say nothing about --
+    /// which then draws as its text, the core's own sentence.
+    property string callState: ""
+    property bool callHasVideo: false
+    /// Seconds, for a completed call.
+    property int callDuration: 0
+
+    /// This row is a call, drawn as one.
+    readonly property bool isCall: root.viewType === "Call"
+                                   && root.callState.length > 0
+    /// What a call row says first, and the line under it; see Calls.js.
+    readonly property string callTitle: Calls.title(root.callState, root.callHasVideo)
+    readonly property string callDetail: Calls.detail(root.callState, root.callDuration,
+                                                      root.isOutgoing)
+    /// A call that did not happen, drawn in the colour that says so.
+    readonly property bool callFailed: Calls.failed(root.callState)
 
     property bool hasFile: filePath.length > 0
     // A sticker is a picture with no bubble behind it, which is the whole
@@ -198,6 +225,7 @@ Item {
     /// excluded before, and an attachment arriving in an open chat grew
     /// a View full message it had no use for.
     readonly property bool hasBody: root.messageText.length > 0 && !root.heldBack
+                                    && !root.isCall
     /// Whether the sending core cut this message, leaving the rest of it
     /// in an HTML part and off this phone.
     ///
@@ -251,6 +279,7 @@ Item {
         root.maxWidth,
         Math.max(textMetric.implicitWidth,
                  attachmentMetric.implicitWidth,
+                 root.isCall ? callRow.wantedWidth : 0,
                  reactionRow.wantedWidth,
                  footerMetric.implicitWidth,
                  attachment.item && attachment.item.wantsFullWidth
@@ -288,7 +317,8 @@ Item {
         font: messageLabel.font
         // Measured as it will be drawn: bold is wider than plain.
         textFormat: root.drawsStyled ? Text.StyledText : Text.PlainText
-        text: root.shownText
+        // A call's text is not drawn, so it does not size the bubble.
+        text: root.isCall ? "" : root.shownText
     }
 
     Text {
@@ -518,14 +548,94 @@ Item {
             }
         }
 
+        // A call: what kind, or what became of it, and how long it
+        // lasted. In place of the text, which is the same thing said by
+        // the core in English.
+        Item {
+            id: callRow
+            objectName: "callRow"
+            readonly property bool shown: root.isCall
+            /// Icon, gap and the wider of the two lines.
+            readonly property real wantedWidth:
+                callIcon.width + Theme.paddingMedium
+                + Math.max(callTitleMetric.implicitWidth, callDetailMetric.implicitWidth)
+            visible: callRow.shown
+            x: Theme.paddingMedium
+            y: root.below(attachment, callRow.shown)
+            width: root.contentWidth
+            height: callRow.shown
+                    ? Math.max(callIcon.height, callTitleLabel.height + callDetailLabel.height)
+                    : 0
+
+            Text {
+                id: callTitleMetric
+                visible: false
+                font.pixelSize: Theme.fontSizeMedium
+                textFormat: Text.PlainText
+                text: root.callTitle
+            }
+
+            Text {
+                id: callDetailMetric
+                visible: false
+                font.pixelSize: Theme.fontSizeExtraSmall
+                textFormat: Text.PlainText
+                text: root.callDetail
+            }
+
+            Image {
+                id: callIcon
+                objectName: "callIcon"
+                width: Theme.iconSizeMedium
+                height: Theme.iconSizeMedium
+                anchors.verticalCenter: parent.verticalCenter
+                // Theme icons take their colour after the `?`.
+                source: (root.callHasVideo ? "image://theme/icon-m-video?"
+                                           : "image://theme/icon-m-call?")
+                        + (root.callFailed ? Theme.errorColor : Theme.highlightColor)
+            }
+
+            Label {
+                id: callTitleLabel
+                objectName: "callTitle"
+                x: callIcon.width + Theme.paddingMedium
+                y: callDetailLabel.height > 0
+                   ? Math.floor((callRow.height - height - callDetailLabel.height) / 2)
+                   : Math.floor((callRow.height - height) / 2)
+                width: callRow.width - x
+                truncationMode: TruncationMode.Fade
+                color: root.callFailed ? Theme.errorColor : Theme.primaryColor
+                textFormat: Text.PlainText
+                text: root.callTitle
+            }
+
+            Label {
+                id: callDetailLabel
+                objectName: "callDetail"
+                x: callTitleLabel.x
+                y: callTitleLabel.y + callTitleLabel.height
+                width: callTitleLabel.width
+                height: root.callDetail.length > 0 ? implicitHeight : 0
+                truncationMode: TruncationMode.Fade
+                font.pixelSize: Theme.fontSizeExtraSmall
+                color: Theme.secondaryColor
+                textFormat: Text.PlainText
+                text: root.callDetail
+            }
+        }
+
         Label {
             id: messageLabel
             objectName: "messageLabel"
-            readonly property bool shown: root.messageText.length > 0
+            readonly property bool shown: root.messageText.length > 0 && !root.isCall
             visible: messageLabel.shown
             height: messageLabel.shown ? implicitHeight : 0
             x: Theme.paddingMedium
-            y: root.below(attachment, messageLabel.shown)
+            // Under the call when there is one -- nothing is, since a
+            // call's text is not drawn, but the rows below chain from
+            // here -- and under the attachment otherwise, which is what
+            // the gap between the two is measured from.
+            y: root.below(callRow.shown ? callRow : attachment, messageLabel.shown)
             // The body's width, not the bubble's: see `bodyWidth`. The
             // two differ only when the offer widened the bubble, and the
             // body is left-aligned in it either way.

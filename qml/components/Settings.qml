@@ -8,8 +8,8 @@ import Nemo.Configuration 1.0
  * how much of an attachment arrives unasked, how long a message is kept,
  * whether anything is announced at all and if so how much a notification
  * gives away and whether a muted group can still raise one, whether
- * webxdc apps are offered at all, and how many quick actions the cover
- * offers and which.
+ * webxdc apps are offered at all, whether calls are and whether one rings
+ * here, and how many quick actions the cover offers and which.
  *
  * They live in dconf under the app's own path, and every page reads
  * them through this one object: the settings page (qml/pages/
@@ -72,6 +72,15 @@ QtObject {
     /// for, and every one of those three reads this rather than deciding
     /// for itself.
     property alias webxdcEnabled: webxdcEnabledValue.value
+    /// Whether calls are offered: the Calls tile on a contact's page,
+    /// answering one that rings, and calling back from a call's row. Off
+    /// until it is asked for, as apps are.
+    property alias callsEnabled: callsEnabledValue.value
+    /// Whether a call from a contact rings here. The reference clients'
+    /// "Calls" notification setting, and on by default as they have it;
+    /// it means something only while calls are on. The core's own
+    /// `who_can_call_me`, applied to every profile.
+    property alias callsRing: callsRingValue.value
     /// How many quick actions the cover has room for: 1, or 2. With one,
     /// the left action is the one, and what was set up on the right is
     /// kept for when there are two again.
@@ -164,6 +173,22 @@ QtObject {
         // half of it that is ours is new enough to still be finding out
         // what it gets wrong.
         defaultValue: false
+    }
+
+    // Off on a phone that has never been asked, for the reason apps are:
+    // the media half of a call runs in the browser engine, and whether
+    // it holds up on this hardware is still being found out
+    // (docs/CALLS.md).
+    property ConfigurationValue callsEnabledConfig: ConfigurationValue {
+        id: callsEnabledValue
+        key: "/apps/harbour-piirit/calls_enabled"
+        defaultValue: false
+    }
+
+    property ConfigurationValue callsRingConfig: ConfigurationValue {
+        id: callsRingValue
+        key: "/apps/harbour-piirit/calls_ring"
+        defaultValue: true
     }
 
     // One, and that one none, on a phone that has never been asked: the

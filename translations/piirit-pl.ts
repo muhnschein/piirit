@@ -281,6 +281,149 @@ Wiadomości innych grup z zablokowanymi kontaktami nadal będą wyświetlane.</t
     </message>
 </context>
 <context>
+    <name>CallCenter</name>
+    <message>
+        <source>Incoming call</source>
+        <translation>Połączenie przychodzące</translation>
+    </message>
+    <message>
+        <source>Decline</source>
+        <translation>Odrzuć</translation>
+    </message>
+    <message>
+        <source>Answer</source>
+        <translation>Odbierz</translation>
+    </message>
+    <message>
+        <source>Missed call</source>
+        <translation>Nieodebrane połączenie</translation>
+    </message>
+    <message>
+        <source>Call back</source>
+        <translation>Oddzwoń</translation>
+    </message>
+</context>
+<context>
+    <name>CallPage</name>
+    <message>
+        <source>Incoming call</source>
+        <translation>Połączenie przychodzące</translation>
+    </message>
+    <message>
+        <source>Ringing…</source>
+        <translation>Dzwoni…</translation>
+    </message>
+    <message>
+        <source>Connecting…</source>
+        <translation>Łączenie…</translation>
+    </message>
+    <message>
+        <source>Reconnecting…</source>
+        <translation>Ponowne łączenie…</translation>
+    </message>
+    <message>
+        <source>Call answered on another device</source>
+        <translation>Połączenie odebrane na innym urządzeniu</translation>
+    </message>
+    <message>
+        <source>Call failed</source>
+        <translation>Połączenie nieudane</translation>
+    </message>
+    <message>
+        <source>Missed call</source>
+        <translation>Nieodebrane połączenie</translation>
+    </message>
+    <message>
+        <source>Declined call</source>
+        <translation>Odrzucone połączenie</translation>
+    </message>
+    <message>
+        <source>Call ended</source>
+        <translation>Połączenie zakończone</translation>
+    </message>
+    <message>
+        <source>Decline</source>
+        <extracomment>Declines a call that is ringing. A verb.</extracomment>
+        <translation>Odrzuć</translation>
+    </message>
+    <message>
+        <source>End call</source>
+        <extracomment>Ends a call in progress.</extracomment>
+        <translation>Zakończ połączenie</translation>
+    </message>
+    <message>
+        <source>Answer</source>
+        <extracomment>Answers a call that is ringing. A verb.</extracomment>
+        <translation>Odbierz</translation>
+    </message>
+</context>
+<context>
+    <name>Calls</name>
+    <message>
+        <source>Missed call</source>
+        <translation>Nieodebrane połączenie</translation>
+    </message>
+    <message>
+        <source>Declined call</source>
+        <translation>Odrzucone połączenie</translation>
+    </message>
+    <message>
+        <source>Canceled call</source>
+        <translation>Anulowane połączenie</translation>
+    </message>
+    <message>
+        <source>Video call</source>
+        <translation>Połączenie wideo</translation>
+    </message>
+    <message>
+        <source>Audio call</source>
+        <translation>Połączenie głosowe</translation>
+    </message>
+    <message>
+        <source>Less than 1 minute</source>
+        <extracomment>How long a call lasted, when it was shorter than a minute.</extracomment>
+        <translation>Mniej niż 1 minuta</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n minute(s) duration</source>
+        <extracomment>How long a call lasted. %n is whole minutes.</extracomment>
+        <translation>
+            <numerusform>Czas trwania: %n minuta</numerusform>
+            <numerusform>Czas trwania: %n minuty</numerusform>
+            <numerusform>Czas trwania: %n minut</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Ringing…</source>
+        <translation>Dzwoni…</translation>
+    </message>
+    <message>
+        <source>Incoming call</source>
+        <translation>Połączenie przychodzące</translation>
+    </message>
+</context>
+<context>
+    <name>CallsPage</name>
+    <message>
+        <source>Outgoing call</source>
+        <extracomment>A call this account placed, in a list of calls.</extracomment>
+        <translation>Połączenie wychodzące</translation>
+    </message>
+    <message>
+        <source>Incoming call</source>
+        <translation>Połączenie przychodzące</translation>
+    </message>
+    <message>
+        <source>Ringing…</source>
+        <translation>Dzwoni…</translation>
+    </message>
+    <message>
+        <source>Call %1</source>
+        <extracomment>Places a call. %1 is the name of whoever is called.</extracomment>
+        <translation>Zadzwoń: %1</translation>
+    </message>
+</context>
+<context>
     <name>CapturePage</name>
     <message>
         <source>The video could not be saved</source>
@@ -864,6 +1007,15 @@ Wiadomości innych grup z zablokowanymi kontaktami nadal będą wyświetlane.</t
     <message>
         <source>No apps yet</source>
         <translation>Nie ma jeszcze aplikacji</translation>
+    </message>
+    <message>
+        <source>Calls</source>
+        <extracomment>The calls made and received in a chat: a tile, and a page heading.</extracomment>
+        <translation>Połączenia</translation>
+    </message>
+    <message>
+        <source>No calls yet</source>
+        <translation>Brak połączeń</translation>
     </message>
 </context>
 <context>
@@ -1636,6 +1788,23 @@ Wiadomości innych grup z zablokowanymi kontaktami nadal będą wyświetlane.</t
         <source>This applies to every profile, whatever a chat&apos;s own disappearing messages setting is.</source>
         <extracomment>Under &quot;Delete messages from device&quot;. &quot;Disappearing messages&quot; is each chat&apos;s own setting of that name.</extracomment>
         <translation>Dotyczy każdego profilu, niezależnie od ustawienia znikających wiadomości w danym czacie.</translation>
+    </message>
+    <message>
+        <source>Calls</source>
+        <extracomment>Whether calls ring. A plural noun, not a verb.</extracomment>
+        <translation>Połączenia</translation>
+    </message>
+    <message>
+        <source>Show call screen for accepted contacts</source>
+        <translation>Pokaż ekran połączenia dla zaakceptowanych kontaktów</translation>
+    </message>
+    <message>
+        <source>Enable calls (experimental)</source>
+        <translation>Włącz połączenia (eksperymentalne)</translation>
+    </message>
+    <message>
+        <source>Makes and answers voice calls in one-to-one chats. These features may be unstable and may be changed or removed.</source>
+        <translation>Wykonuje i odbiera połączenia głosowe w czatach jeden na jeden. Te funkcje mogą być niestabilne oraz mogą zostać zmienione lub usunięte.</translation>
     </message>
 </context>
 <context>

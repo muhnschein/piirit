@@ -281,6 +281,149 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
     </message>
 </context>
 <context>
+    <name>CallCenter</name>
+    <message>
+        <source>Incoming call</source>
+        <translation>Příchozí hovor</translation>
+    </message>
+    <message>
+        <source>Decline</source>
+        <translation>Odmítnout</translation>
+    </message>
+    <message>
+        <source>Answer</source>
+        <translation>Přijmout</translation>
+    </message>
+    <message>
+        <source>Missed call</source>
+        <translation>Zmeškaný hovor</translation>
+    </message>
+    <message>
+        <source>Call back</source>
+        <translation>Zavolat zpět</translation>
+    </message>
+</context>
+<context>
+    <name>CallPage</name>
+    <message>
+        <source>Incoming call</source>
+        <translation>Příchozí hovor</translation>
+    </message>
+    <message>
+        <source>Ringing…</source>
+        <translation>Vyzvání…</translation>
+    </message>
+    <message>
+        <source>Connecting…</source>
+        <translation>Připojování…</translation>
+    </message>
+    <message>
+        <source>Reconnecting…</source>
+        <translation>Obnovování spojení…</translation>
+    </message>
+    <message>
+        <source>Call answered on another device</source>
+        <translation>Hovor byl přijat na jiném zařízení</translation>
+    </message>
+    <message>
+        <source>Call failed</source>
+        <translation>Hovor se nezdařil</translation>
+    </message>
+    <message>
+        <source>Missed call</source>
+        <translation>Zmeškaný hovor</translation>
+    </message>
+    <message>
+        <source>Declined call</source>
+        <translation>Odmítnutý hovor</translation>
+    </message>
+    <message>
+        <source>Call ended</source>
+        <translation>Hovor ukončen</translation>
+    </message>
+    <message>
+        <source>Decline</source>
+        <extracomment>Declines a call that is ringing. A verb.</extracomment>
+        <translation>Odmítnout</translation>
+    </message>
+    <message>
+        <source>End call</source>
+        <extracomment>Ends a call in progress.</extracomment>
+        <translation>Ukončit hovor</translation>
+    </message>
+    <message>
+        <source>Answer</source>
+        <extracomment>Answers a call that is ringing. A verb.</extracomment>
+        <translation>Přijmout</translation>
+    </message>
+</context>
+<context>
+    <name>Calls</name>
+    <message>
+        <source>Missed call</source>
+        <translation>Zmeškaný hovor</translation>
+    </message>
+    <message>
+        <source>Declined call</source>
+        <translation>Odmítnutý hovor</translation>
+    </message>
+    <message>
+        <source>Canceled call</source>
+        <translation>Zrušený hovor</translation>
+    </message>
+    <message>
+        <source>Video call</source>
+        <translation>Videohovor</translation>
+    </message>
+    <message>
+        <source>Audio call</source>
+        <translation>Hlasový hovor</translation>
+    </message>
+    <message>
+        <source>Less than 1 minute</source>
+        <extracomment>How long a call lasted, when it was shorter than a minute.</extracomment>
+        <translation>Méně než 1 minuta</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n minute(s) duration</source>
+        <extracomment>How long a call lasted. %n is whole minutes.</extracomment>
+        <translation>
+            <numerusform>Trvání %n minuta</numerusform>
+            <numerusform>Trvání %n minuty</numerusform>
+            <numerusform>Trvání %n minut</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Ringing…</source>
+        <translation>Vyzvání…</translation>
+    </message>
+    <message>
+        <source>Incoming call</source>
+        <translation>Příchozí hovor</translation>
+    </message>
+</context>
+<context>
+    <name>CallsPage</name>
+    <message>
+        <source>Outgoing call</source>
+        <extracomment>A call this account placed, in a list of calls.</extracomment>
+        <translation>Odchozí hovor</translation>
+    </message>
+    <message>
+        <source>Incoming call</source>
+        <translation>Příchozí hovor</translation>
+    </message>
+    <message>
+        <source>Ringing…</source>
+        <translation>Vyzvání…</translation>
+    </message>
+    <message>
+        <source>Call %1</source>
+        <extracomment>Places a call. %1 is the name of whoever is called.</extracomment>
+        <translation>Zavolat %1</translation>
+    </message>
+</context>
+<context>
     <name>CapturePage</name>
     <message>
         <source>The video could not be saved</source>
@@ -864,6 +1007,15 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
     <message>
         <source>No apps yet</source>
         <translation>Zatím žádné aplikace</translation>
+    </message>
+    <message>
+        <source>Calls</source>
+        <extracomment>The calls made and received in a chat: a tile, and a page heading.</extracomment>
+        <translation>Hovory</translation>
+    </message>
+    <message>
+        <source>No calls yet</source>
+        <translation>Zatím žádné hovory</translation>
     </message>
 </context>
 <context>
@@ -1636,6 +1788,23 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
         <source>This applies to every profile, whatever a chat&apos;s own disappearing messages setting is.</source>
         <extracomment>Under &quot;Delete messages from device&quot;. &quot;Disappearing messages&quot; is each chat&apos;s own setting of that name.</extracomment>
         <translation>Platí pro každý profil bez ohledu na nastavení mizejících zpráv v jednotlivých chatech.</translation>
+    </message>
+    <message>
+        <source>Calls</source>
+        <extracomment>Whether calls ring. A plural noun, not a verb.</extracomment>
+        <translation>Hovory</translation>
+    </message>
+    <message>
+        <source>Show call screen for accepted contacts</source>
+        <translation>Zobrazit obrazovku hovoru pro přijaté kontakty</translation>
+    </message>
+    <message>
+        <source>Enable calls (experimental)</source>
+        <translation>Povolit hovory (experimentální)</translation>
+    </message>
+    <message>
+        <source>Makes and answers voice calls in one-to-one chats. These features may be unstable and may be changed or removed.</source>
+        <translation>Uskutečňuje a přijímá hlasové hovory v individuálních chatech. Tyto funkce mohou být nestabilní a mohou být změněny nebo odstraněny.</translation>
     </message>
 </context>
 <context>

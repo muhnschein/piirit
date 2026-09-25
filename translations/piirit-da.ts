@@ -276,6 +276,148 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>CallCenter</name>
+    <message>
+        <source>Incoming call</source>
+        <translation>Indgående opkald</translation>
+    </message>
+    <message>
+        <source>Decline</source>
+        <translation>Afvis</translation>
+    </message>
+    <message>
+        <source>Answer</source>
+        <translation>Besvar</translation>
+    </message>
+    <message>
+        <source>Missed call</source>
+        <translation>Ubesvaret opkald</translation>
+    </message>
+    <message>
+        <source>Call back</source>
+        <translation>Ring tilbage</translation>
+    </message>
+</context>
+<context>
+    <name>CallPage</name>
+    <message>
+        <source>Incoming call</source>
+        <translation>Indgående opkald</translation>
+    </message>
+    <message>
+        <source>Ringing…</source>
+        <translation>Ringer…</translation>
+    </message>
+    <message>
+        <source>Connecting…</source>
+        <translation>Forbinder…</translation>
+    </message>
+    <message>
+        <source>Reconnecting…</source>
+        <translation>Genopretter forbindelse…</translation>
+    </message>
+    <message>
+        <source>Call answered on another device</source>
+        <translation>Opkaldet blev besvaret på en anden enhed</translation>
+    </message>
+    <message>
+        <source>Call failed</source>
+        <translation>Opkaldet mislykkedes</translation>
+    </message>
+    <message>
+        <source>Missed call</source>
+        <translation>Ubesvaret opkald</translation>
+    </message>
+    <message>
+        <source>Declined call</source>
+        <translation>Afvist opkald</translation>
+    </message>
+    <message>
+        <source>Call ended</source>
+        <translation>Opkaldet er afsluttet</translation>
+    </message>
+    <message>
+        <source>Decline</source>
+        <extracomment>Declines a call that is ringing. A verb.</extracomment>
+        <translation>Afvis</translation>
+    </message>
+    <message>
+        <source>End call</source>
+        <extracomment>Ends a call in progress.</extracomment>
+        <translation>Afslut opkald</translation>
+    </message>
+    <message>
+        <source>Answer</source>
+        <extracomment>Answers a call that is ringing. A verb.</extracomment>
+        <translation>Besvar</translation>
+    </message>
+</context>
+<context>
+    <name>Calls</name>
+    <message>
+        <source>Missed call</source>
+        <translation>Ubesvaret opkald</translation>
+    </message>
+    <message>
+        <source>Declined call</source>
+        <translation>Afvist opkald</translation>
+    </message>
+    <message>
+        <source>Canceled call</source>
+        <translation>Annulleret opkald</translation>
+    </message>
+    <message>
+        <source>Video call</source>
+        <translation>Videoopkald</translation>
+    </message>
+    <message>
+        <source>Audio call</source>
+        <translation>Lydopkald</translation>
+    </message>
+    <message>
+        <source>Less than 1 minute</source>
+        <extracomment>How long a call lasted, when it was shorter than a minute.</extracomment>
+        <translation>Under 1 minut</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n minute(s) duration</source>
+        <extracomment>How long a call lasted. %n is whole minutes.</extracomment>
+        <translation>
+            <numerusform>Varighed: %n minut</numerusform>
+            <numerusform>Varighed: %n minutter</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Ringing…</source>
+        <translation>Ringer…</translation>
+    </message>
+    <message>
+        <source>Incoming call</source>
+        <translation>Indgående opkald</translation>
+    </message>
+</context>
+<context>
+    <name>CallsPage</name>
+    <message>
+        <source>Outgoing call</source>
+        <extracomment>A call this account placed, in a list of calls.</extracomment>
+        <translation>Udgående opkald</translation>
+    </message>
+    <message>
+        <source>Incoming call</source>
+        <translation>Indgående opkald</translation>
+    </message>
+    <message>
+        <source>Ringing…</source>
+        <translation>Ringer…</translation>
+    </message>
+    <message>
+        <source>Call %1</source>
+        <extracomment>Places a call. %1 is the name of whoever is called.</extracomment>
+        <translation>Ring til %1</translation>
+    </message>
+</context>
+<context>
     <name>CapturePage</name>
     <message>
         <source>The video could not be saved</source>
@@ -856,6 +998,15 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>No apps yet</source>
         <translation>Ingen apps endnu</translation>
+    </message>
+    <message>
+        <source>Calls</source>
+        <extracomment>The calls made and received in a chat: a tile, and a page heading.</extracomment>
+        <translation>Opkald</translation>
+    </message>
+    <message>
+        <source>No calls yet</source>
+        <translation>Ingen opkald endnu</translation>
     </message>
 </context>
 <context>
@@ -1626,6 +1777,23 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>This applies to every profile, whatever a chat&apos;s own disappearing messages setting is.</source>
         <extracomment>Under &quot;Delete messages from device&quot;. &quot;Disappearing messages&quot; is each chat&apos;s own setting of that name.</extracomment>
         <translation>Gælder for hver profil, uanset en chats egen indstilling for forsvindende beskeder.</translation>
+    </message>
+    <message>
+        <source>Calls</source>
+        <extracomment>Whether calls ring. A plural noun, not a verb.</extracomment>
+        <translation>Opkald</translation>
+    </message>
+    <message>
+        <source>Show call screen for accepted contacts</source>
+        <translation>Vis opkaldsskærm for godkendte kontakter</translation>
+    </message>
+    <message>
+        <source>Enable calls (experimental)</source>
+        <translation>Aktivér opkald (eksperimentelt)</translation>
+    </message>
+    <message>
+        <source>Makes and answers voice calls in one-to-one chats. These features may be unstable and may be changed or removed.</source>
+        <translation>Foretager og besvarer taleopkald i chats med én person. Disse funktioner kan være ustabile og kan blive ændret eller fjernet.</translation>
     </message>
 </context>
 <context>

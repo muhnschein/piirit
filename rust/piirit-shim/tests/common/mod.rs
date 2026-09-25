@@ -3,6 +3,8 @@
 // Not every test uses every helper.
 #![allow(dead_code)]
 
+pub mod http;
+
 use std::cell::RefCell;
 use std::ffi::CString;
 use std::path::{Path, PathBuf};

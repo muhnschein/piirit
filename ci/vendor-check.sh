@@ -1,5 +1,6 @@
 #!/bin/sh
-# Prove third_party/qmetaobject is upstream 0.2.10 plus one known patch.
+# Prove third_party/qmetaobject is upstream 0.2.10 plus one known patch,
+# and vendor/calls-webapp/index.html is upstream's release asset.
 #
 # Carrying 7,000 lines of someone else's crate is only safe while everyone
 # can see exactly how it differs from the published one. So: fetch the
@@ -60,6 +61,9 @@ fi
 
 if diff -r -q -x .cargo-ok "$upstream" "$vendored" >/dev/null 2>&1; then
     echo "vendor-check: ok (qmetaobject $version + qmetaobject.patch)"
+    # The page a call runs in is the other thing committed from upstream:
+    # fetched again from the release and compared byte for byte.
+    "$root/scripts/fetch-calls-webapp.sh" --check
     exit 0
 fi
 

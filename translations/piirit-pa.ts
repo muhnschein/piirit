@@ -280,6 +280,148 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>CallCenter</name>
+    <message>
+        <source>Incoming call</source>
+        <translation>ਆਉਣ ਵਾਲੀ ਕਾਲ</translation>
+    </message>
+    <message>
+        <source>Decline</source>
+        <translation>ਅਸਵੀਕਾਰ ਕਰੋ</translation>
+    </message>
+    <message>
+        <source>Answer</source>
+        <translation>ਜਵਾਬ ਦਿਓ</translation>
+    </message>
+    <message>
+        <source>Missed call</source>
+        <translation>ਮਿਸਡ ਕਾਲ</translation>
+    </message>
+    <message>
+        <source>Call back</source>
+        <translation>ਵਾਪਸ ਕਾਲ ਕਰੋ</translation>
+    </message>
+</context>
+<context>
+    <name>CallPage</name>
+    <message>
+        <source>Incoming call</source>
+        <translation>ਆਉਣ ਵਾਲੀ ਕਾਲ</translation>
+    </message>
+    <message>
+        <source>Ringing…</source>
+        <translation>ਘੰਟੀ ਵੱਜ ਰਹੀ ਹੈ…</translation>
+    </message>
+    <message>
+        <source>Connecting…</source>
+        <translation>ਕਨੈਕਟ ਹੋ ਰਿਹਾ ਹੈ…</translation>
+    </message>
+    <message>
+        <source>Reconnecting…</source>
+        <translation>ਮੁੜ ਕਨੈਕਟ ਹੋ ਰਿਹਾ ਹੈ…</translation>
+    </message>
+    <message>
+        <source>Call answered on another device</source>
+        <translation>ਕਾਲ ਦਾ ਜਵਾਬ ਕਿਸੇ ਹੋਰ ਡਿਵਾਈਸ ’ਤੇ ਦਿੱਤਾ ਗਿਆ</translation>
+    </message>
+    <message>
+        <source>Call failed</source>
+        <translation>ਕਾਲ ਅਸਫਲ ਰਹੀ</translation>
+    </message>
+    <message>
+        <source>Missed call</source>
+        <translation>ਮਿਸਡ ਕਾਲ</translation>
+    </message>
+    <message>
+        <source>Declined call</source>
+        <translation>ਅਸਵੀਕਾਰ ਕੀਤੀ ਕਾਲ</translation>
+    </message>
+    <message>
+        <source>Call ended</source>
+        <translation>ਕਾਲ ਖਤਮ ਹੋਈ</translation>
+    </message>
+    <message>
+        <source>Decline</source>
+        <extracomment>Declines a call that is ringing. A verb.</extracomment>
+        <translation>ਅਸਵੀਕਾਰ ਕਰੋ</translation>
+    </message>
+    <message>
+        <source>End call</source>
+        <extracomment>Ends a call in progress.</extracomment>
+        <translation>ਕਾਲ ਖਤਮ ਕਰੋ</translation>
+    </message>
+    <message>
+        <source>Answer</source>
+        <extracomment>Answers a call that is ringing. A verb.</extracomment>
+        <translation>ਜਵਾਬ ਦਿਓ</translation>
+    </message>
+</context>
+<context>
+    <name>Calls</name>
+    <message>
+        <source>Missed call</source>
+        <translation>ਮਿਸਡ ਕਾਲ</translation>
+    </message>
+    <message>
+        <source>Declined call</source>
+        <translation>ਅਸਵੀਕਾਰ ਕੀਤੀ ਕਾਲ</translation>
+    </message>
+    <message>
+        <source>Canceled call</source>
+        <translation>ਰੱਦ ਕੀਤੀ ਕਾਲ</translation>
+    </message>
+    <message>
+        <source>Video call</source>
+        <translation>ਵੀਡੀਓ ਕਾਲ</translation>
+    </message>
+    <message>
+        <source>Audio call</source>
+        <translation>ਆਡੀਓ ਕਾਲ</translation>
+    </message>
+    <message>
+        <source>Less than 1 minute</source>
+        <extracomment>How long a call lasted, when it was shorter than a minute.</extracomment>
+        <translation>1 ਮਿੰਟ ਤੋਂ ਘੱਟ</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n minute(s) duration</source>
+        <extracomment>How long a call lasted. %n is whole minutes.</extracomment>
+        <translation>
+            <numerusform>ਮਿਆਦ %n ਮਿੰਟ</numerusform>
+            <numerusform>ਮਿਆਦ %n ਮਿੰਟ</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Ringing…</source>
+        <translation>ਘੰਟੀ ਵੱਜ ਰਹੀ ਹੈ…</translation>
+    </message>
+    <message>
+        <source>Incoming call</source>
+        <translation>ਆਉਣ ਵਾਲੀ ਕਾਲ</translation>
+    </message>
+</context>
+<context>
+    <name>CallsPage</name>
+    <message>
+        <source>Outgoing call</source>
+        <extracomment>A call this account placed, in a list of calls.</extracomment>
+        <translation>ਬਾਹਰ ਜਾਣ ਵਾਲੀ ਕਾਲ</translation>
+    </message>
+    <message>
+        <source>Incoming call</source>
+        <translation>ਆਉਣ ਵਾਲੀ ਕਾਲ</translation>
+    </message>
+    <message>
+        <source>Ringing…</source>
+        <translation>ਘੰਟੀ ਵੱਜ ਰਹੀ ਹੈ…</translation>
+    </message>
+    <message>
+        <source>Call %1</source>
+        <extracomment>Places a call. %1 is the name of whoever is called.</extracomment>
+        <translation>%1 ਨੂੰ ਕਾਲ ਕਰੋ</translation>
+    </message>
+</context>
+<context>
     <name>CapturePage</name>
     <message>
         <source>The video could not be saved</source>
@@ -860,6 +1002,15 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>No apps yet</source>
         <translation>ਹਾਲੇ ਕੋਈ ਐਪ ਨਹੀਂ</translation>
+    </message>
+    <message>
+        <source>Calls</source>
+        <extracomment>The calls made and received in a chat: a tile, and a page heading.</extracomment>
+        <translation>ਕਾਲਾਂ</translation>
+    </message>
+    <message>
+        <source>No calls yet</source>
+        <translation>ਹਾਲੇ ਕੋਈ ਕਾਲ ਨਹੀਂ</translation>
     </message>
 </context>
 <context>
@@ -1630,6 +1781,23 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>This applies to every profile, whatever a chat&apos;s own disappearing messages setting is.</source>
         <extracomment>Under &quot;Delete messages from device&quot;. &quot;Disappearing messages&quot; is each chat&apos;s own setting of that name.</extracomment>
         <translation>ਹਰ ਪ੍ਰੋਫ਼ਾਈਲ &apos;ਤੇ ਲਾਗੂ ਹੁੰਦਾ ਹੈ, ਭਾਵੇਂ ਕਿਸੇ ਚੈਟ ਦੀ ਆਪਣੀ ਗਾਇਬ ਹੋਣ ਵਾਲੇ ਸੁਨੇਹਿਆਂ ਦੀ ਸੈਟਿੰਗ ਕੁਝ ਵੀ ਹੋਵੇ।</translation>
+    </message>
+    <message>
+        <source>Calls</source>
+        <extracomment>Whether calls ring. A plural noun, not a verb.</extracomment>
+        <translation>ਕਾਲਾਂ</translation>
+    </message>
+    <message>
+        <source>Show call screen for accepted contacts</source>
+        <translation>ਸਵੀਕਾਰ ਕੀਤੇ ਸੰਪਰਕਾਂ ਲਈ ਕਾਲ ਸਕ੍ਰੀਨ ਦਿਖਾਓ</translation>
+    </message>
+    <message>
+        <source>Enable calls (experimental)</source>
+        <translation>ਕਾਲਾਂ ਚਾਲੂ ਕਰੋ (ਪ੍ਰਯੋਗਾਤਮਕ)</translation>
+    </message>
+    <message>
+        <source>Makes and answers voice calls in one-to-one chats. These features may be unstable and may be changed or removed.</source>
+        <translation>ਇੱਕ-ਤੋਂ-ਇੱਕ ਗੱਲਬਾਤਾਂ ਵਿੱਚ ਵੌਇਸ ਕਾਲਾਂ ਕਰਦਾ ਹੈ ਅਤੇ ਉਨ੍ਹਾਂ ਦਾ ਜਵਾਬ ਦਿੰਦਾ ਹੈ। ਇਹ ਸਹੂਲਤਾਂ ਅਸਥਿਰ ਹੋ ਸਕਦੀਆਂ ਹਨ ਅਤੇ ਬਦਲੀਆਂ ਜਾਂ ਹਟਾਈਆਂ ਜਾ ਸਕਦੀਆਂ ਹਨ।</translation>
     </message>
 </context>
 <context>

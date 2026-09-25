@@ -279,6 +279,147 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
     </message>
 </context>
 <context>
+    <name>CallCenter</name>
+    <message>
+        <source>Incoming call</source>
+        <translation>Gelen arama</translation>
+    </message>
+    <message>
+        <source>Decline</source>
+        <translation>Reddet</translation>
+    </message>
+    <message>
+        <source>Answer</source>
+        <translation>Yanıtla</translation>
+    </message>
+    <message>
+        <source>Missed call</source>
+        <translation>Cevapsız arama</translation>
+    </message>
+    <message>
+        <source>Call back</source>
+        <translation>Geri ara</translation>
+    </message>
+</context>
+<context>
+    <name>CallPage</name>
+    <message>
+        <source>Incoming call</source>
+        <translation>Gelen arama</translation>
+    </message>
+    <message>
+        <source>Ringing…</source>
+        <translation>Çalıyor…</translation>
+    </message>
+    <message>
+        <source>Connecting…</source>
+        <translation>Bağlanıyor…</translation>
+    </message>
+    <message>
+        <source>Reconnecting…</source>
+        <translation>Yeniden bağlanıyor…</translation>
+    </message>
+    <message>
+        <source>Call answered on another device</source>
+        <translation>Arama başka bir aygıtta yanıtlandı</translation>
+    </message>
+    <message>
+        <source>Call failed</source>
+        <translation>Arama başarısız</translation>
+    </message>
+    <message>
+        <source>Missed call</source>
+        <translation>Cevapsız arama</translation>
+    </message>
+    <message>
+        <source>Declined call</source>
+        <translation>Reddedilen arama</translation>
+    </message>
+    <message>
+        <source>Call ended</source>
+        <translation>Arama sona erdi</translation>
+    </message>
+    <message>
+        <source>Decline</source>
+        <extracomment>Declines a call that is ringing. A verb.</extracomment>
+        <translation>Reddet</translation>
+    </message>
+    <message>
+        <source>End call</source>
+        <extracomment>Ends a call in progress.</extracomment>
+        <translation>Aramayı bitir</translation>
+    </message>
+    <message>
+        <source>Answer</source>
+        <extracomment>Answers a call that is ringing. A verb.</extracomment>
+        <translation>Yanıtla</translation>
+    </message>
+</context>
+<context>
+    <name>Calls</name>
+    <message>
+        <source>Missed call</source>
+        <translation>Cevapsız arama</translation>
+    </message>
+    <message>
+        <source>Declined call</source>
+        <translation>Reddedilen arama</translation>
+    </message>
+    <message>
+        <source>Canceled call</source>
+        <translation>İptal edilen arama</translation>
+    </message>
+    <message>
+        <source>Video call</source>
+        <translation>Görüntülü arama</translation>
+    </message>
+    <message>
+        <source>Audio call</source>
+        <translation>Sesli arama</translation>
+    </message>
+    <message>
+        <source>Less than 1 minute</source>
+        <extracomment>How long a call lasted, when it was shorter than a minute.</extracomment>
+        <translation>1 dakikadan az</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n minute(s) duration</source>
+        <extracomment>How long a call lasted. %n is whole minutes.</extracomment>
+        <translation>
+            <numerusform>Süre: %n dakika</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Ringing…</source>
+        <translation>Çalıyor…</translation>
+    </message>
+    <message>
+        <source>Incoming call</source>
+        <translation>Gelen arama</translation>
+    </message>
+</context>
+<context>
+    <name>CallsPage</name>
+    <message>
+        <source>Outgoing call</source>
+        <extracomment>A call this account placed, in a list of calls.</extracomment>
+        <translation>Giden arama</translation>
+    </message>
+    <message>
+        <source>Incoming call</source>
+        <translation>Gelen arama</translation>
+    </message>
+    <message>
+        <source>Ringing…</source>
+        <translation>Çalıyor…</translation>
+    </message>
+    <message>
+        <source>Call %1</source>
+        <extracomment>Places a call. %1 is the name of whoever is called.</extracomment>
+        <translation>Ara: %1</translation>
+    </message>
+</context>
+<context>
     <name>CapturePage</name>
     <message>
         <source>The video could not be saved</source>
@@ -856,6 +997,15 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
     <message>
         <source>No apps yet</source>
         <translation>Henüz uygulama yok</translation>
+    </message>
+    <message>
+        <source>Calls</source>
+        <extracomment>The calls made and received in a chat: a tile, and a page heading.</extracomment>
+        <translation>Aramalar</translation>
+    </message>
+    <message>
+        <source>No calls yet</source>
+        <translation>Henüz arama yok</translation>
     </message>
 </context>
 <context>
@@ -1624,6 +1774,23 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
         <source>This applies to every profile, whatever a chat&apos;s own disappearing messages setting is.</source>
         <extracomment>Under &quot;Delete messages from device&quot;. &quot;Disappearing messages&quot; is each chat&apos;s own setting of that name.</extracomment>
         <translation>Sohbetin kendi kaybolan mesajlar ayarından bağımsız olarak her profile uygulanır.</translation>
+    </message>
+    <message>
+        <source>Calls</source>
+        <extracomment>Whether calls ring. A plural noun, not a verb.</extracomment>
+        <translation>Aramalar</translation>
+    </message>
+    <message>
+        <source>Show call screen for accepted contacts</source>
+        <translation>Kabul edilen kişiler için arama ekranını göster</translation>
+    </message>
+    <message>
+        <source>Enable calls (experimental)</source>
+        <translation>Aramaları etkinleştir (deneysel)</translation>
+    </message>
+    <message>
+        <source>Makes and answers voice calls in one-to-one chats. These features may be unstable and may be changed or removed.</source>
+        <translation>Bire bir sohbetlerde sesli arama yapar ve aramaları yanıtlar. Bu özellikler kararsız olabilir ve değiştirilebilir ya da kaldırılabilir.</translation>
     </message>
 </context>
 <context>

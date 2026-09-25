@@ -280,6 +280,148 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>CallCenter</name>
+    <message>
+        <source>Incoming call</source>
+        <translation>ഇൻകമിംഗ് കോൾ</translation>
+    </message>
+    <message>
+        <source>Decline</source>
+        <translation>നിരസിക്കുക</translation>
+    </message>
+    <message>
+        <source>Answer</source>
+        <translation>മറുപടി നൽകുക</translation>
+    </message>
+    <message>
+        <source>Missed call</source>
+        <translation>മിസ്ഡ് കോൾ</translation>
+    </message>
+    <message>
+        <source>Call back</source>
+        <translation>തിരികെ വിളിക്കുക</translation>
+    </message>
+</context>
+<context>
+    <name>CallPage</name>
+    <message>
+        <source>Incoming call</source>
+        <translation>ഇൻകമിംഗ് കോൾ</translation>
+    </message>
+    <message>
+        <source>Ringing…</source>
+        <translation>റിംഗ് ചെയ്യുന്നു…</translation>
+    </message>
+    <message>
+        <source>Connecting…</source>
+        <translation>കണക്റ്റ് ചെയ്യുന്നു…</translation>
+    </message>
+    <message>
+        <source>Reconnecting…</source>
+        <translation>വീണ്ടും കണക്റ്റ് ചെയ്യുന്നു…</translation>
+    </message>
+    <message>
+        <source>Call answered on another device</source>
+        <translation>മറ്റൊരു ഉപകരണത്തിൽ കോളിന് മറുപടി നൽകി</translation>
+    </message>
+    <message>
+        <source>Call failed</source>
+        <translation>കോൾ പരാജയപ്പെട്ടു</translation>
+    </message>
+    <message>
+        <source>Missed call</source>
+        <translation>മിസ്ഡ് കോൾ</translation>
+    </message>
+    <message>
+        <source>Declined call</source>
+        <translation>നിരസിച്ച കോൾ</translation>
+    </message>
+    <message>
+        <source>Call ended</source>
+        <translation>കോൾ അവസാനിച്ചു</translation>
+    </message>
+    <message>
+        <source>Decline</source>
+        <extracomment>Declines a call that is ringing. A verb.</extracomment>
+        <translation>നിരസിക്കുക</translation>
+    </message>
+    <message>
+        <source>End call</source>
+        <extracomment>Ends a call in progress.</extracomment>
+        <translation>കോൾ അവസാനിപ്പിക്കുക</translation>
+    </message>
+    <message>
+        <source>Answer</source>
+        <extracomment>Answers a call that is ringing. A verb.</extracomment>
+        <translation>മറുപടി നൽകുക</translation>
+    </message>
+</context>
+<context>
+    <name>Calls</name>
+    <message>
+        <source>Missed call</source>
+        <translation>മിസ്ഡ് കോൾ</translation>
+    </message>
+    <message>
+        <source>Declined call</source>
+        <translation>നിരസിച്ച കോൾ</translation>
+    </message>
+    <message>
+        <source>Canceled call</source>
+        <translation>റദ്ദാക്കിയ കോൾ</translation>
+    </message>
+    <message>
+        <source>Video call</source>
+        <translation>വീഡിയോ കോൾ</translation>
+    </message>
+    <message>
+        <source>Audio call</source>
+        <translation>ഓഡിയോ കോൾ</translation>
+    </message>
+    <message>
+        <source>Less than 1 minute</source>
+        <extracomment>How long a call lasted, when it was shorter than a minute.</extracomment>
+        <translation>1 മിനിറ്റിൽ താഴെ</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n minute(s) duration</source>
+        <extracomment>How long a call lasted. %n is whole minutes.</extracomment>
+        <translation>
+            <numerusform>ദൈർഘ്യം %n മിനിറ്റ്</numerusform>
+            <numerusform>ദൈർഘ്യം %n മിനിറ്റ്</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Ringing…</source>
+        <translation>റിംഗ് ചെയ്യുന്നു…</translation>
+    </message>
+    <message>
+        <source>Incoming call</source>
+        <translation>ഇൻകമിംഗ് കോൾ</translation>
+    </message>
+</context>
+<context>
+    <name>CallsPage</name>
+    <message>
+        <source>Outgoing call</source>
+        <extracomment>A call this account placed, in a list of calls.</extracomment>
+        <translation>പുറത്തേക്കുള്ള കോൾ</translation>
+    </message>
+    <message>
+        <source>Incoming call</source>
+        <translation>ഇൻകമിംഗ് കോൾ</translation>
+    </message>
+    <message>
+        <source>Ringing…</source>
+        <translation>റിംഗ് ചെയ്യുന്നു…</translation>
+    </message>
+    <message>
+        <source>Call %1</source>
+        <extracomment>Places a call. %1 is the name of whoever is called.</extracomment>
+        <translation>%1-നെ വിളിക്കുക</translation>
+    </message>
+</context>
+<context>
     <name>CapturePage</name>
     <message>
         <source>The video could not be saved</source>
@@ -860,6 +1002,15 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>No apps yet</source>
         <translation>ഇതുവരെ ആപ്പുകളൊന്നുമില്ല</translation>
+    </message>
+    <message>
+        <source>Calls</source>
+        <extracomment>The calls made and received in a chat: a tile, and a page heading.</extracomment>
+        <translation>കോളുകൾ</translation>
+    </message>
+    <message>
+        <source>No calls yet</source>
+        <translation>ഇതുവരെ കോളുകളൊന്നുമില്ല</translation>
     </message>
 </context>
 <context>
@@ -1630,6 +1781,23 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>This applies to every profile, whatever a chat&apos;s own disappearing messages setting is.</source>
         <extracomment>Under &quot;Delete messages from device&quot;. &quot;Disappearing messages&quot; is each chat&apos;s own setting of that name.</extracomment>
         <translation>ഓരോ പ്രൊഫൈലിനും ബാധകമാണ്, ഒരു ചാറ്റിന്റെ സ്വന്തം അപ്രത്യക്ഷമാകുന്ന സന്ദേശങ്ങളുടെ ക്രമീകരണം എന്തായാലും.</translation>
+    </message>
+    <message>
+        <source>Calls</source>
+        <extracomment>Whether calls ring. A plural noun, not a verb.</extracomment>
+        <translation>കോളുകൾ</translation>
+    </message>
+    <message>
+        <source>Show call screen for accepted contacts</source>
+        <translation>സ്വീകരിച്ച കോൺടാക്റ്റുകൾക്കായി കോൾ സ്ക്രീൻ കാണിക്കുക</translation>
+    </message>
+    <message>
+        <source>Enable calls (experimental)</source>
+        <translation>കോളുകൾ പ്രവർത്തനക്ഷമമാക്കുക (പരീക്ഷണാത്മകം)</translation>
+    </message>
+    <message>
+        <source>Makes and answers voice calls in one-to-one chats. These features may be unstable and may be changed or removed.</source>
+        <translation>ഒരാളുമായുള്ള സംഭാഷണങ്ങളിൽ വോയ്സ് കോളുകൾ ചെയ്യുകയും അവയ്ക്ക് മറുപടി നൽകുകയും ചെയ്യുന്നു. ഈ സൗകര്യങ്ങൾ അസ്ഥിരമാകാം, മാറ്റുകയോ നീക്കം ചെയ്യുകയോ ചെയ്യാം.</translation>
     </message>
 </context>
 <context>

@@ -15,6 +15,9 @@ use crate::json;
 use crate::models::{ContactItem, ContactListModel};
 
 /// What one load found.
+// Four facts of the chat, read into the four properties of the same
+// names; see `ChatInfo`.
+#[allow(clippy::struct_excessive_bools)]
 struct Loaded {
     name: String,
     avatar_path: String,
@@ -22,6 +25,7 @@ struct Loaded {
     is_group: bool,
     can_edit: bool,
     can_send: bool,
+    can_call: bool,
     ephemeral_timer: u32,
     members: Vec<ContactItem>,
 }
@@ -69,6 +73,9 @@ pub struct ChatInfo {
     /// and for a contact request, and what settings that apply to the
     /// whole chat -- disappearing messages -- are offered on.
     pub can_send: qt_property!(bool; NOTIFY loaded_changed),
+    /// A call can be placed here: a one-to-one chat, encrypted, that
+    /// takes messages. See `ChatMessages::can_call`, which reads the same.
+    pub can_call: qt_property!(bool; NOTIFY loaded_changed),
     /// Seconds after which messages in this chat disappear, 0 for never.
     /// The core's `ephemeralTimer`.
     pub ephemeral_timer: qt_property!(u32; NOTIFY loaded_changed),
@@ -190,6 +197,7 @@ impl ChatInfo {
                         this_mut.is_group = found.is_group;
                         this_mut.can_edit = found.can_edit;
                         this_mut.can_send = found.can_send;
+                        this_mut.can_call = found.can_call;
                         this_mut.ephemeral_timer = found.ephemeral_timer;
                         this_mut.members.borrow_mut().reset_data(found.members);
                         this_mut.loaded = true;
@@ -500,6 +508,7 @@ async fn fetch(rpc: &RpcClient, account_id: u32, chat_id: u32) -> Result<Loaded,
     // "Single" is the one-to-one chat; everything else -- Group, and the
     // broadcast and mailing-list kinds -- has members worth listing.
     let is_group = !matches!(json::str_at(&chat, "chatType"), "Single" | "");
+    let can_send = json::flag(&chat, "canSend");
     Ok(Loaded {
         name: json::str_at(&chat, "name").to_string(),
         avatar_path: json::str_at(&chat, "profileImage").to_string(),
@@ -508,7 +517,8 @@ async fn fetch(rpc: &RpcClient, account_id: u32, chat_id: u32) -> Result<Loaded,
         // Pinned against the real core: after leaving, `selfInGroup` and
         // `canSend` both go false and every edit is refused.
         can_edit: is_group && json::flag(&chat, "selfInGroup"),
-        can_send: json::flag(&chat, "canSend"),
+        can_send,
+        can_call: crate::chat::takes_calls(&chat, is_group, can_send),
         ephemeral_timer: json::u32_at(&chat, "ephemeralTimer"),
         members,
     })

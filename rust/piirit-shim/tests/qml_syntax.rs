@@ -66,6 +66,75 @@ fn qml_avoids_qt_5_15_only_signal_handler_syntax() {
     );
 }
 
+/// A platform type's enum property is bound by name, never by number.
+///
+/// Qt's QML compiler checks a literal bound to an enum property against
+/// the enum's key names, and "2" is not one: the file fails to compile.
+/// For a component the window creates, that is the whole window -- the
+/// app opens on an empty white screen, as it did with `urgency: 2` on a
+/// Nemo notification. No test run on the host sees it: the stubs stand in
+/// for these types in QML, which can declare an enum but not a property
+/// of one, so theirs are `int`s and take any number.
+///
+/// The properties below are enum-typed on the device; a name is only
+/// listed once the tree binds it, so that the list says what is checked.
+#[test]
+fn platform_enum_properties_are_bound_by_name() {
+    const ENUM_PROPERTIES: &[(&str, &str)] = &[
+        (
+            "urgency",
+            "Nemo.Notifications' Notification.urgency (enum Urgency)",
+        ),
+        ("bus", "Nemo.DBus' DBusInterface.bus (enum BusType)"),
+        (
+            "truncationMode",
+            "Silica's truncationMode (enum TruncationMode.Mode)",
+        ),
+        (
+            "horizontalAlignment",
+            "QtQuick's horizontalAlignment (enum HAlignment)",
+        ),
+        ("wrapMode", "QtQuick's wrapMode (enum WrapMode)"),
+        ("textFormat", "QtQuick's textFormat (enum TextFormat)"),
+    ];
+    let files = qml_files();
+    assert!(!files.is_empty(), "found no .qml files to check");
+
+    let mut offenders = Vec::new();
+    for file in &files {
+        let text = fs::read_to_string(file).expect("read qml");
+        for (number, line) in code_only(&text).lines().enumerate() {
+            let Some((name, value)) = line.trim().split_once(':') else {
+                continue;
+            };
+            let value = value.trim().trim_end_matches(';').trim();
+            let numeric = !value.is_empty()
+                && value
+                    .trim_start_matches('-')
+                    .chars()
+                    .all(|c| c.is_ascii_digit());
+            if let Some((_, what)) = ENUM_PROPERTIES.iter().find(|(key, _)| *key == name.trim()) {
+                if numeric {
+                    offenders.push(format!(
+                        "{}:{}: {} -- {what}",
+                        file.display(),
+                        number + 1,
+                        line.trim()
+                    ));
+                }
+            }
+        }
+    }
+
+    assert!(
+        offenders.is_empty(),
+        "an enum property bound to a number: Qt 5.6 refuses the file \
+         (\"Invalid property assignment: unknown enumeration\"), and the \
+         host stubs cannot tell. Use the enum's name.\n  {}",
+        offenders.join("\n  ")
+    );
+}
+
 /// A list row holding a wrapping `Label` must take its height from that
 /// label. With a constant `contentHeight` a long message -- a device
 /// message runs to a dozen wrapped lines -- overlaps its neighbours and the
@@ -966,18 +1035,19 @@ fn only_the_picker_pages_import_sailfish_pickers() {
     );
 }
 
-/// The two webxdc pages are the only files naming a `Sailfish.WebView`
-/// type.
+/// The two webxdc pages and the call's view are the only files naming a
+/// `Sailfish.WebView` type.
 ///
 /// The same rule as the pickers above, for the same reason and a sharper
 /// case: the browser engine is a separate package, and a release without
 /// it -- or a device where it is not installed -- would take down every
 /// file naming the type. Here that is the page that runs one app, pushed
 /// by URL from the conversation, so a chat still opens and every other
-/// attachment still works.
+/// attachment still works; and the view a call's media runs in, loaded
+/// by the call page, so a call that rings can still be seen and declined.
 #[test]
 fn only_the_webxdc_pages_import_sailfish_webview() {
-    const ALLOWED: [&str; 2] = ["WebxdcPage.qml", "WebxdcStorePage.qml"];
+    const ALLOWED: [&str; 3] = ["WebxdcPage.qml", "WebxdcStorePage.qml", "CallView.qml"];
     let mut offenders = Vec::new();
     for file in qml_files() {
         let name = file
@@ -1027,6 +1097,34 @@ fn the_webxdc_pages_leave_the_views_activation_alone() {
             offender.map_or(0, |(number, _)| number + 1)
         );
     }
+}
+
+/// The call's view decides when its `WebView` is active, and only after
+/// the page has come up.
+///
+/// The opposite of the rule above, and for a reason of its own: an
+/// inactive view is a hidden document, and the engine pauses a hidden
+/// document's media -- which for a call is the other end's voice, gone
+/// the moment the reader looks at another app. So the view is held
+/// active for as long as the call lasts. Until the page has come up it
+/// follows what `WebView.qml` itself would follow, handed in as `shown`,
+/// since a view that is never activated by its page's transition draws
+/// nothing.
+#[test]
+fn the_call_view_holds_its_page_running_only_once_it_has_come_up() {
+    let file = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../qml/components/CallView.qml");
+    let code = code_only(&fs::read_to_string(file).expect("read the call view"));
+    let active: Vec<&str> = code
+        .lines()
+        .map(str::trim)
+        .filter(|line| line.starts_with("active:"))
+        .collect();
+    assert_eq!(
+        active,
+        vec!["active: root.shown || (root.holding && view.loaded)"],
+        "the call view's `active` is not the page's own condition, held \
+         once the page has come up"
+    );
 }
 
 /// The share methods the desktop file offers are the ones the app

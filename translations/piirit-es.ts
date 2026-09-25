@@ -276,6 +276,148 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>CallCenter</name>
+    <message>
+        <source>Incoming call</source>
+        <translation>Llamada entrante</translation>
+    </message>
+    <message>
+        <source>Decline</source>
+        <translation>Rechazar</translation>
+    </message>
+    <message>
+        <source>Answer</source>
+        <translation>Contestar</translation>
+    </message>
+    <message>
+        <source>Missed call</source>
+        <translation>Llamada perdida</translation>
+    </message>
+    <message>
+        <source>Call back</source>
+        <translation>Devolver llamada</translation>
+    </message>
+</context>
+<context>
+    <name>CallPage</name>
+    <message>
+        <source>Incoming call</source>
+        <translation>Llamada entrante</translation>
+    </message>
+    <message>
+        <source>Ringing…</source>
+        <translation>Sonando…</translation>
+    </message>
+    <message>
+        <source>Connecting…</source>
+        <translation>Conectando…</translation>
+    </message>
+    <message>
+        <source>Reconnecting…</source>
+        <translation>Reconectando…</translation>
+    </message>
+    <message>
+        <source>Call answered on another device</source>
+        <translation>Llamada contestada en otro dispositivo</translation>
+    </message>
+    <message>
+        <source>Call failed</source>
+        <translation>La llamada falló</translation>
+    </message>
+    <message>
+        <source>Missed call</source>
+        <translation>Llamada perdida</translation>
+    </message>
+    <message>
+        <source>Declined call</source>
+        <translation>Llamada rechazada</translation>
+    </message>
+    <message>
+        <source>Call ended</source>
+        <translation>Llamada finalizada</translation>
+    </message>
+    <message>
+        <source>Decline</source>
+        <extracomment>Declines a call that is ringing. A verb.</extracomment>
+        <translation>Rechazar</translation>
+    </message>
+    <message>
+        <source>End call</source>
+        <extracomment>Ends a call in progress.</extracomment>
+        <translation>Finalizar llamada</translation>
+    </message>
+    <message>
+        <source>Answer</source>
+        <extracomment>Answers a call that is ringing. A verb.</extracomment>
+        <translation>Contestar</translation>
+    </message>
+</context>
+<context>
+    <name>Calls</name>
+    <message>
+        <source>Missed call</source>
+        <translation>Llamada perdida</translation>
+    </message>
+    <message>
+        <source>Declined call</source>
+        <translation>Llamada rechazada</translation>
+    </message>
+    <message>
+        <source>Canceled call</source>
+        <translation>Llamada cancelada</translation>
+    </message>
+    <message>
+        <source>Video call</source>
+        <translation>Videollamada</translation>
+    </message>
+    <message>
+        <source>Audio call</source>
+        <translation>Llamada de voz</translation>
+    </message>
+    <message>
+        <source>Less than 1 minute</source>
+        <extracomment>How long a call lasted, when it was shorter than a minute.</extracomment>
+        <translation>Menos de 1 minuto</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n minute(s) duration</source>
+        <extracomment>How long a call lasted. %n is whole minutes.</extracomment>
+        <translation>
+            <numerusform>Duración: %n minuto</numerusform>
+            <numerusform>Duración: %n minutos</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Ringing…</source>
+        <translation>Sonando…</translation>
+    </message>
+    <message>
+        <source>Incoming call</source>
+        <translation>Llamada entrante</translation>
+    </message>
+</context>
+<context>
+    <name>CallsPage</name>
+    <message>
+        <source>Outgoing call</source>
+        <extracomment>A call this account placed, in a list of calls.</extracomment>
+        <translation>Llamada saliente</translation>
+    </message>
+    <message>
+        <source>Incoming call</source>
+        <translation>Llamada entrante</translation>
+    </message>
+    <message>
+        <source>Ringing…</source>
+        <translation>Sonando…</translation>
+    </message>
+    <message>
+        <source>Call %1</source>
+        <extracomment>Places a call. %1 is the name of whoever is called.</extracomment>
+        <translation>Llamar a %1</translation>
+    </message>
+</context>
+<context>
     <name>CapturePage</name>
     <message>
         <source>The video could not be saved</source>
@@ -856,6 +998,15 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>No apps yet</source>
         <translation>Aún no hay aplicaciones</translation>
+    </message>
+    <message>
+        <source>Calls</source>
+        <extracomment>The calls made and received in a chat: a tile, and a page heading.</extracomment>
+        <translation>Llamadas</translation>
+    </message>
+    <message>
+        <source>No calls yet</source>
+        <translation>Aún no hay llamadas</translation>
     </message>
 </context>
 <context>
@@ -1626,6 +1777,23 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>This applies to every profile, whatever a chat&apos;s own disappearing messages setting is.</source>
         <extracomment>Under &quot;Delete messages from device&quot;. &quot;Disappearing messages&quot; is each chat&apos;s own setting of that name.</extracomment>
         <translation>Se aplica a todos los perfiles, independientemente del ajuste de mensajes que desaparecen de cada chat.</translation>
+    </message>
+    <message>
+        <source>Calls</source>
+        <extracomment>Whether calls ring. A plural noun, not a verb.</extracomment>
+        <translation>Llamadas</translation>
+    </message>
+    <message>
+        <source>Show call screen for accepted contacts</source>
+        <translation>Mostrar la pantalla de llamada para los contactos aceptados</translation>
+    </message>
+    <message>
+        <source>Enable calls (experimental)</source>
+        <translation>Activar llamadas (experimental)</translation>
+    </message>
+    <message>
+        <source>Makes and answers voice calls in one-to-one chats. These features may be unstable and may be changed or removed.</source>
+        <translation>Hace y contesta llamadas de voz en chats individuales. Estas funciones pueden ser inestables y pueden cambiarse o eliminarse.</translation>
     </message>
 </context>
 <context>

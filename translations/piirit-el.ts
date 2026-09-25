@@ -276,6 +276,148 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>CallCenter</name>
+    <message>
+        <source>Incoming call</source>
+        <translation>Εισερχόμενη κλήση</translation>
+    </message>
+    <message>
+        <source>Decline</source>
+        <translation>Απόρριψη</translation>
+    </message>
+    <message>
+        <source>Answer</source>
+        <translation>Απάντηση</translation>
+    </message>
+    <message>
+        <source>Missed call</source>
+        <translation>Αναπάντητη κλήση</translation>
+    </message>
+    <message>
+        <source>Call back</source>
+        <translation>Επανάκληση</translation>
+    </message>
+</context>
+<context>
+    <name>CallPage</name>
+    <message>
+        <source>Incoming call</source>
+        <translation>Εισερχόμενη κλήση</translation>
+    </message>
+    <message>
+        <source>Ringing…</source>
+        <translation>Κουδουνίζει…</translation>
+    </message>
+    <message>
+        <source>Connecting…</source>
+        <translation>Συνδέεται…</translation>
+    </message>
+    <message>
+        <source>Reconnecting…</source>
+        <translation>Επανασύνδεση…</translation>
+    </message>
+    <message>
+        <source>Call answered on another device</source>
+        <translation>Η κλήση απαντήθηκε σε άλλη συσκευή</translation>
+    </message>
+    <message>
+        <source>Call failed</source>
+        <translation>Η κλήση απέτυχε</translation>
+    </message>
+    <message>
+        <source>Missed call</source>
+        <translation>Αναπάντητη κλήση</translation>
+    </message>
+    <message>
+        <source>Declined call</source>
+        <translation>Απορριφθείσα κλήση</translation>
+    </message>
+    <message>
+        <source>Call ended</source>
+        <translation>Η κλήση τερματίστηκε</translation>
+    </message>
+    <message>
+        <source>Decline</source>
+        <extracomment>Declines a call that is ringing. A verb.</extracomment>
+        <translation>Απόρριψη</translation>
+    </message>
+    <message>
+        <source>End call</source>
+        <extracomment>Ends a call in progress.</extracomment>
+        <translation>Τερματισμός κλήσης</translation>
+    </message>
+    <message>
+        <source>Answer</source>
+        <extracomment>Answers a call that is ringing. A verb.</extracomment>
+        <translation>Απάντηση</translation>
+    </message>
+</context>
+<context>
+    <name>Calls</name>
+    <message>
+        <source>Missed call</source>
+        <translation>Αναπάντητη κλήση</translation>
+    </message>
+    <message>
+        <source>Declined call</source>
+        <translation>Απορριφθείσα κλήση</translation>
+    </message>
+    <message>
+        <source>Canceled call</source>
+        <translation>Ακυρωμένη κλήση</translation>
+    </message>
+    <message>
+        <source>Video call</source>
+        <translation>Βιντεοκλήση</translation>
+    </message>
+    <message>
+        <source>Audio call</source>
+        <translation>Φωνητική κλήση</translation>
+    </message>
+    <message>
+        <source>Less than 1 minute</source>
+        <extracomment>How long a call lasted, when it was shorter than a minute.</extracomment>
+        <translation>Λιγότερο από 1 λεπτό</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n minute(s) duration</source>
+        <extracomment>How long a call lasted. %n is whole minutes.</extracomment>
+        <translation>
+            <numerusform>Διάρκεια %n λεπτό</numerusform>
+            <numerusform>Διάρκεια %n λεπτά</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Ringing…</source>
+        <translation>Κουδουνίζει…</translation>
+    </message>
+    <message>
+        <source>Incoming call</source>
+        <translation>Εισερχόμενη κλήση</translation>
+    </message>
+</context>
+<context>
+    <name>CallsPage</name>
+    <message>
+        <source>Outgoing call</source>
+        <extracomment>A call this account placed, in a list of calls.</extracomment>
+        <translation>Εξερχόμενη κλήση</translation>
+    </message>
+    <message>
+        <source>Incoming call</source>
+        <translation>Εισερχόμενη κλήση</translation>
+    </message>
+    <message>
+        <source>Ringing…</source>
+        <translation>Κουδουνίζει…</translation>
+    </message>
+    <message>
+        <source>Call %1</source>
+        <extracomment>Places a call. %1 is the name of whoever is called.</extracomment>
+        <translation>Κλήση προς %1</translation>
+    </message>
+</context>
+<context>
     <name>CapturePage</name>
     <message>
         <source>The video could not be saved</source>
@@ -856,6 +998,15 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>No apps yet</source>
         <translation>Δεν υπάρχουν ακόμη εφαρμογές</translation>
+    </message>
+    <message>
+        <source>Calls</source>
+        <extracomment>The calls made and received in a chat: a tile, and a page heading.</extracomment>
+        <translation>Κλήσεις</translation>
+    </message>
+    <message>
+        <source>No calls yet</source>
+        <translation>Δεν υπάρχουν κλήσεις ακόμα</translation>
     </message>
 </context>
 <context>
@@ -1626,6 +1777,23 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>This applies to every profile, whatever a chat&apos;s own disappearing messages setting is.</source>
         <extracomment>Under &quot;Delete messages from device&quot;. &quot;Disappearing messages&quot; is each chat&apos;s own setting of that name.</extracomment>
         <translation>Ισχύει για κάθε προφίλ, ανεξάρτητα από τη ρύθμιση μηνυμάτων που εξαφανίζονται κάθε συνομιλίας.</translation>
+    </message>
+    <message>
+        <source>Calls</source>
+        <extracomment>Whether calls ring. A plural noun, not a verb.</extracomment>
+        <translation>Κλήσεις</translation>
+    </message>
+    <message>
+        <source>Show call screen for accepted contacts</source>
+        <translation>Εμφάνιση οθόνης κλήσης για αποδεκτές επαφές</translation>
+    </message>
+    <message>
+        <source>Enable calls (experimental)</source>
+        <translation>Ενεργοποίηση κλήσεων (πειραματικό)</translation>
+    </message>
+    <message>
+        <source>Makes and answers voice calls in one-to-one chats. These features may be unstable and may be changed or removed.</source>
+        <translation>Πραγματοποιεί και απαντά σε φωνητικές κλήσεις σε ατομικές συνομιλίες. Αυτές οι λειτουργίες μπορεί να είναι ασταθείς και να αλλάξουν ή να αφαιρεθούν.</translation>
     </message>
 </context>
 <context>

@@ -46,6 +46,46 @@ struct Account {
     configured: bool,
 }
 
+/// One call, as the real core keeps it on the call's message.
+struct FakeCall {
+    /// It came in, rather than being placed here.
+    incoming: bool,
+    has_video: bool,
+    /// The caller's SDP, as `call_info` hands it back.
+    offer: String,
+    /// Answered, at either end.
+    accepted: bool,
+    /// The core's `CallState` kind, which `call_info` reports.
+    state: &'static str,
+}
+
+impl FakeCall {
+    /// The text the real core writes onto the call's message, in its own
+    /// English: what a row that does not read the state would show.
+    fn text(&self) -> &'static str {
+        match (self.state, self.incoming, self.has_video) {
+            ("Missed", ..) => "Missed call",
+            ("Declined", ..) => "Declined call",
+            ("Canceled", ..) => "Canceled call",
+            (_, true, false) => "Incoming audio call",
+            (_, true, true) => "Incoming video call",
+            (_, false, false) => "Outgoing audio call",
+            (_, false, true) => "Outgoing video call",
+        }
+    }
+
+    /// `call_info`, as the real core serialises it: camelCase, the state
+    /// tagged by `kind`, and a duration only on a completed call.
+    fn info(&self) -> Value {
+        let state = if self.state == "Completed" {
+            json!({"kind": "Completed", "duration": 185})
+        } else {
+            json!({"kind": self.state})
+        };
+        json!({"sdpOffer": self.offer, "hasVideo": self.has_video, "state": state})
+    }
+}
+
 /// What one `send_msg` handed over: the fields of its `MessageData` the
 /// row has to carry back.
 struct Sent {
@@ -141,6 +181,9 @@ struct State {
     /// Messages sent from here, in the order they went. Read as the
     /// account's own when a test asks for that; see `full_message`.
     sent: std::collections::BTreeSet<u32>,
+    /// Calls, by their message. Placed here, or rung in under
+    /// `PIIRIT_FAKE_INCOMING_CALL_MS`.
+    calls: std::collections::BTreeMap<u32, FakeCall>,
     /// Each account's transports, in the order they were added -- the
     /// real core's `transports` table, which `list_transports` reads
     /// oldest first. The one with the account's own address on it is
@@ -446,6 +489,13 @@ impl State {
             message["text"] = json!(text);
             message["isEdited"] = json!(true);
         }
+        if let Some(call) = self.calls.get(&id) {
+            message["viewType"] = json!("Call");
+            message["text"] = json!(call.text());
+            if !call.incoming {
+                message["fromId"] = json!(SELF);
+            }
+        }
         if let Some(quoted) = self.quotes.get(&id) {
             // The real core's `WithMessage` quote: the quoted message's
             // id beside its text and author.
@@ -526,6 +576,48 @@ impl State {
             "event": {"kind": "IncomingMsg", "chatId": chat_id, "msgId": id},
         }));
         id
+    }
+
+    /// Put a call's message into a chat, as the real core does for a call
+    /// placed here and one that comes in: a message like any other, which
+    /// `MsgsChanged` announces -- a ringing call is not an `IncomingMsg`.
+    fn add_call(&mut self, account_id: u32, chat_id: u32, call: FakeCall) -> u32 {
+        self.seed_chats();
+        self.next_message_id += 1;
+        let id = self.next_message_id;
+        self.chats.entry(chat_id).or_default().push(id);
+        if !call.incoming {
+            self.sent.insert(id);
+        }
+        self.calls.insert(id, call);
+        self.call_changed(account_id, id);
+        id
+    }
+
+    /// Announce that a call's state moved, as the real core does with
+    /// every move: `MsgsChanged` for its message.
+    fn call_changed(&mut self, account_id: u32, message_id: u32) {
+        let chat_id = self.chat_of(message_id);
+        self.events.push_back(json!({
+            "contextId": account_id,
+            "event": {"kind": "MsgsChanged", "chatId": chat_id, "msgId": message_id},
+        }));
+    }
+
+    /// One of the four call events, in the real core's own `snake_case`.
+    fn call_event(&mut self, account_id: u32, kind: &str, message_id: u32, extra: &Value) {
+        let mut event = json!({
+            "kind": kind,
+            "msg_id": message_id,
+            "chat_id": self.chat_of(message_id),
+        });
+        if let (Some(event), Some(extra)) = (event.as_object_mut(), extra.as_object()) {
+            for (key, value) in extra {
+                event.insert(key.clone(), value.clone());
+            }
+        }
+        self.events
+            .push_back(json!({"contextId": account_id, "event": event}));
     }
 
     /// Queue one import/export progress event, as the core does while a
@@ -1161,6 +1253,36 @@ async fn serve() {
             });
         }
     }
+    // A call ringing in, this long after the server starts: from the
+    // first chat's other end, audio only, with an offer the page would
+    // answer. The real core says `IncomingCall` for it, and `MsgsChanged`
+    // for its message.
+    if let Ok(after) = std::env::var("PIIRIT_FAKE_INCOMING_CALL_MS") {
+        if let Ok(millis) = after.parse() {
+            let state = state.clone();
+            tokio::spawn(async move {
+                tokio::time::sleep(std::time::Duration::from_millis(millis)).await;
+                let mut state = state.lock().await;
+                let id = state.add_call(
+                    1,
+                    1,
+                    FakeCall {
+                        incoming: true,
+                        has_video: false,
+                        offer: "v=0 fake-offer".to_string(),
+                        accepted: false,
+                        state: "Alerting",
+                    },
+                );
+                state.call_event(
+                    1,
+                    "IncomingCall",
+                    id,
+                    &json!({"place_call_info": "v=0 fake-offer", "has_video": false}),
+                );
+            });
+        }
+    }
     let mut lines = BufReader::new(tokio::io::stdin()).lines();
 
     while let Ok(Some(line)) = lines.next_line().await {
@@ -1771,6 +1893,10 @@ async fn serve() {
                                 // is not a group the account is "in" at all.
                                 "selfInGroup": is_group && !left,
                                 "canSend": !left,
+                                // Every chat here is a chatmail chat.
+                                "isEncrypted": true,
+                                "isSelfTalk": false,
+                                "isDeviceChat": false,
                                 "ephemeralTimer": state.timers.get(&chat).copied().unwrap_or(0),
                             }),
                         )
@@ -2597,6 +2723,123 @@ async fn serve() {
                             },
                         }));
                         ok(&id, &Value::Null)
+                    }
+                }
+                // The call methods, kept to what the real core does with
+                // each (src/calls.rs upstream): a call is a message, and
+                // every move of its state is announced.
+                "ice_servers" => ok(
+                    &id,
+                    &json!(
+                        r#"[{"urls":["turn:127.0.0.1:3478"],"username":"fake","credential":"fake"}]"#
+                    ),
+                ),
+                "place_outgoing_call" => {
+                    let account = account_id();
+                    let chat = positional(1)
+                        .as_u64()
+                        .and_then(|value| u32::try_from(value).ok())
+                        .unwrap_or_default();
+                    let offer = positional(2).as_str().unwrap_or_default().to_string();
+                    let has_video = positional(3).as_bool().unwrap_or(false);
+                    let mut state = state.lock().await;
+                    state.seed_chats();
+                    if state.is_group(chat) {
+                        err(&id, "Can only place calls in single chats")
+                    } else {
+                        let answer_me = offer.contains("answer-me");
+                        let call = state.add_call(
+                            account,
+                            chat,
+                            FakeCall {
+                                incoming: false,
+                                has_video,
+                                offer,
+                                accepted: false,
+                                state: "Alerting",
+                            },
+                        );
+                        // An offer that asks for it is answered at once,
+                        // as the other end's device would.
+                        if answer_me {
+                            if let Some(placed) = state.calls.get_mut(&call) {
+                                placed.accepted = true;
+                                placed.state = "Active";
+                            }
+                            state.call_changed(account, call);
+                            state.call_event(
+                                account,
+                                "OutgoingCallAccepted",
+                                call,
+                                &json!({"accept_call_info": "v=0 fake-answer"}),
+                            );
+                        }
+                        ok(&id, &json!(call))
+                    }
+                }
+                "accept_incoming_call" => {
+                    let account = account_id();
+                    let msg = positional(1)
+                        .as_u64()
+                        .and_then(|value| u32::try_from(value).ok())
+                        .unwrap_or_default();
+                    let mut state = state.lock().await;
+                    match state.calls.get_mut(&msg) {
+                        Some(call) if call.incoming => {
+                            call.accepted = true;
+                            call.state = "Active";
+                            state.call_event(
+                                account,
+                                "IncomingCallAccepted",
+                                msg,
+                                &json!({"from_this_device": true}),
+                            );
+                            state.call_changed(account, msg);
+                            ok(&id, &Value::Null)
+                        }
+                        _ => err(&id, "accept_incoming_call is called with a message that is not an incoming call"),
+                    }
+                }
+                "end_call" => {
+                    let account = account_id();
+                    let msg = positional(1)
+                        .as_u64()
+                        .and_then(|value| u32::try_from(value).ok())
+                        .unwrap_or_default();
+                    let mut state = state.lock().await;
+                    let ended = match state.calls.get_mut(&msg) {
+                        None => None,
+                        Some(call) if matches!(call.state, "Alerting" | "Active") => {
+                            call.state = match (call.accepted, call.incoming) {
+                                (true, _) => "Completed",
+                                (false, true) => "Declined",
+                                (false, false) => "Canceled",
+                            };
+                            Some(true)
+                        }
+                        // Ended already: the real core says so in its log
+                        // and does nothing.
+                        Some(_) => Some(false),
+                    };
+                    match ended {
+                        None => err(&id, "end_call is called with a message that is not a call"),
+                        Some(moved) => {
+                            if moved {
+                                state.call_event(account, "CallEnded", msg, &json!({}));
+                                state.call_changed(account, msg);
+                            }
+                            ok(&id, &Value::Null)
+                        }
+                    }
+                }
+                "call_info" => {
+                    let msg = positional(1)
+                        .as_u64()
+                        .and_then(|value| u32::try_from(value).ok())
+                        .unwrap_or_default();
+                    match state.lock().await.calls.get(&msg) {
+                        Some(call) => ok(&id, &call.info()),
+                        None => err(&id, "Attempting to get call state of non-call message"),
                     }
                 }
                 "get_next_event_batch" => {

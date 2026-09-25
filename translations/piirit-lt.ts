@@ -277,6 +277,149 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>CallCenter</name>
+    <message>
+        <source>Incoming call</source>
+        <translation>Gaunamasis skambutis</translation>
+    </message>
+    <message>
+        <source>Decline</source>
+        <translation>Atmesti</translation>
+    </message>
+    <message>
+        <source>Answer</source>
+        <translation>Atsiliepti</translation>
+    </message>
+    <message>
+        <source>Missed call</source>
+        <translation>Praleistas skambutis</translation>
+    </message>
+    <message>
+        <source>Call back</source>
+        <translation>Atskambinti</translation>
+    </message>
+</context>
+<context>
+    <name>CallPage</name>
+    <message>
+        <source>Incoming call</source>
+        <translation>Gaunamasis skambutis</translation>
+    </message>
+    <message>
+        <source>Ringing…</source>
+        <translation>Skambinama…</translation>
+    </message>
+    <message>
+        <source>Connecting…</source>
+        <translation>Jungiamasi…</translation>
+    </message>
+    <message>
+        <source>Reconnecting…</source>
+        <translation>Jungiamasi iš naujo…</translation>
+    </message>
+    <message>
+        <source>Call answered on another device</source>
+        <translation>Atsiliepta kitame įrenginyje</translation>
+    </message>
+    <message>
+        <source>Call failed</source>
+        <translation>Skambutis nepavyko</translation>
+    </message>
+    <message>
+        <source>Missed call</source>
+        <translation>Praleistas skambutis</translation>
+    </message>
+    <message>
+        <source>Declined call</source>
+        <translation>Atmestas skambutis</translation>
+    </message>
+    <message>
+        <source>Call ended</source>
+        <translation>Skambutis baigtas</translation>
+    </message>
+    <message>
+        <source>Decline</source>
+        <extracomment>Declines a call that is ringing. A verb.</extracomment>
+        <translation>Atmesti</translation>
+    </message>
+    <message>
+        <source>End call</source>
+        <extracomment>Ends a call in progress.</extracomment>
+        <translation>Baigti skambutį</translation>
+    </message>
+    <message>
+        <source>Answer</source>
+        <extracomment>Answers a call that is ringing. A verb.</extracomment>
+        <translation>Atsiliepti</translation>
+    </message>
+</context>
+<context>
+    <name>Calls</name>
+    <message>
+        <source>Missed call</source>
+        <translation>Praleistas skambutis</translation>
+    </message>
+    <message>
+        <source>Declined call</source>
+        <translation>Atmestas skambutis</translation>
+    </message>
+    <message>
+        <source>Canceled call</source>
+        <translation>Atšauktas skambutis</translation>
+    </message>
+    <message>
+        <source>Video call</source>
+        <translation>Vaizdo skambutis</translation>
+    </message>
+    <message>
+        <source>Audio call</source>
+        <translation>Garso skambutis</translation>
+    </message>
+    <message>
+        <source>Less than 1 minute</source>
+        <extracomment>How long a call lasted, when it was shorter than a minute.</extracomment>
+        <translation>Mažiau nei 1 minutė</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n minute(s) duration</source>
+        <extracomment>How long a call lasted. %n is whole minutes.</extracomment>
+        <translation>
+            <numerusform>Trukmė %n minutė</numerusform>
+            <numerusform>Trukmė %n minutės</numerusform>
+            <numerusform>Trukmė %n minučių</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Ringing…</source>
+        <translation>Skambinama…</translation>
+    </message>
+    <message>
+        <source>Incoming call</source>
+        <translation>Gaunamasis skambutis</translation>
+    </message>
+</context>
+<context>
+    <name>CallsPage</name>
+    <message>
+        <source>Outgoing call</source>
+        <extracomment>A call this account placed, in a list of calls.</extracomment>
+        <translation>Išeinantis skambutis</translation>
+    </message>
+    <message>
+        <source>Incoming call</source>
+        <translation>Gaunamasis skambutis</translation>
+    </message>
+    <message>
+        <source>Ringing…</source>
+        <translation>Skambinama…</translation>
+    </message>
+    <message>
+        <source>Call %1</source>
+        <extracomment>Places a call. %1 is the name of whoever is called.</extracomment>
+        <translation>Skambinti: %1</translation>
+    </message>
+</context>
+<context>
     <name>CapturePage</name>
     <message>
         <source>The video could not be saved</source>
@@ -860,6 +1003,15 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>No apps yet</source>
         <translation>Kol kas nėra programėlių</translation>
+    </message>
+    <message>
+        <source>Calls</source>
+        <extracomment>The calls made and received in a chat: a tile, and a page heading.</extracomment>
+        <translation>Skambučiai</translation>
+    </message>
+    <message>
+        <source>No calls yet</source>
+        <translation>Skambučių dar nėra</translation>
     </message>
 </context>
 <context>
@@ -1632,6 +1784,23 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>This applies to every profile, whatever a chat&apos;s own disappearing messages setting is.</source>
         <extracomment>Under &quot;Delete messages from device&quot;. &quot;Disappearing messages&quot; is each chat&apos;s own setting of that name.</extracomment>
         <translation>Taikoma kiekvienam profiliui, nepaisant pokalbio išnykstančių žinučių nustatymo.</translation>
+    </message>
+    <message>
+        <source>Calls</source>
+        <extracomment>Whether calls ring. A plural noun, not a verb.</extracomment>
+        <translation>Skambučiai</translation>
+    </message>
+    <message>
+        <source>Show call screen for accepted contacts</source>
+        <translation>Rodyti skambučio ekraną priimtiems kontaktams</translation>
+    </message>
+    <message>
+        <source>Enable calls (experimental)</source>
+        <translation>Įjungti skambučius (eksperimentinė)</translation>
+    </message>
+    <message>
+        <source>Makes and answers voice calls in one-to-one chats. These features may be unstable and may be changed or removed.</source>
+        <translation>Skambina ir atsiliepia balso skambučiais asmeniniuose pokalbiuose. Šios funkcijos gali būti nestabilios ir gali būti pakeistos arba pašalintos.</translation>
     </message>
 </context>
 <context>

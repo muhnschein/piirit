@@ -16,6 +16,8 @@
 )]
 
 mod backup;
+mod call_host;
+mod calls;
 mod capture;
 mod chat;
 mod chat_info;
@@ -46,6 +48,7 @@ mod webxdc;
 mod webxdc_host;
 
 pub use crate::backup::Backup;
+pub use crate::calls::Call;
 pub use crate::capture::Captures;
 pub use crate::chat::{local_day_number, ChatMessages};
 pub use crate::chat_info::ChatInfo;
@@ -108,10 +111,11 @@ pub fn register_qml_types() {
     ) else {
         return;
     };
-    let (Ok(backup), Ok(transports), Ok(second_device)) = (
+    let (Ok(backup), Ok(transports), Ok(second_device), Ok(call)) = (
         std::ffi::CStr::from_bytes_with_nul(b"Backup\0"),
         std::ffi::CStr::from_bytes_with_nul(b"Transports\0"),
         std::ffi::CStr::from_bytes_with_nul(b"SecondDevice\0"),
+        std::ffi::CStr::from_bytes_with_nul(b"Call\0"),
     ) else {
         return;
     };
@@ -134,6 +138,7 @@ pub fn register_qml_types() {
     qmetaobject::qml_register_type::<Backup>(uri, 1, 0, backup);
     qmetaobject::qml_register_type::<Transports>(uri, 1, 0, transports);
     qmetaobject::qml_register_type::<SecondDevice>(uri, 1, 0, second_device);
+    qmetaobject::qml_register_type::<Call>(uri, 1, 0, call);
 }
 pub use models::{
     AccountItem, ChatListItem, ChatListModel, ContactItem, ContactListModel, MessageListItem,

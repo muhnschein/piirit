@@ -281,6 +281,149 @@ Citās grupās, kurās ir bloķēti kontakti, viņu ziņas joprojām būs redzam
     </message>
 </context>
 <context>
+    <name>CallCenter</name>
+    <message>
+        <source>Incoming call</source>
+        <translation>Ienākošs zvans</translation>
+    </message>
+    <message>
+        <source>Decline</source>
+        <translation>Noraidīt</translation>
+    </message>
+    <message>
+        <source>Answer</source>
+        <translation>Atbildēt</translation>
+    </message>
+    <message>
+        <source>Missed call</source>
+        <translation>Neatbildēts zvans</translation>
+    </message>
+    <message>
+        <source>Call back</source>
+        <translation>Atzvanīt</translation>
+    </message>
+</context>
+<context>
+    <name>CallPage</name>
+    <message>
+        <source>Incoming call</source>
+        <translation>Ienākošs zvans</translation>
+    </message>
+    <message>
+        <source>Ringing…</source>
+        <translation>Zvana…</translation>
+    </message>
+    <message>
+        <source>Connecting…</source>
+        <translation>Savienojas…</translation>
+    </message>
+    <message>
+        <source>Reconnecting…</source>
+        <translation>Atjauno savienojumu…</translation>
+    </message>
+    <message>
+        <source>Call answered on another device</source>
+        <translation>Uz zvanu atbildēja citā ierīcē</translation>
+    </message>
+    <message>
+        <source>Call failed</source>
+        <translation>Zvans neizdevās</translation>
+    </message>
+    <message>
+        <source>Missed call</source>
+        <translation>Neatbildēts zvans</translation>
+    </message>
+    <message>
+        <source>Declined call</source>
+        <translation>Noraidīts zvans</translation>
+    </message>
+    <message>
+        <source>Call ended</source>
+        <translation>Zvans beidzās</translation>
+    </message>
+    <message>
+        <source>Decline</source>
+        <extracomment>Declines a call that is ringing. A verb.</extracomment>
+        <translation>Noraidīt</translation>
+    </message>
+    <message>
+        <source>End call</source>
+        <extracomment>Ends a call in progress.</extracomment>
+        <translation>Beigt zvanu</translation>
+    </message>
+    <message>
+        <source>Answer</source>
+        <extracomment>Answers a call that is ringing. A verb.</extracomment>
+        <translation>Atbildēt</translation>
+    </message>
+</context>
+<context>
+    <name>Calls</name>
+    <message>
+        <source>Missed call</source>
+        <translation>Neatbildēts zvans</translation>
+    </message>
+    <message>
+        <source>Declined call</source>
+        <translation>Noraidīts zvans</translation>
+    </message>
+    <message>
+        <source>Canceled call</source>
+        <translation>Atcelts zvans</translation>
+    </message>
+    <message>
+        <source>Video call</source>
+        <translation>Videozvans</translation>
+    </message>
+    <message>
+        <source>Audio call</source>
+        <translation>Balss zvans</translation>
+    </message>
+    <message>
+        <source>Less than 1 minute</source>
+        <extracomment>How long a call lasted, when it was shorter than a minute.</extracomment>
+        <translation>Mazāk par 1 minūti</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n minute(s) duration</source>
+        <extracomment>How long a call lasted. %n is whole minutes.</extracomment>
+        <translation>
+            <numerusform>Ilgums: %n minūte</numerusform>
+            <numerusform>Ilgums: %n minūtes</numerusform>
+            <numerusform>Ilgums: %n minūšu</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Ringing…</source>
+        <translation>Zvana…</translation>
+    </message>
+    <message>
+        <source>Incoming call</source>
+        <translation>Ienākošs zvans</translation>
+    </message>
+</context>
+<context>
+    <name>CallsPage</name>
+    <message>
+        <source>Outgoing call</source>
+        <extracomment>A call this account placed, in a list of calls.</extracomment>
+        <translation>Izejošais zvans</translation>
+    </message>
+    <message>
+        <source>Incoming call</source>
+        <translation>Ienākošs zvans</translation>
+    </message>
+    <message>
+        <source>Ringing…</source>
+        <translation>Zvana…</translation>
+    </message>
+    <message>
+        <source>Call %1</source>
+        <extracomment>Places a call. %1 is the name of whoever is called.</extracomment>
+        <translation>Zvanīt: %1</translation>
+    </message>
+</context>
+<context>
     <name>CapturePage</name>
     <message>
         <source>The video could not be saved</source>
@@ -864,6 +1007,15 @@ Citās grupās, kurās ir bloķēti kontakti, viņu ziņas joprojām būs redzam
     <message>
         <source>No apps yet</source>
         <translation>Vēl nav lietotņu</translation>
+    </message>
+    <message>
+        <source>Calls</source>
+        <extracomment>The calls made and received in a chat: a tile, and a page heading.</extracomment>
+        <translation>Zvani</translation>
+    </message>
+    <message>
+        <source>No calls yet</source>
+        <translation>Vēl nav zvanu</translation>
     </message>
 </context>
 <context>
@@ -1636,6 +1788,23 @@ Citās grupās, kurās ir bloķēti kontakti, viņu ziņas joprojām būs redzam
         <source>This applies to every profile, whatever a chat&apos;s own disappearing messages setting is.</source>
         <extracomment>Under &quot;Delete messages from device&quot;. &quot;Disappearing messages&quot; is each chat&apos;s own setting of that name.</extracomment>
         <translation>Attiecas uz katru profilu neatkarīgi no sarunas pazūdošo ziņu iestatījuma.</translation>
+    </message>
+    <message>
+        <source>Calls</source>
+        <extracomment>Whether calls ring. A plural noun, not a verb.</extracomment>
+        <translation>Zvani</translation>
+    </message>
+    <message>
+        <source>Show call screen for accepted contacts</source>
+        <translation>Rādīt zvana ekrānu apstiprinātiem kontaktiem</translation>
+    </message>
+    <message>
+        <source>Enable calls (experimental)</source>
+        <translation>Iespējot zvanus (eksperimentāli)</translation>
+    </message>
+    <message>
+        <source>Makes and answers voice calls in one-to-one chats. These features may be unstable and may be changed or removed.</source>
+        <translation>Veic balss zvanus un atbild uz tiem divpersonu sarakstēs. Šīs funkcijas var būt nestabilas un var tikt mainītas vai noņemtas.</translation>
     </message>
 </context>
 <context>

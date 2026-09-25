@@ -122,8 +122,17 @@ Page {
     }
 
     // Every kind of thing the chat holds, on a page of its own: pushed
-    // by name, as every page is, and the tile says which kind.
+    // by name, as every page is, and the tile says which kind. Calls have
+    // a page of their own, which is also where a call is placed from.
     function openMedia(kind) {
+        if (kind === "calls") {
+            pageStack.push(Qt.resolvedUrl("CallsPage.qml"), {
+                accountId: page.accountId,
+                chatId: page.chatId,
+                contactName: page.displayName
+            })
+            return
+        }
         pageStack.push(Qt.resolvedUrl("ChatMediaPage.qml"), {
             accountId: page.accountId,
             chatId: page.chatId,
@@ -239,6 +248,7 @@ Page {
                 // `=== true` because dconf hands back `undefined` before it
                 // has read the key.
                 appsAvailable: Settings.webxdcEnabled === true
+                callsAvailable: Settings.callsEnabled === true && chat.can_call
                 onKindRequested: page.openMedia(kind)
             }
 

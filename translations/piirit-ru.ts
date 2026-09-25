@@ -281,6 +281,149 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>CallCenter</name>
+    <message>
+        <source>Incoming call</source>
+        <translation>Входящий звонок</translation>
+    </message>
+    <message>
+        <source>Decline</source>
+        <translation>Отклонить</translation>
+    </message>
+    <message>
+        <source>Answer</source>
+        <translation>Ответить</translation>
+    </message>
+    <message>
+        <source>Missed call</source>
+        <translation>Пропущенный звонок</translation>
+    </message>
+    <message>
+        <source>Call back</source>
+        <translation>Перезвонить</translation>
+    </message>
+</context>
+<context>
+    <name>CallPage</name>
+    <message>
+        <source>Incoming call</source>
+        <translation>Входящий звонок</translation>
+    </message>
+    <message>
+        <source>Ringing…</source>
+        <translation>Вызов…</translation>
+    </message>
+    <message>
+        <source>Connecting…</source>
+        <translation>Соединение…</translation>
+    </message>
+    <message>
+        <source>Reconnecting…</source>
+        <translation>Переподключение…</translation>
+    </message>
+    <message>
+        <source>Call answered on another device</source>
+        <translation>На звонок ответили на другом устройстве</translation>
+    </message>
+    <message>
+        <source>Call failed</source>
+        <translation>Звонок не удался</translation>
+    </message>
+    <message>
+        <source>Missed call</source>
+        <translation>Пропущенный звонок</translation>
+    </message>
+    <message>
+        <source>Declined call</source>
+        <translation>Отклонённый звонок</translation>
+    </message>
+    <message>
+        <source>Call ended</source>
+        <translation>Звонок завершён</translation>
+    </message>
+    <message>
+        <source>Decline</source>
+        <extracomment>Declines a call that is ringing. A verb.</extracomment>
+        <translation>Отклонить</translation>
+    </message>
+    <message>
+        <source>End call</source>
+        <extracomment>Ends a call in progress.</extracomment>
+        <translation>Завершить звонок</translation>
+    </message>
+    <message>
+        <source>Answer</source>
+        <extracomment>Answers a call that is ringing. A verb.</extracomment>
+        <translation>Ответить</translation>
+    </message>
+</context>
+<context>
+    <name>Calls</name>
+    <message>
+        <source>Missed call</source>
+        <translation>Пропущенный звонок</translation>
+    </message>
+    <message>
+        <source>Declined call</source>
+        <translation>Отклонённый звонок</translation>
+    </message>
+    <message>
+        <source>Canceled call</source>
+        <translation>Отменённый звонок</translation>
+    </message>
+    <message>
+        <source>Video call</source>
+        <translation>Видеозвонок</translation>
+    </message>
+    <message>
+        <source>Audio call</source>
+        <translation>Аудиозвонок</translation>
+    </message>
+    <message>
+        <source>Less than 1 minute</source>
+        <extracomment>How long a call lasted, when it was shorter than a minute.</extracomment>
+        <translation>Менее 1 минуты</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n minute(s) duration</source>
+        <extracomment>How long a call lasted. %n is whole minutes.</extracomment>
+        <translation>
+            <numerusform>Длительность: %n минута</numerusform>
+            <numerusform>Длительность: %n минуты</numerusform>
+            <numerusform>Длительность: %n минут</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Ringing…</source>
+        <translation>Вызов…</translation>
+    </message>
+    <message>
+        <source>Incoming call</source>
+        <translation>Входящий звонок</translation>
+    </message>
+</context>
+<context>
+    <name>CallsPage</name>
+    <message>
+        <source>Outgoing call</source>
+        <extracomment>A call this account placed, in a list of calls.</extracomment>
+        <translation>Исходящий звонок</translation>
+    </message>
+    <message>
+        <source>Incoming call</source>
+        <translation>Входящий звонок</translation>
+    </message>
+    <message>
+        <source>Ringing…</source>
+        <translation>Вызов…</translation>
+    </message>
+    <message>
+        <source>Call %1</source>
+        <extracomment>Places a call. %1 is the name of whoever is called.</extracomment>
+        <translation>Позвонить: %1</translation>
+    </message>
+</context>
+<context>
     <name>CapturePage</name>
     <message>
         <source>The video could not be saved</source>
@@ -864,6 +1007,15 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>No apps yet</source>
         <translation>Пока нет приложений</translation>
+    </message>
+    <message>
+        <source>Calls</source>
+        <extracomment>The calls made and received in a chat: a tile, and a page heading.</extracomment>
+        <translation>Звонки</translation>
+    </message>
+    <message>
+        <source>No calls yet</source>
+        <translation>Звонков пока нет</translation>
     </message>
 </context>
 <context>
@@ -1636,6 +1788,23 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>This applies to every profile, whatever a chat&apos;s own disappearing messages setting is.</source>
         <extracomment>Under &quot;Delete messages from device&quot;. &quot;Disappearing messages&quot; is each chat&apos;s own setting of that name.</extracomment>
         <translation>Действует для каждого профиля независимо от настройки исчезающих сообщений в самом чате.</translation>
+    </message>
+    <message>
+        <source>Calls</source>
+        <extracomment>Whether calls ring. A plural noun, not a verb.</extracomment>
+        <translation>Звонки</translation>
+    </message>
+    <message>
+        <source>Show call screen for accepted contacts</source>
+        <translation>Показывать экран вызова для принятых контактов</translation>
+    </message>
+    <message>
+        <source>Enable calls (experimental)</source>
+        <translation>Включить звонки (эксперимент)</translation>
+    </message>
+    <message>
+        <source>Makes and answers voice calls in one-to-one chats. These features may be unstable and may be changed or removed.</source>
+        <translation>Совершает голосовые звонки и отвечает на них в личных чатах. Эти функции могут быть нестабильны, а также изменены или удалены.</translation>
     </message>
 </context>
 <context>

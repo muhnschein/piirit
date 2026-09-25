@@ -147,6 +147,9 @@ SilicaListView {
     /// The reader tapped a webxdc app. Running one is a page, which is
     /// the page's to push.
     signal appRequested(int messageId)
+    /// The reader tapped a call. Which call, and where it stood, so the
+    /// page can tell one still ringing from one to call back.
+    signal callRequested(int messageId, bool outgoing, string callState)
     /// The reader picked an emoji for a message, from the menu or from a
     /// chip already on it. Whether that puts it on or takes it off is the
     /// model's to decide, from what it knows the reader already sent.
@@ -1122,12 +1125,18 @@ SilicaListView {
             webxdcSummary: model.webxdc_summary
             webxdcIcon: model.webxdc_icon
             appsEnabled: root.appsEnabled
+            callState: model.call_state
+            callHasVideo: model.call_has_video
+            callDuration: model.call_duration
             reactions: model.reactions
             onOpenRequested: root.openRequested(fileUrl, fileName, viewType,
                                                 previewWidth)
             onFullTextRequested: root.fullTextRequested(model.message_id,
                                                        model.sender_name)
             onAppRequested: root.appRequested(model.message_id)
+            onCallRequested: root.callRequested(model.message_id,
+                                                model.is_outgoing,
+                                                model.call_state)
             onDownloadRequested: root.downloadRequested(model.message_id)
             onReactionRequested: root.reactionRequested(model.message_id, emoji)
             // A long press on a chip, the download offer or a play

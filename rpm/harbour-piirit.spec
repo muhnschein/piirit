@@ -44,12 +44,15 @@ Summary:    Native SailfishOS client for Delta Chat
 Version:    1.0.0
 Release:    1
 # Piirit's own code is GPL-3.0-or-later; the bundled
-# deltachat-rpc-server is upstream's unmodified MPL-2.0 binary, and the tag
-# describes the contents of the binary package.
+# deltachat-rpc-server is upstream's unmodified MPL-2.0 binary; and the
+# page a call runs in, compiled into the app, is upstream's GPL-3.0
+# calls-webapp with Preact (MIT) and Material Symbols icons (Apache-2.0)
+# built into it (vendor/calls-webapp/SOURCE.md). The tag describes the
+# contents of the binary package.
 %if 0%{?bundle_rpc_server}
-License:    GPL-3.0-or-later AND MPL-2.0
+License:    GPL-3.0-or-later AND MPL-2.0 AND MIT AND Apache-2.0
 %else
-License:    GPL-3.0-or-later
+License:    GPL-3.0-or-later AND MIT AND Apache-2.0
 %endif
 Group:      Qt/Qt
 URL:        https://github.com/muhnschein/piirit
@@ -86,6 +89,10 @@ Requires:   nemo-qml-plugin-dbus-qt5
 # Nemo.Configuration, for the settings that belong to no profile: they
 # live in dconf, so a change on the settings page reaches every open page.
 Requires:   nemo-qml-plugin-configuration-qt5
+# Nemo.KeepAlive, which keeps the phone awake while a call is up and its
+# screen on while one rings (qml/components/CallCenter.qml). The package
+# carries the QML module beside the library.
+Requires:   libkeepalive
 # Sailfish.WebView, for running a webxdc app and for the store it comes
 # from (qml/pages/Webxdc*Page.qml). The only two pages that name the type,
 # so a device without the browser engine loses those and nothing else --
@@ -300,6 +307,12 @@ install -Dm 755 vendor/deltachat-rpc-server/%{_target_cpu}/deltachat-rpc-server 
 # the upstream repository, the exact tag, and the sha256 of every binary.
 install -Dm 644 vendor/deltachat-rpc-server/SOURCE.md \
     %{buildroot}%{appdatadir}/vendor/deltachat-rpc-server/SOURCE.md
+# The same for the page a call runs in: it is compiled into the binary
+# rather than installed (rust/piirit-shim/src/call_host.rs), and this
+# names the GPL-3.0 source it was built from and the notices of what was
+# built into it.
+install -Dm 644 vendor/calls-webapp/SOURCE.md \
+    %{buildroot}%{appdatadir}/vendor/calls-webapp/SOURCE.md
 install -Dm 644 LICENSE \
     %{buildroot}%{appdatadir}/LICENSE
 

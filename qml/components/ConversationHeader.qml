@@ -21,6 +21,7 @@ import Sailfish.Silica 1.0
  * height, and a reader whose fonts are big enough to fill it with the
  * name alone keeps the name rather than getting a header over the first
  * message.
+ *
  */
 Item {
     id: root

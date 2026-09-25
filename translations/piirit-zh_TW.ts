@@ -275,6 +275,147 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>CallCenter</name>
+    <message>
+        <source>Incoming call</source>
+        <translation>來電</translation>
+    </message>
+    <message>
+        <source>Decline</source>
+        <translation>拒接</translation>
+    </message>
+    <message>
+        <source>Answer</source>
+        <translation>接聽</translation>
+    </message>
+    <message>
+        <source>Missed call</source>
+        <translation>未接來電</translation>
+    </message>
+    <message>
+        <source>Call back</source>
+        <translation>回撥</translation>
+    </message>
+</context>
+<context>
+    <name>CallPage</name>
+    <message>
+        <source>Incoming call</source>
+        <translation>來電</translation>
+    </message>
+    <message>
+        <source>Ringing…</source>
+        <translation>正在響鈴…</translation>
+    </message>
+    <message>
+        <source>Connecting…</source>
+        <translation>正在連線…</translation>
+    </message>
+    <message>
+        <source>Reconnecting…</source>
+        <translation>正在重新連線…</translation>
+    </message>
+    <message>
+        <source>Call answered on another device</source>
+        <translation>已在其他裝置上接聽</translation>
+    </message>
+    <message>
+        <source>Call failed</source>
+        <translation>通話失敗</translation>
+    </message>
+    <message>
+        <source>Missed call</source>
+        <translation>未接來電</translation>
+    </message>
+    <message>
+        <source>Declined call</source>
+        <translation>已拒接來電</translation>
+    </message>
+    <message>
+        <source>Call ended</source>
+        <translation>通話已結束</translation>
+    </message>
+    <message>
+        <source>Decline</source>
+        <extracomment>Declines a call that is ringing. A verb.</extracomment>
+        <translation>拒接</translation>
+    </message>
+    <message>
+        <source>End call</source>
+        <extracomment>Ends a call in progress.</extracomment>
+        <translation>結束通話</translation>
+    </message>
+    <message>
+        <source>Answer</source>
+        <extracomment>Answers a call that is ringing. A verb.</extracomment>
+        <translation>接聽</translation>
+    </message>
+</context>
+<context>
+    <name>Calls</name>
+    <message>
+        <source>Missed call</source>
+        <translation>未接來電</translation>
+    </message>
+    <message>
+        <source>Declined call</source>
+        <translation>已拒接來電</translation>
+    </message>
+    <message>
+        <source>Canceled call</source>
+        <translation>已取消通話</translation>
+    </message>
+    <message>
+        <source>Video call</source>
+        <translation>視訊通話</translation>
+    </message>
+    <message>
+        <source>Audio call</source>
+        <translation>語音通話</translation>
+    </message>
+    <message>
+        <source>Less than 1 minute</source>
+        <extracomment>How long a call lasted, when it was shorter than a minute.</extracomment>
+        <translation>少於 1 分鐘</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n minute(s) duration</source>
+        <extracomment>How long a call lasted. %n is whole minutes.</extracomment>
+        <translation>
+            <numerusform>時長：%n 分鐘</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Ringing…</source>
+        <translation>正在響鈴…</translation>
+    </message>
+    <message>
+        <source>Incoming call</source>
+        <translation>來電</translation>
+    </message>
+</context>
+<context>
+    <name>CallsPage</name>
+    <message>
+        <source>Outgoing call</source>
+        <extracomment>A call this account placed, in a list of calls.</extracomment>
+        <translation>撥出通話</translation>
+    </message>
+    <message>
+        <source>Incoming call</source>
+        <translation>來電</translation>
+    </message>
+    <message>
+        <source>Ringing…</source>
+        <translation>正在響鈴…</translation>
+    </message>
+    <message>
+        <source>Call %1</source>
+        <extracomment>Places a call. %1 is the name of whoever is called.</extracomment>
+        <translation>撥打給 %1</translation>
+    </message>
+</context>
+<context>
     <name>CapturePage</name>
     <message>
         <source>The video could not be saved</source>
@@ -852,6 +993,15 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>No apps yet</source>
         <translation>尚無應用程式</translation>
+    </message>
+    <message>
+        <source>Calls</source>
+        <extracomment>The calls made and received in a chat: a tile, and a page heading.</extracomment>
+        <translation>通話</translation>
+    </message>
+    <message>
+        <source>No calls yet</source>
+        <translation>尚無通話</translation>
     </message>
 </context>
 <context>
@@ -1620,6 +1770,23 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>This applies to every profile, whatever a chat&apos;s own disappearing messages setting is.</source>
         <extracomment>Under &quot;Delete messages from device&quot;. &quot;Disappearing messages&quot; is each chat&apos;s own setting of that name.</extracomment>
         <translation>適用於所有個人檔案，無論各聊天本身的閱後即焚訊息設定為何。</translation>
+    </message>
+    <message>
+        <source>Calls</source>
+        <extracomment>Whether calls ring. A plural noun, not a verb.</extracomment>
+        <translation>通話</translation>
+    </message>
+    <message>
+        <source>Show call screen for accepted contacts</source>
+        <translation>為已接受的聯絡人顯示通話畫面</translation>
+    </message>
+    <message>
+        <source>Enable calls (experimental)</source>
+        <translation>啟用通話（實驗性）</translation>
+    </message>
+    <message>
+        <source>Makes and answers voice calls in one-to-one chats. These features may be unstable and may be changed or removed.</source>
+        <translation>在一對一聊天中撥打和接聽語音通話。這些功能可能不穩定，並且可能被變更或移除。</translation>
     </message>
 </context>
 <context>
