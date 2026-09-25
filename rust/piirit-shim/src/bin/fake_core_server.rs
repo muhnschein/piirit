@@ -138,6 +138,9 @@ struct State {
     configuring: std::collections::BTreeSet<u32>,
     /// Accounts whose ongoing process was asked to stop.
     stopped: std::collections::BTreeSet<u32>,
+    /// IO was stopped for every account, and not started since. The real
+    /// core then says it is not connected and reports no relays.
+    io_stopped: bool,
     /// Seconds after which a chat's messages disappear, by chat.
     timers: std::collections::BTreeMap<u32, u32>,
     /// Config values per account, so a set can be read back.
@@ -1533,12 +1536,14 @@ async fn serve() {
                     ok(&id, &json!(ids))
                 }
                 "start_io"
-                | "start_io_for_all_accounts"
-                | "stop_io_for_all_accounts"
                 | "maybe_network"
                 | "markseen_msgs"
                 | "set_chat_visibility"
                 | "resend_messages" => ok(&id, &Value::Null),
+                "start_io_for_all_accounts" | "stop_io_for_all_accounts" => {
+                    state.lock().await.io_stopped = method == "stop_io_for_all_accounts";
+                    ok(&id, &Value::Null)
+                }
                 "stop_ongoing_process" => {
                     state.lock().await.stopped.insert(account_id());
                     ok(&id, &Value::Null)
@@ -1717,7 +1722,15 @@ async fn serve() {
                 // reads them: a band, and a report written for a web view
                 // with the quota on a bar in it -- the shape the real core
                 // writes, pinned in deltachat-jsonrpc/tests/real_server.rs.
-                "get_connectivity" => ok(&id, &json!(4000)),
+                // With IO stopped the real core is not connected, and its
+                // report is that and nothing else: no relay is in it.
+                "get_connectivity" => {
+                    let band = if state.lock().await.io_stopped { 1000 } else { 4000 };
+                    ok(&id, &json!(band))
+                }
+                "get_connectivity_html" if state.lock().await.io_stopped => {
+                    ok(&id, &json!("<h3>Not connected</h3>"))
+                }
                 "get_connectivity_html" => {
                     // The core reports every transport, oldest first,
                     // each with its own quota. A profile set up twice

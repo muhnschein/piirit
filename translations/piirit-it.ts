@@ -1234,6 +1234,10 @@ Gli altri gruppi con contatti bloccati continueranno a visualizzare i loro messa
         <source>If read receipts are disabled, you won&apos;t be able to see read receipts from others.</source>
         <translation>Se le conferme di lettura sono disattivate, non potrai vedere le conferme di lettura degli altri.</translation>
     </message>
+    <message>
+        <source>Not connected</source>
+        <translation>Non connesso</translation>
+    </message>
 </context>
 <context>
     <name>ProfileSetupPage</name>

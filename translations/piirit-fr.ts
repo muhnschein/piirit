@@ -1234,6 +1234,10 @@ Vous continuerez à voir les messages des contacts bloqués dans les autres grou
         <source>If read receipts are disabled, you won&apos;t be able to see read receipts from others.</source>
         <translation>Si les accusés de lecture sont désactivés, vous ne pourrez pas voir les accusés de lecture des autres.</translation>
     </message>
+    <message>
+        <source>Not connected</source>
+        <translation>Non connecté</translation>
+    </message>
 </context>
 <context>
     <name>ProfileSetupPage</name>

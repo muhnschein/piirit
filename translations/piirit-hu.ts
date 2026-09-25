@@ -1223,6 +1223,10 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>If read receipts are disabled, you won&apos;t be able to see read receipts from others.</source>
         <translation>Ha az olvasási visszaigazolásokat letiltja, akkor Ön sem fogja látni mások olvasási visszaigazolásait.</translation>
     </message>
+    <message>
+        <source>Not connected</source>
+        <translation>Nincs kapcsolat</translation>
+    </message>
 </context>
 <context>
     <name>ProfileSetupPage</name>

@@ -1234,6 +1234,10 @@ In anderen Gruppen mit blockierten Kontakten werden deren Nachrichten weiterhin 
         <source>If read receipts are disabled, you won&apos;t be able to see read receipts from others.</source>
         <translation>Wenn Lesebestätigungen ausgeschaltet sind, werden auch keine Lesebestätigungen von anderen angezeigt.</translation>
     </message>
+    <message>
+        <source>Not connected</source>
+        <translation>Nicht verbunden</translation>
+    </message>
 </context>
 <context>
     <name>ProfileSetupPage</name>

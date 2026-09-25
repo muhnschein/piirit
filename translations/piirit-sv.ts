@@ -1230,6 +1230,10 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>If read receipts are disabled, you won&apos;t be able to see read receipts from others.</source>
         <translation>Om läskvittenser är avstängda kan du inte se läskvittenser från andra.</translation>
     </message>
+    <message>
+        <source>Not connected</source>
+        <translation>Inte ansluten</translation>
+    </message>
 </context>
 <context>
     <name>ProfileSetupPage</name>

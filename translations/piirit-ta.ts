@@ -1230,6 +1230,10 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>If read receipts are disabled, you won&apos;t be able to see read receipts from others.</source>
         <translation>வாசிப்பு ரசீதுகள் முடக்கப்பட்டிருந்தால், மற்றவர்களிடமிருந்து வாசிப்பு ரசீதுகளை நீங்கள்</translation>
     </message>
+    <message>
+        <source>Not connected</source>
+        <translation>இணைக்கப்படவில்லை</translation>
+    </message>
 </context>
 <context>
     <name>ProfileSetupPage</name>

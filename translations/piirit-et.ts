@@ -1234,6 +1234,10 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
         <source>If read receipts are disabled, you won&apos;t be able to see read receipts from others.</source>
         <translation>Kui sinu lugemisteatised on lülitatud välja, siis ka sina ei näe teiste lugemisteatisi.</translation>
     </message>
+    <message>
+        <source>Not connected</source>
+        <translation>Pole ühendatud</translation>
+    </message>
 </context>
 <context>
     <name>ProfileSetupPage</name>

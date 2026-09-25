@@ -142,6 +142,13 @@ const PROBE_QML: &str = r"
             item.currentIndex = parseInt(index)
             return 'ok'
         }
+        // The phone without a network long enough for the window to
+        // stop IO, and the relays read again.
+        function offline() {
+            core.stop_all_account_io()
+            findIn(loader.item, 'transports').reload()
+            return 'ok'
+        }
         function pageProperty(property) { return '' + loader.item[property] }
         function subProperty(property) { return '' + sub.item[property] }
         function navigation() { return probe.pageStack.log }
@@ -408,6 +415,19 @@ fn the_relays_are_listed_removed_and_added() {
         );
         record!("navigation", call!("navigation"));
         record!("pushed-account", call!("pushedAccount"));
+        record!("offline", call!("offline"));
+    });
+
+    // Not connected at all: the core's report has no relay in it.
+    single_shot(Duration::from_secs(13), move || unsafe {
+        record!(
+            "offline-status",
+            get_in!("relayReport0", "reportStatus", "text")
+        );
+        record!(
+            "offline-dot",
+            get_in!("relayReport1", "reportDot", "color")
+        );
         (*engine_ptr).quit();
     });
 
@@ -446,6 +466,13 @@ fn the_relays_are_listed_removed_and_added() {
     );
     assert_removed(&value, &calls, &context);
     assert_added(&value, &calls, &navigation, &pushed_account, &context);
+    assert_eq!(value("offline"), "ok", "{context}");
+    assert_eq!(
+        (value("offline-status").as_str(), value("offline-dot").as_str()),
+        ("Not connected", "#f33b2d"),
+        "a profile with IO stopped showed its relays as still being \
+         checked, for as long as the phone stays offline. {context}"
+    );
 }
 
 /// The relay with the profile's own address first, the other with its

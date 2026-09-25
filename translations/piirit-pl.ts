@@ -1241,6 +1241,10 @@ Wiadomości innych grup z zablokowanymi kontaktami nadal będą wyświetlane.</t
         <source>If read receipts are disabled, you won&apos;t be able to see read receipts from others.</source>
         <translation>Jeśli potwierdzenia odczytu zostaną wyłączone, nie będzie można zobaczyć potwierdzeń odczytu od innych osób.</translation>
     </message>
+    <message>
+        <source>Not connected</source>
+        <translation>Brak połączenia</translation>
+    </message>
 </context>
 <context>
     <name>ProfileSetupPage</name>

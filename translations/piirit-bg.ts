@@ -1230,6 +1230,10 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>If read receipts are disabled, you won&apos;t be able to see read receipts from others.</source>
         <translation>Ако известията за прочетена поща са забранени, няма да може да виждате известията, идващи от други потребители.</translation>
     </message>
+    <message>
+        <source>Not connected</source>
+        <translation>Няма връзка</translation>
+    </message>
 </context>
 <context>
     <name>ProfileSetupPage</name>

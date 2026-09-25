@@ -1241,6 +1241,10 @@ Správy od zablokovaných kontaktov v ostatných skupinách sa budú naďalej zo
         <source>If read receipts are disabled, you won&apos;t be able to see read receipts from others.</source>
         <translation>Ak sú potvrdenia o prečítaní zakázané, neuvidíte ani potvrdenia o prečítaní od ostatných.</translation>
     </message>
+    <message>
+        <source>Not connected</source>
+        <translation>Nepripojené</translation>
+    </message>
 </context>
 <context>
     <name>ProfileSetupPage</name>

@@ -1248,6 +1248,10 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
         <source>If read receipts are disabled, you won&apos;t be able to see read receipts from others.</source>
         <translation>Če so potrdila o branju izklopljena, tudi potrdil drugih ne boš videl.</translation>
     </message>
+    <message>
+        <source>Not connected</source>
+        <translation>Ni povezave</translation>
+    </message>
 </context>
 <context>
     <name>ProfileSetupPage</name>

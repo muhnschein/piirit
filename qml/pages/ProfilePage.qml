@@ -550,9 +550,12 @@ Page {
                             font.pixelSize: Theme.fontSizeSmall
                             color: Theme.highlightColor
                             // The core's own words, when it has said any.
+                            // A profile not connected at all -- IO
+                            // stopped -- has none to say about any relay.
                             textFormat: Text.PlainText
                             text: model.status.length > 0 ? model.status
-                                                          : qsTr("Checking the connection")
+                                  : model.offline ? qsTr("Not connected")
+                                  : qsTr("Checking the connection")
                         }
                     }
 

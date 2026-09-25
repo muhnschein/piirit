@@ -1234,6 +1234,10 @@ Mensagens de contactos bloqueados não serão ocultadas noutros grupos.</transla
         <source>If read receipts are disabled, you won&apos;t be able to see read receipts from others.</source>
         <translation>Se as confirmações de leitura estiverem desactivadas, não poderá ver os recibos de leitura de outras pessoas.</translation>
     </message>
+    <message>
+        <source>Not connected</source>
+        <translation>Sem ligação</translation>
+    </message>
 </context>
 <context>
     <name>ProfileSetupPage</name>
