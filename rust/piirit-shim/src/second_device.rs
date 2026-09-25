@@ -153,10 +153,15 @@ pub struct SecondDevice {
     /// Nothing was offered, in the core's own words.
     pub error: qt_signal!(message: QString),
 
-    /// This offer is over as far as the page is concerned -- taken,
-    /// stopped, or reported -- so whatever the provider answers next has
-    /// nothing left to say.
-    settled: bool,
+    /// Counts offers, and moves on once one is over as far as the page is
+    /// concerned -- taken, stopped, or reported -- so whatever a provider
+    /// answers after that, the code it shows or the way it ended, lands
+    /// nowhere. Per offer rather than a flag the next offer clears: a
+    /// stopped provider answers a second after the stop (`SETTLE`), by
+    /// when the reader may have asked for the code again, and its answer
+    /// then ended the new offer on the page with the new provider still
+    /// running in the core, where nothing could stop it any more.
+    generation: u64,
 }
 
 impl SecondDevice {
@@ -178,7 +183,8 @@ impl SecondDevice {
             self.error(QString::from("not started"));
             return;
         };
-        self.settled = false;
+        self.generation = self.generation.wrapping_add(1);
+        let generation = self.generation;
         self.set_permille(0);
         self.set_code(QString::default());
         self.set_running(true);
@@ -187,10 +193,10 @@ impl SecondDevice {
         let ended = queued_callback(move |result: Result<(), String>| {
             let Some(this) = ptr.as_pinned() else { return };
             // The offer is already over here: the transfer was reported
-            // done, or the reader stopped it. Either way the provider
-            // answering afterwards -- `Ok`, or its refusal of the stop
-            // -- is not news.
-            if this.borrow().settled {
+            // done, or the reader stopped it -- and may have asked for
+            // another since. Either way the provider answering afterwards
+            // -- `Ok`, or its refusal of the stop -- is not news.
+            if this.borrow().generation != generation {
                 return;
             }
             this.borrow_mut().end();
@@ -210,7 +216,7 @@ impl SecondDevice {
             // refused outright, or the reader gave up while the core was
             // still preparing -- and a code put up after that belongs to
             // nothing.
-            if !this.borrow().running {
+            if this.borrow().generation != generation {
                 return;
             }
             match result {
@@ -292,7 +298,7 @@ impl SecondDevice {
     /// worth reading any more, and whatever answers next has nothing
     /// left to report.
     fn end(&mut self) {
-        self.settled = true;
+        self.generation = self.generation.wrapping_add(1);
         self.set_running(false);
         // The code goes with the provider: what is left on screen after
         // it has ended is a code nothing is listening on any more.
