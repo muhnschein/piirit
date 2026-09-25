@@ -34,13 +34,22 @@ Page {
     // The core has said who is blocked, whatever that was. An empty list
     // before then is no answer rather than nobody: see NewChatPage.
     property bool blockListLoaded: false
+    // Or it would not say: the error is on the banner, and the list is
+    // blank for want of an answer -- which is no reason to stop anyone
+    // being blocked from here.
+    property bool blockListFailed: false
 
     ContactList {
         id: blockList
         objectName: "blocked"
         account_id: page.accountId
         blocked: true
-        onError: page.errorMessage = message
+        onError: {
+            page.errorMessage = message
+            if (!page.blockListLoaded) {
+                page.blockListFailed = true
+            }
+        }
         // Emitted once the rows have been set, whether there turned out
         // to be any or none.
         onRows_changed: page.blockListLoaded = true
@@ -109,11 +118,12 @@ Page {
         // The next one to block. Not until the core has answered, as
         // with the placeholder: drawn under a list still empty, the plus
         // would drop below the rows when they arrive, and a tap aimed at
-        // it would land on the first of them.
+        // it would land on the first of them. An answer that is a failure
+        // counts: it is the only way on this page to block anyone.
         footer: PlusRow {
             objectName: "blockSomeone"
             width: listView.width
-            visible: page.blockListLoaded
+            visible: page.blockListLoaded || page.blockListFailed
             //: Opens the contacts, to pick one to block.
             text: qsTr("Block contact")
             onClicked: pageStack.push(Qt.resolvedUrl("BlockContactPage.qml"), {

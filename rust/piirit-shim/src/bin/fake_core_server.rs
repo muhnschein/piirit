@@ -1665,6 +1665,13 @@ async fn serve() {
                 // A name of the reader's own for a contact; empty puts the
                 // contact's own back. Announced the way the real core
                 // announces any contact change.
+                // A core that will not say who is blocked, for the
+                // accounts a test names.
+                "get_blocked_contacts"
+                    if env_ids("PIIRIT_FAKE_BLOCKED_FAIL").contains(&u64::from(account_id())) =>
+                {
+                    err(&id, "the block list could not be read")
+                }
                 // The other contact list the core keeps: the blocked
                 // ones, which no flag on `get_contacts` brings back.
                 "get_blocked_contacts" => {
