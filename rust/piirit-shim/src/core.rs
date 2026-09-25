@@ -88,6 +88,11 @@ pub const HANDLED_EVENT_KINDS: &[&str] = &[
 /// How long the app waits for the server to go at exit.
 const SHUTDOWN_TIMEOUT: Duration = Duration::from_secs(3);
 
+/// How long the app waits at exit, before stopping the server, for a call
+/// still up to be ended and the other end told; see
+/// `call_host::end_all`. Only spent with a call up.
+const CALL_END_TIMEOUT: Duration = Duration::from_secs(3);
+
 /// Which server binary to run: `--rpc-server <path>` or
 /// `--rpc-server=<path>` from `args`, else `PIIRIT_RPC_SERVER` from
 /// `env`, else [`BUNDLED_SERVER`].
@@ -138,6 +143,11 @@ pub fn server_pid() -> Option<u32> {
 /// exit. The server went anyway, on its stdin closing, but that was its
 /// courtesy rather than this app's doing. Bounded, so a server that will
 /// not die cannot hold the app open.
+///
+/// A call still up is ended first, and the other end told; see
+/// `call_host::end_all`. The window is still there when this runs, so it
+/// is the one place that can happen: the call's host goes with the
+/// window, and by then the server would be gone.
 pub fn shutdown() {
     let Some((rpc, runtime)) = CONNECTION
         .lock()
@@ -148,10 +158,11 @@ pub fn shutdown() {
     };
     let (done_tx, done_rx) = std::sync::mpsc::channel::<()>();
     runtime.spawn(async move {
+        let _ = tokio::time::timeout(CALL_END_TIMEOUT, crate::call_host::end_all()).await;
         let _ = rpc.shutdown().await;
         let _ = done_tx.send(());
     });
-    let _ = done_rx.recv_timeout(SHUTDOWN_TIMEOUT);
+    let _ = done_rx.recv_timeout(CALL_END_TIMEOUT + SHUTDOWN_TIMEOUT);
 }
 
 /// The last few lines the server wrote to stderr, as one message, or
@@ -792,6 +803,9 @@ impl DeltaChatCore {
         runtime.spawn(async move {
             let (mut events, _handle) = spawn_event_loop(rpc.clone());
             while let Some(event) = events.recv().await {
+                // Here rather than in `relay`, which is the Qt thread's:
+                // it is read at exit, once the Qt thread has stopped.
+                crate::call_host::note_sent(json::str_at(&event.event, "kind"));
                 emit(event);
             }
             // The stream ends only when the transport does (see

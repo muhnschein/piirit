@@ -39,8 +39,8 @@
 
 use std::collections::VecDeque;
 use std::net::{Ipv4Addr, SocketAddr};
-use std::sync::atomic::{AtomicBool, AtomicU32, Ordering};
-use std::sync::{Arc, Mutex};
+use std::sync::atomic::{AtomicBool, AtomicU32, AtomicU64, Ordering};
+use std::sync::{Arc, Mutex, Weak};
 use std::time::Duration;
 
 use deltachat_jsonrpc::RpcClient;
@@ -81,6 +81,17 @@ const POLICY: &str = "default-src 'self'; \
 /// none. The bridge asks again at once, so this only decides how often a
 /// quiet call costs a request.
 const COMMAND_WAIT: Duration = Duration::from_secs(20);
+
+/// Every host serving a call, for [`end_all`]. Weak, so a host that has
+/// gone -- and whose call has been ended -- is not kept here.
+static HOSTS: Mutex<Vec<Weak<Shared>>> = Mutex::new(Vec::new());
+
+/// How many messages the core has said it is done sending, one way or
+/// the other; see [`note_sent`].
+static SENT: AtomicU64 = AtomicU64::new(0);
+
+/// How often [`end_all`] looks for the message ending a call to have gone.
+const SENT_POLL: Duration = Duration::from_millis(50);
 
 /// What the host was asked to serve.
 pub(crate) struct Setup {
@@ -144,8 +155,15 @@ struct Shared {
     /// ended as soon as it lands, rather than left ringing at the other
     /// end for a call nobody here is holding.
     ending: AtomicBool,
-    /// Set once `end_call` has gone out, so it goes out once.
+    /// Set once `end_call` has gone out, so it goes out once -- or once
+    /// the core is known not to need it; see [`Host::settle`].
     ended: AtomicBool,
+    /// Set once `end_call` has gone out from here: the core has a message
+    /// to send the other end.
+    told: AtomicBool,
+    /// Held while `end_call` is on its way, so that whoever asks second
+    /// -- the app closing just after a hang-up -- waits for the answer.
+    ending_call: tokio::sync::Mutex<()>,
     /// Set once the page has asked for the call to be placed. The page
     /// asks once; a second ask would be a second call.
     placing: AtomicBool,
@@ -165,10 +183,12 @@ impl Shared {
 
     /// Tell the core the call is over, once, if there is a call to end.
     async fn end(&self) {
+        let _once = self.ending_call.lock().await;
         let message_id = self.message_id.load(Ordering::SeqCst);
         if message_id == 0 || self.ended.swap(true, Ordering::SeqCst) {
             return;
         }
+        self.told.store(true, Ordering::SeqCst);
         let _: Result<serde_json::Value, _> = self
             .rpc
             .call("end_call", (self.account_id, message_id))
@@ -261,11 +281,20 @@ pub(crate) async fn start(
         running: AtomicBool::new(true),
         ending: AtomicBool::new(false),
         ended: AtomicBool::new(false),
+        told: AtomicBool::new(false),
+        ending_call: tokio::sync::Mutex::new(()),
         placing: AtomicBool::new(false),
         commands: Mutex::new(VecDeque::new()),
         changed: Notify::new(),
         report,
     });
+    {
+        let mut hosts = HOSTS
+            .lock()
+            .unwrap_or_else(std::sync::PoisonError::into_inner);
+        hosts.retain(|host| host.strong_count() > 0);
+        hosts.push(Arc::downgrade(&shared));
+    }
     let task = tokio::spawn(accept(listener, Arc::clone(&shared)));
     Ok(Host {
         page,
@@ -273,6 +302,52 @@ pub(crate) async fn start(
         task,
         runtime: Handle::current(),
     })
+}
+
+/// End every call still hosted here, and give the core the moment it
+/// needs to tell the other end: for the app's last moment, before the
+/// core is stopped. Bounded by the caller.
+///
+/// The reader closing the app mid-call takes the call with it, but the
+/// core is stopped before anything on the Qt side lets go of its host --
+/// so this is where the core hears of it, rather than nowhere. A call
+/// that is only ringing here has no host and is left alone: the app
+/// closing is not a decline, and another device may yet answer it.
+///
+/// `end_call` only queues the message that tells the other end, and
+/// sending it is the core's own work, which stopping the core cuts off.
+/// So once a call has been ended this waits for the core to say it has
+/// sent a message -- without it the other end rings on, or talks to
+/// nobody, until its own timeout.
+pub(crate) async fn end_all() {
+    let sent_before = SENT.load(Ordering::SeqCst);
+    let hosts: Vec<Arc<Shared>> = HOSTS
+        .lock()
+        .unwrap_or_else(std::sync::PoisonError::into_inner)
+        .iter()
+        .filter_map(Weak::upgrade)
+        .collect();
+    let mut told = false;
+    for shared in hosts {
+        // A call still being placed is ended as soon as it lands.
+        shared.ending.store(true, Ordering::SeqCst);
+        shared.end().await;
+        told |= shared.told.load(Ordering::SeqCst);
+    }
+    if !told {
+        return;
+    }
+    while SENT.load(Ordering::SeqCst) == sent_before {
+        tokio::time::sleep(SENT_POLL).await;
+    }
+}
+
+/// One core event, looked at for whether the core is done sending a
+/// message: sent, delivered, or given up on. What [`end_all`] waits for.
+pub(crate) fn note_sent(kind: &str) {
+    if matches!(kind, "SmtpMessageSent" | "MsgDelivered" | "MsgFailed") {
+        SENT.fetch_add(1, Ordering::SeqCst);
+    }
 }
 
 /// A page load is a handful of connections at once, and one of them is

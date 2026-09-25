@@ -2827,6 +2827,16 @@ async fn serve() {
                             if moved {
                                 state.call_event(account, "CallEnded", msg, &json!({}));
                                 state.call_changed(account, msg);
+                                // The hidden message telling the other
+                                // end, sent: what the app waits for when
+                                // it ends a call on its way out.
+                                state.events.push_back(json!({
+                                    "contextId": account,
+                                    "event": {
+                                        "kind": "SmtpMessageSent",
+                                        "msg": "Message len=512 was SMTP-sent to 1 recipients.",
+                                    },
+                                }));
                             }
                             ok(&id, &Value::Null)
                         }
