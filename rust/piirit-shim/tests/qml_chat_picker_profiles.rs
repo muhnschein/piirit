@@ -173,6 +173,29 @@ fn the_picker_offers_the_other_profiles_only_when_asked() {
         // Not asked for: no choice, whatever there is to choose from.
         record!("load-plain", load!(r#"{"accountId": 1}"#));
         record!("plain-hidden", get!("pickerProfileCombo", "visible"));
+
+        // Opened on a profile deleted since -- a quick action's -- with
+        // the profile the settings were opened from to fall back on.
+        record!(
+            "load-gone",
+            load!(r#"{"accountId": 9, "profileChoice": true, "fallbackAccountId": 2}"#)
+        );
+    });
+
+    single_shot(Duration::from_secs(5), move || unsafe {
+        record!("gone-on", call!("page", QString::from("accountId")));
+        record!("gone-list", get!("pickerChats", "account_id"));
+        record!("gone-loaded", call!("page", QString::from("chatsLoaded")));
+        record!("gone-error", call!("page", QString::from("errorMessage")));
+        // With nothing to fall back on, the first profile there is.
+        record!(
+            "load-gone-first",
+            load!(r#"{"accountId": 9, "profileChoice": true}"#)
+        );
+    });
+
+    single_shot(Duration::from_secs(6), move || unsafe {
+        record!("gone-first-on", call!("page", QString::from("accountId")));
         (*engine_ptr).quit();
     });
 
@@ -240,4 +263,18 @@ fn the_picker_offers_the_other_profiles_only_when_asked() {
         "false",
         "a picker not asked for a choice of profile offers one. {context}"
     );
+    assert_eq!(value("load-gone"), "ok", "{context}");
+    assert_eq!(
+        (
+            value("gone-on").as_str(),
+            value("gone-list").as_str(),
+            value("gone-loaded").as_str(),
+            value("gone-error").as_str()
+        ),
+        ("2", "2", "true", ""),
+        "a picker opened on a deleted profile stayed on it: an error over \
+         an empty list, and no way to turn it with one profile left. \
+         {context}"
+    );
+    assert_eq!(value("gone-first-on"), "1", "{context}");
 }
