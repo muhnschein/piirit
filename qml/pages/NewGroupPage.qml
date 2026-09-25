@@ -23,6 +23,15 @@ import Piirit 1.0
 Page {
     id: page
 
+    // A move the core asked for, held until this page is the one on
+    // screen: a call's page may be over it, and a move made then would
+    // take that page instead (PendingNavigation.qml).
+    PendingNavigation {
+        id: navigation
+        stack: pageStack
+        ready: page.status === PageStatus.Active
+    }
+
     property int accountId
     property string errorMessage: ""
     // True from tapping create until the core answers, so a second tap
@@ -73,7 +82,7 @@ Page {
         }
         onChat_ready: {
             page.creating = false
-            pageStack.replace(Qt.resolvedUrl("ConversationPage.qml"), {
+            navigation.replace(Qt.resolvedUrl("ConversationPage.qml"), {
                 accountId: page.accountId,
                 chatId: chat_id,
                 chatName: nameField.text.trim()

@@ -234,6 +234,13 @@ pub struct TransportItem {
     /// "Connected", "Connecting…", "Not connected: ..." -- in whatever
     /// language the core is in. Empty before it has said.
     pub status: QString,
+    /// The profile is not connected at all, and the report says nothing
+    /// about this relay: the core writes its relays into the report only
+    /// while it is connecting or connected, and with IO stopped -- no
+    /// network, or the profile being offered to a second device -- it
+    /// writes "Not connected" and nothing else. The dot is red, and the
+    /// words are the page's own, rather than a check that never comes.
+    pub offline: bool,
     /// The relay has said how full the mailbox is. The fields under
     /// this mean nothing while it is false: a relay need not report a
     /// quota, and the report is written only once the relay has been

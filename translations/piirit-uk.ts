@@ -1241,6 +1241,10 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>If read receipts are disabled, you won&apos;t be able to see read receipts from others.</source>
         <translation>Якщо сповіщення про прочитання відключені, Ви не будете бачити підтвердження прочитання повідомлень іншими користувачами.</translation>
     </message>
+    <message>
+        <source>Not connected</source>
+        <translation>Немає з&apos;єднання</translation>
+    </message>
 </context>
 <context>
     <name>ProfileSetupPage</name>

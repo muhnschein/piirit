@@ -1230,6 +1230,10 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>If read receipts are disabled, you won&apos;t be able to see read receipts from others.</source>
         <translation>చదివే రసీదులను నిలిపివేస్తే, మీరు ఇతరుల నుండి చదివే రసీదులను చూడలేరు.</translation>
     </message>
+    <message>
+        <source>Not connected</source>
+        <translation>కనెక్ట్ కాలేదు</translation>
+    </message>
 </context>
 <context>
     <name>ProfileSetupPage</name>

@@ -26,6 +26,15 @@ import Piirit 1.0
 Page {
     id: page
 
+    // A move the core asked for, held until this page is the one on
+    // screen: a call's page may be over it, and a move made then would
+    // take that page instead (PendingNavigation.qml).
+    PendingNavigation {
+        id: navigation
+        stack: pageStack
+        ready: page.status === PageStatus.Active
+    }
+
     property int accountId
     property int messageId
 
@@ -90,7 +99,7 @@ Page {
         onError: page.errorMessage = message
         // The message is gone -- deleted here or on another device --
         // so there is nothing left to run.
-        onGone: pageStack.pop()
+        onGone: navigation.pop()
         // The app has handed a file over. It is kept, not put into a
         // chat: see `offer` below.
         onHanded_over: page.offer(file_path, text)

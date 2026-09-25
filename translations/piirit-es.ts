@@ -1230,6 +1230,10 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>If read receipts are disabled, you won&apos;t be able to see read receipts from others.</source>
         <translation>Si las notificaciones de lectura están desactivadas, no podrás comprobar cuándo se han leído tus mensajes.</translation>
     </message>
+    <message>
+        <source>Not connected</source>
+        <translation>Sin conexión</translation>
+    </message>
 </context>
 <context>
     <name>ProfileSetupPage</name>

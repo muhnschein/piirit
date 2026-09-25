@@ -58,6 +58,15 @@ Page {
     // list, leaving a profile made and nothing shown for it.
     backNavigation: !busy
 
+    // A move the core asked for, held until this page is the one on
+    // screen: a call's page may be over it, and a move made then would
+    // take that page instead (PendingNavigation.qml).
+    PendingNavigation {
+        id: navigation
+        stack: pageStack
+        ready: page.status === PageStatus.Active
+    }
+
     function begin() {
         if (page.started) {
             return
@@ -93,8 +102,8 @@ Page {
                 return
             }
             page.busy = false
-            pageStack.replaceAbove(null, Qt.resolvedUrl("ChatListPage.qml"),
-                                   { accountId: account_id })
+            navigation.replaceAbove(null, Qt.resolvedUrl("ChatListPage.qml"),
+                                    { accountId: account_id })
         }
 
         onProfile_error: {

@@ -30,6 +30,15 @@ import Piirit 1.0
 Page {
     id: page
 
+    // A move the core asked for, held until this page is the one on
+    // screen: a call's page may be over it, and a move made then would
+    // take that page instead (PendingNavigation.qml).
+    PendingNavigation {
+        id: navigation
+        stack: pageStack
+        ready: page.status === PageStatus.Active
+    }
+
     /// The cover offers no quick actions while this is up: a jump away
     /// would drop a code halfway through being shown or read. See
     /// piirit.qml.
@@ -53,8 +62,8 @@ Page {
         onInvite_ready: page.myInvite = link
         onChat_ready: {
             page.joining = false
-            pageStack.replaceAbove(pageStack.previousPage(page),
-                                   Qt.resolvedUrl("ConversationPage.qml"), {
+            navigation.replaceAbove(pageStack.previousPage(page),
+                                    Qt.resolvedUrl("ConversationPage.qml"), {
                 accountId: page.accountId,
                 chatId: chat_id,
                 chatName: qsTr("Chat")

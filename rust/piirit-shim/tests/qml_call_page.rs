@@ -130,6 +130,11 @@ const PROBE_QML: &str = r"
             }))
             return centerLoader.item.call.state
         }
+        // Declined here, from anywhere: a notification's button.
+        function decline() {
+            centerLoader.item.call.hang_up()
+            return centerLoader.item.call.state
+        }
         // The page going, as a pop takes it.
         function dropPage() { pageHolder.setSource('', {}); return 'ok' }
     }
@@ -215,6 +220,8 @@ fn a_call_rings_is_answered_on_its_page_and_ends_with_the_platform_told() {
         record!("ringing-buttons", get!("ringingButtons", "visible"));
         record!("hang-up-button", get!("hangUpButton", "visible"));
         record!("ring-published", get!("ringNote", "isPublished"));
+        record!("ring-summary", get!("ringNote", "summary"));
+        record!("ring-preview", get!("ringNote", "previewSummary"));
         record!("ring-urgency", get!("ringNote", "urgency"));
         record!("ring-body", get!("ringNote", "body"));
         record!("ring-actions", call!("actions", QString::from("ringNote")));
@@ -292,8 +299,52 @@ fn a_call_rings_is_answered_on_its_page_and_ends_with_the_platform_told() {
         record!("ring-third", call!("ring", 9200));
     });
 
+    // It rings out too, and its page pops itself -- recorded, and so
+    // still there, as a page is while the stack animates it away.
     single_shot(Duration::from_secs(11), move || unsafe {
         record!("pushes-third", call!("pushes"));
+        call!("endRinging", 9200);
+    });
+
+    // A fourth rings while that page is on its way out, and the page goes:
+    // not the fourth call's page, which gets one of its own.
+    single_shot(Duration::from_secs(13), move || unsafe {
+        record!("popped-third", call!("popped"));
+        record!("ring-fourth", call!("ring", 9300));
+        call!("dropPage");
+        record!("fourth-kept", call!("callState"));
+    });
+
+    single_shot(Duration::from_secs(14), move || unsafe {
+        record!("pushes-fourth", call!("pushes"));
+        record!("fourth-ringing", get!("ringingButtons", "visible"));
+        record!(
+            "decline-fourth",
+            call!("tap", QString::from("declineButton"))
+        );
+    });
+
+    single_shot(Duration::from_secs(17), move || unsafe {
+        record!("popped-fourth", call!("popped"));
+        call!("dropPage");
+    });
+
+    // A fifth rings and is declined before its page is up -- from the
+    // notification, while the stack is still busy: the page still comes,
+    // says so, and goes.
+    single_shot(Duration::from_secs(18), move || unsafe {
+        call!("ring", 9400);
+        record!("declined-fifth", call!("decline"));
+    });
+
+    single_shot(Duration::from_secs(19), move || unsafe {
+        record!("pushes-fifth", call!("pushes"));
+        record!("fifth-status", get!("callStatus", "text"));
+    });
+
+    single_shot(Duration::from_secs(21), move || unsafe {
+        record!("popped-fifth", call!("popped"));
+        record!("after-fifth", call!("callState"));
         (*engine_ptr).quit();
     });
 
@@ -339,6 +390,13 @@ fn a_call_rings_is_answered_on_its_page_and_ends_with_the_platform_told() {
         "a ringing call is not the critical notification a ringing phone is. {context}"
     );
     assert_eq!(value("ring-body"), "\u{1f4de} Incoming call", "{context}");
+    assert_eq!(
+        value("ring-summary"),
+        "chat 1",
+        "the ringing notification does not say who is calling: the name \
+         came after it was raised, and it was never said again. {context}"
+    );
+    assert_eq!(value("ring-preview"), "chat 1", "{context}");
     assert_eq!(value("ring-actions"), "default,decline,answer", "{context}");
     assert!(
         value("ringing-feedback").contains("Play [{\"type\":\"s\",\"value\":\"voip_ringtone\"}"),
@@ -489,5 +547,37 @@ fn a_call_rings_is_answered_on_its_page_and_ends_with_the_platform_told() {
         "3",
         "a call that rang while the last page was on its way out was never \
          shown. {context}"
+    );
+
+    assert_eq!(value("popped-third"), "pop;pop;", "{context}");
+    assert_eq!(value("ring-fourth"), "ringing", "{context}");
+    assert_eq!(
+        value("fourth-kept"),
+        "ringing|",
+        "a call that rang as the last call's page was going was declined \
+         when that page went. {context}"
+    );
+    assert_eq!(
+        value("pushes-fourth"),
+        "4",
+        "a call that rang as the last call's page was going was not shown \
+         on a page of its own. {context}"
+    );
+    assert_eq!(value("fourth-ringing"), "true", "{context}");
+    assert_eq!(value("decline-fourth"), "ok", "{context}");
+    assert_eq!(value("popped-fourth"), "pop;pop;pop;", "{context}");
+
+    assert_eq!(value("declined-fifth"), "ended", "{context}");
+    assert_eq!(value("pushes-fifth"), "5", "{context}");
+    assert_eq!(value("fifth-status"), "Declined call", "{context}");
+    assert_eq!(
+        value("popped-fifth"),
+        "pop;pop;pop;pop;",
+        "a page pushed for a call already over stayed up. {context}"
+    );
+    assert_eq!(
+        value("after-fifth"),
+        "|",
+        "a page pushed for a call already over never let it go. {context}"
     );
 }

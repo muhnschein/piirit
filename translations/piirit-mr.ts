@@ -1234,6 +1234,10 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>If read receipts are disabled, you won&apos;t be able to see read receipts from others.</source>
         <translation>वाचल्याच्या पावत्या बंद असल्यास तुम्हाला इतरांच्या वाचल्याच्या पावत्याही दिसणार नाहीत.</translation>
     </message>
+    <message>
+        <source>Not connected</source>
+        <translation>जोडलेले नाही</translation>
+    </message>
 </context>
 <context>
     <name>ProfileSetupPage</name>

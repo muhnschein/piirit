@@ -10,7 +10,9 @@
 //!
 //! Answering is played on the page's side over a real socket, as in
 //! `call_outgoing.rs`: the offer the page opens on, and the answer it
-//! hands back for the core to send.
+//! hands back for the core to send. So is a call answered here and taken
+//! on another device before this one's answer reached the core: the call
+//! is that device's, and nothing here may end it.
 
 // Qt harness: see qml_pages.rs.
 #![allow(
@@ -211,6 +213,27 @@ fn a_call_rings_is_answered_and_ends_every_way_a_ringing_call_can() {
     single_shot(Duration::from_secs(7), move || unsafe {
         record!("missed", call!("state"));
         record!("said", call!("said"));
+        call!("reset");
+
+        // Answered here, and taken on another device while this one's
+        // page is still coming up: the core turns this device's accept
+        // into nothing, so the call is the other device's.
+        record!("ring-5", call!("ring", 9005));
+        record!("answer-5", call!("answer"));
+    });
+
+    single_shot(Duration::from_secs(8), move || unsafe {
+        record!("elsewhere-5", call!("takenElsewhere", 9005));
+        call!("reset");
+
+        // The same before the page has come up at all.
+        call!("ring", 9006);
+        call!("answer");
+        record!("elsewhere-6", call!("takenElsewhere", 9006));
+    });
+
+    // Long enough for the host still coming up to have come and gone.
+    single_shot(Duration::from_secs(9), move || unsafe {
         (*engine_ptr).quit();
     });
 
@@ -315,6 +338,21 @@ fn a_call_rings_is_answered_and_ends_every_way_a_ringing_call_can() {
          and one taken up from its row must not ring. {context}"
     );
 
+    assert_eq!(value("ring-5"), "ringing|9005", "{context}");
+    assert_eq!(value("answer-5"), "starting", "{context}");
+    assert_eq!(
+        value("elsewhere-5"),
+        "ended|answered-elsewhere",
+        "a call answered here and then on another device went on here, \
+         on a call this device will never join. {context}"
+    );
+    assert_eq!(
+        value("elsewhere-6"),
+        "ended|answered-elsewhere",
+        "a call taken on another device before this one's page was up \
+         went on here. {context}"
+    );
+
     let calls = common::calls(&journal);
     let named = |method: &str| -> Vec<serde_json::Value> {
         calls
@@ -330,7 +368,10 @@ fn a_call_rings_is_answered_and_ends_every_way_a_ringing_call_can() {
         "the core was not handed the page's answer to the call. {context}"
     );
     // Declining is the one end told to the core from here: the other end
-    // hanging up is the core's news, and so is another device answering.
+    // hanging up is the core's news, and so is another device answering
+    // -- whether or not this device had answered too, and whether or not
+    // its page was up yet. Ending either would end the call on the device
+    // that took it.
     assert_eq!(
         named("end_call"),
         vec![json!([1, 9003])],

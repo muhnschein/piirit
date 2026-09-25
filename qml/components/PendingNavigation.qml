@@ -25,6 +25,14 @@ import QtQuick 2.0
  * `ready` is the owner's own condition, which a page sets to "I am the
  * page on screen": a page with a picker over it is not one Silica will
  * move from either.
+ *
+ * And a page with a call over it must not move at all. A call's page
+ * is pushed over whatever is on screen (CallCenter.qml), and every move
+ * here acts on the top of the stack -- a pop takes the top page, and a
+ * replace everything above its target -- so a move made then takes the
+ * call's page, and the call with it. So a move waits for `ready` for as
+ * long as it takes, and `patience` only bounds the wait on a stack that
+ * is busy: the page being on screen again is what makes the move its own.
  */
 QtObject {
     id: root
@@ -34,7 +42,8 @@ QtObject {
     property var stack: null
 
     /// Whether the owner is in a position to move at all. A page sets
-    /// `page.status === PageStatus.Active`.
+    /// `page.status === PageStatus.Active`: the page on screen, with
+    /// nothing over it.
     property bool ready: true
 
     /// Whether a move is waiting to be made. A page with one waiting
@@ -45,13 +54,14 @@ QtObject {
     /// How often to look again while the stack is mid-transition.
     property int retryInterval: 50
 
-    /// How long to keep trying, in milliseconds. A page transition is a
-    /// few hundred of them; this is well past any of them, and it is
-    /// here so that a stack which never goes quiet leaves a timer
-    /// running for a few seconds rather than for the rest of the day.
+    /// How long to keep trying while the stack is busy, in
+    /// milliseconds. A page transition is a few hundred of them; this is
+    /// well past any of them, and it is here so that a stack which never
+    /// goes quiet leaves a timer running for a few seconds rather than
+    /// for the rest of the day.
     property int patience: 5000
 
-    /// The move waiting, as `{ target, page, properties }`, or null.
+    /// The move waiting, as `{ kind, target, page, properties }`, or null.
     property var _move: null
     /// Milliseconds spent waiting for this one.
     property int _waited: 0
@@ -59,7 +69,22 @@ QtObject {
     /// Replace everything above `target` with `page` -- now, or as soon
     /// as the stack is finished with whatever it is doing.
     function replaceAbove(target, page, properties) {
-        root._move = { target: target, page: page, properties: properties }
+        root._hold({ kind: "replaceAbove", target: target, page: page,
+                     properties: properties })
+    }
+
+    /// Replace the owner with `page`, once the owner is on top.
+    function replace(page, properties) {
+        root._hold({ kind: "replace", page: page, properties: properties })
+    }
+
+    /// Take the owner off the stack, once it is on top.
+    function pop() {
+        root._hold({ kind: "pop" })
+    }
+
+    function _hold(move) {
+        root._move = move
         root._waited = 0
         root._go()
     }
@@ -76,10 +101,15 @@ QtObject {
         if (!root._move || !root.stack) {
             return
         }
+        // Not until the owner is on screen, however long: looked at
+        // again when it is (`onReadyChanged`).
+        if (!root.ready) {
+            root._retry.stop()
+            return
+        }
         // `=== true` rather than a plain test: a stack without the
         // property hands back undefined, which is not "busy".
-        var blocked = !root.ready || root.stack.busy === true
-        if (blocked && root._waited < root.patience) {
+        if (root.stack.busy === true && root._waited < root.patience) {
             root._waited += root.retryInterval
             root._retry.restart()
             return
@@ -87,7 +117,20 @@ QtObject {
         var move = root._move
         root._move = null
         root._retry.stop()
-        root.stack.replaceAbove(move.target, move.page, move.properties)
+        if (move.kind === "pop") {
+            root.stack.pop()
+        } else if (move.kind === "replace") {
+            root.stack.replace(move.page, move.properties)
+        } else {
+            root.stack.replaceAbove(move.target, move.page, move.properties)
+        }
+    }
+
+    onReadyChanged: {
+        if (root.ready) {
+            root._waited = 0
+            root._go()
+        }
     }
 
     property Timer _retry: Timer {

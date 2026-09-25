@@ -44,6 +44,48 @@ Page {
         return count
     }
 
+    /// The profile to turn the list to when `accountId` is none of the
+    /// profiles there are -- a quick action's, whose chat was in a
+    /// profile deleted since. 0 for the first there is.
+    property int fallbackAccountId: 0
+
+    /// A list opened on a profile that has gone is a list of nothing but
+    /// "account not found", and with one profile left there is no choice
+    /// over it to turn it by: it is turned to a profile there is. Only
+    /// with a choice of profile; a picker without one sends from the
+    /// profile it was started in, which is there.
+    function settleProfile() {
+        if (!page.profileChoice || profiles.count === 0
+                || page.profileName(page.accountId) !== "") {
+            return
+        }
+        var first = 0
+        for (var i = 0; i < profiles.count; i++) {
+            var item = profiles.itemAt(i)
+            if (!item || !item.configured) {
+                continue
+            }
+            if (item.accountId === page.fallbackAccountId) {
+                page.accountId = item.accountId
+                return
+            }
+            if (first === 0) {
+                first = item.accountId
+            }
+        }
+        if (first > 0) {
+            page.accountId = first
+        }
+    }
+
+    // Once the profiles are all in, however many there are: they arrive
+    // one item at a time.
+    Timer {
+        id: settle
+        interval: 0
+        onTriggered: page.settleProfile()
+    }
+
     /// What a profile goes by in the choice: its name, or its address
     /// without one.
     function profileName(accountId) {
@@ -56,8 +98,12 @@ Page {
         return ""
     }
 
-    // Another profile's chats are no answer yet either.
-    onAccountIdChanged: page.chatsLoaded = false
+    // Another profile's chats are no answer yet either, and what the last
+    // one's said is not about these.
+    onAccountIdChanged: {
+        page.chatsLoaded = false
+        page.errorMessage = ""
+    }
 
     /// Whether picking a chat closes this page.
     ///
@@ -136,6 +182,7 @@ Page {
                 Repeater {
                     id: profiles
                     model: core.account_list
+                    onItemAdded: settle.restart()
 
                     MenuItem {
                         objectName: "pickerProfile" + model.account_id

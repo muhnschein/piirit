@@ -145,6 +145,8 @@ fn a_contact_is_blocked_and_let_back_in_from_the_settings() {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_FAKE_JOURNAL", &journal);
         std::env::set_var("PIIRIT_ACCOUNTS_DIR", temp.join("accounts"));
+        // A profile whose block list the core will not read.
+        std::env::set_var("PIIRIT_FAKE_BLOCKED_FAIL", "7");
     }
 
     piirit_shim::register_qml_types();
@@ -340,6 +342,37 @@ fn a_contact_is_blocked_and_let_back_in_from_the_settings() {
             "error",
             call!("get", QString::from("errorBanner"), QString::from("text"))
         );
+        // The block list the core will not read.
+        record!(
+            "load-unreadable",
+            call!(
+                "load",
+                QString::from(common::page_url("BlockedContactsPage.qml")),
+                7
+            )
+        );
+    });
+    single_shot(Duration::from_secs(18), move || unsafe {
+        record!(
+            "unreadable-error",
+            call!("get", QString::from("errorBanner"), QString::from("text"))
+        );
+        record!(
+            "unreadable-plus",
+            call!(
+                "get",
+                QString::from("blockSomeone"),
+                QString::from("visible")
+            )
+        );
+        record!(
+            "unreadable-nobody",
+            call!(
+                "get",
+                QString::from("nobodyBlocked"),
+                QString::from("enabled")
+            )
+        );
         (*engine_ptr).quit();
     });
 
@@ -355,6 +388,21 @@ fn a_contact_is_blocked_and_let_back_in_from_the_settings() {
     let calls = common::calls(&journal);
     let names: Vec<&str> = calls.iter().map(|(name, _)| name.as_str()).collect();
     let context = format!("steps: {steps:?}, calls: {names:?}");
+
+    assert_eq!(value("load-unreadable"), "ok", "{context}");
+    assert!(
+        value("unreadable-error").ends_with("the block list could not be read"),
+        "the core's refusal to read the block list was not said. {context}"
+    );
+    assert_eq!(
+        (
+            value("unreadable-plus").as_str(),
+            value("unreadable-nobody").as_str()
+        ),
+        ("true", "false"),
+        "a block list the core would not read left the page with no way \
+         to block anyone -- or said nobody was blocked. {context}"
+    );
 
     for label in [
         "load-settings",

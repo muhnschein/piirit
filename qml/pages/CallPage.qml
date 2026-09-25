@@ -135,6 +135,11 @@ Page {
     // the pop takes this page and nothing the reader is looking at.
     property bool closeWhenActive: false
 
+    /// On its way out: popped by itself, or swiped away once its call was
+    /// over. A call that comes in now is not this page's to keep -- it
+    /// gets a page of its own once this one has gone (CallCenter.qml).
+    property bool leaving: false
+
     Timer {
         id: leave
         objectName: "leave"
@@ -151,6 +156,7 @@ Page {
             return
         }
         page.closeWhenActive = false
+        page.leaving = true
         if (page.call && page.call.state === "ended") {
             page.call.reset()
         }
@@ -158,15 +164,22 @@ Page {
     }
 
     onStatusChanged: {
-        if (page.status === PageStatus.Active && page.closeWhenActive) {
-            page.close()
+        if (page.status === PageStatus.Active) {
+            page.leaving = false
+            if (page.closeWhenActive) {
+                page.close()
+            }
+        } else if (page.status === PageStatus.Deactivating && !page.busy) {
+            // Nothing but an ended call can be swiped away.
+            page.leaving = true
         }
     }
 
     // A call that comes in while the last one is still being said to be
-    // over keeps the page: it is this call's now.
+    // over keeps the page: it is this call's now. Not once the page is
+    // leaving, which would take the call with it.
     onBusyChanged: {
-        if (page.busy) {
+        if (page.busy && !page.leaving) {
             leave.stop()
             page.closeWhenActive = false
         }
@@ -178,11 +191,23 @@ Page {
         onEnded: leave.restart()
     }
 
-    // A page that goes while its call is still up -- the stack replaced
-    // under it -- takes the call's media with it. Hanging up then is the
-    // honest end: the other side stops talking to nobody.
+    // Pushed for a call that was over before the page was up -- one that
+    // failed as it was placed, or rang and ended while the stack was busy:
+    // said, and then gone, as if it had ended while the page was up.
+    Component.onCompleted: {
+        if (page.call && page.call.state === "ended") {
+            leave.restart()
+        }
+    }
+
+    // A page that goes while its call is up -- the stack replaced under it
+    // -- takes the call's media with it. Hanging up then is the honest
+    // end: the other side stops talking to nobody. Only a call whose media
+    // is here, and only from a page that is not already leaving: a call
+    // that rings as the last one's page goes has nothing on this page,
+    // and is shown on a page of its own once this one has gone.
     Component.onDestruction: {
-        if (page.busy) {
+        if (page.inCall && !page.leaving) {
             page.call.hang_up()
         }
     }

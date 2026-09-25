@@ -89,8 +89,13 @@ pub struct Transports {
 }
 
 /// What one load brings back: the transports as the core lists them, the
-/// profile's own address, and the connectivity report.
-type Listed = (Vec<serde_json::Value>, String, String);
+/// profile's own address, the connectivity report, and the connectivity
+/// band (`connectivity.rs`).
+type Listed = (Vec<serde_json::Value>, String, String, u32);
+
+/// The core's `get_connectivity` band at and above which it is at least
+/// trying to connect; below it, it is not connected at all.
+const CONNECTING: u32 = 2000;
 
 impl Transports {
     /// Set the account and reload if it changed.
@@ -122,8 +127,8 @@ impl Transports {
                 return;
             }
             match result {
-                Ok((transports, primary, report)) => {
-                    let rows = rows_from(&transports, &primary, &report);
+                Ok((transports, primary, report, band)) => {
+                    let rows = rows_from(&transports, &primary, &report, band);
                     {
                         let mut this_mut = this.borrow_mut();
                         this_mut.count = u32::try_from(rows.len()).unwrap_or(u32::MAX);
@@ -153,7 +158,14 @@ impl Transports {
                     .call("get_connectivity_html", (account_id,))
                     .await
                     .unwrap_or_default();
-                Ok::<_, String>((transports, primary, report))
+                // What the report leaves unsaid while the profile is not
+                // connected: see `TransportItem::offline`. 0, "unknown",
+                // when it will not say.
+                let band: u32 = rpc
+                    .call("get_connectivity", (account_id,))
+                    .await
+                    .unwrap_or_default();
+                Ok::<_, String>((transports, primary, report, band))
             }
             .await;
             done(result);
@@ -215,9 +227,16 @@ impl Transports {
 
 /// The rows for what the core listed: the relay with the profile's own
 /// address first, the rest in the core's order, each with its mailbox
-/// off the report.
-fn rows_from(transports: &[serde_json::Value], primary: &str, report: &str) -> Vec<TransportItem> {
+/// off the report -- or, for a profile that is not connected at all
+/// (`band`), as a relay that is not connected.
+fn rows_from(
+    transports: &[serde_json::Value],
+    primary: &str,
+    report: &str,
+    band: u32,
+) -> Vec<TransportItem> {
     let reports = transport_reports(report);
+    let not_connected = band > 0 && band < CONNECTING;
     let mut rows: Vec<TransportItem> = transports
         .iter()
         .map(|transport| json::str_at(transport, "addr"))
@@ -228,6 +247,7 @@ fn rows_from(transports: &[serde_json::Value], primary: &str, report: &str) -> V
                 .iter()
                 .find(|reported| reported.domain.eq_ignore_ascii_case(domain));
             let quota = reported.and_then(|reported| reported.quota.as_ref());
+            let offline = reported.is_none() && not_connected;
             // Exact to 2^53 bytes, which no mailbox holds.
             #[allow(clippy::cast_precision_loss)]
             TransportItem {
@@ -235,10 +255,14 @@ fn rows_from(transports: &[serde_json::Value], primary: &str, report: &str) -> V
                 addr: addr.into(),
                 domain: domain.into(),
                 is_primary: addr.eq_ignore_ascii_case(primary),
-                dot: reported
-                    .map_or_else(QString::default, |reported| reported.dot.as_str().into()),
+                dot: match reported {
+                    Some(reported) => reported.dot.as_str().into(),
+                    None if offline => "red".into(),
+                    None => QString::default(),
+                },
                 status: reported
                     .map_or_else(QString::default, |reported| reported.status.as_str().into()),
+                offline,
                 has_quota: quota.is_some(),
                 quota_percent: quota.map_or(0, |quota| quota.percent),
                 quota_text: quota.map_or_else(QString::default, |quota| quota.text.as_str().into()),
@@ -309,6 +333,7 @@ mod tests {
             &listed(&["ada@old.example.net", "ada@nine.testrun.org"]),
             "ada@nine.testrun.org",
             REPORT,
+            4000,
         );
         assert_eq!(
             summary(&rows),
@@ -334,6 +359,7 @@ mod tests {
             &listed(&["ada@old.example.net", "Ada@Nine.Testrun.ORG"]),
             "ada@nine.testrun.org",
             REPORT,
+            4000,
         );
         assert_eq!(
             summary(&rows),
@@ -349,6 +375,7 @@ mod tests {
             &listed(&["ada@old.example.net", "ada@nine.testrun.org", ""]),
             "",
             "",
+            0,
         );
         assert_eq!(
             summary(&rows),
@@ -356,7 +383,42 @@ mod tests {
         );
         assert_eq!(rows[0].dot.to_string(), "");
         assert_eq!(rows[0].status.to_string(), "");
-        assert!(rows_from(&[], "ada@nine.testrun.org", REPORT).is_empty());
+        assert!(rows_from(&[], "ada@nine.testrun.org", REPORT, 4000).is_empty());
+    }
+
+    /// A profile that is not connected at all -- IO stopped -- gets a
+    /// report with no relays in it: each relay is not connected, rather
+    /// than a check still to come. A relay the report does cover keeps
+    /// the core's own word, and a profile still connecting is still
+    /// being checked.
+    #[test]
+    fn a_profile_not_connected_at_all_has_relays_not_connected() {
+        let relays = listed(&["ada@old.example.net", "ada@nine.testrun.org"]);
+        let rows = rows_from(
+            &relays,
+            "ada@nine.testrun.org",
+            "<h3>Not connected</h3>",
+            1000,
+        );
+        assert_eq!(
+            rows.iter()
+                .map(|row| (row.dot.to_string(), row.status.to_string(), row.offline))
+                .collect::<Vec<_>>(),
+            vec![
+                ("red".to_string(), String::new(), true),
+                ("red".to_string(), String::new(), true),
+            ]
+        );
+        let rows = rows_from(&relays, "ada@nine.testrun.org", REPORT, 1000);
+        assert!(rows.iter().all(|row| !row.offline));
+        assert_eq!(rows[1].status.to_string(), "Not connected: timed out");
+        for band in [0, 2000, 4000] {
+            let rows = rows_from(&relays, "", "", band);
+            assert!(
+                rows.iter().all(|row| !row.offline && row.dot.is_empty()),
+                "band {band}"
+            );
+        }
     }
 
     /// The number a row is known by to the countdown is the address's
@@ -367,6 +429,7 @@ mod tests {
             &listed(&["ada@old.example.net", "ada@nine.testrun.org"]),
             "",
             "",
+            0,
         );
         let after = rows_from(
             &listed(&[
@@ -376,6 +439,7 @@ mod tests {
             ]),
             "ada@nine.testrun.org",
             REPORT,
+            4000,
         );
         let id_of = |rows: &[TransportItem], addr: &str| {
             rows.iter()

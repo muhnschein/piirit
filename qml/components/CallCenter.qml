@@ -171,7 +171,7 @@ Item {
     /// unanswered is left behind as a missed call.
     function over(reason) {
         center.stopRinging()
-        ringNote.close()
+        ringNote.withdraw()
         if (reason === "missed") {
             missedNote.missed(call.account_id, call.chat_id, call.peer_name)
         }
@@ -229,13 +229,16 @@ Item {
                 // ringtone stops the moment the call stops ringing,
                 // whichever way that happened.
                 center.stopRinging()
-                ringNote.close()
+                ringNote.withdraw()
             } else if (center.page === null) {
                 // A call taken up from its row is ringing without having
                 // rung: shown, and nothing more.
                 center.show()
             }
         }
+        // Who is calling is read after the call has started ringing: the
+        // notification says it once it is known.
+        onCall_changed: ringNote.name()
     }
 
     // ngfd, on the system bus: the sounds, vibration and lights the phone
@@ -364,6 +367,9 @@ Item {
         // file -- and this file is the window's, so the window with it.
         urgency: Notification.Critical
 
+        /// Published, and not yet taken down.
+        property bool up: false
+
         function ring() {
             ringNote.summary = call.peer_name
             // A phone first: the line says it is a call before it is read.
@@ -376,7 +382,24 @@ Item {
                 center.action("decline", qsTr("Decline"), "decline", []),
                 center.action("answer", qsTr("Answer"), "answer", [])
             ]
+            ringNote.up = true
             ringNote.publish()
+        }
+
+        /// The caller's name, once the core has said it: the call rings
+        /// before it is read, and the notification was raised without it.
+        function name() {
+            if (!ringNote.up || ringNote.summary === call.peer_name) {
+                return
+            }
+            ringNote.summary = call.peer_name
+            ringNote.previewSummary = ringNote.summary
+            ringNote.publish()
+        }
+
+        function withdraw() {
+            ringNote.up = false
+            ringNote.close()
         }
     }
 

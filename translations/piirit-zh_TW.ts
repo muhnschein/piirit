@@ -1223,6 +1223,10 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>If read receipts are disabled, you won&apos;t be able to see read receipts from others.</source>
         <translation>關掉收執回條的話，就無法知道對方是否已讀訊息。</translation>
     </message>
+    <message>
+        <source>Not connected</source>
+        <translation>未連線</translation>
+    </message>
 </context>
 <context>
     <name>ProfileSetupPage</name>

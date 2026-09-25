@@ -51,10 +51,12 @@ import Piirit 1.0
 Page {
     id: page
 
-    /// The cover offers no quick actions while this is up: a jump away
-    /// would leave the other device halfway through taking the profile. See
-    /// piirit.qml.
-    readonly property bool pausesQuickActions: true
+    /// The cover offers no quick actions while an offer is up, and a
+    /// tapped notification waits: a jump away would leave the other
+    /// device halfway through taking the profile. See piirit.qml. Not
+    /// once it is over, when the chats are attached and nothing is left
+    /// here to drop.
+    readonly property bool pausesQuickActions: device.running
 
     /// Whose profile is offered. The core's provider takes an account,
     /// and this is it.
@@ -145,13 +147,13 @@ Page {
     // core's and outlives this page; left running it would hold the
     // profile out to whoever asks, with nothing on screen to say so and
     // nothing left to stop it. Cancel stops it without leaving; this is
-    // the swipe. Harmless on the way to the chats after a hand-over: by
-    // then there is no offer to stop.
-    onStatusChanged: {
-        if (page.status === PageStatus.Deactivating) {
-            device.cancel()
-        }
-    }
+    // the swipe.
+    //
+    // Left, not covered: a page pushed over this one -- a call's, which
+    // comes in whatever is on screen -- is not the reader walking away,
+    // and ending the offer then dropped a second device part-way through
+    // copying the profile. A page left is a page gone.
+    Component.onDestruction: device.cancel()
 
     /// Start the offer, on the reader's word.
     ///
@@ -176,7 +178,7 @@ Page {
             return
         }
         pageStack.pushAttached(Qt.resolvedUrl("ChatListPage.qml"),
-                               { accountId: page.currentAccountId })
+                               { accountId: page.currentAccountId, attached: true })
         page.chatsAttached = true
     }
 

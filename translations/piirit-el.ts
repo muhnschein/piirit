@@ -1230,6 +1230,10 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>If read receipts are disabled, you won&apos;t be able to see read receipts from others.</source>
         <translation>Αν τα αποδεικτικά ανάγνωσης είναι απενεργοποιημένα, δε θα μπορείς να δεις αποδεικτικά ανάγνωσης από άλλους/ες.</translation>
     </message>
+    <message>
+        <source>Not connected</source>
+        <translation>Χωρίς σύνδεση</translation>
+    </message>
 </context>
 <context>
     <name>ProfileSetupPage</name>

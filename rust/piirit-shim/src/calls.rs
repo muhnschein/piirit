@@ -16,6 +16,7 @@
 //! - [`Call`], the one call the app can be in: ringing, answered, placed,
 //!   and ended, with the page it runs in.
 
+use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
 
 use deltachat_jsonrpc::RpcClient;
@@ -182,6 +183,11 @@ pub struct Call {
     pub handle_event:
         qt_method!(fn(&mut self, context_id: u32, kind: QString, payload_json: QString)),
 
+    /// How long a call may ring here before it is taken to have rung
+    /// out, in milliseconds; 0 for the app's own limit, a little over the
+    /// core's 120 seconds. Only a test sets it.
+    pub ring_limit_ms: qt_property!(u32),
+
     /// The loopback host the page is served from, while there is a page.
     host: Option<Host>,
     /// The caller's offer, for a call that came in: what answering it
@@ -196,7 +202,24 @@ pub struct Call {
     /// not naming a known call is a call that never connects. Read again
     /// once the id is known; see `take_report`.
     early: Vec<(String, String)>,
+    /// Set once the core needs telling nothing more about this call: it
+    /// ended the call itself, or another of this account's devices took
+    /// it. A host let go after that -- the one up now, or one still
+    /// coming up -- goes without `end_call`, which for a call answered
+    /// elsewhere would end it on the device that answered. One per call,
+    /// so a host coming up late reads the flag of the call it was for.
+    settled: Arc<AtomicBool>,
 }
+
+/// How long a call may ring here before it is taken to have rung out
+/// without the core saying so. The core rings a call for 120 seconds from
+/// when it was sent, and says `CallEnded` when that is up -- once, from a
+/// timer that lives only in the server that heard the call. An event
+/// channel that overflowed, or a server that died and was started again,
+/// loses it, and without this the phone would ring until somebody
+/// declined. A little over the core's own, so that when the core does
+/// say it, its word is the one taken.
+const RING_LIMIT: std::time::Duration = std::time::Duration::from_secs(125);
 
 /// The most early events kept for one call. They are for a moment that
 /// lasts as long as one round trip to the core, and anything past this
@@ -222,6 +245,7 @@ impl Call {
         self.generation = self.generation.wrapping_add(1);
         self.host = None;
         self.early.clear();
+        self.settled = Arc::new(AtomicBool::new(false));
         self.account_id = account_id;
         self.chat_id = chat_id;
         self.message_id = message_id;
@@ -277,6 +301,7 @@ impl Call {
             this_mut.offer = call.sdp_offer;
             this_mut.call_changed();
             this_mut.set_state("ringing");
+            this_mut.watch_ringing();
         });
         runtime.spawn(async move {
             done(summary(&rpc, account_id, message_id).await);
@@ -364,6 +389,15 @@ impl Call {
         self.ended(reason.into());
     }
 
+    /// The core needs telling nothing more about this call; see
+    /// `settled`.
+    fn settle(&self) {
+        self.settled.store(true, Ordering::SeqCst);
+        if let Some(host) = &self.host {
+            host.settle();
+        }
+    }
+
     /// Tell the core to end the call, without waiting for it.
     fn end_call(&self) {
         let (account_id, message_id) = (self.account_id, self.message_id);
@@ -447,12 +481,17 @@ impl Call {
         });
         let report: call_host::Reporter = Arc::new(raise);
 
+        let settled = Arc::clone(&self.settled);
         let ptr: QPointer<Self> = QPointer::from(&*self);
         let done = queued_callback(move |result: Result<Host, String>| {
             let Some(this) = ptr.as_pinned() else { return };
             // A call hung up while its page was coming up: dropping the
-            // host here is what lets it go.
+            // host here is what lets it go -- quietly, for a call the
+            // core has nothing more to hear about.
             if this.borrow().generation != generation {
+                if let (Ok(host), true) = (&result, settled.load(Ordering::SeqCst)) {
+                    host.settle();
+                }
                 return;
             }
             match result {
@@ -591,13 +630,18 @@ impl Call {
                 self.offer = json::str_at(&payload, "place_call_info").to_string();
                 self.call_changed();
                 self.set_state("ringing");
+                self.watch_ringing();
                 self.ringing();
             }
             // Answered: here, which the host has reported already, or on
-            // another device, where it rings no longer.
+            // another device. The core says the latter only of a call
+            // this device has not accepted itself, and turns this
+            // device's own accept into nothing once it has -- so from any
+            // state short of over, answered here or not, the call is that
+            // device's now, and letting it go must not end it there.
             "IncomingCallAccepted" if ours => {
-                if !json::flag(&payload, "from_this_device") && self.state.to_string() == "ringing"
-                {
+                if !json::flag(&payload, "from_this_device") && self.busy() {
+                    self.settle();
                     self.finish("answered-elsewhere");
                 }
             }
@@ -615,9 +659,7 @@ impl Call {
             }
             "CallEnded" if ours && self.busy() => {
                 // Nothing to tell the core: it is the one saying so.
-                if let Some(host) = &self.host {
-                    host.settle();
-                }
+                self.settle();
                 if self.state.to_string() == "ringing" {
                     self.finish_unanswered();
                 } else {
@@ -626,6 +668,38 @@ impl Call {
             }
             _ => {}
         }
+    }
+
+    /// Stop a call ringing that has rung past [`RING_LIMIT`] with nothing
+    /// from the core. By then the core counts it as over whatever became
+    /// of its own timer -- a ringing call goes stale 120 seconds after it
+    /// was sent, and `call_info` says so -- so it is ended as one that
+    /// rang out, and the core is asked, as ever, which way.
+    fn watch_ringing(&self) {
+        let Some((_, runtime)) = connection() else {
+            return;
+        };
+        let limit = match self.ring_limit_ms {
+            0 => RING_LIMIT,
+            ms => std::time::Duration::from_millis(u64::from(ms)),
+        };
+        let generation = self.generation;
+        let ptr: QPointer<Self> = QPointer::from(self);
+        let done = queued_callback(move |()| {
+            let Some(this) = ptr.as_pinned() else { return };
+            // Answered, declined or ended meanwhile: answering keeps the
+            // call, ending it starts another count.
+            if this.borrow().generation != generation
+                || this.borrow().state.to_string() != "ringing"
+            {
+                return;
+            }
+            this.borrow_mut().finish_unanswered();
+        });
+        runtime.spawn(async move {
+            tokio::time::sleep(limit).await;
+            done(());
+        });
     }
 
     /// A call that rang here and ended unanswered: missed, or declined on

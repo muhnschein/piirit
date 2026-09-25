@@ -94,6 +94,8 @@ Column {
         var picker = pageStack.push(Qt.resolvedUrl("../pages/ChatPickerPage.qml"), {
             accountId: setting.action.kind === "chat" && setting.action.accountId > 0
                        ? setting.action.accountId : setting.accountId,
+            // The action's profile may have been deleted since.
+            fallbackAccountId: setting.accountId,
             profileChoice: true,
             //: Over the list of chats, when picking the one a quick action
             //: on the cover opens.

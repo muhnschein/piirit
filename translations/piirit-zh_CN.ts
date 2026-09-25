@@ -1227,6 +1227,10 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>If read receipts are disabled, you won&apos;t be able to see read receipts from others.</source>
         <translation>禁用已读回执后，您将无法看到其他人的已读回执。</translation>
     </message>
+    <message>
+        <source>Not connected</source>
+        <translation>未连接</translation>
+    </message>
 </context>
 <context>
     <name>ProfileSetupPage</name>

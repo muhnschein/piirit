@@ -1241,6 +1241,10 @@ Citās grupās, kurās ir bloķēti kontakti, viņu ziņas joprojām būs redzam
         <source>If read receipts are disabled, you won&apos;t be able to see read receipts from others.</source>
         <translation>Ja lasīšanas apstiprinājumi ir izslēgti, tu neredzēsi arī citu lasīšanas apstiprinājumus.</translation>
     </message>
+    <message>
+        <source>Not connected</source>
+        <translation>Nav savienojuma</translation>
+    </message>
 </context>
 <context>
     <name>ProfileSetupPage</name>

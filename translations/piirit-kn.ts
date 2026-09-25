@@ -1234,6 +1234,10 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>If read receipts are disabled, you won&apos;t be able to see read receipts from others.</source>
         <translation>ಓದಿದ ರಸೀದಿಗಳನ್ನು ಆಫ್ ಮಾಡಿದ್ದರೆ, ಇತರರ ಓದಿದ ರಸೀದಿಗಳೂ ನಿಮಗೆ ಕಾಣುವುದಿಲ್ಲ.</translation>
     </message>
+    <message>
+        <source>Not connected</source>
+        <translation>ಸಂಪರ್ಕಗೊಂಡಿಲ್ಲ</translation>
+    </message>
 </context>
 <context>
     <name>ProfileSetupPage</name>

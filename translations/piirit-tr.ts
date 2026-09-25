@@ -1227,6 +1227,10 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
         <source>If read receipts are disabled, you won&apos;t be able to see read receipts from others.</source>
         <translation>Okundu onayları etkisizleştirilirse, diğerlerinden gelen okundu onaylarını göremeyeceksiniz.</translation>
     </message>
+    <message>
+        <source>Not connected</source>
+        <translation>Bağlı değil</translation>
+    </message>
 </context>
 <context>
     <name>ProfileSetupPage</name>

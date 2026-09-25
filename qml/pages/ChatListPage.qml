@@ -10,6 +10,10 @@ Page {
     /// Shows the archived chats instead of the ordinary ones. The two
     /// lists are disjoint, so this is a mode rather than a filter.
     property bool archived: false
+    /// Attached to the right of a page that has finished -- a backup
+    /// written, a profile handed over -- as the swipe on from it. The
+    /// list at the bottom of the stack is still the window's.
+    property bool attached: false
     /// How many configured accounts there are, from the core. Decides
     /// whether switching is worth offering at all.
     property int accountCount: 0
@@ -145,11 +149,21 @@ Page {
     /// would take the call's sound with it: the app comes forward onto the
     /// call, and whatever was tapped waits until it is over. False then,
     /// so the caller goes no further.
+    ///
+    /// Nor over a page in the middle of something the core is doing -- a
+    /// backup being written or read back, a profile being made or handed
+    /// to another device -- which is what the cover's own quick actions
+    /// are hidden for (`quickActionsPaused`): popping it would leave the
+    /// core carrying on with nothing to report to. The app comes forward
+    /// onto it instead.
     function comeForward() {
         if (typeof appWindow !== "undefined") {
             appWindow.activate()
             if (appWindow.callBusy === true) {
                 appWindow.showCall()
+                return false
+            }
+            if (appWindow.quickActionsPaused === true) {
                 return false
             }
         }
@@ -238,6 +252,13 @@ Page {
                 return
             }
             page.quickChatPending = false
+            // Only while this is the page on screen: a call that came in
+            // while the chat was looked up has its page over this one, and
+            // the replace below would take it. The tap is dropped, as a
+            // tapped chat is (`openLoadedChat`).
+            if (page.status !== PageStatus.Active) {
+                return
+            }
             if (quickChat.account_id === page.accountId) {
                 page.openChat(quickChat.chat_id, quickChat.name, 0)
                 return
@@ -376,8 +397,12 @@ Page {
             // loaded on its own in a test does not have.
             if (typeof appWindow !== "undefined") {
                 appWindow.accountId = page.accountId
-                // And where the cover's quick actions land.
-                appWindow.chatList = page
+                // And where the cover's quick actions land -- not on a
+                // list attached beside a finished backup, which goes with
+                // a swipe back and would leave the window with none.
+                if (!page.attached) {
+                    appWindow.chatList = page
+                }
             }
         }
     }

@@ -37,9 +37,11 @@ import Piirit 1.0
 Page {
     id: page
 
-    /// The cover offers no quick actions while this is up: a jump away
-    /// would leave a backup halfway written. See piirit.qml.
-    readonly property bool pausesQuickActions: true
+    /// The cover offers no quick actions while a backup is being
+    /// written, and a tapped notification waits: a jump away would leave
+    /// it halfway written. See piirit.qml. Not before or after, when there
+    /// is nothing here to drop.
+    readonly property bool pausesQuickActions: backup.running
 
     /// Whose backup. The core's export takes an account, and this is it.
     property int accountId
@@ -103,7 +105,7 @@ Page {
             return
         }
         pageStack.pushAttached(Qt.resolvedUrl("ChatListPage.qml"),
-                               { accountId: page.currentAccountId })
+                               { accountId: page.currentAccountId, attached: true })
         page.chatsAttached = true
     }
 

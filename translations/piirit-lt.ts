@@ -1237,6 +1237,10 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>If read receipts are disabled, you won&apos;t be able to see read receipts from others.</source>
         <translation>Jei pranešimai apie skaitymą yra išjungti, jūs negalėsite matyti pranešimų apie skaitymą iš kitų žmonių.</translation>
     </message>
+    <message>
+        <source>Not connected</source>
+        <translation>Neprisijungta</translation>
+    </message>
 </context>
 <context>
     <name>ProfileSetupPage</name>
