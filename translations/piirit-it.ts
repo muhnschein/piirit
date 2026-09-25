@@ -358,7 +358,7 @@ Gli altri gruppi con contatti bloccati continueranno a visualizzare i loro messa
     <message>
         <source>Call silenced</source>
         <extracomment>A ringing call whose ringtone has been stopped.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Chiamata silenziata</translation>
     </message>
     <message>
         <source>Message</source>
@@ -368,7 +368,7 @@ Gli altri gruppi con contatti bloccati continueranno a visualizzare i loro messa
     <message>
         <source>Remind me</source>
         <extracomment>Declines a ringing call, and reminds the reader to call back later.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Ricordamelo</translation>
     </message>
 </context>
 <context>
@@ -420,7 +420,7 @@ Gli altri gruppi con contatti bloccati continueranno a visualizzare i loro messa
     <message>
         <source>Outgoing call</source>
         <extracomment>A call this account placed, in a list of calls.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Chiamata in uscita</translation>
     </message>
     <message>
         <source>Incoming call</source>
@@ -433,7 +433,7 @@ Gli altri gruppi con contatti bloccati continueranno a visualizzare i loro messa
     <message>
         <source>Call %1</source>
         <extracomment>Places a call. %1 is the name of whoever is called.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Chiama %1</translation>
     </message>
 </context>
 <context>
@@ -1025,7 +1025,7 @@ Gli altri gruppi con contatti bloccati continueranno a visualizzare i loro messa
     </message>
     <message>
         <source>No calls yet</source>
-        <translation type="unfinished"></translation>
+        <translation>Ancora nessuna chiamata</translation>
     </message>
 </context>
 <context>

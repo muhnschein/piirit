@@ -358,7 +358,7 @@ Vous continuerez à voir les messages des contacts bloqués dans les autres grou
     <message>
         <source>Call silenced</source>
         <extracomment>A ringing call whose ringtone has been stopped.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Appel mis en silencieux</translation>
     </message>
     <message>
         <source>Message</source>
@@ -368,7 +368,7 @@ Vous continuerez à voir les messages des contacts bloqués dans les autres grou
     <message>
         <source>Remind me</source>
         <extracomment>Declines a ringing call, and reminds the reader to call back later.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Me le rappeler</translation>
     </message>
 </context>
 <context>
@@ -420,7 +420,7 @@ Vous continuerez à voir les messages des contacts bloqués dans les autres grou
     <message>
         <source>Outgoing call</source>
         <extracomment>A call this account placed, in a list of calls.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Appel sortant</translation>
     </message>
     <message>
         <source>Incoming call</source>
@@ -433,7 +433,7 @@ Vous continuerez à voir les messages des contacts bloqués dans les autres grou
     <message>
         <source>Call %1</source>
         <extracomment>Places a call. %1 is the name of whoever is called.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Appeler %1</translation>
     </message>
 </context>
 <context>
@@ -1025,7 +1025,7 @@ Vous continuerez à voir les messages des contacts bloqués dans les autres grou
     </message>
     <message>
         <source>No calls yet</source>
-        <translation type="unfinished"></translation>
+        <translation>Aucun appel pour le moment</translation>
     </message>
 </context>
 <context>

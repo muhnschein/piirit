@@ -359,7 +359,7 @@ Správy od zablokovaných kontaktov v ostatných skupinách sa budú naďalej zo
     <message>
         <source>Call silenced</source>
         <extracomment>A ringing call whose ringtone has been stopped.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Hovor stlmený</translation>
     </message>
     <message>
         <source>Message</source>
@@ -369,7 +369,7 @@ Správy od zablokovaných kontaktov v ostatných skupinách sa budú naďalej zo
     <message>
         <source>Remind me</source>
         <extracomment>Declines a ringing call, and reminds the reader to call back later.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Pripomenúť</translation>
     </message>
 </context>
 <context>
@@ -422,7 +422,7 @@ Správy od zablokovaných kontaktov v ostatných skupinách sa budú naďalej zo
     <message>
         <source>Outgoing call</source>
         <extracomment>A call this account placed, in a list of calls.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Odchádzajúci hovor</translation>
     </message>
     <message>
         <source>Incoming call</source>
@@ -435,7 +435,7 @@ Správy od zablokovaných kontaktov v ostatných skupinách sa budú naďalej zo
     <message>
         <source>Call %1</source>
         <extracomment>Places a call. %1 is the name of whoever is called.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Zavolať: %1</translation>
     </message>
 </context>
 <context>
@@ -1030,7 +1030,7 @@ Správy od zablokovaných kontaktov v ostatných skupinách sa budú naďalej zo
     </message>
     <message>
         <source>No calls yet</source>
-        <translation type="unfinished"></translation>
+        <translation>Zatiaľ žiadne hovory</translation>
     </message>
 </context>
 <context>

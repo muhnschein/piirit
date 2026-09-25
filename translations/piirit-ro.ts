@@ -355,7 +355,7 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Call silenced</source>
         <extracomment>A ringing call whose ringtone has been stopped.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Apel pus pe silențios</translation>
     </message>
     <message>
         <source>Message</source>
@@ -365,7 +365,7 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Remind me</source>
         <extracomment>Declines a ringing call, and reminds the reader to call back later.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Amintește-mi</translation>
     </message>
 </context>
 <context>
@@ -418,7 +418,7 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Outgoing call</source>
         <extracomment>A call this account placed, in a list of calls.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Apel efectuat</translation>
     </message>
     <message>
         <source>Incoming call</source>
@@ -431,7 +431,7 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Call %1</source>
         <extracomment>Places a call. %1 is the name of whoever is called.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Apelează: %1</translation>
     </message>
 </context>
 <context>
@@ -1026,7 +1026,7 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
     <message>
         <source>No calls yet</source>
-        <translation type="unfinished"></translation>
+        <translation>Încă nu există apeluri</translation>
     </message>
 </context>
 <context>

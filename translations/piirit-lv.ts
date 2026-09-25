@@ -359,7 +359,7 @@ Citās grupās, kurās ir bloķēti kontakti, viņu ziņas joprojām būs redzam
     <message>
         <source>Call silenced</source>
         <extracomment>A ringing call whose ringtone has been stopped.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Zvans apklusināts</translation>
     </message>
     <message>
         <source>Message</source>
@@ -369,7 +369,7 @@ Citās grupās, kurās ir bloķēti kontakti, viņu ziņas joprojām būs redzam
     <message>
         <source>Remind me</source>
         <extracomment>Declines a ringing call, and reminds the reader to call back later.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Atgādināt man</translation>
     </message>
 </context>
 <context>
@@ -422,7 +422,7 @@ Citās grupās, kurās ir bloķēti kontakti, viņu ziņas joprojām būs redzam
     <message>
         <source>Outgoing call</source>
         <extracomment>A call this account placed, in a list of calls.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Izejošais zvans</translation>
     </message>
     <message>
         <source>Incoming call</source>
@@ -435,7 +435,7 @@ Citās grupās, kurās ir bloķēti kontakti, viņu ziņas joprojām būs redzam
     <message>
         <source>Call %1</source>
         <extracomment>Places a call. %1 is the name of whoever is called.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Zvanīt: %1</translation>
     </message>
 </context>
 <context>
@@ -1030,7 +1030,7 @@ Citās grupās, kurās ir bloķēti kontakti, viņu ziņas joprojām būs redzam
     </message>
     <message>
         <source>No calls yet</source>
-        <translation type="unfinished"></translation>
+        <translation>Vēl nav zvanu</translation>
     </message>
 </context>
 <context>
