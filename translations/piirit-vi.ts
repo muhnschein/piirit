@@ -294,7 +294,6 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
     <message>
         <source>Call back</source>
-        <extracomment>A reminder, a while after a call was declined, to call back.</extracomment>
         <translation>Gọi lại</translation>
     </message>
 </context>
@@ -347,23 +346,9 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Kết thúc cuộc gọi</translation>
     </message>
     <message>
-        <source>Audio call</source>
-        <translation>Cuộc gọi thoại</translation>
-    </message>
-    <message>
-        <source>Call silenced</source>
-        <extracomment>A ringing call whose ringtone has been stopped.</extracomment>
-        <translation>Đã tắt tiếng cuộc gọi</translation>
-    </message>
-    <message>
-        <source>Message</source>
-        <extracomment>Declines a ringing call and opens its chat, to write instead.</extracomment>
-        <translation>Tin nhắn</translation>
-    </message>
-    <message>
-        <source>Remind me</source>
-        <extracomment>Declines a ringing call, and reminds the reader to call back later.</extracomment>
-        <translation>Nhắc tôi</translation>
+        <source>Answer</source>
+        <extracomment>Answers a call that is ringing. A verb.</extracomment>
+        <translation>Trả lời</translation>
     </message>
 </context>
 <context>

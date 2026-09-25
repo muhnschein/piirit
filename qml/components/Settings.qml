@@ -81,12 +81,6 @@ QtObject {
     /// it means something only while calls are on. The core's own
     /// `who_can_call_me`, applied to every profile.
     property alias callsRing: callsRingValue.value
-    /// The audio route a call has asked the phone's audio policy to
-    /// prefer -- "earpiece" or "speaker" -- and not yet let go of; empty
-    /// for none. Kept here because the preference outlives the app: one
-    /// left behind by a run that did not end cleanly is let go of by the
-    /// next (CallCenter.qml).
-    property alias callRoute: callRouteValue.value
     /// How many quick actions the cover has room for: 1, or 2. With one,
     /// the left action is the one, and what was set up on the right is
     /// kept for when there are two again.
@@ -195,12 +189,6 @@ QtObject {
         id: callsRingValue
         key: "/apps/harbour-piirit/calls_ring"
         defaultValue: true
-    }
-
-    property ConfigurationValue callRouteConfig: ConfigurationValue {
-        id: callRouteValue
-        key: "/apps/harbour-piirit/call_route"
-        defaultValue: ""
     }
 
     // One, and that one none, on a phone that has never been asked: the

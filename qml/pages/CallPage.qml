@@ -10,15 +10,11 @@ import "../components"
  *
  * The call itself is the window's (`CallCenter.qml`), not this page's --
  * a call comes in whatever is on screen -- and this is where it is shown.
- * Laid out as the phone's own call screen lays out a call. Ringing: who,
- * large and centred at the top, and the handset in the middle, to drag
- * to either side to answer or up to silence the ringing -- after which
- * the call can be declined, declined with a message, or declined with a
- * reminder to call back. In a call: who, at the top on the left, and the
- * time on the right; how long, large, under them; the loudspeaker and
- * the microphone under that; and End call at the foot. Their picture,
- * where they have one of their own, fills the screen behind it all, out
- * of focus.
+ * Laid out as the phone's own call screen lays out a call: who, at the
+ * top on the left, and the time on the right; how long, large, under
+ * them; the switches under that; and the red button at the foot. Their
+ * picture, where they have one of their own, fills the screen behind it
+ * all, out of focus.
  *
  * The media runs in the browser engine, in upstream's call page
  * (`CallView.qml`), which draws controls of its own. They are not shown:
@@ -40,14 +36,6 @@ Page {
 
     /// The window's call.
     property QtObject call: null
-
-    /// The window's call handling (CallCenter.qml): where the call's
-    /// sound goes, and what a ringing call can be silenced into.
-    property QtObject center: null
-
-    /// The call is ringing here, and the screen is the one a phone rings
-    /// with.
-    readonly property bool ringing: page.call !== null && page.call.state === "ringing"
 
     /// A call is under way: anything short of over.
     readonly property bool busy: page.call !== null && page.call.state !== ""
@@ -272,7 +260,6 @@ Page {
     Item {
         id: who
         objectName: "callWho"
-        visible: !page.ringing
         anchors {
             top: parent.top
             topMargin: 2 * Theme.paddingLarge
@@ -312,7 +299,6 @@ Page {
     // whatever it says, so the switches under it stay where they are.
     Item {
         id: statusLine
-        visible: !page.ringing
         anchors {
             top: who.bottom
             topMargin: Theme.itemSizeLarge
@@ -345,26 +331,9 @@ Page {
         }
     }
 
-    // The switches, under the clock: the loudspeaker and the
-    // microphone. The phone's own screen also has the keypad and
-    // recording, which belong to a phone call. As far apart as the
-    // phone's four are.
-    Switch {
-        id: loud
-        objectName: "speakerSwitch"
-        visible: page.inCall
-        anchors {
-            top: statusLine.bottom
-            topMargin: 2 * Theme.paddingLarge
-            horizontalCenter: parent.horizontalCenter
-            horizontalCenterOffset: -page.width / 12
-        }
-        icon.source: "image://theme/icon-m-speaker"
-        automaticCheck: false
-        checked: page.center !== null && page.center.speaker
-        onClicked: page.center.speaker = !page.center.speaker
-    }
-
+    // The switches, under the clock. The microphone is the one a call
+    // here has: the phone's own screen also has the loudspeaker, the
+    // keypad and recording, which belong to a phone call.
     Switch {
         id: mute
         objectName: "muteSwitch"
@@ -373,7 +342,6 @@ Page {
             top: statusLine.bottom
             topMargin: 2 * Theme.paddingLarge
             horizontalCenter: parent.horizontalCenter
-            horizontalCenterOffset: page.width / 12
         }
         icon.source: "image://theme/icon-m-mic-mute"
         automaticCheck: false
@@ -381,150 +349,32 @@ Page {
         onClicked: page.call.mute(!page.call.muted)
     }
 
-    // Ringing: the phone's own screen for it.
-    Item {
-        id: ringingView
-        objectName: "ringingView"
-        anchors.fill: parent
-        visible: page.ringing
+    // Answering and declining, while it rings. Declining is on the left
+    // and answering on the right, where the phone's own call screen has
+    // them.
+    Row {
+        objectName: "ringingButtons"
+        visible: page.call !== null && page.call.state === "ringing"
+        anchors {
+            bottom: parent.bottom
+            bottomMargin: Theme.itemSizeLarge
+            horizontalCenter: parent.horizontalCenter
+        }
+        spacing: Theme.paddingLarge * 2
 
-        /// The ringing has been silenced, and what can be done instead of
-        /// answering is on offer.
-        readonly property bool silenced: page.center !== null && page.center.quiet
-
-        // Who, centred and large, and what is calling.
-        Label {
-            id: ringName
-            objectName: "ringName"
-            anchors {
-                top: parent.top
-                topMargin: Theme.itemSizeLarge
-            }
-            x: Theme.horizontalPageMargin
-            width: parent.width - 2 * Theme.horizontalPageMargin
-            horizontalAlignment: Text.AlignHCenter
-            truncationMode: TruncationMode.Fade
-            font.family: Theme.fontFamilyHeading
-            font.pixelSize: Theme.fontSizeExtraLarge
-            color: Theme.primaryColor
-            // The other end's own name for themselves.
-            textFormat: Text.PlainText
-            text: page.call ? page.call.peer_name : ""
+        Button {
+            objectName: "declineButton"
+            //: Declines a call that is ringing. A verb.
+            text: qsTr("Decline")
+            color: Theme.errorColor
+            onClicked: page.call.hang_up()
         }
 
-        Label {
-            objectName: "ringSource"
-            anchors {
-                top: ringName.bottom
-                horizontalCenter: parent.horizontalCenter
-            }
-            font.pixelSize: Theme.fontSizeSmall
-            color: Theme.primaryColor
-            textFormat: Text.PlainText
-            // Where the phone's own says what kind of number it is.
-            text: "Piirit • " + qsTr("Audio call")
-        }
-
-        // Lower down while it rings; higher once silenced, to make room
-        // for what comes instead.
-        CallSwipe {
-            id: swipe
-            objectName: "callSwipe"
-            y: (ringingView.silenced ? 0.40 : 0.62) * parent.height - height / 2
-            silenced: ringingView.silenced
-            onAnswered: page.call.answer()
-            onSilenceRequested: page.center.silence()
-
-            Behavior on y {
-                NumberAnimation { duration: 250; easing.type: Easing.InOutQuad }
-            }
-        }
-
-        Label {
-            objectName: "silencedLabel"
-            visible: ringingView.silenced
-            anchors.horizontalCenter: parent.horizontalCenter
-            y: 0.69 * parent.height - height / 2
-            color: Theme.primaryColor
-            textFormat: Text.PlainText
-            //: A ringing call whose ringtone has been stopped.
-            text: qsTr("Call silenced")
-        }
-
-        // What a silenced call can be instead: a message, declined, or a
-        // reminder. Laid out by bindings, a third of the width each.
-        Item {
-            id: options
-            objectName: "ringingOptions"
-            visible: ringingView.silenced
-            y: 0.73 * parent.height
-            width: parent.width
-            height: Theme.itemSizeLarge
-
-            Repeater {
-                model: [
-                    //: Declines a ringing call and opens its chat, to write instead.
-                    { "name": "message", "icon": "icon-m-message", "label": qsTr("Message") },
-                    //: Declines a call that is ringing. A verb.
-                    { "name": "decline", "icon": "icon-m-call", "label": qsTr("Decline") },
-                    //: Declines a ringing call, and reminds the reader to call back later.
-                    { "name": "remind", "icon": "icon-m-alarm", "label": qsTr("Remind me") }
-                ]
-
-                BackgroundItem {
-                    id: option
-                    objectName: modelData.name + "Option"
-                    x: Theme.horizontalPageMargin
-                       + index * (options.width - 2 * Theme.horizontalPageMargin) / 3
-                    width: (options.width - 2 * Theme.horizontalPageMargin) / 3
-                    height: options.height
-                    onClicked: page.instead(modelData.name)
-
-                    readonly property bool declines: modelData.name === "decline"
-
-                    // Declining is the handset hung up, in red.
-                    Image {
-                        id: optionIcon
-                        anchors {
-                            top: parent.top
-                            topMargin: Theme.paddingMedium
-                            horizontalCenter: parent.horizontalCenter
-                        }
-                        width: Theme.iconSizeMedium
-                        height: Theme.iconSizeMedium
-                        rotation: option.declines ? 135 : 0
-                        source: "image://theme/" + modelData.icon + "?"
-                                + (option.declines ? Theme.errorColor
-                                   : option.highlighted ? Theme.highlightColor
-                                                        : Theme.primaryColor)
-                    }
-
-                    Label {
-                        anchors {
-                            top: optionIcon.bottom
-                            horizontalCenter: parent.horizontalCenter
-                        }
-                        width: parent.width
-                        horizontalAlignment: Text.AlignHCenter
-                        truncationMode: TruncationMode.Fade
-                        font.pixelSize: Theme.fontSizeSmall
-                        color: option.highlighted ? Theme.highlightColor : Theme.primaryColor
-                        textFormat: Text.PlainText
-                        text: modelData.label
-                    }
-                }
-            }
-        }
-    }
-
-    /// One of the silenced call's options was chosen.
-    function instead(what) {
-        if (what === "message") {
-            page.center.messageInstead()
-        } else if (what === "remind") {
-            page.center.remindLater()
-        } else {
-            page.call.hang_up()
+        Button {
+            objectName: "answerButton"
+            //: Answers a call that is ringing. A verb.
+            text: qsTr("Answer")
+            onClicked: page.call.answer()
         }
     }
 

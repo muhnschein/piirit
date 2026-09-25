@@ -300,7 +300,6 @@ Citās grupās, kurās ir bloķēti kontakti, viņu ziņas joprojām būs redzam
     </message>
     <message>
         <source>Call back</source>
-        <extracomment>A reminder, a while after a call was declined, to call back.</extracomment>
         <translation>Atzvanīt</translation>
     </message>
 </context>
@@ -353,23 +352,9 @@ Citās grupās, kurās ir bloķēti kontakti, viņu ziņas joprojām būs redzam
         <translation>Beigt zvanu</translation>
     </message>
     <message>
-        <source>Audio call</source>
-        <translation>Balss zvans</translation>
-    </message>
-    <message>
-        <source>Call silenced</source>
-        <extracomment>A ringing call whose ringtone has been stopped.</extracomment>
-        <translation>Zvans apklusināts</translation>
-    </message>
-    <message>
-        <source>Message</source>
-        <extracomment>Declines a ringing call and opens its chat, to write instead.</extracomment>
-        <translation>Ziņa</translation>
-    </message>
-    <message>
-        <source>Remind me</source>
-        <extracomment>Declines a ringing call, and reminds the reader to call back later.</extracomment>
-        <translation>Atgādināt man</translation>
+        <source>Answer</source>
+        <extracomment>Answers a call that is ringing. A verb.</extracomment>
+        <translation>Atbildēt</translation>
     </message>
 </context>
 <context>

@@ -298,7 +298,6 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
     </message>
     <message>
         <source>Call back</source>
-        <extracomment>A reminder, a while after a call was declined, to call back.</extracomment>
         <translation>Geri ara</translation>
     </message>
 </context>
@@ -351,23 +350,9 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
         <translation>Aramayı bitir</translation>
     </message>
     <message>
-        <source>Audio call</source>
-        <translation>Sesli arama</translation>
-    </message>
-    <message>
-        <source>Call silenced</source>
-        <extracomment>A ringing call whose ringtone has been stopped.</extracomment>
-        <translation>Arama sessize alındı</translation>
-    </message>
-    <message>
-        <source>Message</source>
-        <extracomment>Declines a ringing call and opens its chat, to write instead.</extracomment>
-        <translation>Mesaj</translation>
-    </message>
-    <message>
-        <source>Remind me</source>
-        <extracomment>Declines a ringing call, and reminds the reader to call back later.</extracomment>
-        <translation>Bana hatırlat</translation>
+        <source>Answer</source>
+        <extracomment>Answers a call that is ringing. A verb.</extracomment>
+        <translation>Yanıtla</translation>
     </message>
 </context>
 <context>

@@ -295,7 +295,6 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
     <message>
         <source>Call back</source>
-        <extracomment>A reminder, a while after a call was declined, to call back.</extracomment>
         <translation>Обратно обаждане</translation>
     </message>
 </context>
@@ -348,23 +347,9 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Край на обаждането</translation>
     </message>
     <message>
-        <source>Audio call</source>
-        <translation>Гласово обаждане</translation>
-    </message>
-    <message>
-        <source>Call silenced</source>
-        <extracomment>A ringing call whose ringtone has been stopped.</extracomment>
-        <translation>Обаждането е заглушено</translation>
-    </message>
-    <message>
-        <source>Message</source>
-        <extracomment>Declines a ringing call and opens its chat, to write instead.</extracomment>
-        <translation>Съобщение</translation>
-    </message>
-    <message>
-        <source>Remind me</source>
-        <extracomment>Declines a ringing call, and reminds the reader to call back later.</extracomment>
-        <translation>Напомни ми</translation>
+        <source>Answer</source>
+        <extracomment>Answers a call that is ringing. A verb.</extracomment>
+        <translation>Отговор</translation>
     </message>
 </context>
 <context>

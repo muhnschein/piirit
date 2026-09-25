@@ -299,7 +299,6 @@ Vous continuerez à voir les messages des contacts bloqués dans les autres grou
     </message>
     <message>
         <source>Call back</source>
-        <extracomment>A reminder, a while after a call was declined, to call back.</extracomment>
         <translation>Rappeler</translation>
     </message>
 </context>
@@ -352,23 +351,9 @@ Vous continuerez à voir les messages des contacts bloqués dans les autres grou
         <translation>Raccrocher</translation>
     </message>
     <message>
-        <source>Audio call</source>
-        <translation>Appel audio</translation>
-    </message>
-    <message>
-        <source>Call silenced</source>
-        <extracomment>A ringing call whose ringtone has been stopped.</extracomment>
-        <translation>Appel mis en silencieux</translation>
-    </message>
-    <message>
-        <source>Message</source>
-        <extracomment>Declines a ringing call and opens its chat, to write instead.</extracomment>
-        <translation>Message</translation>
-    </message>
-    <message>
-        <source>Remind me</source>
-        <extracomment>Declines a ringing call, and reminds the reader to call back later.</extracomment>
-        <translation>Me le rappeler</translation>
+        <source>Answer</source>
+        <extracomment>Answers a call that is ringing. A verb.</extracomment>
+        <translation>Décrocher</translation>
     </message>
 </context>
 <context>

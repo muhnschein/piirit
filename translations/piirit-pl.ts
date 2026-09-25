@@ -300,7 +300,6 @@ Wiadomości innych grup z zablokowanymi kontaktami nadal będą wyświetlane.</t
     </message>
     <message>
         <source>Call back</source>
-        <extracomment>A reminder, a while after a call was declined, to call back.</extracomment>
         <translation>Oddzwoń</translation>
     </message>
 </context>
@@ -353,23 +352,9 @@ Wiadomości innych grup z zablokowanymi kontaktami nadal będą wyświetlane.</t
         <translation>Zakończ połączenie</translation>
     </message>
     <message>
-        <source>Audio call</source>
-        <translation>Połączenie głosowe</translation>
-    </message>
-    <message>
-        <source>Call silenced</source>
-        <extracomment>A ringing call whose ringtone has been stopped.</extracomment>
-        <translation>Połączenie wyciszone</translation>
-    </message>
-    <message>
-        <source>Message</source>
-        <extracomment>Declines a ringing call and opens its chat, to write instead.</extracomment>
-        <translation>Wiadomość</translation>
-    </message>
-    <message>
-        <source>Remind me</source>
-        <extracomment>Declines a ringing call, and reminds the reader to call back later.</extracomment>
-        <translation>Przypomnij mi</translation>
+        <source>Answer</source>
+        <extracomment>Answers a call that is ringing. A verb.</extracomment>
+        <translation>Odbierz</translation>
     </message>
 </context>
 <context>

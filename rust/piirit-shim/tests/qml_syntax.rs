@@ -1676,13 +1676,10 @@ fn qualified_uses(code: &str) -> Vec<(usize, String)> {
 #[test]
 fn qml_reads_no_name_that_is_not_there() {
     // What QML puts in scope without the file saying so.
-    const IN_SCOPE: [&str; 21] = [
+    const IN_SCOPE: [&str; 20] = [
         // Grouped properties, and properties of the element being
         // configured read without qualifying them.
         "anchors",
-        // An animation's curve: the call screen's handset falls back
-        // along one.
-        "easing",
         "font",
         "icon",
         "text",

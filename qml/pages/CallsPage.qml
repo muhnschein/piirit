@@ -122,7 +122,9 @@ Page {
 
         header: Item {
             width: list.width
-            height: header.height + callAction.height + Theme.paddingLarge
+            // A clear gap under calling, so the row to call from does not
+            // read as the first of the calls.
+            height: header.height + callAction.height + 3 * Theme.paddingLarge
 
             PageHeader {
                 id: header

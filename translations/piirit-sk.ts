@@ -300,7 +300,6 @@ Správy od zablokovaných kontaktov v ostatných skupinách sa budú naďalej zo
     </message>
     <message>
         <source>Call back</source>
-        <extracomment>A reminder, a while after a call was declined, to call back.</extracomment>
         <translation>Zavolať späť</translation>
     </message>
 </context>
@@ -353,23 +352,9 @@ Správy od zablokovaných kontaktov v ostatných skupinách sa budú naďalej zo
         <translation>Ukončiť hovor</translation>
     </message>
     <message>
-        <source>Audio call</source>
-        <translation>Hlasový hovor</translation>
-    </message>
-    <message>
-        <source>Call silenced</source>
-        <extracomment>A ringing call whose ringtone has been stopped.</extracomment>
-        <translation>Hovor stlmený</translation>
-    </message>
-    <message>
-        <source>Message</source>
-        <extracomment>Declines a ringing call and opens its chat, to write instead.</extracomment>
-        <translation>Správa</translation>
-    </message>
-    <message>
-        <source>Remind me</source>
-        <extracomment>Declines a ringing call, and reminds the reader to call back later.</extracomment>
-        <translation>Pripomenúť</translation>
+        <source>Answer</source>
+        <extracomment>Answers a call that is ringing. A verb.</extracomment>
+        <translation>Prijať</translation>
     </message>
 </context>
 <context>

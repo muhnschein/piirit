@@ -301,7 +301,6 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
     </message>
     <message>
         <source>Call back</source>
-        <extracomment>A reminder, a while after a call was declined, to call back.</extracomment>
         <translation>Pokliči nazaj</translation>
     </message>
 </context>
@@ -354,23 +353,9 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
         <translation>Končaj klic</translation>
     </message>
     <message>
-        <source>Audio call</source>
-        <translation>Glasovni klic</translation>
-    </message>
-    <message>
-        <source>Call silenced</source>
-        <extracomment>A ringing call whose ringtone has been stopped.</extracomment>
-        <translation>Klic utišan</translation>
-    </message>
-    <message>
-        <source>Message</source>
-        <extracomment>Declines a ringing call and opens its chat, to write instead.</extracomment>
-        <translation>Sporočilo</translation>
-    </message>
-    <message>
-        <source>Remind me</source>
-        <extracomment>Declines a ringing call, and reminds the reader to call back later.</extracomment>
-        <translation>Opomni me</translation>
+        <source>Answer</source>
+        <extracomment>Answers a call that is ringing. A verb.</extracomment>
+        <translation>Sprejmi</translation>
     </message>
 </context>
 <context>

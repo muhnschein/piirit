@@ -299,7 +299,6 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
     <message>
         <source>Call back</source>
-        <extracomment>A reminder, a while after a call was declined, to call back.</extracomment>
         <translation>પાછો કૉલ કરો</translation>
     </message>
 </context>
@@ -352,23 +351,9 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>કૉલ સમાપ્ત કરો</translation>
     </message>
     <message>
-        <source>Audio call</source>
-        <translation>ઑડિયો કૉલ</translation>
-    </message>
-    <message>
-        <source>Call silenced</source>
-        <extracomment>A ringing call whose ringtone has been stopped.</extracomment>
-        <translation>કૉલ મૌન કરાયો</translation>
-    </message>
-    <message>
-        <source>Message</source>
-        <extracomment>Declines a ringing call and opens its chat, to write instead.</extracomment>
-        <translation>સંદેશ</translation>
-    </message>
-    <message>
-        <source>Remind me</source>
-        <extracomment>Declines a ringing call, and reminds the reader to call back later.</extracomment>
-        <translation>મને યાદ અપાવો</translation>
+        <source>Answer</source>
+        <extracomment>Answers a call that is ringing. A verb.</extracomment>
+        <translation>જવાબ આપો</translation>
     </message>
 </context>
 <context>

@@ -299,7 +299,6 @@ Mensagens de contactos bloqueados não serão ocultadas noutros grupos.</transla
     </message>
     <message>
         <source>Call back</source>
-        <extracomment>A reminder, a while after a call was declined, to call back.</extracomment>
         <translation>Ligar de volta</translation>
     </message>
 </context>
@@ -352,23 +351,9 @@ Mensagens de contactos bloqueados não serão ocultadas noutros grupos.</transla
         <translation>Terminar chamada</translation>
     </message>
     <message>
-        <source>Audio call</source>
-        <translation>Chamada de voz</translation>
-    </message>
-    <message>
-        <source>Call silenced</source>
-        <extracomment>A ringing call whose ringtone has been stopped.</extracomment>
-        <translation>Chamada silenciada</translation>
-    </message>
-    <message>
-        <source>Message</source>
-        <extracomment>Declines a ringing call and opens its chat, to write instead.</extracomment>
-        <translation>Mensagem</translation>
-    </message>
-    <message>
-        <source>Remind me</source>
-        <extracomment>Declines a ringing call, and reminds the reader to call back later.</extracomment>
-        <translation>Lembrar-me</translation>
+        <source>Answer</source>
+        <extracomment>Answers a call that is ringing. A verb.</extracomment>
+        <translation>Atender</translation>
     </message>
 </context>
 <context>

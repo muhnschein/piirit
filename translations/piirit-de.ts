@@ -299,7 +299,6 @@ In anderen Gruppen mit blockierten Kontakten werden deren Nachrichten weiterhin 
     </message>
     <message>
         <source>Call back</source>
-        <extracomment>A reminder, a while after a call was declined, to call back.</extracomment>
         <translation>Zurückrufen</translation>
     </message>
 </context>
@@ -352,23 +351,9 @@ In anderen Gruppen mit blockierten Kontakten werden deren Nachrichten weiterhin 
         <translation>Anruf beenden</translation>
     </message>
     <message>
-        <source>Audio call</source>
-        <translation>Sprachanruf</translation>
-    </message>
-    <message>
-        <source>Call silenced</source>
-        <extracomment>A ringing call whose ringtone has been stopped.</extracomment>
-        <translation>Anruf stummgeschaltet</translation>
-    </message>
-    <message>
-        <source>Message</source>
-        <extracomment>Declines a ringing call and opens its chat, to write instead.</extracomment>
-        <translation>Nachricht</translation>
-    </message>
-    <message>
-        <source>Remind me</source>
-        <extracomment>Declines a ringing call, and reminds the reader to call back later.</extracomment>
-        <translation>Erinnere mich</translation>
+        <source>Answer</source>
+        <extracomment>Answers a call that is ringing. A verb.</extracomment>
+        <translation>Annehmen</translation>
     </message>
 </context>
 <context>

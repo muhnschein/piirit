@@ -298,7 +298,6 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
     <message>
         <source>Call back</source>
-        <extracomment>A reminder, a while after a call was declined, to call back.</extracomment>
         <translation>Кире шалтырату</translation>
     </message>
 </context>
@@ -351,23 +350,9 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Шалтыратуны тәмамлау</translation>
     </message>
     <message>
-        <source>Audio call</source>
-        <translation>Тавышлы шалтырату</translation>
-    </message>
-    <message>
-        <source>Call silenced</source>
-        <extracomment>A ringing call whose ringtone has been stopped.</extracomment>
-        <translation>Шалтырату тавышсыз</translation>
-    </message>
-    <message>
-        <source>Message</source>
-        <extracomment>Declines a ringing call and opens its chat, to write instead.</extracomment>
-        <translation>Хәбәр</translation>
-    </message>
-    <message>
-        <source>Remind me</source>
-        <extracomment>Declines a ringing call, and reminds the reader to call back later.</extracomment>
-        <translation>Искә төшер</translation>
+        <source>Answer</source>
+        <extracomment>Answers a call that is ringing. A verb.</extracomment>
+        <translation>Җавап бирү</translation>
     </message>
 </context>
 <context>
