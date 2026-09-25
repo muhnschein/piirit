@@ -424,10 +424,7 @@ fn the_relays_are_listed_removed_and_added() {
             "offline-status",
             get_in!("relayReport0", "reportStatus", "text")
         );
-        record!(
-            "offline-dot",
-            get_in!("relayReport1", "reportDot", "color")
-        );
+        record!("offline-dot", get_in!("relayReport1", "reportDot", "color"));
         (*engine_ptr).quit();
     });
 
@@ -468,7 +465,10 @@ fn the_relays_are_listed_removed_and_added() {
     assert_added(&value, &calls, &navigation, &pushed_account, &context);
     assert_eq!(value("offline"), "ok", "{context}");
     assert_eq!(
-        (value("offline-status").as_str(), value("offline-dot").as_str()),
+        (
+            value("offline-status").as_str(),
+            value("offline-dot").as_str()
+        ),
         ("Not connected", "#f33b2d"),
         "a profile with IO stopped showed its relays as still being \
          checked, for as long as the phone stays offline. {context}"

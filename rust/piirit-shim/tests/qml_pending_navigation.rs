@@ -140,7 +140,11 @@ fn a_move_waits_for_its_page_to_be_on_screen() {
     let context = format!("steps: {steps:?}");
 
     assert_eq!(value("load"), "ok", "{context}");
-    assert_eq!(value("asked"), "", "a move was made over a call's page. {context}");
+    assert_eq!(
+        value("asked"),
+        "",
+        "a move was made over a call's page. {context}"
+    );
     assert_eq!(value("pending"), "true", "{context}");
     assert_eq!(
         value("waited"),
@@ -155,7 +159,11 @@ fn a_move_waits_for_its_page_to_be_on_screen() {
     );
     assert_eq!(value("pending-after"), "false", "{context}");
     assert_eq!(value("replace-asked"), "pop;", "{context}");
-    assert_eq!(value("replace-on-screen"), "pop;replace:Next.qml;", "{context}");
+    assert_eq!(
+        value("replace-on-screen"),
+        "pop;replace:Next.qml;",
+        "{context}"
+    );
     assert_eq!(value("busy-asked"), "pop;replace:Next.qml;", "{context}");
     assert_eq!(
         value("busy-done"),

@@ -318,7 +318,10 @@ fn a_call_rings_is_answered_on_its_page_and_ends_with_the_platform_told() {
     single_shot(Duration::from_secs(14), move || unsafe {
         record!("pushes-fourth", call!("pushes"));
         record!("fourth-ringing", get!("ringingButtons", "visible"));
-        record!("decline-fourth", call!("tap", QString::from("declineButton")));
+        record!(
+            "decline-fourth",
+            call!("tap", QString::from("declineButton"))
+        );
     });
 
     single_shot(Duration::from_secs(17), move || unsafe {

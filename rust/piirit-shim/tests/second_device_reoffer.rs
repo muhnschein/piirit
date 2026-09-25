@@ -155,13 +155,13 @@ fn an_offer_made_again_straight_after_cancel_is_not_ended_by_the_first() {
     );
     assert_eq!(value("cancel-second"), "false|", "{context}");
 
-    let stops = common::calls(&journal)
+    let stop_requests = common::calls(&journal)
         .into_iter()
         .filter(|(name, _)| name == "stop_ongoing_process")
         .map(|(_, params)| params)
         .collect::<Vec<Value>>();
     assert_eq!(
-        stops.len(),
+        stop_requests.len(),
         2,
         "the second provider could not be stopped: it was running in the \
          core with nothing on the page to stop it. {context}"

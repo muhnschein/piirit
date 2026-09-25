@@ -184,7 +184,8 @@ pub struct Call {
         qt_method!(fn(&mut self, context_id: u32, kind: QString, payload_json: QString)),
 
     /// How long a call may ring here before it is taken to have rung
-    /// out, in milliseconds; 0 for [`RING_LIMIT`]. Only a test sets it.
+    /// out, in milliseconds; 0 for the app's own limit, a little over the
+    /// core's 120 seconds. Only a test sets it.
     pub ring_limit_ms: qt_property!(u32),
 
     /// The loopback host the page is served from, while there is a page.
@@ -688,7 +689,8 @@ impl Call {
             let Some(this) = ptr.as_pinned() else { return };
             // Answered, declined or ended meanwhile: answering keeps the
             // call, ending it starts another count.
-            if this.borrow().generation != generation || this.borrow().state.to_string() != "ringing"
+            if this.borrow().generation != generation
+                || this.borrow().state.to_string() != "ringing"
             {
                 return;
             }

@@ -1732,7 +1732,11 @@ async fn serve() {
                 // With IO stopped the real core is not connected, and its
                 // report is that and nothing else: no relay is in it.
                 "get_connectivity" => {
-                    let band = if state.lock().await.io_stopped { 1000 } else { 4000 };
+                    let band = if state.lock().await.io_stopped {
+                        1000
+                    } else {
+                        4000
+                    };
                     ok(&id, &json!(band))
                 }
                 "get_connectivity_html" if state.lock().await.io_stopped => {

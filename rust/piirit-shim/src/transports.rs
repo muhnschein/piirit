@@ -394,7 +394,12 @@ mod tests {
     #[test]
     fn a_profile_not_connected_at_all_has_relays_not_connected() {
         let relays = listed(&["ada@old.example.net", "ada@nine.testrun.org"]);
-        let rows = rows_from(&relays, "ada@nine.testrun.org", "<h3>Not connected</h3>", 1000);
+        let rows = rows_from(
+            &relays,
+            "ada@nine.testrun.org",
+            "<h3>Not connected</h3>",
+            1000,
+        );
         assert_eq!(
             rows.iter()
                 .map(|row| (row.dot.to_string(), row.status.to_string(), row.offline))
