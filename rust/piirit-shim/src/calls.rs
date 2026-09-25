@@ -183,6 +183,10 @@ pub struct Call {
     pub handle_event:
         qt_method!(fn(&mut self, context_id: u32, kind: QString, payload_json: QString)),
 
+    /// How long a call may ring here before it is taken to have rung
+    /// out, in milliseconds; 0 for [`RING_LIMIT`]. Only a test sets it.
+    pub ring_limit_ms: qt_property!(u32),
+
     /// The loopback host the page is served from, while there is a page.
     host: Option<Host>,
     /// The caller's offer, for a call that came in: what answering it
@@ -205,6 +209,16 @@ pub struct Call {
     /// so a host coming up late reads the flag of the call it was for.
     settled: Arc<AtomicBool>,
 }
+
+/// How long a call may ring here before it is taken to have rung out
+/// without the core saying so. The core rings a call for 120 seconds from
+/// when it was sent, and says `CallEnded` when that is up -- once, from a
+/// timer that lives only in the server that heard the call. An event
+/// channel that overflowed, or a server that died and was started again,
+/// loses it, and without this the phone would ring until somebody
+/// declined. A little over the core's own, so that when the core does
+/// say it, its word is the one taken.
+const RING_LIMIT: std::time::Duration = std::time::Duration::from_secs(125);
 
 /// The most early events kept for one call. They are for a moment that
 /// lasts as long as one round trip to the core, and anything past this
@@ -286,6 +300,7 @@ impl Call {
             this_mut.offer = call.sdp_offer;
             this_mut.call_changed();
             this_mut.set_state("ringing");
+            this_mut.watch_ringing();
         });
         runtime.spawn(async move {
             done(summary(&rpc, account_id, message_id).await);
@@ -614,6 +629,7 @@ impl Call {
                 self.offer = json::str_at(&payload, "place_call_info").to_string();
                 self.call_changed();
                 self.set_state("ringing");
+                self.watch_ringing();
                 self.ringing();
             }
             // Answered: here, which the host has reported already, or on
@@ -651,6 +667,37 @@ impl Call {
             }
             _ => {}
         }
+    }
+
+    /// Stop a call ringing that has rung past [`RING_LIMIT`] with nothing
+    /// from the core. By then the core counts it as over whatever became
+    /// of its own timer -- a ringing call goes stale 120 seconds after it
+    /// was sent, and `call_info` says so -- so it is ended as one that
+    /// rang out, and the core is asked, as ever, which way.
+    fn watch_ringing(&self) {
+        let Some((_, runtime)) = connection() else {
+            return;
+        };
+        let limit = match self.ring_limit_ms {
+            0 => RING_LIMIT,
+            ms => std::time::Duration::from_millis(u64::from(ms)),
+        };
+        let generation = self.generation;
+        let ptr: QPointer<Self> = QPointer::from(self);
+        let done = queued_callback(move |()| {
+            let Some(this) = ptr.as_pinned() else { return };
+            // Answered, declined or ended meanwhile: answering keeps the
+            // call, ending it starts another count.
+            if this.borrow().generation != generation || this.borrow().state.to_string() != "ringing"
+            {
+                return;
+            }
+            this.borrow_mut().finish_unanswered();
+        });
+        runtime.spawn(async move {
+            tokio::time::sleep(limit).await;
+            done(());
+        });
     }
 
     /// A call that rang here and ended unanswered: missed, or declined on
