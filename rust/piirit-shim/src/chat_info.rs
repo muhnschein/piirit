@@ -15,6 +15,9 @@ use crate::json;
 use crate::models::{ContactItem, ContactListModel};
 
 /// What one load found.
+// Four facts of the chat, read into the four properties of the same
+// names; see `ChatInfo`.
+#[allow(clippy::struct_excessive_bools)]
 struct Loaded {
     name: String,
     avatar_path: String,
