@@ -15,7 +15,9 @@
 //!   again" after that;
 //! - the page can be walked away from, and going back ends the offer in
 //!   the core rather than leaving a provider running behind a page that
-//!   is gone; only a transfer already under way pins it;
+//!   is gone; only a transfer already under way pins it -- and a page
+//!   pushed over this one, a call's, is not the reader leaving, and
+//!   leaves the offer up;
 //! - Cancel stops the provider in the core and leaves the reader on the
 //!   page, with the button back;
 //! - an offer the reader stops reports nothing: the core refuses the
@@ -152,11 +154,16 @@ const PROBE_QML: &str = r"
             return '' + item[property]
         }
         function pageProperty(property) { return '' + loader.item[property] }
-        // What Silica does to a page on the way off it, whichever way
-        // the reader is going.
-        function leave() {
-            loader.item.status = PageStatus.Deactivating
+        // What Silica does to a page when another is pushed over it --
+        // a call's, which comes in whatever is on screen -- and back.
+        function cover(on) {
+            loader.item.status = on ? PageStatus.Deactivating : PageStatus.Active
             return 'ok'
+        }
+        // The page gone, as going back takes it.
+        function leave() {
+            loader.setSource('', {})
+            return loader.item === null ? 'ok' : 'still-there'
         }
         function click(name) {
             var item = findIn(loader.item, name)
@@ -352,16 +359,15 @@ fn the_second_device_page_offers_one_profile_and_hands_it_over() {
 
     single_shot(Duration::from_secs(11), move || unsafe {
         record!("leaving-code", get!("device", "code"));
+        // Covered, not left: the offer stays up under the page on top.
+        call!("cover", true);
+        record!("covered-running", get!("device", "running"));
+        record!("covered-code", get!("device", "code"));
+        call!("cover", false);
         record!("leave", call!("leave"));
     });
 
     single_shot(Duration::from_secs(13), move || unsafe {
-        record!("left-idle", get!("device", "running"));
-        record!("left-code", get!("device", "code"));
-        record!(
-            "left-said",
-            call!("pageProperty", QString::from("errorMessage"))
-        );
         // And the profile a device really turns up for and stays for.
         record!(
             "load-taken",
@@ -571,17 +577,17 @@ fn the_second_device_page_offers_one_profile_and_hands_it_over() {
         "there was no offer up to leave: {}. {context}",
         value("leaving-code")
     );
-    assert_eq!(value("leave"), "ok", "nothing left the page. {context}");
     assert_eq!(
         (
-            value("left-idle").as_str(),
-            value("left-code").as_str(),
-            value("left-said").as_str()
+            value("covered-running").as_str(),
+            value("covered-code") == value("leaving-code")
         ),
-        ("false", "", ""),
-        "going back left the offer running, or a code on the page, or \
-         reported the reader's own leaving back to them. {context}"
+        ("true", true),
+        "a page pushed over the offer -- a call's -- ended it, which drops \
+         a second device part-way through copying the profile. {context}"
     );
+    // That going back stopped it in the core is `assert_offers`'s.
+    assert_eq!(value("leave"), "ok", "nothing left the page. {context}");
 
     // Stopped by the reader: nothing reported, nothing left up.
     assert_eq!(value("cancel"), "ok", "nothing cancelled. {context}");

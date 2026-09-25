@@ -57,10 +57,20 @@ const PROBE_QML: &str = r"
             property int accountId: 0
             property Item chatList: null
             property int raised: 0
+            // A page up that must not be jumped away from.
+            property bool quickActionsPaused: false
             function activate() { raised += 1 }
         }
 
         Loader { id: loader }
+        // A list attached beside a finished backup, as BackupPage puts it.
+        Loader { id: attachedLoader }
+        function attach(properties) {
+            attachedLoader.setSource(Qt.resolvedUrl(loader.source), JSON.parse(properties))
+            return attachedLoader.status === Loader.Ready ? 'ok' : 'load-failed'
+        }
+        function detach() { attachedLoader.setSource('', {}); return 'ok' }
+        function paused(on) { appWindow.quickActionsPaused = on === 'true'; return 'ok' }
         function load(url, properties) {
             loader.setSource('', {})
             loader.setSource(url, JSON.parse(properties))
@@ -264,6 +274,34 @@ fn a_quick_action_lands_on_the_chat_list_and_does_what_it_says() {
 
     single_shot(Duration::from_secs(8), move || unsafe {
         record!("arrived-stack", call!("stackLog"));
+
+        // A page up mid-work -- a backup being written -- under a tap: the
+        // app comes forward onto it, and nothing is popped.
+        call!("onTop", QString::from("false"));
+        call!("paused", QString::from("true"));
+        record!("paused-raised-before", call!("raised"));
+        record!("paused", act!("qr", 0, 0));
+        record!("paused-raised", call!("raised"));
+        record!("paused-stack", call!("stackLog"));
+        call!("paused", QString::from("false"));
+        call!("onTop", QString::from("true"));
+
+        // A list attached beside a finished backup is not where quick
+        // actions land: it goes with a swipe back, and the one under it
+        // is still there.
+        record!(
+            "attach",
+            call!(
+                "attach",
+                QString::from(r#"{"accountId": 2, "attached": true}"#)
+            )
+        );
+        record!("attached-registered", call!("registered"));
+        call!("detach");
+    });
+
+    single_shot(Duration::from_secs(9), move || unsafe {
+        record!("detached-registered", call!("registered"));
         (*engine_ptr).quit();
     });
 
@@ -279,6 +317,27 @@ fn a_quick_action_lands_on_the_chat_list_and_does_what_it_says() {
     let context = format!("steps: {steps:?}");
 
     assert_eq!(value("load"), "ok", "the chat list did not load. {context}");
+    assert_eq!(
+        value("paused-stack"),
+        "",
+        "a tap popped a page that was in the middle of something. {context}"
+    );
+    let raised_before: u32 = value("paused-raised-before").parse().unwrap_or_default();
+    assert_eq!(
+        value("paused-raised"),
+        (raised_before + 1).to_string(),
+        "the app did not come forward onto the page it kept. {context}"
+    );
+    assert_eq!(value("attach"), "ok", "{context}");
+    assert_eq!(
+        (
+            value("attached-registered").as_str(),
+            value("detached-registered").as_str()
+        ),
+        ("registered", "registered"),
+        "a chat list attached beside a finished backup took the window's \
+         quick actions, and left it with none once it went. {context}"
+    );
     assert_eq!(
         value("registered"),
         "registered",
