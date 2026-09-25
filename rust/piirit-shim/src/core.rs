@@ -318,6 +318,11 @@ pub struct DeltaChatCore {
     /// runs -- or the first configured one when nothing is selected, or
     /// what is selected is not usable.
     pub accounts_refreshed: qt_signal!(configured_count: u32, resume_account_id: u32),
+    /// Whether `account_id` is a configured profile in
+    /// [`DeltaChatCore::account_list`] as last read: what the window asks
+    /// of every id it holds when the list comes back, so that one left
+    /// pointing at a deleted profile is moved off it.
+    pub is_configured_account: qt_method!(fn(&self, account_id: u32) -> bool),
 
     /// Tell the core which profile is being shown, so the next start
     /// comes back to it. The core's `select_account`, which it writes to
@@ -1196,6 +1201,15 @@ impl DeltaChatCore {
             .await;
             done(result);
         });
+    }
+
+    /// Whether `account_id` is a configured profile, as the list was last
+    /// read.
+    pub fn is_configured_account(&self, account_id: u32) -> bool {
+        self.account_list
+            .borrow()
+            .iter()
+            .any(|row| row.account_id == account_id && row.is_configured)
     }
 
     /// Tell the core which profile is being shown.

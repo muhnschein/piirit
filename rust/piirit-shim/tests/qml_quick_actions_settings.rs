@@ -69,6 +69,9 @@ const PROBE_QML: &str = r"
 
         Loader { id: loader }
         function load(url) {
+            // The profiles there are, which the app has read long before
+            // anyone reaches its settings.
+            core.refresh_accounts()
             loader.setSource(url, { accountId: 1 })
             return loader.status === Loader.Ready ? 'ok' : 'load-failed'
         }
@@ -136,6 +139,14 @@ const PROBE_QML: &str = r"
         function pickIn(accountId, chatId, chatName) {
             pageStack.picker.accountId = accountId
             pageStack.picker.chatPicked(chatId, chatName)
+            return 'ok'
+        }
+        // An action whose chat is in a profile deleted since.
+        function orphan(side, account) {
+            var prefix = side === 'right' ? 'quickActionRight' : 'quickActionLeft'
+            Settings[prefix] = 'chat'
+            Settings[prefix + 'Account'] = account
+            Settings[prefix + 'Chat'] = 1
             return 'ok'
         }
         function stackLog() {
@@ -424,6 +435,11 @@ fn the_quick_actions_are_set_up_on_a_page_of_their_own() {
         record!("pick-again", click!("leftAction-chat"));
         record!("asked-there", call!("stackLog"));
 
+        // Its profile deleted since: the picker opens on one there is.
+        record!("orphan", call!("orphan", QString::from("left"), 9));
+        record!("pick-orphan", click!("leftAction-chat"));
+        record!("asked-orphan", call!("stackLog"));
+
         // Back to room for one: the right hidden, and kept.
         record!("choose-one", click!("oneActionPreview"));
         record!("count-one", call!("count"));
@@ -651,6 +667,12 @@ fn the_quick_actions_are_set_up_on_a_page_of_their_own() {
         "push:ChatPickerPage.qml:2:Choose a chat:true|",
         "picked again, the picker does not open on the chat's profile. \
          {context}"
+    );
+    assert_eq!(
+        value("asked-orphan"),
+        "push:ChatPickerPage.qml:1:Choose a chat:true|",
+        "an action whose profile was deleted opens the picker on that \
+         profile, a list of nothing but \"account not found\". {context}"
     );
     assert_eq!(value("count-one"), "1", "{context}");
     assert_eq!(value("right-hidden-again"), "false", "{context}");
