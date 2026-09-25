@@ -11,9 +11,9 @@
 /// this was built from has them, and only where apps are on; calls last,
 /// and only where calls are on and the chat is one a call can be in.
 function kinds(appsAvailable, callsAvailable) {
-    var all = appsAvailable ? ["apps", "gallery", "audio", "files"]
-                            : ["gallery", "audio", "files"]
-    return callsAvailable ? all.concat(["calls"]) : all
+    return (appsAvailable ? ["apps", "gallery", "audio", "files"]
+                          : ["gallery", "audio", "files"])
+        .concat(callsAvailable ? ["calls"] : [])
 }
 
 /// What a kind is called: the tile's word, and the page's heading.
