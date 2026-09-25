@@ -228,6 +228,52 @@ ApplicationWindow {
         stack: pageStack
     }
 
+    /// The way to another profile's chats, held the same way and for the
+    /// same reason: the profile the chat list is on goes as the profiles
+    /// page is leaving.
+    PendingNavigation {
+        id: otherProfile
+        stack: pageStack
+    }
+
+    /// Move everything the window holds off profiles the core no longer
+    /// has, onto `resumeAccountId`, the one the core says to show.
+    ///
+    /// Deleting the profile the chat list was on, with another left, used
+    /// to leave the list open on it -- and dconf remembering it, so the
+    /// next launch resumed onto it too. Every page opened from there took
+    /// its profile off the list and answered with the core's "account
+    /// with id N not found": the chats, the settings, the quick actions'
+    /// chat picker. Asked on every refresh, so a profile remembered from
+    /// before this was fixed, or deleted from another client, is left the
+    /// first time the core lists the profiles there are.
+    function leaveGoneProfiles(resumeAccountId) {
+        // A quick action's chat went with its profile. Nothing, rather
+        // than a chat the cover cannot open and the picker cannot list.
+        var sides = ["quickActionLeft", "quickActionRight"]
+        for (var i = 0; i < sides.length; i++) {
+            var prefix = sides[i]
+            if (Settings[prefix] === "chat" && Settings[prefix + "Account"] > 0
+                    && !core.is_configured_account(Settings[prefix + "Account"])) {
+                Settings[prefix] = ""
+                Settings[prefix + "Account"] = 0
+                Settings[prefix + "Chat"] = 0
+            }
+        }
+        if (appWindow.accountId === 0 || resumeAccountId === 0
+                || core.is_configured_account(appWindow.accountId)) {
+            return
+        }
+        // Now rather than when the new list is up: the app may be closed
+        // before the move is made, and the next launch must not resume
+        // onto the profile that is gone. And a refresh arriving before
+        // then finds nothing left to move.
+        appWindow.accountId = resumeAccountId
+        Settings.lastAccountId = resumeAccountId
+        otherProfile.replaceAbove(null, Qt.resolvedUrl("pages/ChatListPage.qml"),
+                                  { accountId: resumeAccountId })
+    }
+
     // Where the app goes when the last profile is gone. Here rather
     // than on the pages, which is where it used to be: the profiles
     // page is destroyed by the same swipe that deletes from it, the
@@ -239,6 +285,7 @@ ApplicationWindow {
         onAccounts_refreshed: {
             if (configured_count > 0) {
                 appWindow.hadProfile = true
+                appWindow.leaveGoneProfiles(resume_account_id)
                 return
             }
             if (!appWindow.hadProfile) {

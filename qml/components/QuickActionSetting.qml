@@ -92,7 +92,10 @@ Column {
     /// any other: the chat is whichever profile's it was picked from.
     function pickChat() {
         var picker = pageStack.push(Qt.resolvedUrl("../pages/ChatPickerPage.qml"), {
+            // Only a profile there is: one the core no longer has is a
+            // list of nothing but "account not found" (piirit.qml).
             accountId: setting.action.kind === "chat" && setting.action.accountId > 0
+                       && core.is_configured_account(setting.action.accountId)
                        ? setting.action.accountId : setting.accountId,
             // The action's profile may have been deleted since.
             fallbackAccountId: setting.accountId,
