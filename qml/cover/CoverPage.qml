@@ -318,8 +318,39 @@ CoverBackground {
 
         cover.people = everyone
         cover.unreadTotal = total
-        cover.cells = made
+        // An unchanged refresh must not throw every masked picture away.
+        // When what a cell shows does change, give it a fresh Avatar and
+        // effect chain rather than switching an Image source underneath a
+        // cached OpacityMask.
+        if (!cover.sameCells(made)) {
+            cover.cells = made
+        }
     }
+
+    /// What makes two cells the same face in the same place: what the cover
+    /// draws, not the objects it read them from. A person's unread count is
+    /// left out -- a face already lit stays lit when one more message lands
+    /// -- because the pill's total is updated on its own.
+    function cellFaces(cell) {
+        var person = cell.person
+        return cell.row + ":" + cell.col + ":" + (cell.loud ? 1 : 0) + ":"
+               + (person ? person.key + "|" + person.name + "|" + person.color
+                           + "|" + person.avatar_path : "")
+    }
+
+    /// Whether the grid would be drawn the same as it is now.
+    function sameCells(made) {
+        if (cover.cells.length !== made.length) {
+            return false
+        }
+        for (var i = 0; i < made.length; i++) {
+            if (cover.cellFaces(cover.cells[i]) !== cover.cellFaces(made[i])) {
+                return false
+            }
+        }
+        return true
+    }
+
     onRowsChanged: cover.gather()
     onWidthChanged: cover.gather()
     // The cells worth having move with the strip.

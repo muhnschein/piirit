@@ -194,6 +194,12 @@ fn delegates_bind_only_roles_their_models_have() {
     }
 
     let root = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../..");
+    // The cover's grid is a `ListModel` it fills itself, so its roles are
+    // not a Rust row's and are named here beside the profile's.
+    let grid_roles: Vec<String> = ["row", "col", "loud", "filled", "name", "color", "avatar"]
+        .into_iter()
+        .map(String::from)
+        .collect();
     let cases: [(&str, Vec<String>); 14] = [
         (
             "qml/components/ConversationList.qml",
@@ -209,11 +215,12 @@ fn delegates_bind_only_roles_their_models_have() {
             "qml/pages/ChatListPage.qml",
             names_of::<piirit_shim::ChatListItem>(),
         ),
-        // One chat list per profile; the people themselves come out of
-        // those lists as JSON and are bound as `modelData`, not roles.
+        // One chat list per profile, and the grid of cells the cover draws
+        // from its own model; the people themselves come out of those
+        // lists as JSON and are bound as `modelData`, not roles.
         (
             "qml/cover/CoverPage.qml",
-            names_of::<piirit_shim::AccountItem>(),
+            [names_of::<piirit_shim::AccountItem>(), grid_roles].concat(),
         ),
         // The chats, and the profiles its choice of profile lists.
         (
