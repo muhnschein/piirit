@@ -2,9 +2,9 @@
 //! initials beside it do.
 //!
 //! An `Image` does not inherit its parent's corner radius, and `clip` cuts
-//! only to the bounding box, so the picture is drawn through an
-//! `OpacityMask` instead. This pins that: the raw image must not be what
-//! is on screen.
+//! only to the bounding box, so the picture is drawn by a shader that cuts
+//! it to a circle instead. This pins that: the raw image must not be what
+//! is on screen, and the circle is as wide as the avatar.
 //!
 //! And what an avatar is drawn *in*: its own colour on a page, the
 //! ambience's where the cover lights up whoever has written -- and what
@@ -59,7 +59,7 @@ const PROBE_QML: &str = r"
 ";
 
 #[test]
-fn a_picture_avatar_is_drawn_through_a_round_mask() {
+fn a_picture_avatar_is_drawn_cut_to_a_circle() {
     // SAFETY: single-threaded test binary; set before Qt starts.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
@@ -110,8 +110,8 @@ fn a_picture_avatar_is_drawn_through_a_round_mask() {
             call!("set", QString::from("chatName"), QString::from("Ada"))
         );
 
-        // No picture: the initial stands in, and nothing is masked.
-        record!("plain-masked", get!("avatarMasked", "visible"));
+        // No picture: the initial stands in, and no picture is drawn.
+        record!("plain-face", get!("avatarFace", "visible"));
         record!("plain-initial", get!("avatarInitial", "visible"));
 
         // A picture, from the frame the path arrives in. It is loaded
@@ -127,17 +127,18 @@ fn a_picture_avatar_is_drawn_through_a_round_mask() {
             )
         );
         record!("loading-initial", get!("avatarInitial", "visible"));
-        record!("loading-masked", get!("avatarMasked", "visible"));
+        record!("loading-face", get!("avatarFace", "visible"));
     });
 
     // A second later the picture has loaded, and it is what is drawn.
     single_shot(Duration::from_secs(2), move || unsafe {
         record!("picture-status", get!("avatarImage", "status"));
-        record!("picture-masked", get!("avatarMasked", "visible"));
+        record!("picture-face", get!("avatarFace", "visible"));
         record!("picture-raw", get!("avatarImage", "visible"));
         record!("picture-initial", get!("avatarInitial", "visible"));
-        record!("mask-radius", get!("avatarMask", "radius"));
-        record!("mask-width", get!("avatarMask", "width"));
+        record!("face-diameter", get!("avatarFace", "diameter"));
+        record!("face-width", get!("avatarFace", "width"));
+        record!("face-height", get!("avatarFace", "height"));
 
         (*engine_ptr).quit();
     });
@@ -160,9 +161,9 @@ fn assert_avatar(steps: &[(&str, String)]) {
 
     assert_eq!(value("load"), "ok", "the row did not load. {context}");
     assert_eq!(
-        value("plain-masked"),
+        value("plain-face"),
         "false",
-        "a chat with no picture still drew a masked image. {context}"
+        "a chat with no picture still drew a picture. {context}"
     );
     assert_eq!(
         value("plain-initial"),
@@ -190,7 +191,7 @@ fn assert_avatar(steps: &[(&str, String)]) {
          holes that fill in one by one. {context}"
     );
     assert_eq!(
-        value("loading-masked"),
+        value("loading-face"),
         "false",
         "a picture that has not loaded is on screen, which is nothing. \
          {context}"
@@ -201,22 +202,26 @@ fn assert_avatar(steps: &[(&str, String)]) {
         "the initial is still drawn under the loaded picture. {context}"
     );
     assert_eq!(
-        value("picture-masked"),
+        value("picture-face"),
         "true",
-        "a chat with a picture did not draw it through the mask. {context}"
+        "a chat with a picture did not draw it cut to a circle. {context}"
     );
     assert_eq!(
         value("picture-raw"),
         "false",
-        "the unmasked image is on screen, so the avatar renders square. {context}"
+        "the raw image is on screen, so the avatar renders square. {context}"
     );
 
-    // A circle, not a rounded rectangle: the radius is half the width.
-    let radius: f64 = value("mask-radius").parse().unwrap_or_default();
-    let width: f64 = value("mask-width").parse().unwrap_or_default();
-    assert!(width > 0.0, "the mask has no width. {context}");
+    // A circle, not an oval or a disc inside a square: the face is
+    // square, and the shader cuts it at half its `diameter` from the
+    // middle, so that has to be the face's own width.
+    let diameter: f64 = value("face-diameter").parse().unwrap_or_default();
+    let width: f64 = value("face-width").parse().unwrap_or_default();
+    let height: f64 = value("face-height").parse().unwrap_or_default();
+    assert!(width > 0.0, "the face has no width. {context}");
     assert!(
-        (radius - width / 2.0).abs() < 0.5,
-        "the mask is not a circle: radius {radius} of width {width}. {context}"
+        (width - height).abs() < 0.5 && (diameter - width).abs() < 0.5,
+        "the face is not a circle: {diameter} across in a face {width} by \
+         {height}. {context}"
     );
 }

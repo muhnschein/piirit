@@ -1,12 +1,11 @@
 import QtQuick 2.0
-import QtGraphicalEffects 1.0
 import Sailfish.Silica 1.0
 
 /*
  * A round avatar: the subject's own colour with their initial on it, or
- * their picture drawn through a circular mask.
+ * their picture cut to a circle.
  *
- * The mask is the whole point. An Image does not inherit its parent's
+ * The circle is the whole point. An Image does not inherit its parent's
  * corner radius, and `clip` cuts only to the bounding box, so a picture
  * left to itself reads as a square among circles.
  *
@@ -78,6 +77,7 @@ Rectangle {
         id: picture
         objectName: "avatarImage"
         anchors.fill: parent
+        // Never drawn itself: the face below draws its texture.
         visible: false
         fillMode: Image.PreserveAspectCrop
         asynchronous: true
@@ -88,50 +88,72 @@ Rectangle {
                 : ""
     }
 
-    Rectangle {
-        id: mask
-        objectName: "avatarMask"
+    // The picture as it is seen: cut to a circle, grey where it is drawn
+    // without its colour, and through the ambience's colour where the
+    // cover lights it -- all of it arithmetic on each pixel of the
+    // picture's own texture, in one pass straight to the screen.
+    //
+    // Nothing here is drawn into a texture of its own first, and that is
+    // the point (issue #102). This used to be a Rectangle drawn as a mask,
+    // an OpacityMask kept in a texture (`cached`), a Desaturate drawn out
+    // of a layer, and a ColorOverlay kept in another: four or five
+    // framebuffers per face, and every one of them made again whenever
+    // the cover laid its grid out, which it does for every message. Qt
+    // 5.6 never asks whether a framebuffer it made is any good. When the
+    // phone cannot give it one, the texture it draws from is no texture,
+    // which reads as opaque black -- a flat square, grey under the cover's
+    // opacity, tinted under the overlay -- and it stays that way for as
+    // long as the face does. A face with no framebuffer cannot lose one.
+    //
+    // The texture is the whole picture, not the part PreserveAspectCrop
+    // would show, so the crop is done here too; and it may be a corner of
+    // a texture atlas, which `qt_SubRect_source` says where, rather than
+    // have Qt copy it out into a texture of its own.
+    ShaderEffect {
+        id: face
+        objectName: "avatarFace"
         anchors.fill: parent
-        radius: width / 2
-        visible: false
-    }
+        visible: avatar.showsPicture
 
-    OpacityMask {
-        id: masked
-        objectName: "avatarMasked"
-        anchors.fill: parent
-        // Hidden while it is what the tint below is drawn from: an
-        // effect draws its source itself, and both on screen would be
-        // the same face twice.
-        visible: avatar.showsPicture && !avatar.highlight
-        source: picture
-        maskSource: mask
-        // An effect re-runs its shader whenever what it draws is redrawn,
-        // and a list redraws its rows on every frame of a scroll. An
-        // avatar does not change between those frames, so the result is
-        // kept in a texture and reused until the picture does change.
-        cached: true
-        // The colour taken out on the way to the screen, as a layer over
-        // the masked picture, so the mask and the desaturation are one
-        // texture rather than two effects drawn over each other. Taken
-        // out for the tint too: what goes through the highlight colour
-        // is a grey face, not a green one.
-        layer.enabled: avatar.monochrome || avatar.highlight
-        layer.effect: Desaturate {
-            desaturation: 1.0
-        }
-    }
+        property variant source: picture
+        /// How much of the picture's width and height the circle takes:
+        /// the middle of its long side, the whole of its short one.
+        property size crop: picture.implicitWidth > picture.implicitHeight
+                            ? Qt.size(picture.implicitHeight / picture.implicitWidth, 1)
+                            : Qt.size(1, picture.implicitHeight > 0
+                                         ? picture.implicitWidth / picture.implicitHeight
+                                         : 1)
+        /// Across, in pixels: the circle's rim is softened over one.
+        property real diameter: Math.max(1, width)
+        /// 1 takes the colour out. Taken out for the tint too: what goes
+        /// through the highlight colour is a grey face, not a green one.
+        property real desaturation: avatar.monochrome || avatar.highlight ? 1.0 : 0.0
+        /// Kept to a part of the way so the face is still a face -- a
+        /// full overlay is a silhouette, which says nothing about who
+        /// wrote. Transparent is no tint at all.
+        property color tint: avatar.highlight ? Theme.rgba(Theme.highlightColor, 0.75)
+                                              : "transparent"
 
-    // The picture in the ambience's colour: the grey masked face with
-    // the highlight over it, rather than the face's own colours. Kept
-    // to a part of the way so the face is still a face -- a full
-    // overlay is a silhouette, which says nothing about who wrote.
-    ColorOverlay {
-        objectName: "avatarTinted"
-        anchors.fill: parent
-        visible: avatar.showsPicture && avatar.highlight
-        source: masked
-        color: Theme.rgba(Theme.highlightColor, 0.75)
-        cached: true
+        fragmentShader: "
+            varying highp vec2 qt_TexCoord0;
+            uniform lowp float qt_Opacity;
+            uniform lowp sampler2D source;
+            uniform highp vec4 qt_SubRect_source;
+            uniform highp vec2 crop;
+            uniform highp float diameter;
+            uniform lowp float desaturation;
+            uniform highp vec4 tint;
+            void main() {
+                highp vec2 at = vec2(0.5) + (qt_TexCoord0 - vec2(0.5)) * crop;
+                highp vec4 pixel = texture2D(source, qt_SubRect_source.xy + qt_SubRect_source.zw * at);
+                highp float grey = (pixel.r + pixel.g + pixel.b) / 3.0;
+                pixel.rgb = mix(pixel.rgb, vec3(grey), desaturation);
+                pixel.rgb = mix(pixel.rgb / max(pixel.a, 0.00390625),
+                                tint.rgb / max(tint.a, 0.00390625), tint.a) * pixel.a;
+                highp float rim = clamp(diameter * 0.5 - length(qt_TexCoord0 - vec2(0.5)) * diameter + 0.5,
+                                        0.0, 1.0);
+                gl_FragColor = pixel * rim * qt_Opacity;
+            }
+        "
     }
 }

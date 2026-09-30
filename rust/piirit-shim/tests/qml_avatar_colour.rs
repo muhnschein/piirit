@@ -51,6 +51,15 @@ const PROBE_QML: &str = r"
         }
         // The loaded component itself, which has no name to be found by.
         function root(property) { return '' + loader.item[property] }
+        // What the face is drawn through: how much colour is taken out,
+        // and the tint over it as 0-255 channels and an alpha.
+        function face() {
+            var face = findIn(loader.item, 'avatarFace')
+            if (!face) { return 'missing:avatarFace' }
+            var t = face.tint
+            return face.desaturation + '|' + [Math.round(t.r * 255), Math.round(t.g * 255),
+                                              Math.round(t.b * 255), t.a.toFixed(2)].join(',')
+        }
     }
 ";
 
@@ -121,21 +130,10 @@ fn an_avatar_with_news_wears_the_ambiences_colour_rather_than_its_own() {
 
     single_shot(Duration::from_secs(2), move || unsafe {
         record!(
-            "lit-masked",
-            call!(
-                "get",
-                QString::from("avatarMasked"),
-                QString::from("visible")
-            )
+            "lit-visible",
+            call!("get", QString::from("avatarFace"), QString::from("visible"))
         );
-        record!(
-            "lit-tinted",
-            call!(
-                "get",
-                QString::from("avatarTinted"),
-                QString::from("visible")
-            )
-        );
+        record!("lit-face", call!("face"));
         record!(
             "lit-raw",
             call!(
@@ -146,22 +144,10 @@ fn an_avatar_with_news_wears_the_ambiences_colour_rather_than_its_own() {
         );
 
         call!("set", QString::from("highlight"), false);
-        record!(
-            "quiet-masked",
-            call!(
-                "get",
-                QString::from("avatarMasked"),
-                QString::from("visible")
-            )
-        );
-        record!(
-            "quiet-tinted",
-            call!(
-                "get",
-                QString::from("avatarTinted"),
-                QString::from("visible")
-            )
-        );
+        record!("quiet-face", call!("face"));
+
+        call!("set", QString::from("monochrome"), false);
+        record!("own-face", call!("face"));
         record!(
             "picture-status",
             call!("get", QString::from("avatarImage"), QString::from("status"))
@@ -201,32 +187,32 @@ fn an_avatar_with_news_wears_the_ambiences_colour_rather_than_its_own() {
          highlight (the stub's Theme.highlightColor). {context}"
     );
     assert_eq!(
-        value("lit-masked"),
-        "false",
-        "the untinted face is on screen under the tinted one, so a lit \
-         picture is drawn twice. {context}"
+        value("lit-visible"),
+        "true",
+        "a lit picture is not drawn. {context}"
     );
     assert_eq!(
-        value("lit-tinted"),
-        "true",
-        "a lit picture is not put through the ambience's colour. {context}"
+        value("lit-face"),
+        "1|128,192,255,0.75",
+        "a lit picture is not a grey face through three quarters of the \
+         ambience's highlight (the stub's Theme.highlightColor). {context}"
     );
     assert_eq!(
         value("lit-raw"),
         "false",
-        "the unmasked image is on screen, so a lit avatar renders square. \
+        "the raw image is on screen, so a lit avatar renders square. \
          {context}"
     );
     assert_eq!(
-        value("quiet-masked"),
-        "true",
-        "a picture with nothing new is not drawn at all. {context}"
+        value("quiet-face"),
+        "1|0,0,0,0.00",
+        "a picture with nothing new is not grey, or is still put through \
+         the ambience's colour. {context}"
     );
     assert_eq!(
-        value("quiet-tinted"),
-        "false",
-        "a picture with nothing new is still put through the ambience's \
-         colour. {context}"
+        value("own-face"),
+        "0|0,0,0,0.00",
+        "a picture on a page is not drawn in its own colours. {context}"
     );
     // Image.Ready is 1. Without it the three above would all be false
     // for the honest reason that there is no picture yet, and would say
