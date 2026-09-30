@@ -713,9 +713,9 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
         <translation>Povezava z jedrom Delta Chat je izgubljena. Ponovno povezovanje…</translation>
     </message>
     <message>
-        <source>%1 is too large to send. Attachments can be up to %2.</source>
-        <extracomment>Shown above the message field when the attached file is bigger than will be sent. %1 is the file&apos;s size and %2 the largest that goes, each such as &quot;24 MB&quot;.</extracomment>
-        <translation>%1 je prevelik za pošiljanje. Priloge so lahko velike do %2.</translation>
+        <source>This file is %1. Some relays refuse files larger than %2.</source>
+        <extracomment>Shown above the message field when the attached file is bigger than Delta Chat recommends. The file is still sent. %1 is the file&apos;s size and %2 the recommended largest size, each such as &quot;24 MB&quot;.</extracomment>
+        <translation>Ta datoteka je velika %1. Nekateri posredniki zavrnejo datoteke, večje od %2.</translation>
     </message>
 </context>
 <context>

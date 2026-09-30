@@ -704,9 +704,9 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>与 Delta Chat 核心的连接已断开。正在重新连接…</translation>
     </message>
     <message>
-        <source>%1 is too large to send. Attachments can be up to %2.</source>
-        <extracomment>Shown above the message field when the attached file is bigger than will be sent. %1 is the file&apos;s size and %2 the largest that goes, each such as &quot;24 MB&quot;.</extracomment>
-        <translation>%1 过大，无法发送。附件最大可为 %2。</translation>
+        <source>This file is %1. Some relays refuse files larger than %2.</source>
+        <extracomment>Shown above the message field when the attached file is bigger than Delta Chat recommends. The file is still sent. %1 is the file&apos;s size and %2 the recommended largest size, each such as &quot;24 MB&quot;.</extracomment>
+        <translation>此文件大小为 %1。部分中继会拒收大于 %2 的文件。</translation>
     </message>
 </context>
 <context>

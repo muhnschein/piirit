@@ -1,4 +1,4 @@
-//! What a picture or a video costs to send, and what the relay will take.
+//! What a picture or a video costs to send, and what most relays take.
 //!
 //! Two questions the conversation asks about a file before it hands it
 //! over, and both are the core's own answers rather than rules of ours.
@@ -22,19 +22,22 @@
 //! do, and both are pinned against the real core by
 //! `deltachat-jsonrpc/tests/real_server.rs`.
 //!
-//! The second is whether the file will go at all. The core answers that
-//! with `sys.msgsize_max_recommended`, the largest attachment it
-//! recommends, and says of it that a UI may refuse a bigger one. It is
-//! the core's own constant (`RECOMMENDED_FILE_SIZE`, about 22 MB), the
-//! same whichever relay mail leaves through, so nothing that shows
-//! it should call it the relay's or expect it to change with the relay.
-//! Nothing here refuses a picture: the core is about to shrink it, and
-//! the size on the phone says nothing about the size that leaves.
+//! The second is whether the file might not go at all. The core answers
+//! that with `sys.msgsize_max_recommended`, the largest attachment it
+//! recommends. It is the core's own constant (`RECOMMENDED_FILE_SIZE`,
+//! about 22 MB), sized for what most relays and mail servers take, and
+//! the same whichever relay mail leaves through. So it is a warning and
+//! never a ceiling: a relay that takes more is common (issue #101 is one
+//! taking 200 MB), and neither Delta Chat Desktop nor iOS looks at it at
+//! all. A file past it is said to be large and is still sent; a relay
+//! that refuses one fails that message the way it fails any other.
+//! Nothing here warns about a picture: the core is about to shrink it,
+//! and the size on the phone says nothing about the size that leaves.
 
 use deltachat_jsonrpc::RpcClient;
 
-/// The config key the core answers its attachment ceiling with, in
-/// bytes.
+/// The config key the core answers its recommended attachment size
+/// with, in bytes.
 const LIMIT_KEY: &str = "sys.msgsize_max_recommended";
 
 /// The suffixes the core reads as a picture, and so the files it recodes
@@ -66,12 +69,13 @@ pub(crate) fn file_bytes(path: &str) -> u64 {
     std::fs::metadata(path).map(|file| file.len()).unwrap_or(0)
 }
 
-/// Whether this file is bigger than the relay takes.
+/// Whether this file is bigger than the core recommends, and so bigger
+/// than some relays take. A warning only; see the module doc.
 ///
 /// False for a picture, whatever it weighs: the core recodes those, and
 /// what it sends is not what is on the phone. False as well when the
 /// limit is not known yet, or the file cannot be measured -- a question
-/// that cannot be answered is not an answer of "too big".
+/// that cannot be answered is not an answer of "large".
 pub(crate) fn exceeds_limit(path: &str, limit: u64) -> bool {
     if limit == 0 || is_picture(path) {
         return false;
@@ -131,7 +135,7 @@ mod tests {
     }
 
     #[test]
-    fn a_file_over_the_relays_ceiling_is_too_big() {
+    fn a_file_over_the_recommendation_is_large() {
         let dir = std::env::temp_dir().join(format!("piirit-media-{}", std::process::id()));
         let _ = std::fs::create_dir_all(&dir);
         let video = dir.join("video.mp4");
@@ -154,7 +158,7 @@ mod tests {
     }
 
     #[test]
-    fn a_file_that_is_not_there_is_not_too_big() {
+    fn a_file_that_is_not_there_is_not_large() {
         assert_eq!(file_bytes("/nowhere/at/all/video.mp4"), 0);
         assert_eq!(file_bytes(""), 0);
         assert!(!exceeds_limit("/nowhere/at/all/video.mp4", 1024));
