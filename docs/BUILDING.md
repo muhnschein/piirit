@@ -83,7 +83,11 @@ would notice the first one silently never running.
 3. **Qt event-loop tests** under `QT_QPA_PLATFORM=offscreen`.
 4. **QML load tests** against stub Silica components (`tests/silica-stubs/`):
    the real page files, driven by `objectName`. The stubs imitate no layout,
-   so nothing here says a page *looks* right. Silica's `EnterKey` attached
+   so nothing here says a page *looks* right -- with one exception: what an
+   avatar draws is measured on its own pixels by `qml_avatar_shape.rs`,
+   because issue #102 was a page that looked wrong and no property said so.
+   It needs a window to draw on and is `make render`'s (see above). Silica's
+   `EnterKey` attached
    property cannot be stubbed — QML forbids capitalised property names and
    `qmetaobject` cannot register attached types — so pages using it cannot
    be loaded. Put what such a page shows in a component that can be, and lay

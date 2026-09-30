@@ -65,6 +65,25 @@ jobs:
       # Broken intra-doc links are errors.
       - run: cd rust && RUSTDOCFLAGS="-D warnings" cargo doc --locked --workspace --no-deps
 
+  # The one test that says what a page looks like. `qml_avatar_shape`
+  # measures what an avatar draws -- a circle, with the picture in it --
+  # and that needs a surface to draw on: offscreen has nowhere to put a
+  # window, so the suite run above leaves the test be and it runs here.
+  # A virtual display and Mesa's software GL: the drawing under test is a
+  # shader, and the software QtQuick backend does not run shaders.
+  render:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - run: ./ci/apt-install.sh qtbase5-dev qtdeclarative5-dev qtmultimedia5-dev qtdeclarative5-dev-tools qml-module-qtquick2 qml-module-qtgraphicaleffects qttools5-dev-tools xvfb libgl1-mesa-dri libglx-mesa0
+      - uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
+        with:
+          workspaces: rust
+      - run: xvfb-run -a -s "-screen 0 1024x768x24" cargo test --locked --manifest-path rust/Cargo.toml -p piirit-shim --test qml_avatar_shape -- --nocapture
+        env:
+          PIIRIT_RENDER: "1"
+
   # The device toolchain floor: Sailfish ships Rust 1.75.0 and does not get
   # to pick a newer one.
   msrv:

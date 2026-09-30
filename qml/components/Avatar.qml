@@ -1,5 +1,4 @@
 import QtQuick 2.0
-import QtGraphicalEffects 1.0
 import Sailfish.Silica 1.0
 
 /*
@@ -9,6 +8,21 @@ import Sailfish.Silica 1.0
  * The mask is the whole point. An Image does not inherit its parent's
  * corner radius, and `clip` cuts only to the bounding box, so a picture
  * left to itself reads as a square among circles.
+ *
+ * The picture is masked, greyed and tinted in ONE pass over the
+ * picture's own texture. It used to be three effects in a row -- an
+ * `OpacityMask` keeping its result in a texture, that result greyed
+ * through a `layer.effect`, and a `ColorOverlay` keeping *its* result in
+ * a texture -- and every one of those textures is a drawing of the
+ * avatar rather than the avatar's own. A texture like that can come back
+ * blank and is then drawn blank for good: on the cover, where every cell
+ * is grey or tinted and so every cell went through all three, whole
+ * grids of avatars turned into flat squares after a long run (issue
+ * #102). Here there is nothing between the picture and the screen: the
+ * circle, the desaturation and the tint are arithmetic on each pixel of
+ * the picture's own texture, redone whenever it is drawn. The circle
+ * cannot come out square, because its alpha is computed here rather than
+ * kept somewhere.
  *
  * Shared by the chat list and the contact lists so the two cannot drift.
  */
@@ -84,54 +98,53 @@ Rectangle {
         // Encoded per segment; see AttachmentPreview.qml's fileUrl.
         source: avatar.picturePath.length > 0
                 ? Qt.resolvedUrl("file://" + avatar.picturePath.split("/")
-                                                 .map(encodeURIComponent).join("/"))
+                                         .map(encodeURIComponent).join("/"))
                 : ""
     }
 
-    Rectangle {
-        id: mask
-        objectName: "avatarMask"
-        anchors.fill: parent
-        radius: width / 2
-        visible: false
-    }
-
-    OpacityMask {
-        id: masked
+    // The picture, masked and dressed. `source` is the picture's own
+    // texture and this draws it again on every frame it is shown: no
+    // drawing of the avatar is kept between frames anywhere.
+    ShaderEffect {
+        id: painted
         objectName: "avatarMasked"
         anchors.fill: parent
-        // Hidden while it is what the tint below is drawn from: an
-        // effect draws its source itself, and both on screen would be
-        // the same face twice.
-        visible: avatar.showsPicture && !avatar.highlight
-        source: picture
-        maskSource: mask
-        // An effect re-runs its shader whenever what it draws is redrawn,
-        // and a list redraws its rows on every frame of a scroll. An
-        // avatar does not change between those frames, so the result is
-        // kept in a texture and reused until the picture does change.
-        cached: true
-        // The colour taken out on the way to the screen, as a layer over
-        // the masked picture, so the mask and the desaturation are one
-        // texture rather than two effects drawn over each other. Taken
-        // out for the tint too: what goes through the highlight colour
-        // is a grey face, not a green one.
-        layer.enabled: avatar.monochrome || avatar.highlight
-        layer.effect: Desaturate {
-            desaturation: 1.0
-        }
-    }
+        visible: avatar.showsPicture
+        property variant source: picture
+        /// The circle softens over about a pixel at its rim, the way the
+        /// rounded rectangle the mask used to be was antialiased.
+        property real rim: 2.0 / Math.max(1, avatar.width)
+        /// The colour taken out: 1 for the cover, which draws nobody in
+        /// their own colours, and 0 for a chat list.
+        property real grey: avatar.monochrome || avatar.highlight ? 1.0 : 0.0
+        /// The ambience's colour, kept to a part of the way so the face
+        /// is still a face -- a full overlay is a silhouette, which says
+        /// nothing about who wrote. Transparent where nothing is laid
+        /// over the picture at all.
+        property color tint: avatar.highlight ? Theme.rgba(Theme.highlightColor, 0.75)
+                                              : Qt.rgba(0, 0, 0, 0)
 
-    // The picture in the ambience's colour: the grey masked face with
-    // the highlight over it, rather than the face's own colours. Kept
-    // to a part of the way so the face is still a face -- a full
-    // overlay is a silhouette, which says nothing about who wrote.
-    ColorOverlay {
-        objectName: "avatarTinted"
-        anchors.fill: parent
-        visible: avatar.showsPicture && avatar.highlight
-        source: masked
-        color: Theme.rgba(Theme.highlightColor, 0.75)
-        cached: true
+        // The colour is premultiplied, so the whole of it goes with the
+        // mask's alpha. Pieced together line by line rather than written
+        // as one string over several lines, which QML takes and a script
+        // need not -- the way qml/js/QuickActions.js keeps its shader.
+        fragmentShader:
+            "varying highp vec2 qt_TexCoord0;\n" +
+            "uniform sampler2D source;\n" +
+            "uniform highp float rim;\n" +
+            "uniform lowp float grey;\n" +
+            "uniform lowp vec4 tint;\n" +
+            "uniform lowp float qt_Opacity;\n" +
+            "void main() {\n" +
+            "    lowp vec4 face = texture2D(source, qt_TexCoord0);\n" +
+            "    highp vec2 fromMiddle = qt_TexCoord0 - vec2(0.5, 0.5);\n" +
+            "    highp float across = length(fromMiddle) * 2.0;\n" +
+            "    lowp float circle = 1.0 - smoothstep(1.0 - rim, 1.0, across);\n" +
+            "    lowp float luma = dot(face.rgb, vec3(0.2126, 0.7152, 0.0722));\n" +
+            "    lowp vec3 body = mix(face.rgb, vec3(luma), grey);\n" +
+            "    body = mix(body, tint.rgb, tint.a);\n" +
+            "    lowp float alpha = face.a * circle;\n" +
+            "    gl_FragColor = vec4(body * alpha, alpha) * qt_Opacity;\n" +
+            "}\n"
     }
 }

@@ -17,7 +17,7 @@
 .PHONY: check test lint fmt qml-lint packaging-lint lockfile-lint doc-lint \
         msrv deny integration harbour vendor-check fetch-server \
         sonar-report-test apt-install-test sonar-reports translations \
-        cover-icons clean
+        render cover-icons clean
 
 CARGO ?= cargo
 # The shim's tests drive a real Qt event loop, which needs a platform
@@ -29,7 +29,7 @@ export QT_QPA_PLATFORM = offscreen
 ## `msrv` fetches a toolchain the first time, so this is not quite
 ## network-free; `deny` needs the advisory database and is CI's job.
 check: fmt lint test doc-lint msrv qml-lint lockfile-lint packaging-lint harbour \
-       sonar-report-test apt-install-test vendor-check deny
+       render sonar-report-test apt-install-test vendor-check deny
 
 ## Unit, integration, and Qt event-loop tests.
 ##
@@ -56,6 +56,26 @@ test:
 		cd rust && $(CARGO) test --workspace; \
 	fi
 	cd rust && $(CARGO) test --workspace --doc
+
+## What a page looks like, measured on pixels.
+##
+## The one test here that says a page looks right -- the avatar's picture
+## has to draw as a circle with the picture in it (issue #102 drew squares
+## with nothing in them). It needs a window to draw on, which the offscreen
+## platform the suite runs on has nowhere to put, so the suite skips it and
+## it runs here instead: against this display, or against xvfb-run's when
+## there is none. Skipped where there is neither.
+render:
+	@if [ -n "$$DISPLAY" ]; then \
+		PIIRIT_RENDER=1 $(CARGO) test --locked --manifest-path rust/Cargo.toml \
+			-p piirit-shim --test qml_avatar_shape -- --nocapture; \
+	elif command -v xvfb-run >/dev/null 2>&1; then \
+		PIIRIT_RENDER=1 xvfb-run -a $(CARGO) test --locked \
+			--manifest-path rust/Cargo.toml \
+			-p piirit-shim --test qml_avatar_shape -- --nocapture; \
+	else \
+		echo "render: SKIP (no display and no xvfb-run)"; \
+	fi
 
 ## Clippy at the workspace lint level, over tests and binaries too.
 lint:

@@ -2,9 +2,15 @@
 //! initials beside it do.
 //!
 //! An `Image` does not inherit its parent's corner radius, and `clip` cuts
-//! only to the bounding box, so the picture is drawn through an
-//! `OpacityMask` instead. This pins that: the raw image must not be what
-//! is on screen.
+//! only to the bounding box, so the picture is drawn through a mask
+//! instead. This pins that: the raw image must not be what is on screen.
+//!
+//! And what is on the way from the picture to the screen. The picture used
+//! to be masked, greyed and tinted by effects that kept their drawing in
+//! textures; a texture like that comes back blank sometimes and is then
+//! drawn blank for good, which is how whole grids of avatars turned into
+//! flat squares on a cover left up for an evening (issue #102). Nothing
+//! between the picture and the screen may keep its drawing any more.
 //!
 //! And what an avatar is drawn *in*: its own colour on a page, the
 //! ambience's where the cover lights up whoever has written -- and what
@@ -53,8 +59,27 @@ const PROBE_QML: &str = r"
             if (!item) { return 'missing:' + name }
             return '' + item[property]
         }
+        // Nothing on the way from the picture to the screen keeps its
+        // drawing in a texture: a texture kept between frames can come
+        // back blank and be drawn blank for good (issue #102).
+        function keptTextures(node) {
+            if (!node) { return 'none' }
+            if (node.cached === true) {
+                return 'cached:' + (node.objectName || '?')
+            }
+            if (node.layer && node.layer.enabled) {
+                return 'layer:' + (node.objectName || '?')
+            }
+            var kids = node.children
+            for (var i = 0; kids && i < kids.length; i++) {
+                var hit = keptTextures(kids[i])
+                if (hit !== 'none') { return hit }
+            }
+            return 'none'
+        }
         // The loaded component itself, which has no name to be found by.
         function root(property) { return '' + loader.item[property] }
+        function kept() { return keptTextures(loader.item) }
     }
 ";
 
@@ -136,8 +161,10 @@ fn a_picture_avatar_is_drawn_through_a_round_mask() {
         record!("picture-masked", get!("avatarMasked", "visible"));
         record!("picture-raw", get!("avatarImage", "visible"));
         record!("picture-initial", get!("avatarInitial", "visible"));
-        record!("mask-radius", get!("avatarMask", "radius"));
-        record!("mask-width", get!("avatarMask", "width"));
+        record!("paint-width", get!("avatarMasked", "width"));
+        record!("paint-height", get!("avatarMasked", "height"));
+        record!("paint-rim", get!("avatarMasked", "rim"));
+        record!("kept", call!("kept"));
 
         (*engine_ptr).quit();
     });
@@ -211,12 +238,29 @@ fn assert_avatar(steps: &[(&str, String)]) {
         "the unmasked image is on screen, so the avatar renders square. {context}"
     );
 
-    // A circle, not a rounded rectangle: the radius is half the width.
-    let radius: f64 = value("mask-radius").parse().unwrap_or_default();
-    let width: f64 = value("mask-width").parse().unwrap_or_default();
-    assert!(width > 0.0, "the mask has no width. {context}");
+    // A circle, not a rounded rectangle or an ellipse: the drawing is
+    // square and the mask's rim softens over a pixel of it. The circle
+    // itself is arithmetic in the drawing's shader, and the picture it
+    // masks is what qml_avatar_shape.rs renders and measures.
+    let width: f64 = value("paint-width").parse().unwrap_or_default();
+    let height: f64 = value("paint-height").parse().unwrap_or_default();
+    assert!(width > 0.0, "the picture is drawn nowhere. {context}");
     assert!(
-        (radius - width / 2.0).abs() < 0.5,
-        "the mask is not a circle: radius {radius} of width {width}. {context}"
+        (width - height).abs() < 0.5,
+        "the picture is drawn on a {width}x{height} quad, so the circle \
+         masking it is an ellipse. {context}"
+    );
+    let rim: f64 = value("paint-rim").parse().unwrap_or_default();
+    assert!(
+        rim > 0.0,
+        "the mask has no rim to soften, so its edge is a step. {context}"
+    );
+    assert_eq!(
+        value("kept"),
+        "none",
+        "something between the picture and the screen keeps its drawing \
+         in a texture. That texture comes back blank sometimes and is \
+         then drawn blank for good: the flat squares of issue #102. \
+         {context}"
     );
 }

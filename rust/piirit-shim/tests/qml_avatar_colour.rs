@@ -120,21 +120,17 @@ fn an_avatar_with_news_wears_the_ambiences_colour_rather_than_its_own() {
     });
 
     single_shot(Duration::from_secs(2), move || unsafe {
+        // What the drawn picture wears: the colour taken out, and the
+        // ambience's own kept to a part of the way over it. Both are the
+        // drawing's own inputs now -- one pass over the picture's
+        // texture -- rather than effects drawn over each other.
         record!(
-            "lit-masked",
-            call!(
-                "get",
-                QString::from("avatarMasked"),
-                QString::from("visible")
-            )
+            "lit-grey",
+            call!("get", QString::from("avatarMasked"), QString::from("grey"))
         );
         record!(
-            "lit-tinted",
-            call!(
-                "get",
-                QString::from("avatarTinted"),
-                QString::from("visible")
-            )
+            "lit-tint",
+            call!("get", QString::from("avatarMasked"), QString::from("tint"))
         );
         record!(
             "lit-raw",
@@ -147,20 +143,12 @@ fn an_avatar_with_news_wears_the_ambiences_colour_rather_than_its_own() {
 
         call!("set", QString::from("highlight"), false);
         record!(
-            "quiet-masked",
-            call!(
-                "get",
-                QString::from("avatarMasked"),
-                QString::from("visible")
-            )
+            "quiet-grey",
+            call!("get", QString::from("avatarMasked"), QString::from("grey"))
         );
         record!(
-            "quiet-tinted",
-            call!(
-                "get",
-                QString::from("avatarTinted"),
-                QString::from("visible")
-            )
+            "quiet-tint",
+            call!("get", QString::from("avatarMasked"), QString::from("tint"))
         );
         record!(
             "picture-status",
@@ -201,15 +189,18 @@ fn an_avatar_with_news_wears_the_ambiences_colour_rather_than_its_own() {
          highlight (the stub's Theme.highlightColor). {context}"
     );
     assert_eq!(
-        value("lit-masked"),
-        "false",
-        "the untinted face is on screen under the tinted one, so a lit \
-         picture is drawn twice. {context}"
+        value("lit-grey"),
+        "1",
+        "the colour is left in a lit face, so what the ambience's colour \
+         is kept over is the subject's own colours rather than a grey one. \
+         {context}"
     );
+    // #80c0ff (the stub's Theme.highlightColor) at 0.75 of the way.
     assert_eq!(
-        value("lit-tinted"),
-        "true",
-        "a lit picture is not put through the ambience's colour. {context}"
+        value("lit-tint"),
+        "#bf80c0ff",
+        "a lit picture is not put through the ambience's colour, kept to a \
+         part of the way so the face is still a face. {context}"
     );
     assert_eq!(
         value("lit-raw"),
@@ -218,15 +209,15 @@ fn an_avatar_with_news_wears_the_ambiences_colour_rather_than_its_own() {
          {context}"
     );
     assert_eq!(
-        value("quiet-masked"),
-        "true",
-        "a picture with nothing new is not drawn at all. {context}"
-    );
-    assert_eq!(
-        value("quiet-tinted"),
-        "false",
+        value("quiet-tint"),
+        "#00000000",
         "a picture with nothing new is still put through the ambience's \
          colour. {context}"
+    );
+    assert_eq!(
+        value("quiet-grey"),
+        "1",
+        "the colour is left in a face the cover draws grey. {context}"
     );
     // Image.Ready is 1. Without it the three above would all be false
     // for the honest reason that there is no picture yet, and would say

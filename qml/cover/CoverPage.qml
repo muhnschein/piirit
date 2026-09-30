@@ -318,7 +318,14 @@ CoverBackground {
 
         cover.people = everyone
         cover.unreadTotal = total
-        cover.cells = made
+        // Laid out again only when the answer changes. The cells are a
+        // grid of avatars -- pictures, effects and textures -- and
+        // re-setting the model they are read from decides whether they
+        // live on or are made again. An evening of arrivals remade all
+        // of them, over and over (issue #102).
+        if (JSON.stringify(made) !== JSON.stringify(cover.cells)) {
+            cover.cells = made
+        }
     }
     onRowsChanged: cover.gather()
     onWidthChanged: cover.gather()
@@ -355,28 +362,37 @@ CoverBackground {
             fragmentShader: QuickActions.fadeShader
         }
 
+        // The count of cells, not the cells themselves: a model that is
+        // re-set destroys and remakes every delegate under it, and the
+        // cover's cells are laid out again whenever anything anywhere is
+        // said. Remaking twenty-one avatars per arrival -- each of them a
+        // picture, an effect and a texture or two -- is what had the
+        // cover's textures churning all evening long. The count changes
+        // only when the grid's shape does; the delegates below read their
+        // cell out of `cover.cells` and are updated in place.
         Repeater {
-            model: cover.cells
+            model: cover.cells.length
 
             Avatar {
                 objectName: "gridCell"
-                x: cover.cellX(modelData.row, modelData.col) + cover.gap / 2
-                y: cover.cellY(modelData.row) + cover.gap / 2
+                readonly property var cell: cover.cells[index]
+                x: cover.cellX(cell.row, cell.col) + cover.gap / 2
+                y: cover.cellY(cell.row) + cover.gap / 2
                 width: cover.cellSize - cover.gap
                 /// Whether anyone is drawn here, or only the circle.
-                readonly property bool filled: modelData.person !== null
-                initial: filled ? modelData.person.name : ""
-                ownColor: filled ? modelData.person.color : ""
-                picturePath: filled ? modelData.person.avatar_path : ""
+                readonly property bool filled: cell.person !== null
+                initial: filled ? cell.person.name : ""
+                ownColor: filled ? cell.person.color : ""
+                picturePath: filled ? cell.person.avatar_path : ""
                 // Nobody is drawn in their own colours here. A cover is
                 // the phone's, not the app's: whoever has written is the
                 // ambience's highlight, the same colour the unread badge
                 // in the chat list wears, everyone else is grey, and an
                 // empty circle is fainter still.
-                monochrome: !modelData.loud
-                highlight: modelData.loud
-                opacity: modelData.loud ? 1.0 : filled ? 0.6 : 0.35
-                z: modelData.loud ? 1 : 0
+                monochrome: !cell.loud
+                highlight: cell.loud
+                opacity: cell.loud ? 1.0 : filled ? 0.6 : 0.35
+                z: cell.loud ? 1 : 0
             }
         }
 
