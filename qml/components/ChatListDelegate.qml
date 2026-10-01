@@ -1,6 +1,7 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
 import "../js/Format.js" as Format
+import "."
 
 /*
  * One chat-list row. The name and the preview are whatever the other end
@@ -67,7 +68,7 @@ Item {
             objectName: "timeLabel"
             font.pixelSize: Theme.fontSizeExtraSmall
             color: Theme.secondaryColor
-            text: Format.timeLabel(root.lastUpdated)
+            text: Format.timeLabel(root.lastUpdated, Clock.now)
         }
 
         Label {

@@ -11,12 +11,20 @@
 /// "recently", and it does not need the reader to know what time it is
 /// now. Past a week the elapsed count stops meaning anything, so it goes
 /// back to a date.
-function timeLabel(seconds) {
+///
+/// `now` is the present in milliseconds, and the caller passes
+/// `Clock.now` rather than leaving it to be read here: a binding that
+/// reads `Date.now()` is never told the time has changed, and kept saying
+/// "now" for as long as the row lived (see Clock.qml). It is what makes
+/// the label be worked out again; the time itself is the later of it and
+/// the real one, because the clock is up to a tick behind, and a message
+/// three days old read a tick ago as "2 days".
+function timeLabel(seconds, now) {
     if (seconds <= 0) {
         return ""
     }
     var when = new Date(seconds * 1000)
-    var elapsed = Date.now() - when.getTime()
+    var elapsed = Math.max(now, Date.now()) - when.getTime()
     if (elapsed < 60000) {
         return qsTr("now")
     }
