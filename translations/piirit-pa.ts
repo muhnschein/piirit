@@ -1049,7 +1049,7 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>⏳ Not on the server yet, tap to check again</source>
         <extracomment>A large attachment was asked for and the server has no copy of it (yet). Tapping asks the server again.</extracomment>
-        <translation>⏳ ਹਾਲੇ ਸਰਵਰ 'ਤੇ ਨਹੀਂ ਹੈ, ਮੁੜ ਜਾਂਚਣ ਲਈ ਟੈਪ ਕਰੋ</translation>
+        <translation>⏳ ਹਾਲੇ ਸਰਵਰ &apos;ਤੇ ਨਹੀਂ ਹੈ, ਮੁੜ ਜਾਂਚਣ ਲਈ ਟੈਪ ਕਰੋ</translation>
     </message>
     <message>
         <source>Downloading… tap to try again</source>
