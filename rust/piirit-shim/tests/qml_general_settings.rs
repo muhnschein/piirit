@@ -86,6 +86,15 @@ fn probe_qml() -> String {
             if (!item) {{ return 'missing:' + name }}
             return '' + item[property]
         }}
+        function set(name, property, value) {{
+            var item = findIn(loader.item, name)
+            if (!item) {{ return 'missing:' + name }}
+            item[property] = value
+            return 'ok'
+        }}
+        // Silica's page status, as the page stack moves it: 1 is
+        // Activating and 2 Active.
+        function setStatus(status) {{ loader.item.status = status; return 'ok' }}
         function click(name) {{
             var item = findIn(loader.item, name)
             if (!item) {{ return 'missing:' + name }}
@@ -380,8 +389,52 @@ fn the_settings_page_writes_what_the_app_reads() {
         // both ways round it goes matter: off is what a phone that has
         // never been asked reads, and the switch says so. Turning an
         // experimental feature on asks first; turning it off does not.
+        // Scrolled down to the switch, and back there once the question
+        // is answered: whatever moved the view while it was away.
+        call!(
+            "set",
+            QString::from("settingsFlickable"),
+            QString::from("contentY"),
+            300
+        );
         record!("flip-apps", call!("click", QString::from("webxdcSwitch")));
         record!("apps-asked", call!("pushed"));
+        call!("setStatus", 0);
+        call!(
+            "set",
+            QString::from("settingsFlickable"),
+            QString::from("contentY"),
+            0
+        );
+        call!("setStatus", 1);
+        record!(
+            "apps-back-activating",
+            get!("settingsFlickable", "contentY")
+        );
+        call!(
+            "set",
+            QString::from("settingsFlickable"),
+            QString::from("contentY"),
+            0
+        );
+        call!("setStatus", 2);
+        record!(
+            "apps-back-where-left",
+            get!("settingsFlickable", "contentY")
+        );
+        // Only the once: the next time the page comes up it stays put.
+        call!(
+            "set",
+            QString::from("settingsFlickable"),
+            QString::from("contentY"),
+            40
+        );
+        call!("setStatus", 1);
+        call!("setStatus", 2);
+        record!(
+            "apps-later-left-alone",
+            get!("settingsFlickable", "contentY")
+        );
         record!(
             "apps-on-tap",
             call!("appReads", QString::from("webxdcEnabled"))
@@ -557,6 +610,9 @@ fn the_settings_page_writes_what_the_app_reads() {
             "apps-asked",
             "ExperimentalFeatureDialog.qml:title=Enable webxdc apps (experimental)",
         ),
+        ("apps-back-activating", "300"),
+        ("apps-back-where-left", "300"),
+        ("apps-later-left-alone", "40"),
         ("apps-on-tap", "false"),
         ("accept-apps", "ok"),
         ("apps-on", "true"),
