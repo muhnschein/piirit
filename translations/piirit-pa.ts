@@ -707,9 +707,9 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Delta Chat ਕੋਰ ਨਾਲ ਕਨੈਕਸ਼ਨ ਟੁੱਟ ਗਿਆ। ਮੁੜ ਜੁੜਿਆ ਜਾ ਰਿਹਾ ਹੈ…</translation>
     </message>
     <message>
-        <source>This file is %1. Some relays refuse files larger than %2.</source>
+        <source>This file is %1. Some relays refuse files larger than %2, so sending this might fail.</source>
         <extracomment>Shown above the message field when the attached file is bigger than Delta Chat recommends. The file is still sent. %1 is the file&apos;s size and %2 the recommended largest size, each such as &quot;24 MB&quot;.</extracomment>
-        <translation>ਇਸ ਫ਼ਾਈਲ ਦਾ ਆਕਾਰ %1 ਹੈ। ਕੁਝ ਰੀਲੇਅ %2 ਤੋਂ ਵੱਡੀਆਂ ਫ਼ਾਈਲਾਂ ਨੂੰ ਅਸਵੀਕਾਰ ਕਰਦੇ ਹਨ।</translation>
+        <translation>ਇਸ ਫ਼ਾਈਲ ਦਾ ਆਕਾਰ %1 ਹੈ। ਕੁਝ ਰੀਲੇਅ %2 ਤੋਂ ਵੱਡੀਆਂ ਫ਼ਾਈਲਾਂ ਨੂੰ ਅਸਵੀਕਾਰ ਕਰਦੇ ਹਨ, ਇਸ ਲਈ ਇਸ ਨੂੰ ਭੇਜਣਾ ਅਸਫਲ ਹੋ ਸਕਦਾ ਹੈ।</translation>
     </message>
 </context>
 <context>

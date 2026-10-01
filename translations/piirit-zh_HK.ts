@@ -700,9 +700,9 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>與 Delta Chat 核心的連線已中斷。正在重新連線…</translation>
     </message>
     <message>
-        <source>This file is %1. Some relays refuse files larger than %2.</source>
+        <source>This file is %1. Some relays refuse files larger than %2, so sending this might fail.</source>
         <extracomment>Shown above the message field when the attached file is bigger than Delta Chat recommends. The file is still sent. %1 is the file&apos;s size and %2 the recommended largest size, each such as &quot;24 MB&quot;.</extracomment>
-        <translation>此檔案大小為 %1。部分中繼會拒收大於 %2 的檔案。</translation>
+        <translation>此檔案大小為 %1。部分中繼會拒收大於 %2 的檔案，因此傳送此檔案可能會失敗。</translation>
     </message>
 </context>
 <context>

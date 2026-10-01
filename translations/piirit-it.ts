@@ -707,9 +707,9 @@ Gli altri gruppi con contatti bloccati continueranno a visualizzare i loro messa
         <translation>Connessione al core di Delta Chat persa. Riconnessione…</translation>
     </message>
     <message>
-        <source>This file is %1. Some relays refuse files larger than %2.</source>
+        <source>This file is %1. Some relays refuse files larger than %2, so sending this might fail.</source>
         <extracomment>Shown above the message field when the attached file is bigger than Delta Chat recommends. The file is still sent. %1 is the file&apos;s size and %2 the recommended largest size, each such as &quot;24 MB&quot;.</extracomment>
-        <translation>Questo file è di %1. Alcuni relay rifiutano i file più grandi di %2.</translation>
+        <translation>Questo file è di %1. Alcuni relay rifiutano i file più grandi di %2, quindi l&apos;invio potrebbe non riuscire.</translation>
     </message>
 </context>
 <context>

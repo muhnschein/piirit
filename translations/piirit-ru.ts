@@ -710,9 +710,9 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Потеряна связь с ядром Delta Chat. Переподключение…</translation>
     </message>
     <message>
-        <source>This file is %1. Some relays refuse files larger than %2.</source>
+        <source>This file is %1. Some relays refuse files larger than %2, so sending this might fail.</source>
         <extracomment>Shown above the message field when the attached file is bigger than Delta Chat recommends. The file is still sent. %1 is the file&apos;s size and %2 the recommended largest size, each such as &quot;24 MB&quot;.</extracomment>
-        <translation>Размер этого файла — %1. Некоторые релеи отклоняют файлы больше %2.</translation>
+        <translation>Размер этого файла — %1. Некоторые релеи отклоняют файлы больше %2, поэтому его отправка может не удаться.</translation>
     </message>
 </context>
 <context>

@@ -213,11 +213,14 @@ fn a_file_over_the_recommended_size_is_said_to_be_large_and_is_sent() {
         "nothing says the picked file is bigger than some relays take, so \
          the reader finds out only from a send that fails. {context}"
     );
-    assert!(
-        value("bar-text").contains("4.1 kB") && value("bar-text").contains("1.0 kB"),
-        "the notice does not say how big the file is and how big the core \
-         recommends: {:?}. {context}",
-        value("bar-text")
+    // Both sizes, and that the send may fail: the reader decides from
+    // this whether to send a file the relay may refuse.
+    assert_eq!(
+        value("bar-text"),
+        "This file is 4.1 kB. Some relays refuse files larger than 1.0 kB, \
+         so sending this might fail.",
+        "the notice does not say how big the file is, how big the core \
+         recommends, and that the send may fail. {context}"
     );
     // Issue #101: the recommendation is the core's, the same for every
     // relay, and a relay that takes more is common. It is a warning.

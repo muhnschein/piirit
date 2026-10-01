@@ -710,9 +710,9 @@ Wiadomości innych grup z zablokowanymi kontaktami nadal będą wyświetlane.</t
         <translation>Utracono połączenie z rdzeniem Delta Chat. Ponowne łączenie…</translation>
     </message>
     <message>
-        <source>This file is %1. Some relays refuse files larger than %2.</source>
+        <source>This file is %1. Some relays refuse files larger than %2, so sending this might fail.</source>
         <extracomment>Shown above the message field when the attached file is bigger than Delta Chat recommends. The file is still sent. %1 is the file&apos;s size and %2 the recommended largest size, each such as &quot;24 MB&quot;.</extracomment>
-        <translation>Ten plik ma %1. Niektóre relay odrzucają pliki większe niż %2.</translation>
+        <translation>Ten plik ma %1. Niektóre relay odrzucają pliki większe niż %2, więc jego wysłanie może się nie powieść.</translation>
     </message>
 </context>
 <context>

@@ -700,9 +700,9 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Mất kết nối với lõi Delta Chat. Đang kết nối lại…</translation>
     </message>
     <message>
-        <source>This file is %1. Some relays refuse files larger than %2.</source>
+        <source>This file is %1. Some relays refuse files larger than %2, so sending this might fail.</source>
         <extracomment>Shown above the message field when the attached file is bigger than Delta Chat recommends. The file is still sent. %1 is the file&apos;s size and %2 the recommended largest size, each such as &quot;24 MB&quot;.</extracomment>
-        <translation>Tệp này có dung lượng %1. Một số máy chuyển tiếp từ chối các tệp lớn hơn %2.</translation>
+        <translation>Tệp này có dung lượng %1. Một số máy chuyển tiếp từ chối các tệp lớn hơn %2, vì vậy việc gửi tệp này có thể không thành công.</translation>
     </message>
 </context>
 <context>

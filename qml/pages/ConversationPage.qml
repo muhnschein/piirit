@@ -684,7 +684,7 @@ Page {
               //: bigger than Delta Chat recommends. The file is still
               //: sent. %1 is the file's size and %2 the recommended
               //: largest size, each such as "24 MB".
-              ? qsTr("This file is %1. Some relays refuse files larger than %2.")
+              ? qsTr("This file is %1. Some relays refuse files larger than %2, so sending this might fail.")
                 .arg(Format.readableSize(messages.attachment_bytes))
                 .arg(Format.readableSize(messages.attachment_limit))
               : ""

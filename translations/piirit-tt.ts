@@ -704,9 +704,9 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Delta Chat үзәге белән элемтә өзелде. Яңадан тоташу…</translation>
     </message>
     <message>
-        <source>This file is %1. Some relays refuse files larger than %2.</source>
+        <source>This file is %1. Some relays refuse files larger than %2, so sending this might fail.</source>
         <extracomment>Shown above the message field when the attached file is bigger than Delta Chat recommends. The file is still sent. %1 is the file&apos;s size and %2 the recommended largest size, each such as &quot;24 MB&quot;.</extracomment>
-        <translation>Бу файлның зурлыгы — %1. Кайбер реле %2 чиген узган файлларны кабул итми.</translation>
+        <translation>Бу файлның зурлыгы — %1. Кайбер реле %2 чиген узган файлларны кабул итми, шуңа күрә аны җибәрү уңышсыз булырга мөмкин.</translation>
     </message>
 </context>
 <context>

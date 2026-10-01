@@ -703,9 +703,9 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Χάθηκε η σύνδεση με τον πυρήνα του Delta Chat. Επανασύνδεση…</translation>
     </message>
     <message>
-        <source>This file is %1. Some relays refuse files larger than %2.</source>
+        <source>This file is %1. Some relays refuse files larger than %2, so sending this might fail.</source>
         <extracomment>Shown above the message field when the attached file is bigger than Delta Chat recommends. The file is still sent. %1 is the file&apos;s size and %2 the recommended largest size, each such as &quot;24 MB&quot;.</extracomment>
-        <translation>Αυτό το αρχείο έχει μέγεθος %1. Ορισμένοι αναμεταδότες απορρίπτουν αρχεία μεγαλύτερα από %2.</translation>
+        <translation>Αυτό το αρχείο έχει μέγεθος %1. Ορισμένοι αναμεταδότες απορρίπτουν αρχεία μεγαλύτερα από %2, οπότε η αποστολή του ενδέχεται να αποτύχει.</translation>
     </message>
 </context>
 <context>
