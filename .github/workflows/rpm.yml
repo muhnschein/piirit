@@ -183,7 +183,7 @@ jobs:
       # Keyed on the image as well as the lockfile: these are artifacts for
       # one target triple, built by the rust that image ships.
       - name: Restore the cross-compiled dependencies
-        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: rust/target
           key: rpm-target-${{ env.ARCH }}-${{ env.SDK_IMAGE_ID }}-${{ hashFiles('rust/Cargo.lock') }}
@@ -196,7 +196,7 @@ jobs:
       # little in seconds and a great deal in not depending on crates.io
       # being up while a release is being cut.
       - name: Restore the crates
-        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ~/.cache/piirit-cargo
           key: rpm-cargo-${{ hashFiles('rust/Cargo.lock') }}
