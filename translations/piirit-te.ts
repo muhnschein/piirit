@@ -824,6 +824,22 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>ExperimentalFeatureDialog</name>
+    <message>
+        <source>Enable</source>
+        <extracomment>Accepts turning on an experimental feature.</extracomment>
+        <translation>ప్రారంభించు</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>రద్దు చేయి</translation>
+    </message>
+    <message>
+        <source>This feature may be unstable and may be changed or removed.</source>
+        <translation>ఈ సౌకర్యం అస్థిరంగా ఉండవచ్చు, మారవచ్చు లేదా తొలగించబడవచ్చు.</translation>
+    </message>
+</context>
+<context>
     <name>Format</name>
     <message>
         <source>now</source>
@@ -1765,10 +1781,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>మీరు పంపే లింకుల నుంచి క్లిక్ ఐడీలను, ప్రచార ట్యాగులను తొలగిస్తుంది.</translation>
     </message>
     <message>
-        <source>Runs small apps inside chats. These features may be unstable and may be changed or removed.</source>
-        <translation>సంభాషణల లోపల చిన్న యాప్‌లను నడుపుతుంది. ఈ సౌకర్యాలు అస్థిరంగా ఉండవచ్చు, మారవచ్చు లేదా తొలగించబడవచ్చు.</translation>
-    </message>
-    <message>
         <source>Quick actions</source>
         <translation>త్వరిత చర్యలు</translation>
     </message>
@@ -1796,8 +1808,12 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>కాల్స్‌ను ప్రారంభించు (ప్రయోగాత్మకం)</translation>
     </message>
     <message>
-        <source>Makes and answers voice calls in one-to-one chats. These features may be unstable and may be changed or removed.</source>
-        <translation>ఒకరితో ఒకరు సంభాషణలలో వాయిస్ కాల్స్ చేస్తుంది, వాటికి సమాధానం ఇస్తుంది. ఈ సౌకర్యాలు అస్థిరంగా ఉండవచ్చు, మారవచ్చు లేదా తొలగించబడవచ్చు.</translation>
+        <source>Runs small apps inside chats.</source>
+        <translation>సంభాషణల లోపల చిన్న యాప్‌లను నడుపుతుంది.</translation>
+    </message>
+    <message>
+        <source>Makes and answers voice calls in one-to-one chats.</source>
+        <translation>ఒకరితో ఒకరు సంభాషణలలో వాయిస్ కాల్స్ చేస్తుంది, వాటికి సమాధానం ఇస్తుంది.</translation>
     </message>
 </context>
 <context>

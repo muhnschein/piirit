@@ -828,6 +828,22 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>ExperimentalFeatureDialog</name>
+    <message>
+        <source>Enable</source>
+        <extracomment>Accepts turning on an experimental feature.</extracomment>
+        <translation>പ്രവർത്തനക്ഷമമാക്കുക</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>റദ്ദാക്കുക</translation>
+    </message>
+    <message>
+        <source>This feature may be unstable and may be changed or removed.</source>
+        <translation>ഈ സൗകര്യം അസ്ഥിരമാകാം, മാറ്റുകയോ നീക്കം ചെയ്യുകയോ ചെയ്യാം.</translation>
+    </message>
+</context>
+<context>
     <name>Format</name>
     <message>
         <source>now</source>
@@ -1769,10 +1785,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>നിങ്ങൾ അയയ്ക്കുന്ന ലിങ്കുകളിൽ നിന്ന് ക്ലിക്ക് ഐഡികളും പ്രചാരണ ടാഗുകളും നീക്കം ചെയ്യുന്നു.</translation>
     </message>
     <message>
-        <source>Runs small apps inside chats. These features may be unstable and may be changed or removed.</source>
-        <translation>സംഭാഷണങ്ങൾക്കുള്ളിൽ ചെറിയ ആപ്പുകൾ പ്രവർത്തിപ്പിക്കുന്നു. ഈ സൗകര്യങ്ങൾ അസ്ഥിരമാകാം, മാറ്റുകയോ നീക്കം ചെയ്യുകയോ ചെയ്യാം.</translation>
-    </message>
-    <message>
         <source>Quick actions</source>
         <translation>ദ്രുത പ്രവർത്തനങ്ങൾ</translation>
     </message>
@@ -1800,8 +1812,12 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>കോളുകൾ പ്രവർത്തനക്ഷമമാക്കുക (പരീക്ഷണാത്മകം)</translation>
     </message>
     <message>
-        <source>Makes and answers voice calls in one-to-one chats. These features may be unstable and may be changed or removed.</source>
-        <translation>ഒരാളുമായുള്ള സംഭാഷണങ്ങളിൽ വോയ്സ് കോളുകൾ ചെയ്യുകയും അവയ്ക്ക് മറുപടി നൽകുകയും ചെയ്യുന്നു. ഈ സൗകര്യങ്ങൾ അസ്ഥിരമാകാം, മാറ്റുകയോ നീക്കം ചെയ്യുകയോ ചെയ്യാം.</translation>
+        <source>Runs small apps inside chats.</source>
+        <translation>സംഭാഷണങ്ങൾക്കുള്ളിൽ ചെറിയ ആപ്പുകൾ പ്രവർത്തിപ്പിക്കുന്നു.</translation>
+    </message>
+    <message>
+        <source>Makes and answers voice calls in one-to-one chats.</source>
+        <translation>ഒരാളുമായുള്ള സംഭാഷണങ്ങളിൽ വോയ്സ് കോളുകൾ ചെയ്യുകയും അവയ്ക്ക് മറുപടി നൽകുകയും ചെയ്യുന്നു.</translation>
     </message>
 </context>
 <context>

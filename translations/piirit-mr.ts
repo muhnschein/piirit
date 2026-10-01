@@ -828,6 +828,22 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>ExperimentalFeatureDialog</name>
+    <message>
+        <source>Enable</source>
+        <extracomment>Accepts turning on an experimental feature.</extracomment>
+        <translation>सुरू करा</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>रद्द करा</translation>
+    </message>
+    <message>
+        <source>This feature may be unstable and may be changed or removed.</source>
+        <translation>हे वैशिष्ट्य अस्थिर असू शकते आणि बदलले किंवा काढले जाऊ शकते.</translation>
+    </message>
+</context>
+<context>
     <name>Format</name>
     <message>
         <source>now</source>
@@ -1769,10 +1785,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>तुम्ही पाठवलेल्या लिंकमधून क्लिक आयडी आणि मोहीम टॅग काढून टाकते.</translation>
     </message>
     <message>
-        <source>Runs small apps inside chats. These features may be unstable and may be changed or removed.</source>
-        <translation>संभाषणांमध्ये छोटे अॅप चालवते. ही वैशिष्ट्ये अस्थिर असू शकतात आणि बदलली किंवा काढली जाऊ शकतात.</translation>
-    </message>
-    <message>
         <source>Quick actions</source>
         <translation>जलद क्रिया</translation>
     </message>
@@ -1800,8 +1812,12 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>कॉल सक्षम करा (प्रायोगिक)</translation>
     </message>
     <message>
-        <source>Makes and answers voice calls in one-to-one chats. These features may be unstable and may be changed or removed.</source>
-        <translation>एकास-एक संभाषणांमध्ये व्हॉइस कॉल करते आणि त्यांना उत्तर देते. ही वैशिष्ट्ये अस्थिर असू शकतात आणि बदलली किंवा काढली जाऊ शकतात.</translation>
+        <source>Runs small apps inside chats.</source>
+        <translation>संभाषणांमध्ये छोटे अॅप चालवते.</translation>
+    </message>
+    <message>
+        <source>Makes and answers voice calls in one-to-one chats.</source>
+        <translation>एकास-एक संभाषणांमध्ये व्हॉइस कॉल करते आणि त्यांना उत्तर देते.</translation>
     </message>
 </context>
 <context>

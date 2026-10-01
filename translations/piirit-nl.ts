@@ -824,6 +824,22 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>ExperimentalFeatureDialog</name>
+    <message>
+        <source>Enable</source>
+        <extracomment>Accepts turning on an experimental feature.</extracomment>
+        <translation>Inschakelen</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Annuleren</translation>
+    </message>
+    <message>
+        <source>This feature may be unstable and may be changed or removed.</source>
+        <translation>Deze functie kan instabiel zijn en gewijzigd of verwijderd worden.</translation>
+    </message>
+</context>
+<context>
     <name>Format</name>
     <message>
         <source>now</source>
@@ -1765,10 +1781,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Verwijdert click-ID&apos;s en campagnetags uit links die je verstuurt.</translation>
     </message>
     <message>
-        <source>Runs small apps inside chats. These features may be unstable and may be changed or removed.</source>
-        <translation>Voert kleine apps uit in chats. Deze functies kunnen instabiel zijn en gewijzigd of verwijderd worden.</translation>
-    </message>
-    <message>
         <source>Quick actions</source>
         <translation>Snelle acties</translation>
     </message>
@@ -1796,8 +1808,12 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Oproepen inschakelen (experimenteel)</translation>
     </message>
     <message>
-        <source>Makes and answers voice calls in one-to-one chats. These features may be unstable and may be changed or removed.</source>
-        <translation>Plaatst en beantwoordt spraakoproepen in één-op-éénchats. Deze functies kunnen instabiel zijn en gewijzigd of verwijderd worden.</translation>
+        <source>Runs small apps inside chats.</source>
+        <translation>Voert kleine apps uit in chats.</translation>
+    </message>
+    <message>
+        <source>Makes and answers voice calls in one-to-one chats.</source>
+        <translation>Plaatst en beantwoordt spraakoproepen in één-op-éénchats.</translation>
     </message>
 </context>
 <context>

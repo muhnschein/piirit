@@ -824,6 +824,22 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>ExperimentalFeatureDialog</name>
+    <message>
+        <source>Enable</source>
+        <extracomment>Accepts turning on an experimental feature.</extracomment>
+        <translation>இயக்கு</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>ரத்துசெய்</translation>
+    </message>
+    <message>
+        <source>This feature may be unstable and may be changed or removed.</source>
+        <translation>இந்த வசதி நிலையற்றதாக இருக்கலாம், மாற்றப்படலாம் அல்லது நீக்கப்படலாம்.</translation>
+    </message>
+</context>
+<context>
     <name>Format</name>
     <message>
         <source>now</source>
@@ -1765,10 +1781,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>நீங்கள் அனுப்பும் இணைப்புகளிலிருந்து சொடுக்கு ஐடிகளையும் பிரச்சாரக் குறிச்சொற்களையும் நீக்குகிறது.</translation>
     </message>
     <message>
-        <source>Runs small apps inside chats. These features may be unstable and may be changed or removed.</source>
-        <translation>அரட்டைகளுக்குள் சிறு செயலிகளை இயக்குகிறது. இந்த வசதிகள் நிலையற்றவையாக இருக்கலாம், மாற்றப்படலாம் அல்லது நீக்கப்படலாம்.</translation>
-    </message>
-    <message>
         <source>Quick actions</source>
         <translation>விரைவுச் செயல்கள்</translation>
     </message>
@@ -1796,8 +1808,12 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>அழைப்புகளை இயக்கு (சோதனை முறை)</translation>
     </message>
     <message>
-        <source>Makes and answers voice calls in one-to-one chats. These features may be unstable and may be changed or removed.</source>
-        <translation>தனிநபர் அரட்டைகளில் குரல் அழைப்புகளைச் செய்கிறது, அவற்றுக்குப் பதிலளிக்கிறது. இந்த வசதிகள் நிலையற்றவையாக இருக்கலாம், மாற்றப்படலாம் அல்லது நீக்கப்படலாம்.</translation>
+        <source>Runs small apps inside chats.</source>
+        <translation>அரட்டைகளுக்குள் சிறு செயலிகளை இயக்குகிறது.</translation>
+    </message>
+    <message>
+        <source>Makes and answers voice calls in one-to-one chats.</source>
+        <translation>தனிநபர் அரட்டைகளில் குரல் அழைப்புகளைச் செய்கிறது, அவற்றுக்குப் பதிலளிக்கிறது.</translation>
     </message>
 </context>
 <context>

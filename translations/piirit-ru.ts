@@ -831,6 +831,22 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>ExperimentalFeatureDialog</name>
+    <message>
+        <source>Enable</source>
+        <extracomment>Accepts turning on an experimental feature.</extracomment>
+        <translation>Включить</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Отмена</translation>
+    </message>
+    <message>
+        <source>This feature may be unstable and may be changed or removed.</source>
+        <translation>Эта функция может быть нестабильна, а также изменена или удалена.</translation>
+    </message>
+</context>
+<context>
     <name>Format</name>
     <message>
         <source>now</source>
@@ -1776,10 +1792,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Удаляет идентификаторы кликов и метки кампаний из ссылок, которые вы отправляете.</translation>
     </message>
     <message>
-        <source>Runs small apps inside chats. These features may be unstable and may be changed or removed.</source>
-        <translation>Запускает небольшие приложения внутри чатов. Эти функции могут быть нестабильны, а также изменены или удалены.</translation>
-    </message>
-    <message>
         <source>Quick actions</source>
         <translation>Быстрые действия</translation>
     </message>
@@ -1807,8 +1819,12 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Включить звонки (эксперимент)</translation>
     </message>
     <message>
-        <source>Makes and answers voice calls in one-to-one chats. These features may be unstable and may be changed or removed.</source>
-        <translation>Совершает голосовые звонки и отвечает на них в личных чатах. Эти функции могут быть нестабильны, а также изменены или удалены.</translation>
+        <source>Runs small apps inside chats.</source>
+        <translation>Запускает небольшие приложения внутри чатов.</translation>
+    </message>
+    <message>
+        <source>Makes and answers voice calls in one-to-one chats.</source>
+        <translation>Совершает голосовые звонки и отвечает на них в личных чатах.</translation>
     </message>
 </context>
 <context>

@@ -827,6 +827,22 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>ExperimentalFeatureDialog</name>
+    <message>
+        <source>Enable</source>
+        <extracomment>Accepts turning on an experimental feature.</extracomment>
+        <translation>Activează</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Anulează</translation>
+    </message>
+    <message>
+        <source>This feature may be unstable and may be changed or removed.</source>
+        <translation>Această funcție poate fi instabilă și poate fi modificată sau eliminată.</translation>
+    </message>
+</context>
+<context>
     <name>Format</name>
     <message>
         <source>now</source>
@@ -1772,10 +1788,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Elimină ID-urile de clic și etichetele de campanie din linkurile pe care le trimiți.</translation>
     </message>
     <message>
-        <source>Runs small apps inside chats. These features may be unstable and may be changed or removed.</source>
-        <translation>Rulează aplicații mici în conversații. Aceste funcții pot fi instabile și pot fi modificate sau eliminate.</translation>
-    </message>
-    <message>
         <source>Quick actions</source>
         <translation>Acțiuni rapide</translation>
     </message>
@@ -1803,8 +1815,12 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Activează apelurile (experimental)</translation>
     </message>
     <message>
-        <source>Makes and answers voice calls in one-to-one chats. These features may be unstable and may be changed or removed.</source>
-        <translation>Efectuează și primește apeluri vocale în conversațiile unu-la-unu. Aceste funcții pot fi instabile și pot fi modificate sau eliminate.</translation>
+        <source>Runs small apps inside chats.</source>
+        <translation>Rulează aplicații mici în conversații.</translation>
+    </message>
+    <message>
+        <source>Makes and answers voice calls in one-to-one chats.</source>
+        <translation>Efectuează și primește apeluri vocale în conversațiile unu-la-unu.</translation>
     </message>
 </context>
 <context>

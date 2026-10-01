@@ -825,6 +825,22 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>ExperimentalFeatureDialog</name>
+    <message>
+        <source>Enable</source>
+        <extracomment>Accepts turning on an experimental feature.</extracomment>
+        <translation>启用</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>取消</translation>
+    </message>
+    <message>
+        <source>This feature may be unstable and may be changed or removed.</source>
+        <translation>此功能可能不稳定，并且可能被更改或移除。</translation>
+    </message>
+</context>
+<context>
     <name>Format</name>
     <message>
         <source>now</source>
@@ -1762,10 +1778,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>从你发送的链接中移除点击 ID 和营销标签。</translation>
     </message>
     <message>
-        <source>Runs small apps inside chats. These features may be unstable and may be changed or removed.</source>
-        <translation>在聊天中运行小应用。这些功能可能不稳定，并且可能被更改或移除。</translation>
-    </message>
-    <message>
         <source>Quick actions</source>
         <translation>快捷操作</translation>
     </message>
@@ -1793,8 +1805,12 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>启用通话（实验性）</translation>
     </message>
     <message>
-        <source>Makes and answers voice calls in one-to-one chats. These features may be unstable and may be changed or removed.</source>
-        <translation>在一对一聊天中拨打和接听语音通话。这些功能可能不稳定，并且可能被更改或移除。</translation>
+        <source>Runs small apps inside chats.</source>
+        <translation>在聊天中运行小应用。</translation>
+    </message>
+    <message>
+        <source>Makes and answers voice calls in one-to-one chats.</source>
+        <translation>在一对一聊天中拨打和接听语音通话。</translation>
     </message>
 </context>
 <context>

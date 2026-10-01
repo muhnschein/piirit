@@ -828,6 +828,22 @@ Mensagens de contactos bloqueados não serão ocultadas noutros grupos.</transla
     </message>
 </context>
 <context>
+    <name>ExperimentalFeatureDialog</name>
+    <message>
+        <source>Enable</source>
+        <extracomment>Accepts turning on an experimental feature.</extracomment>
+        <translation>Ativar</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Cancelar</translation>
+    </message>
+    <message>
+        <source>This feature may be unstable and may be changed or removed.</source>
+        <translation>Esta funcionalidade pode ser instável e pode ser alterada ou removida.</translation>
+    </message>
+</context>
+<context>
     <name>Format</name>
     <message>
         <source>now</source>
@@ -1769,10 +1785,6 @@ Mensagens de contactos bloqueados não serão ocultadas noutros grupos.</transla
         <translation>Remove identificadores de clique e etiquetas de campanha das ligações que envia.</translation>
     </message>
     <message>
-        <source>Runs small apps inside chats. These features may be unstable and may be changed or removed.</source>
-        <translation>Executa pequenas aplicações dentro das conversas. Estas funcionalidades podem ser instáveis e podem ser alteradas ou removidas.</translation>
-    </message>
-    <message>
         <source>Quick actions</source>
         <translation>Ações rápidas</translation>
     </message>
@@ -1800,8 +1812,12 @@ Mensagens de contactos bloqueados não serão ocultadas noutros grupos.</transla
         <translation>Ativar chamadas (experimental)</translation>
     </message>
     <message>
-        <source>Makes and answers voice calls in one-to-one chats. These features may be unstable and may be changed or removed.</source>
-        <translation>Faz e atende chamadas de voz em conversas individuais. Estas funcionalidades podem ser instáveis e podem ser alteradas ou removidas.</translation>
+        <source>Runs small apps inside chats.</source>
+        <translation>Executa pequenas aplicações dentro das conversas.</translation>
+    </message>
+    <message>
+        <source>Makes and answers voice calls in one-to-one chats.</source>
+        <translation>Faz e atende chamadas de voz em conversas individuais.</translation>
     </message>
 </context>
 <context>

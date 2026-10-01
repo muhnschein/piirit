@@ -174,6 +174,23 @@ Page {
         core.estimate_auto_deletion(seconds)
     }
 
+    /// An experimental feature's switch: off at once, on only once the
+    /// reader has been told it may not hold up and has said go ahead.
+    function toggleExperimental(toggle, setting) {
+        if (toggle.checked) {
+            Settings[setting] = false
+            return
+        }
+        var dialog = pageStack.push(Qt.resolvedUrl("ExperimentalFeatureDialog.qml"), {
+            title: toggle.text
+        })
+        if (dialog) {
+            dialog.accepted.connect(function() {
+                Settings[setting] = true
+            })
+        }
+    }
+
     /// The period waiting on the reader's answer, 0 for none. The
     /// estimate comes back by signal, and an answer to an earlier
     /// question is not the one to act on.
@@ -467,15 +484,16 @@ Page {
             // each of them reads the setting rather than being told, so
             // there is nothing to keep in step here.
             TextSwitch {
+                id: webxdcSwitch
                 objectName: "webxdcSwitch"
                 //: A webxdc app is a small program somebody sends into a
                 //: chat and everyone in it plays with. Keep the name:
                 //: it is what every other Delta Chat client calls them.
                 text: qsTr("Enable webxdc apps (experimental)")
-                description: qsTr("Runs small apps inside chats. These features may be unstable and may be changed or removed.")
+                description: qsTr("Runs small apps inside chats.")
                 automaticCheck: false
                 checked: Settings.webxdcEnabled === true
-                onClicked: Settings.webxdcEnabled = !checked
+                onClicked: page.toggleExperimental(webxdcSwitch, "webxdcEnabled")
             }
 
             // Off until it is asked for, as apps are: a call's media runs
@@ -484,12 +502,13 @@ Page {
             // turns on is the call button in a chat, a call ringing here,
             // and calling back from a call's row; each reads the setting.
             TextSwitch {
+                id: callsSwitch
                 objectName: "callsSwitch"
                 text: qsTr("Enable calls (experimental)")
-                description: qsTr("Makes and answers voice calls in one-to-one chats. These features may be unstable and may be changed or removed.")
+                description: qsTr("Makes and answers voice calls in one-to-one chats.")
                 automaticCheck: false
                 checked: Settings.callsEnabled === true
-                onClicked: Settings.callsEnabled = !checked
+                onClicked: page.toggleExperimental(callsSwitch, "callsEnabled")
             }
         }
     }

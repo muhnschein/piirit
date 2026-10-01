@@ -827,6 +827,22 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>ExperimentalFeatureDialog</name>
+    <message>
+        <source>Enable</source>
+        <extracomment>Accepts turning on an experimental feature.</extracomment>
+        <translation>Įjungti</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Atšaukti</translation>
+    </message>
+    <message>
+        <source>This feature may be unstable and may be changed or removed.</source>
+        <translation>Ši funkcija gali būti nestabili ir gali būti pakeista arba pašalinta.</translation>
+    </message>
+</context>
+<context>
     <name>Format</name>
     <message>
         <source>now</source>
@@ -1772,10 +1788,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Pašalina paspaudimų identifikatorius ir kampanijų žymas iš tavo siunčiamų nuorodų.</translation>
     </message>
     <message>
-        <source>Runs small apps inside chats. These features may be unstable and may be changed or removed.</source>
-        <translation>Paleidžia mažas programėles pokalbiuose. Šios funkcijos gali būti nestabilios ir gali būti pakeistos arba pašalintos.</translation>
-    </message>
-    <message>
         <source>Quick actions</source>
         <translation>Greitieji veiksmai</translation>
     </message>
@@ -1803,8 +1815,12 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Įjungti skambučius (eksperimentinė)</translation>
     </message>
     <message>
-        <source>Makes and answers voice calls in one-to-one chats. These features may be unstable and may be changed or removed.</source>
-        <translation>Skambina ir atsiliepia balso skambučiais asmeniniuose pokalbiuose. Šios funkcijos gali būti nestabilios ir gali būti pakeistos arba pašalintos.</translation>
+        <source>Runs small apps inside chats.</source>
+        <translation>Paleidžia mažas programėles pokalbiuose.</translation>
+    </message>
+    <message>
+        <source>Makes and answers voice calls in one-to-one chats.</source>
+        <translation>Skambina ir atsiliepia balso skambučiais asmeniniuose pokalbiuose.</translation>
     </message>
 </context>
 <context>

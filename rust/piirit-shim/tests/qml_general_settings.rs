@@ -41,6 +41,23 @@ fn probe_qml() -> String {
     import 'file://{}'
     Item {{
         Loader {{ id: loader }}
+        // Silica's page stack, as far as the page uses it here: push
+        // records what was pushed and hands back a dialog for the page
+        // to connect to, which the test accepts or leaves.
+        QtObject {{
+            id: stack
+            property string pushed: ''
+            property QtObject dialog: QtObject {{
+                signal accepted()
+            }}
+            function push(url, props) {{
+                pushed = ('' + url).split('/').pop() + ':title=' + props.title
+                return dialog
+            }}
+        }}
+        function stackObject() {{ return stack }}
+        function pushed() {{ var was = stack.pushed; stack.pushed = ''; return was }}
+        function acceptDialog() {{ stack.dialog.accepted(); return 'ok' }}
         function load(url) {{
             loader.setSource(url, {{}})
             return loader.status === Loader.Ready ? 'ok' : 'load-failed'
@@ -137,6 +154,9 @@ fn the_settings_page_writes_what_the_app_reads() {
     ));
     engine.set_object_property("core".into(), core_box.pinned());
     engine.load_data(QByteArray::from(probe_qml()));
+    // Named for the page before it is loaded, as Silica names its own.
+    let stack = engine.invoke_method("stackObject".into(), &[]);
+    engine.set_property("pageStack".into(), stack);
 
     let engine_ptr = std::ptr::addr_of_mut!(engine);
     let mut steps: Vec<(&str, String)> = Vec::new();
@@ -358,19 +378,35 @@ fn the_settings_page_writes_what_the_app_reads() {
         );
         // Apps are the one setting the rest of the app hides behind, so
         // both ways round it goes matter: off is what a phone that has
-        // never been asked reads, and the switch says so.
+        // never been asked reads, and the switch says so. Turning an
+        // experimental feature on asks first; turning it off does not.
         record!("flip-apps", call!("click", QString::from("webxdcSwitch")));
+        record!("apps-asked", call!("pushed"));
+        record!(
+            "apps-on-tap",
+            call!("appReads", QString::from("webxdcEnabled"))
+        );
+        record!("accept-apps", call!("acceptDialog"));
         record!("apps-on", call!("appReads", QString::from("webxdcEnabled")));
         record!("apps-switch-on", get!("webxdcSwitch", "checked"));
         record!(
             "flip-apps-back",
             call!("click", QString::from("webxdcSwitch"))
         );
+        record!("apps-off-asked", call!("pushed"));
         record!(
             "apps-off",
             call!("appReads", QString::from("webxdcEnabled"))
         );
         record!("apps-switch-off", get!("webxdcSwitch", "checked"));
+        // Calls the same way, and a dialog left without accepting
+        // writes nothing.
+        record!("flip-calls", call!("click", QString::from("callsSwitch")));
+        record!("calls-asked", call!("pushed"));
+        record!(
+            "calls-unanswered",
+            call!("appReads", QString::from("callsEnabled"))
+        );
         // A deletion period is not written on the tap: the core is asked
         // first, and this one is not there to answer.
         record!(
@@ -514,6 +550,27 @@ fn the_settings_page_writes_what_the_app_reads() {
             "/apps/harbour-piirit/mention_notifications",
         ),
         ("app-apps-key", "/apps/harbour-piirit/webxdc_enabled"),
+        ("apps-default", "false"),
+        ("apps-switch", "false"),
+        ("flip-apps", "ok"),
+        (
+            "apps-asked",
+            "ExperimentalFeatureDialog.qml:title=Enable webxdc apps (experimental)",
+        ),
+        ("apps-on-tap", "false"),
+        ("accept-apps", "ok"),
+        ("apps-on", "true"),
+        ("apps-switch-on", "true"),
+        ("flip-apps-back", "ok"),
+        ("apps-off-asked", ""),
+        ("apps-off", "false"),
+        ("apps-switch-off", "false"),
+        ("flip-calls", "ok"),
+        (
+            "calls-asked",
+            "ExperimentalFeatureDialog.qml:title=Enable calls (experimental)",
+        ),
+        ("calls-unanswered", "false"),
         (
             "app-notifications-key",
             "/apps/harbour-piirit/notifications_enabled",

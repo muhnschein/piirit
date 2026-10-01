@@ -824,6 +824,22 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>ExperimentalFeatureDialog</name>
+    <message>
+        <source>Enable</source>
+        <extracomment>Accepts turning on an experimental feature.</extracomment>
+        <translation>Ενεργοποίηση</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Ακύρωση</translation>
+    </message>
+    <message>
+        <source>This feature may be unstable and may be changed or removed.</source>
+        <translation>Αυτή η λειτουργία μπορεί να είναι ασταθής και να αλλάξει ή να αφαιρεθεί.</translation>
+    </message>
+</context>
+<context>
     <name>Format</name>
     <message>
         <source>now</source>
@@ -1765,10 +1781,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Αφαιρεί αναγνωριστικά κλικ και ετικέτες καμπάνιας από τους συνδέσμους που στέλνεις.</translation>
     </message>
     <message>
-        <source>Runs small apps inside chats. These features may be unstable and may be changed or removed.</source>
-        <translation>Εκτελεί μικρές εφαρμογές μέσα στις συνομιλίες. Αυτές οι λειτουργίες μπορεί να είναι ασταθείς και να αλλάξουν ή να αφαιρεθούν.</translation>
-    </message>
-    <message>
         <source>Quick actions</source>
         <translation>Γρήγορες ενέργειες</translation>
     </message>
@@ -1796,8 +1808,12 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Ενεργοποίηση κλήσεων (πειραματικό)</translation>
     </message>
     <message>
-        <source>Makes and answers voice calls in one-to-one chats. These features may be unstable and may be changed or removed.</source>
-        <translation>Πραγματοποιεί και απαντά σε φωνητικές κλήσεις σε ατομικές συνομιλίες. Αυτές οι λειτουργίες μπορεί να είναι ασταθείς και να αλλάξουν ή να αφαιρεθούν.</translation>
+        <source>Runs small apps inside chats.</source>
+        <translation>Εκτελεί μικρές εφαρμογές μέσα στις συνομιλίες.</translation>
+    </message>
+    <message>
+        <source>Makes and answers voice calls in one-to-one chats.</source>
+        <translation>Πραγματοποιεί και απαντά σε φωνητικές κλήσεις σε ατομικές συνομιλίες.</translation>
     </message>
 </context>
 <context>

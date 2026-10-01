@@ -824,6 +824,22 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>ExperimentalFeatureDialog</name>
+    <message>
+        <source>Enable</source>
+        <extracomment>Accepts turning on an experimental feature.</extracomment>
+        <translation>Slå til</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Annullér</translation>
+    </message>
+    <message>
+        <source>This feature may be unstable and may be changed or removed.</source>
+        <translation>Denne funktion kan være ustabil og kan blive ændret eller fjernet.</translation>
+    </message>
+</context>
+<context>
     <name>Format</name>
     <message>
         <source>now</source>
@@ -1765,10 +1781,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Fjerner klik-id&apos;er og kampagnemærker fra links, du sender.</translation>
     </message>
     <message>
-        <source>Runs small apps inside chats. These features may be unstable and may be changed or removed.</source>
-        <translation>Kører små apps inde i chats. Disse funktioner kan være ustabile og kan blive ændret eller fjernet.</translation>
-    </message>
-    <message>
         <source>Quick actions</source>
         <translation>Hurtighandlinger</translation>
     </message>
@@ -1796,8 +1808,12 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Aktivér opkald (eksperimentelt)</translation>
     </message>
     <message>
-        <source>Makes and answers voice calls in one-to-one chats. These features may be unstable and may be changed or removed.</source>
-        <translation>Foretager og besvarer taleopkald i chats med én person. Disse funktioner kan være ustabile og kan blive ændret eller fjernet.</translation>
+        <source>Runs small apps inside chats.</source>
+        <translation>Kører små apps inde i chats.</translation>
+    </message>
+    <message>
+        <source>Makes and answers voice calls in one-to-one chats.</source>
+        <translation>Foretager og besvarer taleopkald i chats med én person.</translation>
     </message>
 </context>
 <context>

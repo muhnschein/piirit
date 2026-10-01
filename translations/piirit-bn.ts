@@ -828,6 +828,22 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>ExperimentalFeatureDialog</name>
+    <message>
+        <source>Enable</source>
+        <extracomment>Accepts turning on an experimental feature.</extracomment>
+        <translation>চালু করুন</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>বাতিল</translation>
+    </message>
+    <message>
+        <source>This feature may be unstable and may be changed or removed.</source>
+        <translation>এই বৈশিষ্ট্যটি অস্থিতিশীল হতে পারে এবং বদলানো বা সরিয়ে ফেলা হতে পারে।</translation>
+    </message>
+</context>
+<context>
     <name>Format</name>
     <message>
         <source>now</source>
@@ -1769,10 +1785,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>আপনার পাঠানো লিঙ্ক থেকে ক্লিক আইডি ও প্রচারণা ট্যাগ সরিয়ে দেয়।</translation>
     </message>
     <message>
-        <source>Runs small apps inside chats. These features may be unstable and may be changed or removed.</source>
-        <translation>চ্যাটের ভিতরে ছোট অ্যাপ চালায়। এই বৈশিষ্ট্যগুলি অস্থিতিশীল হতে পারে এবং বদলানো বা সরিয়ে ফেলা হতে পারে।</translation>
-    </message>
-    <message>
         <source>Quick actions</source>
         <translation>দ্রুত অ্যাকশন</translation>
     </message>
@@ -1800,8 +1812,12 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>কল চালু করুন (পরীক্ষামূলক)</translation>
     </message>
     <message>
-        <source>Makes and answers voice calls in one-to-one chats. These features may be unstable and may be changed or removed.</source>
-        <translation>একক চ্যাটে ভয়েস কল করে ও তার উত্তর দেয়। এই বৈশিষ্ট্যগুলি অস্থিতিশীল হতে পারে এবং বদলানো বা সরিয়ে ফেলা হতে পারে।</translation>
+        <source>Runs small apps inside chats.</source>
+        <translation>চ্যাটের ভিতরে ছোট অ্যাপ চালায়।</translation>
+    </message>
+    <message>
+        <source>Makes and answers voice calls in one-to-one chats.</source>
+        <translation>একক চ্যাটে ভয়েস কল করে ও তার উত্তর দেয়।</translation>
     </message>
 </context>
 <context>

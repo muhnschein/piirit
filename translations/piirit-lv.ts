@@ -831,6 +831,22 @@ Citās grupās, kurās ir bloķēti kontakti, viņu ziņas joprojām būs redzam
     </message>
 </context>
 <context>
+    <name>ExperimentalFeatureDialog</name>
+    <message>
+        <source>Enable</source>
+        <extracomment>Accepts turning on an experimental feature.</extracomment>
+        <translation>Ieslēgt</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Atcelt</translation>
+    </message>
+    <message>
+        <source>This feature may be unstable and may be changed or removed.</source>
+        <translation>Šī funkcija var būt nestabila un var tikt mainīta vai noņemta.</translation>
+    </message>
+</context>
+<context>
     <name>Format</name>
     <message>
         <source>now</source>
@@ -1776,10 +1792,6 @@ Citās grupās, kurās ir bloķēti kontakti, viņu ziņas joprojām būs redzam
         <translation>Noņem klikšķu identifikatorus un kampaņu birkas no saitēm, ko sūti.</translation>
     </message>
     <message>
-        <source>Runs small apps inside chats. These features may be unstable and may be changed or removed.</source>
-        <translation>Darbina mazas lietotnes sarakstēs. Šīs funkcijas var būt nestabilas un var tikt mainītas vai noņemtas.</translation>
-    </message>
-    <message>
         <source>Quick actions</source>
         <translation>Ātrās darbības</translation>
     </message>
@@ -1807,8 +1819,12 @@ Citās grupās, kurās ir bloķēti kontakti, viņu ziņas joprojām būs redzam
         <translation>Iespējot zvanus (eksperimentāli)</translation>
     </message>
     <message>
-        <source>Makes and answers voice calls in one-to-one chats. These features may be unstable and may be changed or removed.</source>
-        <translation>Veic balss zvanus un atbild uz tiem divpersonu sarakstēs. Šīs funkcijas var būt nestabilas un var tikt mainītas vai noņemtas.</translation>
+        <source>Runs small apps inside chats.</source>
+        <translation>Darbina mazas lietotnes sarakstēs.</translation>
+    </message>
+    <message>
+        <source>Makes and answers voice calls in one-to-one chats.</source>
+        <translation>Veic balss zvanus un atbild uz tiem divpersonu sarakstēs.</translation>
     </message>
 </context>
 <context>
