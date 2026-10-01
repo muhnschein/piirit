@@ -664,11 +664,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Edit</source>
         <translation>Szerkesztés</translation>
     </message>
-    <message>
-        <source>Try downloading again</source>
-        <extracomment>A download that has not finished: ask the server again now.</extracomment>
-        <translation>Letöltés újrapróbálása</translation>
-    </message>
 </context>
 <context>
     <name>ConversationPage</name>
@@ -1016,6 +1011,10 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Továbbítva</translation>
     </message>
     <message>
+        <source>Downloading…</source>
+        <translation>Letöltés…</translation>
+    </message>
+    <message>
         <source>⬇ Download failed, tap to try again</source>
         <translation>⬇ A letöltés nem sikerült, koppintson az újrapróbáláshoz</translation>
     </message>
@@ -1036,16 +1035,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Edited</source>
         <translation>Szerkesztve</translation>
-    </message>
-    <message>
-        <source>⏳ Not on the server yet, tap to check again</source>
-        <extracomment>A large attachment was asked for and the server has no copy of it (yet). Tapping asks the server again.</extracomment>
-        <translation>⏳ Még nincs a kiszolgálón, koppintson az újraellenőrzéshez</translation>
-    </message>
-    <message>
-        <source>Downloading… tap to try again</source>
-        <extracomment>A large attachment is being fetched. Tapping asks the server again rather than waiting for the next try.</extracomment>
-        <translation>Letöltés… koppintson az újrapróbáláshoz</translation>
     </message>
 </context>
 <context>

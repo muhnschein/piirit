@@ -666,11 +666,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Edit</source>
         <translation>திருத்து</translation>
     </message>
-    <message>
-        <source>Try downloading again</source>
-        <extracomment>A download that has not finished: ask the server again now.</extracomment>
-        <translation>மீண்டும் பதிவிறக்க முயற்சிக்கவும்</translation>
-    </message>
 </context>
 <context>
     <name>ConversationPage</name>
@@ -1021,6 +1016,10 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>முன்னனுப்பப்பட்டது</translation>
     </message>
     <message>
+        <source>Downloading…</source>
+        <translation>பதிவிறக்கப்படுகிறது…</translation>
+    </message>
+    <message>
         <source>⬇ Download failed, tap to try again</source>
         <translation>⬇ பதிவிறக்கம் தோல்வி, மீண்டும் முயற்சிக்கத் தட்டவும்</translation>
     </message>
@@ -1041,16 +1040,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Edited</source>
         <translation>திருத்தப்பட்டது</translation>
-    </message>
-    <message>
-        <source>⏳ Not on the server yet, tap to check again</source>
-        <extracomment>A large attachment was asked for and the server has no copy of it (yet). Tapping asks the server again.</extracomment>
-        <translation>⏳ இன்னும் சேவையகத்தில் இல்லை, மீண்டும் சரிபார்க்கத் தட்டவும்</translation>
-    </message>
-    <message>
-        <source>Downloading… tap to try again</source>
-        <extracomment>A large attachment is being fetched. Tapping asks the server again rather than waiting for the next try.</extracomment>
-        <translation>பதிவிறக்கப்படுகிறது… மீண்டும் முயற்சிக்கத் தட்டவும்</translation>
     </message>
 </context>
 <context>

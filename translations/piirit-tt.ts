@@ -668,11 +668,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Edit</source>
         <translation>Үзгәртергә</translation>
     </message>
-    <message>
-        <source>Try downloading again</source>
-        <extracomment>A download that has not finished: ask the server again now.</extracomment>
-        <translation>Яңадан йөкләп карау</translation>
-    </message>
 </context>
 <context>
     <name>ConversationPage</name>
@@ -1020,6 +1015,10 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Җибәрелгән</translation>
     </message>
     <message>
+        <source>Downloading…</source>
+        <translation>Йөкләнә…</translation>
+    </message>
+    <message>
         <source>⬇ Download failed, tap to try again</source>
         <translation>⬇ Йөкләү барып чыкмады, яңадан сынап карау өчен басыгыз</translation>
     </message>
@@ -1040,16 +1039,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Edited</source>
         <translation>Үзгәртелгән</translation>
-    </message>
-    <message>
-        <source>⏳ Not on the server yet, tap to check again</source>
-        <extracomment>A large attachment was asked for and the server has no copy of it (yet). Tapping asks the server again.</extracomment>
-        <translation>⏳ Серверда әле юк, яңадан тикшерү өчен басыгыз</translation>
-    </message>
-    <message>
-        <source>Downloading… tap to try again</source>
-        <extracomment>A large attachment is being fetched. Tapping asks the server again rather than waiting for the next try.</extracomment>
-        <translation>Йөкләнә… яңадан сынап карау өчен басыгыз</translation>
     </message>
 </context>
 <context>

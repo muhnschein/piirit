@@ -670,11 +670,6 @@ Vous continuerez à voir les messages des contacts bloqués dans les autres grou
         <source>Edit</source>
         <translation>Modifier</translation>
     </message>
-    <message>
-        <source>Try downloading again</source>
-        <extracomment>A download that has not finished: ask the server again now.</extracomment>
-        <translation>Réessayer le téléchargement</translation>
-    </message>
 </context>
 <context>
     <name>ConversationPage</name>
@@ -1025,6 +1020,10 @@ Vous continuerez à voir les messages des contacts bloqués dans les autres grou
         <translation>Transféré</translation>
     </message>
     <message>
+        <source>Downloading…</source>
+        <translation>Téléchargement…</translation>
+    </message>
+    <message>
         <source>⬇ Download failed, tap to try again</source>
         <translation>⬇ Échec du téléchargement, touchez pour réessayer</translation>
     </message>
@@ -1045,16 +1044,6 @@ Vous continuerez à voir les messages des contacts bloqués dans les autres grou
     <message>
         <source>Edited</source>
         <translation>Modifié</translation>
-    </message>
-    <message>
-        <source>⏳ Not on the server yet, tap to check again</source>
-        <extracomment>A large attachment was asked for and the server has no copy of it (yet). Tapping asks the server again.</extracomment>
-        <translation>⏳ Pas encore sur le serveur, touchez pour vérifier à nouveau</translation>
-    </message>
-    <message>
-        <source>Downloading… tap to try again</source>
-        <extracomment>A large attachment is being fetched. Tapping asks the server again rather than waiting for the next try.</extracomment>
-        <translation>Téléchargement… touchez pour réessayer</translation>
     </message>
 </context>
 <context>

@@ -674,11 +674,6 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
         <source>Edit</source>
         <translation>Uredi</translation>
     </message>
-    <message>
-        <source>Try downloading again</source>
-        <extracomment>A download that has not finished: ask the server again now.</extracomment>
-        <translation>Poskusi znova prenesti</translation>
-    </message>
 </context>
 <context>
     <name>ConversationPage</name>
@@ -1035,6 +1030,10 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
         <translation>Posredovano</translation>
     </message>
     <message>
+        <source>Downloading…</source>
+        <translation>Prenašanje…</translation>
+    </message>
+    <message>
         <source>⬇ Download failed, tap to try again</source>
         <translation>⬇ Prenos ni uspel, tapnite za ponovni poskus</translation>
     </message>
@@ -1055,16 +1054,6 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
     <message>
         <source>Edited</source>
         <translation>Urejeno</translation>
-    </message>
-    <message>
-        <source>⏳ Not on the server yet, tap to check again</source>
-        <extracomment>A large attachment was asked for and the server has no copy of it (yet). Tapping asks the server again.</extracomment>
-        <translation>⏳ Še ni na strežniku, tapnite za ponovno preverjanje</translation>
-    </message>
-    <message>
-        <source>Downloading… tap to try again</source>
-        <extracomment>A large attachment is being fetched. Tapping asks the server again rather than waiting for the next try.</extracomment>
-        <translation>Prenašanje… tapnite za ponovni poskus</translation>
     </message>
 </context>
 <context>

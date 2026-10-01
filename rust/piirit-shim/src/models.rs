@@ -126,12 +126,6 @@ pub struct MessageListItem {
     /// Undecipherable. Anything but Done is a message the core holds only
     /// the header of, kept back by the download limit until asked for.
     pub download_state: QString,
-    /// A download under way whose remainder no server of this account
-    /// holds a copy of: the core is waiting for something that has not
-    /// arrived, and may never -- a sender's relay that refused it for its
-    /// size, or a server that has expired it. Only ever true while
-    /// `download_state` is `InProgress`; see `with_download` in chat.rs.
-    pub download_missing: bool,
     /// `hasHtml` upstream: what is in `text` is not the whole of what
     /// arrived, and an HTML part behind `get_message_html` holds the
     /// rest. Being cut is only one of the things that raises it -- a

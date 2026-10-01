@@ -666,11 +666,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Edit</source>
         <translation>Editar</translation>
     </message>
-    <message>
-        <source>Try downloading again</source>
-        <extracomment>A download that has not finished: ask the server again now.</extracomment>
-        <translation>Reintentar descarga</translation>
-    </message>
 </context>
 <context>
     <name>ConversationPage</name>
@@ -1021,6 +1016,10 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Reenviado</translation>
     </message>
     <message>
+        <source>Downloading…</source>
+        <translation>Descargando…</translation>
+    </message>
+    <message>
         <source>⬇ Download failed, tap to try again</source>
         <translation>⬇ Falló la descarga, toca para reintentar</translation>
     </message>
@@ -1041,16 +1040,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Edited</source>
         <translation>Editado</translation>
-    </message>
-    <message>
-        <source>⏳ Not on the server yet, tap to check again</source>
-        <extracomment>A large attachment was asked for and the server has no copy of it (yet). Tapping asks the server again.</extracomment>
-        <translation>⏳ Aún no está en el servidor, toca para comprobar de nuevo</translation>
-    </message>
-    <message>
-        <source>Downloading… tap to try again</source>
-        <extracomment>A large attachment is being fetched. Tapping asks the server again rather than waiting for the next try.</extracomment>
-        <translation>Descargando… toca para reintentar</translation>
     </message>
 </context>
 <context>

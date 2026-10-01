@@ -668,11 +668,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Edit</source>
         <translation>Editează</translation>
     </message>
-    <message>
-        <source>Try downloading again</source>
-        <extracomment>A download that has not finished: ask the server again now.</extracomment>
-        <translation>Reîncearcă descărcarea</translation>
-    </message>
 </context>
 <context>
     <name>ConversationPage</name>
@@ -1026,6 +1021,10 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Redirecționat</translation>
     </message>
     <message>
+        <source>Downloading…</source>
+        <translation>Se descarcă…</translation>
+    </message>
+    <message>
         <source>⬇ Download failed, tap to try again</source>
         <translation>⬇ Descărcarea a eșuat, atinge pentru a reîncerca</translation>
     </message>
@@ -1046,16 +1045,6 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Edited</source>
         <translation>Editat</translation>
-    </message>
-    <message>
-        <source>⏳ Not on the server yet, tap to check again</source>
-        <extracomment>A large attachment was asked for and the server has no copy of it (yet). Tapping asks the server again.</extracomment>
-        <translation>⏳ Încă nu este pe server, atinge pentru a verifica din nou</translation>
-    </message>
-    <message>
-        <source>Downloading… tap to try again</source>
-        <extracomment>A large attachment is being fetched. Tapping asks the server again rather than waiting for the next try.</extracomment>
-        <translation>Se descarcă… atinge pentru a reîncerca</translation>
     </message>
 </context>
 <context>

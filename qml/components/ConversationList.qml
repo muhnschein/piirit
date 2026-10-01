@@ -857,18 +857,11 @@ SilicaListView {
                 }
                 MenuItem {
                     objectName: "downloadItem"
-                    // The states the row's own tap does something in:
-                    // the two the rest of a message can be asked for in,
-                    // and a download under way, which is asked about
-                    // again (MessageDelegate's `canDownload`).
+                    // The two states the rest of a message can be asked
+                    // for in; the row offers the same tap.
                     visible: model.download_state === "Available"
                              || model.download_state === "Failure"
-                             || model.download_state === "InProgress"
-                    text: model.download_state === "InProgress"
-                          //: A download that has not finished: ask the
-                          //: server again now.
-                          ? qsTr("Try downloading again")
-                          : qsTr("Download")
+                    text: qsTr("Download")
                     onClicked: root.downloadRequested(model.message_id)
                 }
                 MenuItem {
@@ -1103,7 +1096,6 @@ SilicaListView {
             isEdited: model.is_edited
             markdownMode: root.markdownMode
             downloadState: model.download_state
-            downloadMissing: model.download_missing
             isOutgoing: model.is_outgoing
             isInfo: model.is_info
             isForwarded: model.is_forwarded
