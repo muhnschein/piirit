@@ -181,7 +181,6 @@ Page {
             Settings[setting] = false
             return
         }
-        page.returnY = flickable.contentY
         var dialog = pageStack.push(Qt.resolvedUrl("ExperimentalFeatureDialog.qml"), {
             title: toggle.text
         })
@@ -189,23 +188,6 @@ Page {
             dialog.accepted.connect(function() {
                 Settings[setting] = true
             })
-        }
-    }
-
-    /// Where the page was scrolled to when it pushed a question, -1 for
-    /// none. Coming back from an accepted one lands at the top otherwise,
-    /// which is not where the switch that asked is.
-    property real returnY: -1
-
-    onStatusChanged: {
-        if (page.returnY < 0) {
-            return
-        }
-        if (status === PageStatus.Activating || status === PageStatus.Active) {
-            flickable.contentY = page.returnY
-        }
-        if (status === PageStatus.Active) {
-            page.returnY = -1
         }
     }
 
@@ -241,8 +223,6 @@ Page {
     }
 
     SilicaFlickable {
-        id: flickable
-        objectName: "settingsFlickable"
         anchors.fill: parent
         contentHeight: column.height + Theme.paddingLarge
 
