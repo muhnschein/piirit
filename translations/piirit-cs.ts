@@ -831,6 +831,22 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
     </message>
 </context>
 <context>
+    <name>ExperimentalFeatureDialog</name>
+    <message>
+        <source>Enable</source>
+        <extracomment>Accepts turning on an experimental feature.</extracomment>
+        <translation>Zapnout</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Zrušit</translation>
+    </message>
+    <message>
+        <source>This feature may be unstable and may be changed or removed.</source>
+        <translation>Tato funkce může být nestabilní a může být změněna nebo odstraněna.</translation>
+    </message>
+</context>
+<context>
     <name>Format</name>
     <message>
         <source>now</source>
@@ -1776,10 +1792,6 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
         <translation>Odstraňuje z odkazů, které odesíláš, identifikátory kliknutí a kampaňové značky.</translation>
     </message>
     <message>
-        <source>Runs small apps inside chats. These features may be unstable and may be changed or removed.</source>
-        <translation>Spouští malé aplikace uvnitř chatů. Tyto funkce mohou být nestabilní a mohou být změněny nebo odstraněny.</translation>
-    </message>
-    <message>
         <source>Quick actions</source>
         <translation>Rychlé akce</translation>
     </message>
@@ -1807,8 +1819,12 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
         <translation>Povolit hovory (experimentální)</translation>
     </message>
     <message>
-        <source>Makes and answers voice calls in one-to-one chats. These features may be unstable and may be changed or removed.</source>
-        <translation>Uskutečňuje a přijímá hlasové hovory v individuálních chatech. Tyto funkce mohou být nestabilní a mohou být změněny nebo odstraněny.</translation>
+        <source>Runs small apps inside chats.</source>
+        <translation>Spouští malé aplikace uvnitř chatů.</translation>
+    </message>
+    <message>
+        <source>Makes and answers voice calls in one-to-one chats.</source>
+        <translation>Uskutečňuje a přijímá hlasové hovory v individuálních chatech.</translation>
     </message>
 </context>
 <context>

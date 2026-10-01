@@ -824,6 +824,22 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>ExperimentalFeatureDialog</name>
+    <message>
+        <source>Enable</source>
+        <extracomment>Accepts turning on an experimental feature.</extracomment>
+        <translation>Slå på</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Avbryt</translation>
+    </message>
+    <message>
+        <source>This feature may be unstable and may be changed or removed.</source>
+        <translation>Den här funktionen kan vara instabil och kan ändras eller tas bort.</translation>
+    </message>
+</context>
+<context>
     <name>Format</name>
     <message>
         <source>now</source>
@@ -1765,10 +1781,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Tar bort klick-ID:n och kampanjtaggar från länkar du skickar.</translation>
     </message>
     <message>
-        <source>Runs small apps inside chats. These features may be unstable and may be changed or removed.</source>
-        <translation>Kör små appar inuti chattar. Dessa funktioner kan vara instabila och kan ändras eller tas bort.</translation>
-    </message>
-    <message>
         <source>Quick actions</source>
         <translation>Snabbåtgärder</translation>
     </message>
@@ -1796,8 +1808,12 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Aktivera samtal (experimentellt)</translation>
     </message>
     <message>
-        <source>Makes and answers voice calls in one-to-one chats. These features may be unstable and may be changed or removed.</source>
-        <translation>Ringer och besvarar röstsamtal i chattar med en person. Dessa funktioner kan vara instabila och kan ändras eller tas bort.</translation>
+        <source>Runs small apps inside chats.</source>
+        <translation>Kör små appar inuti chattar.</translation>
+    </message>
+    <message>
+        <source>Makes and answers voice calls in one-to-one chats.</source>
+        <translation>Ringer och besvarar röstsamtal i chattar med en person.</translation>
     </message>
 </context>
 <context>

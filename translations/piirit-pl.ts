@@ -831,6 +831,22 @@ Wiadomości innych grup z zablokowanymi kontaktami nadal będą wyświetlane.</t
     </message>
 </context>
 <context>
+    <name>ExperimentalFeatureDialog</name>
+    <message>
+        <source>Enable</source>
+        <extracomment>Accepts turning on an experimental feature.</extracomment>
+        <translation>Włącz</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Anuluj</translation>
+    </message>
+    <message>
+        <source>This feature may be unstable and may be changed or removed.</source>
+        <translation>Ta funkcja może być niestabilna oraz może zostać zmieniona lub usunięta.</translation>
+    </message>
+</context>
+<context>
     <name>Format</name>
     <message>
         <source>now</source>
@@ -1776,10 +1792,6 @@ Wiadomości innych grup z zablokowanymi kontaktami nadal będą wyświetlane.</t
         <translation>Usuwa identyfikatory kliknięć i znaczniki kampanii z linków, które wysyłasz.</translation>
     </message>
     <message>
-        <source>Runs small apps inside chats. These features may be unstable and may be changed or removed.</source>
-        <translation>Uruchamia małe aplikacje wewnątrz czatów. Te funkcje mogą być niestabilne oraz mogą zostać zmienione lub usunięte.</translation>
-    </message>
-    <message>
         <source>Quick actions</source>
         <translation>Szybkie akcje</translation>
     </message>
@@ -1807,8 +1819,12 @@ Wiadomości innych grup z zablokowanymi kontaktami nadal będą wyświetlane.</t
         <translation>Włącz połączenia (eksperymentalne)</translation>
     </message>
     <message>
-        <source>Makes and answers voice calls in one-to-one chats. These features may be unstable and may be changed or removed.</source>
-        <translation>Wykonuje i odbiera połączenia głosowe w czatach jeden na jeden. Te funkcje mogą być niestabilne oraz mogą zostać zmienione lub usunięte.</translation>
+        <source>Runs small apps inside chats.</source>
+        <translation>Uruchamia małe aplikacje wewnątrz czatów.</translation>
+    </message>
+    <message>
+        <source>Makes and answers voice calls in one-to-one chats.</source>
+        <translation>Wykonuje i odbiera połączenia głosowe w czatach jeden na jeden.</translation>
     </message>
 </context>
 <context>

@@ -821,6 +821,22 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>ExperimentalFeatureDialog</name>
+    <message>
+        <source>Enable</source>
+        <extracomment>Accepts turning on an experimental feature.</extracomment>
+        <translation>Bật</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Hủy</translation>
+    </message>
+    <message>
+        <source>This feature may be unstable and may be changed or removed.</source>
+        <translation>Tính năng này có thể không ổn định và có thể bị thay đổi hoặc gỡ bỏ.</translation>
+    </message>
+</context>
+<context>
     <name>Format</name>
     <message>
         <source>now</source>
@@ -1758,10 +1774,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Loại bỏ ID nhấp chuột và thẻ chiến dịch khỏi các liên kết bạn gửi.</translation>
     </message>
     <message>
-        <source>Runs small apps inside chats. These features may be unstable and may be changed or removed.</source>
-        <translation>Chạy các ứng dụng nhỏ bên trong cuộc trò chuyện. Các tính năng này có thể không ổn định và có thể bị thay đổi hoặc gỡ bỏ.</translation>
-    </message>
-    <message>
         <source>Quick actions</source>
         <translation>Thao tác nhanh</translation>
     </message>
@@ -1789,8 +1801,12 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Bật cuộc gọi (thử nghiệm)</translation>
     </message>
     <message>
-        <source>Makes and answers voice calls in one-to-one chats. These features may be unstable and may be changed or removed.</source>
-        <translation>Thực hiện và trả lời cuộc gọi thoại trong cuộc trò chuyện một-một. Các tính năng này có thể không ổn định và có thể bị thay đổi hoặc gỡ bỏ.</translation>
+        <source>Runs small apps inside chats.</source>
+        <translation>Chạy các ứng dụng nhỏ bên trong cuộc trò chuyện.</translation>
+    </message>
+    <message>
+        <source>Makes and answers voice calls in one-to-one chats.</source>
+        <translation>Thực hiện và trả lời cuộc gọi thoại trong cuộc trò chuyện một-một.</translation>
     </message>
 </context>
 <context>

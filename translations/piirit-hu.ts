@@ -821,6 +821,22 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>ExperimentalFeatureDialog</name>
+    <message>
+        <source>Enable</source>
+        <extracomment>Accepts turning on an experimental feature.</extracomment>
+        <translation>Bekapcsolás</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Mégse</translation>
+    </message>
+    <message>
+        <source>This feature may be unstable and may be changed or removed.</source>
+        <translation>Ez a funkció instabil lehet, és megváltozhat vagy eltávolításra kerülhet.</translation>
+    </message>
+</context>
+<context>
     <name>Format</name>
     <message>
         <source>now</source>
@@ -1758,10 +1774,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Eltávolítja a kattintásazonosítókat és kampánycímkéket az általad küldött linkekből.</translation>
     </message>
     <message>
-        <source>Runs small apps inside chats. These features may be unstable and may be changed or removed.</source>
-        <translation>Kis alkalmazásokat futtat a csevegéseken belül. Ezek a funkciók instabilak lehetnek, és megváltozhatnak vagy eltávolításra kerülhetnek.</translation>
-    </message>
-    <message>
         <source>Quick actions</source>
         <translation>Gyorsműveletek</translation>
     </message>
@@ -1789,8 +1801,12 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Hívások engedélyezése (kísérleti)</translation>
     </message>
     <message>
-        <source>Makes and answers voice calls in one-to-one chats. These features may be unstable and may be changed or removed.</source>
-        <translation>Hanghívásokat indít és fogad kétszemélyes csevegésekben. Ezek a funkciók instabilak lehetnek, és megváltozhatnak vagy eltávolításra kerülhetnek.</translation>
+        <source>Runs small apps inside chats.</source>
+        <translation>Kis alkalmazásokat futtat a csevegéseken belül.</translation>
+    </message>
+    <message>
+        <source>Makes and answers voice calls in one-to-one chats.</source>
+        <translation>Hanghívásokat indít és fogad kétszemélyes csevegésekben.</translation>
     </message>
 </context>
 <context>

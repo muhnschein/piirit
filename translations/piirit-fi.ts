@@ -824,6 +824,22 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>ExperimentalFeatureDialog</name>
+    <message>
+        <source>Enable</source>
+        <extracomment>Accepts turning on an experimental feature.</extracomment>
+        <translation>Ota käyttöön</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Peruuta</translation>
+    </message>
+    <message>
+        <source>This feature may be unstable and may be changed or removed.</source>
+        <translation>Tämä ominaisuus voi olla epävakaa, ja sitä voidaan muuttaa tai se voidaan poistaa.</translation>
+    </message>
+</context>
+<context>
     <name>Format</name>
     <message>
         <source>now</source>
@@ -1765,10 +1781,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Poistaa klikkaustunnisteet ja kampanjamerkinnät lähettämistäsi linkeistä.</translation>
     </message>
     <message>
-        <source>Runs small apps inside chats. These features may be unstable and may be changed or removed.</source>
-        <translation>Suorittaa pieniä sovelluksia keskusteluissa. Nämä ominaisuudet voivat olla epävakaita, ja niitä voidaan muuttaa tai poistaa.</translation>
-    </message>
-    <message>
         <source>Quick actions</source>
         <translation>Pikatoiminnot</translation>
     </message>
@@ -1796,8 +1808,12 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Ota puhelut käyttöön (kokeellinen)</translation>
     </message>
     <message>
-        <source>Makes and answers voice calls in one-to-one chats. These features may be unstable and may be changed or removed.</source>
-        <translation>Soittaa ja vastaa äänipuheluihin kahdenkeskisissä keskusteluissa. Nämä ominaisuudet voivat olla epävakaita, ja niitä voidaan muuttaa tai poistaa.</translation>
+        <source>Runs small apps inside chats.</source>
+        <translation>Suorittaa pieniä sovelluksia keskusteluissa.</translation>
+    </message>
+    <message>
+        <source>Makes and answers voice calls in one-to-one chats.</source>
+        <translation>Soittaa ja vastaa äänipuheluihin kahdenkeskisissä keskusteluissa.</translation>
     </message>
 </context>
 <context>

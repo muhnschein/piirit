@@ -828,6 +828,22 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
     </message>
 </context>
 <context>
+    <name>ExperimentalFeatureDialog</name>
+    <message>
+        <source>Enable</source>
+        <extracomment>Accepts turning on an experimental feature.</extracomment>
+        <translation>Lülita sisse</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Loobu</translation>
+    </message>
+    <message>
+        <source>This feature may be unstable and may be changed or removed.</source>
+        <translation>See funktsioon võib olla ebastabiilne ning seda võidakse muuta või eemaldada.</translation>
+    </message>
+</context>
+<context>
     <name>Format</name>
     <message>
         <source>now</source>
@@ -1769,10 +1785,6 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
         <translation>Eemaldab klikitunnused ja kampaaniasildid linkidelt, mida saadad.</translation>
     </message>
     <message>
-        <source>Runs small apps inside chats. These features may be unstable and may be changed or removed.</source>
-        <translation>Käitab vestlustes väikeseid rakendusi. Need funktsioonid võivad olla ebastabiilsed ning neid võidakse muuta või eemaldada.</translation>
-    </message>
-    <message>
         <source>Quick actions</source>
         <translation>Kiirtoimingud</translation>
     </message>
@@ -1800,8 +1812,12 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
         <translation>Luba kõned (katseline)</translation>
     </message>
     <message>
-        <source>Makes and answers voice calls in one-to-one chats. These features may be unstable and may be changed or removed.</source>
-        <translation>Teeb ja võtab vastu häälkõnesid üks-ühele vestlustes. Need funktsioonid võivad olla ebastabiilsed ning neid võidakse muuta või eemaldada.</translation>
+        <source>Runs small apps inside chats.</source>
+        <translation>Käitab vestlustes väikeseid rakendusi.</translation>
+    </message>
+    <message>
+        <source>Makes and answers voice calls in one-to-one chats.</source>
+        <translation>Teeb ja võtab vastu häälkõnesid üks-ühele vestlustes.</translation>
     </message>
 </context>
 <context>

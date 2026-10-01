@@ -825,6 +825,22 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
     </message>
 </context>
 <context>
+    <name>ExperimentalFeatureDialog</name>
+    <message>
+        <source>Enable</source>
+        <extracomment>Accepts turning on an experimental feature.</extracomment>
+        <translation>Etkinleştir</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>İptal</translation>
+    </message>
+    <message>
+        <source>This feature may be unstable and may be changed or removed.</source>
+        <translation>Bu özellik kararsız olabilir ve değiştirilebilir ya da kaldırılabilir.</translation>
+    </message>
+</context>
+<context>
     <name>Format</name>
     <message>
         <source>now</source>
@@ -1762,10 +1778,6 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
         <translation>Gönderdiğin bağlantılardan tıklama kimliklerini ve kampanya etiketlerini kaldırır.</translation>
     </message>
     <message>
-        <source>Runs small apps inside chats. These features may be unstable and may be changed or removed.</source>
-        <translation>Sohbetlerin içinde küçük uygulamalar çalıştırır. Bu özellikler kararsız olabilir ve değiştirilebilir ya da kaldırılabilir.</translation>
-    </message>
-    <message>
         <source>Quick actions</source>
         <translation>Hızlı işlemler</translation>
     </message>
@@ -1793,8 +1805,12 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
         <translation>Aramaları etkinleştir (deneysel)</translation>
     </message>
     <message>
-        <source>Makes and answers voice calls in one-to-one chats. These features may be unstable and may be changed or removed.</source>
-        <translation>Bire bir sohbetlerde sesli arama yapar ve aramaları yanıtlar. Bu özellikler kararsız olabilir ve değiştirilebilir ya da kaldırılabilir.</translation>
+        <source>Runs small apps inside chats.</source>
+        <translation>Sohbetlerin içinde küçük uygulamalar çalıştırır.</translation>
+    </message>
+    <message>
+        <source>Makes and answers voice calls in one-to-one chats.</source>
+        <translation>Bire bir sohbetlerde sesli arama yapar ve aramaları yanıtlar.</translation>
     </message>
 </context>
 <context>

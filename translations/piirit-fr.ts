@@ -828,6 +828,22 @@ Vous continuerez à voir les messages des contacts bloqués dans les autres grou
     </message>
 </context>
 <context>
+    <name>ExperimentalFeatureDialog</name>
+    <message>
+        <source>Enable</source>
+        <extracomment>Accepts turning on an experimental feature.</extracomment>
+        <translation>Activer</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Annuler</translation>
+    </message>
+    <message>
+        <source>This feature may be unstable and may be changed or removed.</source>
+        <translation>Cette fonctionnalité peut être instable et être modifiée ou supprimée.</translation>
+    </message>
+</context>
+<context>
     <name>Format</name>
     <message>
         <source>now</source>
@@ -1769,10 +1785,6 @@ Vous continuerez à voir les messages des contacts bloqués dans les autres grou
         <translation>Supprime les identifiants de clic et les balises de campagne des liens que vous envoyez.</translation>
     </message>
     <message>
-        <source>Runs small apps inside chats. These features may be unstable and may be changed or removed.</source>
-        <translation>Exécute de petites applications dans les discussions. Ces fonctionnalités peuvent être instables et être modifiées ou supprimées.</translation>
-    </message>
-    <message>
         <source>Quick actions</source>
         <translation>Actions rapides</translation>
     </message>
@@ -1800,8 +1812,12 @@ Vous continuerez à voir les messages des contacts bloqués dans les autres grou
         <translation>Activer les appels (expérimental)</translation>
     </message>
     <message>
-        <source>Makes and answers voice calls in one-to-one chats. These features may be unstable and may be changed or removed.</source>
-        <translation>Passe et reçoit des appels vocaux dans les discussions individuelles. Ces fonctionnalités peuvent être instables et être modifiées ou supprimées.</translation>
+        <source>Runs small apps inside chats.</source>
+        <translation>Exécute de petites applications dans les discussions.</translation>
+    </message>
+    <message>
+        <source>Makes and answers voice calls in one-to-one chats.</source>
+        <translation>Passe et reçoit des appels vocaux dans les discussions individuelles.</translation>
     </message>
 </context>
 <context>

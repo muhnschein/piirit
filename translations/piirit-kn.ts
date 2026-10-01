@@ -828,6 +828,22 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>ExperimentalFeatureDialog</name>
+    <message>
+        <source>Enable</source>
+        <extracomment>Accepts turning on an experimental feature.</extracomment>
+        <translation>ಸಕ್ರಿಯಗೊಳಿಸಿ</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>ರದ್ದುಮಾಡಿ</translation>
+    </message>
+    <message>
+        <source>This feature may be unstable and may be changed or removed.</source>
+        <translation>ಈ ಸೌಲಭ್ಯ ಅಸ್ಥಿರವಾಗಿರಬಹುದು ಮತ್ತು ಬದಲಾಗಬಹುದು ಅಥವಾ ತೆಗೆದುಹಾಕಬಹುದು.</translation>
+    </message>
+</context>
+<context>
     <name>Format</name>
     <message>
         <source>now</source>
@@ -1769,10 +1785,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>ನೀವು ಕಳುಹಿಸುವ ಕೊಂಡಿಗಳಿಂದ ಕ್ಲಿಕ್ ಐಡಿಗಳನ್ನು ಮತ್ತು ಅಭಿಯಾನ ಟ್ಯಾಗುಗಳನ್ನು ತೆಗೆದುಹಾಕುತ್ತದೆ.</translation>
     </message>
     <message>
-        <source>Runs small apps inside chats. These features may be unstable and may be changed or removed.</source>
-        <translation>ಸಂಭಾಷಣೆಗಳ ಒಳಗೆ ಸಣ್ಣ ಅನ್ವಯಗಳನ್ನು ಚಲಾಯಿಸುತ್ತದೆ. ಈ ಸೌಲಭ್ಯಗಳು ಅಸ್ಥಿರವಾಗಿರಬಹುದು ಮತ್ತು ಬದಲಾಗಬಹುದು ಅಥವಾ ತೆಗೆದುಹಾಕಬಹುದು.</translation>
-    </message>
-    <message>
         <source>Quick actions</source>
         <translation>ತ್ವರಿತ ಕ್ರಿಯೆಗಳು</translation>
     </message>
@@ -1800,8 +1812,12 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>ಕರೆಗಳನ್ನು ಸಕ್ರಿಯಗೊಳಿಸಿ (ಪ್ರಯೋಗಾತ್ಮಕ)</translation>
     </message>
     <message>
-        <source>Makes and answers voice calls in one-to-one chats. These features may be unstable and may be changed or removed.</source>
-        <translation>ಒಬ್ಬರಿಗೊಬ್ಬರ ಸಂಭಾಷಣೆಗಳಲ್ಲಿ ಧ್ವನಿ ಕರೆಗಳನ್ನು ಮಾಡುತ್ತದೆ ಮತ್ತು ಉತ್ತರಿಸುತ್ತದೆ. ಈ ಸೌಲಭ್ಯಗಳು ಅಸ್ಥಿರವಾಗಿರಬಹುದು ಮತ್ತು ಬದಲಾಗಬಹುದು ಅಥವಾ ತೆಗೆದುಹಾಕಬಹುದು.</translation>
+        <source>Runs small apps inside chats.</source>
+        <translation>ಸಂಭಾಷಣೆಗಳ ಒಳಗೆ ಸಣ್ಣ ಅನ್ವಯಗಳನ್ನು ಚಲಾಯಿಸುತ್ತದೆ.</translation>
+    </message>
+    <message>
+        <source>Makes and answers voice calls in one-to-one chats.</source>
+        <translation>ಒಬ್ಬರಿಗೊಬ್ಬರ ಸಂಭಾಷಣೆಗಳಲ್ಲಿ ಧ್ವನಿ ಕರೆಗಳನ್ನು ಮಾಡುತ್ತದೆ ಮತ್ತು ಉತ್ತರಿಸುತ್ತದೆ.</translation>
     </message>
 </context>
 <context>

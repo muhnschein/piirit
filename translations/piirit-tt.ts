@@ -825,6 +825,22 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>ExperimentalFeatureDialog</name>
+    <message>
+        <source>Enable</source>
+        <extracomment>Accepts turning on an experimental feature.</extracomment>
+        <translation>Кабызу</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Баш тартырга</translation>
+    </message>
+    <message>
+        <source>This feature may be unstable and may be changed or removed.</source>
+        <translation>Бу мөмкинлек тотрыксыз булырга, үзгәртелергә яки бетерелергә мөмкин.</translation>
+    </message>
+</context>
+<context>
     <name>Format</name>
     <message>
         <source>now</source>
@@ -1762,10 +1778,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Сез җибәргән сылтамалардан басу идентификаторларын һәм кампания билгеләрен бетерә.</translation>
     </message>
     <message>
-        <source>Runs small apps inside chats. These features may be unstable and may be changed or removed.</source>
-        <translation>Әңгәмәләр эчендә кечкенә кушымталар эшләтә. Бу мөмкинлекләр тотрыксыз булырга, үзгәртелергә яки бетерелергә мөмкин.</translation>
-    </message>
-    <message>
         <source>Quick actions</source>
         <translation>Тиз гамәлләр</translation>
     </message>
@@ -1793,8 +1805,12 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Шалтыратуларны кабызу (сынау режимы)</translation>
     </message>
     <message>
-        <source>Makes and answers voice calls in one-to-one chats. These features may be unstable and may be changed or removed.</source>
-        <translation>Шәхси әңгәмәләрдә тавышлы шалтыратулар ясый һәм аларга җавап бирә. Бу мөмкинлекләр тотрыксыз булырга, үзгәртелергә яки бетерелергә мөмкин.</translation>
+        <source>Runs small apps inside chats.</source>
+        <translation>Әңгәмәләр эчендә кечкенә кушымталар эшләтә.</translation>
+    </message>
+    <message>
+        <source>Makes and answers voice calls in one-to-one chats.</source>
+        <translation>Шәхси әңгәмәләрдә тавышлы шалтыратулар ясый һәм аларга җавап бирә.</translation>
     </message>
 </context>
 <context>

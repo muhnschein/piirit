@@ -824,6 +824,22 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>ExperimentalFeatureDialog</name>
+    <message>
+        <source>Enable</source>
+        <extracomment>Accepts turning on an experimental feature.</extracomment>
+        <translation>Включване</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Отказ</translation>
+    </message>
+    <message>
+        <source>This feature may be unstable and may be changed or removed.</source>
+        <translation>Тази функция може да е нестабилна и може да бъде променена или премахната.</translation>
+    </message>
+</context>
+<context>
     <name>Format</name>
     <message>
         <source>now</source>
@@ -1765,10 +1781,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Премахва идентификатори на кликове и етикети на кампании от връзките, които изпращате.</translation>
     </message>
     <message>
-        <source>Runs small apps inside chats. These features may be unstable and may be changed or removed.</source>
-        <translation>Изпълнява малки приложения вътре в чатовете. Тези функции може да са нестабилни и може да бъдат променени или премахнати.</translation>
-    </message>
-    <message>
         <source>Quick actions</source>
         <translation>Бързи действия</translation>
     </message>
@@ -1796,8 +1808,12 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Включване на обажданията (експериментално)</translation>
     </message>
     <message>
-        <source>Makes and answers voice calls in one-to-one chats. These features may be unstable and may be changed or removed.</source>
-        <translation>Осъществява и приема гласови обаждания в лични чатове. Тези функции може да са нестабилни и може да бъдат променени или премахнати.</translation>
+        <source>Runs small apps inside chats.</source>
+        <translation>Изпълнява малки приложения вътре в чатовете.</translation>
+    </message>
+    <message>
+        <source>Makes and answers voice calls in one-to-one chats.</source>
+        <translation>Осъществява и приема гласови обаждания в лични чатове.</translation>
     </message>
 </context>
 <context>

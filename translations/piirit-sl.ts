@@ -834,6 +834,22 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
     </message>
 </context>
 <context>
+    <name>ExperimentalFeatureDialog</name>
+    <message>
+        <source>Enable</source>
+        <extracomment>Accepts turning on an experimental feature.</extracomment>
+        <translation>Vklopi</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Prekliči</translation>
+    </message>
+    <message>
+        <source>This feature may be unstable and may be changed or removed.</source>
+        <translation>Ta funkcija je lahko nestabilna ter se lahko spremeni ali odstrani.</translation>
+    </message>
+</context>
+<context>
     <name>Format</name>
     <message>
         <source>now</source>
@@ -1783,10 +1799,6 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
         <translation>Iz povezav, ki jih pošiljaš, odstrani identifikatorje klikov in oznake kampanj.</translation>
     </message>
     <message>
-        <source>Runs small apps inside chats. These features may be unstable and may be changed or removed.</source>
-        <translation>Znotraj klepetov poganja majhne aplikacije. Te funkcije so lahko nestabilne ter se lahko spremenijo ali odstranijo.</translation>
-    </message>
-    <message>
         <source>Quick actions</source>
         <translation>Hitra dejanja</translation>
     </message>
@@ -1814,8 +1826,12 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
         <translation>Omogoči klice (poskusno)</translation>
     </message>
     <message>
-        <source>Makes and answers voice calls in one-to-one chats. These features may be unstable and may be changed or removed.</source>
-        <translation>Opravlja in sprejema glasovne klice v klepetih z eno osebo. Te funkcije so lahko nestabilne ter se lahko spremenijo ali odstranijo.</translation>
+        <source>Runs small apps inside chats.</source>
+        <translation>Znotraj klepetov poganja majhne aplikacije.</translation>
+    </message>
+    <message>
+        <source>Makes and answers voice calls in one-to-one chats.</source>
+        <translation>Opravlja in sprejema glasovne klice v klepetih z eno osebo.</translation>
     </message>
 </context>
 <context>

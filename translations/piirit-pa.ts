@@ -828,6 +828,22 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>ExperimentalFeatureDialog</name>
+    <message>
+        <source>Enable</source>
+        <extracomment>Accepts turning on an experimental feature.</extracomment>
+        <translation>ਚਾਲੂ ਕਰੋ</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>ਰੱਦ ਕਰੋ</translation>
+    </message>
+    <message>
+        <source>This feature may be unstable and may be changed or removed.</source>
+        <translation>ਇਹ ਸਹੂਲਤ ਅਸਥਿਰ ਹੋ ਸਕਦੀ ਹੈ ਅਤੇ ਬਦਲੀ ਜਾਂ ਹਟਾਈ ਜਾ ਸਕਦੀ ਹੈ।</translation>
+    </message>
+</context>
+<context>
     <name>Format</name>
     <message>
         <source>now</source>
@@ -1769,10 +1785,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>ਤੁਹਾਡੇ ਭੇਜੇ ਲਿੰਕਾਂ ਵਿੱਚੋਂ ਕਲਿੱਕ ਆਈਡੀ ਅਤੇ ਮੁਹਿੰਮ ਟੈਗ ਹਟਾਉਂਦਾ ਹੈ।</translation>
     </message>
     <message>
-        <source>Runs small apps inside chats. These features may be unstable and may be changed or removed.</source>
-        <translation>ਗੱਲਬਾਤਾਂ ਵਿੱਚ ਛੋਟੇ ਐਪ ਚਲਾਉਂਦਾ ਹੈ। ਇਹ ਸਹੂਲਤਾਂ ਅਸਥਿਰ ਹੋ ਸਕਦੀਆਂ ਹਨ ਅਤੇ ਬਦਲੀਆਂ ਜਾਂ ਹਟਾਈਆਂ ਜਾ ਸਕਦੀਆਂ ਹਨ।</translation>
-    </message>
-    <message>
         <source>Quick actions</source>
         <translation>ਤੁਰੰਤ ਕਾਰਵਾਈਆਂ</translation>
     </message>
@@ -1800,8 +1812,12 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>ਕਾਲਾਂ ਚਾਲੂ ਕਰੋ (ਪ੍ਰਯੋਗਾਤਮਕ)</translation>
     </message>
     <message>
-        <source>Makes and answers voice calls in one-to-one chats. These features may be unstable and may be changed or removed.</source>
-        <translation>ਇੱਕ-ਤੋਂ-ਇੱਕ ਗੱਲਬਾਤਾਂ ਵਿੱਚ ਵੌਇਸ ਕਾਲਾਂ ਕਰਦਾ ਹੈ ਅਤੇ ਉਨ੍ਹਾਂ ਦਾ ਜਵਾਬ ਦਿੰਦਾ ਹੈ। ਇਹ ਸਹੂਲਤਾਂ ਅਸਥਿਰ ਹੋ ਸਕਦੀਆਂ ਹਨ ਅਤੇ ਬਦਲੀਆਂ ਜਾਂ ਹਟਾਈਆਂ ਜਾ ਸਕਦੀਆਂ ਹਨ।</translation>
+        <source>Runs small apps inside chats.</source>
+        <translation>ਗੱਲਬਾਤਾਂ ਵਿੱਚ ਛੋਟੇ ਐਪ ਚਲਾਉਂਦਾ ਹੈ।</translation>
+    </message>
+    <message>
+        <source>Makes and answers voice calls in one-to-one chats.</source>
+        <translation>ਇੱਕ-ਤੋਂ-ਇੱਕ ਗੱਲਬਾਤਾਂ ਵਿੱਚ ਵੌਇਸ ਕਾਲਾਂ ਕਰਦਾ ਹੈ ਅਤੇ ਉਨ੍ਹਾਂ ਦਾ ਜਵਾਬ ਦਿੰਦਾ ਹੈ।</translation>
     </message>
 </context>
 <context>

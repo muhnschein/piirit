@@ -831,6 +831,22 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>ExperimentalFeatureDialog</name>
+    <message>
+        <source>Enable</source>
+        <extracomment>Accepts turning on an experimental feature.</extracomment>
+        <translation>Увімкнути</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Скасувати</translation>
+    </message>
+    <message>
+        <source>This feature may be unstable and may be changed or removed.</source>
+        <translation>Ця функція може бути нестабільною, а також змінюватися чи вилучатися.</translation>
+    </message>
+</context>
+<context>
     <name>Format</name>
     <message>
         <source>now</source>
@@ -1776,10 +1792,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Вилучає ідентифікатори кліків і мітки кампаній із посилань, які ви надсилаєте.</translation>
     </message>
     <message>
-        <source>Runs small apps inside chats. These features may be unstable and may be changed or removed.</source>
-        <translation>Запускає невеликі застосунки всередині чатів. Ці функції можуть бути нестабільними, а також змінюватися чи вилучатися.</translation>
-    </message>
-    <message>
         <source>Quick actions</source>
         <translation>Швидкі дії</translation>
     </message>
@@ -1807,8 +1819,12 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Увімкнути виклики (експериментально)</translation>
     </message>
     <message>
-        <source>Makes and answers voice calls in one-to-one chats. These features may be unstable and may be changed or removed.</source>
-        <translation>Здійснює голосові виклики та відповідає на них в особистих чатах. Ці функції можуть бути нестабільними, а також змінюватися чи вилучатися.</translation>
+        <source>Runs small apps inside chats.</source>
+        <translation>Запускає невеликі застосунки всередині чатів.</translation>
+    </message>
+    <message>
+        <source>Makes and answers voice calls in one-to-one chats.</source>
+        <translation>Здійснює голосові виклики та відповідає на них в особистих чатах.</translation>
     </message>
 </context>
 <context>
