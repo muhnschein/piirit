@@ -1,10 +1,11 @@
-//! A file the profile's relay will not take.
+//! A file bigger than the core recommends is said to be large, and sent.
 //!
-//! The conversation asks the core what this profile's relay recommends as
-//! the largest attachment (`sys.msgsize_max_recommended`, see `media.rs`)
-//! and holds the picked file to it: a bar above the field says so while
-//! the file is sitting there, and the send button is off until it is
-//! taken away. A picture is never refused, whatever it weighs, because
+//! The conversation asks the core for the largest attachment it
+//! recommends (`sys.msgsize_max_recommended`, see `media.rs`). That is one
+//! constant for every relay, and many relays take more -- issue #101 is a
+//! relay taking 200 MB that Piirit would not hand a 25 MB file to. So a
+//! file past it gets a notice above the field, and the send button stays
+//! on and sends it. A picture gets no notice, whatever it weighs, because
 //! the core recodes one on its way out.
 //!
 //! The fake core is told a ceiling of a kilobyte
@@ -74,8 +75,8 @@ const PROBE_QML: &str = r"
 
 #[test]
 #[allow(clippy::too_many_lines)]
-fn a_file_the_relay_will_not_take_is_said_so_and_cannot_be_sent() {
-    let temp = std::env::temp_dir().join(format!("piirit-qml-too-big-{}", std::process::id()));
+fn a_file_over_the_recommended_size_is_said_to_be_large_and_is_sent() {
+    let temp = std::env::temp_dir().join(format!("piirit-qml-large-{}", std::process::id()));
     let journal = common::fresh_journal(&temp);
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
     let tree = common::qml_tree_without_enter_key();
@@ -137,6 +138,7 @@ fn a_file_the_relay_will_not_take_is_said_so_and_cannot_be_sent() {
     }
 
     let video_path = video.to_string_lossy().into_owned();
+    let video_file = video_path.clone();
     let picture_path = picture.to_string_lossy().into_owned();
 
     single_shot(Duration::from_secs(1), move || unsafe {
@@ -153,7 +155,7 @@ fn a_file_the_relay_will_not_take_is_said_so_and_cannot_be_sent() {
     });
 
     single_shot(Duration::from_secs(3), move || unsafe {
-        probe!("bar-before", "tooBigBar", "visible");
+        probe!("bar-before", "largeFileBar", "visible");
         (*steps_ptr).push((
             "attach-video",
             call!("attach", QString::from(video_path.as_str())),
@@ -161,18 +163,17 @@ fn a_file_the_relay_will_not_take_is_said_so_and_cannot_be_sent() {
     });
 
     single_shot(Duration::from_secs(4), move || unsafe {
-        probe!("bar-after", "tooBigBar", "visible");
-        probe!("bar-text", "tooBigLabel", "text");
+        probe!("bar-after", "largeFileBar", "visible");
+        probe!("bar-text", "largeFileLabel", "text");
         probe!("send-enabled", "sendButton", "enabled");
-        // A caption does not make it sendable either: the caption belongs
-        // to the file, and sending it alone would drop the file silently.
         (*steps_ptr).push(("type", call!("type", QString::from("look at this"))));
         probe!("send-enabled-with-caption", "sendButton", "enabled");
-        (*steps_ptr).push(("send-anyway", call!("send")));
+        (*steps_ptr).push(("send", call!("send")));
     });
 
     single_shot(Duration::from_secs(6), move || unsafe {
-        probe!("still-pending", "pendingAttachmentLabel", "text");
+        // Sent, so the bar and the notice with it are gone.
+        probe!("bar-after-send", "largeFileBar", "visible");
         (*steps_ptr).push((
             "attach-picture",
             call!("attach", QString::from(picture_path.as_str())),
@@ -180,7 +181,7 @@ fn a_file_the_relay_will_not_take_is_said_so_and_cannot_be_sent() {
     });
 
     single_shot(Duration::from_secs(7), move || unsafe {
-        probe!("bar-for-picture", "tooBigBar", "visible");
+        probe!("bar-for-picture", "largeFileBar", "visible");
         probe!("send-enabled-for-picture", "sendButton", "enabled");
         (*engine_ptr).quit();
     });
@@ -204,48 +205,72 @@ fn a_file_the_relay_will_not_take_is_said_so_and_cannot_be_sent() {
     assert_eq!(
         value("bar-before"),
         "false",
-        "the page says a file is too big before one has been picked. {context}"
+        "the page says a file is large before one has been picked. {context}"
     );
     assert_eq!(
         value("bar-after"),
         "true",
-        "nothing says the picked file is bigger than the relay takes, so \
-         the reader finds out from a send that fails. {context}"
+        "nothing says the picked file is bigger than some relays take, so \
+         the reader finds out only from a send that fails. {context}"
     );
-    assert!(
-        value("bar-text").contains("4.1 kB") && value("bar-text").contains("1.0 kB"),
-        "the notice does not say how big the file is and how big the relay \
-         takes: {:?}. {context}",
-        value("bar-text")
+    // Both sizes, and that the send may fail: the reader decides from
+    // this whether to send a file the relay may refuse.
+    assert_eq!(
+        value("bar-text"),
+        "This file is 4.1 kB. Some relays refuse files larger than 1.0 kB, \
+         so sending this might fail.",
+        "the notice does not say how big the file is, how big the core \
+         recommends, and that the send may fail. {context}"
     );
+    // Issue #101: the recommendation is the core's, the same for every
+    // relay, and a relay that takes more is common. It is a warning.
     assert_eq!(
         value("send-enabled"),
-        "false",
-        "the send button is live over a file the relay will not take. {context}"
+        "true",
+        "the send button is off over a file bigger than the core \
+         recommends, so a relay that takes it is never handed it. {context}"
     );
     assert_eq!(
         value("send-enabled-with-caption"),
-        "false",
-        "a caption made the message sendable, which would send the words \
-         and drop the file. {context}"
-    );
-    assert!(
-        !value("still-pending").is_empty(),
-        "the file left the bar although nothing was sent. {context}"
+        "true",
+        "a caption turned the send button off. {context}"
     );
 
-    let sends = common::calls(&journal)
+    let sends: Vec<(String, serde_json::Value)> = common::calls(&journal)
         .into_iter()
         .filter(|(method, _)| method == "misc_send_msg" || method == "send_msg")
-        .count();
-    assert_eq!(sends, 0, "the send reached the core anyway. {context}");
+        .collect();
+    let sent_file = sends
+        .first()
+        .filter(|(method, _)| method == "misc_send_msg")
+        .and_then(|(_, params)| params.get(3))
+        .and_then(serde_json::Value::as_str)
+        .unwrap_or_default()
+        .to_string();
+    assert_eq!(
+        sent_file, video_file,
+        "the large file did not reach the core. {context}. Sends: {sends:?}"
+    );
+    assert_eq!(
+        sends
+            .first()
+            .and_then(|(_, params)| params.get(2))
+            .and_then(serde_json::Value::as_str),
+        Some("look at this"),
+        "the caption did not go with the file. {context}. Sends: {sends:?}"
+    );
+    assert_eq!(
+        value("bar-after-send"),
+        "false",
+        "the notice outlived the file it is about. {context}"
+    );
 
     // The core recodes a picture before it sends it, so what it weighs on
     // the phone says nothing about what leaves.
     assert_eq!(
         value("bar-for-picture"),
         "false",
-        "a picture was refused for its size, which the core is about to \
+        "a picture was warned about for its size, which the core is about to \
          change. {context}"
     );
     assert_eq!(

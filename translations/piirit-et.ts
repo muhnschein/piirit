@@ -707,9 +707,9 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
         <translation>Ühendus Delta Chati tuumaga katkes. Ühendan uuesti…</translation>
     </message>
     <message>
-        <source>%1 is too large to send. Attachments can be up to %2.</source>
-        <extracomment>Shown above the message field when the attached file is bigger than will be sent. %1 is the file&apos;s size and %2 the largest that goes, each such as &quot;24 MB&quot;.</extracomment>
-        <translation>%1 on saatmiseks liiga suur. Manused võivad olla kuni %2.</translation>
+        <source>This file is %1. Some relays refuse files larger than %2, so sending this might fail.</source>
+        <extracomment>Shown above the message field when the attached file is bigger than Delta Chat recommends. The file is still sent. %1 is the file&apos;s size and %2 the recommended largest size, each such as &quot;24 MB&quot;.</extracomment>
+        <translation>See fail on %1 suur. Mõned releed lükkavad tagasi failid, mis on suuremad kui %2, seega võib selle saatmine ebaõnnestuda.</translation>
     </message>
 </context>
 <context>

@@ -707,9 +707,9 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Delta Chat কোরের সাথে সংযোগ হারিয়ে গেছে। আবার সংযোগ করা হচ্ছে…</translation>
     </message>
     <message>
-        <source>%1 is too large to send. Attachments can be up to %2.</source>
-        <extracomment>Shown above the message field when the attached file is bigger than will be sent. %1 is the file&apos;s size and %2 the largest that goes, each such as &quot;24 MB&quot;.</extracomment>
-        <translation>%1 পাঠানোর জন্য অত্যন্ত বড়। সংযুক্তি %2 পর্যন্ত হতে পারে।</translation>
+        <source>This file is %1. Some relays refuse files larger than %2, so sending this might fail.</source>
+        <extracomment>Shown above the message field when the attached file is bigger than Delta Chat recommends. The file is still sent. %1 is the file&apos;s size and %2 the recommended largest size, each such as &quot;24 MB&quot;.</extracomment>
+        <translation>এই ফাইলটির আকার %1। কিছু রিলে %2-এর চেয়ে বড় ফাইল প্রত্যাখ্যান করে, তাই এটি পাঠানো ব্যর্থ হতে পারে।</translation>
     </message>
 </context>
 <context>

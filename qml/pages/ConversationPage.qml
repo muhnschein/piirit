@@ -28,7 +28,7 @@ Page {
         // parameters come out of links on the way out.
         clean_links: Settings.cleanLinks === true
         // What is waiting on the attachment bar, so the model can weigh
-        // it against what this profile's relay takes. Put aside with the
+        // it against the size the core recommends. Put aside with the
         // bar itself while a message is being edited, since an edit
         // carries no file.
         pending_file: page.editing ? "" : page.attachmentPath
@@ -654,7 +654,7 @@ Page {
         anchors {
             left: parent.left
             right: parent.right
-            bottom: tooBigBar.top
+            bottom: largeFileBar.top
         }
         // Put aside with the draft while a message is edited: an edit
         // carries no file, and a bar saying one is about to be sent would
@@ -664,25 +664,27 @@ Page {
         onCancelled: page.dropAttachment()
     }
 
-    // Under the file it is about: this one the relay will not take, so
-    // there is nothing to do but pick something smaller. Said here rather
-    // than after a send that failed, and the send button is off while it
-    // stands -- a picture is never this, since the core shrinks those on
-    // the way out. The limit is the core's own recommendation for the
-    // profile's relay; see rust/piirit-shim/src/media.rs.
+    // Under the file it is about: this one is bigger than the core
+    // recommends, which some relays refuse. A warning and not a refusal:
+    // the size is the core's one recommendation for every relay, and many
+    // take more (issue #101), so the send button stays on. Said before
+    // the upload rather than only after a send that failed -- a picture
+    // is never this, since the core shrinks those on the way out. See
+    // rust/piirit-shim/src/media.rs.
     Banner {
-        id: tooBigBar
-        objectName: "tooBigBar"
-        labelObjectName: "tooBigLabel"
-        tone: "error"
+        id: largeFileBar
+        objectName: "largeFileBar"
+        labelObjectName: "largeFileLabel"
+        tone: "info"
         // Not transient: it is true for as long as the file is on the
         // bar.
         timeout: 0
-        text: messages.attachment_too_big
+        text: messages.attachment_large
               //: Shown above the message field when the attached file is
-              //: bigger than will be sent. %1 is the file's size and %2
-              //: the largest that goes, each such as "24 MB".
-              ? qsTr("%1 is too large to send. Attachments can be up to %2.")
+              //: bigger than Delta Chat recommends. The file is still
+              //: sent. %1 is the file's size and %2 the recommended
+              //: largest size, each such as "24 MB".
+              ? qsTr("This file is %1. Some relays refuse files larger than %2, so sending this might fail.")
                 .arg(Format.readableSize(messages.attachment_bytes))
                 .arg(Format.readableSize(messages.attachment_limit))
               : ""
@@ -711,15 +713,9 @@ Page {
 
     /// The text and the file: what send has to send. While a message is
     /// being edited the file is put aside, and only the text counts.
-    ///
-    /// Nothing at all while the file on the bar is bigger than the relay
-    /// takes, text included: the caption belongs to the file, and sending
-    /// it on its own would drop the file without saying so. The way on is
-    /// to take the file off the bar.
     readonly property bool hasSomethingToSend:
-        !(!page.editing && messages.attachment_too_big)
-        && (textField.text.trim().length > 0
-            || (!page.editing && page.attachmentPath.length > 0))
+        textField.text.trim().length > 0
+        || (!page.editing && page.attachmentPath.length > 0)
 
     // A tap anywhere but the tray closes the tray: over everything
     // declared above -- the list, the bars -- and under the input row,
@@ -772,10 +768,10 @@ Page {
             objectName: "voiceBar"
             width: parent.width - sendButton.width
             anchors.verticalCenter: sendButton.verticalCenter
-            // A recording stops at the longest the relay takes -- the
-            // limit a file on the attachment bar is held to -- and is
-            // made at the bit rate the reader's outgoing media quality
-            // says.
+            // A recording stops at the size the core recommends -- the
+            // one a file on the attachment bar is warned about, and over
+            // an hour of speech -- and is made at the bit rate the
+            // reader's outgoing media quality says.
             limitBytes: messages.attachment_limit
             mediaQuality: Settings.mediaQuality === 1 ? 1 : 0
             onRecorded: {
@@ -982,11 +978,6 @@ Page {
         // and a trailing newline from the keyboard is not part of one.
         var text = textField.text.trim()
         if (page.attachmentPath.length > 0) {
-            // The button is already off and the bar says why; this says
-            // so a second time, as the check on `sending` above does.
-            if (messages.attachment_too_big) {
-                return
-            }
             page.errorMessage = ""
             messages.send_file(text, page.attachmentPath)
         } else if (text.length > 0) {

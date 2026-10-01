@@ -260,27 +260,27 @@ pub struct ChatMessages {
     ///
     /// Held here rather than only on the page because the answer below is
     /// the core's: the page hands the path over and reads back whether
-    /// the relay will take it.
+    /// the file is larger than some relays take.
     pub pending_file: qt_property!(QString; WRITE set_pending_file NOTIFY pending_file_changed),
     /// Emitted when [`Self::pending_file`] changes.
     pub pending_file_changed: qt_signal!(),
     /// What [`Self::pending_file`] weighs on the phone, in bytes, 0 when
     /// there is none or it cannot be measured. What the bar says about a
-    /// file the relay will not take. Through f64 because QML has no
-    /// 64-bit integer.
+    /// large file. Through f64 because QML has no 64-bit integer.
     pub attachment_bytes: qt_property!(f64; NOTIFY pending_file_changed),
-    /// The largest attachment the core recommends for this profile's
-    /// relay, in bytes; 0 until it has said. A real for the reason above.
-    /// See `media.rs`.
+    /// The largest attachment the core recommends, in bytes; 0 until it
+    /// has said. A recommendation, not what this profile's relay takes:
+    /// see `media.rs`. A real for the reason above.
     pub attachment_limit: qt_property!(f64; NOTIFY attachment_limit_changed),
     /// Emitted when the limit is read.
     pub attachment_limit_changed: qt_signal!(),
-    /// Whether [`Self::pending_file`] is bigger than that. False while
-    /// the limit is unknown, and false for a picture whatever it weighs:
-    /// the core recodes those on the way out.
-    pub attachment_too_big: qt_property!(bool; NOTIFY attachment_too_big_changed),
-    /// Emitted when [`Self::attachment_too_big`] changes.
-    pub attachment_too_big_changed: qt_signal!(),
+    /// Whether [`Self::pending_file`] is bigger than that, which the page
+    /// warns about and still sends. False while the limit is unknown, and
+    /// false for a picture whatever it weighs: the core recodes those on
+    /// the way out.
+    pub attachment_large: qt_property!(bool; NOTIFY attachment_large_changed),
+    /// Emitted when [`Self::attachment_large`] changes.
+    pub attachment_large_changed: qt_signal!(),
 
     /// Fetch the rest of a message the core holds only the header of.
     /// The core announces the result as a change to the message.
@@ -376,8 +376,8 @@ pub struct ChatMessages {
     unread_marked_chat: u32,
 
     /// Which account `attachment_limit` was read for, 0 for none: the
-    /// limit belongs to the profile's relay, so it is asked for once per
-    /// profile rather than once per chat.
+    /// core answers per profile, so it is asked for once per profile
+    /// rather than once per chat.
     limit_account: u32,
 
     /// The rows asked for and not yet answered, so the next ask skips them
@@ -490,15 +490,15 @@ impl ChatMessages {
     /// Measure whatever is on the bar against the limit, and say so when
     /// the answer changed. Called when either of the two moves.
     fn weigh_pending_file(&mut self) {
-        let too_big = media::exceeds_limit(&self.pending_path(), self.relay_limit());
-        if self.attachment_too_big != too_big {
-            self.attachment_too_big = too_big;
-            self.attachment_too_big_changed();
+        let large = media::exceeds_limit(&self.pending_path(), self.recommended_limit());
+        if self.attachment_large != large {
+            self.attachment_large = large;
+            self.attachment_large_changed();
         }
     }
 
-    /// What the relay takes, as bytes; 0 while the core has not said.
-    fn relay_limit(&self) -> u64 {
+    /// What the core recommends, as bytes; 0 while it has not said.
+    fn recommended_limit(&self) -> u64 {
         // Exact to 2^53 bytes, which no relay takes.
         #[allow(clippy::cast_sign_loss, clippy::cast_possible_truncation)]
         {
@@ -506,7 +506,7 @@ impl ChatMessages {
         }
     }
 
-    /// Ask the core what this profile's relay takes.
+    /// Ask the core what it recommends as the largest attachment.
     ///
     /// Once per profile: the answer is the same for every chat in it, and
     /// is kept under `limit_account` so a reload that is not a change of
@@ -680,8 +680,8 @@ impl ChatMessages {
         // Where the reader left off, likewise: asked here so the question
         // is in flight before anything on either path is marked read.
         self.load_unread_mark();
-        // And what this profile's relay takes, so the answer is in before
-        // the reader has picked anything to attach.
+        // And the largest attachment the core recommends, so the answer
+        // is in before the reader has picked anything to attach.
         self.load_attachment_limit();
         // Already loaded, by whoever opened this page: take it and skip
         // the round trip entirely. This is what lets the transition start
@@ -1589,9 +1589,9 @@ impl ChatMessages {
             self.error(QString::from("no file to send"));
             return;
         }
-        if self.refuse_if_too_big(&path) {
-            return;
-        }
+        // Not held to the core's recommended size: that is a warning,
+        // which the page gives, and a relay that takes more is common.
+        // One that does not fails the message like any other refusal.
         let name = file_name_of(&path);
         self.send_message(self.outgoing_text(&text.to_string()), Some((path, name)));
     }
@@ -1603,24 +1603,7 @@ impl ChatMessages {
             self.error(QString::from("no recording to send"));
             return;
         }
-        if self.refuse_if_too_big(&path) {
-            return;
-        }
         self.send_message(String::new(), Some((path, String::new())));
-    }
-
-    /// Refuse a file the relay will not take, and say so.
-    ///
-    /// The last word on one. The bar above the field says the same thing
-    /// while the file is sitting there and the send button is off, so
-    /// this is for whatever reaches a send without going past that -- a
-    /// share, a recording that ran for hours, a page that got it wrong.
-    fn refuse_if_too_big(&mut self, path: &str) -> bool {
-        if media::exceeds_limit(path, self.relay_limit()) {
-            self.error(QString::from("the file is bigger than this relay takes"));
-            return true;
-        }
-        false
     }
 
     /// The one send. `file` is the path the core should attach and the name

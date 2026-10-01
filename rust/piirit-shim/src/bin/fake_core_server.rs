@@ -30,9 +30,9 @@ const RECOMMENDED_SIZE: u64 = (30 - 1) * 1024 * 1024 / 4 * 3;
 
 /// What to answer `sys.msgsize_max_recommended` with.
 ///
-/// `PIIRIT_FAKE_MSGSIZE_MAX` lowers it, so a test about a file the
-/// relay will not take can write a file of a few kilobytes rather than
-/// twenty-odd megabytes.
+/// `PIIRIT_FAKE_MSGSIZE_MAX` lowers it, so a test about a file bigger
+/// than that can write a file of a few kilobytes rather than twenty-odd
+/// megabytes.
 fn recommended_size() -> String {
     std::env::var("PIIRIT_FAKE_MSGSIZE_MAX")
         .ok()

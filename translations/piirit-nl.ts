@@ -703,9 +703,9 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Verbinding met de Delta Chat-kern verloren. Opnieuw verbinden…</translation>
     </message>
     <message>
-        <source>%1 is too large to send. Attachments can be up to %2.</source>
-        <extracomment>Shown above the message field when the attached file is bigger than will be sent. %1 is the file&apos;s size and %2 the largest that goes, each such as &quot;24 MB&quot;.</extracomment>
-        <translation>%1 is te groot om te verzenden. Bijlagen mogen tot %2 groot zijn.</translation>
+        <source>This file is %1. Some relays refuse files larger than %2, so sending this might fail.</source>
+        <extracomment>Shown above the message field when the attached file is bigger than Delta Chat recommends. The file is still sent. %1 is the file&apos;s size and %2 the recommended largest size, each such as &quot;24 MB&quot;.</extracomment>
+        <translation>Dit bestand is %1 groot. Sommige relays weigeren bestanden die groter zijn dan %2, dus het verzenden kan mislukken.</translation>
     </message>
 </context>
 <context>

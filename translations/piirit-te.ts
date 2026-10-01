@@ -703,9 +703,9 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Delta Chat కోర్‌తో కనెక్షన్ తెగిపోయింది. మళ్లీ కనెక్ట్ అవుతోంది…</translation>
     </message>
     <message>
-        <source>%1 is too large to send. Attachments can be up to %2.</source>
-        <extracomment>Shown above the message field when the attached file is bigger than will be sent. %1 is the file&apos;s size and %2 the largest that goes, each such as &quot;24 MB&quot;.</extracomment>
-        <translation>%1 పంపడానికి చాలా పెద్దది. జతపత్రాలు %2 వరకు ఉండవచ్చు.</translation>
+        <source>This file is %1. Some relays refuse files larger than %2, so sending this might fail.</source>
+        <extracomment>Shown above the message field when the attached file is bigger than Delta Chat recommends. The file is still sent. %1 is the file&apos;s size and %2 the recommended largest size, each such as &quot;24 MB&quot;.</extracomment>
+        <translation>ఈ ఫైల్ పరిమాణం %1 ఉంది. కొన్ని రిలేలు %2 కంటే పెద్ద ఫైళ్లను తిరస్కరిస్తాయి, కాబట్టి దీన్ని పంపడం విఫలం కావచ్చు.</translation>
     </message>
 </context>
 <context>
