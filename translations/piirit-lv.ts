@@ -672,6 +672,11 @@ Citās grupās, kurās ir bloķēti kontakti, viņu ziņas joprojām būs redzam
         <source>Edit</source>
         <translation>Rediģēt</translation>
     </message>
+    <message>
+        <source>Try downloading again</source>
+        <extracomment>A download that has not finished: ask the server again now.</extracomment>
+        <translation>Mēģināt lejupielādēt vēlreiz</translation>
+    </message>
 </context>
 <context>
     <name>ConversationPage</name>
@@ -1025,10 +1030,6 @@ Citās grupās, kurās ir bloķēti kontakti, viņu ziņas joprojām būs redzam
         <translation>Pārsūtīts</translation>
     </message>
     <message>
-        <source>Downloading…</source>
-        <translation>Lejupielādē…</translation>
-    </message>
-    <message>
         <source>⬇ Download failed, tap to try again</source>
         <translation>⬇ Lejupielāde neizdevās, pieskarieties, lai mēģinātu vēlreiz</translation>
     </message>
@@ -1049,6 +1050,16 @@ Citās grupās, kurās ir bloķēti kontakti, viņu ziņas joprojām būs redzam
     <message>
         <source>Edited</source>
         <translation>Rediģēts</translation>
+    </message>
+    <message>
+        <source>⏳ Not on the server yet, tap to check again</source>
+        <extracomment>A large attachment was asked for and the server has no copy of it (yet). Tapping asks the server again.</extracomment>
+        <translation>⏳ Serverī vēl nav, pieskarieties, lai pārbaudītu vēlreiz</translation>
+    </message>
+    <message>
+        <source>Downloading… tap to try again</source>
+        <extracomment>A large attachment is being fetched. Tapping asks the server again rather than waiting for the next try.</extracomment>
+        <translation>Lejupielādē… pieskarieties, lai mēģinātu vēlreiz</translation>
     </message>
 </context>
 <context>

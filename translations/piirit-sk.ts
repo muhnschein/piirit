@@ -672,6 +672,11 @@ Správy od zablokovaných kontaktov v ostatných skupinách sa budú naďalej zo
         <source>Edit</source>
         <translation>Upraviť</translation>
     </message>
+    <message>
+        <source>Try downloading again</source>
+        <extracomment>A download that has not finished: ask the server again now.</extracomment>
+        <translation>Skúsiť stiahnuť znova</translation>
+    </message>
 </context>
 <context>
     <name>ConversationPage</name>
@@ -1025,10 +1030,6 @@ Správy od zablokovaných kontaktov v ostatných skupinách sa budú naďalej zo
         <translation>Preposlané</translation>
     </message>
     <message>
-        <source>Downloading…</source>
-        <translation>Sťahuje sa…</translation>
-    </message>
-    <message>
         <source>⬇ Download failed, tap to try again</source>
         <translation>⬇ Sťahovanie zlyhalo, ťuknutím to skúsite znova</translation>
     </message>
@@ -1049,6 +1050,16 @@ Správy od zablokovaných kontaktov v ostatných skupinách sa budú naďalej zo
     <message>
         <source>Edited</source>
         <translation>Upravené</translation>
+    </message>
+    <message>
+        <source>⏳ Not on the server yet, tap to check again</source>
+        <extracomment>A large attachment was asked for and the server has no copy of it (yet). Tapping asks the server again.</extracomment>
+        <translation>⏳ Na serveri zatiaľ nie je, ťuknutím to znova skontrolujete</translation>
+    </message>
+    <message>
+        <source>Downloading… tap to try again</source>
+        <extracomment>A large attachment is being fetched. Tapping asks the server again rather than waiting for the next try.</extracomment>
+        <translation>Sťahuje sa… ťuknutím to skúsite znova</translation>
     </message>
 </context>
 <context>

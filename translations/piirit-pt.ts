@@ -670,6 +670,11 @@ Mensagens de contactos bloqueados não serão ocultadas noutros grupos.</transla
         <source>Edit</source>
         <translation>Editar</translation>
     </message>
+    <message>
+        <source>Try downloading again</source>
+        <extracomment>A download that has not finished: ask the server again now.</extracomment>
+        <translation>Tentar transferir de novo</translation>
+    </message>
 </context>
 <context>
     <name>ConversationPage</name>
@@ -1020,10 +1025,6 @@ Mensagens de contactos bloqueados não serão ocultadas noutros grupos.</transla
         <translation>Reencaminhada</translation>
     </message>
     <message>
-        <source>Downloading…</source>
-        <translation>A transferir…</translation>
-    </message>
-    <message>
         <source>⬇ Download failed, tap to try again</source>
         <translation>⬇ A transferência falhou, toque para tentar de novo</translation>
     </message>
@@ -1044,6 +1045,16 @@ Mensagens de contactos bloqueados não serão ocultadas noutros grupos.</transla
     <message>
         <source>Edited</source>
         <translation>Editada</translation>
+    </message>
+    <message>
+        <source>⏳ Not on the server yet, tap to check again</source>
+        <extracomment>A large attachment was asked for and the server has no copy of it (yet). Tapping asks the server again.</extracomment>
+        <translation>⏳ Ainda não está no servidor, toque para verificar de novo</translation>
+    </message>
+    <message>
+        <source>Downloading… tap to try again</source>
+        <extracomment>A large attachment is being fetched. Tapping asks the server again rather than waiting for the next try.</extracomment>
+        <translation>A transferir… toque para tentar de novo</translation>
     </message>
 </context>
 <context>

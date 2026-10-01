@@ -517,6 +517,8 @@ impl State {
         let fetched = self.downloaded.contains(&id);
         message["downloadState"] = json!(if held_back == Some(msg) && !fetched {
             "Available"
+        } else if stuck_download() == Some(msg) {
+            "InProgress"
         } else {
             "Done"
         });
@@ -1785,8 +1787,32 @@ async fn serve() {
                         ok(&id, &Value::Null)
                     }
                 }
+                // Where the core has seen a message on a server. For the
+                // download a test names as stuck, nowhere: the remainder
+                // it waits on never reached the server.
+                "get_message_info_object" => {
+                    let msg = positional(1).as_u64().unwrap_or_default();
+                    let urls = if stuck_download() == Some(msg) {
+                        json!([])
+                    } else {
+                        json!([format!("<fake@example.org/INBOX/;UID={msg}>")])
+                    };
+                    ok(
+                        &id,
+                        &json!({
+                            "error": null,
+                            "rfc724Mid": format!("{msg}@fake"),
+                            "serverUrls": urls,
+                            "hopInfo": "",
+                        }),
+                    )
+                }
                 // The real core fetches it and announces the message
-                // changed; here the fetch is instant.
+                // changed; here the fetch is instant. A message already
+                // downloading is refused, in the real core's words.
+                "download_full_message" if stuck_download() == positional(1).as_u64() => {
+                    err(&id, "Download already in progress.")
+                }
                 "download_full_message" => {
                     let account = account_id();
                     let msg = positional(1)
@@ -2907,6 +2933,15 @@ async fn serve() {
             let _ = out.flush().await;
         });
     }
+}
+
+/// The message a test names as a download that never finishes:
+/// `InProgress` for good, the way the real core leaves one whose
+/// remainder it cannot fetch.
+fn stuck_download() -> Option<u64> {
+    std::env::var("PIIRIT_FAKE_STUCK_MSG")
+        .ok()
+        .and_then(|value| value.parse::<u64>().ok())
 }
 
 fn ok(id: &Value, result: &Value) -> Value {

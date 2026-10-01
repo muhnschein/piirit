@@ -668,6 +668,11 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
         <source>Edit</source>
         <translation>Düzenle</translation>
     </message>
+    <message>
+        <source>Try downloading again</source>
+        <extracomment>A download that has not finished: ask the server again now.</extracomment>
+        <translation>Yeniden indirmeyi dene</translation>
+    </message>
 </context>
 <context>
     <name>ConversationPage</name>
@@ -1015,10 +1020,6 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
         <translation>İletildi</translation>
     </message>
     <message>
-        <source>Downloading…</source>
-        <translation>İndiriliyor…</translation>
-    </message>
-    <message>
         <source>⬇ Download failed, tap to try again</source>
         <translation>⬇ İndirme başarısız, yeniden denemek için dokunun</translation>
     </message>
@@ -1039,6 +1040,16 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
     <message>
         <source>Edited</source>
         <translation>Düzenlendi</translation>
+    </message>
+    <message>
+        <source>⏳ Not on the server yet, tap to check again</source>
+        <extracomment>A large attachment was asked for and the server has no copy of it (yet). Tapping asks the server again.</extracomment>
+        <translation>⏳ Henüz sunucuda yok, yeniden denetlemek için dokunun</translation>
+    </message>
+    <message>
+        <source>Downloading… tap to try again</source>
+        <extracomment>A large attachment is being fetched. Tapping asks the server again rather than waiting for the next try.</extracomment>
+        <translation>İndiriliyor… yeniden denemek için dokunun</translation>
     </message>
 </context>
 <context>

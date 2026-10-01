@@ -664,6 +664,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Edit</source>
         <translation>編輯</translation>
     </message>
+    <message>
+        <source>Try downloading again</source>
+        <extracomment>A download that has not finished: ask the server again now.</extracomment>
+        <translation>重新下載</translation>
+    </message>
 </context>
 <context>
     <name>ConversationPage</name>
@@ -1011,10 +1016,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>已轉寄</translation>
     </message>
     <message>
-        <source>Downloading…</source>
-        <translation>正在下載…</translation>
-    </message>
-    <message>
         <source>⬇ Download failed, tap to try again</source>
         <translation>⬇ 下載失敗，點一下以重試</translation>
     </message>
@@ -1035,6 +1036,16 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Edited</source>
         <translation>已編輯</translation>
+    </message>
+    <message>
+        <source>⏳ Not on the server yet, tap to check again</source>
+        <extracomment>A large attachment was asked for and the server has no copy of it (yet). Tapping asks the server again.</extracomment>
+        <translation>⏳ 伺服器上暫時沒有，點一下以重新檢查</translation>
+    </message>
+    <message>
+        <source>Downloading… tap to try again</source>
+        <extracomment>A large attachment is being fetched. Tapping asks the server again rather than waiting for the next try.</extracomment>
+        <translation>正在下載… 點一下以重試</translation>
     </message>
 </context>
 <context>

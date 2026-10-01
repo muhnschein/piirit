@@ -666,6 +666,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Edit</source>
         <translation>Επεξεργασία</translation>
     </message>
+    <message>
+        <source>Try downloading again</source>
+        <extracomment>A download that has not finished: ask the server again now.</extracomment>
+        <translation>Δοκιμή λήψης ξανά</translation>
+    </message>
 </context>
 <context>
     <name>ConversationPage</name>
@@ -1016,10 +1021,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Προωθημένο</translation>
     </message>
     <message>
-        <source>Downloading…</source>
-        <translation>Λήψη σε εξέλιξη…</translation>
-    </message>
-    <message>
         <source>⬇ Download failed, tap to try again</source>
         <translation>⬇ Η λήψη απέτυχε, πατήστε για να δοκιμάσετε ξανά</translation>
     </message>
@@ -1040,6 +1041,16 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Edited</source>
         <translation>Επεξεργασμένο</translation>
+    </message>
+    <message>
+        <source>⏳ Not on the server yet, tap to check again</source>
+        <extracomment>A large attachment was asked for and the server has no copy of it (yet). Tapping asks the server again.</extracomment>
+        <translation>⏳ Δεν υπάρχει ακόμα στον διακομιστή, πατήστε για νέο έλεγχο</translation>
+    </message>
+    <message>
+        <source>Downloading… tap to try again</source>
+        <extracomment>A large attachment is being fetched. Tapping asks the server again rather than waiting for the next try.</extracomment>
+        <translation>Λήψη σε εξέλιξη… πατήστε για να δοκιμάσετε ξανά</translation>
     </message>
 </context>
 <context>

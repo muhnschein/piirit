@@ -96,6 +96,10 @@ Item {
     /// Undecipherable. Anything but Done and empty is a message the core
     /// has only the header of.
     property string downloadState: ""
+    /// Downloading, and no server of the account holds the rest: the
+    /// core is waiting on something that has not arrived. The shim's
+    /// `download_missing`.
+    property bool downloadMissing: false
     property bool isOutgoing: false
     property bool isInfo: false
     property bool isForwarded: false
@@ -180,9 +184,14 @@ Item {
     /// could not fetch: something to say, and mostly something to tap.
     readonly property bool heldBack: root.downloadState.length > 0
                                      && root.downloadState !== "Done"
-    /// The two states the rest of a message can be asked for in.
+    /// The states a tap does something in: the two the rest of a message
+    /// can be asked for in, and a download under way, which the core
+    /// cannot be told to start over but can be told to look again.
+    /// Without that a download that stalled said "Downloading…" for good
+    /// and offered nothing (issue 107).
     readonly property bool canDownload: root.downloadState === "Available"
                                         || root.downloadState === "Failure"
+                                        || root.downloadState === "InProgress"
 
     /// What the offer says. Here rather than only in the label because
     /// the bubble is sized from it: a bubble made narrow by short lines
@@ -712,7 +721,13 @@ Item {
             // Translated literals, chosen by the core's state.
             textFormat: Text.PlainText
             text: root.downloadState === "InProgress"
-                  ? qsTr("Downloading…")
+                  ? (root.downloadMissing
+                     //: A large attachment was asked for and the server has
+                     //: no copy of it (yet). Tapping asks the server again.
+                     ? qsTr("⏳ Not on the server yet, tap to check again")
+                     //: A large attachment is being fetched. Tapping asks
+                     //: the server again rather than waiting for the next try.
+                     : qsTr("Downloading… tap to try again"))
                   : root.downloadState === "Failure"
                     ? qsTr("⬇ Download failed, tap to try again")
                     : root.downloadState === "Undecipherable"

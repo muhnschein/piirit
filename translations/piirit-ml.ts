@@ -670,6 +670,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Edit</source>
         <translation>തിരുത്തുക</translation>
     </message>
+    <message>
+        <source>Try downloading again</source>
+        <extracomment>A download that has not finished: ask the server again now.</extracomment>
+        <translation>വീണ്ടും ഡൗൺലോഡ് ചെയ്യാൻ ശ്രമിക്കുക</translation>
+    </message>
 </context>
 <context>
     <name>ConversationPage</name>
@@ -1020,10 +1025,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>ഫോർവേഡ് ചെയ്തത്</translation>
     </message>
     <message>
-        <source>Downloading…</source>
-        <translation>ഡൗൺലോഡ് ചെയ്യുന്നു…</translation>
-    </message>
-    <message>
         <source>⬇ Download failed, tap to try again</source>
         <translation>⬇ ഡൗൺലോഡ് പരാജയപ്പെട്ടു, വീണ്ടും ശ്രമിക്കാൻ ടാപ്പ് ചെയ്യുക</translation>
     </message>
@@ -1044,6 +1045,16 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Edited</source>
         <translation>തിരുത്തിയത്</translation>
+    </message>
+    <message>
+        <source>⏳ Not on the server yet, tap to check again</source>
+        <extracomment>A large attachment was asked for and the server has no copy of it (yet). Tapping asks the server again.</extracomment>
+        <translation>⏳ ഇതുവരെ സെർവറിൽ ഇല്ല, വീണ്ടും പരിശോധിക്കാൻ ടാപ്പ് ചെയ്യുക</translation>
+    </message>
+    <message>
+        <source>Downloading… tap to try again</source>
+        <extracomment>A large attachment is being fetched. Tapping asks the server again rather than waiting for the next try.</extracomment>
+        <translation>ഡൗൺലോഡ് ചെയ്യുന്നു… വീണ്ടും ശ്രമിക്കാൻ ടാപ്പ് ചെയ്യുക</translation>
     </message>
 </context>
 <context>

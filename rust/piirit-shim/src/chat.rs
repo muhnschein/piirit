@@ -1418,6 +1418,15 @@ impl ChatMessages {
     /// list, and the row is re-read on the `MsgsChanged` the core sends
     /// once the download lands rather than on this call's return, which
     /// only says the download was started.
+    ///
+    /// A message already downloading is asked about again instead. The
+    /// core refuses `download_full_message` for one -- "Download already
+    /// in progress." -- and has no way to start it over, but it keeps the
+    /// download queued and retries it every time it looks at the server,
+    /// which is up to five minutes of IDLE away. `maybe_network` ends the
+    /// wait: it interrupts IDLE and nothing else, so a fetch that is
+    /// under way carries on. The row is re-read afterwards for whether
+    /// the remainder is on a server at all. Issue 107.
     pub fn download_full(&mut self, message_id: u32) {
         let account_id = self.account_id;
         if account_id == 0 || message_id == 0 {
@@ -1427,6 +1436,23 @@ impl ChatMessages {
             self.error(QString::from("not started"));
             return;
         };
+        let in_progress = self.rows.borrow().iter().any(|row| {
+            row.message_id == message_id && row.download_state.to_string() == "InProgress"
+        });
+        if in_progress {
+            let ptr: QPointer<Self> = QPointer::from(&*self);
+            let done = queued_callback(move |()| {
+                let Some(this) = ptr.as_pinned() else { return };
+                this.borrow_mut().refresh_one(message_id);
+            });
+            runtime.spawn(async move {
+                // Nothing to report if it fails: the core retries on its
+                // own all the same, and the re-read says where it stands.
+                let _ = rpc.call_unit::<()>("maybe_network").await;
+                done(());
+            });
+            return;
+        }
 
         let ptr: QPointer<Self> = QPointer::from(&*self);
         let done = queued_callback(move |result: Result<(), String>| {
@@ -2037,8 +2063,45 @@ pub(crate) async fn fetch_messages(
     for row in &mut rows {
         with_webxdc(rpc, account_id, row).await;
         with_call(rpc, account_id, row).await;
+        with_download(rpc, account_id, row).await;
     }
     Ok(rows)
+}
+
+/// Say whether a download under way has anything to download, for the
+/// rows that are one.
+///
+/// The core gives a message `InProgress` when its remainder is asked for
+/// and takes it out of that state only once the remainder has arrived
+/// and been put in place. Until then it tries again every time it looks
+/// at the server, and says nothing: a remainder that is not on the
+/// server -- not there yet, refused by the sender's relay, expired --
+/// leaves the row "Downloading…" for good, and `download_full_message`
+/// refuses a message already in that state. Issue 107.
+///
+/// What the core does know is where it has seen the remainder, and
+/// `get_message_info_object` says so: `serverUrls` lists each server
+/// copy of the message's Message-ID, which for a message still waiting
+/// on its remainder is the remainder's. None at all is the case worth
+/// telling the reader about, because no amount of waiting fixes it.
+/// A second round trip, as for an app or a call, and only for a row in
+/// that state, which is rare.
+async fn with_download(rpc: &RpcClient, account_id: u32, row: &mut MessageListItem) {
+    if row.download_state.to_string() != "InProgress" {
+        return;
+    }
+    // A core that cannot say leaves the row as a download under way,
+    // which is what it was before anyone asked.
+    let Ok(info) = rpc
+        .call::<_, serde_json::Value>("get_message_info_object", (account_id, row.message_id))
+        .await
+    else {
+        return;
+    };
+    row.download_missing = info
+        .get("serverUrls")
+        .and_then(serde_json::Value::as_array)
+        .is_some_and(Vec::is_empty);
 }
 
 /// Fill in what a webxdc row draws, for the rows that are one.

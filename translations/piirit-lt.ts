@@ -668,6 +668,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Edit</source>
         <translation>Redaguoti</translation>
     </message>
+    <message>
+        <source>Try downloading again</source>
+        <extracomment>A download that has not finished: ask the server again now.</extracomment>
+        <translation>Bandyti atsisiųsti dar kartą</translation>
+    </message>
 </context>
 <context>
     <name>ConversationPage</name>
@@ -1021,10 +1026,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Persiųsta</translation>
     </message>
     <message>
-        <source>Downloading…</source>
-        <translation>Atsisiunčiama…</translation>
-    </message>
-    <message>
         <source>⬇ Download failed, tap to try again</source>
         <translation>⬇ Atsisiųsti nepavyko, bakstelėkite, kad bandytumėte dar kartą</translation>
     </message>
@@ -1045,6 +1046,16 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Edited</source>
         <translation>Redaguota</translation>
+    </message>
+    <message>
+        <source>⏳ Not on the server yet, tap to check again</source>
+        <extracomment>A large attachment was asked for and the server has no copy of it (yet). Tapping asks the server again.</extracomment>
+        <translation>⏳ Serveryje dar nėra, bakstelėkite, kad patikrintumėte dar kartą</translation>
+    </message>
+    <message>
+        <source>Downloading… tap to try again</source>
+        <extracomment>A large attachment is being fetched. Tapping asks the server again rather than waiting for the next try.</extracomment>
+        <translation>Atsisiunčiama… bakstelėkite, kad bandytumėte dar kartą</translation>
     </message>
 </context>
 <context>

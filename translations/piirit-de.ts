@@ -670,6 +670,11 @@ In anderen Gruppen mit blockierten Kontakten werden deren Nachrichten weiterhin 
         <source>Edit</source>
         <translation>Bearbeiten</translation>
     </message>
+    <message>
+        <source>Try downloading again</source>
+        <extracomment>A download that has not finished: ask the server again now.</extracomment>
+        <translation>Erneut herunterladen</translation>
+    </message>
 </context>
 <context>
     <name>ConversationPage</name>
@@ -1020,10 +1025,6 @@ In anderen Gruppen mit blockierten Kontakten werden deren Nachrichten weiterhin 
         <translation>Weitergeleitet</translation>
     </message>
     <message>
-        <source>Downloading…</source>
-        <translation>Wird heruntergeladen…</translation>
-    </message>
-    <message>
         <source>⬇ Download failed, tap to try again</source>
         <translation>⬇ Download fehlgeschlagen, zum erneuten Versuch tippen</translation>
     </message>
@@ -1044,6 +1045,16 @@ In anderen Gruppen mit blockierten Kontakten werden deren Nachrichten weiterhin 
     <message>
         <source>Edited</source>
         <translation>Bearbeitet</translation>
+    </message>
+    <message>
+        <source>⏳ Not on the server yet, tap to check again</source>
+        <extracomment>A large attachment was asked for and the server has no copy of it (yet). Tapping asks the server again.</extracomment>
+        <translation>⏳ Noch nicht auf dem Server, zum erneuten Prüfen tippen</translation>
+    </message>
+    <message>
+        <source>Downloading… tap to try again</source>
+        <extracomment>A large attachment is being fetched. Tapping asks the server again rather than waiting for the next try.</extracomment>
+        <translation>Wird heruntergeladen… zum erneuten Versuch tippen</translation>
     </message>
 </context>
 <context>

@@ -666,6 +666,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Edit</source>
         <translation>Bewerken</translation>
     </message>
+    <message>
+        <source>Try downloading again</source>
+        <extracomment>A download that has not finished: ask the server again now.</extracomment>
+        <translation>Opnieuw downloaden proberen</translation>
+    </message>
 </context>
 <context>
     <name>ConversationPage</name>
@@ -1016,10 +1021,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Doorgestuurd</translation>
     </message>
     <message>
-        <source>Downloading…</source>
-        <translation>Downloaden…</translation>
-    </message>
-    <message>
         <source>⬇ Download failed, tap to try again</source>
         <translation>⬇ Download mislukt, tik om opnieuw te proberen</translation>
     </message>
@@ -1040,6 +1041,16 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Edited</source>
         <translation>Bewerkt</translation>
+    </message>
+    <message>
+        <source>⏳ Not on the server yet, tap to check again</source>
+        <extracomment>A large attachment was asked for and the server has no copy of it (yet). Tapping asks the server again.</extracomment>
+        <translation>⏳ Nog niet op de server, tik om opnieuw te controleren</translation>
+    </message>
+    <message>
+        <source>Downloading… tap to try again</source>
+        <extracomment>A large attachment is being fetched. Tapping asks the server again rather than waiting for the next try.</extracomment>
+        <translation>Downloaden… tik om opnieuw te proberen</translation>
     </message>
 </context>
 <context>

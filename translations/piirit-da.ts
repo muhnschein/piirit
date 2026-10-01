@@ -666,6 +666,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Edit</source>
         <translation>Redigér</translation>
     </message>
+    <message>
+        <source>Try downloading again</source>
+        <extracomment>A download that has not finished: ask the server again now.</extracomment>
+        <translation>Prøv at hente igen</translation>
+    </message>
 </context>
 <context>
     <name>ConversationPage</name>
@@ -1016,10 +1021,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Videresendt</translation>
     </message>
     <message>
-        <source>Downloading…</source>
-        <translation>Henter…</translation>
-    </message>
-    <message>
         <source>⬇ Download failed, tap to try again</source>
         <translation>⬇ Hentning mislykkedes, tryk for at prøve igen</translation>
     </message>
@@ -1040,6 +1041,16 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Edited</source>
         <translation>Redigeret</translation>
+    </message>
+    <message>
+        <source>⏳ Not on the server yet, tap to check again</source>
+        <extracomment>A large attachment was asked for and the server has no copy of it (yet). Tapping asks the server again.</extracomment>
+        <translation>⏳ Ikke på serveren endnu, tryk for at tjekke igen</translation>
+    </message>
+    <message>
+        <source>Downloading… tap to try again</source>
+        <extracomment>A large attachment is being fetched. Tapping asks the server again rather than waiting for the next try.</extracomment>
+        <translation>Henter… tryk for at prøve igen</translation>
     </message>
 </context>
 <context>

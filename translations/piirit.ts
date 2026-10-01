@@ -664,6 +664,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Edit</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Try downloading again</source>
+        <extracomment>A download that has not finished: ask the server again now.</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ConversationPage</name>
@@ -1011,10 +1016,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Downloading…</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>⬇ Download failed, tap to try again</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1034,6 +1035,16 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
     <message>
         <source>Edited</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>⏳ Not on the server yet, tap to check again</source>
+        <extracomment>A large attachment was asked for and the server has no copy of it (yet). Tapping asks the server again.</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Downloading… tap to try again</source>
+        <extracomment>A large attachment is being fetched. Tapping asks the server again rather than waiting for the next try.</extracomment>
         <translation type="unfinished"></translation>
     </message>
 </context>

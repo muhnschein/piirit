@@ -670,6 +670,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Edit</source>
         <translation>संपादित करें</translation>
     </message>
+    <message>
+        <source>Try downloading again</source>
+        <extracomment>A download that has not finished: ask the server again now.</extracomment>
+        <translation>फिर से डाउनलोड करने की कोशिश करें</translation>
+    </message>
 </context>
 <context>
     <name>ConversationPage</name>
@@ -1020,10 +1025,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>अग्रेषित</translation>
     </message>
     <message>
-        <source>Downloading…</source>
-        <translation>डाउनलोड हो रहा है…</translation>
-    </message>
-    <message>
         <source>⬇ Download failed, tap to try again</source>
         <translation>⬇ डाउनलोड विफल, फिर से कोशिश करने के लिए टैप करें</translation>
     </message>
@@ -1044,6 +1045,16 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Edited</source>
         <translation>संपादित</translation>
+    </message>
+    <message>
+        <source>⏳ Not on the server yet, tap to check again</source>
+        <extracomment>A large attachment was asked for and the server has no copy of it (yet). Tapping asks the server again.</extracomment>
+        <translation>⏳ अभी सर्वर पर नहीं है, दोबारा जाँचने के लिए टैप करें</translation>
+    </message>
+    <message>
+        <source>Downloading… tap to try again</source>
+        <extracomment>A large attachment is being fetched. Tapping asks the server again rather than waiting for the next try.</extracomment>
+        <translation>डाउनलोड हो रहा है… फिर से कोशिश करने के लिए टैप करें</translation>
     </message>
 </context>
 <context>

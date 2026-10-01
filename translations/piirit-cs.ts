@@ -672,6 +672,11 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
         <source>Edit</source>
         <translation>Upravit</translation>
     </message>
+    <message>
+        <source>Try downloading again</source>
+        <extracomment>A download that has not finished: ask the server again now.</extracomment>
+        <translation>Zkusit stáhnout znovu</translation>
+    </message>
 </context>
 <context>
     <name>ConversationPage</name>
@@ -1025,10 +1030,6 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
         <translation>Přeposláno</translation>
     </message>
     <message>
-        <source>Downloading…</source>
-        <translation>Stahuje se…</translation>
-    </message>
-    <message>
         <source>⬇ Download failed, tap to try again</source>
         <translation>⬇ Stahování selhalo, klepnutím to zkusíte znovu</translation>
     </message>
@@ -1049,6 +1050,16 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
     <message>
         <source>Edited</source>
         <translation>Upraveno</translation>
+    </message>
+    <message>
+        <source>⏳ Not on the server yet, tap to check again</source>
+        <extracomment>A large attachment was asked for and the server has no copy of it (yet). Tapping asks the server again.</extracomment>
+        <translation>⏳ Na serveru zatím není, klepnutím to znovu zkontrolujete</translation>
+    </message>
+    <message>
+        <source>Downloading… tap to try again</source>
+        <extracomment>A large attachment is being fetched. Tapping asks the server again rather than waiting for the next try.</extracomment>
+        <translation>Stahuje se… klepnutím to zkusíte znovu</translation>
     </message>
 </context>
 <context>

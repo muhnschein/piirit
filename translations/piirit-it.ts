@@ -670,6 +670,11 @@ Gli altri gruppi con contatti bloccati continueranno a visualizzare i loro messa
         <source>Edit</source>
         <translation>Modifica</translation>
     </message>
+    <message>
+        <source>Try downloading again</source>
+        <extracomment>A download that has not finished: ask the server again now.</extracomment>
+        <translation>Riprova il download</translation>
+    </message>
 </context>
 <context>
     <name>ConversationPage</name>
@@ -1020,10 +1025,6 @@ Gli altri gruppi con contatti bloccati continueranno a visualizzare i loro messa
         <translation>Inoltrato</translation>
     </message>
     <message>
-        <source>Downloading…</source>
-        <translation>Download in corso…</translation>
-    </message>
-    <message>
         <source>⬇ Download failed, tap to try again</source>
         <translation>⬇ Download non riuscito, tocca per riprovare</translation>
     </message>
@@ -1044,6 +1045,16 @@ Gli altri gruppi con contatti bloccati continueranno a visualizzare i loro messa
     <message>
         <source>Edited</source>
         <translation>Modificato</translation>
+    </message>
+    <message>
+        <source>⏳ Not on the server yet, tap to check again</source>
+        <extracomment>A large attachment was asked for and the server has no copy of it (yet). Tapping asks the server again.</extracomment>
+        <translation>⏳ Non ancora sul server, tocca per ricontrollare</translation>
+    </message>
+    <message>
+        <source>Downloading… tap to try again</source>
+        <extracomment>A large attachment is being fetched. Tapping asks the server again rather than waiting for the next try.</extracomment>
+        <translation>Download in corso… tocca per riprovare</translation>
     </message>
 </context>
 <context>

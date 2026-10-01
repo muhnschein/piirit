@@ -666,6 +666,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Edit</source>
         <translation>సవరించు</translation>
     </message>
+    <message>
+        <source>Try downloading again</source>
+        <extracomment>A download that has not finished: ask the server again now.</extracomment>
+        <translation>మళ్లీ డౌన్‌లోడ్ చేయడానికి ప్రయత్నించండి</translation>
+    </message>
 </context>
 <context>
     <name>ConversationPage</name>
@@ -1016,10 +1021,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>ఫార్వర్డ్ చేయబడింది</translation>
     </message>
     <message>
-        <source>Downloading…</source>
-        <translation>డౌన్‌లోడ్ అవుతోంది…</translation>
-    </message>
-    <message>
         <source>⬇ Download failed, tap to try again</source>
         <translation>⬇ డౌన్‌లోడ్ విఫలమైంది, మళ్లీ ప్రయత్నించడానికి నొక్కండి</translation>
     </message>
@@ -1040,6 +1041,16 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Edited</source>
         <translation>సవరించబడింది</translation>
+    </message>
+    <message>
+        <source>⏳ Not on the server yet, tap to check again</source>
+        <extracomment>A large attachment was asked for and the server has no copy of it (yet). Tapping asks the server again.</extracomment>
+        <translation>⏳ ఇంకా సర్వర్‌లో లేదు, మళ్లీ తనిఖీ చేయడానికి నొక్కండి</translation>
+    </message>
+    <message>
+        <source>Downloading… tap to try again</source>
+        <extracomment>A large attachment is being fetched. Tapping asks the server again rather than waiting for the next try.</extracomment>
+        <translation>డౌన్‌లోడ్ అవుతోంది… మళ్లీ ప్రయత్నించడానికి నొక్కండి</translation>
     </message>
 </context>
 <context>

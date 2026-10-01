@@ -672,6 +672,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Edit</source>
         <translation>Изменить</translation>
     </message>
+    <message>
+        <source>Try downloading again</source>
+        <extracomment>A download that has not finished: ask the server again now.</extracomment>
+        <translation>Повторить загрузку</translation>
+    </message>
 </context>
 <context>
     <name>ConversationPage</name>
@@ -1025,10 +1030,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Переслано</translation>
     </message>
     <message>
-        <source>Downloading…</source>
-        <translation>Скачивание…</translation>
-    </message>
-    <message>
         <source>⬇ Download failed, tap to try again</source>
         <translation>⬇ Скачать не удалось, нажмите, чтобы повторить</translation>
     </message>
@@ -1049,6 +1050,16 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Edited</source>
         <translation>Изменено</translation>
+    </message>
+    <message>
+        <source>⏳ Not on the server yet, tap to check again</source>
+        <extracomment>A large attachment was asked for and the server has no copy of it (yet). Tapping asks the server again.</extracomment>
+        <translation>⏳ Пока нет на сервере, нажмите, чтобы проверить снова</translation>
+    </message>
+    <message>
+        <source>Downloading… tap to try again</source>
+        <extracomment>A large attachment is being fetched. Tapping asks the server again rather than waiting for the next try.</extracomment>
+        <translation>Скачивание… нажмите, чтобы повторить</translation>
     </message>
 </context>
 <context>
