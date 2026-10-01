@@ -1,6 +1,7 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
 import "../js/Format.js" as Format
+import "."
 
 /*
  * One search result, whatever kind it is. Laid out like a chat-list row so
@@ -55,7 +56,7 @@ Item {
         visible: root.timestamp > 0
         font.pixelSize: Theme.fontSizeExtraSmall
         color: Theme.secondaryColor
-        text: Format.timeLabel(root.timestamp)
+        text: Format.timeLabel(root.timestamp, Clock.now)
     }
 
     Label {
