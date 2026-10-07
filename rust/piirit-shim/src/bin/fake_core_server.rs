@@ -1539,7 +1539,9 @@ async fn serve() {
                 | "maybe_network"
                 | "markseen_msgs"
                 | "set_chat_visibility"
-                | "resend_messages" => ok(&id, &Value::Null),
+                | "resend_messages"
+                // Taken and forgotten; the journal is what a test reads.
+                | "set_stock_strings" => ok(&id, &Value::Null),
                 "start_io_for_all_accounts" | "stop_io_for_all_accounts" => {
                     state.lock().await.io_stopped = method == "stop_io_for_all_accounts";
                     ok(&id, &Value::Null)

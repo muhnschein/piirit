@@ -150,22 +150,30 @@ mod tests {
 
         // Asked with the context each string is under in its page, as a
         // qsTr() in that file would be.
+        // And the core's own words, from the table the window hands it:
+        // `qsTr()` in a script file translates under the file's name,
+        // which has to be the context lupdate filed them under.
+        let stock = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../qml/js/StockStrings.js");
         engine.load_data(QByteArray::from(
             r"
             import QtQuick 2.0
+            import '__STOCK__' as Stock
             Item {
+                function stock() { return Stock.all()[3] + '|' + Stock.all()[129] }
                 function plain() { return qsTranslate('WelcomePage', 'Set up your profile') }
                 function one() { return qsTranslate('GroupPage', '%n member(s)', '', 1) }
                 function many() { return qsTranslate('GroupPage', '%n member(s)', '', 3) }
                 function untranslated() { return qsTranslate('Nowhere', 'not in any catalog') }
             }
-            ",
+            "
+            .replace("__STOCK__", &format!("file://{}", stock.display()))
+            .as_str(),
         ));
         let engine_ptr = std::ptr::addr_of_mut!(engine);
         let mut seen: Vec<(&str, String)> = Vec::new();
         let seen_ptr: *mut Vec<(&str, String)> = std::ptr::addr_of_mut!(seen);
         single_shot(Duration::from_millis(200), move || unsafe {
-            for name in ["plain", "one", "many", "untranslated"] {
+            for name in ["plain", "one", "many", "untranslated", "stock"] {
                 let value = (*engine_ptr).invoke_method(name.into(), &[]);
                 let text = QString::from_qvariant(value)
                     .map(|value| value.to_string())
@@ -185,6 +193,12 @@ mod tests {
         assert_eq!(value("plain"), "Profil einrichten", "seen: {seen:?}");
         assert_eq!(value("one"), "1 Mitglied", "seen: {seen:?}");
         assert_eq!(value("many"), "3 Mitglieder", "seen: {seen:?}");
+        assert_eq!(
+            value("stock"),
+            "Entwurf|%1$s hinzugefügt von %2$s.",
+            "the core's words are not translated, so it writes English into a \
+             German reader's chats. seen: {seen:?}"
+        );
         assert_eq!(
             value("untranslated"),
             "not in any catalog",
