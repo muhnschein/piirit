@@ -353,10 +353,10 @@ Item {
         text: root.footerText
     }
 
-    // The chips' text end to end, for how wide the strip wants to be and
-    // how tall one line of it is. The chips themselves are measured one
-    // by one below; this is the sum the bubble's width is decided from
-    // before any of them exists.
+    // The chips' counts end to end, for how wide the strip wants to be.
+    // The chips themselves are measured one by one below; this, with an
+    // emoji's square for each, is the sum the bubble's width is decided
+    // from before any of them exists.
     Text {
         id: reactionMetric
         visible: false
@@ -365,17 +365,26 @@ Item {
         text: {
             var parts = []
             for (var i = 0; i < root.reactionList.length; i++) {
-                parts.push(root.chipText(root.reactionList[i]))
+                parts.push(root.chipCount(root.reactionList[i]))
             }
-            return parts.join(" ")
+            return parts.join("")
         }
     }
 
-    /// What a chip says: the emoji, and how many when it is more than one
-    /// person. "👍" reads as one; "👍 1" reads as a score.
-    function chipText(reaction) {
-        return reaction.count > 1 ? reaction.emoji + " " + reaction.count
-                                  : reaction.emoji
+    // One line of the chip font, for how tall a chip is: the emoji is
+    // drawn a line high, whether it is a picture or text.
+    Text {
+        id: chipLineMetric
+        visible: false
+        font.pixelSize: Theme.fontSizeSmall
+        textFormat: Text.PlainText
+        text: "0"
+    }
+
+    /// How many put the emoji on, when it is more than one person. "👍"
+    /// reads as one; "👍 1" reads as a score.
+    function chipCount(reaction) {
+        return reaction.count > 1 ? "" + reaction.count : ""
     }
 
     // A core notice, not something anyone typed: centred and unadorned.
@@ -771,16 +780,31 @@ Item {
         // chips where it can.
         width: Math.min(wantedWidth, root.contentWidth)
         // A line of the chip font plus the chip's own padding.
-        height: reactionRow.shown ? reactionMetric.height + 2 * Theme.paddingSmall : 0
+        height: reactionRow.shown ? chipLineMetric.height + 2 * Theme.paddingSmall : 0
         clip: true
 
-        /// The room the chips take in a row: their text, each one's
-        /// padding, and the gaps between them.
-        readonly property real wantedWidth:
-            root.reactionList.length === 0 ? 0
-            : reactionMetric.implicitWidth
-              + root.reactionList.length * 2 * Theme.paddingMedium
-              + (root.reactionList.length - 1) * Theme.paddingSmall
+        /// How big an emoji is drawn on a chip: a line of its text.
+        readonly property real glyphSize: chipLineMetric.height
+
+        /// The room the chips take in a row: an emoji each, their counts,
+        /// the gap before each count, each chip's padding, and the gaps
+        /// between them.
+        readonly property real wantedWidth: {
+            var n = root.reactionList.length
+            if (n === 0) {
+                return 0
+            }
+            var counted = 0
+            for (var i = 0; i < n; i++) {
+                if (root.chipCount(root.reactionList[i]).length > 0) {
+                    counted++
+                }
+            }
+            return n * reactionRow.glyphSize + reactionMetric.implicitWidth
+                   + counted * Theme.paddingSmall
+                   + n * 2 * Theme.paddingMedium
+                   + (n - 1) * Theme.paddingSmall
+        }
 
         Repeater {
             id: reactionRepeater
@@ -806,7 +830,10 @@ Item {
                     }
                     return at
                 }
-                width: chipLabel.implicitWidth + 2 * Theme.paddingMedium
+                width: chipEmoji.width
+                       + (chipCountLabel.text.length > 0
+                          ? Theme.paddingSmall + chipCountLabel.implicitWidth : 0)
+                       + 2 * Theme.paddingMedium
                 height: reactionRow.height
                 radius: height / 2
                 // Nearly solid: a chip straddles the bubble's edge, and
@@ -814,16 +841,28 @@ Item {
                 color: mine ? Theme.rgba(Theme.highlightBackgroundColor, 0.9)
                             : Theme.rgba(Theme.highlightDimmerColor, 0.9)
 
+                // A picture where one is shipped: Sailfish draws few
+                // emoji itself. The emoji is whatever the other end
+                // sent, and the core does not check that it is one;
+                // EmojiGlyph draws anything else as plain text.
+                EmojiGlyph {
+                    id: chipEmoji
+                    objectName: "chipEmoji"
+                    x: Theme.paddingMedium
+                    anchors.verticalCenter: parent.verticalCenter
+                    size: reactionRow.glyphSize
+                    emoji: modelData.emoji
+                }
+
                 Label {
-                    id: chipLabel
-                    objectName: "chipLabel"
-                    anchors.centerIn: parent
+                    id: chipCountLabel
+                    objectName: "chipCount"
+                    x: chipEmoji.x + chipEmoji.width + Theme.paddingSmall
+                    anchors.verticalCenter: parent.verticalCenter
                     font.pixelSize: Theme.fontSizeSmall
                     color: Theme.primaryColor
-                    // The emoji is whatever the other end sent, and
-                    // the core does not check that it is one.
                     textFormat: Text.PlainText
-                    text: root.chipText(modelData)
+                    text: root.chipCount(modelData)
                 }
 
                 MouseArea {

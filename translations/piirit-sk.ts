@@ -1474,6 +1474,65 @@ Správy od zablokovaných kontaktov v ostatných skupinách sa budú naďalej zo
     </message>
 </context>
 <context>
+    <name>ReactionPickerPage</name>
+    <message>
+        <source>Smileys &amp; emotion</source>
+        <translation>Smajlíky a emócie</translation>
+    </message>
+    <message>
+        <source>People &amp; body</source>
+        <translation>Ľudia a telo</translation>
+    </message>
+    <message>
+        <source>Animals &amp; nature</source>
+        <translation>Zvieratá a príroda</translation>
+    </message>
+    <message>
+        <source>Food &amp; drink</source>
+        <translation>Jedlo a nápoje</translation>
+    </message>
+    <message>
+        <source>Travel &amp; places</source>
+        <translation>Cestovanie a miesta</translation>
+    </message>
+    <message>
+        <source>Activities</source>
+        <translation>Aktivity</translation>
+    </message>
+    <message>
+        <source>Objects</source>
+        <translation>Predmety</translation>
+    </message>
+    <message>
+        <source>Symbols</source>
+        <translation>Symboly</translation>
+    </message>
+    <message>
+        <source>Flags</source>
+        <translation>Vlajky</translation>
+    </message>
+    <message>
+        <source>Recent</source>
+        <translation>Nedávne</translation>
+    </message>
+    <message>
+        <source>React</source>
+        <translation>Reagovať</translation>
+    </message>
+    <message>
+        <source>Search</source>
+        <translation>Hľadať</translation>
+    </message>
+    <message>
+        <source>No emoji found</source>
+        <translation>Nenašli sa žiadne emoji</translation>
+    </message>
+    <message>
+        <source>Emoji names are in English, like &quot;heart&quot;</source>
+        <translation>Názvy emoji sú v angličtine, napr. „heart“</translation>
+    </message>
+</context>
+<context>
     <name>ReplyBar</name>
     <message>
         <source>Replying to %1</source>

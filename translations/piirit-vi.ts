@@ -1456,6 +1456,65 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>ReactionPickerPage</name>
+    <message>
+        <source>Smileys &amp; emotion</source>
+        <translation>Mặt cười &amp; cảm xúc</translation>
+    </message>
+    <message>
+        <source>People &amp; body</source>
+        <translation>Người &amp; cơ thể</translation>
+    </message>
+    <message>
+        <source>Animals &amp; nature</source>
+        <translation>Động vật &amp; thiên nhiên</translation>
+    </message>
+    <message>
+        <source>Food &amp; drink</source>
+        <translation>Đồ ăn &amp; thức uống</translation>
+    </message>
+    <message>
+        <source>Travel &amp; places</source>
+        <translation>Du lịch &amp; địa điểm</translation>
+    </message>
+    <message>
+        <source>Activities</source>
+        <translation>Hoạt động</translation>
+    </message>
+    <message>
+        <source>Objects</source>
+        <translation>Đồ vật</translation>
+    </message>
+    <message>
+        <source>Symbols</source>
+        <translation>Ký hiệu</translation>
+    </message>
+    <message>
+        <source>Flags</source>
+        <translation>Cờ</translation>
+    </message>
+    <message>
+        <source>Recent</source>
+        <translation>Gần đây</translation>
+    </message>
+    <message>
+        <source>React</source>
+        <translation>Bày tỏ cảm xúc</translation>
+    </message>
+    <message>
+        <source>Search</source>
+        <translation>Tìm kiếm</translation>
+    </message>
+    <message>
+        <source>No emoji found</source>
+        <translation>Không tìm thấy emoji</translation>
+    </message>
+    <message>
+        <source>Emoji names are in English, like &quot;heart&quot;</source>
+        <translation>Tên emoji bằng tiếng Anh, ví dụ &quot;heart&quot;</translation>
+    </message>
+</context>
+<context>
     <name>ReplyBar</name>
     <message>
         <source>Replying to %1</source>

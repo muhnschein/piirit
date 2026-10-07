@@ -1463,6 +1463,65 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>ReactionPickerPage</name>
+    <message>
+        <source>Smileys &amp; emotion</source>
+        <translation>Emoticonos y emociones</translation>
+    </message>
+    <message>
+        <source>People &amp; body</source>
+        <translation>Personas y cuerpo</translation>
+    </message>
+    <message>
+        <source>Animals &amp; nature</source>
+        <translation>Animales y naturaleza</translation>
+    </message>
+    <message>
+        <source>Food &amp; drink</source>
+        <translation>Comida y bebida</translation>
+    </message>
+    <message>
+        <source>Travel &amp; places</source>
+        <translation>Viajes y lugares</translation>
+    </message>
+    <message>
+        <source>Activities</source>
+        <translation>Actividades</translation>
+    </message>
+    <message>
+        <source>Objects</source>
+        <translation>Objetos</translation>
+    </message>
+    <message>
+        <source>Symbols</source>
+        <translation>Símbolos</translation>
+    </message>
+    <message>
+        <source>Flags</source>
+        <translation>Banderas</translation>
+    </message>
+    <message>
+        <source>Recent</source>
+        <translation>Recientes</translation>
+    </message>
+    <message>
+        <source>React</source>
+        <translation>Reaccionar</translation>
+    </message>
+    <message>
+        <source>Search</source>
+        <translation>Buscar</translation>
+    </message>
+    <message>
+        <source>No emoji found</source>
+        <translation>No se encontraron emojis</translation>
+    </message>
+    <message>
+        <source>Emoji names are in English, like &quot;heart&quot;</source>
+        <translation>Los nombres de los emojis están en inglés, p. ej. «heart»</translation>
+    </message>
+</context>
+<context>
     <name>ReplyBar</name>
     <message>
         <source>Replying to %1</source>

@@ -1463,6 +1463,65 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>ReactionPickerPage</name>
+    <message>
+        <source>Smileys &amp; emotion</source>
+        <translation>స్మైలీలు &amp; భావోద్వేగాలు</translation>
+    </message>
+    <message>
+        <source>People &amp; body</source>
+        <translation>వ్యక్తులు &amp; శరీరం</translation>
+    </message>
+    <message>
+        <source>Animals &amp; nature</source>
+        <translation>జంతువులు &amp; ప్రకృతి</translation>
+    </message>
+    <message>
+        <source>Food &amp; drink</source>
+        <translation>ఆహారం &amp; పానీయం</translation>
+    </message>
+    <message>
+        <source>Travel &amp; places</source>
+        <translation>ప్రయాణం &amp; ప్రదేశాలు</translation>
+    </message>
+    <message>
+        <source>Activities</source>
+        <translation>కార్యకలాపాలు</translation>
+    </message>
+    <message>
+        <source>Objects</source>
+        <translation>వస్తువులు</translation>
+    </message>
+    <message>
+        <source>Symbols</source>
+        <translation>చిహ్నాలు</translation>
+    </message>
+    <message>
+        <source>Flags</source>
+        <translation>జెండాలు</translation>
+    </message>
+    <message>
+        <source>Recent</source>
+        <translation>ఇటీవలివి</translation>
+    </message>
+    <message>
+        <source>React</source>
+        <translation>స్పందించండి</translation>
+    </message>
+    <message>
+        <source>Search</source>
+        <translation>వెతకండి</translation>
+    </message>
+    <message>
+        <source>No emoji found</source>
+        <translation>ఎమోజీలు ఏవీ కనుగొనబడలేదు</translation>
+    </message>
+    <message>
+        <source>Emoji names are in English, like &quot;heart&quot;</source>
+        <translation>ఎమోజీ పేర్లు ఆంగ్లంలో ఉన్నాయి, ఉదా. &quot;heart&quot;</translation>
+    </message>
+</context>
+<context>
     <name>ReplyBar</name>
     <message>
         <source>Replying to %1</source>

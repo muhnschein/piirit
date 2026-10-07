@@ -1463,6 +1463,65 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>ReactionPickerPage</name>
+    <message>
+        <source>Smileys &amp; emotion</source>
+        <translation>Hymiöt ja tunteet</translation>
+    </message>
+    <message>
+        <source>People &amp; body</source>
+        <translation>Ihmiset ja keho</translation>
+    </message>
+    <message>
+        <source>Animals &amp; nature</source>
+        <translation>Eläimet ja luonto</translation>
+    </message>
+    <message>
+        <source>Food &amp; drink</source>
+        <translation>Ruoka ja juoma</translation>
+    </message>
+    <message>
+        <source>Travel &amp; places</source>
+        <translation>Matkailu ja paikat</translation>
+    </message>
+    <message>
+        <source>Activities</source>
+        <translation>Aktiviteetit</translation>
+    </message>
+    <message>
+        <source>Objects</source>
+        <translation>Esineet</translation>
+    </message>
+    <message>
+        <source>Symbols</source>
+        <translation>Symbolit</translation>
+    </message>
+    <message>
+        <source>Flags</source>
+        <translation>Liput</translation>
+    </message>
+    <message>
+        <source>Recent</source>
+        <translation>Viimeisimmät</translation>
+    </message>
+    <message>
+        <source>React</source>
+        <translation>Reagoi</translation>
+    </message>
+    <message>
+        <source>Search</source>
+        <translation>Hae</translation>
+    </message>
+    <message>
+        <source>No emoji found</source>
+        <translation>Emojeja ei löytynyt</translation>
+    </message>
+    <message>
+        <source>Emoji names are in English, like &quot;heart&quot;</source>
+        <translation>Emojien nimet ovat englanniksi, esim. ”heart”</translation>
+    </message>
+</context>
+<context>
     <name>ReplyBar</name>
     <message>
         <source>Replying to %1</source>

@@ -1481,6 +1481,65 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
     </message>
 </context>
 <context>
+    <name>ReactionPickerPage</name>
+    <message>
+        <source>Smileys &amp; emotion</source>
+        <translation>Smeški in čustva</translation>
+    </message>
+    <message>
+        <source>People &amp; body</source>
+        <translation>Ljudje in telo</translation>
+    </message>
+    <message>
+        <source>Animals &amp; nature</source>
+        <translation>Živali in narava</translation>
+    </message>
+    <message>
+        <source>Food &amp; drink</source>
+        <translation>Hrana in pijača</translation>
+    </message>
+    <message>
+        <source>Travel &amp; places</source>
+        <translation>Potovanja in kraji</translation>
+    </message>
+    <message>
+        <source>Activities</source>
+        <translation>Dejavnosti</translation>
+    </message>
+    <message>
+        <source>Objects</source>
+        <translation>Predmeti</translation>
+    </message>
+    <message>
+        <source>Symbols</source>
+        <translation>Simboli</translation>
+    </message>
+    <message>
+        <source>Flags</source>
+        <translation>Zastave</translation>
+    </message>
+    <message>
+        <source>Recent</source>
+        <translation>Nedavno</translation>
+    </message>
+    <message>
+        <source>React</source>
+        <translation>Odzovi se</translation>
+    </message>
+    <message>
+        <source>Search</source>
+        <translation>Išči</translation>
+    </message>
+    <message>
+        <source>No emoji found</source>
+        <translation>Ni najdenih emojijev</translation>
+    </message>
+    <message>
+        <source>Emoji names are in English, like &quot;heart&quot;</source>
+        <translation>Imena emojijev so v angleščini, npr. »heart«</translation>
+    </message>
+</context>
+<context>
     <name>ReplyBar</name>
     <message>
         <source>Replying to %1</source>

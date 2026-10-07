@@ -154,6 +154,10 @@ SilicaListView {
     /// chip already on it. Whether that puts it on or takes it off is the
     /// model's to decide, from what it knows the reader already sent.
     signal reactionRequested(int messageId, string emoji)
+    /// The reader asked for an emoji the quick reactions do not offer:
+    /// the picker is a page, which is the page's to push. `current` is
+    /// the reader's own reaction on the message, "" for none.
+    signal reactionPickerRequested(int messageId, string current)
 
     /// How long a message waits before it goes, in milliseconds. The
     /// page does not set it; a test turns it down rather than waiting.
@@ -193,8 +197,9 @@ SilicaListView {
     }
 
     /// The emoji the menu offers first, as the reference clients offer
-    /// them. Anything else is a chip someone else's reaction has put on
-    /// the message, which a tap answers in kind.
+    /// them. Anything else is the "+" after them, which opens the picker
+    /// (pages/ReactionPickerPage.qml), or a chip someone else's reaction
+    /// has put on the message, which a tap answers in kind.
     readonly property var quickReactions: ["👍", "❤️", "😂", "😮", "😢", "🙏"]
 
     /// Whether a tap on an attachment of this kind opens a page of the
@@ -725,10 +730,11 @@ SilicaListView {
         // A Component rather than a menu built with the row. Silica builds
         // a Component the first time the menu is opened; a ContextMenu
         // declared here outright was built with every row, and it is the
-        // biggest thing on one -- six reactions and eight items, thirty
-        // objects, for a long press most rows never get. What a row costs
-        // to build is what a flick costs per frame, and what coming back
-        // to a conversation costs while the page is still sliding in.
+        // biggest thing on one -- six reactions, a "+" and eight items,
+        // over thirty objects, for a long press most rows never get. What
+        // a row costs to build is what a flick costs per frame, and what
+        // coming back to a conversation costs while the page is still
+        // sliding in.
         menu: Component {
             ContextMenu {
                 id: rowMenu
@@ -748,32 +754,65 @@ SilicaListView {
                     /// Taken while the row is here, like Delete's id: the
                     /// menu can outlive the row it was opened on.
                     readonly property int messageId: model.message_id
+                    /// The reader's own reaction, for the picker to ring;
+                    /// taken now for the same reason.
+                    readonly property string myReaction: model.my_reaction
+                    // The emoji and the "+" after them, side by side and
+                    // centred, each narrower than a small item when that
+                    // many do not fit across the menu. Laid out by hand
+                    // rather than in a Row, for the reason at the top of
+                    // MessageDelegate.
+                    readonly property int slots: root.quickReactions.length + 1
+                    readonly property real slotGap: Theme.paddingSmall
+                    readonly property real slotSize: Math.min(
+                        Theme.itemSizeSmall,
+                        Math.floor((width - (slots - 1) * slotGap) / slots))
+                    readonly property real slotsX: (width - slots * slotSize
+                                                    - (slots - 1) * slotGap) / 2
 
-                    Row {
-                        anchors.centerIn: parent
-                        spacing: Theme.paddingMedium
+                    Repeater {
+                        model: root.quickReactions
 
-                        Repeater {
-                            model: root.quickReactions
-
-                            MouseArea {
-                                objectName: "reactionOption"
-                                width: Theme.itemSizeSmall
-                                height: Theme.itemSizeSmall
-                                readonly property string emoji: modelData
-                                function choose() {
-                                    root.reactionRequested(reactionPicker.messageId, emoji)
-                                    rowMenu.close()
-                                }
-                                onClicked: choose()
-
-                                Label {
-                                    anchors.centerIn: parent
-                                    font.pixelSize: Theme.fontSizeLarge
-                                    textFormat: Text.PlainText
-                                    text: modelData
-                                }
+                        MouseArea {
+                            objectName: "reactionOption"
+                            x: reactionPicker.slotsX
+                               + index * (reactionPicker.slotSize + reactionPicker.slotGap)
+                            width: reactionPicker.slotSize
+                            height: reactionPicker.height
+                            readonly property string emoji: modelData
+                            function choose() {
+                                root.reactionRequested(reactionPicker.messageId, emoji)
+                                rowMenu.close()
                             }
+                            onClicked: choose()
+
+                            EmojiGlyph {
+                                anchors.centerIn: parent
+                                size: Theme.fontSizeLarge
+                                emoji: modelData
+                            }
+                        }
+                    }
+
+                    // Every other emoji: the picker, which is a page.
+                    MouseArea {
+                        id: morePicker
+                        objectName: "reactionMore"
+                        x: reactionPicker.slotsX + root.quickReactions.length
+                           * (reactionPicker.slotSize + reactionPicker.slotGap)
+                        width: reactionPicker.slotSize
+                        height: reactionPicker.height
+                        function choose() {
+                            root.reactionPickerRequested(reactionPicker.messageId,
+                                                         reactionPicker.myReaction)
+                            rowMenu.close()
+                        }
+                        onClicked: choose()
+
+                        Image {
+                            anchors.centerIn: parent
+                            source: "image://theme/icon-m-add"
+                                    + (morePicker.pressed ? "?" + Theme.highlightColor : "")
                         }
                     }
                 }

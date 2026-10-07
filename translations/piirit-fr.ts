@@ -1467,6 +1467,65 @@ Vous continuerez à voir les messages des contacts bloqués dans les autres grou
     </message>
 </context>
 <context>
+    <name>ReactionPickerPage</name>
+    <message>
+        <source>Smileys &amp; emotion</source>
+        <translation>Smileys et émotions</translation>
+    </message>
+    <message>
+        <source>People &amp; body</source>
+        <translation>Personnes et corps</translation>
+    </message>
+    <message>
+        <source>Animals &amp; nature</source>
+        <translation>Animaux et nature</translation>
+    </message>
+    <message>
+        <source>Food &amp; drink</source>
+        <translation>Nourriture et boissons</translation>
+    </message>
+    <message>
+        <source>Travel &amp; places</source>
+        <translation>Voyages et lieux</translation>
+    </message>
+    <message>
+        <source>Activities</source>
+        <translation>Activités</translation>
+    </message>
+    <message>
+        <source>Objects</source>
+        <translation>Objets</translation>
+    </message>
+    <message>
+        <source>Symbols</source>
+        <translation>Symboles</translation>
+    </message>
+    <message>
+        <source>Flags</source>
+        <translation>Drapeaux</translation>
+    </message>
+    <message>
+        <source>Recent</source>
+        <translation>Récents</translation>
+    </message>
+    <message>
+        <source>React</source>
+        <translation>Réagir</translation>
+    </message>
+    <message>
+        <source>Search</source>
+        <translation>Rechercher</translation>
+    </message>
+    <message>
+        <source>No emoji found</source>
+        <translation>Aucun emoji trouvé</translation>
+    </message>
+    <message>
+        <source>Emoji names are in English, like &quot;heart&quot;</source>
+        <translation>Les noms des emojis sont en anglais, par ex. « heart »</translation>
+    </message>
+</context>
+<context>
     <name>ReplyBar</name>
     <message>
         <source>Replying to %1</source>

@@ -1467,6 +1467,65 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>ReactionPickerPage</name>
+    <message>
+        <source>Smileys &amp; emotion</source>
+        <translation>स्माइली आणि भावना</translation>
+    </message>
+    <message>
+        <source>People &amp; body</source>
+        <translation>लोक आणि शरीर</translation>
+    </message>
+    <message>
+        <source>Animals &amp; nature</source>
+        <translation>प्राणी आणि निसर्ग</translation>
+    </message>
+    <message>
+        <source>Food &amp; drink</source>
+        <translation>अन्न आणि पेय</translation>
+    </message>
+    <message>
+        <source>Travel &amp; places</source>
+        <translation>प्रवास आणि ठिकाणे</translation>
+    </message>
+    <message>
+        <source>Activities</source>
+        <translation>उपक्रम</translation>
+    </message>
+    <message>
+        <source>Objects</source>
+        <translation>वस्तू</translation>
+    </message>
+    <message>
+        <source>Symbols</source>
+        <translation>चिन्हे</translation>
+    </message>
+    <message>
+        <source>Flags</source>
+        <translation>ध्वज</translation>
+    </message>
+    <message>
+        <source>Recent</source>
+        <translation>अलीकडील</translation>
+    </message>
+    <message>
+        <source>React</source>
+        <translation>प्रतिक्रिया द्या</translation>
+    </message>
+    <message>
+        <source>Search</source>
+        <translation>शोधा</translation>
+    </message>
+    <message>
+        <source>No emoji found</source>
+        <translation>कोणतेही इमोजी सापडले नाहीत</translation>
+    </message>
+    <message>
+        <source>Emoji names are in English, like &quot;heart&quot;</source>
+        <translation>इमोजींची नावे इंग्रजीत आहेत, उदा. &quot;heart&quot;</translation>
+    </message>
+</context>
+<context>
     <name>ReplyBar</name>
     <message>
         <source>Replying to %1</source>

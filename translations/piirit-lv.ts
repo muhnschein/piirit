@@ -1474,6 +1474,65 @@ Citās grupās, kurās ir bloķēti kontakti, viņu ziņas joprojām būs redzam
     </message>
 </context>
 <context>
+    <name>ReactionPickerPage</name>
+    <message>
+        <source>Smileys &amp; emotion</source>
+        <translation>Smaidiņi un emocijas</translation>
+    </message>
+    <message>
+        <source>People &amp; body</source>
+        <translation>Cilvēki un ķermenis</translation>
+    </message>
+    <message>
+        <source>Animals &amp; nature</source>
+        <translation>Dzīvnieki un daba</translation>
+    </message>
+    <message>
+        <source>Food &amp; drink</source>
+        <translation>Ēdiens un dzērieni</translation>
+    </message>
+    <message>
+        <source>Travel &amp; places</source>
+        <translation>Ceļojumi un vietas</translation>
+    </message>
+    <message>
+        <source>Activities</source>
+        <translation>Aktivitātes</translation>
+    </message>
+    <message>
+        <source>Objects</source>
+        <translation>Priekšmeti</translation>
+    </message>
+    <message>
+        <source>Symbols</source>
+        <translation>Simboli</translation>
+    </message>
+    <message>
+        <source>Flags</source>
+        <translation>Karogi</translation>
+    </message>
+    <message>
+        <source>Recent</source>
+        <translation>Nesenie</translation>
+    </message>
+    <message>
+        <source>React</source>
+        <translation>Reaģēt</translation>
+    </message>
+    <message>
+        <source>Search</source>
+        <translation>Meklēt</translation>
+    </message>
+    <message>
+        <source>No emoji found</source>
+        <translation>Nav atrasta neviena emocijzīme</translation>
+    </message>
+    <message>
+        <source>Emoji names are in English, like &quot;heart&quot;</source>
+        <translation>Emocijzīmju nosaukumi ir angliski, piem., “heart”</translation>
+    </message>
+</context>
+<context>
     <name>ReplyBar</name>
     <message>
         <source>Replying to %1</source>

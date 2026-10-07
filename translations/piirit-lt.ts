@@ -1470,6 +1470,65 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>ReactionPickerPage</name>
+    <message>
+        <source>Smileys &amp; emotion</source>
+        <translation>Šypsenėlės ir emocijos</translation>
+    </message>
+    <message>
+        <source>People &amp; body</source>
+        <translation>Žmonės ir kūnas</translation>
+    </message>
+    <message>
+        <source>Animals &amp; nature</source>
+        <translation>Gyvūnai ir gamta</translation>
+    </message>
+    <message>
+        <source>Food &amp; drink</source>
+        <translation>Maistas ir gėrimai</translation>
+    </message>
+    <message>
+        <source>Travel &amp; places</source>
+        <translation>Kelionės ir vietos</translation>
+    </message>
+    <message>
+        <source>Activities</source>
+        <translation>Veikla</translation>
+    </message>
+    <message>
+        <source>Objects</source>
+        <translation>Daiktai</translation>
+    </message>
+    <message>
+        <source>Symbols</source>
+        <translation>Simboliai</translation>
+    </message>
+    <message>
+        <source>Flags</source>
+        <translation>Vėliavos</translation>
+    </message>
+    <message>
+        <source>Recent</source>
+        <translation>Naujausi</translation>
+    </message>
+    <message>
+        <source>React</source>
+        <translation>Reaguoti</translation>
+    </message>
+    <message>
+        <source>Search</source>
+        <translation>Ieškoti</translation>
+    </message>
+    <message>
+        <source>No emoji found</source>
+        <translation>Jaustukų nerasta</translation>
+    </message>
+    <message>
+        <source>Emoji names are in English, like &quot;heart&quot;</source>
+        <translation>Jaustukų pavadinimai yra angliški, pvz., „heart“</translation>
+    </message>
+</context>
+<context>
     <name>ReplyBar</name>
     <message>
         <source>Replying to %1</source>

@@ -47,12 +47,14 @@ Release:    1
 # deltachat-rpc-server is upstream's unmodified MPL-2.0 binary; and the
 # page a call runs in, compiled into the app, is upstream's GPL-3.0
 # calls-webapp with Preact (MIT) and Material Symbols icons (Apache-2.0)
-# built into it (vendor/calls-webapp/SOURCE.md). The tag describes the
-# contents of the binary package.
+# built into it (vendor/calls-webapp/SOURCE.md); and the emoji are
+# Twemoji's pictures (CC-BY-4.0) with emojibase's list of them (MIT) and
+# CLDR's names (Unicode-3.0) (vendor/emoji/SOURCE.md). The tag describes
+# the contents of the binary package.
 %if 0%{?bundle_rpc_server}
-License:    GPL-3.0-or-later AND MPL-2.0 AND MIT AND Apache-2.0
+License:    GPL-3.0-or-later AND MPL-2.0 AND MIT AND Apache-2.0 AND CC-BY-4.0 AND Unicode-3.0
 %else
-License:    GPL-3.0-or-later AND MIT AND Apache-2.0
+License:    GPL-3.0-or-later AND MIT AND Apache-2.0 AND CC-BY-4.0 AND Unicode-3.0
 %endif
 Group:      Qt/Qt
 URL:        https://github.com/muhnschein/piirit
@@ -313,6 +315,10 @@ install -Dm 644 vendor/deltachat-rpc-server/SOURCE.md \
 # built into it.
 install -Dm 644 vendor/calls-webapp/SOURCE.md \
     %{buildroot}%{appdatadir}/vendor/calls-webapp/SOURCE.md
+# The emoji pictures and the list of them: CC-BY-4.0 asks for the
+# attribution this carries to travel with them.
+install -Dm 644 vendor/emoji/SOURCE.md \
+    %{buildroot}%{appdatadir}/vendor/emoji/SOURCE.md
 install -Dm 644 LICENSE \
     %{buildroot}%{appdatadir}/LICENSE
 

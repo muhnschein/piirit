@@ -1456,6 +1456,65 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>ReactionPickerPage</name>
+    <message>
+        <source>Smileys &amp; emotion</source>
+        <translation>Hangulatjelek és érzelmek</translation>
+    </message>
+    <message>
+        <source>People &amp; body</source>
+        <translation>Emberek és test</translation>
+    </message>
+    <message>
+        <source>Animals &amp; nature</source>
+        <translation>Állatok és természet</translation>
+    </message>
+    <message>
+        <source>Food &amp; drink</source>
+        <translation>Étel és ital</translation>
+    </message>
+    <message>
+        <source>Travel &amp; places</source>
+        <translation>Utazás és helyek</translation>
+    </message>
+    <message>
+        <source>Activities</source>
+        <translation>Tevékenységek</translation>
+    </message>
+    <message>
+        <source>Objects</source>
+        <translation>Tárgyak</translation>
+    </message>
+    <message>
+        <source>Symbols</source>
+        <translation>Szimbólumok</translation>
+    </message>
+    <message>
+        <source>Flags</source>
+        <translation>Zászlók</translation>
+    </message>
+    <message>
+        <source>Recent</source>
+        <translation>Legutóbbiak</translation>
+    </message>
+    <message>
+        <source>React</source>
+        <translation>Reagálás</translation>
+    </message>
+    <message>
+        <source>Search</source>
+        <translation>Keresés</translation>
+    </message>
+    <message>
+        <source>No emoji found</source>
+        <translation>Nem található emoji</translation>
+    </message>
+    <message>
+        <source>Emoji names are in English, like &quot;heart&quot;</source>
+        <translation>Az emojik nevei angolul vannak, pl. „heart”</translation>
+    </message>
+</context>
+<context>
     <name>ReplyBar</name>
     <message>
         <source>Replying to %1</source>

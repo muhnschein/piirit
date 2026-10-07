@@ -1463,6 +1463,65 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>ReactionPickerPage</name>
+    <message>
+        <source>Smileys &amp; emotion</source>
+        <translation>ஸ்மைலிகள் மற்றும் உணர்வுகள்</translation>
+    </message>
+    <message>
+        <source>People &amp; body</source>
+        <translation>மக்கள் மற்றும் உடல்</translation>
+    </message>
+    <message>
+        <source>Animals &amp; nature</source>
+        <translation>விலங்குகள் மற்றும் இயற்கை</translation>
+    </message>
+    <message>
+        <source>Food &amp; drink</source>
+        <translation>உணவு மற்றும் பானம்</translation>
+    </message>
+    <message>
+        <source>Travel &amp; places</source>
+        <translation>பயணம் மற்றும் இடங்கள்</translation>
+    </message>
+    <message>
+        <source>Activities</source>
+        <translation>செயல்பாடுகள்</translation>
+    </message>
+    <message>
+        <source>Objects</source>
+        <translation>பொருட்கள்</translation>
+    </message>
+    <message>
+        <source>Symbols</source>
+        <translation>குறியீடுகள்</translation>
+    </message>
+    <message>
+        <source>Flags</source>
+        <translation>கொடிகள்</translation>
+    </message>
+    <message>
+        <source>Recent</source>
+        <translation>சமீபத்தியவை</translation>
+    </message>
+    <message>
+        <source>React</source>
+        <translation>எதிர்வினையாற்று</translation>
+    </message>
+    <message>
+        <source>Search</source>
+        <translation>தேடு</translation>
+    </message>
+    <message>
+        <source>No emoji found</source>
+        <translation>எமோஜி எதுவும் கிடைக்கவில்லை</translation>
+    </message>
+    <message>
+        <source>Emoji names are in English, like &quot;heart&quot;</source>
+        <translation>எமோஜி பெயர்கள் ஆங்கிலத்தில் உள்ளன, எ.கா. &quot;heart&quot;</translation>
+    </message>
+</context>
+<context>
     <name>ReplyBar</name>
     <message>
         <source>Replying to %1</source>

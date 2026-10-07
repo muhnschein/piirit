@@ -1463,6 +1463,65 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>ReactionPickerPage</name>
+    <message>
+        <source>Smileys &amp; emotion</source>
+        <translation>Smileys og følelser</translation>
+    </message>
+    <message>
+        <source>People &amp; body</source>
+        <translation>Mennesker og krop</translation>
+    </message>
+    <message>
+        <source>Animals &amp; nature</source>
+        <translation>Dyr og natur</translation>
+    </message>
+    <message>
+        <source>Food &amp; drink</source>
+        <translation>Mad og drikke</translation>
+    </message>
+    <message>
+        <source>Travel &amp; places</source>
+        <translation>Rejser og steder</translation>
+    </message>
+    <message>
+        <source>Activities</source>
+        <translation>Aktiviteter</translation>
+    </message>
+    <message>
+        <source>Objects</source>
+        <translation>Objekter</translation>
+    </message>
+    <message>
+        <source>Symbols</source>
+        <translation>Symboler</translation>
+    </message>
+    <message>
+        <source>Flags</source>
+        <translation>Flag</translation>
+    </message>
+    <message>
+        <source>Recent</source>
+        <translation>Seneste</translation>
+    </message>
+    <message>
+        <source>React</source>
+        <translation>Reager</translation>
+    </message>
+    <message>
+        <source>Search</source>
+        <translation>Søg</translation>
+    </message>
+    <message>
+        <source>No emoji found</source>
+        <translation>Ingen emoji fundet</translation>
+    </message>
+    <message>
+        <source>Emoji names are in English, like &quot;heart&quot;</source>
+        <translation>Emoji-navne er på engelsk, f.eks. &quot;heart&quot;</translation>
+    </message>
+</context>
+<context>
     <name>ReplyBar</name>
     <message>
         <source>Replying to %1</source>

@@ -1470,6 +1470,65 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>ReactionPickerPage</name>
+    <message>
+        <source>Smileys &amp; emotion</source>
+        <translation>Fețe zâmbitoare și emoții</translation>
+    </message>
+    <message>
+        <source>People &amp; body</source>
+        <translation>Oameni și corp</translation>
+    </message>
+    <message>
+        <source>Animals &amp; nature</source>
+        <translation>Animale și natură</translation>
+    </message>
+    <message>
+        <source>Food &amp; drink</source>
+        <translation>Mâncare și băutură</translation>
+    </message>
+    <message>
+        <source>Travel &amp; places</source>
+        <translation>Călătorii și locuri</translation>
+    </message>
+    <message>
+        <source>Activities</source>
+        <translation>Activități</translation>
+    </message>
+    <message>
+        <source>Objects</source>
+        <translation>Obiecte</translation>
+    </message>
+    <message>
+        <source>Symbols</source>
+        <translation>Simboluri</translation>
+    </message>
+    <message>
+        <source>Flags</source>
+        <translation>Steaguri</translation>
+    </message>
+    <message>
+        <source>Recent</source>
+        <translation>Recente</translation>
+    </message>
+    <message>
+        <source>React</source>
+        <translation>Reacționează</translation>
+    </message>
+    <message>
+        <source>Search</source>
+        <translation>Caută</translation>
+    </message>
+    <message>
+        <source>No emoji found</source>
+        <translation>Nu s-a găsit niciun emoji</translation>
+    </message>
+    <message>
+        <source>Emoji names are in English, like &quot;heart&quot;</source>
+        <translation>Numele emoji sunt în engleză, de ex. „heart”</translation>
+    </message>
+</context>
+<context>
     <name>ReplyBar</name>
     <message>
         <source>Replying to %1</source>
