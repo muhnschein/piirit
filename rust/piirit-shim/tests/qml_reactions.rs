@@ -294,6 +294,7 @@ fn reactions_are_chips_on_the_message_and_a_row_in_its_menu() {
     assert_outcome(&steps);
 }
 
+#[allow(clippy::too_many_lines)]
 fn assert_outcome(steps: &[(&str, String)]) {
     let value = |label: &str| {
         steps
