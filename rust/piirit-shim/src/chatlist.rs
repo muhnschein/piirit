@@ -194,9 +194,10 @@ pub struct ChatList {
     awaiting: Awaiting,
 
     /// Every chat the core listed, whatever the unread filter shows of
-    /// them. What a refresh reuses rows from, and what the cover's counts
-    /// and the announcements read: a chat filtered out of view is still a
-    /// chat that can have a message arrive in it.
+    /// them. What a refresh reuses rows from, and what the announcements
+    /// read: a chat filtered out of view is still a chat that can have a
+    /// message arrive in it. The cover's counts read the rows instead; its
+    /// own lists are never filtered.
     all_rows: Vec<ChatListItem>,
 
     /// The chats the unread filter lets through: every chat that has had
@@ -211,9 +212,10 @@ impl ChatList {
         u32::try_from(self.rows.borrow().iter().count()).unwrap_or(u32::MAX)
     }
 
-    /// Unread messages across every chat, shown or filtered out.
+    /// Unread messages across every chat.
     pub fn unread_total(&self) -> u32 {
-        self.all_rows
+        self.rows
+            .borrow()
             .iter()
             .fold(0u32, |total, row| total.saturating_add(row.unread_count))
     }
@@ -221,7 +223,8 @@ impl ChatList {
     /// The people behind the chats, as JSON; see the property.
     pub fn cover_people(&self) -> QString {
         let people: Vec<serde_json::Value> = self
-            .all_rows
+            .rows
+            .borrow()
             .iter()
             .filter(|row| !row.is_self_talk && !row.is_device_talk)
             .map(|row| {

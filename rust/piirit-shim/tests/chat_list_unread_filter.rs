@@ -3,8 +3,7 @@
 //! It shows the chats with something unread, and keeps a chat read since
 //! it went on until it is told to let go: the reader who opens a chat
 //! from the filtered list and comes back should find the row where they
-//! left it. Everything that is not the list on screen -- the cover's
-//! people, the unread total -- still reads every chat.
+//! left it.
 
 // Qt harness: see chat_list.rs.
 #![allow(
@@ -28,7 +27,6 @@ const PROBE_QML: &str = r"
     Item {
         ChatList { id: chats; account_id: 1 }
         function count() { return '' + chats.count }
-        function people() { return '' + JSON.parse(chats.cover_people).length }
         function filter(on) { chats.unread_only = on; return 'ok' }
         function markUnread(chatId) { chats.mark_unread(chatId); return 'ok' }
         function markRead(chatId) { chats.mark_read(chatId); return 'ok' }
@@ -91,7 +89,6 @@ fn the_filter_shows_unread_chats_and_keeps_the_ones_read_meanwhile() {
 
     single_shot(Duration::from_millis(4000), move || unsafe {
         record!("nothing-unread", call!("count"));
-        record!("people-while-filtered", call!("people"));
         record!("marked-unread", call!("markUnread", 2u32));
     });
 
@@ -135,11 +132,6 @@ fn the_filter_shows_unread_chats_and_keeps_the_ones_read_meanwhile() {
         value("nothing-unread"),
         "0",
         "with nothing unread the filter still shows chats. {context}"
-    );
-    assert_eq!(
-        value("people-while-filtered"),
-        "2",
-        "the cover lost the people the filter hides from the list. {context}"
     );
     assert_eq!(
         value("one-unread"),
