@@ -56,7 +56,8 @@ pub use crate::chat_media::ChatMedia;
 pub use crate::chatlist::ChatList;
 pub use crate::contacts::ContactList;
 pub use crate::core::{
-    server_path, server_pid, shutdown, DeltaChatCore, BUNDLED_SERVER, HANDLED_EVENT_KINDS,
+    server_path, server_pid, shutdown, DeltaChatCore, BUNDLED_SERVER, DEFAULT_PROVIDER_QR,
+    HANDLED_EVENT_KINDS,
 };
 pub use crate::full_text::FullText;
 pub use crate::prefetch::ChatPrefetch;
