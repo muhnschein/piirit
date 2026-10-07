@@ -918,6 +918,11 @@ Wiadomości innych grup z zablokowanymi kontaktami nadal będą wyświetlane.</t
         <source>Everyone in the group sees the name</source>
         <translation>Nazwę widzą wszyscy w grupie</translation>
     </message>
+    <message>
+        <source>Description</source>
+        <extracomment>Label of the text that says what a group or channel is for, on its info page, and the prompt in its empty field.</extracomment>
+        <translation>Opis</translation>
+    </message>
 </context>
 <context>
     <name>IntroPage</name>

@@ -908,6 +908,11 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
         <source>Everyone in the group sees the name</source>
         <translation>Adı gruptaki herkes görür</translation>
     </message>
+    <message>
+        <source>Description</source>
+        <extracomment>Label of the text that says what a group or channel is for, on its info page, and the prompt in its empty field.</extracomment>
+        <translation>Açıklama</translation>
+    </message>
 </context>
 <context>
     <name>IntroPage</name>

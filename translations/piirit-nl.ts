@@ -909,6 +909,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Everyone in the group sees the name</source>
         <translation>Iedereen in de groep ziet de naam</translation>
     </message>
+    <message>
+        <source>Description</source>
+        <extracomment>Label of the text that says what a group or channel is for, on its info page, and the prompt in its empty field.</extracomment>
+        <translation>Beschrijving</translation>
+    </message>
 </context>
 <context>
     <name>IntroPage</name>

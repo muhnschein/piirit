@@ -918,6 +918,11 @@ Správy od zablokovaných kontaktov v ostatných skupinách sa budú naďalej zo
         <source>Everyone in the group sees the name</source>
         <translation>Meno vidia všetci v skupine</translation>
     </message>
+    <message>
+        <source>Description</source>
+        <extracomment>Label of the text that says what a group or channel is for, on its info page, and the prompt in its empty field.</extracomment>
+        <translation>Popis</translation>
+    </message>
 </context>
 <context>
     <name>IntroPage</name>
