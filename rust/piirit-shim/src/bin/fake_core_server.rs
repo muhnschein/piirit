@@ -123,6 +123,9 @@ struct State {
     group_members: std::collections::BTreeMap<u32, Vec<u32>>,
     /// Group names given after creation, by chat.
     group_names: std::collections::BTreeMap<u32, String>,
+    /// Group descriptions, by chat. `PIIRIT_FAKE_DESCRIPTION` gives the
+    /// seeded group one.
+    descriptions: std::collections::BTreeMap<u32, String>,
     /// Group pictures, by chat. The real core keeps the path of its own
     /// copy; this keeps the path it was given.
     group_images: std::collections::BTreeMap<u32, String>,
@@ -1982,6 +1985,45 @@ async fn serve() {
                         err(&id, "Failed to set name")
                     } else {
                         state.group_names.insert(chat, name);
+                        state.chat_modified(account, chat);
+                        ok(&id, &Value::Null)
+                    }
+                }
+                // As the real core: trimmed, empty clears, and refused on
+                // a chat that is not a group this account is in.
+                "get_chat_description" => {
+                    let chat = positional(1)
+                        .as_u64()
+                        .and_then(|value| u32::try_from(value).ok())
+                        .unwrap_or_default();
+                    let mut state = state.lock().await;
+                    state.seed_chats();
+                    let seeded = (chat == 2)
+                        .then(|| std::env::var("PIIRIT_FAKE_DESCRIPTION").ok())
+                        .flatten()
+                        .unwrap_or_default();
+                    let text = state.descriptions.get(&chat).cloned().unwrap_or(seeded);
+                    ok(&id, &json!(text))
+                }
+                "set_chat_description" => {
+                    let account = account_id();
+                    let chat = positional(1)
+                        .as_u64()
+                        .and_then(|value| u32::try_from(value).ok())
+                        .unwrap_or_default();
+                    let text = positional(2)
+                        .as_str()
+                        .unwrap_or_default()
+                        .trim()
+                        .to_string();
+                    let mut state = state.lock().await;
+                    state.seed_chats();
+                    if !state.is_group(chat) || state.left_groups.contains(&chat) {
+                        err(&id, "Cannot set chat description; self not in group")
+                    } else if should_fail(&text) {
+                        err(&id, "Cannot set chat description")
+                    } else {
+                        state.descriptions.insert(chat, text);
                         state.chat_modified(account, chat);
                         ok(&id, &Value::Null)
                     }

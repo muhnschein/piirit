@@ -91,6 +91,14 @@ const PROBE_QML: &str = r"
             item.text = value
             return 'ok'
         }
+        /// A method of the model, called by name: leaving the group is
+        /// what the page asks the model for after its confirmation page.
+        function ask(name, method) {
+            var item = findIn(loader.item, name)
+            if (!item) { return 'missing:' + name }
+            item[method]()
+            return 'ok'
+        }
         function click(name) {
             var item = findIn(loader.item, name)
             if (!item) { return 'missing:' + name }
@@ -119,6 +127,7 @@ fn the_group_page_shows_the_group_and_renames_it() {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_FAKE_JOURNAL", &journal);
         std::env::set_var("PIIRIT_ACCOUNTS_DIR", temp.join("accounts"));
+        std::env::set_var("PIIRIT_FAKE_DESCRIPTION", "Walks\nBring boots");
     }
 
     piirit_shim::register_qml_types();
@@ -192,6 +201,20 @@ fn the_group_page_shows_the_group_and_renames_it() {
             "timer-pick",
             call!("click", QString::from("timerOption86400"))
         );
+        // The description, as the core holds it: shown with its line
+        // break, and a field on a group the account is in.
+        record!("desc-visible", get!("descriptionField", "visible"));
+        record!("desc-text", get!("descriptionField", "text"));
+        record!("desc-readonly", get!("descriptionField", "readOnly"));
+        // A new one, applied on the way out with the name.
+        record!(
+            "desc-typed",
+            call!(
+                "setText",
+                QString::from("descriptionField"),
+                QString::from("  Bring water\nand boots \n")
+            )
+        );
         // A new name, applied on the way out rather than a pause later.
         record!(
             "typed",
@@ -205,6 +228,17 @@ fn the_group_page_shows_the_group_and_renames_it() {
     });
 
     single_shot(Duration::from_secs(5), move || unsafe {
+        // What went out came back trimmed, and is what the field shows.
+        record!("desc-saved", get!("descriptionField", "text"));
+        // Cleared again: the field is blanked and the page left.
+        record!(
+            "desc-cleared",
+            call!(
+                "setText",
+                QString::from("descriptionField"),
+                QString::from("")
+            )
+        );
         // A blanked name goes back to the group's rather than to the
         // core as nothing.
         record!(
@@ -239,6 +273,45 @@ fn the_group_page_shows_the_group_and_renames_it() {
         // an empty pull-down is a pull that does nothing.
         record!("single-menu", get!("groupMenu", "visible"));
         record!("single-badge", get!("editBadge", "visible"));
+        // Nothing to show and nothing to add: no field at all.
+        record!("single-desc", get!("descriptionField", "visible"));
+        record!("single-desc-edit", get!("chat", "can_edit_description"));
+        record!(
+            "load-again",
+            call!("load", QString::from(common::page_url("GroupPage.qml")), 2)
+        );
+    });
+
+    single_shot(Duration::from_secs(9), move || unsafe {
+        // The group again, its description now empty: the field is
+        // there, to write one in.
+        record!("empty-visible", get!("descriptionField", "visible"));
+        record!("empty-text", get!("descriptionField", "text"));
+        record!("empty-readonly", get!("descriptionField", "readOnly"));
+        record!(
+            "desc-retyped",
+            call!(
+                "setText",
+                QString::from("descriptionField"),
+                QString::from("Back soon")
+            )
+        );
+        record!("leave-again", call!("leave"));
+    });
+
+    single_shot(Duration::from_secs(11), move || unsafe {
+        // Once the account has left, the description stays readable and
+        // cannot be written to.
+        record!(
+            "leave-group",
+            call!("ask", QString::from("chat"), QString::from("leave"))
+        );
+    });
+
+    single_shot(Duration::from_secs(13), move || unsafe {
+        record!("left-visible", get!("descriptionField", "visible"));
+        record!("left-text", get!("descriptionField", "text"));
+        record!("left-readonly", get!("descriptionField", "readOnly"));
         (*engine_ptr).quit();
     });
 
@@ -270,6 +343,12 @@ fn assert_page(steps: &[(&str, String)], navigation: &str, calls: &[(String, Val
         "confirm-leave",
         "load-single",
         "timer-pick",
+        "desc-typed",
+        "desc-cleared",
+        "load-again",
+        "desc-retyped",
+        "leave-again",
+        "leave-group",
     ] {
         assert_eq!(value(label), "ok", "step {label} failed. {context}");
     }
@@ -311,6 +390,85 @@ fn assert_page(steps: &[(&str, String)], navigation: &str, calls: &[(String, Val
         "picking a duration did not reach the core. {context}"
     );
     assert_eq!(value("loaded"), "true", "the group never loaded. {context}");
+
+    // The description: shown as the core holds it, line break kept, in a
+    // field the account can write to; what it wrote went out trimmed and
+    // came back; cleared it is still a field, and gone from a chat that
+    // has none to show or to add; left, it reads but does not write.
+    assert_eq!(
+        value("desc-visible"),
+        "true",
+        "a group with a description does not show it. {context}"
+    );
+    assert_eq!(
+        value("desc-text"),
+        "Walks\nBring boots",
+        "the description is not the core's, line break and all. {context}"
+    );
+    assert_eq!(
+        value("desc-readonly"),
+        "false",
+        "the description cannot be edited on a group the account is in. {context}"
+    );
+    assert_eq!(
+        value("desc-saved"),
+        "Bring water\nand boots",
+        "the saved description did not come back trimmed. {context}"
+    );
+    assert_eq!(
+        value("single-desc"),
+        "false",
+        "a one-to-one chat shows a description field. {context}"
+    );
+    assert_eq!(
+        value("single-desc-edit"),
+        "false",
+        "a one-to-one chat offers a description edit. {context}"
+    );
+    assert_eq!(
+        value("empty-visible"),
+        "true",
+        "an empty description gives a group member no field to write in. {context}"
+    );
+    assert_eq!(
+        value("empty-text"),
+        "",
+        "the cleared description is still showing. {context}"
+    );
+    assert_eq!(
+        value("empty-readonly"),
+        "false",
+        "the empty description cannot be written to. {context}"
+    );
+    assert_eq!(
+        value("left-visible"),
+        "true",
+        "a description is hidden once the group is left. {context}"
+    );
+    assert_eq!(
+        value("left-text"),
+        "Back soon",
+        "the group's description is not the last one written. {context}"
+    );
+    assert_eq!(
+        value("left-readonly"),
+        "true",
+        "a group the account has left still offers to edit the description. {context}"
+    );
+    let described: Vec<Value> = calls
+        .iter()
+        .filter(|(name, _)| name == "set_chat_description")
+        .map(|(_, params)| params.clone())
+        .collect();
+    assert_eq!(
+        described,
+        vec![
+            serde_json::json!([1, 2, "Bring water\nand boots"]),
+            serde_json::json!([1, 2, ""]),
+            serde_json::json!([1, 2, "Back soon"]),
+        ],
+        "leaving the page did not send each typed description, trimmed. {context}"
+    );
     assert_eq!(
         value("name"),
         "chat 2",
