@@ -117,7 +117,7 @@ fn a_chat_can_be_started_three_ways() {
         (*engine_ptr).load_data(QByteArray::from(PROBE_QML));
     });
 
-    single_shot(Duration::from_secs(9), move || unsafe {
+    single_shot(Duration::from_secs(6), move || unsafe {
         let value = (*engine_ptr).invoke_method("names".into(), &[]);
         *listed_ptr = QString::from_qvariant(value)
             .map(|text| text.to_string())
@@ -182,11 +182,16 @@ fn assert_routes(calls: &[(String, Value)], listed: &str, report: &str) {
     );
     // A relay's code is neither an invite nor refused as one: it is
     // offered back, with the relay it names, as one to add to this
-    // profile. Nothing is added until the reader says so.
+    // profile. Nothing is added until the reader says so. The two are
+    // asked about at once, so they answer in either order.
+    let mut offered: Vec<&str> = relays.split(';').filter(|part| !part.is_empty()).collect();
+    offered.sort_unstable();
     assert_eq!(
-        relays,
-        "chat.example.org=DCACCOUNT:https://chat.example.org/new;\
-         ada@mail.example.org=dclogin:ada@mail.example.org?p=secret&v=1;",
+        offered,
+        vec![
+            "ada@mail.example.org=dclogin:ada@mail.example.org?p=secret&v=1",
+            "chat.example.org=DCACCOUNT:https://chat.example.org/new",
+        ],
         "a relay's code was not offered as a relay to add: {names:?}"
     );
     assert!(
