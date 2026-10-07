@@ -54,6 +54,14 @@
         <source>Choose a name and a relay. Nothing else is needed.</source>
         <translation>Виберіть ім&apos;я та релей. Більше нічого не потрібно.</translation>
     </message>
+    <message>
+        <source>Automatic</source>
+        <translation>Автоматично</translation>
+    </message>
+    <message>
+        <source>Relays are used for sending and receiving messages. Having more than one keeps your connection reliable.</source>
+        <translation>Релеї використовуються для надсилання й отримання повідомлень. Кілька релеїв роблять з’єднання надійнішим.</translation>
+    </message>
 </context>
 <context>
     <name>AddProfilePage</name>
@@ -115,6 +123,11 @@
     <message>
         <source>Adds another address for this profile on a second relay.</source>
         <translation>Додає цьому профілю ще одну адресу на іншому релеї.</translation>
+    </message>
+    <message>
+        <source>Add this relay?</source>
+        <extracomment>Delta Chat&apos;s question, over a relay read off a scanned code.</extracomment>
+        <translation>Додати цей релей?</translation>
     </message>
 </context>
 <context>
@@ -622,6 +635,11 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Leave blank to use the name they chose</source>
         <translation>Залиште порожнім, щоб використати обране ним ім&apos;я</translation>
+    </message>
+    <message>
+        <source>Seen a long time ago</source>
+        <extracomment>Under a contact&apos;s name: the core has not seen them for a long time, or never.</extracomment>
+        <translation>Був(-ла) у мережі дуже давно</translation>
     </message>
 </context>
 <context>
@@ -1292,6 +1310,14 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Could not reach the relay. Try another one.</source>
         <translation>Не вдалося зв&apos;язатися з релеєм. Спробуйте інший.</translation>
+    </message>
+    <message>
+        <source>No relay answered within %1 seconds.</source>
+        <translation>Жоден релей не відповів протягом %1 секунд.</translation>
+    </message>
+    <message>
+        <source>Connecting…</source>
+        <translation>Підключення…</translation>
     </message>
 </context>
 <context>

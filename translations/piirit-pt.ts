@@ -54,6 +54,14 @@
         <source>Choose a name and a relay. Nothing else is needed.</source>
         <translation>Escolha um nome e um relay. Não é preciso mais nada.</translation>
     </message>
+    <message>
+        <source>Automatic</source>
+        <translation>Automático</translation>
+    </message>
+    <message>
+        <source>Relays are used for sending and receiving messages. Having more than one keeps your connection reliable.</source>
+        <translation>Os relays são usados para enviar e receber mensagens. Ter mais do que um mantém a sua ligação fiável.</translation>
+    </message>
 </context>
 <context>
     <name>AddProfilePage</name>
@@ -115,6 +123,11 @@
     <message>
         <source>Adds another address for this profile on a second relay.</source>
         <translation>Acrescenta a este perfil outro endereço num segundo relay.</translation>
+    </message>
+    <message>
+        <source>Add this relay?</source>
+        <extracomment>Delta Chat&apos;s question, over a relay read off a scanned code.</extracomment>
+        <translation>Adicionar este relay?</translation>
     </message>
 </context>
 <context>
@@ -620,6 +633,11 @@ Mensagens de contactos bloqueados não serão ocultadas noutros grupos.</transla
     <message>
         <source>Leave blank to use the name they chose</source>
         <translation>Deixe em branco para usar o nome que a pessoa escolheu</translation>
+    </message>
+    <message>
+        <source>Seen a long time ago</source>
+        <extracomment>Under a contact&apos;s name: the core has not seen them for a long time, or never.</extracomment>
+        <translation>Visto há muito tempo</translation>
     </message>
 </context>
 <context>
@@ -1285,6 +1303,14 @@ Mensagens de contactos bloqueados não serão ocultadas noutros grupos.</transla
     <message>
         <source>Could not reach the relay. Try another one.</source>
         <translation>Não foi possível contactar o relay. Tente outro.</translation>
+    </message>
+    <message>
+        <source>No relay answered within %1 seconds.</source>
+        <translation>Nenhum relay respondeu em %1 segundos.</translation>
+    </message>
+    <message>
+        <source>Connecting…</source>
+        <translation>A ligar…</translation>
     </message>
 </context>
 <context>

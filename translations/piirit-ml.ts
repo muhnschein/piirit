@@ -54,6 +54,14 @@
         <source>Choose a name and a relay. Nothing else is needed.</source>
         <translation>ഒരു പേരും ഒരു റിലേയും തിരഞ്ഞെടുക്കുക. ഇതിനപ്പുറം ഒന്നും വേണ്ട.</translation>
     </message>
+    <message>
+        <source>Automatic</source>
+        <translation>സ്വയമേവ</translation>
+    </message>
+    <message>
+        <source>Relays are used for sending and receiving messages. Having more than one keeps your connection reliable.</source>
+        <translation>സന്ദേശങ്ങൾ അയയ്ക്കാനും സ്വീകരിക്കാനും റിലേകൾ ഉപയോഗിക്കുന്നു. ഒന്നിൽ കൂടുതൽ ഉണ്ടെങ്കിൽ നിങ്ങളുടെ കണക്ഷൻ വിശ്വസനീയമായി തുടരും.</translation>
+    </message>
 </context>
 <context>
     <name>AddProfilePage</name>
@@ -115,6 +123,11 @@
     <message>
         <source>Adds another address for this profile on a second relay.</source>
         <translation>ഈ പ്രൊഫൈലിന് രണ്ടാമത്തൊരു റിലേയിൽ മറ്റൊരു വിലാസം ചേർക്കുന്നു.</translation>
+    </message>
+    <message>
+        <source>Add this relay?</source>
+        <extracomment>Delta Chat&apos;s question, over a relay read off a scanned code.</extracomment>
+        <translation>ഈ റിലേ ചേർക്കണോ?</translation>
     </message>
 </context>
 <context>
@@ -620,6 +633,11 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Leave blank to use the name they chose</source>
         <translation>അവർ തിരഞ്ഞെടുത്ത പേര് ഉപയോഗിക്കാൻ ശൂന്യമായി വിടുക</translation>
+    </message>
+    <message>
+        <source>Seen a long time ago</source>
+        <extracomment>Under a contact&apos;s name: the core has not seen them for a long time, or never.</extracomment>
+        <translation>വളരെ മുമ്പ് കണ്ടതാണ്</translation>
     </message>
 </context>
 <context>
@@ -1285,6 +1303,14 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Could not reach the relay. Try another one.</source>
         <translation>റിലേയിൽ എത്താനായില്ല. മറ്റൊന്ന് പരീക്ഷിക്കുക.</translation>
+    </message>
+    <message>
+        <source>No relay answered within %1 seconds.</source>
+        <translation>%1 സെക്കൻഡിനുള്ളിൽ ഒരു റിലേയും മറുപടി നൽകിയില്ല.</translation>
+    </message>
+    <message>
+        <source>Connecting…</source>
+        <translation>കണക്റ്റ് ചെയ്യുന്നു…</translation>
     </message>
 </context>
 <context>

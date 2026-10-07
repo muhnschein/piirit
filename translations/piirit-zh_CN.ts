@@ -54,6 +54,14 @@
         <source>Choose a name and a relay. Nothing else is needed.</source>
         <translation>选择一个名称和一个中继。除此之外无需其他设置。</translation>
     </message>
+    <message>
+        <source>Automatic</source>
+        <translation>自动</translation>
+    </message>
+    <message>
+        <source>Relays are used for sending and receiving messages. Having more than one keeps your connection reliable.</source>
+        <translation>中继用于发送和接收消息。拥有多个中继可让您的连接更可靠。</translation>
+    </message>
 </context>
 <context>
     <name>AddProfilePage</name>
@@ -115,6 +123,11 @@
     <message>
         <source>Adds another address for this profile on a second relay.</source>
         <translation>为该资料在另一个中继上添加一个地址。</translation>
+    </message>
+    <message>
+        <source>Add this relay?</source>
+        <extracomment>Delta Chat&apos;s question, over a relay read off a scanned code.</extracomment>
+        <translation>添加此中继？</translation>
     </message>
 </context>
 <context>
@@ -618,6 +631,11 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Leave blank to use the name they chose</source>
         <translation>留空则使用对方自己选择的名字</translation>
+    </message>
+    <message>
+        <source>Seen a long time ago</source>
+        <extracomment>Under a contact&apos;s name: the core has not seen them for a long time, or never.</extracomment>
+        <translation>很久以前在线</translation>
     </message>
 </context>
 <context>
@@ -1278,6 +1296,14 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Could not reach the relay. Try another one.</source>
         <translation>无法连接该中继。请尝试另一个。</translation>
+    </message>
+    <message>
+        <source>No relay answered within %1 seconds.</source>
+        <translation>没有中继在 %1 秒内回应。</translation>
+    </message>
+    <message>
+        <source>Connecting…</source>
+        <translation>正在连接…</translation>
     </message>
 </context>
 <context>

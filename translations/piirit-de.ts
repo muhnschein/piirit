@@ -54,6 +54,14 @@
         <source>Choose a name and a relay. Nothing else is needed.</source>
         <translation>Wähle einen Namen und ein Relay. Mehr ist nicht nötig.</translation>
     </message>
+    <message>
+        <source>Automatic</source>
+        <translation>Automatisch</translation>
+    </message>
+    <message>
+        <source>Relays are used for sending and receiving messages. Having more than one keeps your connection reliable.</source>
+        <translation>Relays werden zum Senden und Empfangen von Nachrichten verwendet. Mehrere Relays erhöhen die Zuverlässigkeit.</translation>
+    </message>
 </context>
 <context>
     <name>AddProfilePage</name>
@@ -115,6 +123,11 @@
     <message>
         <source>Adds another address for this profile on a second relay.</source>
         <translation>Fügt diesem Profil eine weitere Adresse auf einem zweiten Relay hinzu.</translation>
+    </message>
+    <message>
+        <source>Add this relay?</source>
+        <extracomment>Delta Chat&apos;s question, over a relay read off a scanned code.</extracomment>
+        <translation>Relay hinzufügen?</translation>
     </message>
 </context>
 <context>
@@ -620,6 +633,11 @@ In anderen Gruppen mit blockierten Kontakten werden deren Nachrichten weiterhin 
     <message>
         <source>Leave blank to use the name they chose</source>
         <translation>Leer lassen, um den selbst gewählten Namen zu verwenden</translation>
+    </message>
+    <message>
+        <source>Seen a long time ago</source>
+        <extracomment>Under a contact&apos;s name: the core has not seen them for a long time, or never.</extracomment>
+        <translation>Vor langer Zeit zuletzt gesehen</translation>
     </message>
 </context>
 <context>
@@ -1285,6 +1303,14 @@ In anderen Gruppen mit blockierten Kontakten werden deren Nachrichten weiterhin 
     <message>
         <source>Could not reach the relay. Try another one.</source>
         <translation>Das Relay war nicht erreichbar. Versuche ein anderes.</translation>
+    </message>
+    <message>
+        <source>No relay answered within %1 seconds.</source>
+        <translation>Kein Relay hat innerhalb von %1 Sekunden geantwortet.</translation>
+    </message>
+    <message>
+        <source>Connecting…</source>
+        <translation>Verbinde…</translation>
     </message>
 </context>
 <context>

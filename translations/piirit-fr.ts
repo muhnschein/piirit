@@ -54,6 +54,14 @@
         <source>Choose a name and a relay. Nothing else is needed.</source>
         <translation>Choisissez un nom et un relais. Rien d&apos;autre n&apos;est nécessaire.</translation>
     </message>
+    <message>
+        <source>Automatic</source>
+        <translation>Automatique</translation>
+    </message>
+    <message>
+        <source>Relays are used for sending and receiving messages. Having more than one keeps your connection reliable.</source>
+        <translation>Les relais servent à envoyer et à recevoir des messages. En avoir plusieurs rend votre connexion plus fiable.</translation>
+    </message>
 </context>
 <context>
     <name>AddProfilePage</name>
@@ -115,6 +123,11 @@
     <message>
         <source>Adds another address for this profile on a second relay.</source>
         <translation>Ajoute à ce profil une autre adresse sur un second relais.</translation>
+    </message>
+    <message>
+        <source>Add this relay?</source>
+        <extracomment>Delta Chat&apos;s question, over a relay read off a scanned code.</extracomment>
+        <translation>Ajouter le relais&#xa0;?</translation>
     </message>
 </context>
 <context>
@@ -620,6 +633,11 @@ Vous continuerez à voir les messages des contacts bloqués dans les autres grou
     <message>
         <source>Leave blank to use the name they chose</source>
         <translation>Laissez vide pour utiliser le nom qu&apos;il ou elle a choisi</translation>
+    </message>
+    <message>
+        <source>Seen a long time ago</source>
+        <extracomment>Under a contact&apos;s name: the core has not seen them for a long time, or never.</extracomment>
+        <translation>Vu il y a longtemps</translation>
     </message>
 </context>
 <context>
@@ -1285,6 +1303,14 @@ Vous continuerez à voir les messages des contacts bloqués dans les autres grou
     <message>
         <source>Could not reach the relay. Try another one.</source>
         <translation>Impossible de joindre le relais. Essayez-en un autre.</translation>
+    </message>
+    <message>
+        <source>No relay answered within %1 seconds.</source>
+        <translation>Aucun relais n’a répondu en %1 secondes.</translation>
+    </message>
+    <message>
+        <source>Connecting…</source>
+        <translation>Connexion…</translation>
     </message>
 </context>
 <context>

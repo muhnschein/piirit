@@ -54,6 +54,14 @@
         <source>Choose a name and a relay. Nothing else is needed.</source>
         <translation>Velg et navn og et relé. Mer trengs ikke.</translation>
     </message>
+    <message>
+        <source>Automatic</source>
+        <translation>Automatisk</translation>
+    </message>
+    <message>
+        <source>Relays are used for sending and receiving messages. Having more than one keeps your connection reliable.</source>
+        <translation>Reléer brukes til å sende og motta meldinger. Å ha mer enn ett holder tilkoblingen pålitelig.</translation>
+    </message>
 </context>
 <context>
     <name>AddProfilePage</name>
@@ -115,6 +123,11 @@
     <message>
         <source>Adds another address for this profile on a second relay.</source>
         <translation>Legger til enda en adresse for denne profilen på et annet relé.</translation>
+    </message>
+    <message>
+        <source>Add this relay?</source>
+        <extracomment>Delta Chat&apos;s question, over a relay read off a scanned code.</extracomment>
+        <translation>Legge til dette releet?</translation>
     </message>
 </context>
 <context>
@@ -616,6 +629,11 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Leave blank to use the name they chose</source>
         <translation>La stå tomt for å bruke navnet de selv valgte</translation>
+    </message>
+    <message>
+        <source>Seen a long time ago</source>
+        <extracomment>Under a contact&apos;s name: the core has not seen them for a long time, or never.</extracomment>
+        <translation>Sist sett for lenge siden</translation>
     </message>
 </context>
 <context>
@@ -1281,6 +1299,14 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Could not reach the relay. Try another one.</source>
         <translation>Kunne ikke nå reléet. Prøv et annet.</translation>
+    </message>
+    <message>
+        <source>No relay answered within %1 seconds.</source>
+        <translation>Ingen reléer svarte innen %1 sekunder.</translation>
+    </message>
+    <message>
+        <source>Connecting…</source>
+        <translation>Kobler til…</translation>
     </message>
 </context>
 <context>

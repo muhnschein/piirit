@@ -54,6 +54,14 @@
         <source>Choose a name and a relay. Nothing else is needed.</source>
         <translation>Zvol název a relay. Nic dalšího není potřeba.</translation>
     </message>
+    <message>
+        <source>Automatic</source>
+        <translation>Automaticky</translation>
+    </message>
+    <message>
+        <source>Relays are used for sending and receiving messages. Having more than one keeps your connection reliable.</source>
+        <translation>Relay se používají k odesílání a přijímání zpráv. Více než jeden relay udržuje vaše připojení spolehlivé.</translation>
+    </message>
 </context>
 <context>
     <name>AddProfilePage</name>
@@ -115,6 +123,11 @@
     <message>
         <source>Adds another address for this profile on a second relay.</source>
         <translation>Přidá tomuto profilu další adresu na druhém relay.</translation>
+    </message>
+    <message>
+        <source>Add this relay?</source>
+        <extracomment>Delta Chat&apos;s question, over a relay read off a scanned code.</extracomment>
+        <translation>Přidat tento relay?</translation>
     </message>
 </context>
 <context>
@@ -622,6 +635,11 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
     <message>
         <source>Leave blank to use the name they chose</source>
         <translation>Ponechte prázdné, aby se použilo jméno, které si zvolili</translation>
+    </message>
+    <message>
+        <source>Seen a long time ago</source>
+        <extracomment>Under a contact&apos;s name: the core has not seen them for a long time, or never.</extracomment>
+        <translation>Naposledy viděn(a) před dlouhou dobou</translation>
     </message>
 </context>
 <context>
@@ -1292,6 +1310,14 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
     <message>
         <source>Could not reach the relay. Try another one.</source>
         <translation>Relay se nepodařilo kontaktovat. Zkus jiný.</translation>
+    </message>
+    <message>
+        <source>No relay answered within %1 seconds.</source>
+        <translation>Žádný relay neodpověděl do %1 sekund.</translation>
+    </message>
+    <message>
+        <source>Connecting…</source>
+        <translation>Připojování…</translation>
     </message>
 </context>
 <context>

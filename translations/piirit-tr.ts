@@ -54,6 +54,14 @@
         <source>Choose a name and a relay. Nothing else is needed.</source>
         <translation>Bir ad ve bir röle seç. Başka bir şey gerekmez.</translation>
     </message>
+    <message>
+        <source>Automatic</source>
+        <translation>Otomatik</translation>
+    </message>
+    <message>
+        <source>Relays are used for sending and receiving messages. Having more than one keeps your connection reliable.</source>
+        <translation>Röleler mesaj göndermek ve almak için kullanılır. Birden fazla röle olması bağlantınızı güvenilir tutar.</translation>
+    </message>
 </context>
 <context>
     <name>AddProfilePage</name>
@@ -115,6 +123,11 @@
     <message>
         <source>Adds another address for this profile on a second relay.</source>
         <translation>Bu profile ikinci bir rölede başka bir adres ekler.</translation>
+    </message>
+    <message>
+        <source>Add this relay?</source>
+        <extracomment>Delta Chat&apos;s question, over a relay read off a scanned code.</extracomment>
+        <translation>Bu röle eklensin mi?</translation>
     </message>
 </context>
 <context>
@@ -618,6 +631,11 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
     <message>
         <source>Leave blank to use the name they chose</source>
         <translation>Kendi seçtiği adı kullanmak için boş bırakın</translation>
+    </message>
+    <message>
+        <source>Seen a long time ago</source>
+        <extracomment>Under a contact&apos;s name: the core has not seen them for a long time, or never.</extracomment>
+        <translation>Çok uzun zaman önce görüldü</translation>
     </message>
 </context>
 <context>
@@ -1278,6 +1296,14 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
     <message>
         <source>Could not reach the relay. Try another one.</source>
         <translation>Röleye ulaşılamadı. Başka birini dene.</translation>
+    </message>
+    <message>
+        <source>No relay answered within %1 seconds.</source>
+        <translation>Hiçbir röle %1 saniye içinde yanıt vermedi.</translation>
+    </message>
+    <message>
+        <source>Connecting…</source>
+        <translation>Bağlanıyor…</translation>
     </message>
 </context>
 <context>

@@ -54,6 +54,14 @@
         <source>Choose a name and a relay. Nothing else is needed.</source>
         <translation>Alege un nume și un releu. Nu mai este nevoie de nimic altceva.</translation>
     </message>
+    <message>
+        <source>Automatic</source>
+        <translation>Automat</translation>
+    </message>
+    <message>
+        <source>Relays are used for sending and receiving messages. Having more than one keeps your connection reliable.</source>
+        <translation>Releele sunt folosite pentru trimiterea și primirea mesajelor. Cu mai mult de unul, conexiunea rămâne fiabilă.</translation>
+    </message>
 </context>
 <context>
     <name>AddProfilePage</name>
@@ -115,6 +123,11 @@
     <message>
         <source>Adds another address for this profile on a second relay.</source>
         <translation>Adaugă acestui profil încă o adresă pe un al doilea releu.</translation>
+    </message>
+    <message>
+        <source>Add this relay?</source>
+        <extracomment>Delta Chat&apos;s question, over a relay read off a scanned code.</extracomment>
+        <translation>Adaugi acest releu?</translation>
     </message>
 </context>
 <context>
@@ -618,6 +631,11 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Leave blank to use the name they chose</source>
         <translation>Lasă gol pentru a folosi numele ales de persoana respectivă</translation>
+    </message>
+    <message>
+        <source>Seen a long time ago</source>
+        <extracomment>Under a contact&apos;s name: the core has not seen them for a long time, or never.</extracomment>
+        <translation>Văzut cu mult timp în urmă</translation>
     </message>
 </context>
 <context>
@@ -1288,6 +1306,14 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Could not reach the relay. Try another one.</source>
         <translation>Releul nu a putut fi contactat. Încearcă altul.</translation>
+    </message>
+    <message>
+        <source>No relay answered within %1 seconds.</source>
+        <translation>Niciun releu nu a răspuns în %1 secunde.</translation>
+    </message>
+    <message>
+        <source>Connecting…</source>
+        <translation>Se conectează…</translation>
     </message>
 </context>
 <context>

@@ -54,6 +54,14 @@
         <source>Choose a name and a relay. Nothing else is needed.</source>
         <translation>Välj ett namn och ett relä. Mer behövs inte.</translation>
     </message>
+    <message>
+        <source>Automatic</source>
+        <translation>Automatiskt</translation>
+    </message>
+    <message>
+        <source>Relays are used for sending and receiving messages. Having more than one keeps your connection reliable.</source>
+        <translation>Reläer används för att skicka och ta emot meddelanden. Att ha fler än ett håller din anslutning pålitlig.</translation>
+    </message>
 </context>
 <context>
     <name>AddProfilePage</name>
@@ -115,6 +123,11 @@
     <message>
         <source>Adds another address for this profile on a second relay.</source>
         <translation>Lägger till ytterligare en adress för den här profilen på ett annat relä.</translation>
+    </message>
+    <message>
+        <source>Add this relay?</source>
+        <extracomment>Delta Chat&apos;s question, over a relay read off a scanned code.</extracomment>
+        <translation>Vill du lägga till detta relä?</translation>
     </message>
 </context>
 <context>
@@ -616,6 +629,11 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Leave blank to use the name they chose</source>
         <translation>Lämna tomt för att använda det namn de själva valde</translation>
+    </message>
+    <message>
+        <source>Seen a long time ago</source>
+        <extracomment>Under a contact&apos;s name: the core has not seen them for a long time, or never.</extracomment>
+        <translation>Sågs senast för länge sedan</translation>
     </message>
 </context>
 <context>
@@ -1281,6 +1299,14 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Could not reach the relay. Try another one.</source>
         <translation>Kunde inte nå reläet. Försök med ett annat.</translation>
+    </message>
+    <message>
+        <source>No relay answered within %1 seconds.</source>
+        <translation>Inget relä svarade inom %1 sekunder.</translation>
+    </message>
+    <message>
+        <source>Connecting…</source>
+        <translation>Ansluter…</translation>
     </message>
 </context>
 <context>

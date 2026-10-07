@@ -54,6 +54,14 @@
         <source>Choose a name and a relay. Nothing else is needed.</source>
         <translation>Изберете име и релей. Нищо друго не е необходимо.</translation>
     </message>
+    <message>
+        <source>Automatic</source>
+        <translation>Автоматично</translation>
+    </message>
+    <message>
+        <source>Relays are used for sending and receiving messages. Having more than one keeps your connection reliable.</source>
+        <translation>Релеите се използват за изпращане и получаване на съобщения. Наличието на повече от един поддържа връзката ви надеждна.</translation>
+    </message>
 </context>
 <context>
     <name>AddProfilePage</name>
@@ -115,6 +123,11 @@
     <message>
         <source>Adds another address for this profile on a second relay.</source>
         <translation>Добавя към този профил още един адрес на друг релей.</translation>
+    </message>
+    <message>
+        <source>Add this relay?</source>
+        <extracomment>Delta Chat&apos;s question, over a relay read off a scanned code.</extracomment>
+        <translation>Да се добави ли този релей?</translation>
     </message>
 </context>
 <context>
@@ -616,6 +629,11 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Leave blank to use the name they chose</source>
         <translation>Оставете празно, за да се използва избраното от него име</translation>
+    </message>
+    <message>
+        <source>Seen a long time ago</source>
+        <extracomment>Under a contact&apos;s name: the core has not seen them for a long time, or never.</extracomment>
+        <translation>Видян(а) преди много време</translation>
     </message>
 </context>
 <context>
@@ -1281,6 +1299,14 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Could not reach the relay. Try another one.</source>
         <translation>Релеят не можа да бъде достигнат. Опитайте друг.</translation>
+    </message>
+    <message>
+        <source>No relay answered within %1 seconds.</source>
+        <translation>Нито един релей не отговори в рамките на %1 секунди.</translation>
+    </message>
+    <message>
+        <source>Connecting…</source>
+        <translation>Свързване…</translation>
     </message>
 </context>
 <context>

@@ -54,6 +54,14 @@
         <source>Choose a name and a relay. Nothing else is needed.</source>
         <translation>Válassz nevet és relét. Másra nincs szükség.</translation>
     </message>
+    <message>
+        <source>Automatic</source>
+        <translation>Automatikus</translation>
+    </message>
+    <message>
+        <source>Relays are used for sending and receiving messages. Having more than one keeps your connection reliable.</source>
+        <translation>A relék üzenetek küldésére és fogadására szolgálnak. Ha egynél több van belőlük, a kapcsolat megbízhatóbb marad.</translation>
+    </message>
 </context>
 <context>
     <name>AddProfilePage</name>
@@ -115,6 +123,11 @@
     <message>
         <source>Adds another address for this profile on a second relay.</source>
         <translation>Egy további címet ad ehhez a profilhoz egy másik relén.</translation>
+    </message>
+    <message>
+        <source>Add this relay?</source>
+        <extracomment>Delta Chat&apos;s question, over a relay read off a scanned code.</extracomment>
+        <translation>Hozzáadod ezt a relét?</translation>
     </message>
 </context>
 <context>
@@ -614,6 +627,11 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Leave blank to use the name they chose</source>
         <translation>Hagyja üresen, hogy az általa választott név jelenjen meg</translation>
+    </message>
+    <message>
+        <source>Seen a long time ago</source>
+        <extracomment>Under a contact&apos;s name: the core has not seen them for a long time, or never.</extracomment>
+        <translation>Utoljára régen volt látható</translation>
     </message>
 </context>
 <context>
@@ -1274,6 +1292,14 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Could not reach the relay. Try another one.</source>
         <translation>A relé nem volt elérhető. Próbálj meg egy másikat.</translation>
+    </message>
+    <message>
+        <source>No relay answered within %1 seconds.</source>
+        <translation>Egyetlen relé sem válaszolt %1 másodpercen belül.</translation>
+    </message>
+    <message>
+        <source>Connecting…</source>
+        <translation>Kapcsolódás…</translation>
     </message>
 </context>
 <context>

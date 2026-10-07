@@ -54,6 +54,14 @@
         <source>Choose a name and a relay. Nothing else is needed.</source>
         <translation>Izvēlies vārdu un releju. Vairāk nekas nav vajadzīgs.</translation>
     </message>
+    <message>
+        <source>Automatic</source>
+        <translation>Automātiski</translation>
+    </message>
+    <message>
+        <source>Relays are used for sending and receiving messages. Having more than one keeps your connection reliable.</source>
+        <translation>Releji tiek izmantoti ziņu sūtīšanai un saņemšanai. Vairāki releji nodrošina uzticamu savienojumu.</translation>
+    </message>
 </context>
 <context>
     <name>AddProfilePage</name>
@@ -115,6 +123,11 @@
     <message>
         <source>Adds another address for this profile on a second relay.</source>
         <translation>Pievieno šim profilam vēl vienu adresi citā relejā.</translation>
+    </message>
+    <message>
+        <source>Add this relay?</source>
+        <extracomment>Delta Chat&apos;s question, over a relay read off a scanned code.</extracomment>
+        <translation>Pievienot šo releju?</translation>
     </message>
 </context>
 <context>
@@ -622,6 +635,11 @@ Citās grupās, kurās ir bloķēti kontakti, viņu ziņas joprojām būs redzam
     <message>
         <source>Leave blank to use the name they chose</source>
         <translation>Atstājiet tukšu, lai izmantotu viņu izvēlēto vārdu</translation>
+    </message>
+    <message>
+        <source>Seen a long time ago</source>
+        <extracomment>Under a contact&apos;s name: the core has not seen them for a long time, or never.</extracomment>
+        <translation>Pēdējo reizi redzēts sen</translation>
     </message>
 </context>
 <context>
@@ -1292,6 +1310,14 @@ Citās grupās, kurās ir bloķēti kontakti, viņu ziņas joprojām būs redzam
     <message>
         <source>Could not reach the relay. Try another one.</source>
         <translation>Neizdevās sasniegt releju. Mēģini citu.</translation>
+    </message>
+    <message>
+        <source>No relay answered within %1 seconds.</source>
+        <translation>Neviens relejs neatbildēja %1 sekunžu laikā.</translation>
+    </message>
+    <message>
+        <source>Connecting…</source>
+        <translation>Savienojas…</translation>
     </message>
 </context>
 <context>

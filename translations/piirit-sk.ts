@@ -54,6 +54,14 @@
         <source>Choose a name and a relay. Nothing else is needed.</source>
         <translation>Zvoľ názov a relay. Nič ďalšie nie je potrebné.</translation>
     </message>
+    <message>
+        <source>Automatic</source>
+        <translation>Automaticky</translation>
+    </message>
+    <message>
+        <source>Relays are used for sending and receiving messages. Having more than one keeps your connection reliable.</source>
+        <translation>Relay sa používajú na odosielanie a prijímanie správ. Viac ako jeden relay udržiava vaše pripojenie spoľahlivé.</translation>
+    </message>
 </context>
 <context>
     <name>AddProfilePage</name>
@@ -115,6 +123,11 @@
     <message>
         <source>Adds another address for this profile on a second relay.</source>
         <translation>Pridá tomuto profilu ďalšiu adresu na druhom relay.</translation>
+    </message>
+    <message>
+        <source>Add this relay?</source>
+        <extracomment>Delta Chat&apos;s question, over a relay read off a scanned code.</extracomment>
+        <translation>Pridať tento relay?</translation>
     </message>
 </context>
 <context>
@@ -622,6 +635,11 @@ Správy od zablokovaných kontaktov v ostatných skupinách sa budú naďalej zo
     <message>
         <source>Leave blank to use the name they chose</source>
         <translation>Nechajte prázdne, aby sa použilo meno, ktoré si zvolili</translation>
+    </message>
+    <message>
+        <source>Seen a long time ago</source>
+        <extracomment>Under a contact&apos;s name: the core has not seen them for a long time, or never.</extracomment>
+        <translation>Naposledy videný(á) dávno</translation>
     </message>
 </context>
 <context>
@@ -1292,6 +1310,14 @@ Správy od zablokovaných kontaktov v ostatných skupinách sa budú naďalej zo
     <message>
         <source>Could not reach the relay. Try another one.</source>
         <translation>Relay sa nepodarilo kontaktovať. Skús iný.</translation>
+    </message>
+    <message>
+        <source>No relay answered within %1 seconds.</source>
+        <translation>Žiadny relay neodpovedal do %1 sekúnd.</translation>
+    </message>
+    <message>
+        <source>Connecting…</source>
+        <translation>Pripájanie…</translation>
     </message>
 </context>
 <context>

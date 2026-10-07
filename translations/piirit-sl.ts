@@ -54,6 +54,14 @@
         <source>Choose a name and a relay. Nothing else is needed.</source>
         <translation>Izberi ime in posrednika. Nič drugega ni potrebno.</translation>
     </message>
+    <message>
+        <source>Automatic</source>
+        <translation>Samodejno</translation>
+    </message>
+    <message>
+        <source>Relays are used for sending and receiving messages. Having more than one keeps your connection reliable.</source>
+        <translation>Posredniki se uporabljajo za pošiljanje in prejemanje sporočil. Več kot en posrednik zagotavlja zanesljivo povezavo.</translation>
+    </message>
 </context>
 <context>
     <name>AddProfilePage</name>
@@ -115,6 +123,11 @@
     <message>
         <source>Adds another address for this profile on a second relay.</source>
         <translation>Temu profilu doda še en naslov pri drugem posredniku.</translation>
+    </message>
+    <message>
+        <source>Add this relay?</source>
+        <extracomment>Delta Chat&apos;s question, over a relay read off a scanned code.</extracomment>
+        <translation>Želite dodati tega posrednika?</translation>
     </message>
 </context>
 <context>
@@ -624,6 +637,11 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
     <message>
         <source>Leave blank to use the name they chose</source>
         <translation>Pustite prazno, da se uporabi ime, ki so ga izbrali sami</translation>
+    </message>
+    <message>
+        <source>Seen a long time ago</source>
+        <extracomment>Under a contact&apos;s name: the core has not seen them for a long time, or never.</extracomment>
+        <translation>Nazadnje viden(a) pred dolgim časom</translation>
     </message>
 </context>
 <context>
@@ -1299,6 +1317,14 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
     <message>
         <source>Could not reach the relay. Try another one.</source>
         <translation>Posrednika ni bilo mogoče doseči. Poskusi drugega.</translation>
+    </message>
+    <message>
+        <source>No relay answered within %1 seconds.</source>
+        <translation>Noben posrednik ni odgovoril v %1 sekundah.</translation>
+    </message>
+    <message>
+        <source>Connecting…</source>
+        <translation>Povezovanje…</translation>
     </message>
 </context>
 <context>

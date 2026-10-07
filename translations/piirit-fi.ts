@@ -54,6 +54,14 @@
         <source>Choose a name and a relay. Nothing else is needed.</source>
         <translation>Valitse nimi ja välittäjä. Muuta ei tarvita.</translation>
     </message>
+    <message>
+        <source>Automatic</source>
+        <translation>Automaattinen</translation>
+    </message>
+    <message>
+        <source>Relays are used for sending and receiving messages. Having more than one keeps your connection reliable.</source>
+        <translation>Välittäjiä käytetään viestien lähettämiseen ja vastaanottamiseen. Useamman kuin yhden välittäjän avulla yhteytesi pysyy luotettavana.</translation>
+    </message>
 </context>
 <context>
     <name>AddProfilePage</name>
@@ -115,6 +123,11 @@
     <message>
         <source>Adds another address for this profile on a second relay.</source>
         <translation>Lisää tälle profiilille toisen osoitteen toisella välittäjällä.</translation>
+    </message>
+    <message>
+        <source>Add this relay?</source>
+        <extracomment>Delta Chat&apos;s question, over a relay read off a scanned code.</extracomment>
+        <translation>Lisätäänkö tämä välittäjä?</translation>
     </message>
 </context>
 <context>
@@ -616,6 +629,11 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Leave blank to use the name they chose</source>
         <translation>Jätä tyhjäksi, niin käytetään hänen itse valitsemaansa nimeä</translation>
+    </message>
+    <message>
+        <source>Seen a long time ago</source>
+        <extracomment>Under a contact&apos;s name: the core has not seen them for a long time, or never.</extracomment>
+        <translation>Nähty viimeksi kauan sitten</translation>
     </message>
 </context>
 <context>
@@ -1281,6 +1299,14 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Could not reach the relay. Try another one.</source>
         <translation>Välittäjää ei tavoitettu. Kokeile toista.</translation>
+    </message>
+    <message>
+        <source>No relay answered within %1 seconds.</source>
+        <translation>Mikään välittäjä ei vastannut %1 sekunnin kuluessa.</translation>
+    </message>
+    <message>
+        <source>Connecting…</source>
+        <translation>Yhdistetään…</translation>
     </message>
 </context>
 <context>

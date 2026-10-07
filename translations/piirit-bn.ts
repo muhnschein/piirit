@@ -54,6 +54,14 @@
         <source>Choose a name and a relay. Nothing else is needed.</source>
         <translation>একটি নাম এবং একটি রিলে বেছে নিন। এর বাইরে আর কিছু লাগে না।</translation>
     </message>
+    <message>
+        <source>Automatic</source>
+        <translation>স্বয়ংক্রিয়</translation>
+    </message>
+    <message>
+        <source>Relays are used for sending and receiving messages. Having more than one keeps your connection reliable.</source>
+        <translation>রিলে বার্তা পাঠানো ও গ্রহণের জন্য ব্যবহৃত হয়। একাধিক রিলে থাকলে আপনার সংযোগ নির্ভরযোগ্য থাকে।</translation>
+    </message>
 </context>
 <context>
     <name>AddProfilePage</name>
@@ -115,6 +123,11 @@
     <message>
         <source>Adds another address for this profile on a second relay.</source>
         <translation>এই প্রোফাইলের জন্য দ্বিতীয় একটি রিলেতে আরেকটি ঠিকানা যোগ করে।</translation>
+    </message>
+    <message>
+        <source>Add this relay?</source>
+        <extracomment>Delta Chat&apos;s question, over a relay read off a scanned code.</extracomment>
+        <translation>এই রিলে যোগ করবেন?</translation>
     </message>
 </context>
 <context>
@@ -620,6 +633,11 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Leave blank to use the name they chose</source>
         <translation>তাদের বেছে নেওয়া নাম ব্যবহার করতে খালি রাখুন</translation>
+    </message>
+    <message>
+        <source>Seen a long time ago</source>
+        <extracomment>Under a contact&apos;s name: the core has not seen them for a long time, or never.</extracomment>
+        <translation>অনেক আগে দেখা গেছে</translation>
     </message>
 </context>
 <context>
@@ -1285,6 +1303,14 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Could not reach the relay. Try another one.</source>
         <translation>রিলেতে পৌঁছানো যায়নি। অন্য একটি চেষ্টা করুন।</translation>
+    </message>
+    <message>
+        <source>No relay answered within %1 seconds.</source>
+        <translation>%1 সেকেন্ডের মধ্যে কোনো রিলে সাড়া দেয়নি।</translation>
+    </message>
+    <message>
+        <source>Connecting…</source>
+        <translation>সংযোগ করা হচ্ছে…</translation>
     </message>
 </context>
 <context>

@@ -54,6 +54,14 @@
         <source>Choose a name and a relay. Nothing else is needed.</source>
         <translation>Vali nimi ja relee. Rohkemat pole vaja.</translation>
     </message>
+    <message>
+        <source>Automatic</source>
+        <translation>Automaatne</translation>
+    </message>
+    <message>
+        <source>Relays are used for sending and receiving messages. Having more than one keeps your connection reliable.</source>
+        <translation>Releed on mõeldud sõnumite saatmiseks ja vastuvõtmiseks. Kui neid on rohkem kui üks, püsib sinu ühendus töökindel.</translation>
+    </message>
 </context>
 <context>
     <name>AddProfilePage</name>
@@ -115,6 +123,11 @@
     <message>
         <source>Adds another address for this profile on a second relay.</source>
         <translation>Lisab sellele profiilile veel ühe aadressi teisel releel.</translation>
+    </message>
+    <message>
+        <source>Add this relay?</source>
+        <extracomment>Delta Chat&apos;s question, over a relay read off a scanned code.</extracomment>
+        <translation>Kas lisad selle relee?</translation>
     </message>
 </context>
 <context>
@@ -620,6 +633,11 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
     <message>
         <source>Leave blank to use the name they chose</source>
         <translation>Jäta tühjaks, et kasutada tema enda valitud nime</translation>
+    </message>
+    <message>
+        <source>Seen a long time ago</source>
+        <extracomment>Under a contact&apos;s name: the core has not seen them for a long time, or never.</extracomment>
+        <translation>Nähtud ammu</translation>
     </message>
 </context>
 <context>
@@ -1285,6 +1303,14 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
     <message>
         <source>Could not reach the relay. Try another one.</source>
         <translation>Releega ei õnnestunud ühendust saada. Proovi teist.</translation>
+    </message>
+    <message>
+        <source>No relay answered within %1 seconds.</source>
+        <translation>Ükski relee ei vastanud %1 sekundi jooksul.</translation>
+    </message>
+    <message>
+        <source>Connecting…</source>
+        <translation>Ühendan…</translation>
     </message>
 </context>
 <context>

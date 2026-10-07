@@ -54,6 +54,14 @@
         <source>Choose a name and a relay. Nothing else is needed.</source>
         <translation>ஒரு பெயரையும் ஒரு ரிலேயையும் தேர்ந்தெடுங்கள். இதைத் தவிர வேறு எதுவும் தேவையில்லை.</translation>
     </message>
+    <message>
+        <source>Automatic</source>
+        <translation>தானியங்கி</translation>
+    </message>
+    <message>
+        <source>Relays are used for sending and receiving messages. Having more than one keeps your connection reliable.</source>
+        <translation>செய்திகளை அனுப்பவும் பெறவும் ரிலேக்கள் பயன்படுகின்றன. ஒன்றுக்கு மேற்பட்டவை இருந்தால் உங்கள் இணைப்பு நம்பகமாக இருக்கும்.</translation>
+    </message>
 </context>
 <context>
     <name>AddProfilePage</name>
@@ -115,6 +123,11 @@
     <message>
         <source>Adds another address for this profile on a second relay.</source>
         <translation>இந்தச் சுயவிவரத்திற்கு இரண்டாவது ரிலேயில் மற்றொரு முகவரியைச் சேர்க்கிறது.</translation>
+    </message>
+    <message>
+        <source>Add this relay?</source>
+        <extracomment>Delta Chat&apos;s question, over a relay read off a scanned code.</extracomment>
+        <translation>இந்த ரிலேவைச் சேர்க்கவா?</translation>
     </message>
 </context>
 <context>
@@ -616,6 +629,11 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Leave blank to use the name they chose</source>
         <translation>அவர்கள் தேர்ந்தெடுத்த பெயரைப் பயன்படுத்த வெற்றாக விடவும்</translation>
+    </message>
+    <message>
+        <source>Seen a long time ago</source>
+        <extracomment>Under a contact&apos;s name: the core has not seen them for a long time, or never.</extracomment>
+        <translation>நீண்ட காலத்துக்கு முன் பார்க்கப்பட்டது</translation>
     </message>
 </context>
 <context>
@@ -1281,6 +1299,14 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Could not reach the relay. Try another one.</source>
         <translation>ரிலேயை அடைய முடியவில்லை. வேறொன்றை முயற்சியுங்கள்.</translation>
+    </message>
+    <message>
+        <source>No relay answered within %1 seconds.</source>
+        <translation>%1 வினாடிகளுக்குள் எந்த ரிலேயும் பதிலளிக்கவில்லை.</translation>
+    </message>
+    <message>
+        <source>Connecting…</source>
+        <translation>இணைக்கிறது…</translation>
     </message>
 </context>
 <context>

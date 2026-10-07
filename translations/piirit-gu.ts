@@ -54,6 +54,14 @@
         <source>Choose a name and a relay. Nothing else is needed.</source>
         <translation>એક નામ અને એક રિલે પસંદ કરો. આ સિવાય બીજું કશું જરૂરી નથી.</translation>
     </message>
+    <message>
+        <source>Automatic</source>
+        <translation>સ્વચાલિત</translation>
+    </message>
+    <message>
+        <source>Relays are used for sending and receiving messages. Having more than one keeps your connection reliable.</source>
+        <translation>રિલેનો ઉપયોગ સંદેશા મોકલવા અને પ્રાપ્ત કરવા માટે થાય છે. એકથી વધુ રિલે હોવાથી તમારું કનેક્શન વિશ્વસનીય રહે છે.</translation>
+    </message>
 </context>
 <context>
     <name>AddProfilePage</name>
@@ -115,6 +123,11 @@
     <message>
         <source>Adds another address for this profile on a second relay.</source>
         <translation>આ પ્રોફાઇલ માટે બીજા રિલે પર વધુ એક સરનામું ઉમેરે છે.</translation>
+    </message>
+    <message>
+        <source>Add this relay?</source>
+        <extracomment>Delta Chat&apos;s question, over a relay read off a scanned code.</extracomment>
+        <translation>આ રિલે ઉમેરવું છે?</translation>
     </message>
 </context>
 <context>
@@ -620,6 +633,11 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Leave blank to use the name they chose</source>
         <translation>તેમણે પસંદ કરેલું નામ વાપરવા ખાલી રાખો</translation>
+    </message>
+    <message>
+        <source>Seen a long time ago</source>
+        <extracomment>Under a contact&apos;s name: the core has not seen them for a long time, or never.</extracomment>
+        <translation>ઘણા સમય પહેલાં જોયા હતા</translation>
     </message>
 </context>
 <context>
@@ -1285,6 +1303,14 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Could not reach the relay. Try another one.</source>
         <translation>રિલે સુધી પહોંચી શકાયું નહીં. બીજું અજમાવો.</translation>
+    </message>
+    <message>
+        <source>No relay answered within %1 seconds.</source>
+        <translation>કોઈ રિલેએ %1 સેકન્ડમાં જવાબ આપ્યો નહીં.</translation>
+    </message>
+    <message>
+        <source>Connecting…</source>
+        <translation>જોડાઈ રહ્યું છે…</translation>
     </message>
 </context>
 <context>

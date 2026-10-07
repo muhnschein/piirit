@@ -54,6 +54,14 @@
         <source>Choose a name and a relay. Nothing else is needed.</source>
         <translation>Chọn một tên và một máy chuyển tiếp. Không cần gì thêm.</translation>
     </message>
+    <message>
+        <source>Automatic</source>
+        <translation>Tự động</translation>
+    </message>
+    <message>
+        <source>Relays are used for sending and receiving messages. Having more than one keeps your connection reliable.</source>
+        <translation>Máy chuyển tiếp được dùng để gửi và nhận tin nhắn. Có nhiều hơn một máy chuyển tiếp giúp kết nối của bạn ổn định.</translation>
+    </message>
 </context>
 <context>
     <name>AddProfilePage</name>
@@ -115,6 +123,11 @@
     <message>
         <source>Adds another address for this profile on a second relay.</source>
         <translation>Thêm cho hồ sơ này một địa chỉ nữa trên một máy chuyển tiếp khác.</translation>
+    </message>
+    <message>
+        <source>Add this relay?</source>
+        <extracomment>Delta Chat&apos;s question, over a relay read off a scanned code.</extracomment>
+        <translation>Thêm máy chuyển tiếp này?</translation>
     </message>
 </context>
 <context>
@@ -614,6 +627,11 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Leave blank to use the name they chose</source>
         <translation>Để trống để dùng tên họ tự chọn</translation>
+    </message>
+    <message>
+        <source>Seen a long time ago</source>
+        <extracomment>Under a contact&apos;s name: the core has not seen them for a long time, or never.</extracomment>
+        <translation>Đã thấy cách đây rất lâu</translation>
     </message>
 </context>
 <context>
@@ -1274,6 +1292,14 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Could not reach the relay. Try another one.</source>
         <translation>Không liên hệ được với máy chuyển tiếp. Hãy thử máy khác.</translation>
+    </message>
+    <message>
+        <source>No relay answered within %1 seconds.</source>
+        <translation>Không có máy chuyển tiếp nào trả lời trong %1 giây.</translation>
+    </message>
+    <message>
+        <source>Connecting…</source>
+        <translation>Đang kết nối…</translation>
     </message>
 </context>
 <context>

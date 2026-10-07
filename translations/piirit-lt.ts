@@ -54,6 +54,14 @@
         <source>Choose a name and a relay. Nothing else is needed.</source>
         <translation>Pasirink pavadinimą ir retransliatorių. Daugiau nieko nereikia.</translation>
     </message>
+    <message>
+        <source>Automatic</source>
+        <translation>Automatinis</translation>
+    </message>
+    <message>
+        <source>Relays are used for sending and receiving messages. Having more than one keeps your connection reliable.</source>
+        <translation>Retransliatoriai naudojami žinutėms siųsti ir gauti. Turint daugiau nei vieną, ryšys išlieka patikimas.</translation>
+    </message>
 </context>
 <context>
     <name>AddProfilePage</name>
@@ -115,6 +123,11 @@
     <message>
         <source>Adds another address for this profile on a second relay.</source>
         <translation>Prideda šiam profiliui dar vieną adresą kitame retransliatoriuje.</translation>
+    </message>
+    <message>
+        <source>Add this relay?</source>
+        <extracomment>Delta Chat&apos;s question, over a relay read off a scanned code.</extracomment>
+        <translation>Pridėti šį retransliatorių?</translation>
     </message>
 </context>
 <context>
@@ -618,6 +631,11 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Leave blank to use the name they chose</source>
         <translation>Palikite tuščią, kad būtų naudojamas jų pasirinktas vardas</translation>
+    </message>
+    <message>
+        <source>Seen a long time ago</source>
+        <extracomment>Under a contact&apos;s name: the core has not seen them for a long time, or never.</extracomment>
+        <translation>Matytas seniai</translation>
     </message>
 </context>
 <context>
@@ -1288,6 +1306,14 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Could not reach the relay. Try another one.</source>
         <translation>Nepavyko pasiekti retransliatoriaus. Pabandyk kitą.</translation>
+    </message>
+    <message>
+        <source>No relay answered within %1 seconds.</source>
+        <translation>Nė vienas retransliatorius neatsakė per %1 sek.</translation>
+    </message>
+    <message>
+        <source>Connecting…</source>
+        <translation>Jungiamasi…</translation>
     </message>
 </context>
 <context>
