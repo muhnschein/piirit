@@ -1830,6 +1830,600 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>StockStrings</name>
+    <message>
+        <source>No messages.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;chat_no_messages&quot;.</extracomment>
+        <translation>சேதிகள் இல்லை</translation>
+    </message>
+    <message>
+        <source>Me</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;self&quot;.</extracomment>
+        <translation>நான்</translation>
+    </message>
+    <message>
+        <source>Draft</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;draft&quot;.</extracomment>
+        <translation>வரைவு</translation>
+    </message>
+    <message>
+        <source>Voice Message</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;voice_message&quot;.</extracomment>
+        <translation>குரல் செய்தி</translation>
+    </message>
+    <message>
+        <source>Image</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;image&quot;.</extracomment>
+        <translation>படம்</translation>
+    </message>
+    <message>
+        <source>Video</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;video&quot;.</extracomment>
+        <translation>காணொளி</translation>
+    </message>
+    <message>
+        <source>Audio</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;audio&quot;.</extracomment>
+        <translation>ஒலி</translation>
+    </message>
+    <message>
+        <source>File</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;file&quot;.</extracomment>
+        <translation>கோப்பு</translation>
+    </message>
+    <message>
+        <source>GIF</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;gif&quot;.</extracomment>
+        <translation>GIF</translation>
+    </message>
+    <message>
+        <source>%1$s introduced.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;contact_verified&quot;.</extracomment>
+        <translation>%1$s அறிமுகப்படுத்தப்பட்டார்.</translation>
+    </message>
+    <message>
+        <source>Archived</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;chat_archived_label&quot;.</extracomment>
+        <translation>ஆவண காக்கப்படுத்தப்பட்டது</translation>
+    </message>
+    <message>
+        <source>Location</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;location&quot;.</extracomment>
+        <translation>இடம்</translation>
+    </message>
+    <message>
+        <source>Sticker</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;sticker&quot;.</extracomment>
+        <translation>ஸ்டிக்கர்</translation>
+    </message>
+    <message>
+        <source>Device Messages</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;device_talk&quot;.</extracomment>
+        <translation>சாதனச் செய்திகள்</translation>
+    </message>
+    <message>
+        <source>Saved Messages</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;saved_messages&quot;.</extracomment>
+        <translation>சேமித்த செய்திகள்</translation>
+    </message>
+    <message>
+        <source>Messages in this chat are generated on your device to inform about app updates and problems during usage.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;device_talk_explain&quot;.</extracomment>
+        <translation>இந்த அரட்டையில் உள்ள செய்திகள், செயலி புதுப்பிப்புகள் மற்றும் பயன்பாட்டின் போது ஏற்படும் சிக்கல்களைத் தெரிவிக்க உங்கள் சாதனத்திலேயே உருவாக்கப்படுகின்றன.</translation>
+    </message>
+    <message>
+        <source>Get in contact!
+
+🙌 Tap &quot;QR code&quot; on the main screen of both devices. Choose &quot;Scan QR Code&quot; on one device, and point it at the other
+
+🌍 If not in the same room, scan via video call or share an invite link from &quot;Scan QR code&quot;
+
+Then: Enjoy your decentralized messenger experience. In contrast to other popular apps, without central control or tracking or selling you, friends, colleagues or family out to large organizations.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;device_talk_welcome_message2&quot;.</extracomment>
+        <translation>தொடர்பு கொள்ளுங்கள்!
+
+🙌 இரண்டு சாதனங்களிலும் முதன்மைத் திரையில் &quot;QR குறியீடு&quot; என்பதைத் தொடவும். ஒரு சாதனத்தில் &quot;QR குறியீட்டை ஸ்கேன் செய்&quot; என்பதைத் தேர்ந்தெடுத்து, மற்றொரு சாதனத்தை நோக்கிக் காட்டவும்
+
+🌍 ஒரே அறையில் இல்லையென்றால், வீடியோ அழைப்பு மூலம் ஸ்கேன் செய்யவும் அல்லது &quot;QR குறியீட்டை ஸ்கேன் செய்&quot; என்பதிலிருந்து அழைப்பு இணைப்பைப் பகிரவும்
+
+பிறகு: பரவலாக்கப்பட்ட செய்தியிடல் அனுபவத்தை அனுபவியுங்கள். பிற பிரபலமான செயலிகளைப் போலன்றி, மைய கட்டுப்பாடோ கண்காணிப்போ இல்லை, உங்களையும் நண்பர்களையும் சக ஊழியர்களையும் குடும்பத்தினரையும் பெரிய நிறுவனங்களுக்கு விற்பதும் இல்லை.</translation>
+    </message>
+    <message>
+        <source>Message from %1$s</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;systemmsg_subject_for_new_contact&quot;.</extracomment>
+        <translation>%1$s இடமிருந்து செய்தி</translation>
+    </message>
+    <message>
+        <source>Failed to send message to %1$s.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;systemmsg_failed_sending_to&quot;.</extracomment>
+        <translation>%1$s க்கு செய்தியை அனுப்ப முடியவில்லை.</translation>
+    </message>
+    <message>
+        <source>Configuration failed. Error: %1$s</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;configuration_failed_with_error&quot;.</extracomment>
+        <translation>கட்டமைப்பு தோல்வியடைந்தது. பிழை: %1$s</translation>
+    </message>
+    <message>
+        <source>⚠️ Date or time on your device seems to be inaccurate (%1$s).
+
+Adjust your clock ⏰🔧 to ensure your messages are received correctly.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;devicemsg_bad_time&quot;.</extracomment>
+        <translation>⚠️ உங்கள் சாதனத்தின் தேதி அல்லது நேரம் தவறாக உள்ளது போல் தெரிகிறது (%1$s).
+
+உங்கள் செய்திகள் சரியாகப் பெறப்பட, கடிகாரத்தைச் சரிசெய்யவும் ⏰🔧</translation>
+    </message>
+    <message>
+        <source>⚠️ Your Delta Chat version might be outdated.
+
+This may cause problems because your chat partners use newer versions - and you are missing the latest features 😳
+Please check https://get.delta.chat or your app store for updates.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;devicemsg_update_reminder&quot;.</extracomment>
+        <translation>⚠️ உங்கள் Delta Chat பதிப்பு காலாவதியானதாக இருக்கலாம்.
+
+உங்கள் அரட்டை கூட்டாளிகள் புதிய பதிப்புகளைப் பயன்படுத்துவதால் இது சிக்கல்களை ஏற்படுத்தலாம் - மேலும் நீங்கள் சமீபத்திய அம்சங்களைப் பெறவில்லை 😳
+புதுப்பிப்புகளுக்கு https://get.delta.chat அல்லது உங்கள் செயலி அங்காடியைப் பார்க்கவும்.</translation>
+    </message>
+    <message>
+        <source>Reply</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;reply_noun&quot;.</extracomment>
+        <translation>பதிலளி</translation>
+    </message>
+    <message>
+        <source>You deleted the &quot;Saved messages&quot; chat.
+
+ℹ️ To use the &quot;Saved messages&quot; feature again, create a new chat with yourself.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;devicemsg_self_deleted&quot;.</extracomment>
+        <translation>நீங்கள் &quot;சேமித்த செய்திகள்&quot; அரட்டையை நீக்கிவிட்டீர்கள்.
+
+ℹ️ &quot;சேமித்த செய்திகள்&quot; வசதியை மீண்டும் பயன்படுத்த, உங்களுடன் ஒரு புதிய அரட்டையை உருவாக்கவும்.</translation>
+    </message>
+    <message>
+        <source>Forwarded</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;forwarded&quot;.</extracomment>
+        <translation>முன்னனுப்பப்பட்டது</translation>
+    </message>
+    <message>
+        <source>Incoming Messages</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;incoming_messages&quot;.</extracomment>
+        <translation>உள்வரும் செய்திகள்</translation>
+    </message>
+    <message>
+        <source>Outgoing Messages</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;outgoing_messages&quot;.</extracomment>
+        <translation>வெளிச்செல்லும் செய்திகள்</translation>
+    </message>
+    <message>
+        <source>Connected</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;connectivity_connected&quot;.</extracomment>
+        <translation>இணைக்கப்பட்டது</translation>
+    </message>
+    <message>
+        <source>Connecting…</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;connectivity_connecting&quot;.</extracomment>
+        <translation>இணைக்கிறது…</translation>
+    </message>
+    <message>
+        <source>Updating…</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;connectivity_updating&quot;.</extracomment>
+        <translation>புதுப்பிக்கிறது…</translation>
+    </message>
+    <message>
+        <source>Sending…</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;sending&quot;.</extracomment>
+        <translation>அனுப்புகிறது…</translation>
+    </message>
+    <message>
+        <source>Last message sent successfully.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;last_msg_sent_successfully&quot;.</extracomment>
+        <translation>கடைசிச் செய்தி வெற்றிகரமாக அனுப்பப்பட்டது.</translation>
+    </message>
+    <message>
+        <source>Error: %1$s</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;error_x&quot;.</extracomment>
+        <translation>பிழை: %1$s</translation>
+    </message>
+    <message>
+        <source>Messages</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;messages&quot;.</extracomment>
+        <translation>செய்திகள்</translation>
+    </message>
+    <message>
+        <source>%1$s of %2$s used</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;part_of_total_used&quot;.</extracomment>
+        <translation>%2$s இல் %1$s பயன்படுத்தப்பட்டது</translation>
+    </message>
+    <message>
+        <source>%1$s invited you to join this group.
+
+Waiting for the device of %2$s to reply…</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;secure_join_started&quot;.</extracomment>
+        <translation>%1$s உங்களை இந்தக் குழுவில் சேர அழைத்தார்.
+
+%2$s இன் சாதனம் பதிலளிப்பதற்காகக் காத்திருக்கிறது…</translation>
+    </message>
+    <message>
+        <source>%1$s replied, waiting for being added to the group…</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;secure_join_replies&quot;.</extracomment>
+        <translation>%1$s பதிலளித்தார், குழுவில் சேர்க்கப்படுவதற்காகக் காத்திருக்கிறது…</translation>
+    </message>
+    <message>
+        <source>Scan to chat with %1$s</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;qrshow_join_contact_hint&quot;.</extracomment>
+        <translation>%1$s உடன் அரட்டையடிக்க ஸ்கேன் செய்யவும்</translation>
+    </message>
+    <message>
+        <source>Scan to join group %1$s</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;qrshow_join_group_hint&quot;.</extracomment>
+        <translation>%1$s குழுவில் சேர ஸ்கேன் செய்யவும்</translation>
+    </message>
+    <message>
+        <source>Not connected</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;connectivity_not_connected&quot;.</extracomment>
+        <translation>இணைக்கப்படவில்லை</translation>
+    </message>
+    <message>
+        <source>You changed the group name from &quot;%1$s&quot; to &quot;%2$s&quot;.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;group_name_changed_by_you&quot;.</extracomment>
+        <translation>நீங்கள் குழுவின் பெயரை &quot;%1$s&quot; என்பதிலிருந்து &quot;%2$s&quot; என மாற்றினீர்கள்.</translation>
+    </message>
+    <message>
+        <source>Group name changed from &quot;%1$s&quot; to &quot;%2$s&quot; by %3$s.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;group_name_changed_by_other&quot;.</extracomment>
+        <translation>%3$s குழுவின் பெயரை &quot;%1$s&quot; என்பதிலிருந்து &quot;%2$s&quot; என மாற்றினார்.</translation>
+    </message>
+    <message>
+        <source>You changed the group image.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;group_image_changed_by_you&quot;.</extracomment>
+        <translation>நீங்கள் குழுப் படத்தை மாற்றினீர்கள்.</translation>
+    </message>
+    <message>
+        <source>Group image changed by %1$s.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;group_image_changed_by_other&quot;.</extracomment>
+        <translation>%1$s குழுப் படத்தை மாற்றினார்.</translation>
+    </message>
+    <message>
+        <source>You added member %1$s.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;add_member_by_you&quot;.</extracomment>
+        <translation>நீங்கள் உறுப்பினர் %1$s ஐச் சேர்த்தீர்கள்.</translation>
+    </message>
+    <message>
+        <source>Member %1$s added by %2$s.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;add_member_by_other&quot;.</extracomment>
+        <translation>உறுப்பினர் %1$s ஐ %2$s சேர்த்தார்.</translation>
+    </message>
+    <message>
+        <source>You removed member %1$s.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;remove_member_by_you&quot;.</extracomment>
+        <translation>நீங்கள் உறுப்பினர் %1$s ஐ நீக்கினீர்கள்.</translation>
+    </message>
+    <message>
+        <source>Member %1$s removed by %2$s.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;remove_member_by_other&quot;.</extracomment>
+        <translation>உறுப்பினர் %1$s ஐ %2$s நீக்கினார்.</translation>
+    </message>
+    <message>
+        <source>You left the group.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;group_left_by_you&quot;.</extracomment>
+        <translation>நீங்கள் குழுவிலிருந்து வெளியேறினீர்கள்.</translation>
+    </message>
+    <message>
+        <source>Group left by %1$s.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;group_left_by_other&quot;.</extracomment>
+        <translation>%1$s குழுவிலிருந்து வெளியேறினார்.</translation>
+    </message>
+    <message>
+        <source>You deleted the group image.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;group_image_deleted_by_you&quot;.</extracomment>
+        <translation>நீங்கள் குழுப் படத்தை நீக்கினீர்கள்.</translation>
+    </message>
+    <message>
+        <source>Group image deleted by %1$s.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;group_image_deleted_by_other&quot;.</extracomment>
+        <translation>%1$s குழுப் படத்தை நீக்கினார்.</translation>
+    </message>
+    <message>
+        <source>You enabled location streaming.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;location_enabled_by_you&quot;.</extracomment>
+        <translation>நீங்கள் இருப்பிடப் பகிர்வை இயக்கினீர்கள்.</translation>
+    </message>
+    <message>
+        <source>Location streaming enabled by %1$s.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;location_enabled_by_other&quot;.</extracomment>
+        <translation>%1$s இருப்பிடப் பகிர்வை இயக்கினார்.</translation>
+    </message>
+    <message>
+        <source>You disabled disappearing messages timer.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;ephemeral_timer_disabled_by_you&quot;.</extracomment>
+        <translation>நீங்கள் மறையும் செய்திகளின் நேரங்கணிப்பானை முடக்கினீர்கள்.</translation>
+    </message>
+    <message>
+        <source>Disappearing messages timer disabled by %1$s.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;ephemeral_timer_disabled_by_other&quot;.</extracomment>
+        <translation>மறையும் செய்திகளின் நேரங்கணிப்பானை %1$s முடக்கினார்.</translation>
+    </message>
+    <message>
+        <source>You set disappearing messages timer to %1$s seconds</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;ephemeral_timer_seconds_by_you&quot;.</extracomment>
+        <translation>நீங்கள் மறையும் செய்திகளின் நேரங்கணிப்பானை %1$s விநாடிகளாக அமைத்தீர்கள்</translation>
+    </message>
+    <message>
+        <source>Disappearing messages timer set to %1$s seconds by %2$s.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;ephemeral_timer_seconds_by_other&quot;.</extracomment>
+        <translation>மறையும் செய்திகளின் நேரங்கணிப்பானை %2$s %1$s விநாடிகளாக அமைத்தார்.</translation>
+    </message>
+    <message>
+        <source>You set disappearing messages timer to 1 hour.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;ephemeral_timer_1_hour_by_you&quot;.</extracomment>
+        <translation>நீங்கள் மறையும் செய்திகளின் நேரங்கணிப்பானை 1 மணிநேரமாக அமைத்தீர்கள்.</translation>
+    </message>
+    <message>
+        <source>Disappearing messages timer set to 1 hour by %1$s.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;ephemeral_timer_1_hour_by_other&quot;.</extracomment>
+        <translation>மறையும் செய்திகளின் நேரங்கணிப்பானை %1$s 1 மணிநேரமாக அமைத்தார்.</translation>
+    </message>
+    <message>
+        <source>You set disappearing messages timer to 1 day.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;ephemeral_timer_1_day_by_you&quot;.</extracomment>
+        <translation>நீங்கள் மறையும் செய்திகளின் நேரங்கணிப்பானை 1 நாளாக அமைத்தீர்கள்.</translation>
+    </message>
+    <message>
+        <source>Disappearing messages timer set to 1 day by %1$s.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;ephemeral_timer_1_day_by_other&quot;.</extracomment>
+        <translation>மறையும் செய்திகளின் நேரங்கணிப்பானை %1$s 1 நாளாக அமைத்தார்.</translation>
+    </message>
+    <message>
+        <source>You set disappearing messages timer to 1 week.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;ephemeral_timer_1_week_by_you&quot;.</extracomment>
+        <translation>நீங்கள் மறையும் செய்திகளின் நேரங்கணிப்பானை 1 வாரமாக அமைத்தீர்கள்.</translation>
+    </message>
+    <message>
+        <source>Disappearing messages timer set to 1 week by %1$s.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;ephemeral_timer_1_week_by_other&quot;.</extracomment>
+        <translation>மறையும் செய்திகளின் நேரங்கணிப்பானை %1$s 1 வாரமாக அமைத்தார்.</translation>
+    </message>
+    <message>
+        <source>You set disappearing messages timer to %1$s minutes.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;ephemeral_timer_minutes_by_you&quot;.</extracomment>
+        <translation>நீங்கள் மறையும் செய்திகளின் நேரங்கணிப்பானை %1$s நிமிடங்களாக அமைத்தீர்கள்.</translation>
+    </message>
+    <message>
+        <source>Disappearing messages timer set to %1$s minutes by %2$s.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;ephemeral_timer_minutes_by_other&quot;.</extracomment>
+        <translation>மறையும் செய்திகளின் நேரங்கணிப்பானை %2$s %1$s நிமிடங்களாக அமைத்தார்.</translation>
+    </message>
+    <message>
+        <source>You set disappearing messages timer to %1$s hours.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;ephemeral_timer_hours_by_you&quot;.</extracomment>
+        <translation>நீங்கள் மறையும் செய்திகளின் நேரங்கணிப்பானை %1$s மணிநேரமாக அமைத்தீர்கள்.</translation>
+    </message>
+    <message>
+        <source>Disappearing messages timer set to %1$s hours by %2$s.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;ephemeral_timer_hours_by_other&quot;.</extracomment>
+        <translation>மறையும் செய்திகளின் நேரங்கணிப்பானை %2$s %1$s மணிநேரமாக அமைத்தார்.</translation>
+    </message>
+    <message>
+        <source>You set disappearing messages timer to %1$s days.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;ephemeral_timer_days_by_you&quot;.</extracomment>
+        <translation>நீங்கள் மறையும் செய்திகளின் நேரங்கணிப்பானை %1$s நாட்களாக அமைத்தீர்கள்.</translation>
+    </message>
+    <message>
+        <source>Disappearing messages timer set to %1$s days by %2$s.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;ephemeral_timer_days_by_other&quot;.</extracomment>
+        <translation>மறையும் செய்திகளின் நேரங்கணிப்பானை %2$s %1$s நாட்களாக அமைத்தார்.</translation>
+    </message>
+    <message>
+        <source>You set disappearing messages timer to %1$s weeks.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;ephemeral_timer_weeks_by_you&quot;.</extracomment>
+        <translation>நீங்கள் மறையும் செய்திகளின் நேரங்கணிப்பானை %1$s வாரங்களாக அமைத்தீர்கள்.</translation>
+    </message>
+    <message>
+        <source>Disappearing messages timer set to %1$s weeks by %2$s.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;ephemeral_timer_weeks_by_other&quot;.</extracomment>
+        <translation>மறையும் செய்திகளின் நேரங்கணிப்பானை %2$s %1$s வாரங்களாக அமைத்தார்.</translation>
+    </message>
+    <message>
+        <source>You set disappearing messages timer to 1 year.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;ephemeral_timer_1_year_by_you&quot;.</extracomment>
+        <translation>நீங்கள் மறையும் செய்திகளின் நேரங்கணிப்பானை 1 ஆண்டாக அமைத்தீர்கள்.</translation>
+    </message>
+    <message>
+        <source>Disappearing messages timer set to 1 year by %1$s.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;ephemeral_timer_1_year_by_other&quot;.</extracomment>
+        <translation>மறையும் செய்திகளின் நேரங்கணிப்பானை %1$s 1 ஆண்டாக அமைத்தார்.</translation>
+    </message>
+    <message>
+        <source>Scan to set up second device for %1$s</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;multidevice_qr_subtitle&quot;.</extracomment>
+        <translation>%1$s க்கான இரண்டாவது சாதனத்தை அமைக்க ஸ்கேன் செய்யவும்</translation>
+    </message>
+    <message>
+        <source>ℹ️ Profile transferred to your second device.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;multidevice_transfer_done_devicemsg&quot;.</extracomment>
+        <translation>ℹ️ சுயவிவரம் உங்கள் இரண்டாவது சாதனத்திற்கு மாற்றப்பட்டது.</translation>
+    </message>
+    <message>
+        <source>Messages are end-to-end encrypted.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;messages_are_e2ee&quot;.</extracomment>
+        <translation>செய்திகள் முனை-முதல்-முனை குறியாக்கம் செய்யப்பட்டவை.</translation>
+    </message>
+    <message>
+        <source>Others will only see this group after you sent a first message.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;chat_new_group_hint&quot;.</extracomment>
+        <translation>நீங்கள் முதல் செய்தியை அனுப்பிய பிறகுதான் மற்றவர்கள் இந்தக் குழுவைப் பார்ப்பார்கள்.</translation>
+    </message>
+    <message>
+        <source>Member %1$s added.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;member_x_added&quot;.</extracomment>
+        <translation>உறுப்பினர் %1$s சேர்க்கப்பட்டார்.</translation>
+    </message>
+    <message>
+        <source>You reacted %1$s to &quot;%2$s&quot;</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;reaction_by_you&quot;.</extracomment>
+        <translation>நீங்கள் &quot;%2$s&quot; க்கு %1$s எனப் பதிலளித்தீர்கள்</translation>
+    </message>
+    <message>
+        <source>%1$s reacted %2$s to &quot;%3$s&quot;</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;reaction_by_other&quot;.</extracomment>
+        <translation>%1$s &quot;%3$s&quot; க்கு %2$s எனப் பதிலளித்தார்</translation>
+    </message>
+    <message>
+        <source>Member %1$s removed.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;member_x_removed&quot;.</extracomment>
+        <translation>உறுப்பினர் %1$s நீக்கப்பட்டார்</translation>
+    </message>
+    <message>
+        <source>You were removed by %1$s.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;remove_you_by_other&quot;.</extracomment>
+        <translation>%1$s உங்களை நீக்கினார்.</translation>
+    </message>
+    <message>
+        <source>You were added by %1$s.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;add_you_by_other&quot;.</extracomment>
+        <translation>%1$s உங்களைச் சேர்த்தார்.</translation>
+    </message>
+    <message>
+        <source>You were removed.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;member_you_removed&quot;.</extracomment>
+        <translation>நீங்கள் நீக்கப்பட்டீர்கள்.</translation>
+    </message>
+    <message>
+        <source>You were added.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;member_you_added&quot;.</extracomment>
+        <translation>நீங்கள் சேர்க்கப்பட்டீர்கள்.</translation>
+    </message>
+    <message>
+        <source>Establishing connection, please wait…</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;secure_join_wait&quot;.</extracomment>
+        <translation>இணைப்பை ஏற்படுத்துகிறது, காத்திருக்கவும்…</translation>
+    </message>
+    <message>
+        <source>❤️ Seems you&apos;re enjoying Delta Chat!
+
+Please consider donating to help ensure that Delta Chat stays free for everyone.
+
+While Delta Chat is free to use and open source, development costs money. Help us to keep Delta Chat independent and make it even more awesome in the future.
+
+https://delta.chat/donate</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;donate_device_msg&quot;.</extracomment>
+        <translation>❤️ நீங்கள் Delta Chat ஐ ரசிக்கிறீர்கள் போல் தெரிகிறது!
+
+Delta Chat அனைவருக்கும் இலவசமாகத் தொடர உதவ, நன்கொடை அளிப்பதைப் பரிசீலிக்கவும்.
+
+Delta Chat இலவசமாகப் பயன்படுத்தக்கூடியதும் திறந்த மூலமும் என்றாலும், மேம்பாட்டிற்குப் பணம் செலவாகிறது. Delta Chat ஐ சுதந்திரமாக வைத்திருக்கவும், எதிர்காலத்தில் இன்னும் சிறப்பாக்கவும் எங்களுக்கு உதவுங்கள்.
+
+https://delta.chat/donate</translation>
+    </message>
+    <message>
+        <source>Declined call</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;declined_call&quot;.</extracomment>
+        <translation>நிராகரிக்கப்பட்ட அழைப்பு</translation>
+    </message>
+    <message>
+        <source>Canceled call</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;canceled_call&quot;.</extracomment>
+        <translation>ரத்துசெய்யப்பட்ட அழைப்பு</translation>
+    </message>
+    <message>
+        <source>Missed call</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;missed_call&quot;.</extracomment>
+        <translation>தவறிய அழைப்பு</translation>
+    </message>
+    <message>
+        <source>You left the channel.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;channel_left_by_you&quot;.</extracomment>
+        <translation>நீங்கள் சேனலிலிருந்து வெளியேறினீர்கள்.</translation>
+    </message>
+    <message>
+        <source>Scan to join channel &quot;%1$s&quot;</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;qrshow_join_channel_hint&quot;.</extracomment>
+        <translation>&quot;%1$s&quot; சேனலில் சேர ஸ்கேன் செய்யவும்</translation>
+    </message>
+    <message>
+        <source>You joined the channel.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;you_joined_the_channel&quot;.</extracomment>
+        <translation>நீங்கள் சேனலில் சேர்ந்தீர்கள்.</translation>
+    </message>
+    <message>
+        <source>%1$s invited you to join this channel.
+
+Waiting for the device of %2$s to reply…</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;secure_join_channel_started&quot;.</extracomment>
+        <translation>%1$s உங்களை இந்தச் சேனலில் சேர அழைத்தார்.
+
+%2$s இன் சாதனம் பதிலளிப்பதற்காகக் காத்திருக்கிறது…</translation>
+    </message>
+    <message>
+        <source>Channel name changed from &quot;%1$s&quot; to &quot;%2$s&quot;.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;channel_name_changed&quot;.</extracomment>
+        <translation>சேனலின் பெயர் &quot;%1$s&quot; என்பதிலிருந்து &quot;%2$s&quot; என மாற்றப்பட்டது.</translation>
+    </message>
+    <message>
+        <source>Channel image changed.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;channel_image_changed&quot;.</extracomment>
+        <translation>சேனல் படம் மாற்றப்பட்டது.</translation>
+    </message>
+    <message>
+        <source>The attachment contains anonymous usage statistics, which helps us improve Delta Chat. See https://delta.chat/help#statssending for more information. Thank you!</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;stats_msg_body&quot;.</extracomment>
+        <translation>இணைப்பில் அநாமதேயப் பயன்பாட்டுப் புள்ளிவிவரங்கள் உள்ளன, இது Delta Chat ஐ மேம்படுத்த எங்களுக்கு உதவுகிறது. மேலும் தகவலுக்கு https://delta.chat/help#statssending ஐப் பார்க்கவும். நன்றி!</translation>
+    </message>
+    <message>
+        <source>Proxy Enabled</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;proxy_enabled&quot;.</extracomment>
+        <translation>பிராக்ஸி இயக்கப்பட்டது</translation>
+    </message>
+    <message>
+        <source>You are using a proxy. If you&apos;re having trouble connecting, try a different proxy.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;proxy_enabled_hint&quot;.</extracomment>
+        <translation>நீங்கள் ஒரு பிராக்ஸியைப் பயன்படுத்துகிறீர்கள். இணைப்பதில் சிக்கல் இருந்தால், வேறொரு பிராக்ஸியை முயற்சிக்கவும்.</translation>
+    </message>
+    <message>
+        <source>Messages in this chat use classic email and are not end-to-end encrypted.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;chat_unencrypted_explanation&quot;.</extracomment>
+        <translation>இந்த அரட்டையில் உள்ள செய்திகள் வழக்கமான மின்னஞ்சலைப் பயன்படுத்துகின்றன, அவை முனை-முதல்-முனை குறியாக்கம் செய்யப்பட்டவை அல்ல.</translation>
+    </message>
+    <message>
+        <source>Outgoing audio call</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;outgoing_audio_call&quot;.</extracomment>
+        <translation>வெளிச்செல்லும் குரல் அழைப்பு</translation>
+    </message>
+    <message>
+        <source>Outgoing video call</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;outgoing_video_call&quot;.</extracomment>
+        <translation>வெளிச்செல்லும் வீடியோ அழைப்பு</translation>
+    </message>
+    <message>
+        <source>Incoming audio call</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;incoming_audio_call&quot;.</extracomment>
+        <translation>உள்வரும் குரல் அழைப்பு</translation>
+    </message>
+    <message>
+        <source>Incoming video call</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;incoming_video_call&quot;.</extracomment>
+        <translation>உள்வரும் வீடியோ அழைப்பு</translation>
+    </message>
+    <message>
+        <source>You changed the chat description.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;chat_description_changed_by_you&quot;.</extracomment>
+        <translation>நீங்கள் அரட்டை விளக்கத்தை மாற்றினீர்கள்.</translation>
+    </message>
+    <message>
+        <source>Chat description changed by %1$s.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;chat_description_changed_by_other&quot;.</extracomment>
+        <translation>%1$s அரட்டை விளக்கத்தை மாற்றினார்.</translation>
+    </message>
+    <message>
+        <source>You pinned a message</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;message_pinned_by_you&quot;.</extracomment>
+        <translation>நீங்கள் ஒரு செய்தியை பின் செய்தீர்கள்</translation>
+    </message>
+    <message>
+        <source>Message pinned by %1$s</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;message_pinned_by_other&quot;.</extracomment>
+        <translation>%1$s செய்தியை பின் செய்தார்</translation>
+    </message>
+</context>
+<context>
     <name>VideoPage</name>
     <message>
         <source>Open in another app</source>

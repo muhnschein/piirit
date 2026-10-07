@@ -1834,6 +1834,600 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>StockStrings</name>
+    <message>
+        <source>No messages.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;chat_no_messages&quot;.</extracomment>
+        <translation>ਕੋਈ ਸੁਨੇਹਾ ਨਹੀਂ।</translation>
+    </message>
+    <message>
+        <source>Me</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;self&quot;.</extracomment>
+        <translation>ਮੈਂ</translation>
+    </message>
+    <message>
+        <source>Draft</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;draft&quot;.</extracomment>
+        <translation>ਖਰੜਾ</translation>
+    </message>
+    <message>
+        <source>Voice Message</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;voice_message&quot;.</extracomment>
+        <translation>ਆਵਾਜ਼ੀ ਸੁਨੇਹਾ</translation>
+    </message>
+    <message>
+        <source>Image</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;image&quot;.</extracomment>
+        <translation>ਤਸਵੀਰ</translation>
+    </message>
+    <message>
+        <source>Video</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;video&quot;.</extracomment>
+        <translation>ਵੀਡੀਓ</translation>
+    </message>
+    <message>
+        <source>Audio</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;audio&quot;.</extracomment>
+        <translation>ਆਡੀਓ</translation>
+    </message>
+    <message>
+        <source>File</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;file&quot;.</extracomment>
+        <translation>ਫ਼ਾਈਲ</translation>
+    </message>
+    <message>
+        <source>GIF</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;gif&quot;.</extracomment>
+        <translation>GIF</translation>
+    </message>
+    <message>
+        <source>%1$s introduced.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;contact_verified&quot;.</extracomment>
+        <translation>%1$s ਦੀ ਜਾਣ-ਪਛਾਣ ਕਰਵਾਈ ਗਈ।</translation>
+    </message>
+    <message>
+        <source>Archived</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;chat_archived_label&quot;.</extracomment>
+        <translation>ਪੁਰਾਲੇਖ ਕੀਤੀ</translation>
+    </message>
+    <message>
+        <source>Location</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;location&quot;.</extracomment>
+        <translation>ਟਿਕਾਣਾ</translation>
+    </message>
+    <message>
+        <source>Sticker</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;sticker&quot;.</extracomment>
+        <translation>ਸਟਿੱਕਰ</translation>
+    </message>
+    <message>
+        <source>Device Messages</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;device_talk&quot;.</extracomment>
+        <translation>ਡਿਵਾਈਸ ਸੁਨੇਹੇ</translation>
+    </message>
+    <message>
+        <source>Saved Messages</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;saved_messages&quot;.</extracomment>
+        <translation>ਸੰਭਾਲੇ ਸੁਨੇਹੇ</translation>
+    </message>
+    <message>
+        <source>Messages in this chat are generated on your device to inform about app updates and problems during usage.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;device_talk_explain&quot;.</extracomment>
+        <translation>ਇਸ ਚੈਟ ਦੇ ਸੁਨੇਹੇ ਤੁਹਾਡੀ ਡਿਵਾਈਸ ਉੱਤੇ ਹੀ ਬਣਦੇ ਹਨ, ਤਾਂ ਜੋ ਐਪ ਦੇ ਅੱਪਡੇਟਾਂ ਅਤੇ ਵਰਤੋਂ ਦੌਰਾਨ ਆਈਆਂ ਸਮੱਸਿਆਵਾਂ ਬਾਰੇ ਦੱਸਿਆ ਜਾ ਸਕੇ।</translation>
+    </message>
+    <message>
+        <source>Get in contact!
+
+🙌 Tap &quot;QR code&quot; on the main screen of both devices. Choose &quot;Scan QR Code&quot; on one device, and point it at the other
+
+🌍 If not in the same room, scan via video call or share an invite link from &quot;Scan QR code&quot;
+
+Then: Enjoy your decentralized messenger experience. In contrast to other popular apps, without central control or tracking or selling you, friends, colleagues or family out to large organizations.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;device_talk_welcome_message2&quot;.</extracomment>
+        <translation>ਸੰਪਰਕ ਕਰੋ!
+
+🙌 ਦੋਵਾਂ ਡਿਵਾਈਸਾਂ ਦੀ ਮੁੱਖ ਸਕਰੀਨ ਉੱਤੇ &quot;QR ਕੋਡ&quot; ਨੂੰ ਛੂਹੋ। ਇੱਕ ਡਿਵਾਈਸ ਉੱਤੇ &quot;QR ਕੋਡ ਸਕੈਨ ਕਰੋ&quot; ਚੁਣੋ ਅਤੇ ਉਸ ਨੂੰ ਦੂਜੀ ਵੱਲ ਕਰੋ
+
+🌍 ਜੇ ਤੁਸੀਂ ਇੱਕੋ ਕਮਰੇ ਵਿੱਚ ਨਹੀਂ ਹੋ, ਤਾਂ ਵੀਡੀਓ ਕਾਲ ਰਾਹੀਂ ਸਕੈਨ ਕਰੋ ਜਾਂ &quot;QR ਕੋਡ ਸਕੈਨ ਕਰੋ&quot; ਤੋਂ ਸੱਦਾ ਲਿੰਕ ਸਾਂਝਾ ਕਰੋ
+
+ਫਿਰ: ਵਿਕੇਂਦਰੀਕ੍ਰਿਤ ਮੈਸੇਂਜਰ ਦਾ ਆਨੰਦ ਮਾਣੋ। ਹੋਰ ਮਸ਼ਹੂਰ ਐਪਾਂ ਦੇ ਉਲਟ, ਇੱਥੇ ਕੋਈ ਕੇਂਦਰੀ ਕੰਟਰੋਲ ਜਾਂ ਟਰੈਕਿੰਗ ਨਹੀਂ ਹੈ, ਅਤੇ ਤੁਹਾਨੂੰ, ਦੋਸਤਾਂ, ਸਹਿਕਰਮੀਆਂ ਜਾਂ ਪਰਿਵਾਰ ਨੂੰ ਵੱਡੇ ਅਦਾਰਿਆਂ ਨੂੰ ਵੇਚਿਆ ਨਹੀਂ ਜਾਂਦਾ।</translation>
+    </message>
+    <message>
+        <source>Message from %1$s</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;systemmsg_subject_for_new_contact&quot;.</extracomment>
+        <translation>%1$s ਵੱਲੋਂ ਸੁਨੇਹਾ</translation>
+    </message>
+    <message>
+        <source>Failed to send message to %1$s.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;systemmsg_failed_sending_to&quot;.</extracomment>
+        <translation>%1$s ਨੂੰ ਸੁਨੇਹਾ ਭੇਜਣ ਵਿੱਚ ਅਸਫਲ।</translation>
+    </message>
+    <message>
+        <source>Configuration failed. Error: %1$s</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;configuration_failed_with_error&quot;.</extracomment>
+        <translation>ਸੰਰਚਨਾ ਅਸਫਲ ਰਹੀ। ਗਲਤੀ: %1$s</translation>
+    </message>
+    <message>
+        <source>⚠️ Date or time on your device seems to be inaccurate (%1$s).
+
+Adjust your clock ⏰🔧 to ensure your messages are received correctly.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;devicemsg_bad_time&quot;.</extracomment>
+        <translation>⚠️ ਤੁਹਾਡੀ ਡਿਵਾਈਸ ਦੀ ਤਾਰੀਖ ਜਾਂ ਸਮਾਂ ਗਲਤ ਜਾਪਦਾ ਹੈ (%1$s)।
+
+ਆਪਣੇ ਸੁਨੇਹੇ ਸਹੀ ਢੰਗ ਨਾਲ ਪ੍ਰਾਪਤ ਕਰਨ ਲਈ ਘੜੀ ਠੀਕ ਕਰੋ ⏰🔧</translation>
+    </message>
+    <message>
+        <source>⚠️ Your Delta Chat version might be outdated.
+
+This may cause problems because your chat partners use newer versions - and you are missing the latest features 😳
+Please check https://get.delta.chat or your app store for updates.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;devicemsg_update_reminder&quot;.</extracomment>
+        <translation>⚠️ ਤੁਹਾਡਾ Delta Chat ਵਰਜਨ ਪੁਰਾਣਾ ਹੋ ਸਕਦਾ ਹੈ।
+
+ਇਸ ਨਾਲ ਸਮੱਸਿਆਵਾਂ ਆ ਸਕਦੀਆਂ ਹਨ ਕਿਉਂਕਿ ਤੁਹਾਡੇ ਚੈਟ ਸਾਥੀ ਨਵੇਂ ਵਰਜਨ ਵਰਤਦੇ ਹਨ - ਅਤੇ ਤੁਸੀਂ ਨਵੀਆਂ ਸਹੂਲਤਾਂ ਤੋਂ ਵਾਂਝੇ ਹੋ 😳
+ਅੱਪਡੇਟ ਲਈ ਕਿਰਪਾ ਕਰਕੇ https://get.delta.chat ਜਾਂ ਆਪਣਾ ਐਪ ਸਟੋਰ ਵੇਖੋ।</translation>
+    </message>
+    <message>
+        <source>Reply</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;reply_noun&quot;.</extracomment>
+        <translation>ਜਵਾਬ ਦਿਓ</translation>
+    </message>
+    <message>
+        <source>You deleted the &quot;Saved messages&quot; chat.
+
+ℹ️ To use the &quot;Saved messages&quot; feature again, create a new chat with yourself.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;devicemsg_self_deleted&quot;.</extracomment>
+        <translation>ਤੁਸੀਂ &quot;ਸੰਭਾਲੇ ਸੁਨੇਹੇ&quot; ਚੈਟ ਹਟਾ ਦਿੱਤੀ ਹੈ।
+
+ℹ️ &quot;ਸੰਭਾਲੇ ਸੁਨੇਹੇ&quot; ਦੁਬਾਰਾ ਵਰਤਣ ਲਈ ਆਪਣੇ ਨਾਲ ਇੱਕ ਨਵੀਂ ਚੈਟ ਬਣਾਓ।</translation>
+    </message>
+    <message>
+        <source>Forwarded</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;forwarded&quot;.</extracomment>
+        <translation>ਅੱਗੇ ਭੇਜਿਆ</translation>
+    </message>
+    <message>
+        <source>Incoming Messages</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;incoming_messages&quot;.</extracomment>
+        <translation>ਆਉਣ ਵਾਲੇ ਸੁਨੇਹੇ</translation>
+    </message>
+    <message>
+        <source>Outgoing Messages</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;outgoing_messages&quot;.</extracomment>
+        <translation>ਜਾਣ ਵਾਲੇ ਸੁਨੇਹੇ</translation>
+    </message>
+    <message>
+        <source>Connected</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;connectivity_connected&quot;.</extracomment>
+        <translation>ਜੁੜਿਆ ਹੋਇਆ</translation>
+    </message>
+    <message>
+        <source>Connecting…</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;connectivity_connecting&quot;.</extracomment>
+        <translation>ਜੁੜ ਰਿਹਾ ਹੈ…</translation>
+    </message>
+    <message>
+        <source>Updating…</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;connectivity_updating&quot;.</extracomment>
+        <translation>ਅੱਪਡੇਟ ਹੋ ਰਿਹਾ ਹੈ…</translation>
+    </message>
+    <message>
+        <source>Sending…</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;sending&quot;.</extracomment>
+        <translation>ਭੇਜਿਆ ਜਾ ਰਿਹਾ ਹੈ…</translation>
+    </message>
+    <message>
+        <source>Last message sent successfully.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;last_msg_sent_successfully&quot;.</extracomment>
+        <translation>ਆਖਰੀ ਸੁਨੇਹਾ ਸਫਲਤਾ ਨਾਲ ਭੇਜਿਆ ਗਿਆ।</translation>
+    </message>
+    <message>
+        <source>Error: %1$s</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;error_x&quot;.</extracomment>
+        <translation>ਗਲਤੀ: %1$s</translation>
+    </message>
+    <message>
+        <source>Messages</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;messages&quot;.</extracomment>
+        <translation>ਸੁਨੇਹੇ</translation>
+    </message>
+    <message>
+        <source>%1$s of %2$s used</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;part_of_total_used&quot;.</extracomment>
+        <translation>%2$s ਵਿੱਚੋਂ %1$s ਵਰਤਿਆ ਗਿਆ</translation>
+    </message>
+    <message>
+        <source>%1$s invited you to join this group.
+
+Waiting for the device of %2$s to reply…</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;secure_join_started&quot;.</extracomment>
+        <translation>%1$s ਨੇ ਤੁਹਾਨੂੰ ਇਸ ਗਰੁੱਪ ਵਿੱਚ ਸ਼ਾਮਲ ਹੋਣ ਲਈ ਸੱਦਾ ਦਿੱਤਾ ਹੈ।
+
+%2$s ਦੀ ਡਿਵਾਈਸ ਦੇ ਜਵਾਬ ਦੀ ਉਡੀਕ ਹੈ…</translation>
+    </message>
+    <message>
+        <source>%1$s replied, waiting for being added to the group…</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;secure_join_replies&quot;.</extracomment>
+        <translation>%1$s ਨੇ ਜਵਾਬ ਦਿੱਤਾ, ਗਰੁੱਪ ਵਿੱਚ ਜੋੜੇ ਜਾਣ ਦੀ ਉਡੀਕ ਹੈ…</translation>
+    </message>
+    <message>
+        <source>Scan to chat with %1$s</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;qrshow_join_contact_hint&quot;.</extracomment>
+        <translation>%1$s ਨਾਲ ਚੈਟ ਕਰਨ ਲਈ ਸਕੈਨ ਕਰੋ</translation>
+    </message>
+    <message>
+        <source>Scan to join group %1$s</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;qrshow_join_group_hint&quot;.</extracomment>
+        <translation>ਗਰੁੱਪ %1$s ਵਿੱਚ ਸ਼ਾਮਲ ਹੋਣ ਲਈ ਸਕੈਨ ਕਰੋ</translation>
+    </message>
+    <message>
+        <source>Not connected</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;connectivity_not_connected&quot;.</extracomment>
+        <translation>ਜੁੜਿਆ ਨਹੀਂ</translation>
+    </message>
+    <message>
+        <source>You changed the group name from &quot;%1$s&quot; to &quot;%2$s&quot;.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;group_name_changed_by_you&quot;.</extracomment>
+        <translation>ਤੁਸੀਂ ਗਰੁੱਪ ਦਾ ਨਾਂ &quot;%1$s&quot; ਤੋਂ ਬਦਲ ਕੇ &quot;%2$s&quot; ਕਰ ਦਿੱਤਾ।</translation>
+    </message>
+    <message>
+        <source>Group name changed from &quot;%1$s&quot; to &quot;%2$s&quot; by %3$s.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;group_name_changed_by_other&quot;.</extracomment>
+        <translation>%3$s ਨੇ ਗਰੁੱਪ ਦਾ ਨਾਂ &quot;%1$s&quot; ਤੋਂ ਬਦਲ ਕੇ &quot;%2$s&quot; ਕਰ ਦਿੱਤਾ।</translation>
+    </message>
+    <message>
+        <source>You changed the group image.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;group_image_changed_by_you&quot;.</extracomment>
+        <translation>ਤੁਸੀਂ ਗਰੁੱਪ ਦੀ ਤਸਵੀਰ ਬਦਲ ਦਿੱਤੀ।</translation>
+    </message>
+    <message>
+        <source>Group image changed by %1$s.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;group_image_changed_by_other&quot;.</extracomment>
+        <translation>%1$s ਨੇ ਗਰੁੱਪ ਦੀ ਤਸਵੀਰ ਬਦਲ ਦਿੱਤੀ।</translation>
+    </message>
+    <message>
+        <source>You added member %1$s.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;add_member_by_you&quot;.</extracomment>
+        <translation>ਤੁਸੀਂ ਮੈਂਬਰ %1$s ਨੂੰ ਸ਼ਾਮਲ ਕੀਤਾ।</translation>
+    </message>
+    <message>
+        <source>Member %1$s added by %2$s.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;add_member_by_other&quot;.</extracomment>
+        <translation>ਮੈਂਬਰ %1$s ਨੂੰ %2$s ਨੇ ਸ਼ਾਮਲ ਕੀਤਾ।</translation>
+    </message>
+    <message>
+        <source>You removed member %1$s.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;remove_member_by_you&quot;.</extracomment>
+        <translation>ਤੁਸੀਂ ਮੈਂਬਰ %1$s ਨੂੰ ਹਟਾਇਆ।</translation>
+    </message>
+    <message>
+        <source>Member %1$s removed by %2$s.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;remove_member_by_other&quot;.</extracomment>
+        <translation>ਮੈਂਬਰ %1$s ਨੂੰ %2$s ਨੇ ਹਟਾਇਆ।</translation>
+    </message>
+    <message>
+        <source>You left the group.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;group_left_by_you&quot;.</extracomment>
+        <translation>ਤੁਸੀਂ ਗਰੁੱਪ ਛੱਡ ਦਿੱਤਾ।</translation>
+    </message>
+    <message>
+        <source>Group left by %1$s.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;group_left_by_other&quot;.</extracomment>
+        <translation>%1$s ਨੇ ਗਰੁੱਪ ਛੱਡ ਦਿੱਤਾ।</translation>
+    </message>
+    <message>
+        <source>You deleted the group image.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;group_image_deleted_by_you&quot;.</extracomment>
+        <translation>ਤੁਸੀਂ ਗਰੁੱਪ ਦੀ ਤਸਵੀਰ ਹਟਾ ਦਿੱਤੀ।</translation>
+    </message>
+    <message>
+        <source>Group image deleted by %1$s.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;group_image_deleted_by_other&quot;.</extracomment>
+        <translation>%1$s ਨੇ ਗਰੁੱਪ ਦੀ ਤਸਵੀਰ ਹਟਾ ਦਿੱਤੀ।</translation>
+    </message>
+    <message>
+        <source>You enabled location streaming.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;location_enabled_by_you&quot;.</extracomment>
+        <translation>ਤੁਸੀਂ ਟਿਕਾਣਾ ਸਟ੍ਰੀਮਿੰਗ ਚਾਲੂ ਕੀਤੀ।</translation>
+    </message>
+    <message>
+        <source>Location streaming enabled by %1$s.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;location_enabled_by_other&quot;.</extracomment>
+        <translation>%1$s ਨੇ ਟਿਕਾਣਾ ਸਟ੍ਰੀਮਿੰਗ ਚਾਲੂ ਕੀਤੀ।</translation>
+    </message>
+    <message>
+        <source>You disabled disappearing messages timer.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;ephemeral_timer_disabled_by_you&quot;.</extracomment>
+        <translation>ਤੁਸੀਂ ਗਾਇਬ ਹੋਣ ਵਾਲੇ ਸੁਨੇਹਿਆਂ ਦਾ ਟਾਈਮਰ ਬੰਦ ਕਰ ਦਿੱਤਾ।</translation>
+    </message>
+    <message>
+        <source>Disappearing messages timer disabled by %1$s.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;ephemeral_timer_disabled_by_other&quot;.</extracomment>
+        <translation>%1$s ਨੇ ਗਾਇਬ ਹੋਣ ਵਾਲੇ ਸੁਨੇਹਿਆਂ ਦਾ ਟਾਈਮਰ ਬੰਦ ਕਰ ਦਿੱਤਾ।</translation>
+    </message>
+    <message>
+        <source>You set disappearing messages timer to %1$s seconds</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;ephemeral_timer_seconds_by_you&quot;.</extracomment>
+        <translation>ਤੁਸੀਂ ਗਾਇਬ ਹੋਣ ਵਾਲੇ ਸੁਨੇਹਿਆਂ ਦਾ ਟਾਈਮਰ %1$s ਸਕਿੰਟ ਉੱਤੇ ਸੈੱਟ ਕੀਤਾ</translation>
+    </message>
+    <message>
+        <source>Disappearing messages timer set to %1$s seconds by %2$s.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;ephemeral_timer_seconds_by_other&quot;.</extracomment>
+        <translation>%2$s ਨੇ ਗਾਇਬ ਹੋਣ ਵਾਲੇ ਸੁਨੇਹਿਆਂ ਦਾ ਟਾਈਮਰ %1$s ਸਕਿੰਟ ਉੱਤੇ ਸੈੱਟ ਕੀਤਾ।</translation>
+    </message>
+    <message>
+        <source>You set disappearing messages timer to 1 hour.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;ephemeral_timer_1_hour_by_you&quot;.</extracomment>
+        <translation>ਤੁਸੀਂ ਗਾਇਬ ਹੋਣ ਵਾਲੇ ਸੁਨੇਹਿਆਂ ਦਾ ਟਾਈਮਰ 1 ਘੰਟੇ ਉੱਤੇ ਸੈੱਟ ਕੀਤਾ।</translation>
+    </message>
+    <message>
+        <source>Disappearing messages timer set to 1 hour by %1$s.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;ephemeral_timer_1_hour_by_other&quot;.</extracomment>
+        <translation>%1$s ਨੇ ਗਾਇਬ ਹੋਣ ਵਾਲੇ ਸੁਨੇਹਿਆਂ ਦਾ ਟਾਈਮਰ 1 ਘੰਟੇ ਉੱਤੇ ਸੈੱਟ ਕੀਤਾ।</translation>
+    </message>
+    <message>
+        <source>You set disappearing messages timer to 1 day.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;ephemeral_timer_1_day_by_you&quot;.</extracomment>
+        <translation>ਤੁਸੀਂ ਗਾਇਬ ਹੋਣ ਵਾਲੇ ਸੁਨੇਹਿਆਂ ਦਾ ਟਾਈਮਰ 1 ਦਿਨ ਉੱਤੇ ਸੈੱਟ ਕੀਤਾ।</translation>
+    </message>
+    <message>
+        <source>Disappearing messages timer set to 1 day by %1$s.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;ephemeral_timer_1_day_by_other&quot;.</extracomment>
+        <translation>%1$s ਨੇ ਗਾਇਬ ਹੋਣ ਵਾਲੇ ਸੁਨੇਹਿਆਂ ਦਾ ਟਾਈਮਰ 1 ਦਿਨ ਉੱਤੇ ਸੈੱਟ ਕੀਤਾ।</translation>
+    </message>
+    <message>
+        <source>You set disappearing messages timer to 1 week.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;ephemeral_timer_1_week_by_you&quot;.</extracomment>
+        <translation>ਤੁਸੀਂ ਗਾਇਬ ਹੋਣ ਵਾਲੇ ਸੁਨੇਹਿਆਂ ਦਾ ਟਾਈਮਰ 1 ਹਫ਼ਤੇ ਉੱਤੇ ਸੈੱਟ ਕੀਤਾ।</translation>
+    </message>
+    <message>
+        <source>Disappearing messages timer set to 1 week by %1$s.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;ephemeral_timer_1_week_by_other&quot;.</extracomment>
+        <translation>%1$s ਨੇ ਗਾਇਬ ਹੋਣ ਵਾਲੇ ਸੁਨੇਹਿਆਂ ਦਾ ਟਾਈਮਰ 1 ਹਫ਼ਤੇ ਉੱਤੇ ਸੈੱਟ ਕੀਤਾ।</translation>
+    </message>
+    <message>
+        <source>You set disappearing messages timer to %1$s minutes.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;ephemeral_timer_minutes_by_you&quot;.</extracomment>
+        <translation>ਤੁਸੀਂ ਗਾਇਬ ਹੋਣ ਵਾਲੇ ਸੁਨੇਹਿਆਂ ਦਾ ਟਾਈਮਰ %1$s ਮਿੰਟ ਉੱਤੇ ਸੈੱਟ ਕੀਤਾ।</translation>
+    </message>
+    <message>
+        <source>Disappearing messages timer set to %1$s minutes by %2$s.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;ephemeral_timer_minutes_by_other&quot;.</extracomment>
+        <translation>%2$s ਨੇ ਗਾਇਬ ਹੋਣ ਵਾਲੇ ਸੁਨੇਹਿਆਂ ਦਾ ਟਾਈਮਰ %1$s ਮਿੰਟ ਉੱਤੇ ਸੈੱਟ ਕੀਤਾ।</translation>
+    </message>
+    <message>
+        <source>You set disappearing messages timer to %1$s hours.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;ephemeral_timer_hours_by_you&quot;.</extracomment>
+        <translation>ਤੁਸੀਂ ਗਾਇਬ ਹੋਣ ਵਾਲੇ ਸੁਨੇਹਿਆਂ ਦਾ ਟਾਈਮਰ %1$s ਘੰਟੇ ਉੱਤੇ ਸੈੱਟ ਕੀਤਾ।</translation>
+    </message>
+    <message>
+        <source>Disappearing messages timer set to %1$s hours by %2$s.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;ephemeral_timer_hours_by_other&quot;.</extracomment>
+        <translation>%2$s ਨੇ ਗਾਇਬ ਹੋਣ ਵਾਲੇ ਸੁਨੇਹਿਆਂ ਦਾ ਟਾਈਮਰ %1$s ਘੰਟੇ ਉੱਤੇ ਸੈੱਟ ਕੀਤਾ।</translation>
+    </message>
+    <message>
+        <source>You set disappearing messages timer to %1$s days.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;ephemeral_timer_days_by_you&quot;.</extracomment>
+        <translation>ਤੁਸੀਂ ਗਾਇਬ ਹੋਣ ਵਾਲੇ ਸੁਨੇਹਿਆਂ ਦਾ ਟਾਈਮਰ %1$s ਦਿਨ ਉੱਤੇ ਸੈੱਟ ਕੀਤਾ।</translation>
+    </message>
+    <message>
+        <source>Disappearing messages timer set to %1$s days by %2$s.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;ephemeral_timer_days_by_other&quot;.</extracomment>
+        <translation>%2$s ਨੇ ਗਾਇਬ ਹੋਣ ਵਾਲੇ ਸੁਨੇਹਿਆਂ ਦਾ ਟਾਈਮਰ %1$s ਦਿਨ ਉੱਤੇ ਸੈੱਟ ਕੀਤਾ।</translation>
+    </message>
+    <message>
+        <source>You set disappearing messages timer to %1$s weeks.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;ephemeral_timer_weeks_by_you&quot;.</extracomment>
+        <translation>ਤੁਸੀਂ ਗਾਇਬ ਹੋਣ ਵਾਲੇ ਸੁਨੇਹਿਆਂ ਦਾ ਟਾਈਮਰ %1$s ਹਫ਼ਤੇ ਉੱਤੇ ਸੈੱਟ ਕੀਤਾ।</translation>
+    </message>
+    <message>
+        <source>Disappearing messages timer set to %1$s weeks by %2$s.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;ephemeral_timer_weeks_by_other&quot;.</extracomment>
+        <translation>%2$s ਨੇ ਗਾਇਬ ਹੋਣ ਵਾਲੇ ਸੁਨੇਹਿਆਂ ਦਾ ਟਾਈਮਰ %1$s ਹਫ਼ਤੇ ਉੱਤੇ ਸੈੱਟ ਕੀਤਾ।</translation>
+    </message>
+    <message>
+        <source>You set disappearing messages timer to 1 year.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;ephemeral_timer_1_year_by_you&quot;.</extracomment>
+        <translation>ਤੁਸੀਂ ਗਾਇਬ ਹੋਣ ਵਾਲੇ ਸੁਨੇਹਿਆਂ ਦਾ ਟਾਈਮਰ 1 ਸਾਲ ਉੱਤੇ ਸੈੱਟ ਕੀਤਾ।</translation>
+    </message>
+    <message>
+        <source>Disappearing messages timer set to 1 year by %1$s.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;ephemeral_timer_1_year_by_other&quot;.</extracomment>
+        <translation>%1$s ਨੇ ਗਾਇਬ ਹੋਣ ਵਾਲੇ ਸੁਨੇਹਿਆਂ ਦਾ ਟਾਈਮਰ 1 ਸਾਲ ਉੱਤੇ ਸੈੱਟ ਕੀਤਾ।</translation>
+    </message>
+    <message>
+        <source>Scan to set up second device for %1$s</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;multidevice_qr_subtitle&quot;.</extracomment>
+        <translation>%1$s ਲਈ ਦੂਜੀ ਡਿਵਾਈਸ ਸੈੱਟ ਕਰਨ ਵਾਸਤੇ ਸਕੈਨ ਕਰੋ</translation>
+    </message>
+    <message>
+        <source>ℹ️ Profile transferred to your second device.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;multidevice_transfer_done_devicemsg&quot;.</extracomment>
+        <translation>ℹ️ ਪ੍ਰੋਫ਼ਾਈਲ ਤੁਹਾਡੀ ਦੂਜੀ ਡਿਵਾਈਸ ਉੱਤੇ ਭੇਜ ਦਿੱਤੀ ਗਈ।</translation>
+    </message>
+    <message>
+        <source>Messages are end-to-end encrypted.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;messages_are_e2ee&quot;.</extracomment>
+        <translation>ਸੁਨੇਹੇ ਐਂਡ-ਟੂ-ਐਂਡ ਇਨਕ੍ਰਿਪਟਿਡ ਹਨ।</translation>
+    </message>
+    <message>
+        <source>Others will only see this group after you sent a first message.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;chat_new_group_hint&quot;.</extracomment>
+        <translation>ਤੁਹਾਡੇ ਪਹਿਲਾ ਸੁਨੇਹਾ ਭੇਜਣ ਤੋਂ ਬਾਅਦ ਹੀ ਦੂਜੇ ਲੋਕ ਇਹ ਗਰੁੱਪ ਵੇਖ ਸਕਣਗੇ।</translation>
+    </message>
+    <message>
+        <source>Member %1$s added.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;member_x_added&quot;.</extracomment>
+        <translation>ਮੈਂਬਰ %1$s ਨੂੰ ਸ਼ਾਮਲ ਕੀਤਾ ਗਿਆ।</translation>
+    </message>
+    <message>
+        <source>You reacted %1$s to &quot;%2$s&quot;</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;reaction_by_you&quot;.</extracomment>
+        <translation>ਤੁਸੀਂ &quot;%2$s&quot; ਉੱਤੇ %1$s ਨਾਲ ਪ੍ਰਤੀਕਿਰਿਆ ਦਿੱਤੀ</translation>
+    </message>
+    <message>
+        <source>%1$s reacted %2$s to &quot;%3$s&quot;</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;reaction_by_other&quot;.</extracomment>
+        <translation>%1$s ਨੇ &quot;%3$s&quot; ਉੱਤੇ %2$s ਨਾਲ ਪ੍ਰਤੀਕਿਰਿਆ ਦਿੱਤੀ</translation>
+    </message>
+    <message>
+        <source>Member %1$s removed.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;member_x_removed&quot;.</extracomment>
+        <translation>ਮੈਂਬਰ %1$s ਨੂੰ ਹਟਾਇਆ ਗਿਆ।</translation>
+    </message>
+    <message>
+        <source>You were removed by %1$s.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;remove_you_by_other&quot;.</extracomment>
+        <translation>ਤੁਹਾਨੂੰ %1$s ਨੇ ਹਟਾ ਦਿੱਤਾ।</translation>
+    </message>
+    <message>
+        <source>You were added by %1$s.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;add_you_by_other&quot;.</extracomment>
+        <translation>ਤੁਹਾਨੂੰ %1$s ਨੇ ਸ਼ਾਮਲ ਕੀਤਾ।</translation>
+    </message>
+    <message>
+        <source>You were removed.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;member_you_removed&quot;.</extracomment>
+        <translation>ਤੁਹਾਨੂੰ ਹਟਾ ਦਿੱਤਾ ਗਿਆ।</translation>
+    </message>
+    <message>
+        <source>You were added.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;member_you_added&quot;.</extracomment>
+        <translation>ਤੁਹਾਨੂੰ ਸ਼ਾਮਲ ਕੀਤਾ ਗਿਆ।</translation>
+    </message>
+    <message>
+        <source>Establishing connection, please wait…</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;secure_join_wait&quot;.</extracomment>
+        <translation>ਕੁਨੈਕਸ਼ਨ ਬਣਾਇਆ ਜਾ ਰਿਹਾ ਹੈ, ਕਿਰਪਾ ਕਰਕੇ ਉਡੀਕ ਕਰੋ…</translation>
+    </message>
+    <message>
+        <source>❤️ Seems you&apos;re enjoying Delta Chat!
+
+Please consider donating to help ensure that Delta Chat stays free for everyone.
+
+While Delta Chat is free to use and open source, development costs money. Help us to keep Delta Chat independent and make it even more awesome in the future.
+
+https://delta.chat/donate</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;donate_device_msg&quot;.</extracomment>
+        <translation>❤️ ਲੱਗਦਾ ਹੈ ਤੁਹਾਨੂੰ Delta Chat ਪਸੰਦ ਆ ਰਿਹਾ ਹੈ!
+
+ਕਿਰਪਾ ਕਰਕੇ ਦਾਨ ਕਰਨ ਬਾਰੇ ਸੋਚੋ, ਤਾਂ ਜੋ Delta Chat ਸਾਰਿਆਂ ਲਈ ਮੁਫ਼ਤ ਰਹੇ।
+
+Delta Chat ਵਰਤਣ ਲਈ ਮੁਫ਼ਤ ਅਤੇ ਓਪਨ ਸੋਰਸ ਹੈ, ਪਰ ਵਿਕਾਸ ਉੱਤੇ ਖਰਚਾ ਆਉਂਦਾ ਹੈ। Delta Chat ਨੂੰ ਆਜ਼ਾਦ ਰੱਖਣ ਅਤੇ ਭਵਿੱਖ ਵਿੱਚ ਇਸ ਨੂੰ ਹੋਰ ਵਧੀਆ ਬਣਾਉਣ ਵਿੱਚ ਸਾਡੀ ਮਦਦ ਕਰੋ।
+
+https://delta.chat/donate</translation>
+    </message>
+    <message>
+        <source>Declined call</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;declined_call&quot;.</extracomment>
+        <translation>ਨਾਮਨਜ਼ੂਰ ਕੀਤੀ ਕਾਲ</translation>
+    </message>
+    <message>
+        <source>Canceled call</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;canceled_call&quot;.</extracomment>
+        <translation>ਰੱਦ ਕੀਤੀ ਕਾਲ</translation>
+    </message>
+    <message>
+        <source>Missed call</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;missed_call&quot;.</extracomment>
+        <translation>ਮਿਸ ਹੋਈ ਕਾਲ</translation>
+    </message>
+    <message>
+        <source>You left the channel.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;channel_left_by_you&quot;.</extracomment>
+        <translation>ਤੁਸੀਂ ਚੈਨਲ ਛੱਡ ਦਿੱਤਾ।</translation>
+    </message>
+    <message>
+        <source>Scan to join channel &quot;%1$s&quot;</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;qrshow_join_channel_hint&quot;.</extracomment>
+        <translation>ਚੈਨਲ &quot;%1$s&quot; ਵਿੱਚ ਸ਼ਾਮਲ ਹੋਣ ਲਈ ਸਕੈਨ ਕਰੋ</translation>
+    </message>
+    <message>
+        <source>You joined the channel.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;you_joined_the_channel&quot;.</extracomment>
+        <translation>ਤੁਸੀਂ ਚੈਨਲ ਵਿੱਚ ਸ਼ਾਮਲ ਹੋ ਗਏ।</translation>
+    </message>
+    <message>
+        <source>%1$s invited you to join this channel.
+
+Waiting for the device of %2$s to reply…</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;secure_join_channel_started&quot;.</extracomment>
+        <translation>%1$s ਨੇ ਤੁਹਾਨੂੰ ਇਸ ਚੈਨਲ ਵਿੱਚ ਸ਼ਾਮਲ ਹੋਣ ਲਈ ਸੱਦਾ ਦਿੱਤਾ ਹੈ।
+
+%2$s ਦੀ ਡਿਵਾਈਸ ਦੇ ਜਵਾਬ ਦੀ ਉਡੀਕ ਹੈ…</translation>
+    </message>
+    <message>
+        <source>Channel name changed from &quot;%1$s&quot; to &quot;%2$s&quot;.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;channel_name_changed&quot;.</extracomment>
+        <translation>ਚੈਨਲ ਦਾ ਨਾਂ &quot;%1$s&quot; ਤੋਂ ਬਦਲ ਕੇ &quot;%2$s&quot; ਕਰ ਦਿੱਤਾ ਗਿਆ।</translation>
+    </message>
+    <message>
+        <source>Channel image changed.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;channel_image_changed&quot;.</extracomment>
+        <translation>ਚੈਨਲ ਦੀ ਤਸਵੀਰ ਬਦਲ ਦਿੱਤੀ ਗਈ।</translation>
+    </message>
+    <message>
+        <source>The attachment contains anonymous usage statistics, which helps us improve Delta Chat. See https://delta.chat/help#statssending for more information. Thank you!</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;stats_msg_body&quot;.</extracomment>
+        <translation>ਅਟੈਚਮੈਂਟ ਵਿੱਚ ਗੁੰਮਨਾਮ ਵਰਤੋਂ ਦੇ ਅੰਕੜੇ ਹਨ, ਜੋ Delta Chat ਨੂੰ ਬਿਹਤਰ ਬਣਾਉਣ ਵਿੱਚ ਸਾਡੀ ਮਦਦ ਕਰਦੇ ਹਨ। ਵਧੇਰੇ ਜਾਣਕਾਰੀ ਲਈ https://delta.chat/help#statssending ਵੇਖੋ। ਧੰਨਵਾਦ!</translation>
+    </message>
+    <message>
+        <source>Proxy Enabled</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;proxy_enabled&quot;.</extracomment>
+        <translation>ਪ੍ਰੌਕਸੀ ਚਾਲੂ</translation>
+    </message>
+    <message>
+        <source>You are using a proxy. If you&apos;re having trouble connecting, try a different proxy.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;proxy_enabled_hint&quot;.</extracomment>
+        <translation>ਤੁਸੀਂ ਪ੍ਰੌਕਸੀ ਵਰਤ ਰਹੇ ਹੋ। ਜੇ ਜੁੜਨ ਵਿੱਚ ਮੁਸ਼ਕਲ ਆ ਰਹੀ ਹੈ ਤਾਂ ਕੋਈ ਹੋਰ ਪ੍ਰੌਕਸੀ ਅਜ਼ਮਾਓ।</translation>
+    </message>
+    <message>
+        <source>Messages in this chat use classic email and are not end-to-end encrypted.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;chat_unencrypted_explanation&quot;.</extracomment>
+        <translation>ਇਸ ਚੈਟ ਦੇ ਸੁਨੇਹੇ ਆਮ ਈਮੇਲ ਵਰਤਦੇ ਹਨ ਅਤੇ ਐਂਡ-ਟੂ-ਐਂਡ ਇਨਕ੍ਰਿਪਟਿਡ ਨਹੀਂ ਹਨ।</translation>
+    </message>
+    <message>
+        <source>Outgoing audio call</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;outgoing_audio_call&quot;.</extracomment>
+        <translation>ਜਾਣ ਵਾਲੀ ਆਡੀਓ ਕਾਲ</translation>
+    </message>
+    <message>
+        <source>Outgoing video call</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;outgoing_video_call&quot;.</extracomment>
+        <translation>ਜਾਣ ਵਾਲੀ ਵੀਡੀਓ ਕਾਲ</translation>
+    </message>
+    <message>
+        <source>Incoming audio call</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;incoming_audio_call&quot;.</extracomment>
+        <translation>ਆਉਣ ਵਾਲੀ ਆਡੀਓ ਕਾਲ</translation>
+    </message>
+    <message>
+        <source>Incoming video call</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;incoming_video_call&quot;.</extracomment>
+        <translation>ਆਉਣ ਵਾਲੀ ਵੀਡੀਓ ਕਾਲ</translation>
+    </message>
+    <message>
+        <source>You changed the chat description.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;chat_description_changed_by_you&quot;.</extracomment>
+        <translation>ਤੁਸੀਂ ਚੈਟ ਦਾ ਵੇਰਵਾ ਬਦਲ ਦਿੱਤਾ।</translation>
+    </message>
+    <message>
+        <source>Chat description changed by %1$s.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;chat_description_changed_by_other&quot;.</extracomment>
+        <translation>%1$s ਨੇ ਚੈਟ ਦਾ ਵੇਰਵਾ ਬਦਲ ਦਿੱਤਾ।</translation>
+    </message>
+    <message>
+        <source>You pinned a message</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;message_pinned_by_you&quot;.</extracomment>
+        <translation>ਤੁਸੀਂ ਇੱਕ ਸੁਨੇਹਾ ਪਿੰਨ ਕੀਤਾ</translation>
+    </message>
+    <message>
+        <source>Message pinned by %1$s</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;message_pinned_by_other&quot;.</extracomment>
+        <translation>%1$s ਨੇ ਇੱਕ ਸੁਨੇਹਾ ਪਿੰਨ ਕੀਤਾ</translation>
+    </message>
+</context>
+<context>
     <name>VideoPage</name>
     <message>
         <source>Open in another app</source>
