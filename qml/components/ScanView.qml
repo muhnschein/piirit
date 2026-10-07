@@ -34,12 +34,22 @@ import Piirit 1.0
  * reason: a dialog's own pop would be the transition the host's
  * navigation lands in.
  *
- * Focus is asked for three ways, because a camera left to itself gave a
- * viewfinder too soft for any code to register: continuous autofocus in
- * the video pipeline, where the platform's cameras run it; a focus search
- * every couple of seconds while nothing has been read, for a camera that
- * only focuses when told; and a tap on the viewfinder, which focuses on
- * the point under the finger.
+ * Focus is the camera's own: continuous autofocus, left to run, and a
+ * tap on the viewfinder for a reader who wants the point under the
+ * finger. Nothing else asks for a focus search, because in the video
+ * pipeline a search does not search. The platform's camera stack turns
+ * continuous focus into the Android HAL's "continuous-video" mode when
+ * the camera captures video, and the HAL's own state machine says that a
+ * focus trigger in that mode locks the lens where it is, at once,
+ * mid-sweep or not -- unlike "continuous-picture", which finishes the
+ * sweep first. A search every couple of seconds, which this view used to
+ * run, therefore pinned the lens wherever it happened to be, from the
+ * moment the camera started, and gave continuous focus no time between
+ * the unlock and the next lock to find the code: the likeliest reason a
+ * Jolla Phone's viewfinder stayed blurred until the system camera app,
+ * opened alongside, took the lens over and focused it.
+ * CodeReader and Foil Auth, which read codes on the same platform, run
+ * continuous focus the same way and only search on a tap.
  */
 Item {
     id: root
@@ -148,9 +158,13 @@ Item {
         objectName: "camera"
         // The video pipeline is where continuous autofocus runs.
         captureMode: Camera.CaptureVideo
+        // Continuous, except for the few seconds after a tap: a search in
+        // continuous video focus locks the lens where it is rather than
+        // looking, so a tap switches to plain autofocus, which does look,
+        // and switches back once the hold is over.
         focus {
-            focusMode: Camera.FocusContinuous
-            focusPointMode: Camera.FocusPointAuto
+            focusMode: focusHold.running ? Camera.FocusAuto : Camera.FocusContinuous
+            focusPointMode: focusHold.running ? Camera.FocusPointCustom : Camera.FocusPointAuto
         }
         // The resolution is picked as soon as the camera can say what it
         // has, which is before it goes active.
@@ -215,23 +229,27 @@ Item {
         root.viewfinderChosen = true
     }
 
-    // An autofocus run, for a camera that does not run one on its own.
-    // Unlocked first: a search that finds focus locks it, and a locked
-    // focus is a fixed one.
-    function refocus() {
+    /// Focus on a point of the viewfinder, given as a fraction of its
+    /// width and height. The hold starts first, so the camera is in
+    /// plain autofocus on that point before the search is asked for.
+    /// Unlocked first: a search that finds focus locks it, and a locked
+    /// focus is a fixed one.
+    function focusAt(x, y) {
+        focusHold.restart()
         camera.unlock()
+        camera.focus.customFocusPoint = Qt.point(x, y)
         camera.searchAndLock()
     }
 
-    // Every couple of seconds while nothing has been read.
+    // How long a tap's focus is kept. Once it is over the lock comes off
+    // and continuous focus takes the lens back: a lock kept for good is
+    // a fixed focus, which the next code held up at another distance
+    // would not be read through.
     Timer {
-        id: refocusTimer
-        objectName: "refocus"
-        interval: 2500
-        repeat: true
-        triggeredOnStart: true
-        running: root.active && !root.done
-        onTriggered: root.refocus()
+        id: focusHold
+        objectName: "focusHold"
+        interval: 5000
+        onTriggered: camera.unlock()
     }
 
     // The camera runs only while this view is the one on screen.
@@ -307,11 +325,7 @@ Item {
         MouseArea {
             objectName: "focusTap"
             anchors.fill: parent
-            onClicked: {
-                camera.focus.focusPointMode = Camera.FocusPointCustom
-                camera.focus.customFocusPoint = Qt.point(mouse.x / width, mouse.y / height)
-                root.refocus()
-            }
+            onClicked: root.focusAt(mouse.x / width, mouse.y / height)
         }
     }
 

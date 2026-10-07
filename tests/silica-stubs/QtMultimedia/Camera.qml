@@ -3,9 +3,19 @@ import QtQuick 2.0
 // The camera. Nothing is captured here; what a test can check is that a
 // page starts and stops it with its own status, wires it to a viewfinder,
 // asks it to focus, and drives its still and video capture through the
-// two objects below. The enums the pages name (Camera.FocusContinuous
-// and the like) are the real type's and read as undefined here.
+// two objects below. The capture and focus enums carry QCamera's own
+// values, so a test can check which mode a page asked for; the rest the
+// pages name (Camera.FrontFace and the like) read as undefined here.
 QtObject {
+    enum CaptureMode { CaptureViewfinder = 0, CaptureStillImage = 1, CaptureVideo = 2 }
+    enum FocusMode {
+        FocusManual = 1, FocusHyperfocal = 2, FocusInfinity = 4,
+        FocusAuto = 8, FocusContinuous = 16, FocusMacro = 32
+    }
+    enum FocusPointMode {
+        FocusPointAuto = 0, FocusPointCenter = 1,
+        FocusPointFaceDetection = 2, FocusPointCustom = 3
+    }
     property bool running: false
     property var captureMode
     // QCamera::Position's own values: BackFace 1, FrontFace 2. The enum
@@ -19,8 +29,10 @@ QtObject {
     property CameraMetaData metaData: CameraMetaData {}
     property CameraCapture imageCapture: CameraCapture {}
     property CameraRecorder videoRecorder: CameraRecorder {}
-    /// How many focus searches were asked for.
+    /// How many focus searches were asked for, and how many locks taken
+    /// off.
     property int searches: 0
+    property int unlocks: 0
     // What the camera can run its viewfinder at, and what it was asked
     // for. A real camera answers this only once it is loaded, and some
     // answer with nothing at all, so a test can empty the list to check
@@ -45,5 +57,5 @@ QtObject {
         }
     }
     function searchAndLock() { searches += 1 }
-    function unlock() { }
+    function unlock() { unlocks += 1 }
 }

@@ -12,6 +12,11 @@
 //! panel over it, with the clipboard's contents in it when they look
 //! like an invite, and what is entered there is handed back the way a
 //! scanned code is.
+//!
+//! Focus is left to the camera's continuous autofocus, with no search
+//! asked for until the viewfinder is tapped: in continuous video focus a
+//! search locks the lens where it is (issue #122). A tap focuses on its
+//! point in plain autofocus, and lets go again once the hold is over.
 
 // Qt harness: needs `unsafe` for `env::set_var` before Qt starts
 // (`unused_unsafe` because it is only unsafe from edition 2024 on),
@@ -115,6 +120,33 @@ const PROBE_QML: &str = r"
             camera.viewfinderResolutions = []
             loader.item.viewfinderChosen = false
             loader.item.chooseViewfinder()
+            return 'ok'
+        }
+        // What the camera was told about focus, and how often it was
+        // asked to search and to let go.
+        function focusState() {
+            var camera = cameraOf()
+            if (!camera) { return 'no-camera' }
+            var point = camera.focus.customFocusPoint
+            return 'capture:' + camera.captureMode
+                 + ' focus:' + camera.focus.focusMode
+                 + ' point:' + camera.focus.focusPointMode
+                 + ' at:' + point.x + ',' + point.y
+                 + ' searches:' + camera.searches
+                 + ' unlocks:' + camera.unlocks
+        }
+        // A tap on the viewfinder, at a fraction of its width and height.
+        function tapAt(x, y) {
+            if (typeof loader.item.focusAt !== 'function') { return 'no-focusAt' }
+            loader.item.focusAt(parseFloat(x), parseFloat(y))
+            return 'ok'
+        }
+        // A timer running out, without waiting for it.
+        function expire(name) {
+            var timer = findIn(loader.item, name)
+            if (!timer) { return 'missing:' + name }
+            timer.stop()
+            timer.triggered()
             return 'ok'
         }
         function decode(path) {
@@ -246,8 +278,8 @@ fn a_code_held_up_to_the_page_comes_back_as_its_text() {
         call!("setActive", true);
         record!("camera-active", get!("camera", "running"));
         record!("grabbing-active", get!("grabber", "running"));
-        // Focus is asked for while nothing has been read.
-        record!("focusing-active", get!("refocus", "running"));
+        // Continuous focus, left to run: the camera is not told to search.
+        record!("focus-idle", call!("focusState"));
         record!("acting-before", get!("acting", "running"));
         // The viewfinder timer's own call, with the frame made above.
         record!(
@@ -269,10 +301,9 @@ fn a_code_held_up_to_the_page_comes_back_as_its_text() {
                 record!("heard", call!("heardText"));
                 record!("camera-after", get!("camera", "running"));
                 record!("grabbing-after", get!("grabber", "running"));
-                record!("focusing-after", get!("refocus", "running"));
                 record!("acting-after", get!("acting", "running"));
-                // The first search ran as soon as the view came on screen, on
-                // the event loop turn after it did.
+                // Seconds on screen and no search was asked for: in continuous
+                // video focus a search locks the lens where it is.
                 record!("searches", get!("camera", "searches"));
                 // The other way in, on a fresh view: a link typed rather than
                 // scanned, with the clipboard offering it first.
@@ -281,6 +312,15 @@ fn a_code_held_up_to_the_page_comes_back_as_its_text() {
                     call!("load", QString::from(common::component_url("ScanView.qml")))
                 );
                 call!("setActive", true);
+                // A tap: plain autofocus on the point under the finger for
+                // a while, then the lock off and continuous focus back.
+                record!(
+                    "tap",
+                    call!("tapAt", QString::from("0.25"), QString::from("0.75"))
+                );
+                record!("focus-tapped", call!("focusState"));
+                record!("hold-over", call!("expire", QString::from("focusHold")));
+                record!("focus-released", call!("focusState"));
                 record!("panel-before", get!("linkPanel", "visible"));
                 record!(
                     "shopping",
@@ -343,9 +383,32 @@ fn assert_typed(steps: &[(&str, String)]) {
             .map(|(_, value)| value.clone())
             .unwrap_or_default()
     };
-    for label in ["reload", "open", "reload-again", "open-again", "connect"] {
+    for label in [
+        "reload",
+        "tap",
+        "hold-over",
+        "open",
+        "reload-again",
+        "open-again",
+        "connect",
+    ] {
         assert_eq!(value(label), "ok", "step {label} failed. {context}");
     }
+    // A tap searches once, in plain autofocus on the point under the
+    // finger: in continuous video focus the search would lock the lens
+    // without looking.
+    assert_eq!(
+        value("focus-tapped"),
+        "capture:2 focus:8 point:3 at:0.25,0.75 searches:1 unlocks:1",
+        "a tap did not focus on the point under the finger. {context}"
+    );
+    // And once the hold is over the lock comes off and continuous focus
+    // takes the lens back, rather than it staying fixed for good.
+    assert_eq!(
+        value("focus-released"),
+        "capture:2 focus:16 point:0 at:0.25,0.75 searches:1 unlocks:2",
+        "focus stayed locked after a tap. {context}"
+    );
     assert_eq!(
         value("panel-before"),
         "false",
@@ -460,13 +523,16 @@ fn assert_scan(steps: &[(&str, String)]) {
         "frames are not grabbed while the view is on screen. {context}"
     );
     assert_eq!(
-        value("focusing-active"),
-        "true",
-        "focus is not being asked for while scanning. {context}"
+        value("focus-idle"),
+        "capture:2 focus:16 point:0 at:0,0 searches:0 unlocks:0",
+        "the camera is not left in continuous focus while scanning. {context}"
     );
-    assert!(
-        value("searches").parse::<u32>().unwrap_or(0) >= 1,
-        "no focus search was run when the view came on screen. {context}"
+    assert_eq!(
+        value("searches"),
+        "0",
+        "a focus search was asked for with nothing tapped. In continuous \
+         video focus a search locks the lens where it is, which is how a \
+         viewfinder stays blurred (issue #122). {context}"
     );
     assert_eq!(
         value("busy"),
@@ -488,11 +554,6 @@ fn assert_scan(steps: &[(&str, String)]) {
         value("grabbing-after"),
         "false",
         "frames keep being grabbed after a code was read. {context}"
-    );
-    assert_eq!(
-        value("focusing-after"),
-        "false",
-        "focus keeps being asked for after a code was read. {context}"
     );
     assert_eq!(
         value("acting-before"),
