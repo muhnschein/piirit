@@ -751,6 +751,31 @@ async fn offline_round_trip_against_real_core() {
         Some("Group"),
         "unexpected chat shape: {full:?}"
     );
+    // The description ChatInfo reads beside the full chat, which does not
+    // carry it, and sets as it was typed less its outer whitespace: the
+    // line break inside is kept, and an empty text clears it.
+    let description = |text: &'static str| {
+        let client = client.clone();
+        async move {
+            client
+                .call::<_, ()>("set_chat_description", (account_id, group_chat_id, text))
+                .await
+                .expect("set_chat_description");
+            client
+                .call::<_, String>("get_chat_description", (account_id, group_chat_id))
+                .await
+                .expect("get_chat_description")
+        }
+    };
+    assert_eq!(
+        description("Walks\nBring boots").await,
+        "Walks\nBring boots"
+    );
+    assert_eq!(
+        description("").await,
+        "",
+        "an empty description does not clear it"
+    );
     // What a contact's page reads, with the chat's kind and `canSend`,
     // to say whether a call can be placed there (piirit-shim's
     // `takes_calls`): the same flags `get_basic_chat_info` carries.
