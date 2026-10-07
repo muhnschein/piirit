@@ -544,6 +544,21 @@ Other groups with blocked contacts will still show their messages.</source>
         <extracomment>A quick action on the cover was tapped, and the chat it was set up to open has been deleted since.</extracomment>
         <translation>Αυτή η συνομιλία δεν υπάρχει πια.</translation>
     </message>
+    <message>
+        <source>Unread chats</source>
+        <extracomment>Under the &quot;Chats&quot; title while only chats with unread messages are listed.</extracomment>
+        <translation>Μη αναγνωσμένες συνομιλίες</translation>
+    </message>
+    <message>
+        <source>No unread chats</source>
+        <extracomment>The unread filter is on and every chat has been read.</extracomment>
+        <translation>Δεν υπάρχουν μη αναγνωσμένες συνομιλίες</translation>
+    </message>
+    <message>
+        <source>Tap the filter icon to show all chats</source>
+        <extracomment>The filter icon is the three lines at the right of the search field.</extracomment>
+        <translation>Πατήστε το εικονίδιο φίλτρου για να εμφανιστούν όλες οι συνομιλίες</translation>
+    </message>
 </context>
 <context>
     <name>ChatMediaPage</name>

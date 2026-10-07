@@ -548,6 +548,21 @@ Mensagens de contactos bloqueados não serão ocultadas noutros grupos.</transla
         <extracomment>A quick action on the cover was tapped, and the chat it was set up to open has been deleted since.</extracomment>
         <translation>Essa conversa já não existe.</translation>
     </message>
+    <message>
+        <source>Unread chats</source>
+        <extracomment>Under the &quot;Chats&quot; title while only chats with unread messages are listed.</extracomment>
+        <translation>Conversas não lidas</translation>
+    </message>
+    <message>
+        <source>No unread chats</source>
+        <extracomment>The unread filter is on and every chat has been read.</extracomment>
+        <translation>Sem conversas não lidas</translation>
+    </message>
+    <message>
+        <source>Tap the filter icon to show all chats</source>
+        <extracomment>The filter icon is the three lines at the right of the search field.</extracomment>
+        <translation>Toque no ícone de filtro para mostrar todas as conversas</translation>
+    </message>
 </context>
 <context>
     <name>ChatMediaPage</name>

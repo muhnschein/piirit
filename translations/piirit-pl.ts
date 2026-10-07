@@ -550,6 +550,21 @@ Wiadomości innych grup z zablokowanymi kontaktami nadal będą wyświetlane.</t
         <extracomment>A quick action on the cover was tapped, and the chat it was set up to open has been deleted since.</extracomment>
         <translation>Ten czat już nie istnieje.</translation>
     </message>
+    <message>
+        <source>Unread chats</source>
+        <extracomment>Under the &quot;Chats&quot; title while only chats with unread messages are listed.</extracomment>
+        <translation>Nieprzeczytane czaty</translation>
+    </message>
+    <message>
+        <source>No unread chats</source>
+        <extracomment>The unread filter is on and every chat has been read.</extracomment>
+        <translation>Brak nieprzeczytanych czatów</translation>
+    </message>
+    <message>
+        <source>Tap the filter icon to show all chats</source>
+        <extracomment>The filter icon is the three lines at the right of the search field.</extracomment>
+        <translation>Stuknij ikonę filtra, aby pokazać wszystkie czaty</translation>
+    </message>
 </context>
 <context>
     <name>ChatMediaPage</name>

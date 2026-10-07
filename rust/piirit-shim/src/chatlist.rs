@@ -24,6 +24,10 @@ use crate::models::{ChatListItem, ChatListModel};
 /// SilicaListView { model: chats.rows }
 /// ```
 #[derive(QObject, Default)]
+// `archived`, `for_forwarding`, `notify_mentions` and `unread_only` are
+// four properties QML sets on their own, each a question it asks of the
+// list; folding them into one field would hide them from QML.
+#[allow(clippy::struct_excessive_bools)]
 pub struct ChatList {
     base: qt_base_class!(trait QObject),
 
@@ -53,6 +57,19 @@ pub struct ChatList {
     pub for_forwarding: qt_property!(bool; WRITE set_for_forwarding NOTIFY for_forwarding_changed),
     /// Emitted when the forwarding flag changes.
     pub for_forwarding_changed: qt_signal!(),
+
+    /// Show only the chats with something unread in them.
+    ///
+    /// Filtered here rather than asked of the core: `get_chatlist_entries`
+    /// has no flag for it, and every row's unread count is already in hand.
+    /// A chat read while the filter is on stays (see `kept`), so the row
+    /// the reader came back to does not vanish from under their thumb.
+    pub unread_only: qt_property!(bool; WRITE set_unread_only NOTIFY unread_only_changed),
+    /// Emitted when the unread filter is turned on or off.
+    pub unread_only_changed: qt_signal!(),
+    /// Let the chats read since the filter went on go, as turning it on
+    /// afresh would. For the app coming back from the background.
+    pub forget_read: qt_method!(fn(&mut self)),
 
     /// Whether a message in a muted group that answers one of the
     /// account's own is announced all the same. The reader's setting:
@@ -175,6 +192,17 @@ pub struct ChatList {
     /// stays. So whatever is still owed an answer is refetched by
     /// whichever refresh comes next, until one of them lands.
     awaiting: Awaiting,
+
+    /// Every chat the core listed, whatever the unread filter shows of
+    /// them. What a refresh reuses rows from, and what the cover's counts
+    /// and the announcements read: a chat filtered out of view is still a
+    /// chat that can have a message arrive in it.
+    all_rows: Vec<ChatListItem>,
+
+    /// The chats the unread filter lets through: every chat that has had
+    /// something unread since the filter went on. Cleared when it is
+    /// turned on and by `forget_read`.
+    kept: HashSet<u32>,
 }
 
 impl ChatList {
@@ -183,10 +211,9 @@ impl ChatList {
         u32::try_from(self.rows.borrow().iter().count()).unwrap_or(u32::MAX)
     }
 
-    /// Unread messages across every chat.
+    /// Unread messages across every chat, shown or filtered out.
     pub fn unread_total(&self) -> u32 {
-        self.rows
-            .borrow()
+        self.all_rows
             .iter()
             .fold(0u32, |total, row| total.saturating_add(row.unread_count))
     }
@@ -194,8 +221,7 @@ impl ChatList {
     /// The people behind the chats, as JSON; see the property.
     pub fn cover_people(&self) -> QString {
         let people: Vec<serde_json::Value> = self
-            .rows
-            .borrow()
+            .all_rows
             .iter()
             .filter(|row| !row.is_self_talk && !row.is_device_talk)
             .map(|row| {
@@ -285,8 +311,7 @@ impl ChatList {
     /// Whether the row for this chat is muted. A chat not in the list is
     /// a new one, which nobody has had the chance to mute.
     fn is_muted(&self, chat_id: u32) -> bool {
-        self.rows
-            .borrow()
+        self.all_rows
             .iter()
             .any(|row| row.chat_id == chat_id && row.is_muted)
     }
@@ -344,6 +369,83 @@ impl ChatList {
             self.for_forwarding_changed();
             self.refresh(Refresh::All);
         }
+    }
+
+    /// Show only the chats with something unread, or all of them.
+    pub fn set_unread_only(&mut self, unread_only: bool) {
+        if self.unread_only != unread_only {
+            self.unread_only = unread_only;
+            // Turned on afresh, it starts from what is unread now.
+            self.kept.clear();
+            self.unread_only_changed();
+            self.show_later();
+        }
+    }
+
+    /// Let the chats read since the filter went on go.
+    pub fn forget_read(&mut self) {
+        if self.unread_only && !self.kept.is_empty() {
+            self.kept.clear();
+            self.show_later();
+        }
+    }
+
+    /// [`Self::show`], from the event loop rather than from here.
+    ///
+    /// Both callers are QML writing a property or calling a method, which
+    /// holds this object borrowed for the length of the call -- and the
+    /// rows changing builds delegates whose section headings read
+    /// `pinned_count` back, which would borrow it a second time.
+    fn show_later(&mut self) {
+        let ptr: QPointer<Self> = QPointer::from(&*self);
+        let show = queued_callback(move |(): ()| {
+            if let Some(this) = ptr.as_pinned() {
+                Self::show(this);
+            }
+        });
+        show(());
+    }
+
+    /// The rows the filter lets through, in the core's order.
+    fn shown(&mut self) -> Vec<ChatListItem> {
+        if !self.unread_only {
+            return self.all_rows.clone();
+        }
+        // Ids of chats gone from the core go with them, so the set never
+        // outgrows the list.
+        let listed: HashSet<u32> = self.all_rows.iter().map(|row| row.chat_id).collect();
+        self.kept.retain(|id| listed.contains(id));
+        for row in &self.all_rows {
+            if row.unread_count > 0 {
+                self.kept.insert(row.chat_id);
+            }
+        }
+        self.all_rows
+            .iter()
+            .filter(|row| self.kept.contains(&row.chat_id))
+            .cloned()
+            .collect()
+    }
+
+    /// Bring the model in line with `all_rows` and the filter.
+    fn show(this: QObjectPinned<'_, Self>) {
+        let target = {
+            let mut this_mut = this.borrow_mut();
+            let target = this_mut.shown();
+            // Counted before the rows are set, from the list about to
+            // become them: setting the rows is what makes QML read the
+            // counts back.
+            let pinned = target.iter().filter(|row| row.is_pinned).count();
+            this_mut.pinned_count = u32::try_from(pinned).unwrap_or(u32::MAX);
+            this_mut.unpinned_count = u32::try_from(target.len() - pinned).unwrap_or(u32::MAX);
+            target
+        };
+        {
+            let this_ref = this.borrow();
+            let mut rows = this_ref.rows.borrow_mut();
+            reconcile(&mut rows, target);
+        }
+        this.borrow().rows_changed();
     }
 
     /// Accept a contact request, so its chat becomes an ordinary one.
@@ -439,11 +541,11 @@ impl ChatList {
     /// still muted.
     fn settled_announcements(&mut self) -> Vec<(u32, QString, QString, QString)> {
         let waiting: Vec<u32> = self.pending_announcements.drain().collect();
-        let rows = self.rows.borrow();
         let mut announcements = Vec::new();
         for chat_id in waiting {
             let mentioned = self.mentioned.remove(&chat_id);
-            let row = rows
+            let row = self
+                .all_rows
                 .iter()
                 .find(|row| row.chat_id == chat_id && (!row.is_muted || mentioned));
             if let Some(row) = row {
@@ -484,7 +586,7 @@ impl ChatList {
         let query = self.query.to_string();
         let archived = self.archived;
         let for_forwarding = self.for_forwarding;
-        let cached: Vec<ChatListItem> = self.rows.borrow().iter().cloned().collect();
+        let cached: Vec<ChatListItem> = self.all_rows.clone();
         // A set, not a list: this is asked once per entry, and a long chat
         // list would otherwise make the scan quadratic.
         let known: HashSet<u32> = cached.iter().map(|row| row.chat_id).collect();
@@ -516,26 +618,15 @@ impl ChatList {
             match result {
                 Ok(target) => {
                     {
-                        // Counted before the rows are set, from the list
-                        // about to become them: setting the rows is what
-                        // makes QML read the counts back.
-                        let pinned = target.iter().filter(|row| row.is_pinned).count();
                         let mut this_mut = this.borrow_mut();
-                        this_mut.pinned_count = u32::try_from(pinned).unwrap_or(u32::MAX);
-                        this_mut.unpinned_count =
-                            u32::try_from(target.len() - pinned).unwrap_or(u32::MAX);
+                        this_mut.all_rows = target;
                         // Everything that was waiting was re-read by this
                         // refresh, so nothing is owed any more. A failed
                         // one leaves it waiting, for the next refresh to
                         // ask about again.
                         this_mut.awaiting = Awaiting::Nothing;
                     }
-                    {
-                        let this_ref = this.borrow();
-                        let mut rows = this_ref.rows.borrow_mut();
-                        reconcile(&mut rows, target);
-                    }
-                    this.borrow().rows_changed();
+                    Self::show(this);
                     let announcements = this.borrow_mut().settled_announcements();
                     for (chat_id, name, sender, preview) in announcements {
                         this.borrow()

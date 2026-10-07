@@ -548,6 +548,21 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
         <extracomment>A quick action on the cover was tapped, and the chat it was set up to open has been deleted since.</extracomment>
         <translation>Seda vestlust enam ei ole.</translation>
     </message>
+    <message>
+        <source>Unread chats</source>
+        <extracomment>Under the &quot;Chats&quot; title while only chats with unread messages are listed.</extracomment>
+        <translation>Lugemata vestlused</translation>
+    </message>
+    <message>
+        <source>No unread chats</source>
+        <extracomment>The unread filter is on and every chat has been read.</extracomment>
+        <translation>Lugemata vestlusi pole</translation>
+    </message>
+    <message>
+        <source>Tap the filter icon to show all chats</source>
+        <extracomment>The filter icon is the three lines at the right of the search field.</extracomment>
+        <translation>Kõigi vestluste nägemiseks puuduta filtri ikooni</translation>
+    </message>
 </context>
 <context>
     <name>ChatMediaPage</name>

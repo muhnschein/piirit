@@ -548,6 +548,21 @@ Other groups with blocked contacts will still show their messages.</source>
         <extracomment>A quick action on the cover was tapped, and the chat it was set up to open has been deleted since.</extracomment>
         <translation>ਇਹ ਚੈਟ ਹੁਣ ਮੌਜੂਦ ਨਹੀਂ ਹੈ।</translation>
     </message>
+    <message>
+        <source>Unread chats</source>
+        <extracomment>Under the &quot;Chats&quot; title while only chats with unread messages are listed.</extracomment>
+        <translation>ਅਣਪੜ੍ਹੀਆਂ ਚੈਟਾਂ</translation>
+    </message>
+    <message>
+        <source>No unread chats</source>
+        <extracomment>The unread filter is on and every chat has been read.</extracomment>
+        <translation>ਕੋਈ ਅਣਪੜ੍ਹੀ ਚੈਟ ਨਹੀਂ</translation>
+    </message>
+    <message>
+        <source>Tap the filter icon to show all chats</source>
+        <extracomment>The filter icon is the three lines at the right of the search field.</extracomment>
+        <translation>ਸਾਰੀਆਂ ਚੈਟਾਂ ਦਿਖਾਉਣ ਲਈ ਫਿਲਟਰ ਆਈਕਨ &apos;ਤੇ ਟੈਪ ਕਰੋ</translation>
+    </message>
 </context>
 <context>
     <name>ChatMediaPage</name>

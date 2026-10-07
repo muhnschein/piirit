@@ -548,6 +548,21 @@ Gli altri gruppi con contatti bloccati continueranno a visualizzare i loro messa
         <extracomment>A quick action on the cover was tapped, and the chat it was set up to open has been deleted since.</extracomment>
         <translation>Questa chat non esiste più.</translation>
     </message>
+    <message>
+        <source>Unread chats</source>
+        <extracomment>Under the &quot;Chats&quot; title while only chats with unread messages are listed.</extracomment>
+        <translation>Chat non lette</translation>
+    </message>
+    <message>
+        <source>No unread chats</source>
+        <extracomment>The unread filter is on and every chat has been read.</extracomment>
+        <translation>Nessuna chat non letta</translation>
+    </message>
+    <message>
+        <source>Tap the filter icon to show all chats</source>
+        <extracomment>The filter icon is the three lines at the right of the search field.</extracomment>
+        <translation>Tocca l&apos;icona del filtro per mostrare tutte le chat</translation>
+    </message>
 </context>
 <context>
     <name>ChatMediaPage</name>

@@ -285,7 +285,15 @@ Page {
     /// window may still be on its way up.
     property bool searchWanted: false
     readonly property bool appActive: Qt.application.state === Qt.ApplicationActive
-    onAppActiveChanged: page.takeSearch()
+    onAppActiveChanged: {
+        page.takeSearch()
+        // The chats read while the unread filter was on go once the app
+        // has been away: they stayed only so that coming back from one of
+        // them did not move the list.
+        if (page.appActive) {
+            chats.forget_read()
+        }
+    }
 
     function takeSearch() {
         if (!page.searchWanted || page.status !== PageStatus.Active || !page.appActive) {
@@ -524,24 +532,51 @@ Page {
             }
 
             PageHeader {
+                objectName: "chatListHeader"
                 title: page.archived ? qsTr("Archived") : qsTr("Chats")
+                // Says the filter is on, so a list that is short for that
+                // reason is not taken for chats gone missing.
+                //: Under the "Chats" title while only chats with unread
+                //: messages are listed.
+                description: chats.unread_only ? qsTr("Unread chats") : ""
             }
 
-            SearchField {
-                id: searchField
-                objectName: "chatSearchField"
+            Row {
                 width: parent.width
-                // The ordinary list searches chats, contacts and messages;
-                // the archived list is a mode over chats alone.
-                // Nothing to search in an empty archive. It comes back
-                // the moment something has been typed, or there would be
-                // no way to clear the field and get the list back.
-                visible: !page.archived || chats.count > 0
-                         || searchField.text.length > 0
-                // The one word every search field in the app says; what
-                // each searches is what the page it is on shows.
-                placeholderText: qsTr("Search")
-                onTextChanged: searchDebounce.restart()
+
+                SearchField {
+                    id: searchField
+                    objectName: "chatSearchField"
+                    width: parent.width - (unreadFilter.visible ? unreadFilter.width : 0)
+                    anchors.verticalCenter: parent.verticalCenter
+                    // The ordinary list searches chats, contacts and messages;
+                    // the archived list is a mode over chats alone.
+                    // Nothing to search in an empty archive. It comes back
+                    // the moment something has been typed, or there would be
+                    // no way to clear the field and get the list back.
+                    visible: !page.archived || chats.count > 0
+                             || searchField.text.length > 0
+                    // The one word every search field in the app says; what
+                    // each searches is what the page it is on shows.
+                    placeholderText: qsTr("Search")
+                    onTextChanged: searchDebounce.restart()
+                }
+
+                // Beside the field rather than in the pulley: a switch flipped
+                // as often as this one wants to be one tap away, and it sits
+                // where the reference clients put theirs. The archived list
+                // is a mode of its own and has none.
+                FilterButton {
+                    id: unreadFilter
+                    objectName: "unreadFilterButton"
+                    visible: !page.archived
+                    anchors.verticalCenter: parent.verticalCenter
+                    checked: chats.unread_only
+                    // A search covers every chat whatever the filter says, so
+                    // the switch does nothing while one is showing.
+                    enabled: !page.searching
+                    onClicked: chats.unread_only = !chats.unread_only
+                }
             }
         }
 
@@ -748,10 +783,18 @@ Page {
                 // Not until the core has answered: see `chatsLoaded`.
                 enabled: page.chatsLoaded && chats.count === 0
                 text: page.archived ? qsTr("No archived chats")
-                                    : qsTr("No chats yet")
+                                    //: The unread filter is on and every
+                                    //: chat has been read.
+                                    : chats.unread_only ? qsTr("No unread chats")
+                                                        : qsTr("No chats yet")
                 // Nothing here makes an archived chat: a chat is archived
                 // from the ordinary list, not started in this one.
-                hintText: page.archived ? "" : qsTr("Pull down to start one")
+                hintText: page.archived ? ""
+                                        //: The filter icon is the three
+                                        //: lines at the right of the
+                                        //: search field.
+                                        : chats.unread_only ? qsTr("Tap the filter icon to show all chats")
+                                                            : qsTr("Pull down to start one")
             }
         }
 
