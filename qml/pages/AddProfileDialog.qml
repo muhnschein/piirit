@@ -15,12 +15,14 @@ import "../js/Relays.js" as Relays
  * from the list while it is. The list itself is shared with the page
  * that adds a relay to a profile (Relays.js).
  *
- * Nothing is picked to begin with, and the dialog cannot be accepted
- * until something is: a relay is where someone's address and their
- * mailbox live for as long as they keep the profile, so it is a choice
- * to make rather than one to be handed. An earlier version opened on a
- * relay of the list at random, which is a choice made for the reader by
- * a dialog they have not read yet.
+ * The list opens on "Automatic": the core makes the profile on whichever
+ * of its relays answers first and adds more in the background, so that
+ * one relay going down does not cut the profile off (init_transports,
+ * core 2.61). That is not a relay picked for the reader by this dialog,
+ * which an earlier version did, at random from the list: no relay is
+ * named, and which ones the profile is on is the core's to decide and the
+ * profile page's to show. A relay picked from the list or typed is that
+ * relay alone, as before.
  */
 Dialog {
     id: dialog
@@ -29,22 +31,27 @@ Dialog {
     /// being made from it. See piirit.qml.
     readonly property bool pausesQuickActions: true
 
+    /// The core picks the relays: nothing typed, and the first entry of
+    /// the list, "Automatic", picked.
+    readonly property bool automatic: customField.text.trim().length === 0
+                                      && relayCombo.currentIndex === 0
     /// The relay chosen: the custom one if typed, else the picked one.
+    /// The list's entries are one down from the menu's, which opens on
+    /// "Automatic".
     property string domain: customField.text.trim().length > 0
                             ? customField.text.trim()
-                            : (relayCombo.currentIndex >= 0 && relayCombo.currentIndex < relays.length
-                               ? relays[relayCombo.currentIndex].domain : "")
+                            : (relayCombo.currentIndex >= 1 && relayCombo.currentIndex <= relays.length
+                               ? relays[relayCombo.currentIndex - 1].domain : "")
     /// What the core is handed: `dcaccount:` and a relay, which it takes
-    /// with or without the `https://.../new` around it. Empty until a
-    /// relay is chosen: there is nothing to hand over before that.
+    /// with or without the `https://.../new` around it. Empty for
+    /// "Automatic", which the shim hands over as no relay at all.
     property string providerQr: domain.length > 0 ? "dcaccount:" + domain : ""
 
     // The public relays, as chatmail.at/relays lists them (Relays.js).
     readonly property var relays: Relays.list
 
-    // A name, and a relay picked or typed: neither is guessed for the
-    // reader.
-    canAccept: nameField.text.trim().length > 0 && domain.length > 0
+    // A name, and relays: the core's, or one picked or typed.
+    canAccept: nameField.text.trim().length > 0 && (automatic || domain.length > 0)
 
     // The setup page does the work, with what was typed here. Silica
     // makes that page as soon as this one is on screen, so what was
@@ -95,15 +102,18 @@ Dialog {
                 // "Relay" above an empty value read as a line of text
                 // rather than as a list to open.
                 label: qsTr("Select a public chatmail relay")
-                // Nothing to begin with: the reader picks. The label
-                // above the empty value says what is being asked for,
-                // and Create stays dim until it is answered, so the
-                // dialog asks rather than answers for them.
-                currentIndex: -1
+                // "Automatic": several relays, the core's choice.
+                currentIndex: 0
                 // A typed server is the one that counts.
                 enabled: customField.text.trim().length === 0
 
                 menu: ContextMenu {
+                    //: Delta Chat's word: the core picks the relays.
+                    MenuItem {
+                        objectName: "relayAutomatic"
+                        text: qsTr("Automatic")
+                    }
+
                     Repeater {
                         model: dialog.relays
 
@@ -113,6 +123,19 @@ Dialog {
                         }
                     }
                 }
+            }
+
+            // Why several, said while that is what Create will do. Delta
+            // Chat's own sentence, for its translations.
+            Label {
+                objectName: "automaticHint"
+                visible: dialog.automatic
+                x: Theme.horizontalPageMargin
+                width: parent.width - 2 * Theme.horizontalPageMargin
+                wrapMode: Text.Wrap
+                font.pixelSize: Theme.fontSizeExtraSmall
+                color: Theme.secondaryColor
+                text: qsTr("Relays are used for sending and receiving messages. Having more than one keeps your connection reliable.")
             }
 
             TextField {

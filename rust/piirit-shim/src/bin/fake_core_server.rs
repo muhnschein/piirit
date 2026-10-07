@@ -407,7 +407,9 @@ impl State {
     /// `displayName` the second when there is one, else the first.
     ///
     /// Every key the 2.62 core sends is here, whether the app reads it or
-    /// not, with the values for a contact nobody has seen lately.
+    /// not, with the values the real core gives a contact nobody has seen
+    /// (`lastSeen` 0): "Old" freshness, which it reserves for key
+    /// contacts. Its own contact is never highlighted, so "Normal".
     fn contact_object(&self, contact: u32) -> Option<Value> {
         let address = if contact == SELF {
             "me@example.org"
@@ -439,7 +441,7 @@ impl State {
             "color": "#00875a",
             "profileImage": null,
             "lastSeen": 0,
-            "freshness": "Normal",
+            "freshness": if contact == SELF { "Normal" } else { "Old" },
         }))
     }
 
@@ -940,6 +942,52 @@ async fn add_transport_from_qr(
     state.add_transport(account, &format!("account{account}@{relay}"));
     state.configure(account);
     ok(id, &Value::Null)
+}
+
+/// What `check_qr` makes of a payload: enough to tell an invite from a
+/// relay's code from anything else, which are the distinctions the shim
+/// makes. A relay's code says which relay, as the real core reads it:
+/// the domain of a `dcaccount:`, the address of a `dclogin:`.
+fn qr_kind(content: &str) -> Value {
+    let lower = content.to_ascii_lowercase();
+    if let Some(rest) = lower.strip_prefix("dcaccount:") {
+        let domain = rest
+            .trim_start_matches("https://")
+            .split('/')
+            .next()
+            .unwrap_or_default();
+        return json!({"kind": "account", "domain": domain});
+    }
+    if let Some(rest) = lower.strip_prefix("dclogin:") {
+        let address = rest
+            .trim_start_matches("//")
+            .split('?')
+            .next()
+            .unwrap_or_default();
+        return json!({"kind": "login", "address": address});
+    }
+    let kind = if content.contains("i.delta.chat") || content.starts_with("OPENPGP4FPR:") {
+        "askVerifyContact"
+    } else if content.starts_with("DCBACKUP2:") {
+        // What a device offering itself as a first device shows;
+        // `toonew` in it stands in for a backup from a newer Delta Chat
+        // than this core.
+        if content.contains("toonew") {
+            "backupTooNew"
+        } else {
+            "backup2"
+        }
+    } else {
+        "text"
+    };
+    json!({"kind": kind})
+}
+
+/// The relay `init_transports` lands an account on first. Slow, the way
+/// a payload naming `slow` is, when `PIIRIT_FAKE_AUTO_RELAY` says so: no
+/// payload is handed over to say it with.
+fn automatic_relay() -> String {
+    std::env::var("PIIRIT_FAKE_AUTO_RELAY").unwrap_or_else(|_| "first.auto.example".to_string())
 }
 
 /// Take a profile over, from another device or from a file: the import
@@ -1553,6 +1601,23 @@ async fn serve() {
                     state.lock().await.stopped.insert(account_id());
                     ok(&id, &Value::Null)
                 }
+                // The relays the core picks for itself: the first one
+                // that answers, and a second it adds once the profile
+                // is up, which the real core does in the background.
+                // Keyed on the account, as the other transport calls
+                // are on their payload: nothing else is handed over.
+                "init_transports" => {
+                    let account = account_id();
+                    let qr = format!("dcaccount:{}", automatic_relay());
+                    let answer = add_transport_from_qr(&state, &id, account, &qr).await;
+                    if answer.get("error").is_none() {
+                        state
+                            .lock()
+                            .await
+                            .add_transport(account, &format!("account{account}@second.auto.example"));
+                    }
+                    answer
+                }
                 "add_transport_from_qr" => {
                     let qr = positional(1).as_str().unwrap_or_default().to_string();
                     add_transport_from_qr(&state, &id, account_id(), &qr).await
@@ -2131,28 +2196,7 @@ async fn serve() {
                 }
                 "check_qr" => {
                     let content = positional(1).as_str().unwrap_or_default().to_string();
-                    // Enough to tell an invite from anything else, which is
-                    // the only distinction the shim makes.
-                    let kind = if content.contains("i.delta.chat")
-                        || content.starts_with("OPENPGP4FPR:")
-                    {
-                        "askVerifyContact"
-                    } else if content.starts_with("dcaccount:") || content.starts_with("DCACCOUNT:")
-                    {
-                        "account"
-                    } else if content.starts_with("DCBACKUP2:") {
-                        // What a device offering itself as a first
-                        // device shows; `toonew` in it stands in for a
-                        // backup from a newer Delta Chat than this core.
-                        if content.contains("toonew") {
-                            "backupTooNew"
-                        } else {
-                            "backup2"
-                        }
-                    } else {
-                        "text"
-                    };
-                    ok(&id, &json!({"kind": kind}))
+                    ok(&id, &qr_kind(&content))
                 }
                 "get_chat_securejoin_qr_code" => ok(
                     &id,

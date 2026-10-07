@@ -29,7 +29,8 @@ Page {
 
     property string displayName
     property string providerQr
-    /// The relay's name, for the page to say.
+    /// The relay's name, for the page to say. Empty when the core picks
+    /// the relays (AddProfileDialog.qml), and there is none to name.
     readonly property string relay: page.providerQr.replace("dcaccount:", "")
 
     // True while the core is working.
@@ -122,8 +123,10 @@ Page {
                 return
             }
             page.busy = false
-            page.errorMessage = qsTr("%1 did not answer within %2 seconds.")
-                                .arg(page.relay).arg(seconds)
+            page.errorMessage = page.relay.length > 0
+                    ? qsTr("%1 did not answer within %2 seconds.")
+                      .arg(page.relay).arg(seconds)
+                    : qsTr("No relay answered within %1 seconds.").arg(seconds)
         }
 
         // Not gated on `busy`: the core's last progress events can arrive
@@ -148,7 +151,8 @@ Page {
             minimumValue: 0
             maximumValue: 1000
             value: page.permille
-            label: qsTr("Contacting %1…").arg(page.relay)
+            label: page.relay.length > 0 ? qsTr("Contacting %1…").arg(page.relay)
+                                         : qsTr("Connecting…")
         }
 
         Button {
@@ -166,12 +170,13 @@ Page {
         // Under the Cancel button, once the relay has kept the reader
         // waiting: what a relay is, and what to do about one that does
         // not answer. Stays through the error that may follow, since
-        // the Back button under it is the way it points.
+        // the Back button under it is the way it points. Not while the
+        // core picks the relays: trying another is what it is doing.
         Label {
             objectName: "slowHint"
             x: Theme.horizontalPageMargin
             width: parent.width - 2 * Theme.horizontalPageMargin
-            visible: page.slowRelay
+            visible: page.slowRelay && page.relay.length > 0
             wrapMode: Text.Wrap
             horizontalAlignment: Text.AlignHCenter
             font.pixelSize: Theme.fontSizeSmall

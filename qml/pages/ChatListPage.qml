@@ -134,6 +134,7 @@ Page {
     Connections {
         target: chats
         onMessage_arrived: notifier.arrived(chat_id, chat_name, sender, preview)
+        onMessage_restated: notifier.restated(chat_id, chat_name, sender, preview, unread)
         // Emitted once the rows have been set, whether there turned out
         // to be any or none.
         onRows_changed: page.chatsLoaded = true

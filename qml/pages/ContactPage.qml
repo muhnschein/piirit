@@ -70,6 +70,8 @@ Page {
     /// What they wrote about themselves, when they did.
     property string statusLine: ""
     property bool isKeyContact: true
+    /// Not seen for a long time, or never: the core's word for it.
+    property bool seenLongAgo: false
 
     /// Someone has typed since the load. Guards the refill below.
     property bool edited: false
@@ -160,6 +162,7 @@ Page {
             Binding { target: page; property: "avatarPath"; value: model.avatar_path }
             Binding { target: page; property: "statusLine"; value: model.status }
             Binding { target: page; property: "isKeyContact"; value: model.is_key_contact }
+            Binding { target: page; property: "seenLongAgo"; value: model.seen_long_ago }
         }
     }
 
@@ -218,6 +221,23 @@ Page {
                 textFormat: Text.PlainText
                 color: Theme.primaryColor
                 text: page.statusLine
+            }
+
+            // Under the name, as the core asks: someone not seen for a
+            // long time may not read a message soon, or at all. Delta
+            // Chat's own words, for their translations.
+            Label {
+                objectName: "seenLabel"
+                visible: page.seenLongAgo
+                anchors.horizontalCenter: parent.horizontalCenter
+                width: parent.width - 2 * Theme.horizontalPageMargin
+                horizontalAlignment: Text.AlignHCenter
+                wrapMode: Text.Wrap
+                font.pixelSize: Theme.fontSizeSmall
+                color: Theme.secondaryHighlightColor
+                //: Under a contact's name: the core has not seen them for
+                //: a long time, or never.
+                text: qsTr("Seen a long time ago")
             }
 
             // The fact the chat list marks a row with, said in words:

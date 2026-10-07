@@ -82,8 +82,15 @@ pub struct ContactList {
     /// Follow an invite -- a scanned QR payload or a pasted
     /// `https://i.delta.chat/...` link -- and open the chat it leads to.
     /// This is how a Delta Chat contact is normally added: an address alone
-    /// cannot be encrypted to (docs/PROJECT.md). Answers on `chat_ready`.
+    /// cannot be encrypted to (docs/PROJECT.md). Answers on `chat_ready`,
+    /// or on `relay_offered` for a relay's code.
     pub join_by_invite: qt_method!(fn(&mut self, qr_content: QString)),
+    /// What `join_by_invite` was handed is a relay's code, `dcaccount:` or
+    /// `dclogin:`, rather than an invite: one to add to this profile
+    /// rather than a profile of its own, as the reference clients take it
+    /// since 2.61. `relay` is the relay's name, or the address on it, as
+    /// the core read it off the code.
+    pub relay_offered: qt_signal!(qr_content: QString, relay: QString),
 
     /// The rows a group being put together draws: this account's own
     /// contact first, when the list holds it, then the contacts named
@@ -460,7 +467,17 @@ impl ContactList {
             self.error(QString::from("not started"));
             return;
         };
-        let done = self.chat_callback();
+        let ptr: QPointer<Self> = QPointer::from(&*self);
+        let done = queued_callback(move |result: Result<Followed, String>| {
+            let Some(this) = ptr.as_pinned() else { return };
+            match result {
+                Ok(Followed::Chat(chat_id)) => this.borrow().chat_ready(chat_id),
+                Ok(Followed::Relay(qr, relay)) => {
+                    this.borrow().relay_offered(qr.into(), relay.into());
+                }
+                Err(err) => this.borrow().error(err.into()),
+            }
+        });
 
         let qr_content = qr_content.to_string();
         runtime.spawn(async move {
@@ -483,6 +500,17 @@ impl ContactList {
                         err => err.to_string(),
                     })?;
                 let kind = json::str_at(&qr, "kind");
+                // A relay's code is offered to the page, which asks before
+                // anything is added: the core's own `add_transport_from_qr`
+                // then, the way the relay page adds one.
+                let relay = match kind {
+                    "account" => Some(json::str_at(&qr, "domain")),
+                    "login" => Some(json::str_at(&qr, "address")),
+                    _ => None,
+                };
+                if let Some(relay) = relay {
+                    return Ok(Followed::Relay(qr_content, relay.to_string()));
+                }
                 if !matches!(kind, "askVerifyContact" | "askVerifyGroup") {
                     return Err(not_an_invite(kind));
                 }
@@ -490,6 +518,7 @@ impl ContactList {
                 // finishes in the background.
                 rpc.call::<_, u32>("secure_join", (account_id, qr_content))
                     .await
+                    .map(Followed::Chat)
                     .map_err(|err| err.to_string())
             }
             .await;
@@ -538,6 +567,14 @@ impl ContactList {
             }
         })
     }
+}
+
+/// Where a scanned code led: a chat, or a relay to ask about adding.
+enum Followed {
+    /// The chat the invite opened.
+    Chat(u32),
+    /// The code, and the relay it names.
+    Relay(String, String),
 }
 
 /// Why a payload was not followed: it is not an invite. The core's own
@@ -589,5 +626,28 @@ pub(crate) fn contact_row(contact: &serde_json::Value) -> ContactItem {
         // falling back to its initial rather than as a failure.
         color: json::text(contact, "color"),
         avatar_path: json::text(contact, "profileImage"),
+        // Since 2.61, in place of `wasSeenRecently`. "RecentlySeen" and
+        // "Normal" say nothing worth a line here.
+        seen_long_ago: json::str_at(contact, "freshness") == "Old",
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::contact_row;
+    use serde_json::json;
+
+    /// Only the core's "Old" is a contact not seen for a long time; the
+    /// other two, and a core that does not say, are not.
+    #[test]
+    fn only_old_freshness_is_seen_long_ago() {
+        let seen = |freshness: serde_json::Value| {
+            contact_row(&json!({"id": 10, "address": "ada@example.org", "freshness": freshness}))
+                .seen_long_ago
+        };
+        assert!(seen(json!("Old")));
+        assert!(!seen(json!("Normal")));
+        assert!(!seen(json!("RecentlySeen")));
+        assert!(!seen(serde_json::Value::Null));
     }
 }

@@ -291,6 +291,10 @@ pub struct ContactItem {
     pub color: QString,
     /// Path to the contact's picture, empty when they have none.
     pub avatar_path: QString,
+    /// Not seen for a long time, or never: the core's "Old" freshness,
+    /// which it gives key contacts only. The reference clients say so
+    /// under the name.
+    pub seen_long_ago: bool,
 }
 
 /// Contact model, for pickers and the contact list.

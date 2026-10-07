@@ -106,6 +106,20 @@ pub struct ChatList {
     /// is already named after them.
     pub message_arrived: qt_signal!(chat_id: u32, chat_name: QString, sender: QString, preview: QString),
 
+    /// A chat's messages changed without one arriving -- one was edited,
+    /// or deleted -- and the row for it has been read back: what a
+    /// notification already up for it says now, and how many are still
+    /// unread there. Said for every such chat, muted or not; one with no
+    /// notification up has nothing to restate, and that is the
+    /// listener's to know.
+    pub message_restated: qt_signal!(
+        chat_id: u32,
+        chat_name: QString,
+        sender: QString,
+        preview: QString,
+        unread: u32
+    ),
+
     /// Loading failed. The message is the core's own.
     pub error: qt_signal!(message: QString),
 
@@ -150,6 +164,11 @@ pub struct ChatList {
     /// Muted chats whose latest arrival was for the reader, waiting to be
     /// announced past the mute: see `check_mention`.
     mentioned: HashSet<u32>,
+
+    /// Chats whose messages were edited or deleted, waiting for their row
+    /// to be read back to be restated: the same wait as
+    /// `pending_announcements`, for the same reason.
+    pending_restatements: HashSet<u32>,
 
     /// Counts refreshes, so a slow answer to an older question cannot land
     /// on top of a newer one.
@@ -235,6 +254,9 @@ impl ChatList {
             kind.as_str(),
             "IncomingMsg"
                 | "MsgsChanged"
+                // A message deleted, by its sender or by its age: the
+                // row's preview may have been it.
+                | "MsgDeleted"
                 | "MsgsNoticed"
                 | "MsgDelivered"
                 | "MsgRead"
@@ -270,6 +292,15 @@ impl ChatList {
         // message: MsgsChanged and friends fire for messages we sent, for
         // read receipts, and for a chat being pinned.
         let announce = if kind == "IncomingMsg" { chat_id } else { None };
+        // An edit comes as MsgsChanged on the message edited, a deletion
+        // as MsgDeleted: a notification standing for either says what
+        // the chat says now. So does every other MsgsChanged on a chat,
+        // which mostly changes nothing a notification says.
+        if matches!(kind.as_str(), "MsgsChanged" | "MsgDeleted") {
+            if let Some(chat_id) = chat_id {
+                self.pending_restatements.insert(chat_id);
+            }
+        }
         // A muted chat is refreshed like any other and announced only if
         // the message was for the reader, which takes asking the core.
         if let Some(chat_id) = announce {
@@ -458,6 +489,27 @@ impl ChatList {
         announcements
     }
 
+    /// What is waiting to be restated now that the rows are current:
+    /// each chat's name, preview and unread count. A chat no longer in
+    /// the list has no row to say anything from, and is dropped.
+    fn settled_restatements(&mut self) -> Vec<(u32, QString, QString, QString, u32)> {
+        let waiting: Vec<u32> = self.pending_restatements.drain().collect();
+        let rows = self.rows.borrow();
+        waiting
+            .into_iter()
+            .filter_map(|chat_id| rows.iter().find(|row| row.chat_id == chat_id))
+            .map(|row| {
+                (
+                    row.chat_id,
+                    row.name.clone(),
+                    row.preview_sender.clone(),
+                    row.preview.clone(),
+                    row.unread_count,
+                )
+            })
+            .collect()
+    }
+
     /// Bring the model in line with the core.
     ///
     /// [`Refresh::One`] refetches the chat it names, along with any chat
@@ -540,6 +592,11 @@ impl ChatList {
                     for (chat_id, name, sender, preview) in announcements {
                         this.borrow()
                             .message_arrived(chat_id, name, sender, preview);
+                    }
+                    let restatements = this.borrow_mut().settled_restatements();
+                    for (chat_id, name, sender, preview, unread) in restatements {
+                        this.borrow()
+                            .message_restated(chat_id, name, sender, preview, unread);
                     }
                 }
                 Err(err) => this.borrow().error(err.into()),

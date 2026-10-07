@@ -379,7 +379,8 @@ pub struct DeltaChatCore {
     pub default_provider_qr: qt_method!(fn(&mut self) -> QString),
 
     /// Create a profile on a chatmail server: the core mints the address
-    /// and credentials. Result via `profile_created`, `profile_error` or
+    /// and credentials. An empty `provider_qr` leaves the relays to the
+    /// core, which then keeps the profile on several. Result via `profile_created`, `profile_error` or
     /// `profile_timed_out`, and only for the latest attempt: an attempt
     /// cancelled or superseded answers nobody (`signup.rs`).
     pub create_profile: qt_method!(fn(&mut self, display_name: QString, provider_qr: QString)),
@@ -1395,12 +1396,13 @@ impl DeltaChatCore {
     }
 
     /// Create a profile on a chatmail server from a `dcaccount:`/`dclogin:`
-    /// payload.
+    /// payload, or, with none, on relays the core picks (`init_transports`).
     pub fn create_profile(&mut self, display_name: QString, provider_qr: QString) {
-        self.begin_profile(
-            display_name.to_string(),
-            Transport::Qr(provider_qr.to_string()),
-        );
+        let transport = match provider_qr.to_string() {
+            qr if qr.is_empty() => Transport::Automatic,
+            qr => Transport::Qr(qr),
+        };
+        self.begin_profile(display_name.to_string(), transport);
     }
 
     /// Create a profile backed by an existing mailbox. `addr` and

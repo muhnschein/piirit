@@ -25,7 +25,9 @@ import Piirit 1.0
  * a device without one costs that side rather than this page.
  *
  * Whatever the scanner reads is followed as an invite, and the chat it
- * leads to replaces this page, above the one that opened it.
+ * leads to replaces this page, above the one that opened it. A relay's
+ * code (`dcaccount:`, `dclogin:`) is a relay to add to this profile, and
+ * the page that adds one replaces this page instead, asking first.
  */
 Page {
     id: page
@@ -60,6 +62,18 @@ Page {
             page.errorMessage = message
         }
         onInvite_ready: page.myInvite = link
+        // A relay's code rather than an invite: one more relay for this
+        // profile, asked about on the page that adds one, rather than a
+        // profile of its own. In place of this page, as a chat would be.
+        onRelay_offered: {
+            page.joining = false
+            navigation.replaceAbove(pageStack.previousPage(page),
+                                    Qt.resolvedUrl("AddRelayPage.qml"), {
+                accountId: page.accountId,
+                scannedQr: qr_content,
+                scannedRelay: relay
+            })
+        }
         onChat_ready: {
             page.joining = false
             navigation.replaceAbove(pageStack.previousPage(page),

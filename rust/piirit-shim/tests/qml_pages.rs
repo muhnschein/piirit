@@ -335,8 +335,8 @@ fn onboarding_pages_drive_the_core_and_navigate() {
         common::record(&s, "start-create", call!("click", "createProfileTile"));
     });
 
-    // The dialog: nothing to accept until there is a name and a relay,
-    // and no relay until one is picked or typed.
+    // The dialog: nothing to accept until there is a name, and the
+    // relays left to the core until one is picked or typed.
     let s = steps.clone();
     single_shot(Duration::from_secs(4), move || {
         common::record(
@@ -351,9 +351,20 @@ fn onboarding_pages_drive_the_core_and_navigate() {
             call!("get", "relayCombo", "currentIndex"),
         );
         common::record(&s, "dialog-provider", call!("pageProperty", "providerQr"));
+        common::record(&s, "dialog-automatic", call!("pageProperty", "automatic"));
+        common::record(
+            &s,
+            "dialog-automatic-hint",
+            call!("get", "automaticHint", "visible"),
+        );
         common::record(&s, "dialog-name", call!("setText", "nameField", " Ada "));
         common::record(&s, "dialog-named", call!("pageProperty", "canAccept"));
-        common::record(&s, "dialog-pick", call!("pick", "relayCombo", "1"));
+        common::record(&s, "dialog-pick", call!("pick", "relayCombo", "2"));
+        common::record(
+            &s,
+            "dialog-picked-automatic",
+            call!("pageProperty", "automatic"),
+        );
         common::record(&s, "dialog-picked", call!("pageProperty", "providerQr"));
         common::record(
             &s,
@@ -368,6 +379,8 @@ fn onboarding_pages_drive_the_core_and_navigate() {
         common::record(&s, "dialog-typed", call!("pageProperty", "providerQr"));
         common::record(&s, "dialog-list-off", call!("get", "relayCombo", "enabled"));
         common::record(&s, "dialog-uncustom", call!("setText", "customField", ""));
+        common::record(&s, "dialog-repick", call!("pick", "relayCombo", "1"));
+        common::record(&s, "dialog-repicked", call!("pageProperty", "providerQr"));
         common::record(&s, "dialog-unpick", call!("pick", "relayCombo", "0"));
         common::record(&s, "dialog-accept", call!("accept"));
         common::record(&s, "dialog-handed", call!("handed"));
@@ -473,15 +486,16 @@ fn assert_welcome_and_navigation(
     );
 }
 
-/// The dialog: no accepting without a name and a relay, nothing picked
-/// until the reader picks it, and what was chosen is what the setup page
-/// is handed.
+/// The dialog: no accepting without a name, the relays the core's until
+/// the reader picks or types one, and what was chosen is what the setup
+/// page is handed.
 fn assert_dialog(steps: &[(String, String)], context: &str) {
     for step in [
         "dialog-name",
         "dialog-pick",
         "dialog-custom",
         "dialog-uncustom",
+        "dialog-repick",
         "dialog-unpick",
         "dialog-accept",
     ] {
@@ -496,23 +510,43 @@ fn assert_dialog(steps: &[(String, String)], context: &str) {
         "false",
         "the dialog can be accepted without a name. {context}"
     );
-    // Nothing picked on arrival: the relay is the reader's choice, not
-    // the dialog's.
+    // "Automatic" on arrival: the core picks, and keeps the profile on
+    // several relays. No relay of the dialog's own choosing is handed
+    // over.
     assert_eq!(
         common::value_of(steps, "dialog-index"),
-        "-1",
-        "the dialog opened on a relay of its own choosing. {context}"
+        "0",
+        "the dialog did not open on Automatic. {context}"
     );
     assert_eq!(
         common::value_of(steps, "dialog-provider"),
         "",
-        "the dialog had a relay to hand over before one was chosen. {context}"
+        "the dialog had a relay of its own to hand over. {context}"
+    );
+    assert_eq!(
+        common::value_of(steps, "dialog-automatic"),
+        "true",
+        "the dialog does not say the core picks the relays. {context}"
+    );
+    assert_eq!(
+        common::value_of(steps, "dialog-automatic-hint"),
+        "true",
+        "nothing says why several relays. {context}"
     );
     assert_eq!(
         common::value_of(steps, "dialog-named"),
+        "true",
+        "a name alone does not make a profile on the core's relays. {context}"
+    );
+    assert_eq!(
+        common::value_of(steps, "dialog-picked-automatic"),
         "false",
-        "a name alone makes the dialog acceptable, so a profile can be \
-         made on no relay in particular. {context}"
+        "a picked relay still reads as the core's choice. {context}"
+    );
+    assert_eq!(
+        common::value_of(steps, "dialog-repicked"),
+        "dcaccount:nine.testrun.org",
+        "the list's first relay is not the menu's second entry. {context}"
     );
     assert_eq!(
         common::value_of(steps, "dialog-named-picked"),
@@ -536,8 +570,8 @@ fn assert_dialog(steps: &[(String, String)], context: &str) {
     );
     assert_eq!(
         common::value_of(steps, "dialog-handed"),
-        "Ada,dcaccount:nine.testrun.org",
-        "the setup page was not handed the trimmed name and the relay. {context}"
+        "Ada,",
+        "the setup page was not handed the trimmed name and no relay. {context}"
     );
 }
 
