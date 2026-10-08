@@ -45,6 +45,8 @@ Item {
         id: content
         x: root.icon !== "" ? Theme.paddingMedium : Theme.paddingLarge
         anchors.verticalCenter: parent.verticalCenter
+        // The icon's own clear space alone leaves the word crowding it.
+        spacing: root.icon !== "" ? Theme.paddingSmall : 0
 
         Image {
             visible: root.icon !== ""
