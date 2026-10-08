@@ -171,7 +171,7 @@ fn the_filter_switch_sits_by_the_search_and_says_when_it_is_on() {
                 QString::from("a")
             )
         );
-        record!("while-searching", get!("unreadFilterButton", "enabled"));
+        record!("while-searching", get!("unreadFilterButton", "visible"));
         record!(
             "cleared",
             call!(
@@ -180,7 +180,7 @@ fn the_filter_switch_sits_by_the_search_and_says_when_it_is_on() {
                 QString::from("")
             )
         );
-        record!("after-search", get!("unreadFilterButton", "enabled"));
+        record!("after-search", get!("unreadFilterButton", "visible"));
         record!(
             "clicked-off",
             call!("click", QString::from("unreadFilterButton"))
@@ -270,20 +270,20 @@ fn the_filter_switch_sits_by_the_search_and_says_when_it_is_on() {
     );
     assert_eq!(
         value("placeholder-hint"),
-        "Tap the filter icon to show all chats",
+        "Tap Unread to show all chats",
         "an empty filtered list does not say how to get the chats back. \
          {context}"
     );
     assert_eq!(
         value("while-searching"),
         "false",
-        "the switch still works while a search, which ignores it, is \
-         showing. {context}"
+        "the switch still shows while a search, which ignores it, has \
+         the row. {context}"
     );
     assert_eq!(
         value("after-search"),
         "true",
-        "the switch stayed out of use after the search was cleared. {context}"
+        "the switch stayed hidden after the search was cleared. {context}"
     );
     assert_eq!(
         value("count-after"),

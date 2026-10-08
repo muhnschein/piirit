@@ -565,20 +565,22 @@ Page {
                 // Beside the field rather than in the pulley: a switch flipped
                 // as often as this one wants to be one tap away, and it sits
                 // where the reference clients put theirs. The archived list
-                // is a mode of its own and has none.
-                FilterButton {
+                // is a mode of its own and has none, and a search, which
+                // covers every chat whatever the filter says, gives the
+                // field the whole row.
+                FilterPill {
                     id: unreadFilter
                     objectName: "unreadFilterButton"
-                    visible: !page.archived
+                    visible: !page.archived && !page.searching
                     anchors.verticalCenter: parent.verticalCenter
+                    //: Turns the chat list's filter to unread chats on
+                    //: and off.
+                    text: qsTr("Unread")
                     checked: chats.unread_only
-                    // A search covers every chat whatever the filter says, so
-                    // the switch does nothing while one is showing.
-                    enabled: !page.searching
                     onClicked: chats.unread_only = !chats.unread_only
                 }
 
-                // The button ends on the page margin, where the header's
+                // The pill ends on the page margin, where the header's
                 // title and the rows' own icons end.
                 Item {
                     id: filterMargin
@@ -799,10 +801,10 @@ Page {
                 // Nothing here makes an archived chat: a chat is archived
                 // from the ordinary list, not started in this one.
                 hintText: page.archived ? ""
-                                        //: The filter icon is the funnel
-                                        //: in a round button at the right
-                                        //: of the search field.
-                                        : chats.unread_only ? qsTr("Tap the filter icon to show all chats")
+                                        //: %1 is the label of the unread
+                                        //: filter, a button at the right of
+                                        //: the search field.
+                                        : chats.unread_only ? qsTr("Tap %1 to show all chats").arg(unreadFilter.text)
                                                             : qsTr("Pull down to start one")
             }
         }

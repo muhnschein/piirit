@@ -554,9 +554,14 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>कोई अपठित चैट नहीं</translation>
     </message>
     <message>
-        <source>Tap the filter icon to show all chats</source>
-        <extracomment>The filter icon is the funnel in a round button at the right of the search field.</extracomment>
-        <translation>सभी चैट दिखाने के लिए फ़िल्टर आइकन पर टैप करें</translation>
+        <source>Unread</source>
+        <extracomment>Turns the chat list&apos;s filter to unread chats on and off.</extracomment>
+        <translation>अपठित</translation>
+    </message>
+    <message>
+        <source>Tap %1 to show all chats</source>
+        <extracomment>%1 is the label of the unread filter, a button at the right of the search field.</extracomment>
+        <translation>सभी चैट दिखाने के लिए &quot;%1&quot; पर टैप करें</translation>
     </message>
 </context>
 <context>

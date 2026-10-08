@@ -554,9 +554,14 @@ In anderen Gruppen mit blockierten Kontakten werden deren Nachrichten weiterhin 
         <translation>Keine ungelesenen Chats</translation>
     </message>
     <message>
-        <source>Tap the filter icon to show all chats</source>
-        <extracomment>The filter icon is the funnel in a round button at the right of the search field.</extracomment>
-        <translation>Tippen Sie auf das Filtersymbol, um alle Chats anzuzeigen</translation>
+        <source>Unread</source>
+        <extracomment>Turns the chat list&apos;s filter to unread chats on and off.</extracomment>
+        <translation>Ungelesen</translation>
+    </message>
+    <message>
+        <source>Tap %1 to show all chats</source>
+        <extracomment>%1 is the label of the unread filter, a button at the right of the search field.</extracomment>
+        <translation>Tippen Sie auf „%1“, um alle Chats anzuzeigen</translation>
     </message>
 </context>
 <context>

@@ -554,9 +554,14 @@ Mensagens de contactos bloqueados não serão ocultadas noutros grupos.</transla
         <translation>Sem conversas não lidas</translation>
     </message>
     <message>
-        <source>Tap the filter icon to show all chats</source>
-        <extracomment>The filter icon is the funnel in a round button at the right of the search field.</extracomment>
-        <translation>Toque no ícone de filtro para mostrar todas as conversas</translation>
+        <source>Unread</source>
+        <extracomment>Turns the chat list&apos;s filter to unread chats on and off.</extracomment>
+        <translation>Não lidas</translation>
+    </message>
+    <message>
+        <source>Tap %1 to show all chats</source>
+        <extracomment>%1 is the label of the unread filter, a button at the right of the search field.</extracomment>
+        <translation>Toque em «%1» para mostrar todas as conversas</translation>
     </message>
 </context>
 <context>

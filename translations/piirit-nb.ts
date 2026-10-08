@@ -550,9 +550,14 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Ingen uleste samtaler</translation>
     </message>
     <message>
-        <source>Tap the filter icon to show all chats</source>
-        <extracomment>The filter icon is the funnel in a round button at the right of the search field.</extracomment>
-        <translation>Trykk på filterikonet for å vise alle samtaler</translation>
+        <source>Unread</source>
+        <extracomment>Turns the chat list&apos;s filter to unread chats on and off.</extracomment>
+        <translation>Ulest</translation>
+    </message>
+    <message>
+        <source>Tap %1 to show all chats</source>
+        <extracomment>%1 is the label of the unread filter, a button at the right of the search field.</extracomment>
+        <translation>Trykk på «%1» for å vise alle samtaler</translation>
     </message>
 </context>
 <context>

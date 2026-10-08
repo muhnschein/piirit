@@ -554,9 +554,14 @@ Vous continuerez à voir les messages des contacts bloqués dans les autres grou
         <translation>Aucune discussion non lue</translation>
     </message>
     <message>
-        <source>Tap the filter icon to show all chats</source>
-        <extracomment>The filter icon is the funnel in a round button at the right of the search field.</extracomment>
-        <translation>Touchez l&apos;icône de filtre pour afficher toutes les discussions</translation>
+        <source>Unread</source>
+        <extracomment>Turns the chat list&apos;s filter to unread chats on and off.</extracomment>
+        <translation>Non lus</translation>
+    </message>
+    <message>
+        <source>Tap %1 to show all chats</source>
+        <extracomment>%1 is the label of the unread filter, a button at the right of the search field.</extracomment>
+        <translation>Touchez « %1 » pour afficher toutes les discussions</translation>
     </message>
 </context>
 <context>
