@@ -162,7 +162,7 @@ fn the_list_offers_profiles_and_hides_a_search_with_nothing_to_search() {
         // to be marked unread and not read.
         record!("mark-unread", get!("markUnreadItem", "visible"));
         record!("mark-read", get!("markReadItem", "visible"));
-        record!("ordinary-search", get!("chatSearchField", "visible"));
+        record!("ordinary-search", get!("chatSearchPill", "visible"));
         record!(
             "archived",
             call!(
@@ -239,7 +239,7 @@ fn the_list_offers_profiles_and_hides_a_search_with_nothing_to_search() {
     assert_eq!(
         value("ordinary-search"),
         "true",
-        "the ordinary list lost its search field. {context}"
+        "the ordinary list lost its Search pill. {context}"
     );
     assert_eq!(
         value("archived"),

@@ -37,6 +37,22 @@ Page {
         }
     }
 
+    /// The search field is out in place of the Search and Unread pills.
+    /// Only the ordinary list has the pills; the archived one always shows
+    /// its field.
+    property bool searchOpen: false
+
+    function openSearch() {
+        page.searchOpen = true
+        searchField.forceActiveFocus()
+    }
+
+    function closeSearch() {
+        searchField.text = ""
+        page.searchOpen = false
+        searchField.focus = false
+    }
+
     /// Results are showing instead of the chat list. Read from the field
     /// rather than from the model, so the swap happens on the keystroke
     /// and not a debounce later.
@@ -286,14 +302,22 @@ Page {
     /// window may still be on its way up.
     property bool searchWanted: false
     readonly property bool appActive: Qt.application.state === Qt.ApplicationActive
-    onAppActiveChanged: page.takeSearch()
+    onAppActiveChanged: {
+        page.takeSearch()
+        // The chats read while the unread filter was on go once the app
+        // has been away: they stayed only so that coming back from one of
+        // them did not move the list.
+        if (page.appActive) {
+            chats.forget_read()
+        }
+    }
 
     function takeSearch() {
         if (!page.searchWanted || page.status !== PageStatus.Active || !page.appActive) {
             return
         }
         page.searchWanted = false
-        searchField.forceActiveFocus()
+        page.openSearch()
     }
 
     // Back on the list means no chat is being read. Going the other way,
@@ -525,24 +549,121 @@ Page {
             }
 
             PageHeader {
+                objectName: "chatListHeader"
                 title: page.archived ? qsTr("Archived") : qsTr("Chats")
+                // Nothing under the title while the filter is on: the lit
+                // pill already says so, and a description appearing
+                // would push the search row down under the finger that
+                // tapped it.
             }
 
-            SearchField {
-                id: searchField
-                objectName: "chatSearchField"
+            // The ordinary list shows a Search pill and the Unread filter
+            // here, and the field only once Search is tapped: the pills
+            // fade out as it fades in, and back when it is closed or left
+            // empty. The archived list is a mode over chats alone, with no
+            // filter, so it has the field and nothing else.
+            Item {
                 width: parent.width
-                // The ordinary list searches chats, contacts and messages;
-                // the archived list is a mode over chats alone.
-                // Nothing to search in an empty archive. It comes back
-                // the moment something has been typed, or there would be
-                // no way to clear the field and get the list back.
-                visible: !page.archived || chats.count > 0
-                         || searchField.text.length > 0
-                // The one word every search field in the app says; what
-                // each searches is what the page it is on shows.
-                placeholderText: qsTr("Search")
-                onTextChanged: searchDebounce.restart()
+                height: searchField.height
+
+                SearchField {
+                    id: searchField
+                    objectName: "chatSearchField"
+                    width: parent.width
+                    // Nothing to search in an empty archive. It comes back
+                    // the moment something has been typed, or there would be
+                    // no way to clear the field and get the list back.
+                    visible: page.archived
+                             ? chats.count > 0 || searchField.text.length > 0
+                             : page.searchOpen || opacity > 0
+                    opacity: page.archived || page.searchOpen ? 1 : 0
+                    enabled: page.archived || page.searchOpen
+                    Behavior on opacity { NumberAnimation { duration: 200 } }
+                    // The pill's word and magnifier at the pill's size and
+                    // place, so the one fades into the other without either
+                    // moving: Silica's own are a size larger and further
+                    // left. The text starts where the pill's word does.
+                    font.pixelSize: Theme.fontSizeMedium
+                    textLeftMargin: Theme.horizontalPageMargin + Theme.paddingMedium
+                                    + Theme.iconSizeSmallPlus + Theme.paddingSmall
+                    // Silica's own magnifier gives way to the one drawn
+                    // beside the field below; the slot it held stays empty.
+                    leftItem: Item {}
+                    // Empty, it offers to go away instead of to clear.
+                    canHide: !page.archived
+                    onHideClicked: page.closeSearch()
+                    // The one word every search field in the app says; what
+                    // each searches is what the page it is on shows.
+                    placeholderText: qsTr("Search")
+                    onTextChanged: {
+                        searchDebounce.restart()
+                        if (searchField.text.length > 0) {
+                            page.searchOpen = !page.archived
+                        } else if (!searchField.activeFocus) {
+                            page.searchOpen = false
+                        }
+                    }
+                    // Left empty, the field gives the row back to the pills.
+                    onActiveFocusChanged: {
+                        if (!searchField.activeFocus
+                                && searchField.text.trim().length === 0) {
+                            page.closeSearch()
+                        }
+                    }
+                }
+
+                // The field's magnifier, drawn over it rather than in its
+                // `leftItem`: Silica places that item itself, further right
+                // and higher than the pill draws its own. Here it takes the
+                // pill's exact place -- the row's margin, the pill's inset,
+                // centred on the row as the pill is -- and fades with the
+                // field.
+                Image {
+                    x: Theme.horizontalPageMargin + Theme.paddingMedium
+                    anchors.verticalCenter: parent.verticalCenter
+                    visible: searchField.visible
+                    opacity: searchField.opacity
+                    width: Theme.iconSizeSmallPlus
+                    height: Theme.iconSizeSmallPlus
+                    sourceSize.width: Theme.iconSizeSmallPlus
+                    sourceSize.height: Theme.iconSizeSmallPlus
+                    source: "image://theme/icon-m-search?"
+                            + (searchField.activeFocus ? Theme.highlightColor
+                                                       : Theme.primaryColor)
+                }
+
+                Row {
+                    objectName: "chatListPills"
+                    x: Theme.horizontalPageMargin
+                    anchors.verticalCenter: parent.verticalCenter
+                    spacing: Theme.paddingMedium
+                    visible: !page.archived && (!page.searchOpen || opacity > 0)
+                    opacity: page.searchOpen ? 0 : 1
+                    enabled: !page.searchOpen
+                    Behavior on opacity { NumberAnimation { duration: 200 } }
+
+                    PillButton {
+                        objectName: "chatSearchPill"
+                        icon: "image://theme/icon-m-search"
+                        text: qsTr("Search")
+                        onClicked: page.openSearch()
+                    }
+
+                    // Beside the search rather than in the pulley: a switch
+                    // flipped as often as this one wants to be one tap away,
+                    // and it sits where the reference clients put theirs.
+                    // While a search is open it goes with the Search pill:
+                    // a search covers every chat whatever it says.
+                    PillButton {
+                        id: unreadFilter
+                        objectName: "unreadFilterButton"
+                        //: Turns the chat list's filter to unread chats on
+                        //: and off.
+                        text: qsTr("Unread")
+                        checked: chats.unread_only
+                        onClicked: chats.unread_only = !chats.unread_only
+                    }
+                }
             }
         }
 
@@ -749,10 +870,18 @@ Page {
                 // Not until the core has answered: see `chatsLoaded`.
                 enabled: page.chatsLoaded && chats.count === 0
                 text: page.archived ? qsTr("No archived chats")
-                                    : qsTr("No chats yet")
+                                    //: The unread filter is on and every
+                                    //: chat has been read.
+                                    : chats.unread_only ? qsTr("No unread chats")
+                                                        : qsTr("No chats yet")
                 // Nothing here makes an archived chat: a chat is archived
                 // from the ordinary list, not started in this one.
-                hintText: page.archived ? "" : qsTr("Pull down to start one")
+                hintText: page.archived ? ""
+                                        //: %1 is the label of the unread
+                                        //: filter, a button at the right of
+                                        //: the search field.
+                                        : chats.unread_only ? qsTr("Tap %1 to show all chats").arg(unreadFilter.text)
+                                                            : qsTr("Pull down to start one")
             }
         }
 

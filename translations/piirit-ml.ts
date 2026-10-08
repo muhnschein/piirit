@@ -581,6 +581,21 @@ Other groups with blocked contacts will still show their messages.</source>
         <extracomment>A quick action on the cover was tapped, and the chat it was set up to open has been deleted since.</extracomment>
         <translation>ഈ ചാറ്റ് ഇനി നിലവിലില്ല.</translation>
     </message>
+    <message>
+        <source>No unread chats</source>
+        <extracomment>The unread filter is on and every chat has been read.</extracomment>
+        <translation>വായിക്കാത്ത ചാറ്റുകളില്ല</translation>
+    </message>
+    <message>
+        <source>Unread</source>
+        <extracomment>Turns the chat list&apos;s filter to unread chats on and off.</extracomment>
+        <translation>വായിക്കാത്തവ</translation>
+    </message>
+    <message>
+        <source>Tap %1 to show all chats</source>
+        <extracomment>%1 is the label of the unread filter, a button at the right of the search field.</extracomment>
+        <translation>എല്ലാ ചാറ്റുകളും കാണിക്കാൻ &quot;%1&quot; ടാപ്പ് ചെയ്യുക</translation>
+    </message>
 </context>
 <context>
     <name>ChatMediaPage</name>

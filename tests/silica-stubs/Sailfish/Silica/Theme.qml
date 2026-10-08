@@ -28,8 +28,10 @@ QtObject {
     property color highlightBackgroundColor: "#2060a0"
     property color highlightDimmerColor: "#404040"
     property color errorColor: "#ff4040"
+    property real opacityLow: 0.4
     property real highlightBackgroundOpacity: 0.3
     property int iconSizeSmall: 32
+    property int iconSizeSmallPlus: 48
     property int iconSizeMedium: 64
     property size coverSizeLarge: Qt.size(234, 374)
 
