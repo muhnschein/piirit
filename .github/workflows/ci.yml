@@ -51,7 +51,7 @@ jobs:
       # wait on Qt timers, so the step went from about ten minutes to about
       # two and a half. rust/.config/nextest.toml says the rest, including
       # what the `ci` profile changes.
-      - uses: taiki-e/install-action@fa23953489c080190314742a9b907f8e97c6767c # v2.87.10
+      - uses: taiki-e/install-action@4cef1412cce204788f482e778a0b9187f9626a29 # v2.87.21
         with:
           tool: cargo-nextest
       # Also set by the tests; here so a failure is never a missing

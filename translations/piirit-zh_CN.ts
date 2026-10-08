@@ -908,6 +908,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Everyone in the group sees the name</source>
         <translation>群组中的每个人都能看到该名称</translation>
     </message>
+    <message>
+        <source>Description</source>
+        <extracomment>Label of the text that says what a group or channel is for, on its info page, and the prompt in its empty field.</extracomment>
+        <translation>描述</translation>
+    </message>
 </context>
 <context>
     <name>IntroPage</name>
@@ -1824,6 +1829,600 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Send as a message</source>
         <extracomment>Shown in the phone&apos;s share sheet, for text or a link shared to this app.</extracomment>
         <translation>作为消息发送</translation>
+    </message>
+</context>
+<context>
+    <name>StockStrings</name>
+    <message>
+        <source>No messages.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;chat_no_messages&quot;.</extracomment>
+        <translation>没有消息。</translation>
+    </message>
+    <message>
+        <source>Me</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;self&quot;.</extracomment>
+        <translation>我</translation>
+    </message>
+    <message>
+        <source>Draft</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;draft&quot;.</extracomment>
+        <translation>草稿</translation>
+    </message>
+    <message>
+        <source>Voice Message</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;voice_message&quot;.</extracomment>
+        <translation>语音消息</translation>
+    </message>
+    <message>
+        <source>Image</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;image&quot;.</extracomment>
+        <translation>图片</translation>
+    </message>
+    <message>
+        <source>Video</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;video&quot;.</extracomment>
+        <translation>视频</translation>
+    </message>
+    <message>
+        <source>Audio</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;audio&quot;.</extracomment>
+        <translation>音频</translation>
+    </message>
+    <message>
+        <source>File</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;file&quot;.</extracomment>
+        <translation>文件</translation>
+    </message>
+    <message>
+        <source>GIF</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;gif&quot;.</extracomment>
+        <translation>Gif</translation>
+    </message>
+    <message>
+        <source>%1$s introduced.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;contact_verified&quot;.</extracomment>
+        <translation>%1$s 已验证。</translation>
+    </message>
+    <message>
+        <source>Archived</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;chat_archived_label&quot;.</extracomment>
+        <translation>已归档</translation>
+    </message>
+    <message>
+        <source>Location</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;location&quot;.</extracomment>
+        <translation>位置</translation>
+    </message>
+    <message>
+        <source>Sticker</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;sticker&quot;.</extracomment>
+        <translation>贴纸</translation>
+    </message>
+    <message>
+        <source>Device Messages</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;device_talk&quot;.</extracomment>
+        <translation>设备消息</translation>
+    </message>
+    <message>
+        <source>Saved Messages</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;saved_messages&quot;.</extracomment>
+        <translation>保存的消息</translation>
+    </message>
+    <message>
+        <source>Messages in this chat are generated on your device to inform about app updates and problems during usage.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;device_talk_explain&quot;.</extracomment>
+        <translation>此聊天中的消息由您的设备生成，用于通知应用更新和使用过程中出现的问题。</translation>
+    </message>
+    <message>
+        <source>Get in contact!
+
+🙌 Tap &quot;QR code&quot; on the main screen of both devices. Choose &quot;Scan QR Code&quot; on one device, and point it at the other
+
+🌍 If not in the same room, scan via video call or share an invite link from &quot;Scan QR code&quot;
+
+Then: Enjoy your decentralized messenger experience. In contrast to other popular apps, without central control or tracking or selling you, friends, colleagues or family out to large organizations.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;device_talk_welcome_message2&quot;.</extracomment>
+        <translation>取得联系！
+
+🙌 在两台设备的主屏幕上点击“二维码”。在一台设备上选择“扫描二维码”，然后将其对准另一台设备。
+
+🌍 如果双方不在同一个房间内，可以通过视频通话进行扫描，或分享“扫描二维码”中的邀请链接。
+
+然后：尽情享受去中心化的即时通讯应用的体验。与其他流行应用不同，我们不会进行中心化控制、追踪，或将您、您的朋友、同事或家人的数据出售给大型组织。</translation>
+    </message>
+    <message>
+        <source>Message from %1$s</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;systemmsg_subject_for_new_contact&quot;.</extracomment>
+        <translation>来自 %1$s 的消息</translation>
+    </message>
+    <message>
+        <source>Failed to send message to %1$s.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;systemmsg_failed_sending_to&quot;.</extracomment>
+        <translation>无法向 %1$s 发送消息。</translation>
+    </message>
+    <message>
+        <source>Configuration failed. Error: %1$s</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;configuration_failed_with_error&quot;.</extracomment>
+        <translation>配置失败。错误：%1$s</translation>
+    </message>
+    <message>
+        <source>⚠️ Date or time on your device seems to be inaccurate (%1$s).
+
+Adjust your clock ⏰🔧 to ensure your messages are received correctly.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;devicemsg_bad_time&quot;.</extracomment>
+        <translation>⚠️ 设备的日期或时间似乎不准确 （%1$s）。
+
+请调整时钟 ⏰🔧 以确保能够正确接收消息。</translation>
+    </message>
+    <message>
+        <source>⚠️ Your Delta Chat version might be outdated.
+
+This may cause problems because your chat partners use newer versions - and you are missing the latest features 😳
+Please check https://get.delta.chat or your app store for updates.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;devicemsg_update_reminder&quot;.</extracomment>
+        <translation>⚠️您的 Delta Chat 版本可能过时了。
+
+这可能会在您的聊天对象使用更新的版本时造成问题。并且您缺失了最新功能😳
+请浏览 https://get.delta.chat 或应用商店来获取更新。</translation>
+    </message>
+    <message>
+        <source>Reply</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;reply_noun&quot;.</extracomment>
+        <translation>回复</translation>
+    </message>
+    <message>
+        <source>You deleted the &quot;Saved messages&quot; chat.
+
+ℹ️ To use the &quot;Saved messages&quot; feature again, create a new chat with yourself.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;devicemsg_self_deleted&quot;.</extracomment>
+        <translation>您已删除“保存的消息”聊天。
+
+ℹ️ 要再次使用“保存的消息”功能，请创建一个与自己的新聊天。</translation>
+    </message>
+    <message>
+        <source>Forwarded</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;forwarded&quot;.</extracomment>
+        <translation>转发了</translation>
+    </message>
+    <message>
+        <source>Incoming Messages</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;incoming_messages&quot;.</extracomment>
+        <translation>消息接收</translation>
+    </message>
+    <message>
+        <source>Outgoing Messages</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;outgoing_messages&quot;.</extracomment>
+        <translation>消息发送</translation>
+    </message>
+    <message>
+        <source>Connected</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;connectivity_connected&quot;.</extracomment>
+        <translation>已连接</translation>
+    </message>
+    <message>
+        <source>Connecting…</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;connectivity_connecting&quot;.</extracomment>
+        <translation>连接中…</translation>
+    </message>
+    <message>
+        <source>Updating…</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;connectivity_updating&quot;.</extracomment>
+        <translation>更新中…</translation>
+    </message>
+    <message>
+        <source>Sending…</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;sending&quot;.</extracomment>
+        <translation>发送中…</translation>
+    </message>
+    <message>
+        <source>Last message sent successfully.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;last_msg_sent_successfully&quot;.</extracomment>
+        <translation>最后一条消息已成功发送。</translation>
+    </message>
+    <message>
+        <source>Error: %1$s</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;error_x&quot;.</extracomment>
+        <translation>错误：%1$s</translation>
+    </message>
+    <message>
+        <source>Messages</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;messages&quot;.</extracomment>
+        <translation>消息</translation>
+    </message>
+    <message>
+        <source>%1$s of %2$s used</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;part_of_total_used&quot;.</extracomment>
+        <translation>已使用 %1$s，共 %2$s</translation>
+    </message>
+    <message>
+        <source>%1$s invited you to join this group.
+
+Waiting for the device of %2$s to reply…</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;secure_join_started&quot;.</extracomment>
+        <translation>%1$s 邀请您加入此群组。
+
+正在等待 %2$s 的设备回复…</translation>
+    </message>
+    <message>
+        <source>%1$s replied, waiting for being added to the group…</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;secure_join_replies&quot;.</extracomment>
+        <translation>%1$s 已回复，等待被加入群组…</translation>
+    </message>
+    <message>
+        <source>Scan to chat with %1$s</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;qrshow_join_contact_hint&quot;.</extracomment>
+        <translation>扫描即可与 %1$s 聊天</translation>
+    </message>
+    <message>
+        <source>Scan to join group %1$s</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;qrshow_join_group_hint&quot;.</extracomment>
+        <translation>扫描即可加入群组“%1$s”</translation>
+    </message>
+    <message>
+        <source>Not connected</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;connectivity_not_connected&quot;.</extracomment>
+        <translation>未连接</translation>
+    </message>
+    <message>
+        <source>You changed the group name from &quot;%1$s&quot; to &quot;%2$s&quot;.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;group_name_changed_by_you&quot;.</extracomment>
+        <translation>您已将群组名称从“%1$s”更改为“%2$s”。</translation>
+    </message>
+    <message>
+        <source>Group name changed from &quot;%1$s&quot; to &quot;%2$s&quot; by %3$s.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;group_name_changed_by_other&quot;.</extracomment>
+        <translation>%3$s 已将群组名称从“%1$s”更改为“%2$s”。</translation>
+    </message>
+    <message>
+        <source>You changed the group image.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;group_image_changed_by_you&quot;.</extracomment>
+        <translation>您更改了群组头像。</translation>
+    </message>
+    <message>
+        <source>Group image changed by %1$s.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;group_image_changed_by_other&quot;.</extracomment>
+        <translation>%1$s 更改了群组头像。</translation>
+    </message>
+    <message>
+        <source>You added member %1$s.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;add_member_by_you&quot;.</extracomment>
+        <translation>您添加了成员 %1$s。</translation>
+    </message>
+    <message>
+        <source>Member %1$s added by %2$s.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;add_member_by_other&quot;.</extracomment>
+        <translation>%2$s 添加了成员 %1$s。</translation>
+    </message>
+    <message>
+        <source>You removed member %1$s.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;remove_member_by_you&quot;.</extracomment>
+        <translation>您移除了成员 %1$s。</translation>
+    </message>
+    <message>
+        <source>Member %1$s removed by %2$s.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;remove_member_by_other&quot;.</extracomment>
+        <translation>%2$s 移除了成员 %1$s</translation>
+    </message>
+    <message>
+        <source>You left the group.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;group_left_by_you&quot;.</extracomment>
+        <translation>您已离开群组。</translation>
+    </message>
+    <message>
+        <source>Group left by %1$s.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;group_left_by_other&quot;.</extracomment>
+        <translation>%1$s 退出了群组</translation>
+    </message>
+    <message>
+        <source>You deleted the group image.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;group_image_deleted_by_you&quot;.</extracomment>
+        <translation>您删除了群组头像。</translation>
+    </message>
+    <message>
+        <source>Group image deleted by %1$s.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;group_image_deleted_by_other&quot;.</extracomment>
+        <translation>%1$s 删除了群组头像。</translation>
+    </message>
+    <message>
+        <source>You enabled location streaming.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;location_enabled_by_you&quot;.</extracomment>
+        <translation>你开启了位置流</translation>
+    </message>
+    <message>
+        <source>Location streaming enabled by %1$s.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;location_enabled_by_other&quot;.</extracomment>
+        <translation>%1$s 开启了位置流</translation>
+    </message>
+    <message>
+        <source>You disabled disappearing messages timer.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;ephemeral_timer_disabled_by_you&quot;.</extracomment>
+        <translation>你禁用了消息定时销毁计时器</translation>
+    </message>
+    <message>
+        <source>Disappearing messages timer disabled by %1$s.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;ephemeral_timer_disabled_by_other&quot;.</extracomment>
+        <translation>%1$s 禁用了消息定时销毁计时器</translation>
+    </message>
+    <message>
+        <source>You set disappearing messages timer to %1$s seconds</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;ephemeral_timer_seconds_by_you&quot;.</extracomment>
+        <translation>你将消息定时销毁计时器设置为 %1$s 秒</translation>
+    </message>
+    <message>
+        <source>Disappearing messages timer set to %1$s seconds by %2$s.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;ephemeral_timer_seconds_by_other&quot;.</extracomment>
+        <translation>%2$s 将消息定时销毁计时器设为 %1$s 秒</translation>
+    </message>
+    <message>
+        <source>You set disappearing messages timer to 1 hour.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;ephemeral_timer_1_hour_by_you&quot;.</extracomment>
+        <translation>你将消息定时销毁计时器设为 1 小时</translation>
+    </message>
+    <message>
+        <source>Disappearing messages timer set to 1 hour by %1$s.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;ephemeral_timer_1_hour_by_other&quot;.</extracomment>
+        <translation>%1$s 将消息定时销毁计时器设为 1 小时</translation>
+    </message>
+    <message>
+        <source>You set disappearing messages timer to 1 day.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;ephemeral_timer_1_day_by_you&quot;.</extracomment>
+        <translation>你将消息定时销毁计时器设为 1 天</translation>
+    </message>
+    <message>
+        <source>Disappearing messages timer set to 1 day by %1$s.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;ephemeral_timer_1_day_by_other&quot;.</extracomment>
+        <translation>%1$s 将消息定时销毁计时器设为 1 天</translation>
+    </message>
+    <message>
+        <source>You set disappearing messages timer to 1 week.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;ephemeral_timer_1_week_by_you&quot;.</extracomment>
+        <translation>你将消息定时销毁计时器设为 1 周</translation>
+    </message>
+    <message>
+        <source>Disappearing messages timer set to 1 week by %1$s.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;ephemeral_timer_1_week_by_other&quot;.</extracomment>
+        <translation>%1$s 将消息定时销毁计时器设为 1 天</translation>
+    </message>
+    <message>
+        <source>You set disappearing messages timer to %1$s minutes.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;ephemeral_timer_minutes_by_you&quot;.</extracomment>
+        <translation>你将消息定时销毁计时器设为 %1$s 分钟</translation>
+    </message>
+    <message>
+        <source>Disappearing messages timer set to %1$s minutes by %2$s.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;ephemeral_timer_minutes_by_other&quot;.</extracomment>
+        <translation>%2$s 将消息定时销毁计时器设为 %1$s 分钟</translation>
+    </message>
+    <message>
+        <source>You set disappearing messages timer to %1$s hours.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;ephemeral_timer_hours_by_you&quot;.</extracomment>
+        <translation>你将消息定时销毁计时器设为 %1$s 小时</translation>
+    </message>
+    <message>
+        <source>Disappearing messages timer set to %1$s hours by %2$s.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;ephemeral_timer_hours_by_other&quot;.</extracomment>
+        <translation>%2$s 将消息定时销毁计时器设为 %1$s 小时。</translation>
+    </message>
+    <message>
+        <source>You set disappearing messages timer to %1$s days.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;ephemeral_timer_days_by_you&quot;.</extracomment>
+        <translation>你将消息定时销毁计时器设为 %1$s 天</translation>
+    </message>
+    <message>
+        <source>Disappearing messages timer set to %1$s days by %2$s.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;ephemeral_timer_days_by_other&quot;.</extracomment>
+        <translation>%2$s 将消息定时销毁计时器设为 %1$s 天</translation>
+    </message>
+    <message>
+        <source>You set disappearing messages timer to %1$s weeks.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;ephemeral_timer_weeks_by_you&quot;.</extracomment>
+        <translation>你将消息定时销毁计时器设为 %1$s 周</translation>
+    </message>
+    <message>
+        <source>Disappearing messages timer set to %1$s weeks by %2$s.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;ephemeral_timer_weeks_by_other&quot;.</extracomment>
+        <translation>%2$s 将消息定时销毁计时器设为 %1$s 周</translation>
+    </message>
+    <message>
+        <source>You set disappearing messages timer to 1 year.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;ephemeral_timer_1_year_by_you&quot;.</extracomment>
+        <translation>您将消失消息计时器设置为 1 年。</translation>
+    </message>
+    <message>
+        <source>Disappearing messages timer set to 1 year by %1$s.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;ephemeral_timer_1_year_by_other&quot;.</extracomment>
+        <translation>%1$s 将消失消息计时器设置为 1 年。</translation>
+    </message>
+    <message>
+        <source>Scan to set up second device for %1$s</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;multidevice_qr_subtitle&quot;.</extracomment>
+        <translation>扫描此处为 %1$s 设置第二台设备</translation>
+    </message>
+    <message>
+        <source>ℹ️ Profile transferred to your second device.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;multidevice_transfer_done_devicemsg&quot;.</extracomment>
+        <translation>ℹ️ 账号已传输到您的第二台设备。</translation>
+    </message>
+    <message>
+        <source>Messages are end-to-end encrypted.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;messages_are_e2ee&quot;.</extracomment>
+        <translation>消息是端到端加密的。</translation>
+    </message>
+    <message>
+        <source>Others will only see this group after you sent a first message.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;chat_new_group_hint&quot;.</extracomment>
+        <translation>在您发出第一条消息后，其他人才会看到此群组。</translation>
+    </message>
+    <message>
+        <source>Member %1$s added.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;member_x_added&quot;.</extracomment>
+        <translation>添加了成员 %1$s。</translation>
+    </message>
+    <message>
+        <source>You reacted %1$s to &quot;%2$s&quot;</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;reaction_by_you&quot;.</extracomment>
+        <translation>你对 “%2$s” 回应了 %1$s</translation>
+    </message>
+    <message>
+        <source>%1$s reacted %2$s to &quot;%3$s&quot;</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;reaction_by_other&quot;.</extracomment>
+        <translation>%1$s 对 “%3$s” 回应了 %2$s</translation>
+    </message>
+    <message>
+        <source>Member %1$s removed.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;member_x_removed&quot;.</extracomment>
+        <translation>移除了成员 %1$s。</translation>
+    </message>
+    <message>
+        <source>You were removed by %1$s.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;remove_you_by_other&quot;.</extracomment>
+        <translation>%1$s 移除了您。</translation>
+    </message>
+    <message>
+        <source>You were added by %1$s.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;add_you_by_other&quot;.</extracomment>
+        <translation>%1$s 添加了您。</translation>
+    </message>
+    <message>
+        <source>You were removed.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;member_you_removed&quot;.</extracomment>
+        <translation>您已被移除。</translation>
+    </message>
+    <message>
+        <source>You were added.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;member_you_added&quot;.</extracomment>
+        <translation>您已被添加。</translation>
+    </message>
+    <message>
+        <source>Establishing connection, please wait…</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;secure_join_wait&quot;.</extracomment>
+        <translation>正在建立连接，请稍候…</translation>
+    </message>
+    <message>
+        <source>❤️ Seems you&apos;re enjoying Delta Chat!
+
+Please consider donating to help ensure that Delta Chat stays free for everyone.
+
+While Delta Chat is free to use and open source, development costs money. Help us to keep Delta Chat independent and make it even more awesome in the future.
+
+https://delta.chat/donate</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;donate_device_msg&quot;.</extracomment>
+        <translation>❤️ 看起来您很喜欢 Delta Chat！
+
+恳请您考虑捐款支持，让 Delta Chat 始终保持自由开放。
+
+虽然 Delta Chat 是自由且开源的，但开发仍需资金支持。请帮助我们保持 Delta Chat 的独立性，并在未来让它变得更加出色。
+
+https://delta.chat/donate</translation>
+    </message>
+    <message>
+        <source>Declined call</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;declined_call&quot;.</extracomment>
+        <translation>已拒接来电</translation>
+    </message>
+    <message>
+        <source>Canceled call</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;canceled_call&quot;.</extracomment>
+        <translation>已取消通话</translation>
+    </message>
+    <message>
+        <source>Missed call</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;missed_call&quot;.</extracomment>
+        <translation>未接来电</translation>
+    </message>
+    <message>
+        <source>You left the channel.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;channel_left_by_you&quot;.</extracomment>
+        <translation>您已离开频道。</translation>
+    </message>
+    <message>
+        <source>Scan to join channel &quot;%1$s&quot;</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;qrshow_join_channel_hint&quot;.</extracomment>
+        <translation>扫描即可加入频道“%1$s”</translation>
+    </message>
+    <message>
+        <source>You joined the channel.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;you_joined_the_channel&quot;.</extracomment>
+        <translation>您已加入频道。</translation>
+    </message>
+    <message>
+        <source>%1$s invited you to join this channel.
+
+Waiting for the device of %2$s to reply…</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;secure_join_channel_started&quot;.</extracomment>
+        <translation>%1$s 邀请您加入此频道。
+
+正在等待 %2$s 的设备回复…</translation>
+    </message>
+    <message>
+        <source>Channel name changed from &quot;%1$s&quot; to &quot;%2$s&quot;.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;channel_name_changed&quot;.</extracomment>
+        <translation>频道名称已从“%1$s”更改为“%2$s”。</translation>
+    </message>
+    <message>
+        <source>Channel image changed.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;channel_image_changed&quot;.</extracomment>
+        <translation>频道头像已更改。</translation>
+    </message>
+    <message>
+        <source>The attachment contains anonymous usage statistics, which helps us improve Delta Chat. See https://delta.chat/help#statssending for more information. Thank you!</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;stats_msg_body&quot;.</extracomment>
+        <translation>附件包含匿名使用统计数据，这有助于我们改进 Delta Chat。如需了解详情，请访问 https://delta.chat/help#statssending 。谢谢！</translation>
+    </message>
+    <message>
+        <source>Proxy Enabled</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;proxy_enabled&quot;.</extracomment>
+        <translation>代理已启用</translation>
+    </message>
+    <message>
+        <source>You are using a proxy. If you&apos;re having trouble connecting, try a different proxy.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;proxy_enabled_hint&quot;.</extracomment>
+        <translation>您正在使用代理。如果您在连接时遇到问题，请尝试其他代理。</translation>
+    </message>
+    <message>
+        <source>Messages in this chat use classic email and are not end-to-end encrypted.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;chat_unencrypted_explanation&quot;.</extracomment>
+        <translation>此聊天中的消息使用传统电子邮件，未进行端到端加密。</translation>
+    </message>
+    <message>
+        <source>Outgoing audio call</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;outgoing_audio_call&quot;.</extracomment>
+        <translation>音频通话去电</translation>
+    </message>
+    <message>
+        <source>Outgoing video call</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;outgoing_video_call&quot;.</extracomment>
+        <translation>视频通话去电</translation>
+    </message>
+    <message>
+        <source>Incoming audio call</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;incoming_audio_call&quot;.</extracomment>
+        <translation>音频通话来电</translation>
+    </message>
+    <message>
+        <source>Incoming video call</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;incoming_video_call&quot;.</extracomment>
+        <translation>视频通话来电</translation>
+    </message>
+    <message>
+        <source>You changed the chat description.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;chat_description_changed_by_you&quot;.</extracomment>
+        <translation>您更改了聊天描述。</translation>
+    </message>
+    <message>
+        <source>Chat description changed by %1$s.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;chat_description_changed_by_other&quot;.</extracomment>
+        <translation>%1$s 更改了聊天描述。</translation>
+    </message>
+    <message>
+        <source>You pinned a message</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;message_pinned_by_you&quot;.</extracomment>
+        <translation>你固定了一条消息</translation>
+    </message>
+    <message>
+        <source>Message pinned by %1$s</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;message_pinned_by_other&quot;.</extracomment>
+        <translation>%1$s 固定了一条消息</translation>
     </message>
 </context>
 <context>

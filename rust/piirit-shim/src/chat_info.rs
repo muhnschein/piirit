@@ -27,6 +27,8 @@ struct Loaded {
     can_send: bool,
     can_call: bool,
     ephemeral_timer: u32,
+    description: String,
+    can_edit_description: bool,
     members: Vec<ContactItem>,
 }
 
@@ -76,6 +78,14 @@ pub struct ChatInfo {
     /// A call can be placed here: a one-to-one chat, encrypted, that
     /// takes messages. See `ChatMessages::can_call`, which reads the same.
     pub can_call: qt_property!(bool; NOTIFY loaded_changed),
+    /// What the group or channel says about itself, line breaks kept,
+    /// empty when it says nothing. The core's `get_chat_description`:
+    /// `get_full_chat_by_id` does not carry it.
+    pub description: qt_property!(QString; NOTIFY loaded_changed),
+    /// The description can be changed: a group or channel this account
+    /// is still in. Narrower than `can_edit`, since the core refuses it
+    /// on every other kind of chat, such as a mailing list.
+    pub can_edit_description: qt_property!(bool; NOTIFY loaded_changed),
     /// Seconds after which messages in this chat disappear, 0 for never.
     /// The core's `ephemeralTimer`.
     pub ephemeral_timer: qt_property!(u32; NOTIFY loaded_changed),
@@ -110,6 +120,9 @@ pub struct ChatInfo {
 
     /// Give the group a new name. Answers on `renamed`.
     pub rename: qt_method!(fn(&mut self, name: QString)),
+    /// Give the group or channel a description, or none: an empty text
+    /// clears it. Answers on `saved`.
+    pub set_description: qt_method!(fn(&mut self, text: QString)),
     /// Use the image at `path` as the picture. Answers on `saved`.
     pub set_picture: qt_method!(fn(&mut self, path: QString)),
     /// Remove the picture. Answers on `saved`.
@@ -199,6 +212,8 @@ impl ChatInfo {
                         this_mut.can_send = found.can_send;
                         this_mut.can_call = found.can_call;
                         this_mut.ephemeral_timer = found.ephemeral_timer;
+                        this_mut.description = found.description.into();
+                        this_mut.can_edit_description = found.can_edit_description;
                         this_mut.members.borrow_mut().reset_data(found.members);
                         this_mut.loaded = true;
                     }
@@ -265,6 +280,33 @@ impl ChatInfo {
         runtime.spawn(async move {
             let result = rpc
                 .call::<_, ()>("set_chat_name", (account_id, chat_id, name))
+                .await
+                .map_err(|err| err.to_string());
+            done(result);
+        });
+    }
+
+    /// Give the group or channel a description, or none.
+    pub fn set_description(&mut self, text: QString) {
+        // The core trims it too; trimming here is what makes "the same
+        // text with a stray newline" read as no change.
+        let text = text.to_string().trim().to_string();
+        if text == self.description.to_string() {
+            return;
+        }
+        let (account_id, chat_id) = (self.account_id, self.chat_id);
+        let Some((rpc, runtime)) = connection() else {
+            self.error(QString::from("not started"));
+            return;
+        };
+        let done = self.stored_callback(Outcome::Saved);
+
+        runtime.spawn(async move {
+            // An empty text is how the core clears one. For a promoted
+            // group or a channel it also tells the members, so this is
+            // not a local note.
+            let result = rpc
+                .call::<_, ()>("set_chat_description", (account_id, chat_id, text))
                 .await
                 .map_err(|err| err.to_string());
             done(result);
@@ -509,6 +551,19 @@ async fn fetch(rpc: &RpcClient, account_id: u32, chat_id: u32) -> Result<Loaded,
     // broadcast and mailing-list kinds -- has members worth listing.
     let is_group = !matches!(json::str_at(&chat, "chatType"), "Single" | "");
     let can_send = json::flag(&chat, "canSend");
+    // Only these kinds have one to read, and the core refuses to set one
+    // on any other. A description that cannot be read is no reason to
+    // lose the page, so a failed read is an empty one.
+    let chat_type = json::str_at(&chat, "chatType");
+    let has_description = matches!(chat_type, "Group" | "OutBroadcast" | "InBroadcast");
+    let description: String = if has_description {
+        rpc.call("get_chat_description", (account_id, chat_id))
+            .await
+            .unwrap_or_default()
+    } else {
+        String::new()
+    };
+    let self_in_group = json::flag(&chat, "selfInGroup");
     Ok(Loaded {
         name: json::str_at(&chat, "name").to_string(),
         avatar_path: json::str_at(&chat, "profileImage").to_string(),
@@ -516,10 +571,12 @@ async fn fetch(rpc: &RpcClient, account_id: u32, chat_id: u32) -> Result<Loaded,
         is_group,
         // Pinned against the real core: after leaving, `selfInGroup` and
         // `canSend` both go false and every edit is refused.
-        can_edit: is_group && json::flag(&chat, "selfInGroup"),
+        can_edit: is_group && self_in_group,
         can_send,
         can_call: crate::chat::takes_calls(&chat, is_group, can_send),
         ephemeral_timer: json::u32_at(&chat, "ephemeralTimer"),
+        description,
+        can_edit_description: matches!(chat_type, "Group" | "OutBroadcast") && self_in_group,
         members,
     })
 }

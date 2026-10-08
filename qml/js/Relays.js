@@ -3,7 +3,7 @@
 // adds one to a profile that exists. One list rather than two, so the two
 // cannot drift.
 //
-// chatmail.at/relays as it stood on 2026-09-20, in its order, with what
+// chatmail.at/relays as it stood on 2026-10-07, in its order, with what
 // it says about each. Anyone may run a relay and the page is the list
 // that is kept up to date, so this one is a starting point rather than
 // the whole of it -- the hint under the field on either page points at
@@ -26,6 +26,7 @@ var list = [
     { domain: "tarpit.fun", location: "Nuremberg, Germany" },
     { domain: "d.gaufr.es", location: "Roubaix, France" },
     { domain: "chtml.ca", location: "Quebec, Canada" },
+    { domain: "chatmail.au", location: "Melbourne, Australia" },
     { domain: "e2ee.wang", location: "Johannesburg, South Africa" },
     { domain: "chat.privittytech.com", location: "Bangalore, India" },
     { domain: "e2ee.im", location: "Orastie, Romania" },
@@ -33,13 +34,13 @@ var list = [
     { domain: "chat.in-the.eu", location: "Falkenstein, Germany" },
     { domain: "chat.nuvon.app", location: "Prague, Czechia" },
     { domain: "nibblehole.com", location: "Zug, Switzerland" },
-    { domain: "chat.zashm.org", location: "Lviv, Ukraine" },
     { domain: "chat.sus.fr", location: "Iceland/Japan/Kenya/South Africa" },
     { domain: "delta.thelab.uno", location: "Gravelines, France" },
     { domain: "chat.vim.wtf", location: "Frankfurt, Germany" },
     { domain: "uninterest.ing", location: "Elk Grove Village, USA" },
     { domain: "sweetfern.net", location: "Ashburn, USA" },
-    { domain: "delta.disobey.net", location: "Roon, Netherlands" }
+    { domain: "delta.disobey.net", location: "Roon, Netherlands" },
+    { domain: "toque.im", location: "Quebec, Canada" }
 ]
 
 /// What a row of the list says: the relay, and where or for whom it is.

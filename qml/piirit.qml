@@ -4,6 +4,7 @@ import "pages"
 import "cover"
 import "components"
 import "js/QuickActions.js" as QuickActions
+import "js/StockStrings.js" as StockStrings
 
 ApplicationWindow {
     id: appWindow
@@ -425,6 +426,9 @@ ApplicationWindow {
         // A resumed phone had a profile last time it was looked at, so
         // an account list that comes back empty is one that has lost it.
         appWindow.hadProfile = appWindow.resumeAccountId > 0
+        // Before the start, so the first server is handed them before
+        // any message can arrive: see DeltaChatCore.set_stock_strings.
+        core.set_stock_strings(JSON.stringify(StockStrings.all()))
         core.start(rpcServerPath)
     }
 }

@@ -1,5 +1,5 @@
 use std::cell::RefCell;
-use std::collections::BTreeSet;
+use std::collections::{BTreeMap, BTreeSet};
 use std::sync::{Arc, Mutex};
 use std::time::{Duration, Instant};
 
@@ -461,6 +461,16 @@ pub struct DeltaChatCore {
     /// parse the event payload.
     pub core_error: qt_signal!(message: QString),
 
+    /// Hand the core the reader's words for the text it writes itself:
+    /// "Draft", "Saved messages", "Member %1$s added by %2$s.", the
+    /// errors it reports. A JSON object from the core's stock string id
+    /// to the translation, which `qml/js/StockStrings.js` makes. The core
+    /// keeps them only as long as it runs, so they are kept here too and
+    /// handed to every server this spawns, before anything else is asked
+    /// of it: some of that text is written into the database as messages
+    /// arrive, and a message that arrived first would stay in English.
+    pub set_stock_strings: qt_method!(fn(&mut self, strings_json: QString)),
+
     rpc: Option<Arc<RpcClient>>,
     runtime: Option<CoreRuntime>,
 
@@ -496,7 +506,13 @@ pub struct DeltaChatCore {
     /// The attempts at a profile there have been, shared with the tasks
     /// that carry each one out.
     attempts: Arc<Attempts>,
+    /// What `set_stock_strings` was last given, shared with the spawn
+    /// that hands it to a new server.
+    stock_strings: StockStrings,
 }
+
+/// The core's stock strings by id, as the reader's language has them.
+type StockStrings = Arc<Mutex<BTreeMap<u32, String>>>;
 
 impl DeltaChatCore {
     /// Spawn the server and begin draining its event stream. No-op if
@@ -525,7 +541,8 @@ impl DeltaChatCore {
         self.status = QString::from("starting");
         self.status_changed();
 
-        Self::spawn_server(QPointer::from(&*self), path, runtime);
+        let stock = self.stock_strings.clone();
+        Self::spawn_server(QPointer::from(&*self), path, runtime, stock);
     }
 
     /// Spawn the server and wire the result up. Shared by `start` and every
@@ -537,7 +554,7 @@ impl DeltaChatCore {
     /// `status_changed` is handled in QML by code that calls straight back
     /// in here. So every mutation below is scoped to a callback, and every
     /// signal is emitted with no borrow held.
-    fn spawn_server(ptr: QPointer<Self>, path: String, runtime: CoreRuntime) {
+    fn spawn_server(ptr: QPointer<Self>, path: String, runtime: CoreRuntime, stock: StockStrings) {
         let started_ptr = ptr.clone();
         let retry_path = path.clone();
         let started = queued_callback(move |result: Result<Arc<RpcClient>, String>| {
@@ -612,6 +629,9 @@ impl DeltaChatCore {
                 .map_err(|err| err.to_string())
             }
             .await;
+            if let Ok(rpc) = &result {
+                send_stock_strings(rpc, &stock).await;
+            }
             started(result);
         });
     }
@@ -659,12 +679,12 @@ impl DeltaChatCore {
                 let delay = restart_delay(this_mut.restart_attempt);
                 this_mut.restart_attempt += 1;
                 this_mut.status = QString::from("reconnecting");
-                Some((delay, runtime))
+                Some((delay, runtime, this_mut.stock_strings.clone()))
             }
         };
         this.borrow().status_changed();
 
-        let Some((delay, runtime)) = next else {
+        let Some((delay, runtime, stock)) = next else {
             if let Some(detail) = failure {
                 this.borrow().core_error(detail.into());
             }
@@ -672,7 +692,12 @@ impl DeltaChatCore {
         };
         let spawn_runtime = runtime.clone();
         let retry = queued_callback(move |()| {
-            Self::spawn_server(ptr.clone(), path.clone(), spawn_runtime.clone());
+            Self::spawn_server(
+                ptr.clone(),
+                path.clone(),
+                spawn_runtime.clone(),
+                stock.clone(),
+            );
         });
         runtime.spawn(async move {
             tokio::time::sleep(delay).await;
@@ -1618,6 +1643,29 @@ impl DeltaChatCore {
         Some((self.rpc.clone()?, self.runtime.clone()?))
     }
 
+    /// Keep the reader's stock strings, and hand them to the server that
+    /// is running now, if there is one.
+    pub fn set_stock_strings(&mut self, strings_json: QString) {
+        let strings = match parse_stock_strings(&strings_json.to_string()) {
+            Ok(strings) => strings,
+            Err(err) => {
+                self.core_error(format!("stock strings: {err}").into());
+                return;
+            }
+        };
+        *self
+            .stock_strings
+            .lock()
+            .unwrap_or_else(std::sync::PoisonError::into_inner) = strings;
+        let Some((rpc, runtime)) = self.connection() else {
+            return;
+        };
+        let stock = self.stock_strings.clone();
+        runtime.spawn(async move {
+            send_stock_strings(&rpc, &stock).await;
+        });
+    }
+
     /// Classify a QR/invite payload via the core.
     pub fn check_qr(&mut self, account_id: u32, qr_content: QString) {
         let Some((rpc, runtime)) = self.connection() else {
@@ -1635,6 +1683,37 @@ impl DeltaChatCore {
                 .map_err(|err| err.to_string());
             done((account_id, result));
         });
+    }
+}
+
+/// Read what `set_stock_strings` is given: an object from id to text.
+/// Keys are strings, JSON having no other kind; one that is not a number
+/// is a mistake in the table, not something to skip.
+fn parse_stock_strings(text: &str) -> Result<BTreeMap<u32, String>, String> {
+    let map: BTreeMap<String, String> =
+        serde_json::from_str(text).map_err(|err| err.to_string())?;
+    map.into_iter()
+        .map(|(id, value)| {
+            id.parse::<u32>()
+                .map(|id| (id, value))
+                .map_err(|_| format!("{id:?} is not a stock string id"))
+        })
+        .collect()
+}
+
+/// Hand the core every stock string held. Nothing is lost by a refusal:
+/// the core goes on with its own English, which is what it did before
+/// it was asked, so the error is only worth a line on stderr.
+async fn send_stock_strings(rpc: &RpcClient, stock: &StockStrings) {
+    let strings = stock
+        .lock()
+        .unwrap_or_else(std::sync::PoisonError::into_inner)
+        .clone();
+    if strings.is_empty() {
+        return;
+    }
+    if let Err(err) = rpc.call::<_, ()>("set_stock_strings", (strings,)).await {
+        eprintln!("piirit: the core refused the stock strings: {err}");
     }
 }
 

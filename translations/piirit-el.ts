@@ -909,6 +909,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Everyone in the group sees the name</source>
         <translation>Όλοι στην ομάδα βλέπουν το όνομα</translation>
     </message>
+    <message>
+        <source>Description</source>
+        <extracomment>Label of the text that says what a group or channel is for, on its info page, and the prompt in its empty field.</extracomment>
+        <translation>Περιγραφή</translation>
+    </message>
 </context>
 <context>
     <name>IntroPage</name>
@@ -1827,6 +1832,600 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Send as a message</source>
         <extracomment>Shown in the phone&apos;s share sheet, for text or a link shared to this app.</extracomment>
         <translation>Αποστολή ως μήνυμα</translation>
+    </message>
+</context>
+<context>
+    <name>StockStrings</name>
+    <message>
+        <source>No messages.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;chat_no_messages&quot;.</extracomment>
+        <translation>Κανένα μήνυμα.</translation>
+    </message>
+    <message>
+        <source>Me</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;self&quot;.</extracomment>
+        <translation>Εγώ</translation>
+    </message>
+    <message>
+        <source>Draft</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;draft&quot;.</extracomment>
+        <translation>Πρόχειρο</translation>
+    </message>
+    <message>
+        <source>Voice Message</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;voice_message&quot;.</extracomment>
+        <translation>Μήνυμα φωνής</translation>
+    </message>
+    <message>
+        <source>Image</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;image&quot;.</extracomment>
+        <translation>Εικόνα</translation>
+    </message>
+    <message>
+        <source>Video</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;video&quot;.</extracomment>
+        <translation>Βίντεο</translation>
+    </message>
+    <message>
+        <source>Audio</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;audio&quot;.</extracomment>
+        <translation>Ήχοι</translation>
+    </message>
+    <message>
+        <source>File</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;file&quot;.</extracomment>
+        <translation>Αρχείο</translation>
+    </message>
+    <message>
+        <source>GIF</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;gif&quot;.</extracomment>
+        <translation>GIF</translation>
+    </message>
+    <message>
+        <source>%1$s introduced.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;contact_verified&quot;.</extracomment>
+        <translation>%1$s επαληθεύτηκε.</translation>
+    </message>
+    <message>
+        <source>Archived</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;chat_archived_label&quot;.</extracomment>
+        <translation>Αρχειοθετημένα</translation>
+    </message>
+    <message>
+        <source>Location</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;location&quot;.</extracomment>
+        <translation>Τοποθεσία</translation>
+    </message>
+    <message>
+        <source>Sticker</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;sticker&quot;.</extracomment>
+        <translation>Αυτοκόλλητο</translation>
+    </message>
+    <message>
+        <source>Device Messages</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;device_talk&quot;.</extracomment>
+        <translation>Μηνύματα Συσκευής</translation>
+    </message>
+    <message>
+        <source>Saved Messages</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;saved_messages&quot;.</extracomment>
+        <translation>Αποθηκευμένα Μηνύματα</translation>
+    </message>
+    <message>
+        <source>Messages in this chat are generated on your device to inform about app updates and problems during usage.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;device_talk_explain&quot;.</extracomment>
+        <translation>Τα μηνύματα σε αυτήν τη συνομιλία δημιουργούνται στη συσκευή σας για την ενημέρωση σχετικά με ενημερώσεις και προβλήματα κατά τη χρήση της εφαρμογής</translation>
+    </message>
+    <message>
+        <source>Get in contact!
+
+🙌 Tap &quot;QR code&quot; on the main screen of both devices. Choose &quot;Scan QR Code&quot; on one device, and point it at the other
+
+🌍 If not in the same room, scan via video call or share an invite link from &quot;Scan QR code&quot;
+
+Then: Enjoy your decentralized messenger experience. In contrast to other popular apps, without central control or tracking or selling you, friends, colleagues or family out to large organizations.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;device_talk_welcome_message2&quot;.</extracomment>
+        <translation>Επικοινωνήστε!
+
+🙌 Πατήστε «Κωδικός QR» στην κύρια οθόνη και των δύο συσκευών. Επιλέξτε «Σάρωση κωδικού QR» σε μία συσκευή και στρέψτε την προς την άλλη
+
+🌍 Αν δεν βρίσκεστε στον ίδιο χώρο, σαρώστε μέσω βιντεοκλήσης ή μοιραστείτε έναν σύνδεσμο πρόσκλησης από το «Σάρωση κωδικού QR»
+
+Έπειτα: απολαύστε την εμπειρία ενός αποκεντρωμένου messenger. Σε αντίθεση με άλλες δημοφιλείς εφαρμογές, χωρίς κεντρικό έλεγχο ή παρακολούθηση και χωρίς να πουλάνε εσάς, τους φίλους, τους συναδέλφους ή την οικογένειά σας σε μεγάλους οργανισμούς.</translation>
+    </message>
+    <message>
+        <source>Message from %1$s</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;systemmsg_subject_for_new_contact&quot;.</extracomment>
+        <translation>Μήνυμα από τον/την %1$s</translation>
+    </message>
+    <message>
+        <source>Failed to send message to %1$s.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;systemmsg_failed_sending_to&quot;.</extracomment>
+        <translation>Αποτυχία αποστολής μηνύματος σε %1$s.</translation>
+    </message>
+    <message>
+        <source>Configuration failed. Error: %1$s</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;configuration_failed_with_error&quot;.</extracomment>
+        <translation>Η διαμόρφωση απέτυχε. Λάθος: %1$s</translation>
+    </message>
+    <message>
+        <source>⚠️ Date or time on your device seems to be inaccurate (%1$s).
+
+Adjust your clock ⏰🔧 to ensure your messages are received correctly.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;devicemsg_bad_time&quot;.</extracomment>
+        <translation>⚠️ Η ημερομηνία ή η ώρα στη συσκευή σας φαίνεται να είναι μην είναι ακριβής (%1$s).
+
+Προσαρμόστε το ρολόι σας ⏰🔧 για να βεβαιωθείτε ότι τα μηνύματά σας λαμβάνονται σωστά.</translation>
+    </message>
+    <message>
+        <source>⚠️ Your Delta Chat version might be outdated.
+
+This may cause problems because your chat partners use newer versions - and you are missing the latest features 😳
+Please check https://get.delta.chat or your app store for updates.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;devicemsg_update_reminder&quot;.</extracomment>
+        <translation>⚠️ Η έκδοση Delta Chat μπορεί να είναι παλιά.
+
+Αυτό μπορεί να προκαλέσει προβλήματα επειδή οι συνεργάτες συνομιλίας σας χρησιμοποιούν νεότερες εκδόσεις - και δεν έχετε τις πιο πρόσφατες λειτουργίες 😳
+Ελέγξτε τη https://get.delta.chat ή το κατάστημα εφαρμογών σας για ενημερώσεις .</translation>
+    </message>
+    <message>
+        <source>Reply</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;reply_noun&quot;.</extracomment>
+        <translation>Απάντηση</translation>
+    </message>
+    <message>
+        <source>You deleted the &quot;Saved messages&quot; chat.
+
+ℹ️ To use the &quot;Saved messages&quot; feature again, create a new chat with yourself.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;devicemsg_self_deleted&quot;.</extracomment>
+        <translation>Διαγράψατε τη συνομιλία &quot;Αποθηκευμένα μηνύματα&quot;.
+
+ℹ️ Για να χρησιμοποιήσετε ξανά τη λειτουργία &quot;Αποθηκευμένα μηνύματα&quot;, δημιουργήστε μια νέα συνομιλία με τον εαυτό σας.</translation>
+    </message>
+    <message>
+        <source>Forwarded</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;forwarded&quot;.</extracomment>
+        <translation>Κοινοποίηση</translation>
+    </message>
+    <message>
+        <source>Incoming Messages</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;incoming_messages&quot;.</extracomment>
+        <translation>Εισερχόμενα Μηνύματα</translation>
+    </message>
+    <message>
+        <source>Outgoing Messages</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;outgoing_messages&quot;.</extracomment>
+        <translation>Εξερχόμενα Μηνύματα</translation>
+    </message>
+    <message>
+        <source>Connected</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;connectivity_connected&quot;.</extracomment>
+        <translation>Συνδεδεμένο</translation>
+    </message>
+    <message>
+        <source>Connecting…</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;connectivity_connecting&quot;.</extracomment>
+        <translation>Συνδέεται…</translation>
+    </message>
+    <message>
+        <source>Updating…</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;connectivity_updating&quot;.</extracomment>
+        <translation>Ενημέρωση…</translation>
+    </message>
+    <message>
+        <source>Sending…</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;sending&quot;.</extracomment>
+        <translation>Στέλνεται…</translation>
+    </message>
+    <message>
+        <source>Last message sent successfully.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;last_msg_sent_successfully&quot;.</extracomment>
+        <translation>Το τελευταίο μήνυμα στάλθηκε με επιτυχία.</translation>
+    </message>
+    <message>
+        <source>Error: %1$s</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;error_x&quot;.</extracomment>
+        <translation>Σφάλμα: %1$s</translation>
+    </message>
+    <message>
+        <source>Messages</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;messages&quot;.</extracomment>
+        <translation>Μηνύματα</translation>
+    </message>
+    <message>
+        <source>%1$s of %2$s used</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;part_of_total_used&quot;.</extracomment>
+        <translation>%1$s από %2$s χρησιμοποιείται</translation>
+    </message>
+    <message>
+        <source>%1$s invited you to join this group.
+
+Waiting for the device of %2$s to reply…</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;secure_join_started&quot;.</extracomment>
+        <translation>%1$s σας προσκάλεσε να συμμετάσχετε σε αυτήν την ομάδα.
+
+Αναμονή για απάντηση από τη συσκευή του %2$s…</translation>
+    </message>
+    <message>
+        <source>%1$s replied, waiting for being added to the group…</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;secure_join_replies&quot;.</extracomment>
+        <translation>%1$s απάντησε, αναμονή για να προστεθεί στην ομάδα…</translation>
+    </message>
+    <message>
+        <source>Scan to chat with %1$s</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;qrshow_join_contact_hint&quot;.</extracomment>
+        <translation>Σάρωση για συνομιλία με %1$s</translation>
+    </message>
+    <message>
+        <source>Scan to join group %1$s</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;qrshow_join_group_hint&quot;.</extracomment>
+        <translation>Σάρωση για συμμετοχή στην ομάδα %1$s</translation>
+    </message>
+    <message>
+        <source>Not connected</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;connectivity_not_connected&quot;.</extracomment>
+        <translation>Μη συνδεδεμένο</translation>
+    </message>
+    <message>
+        <source>You changed the group name from &quot;%1$s&quot; to &quot;%2$s&quot;.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;group_name_changed_by_you&quot;.</extracomment>
+        <translation>Αλλάξατε το όνομα της ομάδας από &quot;%1$s&quot; σε &quot;%2$s&quot;.</translation>
+    </message>
+    <message>
+        <source>Group name changed from &quot;%1$s&quot; to &quot;%2$s&quot; by %3$s.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;group_name_changed_by_other&quot;.</extracomment>
+        <translation>Το όνομα της ομάδας άλλαξε από &quot;%1$s&quot; σε &quot;%2$s&quot; από %3$s.</translation>
+    </message>
+    <message>
+        <source>You changed the group image.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;group_image_changed_by_you&quot;.</extracomment>
+        <translation>Άλλαξες το εικονίδιο της ομάδας.</translation>
+    </message>
+    <message>
+        <source>Group image changed by %1$s.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;group_image_changed_by_other&quot;.</extracomment>
+        <translation>Ο/Η %1$s άλλαξε το εικονίδιο της ομάδας.</translation>
+    </message>
+    <message>
+        <source>You added member %1$s.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;add_member_by_you&quot;.</extracomment>
+        <translation>Πρόσθεσες τον/την %1$s.</translation>
+    </message>
+    <message>
+        <source>Member %1$s added by %2$s.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;add_member_by_other&quot;.</extracomment>
+        <translation>Ο/Η %2$s πρόσθεσε τον/την %1$s.</translation>
+    </message>
+    <message>
+        <source>You removed member %1$s.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;remove_member_by_you&quot;.</extracomment>
+        <translation>Αφαίρεσες τον/την %1$s.</translation>
+    </message>
+    <message>
+        <source>Member %1$s removed by %2$s.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;remove_member_by_other&quot;.</extracomment>
+        <translation>Ο/Η %2$s αφαίρεσε τον/την %1$s.</translation>
+    </message>
+    <message>
+        <source>You left the group.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;group_left_by_you&quot;.</extracomment>
+        <translation>Αποχωρήσατε από την ομάδα.</translation>
+    </message>
+    <message>
+        <source>Group left by %1$s.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;group_left_by_other&quot;.</extracomment>
+        <translation>Ο/Η %1$s έφυγε απ&apos; την ομαδα.</translation>
+    </message>
+    <message>
+        <source>You deleted the group image.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;group_image_deleted_by_you&quot;.</extracomment>
+        <translation>Διαγράψατε την εικόνα της ομάδας.</translation>
+    </message>
+    <message>
+        <source>Group image deleted by %1$s.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;group_image_deleted_by_other&quot;.</extracomment>
+        <translation>Η εικόνα ομάδας διαγράφηκε από %1$s.</translation>
+    </message>
+    <message>
+        <source>You enabled location streaming.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;location_enabled_by_you&quot;.</extracomment>
+        <translation>Ενεργοποιήσατε την αναμετάδωση τοποθεσίας.</translation>
+    </message>
+    <message>
+        <source>Location streaming enabled by %1$s.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;location_enabled_by_other&quot;.</extracomment>
+        <translation>Η αναμετάδωση τοποθεσίας ενεργοποιήθηκε από %1$s.</translation>
+    </message>
+    <message>
+        <source>You disabled disappearing messages timer.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;ephemeral_timer_disabled_by_you&quot;.</extracomment>
+        <translation>Απενεργοποίησες τα μηνύματα που εξαφανίζονται.</translation>
+    </message>
+    <message>
+        <source>Disappearing messages timer disabled by %1$s.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;ephemeral_timer_disabled_by_other&quot;.</extracomment>
+        <translation>Ο/Η %1$s απενεργοποίησε τα μηνύματα που εξαφανίζονται.</translation>
+    </message>
+    <message>
+        <source>You set disappearing messages timer to %1$s seconds</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;ephemeral_timer_seconds_by_you&quot;.</extracomment>
+        <translation>Όρισες το χρόνο εξαφάνισης των μηνυμάτων σε %1$s δευτερόλεπτα.</translation>
+    </message>
+    <message>
+        <source>Disappearing messages timer set to %1$s seconds by %2$s.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;ephemeral_timer_seconds_by_other&quot;.</extracomment>
+        <translation>Ο/Η %2$s όρισε το χρόνο εξαφάνισης των μηνυμάτων σε %1$s δευτερόλεπτα.</translation>
+    </message>
+    <message>
+        <source>You set disappearing messages timer to 1 hour.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;ephemeral_timer_1_hour_by_you&quot;.</extracomment>
+        <translation>Όρισες το χρόνο εξαφάνισης των μηνυμάτων σε 1 ώρα.</translation>
+    </message>
+    <message>
+        <source>Disappearing messages timer set to 1 hour by %1$s.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;ephemeral_timer_1_hour_by_other&quot;.</extracomment>
+        <translation>Ο/Η %1$s όρισε το χρόνο εξαφάνισης των μηνυμάτων σε 1 ώρα.</translation>
+    </message>
+    <message>
+        <source>You set disappearing messages timer to 1 day.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;ephemeral_timer_1_day_by_you&quot;.</extracomment>
+        <translation>Όρισες το χρόνο εξαφάνισης των μηνυμάτων σε 1 ημέρα.</translation>
+    </message>
+    <message>
+        <source>Disappearing messages timer set to 1 day by %1$s.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;ephemeral_timer_1_day_by_other&quot;.</extracomment>
+        <translation>Ο/Η %1$s όρισε το χρόνο εξαφάνισης των μηνυμάτων σε 1 ημέρα.</translation>
+    </message>
+    <message>
+        <source>You set disappearing messages timer to 1 week.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;ephemeral_timer_1_week_by_you&quot;.</extracomment>
+        <translation>Όρισες το χρόνο εξαφάνισης των μηνυμάτων σε 1 εβδομάδα.</translation>
+    </message>
+    <message>
+        <source>Disappearing messages timer set to 1 week by %1$s.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;ephemeral_timer_1_week_by_other&quot;.</extracomment>
+        <translation>Ο/Η %1$s όρισε το χρόνο εξαφάνισης των μηνυμάτων σε 1 εβδομάδα.</translation>
+    </message>
+    <message>
+        <source>You set disappearing messages timer to %1$s minutes.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;ephemeral_timer_minutes_by_you&quot;.</extracomment>
+        <translation>Όρισες το χρόνο εξαφάνισης των μηνυμάτων σε %1$s λεπτά.</translation>
+    </message>
+    <message>
+        <source>Disappearing messages timer set to %1$s minutes by %2$s.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;ephemeral_timer_minutes_by_other&quot;.</extracomment>
+        <translation>Ο/Η %2$s όρισε το χρόνο εξαφάνισης των μηνυμάτων σε %1$s λεπτά.</translation>
+    </message>
+    <message>
+        <source>You set disappearing messages timer to %1$s hours.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;ephemeral_timer_hours_by_you&quot;.</extracomment>
+        <translation>Όρισες το χρόνο εξαφάνισης των μηνυμάτων σε %1$s ώρες.</translation>
+    </message>
+    <message>
+        <source>Disappearing messages timer set to %1$s hours by %2$s.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;ephemeral_timer_hours_by_other&quot;.</extracomment>
+        <translation>Ο/Η %2$s όρισε το χρόνο εξαφάνισης των μηνυμάτων σε %1$s ώρες.</translation>
+    </message>
+    <message>
+        <source>You set disappearing messages timer to %1$s days.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;ephemeral_timer_days_by_you&quot;.</extracomment>
+        <translation>Όρισες το χρόνο εξαφάνισης των μηνυμάτων σε %1$s ημέρες.</translation>
+    </message>
+    <message>
+        <source>Disappearing messages timer set to %1$s days by %2$s.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;ephemeral_timer_days_by_other&quot;.</extracomment>
+        <translation>Ο/Η %2$s όρισε το χρόνο εξαφάνισης των μηνυμάτων σε %1$s ημέρες.</translation>
+    </message>
+    <message>
+        <source>You set disappearing messages timer to %1$s weeks.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;ephemeral_timer_weeks_by_you&quot;.</extracomment>
+        <translation>Όρισες το χρόνο εξαφάνισης των μηνυμάτων σε %1$s εβδομάδες.</translation>
+    </message>
+    <message>
+        <source>Disappearing messages timer set to %1$s weeks by %2$s.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;ephemeral_timer_weeks_by_other&quot;.</extracomment>
+        <translation>Ο/Η %2$s όρισε το χρόνο εξαφάνισης των μηνυμάτων σε %1$s εβδομάδες.</translation>
+    </message>
+    <message>
+        <source>You set disappearing messages timer to 1 year.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;ephemeral_timer_1_year_by_you&quot;.</extracomment>
+        <translation>Όρισες το χρόνο εξαφάνισης των μηνυμάτων σε 1 έτος.</translation>
+    </message>
+    <message>
+        <source>Disappearing messages timer set to 1 year by %1$s.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;ephemeral_timer_1_year_by_other&quot;.</extracomment>
+        <translation>Ο/Η %1$s όρισε το χρόνο εξαφάνισης των μηνυμάτων σε 1 έτος.</translation>
+    </message>
+    <message>
+        <source>Scan to set up second device for %1$s</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;multidevice_qr_subtitle&quot;.</extracomment>
+        <translation>Σαρώστε για να ρυθμίσετε δεύτερη συσκευή για %1$s</translation>
+    </message>
+    <message>
+        <source>ℹ️ Profile transferred to your second device.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;multidevice_transfer_done_devicemsg&quot;.</extracomment>
+        <translation>ℹ️ Το προφίλ μεταφέρθηκε στη δεύτερη συσκευή σας.</translation>
+    </message>
+    <message>
+        <source>Messages are end-to-end encrypted.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;messages_are_e2ee&quot;.</extracomment>
+        <translation>Τα μηνύματα είναι κρυπτογραφημένα από άκρο σε άκρο.</translation>
+    </message>
+    <message>
+        <source>Others will only see this group after you sent a first message.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;chat_new_group_hint&quot;.</extracomment>
+        <translation>Οι άλλοι θα δουν αυτήν την ομάδα μόνο αφού στείλετε ένα πρώτο μήνυμα.</translation>
+    </message>
+    <message>
+        <source>Member %1$s added.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;member_x_added&quot;.</extracomment>
+        <translation>Το μέλος %1$s προστέθηκε.</translation>
+    </message>
+    <message>
+        <source>You reacted %1$s to &quot;%2$s&quot;</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;reaction_by_you&quot;.</extracomment>
+        <translation>Αντιδράσατε με %1$s στο &quot;%2$s&quot;</translation>
+    </message>
+    <message>
+        <source>%1$s reacted %2$s to &quot;%3$s&quot;</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;reaction_by_other&quot;.</extracomment>
+        <translation>Ο/Η %1$s αντέδρασε με %2$s στο &quot;%3$s&quot;</translation>
+    </message>
+    <message>
+        <source>Member %1$s removed.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;member_x_removed&quot;.</extracomment>
+        <translation>Το μέλος %1$s αφαιρέθηκε.</translation>
+    </message>
+    <message>
+        <source>You were removed by %1$s.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;remove_you_by_other&quot;.</extracomment>
+        <translation>Αφαιρεθήκατε από τον/την %1$s.</translation>
+    </message>
+    <message>
+        <source>You were added by %1$s.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;add_you_by_other&quot;.</extracomment>
+        <translation>Προστεθήκατε από τον/την %1$s.</translation>
+    </message>
+    <message>
+        <source>You were removed.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;member_you_removed&quot;.</extracomment>
+        <translation>Αφαιρεθήκατε.</translation>
+    </message>
+    <message>
+        <source>You were added.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;member_you_added&quot;.</extracomment>
+        <translation>Προστεθήκατε.</translation>
+    </message>
+    <message>
+        <source>Establishing connection, please wait…</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;secure_join_wait&quot;.</extracomment>
+        <translation>Γίνεται σύνδεση, παρακαλώ περιμένετε…</translation>
+    </message>
+    <message>
+        <source>❤️ Seems you&apos;re enjoying Delta Chat!
+
+Please consider donating to help ensure that Delta Chat stays free for everyone.
+
+While Delta Chat is free to use and open source, development costs money. Help us to keep Delta Chat independent and make it even more awesome in the future.
+
+https://delta.chat/donate</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;donate_device_msg&quot;.</extracomment>
+        <translation>❤️ Φαίνεται ότι απολαμβάνετε το Delta Chat!
+
+Σκεφτείτε να κάνετε μια δωρεά για να παραμείνει το Delta Chat δωρεάν για όλους.
+
+Ενώ το Delta Chat είναι δωρεάν και ανοιχτού κώδικα, η ανάπτυξη κοστίζει. Βοηθήστε μας να διατηρήσουμε το Delta Chat ανεξάρτητο και να το κάνουμε ακόμα καλύτερο στο μέλλον.
+
+https://delta.chat/donate</translation>
+    </message>
+    <message>
+        <source>Declined call</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;declined_call&quot;.</extracomment>
+        <translation>Απορριφθείσα κλήση</translation>
+    </message>
+    <message>
+        <source>Canceled call</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;canceled_call&quot;.</extracomment>
+        <translation>Ακυρωμένη κλήση</translation>
+    </message>
+    <message>
+        <source>Missed call</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;missed_call&quot;.</extracomment>
+        <translation>Αναπάντητη κλήση</translation>
+    </message>
+    <message>
+        <source>You left the channel.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;channel_left_by_you&quot;.</extracomment>
+        <translation>Αποχωρήσατε από το κανάλι.</translation>
+    </message>
+    <message>
+        <source>Scan to join channel &quot;%1$s&quot;</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;qrshow_join_channel_hint&quot;.</extracomment>
+        <translation>Σαρώστε για συμμετοχή στο κανάλι &quot;%1$s&quot;</translation>
+    </message>
+    <message>
+        <source>You joined the channel.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;you_joined_the_channel&quot;.</extracomment>
+        <translation>Συμμετάσχατε στο κανάλι.</translation>
+    </message>
+    <message>
+        <source>%1$s invited you to join this channel.
+
+Waiting for the device of %2$s to reply…</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;secure_join_channel_started&quot;.</extracomment>
+        <translation>Ο/Η %1$s σας προσκάλεσε να συμμετάσχετε σε αυτό το κανάλι.
+
+Αναμονή για απάντηση από τη συσκευή του/της %2$s…</translation>
+    </message>
+    <message>
+        <source>Channel name changed from &quot;%1$s&quot; to &quot;%2$s&quot;.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;channel_name_changed&quot;.</extracomment>
+        <translation>Το όνομα του καναλιού άλλαξε από &quot;%1$s&quot; σε &quot;%2$s&quot;.</translation>
+    </message>
+    <message>
+        <source>Channel image changed.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;channel_image_changed&quot;.</extracomment>
+        <translation>Η εικόνα του καναλιού άλλαξε.</translation>
+    </message>
+    <message>
+        <source>The attachment contains anonymous usage statistics, which helps us improve Delta Chat. See https://delta.chat/help#statssending for more information. Thank you!</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;stats_msg_body&quot;.</extracomment>
+        <translation>Το συνημμένο περιέχει ανώνυμα στατιστικά χρήσης, που μας βοηθούν να βελτιώσουμε το Delta Chat. Δείτε το https://delta.chat/help#statssending για περισσότερες πληροφορίες. Ευχαριστούμε!</translation>
+    </message>
+    <message>
+        <source>Proxy Enabled</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;proxy_enabled&quot;.</extracomment>
+        <translation>Το proxy ενεργοποιήθηκε</translation>
+    </message>
+    <message>
+        <source>You are using a proxy. If you&apos;re having trouble connecting, try a different proxy.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;proxy_enabled_hint&quot;.</extracomment>
+        <translation>Χρησιμοποιείτε proxy. Αν αντιμετωπίζετε πρόβλημα σύνδεσης, δοκιμάστε διαφορετικό proxy.</translation>
+    </message>
+    <message>
+        <source>Messages in this chat use classic email and are not end-to-end encrypted.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;chat_unencrypted_explanation&quot;.</extracomment>
+        <translation>Τα μηνύματα σε αυτή τη συνομιλία χρησιμοποιούν κλασικό email και δεν είναι κρυπτογραφημένα από άκρο σε άκρο.</translation>
+    </message>
+    <message>
+        <source>Outgoing audio call</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;outgoing_audio_call&quot;.</extracomment>
+        <translation>Εξερχόμενη ηχητική κλήση</translation>
+    </message>
+    <message>
+        <source>Outgoing video call</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;outgoing_video_call&quot;.</extracomment>
+        <translation>Εξερχόμενη βιντεοκλήση</translation>
+    </message>
+    <message>
+        <source>Incoming audio call</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;incoming_audio_call&quot;.</extracomment>
+        <translation>Εισερχόμενη ηχητική κλήση</translation>
+    </message>
+    <message>
+        <source>Incoming video call</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;incoming_video_call&quot;.</extracomment>
+        <translation>Εισερχόμενη βιντεοκλήση</translation>
+    </message>
+    <message>
+        <source>You changed the chat description.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;chat_description_changed_by_you&quot;.</extracomment>
+        <translation>Αλλάξατε την περιγραφή της συνομιλίας.</translation>
+    </message>
+    <message>
+        <source>Chat description changed by %1$s.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;chat_description_changed_by_other&quot;.</extracomment>
+        <translation>Η περιγραφή της συνομιλίας άλλαξε από %1$s.</translation>
+    </message>
+    <message>
+        <source>You pinned a message</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;message_pinned_by_you&quot;.</extracomment>
+        <translation>Καρφιτσώσατε ένα μήνυμα</translation>
+    </message>
+    <message>
+        <source>Message pinned by %1$s</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;message_pinned_by_other&quot;.</extracomment>
+        <translation>Μήνυμα καρφιτσώθηκε από %1$s</translation>
     </message>
 </context>
 <context>

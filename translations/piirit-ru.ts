@@ -918,6 +918,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Everyone in the group sees the name</source>
         <translation>Название видят все в группе</translation>
     </message>
+    <message>
+        <source>Description</source>
+        <extracomment>Label of the text that says what a group or channel is for, on its info page, and the prompt in its empty field.</extracomment>
+        <translation>Описание</translation>
+    </message>
 </context>
 <context>
     <name>IntroPage</name>
@@ -1838,6 +1843,600 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Send as a message</source>
         <extracomment>Shown in the phone&apos;s share sheet, for text or a link shared to this app.</extracomment>
         <translation>Отправить сообщением</translation>
+    </message>
+</context>
+<context>
+    <name>StockStrings</name>
+    <message>
+        <source>No messages.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;chat_no_messages&quot;.</extracomment>
+        <translation>Нет сообщений.</translation>
+    </message>
+    <message>
+        <source>Me</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;self&quot;.</extracomment>
+        <translation>Я</translation>
+    </message>
+    <message>
+        <source>Draft</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;draft&quot;.</extracomment>
+        <translation>Черновик</translation>
+    </message>
+    <message>
+        <source>Voice Message</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;voice_message&quot;.</extracomment>
+        <translation>Голосовое сообщение</translation>
+    </message>
+    <message>
+        <source>Image</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;image&quot;.</extracomment>
+        <translation>Изображение</translation>
+    </message>
+    <message>
+        <source>Video</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;video&quot;.</extracomment>
+        <translation>Видео</translation>
+    </message>
+    <message>
+        <source>Audio</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;audio&quot;.</extracomment>
+        <translation>Аудио</translation>
+    </message>
+    <message>
+        <source>File</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;file&quot;.</extracomment>
+        <translation>Файл</translation>
+    </message>
+    <message>
+        <source>GIF</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;gif&quot;.</extracomment>
+        <translation>GIF</translation>
+    </message>
+    <message>
+        <source>%1$s introduced.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;contact_verified&quot;.</extracomment>
+        <translation>%1$s подтверждён.</translation>
+    </message>
+    <message>
+        <source>Archived</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;chat_archived_label&quot;.</extracomment>
+        <translation>Архивировано</translation>
+    </message>
+    <message>
+        <source>Location</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;location&quot;.</extracomment>
+        <translation>Местоположение</translation>
+    </message>
+    <message>
+        <source>Sticker</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;sticker&quot;.</extracomment>
+        <translation>Стикер</translation>
+    </message>
+    <message>
+        <source>Device Messages</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;device_talk&quot;.</extracomment>
+        <translation>Сообщения устройства</translation>
+    </message>
+    <message>
+        <source>Saved Messages</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;saved_messages&quot;.</extracomment>
+        <translation>Сохранённые сообщения</translation>
+    </message>
+    <message>
+        <source>Messages in this chat are generated on your device to inform about app updates and problems during usage.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;device_talk_explain&quot;.</extracomment>
+        <translation>Сообщения в этом чате генерируются локально на вашем устройстве чтобы информировать об обновлениях и проблемах при использовании приложения.</translation>
+    </message>
+    <message>
+        <source>Get in contact!
+
+🙌 Tap &quot;QR code&quot; on the main screen of both devices. Choose &quot;Scan QR Code&quot; on one device, and point it at the other
+
+🌍 If not in the same room, scan via video call or share an invite link from &quot;Scan QR code&quot;
+
+Then: Enjoy your decentralized messenger experience. In contrast to other popular apps, without central control or tracking or selling you, friends, colleagues or family out to large organizations.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;device_talk_welcome_message2&quot;.</extracomment>
+        <translation>Оставайтесь на связи!
+
+🙌 Нажмите &quot;QR-код&quot; на главном экране обоих устройств. На одном устройстве выберите &quot;Сканировать QR-код&quot; и направьте камеру на другое устройство.
+
+🌍 Если устройства находятся в разных местах, отсканируйте код с помощью видеозвонка или поделитесь ссылкой-приглашением из раздела &quot;Сканировать QR-код&quot;
+
+Затем: Пользуйтесь преимуществами децентрализованного мессенджера. В отличие от других популярных приложений, он не имеет центрального узла управления, не следит за вами и не продает ваши данные, данные о ваших друзьях, коллегах или членах семьи крупным организациям.</translation>
+    </message>
+    <message>
+        <source>Message from %1$s</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;systemmsg_subject_for_new_contact&quot;.</extracomment>
+        <translation>Сообщение от %1$s</translation>
+    </message>
+    <message>
+        <source>Failed to send message to %1$s.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;systemmsg_failed_sending_to&quot;.</extracomment>
+        <translation>Не удалось отправить сообщение %1$s.</translation>
+    </message>
+    <message>
+        <source>Configuration failed. Error: %1$s</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;configuration_failed_with_error&quot;.</extracomment>
+        <translation>Ошибка конфигурации. Ошибка: %1$s</translation>
+    </message>
+    <message>
+        <source>⚠️ Date or time on your device seems to be inaccurate (%1$s).
+
+Adjust your clock ⏰🔧 to ensure your messages are received correctly.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;devicemsg_bad_time&quot;.</extracomment>
+        <translation>⚠️ Вероятно, дата или время на вашем устройстве установлены неверно (%1$s).
+
+Настройте часы ⏰🔧 чтобы ваши сообщения доставлялись правильно.</translation>
+    </message>
+    <message>
+        <source>⚠️ Your Delta Chat version might be outdated.
+
+This may cause problems because your chat partners use newer versions - and you are missing the latest features 😳
+Please check https://get.delta.chat or your app store for updates.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;devicemsg_update_reminder&quot;.</extracomment>
+        <translation>⚠️ Вероятно, ваша версия Delta Chat устарела.
+
+Это может вызвать проблемы, поскольку ваши собеседники используют более новые версии, а у вас нет доступа к последним функциям. 😳
+Пожалуйста, проверьте наличие обновлений на сайте https://get.delta.chat или в магазине приложений.</translation>
+    </message>
+    <message>
+        <source>Reply</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;reply_noun&quot;.</extracomment>
+        <translation>Ответ</translation>
+    </message>
+    <message>
+        <source>You deleted the &quot;Saved messages&quot; chat.
+
+ℹ️ To use the &quot;Saved messages&quot; feature again, create a new chat with yourself.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;devicemsg_self_deleted&quot;.</extracomment>
+        <translation>Вы удалили чат &quot;Сохраненные сообщения&quot;.
+
+ℹ️ Чтобы снова использовать функцию &quot;Сохраненные сообщения&quot;, создайте новый чат с собой.</translation>
+    </message>
+    <message>
+        <source>Forwarded</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;forwarded&quot;.</extracomment>
+        <translation>Переслано</translation>
+    </message>
+    <message>
+        <source>Incoming Messages</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;incoming_messages&quot;.</extracomment>
+        <translation>Входящие сообщения</translation>
+    </message>
+    <message>
+        <source>Outgoing Messages</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;outgoing_messages&quot;.</extracomment>
+        <translation>Исходящие сообщения</translation>
+    </message>
+    <message>
+        <source>Connected</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;connectivity_connected&quot;.</extracomment>
+        <translation>Соединено</translation>
+    </message>
+    <message>
+        <source>Connecting…</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;connectivity_connecting&quot;.</extracomment>
+        <translation>Соединение…</translation>
+    </message>
+    <message>
+        <source>Updating…</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;connectivity_updating&quot;.</extracomment>
+        <translation>Обновление…</translation>
+    </message>
+    <message>
+        <source>Sending…</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;sending&quot;.</extracomment>
+        <translation>Отправка…</translation>
+    </message>
+    <message>
+        <source>Last message sent successfully.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;last_msg_sent_successfully&quot;.</extracomment>
+        <translation>Последнее сообщение отправлено успешно.</translation>
+    </message>
+    <message>
+        <source>Error: %1$s</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;error_x&quot;.</extracomment>
+        <translation>Ошибка: %1$s</translation>
+    </message>
+    <message>
+        <source>Messages</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;messages&quot;.</extracomment>
+        <translation>Сообщения</translation>
+    </message>
+    <message>
+        <source>%1$s of %2$s used</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;part_of_total_used&quot;.</extracomment>
+        <translation>%1$s из %2$s используется</translation>
+    </message>
+    <message>
+        <source>%1$s invited you to join this group.
+
+Waiting for the device of %2$s to reply…</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;secure_join_started&quot;.</extracomment>
+        <translation>%1$s приглашает вас присоединиться к этой группе.
+
+Ожидаем ответа от устройства %2$s…</translation>
+    </message>
+    <message>
+        <source>%1$s replied, waiting for being added to the group…</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;secure_join_replies&quot;.</extracomment>
+        <translation>%1$s ответил(а), ожидаем добавления в группу…</translation>
+    </message>
+    <message>
+        <source>Scan to chat with %1$s</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;qrshow_join_contact_hint&quot;.</extracomment>
+        <translation>Отсканируйте, чтобы начать чат с %1$s</translation>
+    </message>
+    <message>
+        <source>Scan to join group %1$s</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;qrshow_join_group_hint&quot;.</extracomment>
+        <translation>Сканируйте QR-код, чтобы присоединиться к группе %1$s</translation>
+    </message>
+    <message>
+        <source>Not connected</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;connectivity_not_connected&quot;.</extracomment>
+        <translation>Нет соединения</translation>
+    </message>
+    <message>
+        <source>You changed the group name from &quot;%1$s&quot; to &quot;%2$s&quot;.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;group_name_changed_by_you&quot;.</extracomment>
+        <translation>Вы изменили название группы с &quot;%1$s&quot; на &quot;%2$s&quot;.</translation>
+    </message>
+    <message>
+        <source>Group name changed from &quot;%1$s&quot; to &quot;%2$s&quot; by %3$s.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;group_name_changed_by_other&quot;.</extracomment>
+        <translation>%3$s меняет название группы с &quot;%1$s&quot; на &quot;%2$s&quot;.</translation>
+    </message>
+    <message>
+        <source>You changed the group image.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;group_image_changed_by_you&quot;.</extracomment>
+        <translation>Вы изменили изображение группы.</translation>
+    </message>
+    <message>
+        <source>Group image changed by %1$s.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;group_image_changed_by_other&quot;.</extracomment>
+        <translation>%1$s меняет изображение группы.</translation>
+    </message>
+    <message>
+        <source>You added member %1$s.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;add_member_by_you&quot;.</extracomment>
+        <translation>Вы добавили участника %1$s.</translation>
+    </message>
+    <message>
+        <source>Member %1$s added by %2$s.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;add_member_by_other&quot;.</extracomment>
+        <translation>%2$s добавляет участника %1$s.</translation>
+    </message>
+    <message>
+        <source>You removed member %1$s.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;remove_member_by_you&quot;.</extracomment>
+        <translation>Вы удалили участника %1$s.</translation>
+    </message>
+    <message>
+        <source>Member %1$s removed by %2$s.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;remove_member_by_other&quot;.</extracomment>
+        <translation>%2$s удаляет участника %1$s.</translation>
+    </message>
+    <message>
+        <source>You left the group.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;group_left_by_you&quot;.</extracomment>
+        <translation>Вы покинули группу.</translation>
+    </message>
+    <message>
+        <source>Group left by %1$s.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;group_left_by_other&quot;.</extracomment>
+        <translation>%1$s покидает группу.</translation>
+    </message>
+    <message>
+        <source>You deleted the group image.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;group_image_deleted_by_you&quot;.</extracomment>
+        <translation>Вы удалили изображение группы.</translation>
+    </message>
+    <message>
+        <source>Group image deleted by %1$s.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;group_image_deleted_by_other&quot;.</extracomment>
+        <translation>%1$s удаляет изображение группы.</translation>
+    </message>
+    <message>
+        <source>You enabled location streaming.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;location_enabled_by_you&quot;.</extracomment>
+        <translation>Вы включили трансляцию местоположения.</translation>
+    </message>
+    <message>
+        <source>Location streaming enabled by %1$s.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;location_enabled_by_other&quot;.</extracomment>
+        <translation>%1$s включил трансляцию местоположения.</translation>
+    </message>
+    <message>
+        <source>You disabled disappearing messages timer.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;ephemeral_timer_disabled_by_you&quot;.</extracomment>
+        <translation>Вы отключили удаление сообщений по таймеру.</translation>
+    </message>
+    <message>
+        <source>Disappearing messages timer disabled by %1$s.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;ephemeral_timer_disabled_by_other&quot;.</extracomment>
+        <translation>%1$s отключает удаление сообщений по таймеру.</translation>
+    </message>
+    <message>
+        <source>You set disappearing messages timer to %1$s seconds</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;ephemeral_timer_seconds_by_you&quot;.</extracomment>
+        <translation>Вы включили автоудаление сообщений через %1$s сек</translation>
+    </message>
+    <message>
+        <source>Disappearing messages timer set to %1$s seconds by %2$s.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;ephemeral_timer_seconds_by_other&quot;.</extracomment>
+        <translation>%2$s включает автоудаление сообщений через %1$s сек</translation>
+    </message>
+    <message>
+        <source>You set disappearing messages timer to 1 hour.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;ephemeral_timer_1_hour_by_you&quot;.</extracomment>
+        <translation>Вы включили автоудаление сообщений через 1 час.</translation>
+    </message>
+    <message>
+        <source>Disappearing messages timer set to 1 hour by %1$s.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;ephemeral_timer_1_hour_by_other&quot;.</extracomment>
+        <translation>%1$s включает автоудаление сообщений через 1 час.</translation>
+    </message>
+    <message>
+        <source>You set disappearing messages timer to 1 day.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;ephemeral_timer_1_day_by_you&quot;.</extracomment>
+        <translation>Вы включили автоудаление сообщений через 1 день.</translation>
+    </message>
+    <message>
+        <source>Disappearing messages timer set to 1 day by %1$s.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;ephemeral_timer_1_day_by_other&quot;.</extracomment>
+        <translation>%1$s включает автоудаление сообщений через 1 день.</translation>
+    </message>
+    <message>
+        <source>You set disappearing messages timer to 1 week.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;ephemeral_timer_1_week_by_you&quot;.</extracomment>
+        <translation>Вы включили автоудаление сообщений через 1 неделю.</translation>
+    </message>
+    <message>
+        <source>Disappearing messages timer set to 1 week by %1$s.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;ephemeral_timer_1_week_by_other&quot;.</extracomment>
+        <translation>%1$s включает автоудаление сообщений через 1 неделю.</translation>
+    </message>
+    <message>
+        <source>You set disappearing messages timer to %1$s minutes.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;ephemeral_timer_minutes_by_you&quot;.</extracomment>
+        <translation>Вы включили автоудаление сообщений через %1$s минут.</translation>
+    </message>
+    <message>
+        <source>Disappearing messages timer set to %1$s minutes by %2$s.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;ephemeral_timer_minutes_by_other&quot;.</extracomment>
+        <translation>%2$s включает автоудаление сообщений через %1$s минут.</translation>
+    </message>
+    <message>
+        <source>You set disappearing messages timer to %1$s hours.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;ephemeral_timer_hours_by_you&quot;.</extracomment>
+        <translation>Вы включили автоудаление сообщений через %1$s часов.</translation>
+    </message>
+    <message>
+        <source>Disappearing messages timer set to %1$s hours by %2$s.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;ephemeral_timer_hours_by_other&quot;.</extracomment>
+        <translation>%2$s включает автоудаление сообщений через %1$s часов.</translation>
+    </message>
+    <message>
+        <source>You set disappearing messages timer to %1$s days.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;ephemeral_timer_days_by_you&quot;.</extracomment>
+        <translation>Вы включили автоудаление сообщений через %1$s дней.</translation>
+    </message>
+    <message>
+        <source>Disappearing messages timer set to %1$s days by %2$s.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;ephemeral_timer_days_by_other&quot;.</extracomment>
+        <translation>%2$s включает автоудаление сообщений через %1$s дней.</translation>
+    </message>
+    <message>
+        <source>You set disappearing messages timer to %1$s weeks.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;ephemeral_timer_weeks_by_you&quot;.</extracomment>
+        <translation>Вы включили автоудаление сообщений через %1$s недель.</translation>
+    </message>
+    <message>
+        <source>Disappearing messages timer set to %1$s weeks by %2$s.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;ephemeral_timer_weeks_by_other&quot;.</extracomment>
+        <translation>%2$s включает автоудаление сообщений через %1$s недель.</translation>
+    </message>
+    <message>
+        <source>You set disappearing messages timer to 1 year.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;ephemeral_timer_1_year_by_you&quot;.</extracomment>
+        <translation>Вы включили автоудаление сообщений на 1 год.</translation>
+    </message>
+    <message>
+        <source>Disappearing messages timer set to 1 year by %1$s.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;ephemeral_timer_1_year_by_other&quot;.</extracomment>
+        <translation>%1$s включает автоудаление сообщений на 1 год.</translation>
+    </message>
+    <message>
+        <source>Scan to set up second device for %1$s</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;multidevice_qr_subtitle&quot;.</extracomment>
+        <translation>Отсканируйте, чтобы настроить второе устройство для %1$s</translation>
+    </message>
+    <message>
+        <source>ℹ️ Profile transferred to your second device.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;multidevice_transfer_done_devicemsg&quot;.</extracomment>
+        <translation>ℹ️ Профиль перенесен на ваше второе устройство.</translation>
+    </message>
+    <message>
+        <source>Messages are end-to-end encrypted.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;messages_are_e2ee&quot;.</extracomment>
+        <translation>Сообщения защищены сквозным шифрованием.</translation>
+    </message>
+    <message>
+        <source>Others will only see this group after you sent a first message.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;chat_new_group_hint&quot;.</extracomment>
+        <translation>Другие пользователи увидят эту группу только после того, как вы отправите первое сообщение.</translation>
+    </message>
+    <message>
+        <source>Member %1$s added.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;member_x_added&quot;.</extracomment>
+        <translation>Добавлен участник %1$s.</translation>
+    </message>
+    <message>
+        <source>You reacted %1$s to &quot;%2$s&quot;</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;reaction_by_you&quot;.</extracomment>
+        <translation>Вы реагируете %1$s на &quot;%2$s&quot;</translation>
+    </message>
+    <message>
+        <source>%1$s reacted %2$s to &quot;%3$s&quot;</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;reaction_by_other&quot;.</extracomment>
+        <translation>%1$s реагирует %2$s на &quot;%3$s&quot;</translation>
+    </message>
+    <message>
+        <source>Member %1$s removed.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;member_x_removed&quot;.</extracomment>
+        <translation>Участник %1$s удалён.</translation>
+    </message>
+    <message>
+        <source>You were removed by %1$s.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;remove_you_by_other&quot;.</extracomment>
+        <translation>Вас удалил(а) %1$s.</translation>
+    </message>
+    <message>
+        <source>You were added by %1$s.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;add_you_by_other&quot;.</extracomment>
+        <translation>Вас добавил(а) %1$s.</translation>
+    </message>
+    <message>
+        <source>You were removed.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;member_you_removed&quot;.</extracomment>
+        <translation>Вас удалили.</translation>
+    </message>
+    <message>
+        <source>You were added.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;member_you_added&quot;.</extracomment>
+        <translation>Вас добавили.</translation>
+    </message>
+    <message>
+        <source>Establishing connection, please wait…</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;secure_join_wait&quot;.</extracomment>
+        <translation>Устанавливается соединение, пожалуйста, подождите…</translation>
+    </message>
+    <message>
+        <source>❤️ Seems you&apos;re enjoying Delta Chat!
+
+Please consider donating to help ensure that Delta Chat stays free for everyone.
+
+While Delta Chat is free to use and open source, development costs money. Help us to keep Delta Chat independent and make it even more awesome in the future.
+
+https://delta.chat/donate</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;donate_device_msg&quot;.</extracomment>
+        <translation>❤️ Кажется, вам нравится Delta Chat!
+
+Рассмотрите возможность сделать пожертвование, чтобы помочь нам сохранить Delta Chat бесплатным для всех пользователей.
+
+Хотя использование Delta Chat бесплатно и исходный код открыт, разработка требует финансовых затрат. Помогите нам сохранить независимость Delta Chat и сделать его еще лучше в будущем.
+
+https://delta.chat/donate</translation>
+    </message>
+    <message>
+        <source>Declined call</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;declined_call&quot;.</extracomment>
+        <translation>Отклонённый звонок</translation>
+    </message>
+    <message>
+        <source>Canceled call</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;canceled_call&quot;.</extracomment>
+        <translation>Отменённый звонок</translation>
+    </message>
+    <message>
+        <source>Missed call</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;missed_call&quot;.</extracomment>
+        <translation>Пропущенный звонок</translation>
+    </message>
+    <message>
+        <source>You left the channel.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;channel_left_by_you&quot;.</extracomment>
+        <translation>Вы покинули канал.</translation>
+    </message>
+    <message>
+        <source>Scan to join channel &quot;%1$s&quot;</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;qrshow_join_channel_hint&quot;.</extracomment>
+        <translation>Отсканируйте, чтобы присоединиться к каналу &quot;%1$s&quot;</translation>
+    </message>
+    <message>
+        <source>You joined the channel.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;you_joined_the_channel&quot;.</extracomment>
+        <translation>Вы присоединились к каналу.</translation>
+    </message>
+    <message>
+        <source>%1$s invited you to join this channel.
+
+Waiting for the device of %2$s to reply…</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;secure_join_channel_started&quot;.</extracomment>
+        <translation>%1$s приглашает вас присоединиться к этому каналу.
+
+Ожидаем ответа от устройства %2$s...</translation>
+    </message>
+    <message>
+        <source>Channel name changed from &quot;%1$s&quot; to &quot;%2$s&quot;.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;channel_name_changed&quot;.</extracomment>
+        <translation>Название канала изменено с &quot;%1$s&quot; на &quot;%2$s&quot;.</translation>
+    </message>
+    <message>
+        <source>Channel image changed.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;channel_image_changed&quot;.</extracomment>
+        <translation>Изображение канала изменено.</translation>
+    </message>
+    <message>
+        <source>The attachment contains anonymous usage statistics, which helps us improve Delta Chat. See https://delta.chat/help#statssending for more information. Thank you!</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;stats_msg_body&quot;.</extracomment>
+        <translation>Вложение содержит анонимную статистику использования, которая поможет нам улучшить Delta Chat. Более подробную информацию смотрите на https://delta.chat/help#statssending. Спасибо!</translation>
+    </message>
+    <message>
+        <source>Proxy Enabled</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;proxy_enabled&quot;.</extracomment>
+        <translation>Прокси включен</translation>
+    </message>
+    <message>
+        <source>You are using a proxy. If you&apos;re having trouble connecting, try a different proxy.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;proxy_enabled_hint&quot;.</extracomment>
+        <translation>Вы используете прокси. При проблемах с подключением, попробуйте использовать другой прокси-сервер.</translation>
+    </message>
+    <message>
+        <source>Messages in this chat use classic email and are not end-to-end encrypted.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;chat_unencrypted_explanation&quot;.</extracomment>
+        <translation>Сообщения в этом чате используют обычную электронную почту и не зашифрованы сквозным шифрованием.</translation>
+    </message>
+    <message>
+        <source>Outgoing audio call</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;outgoing_audio_call&quot;.</extracomment>
+        <translation>Исходящий аудиозвонок</translation>
+    </message>
+    <message>
+        <source>Outgoing video call</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;outgoing_video_call&quot;.</extracomment>
+        <translation>Исходящий видеозвонок</translation>
+    </message>
+    <message>
+        <source>Incoming audio call</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;incoming_audio_call&quot;.</extracomment>
+        <translation>Входящий аудиозвонок</translation>
+    </message>
+    <message>
+        <source>Incoming video call</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;incoming_video_call&quot;.</extracomment>
+        <translation>Входящий видеозвонок</translation>
+    </message>
+    <message>
+        <source>You changed the chat description.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;chat_description_changed_by_you&quot;.</extracomment>
+        <translation>Вы изменили описание чата.</translation>
+    </message>
+    <message>
+        <source>Chat description changed by %1$s.</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;chat_description_changed_by_other&quot;.</extracomment>
+        <translation>Описание чата изменено пользователем %1$s.</translation>
+    </message>
+    <message>
+        <source>You pinned a message</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;message_pinned_by_you&quot;.</extracomment>
+        <translation>Вы закрепили сообщение</translation>
+    </message>
+    <message>
+        <source>Message pinned by %1$s</source>
+        <extracomment>Written by the core: Delta Chat&apos;s &quot;message_pinned_by_other&quot;.</extracomment>
+        <translation>Сообщение закреплено пользователем %1$s</translation>
     </message>
 </context>
 <context>

@@ -33,7 +33,13 @@ Page {
         objectName: "chat"
         account_id: page.accountId
         chat_id: page.chatId
-        onError: page.errorMessage = message
+        onError: {
+            page.errorMessage = message
+            // What was typed did not reach the core, so the field goes
+            // back to what the core holds rather than showing a
+            // description nobody else has.
+            page.refillDescription()
+        }
         // Filled from the core, never re-filled from it while someone is
         // typing: every change reloads, and that would reach in and reset
         // the cursor.
@@ -44,6 +50,9 @@ Page {
                 page.filling = true
                 nameField.text = chat.name
                 page.filling = false
+            }
+            if (chat.loaded && !page.descriptionEdited) {
+                page.refillDescription()
             }
         }
         onSaved: notice.show(qsTr("Saved"))
@@ -81,6 +90,9 @@ Page {
     property bool edited: false
     /// The refill is writing to the field, so the change is not an edit.
     property bool filling: false
+    /// The description field has been typed in since the last save or
+    /// load. Guards its refill, as `edited` does the name's.
+    property bool descriptionEdited: false
     property string errorMessage: ""
 
     // A pause, not a keystroke: a round trip per letter would be seven
@@ -108,6 +120,25 @@ Page {
         chat.rename(nameField.text)
     }
 
+    function refillDescription() {
+        page.filling = true
+        descriptionField.text = chat.description
+        page.filling = false
+        page.descriptionEdited = false
+    }
+
+    // Not on a pause, as the name is: the core sends every change of the
+    // description to all the members as a message of its own, so saving
+    // after each pause in typing would put several into the chat. It goes
+    // when the field loses the cursor, and when the page is left.
+    function applyDescription() {
+        if (!chat.loaded || !page.descriptionEdited) {
+            return
+        }
+        page.descriptionEdited = false
+        chat.set_description(descriptionField.text)
+    }
+
     function noteEdit() {
         if (chat.loaded && !page.filling) {
             page.edited = true
@@ -123,6 +154,7 @@ Page {
     onStatusChanged: {
         if (status === PageStatus.Deactivating) {
             page.applyEdits()
+            page.applyDescription()
             nameField.done()
             doomedMembers.flush()
         }
@@ -280,6 +312,32 @@ Page {
                 hint: qsTr("Everyone in the group sees the name")
                 canEdit: chat.can_edit
                 onTextChanged: page.noteEdit()
+            }
+
+            // What the group says about itself. Shown to anyone, and a
+            // field only for those the core lets change it; it keeps the
+            // line breaks it was written with. Nothing is drawn for a
+            // group that has none and cannot be given one.
+            TextArea {
+                id: descriptionField
+                objectName: "descriptionField"
+                visible: chat.can_edit_description || chat.description.length > 0
+                width: parent.width
+                readOnly: !chat.can_edit_description
+                //: Label of the text that says what a group or channel is
+                //: for, on its info page, and the prompt in its empty field.
+                label: qsTr("Description")
+                placeholderText: label
+                onTextChanged: {
+                    if (chat.loaded && !page.filling) {
+                        page.descriptionEdited = true
+                    }
+                }
+                onActiveFocusChanged: {
+                    if (!activeFocus) {
+                        page.applyDescription()
+                    }
+                }
             }
 
             // What the group holds besides words, a tile per kind, each a

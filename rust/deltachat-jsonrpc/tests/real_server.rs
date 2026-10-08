@@ -571,6 +571,35 @@ async fn offline_round_trip_against_real_core() {
          cannot tell it from something sent: {item:?}"
     );
 
+    // That "Draft" is the core's own English, and the reader's language
+    // replaces it through `set_stock_strings`, keyed by the core's stock
+    // string id -- 3 is `StockMessage::Draft` -- in the shape
+    // DeltaChatCore::set_stock_strings sends: an object whose keys are the
+    // ids written as strings. Put back afterwards, since the core keeps
+    // what it is given for as long as it runs.
+    let stock = |text: &str| std::collections::BTreeMap::from([(3_u32, text.to_string())]);
+    client
+        .call::<_, ()>("set_stock_strings", (stock("Entwurf"),))
+        .await
+        .expect("set_stock_strings");
+    let translated: std::collections::HashMap<u32, Value> = client
+        .call("get_chatlist_items_by_entries", (account_id, vec![chat_id]))
+        .await
+        .expect("get_chatlist_items_by_entries after set_stock_strings");
+    assert_eq!(
+        translated[&chat_id]
+            .get("summaryText1")
+            .and_then(Value::as_str),
+        Some("Entwurf"),
+        "the core did not take a stock string in the shape the app sends, so \
+         every word it writes stays English: {:?}",
+        translated[&chat_id]
+    );
+    client
+        .call::<_, ()>("set_stock_strings", (stock("Draft"),))
+        .await
+        .expect("set_stock_strings back");
+
     // Reading one back. The core keeps drafts, so this is what survives
     // the app being closed -- and it comes back as a whole message object
     // rather than a string.
@@ -721,6 +750,31 @@ async fn offline_round_trip_against_real_core() {
         full.get("chatType").and_then(Value::as_str),
         Some("Group"),
         "unexpected chat shape: {full:?}"
+    );
+    // The description ChatInfo reads beside the full chat, which does not
+    // carry it, and sets as it was typed less its outer whitespace: the
+    // line break inside is kept, and an empty text clears it.
+    let description = |text: &'static str| {
+        let client = client.clone();
+        async move {
+            client
+                .call::<_, ()>("set_chat_description", (account_id, group_chat_id, text))
+                .await
+                .expect("set_chat_description");
+            client
+                .call::<_, String>("get_chat_description", (account_id, group_chat_id))
+                .await
+                .expect("get_chat_description")
+        }
+    };
+    assert_eq!(
+        description("Walks\nBring boots").await,
+        "Walks\nBring boots"
+    );
+    assert_eq!(
+        description("").await,
+        "",
+        "an empty description does not clear it"
     );
     // What a contact's page reads, with the chat's kind and `canSend`,
     // to say whether a call can be placed there (piirit-shim's

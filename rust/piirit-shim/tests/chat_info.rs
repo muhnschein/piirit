@@ -34,6 +34,7 @@ const PROBE_QML: &str = r"
     Item {
         property string log: ''
         property int step: 0
+        property string firstDescription: ''
         ChatInfo {
             id: group
             account_id: 1
@@ -72,6 +73,7 @@ const PROBE_QML: &str = r"
             onTriggered: {
                 if (step === 0 && group.loaded && group.member_count === 2) {
                     step = 1
+                    firstDescription = group.description
                     // Refused here, before the core sees it.
                     group.rename('  ')
                     // The name it already has: nothing to send.
@@ -94,15 +96,31 @@ const PROBE_QML: &str = r"
                     group.set_ephemeral_timer(3600)
                 } else if (step === 6 && group.ephemeral_timer === 3600) {
                     step = 7
-                    group.leave()
-                } else if (step === 7 && !group.can_edit) {
+                    // The text it already has, with the stray whitespace
+                    // a field leaves: nothing to send.
+                    group.set_description('Walks\nBring boots \n')
+                    // A real change, kept multi-line and trimmed.
+                    group.set_description('  Bring water\nand boots  \n')
+                } else if (step === 7 && group.description === 'Bring water\nand boots') {
                     step = 8
+                    // Empty clears.
+                    group.set_description('')
+                } else if (step === 8 && group.description === '') {
+                    step = 9
+                    // Refused by the core: said on `error`, not kept.
+                    group.set_description('this will fail')
+                } else if (step === 9 && log.indexOf('Cannot set chat description') >= 0) {
+                    step = 10
+                    group.leave()
+                } else if (step === 10 && !group.can_edit) {
+                    step = 11
                 }
             }
         }
         function report() {
             return step + '#' + group.name + '#' + group.can_edit + '#'
                 + group.avatar_path + '#' + members() + '#' + log
+                + '#' + firstDescription + '#' + group.can_edit_description
         }
     }
 ";
@@ -119,6 +137,7 @@ fn a_group_can_be_changed_after_it_is_made() {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_FAKE_JOURNAL", &journal);
         std::env::set_var("PIIRIT_ACCOUNTS_DIR", temp.join("accounts"));
+        std::env::set_var("PIIRIT_FAKE_DESCRIPTION", "Walks\nBring boots");
     }
 
     piirit_shim::register_qml_types();
@@ -143,7 +162,7 @@ fn a_group_can_be_changed_after_it_is_made() {
     });
 
     // The backstop: reads whatever the steps got to and quits.
-    single_shot(Duration::from_secs(8), move || unsafe {
+    single_shot(Duration::from_secs(12), move || unsafe {
         let value = (*engine_ptr).invoke_method("report".into(), &[]);
         *report_ptr = QString::from_qvariant(value)
             .map(|text| text.to_string())
@@ -170,8 +189,10 @@ fn assert_changes(calls: &[(String, Value)], report: &str) {
     let avatar = parts.next().unwrap_or_default();
     let members = parts.next().unwrap_or_default();
     let log = parts.next().unwrap_or_default();
+    let first_description = parts.next().unwrap_or_default();
+    let can_edit_description = parts.next().unwrap_or_default();
 
-    assert_eq!(step, "8", "the scenario did not run to the end. {context}");
+    assert_eq!(step, "11", "the scenario did not run to the end. {context}");
 
     // The members came from the id list, with the account's own contact
     // marked, and in the core's order.
@@ -272,6 +293,41 @@ fn assert_changes(calls: &[(String, Value)], report: &str) {
         "the timer was not set on this chat. {context}"
     );
 
+    // The description comes from its own call, line breaks and all.
+    assert!(
+        names.contains(&"get_chat_description"),
+        "the description was never read from the core. {context}"
+    );
+    assert_eq!(
+        first_description, "Walks\nBring boots",
+        "the model did not load the description. {context}"
+    );
+    // Setting: trimmed, multi-line kept, nothing for the text it already
+    // had, an empty text to clear, and the core's refusal said aloud.
+    let described: Vec<&Value> = calls
+        .iter()
+        .filter(|(name, _)| name == "set_chat_description")
+        .map(|(_, params)| params)
+        .collect();
+    assert_eq!(
+        described,
+        vec![
+            &serde_json::json!([1, 2, "Bring water\nand boots"]),
+            &serde_json::json!([1, 2, ""]),
+            &serde_json::json!([1, 2, "this will fail"]),
+        ],
+        "the description calls are not the trimmed change, the clear and the refused one, \
+         with nothing sent for the unchanged text. {context}"
+    );
+    assert!(
+        log.contains("Cannot set chat description"),
+        "the core's refusal did not reach the error signal. {context}"
+    );
+    assert_eq!(
+        can_edit_description, "false",
+        "a group that has been left still offers a description edit. {context}"
+    );
+
     // Leaving is its own call, after which the core allows no edits and
     // the model says so.
     assert!(
@@ -293,8 +349,8 @@ fn assert_changes(calls: &[(String, Value)], report: &str) {
     );
     assert_eq!(
         log.matches("saved;").count(),
-        5,
-        "adding, removing, setting and clearing the picture, and the timer \
-         should each have been confirmed once. {context}"
+        7,
+        "adding, removing, setting and clearing the picture, the timer, and \
+         setting and clearing the description should each have been confirmed once. {context}"
     );
 }
