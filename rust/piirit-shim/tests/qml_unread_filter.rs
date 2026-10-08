@@ -188,10 +188,6 @@ fn the_filter_switch_sits_by_the_search_and_says_when_it_is_on() {
     });
 
     single_shot(Duration::from_secs(5), move || unsafe {
-        record!(
-            "off-again-description",
-            get!("chatListHeader", "description")
-        );
         record!("count-after", get!("chats", "count"));
         record!(
             "archived",
@@ -238,7 +234,8 @@ fn the_filter_switch_sits_by_the_search_and_says_when_it_is_on() {
     assert_eq!(
         value("off-description"),
         "",
-        "the header says the list is filtered before it is. {context}"
+        "the header has a line under the title before the filter is on. \
+         {context}"
     );
     assert_eq!(
         value("count-before"),
@@ -252,9 +249,9 @@ fn the_filter_switch_sits_by_the_search_and_says_when_it_is_on() {
     );
     assert_eq!(
         value("on-description"),
-        "Unread chats",
-        "the header does not say the list is filtered, so a short list \
-         reads as chats gone missing. {context}"
+        "",
+        "the header grew a line when the filter went on, pushing the \
+         search row down under the finger that tapped it. {context}"
     );
     assert_eq!(
         value("on-count"),
@@ -287,12 +284,6 @@ fn the_filter_switch_sits_by_the_search_and_says_when_it_is_on() {
         value("after-search"),
         "true",
         "the switch stayed out of use after the search was cleared. {context}"
-    );
-    assert_eq!(
-        value("off-again-description"),
-        "",
-        "the header still says the list is filtered after the filter went \
-         off. {context}"
     );
     assert_eq!(
         value("count-after"),

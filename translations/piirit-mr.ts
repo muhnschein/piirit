@@ -549,11 +549,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>हे चॅट आता अस्तित्वात नाही.</translation>
     </message>
     <message>
-        <source>Unread chats</source>
-        <extracomment>Under the &quot;Chats&quot; title while only chats with unread messages are listed.</extracomment>
-        <translation>न वाचलेले चॅट</translation>
-    </message>
-    <message>
         <source>No unread chats</source>
         <extracomment>The unread filter is on and every chat has been read.</extracomment>
         <translation>न वाचलेले चॅट नाहीत</translation>

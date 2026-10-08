@@ -551,11 +551,6 @@ Wiadomości innych grup z zablokowanymi kontaktami nadal będą wyświetlane.</t
         <translation>Ten czat już nie istnieje.</translation>
     </message>
     <message>
-        <source>Unread chats</source>
-        <extracomment>Under the &quot;Chats&quot; title while only chats with unread messages are listed.</extracomment>
-        <translation>Nieprzeczytane czaty</translation>
-    </message>
-    <message>
         <source>No unread chats</source>
         <extracomment>The unread filter is on and every chat has been read.</extracomment>
         <translation>Brak nieprzeczytanych czatów</translation>

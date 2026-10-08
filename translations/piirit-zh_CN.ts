@@ -547,11 +547,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>该聊天已不存在。</translation>
     </message>
     <message>
-        <source>Unread chats</source>
-        <extracomment>Under the &quot;Chats&quot; title while only chats with unread messages are listed.</extracomment>
-        <translation>未读聊天</translation>
-    </message>
-    <message>
         <source>No unread chats</source>
         <extracomment>The unread filter is on and every chat has been read.</extracomment>
         <translation>没有未读聊天</translation>

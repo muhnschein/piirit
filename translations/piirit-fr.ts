@@ -549,11 +549,6 @@ Vous continuerez à voir les messages des contacts bloqués dans les autres grou
         <translation>Cette discussion n&apos;existe plus.</translation>
     </message>
     <message>
-        <source>Unread chats</source>
-        <extracomment>Under the &quot;Chats&quot; title while only chats with unread messages are listed.</extracomment>
-        <translation>Discussions non lues</translation>
-    </message>
-    <message>
         <source>No unread chats</source>
         <extracomment>The unread filter is on and every chat has been read.</extracomment>
         <translation>Aucune discussion non lue</translation>

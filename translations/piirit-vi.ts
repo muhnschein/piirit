@@ -543,11 +543,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Cuộc trò chuyện đó không còn nữa.</translation>
     </message>
     <message>
-        <source>Unread chats</source>
-        <extracomment>Under the &quot;Chats&quot; title while only chats with unread messages are listed.</extracomment>
-        <translation>Cuộc trò chuyện chưa đọc</translation>
-    </message>
-    <message>
         <source>No unread chats</source>
         <extracomment>The unread filter is on and every chat has been read.</extracomment>
         <translation>Không có cuộc trò chuyện chưa đọc</translation>

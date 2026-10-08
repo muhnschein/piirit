@@ -545,11 +545,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Този чат вече не съществува.</translation>
     </message>
     <message>
-        <source>Unread chats</source>
-        <extracomment>Under the &quot;Chats&quot; title while only chats with unread messages are listed.</extracomment>
-        <translation>Непрочетени чатове</translation>
-    </message>
-    <message>
         <source>No unread chats</source>
         <extracomment>The unread filter is on and every chat has been read.</extracomment>
         <translation>Няма непрочетени чатове</translation>

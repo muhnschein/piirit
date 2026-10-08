@@ -534,11 +534,10 @@ Page {
             PageHeader {
                 objectName: "chatListHeader"
                 title: page.archived ? qsTr("Archived") : qsTr("Chats")
-                // Says the filter is on, so a list that is short for that
-                // reason is not taken for chats gone missing.
-                //: Under the "Chats" title while only chats with unread
-                //: messages are listed.
-                description: chats.unread_only ? qsTr("Unread chats") : ""
+                // Nothing under the title while the filter is on: the lit
+                // button already says so, and a description appearing
+                // would push the search row down under the finger that
+                // tapped it.
             }
 
             Row {

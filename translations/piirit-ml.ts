@@ -549,11 +549,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>ഈ ചാറ്റ് ഇനി നിലവിലില്ല.</translation>
     </message>
     <message>
-        <source>Unread chats</source>
-        <extracomment>Under the &quot;Chats&quot; title while only chats with unread messages are listed.</extracomment>
-        <translation>വായിക്കാത്ത ചാറ്റുകൾ</translation>
-    </message>
-    <message>
         <source>No unread chats</source>
         <extracomment>The unread filter is on and every chat has been read.</extracomment>
         <translation>വായിക്കാത്ത ചാറ്റുകളില്ല</translation>

@@ -545,11 +545,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>இந்த அரட்டை இனி இல்லை.</translation>
     </message>
     <message>
-        <source>Unread chats</source>
-        <extracomment>Under the &quot;Chats&quot; title while only chats with unread messages are listed.</extracomment>
-        <translation>படிக்காத அரட்டைகள்</translation>
-    </message>
-    <message>
         <source>No unread chats</source>
         <extracomment>The unread filter is on and every chat has been read.</extracomment>
         <translation>படிக்காத அரட்டைகள் இல்லை</translation>
