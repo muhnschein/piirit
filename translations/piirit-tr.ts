@@ -1506,6 +1506,65 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
     </message>
 </context>
 <context>
+    <name>ReactionPickerPage</name>
+    <message>
+        <source>Smileys &amp; emotion</source>
+        <translation>Gülen yüzler ve duygular</translation>
+    </message>
+    <message>
+        <source>People &amp; body</source>
+        <translation>İnsanlar ve vücut</translation>
+    </message>
+    <message>
+        <source>Animals &amp; nature</source>
+        <translation>Hayvanlar ve doğa</translation>
+    </message>
+    <message>
+        <source>Food &amp; drink</source>
+        <translation>Yiyecek ve içecek</translation>
+    </message>
+    <message>
+        <source>Travel &amp; places</source>
+        <translation>Seyahat ve yerler</translation>
+    </message>
+    <message>
+        <source>Activities</source>
+        <translation>Etkinlikler</translation>
+    </message>
+    <message>
+        <source>Objects</source>
+        <translation>Nesneler</translation>
+    </message>
+    <message>
+        <source>Symbols</source>
+        <translation>Semboller</translation>
+    </message>
+    <message>
+        <source>Flags</source>
+        <translation>Bayraklar</translation>
+    </message>
+    <message>
+        <source>Recent</source>
+        <translation>Son kullanılanlar</translation>
+    </message>
+    <message>
+        <source>React</source>
+        <translation>Tepki ver</translation>
+    </message>
+    <message>
+        <source>Search</source>
+        <translation>Ara</translation>
+    </message>
+    <message>
+        <source>No emoji found</source>
+        <translation>Emoji bulunamadı</translation>
+    </message>
+    <message>
+        <source>Emoji names are in English, like &quot;heart&quot;</source>
+        <translation>Emoji adları İngilizcedir, ör. &quot;heart&quot;</translation>
+    </message>
+</context>
+<context>
     <name>ReplyBar</name>
     <message>
         <source>Replying to %1</source>

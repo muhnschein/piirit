@@ -9,7 +9,8 @@ import Nemo.Configuration 1.0
  * whether anything is announced at all and if so how much a notification
  * gives away and whether a muted group can still raise one, whether
  * webxdc apps are offered at all, whether calls are and whether one rings
- * here, and how many quick actions the cover offers and which.
+ * here, how many quick actions the cover offers and which, and the
+ * emoji last reacted with from the picker.
  *
  * They live in dconf under the app's own path, and every page reads
  * them through this one object: the settings page (qml/pages/
@@ -98,6 +99,10 @@ QtObject {
     property alias quickActionRightAccount: quickActionRightAccountValue.value
     property alias quickActionRightChat: quickActionRightChatValue.value
     property alias quickActionRightIcon: quickActionRightIconValue.value
+    /// The emoji last reacted with from the reaction picker, newest
+    /// first, which it offers before everything else. Only the picker's:
+    /// the quick reactions are a tap away already.
+    property alias recentReactions: recentReactionsValue.value
 
     // The keys, named here and nowhere else: tests/qml_syntax.rs holds
     // every other file to reading them through this object.
@@ -245,5 +250,11 @@ QtObject {
         id: quickActionRightIconValue
         key: "/apps/harbour-piirit/quick_action_right_icon"
         defaultValue: ""
+    }
+
+    property ConfigurationValue recentReactionsConfig: ConfigurationValue {
+        id: recentReactionsValue
+        key: "/apps/harbour-piirit/recent_reactions"
+        defaultValue: []
     }
 }

@@ -1506,6 +1506,65 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>ReactionPickerPage</name>
+    <message>
+        <source>Smileys &amp; emotion</source>
+        <translation>Смайликлар һәм хисләр</translation>
+    </message>
+    <message>
+        <source>People &amp; body</source>
+        <translation>Кешеләр һәм тән</translation>
+    </message>
+    <message>
+        <source>Animals &amp; nature</source>
+        <translation>Хайваннар һәм табигать</translation>
+    </message>
+    <message>
+        <source>Food &amp; drink</source>
+        <translation>Ашамлыклар һәм эчемлекләр</translation>
+    </message>
+    <message>
+        <source>Travel &amp; places</source>
+        <translation>Сәяхәт һәм урыннар</translation>
+    </message>
+    <message>
+        <source>Activities</source>
+        <translation>Шөгыльләр</translation>
+    </message>
+    <message>
+        <source>Objects</source>
+        <translation>Әйберләр</translation>
+    </message>
+    <message>
+        <source>Symbols</source>
+        <translation>Символлар</translation>
+    </message>
+    <message>
+        <source>Flags</source>
+        <translation>Байраклар</translation>
+    </message>
+    <message>
+        <source>Recent</source>
+        <translation>Соңгылар</translation>
+    </message>
+    <message>
+        <source>React</source>
+        <translation>Реакция</translation>
+    </message>
+    <message>
+        <source>Search</source>
+        <translation>Эзләү</translation>
+    </message>
+    <message>
+        <source>No emoji found</source>
+        <translation>Эмодзи табылмады</translation>
+    </message>
+    <message>
+        <source>Emoji names are in English, like &quot;heart&quot;</source>
+        <translation>Эмодзи исемнәре инглизчә, мәсәлән «heart»</translation>
+    </message>
+</context>
+<context>
     <name>ReplyBar</name>
     <message>
         <source>Replying to %1</source>

@@ -1513,6 +1513,65 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
     </message>
 </context>
 <context>
+    <name>ReactionPickerPage</name>
+    <message>
+        <source>Smileys &amp; emotion</source>
+        <translation>Emotikonid ja emotsioonid</translation>
+    </message>
+    <message>
+        <source>People &amp; body</source>
+        <translation>Inimesed ja keha</translation>
+    </message>
+    <message>
+        <source>Animals &amp; nature</source>
+        <translation>Loomad ja loodus</translation>
+    </message>
+    <message>
+        <source>Food &amp; drink</source>
+        <translation>Toit ja jook</translation>
+    </message>
+    <message>
+        <source>Travel &amp; places</source>
+        <translation>Reisimine ja kohad</translation>
+    </message>
+    <message>
+        <source>Activities</source>
+        <translation>Tegevused</translation>
+    </message>
+    <message>
+        <source>Objects</source>
+        <translation>Objektid</translation>
+    </message>
+    <message>
+        <source>Symbols</source>
+        <translation>Sümbolid</translation>
+    </message>
+    <message>
+        <source>Flags</source>
+        <translation>Lipud</translation>
+    </message>
+    <message>
+        <source>Recent</source>
+        <translation>Hiljutised</translation>
+    </message>
+    <message>
+        <source>React</source>
+        <translation>Reageeri</translation>
+    </message>
+    <message>
+        <source>Search</source>
+        <translation>Otsi</translation>
+    </message>
+    <message>
+        <source>No emoji found</source>
+        <translation>Emojisid ei leitud</translation>
+    </message>
+    <message>
+        <source>Emoji names are in English, like &quot;heart&quot;</source>
+        <translation>Emojide nimed on inglise keeles, nt „heart“</translation>
+    </message>
+</context>
+<context>
     <name>ReplyBar</name>
     <message>
         <source>Replying to %1</source>

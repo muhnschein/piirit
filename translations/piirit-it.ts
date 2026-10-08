@@ -1513,6 +1513,65 @@ Gli altri gruppi con contatti bloccati continueranno a visualizzare i loro messa
     </message>
 </context>
 <context>
+    <name>ReactionPickerPage</name>
+    <message>
+        <source>Smileys &amp; emotion</source>
+        <translation>Faccine ed emozioni</translation>
+    </message>
+    <message>
+        <source>People &amp; body</source>
+        <translation>Persone e corpo</translation>
+    </message>
+    <message>
+        <source>Animals &amp; nature</source>
+        <translation>Animali e natura</translation>
+    </message>
+    <message>
+        <source>Food &amp; drink</source>
+        <translation>Cibo e bevande</translation>
+    </message>
+    <message>
+        <source>Travel &amp; places</source>
+        <translation>Viaggi e luoghi</translation>
+    </message>
+    <message>
+        <source>Activities</source>
+        <translation>Attività</translation>
+    </message>
+    <message>
+        <source>Objects</source>
+        <translation>Oggetti</translation>
+    </message>
+    <message>
+        <source>Symbols</source>
+        <translation>Simboli</translation>
+    </message>
+    <message>
+        <source>Flags</source>
+        <translation>Bandiere</translation>
+    </message>
+    <message>
+        <source>Recent</source>
+        <translation>Recenti</translation>
+    </message>
+    <message>
+        <source>React</source>
+        <translation>Reagisci</translation>
+    </message>
+    <message>
+        <source>Search</source>
+        <translation>Cerca</translation>
+    </message>
+    <message>
+        <source>No emoji found</source>
+        <translation>Nessuna emoji trovata</translation>
+    </message>
+    <message>
+        <source>Emoji names are in English, like &quot;heart&quot;</source>
+        <translation>I nomi delle emoji sono in inglese, ad es. «heart»</translation>
+    </message>
+</context>
+<context>
     <name>ReplyBar</name>
     <message>
         <source>Replying to %1</source>

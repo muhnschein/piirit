@@ -1520,6 +1520,65 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>ReactionPickerPage</name>
+    <message>
+        <source>Smileys &amp; emotion</source>
+        <translation>Смайлики и эмоции</translation>
+    </message>
+    <message>
+        <source>People &amp; body</source>
+        <translation>Люди и тело</translation>
+    </message>
+    <message>
+        <source>Animals &amp; nature</source>
+        <translation>Животные и природа</translation>
+    </message>
+    <message>
+        <source>Food &amp; drink</source>
+        <translation>Еда и напитки</translation>
+    </message>
+    <message>
+        <source>Travel &amp; places</source>
+        <translation>Путешествия и места</translation>
+    </message>
+    <message>
+        <source>Activities</source>
+        <translation>Занятия</translation>
+    </message>
+    <message>
+        <source>Objects</source>
+        <translation>Предметы</translation>
+    </message>
+    <message>
+        <source>Symbols</source>
+        <translation>Символы</translation>
+    </message>
+    <message>
+        <source>Flags</source>
+        <translation>Флаги</translation>
+    </message>
+    <message>
+        <source>Recent</source>
+        <translation>Недавние</translation>
+    </message>
+    <message>
+        <source>React</source>
+        <translation>Реакция</translation>
+    </message>
+    <message>
+        <source>Search</source>
+        <translation>Поиск</translation>
+    </message>
+    <message>
+        <source>No emoji found</source>
+        <translation>Эмодзи не найдены</translation>
+    </message>
+    <message>
+        <source>Emoji names are in English, like &quot;heart&quot;</source>
+        <translation>Названия эмодзи на английском, например «heart»</translation>
+    </message>
+</context>
+<context>
     <name>ReplyBar</name>
     <message>
         <source>Replying to %1</source>

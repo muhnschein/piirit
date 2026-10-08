@@ -1509,6 +1509,65 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>ReactionPickerPage</name>
+    <message>
+        <source>Smileys &amp; emotion</source>
+        <translation>Φατσούλες και συναισθήματα</translation>
+    </message>
+    <message>
+        <source>People &amp; body</source>
+        <translation>Άνθρωποι και σώμα</translation>
+    </message>
+    <message>
+        <source>Animals &amp; nature</source>
+        <translation>Ζώα και φύση</translation>
+    </message>
+    <message>
+        <source>Food &amp; drink</source>
+        <translation>Φαγητό και ποτό</translation>
+    </message>
+    <message>
+        <source>Travel &amp; places</source>
+        <translation>Ταξίδια και μέρη</translation>
+    </message>
+    <message>
+        <source>Activities</source>
+        <translation>Δραστηριότητες</translation>
+    </message>
+    <message>
+        <source>Objects</source>
+        <translation>Αντικείμενα</translation>
+    </message>
+    <message>
+        <source>Symbols</source>
+        <translation>Σύμβολα</translation>
+    </message>
+    <message>
+        <source>Flags</source>
+        <translation>Σημαίες</translation>
+    </message>
+    <message>
+        <source>Recent</source>
+        <translation>Πρόσφατα</translation>
+    </message>
+    <message>
+        <source>React</source>
+        <translation>Αντίδραση</translation>
+    </message>
+    <message>
+        <source>Search</source>
+        <translation>Αναζήτηση</translation>
+    </message>
+    <message>
+        <source>No emoji found</source>
+        <translation>Δεν βρέθηκαν emoji</translation>
+    </message>
+    <message>
+        <source>Emoji names are in English, like &quot;heart&quot;</source>
+        <translation>Τα ονόματα των emoji είναι στα αγγλικά, π.χ. «heart»</translation>
+    </message>
+</context>
+<context>
     <name>ReplyBar</name>
     <message>
         <source>Replying to %1</source>

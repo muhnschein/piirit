@@ -1509,6 +1509,65 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>ReactionPickerPage</name>
+    <message>
+        <source>Smileys &amp; emotion</source>
+        <translation>Smileys en emoties</translation>
+    </message>
+    <message>
+        <source>People &amp; body</source>
+        <translation>Mensen en lichaam</translation>
+    </message>
+    <message>
+        <source>Animals &amp; nature</source>
+        <translation>Dieren en natuur</translation>
+    </message>
+    <message>
+        <source>Food &amp; drink</source>
+        <translation>Eten en drinken</translation>
+    </message>
+    <message>
+        <source>Travel &amp; places</source>
+        <translation>Reizen en plaatsen</translation>
+    </message>
+    <message>
+        <source>Activities</source>
+        <translation>Activiteiten</translation>
+    </message>
+    <message>
+        <source>Objects</source>
+        <translation>Objecten</translation>
+    </message>
+    <message>
+        <source>Symbols</source>
+        <translation>Symbolen</translation>
+    </message>
+    <message>
+        <source>Flags</source>
+        <translation>Vlaggen</translation>
+    </message>
+    <message>
+        <source>Recent</source>
+        <translation>Recent</translation>
+    </message>
+    <message>
+        <source>React</source>
+        <translation>Reageren</translation>
+    </message>
+    <message>
+        <source>Search</source>
+        <translation>Zoeken</translation>
+    </message>
+    <message>
+        <source>No emoji found</source>
+        <translation>Geen emoji gevonden</translation>
+    </message>
+    <message>
+        <source>Emoji names are in English, like &quot;heart&quot;</source>
+        <translation>Emojinamen zijn in het Engels, bijv. ‘heart’</translation>
+    </message>
+</context>
+<context>
     <name>ReplyBar</name>
     <message>
         <source>Replying to %1</source>

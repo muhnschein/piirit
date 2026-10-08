@@ -1520,6 +1520,65 @@ Wiadomości innych grup z zablokowanymi kontaktami nadal będą wyświetlane.</t
     </message>
 </context>
 <context>
+    <name>ReactionPickerPage</name>
+    <message>
+        <source>Smileys &amp; emotion</source>
+        <translation>Buźki i emocje</translation>
+    </message>
+    <message>
+        <source>People &amp; body</source>
+        <translation>Ludzie i ciało</translation>
+    </message>
+    <message>
+        <source>Animals &amp; nature</source>
+        <translation>Zwierzęta i przyroda</translation>
+    </message>
+    <message>
+        <source>Food &amp; drink</source>
+        <translation>Jedzenie i picie</translation>
+    </message>
+    <message>
+        <source>Travel &amp; places</source>
+        <translation>Podróże i miejsca</translation>
+    </message>
+    <message>
+        <source>Activities</source>
+        <translation>Aktywności</translation>
+    </message>
+    <message>
+        <source>Objects</source>
+        <translation>Przedmioty</translation>
+    </message>
+    <message>
+        <source>Symbols</source>
+        <translation>Symbole</translation>
+    </message>
+    <message>
+        <source>Flags</source>
+        <translation>Flagi</translation>
+    </message>
+    <message>
+        <source>Recent</source>
+        <translation>Ostatnie</translation>
+    </message>
+    <message>
+        <source>React</source>
+        <translation>Zareaguj</translation>
+    </message>
+    <message>
+        <source>Search</source>
+        <translation>Szukaj</translation>
+    </message>
+    <message>
+        <source>No emoji found</source>
+        <translation>Nie znaleziono emoji</translation>
+    </message>
+    <message>
+        <source>Emoji names are in English, like &quot;heart&quot;</source>
+        <translation>Nazwy emoji są po angielsku, np. „heart”</translation>
+    </message>
+</context>
+<context>
     <name>ReplyBar</name>
     <message>
         <source>Replying to %1</source>

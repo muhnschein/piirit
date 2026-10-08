@@ -1,6 +1,7 @@
 #!/bin/sh
 # Prove third_party/qmetaobject is upstream 0.2.10 plus one known patch,
-# and vendor/calls-webapp/index.html is upstream's release asset.
+# vendor/calls-webapp/index.html is upstream's release asset, and the
+# emoji in qml/ are the pinned Twemoji and emojibase-data.
 #
 # Carrying 7,000 lines of someone else's crate is only safe while everyone
 # can see exactly how it differs from the published one. So: fetch the
@@ -64,6 +65,9 @@ if diff -r -q -x .cargo-ok "$upstream" "$vendored" >/dev/null 2>&1; then
     # The page a call runs in is the other thing committed from upstream:
     # fetched again from the release and compared byte for byte.
     "$root/scripts/fetch-calls-webapp.sh" --check
+    # And the emoji pictures and the list of them, regenerated from the
+    # pinned Twemoji tag and emojibase-data release.
+    "$root/scripts/fetch-emoji.py" --check
     exit 0
 fi
 

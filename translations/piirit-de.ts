@@ -1513,6 +1513,65 @@ In anderen Gruppen mit blockierten Kontakten werden deren Nachrichten weiterhin 
     </message>
 </context>
 <context>
+    <name>ReactionPickerPage</name>
+    <message>
+        <source>Smileys &amp; emotion</source>
+        <translation>Smileys &amp; Emotionen</translation>
+    </message>
+    <message>
+        <source>People &amp; body</source>
+        <translation>Menschen &amp; Körper</translation>
+    </message>
+    <message>
+        <source>Animals &amp; nature</source>
+        <translation>Tiere &amp; Natur</translation>
+    </message>
+    <message>
+        <source>Food &amp; drink</source>
+        <translation>Essen &amp; Trinken</translation>
+    </message>
+    <message>
+        <source>Travel &amp; places</source>
+        <translation>Reisen &amp; Orte</translation>
+    </message>
+    <message>
+        <source>Activities</source>
+        <translation>Aktivitäten</translation>
+    </message>
+    <message>
+        <source>Objects</source>
+        <translation>Gegenstände</translation>
+    </message>
+    <message>
+        <source>Symbols</source>
+        <translation>Symbole</translation>
+    </message>
+    <message>
+        <source>Flags</source>
+        <translation>Flaggen</translation>
+    </message>
+    <message>
+        <source>Recent</source>
+        <translation>Zuletzt verwendet</translation>
+    </message>
+    <message>
+        <source>React</source>
+        <translation>Reagieren</translation>
+    </message>
+    <message>
+        <source>Search</source>
+        <translation>Suchen</translation>
+    </message>
+    <message>
+        <source>No emoji found</source>
+        <translation>Keine Emojis gefunden</translation>
+    </message>
+    <message>
+        <source>Emoji names are in English, like &quot;heart&quot;</source>
+        <translation>Emoji-Namen sind auf Englisch, z. B. „heart“</translation>
+    </message>
+</context>
+<context>
     <name>ReplyBar</name>
     <message>
         <source>Replying to %1</source>

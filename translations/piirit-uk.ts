@@ -1520,6 +1520,65 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>ReactionPickerPage</name>
+    <message>
+        <source>Smileys &amp; emotion</source>
+        <translation>Смайлики та емоції</translation>
+    </message>
+    <message>
+        <source>People &amp; body</source>
+        <translation>Люди та тіло</translation>
+    </message>
+    <message>
+        <source>Animals &amp; nature</source>
+        <translation>Тварини та природа</translation>
+    </message>
+    <message>
+        <source>Food &amp; drink</source>
+        <translation>Їжа та напої</translation>
+    </message>
+    <message>
+        <source>Travel &amp; places</source>
+        <translation>Подорожі та місця</translation>
+    </message>
+    <message>
+        <source>Activities</source>
+        <translation>Дозвілля</translation>
+    </message>
+    <message>
+        <source>Objects</source>
+        <translation>Об’єкти</translation>
+    </message>
+    <message>
+        <source>Symbols</source>
+        <translation>Символи</translation>
+    </message>
+    <message>
+        <source>Flags</source>
+        <translation>Прапори</translation>
+    </message>
+    <message>
+        <source>Recent</source>
+        <translation>Нещодавні</translation>
+    </message>
+    <message>
+        <source>React</source>
+        <translation>Реакція</translation>
+    </message>
+    <message>
+        <source>Search</source>
+        <translation>Пошук</translation>
+    </message>
+    <message>
+        <source>No emoji found</source>
+        <translation>Емодзі не знайдено</translation>
+    </message>
+    <message>
+        <source>Emoji names are in English, like &quot;heart&quot;</source>
+        <translation>Назви емодзі англійською, наприклад «heart»</translation>
+    </message>
+</context>
+<context>
     <name>ReplyBar</name>
     <message>
         <source>Replying to %1</source>

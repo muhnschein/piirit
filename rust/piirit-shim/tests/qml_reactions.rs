@@ -73,8 +73,11 @@ const PROBE_QML: &str = r"
             var found = findAll(delegate.item, 'reactionChip', [])
             var parts = []
             for (var i = 0; i < found.length; i++) {
-                var label = findIn(found[i], 'chipLabel')
-                parts.push((label ? label.text : '?')
+                var emoji = findIn(found[i], 'chipEmoji')
+                var count = findIn(found[i], 'chipCount')
+                parts.push((emoji ? emoji.emoji : '?')
+                           + (count && count.text.length > 0 ? ' ' + count.text : '')
+                           + (emoji && emoji.drawn ? '' : '~')
                            + (found[i].mine ? '*' : '')
                            + '@' + Math.round(found[i].x))
             }
@@ -100,12 +103,15 @@ const PROBE_QML: &str = r"
                 sender_name: 'Ada', sender_color: '#00875a',
                 quote_text: '', quote_author: '', file_path: '',
                 file_name: '', view_type: 'Text', image_width: 0,
-                image_height: 0, reactions: ''
+                image_height: 0, reactions: '', my_reaction: '👍'
             })
             list.setSource(url, { model: rows })
             if (list.status !== Loader.Ready) { return 'load-failed' }
             list.item.reactionRequested.connect(function(id, emoji) {
                 raised = 'menu:' + id + ':' + emoji
+            })
+            list.item.reactionPickerRequested.connect(function(id, current) {
+                raised = 'more:' + id + ':' + current
             })
             return 'ok'
         }
@@ -124,6 +130,16 @@ const PROBE_QML: &str = r"
             var found = findAll(row.menu, 'reactionOption', [])
             if (index >= found.length) { return 'missing' }
             found[index].choose()
+            return 'ok'
+        }
+        // The '+' after the emoji: the picker, for the message the menu
+        // was opened on and the reader's own reaction on it.
+        function pickMore() {
+            var row = findIn(list.item, 'messageRow')
+            if (!row || !row.menu) { return 'no-menu' }
+            var more = findIn(row.menu, 'reactionMore')
+            if (!more) { return 'missing' }
+            more.choose()
             return 'ok'
         }
         function pickerVisible() {
@@ -268,6 +284,8 @@ fn reactions_are_chips_on_the_message_and_a_row_in_its_menu() {
         record!("options", call!("menuOptions"));
         record!("pick", call!("pickOption", 1));
         record!("menu-raised", call!("raisedSignal"));
+        record!("more", call!("pickMore"));
+        record!("more-raised", call!("raisedSignal"));
         (*engine_ptr).quit();
     });
 
@@ -276,6 +294,7 @@ fn reactions_are_chips_on_the_message_and_a_row_in_its_menu() {
     assert_outcome(&steps);
 }
 
+#[allow(clippy::too_many_lines)]
 fn assert_outcome(steps: &[(&str, String)]) {
     let value = |label: &str| {
         steps
@@ -297,8 +316,9 @@ fn assert_outcome(steps: &[(&str, String)]) {
         "true",
         "a message with reactions does not show them. {context}"
     );
-    // Ours is marked, the count shows only past one, and the second chip
-    // sits after the first rather than on top of it.
+    // Ours is marked, the count shows only past one, both are drawn as
+    // pictures rather than text (a `~` would say text), and the second
+    // chip sits after the first rather than on top of it.
     let chips = value("chips");
     let parts: Vec<&str> = chips.split('|').collect();
     assert_eq!(
@@ -386,5 +406,16 @@ fn assert_outcome(steps: &[(&str, String)]) {
         value("menu-raised"),
         "menu:7:❤️",
         "picking from the menu did not name the message and the emoji. {context}"
+    );
+    assert_eq!(
+        value("more"),
+        "ok",
+        "the menu has no way to every other emoji. {context}"
+    );
+    assert_eq!(
+        value("more-raised"),
+        "more:7:👍",
+        "the '+' did not ask for the picker for this message, with the \
+         reader's own reaction to mark. {context}"
     );
 }

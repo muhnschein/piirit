@@ -2,6 +2,7 @@ import QtQuick 2.0
 import Sailfish.Silica 1.0
 import "../components"
 import "../js/Format.js" as Format
+import "../js/Emoji.js" as Emoji
 import Piirit 1.0
 
 /*
@@ -539,6 +540,26 @@ Page {
         // On or off is the model's call: it knows what the reader already
         // sent, and the core takes the whole list either way.
         onReactionRequested: messages.react(messageId, emoji)
+        // Every other emoji is a page. The id is captured now, as
+        // Forward's is: the row may be gone when the answer comes back.
+        onReactionPickerRequested: {
+            var reactingTo = messageId
+            var mine = current
+            var picker = pageStack.push(
+                Qt.resolvedUrl("ReactionPickerPage.qml"),
+                { current: mine, recent: Settings.recentReactions })
+            if (picker) {
+                picker.picked.connect(function(emoji) {
+                    messages.react(reactingTo, emoji)
+                    // Taking one's reaction off is not a pick to offer
+                    // again.
+                    if (emoji !== mine) {
+                        Settings.recentReactions = Emoji.remember(
+                            Settings.recentReactions, emoji)
+                    }
+                })
+            }
+        }
         // Which kind of delete was picked on the page the menu led to,
         // and the wait is up: the message goes from this account's
         // devices, or from everybody's.

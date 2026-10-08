@@ -1513,6 +1513,65 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>ReactionPickerPage</name>
+    <message>
+        <source>Smileys &amp; emotion</source>
+        <translation>ಸ್ಮೈಲಿಗಳು ಮತ್ತು ಭಾವನೆಗಳು</translation>
+    </message>
+    <message>
+        <source>People &amp; body</source>
+        <translation>ಜನರು ಮತ್ತು ದೇಹ</translation>
+    </message>
+    <message>
+        <source>Animals &amp; nature</source>
+        <translation>ಪ್ರಾಣಿಗಳು ಮತ್ತು ಪ್ರಕೃತಿ</translation>
+    </message>
+    <message>
+        <source>Food &amp; drink</source>
+        <translation>ಆಹಾರ ಮತ್ತು ಪಾನೀಯ</translation>
+    </message>
+    <message>
+        <source>Travel &amp; places</source>
+        <translation>ಪ್ರಯಾಣ ಮತ್ತು ಸ್ಥಳಗಳು</translation>
+    </message>
+    <message>
+        <source>Activities</source>
+        <translation>ಚಟುವಟಿಕೆಗಳು</translation>
+    </message>
+    <message>
+        <source>Objects</source>
+        <translation>ವಸ್ತುಗಳು</translation>
+    </message>
+    <message>
+        <source>Symbols</source>
+        <translation>ಚಿಹ್ನೆಗಳು</translation>
+    </message>
+    <message>
+        <source>Flags</source>
+        <translation>ಧ್ವಜಗಳು</translation>
+    </message>
+    <message>
+        <source>Recent</source>
+        <translation>ಇತ್ತೀಚಿನವು</translation>
+    </message>
+    <message>
+        <source>React</source>
+        <translation>ಪ್ರತಿಕ್ರಿಯಿಸಿ</translation>
+    </message>
+    <message>
+        <source>Search</source>
+        <translation>ಹುಡುಕಿ</translation>
+    </message>
+    <message>
+        <source>No emoji found</source>
+        <translation>ಯಾವುದೇ ಎಮೋಜಿ ಸಿಗಲಿಲ್ಲ</translation>
+    </message>
+    <message>
+        <source>Emoji names are in English, like &quot;heart&quot;</source>
+        <translation>ಎಮೋಜಿ ಹೆಸರುಗಳು ಇಂಗ್ಲಿಷ್‌ನಲ್ಲಿವೆ, ಉದಾ. &quot;heart&quot;</translation>
+    </message>
+</context>
+<context>
     <name>ReplyBar</name>
     <message>
         <source>Replying to %1</source>

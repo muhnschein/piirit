@@ -1,7 +1,9 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
+import "."
 import "../js/Format.js" as Format
 import "../js/Calls.js" as Calls
+import "../js/Emoji.js" as Emoji
 
 /*
  * One message. Its own component so it can be loaded and measured on its
@@ -15,7 +17,10 @@ import "../js/Calls.js" as Calls
  * Markdown drawn, the body is the shim's own rendering of it
  * (markdown.rs), in which every character of the message is escaped and
  * the only tags are the ones the shim wrote -- and it is shown as
- * StyledText, never RichText, so nothing in it can load anything.
+ * StyledText, never RichText, so nothing in it can load anything. The
+ * other: a body or a quote with an emoji in it is StyledText too, so its
+ * emoji are the same pictures the reactions are -- escaped first, and
+ * with no tag added but an <img> of a picture the app ships (Emoji.js).
  *
  * Laid out by bindings rather than by a Column: a positioner sizes itself in
  * a polish pass, which never runs headlessly, so a row built from one cannot
@@ -176,6 +181,21 @@ Item {
     readonly property string shownText: root.drawsStyled
                                         ? root.styledText
                                         : root.messageText
+
+    /// The body with its emoji as the pictures the app ships, as they
+    /// are on the reactions (see EmojiGlyph), or "" when it has none to
+    /// draw and is shown as it was.
+    readonly property string emojiBody: !root.isCall
+                                        ? Emoji.inText(root.shownText, root.drawsStyled,
+                                                       messageLabel.font.pixelSize)
+                                        : ""
+    /// The body as drawn, and whether that is StyledText.
+    readonly property string bodyText: root.emojiBody.length > 0
+                                       ? root.emojiBody : root.shownText
+    readonly property bool bodyStyled: root.drawsStyled || root.emojiBody.length > 0
+    /// The same for the quote, which is always the text as written.
+    readonly property string emojiQuote: Emoji.inText(root.quoteText, false,
+                                                      Theme.fontSizeExtraSmall)
     /// A message the core has only the header of, or is fetching, or
     /// could not fetch: something to say, and mostly something to tap.
     readonly property bool heldBack: root.downloadState.length > 0
@@ -316,9 +336,9 @@ Item {
         visible: false
         font: messageLabel.font
         // Measured as it will be drawn: bold is wider than plain.
-        textFormat: root.drawsStyled ? Text.StyledText : Text.PlainText
+        textFormat: root.bodyStyled ? Text.StyledText : Text.PlainText
         // A call's text is not drawn, so it does not size the bubble.
-        text: root.isCall ? "" : root.shownText
+        text: root.isCall ? "" : root.bodyText
     }
 
     Text {
@@ -353,10 +373,10 @@ Item {
         text: root.footerText
     }
 
-    // The chips' text end to end, for how wide the strip wants to be and
-    // how tall one line of it is. The chips themselves are measured one
-    // by one below; this is the sum the bubble's width is decided from
-    // before any of them exists.
+    // The chips' counts end to end, for how wide the strip wants to be.
+    // The chips themselves are measured one by one below; this, with an
+    // emoji's square for each, is the sum the bubble's width is decided
+    // from before any of them exists.
     Text {
         id: reactionMetric
         visible: false
@@ -365,17 +385,26 @@ Item {
         text: {
             var parts = []
             for (var i = 0; i < root.reactionList.length; i++) {
-                parts.push(root.chipText(root.reactionList[i]))
+                parts.push(root.chipCount(root.reactionList[i]))
             }
-            return parts.join(" ")
+            return parts.join("")
         }
     }
 
-    /// What a chip says: the emoji, and how many when it is more than one
-    /// person. "👍" reads as one; "👍 1" reads as a score.
-    function chipText(reaction) {
-        return reaction.count > 1 ? reaction.emoji + " " + reaction.count
-                                  : reaction.emoji
+    // One line of the chip font, for how tall a chip is: the emoji is
+    // drawn a line high, whether it is a picture or text.
+    Text {
+        id: chipLineMetric
+        visible: false
+        font.pixelSize: Theme.fontSizeSmall
+        textFormat: Text.PlainText
+        text: "0"
+    }
+
+    /// How many put the emoji on, when it is more than one person. "👍"
+    /// reads as one; "👍 1" reads as a score.
+    function chipCount(reaction) {
+        return reaction.count > 1 ? "" + reaction.count : ""
     }
 
     // A core notice, not something anyone typed: centred and unadorned.
@@ -503,8 +532,9 @@ Item {
                 truncationMode: TruncationMode.Elide
                 font.pixelSize: Theme.fontSizeExtraSmall
                 color: Theme.secondaryColor
-                textFormat: Text.PlainText
-                text: root.quoteText
+                // Plain, unless it has emoji to draw: see the top.
+                textFormat: root.emojiQuote.length > 0 ? Text.StyledText : Text.PlainText
+                text: root.emojiQuote.length > 0 ? root.emojiQuote : root.quoteText
             }
         }
 
@@ -654,8 +684,8 @@ Item {
             color: Theme.primaryColor
             linkColor: Theme.highlightColor
             // Plain, unless the shim rendered it: see the note at the top.
-            textFormat: root.drawsStyled ? Text.StyledText : Text.PlainText
-            text: root.shownText
+            textFormat: root.bodyStyled ? Text.StyledText : Text.PlainText
+            text: root.bodyText
             // A link is followed on a tap and on nothing else.
             onLinkActivated: Qt.openUrlExternally(link)
         }
@@ -771,16 +801,31 @@ Item {
         // chips where it can.
         width: Math.min(wantedWidth, root.contentWidth)
         // A line of the chip font plus the chip's own padding.
-        height: reactionRow.shown ? reactionMetric.height + 2 * Theme.paddingSmall : 0
+        height: reactionRow.shown ? chipLineMetric.height + 2 * Theme.paddingSmall : 0
         clip: true
 
-        /// The room the chips take in a row: their text, each one's
-        /// padding, and the gaps between them.
-        readonly property real wantedWidth:
-            root.reactionList.length === 0 ? 0
-            : reactionMetric.implicitWidth
-              + root.reactionList.length * 2 * Theme.paddingMedium
-              + (root.reactionList.length - 1) * Theme.paddingSmall
+        /// How big an emoji is drawn on a chip: a line of its text.
+        readonly property real glyphSize: chipLineMetric.height
+
+        /// The room the chips take in a row: an emoji each, their counts,
+        /// the gap before each count, each chip's padding, and the gaps
+        /// between them.
+        readonly property real wantedWidth: {
+            var n = root.reactionList.length
+            if (n === 0) {
+                return 0
+            }
+            var counted = 0
+            for (var i = 0; i < n; i++) {
+                if (root.chipCount(root.reactionList[i]).length > 0) {
+                    counted++
+                }
+            }
+            return n * reactionRow.glyphSize + reactionMetric.implicitWidth
+                   + counted * Theme.paddingSmall
+                   + n * 2 * Theme.paddingMedium
+                   + (n - 1) * Theme.paddingSmall
+        }
 
         Repeater {
             id: reactionRepeater
@@ -806,7 +851,10 @@ Item {
                     }
                     return at
                 }
-                width: chipLabel.implicitWidth + 2 * Theme.paddingMedium
+                width: chipEmoji.width
+                       + (chipCountLabel.text.length > 0
+                          ? Theme.paddingSmall + chipCountLabel.implicitWidth : 0)
+                       + 2 * Theme.paddingMedium
                 height: reactionRow.height
                 radius: height / 2
                 // Nearly solid: a chip straddles the bubble's edge, and
@@ -814,16 +862,28 @@ Item {
                 color: mine ? Theme.rgba(Theme.highlightBackgroundColor, 0.9)
                             : Theme.rgba(Theme.highlightDimmerColor, 0.9)
 
+                // A picture where one is shipped: Sailfish draws few
+                // emoji itself. The emoji is whatever the other end
+                // sent, and the core does not check that it is one;
+                // EmojiGlyph draws anything else as plain text.
+                EmojiGlyph {
+                    id: chipEmoji
+                    objectName: "chipEmoji"
+                    x: Theme.paddingMedium
+                    anchors.verticalCenter: parent.verticalCenter
+                    size: reactionRow.glyphSize
+                    emoji: modelData.emoji
+                }
+
                 Label {
-                    id: chipLabel
-                    objectName: "chipLabel"
-                    anchors.centerIn: parent
+                    id: chipCountLabel
+                    objectName: "chipCount"
+                    x: chipEmoji.x + chipEmoji.width + Theme.paddingSmall
+                    anchors.verticalCenter: parent.verticalCenter
                     font.pixelSize: Theme.fontSizeSmall
                     color: Theme.primaryColor
-                    // The emoji is whatever the other end sent, and
-                    // the core does not check that it is one.
                     textFormat: Text.PlainText
-                    text: root.chipText(modelData)
+                    text: root.chipCount(modelData)
                 }
 
                 MouseArea {

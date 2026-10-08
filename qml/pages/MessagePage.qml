@@ -2,6 +2,7 @@ import QtQuick 2.0
 import Sailfish.Silica 1.0
 import Piirit 1.0
 import "../components"
+import "../js/Emoji.js" as Emoji
 
 /*
  * One message, whole, with nothing else on the screen.
@@ -59,6 +60,10 @@ Page {
     readonly property string shownText: page.drawsStyled
                                         ? whole.styled_text
                                         : whole.text
+    /// The same with its emoji drawn as pictures, as in the bubble, or
+    /// "" when there are none to draw.
+    readonly property string emojiText: Emoji.inText(page.shownText, page.drawsStyled,
+                                                     bodyLabel.font.pixelSize)
 
     /// Swap the label for the selectable field, focused and with all of
     /// it selected, so the handles are there to be moved.
@@ -148,9 +153,11 @@ Page {
                 wrapMode: Text.Wrap
                 color: Theme.primaryColor
                 linkColor: Theme.highlightColor
-                // Plain, unless the shim rendered it: see MessageDelegate.
-                textFormat: page.drawsStyled ? Text.StyledText : Text.PlainText
-                text: page.shownText
+                // Plain, unless the shim rendered it or it has emoji to
+                // draw: see MessageDelegate.
+                textFormat: page.drawsStyled || page.emojiText.length > 0
+                            ? Text.StyledText : Text.PlainText
+                text: page.emojiText.length > 0 ? page.emojiText : page.shownText
                 onLinkActivated: Qt.openUrlExternally(link)
             }
 

@@ -1506,6 +1506,65 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>ReactionPickerPage</name>
+    <message>
+        <source>Smileys &amp; emotion</source>
+        <translation>笑脸和情感</translation>
+    </message>
+    <message>
+        <source>People &amp; body</source>
+        <translation>人物和身体</translation>
+    </message>
+    <message>
+        <source>Animals &amp; nature</source>
+        <translation>动物和自然</translation>
+    </message>
+    <message>
+        <source>Food &amp; drink</source>
+        <translation>食物和饮料</translation>
+    </message>
+    <message>
+        <source>Travel &amp; places</source>
+        <translation>旅行和地点</translation>
+    </message>
+    <message>
+        <source>Activities</source>
+        <translation>活动</translation>
+    </message>
+    <message>
+        <source>Objects</source>
+        <translation>物品</translation>
+    </message>
+    <message>
+        <source>Symbols</source>
+        <translation>符号</translation>
+    </message>
+    <message>
+        <source>Flags</source>
+        <translation>旗帜</translation>
+    </message>
+    <message>
+        <source>Recent</source>
+        <translation>最近使用</translation>
+    </message>
+    <message>
+        <source>React</source>
+        <translation>回应</translation>
+    </message>
+    <message>
+        <source>Search</source>
+        <translation>搜索</translation>
+    </message>
+    <message>
+        <source>No emoji found</source>
+        <translation>未找到表情符号</translation>
+    </message>
+    <message>
+        <source>Emoji names are in English, like &quot;heart&quot;</source>
+        <translation>表情符号名称为英文，例如“heart”</translation>
+    </message>
+</context>
+<context>
     <name>ReplyBar</name>
     <message>
         <source>Replying to %1</source>
