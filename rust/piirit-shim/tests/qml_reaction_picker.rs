@@ -88,6 +88,16 @@ const PROBE_QML: &str = r"
             return parts.join('|')
         }
         function rowCount() { return '' + loader.item.rows.length }
+        // Where the first heading drawn ends, against the row it is in.
+        function headingFit() {
+            var found = findAll(loader.item, 'emojiSection', [])
+            if (found.length === 0) { return 'missing' }
+            var heading = found[0]
+            var row = heading.parent.parent
+            var right = heading.mapToItem(row, heading.width, 0).x
+            return (right <= row.width && heading.x > 0 && heading.width > 0)
+                   + ' ' + right + '/' + row.width
+        }
         // Every emoji the grid has drawn so far, the reader.s own marked.
         function options() {
             var found = findAll(loader.item, 'emojiOption', [])
@@ -216,6 +226,7 @@ fn the_picker_offers_every_emoji_and_reports_the_one_picked() {
         record!("columns", call!("page", QString::from("columns")));
         record!("rows", call!("rows", 4));
         record!("row-count", call!("rowCount"));
+        record!("heading-fit", call!("headingFit"));
         record!("options", call!("options"));
         record!(
             "strip",
@@ -311,6 +322,15 @@ fn the_picker_offers_every_emoji_and_reports_the_one_picked() {
         value("rows"),
         "#Recent|🔥❤️|#Smileys & emotion|😀😃😄😁😆😅",
         "the grid does not open on the recent emoji and then the smileys. {context}"
+    );
+    // A heading is inset from both margins, its text right-aligned
+    // against its right edge: handed the row's full width it keeps its
+    // inset and pushes the text off the screen.
+    assert!(
+        value("heading-fit").starts_with("true "),
+        "a heading reaches past the right edge of its row, so its text is \
+         cut off by the screen: {}. {context}",
+        value("heading-fit")
     );
     let row_count: usize = value("row-count").parse().unwrap_or_default();
     assert!(

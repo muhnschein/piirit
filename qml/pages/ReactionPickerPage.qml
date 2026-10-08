@@ -217,11 +217,16 @@ Page {
             }
 
             // Built only on a heading's row, not hidden on every other.
+            // The Loader takes no width: given one, it hands it to the
+            // header, which keeps its inset x and so pushes its
+            // right-aligned text a margin off the screen. The header is
+            // given the width it would take from the row by itself.
             Loader {
                 id: sectionTitle
-                width: parent.width
                 active: row.entry.heading.length > 0
                 sourceComponent: SectionHeader {
+                    objectName: "emojiSection"
+                    width: row.width - 2 * Theme.horizontalPageMargin
                     text: row.entry.heading
                 }
             }

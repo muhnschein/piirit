@@ -1872,15 +1872,6 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Makes and answers voice calls in one-to-one chats.</source>
         <translation>在一對一聊天中撥打和接聽語音通話。</translation>
     </message>
-    <message>
-        <source>Use Twemoji</source>
-        <translation>使用 Twemoji</translation>
-    </message>
-    <message>
-        <source>Draws emoji in messages and reactions as pictures. Off, Sailfish OS draws them, and shows the many it has no symbol for as empty boxes.</source>
-        <extracomment>Under &quot;Use Twemoji&quot;. Twemoji is the name of a set of emoji pictures; keep it as it is.</extracomment>
-        <translation>將訊息和回應中的表情符號顯示為圖片。關閉後由 Sailfish OS 繪製，許多它沒有字元的表情符號會顯示為空白方格。</translation>
-    </message>
 </context>
 <context>
     <name>ShareTarget</name>

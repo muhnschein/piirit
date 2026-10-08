@@ -19,7 +19,7 @@ import "../js/Emoji.js" as Emoji
  * the only tags are the ones the shim wrote -- and it is shown as
  * StyledText, never RichText, so nothing in it can load anything. The
  * other: a body or a quote with an emoji in it is StyledText too, so its
- * emoji can be the same pictures the reactions are -- escaped first, and
+ * emoji are the same pictures the reactions are -- escaped first, and
  * with no tag added but an <img> of a picture the app ships (Emoji.js).
  *
  * Laid out by bindings rather than by a Column: a positioner sizes itself in
@@ -182,13 +182,10 @@ Item {
                                         ? root.styledText
                                         : root.messageText
 
-    /// Whether emoji in the text are drawn as the pictures the app
-    /// ships, as they are on the reactions, or left to the system's
-    /// fonts. The reader's setting; see EmojiGlyph.
-    property bool emojiPictures: Settings.twemoji === true
-    /// The body with its emoji as pictures, or "" when it has none
-    /// to draw and is shown as it was.
-    readonly property string emojiBody: root.emojiPictures && !root.isCall
+    /// The body with its emoji as the pictures the app ships, as they
+    /// are on the reactions (see EmojiGlyph), or "" when it has none to
+    /// draw and is shown as it was.
+    readonly property string emojiBody: !root.isCall
                                         ? Emoji.inText(root.shownText, root.drawsStyled,
                                                        messageLabel.font.pixelSize)
                                         : ""
@@ -197,10 +194,8 @@ Item {
                                        ? root.emojiBody : root.shownText
     readonly property bool bodyStyled: root.drawsStyled || root.emojiBody.length > 0
     /// The same for the quote, which is always the text as written.
-    readonly property string emojiQuote: root.emojiPictures
-                                         ? Emoji.inText(root.quoteText, false,
-                                                        Theme.fontSizeExtraSmall)
-                                         : ""
+    readonly property string emojiQuote: Emoji.inText(root.quoteText, false,
+                                                      Theme.fontSizeExtraSmall)
     /// A message the core has only the header of, or is fetching, or
     /// could not fetch: something to say, and mostly something to tap.
     readonly property bool heldBack: root.downloadState.length > 0

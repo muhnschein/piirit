@@ -1883,15 +1883,6 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
         <source>Makes and answers voice calls in one-to-one chats.</source>
         <translation>Teeb ja võtab vastu häälkõnesid üks-ühele vestlustes.</translation>
     </message>
-    <message>
-        <source>Use Twemoji</source>
-        <translation>Kasuta Twemojit</translation>
-    </message>
-    <message>
-        <source>Draws emoji in messages and reactions as pictures. Off, Sailfish OS draws them, and shows the many it has no symbol for as empty boxes.</source>
-        <extracomment>Under &quot;Use Twemoji&quot;. Twemoji is the name of a set of emoji pictures; keep it as it is.</extracomment>
-        <translation>Näitab sõnumite ja reaktsioonide emojisid piltidena. Välja lülitatuna joonistab need Sailfish OS ning paljud, mille jaoks tal sümbolit pole, on tühjad kastid.</translation>
-    </message>
 </context>
 <context>
     <name>ShareTarget</name>

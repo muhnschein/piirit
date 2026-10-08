@@ -1876,15 +1876,6 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
         <source>Makes and answers voice calls in one-to-one chats.</source>
         <translation>Bire bir sohbetlerde sesli arama yapar ve aramaları yanıtlar.</translation>
     </message>
-    <message>
-        <source>Use Twemoji</source>
-        <translation>Twemoji kullan</translation>
-    </message>
-    <message>
-        <source>Draws emoji in messages and reactions as pictures. Off, Sailfish OS draws them, and shows the many it has no symbol for as empty boxes.</source>
-        <extracomment>Under &quot;Use Twemoji&quot;. Twemoji is the name of a set of emoji pictures; keep it as it is.</extracomment>
-        <translation>Mesajlardaki ve tepkilerdeki emojileri resim olarak gösterir. Kapalıyken onları Sailfish OS çizer ve simgesi olmayan pek çoğunu boş kutular olarak gösterir.</translation>
-    </message>
 </context>
 <context>
     <name>ShareTarget</name>

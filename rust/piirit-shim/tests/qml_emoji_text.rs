@@ -1,12 +1,10 @@
-//! Emoji in a message drawn as the same pictures the reactions are, and
-//! the reader's switch back to the system's own.
+//! Emoji in a message drawn as the same pictures the reactions are.
 //!
 //! Sailfish draws few emoji itself, so a message body or a quote with one
 //! in it becomes `StyledText` with the emoji as `<img>` of a shipped picture
 //! (Emoji.js's `inText`). What this pins is what counts as an emoji --
-//! not a digit, not a "©" sent as text -- that nothing the sender wrote
-//! can become markup on the way, and that with the setting off every
-//! emoji is text again: in the bubble, the quote and a glyph.
+//! not a digit, not a "©" sent as text -- and that nothing the sender
+//! wrote can become markup on the way.
 
 // Qt harness: see qml_pages.rs.
 #![allow(
@@ -71,7 +69,6 @@ fn probe_qml() -> String {
             if (!item) {{ return 'missing:' + name }}
             return (item.textFormat === Text.StyledText ? 'styled:' : 'plain:') + item.text
         }}
-        function pictures(on) {{ Settings.twemoji = on; return 'ok' }}
     }}
 ",
         qml = qml.display()
@@ -165,13 +162,6 @@ fn messages_draw_their_emoji_as_the_reactions_do() {
         record!("body-on", call!("label", QString::from("messageLabel")));
         record!("quote-on", call!("label", QString::from("quoteLabel")));
         record!("glyph-on", call!("glyphText"));
-        call!("pictures", false);
-    });
-    single_shot(Duration::from_secs(3), move || unsafe {
-        record!("body-off", call!("label", QString::from("messageLabel")));
-        record!("quote-off", call!("label", QString::from("quoteLabel")));
-        record!("glyph-off", call!("glyphText"));
-        call!("pictures", true);
         (*engine_ptr).quit();
     });
 
@@ -240,19 +230,4 @@ fn messages_draw_their_emoji_as_the_reactions_do() {
         "the quote's emoji is not drawn as its picture. {context}"
     );
     assert_eq!(value("glyph-on"), "picture", "{context}");
-    assert_eq!(
-        value("body-off"),
-        "plain:hi 👍 there",
-        "with pictures off the body is not the text as written. {context}"
-    );
-    assert_eq!(
-        value("quote-off"),
-        "plain:was 🔥",
-        "with pictures off the quote is not the text as written. {context}"
-    );
-    assert_eq!(
-        value("glyph-off"),
-        "text:👍",
-        "with pictures off a reaction is still a picture. {context}"
-    );
 }

@@ -1890,15 +1890,6 @@ Citās grupās, kurās ir bloķēti kontakti, viņu ziņas joprojām būs redzam
         <source>Makes and answers voice calls in one-to-one chats.</source>
         <translation>Veic balss zvanus un atbild uz tiem divpersonu sarakstēs.</translation>
     </message>
-    <message>
-        <source>Use Twemoji</source>
-        <translation>Izmantot Twemoji</translation>
-    </message>
-    <message>
-        <source>Draws emoji in messages and reactions as pictures. Off, Sailfish OS draws them, and shows the many it has no symbol for as empty boxes.</source>
-        <extracomment>Under &quot;Use Twemoji&quot;. Twemoji is the name of a set of emoji pictures; keep it as it is.</extracomment>
-        <translation>Rāda ziņu un reakciju emocijzīmes kā attēlus. Izslēgtu tās zīmē Sailfish OS, un daudzās, kurām tai nav simbola, rāda kā tukšus kvadrātiņus.</translation>
-    </message>
 </context>
 <context>
     <name>ShareTarget</name>

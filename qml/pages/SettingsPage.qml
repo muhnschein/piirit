@@ -311,22 +311,9 @@ Page {
                 }
             }
 
-            // How the app draws an emoji, with Markdown below it: like
-            // it, only how a message looks, not what happens to it.
-            TextSwitch {
-                objectName: "twemojiSwitch"
-                text: qsTr("Use Twemoji")
-                //: Under "Use Twemoji". Twemoji is the name of a set of
-                //: emoji pictures; keep it as it is.
-                description: qsTr("Draws emoji in messages and reactions as pictures. Off, Sailfish OS draws them, and shows the many it has no symbol for as empty boxes.")
-                automaticCheck: false
-                checked: Settings.twemoji === true
-                onClicked: Settings.twemoji = !checked
-            }
-
             // Last under Messages: the three above are what the core does
             // with a message -- what leaves, what arrives, what stays --
-            // and this and the emoji are only how the app draws one.
+            // and this is only how the app draws one.
             TextSwitch {
                 objectName: "markdownSwitch"
                 text: qsTr("Use Markdown formatting")

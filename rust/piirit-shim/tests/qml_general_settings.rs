@@ -107,12 +107,12 @@ fn probe_qml() -> String {
         }}
         // What stands last in the section before a heading: the control
         // before the header that says `heading`.
-        function lastBefore(heading, back) {{
+        function lastBefore(heading) {{
             var header = findText(loader.item, heading)
             if (!header || !header.parent) {{ return 'missing:' + heading }}
             var kids = header.parent.children
-            for (var i = back; i < kids.length; i++) {{
-                if (kids[i] === header) {{ return kids[i - back].objectName }}
+            for (var i = 1; i < kids.length; i++) {{
+                if (kids[i] === header) {{ return kids[i - 1].objectName }}
             }}
             return 'missing:' + heading
         }}
@@ -234,12 +234,7 @@ fn the_settings_page_writes_what_the_app_reads() {
         );
         record!(
             "last-under-messages",
-            call!("lastBefore", QString::from("Notifications"), 1)
-        );
-        // And how an emoji is drawn just above it.
-        record!(
-            "second-last-under-messages",
-            call!("lastBefore", QString::from("Notifications"), 2)
+            call!("lastBefore", QString::from("Notifications"))
         );
         // The return key is a line break and nothing else, so there is
         // no setting for it, on the page or behind it.
@@ -253,26 +248,6 @@ fn the_settings_page_writes_what_the_app_reads() {
             call!("appReads", QString::from("markdownMode"))
         );
         record!("markdown-switch", get!("markdownSwitch", "checked"));
-        record!(
-            "twemoji-default",
-            call!("appReads", QString::from("twemoji"))
-        );
-        record!("twemoji-switch", get!("twemojiSwitch", "checked"));
-        record!(
-            "app-twemoji-key",
-            call!("appKey", QString::from("twemojiConfig"))
-        );
-        record!(
-            "flip-twemoji",
-            call!("click", QString::from("twemojiSwitch"))
-        );
-        record!("twemoji-off", call!("appReads", QString::from("twemoji")));
-        record!("twemoji-switch-off", get!("twemojiSwitch", "checked"));
-        record!(
-            "flip-twemoji-back",
-            call!("click", QString::from("twemojiSwitch"))
-        );
-        record!("twemoji-on", call!("appReads", QString::from("twemoji")));
         record!(
             "quality-default",
             call!("appReads", QString::from("mediaQuality"))
@@ -523,15 +498,6 @@ fn the_settings_page_writes_what_the_app_reads() {
     for (label, expected) in [
         ("first-under-messages", "qualityCombo"),
         ("last-under-messages", "markdownSwitch"),
-        ("second-last-under-messages", "twemojiSwitch"),
-        ("twemoji-default", "true"),
-        ("twemoji-switch", "true"),
-        ("app-twemoji-key", "/apps/harbour-piirit/twemoji"),
-        ("flip-twemoji", "ok"),
-        ("twemoji-off", "false"),
-        ("twemoji-switch-off", "false"),
-        ("flip-twemoji-back", "ok"),
-        ("twemoji-on", "true"),
         ("enter-switch", "missing:enterSendsSwitch"),
         ("enter-setting", "undefined"),
         ("markdown-default", "0"),

@@ -1883,15 +1883,6 @@ Vous continuerez à voir les messages des contacts bloqués dans les autres grou
         <source>Makes and answers voice calls in one-to-one chats.</source>
         <translation>Passe et reçoit des appels vocaux dans les discussions individuelles.</translation>
     </message>
-    <message>
-        <source>Use Twemoji</source>
-        <translation>Utiliser Twemoji</translation>
-    </message>
-    <message>
-        <source>Draws emoji in messages and reactions as pictures. Off, Sailfish OS draws them, and shows the many it has no symbol for as empty boxes.</source>
-        <extracomment>Under &quot;Use Twemoji&quot;. Twemoji is the name of a set of emoji pictures; keep it as it is.</extracomment>
-        <translation>Affiche les emoji des messages et des réactions sous forme d’images. Désactivé, Sailfish OS les dessine et affiche sous forme de cases vides les nombreux pour lesquels il n’a pas de symbole.</translation>
-    </message>
 </context>
 <context>
     <name>ShareTarget</name>
