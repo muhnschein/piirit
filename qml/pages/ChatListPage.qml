@@ -578,6 +578,32 @@ Page {
                     opacity: page.archived || page.searchOpen ? 1 : 0
                     enabled: page.archived || page.searchOpen
                     Behavior on opacity { NumberAnimation { duration: 200 } }
+                    // The pill's word and magnifier at the pill's size and
+                    // place, so the one fades into the other without either
+                    // moving: Silica's own are a size larger and further
+                    // left. The text starts where the pill's word does.
+                    font.pixelSize: Theme.fontSizeMedium
+                    textLeftMargin: Theme.horizontalPageMargin + Theme.paddingMedium
+                                    + Theme.iconSizeSmallPlus + Theme.paddingSmall
+                    leftItem: Item {
+                        id: searchGlyph
+                        width: Theme.iconSizeSmallPlus + Theme.paddingSmall
+                        height: Theme.iconSizeSmallPlus
+
+                        Image {
+                            // Where the pill draws it, whatever offset
+                            // Silica gives the item that holds it.
+                            x: Theme.horizontalPageMargin + Theme.paddingMedium
+                               - searchGlyph.x
+                            width: Theme.iconSizeSmallPlus
+                            height: Theme.iconSizeSmallPlus
+                            sourceSize.width: Theme.iconSizeSmallPlus
+                            sourceSize.height: Theme.iconSizeSmallPlus
+                            source: "image://theme/icon-m-search?"
+                                    + (searchField.activeFocus ? Theme.highlightColor
+                                                               : Theme.primaryColor)
+                        }
+                    }
                     // Empty, it offers to go away instead of to clear.
                     canHide: !page.archived
                     onHideClicked: page.closeSearch()
