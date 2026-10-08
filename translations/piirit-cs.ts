@@ -562,7 +562,7 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
     </message>
     <message>
         <source>Tap the filter icon to show all chats</source>
-        <extracomment>The filter icon is the three lines at the right of the search field.</extracomment>
+        <extracomment>The filter icon is the funnel in a round button at the right of the search field.</extracomment>
         <translation>Klepnutím na ikonu filtru zobrazíte všechny chaty</translation>
     </message>
 </context>

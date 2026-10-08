@@ -560,7 +560,7 @@ Vous continuerez à voir les messages des contacts bloqués dans les autres grou
     </message>
     <message>
         <source>Tap the filter icon to show all chats</source>
-        <extracomment>The filter icon is the three lines at the right of the search field.</extracomment>
+        <extracomment>The filter icon is the funnel in a round button at the right of the search field.</extracomment>
         <translation>Touchez l&apos;icône de filtre pour afficher toutes les discussions</translation>
     </message>
 </context>

@@ -562,7 +562,7 @@ Wiadomości innych grup z zablokowanymi kontaktami nadal będą wyświetlane.</t
     </message>
     <message>
         <source>Tap the filter icon to show all chats</source>
-        <extracomment>The filter icon is the three lines at the right of the search field.</extracomment>
+        <extracomment>The filter icon is the funnel in a round button at the right of the search field.</extracomment>
         <translation>Stuknij ikonę filtra, aby pokazać wszystkie czaty</translation>
     </message>
 </context>

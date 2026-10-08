@@ -560,7 +560,7 @@ Mensagens de contactos bloqueados não serão ocultadas noutros grupos.</transla
     </message>
     <message>
         <source>Tap the filter icon to show all chats</source>
-        <extracomment>The filter icon is the three lines at the right of the search field.</extracomment>
+        <extracomment>The filter icon is the funnel in a round button at the right of the search field.</extracomment>
         <translation>Toque no ícone de filtro para mostrar todas as conversas</translation>
     </message>
 </context>

@@ -31,6 +31,7 @@ QtObject {
     property real opacityLow: 0.4
     property real highlightBackgroundOpacity: 0.3
     property int iconSizeSmall: 32
+    property int iconSizeSmallPlus: 48
     property int iconSizeMedium: 64
     property size coverSizeLarge: Qt.size(234, 374)
 

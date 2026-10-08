@@ -547,7 +547,8 @@ Page {
                 SearchField {
                     id: searchField
                     objectName: "chatSearchField"
-                    width: parent.width - (unreadFilter.visible ? unreadFilter.width : 0)
+                    width: parent.width - (unreadFilter.visible
+                                           ? unreadFilter.width + filterMargin.width : 0)
                     anchors.verticalCenter: parent.verticalCenter
                     // The ordinary list searches chats, contacts and messages;
                     // the archived list is a mode over chats alone.
@@ -576,6 +577,15 @@ Page {
                     // the switch does nothing while one is showing.
                     enabled: !page.searching
                     onClicked: chats.unread_only = !chats.unread_only
+                }
+
+                // The button ends on the page margin, where the header's
+                // title and the rows' own icons end.
+                Item {
+                    id: filterMargin
+                    visible: unreadFilter.visible
+                    width: Theme.horizontalPageMargin
+                    height: 1
                 }
             }
         }
@@ -790,9 +800,9 @@ Page {
                 // Nothing here makes an archived chat: a chat is archived
                 // from the ordinary list, not started in this one.
                 hintText: page.archived ? ""
-                                        //: The filter icon is the three
-                                        //: lines at the right of the
-                                        //: search field.
+                                        //: The filter icon is the funnel
+                                        //: in a round button at the right
+                                        //: of the search field.
                                         : chats.unread_only ? qsTr("Tap the filter icon to show all chats")
                                                             : qsTr("Pull down to start one")
             }

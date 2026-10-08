@@ -560,7 +560,7 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
     <message>
         <source>Tap the filter icon to show all chats</source>
-        <extracomment>The filter icon is the three lines at the right of the search field.</extracomment>
+        <extracomment>The filter icon is the funnel in a round button at the right of the search field.</extracomment>
         <translation>सभी चैट दिखाने के लिए फ़िल्टर आइकन पर टैप करें</translation>
     </message>
 </context>
