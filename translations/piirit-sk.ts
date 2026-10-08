@@ -39,20 +39,8 @@
         <translation>Vaše meno</translation>
     </message>
     <message>
-        <source>Select a public chatmail relay</source>
-        <translation>Vybrať verejný chatmail relay</translation>
-    </message>
-    <message>
-        <source>Use a custom chatmail relay</source>
-        <translation>Použiť vlastný chatmail relay</translation>
-    </message>
-    <message>
         <source>Piirit works only with chatmail relays. These are a particular kind of e-mail server; ordinary e-mail servers are not supported. For more, see &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. A full list of public, free-to-use chatmail relays is at &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</source>
         <translation>Piirit funguje len s chatmail relay. Je to zvláštny druh e-mailového servera; bežné e-mailové servery nie sú podporované. Viac na &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. Úplný zoznam verejných chatmail relay zdarma je na &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
-    </message>
-    <message>
-        <source>Choose a name and a relay. Nothing else is needed.</source>
-        <translation>Zvoľ názov a relay. Nič ďalšie nie je potrebné.</translation>
     </message>
     <message>
         <source>Automatic</source>
@@ -61,6 +49,38 @@
     <message>
         <source>Relays are used for sending and receiving messages. Having more than one keeps your connection reliable.</source>
         <translation>Relay sa používajú na odosielanie a prijímanie správ. Viac ako jeden relay udržiava vaše pripojenie spoľahlivé.</translation>
+    </message>
+    <message>
+        <source>Choose a name. Nothing else is needed.</source>
+        <translation>Vyberte si meno. Nič iné nie je potrebné.</translation>
+    </message>
+    <message>
+        <source>Advanced</source>
+        <extracomment>The section of the add-profile dialog that holds the choice of relay, shut until it is opened.</extracomment>
+        <translation>Rozšírené</translation>
+    </message>
+    <message>
+        <source>Relay: %1</source>
+        <extracomment>Under &quot;Advanced&quot; in the add-profile dialog: the one relay the profile will be made on.</extracomment>
+        <translation>Relay: %1</translation>
+    </message>
+    <message>
+        <source>Relay</source>
+        <extracomment>The relays the profile is made on: the core&apos;s (&quot;Automatic&quot;), one from the list, or another.</extracomment>
+        <translation>Relay</translation>
+    </message>
+    <message>
+        <source>Only this relay. More can be added later on the profile page.</source>
+        <translation>Iba tento relay. Ďalšie možno pridať neskôr na stránke profilu.</translation>
+    </message>
+    <message>
+        <source>Other relay</source>
+        <extracomment>A relay that is not on the list, typed in.</extracomment>
+        <translation>Iný relay</translation>
+    </message>
+    <message>
+        <source>Relay address</source>
+        <translation>Adresa relaya</translation>
     </message>
 </context>
 <context>

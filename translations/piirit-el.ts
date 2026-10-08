@@ -39,20 +39,8 @@
         <translation>Το όνομά σας</translation>
     </message>
     <message>
-        <source>Select a public chatmail relay</source>
-        <translation>Επιλέξτε δημόσιο αναμεταδότη chatmail</translation>
-    </message>
-    <message>
-        <source>Use a custom chatmail relay</source>
-        <translation>Χρήση δικού σας αναμεταδότη chatmail</translation>
-    </message>
-    <message>
         <source>Piirit works only with chatmail relays. These are a particular kind of e-mail server; ordinary e-mail servers are not supported. For more, see &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. A full list of public, free-to-use chatmail relays is at &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</source>
         <translation>Το Piirit λειτουργεί μόνο με αναμεταδότες chatmail. Είναι ένα ιδιαίτερο είδος διακομιστή e-mail· οι συνηθισμένοι διακομιστές e-mail δεν υποστηρίζονται. Περισσότερα στο &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. Πλήρης λίστα δημόσιων, δωρεάν αναμεταδοτών chatmail υπάρχει στο &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
-    </message>
-    <message>
-        <source>Choose a name and a relay. Nothing else is needed.</source>
-        <translation>Επίλεξε ένα όνομα και έναν αναμεταδότη. Τίποτα άλλο δεν χρειάζεται.</translation>
     </message>
     <message>
         <source>Automatic</source>
@@ -61,6 +49,38 @@
     <message>
         <source>Relays are used for sending and receiving messages. Having more than one keeps your connection reliable.</source>
         <translation>Οι αναμεταδότες χρησιμοποιούνται για την αποστολή και λήψη μηνυμάτων. Η ύπαρξη περισσότερων από έναν διατηρεί τη σύνδεσή σας αξιόπιστη.</translation>
+    </message>
+    <message>
+        <source>Choose a name. Nothing else is needed.</source>
+        <translation>Επιλέξτε ένα όνομα. Δεν χρειάζεται τίποτα άλλο.</translation>
+    </message>
+    <message>
+        <source>Advanced</source>
+        <extracomment>The section of the add-profile dialog that holds the choice of relay, shut until it is opened.</extracomment>
+        <translation>Για προχωρημένους</translation>
+    </message>
+    <message>
+        <source>Relay: %1</source>
+        <extracomment>Under &quot;Advanced&quot; in the add-profile dialog: the one relay the profile will be made on.</extracomment>
+        <translation>Αναμεταδότης: %1</translation>
+    </message>
+    <message>
+        <source>Relay</source>
+        <extracomment>The relays the profile is made on: the core&apos;s (&quot;Automatic&quot;), one from the list, or another.</extracomment>
+        <translation>Αναμεταδότης</translation>
+    </message>
+    <message>
+        <source>Only this relay. More can be added later on the profile page.</source>
+        <translation>Μόνο αυτός ο αναμεταδότης. Μπορείτε να προσθέσετε κι άλλους αργότερα στη σελίδα του προφίλ.</translation>
+    </message>
+    <message>
+        <source>Other relay</source>
+        <extracomment>A relay that is not on the list, typed in.</extracomment>
+        <translation>Άλλος αναμεταδότης</translation>
+    </message>
+    <message>
+        <source>Relay address</source>
+        <translation>Διεύθυνση αναμεταδότη</translation>
     </message>
 </context>
 <context>

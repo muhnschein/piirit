@@ -39,20 +39,8 @@
         <translation>તમારું નામ</translation>
     </message>
     <message>
-        <source>Select a public chatmail relay</source>
-        <translation>જાહેર chatmail રિલે પસંદ કરો</translation>
-    </message>
-    <message>
-        <source>Use a custom chatmail relay</source>
-        <translation>પોતાનો chatmail રિલે વાપરો</translation>
-    </message>
-    <message>
         <source>Piirit works only with chatmail relays. These are a particular kind of e-mail server; ordinary e-mail servers are not supported. For more, see &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. A full list of public, free-to-use chatmail relays is at &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</source>
         <translation>Piirit ફક્ત chatmail રિલે સાથે જ કામ કરે છે. આ ખાસ પ્રકારના ઈ-મેઇલ સર્વર છે; સામાન્ય ઈ-મેઇલ સર્વર સપોર્ટેડ નથી. વધુ માહિતી માટે જુઓ &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. જાહેર, મફત chatmail રિલેની પૂરી યાદી &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; પર છે.</translation>
-    </message>
-    <message>
-        <source>Choose a name and a relay. Nothing else is needed.</source>
-        <translation>એક નામ અને એક રિલે પસંદ કરો. આ સિવાય બીજું કશું જરૂરી નથી.</translation>
     </message>
     <message>
         <source>Automatic</source>
@@ -61,6 +49,38 @@
     <message>
         <source>Relays are used for sending and receiving messages. Having more than one keeps your connection reliable.</source>
         <translation>રિલેનો ઉપયોગ સંદેશા મોકલવા અને પ્રાપ્ત કરવા માટે થાય છે. એકથી વધુ રિલે હોવાથી તમારું કનેક્શન વિશ્વસનીય રહે છે.</translation>
+    </message>
+    <message>
+        <source>Choose a name. Nothing else is needed.</source>
+        <translation>એક નામ પસંદ કરો. બીજું કંઈ જરૂરી નથી.</translation>
+    </message>
+    <message>
+        <source>Advanced</source>
+        <extracomment>The section of the add-profile dialog that holds the choice of relay, shut until it is opened.</extracomment>
+        <translation>અદ્યતન</translation>
+    </message>
+    <message>
+        <source>Relay: %1</source>
+        <extracomment>Under &quot;Advanced&quot; in the add-profile dialog: the one relay the profile will be made on.</extracomment>
+        <translation>રિલે: %1</translation>
+    </message>
+    <message>
+        <source>Relay</source>
+        <extracomment>The relays the profile is made on: the core&apos;s (&quot;Automatic&quot;), one from the list, or another.</extracomment>
+        <translation>રિલે</translation>
+    </message>
+    <message>
+        <source>Only this relay. More can be added later on the profile page.</source>
+        <translation>ફક્ત આ રિલે. વધુ રિલે પછીથી પ્રોફાઇલ પેજ પર ઉમેરી શકાય છે.</translation>
+    </message>
+    <message>
+        <source>Other relay</source>
+        <extracomment>A relay that is not on the list, typed in.</extracomment>
+        <translation>બીજું રિલે</translation>
+    </message>
+    <message>
+        <source>Relay address</source>
+        <translation>રિલે સરનામું</translation>
     </message>
 </context>
 <context>

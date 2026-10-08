@@ -39,20 +39,8 @@
         <translation>Navnet ditt</translation>
     </message>
     <message>
-        <source>Select a public chatmail relay</source>
-        <translation>Velg et offentlig chatmail-relé</translation>
-    </message>
-    <message>
-        <source>Use a custom chatmail relay</source>
-        <translation>Bruk et eget chatmail-relé</translation>
-    </message>
-    <message>
         <source>Piirit works only with chatmail relays. These are a particular kind of e-mail server; ordinary e-mail servers are not supported. For more, see &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. A full list of public, free-to-use chatmail relays is at &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</source>
         <translation>Piirit virker bare med chatmail-reléer. Det er en egen type e-posttjener; vanlige e-posttjenere støttes ikke. Les mer på &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. En full liste over offentlige, gratis chatmail-reléer finnes på &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
-    </message>
-    <message>
-        <source>Choose a name and a relay. Nothing else is needed.</source>
-        <translation>Velg et navn og et relé. Mer trengs ikke.</translation>
     </message>
     <message>
         <source>Automatic</source>
@@ -61,6 +49,38 @@
     <message>
         <source>Relays are used for sending and receiving messages. Having more than one keeps your connection reliable.</source>
         <translation>Reléer brukes til å sende og motta meldinger. Å ha mer enn ett holder tilkoblingen pålitelig.</translation>
+    </message>
+    <message>
+        <source>Choose a name. Nothing else is needed.</source>
+        <translation>Velg et navn. Mer trengs ikke.</translation>
+    </message>
+    <message>
+        <source>Advanced</source>
+        <extracomment>The section of the add-profile dialog that holds the choice of relay, shut until it is opened.</extracomment>
+        <translation>Avansert</translation>
+    </message>
+    <message>
+        <source>Relay: %1</source>
+        <extracomment>Under &quot;Advanced&quot; in the add-profile dialog: the one relay the profile will be made on.</extracomment>
+        <translation>Relé: %1</translation>
+    </message>
+    <message>
+        <source>Relay</source>
+        <extracomment>The relays the profile is made on: the core&apos;s (&quot;Automatic&quot;), one from the list, or another.</extracomment>
+        <translation>Relé</translation>
+    </message>
+    <message>
+        <source>Only this relay. More can be added later on the profile page.</source>
+        <translation>Bare dette releet. Flere kan legges til senere på profilsiden.</translation>
+    </message>
+    <message>
+        <source>Other relay</source>
+        <extracomment>A relay that is not on the list, typed in.</extracomment>
+        <translation>Annet relé</translation>
+    </message>
+    <message>
+        <source>Relay address</source>
+        <translation>Reléadresse</translation>
     </message>
 </context>
 <context>

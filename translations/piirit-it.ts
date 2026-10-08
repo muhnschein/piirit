@@ -39,20 +39,8 @@
         <translation>Il tuo nome</translation>
     </message>
     <message>
-        <source>Select a public chatmail relay</source>
-        <translation>Seleziona un relay chatmail pubblico</translation>
-    </message>
-    <message>
-        <source>Use a custom chatmail relay</source>
-        <translation>Usa un relay chatmail personalizzato</translation>
-    </message>
-    <message>
         <source>Piirit works only with chatmail relays. These are a particular kind of e-mail server; ordinary e-mail servers are not supported. For more, see &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. A full list of public, free-to-use chatmail relays is at &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</source>
         <translation>Piirit funziona solo con i relay chatmail. Sono un tipo particolare di server di posta; i comuni server di posta non sono supportati. Per saperne di più vedi &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. L&apos;elenco completo dei relay chatmail pubblici e gratuiti è su &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
-    </message>
-    <message>
-        <source>Choose a name and a relay. Nothing else is needed.</source>
-        <translation>Scegli un nome e un relay. Non serve altro.</translation>
     </message>
     <message>
         <source>Automatic</source>
@@ -61,6 +49,38 @@
     <message>
         <source>Relays are used for sending and receiving messages. Having more than one keeps your connection reliable.</source>
         <translation>I relay vengono usati per inviare e ricevere messaggi. Averne più di uno mantiene la connessione affidabile.</translation>
+    </message>
+    <message>
+        <source>Choose a name. Nothing else is needed.</source>
+        <translation>Scegli un nome. Non serve altro.</translation>
+    </message>
+    <message>
+        <source>Advanced</source>
+        <extracomment>The section of the add-profile dialog that holds the choice of relay, shut until it is opened.</extracomment>
+        <translation>Avanzate</translation>
+    </message>
+    <message>
+        <source>Relay: %1</source>
+        <extracomment>Under &quot;Advanced&quot; in the add-profile dialog: the one relay the profile will be made on.</extracomment>
+        <translation>Relay: %1</translation>
+    </message>
+    <message>
+        <source>Relay</source>
+        <extracomment>The relays the profile is made on: the core&apos;s (&quot;Automatic&quot;), one from the list, or another.</extracomment>
+        <translation>Relay</translation>
+    </message>
+    <message>
+        <source>Only this relay. More can be added later on the profile page.</source>
+        <translation>Solo questo relay. Se ne possono aggiungere altri più tardi nella pagina del profilo.</translation>
+    </message>
+    <message>
+        <source>Other relay</source>
+        <extracomment>A relay that is not on the list, typed in.</extracomment>
+        <translation>Altro relay</translation>
+    </message>
+    <message>
+        <source>Relay address</source>
+        <translation>Indirizzo del relay</translation>
     </message>
 </context>
 <context>

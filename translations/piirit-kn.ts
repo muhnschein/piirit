@@ -39,20 +39,8 @@
         <translation>ನಿಮ್ಮ ಹೆಸರು</translation>
     </message>
     <message>
-        <source>Select a public chatmail relay</source>
-        <translation>ಸಾರ್ವಜನಿಕ chatmail ರಿಲೇ ಆರಿಸಿ</translation>
-    </message>
-    <message>
-        <source>Use a custom chatmail relay</source>
-        <translation>ಸ್ವಂತ chatmail ರಿಲೇ ಬಳಸಿ</translation>
-    </message>
-    <message>
         <source>Piirit works only with chatmail relays. These are a particular kind of e-mail server; ordinary e-mail servers are not supported. For more, see &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. A full list of public, free-to-use chatmail relays is at &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</source>
         <translation>Piirit chatmail ರಿಲೇಗಳೊಂದಿಗೆ ಮಾತ್ರ ಕೆಲಸ ಮಾಡುತ್ತದೆ. ಇವು ವಿಶೇಷ ರೀತಿಯ ಇ-ಮೇಲ್ ಸರ್ವರ್‌ಗಳು; ಸಾಮಾನ್ಯ ಇ-ಮೇಲ್ ಸರ್ವರ್‌ಗಳಿಗೆ ಬೆಂಬಲವಿಲ್ಲ. ಹೆಚ್ಚಿನ ಮಾಹಿತಿಗೆ &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt; ನೋಡಿ. ಸಾರ್ವಜನಿಕ, ಉಚಿತ chatmail ರಿಲೇಗಳ ಪೂರ್ಣ ಪಟ್ಟಿ &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; ನಲ್ಲಿದೆ.</translation>
-    </message>
-    <message>
-        <source>Choose a name and a relay. Nothing else is needed.</source>
-        <translation>ಒಂದು ಹೆಸರನ್ನು ಮತ್ತು ಒಂದು ರಿಲೇಯನ್ನು ಆರಿಸಿ. ಇದಕ್ಕಿಂತ ಹೆಚ್ಚೇನೂ ಬೇಕಿಲ್ಲ.</translation>
     </message>
     <message>
         <source>Automatic</source>
@@ -61,6 +49,38 @@
     <message>
         <source>Relays are used for sending and receiving messages. Having more than one keeps your connection reliable.</source>
         <translation>ರಿಲೇಗಳನ್ನು ಸಂದೇಶಗಳನ್ನು ಕಳುಹಿಸಲು ಮತ್ತು ಸ್ವೀಕರಿಸಲು ಬಳಸಲಾಗುತ್ತದೆ. ಒಂದಕ್ಕಿಂತ ಹೆಚ್ಚು ಇದ್ದರೆ ನಿಮ್ಮ ಸಂಪರ್ಕ ವಿಶ್ವಾಸಾರ್ಹವಾಗಿರುತ್ತದೆ.</translation>
+    </message>
+    <message>
+        <source>Choose a name. Nothing else is needed.</source>
+        <translation>ಒಂದು ಹೆಸರನ್ನು ಆರಿಸಿ. ಬೇರೇನೂ ಬೇಕಿಲ್ಲ.</translation>
+    </message>
+    <message>
+        <source>Advanced</source>
+        <extracomment>The section of the add-profile dialog that holds the choice of relay, shut until it is opened.</extracomment>
+        <translation>ಸುಧಾರಿತ</translation>
+    </message>
+    <message>
+        <source>Relay: %1</source>
+        <extracomment>Under &quot;Advanced&quot; in the add-profile dialog: the one relay the profile will be made on.</extracomment>
+        <translation>ರಿಲೇ: %1</translation>
+    </message>
+    <message>
+        <source>Relay</source>
+        <extracomment>The relays the profile is made on: the core&apos;s (&quot;Automatic&quot;), one from the list, or another.</extracomment>
+        <translation>ರಿಲೇ</translation>
+    </message>
+    <message>
+        <source>Only this relay. More can be added later on the profile page.</source>
+        <translation>ಈ ರಿಲೇ ಮಾತ್ರ. ಇನ್ನಷ್ಟನ್ನು ನಂತರ ಪ್ರೊಫೈಲ್ ಪುಟದಲ್ಲಿ ಸೇರಿಸಬಹುದು.</translation>
+    </message>
+    <message>
+        <source>Other relay</source>
+        <extracomment>A relay that is not on the list, typed in.</extracomment>
+        <translation>ಬೇರೆ ರಿಲೇ</translation>
+    </message>
+    <message>
+        <source>Relay address</source>
+        <translation>ರಿಲೇ ವಿಳಾಸ</translation>
     </message>
 </context>
 <context>

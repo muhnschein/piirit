@@ -39,20 +39,8 @@
         <translation>Az Ön neve</translation>
     </message>
     <message>
-        <source>Select a public chatmail relay</source>
-        <translation>Nyilvános chatmail-relé választása</translation>
-    </message>
-    <message>
-        <source>Use a custom chatmail relay</source>
-        <translation>Saját chatmail-relé használata</translation>
-    </message>
-    <message>
         <source>Piirit works only with chatmail relays. These are a particular kind of e-mail server; ordinary e-mail servers are not supported. For more, see &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. A full list of public, free-to-use chatmail relays is at &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</source>
         <translation>A Piirit csak chatmail-relékkel működik. Ezek különleges fajta e-mail-kiszolgálók; a közönséges e-mail-kiszolgálók nem támogatottak. Bővebben: &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. A nyilvános, ingyenesen használható chatmail-relék teljes listája: &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
-    </message>
-    <message>
-        <source>Choose a name and a relay. Nothing else is needed.</source>
-        <translation>Válassz nevet és relét. Másra nincs szükség.</translation>
     </message>
     <message>
         <source>Automatic</source>
@@ -61,6 +49,38 @@
     <message>
         <source>Relays are used for sending and receiving messages. Having more than one keeps your connection reliable.</source>
         <translation>A relék üzenetek küldésére és fogadására szolgálnak. Ha egynél több van belőlük, a kapcsolat megbízhatóbb marad.</translation>
+    </message>
+    <message>
+        <source>Choose a name. Nothing else is needed.</source>
+        <translation>Válassz egy nevet. Más nem kell.</translation>
+    </message>
+    <message>
+        <source>Advanced</source>
+        <extracomment>The section of the add-profile dialog that holds the choice of relay, shut until it is opened.</extracomment>
+        <translation>Speciális</translation>
+    </message>
+    <message>
+        <source>Relay: %1</source>
+        <extracomment>Under &quot;Advanced&quot; in the add-profile dialog: the one relay the profile will be made on.</extracomment>
+        <translation>Relé: %1</translation>
+    </message>
+    <message>
+        <source>Relay</source>
+        <extracomment>The relays the profile is made on: the core&apos;s (&quot;Automatic&quot;), one from the list, or another.</extracomment>
+        <translation>Relé</translation>
+    </message>
+    <message>
+        <source>Only this relay. More can be added later on the profile page.</source>
+        <translation>Csak ez a relé. Továbbiak később adhatók hozzá a profiloldalon.</translation>
+    </message>
+    <message>
+        <source>Other relay</source>
+        <extracomment>A relay that is not on the list, typed in.</extracomment>
+        <translation>Másik relé</translation>
+    </message>
+    <message>
+        <source>Relay address</source>
+        <translation>Relé címe</translation>
     </message>
 </context>
 <context>

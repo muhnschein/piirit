@@ -39,20 +39,8 @@
         <translation>你的名字</translation>
     </message>
     <message>
-        <source>Select a public chatmail relay</source>
-        <translation>選擇公共 chatmail 中繼</translation>
-    </message>
-    <message>
-        <source>Use a custom chatmail relay</source>
-        <translation>使用自訂 chatmail 中繼</translation>
-    </message>
-    <message>
         <source>Piirit works only with chatmail relays. These are a particular kind of e-mail server; ordinary e-mail servers are not supported. For more, see &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. A full list of public, free-to-use chatmail relays is at &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</source>
         <translation>Piirit 只能配合 chatmail 中繼使用。這是一種特殊的電郵伺服器；不支援普通的電郵伺服器。詳情見 &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;。公共、免費的 chatmail 中繼完整清單見 &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;。</translation>
-    </message>
-    <message>
-        <source>Choose a name and a relay. Nothing else is needed.</source>
-        <translation>選擇一個名稱和一個中繼。除此之外不需要其他設定。</translation>
     </message>
     <message>
         <source>Automatic</source>
@@ -61,6 +49,38 @@
     <message>
         <source>Relays are used for sending and receiving messages. Having more than one keeps your connection reliable.</source>
         <translation>中繼用於傳送和接收訊息。擁有多個中繼可令你的連線更穩定。</translation>
+    </message>
+    <message>
+        <source>Choose a name. Nothing else is needed.</source>
+        <translation>選擇一個名稱即可，無需其他設定。</translation>
+    </message>
+    <message>
+        <source>Advanced</source>
+        <extracomment>The section of the add-profile dialog that holds the choice of relay, shut until it is opened.</extracomment>
+        <translation>進階</translation>
+    </message>
+    <message>
+        <source>Relay: %1</source>
+        <extracomment>Under &quot;Advanced&quot; in the add-profile dialog: the one relay the profile will be made on.</extracomment>
+        <translation>中繼：%1</translation>
+    </message>
+    <message>
+        <source>Relay</source>
+        <extracomment>The relays the profile is made on: the core&apos;s (&quot;Automatic&quot;), one from the list, or another.</extracomment>
+        <translation>中繼</translation>
+    </message>
+    <message>
+        <source>Only this relay. More can be added later on the profile page.</source>
+        <translation>僅此中繼。之後可在個人檔案頁面新增更多。</translation>
+    </message>
+    <message>
+        <source>Other relay</source>
+        <extracomment>A relay that is not on the list, typed in.</extracomment>
+        <translation>其他中繼</translation>
+    </message>
+    <message>
+        <source>Relay address</source>
+        <translation>中繼地址</translation>
     </message>
 </context>
 <context>
