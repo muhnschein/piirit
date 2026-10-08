@@ -416,6 +416,6 @@ fn assert_outcome(steps: &[(&str, String)]) {
         value("more-raised"),
         "more:7:👍",
         "the '+' did not ask for the picker for this message, with the \
-         reader's own reaction to ring. {context}"
+         reader's own reaction to mark. {context}"
     );
 }

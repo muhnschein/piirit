@@ -1,7 +1,9 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
+import "."
 import "../js/Format.js" as Format
 import "../js/Calls.js" as Calls
+import "../js/Emoji.js" as Emoji
 
 /*
  * One message. Its own component so it can be loaded and measured on its
@@ -15,7 +17,10 @@ import "../js/Calls.js" as Calls
  * Markdown drawn, the body is the shim's own rendering of it
  * (markdown.rs), in which every character of the message is escaped and
  * the only tags are the ones the shim wrote -- and it is shown as
- * StyledText, never RichText, so nothing in it can load anything.
+ * StyledText, never RichText, so nothing in it can load anything. The
+ * other: a body or a quote with an emoji in it is StyledText too, so its
+ * emoji can be the same pictures the reactions are -- escaped first, and
+ * with no tag added but an <img> of a picture the app ships (Emoji.js).
  *
  * Laid out by bindings rather than by a Column: a positioner sizes itself in
  * a polish pass, which never runs headlessly, so a row built from one cannot
@@ -176,6 +181,26 @@ Item {
     readonly property string shownText: root.drawsStyled
                                         ? root.styledText
                                         : root.messageText
+
+    /// Whether emoji in the text are drawn as the pictures the app
+    /// ships, as they are on the reactions, or left to the system's
+    /// fonts. The reader's setting; see EmojiGlyph.
+    property bool emojiPictures: Settings.twemoji === true
+    /// The body with its emoji as pictures, or "" when it has none
+    /// to draw and is shown as it was.
+    readonly property string emojiBody: root.emojiPictures && !root.isCall
+                                        ? Emoji.inText(root.shownText, root.drawsStyled,
+                                                       messageLabel.font.pixelSize)
+                                        : ""
+    /// The body as drawn, and whether that is StyledText.
+    readonly property string bodyText: root.emojiBody.length > 0
+                                       ? root.emojiBody : root.shownText
+    readonly property bool bodyStyled: root.drawsStyled || root.emojiBody.length > 0
+    /// The same for the quote, which is always the text as written.
+    readonly property string emojiQuote: root.emojiPictures
+                                         ? Emoji.inText(root.quoteText, false,
+                                                        Theme.fontSizeExtraSmall)
+                                         : ""
     /// A message the core has only the header of, or is fetching, or
     /// could not fetch: something to say, and mostly something to tap.
     readonly property bool heldBack: root.downloadState.length > 0
@@ -316,9 +341,9 @@ Item {
         visible: false
         font: messageLabel.font
         // Measured as it will be drawn: bold is wider than plain.
-        textFormat: root.drawsStyled ? Text.StyledText : Text.PlainText
+        textFormat: root.bodyStyled ? Text.StyledText : Text.PlainText
         // A call's text is not drawn, so it does not size the bubble.
-        text: root.isCall ? "" : root.shownText
+        text: root.isCall ? "" : root.bodyText
     }
 
     Text {
@@ -512,8 +537,9 @@ Item {
                 truncationMode: TruncationMode.Elide
                 font.pixelSize: Theme.fontSizeExtraSmall
                 color: Theme.secondaryColor
-                textFormat: Text.PlainText
-                text: root.quoteText
+                // Plain, unless it has emoji to draw: see the top.
+                textFormat: root.emojiQuote.length > 0 ? Text.StyledText : Text.PlainText
+                text: root.emojiQuote.length > 0 ? root.emojiQuote : root.quoteText
             }
         }
 
@@ -663,8 +689,8 @@ Item {
             color: Theme.primaryColor
             linkColor: Theme.highlightColor
             // Plain, unless the shim rendered it: see the note at the top.
-            textFormat: root.drawsStyled ? Text.StyledText : Text.PlainText
-            text: root.shownText
+            textFormat: root.bodyStyled ? Text.StyledText : Text.PlainText
+            text: root.bodyText
             // A link is followed on a tap and on nothing else.
             onLinkActivated: Qt.openUrlExternally(link)
         }

@@ -1879,6 +1879,15 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Makes and answers voice calls in one-to-one chats.</source>
         <translation>Πραγματοποιεί και απαντά σε φωνητικές κλήσεις σε ατομικές συνομιλίες.</translation>
     </message>
+    <message>
+        <source>Use Twemoji</source>
+        <translation>Χρήση Twemoji</translation>
+    </message>
+    <message>
+        <source>Draws emoji in messages and reactions as pictures. Off, Sailfish OS draws them, and shows the many it has no symbol for as empty boxes.</source>
+        <extracomment>Under &quot;Use Twemoji&quot;. Twemoji is the name of a set of emoji pictures; keep it as it is.</extracomment>
+        <translation>Εμφανίζει τα emoji στα μηνύματα και τις αντιδράσεις ως εικόνες. Όταν είναι ανενεργό, τα σχεδιάζει το Sailfish OS και όσα δεν έχει σύμβολο τα δείχνει ως άδεια κουτάκια.</translation>
+    </message>
 </context>
 <context>
     <name>ShareTarget</name>

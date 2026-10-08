@@ -88,7 +88,7 @@ const PROBE_QML: &str = r"
             return parts.join('|')
         }
         function rowCount() { return '' + loader.item.rows.length }
-        // Every emoji the grid has drawn so far, ringed ones marked.
+        // Every emoji the grid has drawn so far, the reader.s own marked.
         function options() {
             var found = findAll(loader.item, 'emojiOption', [])
             var parts = []
@@ -101,7 +101,7 @@ const PROBE_QML: &str = r"
             var found = findAll(loader.item, 'emojiOption', [])
             for (var i = 0; i < found.length; i++) {
                 if (found[i].emoji === emoji) {
-                    found[i].clicked()
+                    found[i].choose()
                     return 'ok'
                 }
             }
@@ -302,24 +302,25 @@ fn the_picker_offers_every_emoji_and_reports_the_one_picked() {
         "what is not an emoji is not drawn as the text it is. {context}"
     );
 
-    // 540 wide over 60-wide small items in the stubs.
-    assert_eq!(value("columns"), "9", "{context}");
+    // 540 wide over 90-wide medium items in the stubs: room around
+    // each emoji, not a grid packed edge to edge.
+    assert_eq!(value("columns"), "6", "{context}");
     // The recent ones first, without what has no picture, then the
     // groups in Unicode's order.
     assert_eq!(
         value("rows"),
-        "#Recent|🔥❤️|#Smileys & emotion|😀😃😄😁😆😅🤣😂🙂",
+        "#Recent|🔥❤️|#Smileys & emotion|😀😃😄😁😆😅",
         "the grid does not open on the recent emoji and then the smileys. {context}"
     );
     let row_count: usize = value("row-count").parse().unwrap_or_default();
     assert!(
         row_count > 200,
-        "the grid has {row_count} rows; nine columns of every emoji is over two hundred. {context}"
+        "the grid has {row_count} rows; six columns of every emoji is over two hundred. {context}"
     );
     let options = value("options");
     assert!(
         options.contains("🔥|❤️*") && options.contains("😀"),
-        "the grid does not draw the recent emoji with the reader's own ringed, \
+        "the grid does not draw the recent emoji with the reader's own marked, \
          or the smileys after them: {options:?}. {context}"
     );
     assert!(
@@ -327,7 +328,7 @@ fn the_picker_offers_every_emoji_and_reports_the_one_picked() {
             .split('|')
             .filter(|option| option.ends_with('*'))
             .all(|option| option == "❤️*"),
-        "something other than the reader's own reaction is ringed: {options:?}. {context}"
+        "something other than the reader's own reaction is marked: {options:?}. {context}"
     );
     assert_eq!(value("strip"), "true", "{context}");
     assert_eq!(

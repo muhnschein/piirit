@@ -754,7 +754,7 @@ SilicaListView {
                     /// Taken while the row is here, like Delete's id: the
                     /// menu can outlive the row it was opened on.
                     readonly property int messageId: model.message_id
-                    /// The reader's own reaction, for the picker to ring;
+                    /// The reader's own reaction, for the picker to mark;
                     /// taken now for the same reason.
                     readonly property string myReaction: model.my_reaction
                     // The emoji and the "+" after them, side by side and

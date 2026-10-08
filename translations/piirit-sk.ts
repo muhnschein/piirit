@@ -1890,6 +1890,15 @@ Správy od zablokovaných kontaktov v ostatných skupinách sa budú naďalej zo
         <source>Makes and answers voice calls in one-to-one chats.</source>
         <translation>Uskutočňuje a prijíma hlasové hovory v individuálnych chatoch.</translation>
     </message>
+    <message>
+        <source>Use Twemoji</source>
+        <translation>Používať Twemoji</translation>
+    </message>
+    <message>
+        <source>Draws emoji in messages and reactions as pictures. Off, Sailfish OS draws them, and shows the many it has no symbol for as empty boxes.</source>
+        <extracomment>Under &quot;Use Twemoji&quot;. Twemoji is the name of a set of emoji pictures; keep it as it is.</extracomment>
+        <translation>Zobrazuje emoji v správach a reakciách ako obrázky. Keď je vypnuté, kreslí ich Sailfish OS a mnohé, pre ktoré nemá symbol, ukáže ako prázdne štvorčeky.</translation>
+    </message>
 </context>
 <context>
     <name>ShareTarget</name>

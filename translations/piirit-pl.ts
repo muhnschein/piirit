@@ -1890,6 +1890,15 @@ Wiadomości innych grup z zablokowanymi kontaktami nadal będą wyświetlane.</t
         <source>Makes and answers voice calls in one-to-one chats.</source>
         <translation>Wykonuje i odbiera połączenia głosowe w czatach jeden na jeden.</translation>
     </message>
+    <message>
+        <source>Use Twemoji</source>
+        <translation>Używaj Twemoji</translation>
+    </message>
+    <message>
+        <source>Draws emoji in messages and reactions as pictures. Off, Sailfish OS draws them, and shows the many it has no symbol for as empty boxes.</source>
+        <extracomment>Under &quot;Use Twemoji&quot;. Twemoji is the name of a set of emoji pictures; keep it as it is.</extracomment>
+        <translation>Wyświetla emoji w wiadomościach i reakcjach jako obrazki. Po wyłączeniu rysuje je Sailfish OS, a wiele z nich, dla których nie ma symbolu, pokazuje jako puste kwadraty.</translation>
+    </message>
 </context>
 <context>
     <name>ShareTarget</name>

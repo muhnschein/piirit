@@ -9,7 +9,8 @@ import Nemo.Configuration 1.0
  * whether anything is announced at all and if so how much a notification
  * gives away and whether a muted group can still raise one, whether
  * webxdc apps are offered at all, whether calls are and whether one rings
- * here, how many quick actions the cover offers and which, and the
+ * here, how many quick actions the cover offers and which, whether
+ * emoji are drawn as Twemoji pictures or by the system's fonts, and the
  * emoji last reacted with from the picker.
  *
  * They live in dconf under the app's own path, and every page reads
@@ -103,6 +104,11 @@ QtObject {
     /// first, which it offers before everything else. Only the picker's:
     /// the quick reactions are a tap away already.
     property alias recentReactions: recentReactionsValue.value
+    /// Whether emoji are drawn as the Twemoji pictures the app ships --
+    /// in a message, on a reaction chip, in the quick reactions and the
+    /// picker -- rather than by Sailfish OS's own fonts, which have a few
+    /// hundred of them in monochrome and draw the rest as empty boxes.
+    property alias twemoji: twemojiValue.value
 
     // The keys, named here and nowhere else: tests/qml_syntax.rs holds
     // every other file to reading them through this object.
@@ -256,5 +262,11 @@ QtObject {
         id: recentReactionsValue
         key: "/apps/harbour-piirit/recent_reactions"
         defaultValue: []
+    }
+
+    property ConfigurationValue twemojiConfig: ConfigurationValue {
+        id: twemojiValue
+        key: "/apps/harbour-piirit/twemoji"
+        defaultValue: true
     }
 }
