@@ -39,20 +39,48 @@
         <translation>നിങ്ങളുടെ പേര്</translation>
     </message>
     <message>
-        <source>Select a public chatmail relay</source>
-        <translation>പൊതു chatmail റിലേ തിരഞ്ഞെടുക്കുക</translation>
-    </message>
-    <message>
-        <source>Use a custom chatmail relay</source>
-        <translation>സ്വന്തം chatmail റിലേ ഉപയോഗിക്കുക</translation>
-    </message>
-    <message>
         <source>Piirit works only with chatmail relays. These are a particular kind of e-mail server; ordinary e-mail servers are not supported. For more, see &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. A full list of public, free-to-use chatmail relays is at &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</source>
         <translation>Piirit chatmail റിലേകളുമായി മാത്രമേ പ്രവർത്തിക്കൂ. ഇവ ഒരു പ്രത്യേക തരം ഇ-മെയിൽ സെർവറുകളാണ്; സാധാരണ ഇ-മെയിൽ സെർവറുകൾ പിന്തുണയ്ക്കുന്നില്ല. കൂടുതൽ അറിയാൻ &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt; കാണുക. പൊതു, സൗജന്യ chatmail റിലേകളുടെ പൂർണ്ണ പട്ടിക &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;-ൽ ഉണ്ട്.</translation>
     </message>
     <message>
-        <source>Choose a name and a relay. Nothing else is needed.</source>
-        <translation>ഒരു പേരും ഒരു റിലേയും തിരഞ്ഞെടുക്കുക. ഇതിനപ്പുറം ഒന്നും വേണ്ട.</translation>
+        <source>Automatic</source>
+        <translation>സ്വയമേവ</translation>
+    </message>
+    <message>
+        <source>Relays are used for sending and receiving messages. Having more than one keeps your connection reliable.</source>
+        <translation>സന്ദേശങ്ങൾ അയയ്ക്കാനും സ്വീകരിക്കാനും റിലേകൾ ഉപയോഗിക്കുന്നു. ഒന്നിൽ കൂടുതൽ ഉണ്ടെങ്കിൽ നിങ്ങളുടെ കണക്ഷൻ വിശ്വസനീയമായി തുടരും.</translation>
+    </message>
+    <message>
+        <source>Choose a name. Nothing else is needed.</source>
+        <translation>ഒരു പേര് തിരഞ്ഞെടുക്കുക. മറ്റൊന്നും വേണ്ട.</translation>
+    </message>
+    <message>
+        <source>Advanced</source>
+        <extracomment>The section of the add-profile dialog that holds the choice of relay, shut until it is opened.</extracomment>
+        <translation>വിപുലമായത്</translation>
+    </message>
+    <message>
+        <source>Relay: %1</source>
+        <extracomment>Under &quot;Advanced&quot; in the add-profile dialog: the one relay the profile will be made on.</extracomment>
+        <translation>റിലേ: %1</translation>
+    </message>
+    <message>
+        <source>Relay</source>
+        <extracomment>The relays the profile is made on: the core&apos;s (&quot;Automatic&quot;), one from the list, or another.</extracomment>
+        <translation>റിലേ</translation>
+    </message>
+    <message>
+        <source>Only this relay. More can be added later on the profile page.</source>
+        <translation>ഈ റിലേ മാത്രം. കൂടുതൽ പിന്നീട് പ്രൊഫൈൽ പേജിൽ ചേർക്കാം.</translation>
+    </message>
+    <message>
+        <source>Other relay</source>
+        <extracomment>A relay that is not on the list, typed in.</extracomment>
+        <translation>മറ്റൊരു റിലേ</translation>
+    </message>
+    <message>
+        <source>Relay address</source>
+        <translation>റിലേ വിലാസം</translation>
     </message>
 </context>
 <context>
@@ -115,6 +143,11 @@
     <message>
         <source>Adds another address for this profile on a second relay.</source>
         <translation>ഈ പ്രൊഫൈലിന് രണ്ടാമത്തൊരു റിലേയിൽ മറ്റൊരു വിലാസം ചേർക്കുന്നു.</translation>
+    </message>
+    <message>
+        <source>Add this relay?</source>
+        <extracomment>Delta Chat&apos;s question, over a relay read off a scanned code.</extracomment>
+        <translation>ഈ റിലേ ചേർക്കണോ?</translation>
     </message>
 </context>
 <context>
@@ -620,6 +653,11 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Leave blank to use the name they chose</source>
         <translation>അവർ തിരഞ്ഞെടുത്ത പേര് ഉപയോഗിക്കാൻ ശൂന്യമായി വിടുക</translation>
+    </message>
+    <message>
+        <source>Seen a long time ago</source>
+        <extracomment>Under a contact&apos;s name: the core has not seen them for a long time, or never.</extracomment>
+        <translation>വളരെ മുമ്പ് കണ്ടതാണ്</translation>
     </message>
 </context>
 <context>
@@ -1285,6 +1323,14 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Could not reach the relay. Try another one.</source>
         <translation>റിലേയിൽ എത്താനായില്ല. മറ്റൊന്ന് പരീക്ഷിക്കുക.</translation>
+    </message>
+    <message>
+        <source>No relay answered within %1 seconds.</source>
+        <translation>%1 സെക്കൻഡിനുള്ളിൽ ഒരു റിലേയും മറുപടി നൽകിയില്ല.</translation>
+    </message>
+    <message>
+        <source>Connecting…</source>
+        <translation>കണക്റ്റ് ചെയ്യുന്നു…</translation>
     </message>
 </context>
 <context>

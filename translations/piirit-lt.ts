@@ -39,20 +39,48 @@
         <translation>Jūsų vardas</translation>
     </message>
     <message>
-        <source>Select a public chatmail relay</source>
-        <translation>Pasirinkti viešą chatmail retransliatorių</translation>
-    </message>
-    <message>
-        <source>Use a custom chatmail relay</source>
-        <translation>Naudoti savo chatmail retransliatorių</translation>
-    </message>
-    <message>
         <source>Piirit works only with chatmail relays. These are a particular kind of e-mail server; ordinary e-mail servers are not supported. For more, see &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. A full list of public, free-to-use chatmail relays is at &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</source>
         <translation>Piirit veikia tik su chatmail retransliatoriais. Tai ypatinga el. pašto serverių rūšis; įprasti el. pašto serveriai nepalaikomi. Daugiau – &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. Visas viešų, nemokamų chatmail retransliatorių sąrašas yra &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
     </message>
     <message>
-        <source>Choose a name and a relay. Nothing else is needed.</source>
-        <translation>Pasirink pavadinimą ir retransliatorių. Daugiau nieko nereikia.</translation>
+        <source>Automatic</source>
+        <translation>Automatinis</translation>
+    </message>
+    <message>
+        <source>Relays are used for sending and receiving messages. Having more than one keeps your connection reliable.</source>
+        <translation>Retransliatoriai naudojami žinutėms siųsti ir gauti. Turint daugiau nei vieną, ryšys išlieka patikimas.</translation>
+    </message>
+    <message>
+        <source>Choose a name. Nothing else is needed.</source>
+        <translation>Pasirinkite vardą. Nieko daugiau nereikia.</translation>
+    </message>
+    <message>
+        <source>Advanced</source>
+        <extracomment>The section of the add-profile dialog that holds the choice of relay, shut until it is opened.</extracomment>
+        <translation>Išplėstiniai</translation>
+    </message>
+    <message>
+        <source>Relay: %1</source>
+        <extracomment>Under &quot;Advanced&quot; in the add-profile dialog: the one relay the profile will be made on.</extracomment>
+        <translation>Retransliatorius: %1</translation>
+    </message>
+    <message>
+        <source>Relay</source>
+        <extracomment>The relays the profile is made on: the core&apos;s (&quot;Automatic&quot;), one from the list, or another.</extracomment>
+        <translation>Retransliatorius</translation>
+    </message>
+    <message>
+        <source>Only this relay. More can be added later on the profile page.</source>
+        <translation>Tik šis retransliatorius. Daugiau galima pridėti vėliau profilio puslapyje.</translation>
+    </message>
+    <message>
+        <source>Other relay</source>
+        <extracomment>A relay that is not on the list, typed in.</extracomment>
+        <translation>Kitas retransliatorius</translation>
+    </message>
+    <message>
+        <source>Relay address</source>
+        <translation>Retransliatoriaus adresas</translation>
     </message>
 </context>
 <context>
@@ -115,6 +143,11 @@
     <message>
         <source>Adds another address for this profile on a second relay.</source>
         <translation>Prideda šiam profiliui dar vieną adresą kitame retransliatoriuje.</translation>
+    </message>
+    <message>
+        <source>Add this relay?</source>
+        <extracomment>Delta Chat&apos;s question, over a relay read off a scanned code.</extracomment>
+        <translation>Pridėti šį retransliatorių?</translation>
     </message>
 </context>
 <context>
@@ -618,6 +651,11 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Leave blank to use the name they chose</source>
         <translation>Palikite tuščią, kad būtų naudojamas jų pasirinktas vardas</translation>
+    </message>
+    <message>
+        <source>Seen a long time ago</source>
+        <extracomment>Under a contact&apos;s name: the core has not seen them for a long time, or never.</extracomment>
+        <translation>Matytas seniai</translation>
     </message>
 </context>
 <context>
@@ -1288,6 +1326,14 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Could not reach the relay. Try another one.</source>
         <translation>Nepavyko pasiekti retransliatoriaus. Pabandyk kitą.</translation>
+    </message>
+    <message>
+        <source>No relay answered within %1 seconds.</source>
+        <translation>Nė vienas retransliatorius neatsakė per %1 sek.</translation>
+    </message>
+    <message>
+        <source>Connecting…</source>
+        <translation>Jungiamasi…</translation>
     </message>
 </context>
 <context>

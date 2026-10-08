@@ -12,6 +12,12 @@ import Nemo.DBus 2.0
  * `replacesId` reuses it. A second message in the same chat counts up on
  * the one notification rather than adding another.
  *
+ * What stands in the notification area follows the chat: a message edited
+ * there is the edited text on its notification, and one deleted is gone
+ * from it -- the notification comes down once nothing in the chat is
+ * unread, or says the message before once something still is. Updated in
+ * place, with no banner: nothing new arrived.
+ *
  * `ChatList` decides what counts as an arrival and never announces a muted
  * chat; this decides only whether the reader was there to see it, and how
  * much to say: the lock screen shows a notification to whoever is looking
@@ -165,6 +171,39 @@ Item {
             "method": "showChat",
             "arguments": [chatId]
         }]
+        note.publish()
+    }
+
+    /// Bring a notification standing for this chat in line with it: a
+    /// message there was edited or deleted. `unread` is how many are
+    /// unread there now; none, and the notification comes down. Nothing
+    /// is raised for a chat with no notification up, and nothing changes
+    /// on one that already says this.
+    function restated(chatId, chatName, sender, preview, unread) {
+        var note = notifier.notes[chatId]
+        var shown = notifier.counts[chatId] || 0
+        if (!note || shown === 0) {
+            return
+        }
+        if (unread === 0) {
+            notifier.clear(chatId)
+            return
+        }
+        var count = Math.min(shown, unread)
+        var says = notifier.wording(chatName, sender, preview, count)
+        if (says.summary === note.summary && says.body === note.body
+                && count === shown) {
+            return
+        }
+        notifier.names[chatId] = chatName
+        notifier.counts[chatId] = count
+        note.summary = says.summary
+        note.body = says.body
+        // No banner: the preview pair is what pops up over the top, and
+        // nothing arrived.
+        note.previewSummary = ""
+        note.previewBody = ""
+        note.itemCount = count
         note.publish()
     }
 

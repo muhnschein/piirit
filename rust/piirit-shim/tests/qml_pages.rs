@@ -335,8 +335,9 @@ fn onboarding_pages_drive_the_core_and_navigate() {
         common::record(&s, "start-create", call!("click", "createProfileTile"));
     });
 
-    // The dialog: nothing to accept until there is a name and a relay,
-    // and no relay until one is picked or typed.
+    // The dialog: nothing to accept until there is a name, the relays
+    // left to the core, and the choice of one shut away under
+    // "Advanced" until it is opened.
     let s = steps.clone();
     single_shot(Duration::from_secs(4), move || {
         common::record(
@@ -351,9 +352,36 @@ fn onboarding_pages_drive_the_core_and_navigate() {
             call!("get", "relayCombo", "currentIndex"),
         );
         common::record(&s, "dialog-provider", call!("pageProperty", "providerQr"));
+        common::record(&s, "dialog-automatic", call!("pageProperty", "automatic"));
+        common::record(
+            &s,
+            "dialog-shut",
+            call!("get", "advancedSection", "visible"),
+        );
+        common::record(
+            &s,
+            "dialog-shut-summary",
+            call!("get", "advancedSummary", "visible"),
+        );
         common::record(&s, "dialog-name", call!("setText", "nameField", " Ada "));
         common::record(&s, "dialog-named", call!("pageProperty", "canAccept"));
-        common::record(&s, "dialog-pick", call!("pick", "relayCombo", "1"));
+        common::record(&s, "dialog-open", call!("click", "advancedToggle"));
+        common::record(
+            &s,
+            "dialog-opened",
+            call!("get", "advancedSection", "visible"),
+        );
+        common::record(
+            &s,
+            "dialog-why-several",
+            call!("get", "relayCombo", "description"),
+        );
+        common::record(&s, "dialog-pick", call!("pick", "relayCombo", "3"));
+        common::record(
+            &s,
+            "dialog-picked-automatic",
+            call!("pageProperty", "automatic"),
+        );
         common::record(&s, "dialog-picked", call!("pageProperty", "providerQr"));
         common::record(
             &s,
@@ -362,12 +390,56 @@ fn onboarding_pages_drive_the_core_and_navigate() {
         );
         common::record(
             &s,
+            "dialog-only-this",
+            call!("get", "relayCombo", "description"),
+        );
+        common::record(
+            &s,
+            "dialog-picked-field",
+            call!("get", "customField", "visible"),
+        );
+        common::record(&s, "dialog-close", call!("click", "advancedToggle"));
+        common::record(
+            &s,
+            "dialog-closed",
+            call!("get", "advancedSection", "visible"),
+        );
+        common::record(
+            &s,
+            "dialog-closed-summary",
+            call!("get", "advancedSummary", "visible"),
+        );
+        common::record(
+            &s,
+            "dialog-closed-says",
+            call!("get", "advancedSummary", "text"),
+        );
+        common::record(
+            &s,
+            "dialog-closed-provider",
+            call!("pageProperty", "providerQr"),
+        );
+        common::record(&s, "dialog-reopen", call!("click", "advancedToggle"));
+        common::record(&s, "dialog-other", call!("pick", "relayCombo", "1"));
+        common::record(
+            &s,
+            "dialog-other-field",
+            call!("get", "customField", "visible"),
+        );
+        common::record(&s, "dialog-other-empty", call!("pageProperty", "canAccept"));
+        common::record(
+            &s,
             "dialog-custom",
             call!("setText", "customField", " chat.example.org "),
         );
         common::record(&s, "dialog-typed", call!("pageProperty", "providerQr"));
-        common::record(&s, "dialog-list-off", call!("get", "relayCombo", "enabled"));
-        common::record(&s, "dialog-uncustom", call!("setText", "customField", ""));
+        common::record(
+            &s,
+            "dialog-typed-accept",
+            call!("pageProperty", "canAccept"),
+        );
+        common::record(&s, "dialog-repick", call!("pick", "relayCombo", "2"));
+        common::record(&s, "dialog-repicked", call!("pageProperty", "providerQr"));
         common::record(&s, "dialog-unpick", call!("pick", "relayCombo", "0"));
         common::record(&s, "dialog-accept", call!("accept"));
         common::record(&s, "dialog-handed", call!("handed"));
@@ -473,15 +545,20 @@ fn assert_welcome_and_navigation(
     );
 }
 
-/// The dialog: no accepting without a name and a relay, nothing picked
-/// until the reader picks it, and what was chosen is what the setup page
-/// is handed.
+/// The dialog: no accepting without a name, the relays the core's until
+/// the reader opens "Advanced" and picks or types one, a choice made
+/// there still shown once it is shut, and what was chosen is what the
+/// setup page is handed.
 fn assert_dialog(steps: &[(String, String)], context: &str) {
     for step in [
         "dialog-name",
+        "dialog-open",
         "dialog-pick",
+        "dialog-close",
+        "dialog-reopen",
+        "dialog-other",
         "dialog-custom",
-        "dialog-uncustom",
+        "dialog-repick",
         "dialog-unpick",
         "dialog-accept",
     ] {
@@ -491,53 +568,126 @@ fn assert_dialog(steps: &[(String, String)], context: &str) {
             "{step} failed. {context}"
         );
     }
-    assert_eq!(
-        common::value_of(steps, "dialog-empty"),
+    let expect = |step: &str, want: &str, why: &str| {
+        assert_eq!(common::value_of(steps, step), want, "{why}. {context}");
+    };
+    expect(
+        "dialog-empty",
         "false",
-        "the dialog can be accepted without a name. {context}"
+        "the dialog can be accepted without a name",
     );
-    // Nothing picked on arrival: the relay is the reader's choice, not
-    // the dialog's.
-    assert_eq!(
-        common::value_of(steps, "dialog-index"),
-        "-1",
-        "the dialog opened on a relay of its own choosing. {context}"
-    );
-    assert_eq!(
-        common::value_of(steps, "dialog-provider"),
+    // "Automatic" on arrival: the core picks, and keeps the profile on
+    // several relays. No relay of the dialog's own choosing is handed
+    // over, and none is put in front of the reader.
+    expect("dialog-index", "0", "the dialog did not open on Automatic");
+    expect(
+        "dialog-provider",
         "",
-        "the dialog had a relay to hand over before one was chosen. {context}"
+        "the dialog had a relay of its own to hand over",
     );
-    assert_eq!(
-        common::value_of(steps, "dialog-named"),
-        "false",
-        "a name alone makes the dialog acceptable, so a profile can be \
-         made on no relay in particular. {context}"
-    );
-    assert_eq!(
-        common::value_of(steps, "dialog-named-picked"),
+    expect(
+        "dialog-automatic",
         "true",
-        "a name and a picked relay do not make the dialog acceptable. {context}"
+        "the dialog does not say the core picks the relays",
     );
-    assert_eq!(
-        common::value_of(steps, "dialog-picked"),
-        "dcaccount:mehl.cloud",
-        "picking the second relay did not change the payload. {context}"
-    );
-    assert_eq!(
-        common::value_of(steps, "dialog-typed"),
-        "dcaccount:chat.example.org",
-        "a typed server does not take over from the list, trimmed. {context}"
-    );
-    assert_eq!(
-        common::value_of(steps, "dialog-list-off"),
+    expect(
+        "dialog-shut",
         "false",
-        "the list is still offered while a server is typed. {context}"
+        "the choice of relay is in front of the reader on arrival",
     );
-    assert_eq!(
-        common::value_of(steps, "dialog-handed"),
-        "Ada,dcaccount:nine.testrun.org",
-        "the setup page was not handed the trimmed name and the relay. {context}"
+    expect(
+        "dialog-shut-summary",
+        "false",
+        "a relay is named while the core picks them",
+    );
+    expect(
+        "dialog-named",
+        "true",
+        "a name alone does not make a profile on the core's relays",
+    );
+    assert_dialog_relays(steps, context);
+}
+
+/// Inside "Advanced": the list, Other relay and its field, what each
+/// says under it, and a choice that outlasts the section being shut.
+fn assert_dialog_relays(steps: &[(String, String)], context: &str) {
+    let expect = |step: &str, want: &str, why: &str| {
+        assert_eq!(common::value_of(steps, step), want, "{why}. {context}");
+    };
+    expect("dialog-opened", "true", "Advanced did not open");
+    assert!(
+        common::value_of(steps, "dialog-why-several").contains("more than one"),
+        "nothing says why several relays. {context}"
+    );
+    expect(
+        "dialog-picked-automatic",
+        "false",
+        "a picked relay still reads as the core's choice",
+    );
+    expect(
+        "dialog-picked",
+        "dcaccount:mehl.cloud",
+        "the list's second relay is not the menu's fourth entry",
+    );
+    expect(
+        "dialog-named-picked",
+        "true",
+        "a name and a picked relay do not make the dialog acceptable",
+    );
+    assert!(
+        common::value_of(steps, "dialog-only-this").starts_with("Only this relay"),
+        "nothing says a picked relay is the only one. {context}"
+    );
+    expect(
+        "dialog-picked-field",
+        "false",
+        "the address field shows for a relay off the list",
+    );
+    expect("dialog-closed", "false", "Advanced did not shut");
+    expect(
+        "dialog-closed-summary",
+        "true",
+        "a shut Advanced hides the relay it holds",
+    );
+    expect(
+        "dialog-closed-says",
+        "Relay: mehl.cloud",
+        "a shut Advanced names the wrong relay",
+    );
+    expect(
+        "dialog-closed-provider",
+        "dcaccount:mehl.cloud",
+        "shutting Advanced dropped the relay chosen in it",
+    );
+    expect(
+        "dialog-other-field",
+        "true",
+        "Other relay did not bring up the address field",
+    );
+    expect(
+        "dialog-other-empty",
+        "false",
+        "Other relay with nothing typed can be accepted",
+    );
+    expect(
+        "dialog-typed",
+        "dcaccount:chat.example.org",
+        "a typed relay is not the one handed over, trimmed",
+    );
+    expect(
+        "dialog-typed-accept",
+        "true",
+        "a typed relay does not make the dialog acceptable",
+    );
+    expect(
+        "dialog-repicked",
+        "dcaccount:nine.testrun.org",
+        "the list's first relay is not the menu's third entry",
+    );
+    expect(
+        "dialog-handed",
+        "Ada,",
+        "the setup page was not handed the trimmed name and no relay",
     );
 }
 

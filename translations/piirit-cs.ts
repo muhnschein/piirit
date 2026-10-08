@@ -39,20 +39,48 @@
         <translation>Vaše jméno</translation>
     </message>
     <message>
-        <source>Select a public chatmail relay</source>
-        <translation>Vybrat veřejný chatmail relay</translation>
-    </message>
-    <message>
-        <source>Use a custom chatmail relay</source>
-        <translation>Použít vlastní chatmail relay</translation>
-    </message>
-    <message>
         <source>Piirit works only with chatmail relays. These are a particular kind of e-mail server; ordinary e-mail servers are not supported. For more, see &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. A full list of public, free-to-use chatmail relays is at &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</source>
         <translation>Piirit funguje jen s chatmail relay. Je to zvláštní druh e-mailového serveru; běžné e-mailové servery nejsou podporovány. Víc na &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. Úplný seznam veřejných chatmail relay zdarma je na &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
     </message>
     <message>
-        <source>Choose a name and a relay. Nothing else is needed.</source>
-        <translation>Zvol název a relay. Nic dalšího není potřeba.</translation>
+        <source>Automatic</source>
+        <translation>Automaticky</translation>
+    </message>
+    <message>
+        <source>Relays are used for sending and receiving messages. Having more than one keeps your connection reliable.</source>
+        <translation>Relay se používají k odesílání a přijímání zpráv. Více než jeden relay udržuje vaše připojení spolehlivé.</translation>
+    </message>
+    <message>
+        <source>Choose a name. Nothing else is needed.</source>
+        <translation>Zvolte si jméno. Nic dalšího není potřeba.</translation>
+    </message>
+    <message>
+        <source>Advanced</source>
+        <extracomment>The section of the add-profile dialog that holds the choice of relay, shut until it is opened.</extracomment>
+        <translation>Pokročilé</translation>
+    </message>
+    <message>
+        <source>Relay: %1</source>
+        <extracomment>Under &quot;Advanced&quot; in the add-profile dialog: the one relay the profile will be made on.</extracomment>
+        <translation>Relay: %1</translation>
+    </message>
+    <message>
+        <source>Relay</source>
+        <extracomment>The relays the profile is made on: the core&apos;s (&quot;Automatic&quot;), one from the list, or another.</extracomment>
+        <translation>Relay</translation>
+    </message>
+    <message>
+        <source>Only this relay. More can be added later on the profile page.</source>
+        <translation>Pouze tento relay. Další lze přidat později na stránce profilu.</translation>
+    </message>
+    <message>
+        <source>Other relay</source>
+        <extracomment>A relay that is not on the list, typed in.</extracomment>
+        <translation>Jiný relay</translation>
+    </message>
+    <message>
+        <source>Relay address</source>
+        <translation>Adresa relaye</translation>
     </message>
 </context>
 <context>
@@ -115,6 +143,11 @@
     <message>
         <source>Adds another address for this profile on a second relay.</source>
         <translation>Přidá tomuto profilu další adresu na druhém relay.</translation>
+    </message>
+    <message>
+        <source>Add this relay?</source>
+        <extracomment>Delta Chat&apos;s question, over a relay read off a scanned code.</extracomment>
+        <translation>Přidat tento relay?</translation>
     </message>
 </context>
 <context>
@@ -622,6 +655,11 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
     <message>
         <source>Leave blank to use the name they chose</source>
         <translation>Ponechte prázdné, aby se použilo jméno, které si zvolili</translation>
+    </message>
+    <message>
+        <source>Seen a long time ago</source>
+        <extracomment>Under a contact&apos;s name: the core has not seen them for a long time, or never.</extracomment>
+        <translation>Naposledy viděn(a) před dlouhou dobou</translation>
     </message>
 </context>
 <context>
@@ -1292,6 +1330,14 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
     <message>
         <source>Could not reach the relay. Try another one.</source>
         <translation>Relay se nepodařilo kontaktovat. Zkus jiný.</translation>
+    </message>
+    <message>
+        <source>No relay answered within %1 seconds.</source>
+        <translation>Žádný relay neodpověděl do %1 sekund.</translation>
+    </message>
+    <message>
+        <source>Connecting…</source>
+        <translation>Připojování…</translation>
     </message>
 </context>
 <context>

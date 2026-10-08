@@ -39,20 +39,48 @@
         <translation>Sinu nimi</translation>
     </message>
     <message>
-        <source>Select a public chatmail relay</source>
-        <translation>Vali avalik chatmail-relee</translation>
-    </message>
-    <message>
-        <source>Use a custom chatmail relay</source>
-        <translation>Kasuta oma chatmail-releed</translation>
-    </message>
-    <message>
         <source>Piirit works only with chatmail relays. These are a particular kind of e-mail server; ordinary e-mail servers are not supported. For more, see &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. A full list of public, free-to-use chatmail relays is at &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</source>
         <translation>Piirit töötab ainult chatmail-releedega. Need on eriliik e-posti servereid; tavalisi e-posti servereid ei toetata. Lähemalt &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. Avalike, tasuta chatmail-releede täielik loend on aadressil &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
     </message>
     <message>
-        <source>Choose a name and a relay. Nothing else is needed.</source>
-        <translation>Vali nimi ja relee. Rohkemat pole vaja.</translation>
+        <source>Automatic</source>
+        <translation>Automaatne</translation>
+    </message>
+    <message>
+        <source>Relays are used for sending and receiving messages. Having more than one keeps your connection reliable.</source>
+        <translation>Releed on mõeldud sõnumite saatmiseks ja vastuvõtmiseks. Kui neid on rohkem kui üks, püsib sinu ühendus töökindel.</translation>
+    </message>
+    <message>
+        <source>Choose a name. Nothing else is needed.</source>
+        <translation>Vali nimi. Rohkem pole vaja.</translation>
+    </message>
+    <message>
+        <source>Advanced</source>
+        <extracomment>The section of the add-profile dialog that holds the choice of relay, shut until it is opened.</extracomment>
+        <translation>Täpsemad</translation>
+    </message>
+    <message>
+        <source>Relay: %1</source>
+        <extracomment>Under &quot;Advanced&quot; in the add-profile dialog: the one relay the profile will be made on.</extracomment>
+        <translation>Relee: %1</translation>
+    </message>
+    <message>
+        <source>Relay</source>
+        <extracomment>The relays the profile is made on: the core&apos;s (&quot;Automatic&quot;), one from the list, or another.</extracomment>
+        <translation>Relee</translation>
+    </message>
+    <message>
+        <source>Only this relay. More can be added later on the profile page.</source>
+        <translation>Ainult see relee. Rohkem saab hiljem profiili lehel lisada.</translation>
+    </message>
+    <message>
+        <source>Other relay</source>
+        <extracomment>A relay that is not on the list, typed in.</extracomment>
+        <translation>Muu relee</translation>
+    </message>
+    <message>
+        <source>Relay address</source>
+        <translation>Relee aadress</translation>
     </message>
 </context>
 <context>
@@ -115,6 +143,11 @@
     <message>
         <source>Adds another address for this profile on a second relay.</source>
         <translation>Lisab sellele profiilile veel ühe aadressi teisel releel.</translation>
+    </message>
+    <message>
+        <source>Add this relay?</source>
+        <extracomment>Delta Chat&apos;s question, over a relay read off a scanned code.</extracomment>
+        <translation>Kas lisad selle relee?</translation>
     </message>
 </context>
 <context>
@@ -620,6 +653,11 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
     <message>
         <source>Leave blank to use the name they chose</source>
         <translation>Jäta tühjaks, et kasutada tema enda valitud nime</translation>
+    </message>
+    <message>
+        <source>Seen a long time ago</source>
+        <extracomment>Under a contact&apos;s name: the core has not seen them for a long time, or never.</extracomment>
+        <translation>Nähtud ammu</translation>
     </message>
 </context>
 <context>
@@ -1285,6 +1323,14 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
     <message>
         <source>Could not reach the relay. Try another one.</source>
         <translation>Releega ei õnnestunud ühendust saada. Proovi teist.</translation>
+    </message>
+    <message>
+        <source>No relay answered within %1 seconds.</source>
+        <translation>Ükski relee ei vastanud %1 sekundi jooksul.</translation>
+    </message>
+    <message>
+        <source>Connecting…</source>
+        <translation>Ühendan…</translation>
     </message>
 </context>
 <context>

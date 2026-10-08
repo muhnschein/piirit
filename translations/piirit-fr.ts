@@ -39,20 +39,48 @@
         <translation>Votre nom</translation>
     </message>
     <message>
-        <source>Select a public chatmail relay</source>
-        <translation>Sélectionner un relais chatmail public</translation>
-    </message>
-    <message>
-        <source>Use a custom chatmail relay</source>
-        <translation>Utiliser un relais chatmail personnalisé</translation>
-    </message>
-    <message>
         <source>Piirit works only with chatmail relays. These are a particular kind of e-mail server; ordinary e-mail servers are not supported. For more, see &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. A full list of public, free-to-use chatmail relays is at &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</source>
         <translation>Piirit ne fonctionne qu&apos;avec des relais chatmail. Il s&apos;agit d&apos;un type particulier de serveur de courrier ; les serveurs de courrier ordinaires ne sont pas pris en charge. Pour en savoir plus, voir &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. La liste complète des relais chatmail publics et gratuits se trouve sur &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
     </message>
     <message>
-        <source>Choose a name and a relay. Nothing else is needed.</source>
-        <translation>Choisissez un nom et un relais. Rien d&apos;autre n&apos;est nécessaire.</translation>
+        <source>Automatic</source>
+        <translation>Automatique</translation>
+    </message>
+    <message>
+        <source>Relays are used for sending and receiving messages. Having more than one keeps your connection reliable.</source>
+        <translation>Les relais servent à envoyer et à recevoir des messages. En avoir plusieurs rend votre connexion plus fiable.</translation>
+    </message>
+    <message>
+        <source>Choose a name. Nothing else is needed.</source>
+        <translation>Choisissez un nom. Rien d&apos;autre n&apos;est nécessaire.</translation>
+    </message>
+    <message>
+        <source>Advanced</source>
+        <extracomment>The section of the add-profile dialog that holds the choice of relay, shut until it is opened.</extracomment>
+        <translation>Avancé</translation>
+    </message>
+    <message>
+        <source>Relay: %1</source>
+        <extracomment>Under &quot;Advanced&quot; in the add-profile dialog: the one relay the profile will be made on.</extracomment>
+        <translation>Relais&#xa0;: %1</translation>
+    </message>
+    <message>
+        <source>Relay</source>
+        <extracomment>The relays the profile is made on: the core&apos;s (&quot;Automatic&quot;), one from the list, or another.</extracomment>
+        <translation>Relais</translation>
+    </message>
+    <message>
+        <source>Only this relay. More can be added later on the profile page.</source>
+        <translation>Uniquement ce relais. D&apos;autres peuvent être ajoutés plus tard sur la page du profil.</translation>
+    </message>
+    <message>
+        <source>Other relay</source>
+        <extracomment>A relay that is not on the list, typed in.</extracomment>
+        <translation>Autre relais</translation>
+    </message>
+    <message>
+        <source>Relay address</source>
+        <translation>Adresse du relais</translation>
     </message>
 </context>
 <context>
@@ -115,6 +143,11 @@
     <message>
         <source>Adds another address for this profile on a second relay.</source>
         <translation>Ajoute à ce profil une autre adresse sur un second relais.</translation>
+    </message>
+    <message>
+        <source>Add this relay?</source>
+        <extracomment>Delta Chat&apos;s question, over a relay read off a scanned code.</extracomment>
+        <translation>Ajouter le relais&#xa0;?</translation>
     </message>
 </context>
 <context>
@@ -620,6 +653,11 @@ Vous continuerez à voir les messages des contacts bloqués dans les autres grou
     <message>
         <source>Leave blank to use the name they chose</source>
         <translation>Laissez vide pour utiliser le nom qu&apos;il ou elle a choisi</translation>
+    </message>
+    <message>
+        <source>Seen a long time ago</source>
+        <extracomment>Under a contact&apos;s name: the core has not seen them for a long time, or never.</extracomment>
+        <translation>Vu il y a longtemps</translation>
     </message>
 </context>
 <context>
@@ -1285,6 +1323,14 @@ Vous continuerez à voir les messages des contacts bloqués dans les autres grou
     <message>
         <source>Could not reach the relay. Try another one.</source>
         <translation>Impossible de joindre le relais. Essayez-en un autre.</translation>
+    </message>
+    <message>
+        <source>No relay answered within %1 seconds.</source>
+        <translation>Aucun relais n’a répondu en %1 secondes.</translation>
+    </message>
+    <message>
+        <source>Connecting…</source>
+        <translation>Connexion…</translation>
     </message>
 </context>
 <context>

@@ -60,9 +60,15 @@ use crate::runtime::CoreRuntime;
 /// still looking at the page.
 pub const DEADLINE: Duration = Duration::from_secs(30);
 
-/// What a profile is reached through: a chatmail relay's `dcaccount:`
-/// payload, or a mailbox of the reader's own.
+/// What a profile is reached through: relays the core picks, a chatmail
+/// relay's `dcaccount:` payload, or a mailbox of the reader's own.
 pub(crate) enum Transport {
+    /// `init_transports`: the core makes the profile on whichever of its
+    /// relays answers first, and since 2.61 adds more in the background
+    /// once it is up -- the only way in that does. A relay the reader
+    /// names is that one relay and no other: the core turns its own
+    /// additions on for this call alone.
+    Automatic,
     /// `add_transport_from_qr`: the relay mints the address.
     Qr(String),
     /// `add_or_update_transport` with the two fields of an
@@ -396,6 +402,10 @@ async fn transport_call(
     made: Made,
 ) -> Result<(), String> {
     let result = match transport {
+        Transport::Automatic => {
+            rpc.call::<_, ()>("init_transports", (account_id, Option::<String>::None))
+                .await
+        }
         Transport::Qr(qr) => {
             rpc.call::<_, ()>("add_transport_from_qr", (account_id, qr))
                 .await

@@ -39,20 +39,48 @@
         <translation>Tên của bạn</translation>
     </message>
     <message>
-        <source>Select a public chatmail relay</source>
-        <translation>Chọn máy chuyển tiếp chatmail công cộng</translation>
-    </message>
-    <message>
-        <source>Use a custom chatmail relay</source>
-        <translation>Dùng máy chuyển tiếp chatmail riêng</translation>
-    </message>
-    <message>
         <source>Piirit works only with chatmail relays. These are a particular kind of e-mail server; ordinary e-mail servers are not supported. For more, see &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. A full list of public, free-to-use chatmail relays is at &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</source>
         <translation>Piirit chỉ hoạt động với các máy chuyển tiếp chatmail. Đây là một loại máy chủ e-mail đặc biệt; máy chủ e-mail thông thường không được hỗ trợ. Xem thêm tại &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. Danh sách đầy đủ các máy chuyển tiếp chatmail công cộng, miễn phí có tại &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
     </message>
     <message>
-        <source>Choose a name and a relay. Nothing else is needed.</source>
-        <translation>Chọn một tên và một máy chuyển tiếp. Không cần gì thêm.</translation>
+        <source>Automatic</source>
+        <translation>Tự động</translation>
+    </message>
+    <message>
+        <source>Relays are used for sending and receiving messages. Having more than one keeps your connection reliable.</source>
+        <translation>Máy chuyển tiếp được dùng để gửi và nhận tin nhắn. Có nhiều hơn một máy chuyển tiếp giúp kết nối của bạn ổn định.</translation>
+    </message>
+    <message>
+        <source>Choose a name. Nothing else is needed.</source>
+        <translation>Hãy chọn một tên. Không cần gì thêm.</translation>
+    </message>
+    <message>
+        <source>Advanced</source>
+        <extracomment>The section of the add-profile dialog that holds the choice of relay, shut until it is opened.</extracomment>
+        <translation>Nâng cao</translation>
+    </message>
+    <message>
+        <source>Relay: %1</source>
+        <extracomment>Under &quot;Advanced&quot; in the add-profile dialog: the one relay the profile will be made on.</extracomment>
+        <translation>Máy chuyển tiếp: %1</translation>
+    </message>
+    <message>
+        <source>Relay</source>
+        <extracomment>The relays the profile is made on: the core&apos;s (&quot;Automatic&quot;), one from the list, or another.</extracomment>
+        <translation>Máy chuyển tiếp</translation>
+    </message>
+    <message>
+        <source>Only this relay. More can be added later on the profile page.</source>
+        <translation>Chỉ máy chuyển tiếp này. Có thể thêm máy khác sau trong trang hồ sơ.</translation>
+    </message>
+    <message>
+        <source>Other relay</source>
+        <extracomment>A relay that is not on the list, typed in.</extracomment>
+        <translation>Máy chuyển tiếp khác</translation>
+    </message>
+    <message>
+        <source>Relay address</source>
+        <translation>Địa chỉ máy chuyển tiếp</translation>
     </message>
 </context>
 <context>
@@ -115,6 +143,11 @@
     <message>
         <source>Adds another address for this profile on a second relay.</source>
         <translation>Thêm cho hồ sơ này một địa chỉ nữa trên một máy chuyển tiếp khác.</translation>
+    </message>
+    <message>
+        <source>Add this relay?</source>
+        <extracomment>Delta Chat&apos;s question, over a relay read off a scanned code.</extracomment>
+        <translation>Thêm máy chuyển tiếp này?</translation>
     </message>
 </context>
 <context>
@@ -614,6 +647,11 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Leave blank to use the name they chose</source>
         <translation>Để trống để dùng tên họ tự chọn</translation>
+    </message>
+    <message>
+        <source>Seen a long time ago</source>
+        <extracomment>Under a contact&apos;s name: the core has not seen them for a long time, or never.</extracomment>
+        <translation>Đã thấy cách đây rất lâu</translation>
     </message>
 </context>
 <context>
@@ -1274,6 +1312,14 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Could not reach the relay. Try another one.</source>
         <translation>Không liên hệ được với máy chuyển tiếp. Hãy thử máy khác.</translation>
+    </message>
+    <message>
+        <source>No relay answered within %1 seconds.</source>
+        <translation>Không có máy chuyển tiếp nào trả lời trong %1 giây.</translation>
+    </message>
+    <message>
+        <source>Connecting…</source>
+        <translation>Đang kết nối…</translation>
     </message>
 </context>
 <context>

@@ -30,12 +30,14 @@ const PROBE_QML: &str = r"
         property string opened: ''
         property string errors: ''
         property string myInvite: ''
+        property string relays: ''
         property bool started: false
         ContactList {
             id: contacts
             account_id: 1
             onChat_ready: opened = opened + chat_id + ','
             onError: errors = errors + message + ';'
+            onRelay_offered: relays = relays + relay + '=' + qr_content + ';'
             // Drive the scenario off the data arriving rather than off a
             // clock: under load the core takes longer to come up, and a
             // fixed tick then reads an empty list.
@@ -47,6 +49,8 @@ const PROBE_QML: &str = r"
                     contacts.join_by_invite('https://i.delta.chat/#ABC&a=them%40example.org')
                     contacts.join_by_invite('just some text')
                     contacts.join_by_invite('OPENPGP4FPR:0123456789ABCDEF0123456789ABCDEF01234567')
+                    contacts.join_by_invite('DCACCOUNT:https://chat.example.org/new')
+                    contacts.join_by_invite('dclogin:ada@mail.example.org?p=secret&v=1')
                     contacts.fetch_invite()
                 }
             }
@@ -72,7 +76,7 @@ const PROBE_QML: &str = r"
             return out
         }
         function firstId() { return rows.count > 0 ? rows.itemAt(0).cid : 0 }
-        function report() { return opened + '#' + errors + '#' + myInvite }
+        function report() { return opened + '#' + errors + '#' + relays + '#' + myInvite }
     }
 ";
 
@@ -139,9 +143,11 @@ fn assert_routes(calls: &[(String, Value)], listed: &str, report: &str) {
         "the contact list did not load. Calls were: {names:?}"
     );
 
-    let mut parts = report.splitn(3, '#');
+    let mut parts = report.splitn(4, '#');
     let opened = parts.next().unwrap_or_default();
     let errors = parts.next().unwrap_or_default();
+    // Last: the invite has a `#` of its own.
+    let relays = parts.next().unwrap_or_default();
     let invite = parts.next().unwrap_or_default();
     assert_eq!(
         opened.split(',').filter(|part| !part.is_empty()).count(),
@@ -173,6 +179,24 @@ fn assert_routes(calls: &[(String, Value)], listed: &str, report: &str) {
             .iter()
             .all(|refusal| refusal.starts_with("that link is not a contact or group invite")),
         "a refusal did not say that what was pasted is not an invite, got {refusals:?}"
+    );
+    // A relay's code is neither an invite nor refused as one: it is
+    // offered back, with the relay it names, as one to add to this
+    // profile. Nothing is added until the reader says so. The two are
+    // asked about at once, so they answer in either order.
+    let mut offered: Vec<&str> = relays.split(';').filter(|part| !part.is_empty()).collect();
+    offered.sort_unstable();
+    assert_eq!(
+        offered,
+        vec![
+            "ada@mail.example.org=dclogin:ada@mail.example.org?p=secret&v=1",
+            "chat.example.org=DCACCOUNT:https://chat.example.org/new",
+        ],
+        "a relay's code was not offered as a relay to add: {names:?}"
+    );
+    assert!(
+        !names.contains(&"add_transport_from_qr"),
+        "a scanned relay was added before the reader was asked: {names:?}"
     );
     assert!(
         invite.starts_with("https://i.delta.chat/"),

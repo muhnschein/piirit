@@ -39,20 +39,48 @@
         <translation>Vaše ime</translation>
     </message>
     <message>
-        <source>Select a public chatmail relay</source>
-        <translation>Izberi javnega posrednika chatmail</translation>
-    </message>
-    <message>
-        <source>Use a custom chatmail relay</source>
-        <translation>Uporabi lastnega posrednika chatmail</translation>
-    </message>
-    <message>
         <source>Piirit works only with chatmail relays. These are a particular kind of e-mail server; ordinary e-mail servers are not supported. For more, see &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. A full list of public, free-to-use chatmail relays is at &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</source>
         <translation>Piirit deluje samo s posredniki chatmail. To je posebna vrsta e-poštnih strežnikov; navadni e-poštni strežniki niso podprti. Več na &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. Celoten seznam javnih, brezplačnih posrednikov chatmail je na &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
     </message>
     <message>
-        <source>Choose a name and a relay. Nothing else is needed.</source>
-        <translation>Izberi ime in posrednika. Nič drugega ni potrebno.</translation>
+        <source>Automatic</source>
+        <translation>Samodejno</translation>
+    </message>
+    <message>
+        <source>Relays are used for sending and receiving messages. Having more than one keeps your connection reliable.</source>
+        <translation>Posredniki se uporabljajo za pošiljanje in prejemanje sporočil. Več kot en posrednik zagotavlja zanesljivo povezavo.</translation>
+    </message>
+    <message>
+        <source>Choose a name. Nothing else is needed.</source>
+        <translation>Izberi ime. Nič drugega ni potrebno.</translation>
+    </message>
+    <message>
+        <source>Advanced</source>
+        <extracomment>The section of the add-profile dialog that holds the choice of relay, shut until it is opened.</extracomment>
+        <translation>Napredno</translation>
+    </message>
+    <message>
+        <source>Relay: %1</source>
+        <extracomment>Under &quot;Advanced&quot; in the add-profile dialog: the one relay the profile will be made on.</extracomment>
+        <translation>Posrednik: %1</translation>
+    </message>
+    <message>
+        <source>Relay</source>
+        <extracomment>The relays the profile is made on: the core&apos;s (&quot;Automatic&quot;), one from the list, or another.</extracomment>
+        <translation>Posrednik</translation>
+    </message>
+    <message>
+        <source>Only this relay. More can be added later on the profile page.</source>
+        <translation>Samo ta posrednik. Več jih je mogoče dodati pozneje na strani profila.</translation>
+    </message>
+    <message>
+        <source>Other relay</source>
+        <extracomment>A relay that is not on the list, typed in.</extracomment>
+        <translation>Drug posrednik</translation>
+    </message>
+    <message>
+        <source>Relay address</source>
+        <translation>Naslov posrednika</translation>
     </message>
 </context>
 <context>
@@ -115,6 +143,11 @@
     <message>
         <source>Adds another address for this profile on a second relay.</source>
         <translation>Temu profilu doda še en naslov pri drugem posredniku.</translation>
+    </message>
+    <message>
+        <source>Add this relay?</source>
+        <extracomment>Delta Chat&apos;s question, over a relay read off a scanned code.</extracomment>
+        <translation>Želite dodati tega posrednika?</translation>
     </message>
 </context>
 <context>
@@ -624,6 +657,11 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
     <message>
         <source>Leave blank to use the name they chose</source>
         <translation>Pustite prazno, da se uporabi ime, ki so ga izbrali sami</translation>
+    </message>
+    <message>
+        <source>Seen a long time ago</source>
+        <extracomment>Under a contact&apos;s name: the core has not seen them for a long time, or never.</extracomment>
+        <translation>Nazadnje viden(a) pred dolgim časom</translation>
     </message>
 </context>
 <context>
@@ -1299,6 +1337,14 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
     <message>
         <source>Could not reach the relay. Try another one.</source>
         <translation>Posrednika ni bilo mogoče doseči. Poskusi drugega.</translation>
+    </message>
+    <message>
+        <source>No relay answered within %1 seconds.</source>
+        <translation>Noben posrednik ni odgovoril v %1 sekundah.</translation>
+    </message>
+    <message>
+        <source>Connecting…</source>
+        <translation>Povezovanje…</translation>
     </message>
 </context>
 <context>

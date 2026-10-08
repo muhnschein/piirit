@@ -173,6 +173,8 @@ fn the_contact_page_names_the_contact_and_no_address() {
         record!("initial", get!("avatarInitial", "text"));
         record!("status", get!("statusLabel", "text"));
         record!("status-shown", get!("statusLabel", "visible"));
+        record!("seen", get!("seenLabel", "text"));
+        record!("seen-shown", get!("seenLabel", "visible"));
         record!("encryption", get!("encryptionLabel", "text"));
         record!("timer", get!("disappearingCombo", "currentIndex"));
         record!("texts", call!("texts"));
@@ -358,6 +360,12 @@ fn assert_page(steps: &[(&str, String)]) {
     assert!(
         !value("texts").contains('@'),
         "an email address is drawn on the contact page. {context}"
+    );
+    // Ada has never been seen (`lastSeen` 0), which the core calls "Old".
+    assert_eq!(
+        (value("seen-shown").as_str(), value("seen").as_str()),
+        ("true", "Seen a long time ago"),
+        "a contact the core has not seen for a long time is not said to be. {context}"
     );
     assert_eq!(
         value("timer"),

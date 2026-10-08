@@ -24,6 +24,11 @@ import "../js/Relays.js" as Relays
  *
  * Done means gone: the relay is on the profile, and its row is on the
  * page under this one, which re-reads its relays as this page goes.
+ *
+ * A relay's code scanned on the QR page lands here too, with the relay
+ * already chosen (`scannedQr`): the list and the field give way to the
+ * relay the code names, under Delta Chat's own question, and nothing is
+ * added until the button under it is pressed.
  */
 Page {
     id: page
@@ -34,15 +39,27 @@ Page {
 
     property int accountId
 
-    /// The relay chosen: the custom one if typed, else the picked one.
-    property string domain: customField.text.trim().length > 0
+    /// A relay's code, `dcaccount:` or `dclogin:`, scanned rather than
+    /// picked: what the core is handed as it is. Empty when the reader
+    /// picks.
+    property string scannedQr: ""
+    /// The relay that code names, or the address on it, as the core
+    /// read it.
+    property string scannedRelay: ""
+    readonly property bool scanned: page.scannedQr.length > 0
+
+    /// The relay chosen: the scanned one, else the custom one if typed,
+    /// else the picked one.
+    property string domain: page.scanned ? page.scannedRelay
+                            : customField.text.trim().length > 0
                             ? customField.text.trim()
                             : (relayCombo.currentIndex >= 0 && relayCombo.currentIndex < relays.length
                                ? relays[relayCombo.currentIndex].domain : "")
     /// What the core is handed: `dcaccount:` and a relay, which it takes
     /// with or without the `https://.../new` around it. Empty until a
     /// relay is chosen.
-    property string providerQr: domain.length > 0 ? "dcaccount:" + domain : ""
+    property string providerQr: page.scanned ? page.scannedQr
+                                : (domain.length > 0 ? "dcaccount:" + domain : "")
 
     // The public relays, as chatmail.at/relays lists them (Relays.js).
     readonly property var relays: Relays.list
@@ -153,12 +170,30 @@ Page {
                 wrapMode: Text.Wrap
                 font.pixelSize: Theme.fontSizeSmall
                 color: Theme.secondaryHighlightColor
-                text: qsTr("Adds another address for this profile on a second relay.")
+                text: page.scanned
+                      //: Delta Chat's question, over a relay read off a scanned code.
+                      ? qsTr("Add this relay?")
+                      : qsTr("Adds another address for this profile on a second relay.")
+            }
+
+            // The relay the scanned code names, in place of the list.
+            Label {
+                objectName: "scannedRelay"
+                visible: page.scanned
+                x: Theme.horizontalPageMargin
+                width: parent.width - 2 * Theme.horizontalPageMargin
+                wrapMode: Text.WrapAnywhere
+                color: Theme.highlightColor
+                font.pixelSize: Theme.fontSizeLarge
+                // The code's own string, pinned to plain.
+                textFormat: Text.PlainText
+                text: page.scannedRelay
             }
 
             ComboBox {
                 id: relayCombo
                 objectName: "relayCombo"
+                visible: !page.scanned
                 width: parent.width
                 // Said as the action it is, as the add-profile dialog
                 // says it.
@@ -185,6 +220,7 @@ Page {
             TextField {
                 id: customField
                 objectName: "customField"
+                visible: !page.scanned
                 width: parent.width
                 label: qsTr("Use a custom chatmail relay")
                 placeholderText: label
@@ -194,6 +230,7 @@ Page {
 
             Label {
                 objectName: "relaysHint"
+                visible: !page.scanned
                 x: Theme.horizontalPageMargin
                 width: parent.width - 2 * Theme.horizontalPageMargin
                 wrapMode: Text.Wrap

@@ -39,20 +39,48 @@
         <translation>మీ పేరు</translation>
     </message>
     <message>
-        <source>Select a public chatmail relay</source>
-        <translation>పబ్లిక్ chatmail రిలేను ఎంచుకోండి</translation>
-    </message>
-    <message>
-        <source>Use a custom chatmail relay</source>
-        <translation>సొంత chatmail రిలేను వాడండి</translation>
-    </message>
-    <message>
         <source>Piirit works only with chatmail relays. These are a particular kind of e-mail server; ordinary e-mail servers are not supported. For more, see &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. A full list of public, free-to-use chatmail relays is at &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</source>
         <translation>Piirit chatmail రిలేలతో మాత్రమే పనిచేస్తుంది. ఇవి ఒక ప్రత్యేక రకమైన ఇ-మెయిల్ సర్వర్లు; సాధారణ ఇ-మెయిల్ సర్వర్లకు మద్దతు లేదు. మరింత సమాచారానికి &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt; చూడండి. పబ్లిక్, ఉచిత chatmail రిలేల పూర్తి జాబితా &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; లో ఉంది.</translation>
     </message>
     <message>
-        <source>Choose a name and a relay. Nothing else is needed.</source>
-        <translation>ఒక పేరును, ఒక రిలేను ఎంచుకోండి. ఇంతకు మించి ఏమీ అవసరం లేదు.</translation>
+        <source>Automatic</source>
+        <translation>స్వయంచాలక</translation>
+    </message>
+    <message>
+        <source>Relays are used for sending and receiving messages. Having more than one keeps your connection reliable.</source>
+        <translation>సందేశాలను పంపడానికి మరియు స్వీకరించడానికి రిలేలను ఉపయోగిస్తారు. ఒకటి కంటే ఎక్కువ ఉంటే మీ కనెక్షన్ నమ్మదగినదిగా ఉంటుంది.</translation>
+    </message>
+    <message>
+        <source>Choose a name. Nothing else is needed.</source>
+        <translation>ఒక పేరును ఎంచుకోండి. ఇంకేమీ అవసరం లేదు.</translation>
+    </message>
+    <message>
+        <source>Advanced</source>
+        <extracomment>The section of the add-profile dialog that holds the choice of relay, shut until it is opened.</extracomment>
+        <translation>అధునాతనం</translation>
+    </message>
+    <message>
+        <source>Relay: %1</source>
+        <extracomment>Under &quot;Advanced&quot; in the add-profile dialog: the one relay the profile will be made on.</extracomment>
+        <translation>రిలే: %1</translation>
+    </message>
+    <message>
+        <source>Relay</source>
+        <extracomment>The relays the profile is made on: the core&apos;s (&quot;Automatic&quot;), one from the list, or another.</extracomment>
+        <translation>రిలే</translation>
+    </message>
+    <message>
+        <source>Only this relay. More can be added later on the profile page.</source>
+        <translation>ఈ రిలే మాత్రమే. మరిన్నింటిని తర్వాత ప్రొఫైల్ పేజీలో చేర్చవచ్చు.</translation>
+    </message>
+    <message>
+        <source>Other relay</source>
+        <extracomment>A relay that is not on the list, typed in.</extracomment>
+        <translation>ఇతర రిలే</translation>
+    </message>
+    <message>
+        <source>Relay address</source>
+        <translation>రిలే చిరునామా</translation>
     </message>
 </context>
 <context>
@@ -115,6 +143,11 @@
     <message>
         <source>Adds another address for this profile on a second relay.</source>
         <translation>ఈ ప్రొఫైల్‌కు రెండో రిలేలో మరో చిరునామాను జోడిస్తుంది.</translation>
+    </message>
+    <message>
+        <source>Add this relay?</source>
+        <extracomment>Delta Chat&apos;s question, over a relay read off a scanned code.</extracomment>
+        <translation>ఈ రిలేను చేర్చాలా?</translation>
     </message>
 </context>
 <context>
@@ -616,6 +649,11 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Leave blank to use the name they chose</source>
         <translation>వారు ఎంచుకున్న పేరును వాడటానికి ఖాళీగా వదిలేయండి</translation>
+    </message>
+    <message>
+        <source>Seen a long time ago</source>
+        <extracomment>Under a contact&apos;s name: the core has not seen them for a long time, or never.</extracomment>
+        <translation>చాలా కాలం క్రితం చూశారు</translation>
     </message>
 </context>
 <context>
@@ -1281,6 +1319,14 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Could not reach the relay. Try another one.</source>
         <translation>రిలేను చేరుకోలేకపోయాం. వేరొకదాన్ని ప్రయత్నించండి.</translation>
+    </message>
+    <message>
+        <source>No relay answered within %1 seconds.</source>
+        <translation>%1 సెకన్లలో ఏ రిలే స్పందించలేదు.</translation>
+    </message>
+    <message>
+        <source>Connecting…</source>
+        <translation>కనెక్ట్ అవుతోంది…</translation>
     </message>
 </context>
 <context>

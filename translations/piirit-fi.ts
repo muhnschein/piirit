@@ -39,20 +39,48 @@
         <translation>Nimesi</translation>
     </message>
     <message>
-        <source>Select a public chatmail relay</source>
-        <translation>Valitse julkinen chatmail-välittäjä</translation>
-    </message>
-    <message>
-        <source>Use a custom chatmail relay</source>
-        <translation>Käytä omaa chatmail-välittäjää</translation>
-    </message>
-    <message>
         <source>Piirit works only with chatmail relays. These are a particular kind of e-mail server; ordinary e-mail servers are not supported. For more, see &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. A full list of public, free-to-use chatmail relays is at &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</source>
         <translation>Piirit toimii vain chatmail-välittäjien kanssa. Ne ovat erityinen sähköpostipalvelimien laji; tavallisia sähköpostipalvelimia ei tueta. Lisätietoa: &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. Täydellinen luettelo julkisista, maksutta käytettävistä chatmail-välittäjistä on osoitteessa &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
     </message>
     <message>
-        <source>Choose a name and a relay. Nothing else is needed.</source>
-        <translation>Valitse nimi ja välittäjä. Muuta ei tarvita.</translation>
+        <source>Automatic</source>
+        <translation>Automaattinen</translation>
+    </message>
+    <message>
+        <source>Relays are used for sending and receiving messages. Having more than one keeps your connection reliable.</source>
+        <translation>Välittäjiä käytetään viestien lähettämiseen ja vastaanottamiseen. Useamman kuin yhden välittäjän avulla yhteytesi pysyy luotettavana.</translation>
+    </message>
+    <message>
+        <source>Choose a name. Nothing else is needed.</source>
+        <translation>Valitse nimi. Muuta ei tarvita.</translation>
+    </message>
+    <message>
+        <source>Advanced</source>
+        <extracomment>The section of the add-profile dialog that holds the choice of relay, shut until it is opened.</extracomment>
+        <translation>Lisäasetukset</translation>
+    </message>
+    <message>
+        <source>Relay: %1</source>
+        <extracomment>Under &quot;Advanced&quot; in the add-profile dialog: the one relay the profile will be made on.</extracomment>
+        <translation>Välittäjä: %1</translation>
+    </message>
+    <message>
+        <source>Relay</source>
+        <extracomment>The relays the profile is made on: the core&apos;s (&quot;Automatic&quot;), one from the list, or another.</extracomment>
+        <translation>Välittäjä</translation>
+    </message>
+    <message>
+        <source>Only this relay. More can be added later on the profile page.</source>
+        <translation>Vain tämä välittäjä. Lisää voi lisätä myöhemmin profiilisivulla.</translation>
+    </message>
+    <message>
+        <source>Other relay</source>
+        <extracomment>A relay that is not on the list, typed in.</extracomment>
+        <translation>Muu välittäjä</translation>
+    </message>
+    <message>
+        <source>Relay address</source>
+        <translation>Välittäjän osoite</translation>
     </message>
 </context>
 <context>
@@ -115,6 +143,11 @@
     <message>
         <source>Adds another address for this profile on a second relay.</source>
         <translation>Lisää tälle profiilille toisen osoitteen toisella välittäjällä.</translation>
+    </message>
+    <message>
+        <source>Add this relay?</source>
+        <extracomment>Delta Chat&apos;s question, over a relay read off a scanned code.</extracomment>
+        <translation>Lisätäänkö tämä välittäjä?</translation>
     </message>
 </context>
 <context>
@@ -616,6 +649,11 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Leave blank to use the name they chose</source>
         <translation>Jätä tyhjäksi, niin käytetään hänen itse valitsemaansa nimeä</translation>
+    </message>
+    <message>
+        <source>Seen a long time ago</source>
+        <extracomment>Under a contact&apos;s name: the core has not seen them for a long time, or never.</extracomment>
+        <translation>Nähty viimeksi kauan sitten</translation>
     </message>
 </context>
 <context>
@@ -1281,6 +1319,14 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Could not reach the relay. Try another one.</source>
         <translation>Välittäjää ei tavoitettu. Kokeile toista.</translation>
+    </message>
+    <message>
+        <source>No relay answered within %1 seconds.</source>
+        <translation>Mikään välittäjä ei vastannut %1 sekunnin kuluessa.</translation>
+    </message>
+    <message>
+        <source>Connecting…</source>
+        <translation>Yhdistetään…</translation>
     </message>
 </context>
 <context>

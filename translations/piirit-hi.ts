@@ -39,20 +39,48 @@
         <translation>आपका नाम</translation>
     </message>
     <message>
-        <source>Select a public chatmail relay</source>
-        <translation>सार्वजनिक chatmail रिले चुनें</translation>
-    </message>
-    <message>
-        <source>Use a custom chatmail relay</source>
-        <translation>अपना chatmail रिले इस्तेमाल करें</translation>
-    </message>
-    <message>
         <source>Piirit works only with chatmail relays. These are a particular kind of e-mail server; ordinary e-mail servers are not supported. For more, see &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. A full list of public, free-to-use chatmail relays is at &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</source>
         <translation>Piirit केवल chatmail रिले के साथ काम करता है। ये एक ख़ास तरह के ई-मेल सर्वर हैं; साधारण ई-मेल सर्वर समर्थित नहीं हैं। अधिक जानकारी के लिए &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt; देखें। सार्वजनिक, मुफ़्त chatmail रिले की पूरी सूची &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt; पर है।</translation>
     </message>
     <message>
-        <source>Choose a name and a relay. Nothing else is needed.</source>
-        <translation>एक नाम और एक रिले चुनें। इसके अलावा कुछ और सेट करने की ज़रूरत नहीं।</translation>
+        <source>Automatic</source>
+        <translation>स्वचालित</translation>
+    </message>
+    <message>
+        <source>Relays are used for sending and receiving messages. Having more than one keeps your connection reliable.</source>
+        <translation>रिले का उपयोग संदेश भेजने और प्राप्त करने के लिए किया जाता है। एक से अधिक रिले होने पर आपका कनेक्शन भरोसेमंद बना रहता है।</translation>
+    </message>
+    <message>
+        <source>Choose a name. Nothing else is needed.</source>
+        <translation>एक नाम चुनें। और कुछ नहीं चाहिए।</translation>
+    </message>
+    <message>
+        <source>Advanced</source>
+        <extracomment>The section of the add-profile dialog that holds the choice of relay, shut until it is opened.</extracomment>
+        <translation>उन्नत</translation>
+    </message>
+    <message>
+        <source>Relay: %1</source>
+        <extracomment>Under &quot;Advanced&quot; in the add-profile dialog: the one relay the profile will be made on.</extracomment>
+        <translation>रिले: %1</translation>
+    </message>
+    <message>
+        <source>Relay</source>
+        <extracomment>The relays the profile is made on: the core&apos;s (&quot;Automatic&quot;), one from the list, or another.</extracomment>
+        <translation>रिले</translation>
+    </message>
+    <message>
+        <source>Only this relay. More can be added later on the profile page.</source>
+        <translation>सिर्फ़ यही रिले। और रिले बाद में प्रोफ़ाइल पेज पर जोड़े जा सकते हैं।</translation>
+    </message>
+    <message>
+        <source>Other relay</source>
+        <extracomment>A relay that is not on the list, typed in.</extracomment>
+        <translation>दूसरा रिले</translation>
+    </message>
+    <message>
+        <source>Relay address</source>
+        <translation>रिले का पता</translation>
     </message>
 </context>
 <context>
@@ -115,6 +143,11 @@
     <message>
         <source>Adds another address for this profile on a second relay.</source>
         <translation>इस प्रोफ़ाइल के लिए दूसरे रिले पर एक और पता जोड़ता है।</translation>
+    </message>
+    <message>
+        <source>Add this relay?</source>
+        <extracomment>Delta Chat&apos;s question, over a relay read off a scanned code.</extracomment>
+        <translation>यह रिले जोड़ें?</translation>
     </message>
 </context>
 <context>
@@ -620,6 +653,11 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Leave blank to use the name they chose</source>
         <translation>उनका चुना हुआ नाम इस्तेमाल करने के लिए खाली छोड़ दें</translation>
+    </message>
+    <message>
+        <source>Seen a long time ago</source>
+        <extracomment>Under a contact&apos;s name: the core has not seen them for a long time, or never.</extracomment>
+        <translation>काफ़ी समय पहले देखा गया</translation>
     </message>
 </context>
 <context>
@@ -1285,6 +1323,14 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Could not reach the relay. Try another one.</source>
         <translation>रिले तक नहीं पहुँचा जा सका। कोई दूसरा आज़माएँ।</translation>
+    </message>
+    <message>
+        <source>No relay answered within %1 seconds.</source>
+        <translation>किसी भी रिले ने %1 सेकंड में जवाब नहीं दिया।</translation>
+    </message>
+    <message>
+        <source>Connecting…</source>
+        <translation>कनेक्ट हो रहा है…</translation>
     </message>
 </context>
 <context>

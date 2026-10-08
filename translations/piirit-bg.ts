@@ -39,20 +39,48 @@
         <translation>Вашето име</translation>
     </message>
     <message>
-        <source>Select a public chatmail relay</source>
-        <translation>Изберете публичен chatmail релей</translation>
-    </message>
-    <message>
-        <source>Use a custom chatmail relay</source>
-        <translation>Използвайте собствен chatmail релей</translation>
-    </message>
-    <message>
         <source>Piirit works only with chatmail relays. These are a particular kind of e-mail server; ordinary e-mail servers are not supported. For more, see &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. A full list of public, free-to-use chatmail relays is at &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</source>
         <translation>Piirit работи само с chatmail релеи. Те са особен вид пощенски сървъри; обикновените пощенски сървъри не се поддържат. Повече на &lt;a href=&quot;https://chatmail.at&quot;&gt;chatmail.at&lt;/a&gt;. Пълен списък с публични, безплатни chatmail релеи има на &lt;a href=&quot;https://chatmail.at/relays&quot;&gt;chatmail.at/relays&lt;/a&gt;.</translation>
     </message>
     <message>
-        <source>Choose a name and a relay. Nothing else is needed.</source>
-        <translation>Изберете име и релей. Нищо друго не е необходимо.</translation>
+        <source>Automatic</source>
+        <translation>Автоматично</translation>
+    </message>
+    <message>
+        <source>Relays are used for sending and receiving messages. Having more than one keeps your connection reliable.</source>
+        <translation>Релеите се използват за изпращане и получаване на съобщения. Наличието на повече от един поддържа връзката ви надеждна.</translation>
+    </message>
+    <message>
+        <source>Choose a name. Nothing else is needed.</source>
+        <translation>Изберете име. Нищо друго не е нужно.</translation>
+    </message>
+    <message>
+        <source>Advanced</source>
+        <extracomment>The section of the add-profile dialog that holds the choice of relay, shut until it is opened.</extracomment>
+        <translation>Разширени</translation>
+    </message>
+    <message>
+        <source>Relay: %1</source>
+        <extracomment>Under &quot;Advanced&quot; in the add-profile dialog: the one relay the profile will be made on.</extracomment>
+        <translation>Релей: %1</translation>
+    </message>
+    <message>
+        <source>Relay</source>
+        <extracomment>The relays the profile is made on: the core&apos;s (&quot;Automatic&quot;), one from the list, or another.</extracomment>
+        <translation>Релей</translation>
+    </message>
+    <message>
+        <source>Only this relay. More can be added later on the profile page.</source>
+        <translation>Само този релей. Още могат да се добавят по-късно на страницата на профила.</translation>
+    </message>
+    <message>
+        <source>Other relay</source>
+        <extracomment>A relay that is not on the list, typed in.</extracomment>
+        <translation>Друг релей</translation>
+    </message>
+    <message>
+        <source>Relay address</source>
+        <translation>Адрес на релея</translation>
     </message>
 </context>
 <context>
@@ -115,6 +143,11 @@
     <message>
         <source>Adds another address for this profile on a second relay.</source>
         <translation>Добавя към този профил още един адрес на друг релей.</translation>
+    </message>
+    <message>
+        <source>Add this relay?</source>
+        <extracomment>Delta Chat&apos;s question, over a relay read off a scanned code.</extracomment>
+        <translation>Да се добави ли този релей?</translation>
     </message>
 </context>
 <context>
@@ -616,6 +649,11 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Leave blank to use the name they chose</source>
         <translation>Оставете празно, за да се използва избраното от него име</translation>
+    </message>
+    <message>
+        <source>Seen a long time ago</source>
+        <extracomment>Under a contact&apos;s name: the core has not seen them for a long time, or never.</extracomment>
+        <translation>Видян(а) преди много време</translation>
     </message>
 </context>
 <context>
@@ -1281,6 +1319,14 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Could not reach the relay. Try another one.</source>
         <translation>Релеят не можа да бъде достигнат. Опитайте друг.</translation>
+    </message>
+    <message>
+        <source>No relay answered within %1 seconds.</source>
+        <translation>Нито един релей не отговори в рамките на %1 секунди.</translation>
+    </message>
+    <message>
+        <source>Connecting…</source>
+        <translation>Свързване…</translation>
     </message>
 </context>
 <context>
