@@ -1,9 +1,10 @@
-//! The unread filter's switch, beside the chat list's search field.
+//! The chat list's Search and Unread pills, and the field Search brings out.
 //!
-//! It is there on the ordinary list and not on the archived one, which is
-//! a mode of its own. Turning it on says so under the title, and a list
-//! with nothing unread says why it is empty and how to get back. While a
-//! search is showing it does nothing, since a search covers every chat.
+//! They are there on the ordinary list and not on the archived one, which
+//! is a mode of its own with only its field. Turning Unread on leaves the
+//! header alone, and a list with nothing unread says why it is empty and
+//! how to get back. While a search is open the pills give way to the
+//! field, since a search covers every chat.
 
 // Qt harness: see qml_chat_list.rs.
 #![allow(
@@ -68,6 +69,12 @@ const PROBE_QML: &str = r"
             item.clicked()
             return 'ok'
         }
+        function hide(name) {
+            var item = findIn(loader.item, name)
+            if (!item) { return 'missing:' + name }
+            item.hideClicked()
+            return 'ok'
+        }
         function setText(name, value) {
             var item = findIn(loader.item, name)
             if (!item) { return 'missing:' + name }
@@ -79,7 +86,7 @@ const PROBE_QML: &str = r"
 
 #[test]
 #[allow(clippy::too_many_lines)]
-fn the_filter_switch_sits_by_the_search_and_says_when_it_is_on() {
+fn the_search_and_unread_pills_give_way_to_the_search_field() {
     let temp = std::env::temp_dir().join(format!("piirit-unread-switch-{}", std::process::id()));
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
 
@@ -145,6 +152,8 @@ fn the_filter_switch_sits_by_the_search_and_says_when_it_is_on() {
 
     single_shot(Duration::from_secs(3), move || unsafe {
         record!("switch", get!("unreadFilterButton", "visible"));
+        record!("search-pill", get!("chatSearchPill", "visible"));
+        record!("field-before", get!("chatSearchField", "visible"));
         record!("off-checked", get!("unreadFilterButton", "checked"));
         record!("off-description", get!("chatListHeader", "description"));
         record!("count-before", get!("chats", "count"));
@@ -171,7 +180,12 @@ fn the_filter_switch_sits_by_the_search_and_says_when_it_is_on() {
                 QString::from("a")
             )
         );
+    });
+
+    // The pills fade before they go, so each look is a step later.
+    single_shot(Duration::from_secs(5), move || unsafe {
         record!("while-searching", get!("unreadFilterButton", "visible"));
+        record!("field-while", get!("chatSearchField", "visible"));
         record!(
             "cleared",
             call!(
@@ -180,15 +194,28 @@ fn the_filter_switch_sits_by_the_search_and_says_when_it_is_on() {
                 QString::from("")
             )
         );
+    });
+
+    single_shot(Duration::from_secs(6), move || unsafe {
         record!("after-search", get!("unreadFilterButton", "visible"));
+        record!("field-after", get!("chatSearchField", "visible"));
         record!(
             "clicked-off",
             call!("click", QString::from("unreadFilterButton"))
         );
+        record!("opened", call!("click", QString::from("chatSearchPill")));
     });
 
-    single_shot(Duration::from_secs(5), move || unsafe {
+    single_shot(Duration::from_secs(7), move || unsafe {
         record!("count-after", get!("chats", "count"));
+        record!("field-opened", get!("chatSearchField", "visible"));
+        record!("pill-opened", get!("chatSearchPill", "visible"));
+        record!("hidden", call!("hide", QString::from("chatSearchField")));
+    });
+
+    single_shot(Duration::from_secs(8), move || unsafe {
+        record!("pill-closed", get!("chatSearchPill", "visible"));
+        record!("field-closed", get!("chatSearchField", "visible"));
         record!(
             "archived",
             call!(
@@ -200,8 +227,9 @@ fn the_filter_switch_sits_by_the_search_and_says_when_it_is_on() {
         );
     });
 
-    single_shot(Duration::from_secs(7), move || unsafe {
+    single_shot(Duration::from_secs(10), move || unsafe {
         record!("archived-switch", get!("unreadFilterButton", "visible"));
+        record!("archived-search-pill", get!("chatSearchPill", "visible"));
         (*engine_ptr).quit();
     });
 
@@ -225,6 +253,16 @@ fn the_filter_switch_sits_by_the_search_and_says_when_it_is_on() {
         value("switch"),
         "true",
         "the ordinary list has no unread filter switch. {context}"
+    );
+    assert_eq!(
+        value("search-pill"),
+        "true",
+        "the ordinary list has no Search pill. {context}"
+    );
+    assert_eq!(
+        value("field-before"),
+        "false",
+        "the search field shows before Search was tapped. {context}"
     );
     assert_eq!(
         value("off-checked"),
@@ -277,8 +315,40 @@ fn the_filter_switch_sits_by_the_search_and_says_when_it_is_on() {
     assert_eq!(
         value("while-searching"),
         "false",
-        "the switch still shows while a search, which ignores it, has \
-         the row. {context}"
+        "the switch still shows while a search, which ignores it, is \
+         open. {context}"
+    );
+    assert_eq!(
+        value("field-while"),
+        "true",
+        "typing into the list did not bring the search field out. {context}"
+    );
+    assert_eq!(
+        value("field-after"),
+        "false",
+        "the emptied search field did not give the row back to the \
+         pills. {context}"
+    );
+    assert_eq!(
+        value("field-opened"),
+        "true",
+        "tapping the Search pill did not bring the field out. {context}"
+    );
+    assert_eq!(
+        value("pill-opened"),
+        "false",
+        "the pills stayed beside the open search field. {context}"
+    );
+    assert_eq!(
+        value("pill-closed"),
+        "true",
+        "closing the empty search field did not bring the pills back. \
+         {context}"
+    );
+    assert_eq!(
+        value("field-closed"),
+        "false",
+        "the closed search field stayed. {context}"
     );
     assert_eq!(
         value("after-search"),
@@ -300,6 +370,12 @@ fn the_filter_switch_sits_by_the_search_and_says_when_it_is_on() {
         "false",
         "the archived list offers an unread filter, though it is a mode of \
          its own. {context}"
+    );
+    assert_eq!(
+        value("archived-search-pill"),
+        "false",
+        "the archived list, which has its field, also got a Search pill. \
+         {context}"
     );
 
     let _ = std::fs::remove_dir_all(&temp);
