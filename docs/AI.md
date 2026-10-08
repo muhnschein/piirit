@@ -1,13 +1,18 @@
 # On-device AI
 
 This is a feasibility study, not a design that has been built. The
-question is whether Piirit can transcribe voice messages and tag
-pictures and videos on the phone, at a cost in effort and battery this
-project would accept.
+question is whether Piirit can transcribe voice messages, tag
+pictures and videos, sort messages into categories and translate them on
+the phone, at a cost in effort and battery this project would accept.
 
 **Transcription: yes. Tagging: yes, if it means a small fixed set of
 categories rather than free-form labels.** Neither needs anything Harbour
 forbids, and neither sends anything off the phone.
+
+**Categorization: yes, and most of it needs no model. Translation:
+likely, but its runtime is the least proven part of this document.**
+Both are sketched in less depth than the first two; nothing about them
+has been measured yet.
 
 A number marked *measured* was taken for this document, on a build host.
 A number marked *estimated* is arithmetic from model sizes and published
@@ -236,9 +241,135 @@ Each profile gets one small index, mapping message id to category bits, kept in 
 - `ChatMediaPage` gets a row of category filters.
 - A search query that matches a category's name adds that category's pictures to the results.
 
+## Sorting messages into categories
+
+### Two kinds of category
+
+**"Family" and "friends" belong to a contact, not to a message.** A
+model reading each message would guess at something the user knows and
+can say once. So:
+
+- A contact carries a label the user picks: family, friends, work, or
+  none. A chat with that contact, or a group the user labels, inherits it.
+- The core has no field for this, so labels live in a file per profile in
+  the app's data directory, like transcripts.
+- The chat list gets a filter by label, the same way #124 asks for an
+  unread filter.
+
+**"Important" belongs to a message.** It is the only category a model
+could help with, and even there rules come first.
+
+### Rules first
+
+These cost nothing and need no download:
+
+- the message mentions me
+- the message quotes one of mine
+- a question to me in a one-to-one chat
+- the sender is verified, or the chat is pinned
+- the chat is labelled family
+
+That covers most of what people mean by important. A model is an
+optional layer on top, for the rest.
+
+### The optional model
+
+**A small multilingual sentence encoder**, run on the same ggml as
+Whisper. Each incoming message becomes a vector, and "important" is
+judged two ways:
+
+- **Zero-shot to start:** the distance to a handful of prototype
+  sentences per category, embedded offline and shipped as a table, the
+  way tagging ships its category embeddings.
+- **Learned from the user after that:** marking a message important or
+  not trains a logistic regression on its vector, on the phone. That is
+  a few kilobytes of weights per profile, and it never leaves the phone.
+
+**Candidates**, both permissively licensed:
+
+| | multilingual-e5-small (MIT) | paraphrase-multilingual-MiniLM-L12-v2 (Apache-2.0) |
+|---|---|---|
+| Parameters | about 118 M | about 118 M |
+| Download, int8 | *est.* about 120 MB | *est.* about 120 MB |
+| Compute for a 64-token message | *est.* about 3 GFLOP | *est.* about 3 GFLOP |
+| Energy per message | *est.* 0.1–0.2 J | *est.* 0.1–0.2 J |
+
+**Most of that size is the vocabulary table, not the network.** About
+96 M of the 118 M parameters are a 250,000-token embedding table, which
+costs a lookup, not compute. Two ways to shrink it, both to be measured:
+
+- Trim the vocabulary to the tokens the 39 shipped languages use.
+- Use a static-embedding model distilled from one of these (Model2Vec).
+  It skips the transformer entirely and runs in microseconds. Its size and
+  its quality on chat messages are not known yet.
+
+**The encoder is a BERT graph.** llama.cpp has one that can serve as the
+reference, as `clip.cpp` does for tagging.
+
+**Where the result is stored:** one bit per message in the per-profile
+index that tagging already keeps.
+
+## Translating messages
+
+### The runtime: Bergamot
+
+**Bergamot is what Firefox uses for its offline translation.** It is
+Marian, a C++ translation engine, with small int8 student models
+trained by Mozilla for each language pair. It would be linked statically
+behind a `cpp!` wrapper, the way whisper.cpp is.
+
+**This is the riskiest runtime in this document:**
+
+- Marian's fast int8 matrix code (intgemm) targets x86. Firefox runs
+  Bergamot on ARM through WebAssembly with other kernels. Whether a
+  native aarch64 build exists that fits the Rust 1.75 and GCC floors has
+  not been checked.
+- Marian brings more dependencies than whisper.cpp does. Each has to be
+  on Harbour's library list or linked in.
+- The model licence has to be checked per model before shipping.
+
+**If Bergamot does not build, OPUS-MT through CTranslate2 is the
+fallback.** Its models are larger, around 75 MB a pair (*est.*).
+
+### The models
+
+**Pivot through English.** A message in Finnish shown to a German reader
+goes Finnish → English → German. That needs two models for each
+language, not one for every pair: twenty for ten languages instead of
+ninety.
+
+**Each model is about 15–40 MB** (*est.*, Bergamot "tiny" int8).
+
+**Download only what is used:**
+
+- First the pair for the phone's language, offered when the user first
+  taps Translate.
+- When a message arrives in a language no model covers yet, Translate
+  offers that model's download instead of a translation.
+
+**Which languages Mozilla covers has to be checked,** Finnish first.
+Every language Piirit is translated into and Mozilla does not cover gets
+no Translate offer.
+
+### Detecting the language
+
+**fastText's `lid.176.ftz` is under 1 MB,** small enough to ship in the
+package. Its licence (CC BY-SA 3.0) covers data, and has to be checked
+against a GPL app before shipping. Whisper's own detection covers voice
+messages.
+
+### What the user sees
+
+- Translate in the message's context menu, shown only when the message
+  is not in the phone's language.
+- The translation under the original, marked as a translation, with a
+  way back to the original.
+- Translations are stored like transcripts: per profile, keyed by message
+  id, deleted with their message.
+
 ## What it adds to the package
 
-All figures are *measured* on x86_64, stripped, with thin LTO, less an empty Rust binary.
+Figures are *measured* on x86_64, stripped, with thin LTO, less an empty Rust binary.
 
 | | Binary | Compressed (xz) | Model, downloaded on request |
 |---|---|---|---|
@@ -246,6 +377,9 @@ All figures are *measured* on x86_64, stripped, with thin LTO, less an empty Rus
 | symphonia | +1.0 MB | +0.4 MB | – |
 | Tagging, ggml graph | about +0.2 MB (*est.*) | – | 5–90 MB |
 | Tagging, tract NNEF (instead of the ggml graph) | +9.7 MB | +2.1 MB | 5–90 MB |
+| Categorization, BERT graph on ggml | small (*est.*) | – | about 120 MB (*est.*), less if trimmed |
+| Translation, Bergamot | not measured | – | 15–40 MB per language (*est.*) |
+| Language detection, `lid.176.ftz` | – | – | under 1 MB, packaged |
 
 **Models are downloaded on request, not packaged.** The RPM is 11.7 MB today, and most users will never switch these features on.
 
@@ -264,6 +398,11 @@ Every estimate above can be checked in an afternoon with a phone. Do this before
     - `sb2 gcc --version`
     - whether `Nemo.DBus` can read MCE's charger state from inside sailjail
     - whether `QAudioDecoder` has a backend on the phone
+5. **Build Bergamot for aarch64.** Try a native build of
+   bergamot-translator with the SDK, and translate a paragraph with a
+   tiny model on the phone. If it does not build, try CTranslate2.
+6. **Check language coverage.** List which of the 39 shipped languages
+   Mozilla's models cover.
 
 ## Plan
 
@@ -274,6 +413,13 @@ Every estimate above can be checked in an afternoon with a phone. Do this before
     - Choose the image model by measuring two or three candidates on real chat pictures.
     - Write the ggml graph, the category table and the index.
     - Add the gallery filter and the backlog that runs only while charging.
+5. **Categorization rules and contact labels: a few days.** No model. The
+   labels file, the rules, the chat-list filter and the strings.
+6. **The categorization model: about a week**, after transcription has
+   brought ggml in. The BERT graph, the prototype table and the
+   on-phone training from the user's marks.
+7. **Translation: unknown until step 5 of the measurements.** If
+   Bergamot builds, about as long as transcription end to end.
 
 ## What was ruled out
 
