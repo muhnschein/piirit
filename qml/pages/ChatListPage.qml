@@ -585,25 +585,9 @@ Page {
                     font.pixelSize: Theme.fontSizeMedium
                     textLeftMargin: Theme.horizontalPageMargin + Theme.paddingMedium
                                     + Theme.iconSizeSmallPlus + Theme.paddingSmall
-                    leftItem: Item {
-                        id: searchGlyph
-                        width: Theme.iconSizeSmallPlus + Theme.paddingSmall
-                        height: Theme.iconSizeSmallPlus
-
-                        Image {
-                            // Where the pill draws it, whatever offset
-                            // Silica gives the item that holds it.
-                            x: Theme.horizontalPageMargin + Theme.paddingMedium
-                               - searchGlyph.x
-                            width: Theme.iconSizeSmallPlus
-                            height: Theme.iconSizeSmallPlus
-                            sourceSize.width: Theme.iconSizeSmallPlus
-                            sourceSize.height: Theme.iconSizeSmallPlus
-                            source: "image://theme/icon-m-search?"
-                                    + (searchField.activeFocus ? Theme.highlightColor
-                                                               : Theme.primaryColor)
-                        }
-                    }
+                    // Silica's own magnifier gives way to the one drawn
+                    // beside the field below; the slot it held stays empty.
+                    leftItem: Item {}
                     // Empty, it offers to go away instead of to clear.
                     canHide: !page.archived
                     onHideClicked: page.closeSearch()
@@ -625,6 +609,26 @@ Page {
                             page.closeSearch()
                         }
                     }
+                }
+
+                // The field's magnifier, drawn over it rather than in its
+                // `leftItem`: Silica places that item itself, further right
+                // and higher than the pill draws its own. Here it takes the
+                // pill's exact place -- the row's margin, the pill's inset,
+                // centred on the row as the pill is -- and fades with the
+                // field.
+                Image {
+                    x: Theme.horizontalPageMargin + Theme.paddingMedium
+                    anchors.verticalCenter: parent.verticalCenter
+                    visible: searchField.visible
+                    opacity: searchField.opacity
+                    width: Theme.iconSizeSmallPlus
+                    height: Theme.iconSizeSmallPlus
+                    sourceSize.width: Theme.iconSizeSmallPlus
+                    sourceSize.height: Theme.iconSizeSmallPlus
+                    source: "image://theme/icon-m-search?"
+                            + (searchField.activeFocus ? Theme.highlightColor
+                                                       : Theme.primaryColor)
                 }
 
                 Row {
