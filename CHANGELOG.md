@@ -6,6 +6,23 @@ of the GitHub release, which `scripts/release-notes.sh` cuts out of this
 file when the release is made (`.github/workflows/rpm.yml`;
 docs/BUILDING.md, "Cutting a release").
 
+## 2.1.0 — 2026-10-08
+
+- **Unread filter.** Search and Unread pills at the top of the chat list; Unread shows only chats with unread messages.
+- **Any emoji as a reaction**, drawn as Twemoji, and emoji in messages too; "Use Twemoji" in Settings turns the pictures off. Faster emoji picker.
+- **Onboarding on several relays.** A new profile picks a relay automatically and adds more in the background; choosing one yourself is under Advanced.
+- Scanning a relay's QR code offers to add that relay to the profile.
+- **Chat descriptions.** Show and edit the description of a group or channel.
+- Text the core writes itself is now translated into every language.
+- Relay list brought in line with chatmail.at/relays.
+- Contacts seen long ago say so.
+- Notifications follow their chat: edits update them, deletions take them down.
+- Turning on an experimental feature asks first.
+- A large attachment gets a warning instead of being refused.
+- Chat-list ages keep moving instead of freezing at "now".
+- The scanner no longer re-locks its focus every couple of seconds.
+- Avatars on the app cover no longer go flat.
+
 ## 2.0.0 — 2026-09-25
 
 - Bundles deltachat-rpc-server 2.62.0 (was 2.60.0).
