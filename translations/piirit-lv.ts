@@ -335,6 +335,10 @@ Citās grupās, kurās ir bloķēti kontakti, viņu ziņas joprojām būs redzam
         <source>Call back</source>
         <translation>Atzvanīt</translation>
     </message>
+    <message>
+        <source>Incoming video call</source>
+        <translation>Ienākošs videozvans</translation>
+    </message>
 </context>
 <context>
     <name>CallPage</name>
@@ -388,6 +392,10 @@ Citās grupās, kurās ir bloķēti kontakti, viņu ziņas joprojām būs redzam
         <source>Answer</source>
         <extracomment>Answers a call that is ringing. A verb.</extracomment>
         <translation>Atbildēt</translation>
+    </message>
+    <message>
+        <source>Incoming video call</source>
+        <translation>Ienākošs videozvans</translation>
     </message>
 </context>
 <context>
@@ -454,6 +462,11 @@ Citās grupās, kurās ir bloķēti kontakti, viņu ziņas joprojām būs redzam
         <source>Call %1</source>
         <extracomment>Places a call. %1 is the name of whoever is called.</extracomment>
         <translation>Zvanīt: %1</translation>
+    </message>
+    <message>
+        <source>Video call %1</source>
+        <extracomment>Places a video call. %1 is the name of whoever is called.</extracomment>
+        <translation>Videozvans: %1</translation>
     </message>
 </context>
 <context>

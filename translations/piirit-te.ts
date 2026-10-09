@@ -330,6 +330,10 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Call back</source>
         <translation>తిరిగి కాల్ చేయి</translation>
     </message>
+    <message>
+        <source>Incoming video call</source>
+        <translation>ఇన్‌కమింగ్ వీడియో కాల్</translation>
+    </message>
 </context>
 <context>
     <name>CallPage</name>
@@ -383,6 +387,10 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Answer</source>
         <extracomment>Answers a call that is ringing. A verb.</extracomment>
         <translation>సమాధానం ఇవ్వు</translation>
+    </message>
+    <message>
+        <source>Incoming video call</source>
+        <translation>ఇన్‌కమింగ్ వీడియో కాల్</translation>
     </message>
 </context>
 <context>
@@ -448,6 +456,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Call %1</source>
         <extracomment>Places a call. %1 is the name of whoever is called.</extracomment>
         <translation>%1 కి కాల్ చేయండి</translation>
+    </message>
+    <message>
+        <source>Video call %1</source>
+        <extracomment>Places a video call. %1 is the name of whoever is called.</extracomment>
+        <translation>%1 కి వీడియో కాల్ చేయండి</translation>
     </message>
 </context>
 <context>

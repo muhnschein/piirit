@@ -150,8 +150,9 @@ SONAR_COV_ARGS = --workspace \
 	--ignore-filename-regex '(^|/)(third_party|vendor)/' \
 	--lcov --output-path target/sonar/lcov.info
 
-## sonar-reports: the coverage report SonarQube Cloud imports, written to
-## rust/target/sonar/lcov.info. The scanner does not measure coverage; it
+## sonar-reports: the coverage reports SonarQube Cloud imports, written to
+## rust/target/sonar/lcov.info -- and js-lcov.info, for the call page's
+## bridge, which its tests run in Node (tests/js/). The scanner does not measure coverage; it
 ## only imports what someone else measured, so without this target the
 ## reading is 0.0%.
 ##
@@ -194,6 +195,12 @@ sonar-reports:
 		cd rust && $(CARGO) llvm-cov $(SONAR_COV_ARGS); \
 	fi
 	@echo "== wrote rust/target/sonar/lcov.info =="
+	@echo "== JavaScript coverage: the call page's bridge, under Node =="
+	node --test --experimental-test-coverage \
+		--test-reporter=lcov --test-reporter-destination=rust/target/sonar/js-lcov.info \
+		--test-reporter=dot --test-reporter-destination=stdout \
+		tests/js/*.test.js
+	@echo "== wrote rust/target/sonar/js-lcov.info =="
 
 ## The tests that drive the real core, offline. Needs `make fetch-server`.
 integration:

@@ -333,6 +333,10 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Call back</source>
         <translation>回拨</translation>
     </message>
+    <message>
+        <source>Incoming video call</source>
+        <translation>视频通话来电</translation>
+    </message>
 </context>
 <context>
     <name>CallPage</name>
@@ -386,6 +390,10 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Answer</source>
         <extracomment>Answers a call that is ringing. A verb.</extracomment>
         <translation>接听</translation>
+    </message>
+    <message>
+        <source>Incoming video call</source>
+        <translation>视频通话来电</translation>
     </message>
 </context>
 <context>
@@ -450,6 +458,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Call %1</source>
         <extracomment>Places a call. %1 is the name of whoever is called.</extracomment>
         <translation>呼叫 %1</translation>
+    </message>
+    <message>
+        <source>Video call %1</source>
+        <extracomment>Places a video call. %1 is the name of whoever is called.</extracomment>
+        <translation>视频通话 %1</translation>
     </message>
 </context>
 <context>

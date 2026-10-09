@@ -336,6 +336,10 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
         <source>Call back</source>
         <translation>Pokliči nazaj</translation>
     </message>
+    <message>
+        <source>Incoming video call</source>
+        <translation>Dohodni videoklic</translation>
+    </message>
 </context>
 <context>
     <name>CallPage</name>
@@ -389,6 +393,10 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
         <source>Answer</source>
         <extracomment>Answers a call that is ringing. A verb.</extracomment>
         <translation>Sprejmi</translation>
+    </message>
+    <message>
+        <source>Incoming video call</source>
+        <translation>Dohodni videoklic</translation>
     </message>
 </context>
 <context>
@@ -456,6 +464,11 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
         <source>Call %1</source>
         <extracomment>Places a call. %1 is the name of whoever is called.</extracomment>
         <translation>Pokliči: %1</translation>
+    </message>
+    <message>
+        <source>Video call %1</source>
+        <extracomment>Places a video call. %1 is the name of whoever is called.</extracomment>
+        <translation>Videoklic: %1</translation>
     </message>
 </context>
 <context>

@@ -71,19 +71,20 @@ Page {
     /// hands back `undefined` before it has read the key.
     readonly property bool canCall: Settings.callsEnabled === true && chat.can_call
 
-    /// Call them, or go back to the call there is: one call at a time.
-    function call() {
+    /// Call them, with the camera on for a video call, or go back to the
+    /// call there is: one call at a time.
+    function call(video) {
         if (typeof appWindow === "undefined") {
             return
         }
-        if (!appWindow.placeCall(page.accountId, page.chatId)) {
+        if (!appWindow.placeCall(page.accountId, page.chatId, video === true)) {
             appWindow.showCall()
         }
     }
 
     /// A row was tapped. As in the chat: one still ringing here is
-    /// answered, and any other is called back.
-    function callFromRow(messageId, outgoing, callState) {
+    /// answered, and any other is called back, the way it was made.
+    function callFromRow(messageId, outgoing, callState, hasVideo) {
         if (Settings.callsEnabled !== true || typeof appWindow === "undefined") {
             return
         }
@@ -92,7 +93,7 @@ Page {
             return
         }
         if (page.canCall) {
-            page.call()
+            page.call(hasVideo)
         }
     }
 
@@ -124,7 +125,8 @@ Page {
             width: list.width
             // A clear gap under calling, so the row to call from does not
             // read as the first of the calls.
-            height: header.height + callAction.height + 3 * Theme.paddingLarge
+            height: header.height + callAction.height + videoAction.height
+                    + 3 * Theme.paddingLarge
 
             PageHeader {
                 id: header
@@ -140,7 +142,7 @@ Page {
                 width: parent.width
                 height: Theme.itemSizeMedium
                 enabled: page.canCall
-                onClicked: page.call()
+                onClicked: page.call(false)
 
                 readonly property color tint: !callAction.enabled
                                               ? Theme.secondaryColor
@@ -175,6 +177,48 @@ Page {
                     text: qsTr("Call %1").arg(page.contactName)
                 }
             }
+
+            // The same, with the camera on from the start.
+            BackgroundItem {
+                id: videoAction
+                objectName: "videoCallAction"
+                y: callAction.y + callAction.height
+                width: parent.width
+                height: Theme.itemSizeMedium
+                enabled: page.canCall
+                onClicked: page.call(true)
+
+                readonly property color tint: !videoAction.enabled
+                                              ? Theme.secondaryColor
+                                              : videoAction.highlighted
+                                                ? Theme.highlightColor
+                                                : Theme.primaryColor
+
+                Image {
+                    id: videoIcon
+                    x: Theme.horizontalPageMargin
+                    anchors.verticalCenter: parent.verticalCenter
+                    width: Theme.iconSizeMedium
+                    height: width
+                    source: "image://theme/icon-m-video?" + videoAction.tint
+                }
+
+                Label {
+                    objectName: "videoCallActionLabel"
+                    anchors {
+                        left: videoIcon.right
+                        leftMargin: Theme.paddingMedium
+                        right: parent.right
+                        rightMargin: Theme.horizontalPageMargin
+                        verticalCenter: parent.verticalCenter
+                    }
+                    truncationMode: TruncationMode.Fade
+                    color: videoAction.tint
+                    textFormat: Text.PlainText
+                    //: Places a video call. %1 is the name of whoever is called.
+                    text: qsTr("Video call %1").arg(page.contactName)
+                }
+            }
         }
 
         delegate: ListItem {
@@ -184,7 +228,7 @@ Page {
             contentHeight: Theme.itemSizeMedium
             enabled: model.loaded
             onClicked: page.callFromRow(model.message_id, model.is_outgoing,
-                                        model.call_state)
+                                        model.call_state, model.call_has_video)
 
             readonly property bool failed: Calls.failed(model.call_state)
             readonly property string detail:

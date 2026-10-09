@@ -333,6 +333,10 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
         <source>Call back</source>
         <translation>Geri ara</translation>
     </message>
+    <message>
+        <source>Incoming video call</source>
+        <translation>Gelen görüntülü arama</translation>
+    </message>
 </context>
 <context>
     <name>CallPage</name>
@@ -386,6 +390,10 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
         <source>Answer</source>
         <extracomment>Answers a call that is ringing. A verb.</extracomment>
         <translation>Yanıtla</translation>
+    </message>
+    <message>
+        <source>Incoming video call</source>
+        <translation>Gelen görüntülü arama</translation>
     </message>
 </context>
 <context>
@@ -450,6 +458,11 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
         <source>Call %1</source>
         <extracomment>Places a call. %1 is the name of whoever is called.</extracomment>
         <translation>Ara: %1</translation>
+    </message>
+    <message>
+        <source>Video call %1</source>
+        <extracomment>Places a video call. %1 is the name of whoever is called.</extracomment>
+        <translation>Görüntülü ara: %1</translation>
     </message>
 </context>
 <context>

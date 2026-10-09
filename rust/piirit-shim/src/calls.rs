@@ -69,12 +69,18 @@ pub(crate) async fn summary(
     Ok(Summary::from_json(&answer))
 }
 
-/// The page's own option a call's page is loaded with. Audio only, for
-/// now: the page asks for no camera, sends no video and drops what video
-/// comes in, so a call answered here is a voice call whatever the other
-/// end started it as. Video is the half of this that is unproven on a
-/// phone (docs/CALLS.md).
-const PAGE_OPTIONS: &str = "disableVideoCompletely";
+/// The page's own option a call's page is loaded with: whether its
+/// camera starts on. Never `disableVideoCompletely`, which would drop the
+/// other end's picture too: a voice call is one whose camera starts off,
+/// and the bridge (`call_video.js`) keeps the camera closed until it is
+/// switched on.
+fn page_options(camera: bool) -> &'static str {
+    if camera {
+        ""
+    } else {
+        "noOutgoingVideoInitially"
+    }
+}
 
 /// What one call's page needs before the host can come up.
 struct Prepared {
@@ -105,6 +111,8 @@ struct Prepared {
 /// - `connected`: the two ends can hear each other.
 /// - `reconnecting`: the connection dropped, and may come back.
 /// - `ended`: over, for the reason in `end_reason`, until `reset`.
+// One flag per Qt property: QML binds each on its own.
+#[allow(clippy::struct_excessive_bools)]
 #[derive(QObject, Default)]
 pub struct Call {
     base: qt_base_class!(trait QObject),
@@ -148,6 +156,23 @@ pub struct Call {
     /// Emitted when the microphone goes off or on.
     pub muted_changed: qt_signal!(),
 
+    /// The reader wants the camera on: from the start of a video call,
+    /// and whenever it is switched on. Kept while the app is in the
+    /// background, where the camera itself is let go; see
+    /// `set_background`. Off again by itself when the camera will not
+    /// open.
+    pub camera: qt_property!(bool; NOTIFY video_changed),
+    /// The camera faces away from the reader: the back one. The front
+    /// one again for every new call.
+    pub rear_camera: qt_property!(bool; NOTIFY video_changed),
+    /// The camera is open and sending, as the page says.
+    pub local_video: qt_property!(bool; NOTIFY video_changed),
+    /// The other end's picture is being drawn, as the page says: they
+    /// are sending one and have not switched it off.
+    pub remote_video: qt_property!(bool; NOTIFY video_changed),
+    /// Emitted when any of the four above changes.
+    pub video_changed: qt_signal!(),
+
     /// Where the call's page is, with the command it opens on. Empty
     /// until the host is up, and again once the call is over. What a
     /// `WebView` is pointed at.
@@ -179,6 +204,16 @@ pub struct Call {
     pub reset: qt_method!(fn(&mut self)),
     /// Turn the microphone off, or back on, for the call under way.
     pub mute: qt_method!(fn(&mut self, on: bool)),
+    /// Switch the camera on or off: for the call under way, or for the
+    /// call ringing, which is then answered with it or without it.
+    pub set_camera: qt_method!(fn(&mut self, on: bool)),
+    /// Turn the camera to face the other way.
+    pub flip_camera: qt_method!(fn(&mut self)),
+    /// The app has gone to the background, or come back: the camera is
+    /// let go while it is away -- nobody is looking at what it shows,
+    /// and the other end is told it is off -- and the pictures are not
+    /// drawn. Back in front, the camera is opened again if it was on.
+    pub set_background: qt_method!(fn(&mut self, away: bool)),
     /// Apply one core event. Only the four call events are acted on.
     pub handle_event:
         qt_method!(fn(&mut self, context_id: u32, kind: QString, payload_json: QString)),
@@ -209,6 +244,8 @@ pub struct Call {
     /// elsewhere would end it on the device that answered. One per call,
     /// so a host coming up late reads the flag of the call it was for.
     settled: Arc<AtomicBool>,
+    /// The app is in the background; see `set_background`.
+    away: bool,
 }
 
 /// How long a call may ring here before it is taken to have rung out
@@ -256,6 +293,11 @@ impl Call {
         self.end_reason = QString::default();
         self.connected_at = 0.0;
         self.call_changed();
+        self.camera = false;
+        self.rear_camera = false;
+        self.local_video = false;
+        self.remote_video = false;
+        self.video_changed();
         if self.muted {
             self.muted = false;
             self.muted_changed();
@@ -272,6 +314,8 @@ impl Call {
         self.has_video = video;
         self.offer.clear();
         self.call_changed();
+        self.camera = video;
+        self.video_changed();
         self.set_state("starting");
         self.serve("startCall".to_string());
         true
@@ -300,6 +344,8 @@ impl Call {
             this_mut.has_video = call.has_video;
             this_mut.offer = call.sdp_offer;
             this_mut.call_changed();
+            this_mut.camera = call.has_video;
+            this_mut.video_changed();
             this_mut.set_state("ringing");
             this_mut.watch_ringing();
         });
@@ -349,6 +395,80 @@ impl Call {
         }
     }
 
+    /// Whether the camera is to be open now: wanted, and the app in
+    /// front.
+    fn camera_live(&self) -> bool {
+        self.camera && !self.away
+    }
+
+    /// Hand the page a command, if it is up. A page still coming up is
+    /// given the state as it then is; see `serve`.
+    fn tell(&self, command: String) {
+        if let Some(host) = &self.host {
+            host.command(command);
+        }
+    }
+
+    /// The camera, on or off.
+    pub fn set_camera(&mut self, on: bool) {
+        if !self.busy() || self.camera == on {
+            return;
+        }
+        let before = self.camera_live();
+        self.camera = on;
+        self.video_changed();
+        if self.camera_live() != before {
+            self.tell(call_host::camera_command(self.camera_live()));
+        }
+    }
+
+    /// The camera, the other way round.
+    pub fn flip_camera(&mut self) {
+        if !self.busy() {
+            return;
+        }
+        self.rear_camera = !self.rear_camera;
+        self.video_changed();
+        self.tell(call_host::facing_command(!self.rear_camera));
+    }
+
+    /// The app away, or back.
+    pub fn set_background(&mut self, away: bool) {
+        if self.away == away {
+            return;
+        }
+        let before = self.camera_live();
+        self.away = away;
+        self.tell(call_host::shown_command(!away));
+        if self.camera_live() != before {
+            self.tell(call_host::camera_command(self.camera_live()));
+        }
+    }
+
+    /// What the page says of its pictures.
+    fn take_video(&mut self, video: call_host::Video) {
+        if !self.busy() {
+            return;
+        }
+        let mut changed = self.local_video != video.local
+            || self.remote_video != video.remote
+            || self.rear_camera == video.front;
+        self.local_video = video.local;
+        self.remote_video = video.remote;
+        // The page turns back to the camera it had when the other one
+        // will not open: what it faces is what it says.
+        self.rear_camera = !video.front;
+        // A camera that will not open is switched off, as the reader
+        // would see it -- not one that was let go for the background.
+        if video.failed && self.camera_live() {
+            self.camera = false;
+            changed = true;
+        }
+        if changed {
+            self.video_changed();
+        }
+    }
+
     /// Forget an ended call.
     pub fn reset(&mut self) {
         if self.state.to_string() == "ended" {
@@ -378,6 +498,11 @@ impl Call {
             self.url_changed();
         }
         self.end_reason = QString::default();
+        if self.local_video || self.remote_video {
+            self.local_video = false;
+            self.remote_video = false;
+            self.video_changed();
+        }
         self.set_state("ended");
         true
     }
@@ -498,10 +623,20 @@ impl Call {
                 Ok(host) => {
                     {
                         let mut this_mut = this.borrow_mut();
-                        this_mut.url = host.url(PAGE_OPTIONS, &command).into();
+                        // The camera as it is now, switched on or off
+                        // while the page was coming up or not.
+                        let camera = this_mut.camera_live();
+                        this_mut.url = host.url(page_options(camera), &command).into();
                         // Muted before there was a page to tell.
                         if this_mut.muted {
                             host.command(call_host::mute_command(true));
+                        }
+                        // Turned, or away, before there was a page to tell.
+                        if this_mut.rear_camera {
+                            host.command(call_host::facing_command(false));
+                        }
+                        if this_mut.away {
+                            host.command(call_host::shown_command(false));
                         }
                         this_mut.host = Some(host);
                     }
@@ -554,6 +689,7 @@ impl Call {
                 }
             }
             Report::Connection(ice) => self.take_connection(&ice),
+            Report::Video(video) => self.take_video(video),
             // The core has already been told, by the host.
             Report::EndedByPage => self.finish("hung-up"),
             Report::Failed(message) => {
@@ -629,6 +765,8 @@ impl Call {
                 self.has_video = json::flag(&payload, "has_video");
                 self.offer = json::str_at(&payload, "place_call_info").to_string();
                 self.call_changed();
+                self.camera = self.has_video;
+                self.video_changed();
                 self.set_state("ringing");
                 self.watch_ringing();
                 self.ringing();

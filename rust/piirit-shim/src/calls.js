@@ -58,6 +58,11 @@
         xhr.send(body);
     }
 
+    /* Video is its own file's (`call_video.js`, served ahead of this):
+     * it reports on the same route, hears every peer connection the page
+     * makes, and takes the commands that are about the camera. */
+    piiritVideo.attach(post);
+
     /*
      * The page says nothing about how the connection is doing -- nothing
      * when it connects, nothing when it fails. The peer connection does,
@@ -107,6 +112,7 @@
             if (fixedServers) {
                 connection.setConfiguration = function () {};
             }
+            piiritVideo.watch(connection);
             connection.addEventListener("iceconnectionstatechange", function () {
                 post("/state", connection.iceConnectionState);
             });
@@ -186,7 +192,7 @@
                     if (commands[i] === "mute" || commands[i] === "unmute") {
                         wantMuted = commands[i] === "mute";
                         switched = true;
-                    } else {
+                    } else if (!piiritVideo.take(commands[i])) {
                         waiting.push(commands[i]);
                     }
                 }

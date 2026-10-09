@@ -334,6 +334,10 @@ Gli altri gruppi con contatti bloccati continueranno a visualizzare i loro messa
         <source>Call back</source>
         <translation>Richiama</translation>
     </message>
+    <message>
+        <source>Incoming video call</source>
+        <translation>Videochiamata in arrivo</translation>
+    </message>
 </context>
 <context>
     <name>CallPage</name>
@@ -387,6 +391,10 @@ Gli altri gruppi con contatti bloccati continueranno a visualizzare i loro messa
         <source>Answer</source>
         <extracomment>Answers a call that is ringing. A verb.</extracomment>
         <translation>Rispondi</translation>
+    </message>
+    <message>
+        <source>Incoming video call</source>
+        <translation>Videochiamata in arrivo</translation>
     </message>
 </context>
 <context>
@@ -452,6 +460,11 @@ Gli altri gruppi con contatti bloccati continueranno a visualizzare i loro messa
         <source>Call %1</source>
         <extracomment>Places a call. %1 is the name of whoever is called.</extracomment>
         <translation>Chiama %1</translation>
+    </message>
+    <message>
+        <source>Video call %1</source>
+        <extracomment>Places a video call. %1 is the name of whoever is called.</extracomment>
+        <translation>Videochiamata a %1</translation>
     </message>
 </context>
 <context>

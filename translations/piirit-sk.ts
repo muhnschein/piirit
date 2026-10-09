@@ -335,6 +335,10 @@ Správy od zablokovaných kontaktov v ostatných skupinách sa budú naďalej zo
         <source>Call back</source>
         <translation>Zavolať späť</translation>
     </message>
+    <message>
+        <source>Incoming video call</source>
+        <translation>Prichádzajúci video hovor</translation>
+    </message>
 </context>
 <context>
     <name>CallPage</name>
@@ -388,6 +392,10 @@ Správy od zablokovaných kontaktov v ostatných skupinách sa budú naďalej zo
         <source>Answer</source>
         <extracomment>Answers a call that is ringing. A verb.</extracomment>
         <translation>Prijať</translation>
+    </message>
+    <message>
+        <source>Incoming video call</source>
+        <translation>Prichádzajúci video hovor</translation>
     </message>
 </context>
 <context>
@@ -454,6 +462,11 @@ Správy od zablokovaných kontaktov v ostatných skupinách sa budú naďalej zo
         <source>Call %1</source>
         <extracomment>Places a call. %1 is the name of whoever is called.</extracomment>
         <translation>Zavolať: %1</translation>
+    </message>
+    <message>
+        <source>Video call %1</source>
+        <extracomment>Places a video call. %1 is the name of whoever is called.</extracomment>
+        <translation>Videohovor: %1</translation>
     </message>
 </context>
 <context>

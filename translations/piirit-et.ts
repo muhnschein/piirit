@@ -334,6 +334,10 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
         <source>Call back</source>
         <translation>Helista tagasi</translation>
     </message>
+    <message>
+        <source>Incoming video call</source>
+        <translation>Saabuv videokõne</translation>
+    </message>
 </context>
 <context>
     <name>CallPage</name>
@@ -387,6 +391,10 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
         <source>Answer</source>
         <extracomment>Answers a call that is ringing. A verb.</extracomment>
         <translation>Vasta</translation>
+    </message>
+    <message>
+        <source>Incoming video call</source>
+        <translation>Saabuv videokõne</translation>
     </message>
 </context>
 <context>
@@ -452,6 +460,11 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
         <source>Call %1</source>
         <extracomment>Places a call. %1 is the name of whoever is called.</extracomment>
         <translation>Helista: %1</translation>
+    </message>
+    <message>
+        <source>Video call %1</source>
+        <extracomment>Places a video call. %1 is the name of whoever is called.</extracomment>
+        <translation>Videokõne: %1</translation>
     </message>
 </context>
 <context>

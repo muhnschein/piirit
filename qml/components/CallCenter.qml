@@ -72,6 +72,16 @@ Item {
         onError: center.errorMessage = message
     }
 
+    /// The app is not the one in front. The camera is let go meanwhile,
+    /// and the pictures are not drawn (calls.rs, `set_background`). Not
+    /// read-only: a test, which has no app in front, says it is.
+    property bool away: Qt.application.state !== Qt.ApplicationActive
+    onAwayChanged: call.set_background(center.away)
+    Component.onCompleted: call.set_background(center.away)
+
+    /// Pictures are on the call's screen: the reader is watching it.
+    readonly property bool watching: center.busy && (call.local_video || call.remote_video)
+
     Connections {
         target: core
         // Qt 5.6 handler syntax; see WelcomePage.qml.
@@ -82,14 +92,13 @@ Item {
         }
     }
 
-    /// Call a chat. False when the app is in a call already, which the
-    /// caller says to the reader.
-    function place(accountId, chatId) {
+    /// Call a chat, with the camera on for a video call. False when the
+    /// app is in a call already, which the caller says to the reader.
+    function place(accountId, chatId, video) {
         if (center.busy) {
             return false
         }
-        // Audio only: see calls.rs.
-        if (!call.place(accountId, chatId, false)) {
+        if (!call.place(accountId, chatId, video === true)) {
             return false
         }
         center.show()
@@ -291,9 +300,11 @@ Item {
         enabled: center.busy
     }
 
+    // And lit while pictures are on it: nobody touches the screen
+    // through a video call, and it is not held to the ear.
     DisplayBlanking {
         objectName: "callDisplay"
-        preventBlanking: call.state === "ringing"
+        preventBlanking: call.state === "ringing" || center.watching
     }
 
     // A tap on either notification comes back here. On a path of its own
@@ -372,8 +383,10 @@ Item {
 
         function ring() {
             ringNote.summary = call.peer_name
-            // A phone first: the line says it is a call before it is read.
-            ringNote.body = "📞 " + qsTr("Incoming call")
+            // A phone or a camera first: the line says what kind of call
+            // it is before it is read.
+            ringNote.body = call.has_video ? "🎥 " + qsTr("Incoming video call")
+                                           : "📞 " + qsTr("Incoming call")
             ringNote.previewSummary = ringNote.summary
             ringNote.previewBody = ringNote.body
             ringNote.timestamp = new Date()

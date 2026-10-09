@@ -34,8 +34,9 @@ const PROBE_QML: &str = r#"
         // The window, as the page reaches it: what it was asked to do.
         QtObject {
             id: appWindow
-            function placeCall(accountId, chatId) {
-                probe.asked += 'place:' + accountId + ':' + chatId + ';'
+            function placeCall(accountId, chatId, video) {
+                probe.asked += 'place:' + accountId + ':' + chatId
+                               + (video ? ':video' : '') + ';'
                 return true
             }
             function showCall() { probe.asked += 'show;' }
@@ -210,6 +211,15 @@ fn a_contacts_calls_are_listed_and_called_from_their_own_page() {
             "action-enabled",
             call!("get", QString::from("callAction"), QString::from("enabled"))
         );
+        record!(
+            "video-action",
+            call!(
+                "get",
+                QString::from("videoCallActionLabel"),
+                QString::from("text")
+            )
+        );
+        record!("video-call", call!("tap", QString::from("videoCallAction")));
         record!("call", call!("tap", QString::from("callAction")));
         record!("after-call", call!("tapRow"));
         (*engine_ptr).quit();
@@ -267,10 +277,16 @@ fn a_contacts_calls_are_listed_and_called_from_their_own_page() {
         "true",
         "a contact a call can be placed with cannot be called. {context}"
     );
+    assert_eq!(
+        value("video-action"),
+        "Video call Ada <b>Lovelace</b>",
+        "the row to place a video call from does not name the contact. {context}"
+    );
+    assert_eq!(value("video-call"), "ok", "{context}");
     assert_eq!(value("call"), "ok", "{context}");
     let asked = value("after-call");
     assert!(
-        asked.starts_with("place:1:1;") && asked.contains(";pickUp:1:1:"),
+        asked.starts_with("place:1:1:video;place:1:1;") && asked.contains(";pickUp:1:1:"),
         "calling placed no call, or a tap on a call still ringing did not \
          take it up: {asked}. {context}"
     );

@@ -334,6 +334,10 @@ In anderen Gruppen mit blockierten Kontakten werden deren Nachrichten weiterhin 
         <source>Call back</source>
         <translation>Zurückrufen</translation>
     </message>
+    <message>
+        <source>Incoming video call</source>
+        <translation>Eingehender Videoanruf</translation>
+    </message>
 </context>
 <context>
     <name>CallPage</name>
@@ -387,6 +391,10 @@ In anderen Gruppen mit blockierten Kontakten werden deren Nachrichten weiterhin 
         <source>Answer</source>
         <extracomment>Answers a call that is ringing. A verb.</extracomment>
         <translation>Annehmen</translation>
+    </message>
+    <message>
+        <source>Incoming video call</source>
+        <translation>Eingehender Videoanruf</translation>
     </message>
 </context>
 <context>
@@ -452,6 +460,11 @@ In anderen Gruppen mit blockierten Kontakten werden deren Nachrichten weiterhin 
         <source>Call %1</source>
         <extracomment>Places a call. %1 is the name of whoever is called.</extracomment>
         <translation>%1 anrufen</translation>
+    </message>
+    <message>
+        <source>Video call %1</source>
+        <extracomment>Places a video call. %1 is the name of whoever is called.</extracomment>
+        <translation>%1 per Video anrufen</translation>
     </message>
 </context>
 <context>
