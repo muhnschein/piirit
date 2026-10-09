@@ -1946,16 +1946,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>ಸ್ವೀಕರಿಸಿದ ಸಂಪರ್ಕಗಳಿಗೆ ಕರೆ ಪರದೆಯನ್ನು ತೋರಿಸಿ</translation>
     </message>
     <message>
-        <source>Enable calls (experimental)</source>
-        <translation>ಕರೆಗಳನ್ನು ಸಕ್ರಿಯಗೊಳಿಸಿ (ಪ್ರಯೋಗಾತ್ಮಕ)</translation>
-    </message>
-    <message>
         <source>Runs small apps inside chats.</source>
         <translation>ಸಂಭಾಷಣೆಗಳ ಒಳಗೆ ಸಣ್ಣ ಅನ್ವಯಗಳನ್ನು ಚಲಾಯಿಸುತ್ತದೆ.</translation>
-    </message>
-    <message>
-        <source>Makes and answers voice calls in one-to-one chats.</source>
-        <translation>ಒಬ್ಬರಿಗೊಬ್ಬರ ಸಂಭಾಷಣೆಗಳಲ್ಲಿ ಧ್ವನಿ ಕರೆಗಳನ್ನು ಮಾಡುತ್ತದೆ ಮತ್ತು ಉತ್ತರಿಸುತ್ತದೆ.</translation>
     </message>
 </context>
 <context>

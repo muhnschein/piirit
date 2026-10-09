@@ -1946,16 +1946,8 @@ Vous continuerez à voir les messages des contacts bloqués dans les autres grou
         <translation>Afficher l’écran d’appel pour les contacts acceptés</translation>
     </message>
     <message>
-        <source>Enable calls (experimental)</source>
-        <translation>Activer les appels (expérimental)</translation>
-    </message>
-    <message>
         <source>Runs small apps inside chats.</source>
         <translation>Exécute de petites applications dans les discussions.</translation>
-    </message>
-    <message>
-        <source>Makes and answers voice calls in one-to-one chats.</source>
-        <translation>Passe et reçoit des appels vocaux dans les discussions individuelles.</translation>
     </message>
 </context>
 <context>

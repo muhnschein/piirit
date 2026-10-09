@@ -1960,16 +1960,8 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
         <translation>Prikaži zaslon za klic za sprejete stike</translation>
     </message>
     <message>
-        <source>Enable calls (experimental)</source>
-        <translation>Omogoči klice (poskusno)</translation>
-    </message>
-    <message>
         <source>Runs small apps inside chats.</source>
         <translation>Znotraj klepetov poganja majhne aplikacije.</translation>
-    </message>
-    <message>
-        <source>Makes and answers voice calls in one-to-one chats.</source>
-        <translation>Opravlja in sprejema glasovne klice v klepetih z eno osebo.</translation>
     </message>
 </context>
 <context>

@@ -1942,16 +1942,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Mostrar la pantalla de llamada para los contactos aceptados</translation>
     </message>
     <message>
-        <source>Enable calls (experimental)</source>
-        <translation>Activar llamadas (experimental)</translation>
-    </message>
-    <message>
         <source>Runs small apps inside chats.</source>
         <translation>Ejecuta pequeñas aplicaciones dentro de los chats.</translation>
-    </message>
-    <message>
-        <source>Makes and answers voice calls in one-to-one chats.</source>
-        <translation>Hace y contesta llamadas de voz en chats individuales.</translation>
     </message>
 </context>
 <context>

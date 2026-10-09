@@ -1953,16 +1953,8 @@ Citās grupās, kurās ir bloķēti kontakti, viņu ziņas joprojām būs redzam
         <translation>Rādīt zvana ekrānu apstiprinātiem kontaktiem</translation>
     </message>
     <message>
-        <source>Enable calls (experimental)</source>
-        <translation>Iespējot zvanus (eksperimentāli)</translation>
-    </message>
-    <message>
         <source>Runs small apps inside chats.</source>
         <translation>Darbina mazas lietotnes sarakstēs.</translation>
-    </message>
-    <message>
-        <source>Makes and answers voice calls in one-to-one chats.</source>
-        <translation>Veic balss zvanus un atbild uz tiem divpersonu sarakstēs.</translation>
     </message>
 </context>
 <context>

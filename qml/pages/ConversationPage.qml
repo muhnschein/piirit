@@ -432,7 +432,7 @@ Page {
     /// here was listening -- and any other is called back, the way it was
     /// made: a video call with the camera on.
     function callFromRow(messageId, outgoing, callState, hasVideo) {
-        if (Settings.callsEnabled !== true || typeof appWindow === "undefined") {
+        if (typeof appWindow === "undefined") {
             return
         }
         if (!outgoing && callState === "Alerting") {

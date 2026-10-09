@@ -9,6 +9,10 @@ docs/BUILDING.md, "Cutting a release").
 ## Unreleased
 
 - Enter in the chat search closes the keyboard and keeps the search.
+- **Voice calls are no longer experimental**: on for everybody, no switch to turn them on. Settings → Notifications → Calls still decides whether a call rings.
+- A ringing call plays the ringtone rather than a short beep.
+- A call that rings while the screen is off takes the lock screen away, so the call screen stays up.
+- A call declined just as the last call's screen was closing still says so.
 
 ## 2.1.0 — 2026-10-08
 

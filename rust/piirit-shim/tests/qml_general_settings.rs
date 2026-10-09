@@ -399,14 +399,12 @@ fn the_settings_page_writes_what_the_app_reads() {
             call!("appReads", QString::from("webxdcEnabled"))
         );
         record!("apps-switch-off", get!("webxdcSwitch", "checked"));
-        // Calls the same way, and a dialog left without accepting
-        // writes nothing.
-        record!("flip-calls", call!("click", QString::from("callsSwitch")));
-        record!("calls-asked", call!("pushed"));
-        record!(
-            "calls-unanswered",
-            call!("appReads", QString::from("callsEnabled"))
-        );
+        // Calls are not experimental any more (#119): no switch to turn
+        // them on, nothing asked, and whether one rings is a setting of
+        // its own that works on a phone that has never been asked.
+        record!("calls-switch", get!("callsSwitch", "visible"));
+        record!("calls-ring-usable", get!("callsRingSwitch", "enabled"));
+        record!("calls-ring-default", get!("callsRingSwitch", "checked"));
         // A deletion period is not written on the tap: the core is asked
         // first, and this one is not there to answer.
         record!(
@@ -565,12 +563,9 @@ fn the_settings_page_writes_what_the_app_reads() {
         ("apps-off-asked", ""),
         ("apps-off", "false"),
         ("apps-switch-off", "false"),
-        ("flip-calls", "ok"),
-        (
-            "calls-asked",
-            "ExperimentalFeatureDialog.qml:title=Enable calls (experimental)",
-        ),
-        ("calls-unanswered", "false"),
+        ("calls-switch", "missing:callsSwitch"),
+        ("calls-ring-usable", "true"),
+        ("calls-ring-default", "true"),
         (
             "app-notifications-key",
             "/apps/harbour-piirit/notifications_enabled",

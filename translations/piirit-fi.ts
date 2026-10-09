@@ -1942,16 +1942,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Näytä puhelunäkymä hyväksytyiltä yhteystiedoilta</translation>
     </message>
     <message>
-        <source>Enable calls (experimental)</source>
-        <translation>Ota puhelut käyttöön (kokeellinen)</translation>
-    </message>
-    <message>
         <source>Runs small apps inside chats.</source>
         <translation>Suorittaa pieniä sovelluksia keskusteluissa.</translation>
-    </message>
-    <message>
-        <source>Makes and answers voice calls in one-to-one chats.</source>
-        <translation>Soittaa ja vastaa äänipuheluihin kahdenkeskisissä keskusteluissa.</translation>
     </message>
 </context>
 <context>

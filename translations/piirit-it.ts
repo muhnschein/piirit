@@ -1946,16 +1946,8 @@ Gli altri gruppi con contatti bloccati continueranno a visualizzare i loro messa
         <translation>Mostra la schermata di chiamata per i contatti accettati</translation>
     </message>
     <message>
-        <source>Enable calls (experimental)</source>
-        <translation>Abilita le chiamate (sperimentale)</translation>
-    </message>
-    <message>
         <source>Runs small apps inside chats.</source>
         <translation>Esegue piccole app all&apos;interno delle chat.</translation>
-    </message>
-    <message>
-        <source>Makes and answers voice calls in one-to-one chats.</source>
-        <translation>Effettua e risponde alle chiamate vocali nelle chat individuali.</translation>
     </message>
 </context>
 <context>

@@ -1942,16 +1942,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>ஏற்கப்பட்ட தொடர்புகளுக்கு அழைப்புத் திரையைக் காட்டு</translation>
     </message>
     <message>
-        <source>Enable calls (experimental)</source>
-        <translation>அழைப்புகளை இயக்கு (சோதனை முறை)</translation>
-    </message>
-    <message>
         <source>Runs small apps inside chats.</source>
         <translation>அரட்டைகளுக்குள் சிறு செயலிகளை இயக்குகிறது.</translation>
-    </message>
-    <message>
-        <source>Makes and answers voice calls in one-to-one chats.</source>
-        <translation>தனிநபர் அரட்டைகளில் குரல் அழைப்புகளைச் செய்கிறது, அவற்றுக்குப் பதிலளிக்கிறது.</translation>
     </message>
 </context>
 <context>

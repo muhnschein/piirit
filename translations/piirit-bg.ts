@@ -1942,16 +1942,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Показване на екрана за обаждане за приетите контакти</translation>
     </message>
     <message>
-        <source>Enable calls (experimental)</source>
-        <translation>Включване на обажданията (експериментално)</translation>
-    </message>
-    <message>
         <source>Runs small apps inside chats.</source>
         <translation>Изпълнява малки приложения вътре в чатовете.</translation>
-    </message>
-    <message>
-        <source>Makes and answers voice calls in one-to-one chats.</source>
-        <translation>Осъществява и приема гласови обаждания в лични чатове.</translation>
     </message>
 </context>
 <context>

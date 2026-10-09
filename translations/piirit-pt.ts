@@ -1946,16 +1946,8 @@ Mensagens de contactos bloqueados não serão ocultadas noutros grupos.</transla
         <translation>Mostrar ecrã de chamadas para contactos aceites</translation>
     </message>
     <message>
-        <source>Enable calls (experimental)</source>
-        <translation>Ativar chamadas (experimental)</translation>
-    </message>
-    <message>
         <source>Runs small apps inside chats.</source>
         <translation>Executa pequenas aplicações dentro das conversas.</translation>
-    </message>
-    <message>
-        <source>Makes and answers voice calls in one-to-one chats.</source>
-        <translation>Faz e atende chamadas de voz em conversas individuais.</translation>
     </message>
 </context>
 <context>

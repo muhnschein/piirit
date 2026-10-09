@@ -1939,16 +1939,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Кабул ителгән контактлар өчен шалтырату экранын күрсәтү</translation>
     </message>
     <message>
-        <source>Enable calls (experimental)</source>
-        <translation>Шалтыратуларны кабызу (сынау режимы)</translation>
-    </message>
-    <message>
         <source>Runs small apps inside chats.</source>
         <translation>Әңгәмәләр эчендә кечкенә кушымталар эшләтә.</translation>
-    </message>
-    <message>
-        <source>Makes and answers voice calls in one-to-one chats.</source>
-        <translation>Шәхси әңгәмәләрдә тавышлы шалтыратулар ясый һәм аларга җавап бирә.</translation>
     </message>
 </context>
 <context>

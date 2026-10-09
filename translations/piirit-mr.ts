@@ -1946,16 +1946,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>स्वीकारलेल्या संपर्कांसाठी कॉल स्क्रीन दाखवा</translation>
     </message>
     <message>
-        <source>Enable calls (experimental)</source>
-        <translation>कॉल सक्षम करा (प्रायोगिक)</translation>
-    </message>
-    <message>
         <source>Runs small apps inside chats.</source>
         <translation>संभाषणांमध्ये छोटे अॅप चालवते.</translation>
-    </message>
-    <message>
-        <source>Makes and answers voice calls in one-to-one chats.</source>
-        <translation>एकास-एक संभाषणांमध्ये व्हॉइस कॉल करते आणि त्यांना उत्तर देते.</translation>
     </message>
 </context>
 <context>
