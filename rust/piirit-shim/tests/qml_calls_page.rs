@@ -25,7 +25,7 @@ use qmetaobject::*;
 
 mod common;
 
-const PROBE_QML: &str = r#"
+const PROBE_QML: &str = r"
     import QtQuick 2.0
     Item {
         id: probe
@@ -101,7 +101,7 @@ const PROBE_QML: &str = r#"
             return asked
         }
     }
-"#;
+";
 
 #[test]
 #[allow(clippy::too_many_lines)]

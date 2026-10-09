@@ -497,6 +497,20 @@ test("a camera that will not open is reported, and the page told it is off", asy
     assert.equal(pageSwitch.on, false);
 });
 
+test("a camera that will not open says so every time it is asked for", async () => {
+    const world = makeWorld(VOICE, { cameraFails: () => true });
+    await page(world);
+
+    await command(world, "camera-on");
+    assert.equal(lastVideo(world).failed, true, "the first failure was not reported");
+    const before = posts(world, "/video").length;
+    await command(world, "camera-on");
+    const after = posts(world, "/video").slice(before);
+    assert.ok(after.some((said) => said.failed === false)
+              && after[after.length - 1].failed === true,
+        "a second failure is not news to the app: " + JSON.stringify(after));
+});
+
 test("a camera switched off while it opens is let go when it does", async () => {
     const world = makeWorld(VOICE);
     const { connection } = await page(world);

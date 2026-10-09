@@ -357,6 +357,12 @@ var piiritVideo = (function () {
 
     function cameraOn() {
         wanted = true;
+        /* Asked again after a failure: said, so that a second failure
+         * is a change the app hears too. */
+        if (failed) {
+            failed = false;
+            report();
+        }
         syncSwitch();
         if (camera || opening || !stream) {
             return;
