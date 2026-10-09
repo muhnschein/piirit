@@ -53,6 +53,12 @@ Page {
         searchField.focus = false
     }
 
+    /// Enter on the keyboard hands the keyboard back and leaves the search
+    /// as it is: the query and the results stay on screen.
+    function dismissKeyboard() {
+        searchField.focus = false
+    }
+
     /// Results are showing instead of the chat list. Read from the field
     /// rather than from the model, so the swap happens on the keystroke
     /// and not a debounce later.
@@ -592,6 +598,11 @@ Page {
                     // Empty, it offers to go away instead of to clear.
                     canHide: !page.archived
                     onHideClicked: page.closeSearch()
+                    // Enter closes the keyboard and keeps the search. Silica's
+                    // EnterKey attached property would do the same, but the
+                    // test stubs cannot load it.
+                    Keys.onReturnPressed: page.dismissKeyboard()
+                    Keys.onEnterPressed: page.dismissKeyboard()
                     // The one word every search field in the app says; what
                     // each searches is what the page it is on shows.
                     placeholderText: qsTr("Search")
