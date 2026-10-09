@@ -332,21 +332,19 @@ pub fn synth(
     let path = c_path(path)?;
     let mut error = [0 as c_char; ERROR_LEN];
     let int = |value: u32| i32::try_from(value).map_err(|_| format!("{value} is too large"));
-    // SAFETY: as for `probe`.
-    #[allow(unsafe_code)]
-    let result = unsafe {
-        ffi::piirit_video_synth(
-            path.as_ptr(),
-            int(width)?,
-            int(height)?,
-            int(seconds)?,
-            i64::try_from(bit_rate).unwrap_or(i64::MAX),
-            int(rotation)?,
-            c_int::from(with_sound),
-            error.as_mut_ptr(),
-            ERROR_LEN,
-        )
+    let clip = ffi::Clip {
+        width: int(width)?,
+        height: int(height)?,
+        seconds: int(seconds)?,
+        rotation: int(rotation)?,
+        bit_rate: i64::try_from(bit_rate).unwrap_or(i64::MAX),
+        with_sound: i32::from(with_sound),
     };
+    // SAFETY: as for `probe`; `clip` is the layout recode.h declares,
+    // and is only read.
+    #[allow(unsafe_code)]
+    let result =
+        unsafe { ffi::piirit_video_synth(path.as_ptr(), &clip, error.as_mut_ptr(), ERROR_LEN) };
     if result == ffi::OK {
         Ok(())
     } else {
@@ -429,6 +427,16 @@ mod ffi {
         pub audio_bit_rate: i64,
     }
 
+    #[repr(C)]
+    pub struct Clip {
+        pub width: i32,
+        pub height: i32,
+        pub seconds: i32,
+        pub rotation: i32,
+        pub bit_rate: i64,
+        pub with_sound: i32,
+    }
+
     pub type Progress = extern "C" fn(context: *mut c_void, permille: i32) -> c_int;
 
     #[allow(unsafe_code)]
@@ -452,12 +460,7 @@ mod ffi {
 
         pub fn piirit_video_synth(
             path: *const c_char,
-            width: i32,
-            height: i32,
-            seconds: i32,
-            bit_rate: i64,
-            rotation: i32,
-            with_sound: c_int,
+            clip: *const Clip,
             error: *mut c_char,
             error_len: usize,
         ) -> c_int;

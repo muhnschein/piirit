@@ -16,7 +16,6 @@
 #include "recode.h"
 
 #include <math.h>
-#include <stdarg.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -35,22 +34,27 @@
  * the faster two give up in picture for their speed. */
 #define PRESET "veryfast"
 
-static void say(char *error, size_t error_len, const char *format, ...)
+static void say(char *error, size_t error_len, const char *what)
 {
-    va_list args;
-    if (!error || error_len == 0) {
-        return;
+    if (error && error_len > 0) {
+        snprintf(error, error_len, "%s", what);
     }
-    va_start(args, format);
-    vsnprintf(error, error_len, format, args);
-    va_end(args);
+}
+
+/* `what`, and then what about it. */
+static void say_with(char *error, size_t error_len, const char *what,
+                     const char *detail)
+{
+    if (error && error_len > 0) {
+        snprintf(error, error_len, "%s: %s", what, detail);
+    }
 }
 
 static void say_av(char *error, size_t error_len, const char *what, int code)
 {
     char reason[AV_ERROR_MAX_STRING_SIZE] = {0};
     av_strerror(code, reason, sizeof reason);
-    say(error, error_len, "%s: %s", what, reason);
+    say_with(error, error_len, what, reason);
 }
 
 /* FFmpeg and x264 report on stderr, where nobody on a phone reads it;
@@ -97,7 +101,9 @@ int piirit_video_probe(const char *path, struct piirit_probe *out,
                        char *error, size_t error_len)
 {
     AVFormatContext *format = NULL;
-    int video, audio, ret;
+    int video;
+    int audio;
+    int ret;
     int64_t size;
 
     quiet();
@@ -152,30 +158,21 @@ int piirit_video_probe(const char *path, struct piirit_probe *out,
     return PIIRIT_OK;
 }
 
-/* Everything one recoding holds, so that one function can let it go. */
-struct job {
-    AVFormatContext *in;
-    AVFormatContext *out;
-    int video_in;
-    int audio_in;
-    AVStream *video_out;
-    AVStream *audio_out;
-    AVCodecContext *video_dec;
-    AVCodecContext *audio_dec;
-    AVCodecContext *audio_enc;
-    struct SwsContext *scale;
+/* The sound's side of a recoding. */
+struct sound {
+    int in;
+    AVStream *out;
+    AVCodecContext *dec;
+    AVCodecContext *enc;
     struct SwrContext *resample;
     AVAudioFifo *fifo;
-    x264_t *x264;
-    x264_picture_t picture;
-    int picture_allocated;
     AVFrame *frame;
-    AVFrame *sound;
-    AVPacket *packet;
-    const struct piirit_target *target;
-    int64_t last_pts;
-    int64_t audio_pts;
-    int audio_started;
+    int64_t pts;
+    int started;
+};
+
+/* Who is told how far along it is, and how it went. */
+struct report {
     int64_t start;
     int64_t length;
     int32_t permille;
@@ -184,6 +181,25 @@ struct job {
     int cancelled;
     char *error;
     size_t error_len;
+};
+
+/* Everything one recoding holds, so that one function can let it go. */
+struct job {
+    AVFormatContext *in;
+    AVFormatContext *out;
+    int video_in;
+    AVStream *video_out;
+    AVCodecContext *video_dec;
+    struct SwsContext *scale;
+    x264_t *x264;
+    x264_picture_t picture;
+    int picture_allocated;
+    AVFrame *frame;
+    AVPacket *packet;
+    const struct piirit_target *target;
+    int64_t last_pts;
+    struct sound audio;
+    struct report report;
 };
 
 static void job_free(struct job *job)
@@ -195,15 +211,15 @@ static void job_free(struct job *job)
         x264_picture_clean(&job->picture);
     }
     sws_freeContext(job->scale);
-    swr_free(&job->resample);
-    if (job->fifo) {
-        av_audio_fifo_free(job->fifo);
+    swr_free(&job->audio.resample);
+    if (job->audio.fifo) {
+        av_audio_fifo_free(job->audio.fifo);
     }
     avcodec_free_context(&job->video_dec);
-    avcodec_free_context(&job->audio_dec);
-    avcodec_free_context(&job->audio_enc);
+    avcodec_free_context(&job->audio.dec);
+    avcodec_free_context(&job->audio.enc);
     av_frame_free(&job->frame);
-    av_frame_free(&job->sound);
+    av_frame_free(&job->audio.frame);
     av_packet_free(&job->packet);
     avformat_close_input(&job->in);
     if (job->out) {
@@ -220,13 +236,13 @@ static int open_decoder(struct job *job, int index, AVCodecContext **out)
     const AVCodec *codec = avcodec_find_decoder(par->codec_id);
     int ret;
     if (!codec) {
-        say(job->error, job->error_len, "no decoder for %s",
-            avcodec_get_name(par->codec_id));
+        say_with(job->report.error, job->report.error_len, "no decoder",
+                 avcodec_get_name(par->codec_id));
         return PIIRIT_FAILED;
     }
     *out = avcodec_alloc_context3(codec);
     if (!*out) {
-        say(job->error, job->error_len, "out of memory");
+        say(job->report.error, job->report.error_len, "out of memory");
         return PIIRIT_FAILED;
     }
     ret = avcodec_parameters_to_context(*out, par);
@@ -238,7 +254,7 @@ static int open_decoder(struct job *job, int index, AVCodecContext **out)
         ret = avcodec_open2(*out, codec, NULL);
     }
     if (ret < 0) {
-        say_av(job->error, job->error_len, "open the decoder", ret);
+        say_av(job->report.error, job->report.error_len, "open the decoder", ret);
         return PIIRIT_FAILED;
     }
     return PIIRIT_OK;
@@ -252,7 +268,9 @@ static int open_video(struct job *job)
     const AVPacketSideData *matrix;
     x264_param_t param;
     x264_nal_t *nals;
-    int count, i, size = 0, kbps;
+    int count;
+    int size = 0;
+    int kbps;
     uint8_t *extradata;
 
     if (rate.num <= 0 || rate.den <= 0) {
@@ -262,7 +280,7 @@ static int open_video(struct job *job)
         rate = (AVRational){30, 1};
     }
     if (x264_param_default_preset(&param, PRESET, NULL) < 0) {
-        say(job->error, job->error_len, "x264 has no preset " PRESET);
+        say(job->report.error, job->report.error_len, "x264 has no preset " PRESET);
         return PIIRIT_FAILED;
     }
     kbps = (int)(job->target->video_bit_rate / 1000);
@@ -290,24 +308,24 @@ static int open_video(struct job *job)
     param.b_repeat_headers = 0;
     param.b_annexb = 1;
     if (x264_param_apply_profile(&param, "high") < 0) {
-        say(job->error, job->error_len, "x264 has no high profile");
+        say(job->report.error, job->report.error_len, "x264 has no high profile");
         return PIIRIT_FAILED;
     }
     job->x264 = x264_encoder_open(&param);
     if (!job->x264) {
-        say(job->error, job->error_len, "x264 would not open");
+        say(job->report.error, job->report.error_len, "x264 would not open");
         return PIIRIT_FAILED;
     }
     if (x264_picture_alloc(&job->picture, X264_CSP_I420, param.i_width,
                            param.i_height) < 0) {
-        say(job->error, job->error_len, "out of memory");
+        say(job->report.error, job->report.error_len, "out of memory");
         return PIIRIT_FAILED;
     }
     job->picture_allocated = 1;
 
     job->video_out = avformat_new_stream(job->out, NULL);
     if (!job->video_out) {
-        say(job->error, job->error_len, "out of memory");
+        say(job->report.error, job->report.error_len, "out of memory");
         return PIIRIT_FAILED;
     }
     job->video_out->time_base = in->time_base;
@@ -324,22 +342,22 @@ static int open_video(struct job *job)
     /* The parameter sets, which MP4 keeps in the header rather than in
      * the stream; the muxer turns them into the form it stores. */
     if (x264_encoder_headers(job->x264, &nals, &count) < 0) {
-        say(job->error, job->error_len, "x264 wrote no headers");
+        say(job->report.error, job->report.error_len, "x264 wrote no headers");
         return PIIRIT_FAILED;
     }
-    for (i = 0; i < count; i++) {
+    for (int i = 0; i < count; i++) {
         if (nals[i].i_type == NAL_SPS || nals[i].i_type == NAL_PPS) {
             size += nals[i].i_payload;
         }
     }
     extradata = av_mallocz(size + AV_INPUT_BUFFER_PADDING_SIZE);
     if (!extradata) {
-        say(job->error, job->error_len, "out of memory");
+        say(job->report.error, job->report.error_len, "out of memory");
         return PIIRIT_FAILED;
     }
     job->video_out->codecpar->extradata = extradata;
     job->video_out->codecpar->extradata_size = size;
-    for (i = 0; i < count; i++) {
+    for (int i = 0; i < count; i++) {
         if (nals[i].i_type == NAL_SPS || nals[i].i_type == NAL_PPS) {
             memcpy(extradata, nals[i].p_payload, nals[i].i_payload);
             extradata += nals[i].i_payload;
@@ -356,7 +374,7 @@ static int open_video(struct job *job)
             &job->video_out->codecpar->nb_coded_side_data,
             AV_PKT_DATA_DISPLAYMATRIX, matrix->size, 0);
         if (!copy) {
-            say(job->error, job->error_len, "out of memory");
+            say(job->report.error, job->report.error_len, "out of memory");
             return PIIRIT_FAILED;
         }
         memcpy(copy->data, matrix->data, matrix->size);
@@ -367,67 +385,67 @@ static int open_video(struct job *job)
 /* The sound: AAC again at the rate asked for, or copied. */
 static int open_audio(struct job *job)
 {
-    const AVStream *in = job->in->streams[job->audio_in];
+    const AVStream *in = job->in->streams[job->audio.in];
     const AVCodec *codec;
     int ret;
 
-    job->audio_out = avformat_new_stream(job->out, NULL);
-    if (!job->audio_out) {
-        say(job->error, job->error_len, "out of memory");
+    job->audio.out = avformat_new_stream(job->out, NULL);
+    if (!job->audio.out) {
+        say(job->report.error, job->report.error_len, "out of memory");
         return PIIRIT_FAILED;
     }
     if (job->target->audio_bit_rate <= 0
             || in->codecpar->codec_id != AV_CODEC_ID_AAC) {
-        ret = avcodec_parameters_copy(job->audio_out->codecpar, in->codecpar);
+        ret = avcodec_parameters_copy(job->audio.out->codecpar, in->codecpar);
         if (ret < 0) {
-            say_av(job->error, job->error_len, "copy the sound", ret);
+            say_av(job->report.error, job->report.error_len, "copy the sound", ret);
             return PIIRIT_FAILED;
         }
-        job->audio_out->codecpar->codec_tag = 0;
-        job->audio_out->time_base = in->time_base;
+        job->audio.out->codecpar->codec_tag = 0;
+        job->audio.out->time_base = in->time_base;
         return PIIRIT_OK;
     }
 
-    if (open_decoder(job, job->audio_in, &job->audio_dec) != PIIRIT_OK) {
+    if (open_decoder(job, job->audio.in, &job->audio.dec) != PIIRIT_OK) {
         return PIIRIT_FAILED;
     }
     codec = avcodec_find_encoder(AV_CODEC_ID_AAC);
-    job->audio_enc = codec ? avcodec_alloc_context3(codec) : NULL;
-    if (!job->audio_enc) {
-        say(job->error, job->error_len, "no AAC encoder");
+    job->audio.enc = codec ? avcodec_alloc_context3(codec) : NULL;
+    if (!job->audio.enc) {
+        say(job->report.error, job->report.error_len, "no AAC encoder");
         return PIIRIT_FAILED;
     }
-    job->audio_enc->sample_fmt = AV_SAMPLE_FMT_FLTP;
-    job->audio_enc->sample_rate =
-        job->audio_dec->sample_rate > 0 ? job->audio_dec->sample_rate : 48000;
+    job->audio.enc->sample_fmt = AV_SAMPLE_FMT_FLTP;
+    job->audio.enc->sample_rate =
+        job->audio.dec->sample_rate > 0 ? job->audio.dec->sample_rate : 48000;
     /* Stereo at most: a phone's surround track is not what a chat
      * message is for, and every channel costs. */
-    if (job->audio_dec->ch_layout.nb_channels == 1) {
-        av_channel_layout_default(&job->audio_enc->ch_layout, 1);
+    if (job->audio.dec->ch_layout.nb_channels == 1) {
+        av_channel_layout_default(&job->audio.enc->ch_layout, 1);
     } else {
-        av_channel_layout_default(&job->audio_enc->ch_layout, 2);
+        av_channel_layout_default(&job->audio.enc->ch_layout, 2);
     }
-    job->audio_enc->bit_rate = job->target->audio_bit_rate;
-    job->audio_enc->time_base = (AVRational){1, job->audio_enc->sample_rate};
+    job->audio.enc->bit_rate = job->target->audio_bit_rate;
+    job->audio.enc->time_base = (AVRational){1, job->audio.enc->sample_rate};
     if (job->out->oformat->flags & AVFMT_GLOBALHEADER) {
-        job->audio_enc->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;
+        job->audio.enc->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;
     }
-    ret = avcodec_open2(job->audio_enc, codec, NULL);
+    ret = avcodec_open2(job->audio.enc, codec, NULL);
     if (ret >= 0) {
-        ret = avcodec_parameters_from_context(job->audio_out->codecpar,
-                                              job->audio_enc);
+        ret = avcodec_parameters_from_context(job->audio.out->codecpar,
+                                              job->audio.enc);
     }
     if (ret < 0) {
-        say_av(job->error, job->error_len, "open the AAC encoder", ret);
+        say_av(job->report.error, job->report.error_len, "open the AAC encoder", ret);
         return PIIRIT_FAILED;
     }
-    job->audio_out->time_base = job->audio_enc->time_base;
-    job->fifo = av_audio_fifo_alloc(job->audio_enc->sample_fmt,
-                                    job->audio_enc->ch_layout.nb_channels,
-                                    job->audio_enc->frame_size);
-    job->sound = av_frame_alloc();
-    if (!job->fifo || !job->sound) {
-        say(job->error, job->error_len, "out of memory");
+    job->audio.out->time_base = job->audio.enc->time_base;
+    job->audio.fifo = av_audio_fifo_alloc(job->audio.enc->sample_fmt,
+                                    job->audio.enc->ch_layout.nb_channels,
+                                    job->audio.enc->frame_size);
+    job->audio.frame = av_frame_alloc();
+    if (!job->audio.fifo || !job->audio.frame) {
+        say(job->report.error, job->report.error_len, "out of memory");
         return PIIRIT_FAILED;
     }
     return PIIRIT_OK;
@@ -441,7 +459,7 @@ static int write_packet(struct job *job, AVPacket *packet, AVRational from,
     av_packet_rescale_ts(packet, from, to->time_base);
     ret = av_interleaved_write_frame(job->out, packet);
     if (ret < 0) {
-        say_av(job->error, job->error_len, "write", ret);
+        say_av(job->report.error, job->report.error_len, "write", ret);
         return PIIRIT_FAILED;
     }
     return PIIRIT_OK;
@@ -455,14 +473,14 @@ static int encode_video(struct job *job, x264_picture_t *picture)
     int count;
     int size = x264_encoder_encode(job->x264, &nals, &count, picture, &encoded);
     if (size < 0) {
-        say(job->error, job->error_len, "x264 could not encode a frame");
+        say(job->report.error, job->report.error_len, "x264 could not encode a frame");
         return PIIRIT_FAILED;
     }
     if (size == 0) {
         return PIIRIT_OK;
     }
     if (av_new_packet(job->packet, size) < 0) {
-        say(job->error, job->error_len, "out of memory");
+        say(job->report.error, job->report.error_len, "out of memory");
         return PIIRIT_FAILED;
     }
     /* x264 lays a frame's units out one after another. */
@@ -484,15 +502,15 @@ static void report(struct job *job, int64_t pts)
 {
     int64_t done;
     int32_t permille;
-    if (!job->progress || job->length <= 0 || pts == AV_NOPTS_VALUE) {
+    if (!job->report.progress || job->report.length <= 0 || pts == AV_NOPTS_VALUE) {
         return;
     }
-    done = (pts - job->start) * 1000 / job->length;
-    permille = (int32_t)(done < 0 ? 0 : done > 1000 ? 1000 : done);
-    if (permille != job->permille) {
-        job->permille = permille;
-        if (job->progress(job->context, permille)) {
-            job->cancelled = 1;
+    done = (pts - job->report.start) * 1000 / job->report.length;
+    permille = (int32_t)FFMIN(FFMAX(done, 0), 1000);
+    if (permille != job->report.permille) {
+        job->report.permille = permille;
+        if (job->report.progress(job->report.context, permille)) {
+            job->report.cancelled = 1;
         }
     }
 }
@@ -510,8 +528,8 @@ static int scale_and_encode(struct job *job, const AVFrame *frame)
         job->target->width, job->target->height, AV_PIX_FMT_YUV420P,
         SWS_BICUBIC, NULL, NULL, NULL);
     if (!job->scale) {
-        say(job->error, job->error_len, "cannot scale %s",
-            av_get_pix_fmt_name(frame->format));
+        say_with(job->report.error, job->report.error_len, "cannot scale",
+                 av_get_pix_fmt_name(frame->format));
         return PIIRIT_FAILED;
     }
     sws_scale(job->scale, (const uint8_t *const *)frame->data,
@@ -535,7 +553,7 @@ static int drain_video(struct job *job)
         }
     }
     if (ret != AVERROR(EAGAIN) && ret != AVERROR_EOF) {
-        say_av(job->error, job->error_len, "decode the video", ret);
+        say_av(job->report.error, job->report.error_len, "decode the video", ret);
         return PIIRIT_FAILED;
     }
     return PIIRIT_OK;
@@ -544,16 +562,16 @@ static int drain_video(struct job *job)
 static int write_audio_packets(struct job *job)
 {
     int ret;
-    while ((ret = avcodec_receive_packet(job->audio_enc, job->packet)) >= 0) {
-        ret = write_packet(job, job->packet, job->audio_enc->time_base,
-                           job->audio_out);
+    while ((ret = avcodec_receive_packet(job->audio.enc, job->packet)) >= 0) {
+        ret = write_packet(job, job->packet, job->audio.enc->time_base,
+                           job->audio.out);
         av_packet_unref(job->packet);
         if (ret != PIIRIT_OK) {
             return ret;
         }
     }
     if (ret != AVERROR(EAGAIN) && ret != AVERROR_EOF) {
-        say_av(job->error, job->error_len, "encode the sound", ret);
+        say_av(job->report.error, job->report.error_len, "encode the sound", ret);
         return PIIRIT_FAILED;
     }
     return PIIRIT_OK;
@@ -563,34 +581,34 @@ static int write_audio_packets(struct job *job)
  * `everything`, which the end of the file asks for. */
 static int encode_audio(struct job *job, int everything)
 {
-    int frame_size = job->audio_enc->frame_size;
+    int frame_size = job->audio.enc->frame_size;
     int ret;
-    while (av_audio_fifo_size(job->fifo) >= frame_size
-            || (everything && av_audio_fifo_size(job->fifo) > 0)) {
-        int samples = FFMIN(av_audio_fifo_size(job->fifo), frame_size);
-        av_frame_unref(job->sound);
-        job->sound->nb_samples = samples;
-        job->sound->format = job->audio_enc->sample_fmt;
-        job->sound->sample_rate = job->audio_enc->sample_rate;
-        ret = av_channel_layout_copy(&job->sound->ch_layout,
-                                     &job->audio_enc->ch_layout);
+    while (av_audio_fifo_size(job->audio.fifo) >= frame_size
+            || (everything && av_audio_fifo_size(job->audio.fifo) > 0)) {
+        int samples = FFMIN(av_audio_fifo_size(job->audio.fifo), frame_size);
+        av_frame_unref(job->audio.frame);
+        job->audio.frame->nb_samples = samples;
+        job->audio.frame->format = job->audio.enc->sample_fmt;
+        job->audio.frame->sample_rate = job->audio.enc->sample_rate;
+        ret = av_channel_layout_copy(&job->audio.frame->ch_layout,
+                                     &job->audio.enc->ch_layout);
         if (ret >= 0) {
-            ret = av_frame_get_buffer(job->sound, 0);
+            ret = av_frame_get_buffer(job->audio.frame, 0);
         }
         if (ret < 0) {
-            say_av(job->error, job->error_len, "make a sound frame", ret);
+            say_av(job->report.error, job->report.error_len, "make a sound frame", ret);
             return PIIRIT_FAILED;
         }
-        if (av_audio_fifo_read(job->fifo, (void **)job->sound->data, samples)
+        if (av_audio_fifo_read(job->audio.fifo, (void **)job->audio.frame->data, samples)
                 < samples) {
-            say(job->error, job->error_len, "lost samples");
+            say(job->report.error, job->report.error_len, "lost samples");
             return PIIRIT_FAILED;
         }
-        job->sound->pts = job->audio_pts;
-        job->audio_pts += samples;
-        ret = avcodec_send_frame(job->audio_enc, job->sound);
+        job->audio.frame->pts = job->audio.pts;
+        job->audio.pts += samples;
+        ret = avcodec_send_frame(job->audio.enc, job->audio.frame);
         if (ret < 0) {
-            say_av(job->error, job->error_len, "encode the sound", ret);
+            say_av(job->report.error, job->report.error_len, "encode the sound", ret);
             return PIIRIT_FAILED;
         }
         if (write_audio_packets(job) != PIIRIT_OK) {
@@ -605,55 +623,57 @@ static int encode_audio(struct job *job, int everything)
 static int queue_audio(struct job *job, const AVFrame *frame)
 {
     uint8_t **buffer = NULL;
-    int capacity, samples, ret;
+    int capacity;
+    int samples;
+    int ret;
 
-    if (frame && !job->resample) {
+    if (frame && !job->audio.resample) {
         ret = swr_alloc_set_opts2(
-            &job->resample, &job->audio_enc->ch_layout,
-            job->audio_enc->sample_fmt, job->audio_enc->sample_rate,
+            &job->audio.resample, &job->audio.enc->ch_layout,
+            job->audio.enc->sample_fmt, job->audio.enc->sample_rate,
             &frame->ch_layout, frame->format, frame->sample_rate, 0, NULL);
         if (ret >= 0) {
-            ret = swr_init(job->resample);
+            ret = swr_init(job->audio.resample);
         }
         if (ret < 0) {
-            say_av(job->error, job->error_len, "resample the sound", ret);
+            say_av(job->report.error, job->report.error_len, "resample the sound", ret);
             return PIIRIT_FAILED;
         }
     }
-    if (!job->resample) {
+    if (!job->audio.resample) {
         return PIIRIT_OK;
     }
-    if (frame && !job->audio_started) {
+    if (frame && !job->audio.started) {
         /* The sound starts where the old file had it start. */
-        job->audio_started = 1;
+        job->audio.started = 1;
         if (frame->best_effort_timestamp != AV_NOPTS_VALUE) {
-            job->audio_pts = av_rescale_q(
+            job->audio.pts = av_rescale_q(
                 frame->best_effort_timestamp,
-                job->in->streams[job->audio_in]->time_base,
-                job->audio_enc->time_base);
+                job->in->streams[job->audio.in]->time_base,
+                job->audio.enc->time_base);
         }
     }
-    capacity = swr_get_out_samples(job->resample, frame ? frame->nb_samples : 0);
+    capacity = swr_get_out_samples(job->audio.resample, frame ? frame->nb_samples : 0);
     if (capacity <= 0) {
         return PIIRIT_OK;
     }
     ret = av_samples_alloc_array_and_samples(
-        &buffer, NULL, job->audio_enc->ch_layout.nb_channels, capacity,
-        job->audio_enc->sample_fmt, 0);
+        &buffer, NULL, job->audio.enc->ch_layout.nb_channels, capacity,
+        job->audio.enc->sample_fmt, 0);
     if (ret < 0) {
-        say(job->error, job->error_len, "out of memory");
+        say(job->report.error, job->report.error_len, "out of memory");
         return PIIRIT_FAILED;
     }
-    samples = swr_convert(job->resample, buffer, capacity,
+    samples = swr_convert(job->audio.resample, buffer, capacity,
                           frame ? (const uint8_t **)frame->extended_data : NULL,
                           frame ? frame->nb_samples : 0);
     ret = PIIRIT_OK;
     if (samples < 0) {
-        say_av(job->error, job->error_len, "resample the sound", samples);
+        say_av(job->report.error, job->report.error_len, "resample the sound", samples);
         ret = PIIRIT_FAILED;
     } else if (samples > 0
-            && av_audio_fifo_write(job->fifo, (void **)buffer, samples) < samples) {
-        say(job->error, job->error_len, "out of memory");
+            && av_audio_fifo_write(job->audio.fifo, (void **)buffer, samples) < samples) {
+        say(job->report.error, job->report.error_len, "out of memory");
         ret = PIIRIT_FAILED;
     }
     av_freep(&buffer[0]);
@@ -667,7 +687,7 @@ static int queue_audio(struct job *job, const AVFrame *frame)
 static int drain_audio(struct job *job)
 {
     int ret;
-    while ((ret = avcodec_receive_frame(job->audio_dec, job->frame)) >= 0) {
+    while ((ret = avcodec_receive_frame(job->audio.dec, job->frame)) >= 0) {
         ret = queue_audio(job, job->frame);
         av_frame_unref(job->frame);
         if (ret != PIIRIT_OK) {
@@ -675,7 +695,7 @@ static int drain_audio(struct job *job)
         }
     }
     if (ret != AVERROR(EAGAIN) && ret != AVERROR_EOF) {
-        say_av(job->error, job->error_len, "decode the sound", ret);
+        say_av(job->report.error, job->report.error_len, "decode the sound", ret);
         return PIIRIT_FAILED;
     }
     return PIIRIT_OK;
@@ -688,20 +708,20 @@ static int take(struct job *job, AVPacket *packet)
     if (packet->stream_index == job->video_in) {
         ret = avcodec_send_packet(job->video_dec, packet);
         if (ret < 0 && ret != AVERROR_INVALIDDATA) {
-            say_av(job->error, job->error_len, "decode the video", ret);
+            say_av(job->report.error, job->report.error_len, "decode the video", ret);
             return PIIRIT_FAILED;
         }
         return drain_video(job);
     }
-    if (packet->stream_index == job->audio_in) {
-        if (!job->audio_dec) {
+    if (packet->stream_index == job->audio.in) {
+        if (!job->audio.dec) {
             return write_packet(job, packet,
-                                job->in->streams[job->audio_in]->time_base,
-                                job->audio_out);
+                                job->in->streams[job->audio.in]->time_base,
+                                job->audio.out);
         }
-        ret = avcodec_send_packet(job->audio_dec, packet);
+        ret = avcodec_send_packet(job->audio.dec, packet);
         if (ret < 0 && ret != AVERROR_INVALIDDATA) {
-            say_av(job->error, job->error_len, "decode the sound", ret);
+            say_av(job->report.error, job->report.error_len, "decode the sound", ret);
             return PIIRIT_FAILED;
         }
         return drain_audio(job);
@@ -721,13 +741,13 @@ static int finish(struct job *job)
             return PIIRIT_FAILED;
         }
     }
-    if (job->audio_dec) {
-        if (avcodec_send_packet(job->audio_dec, NULL) < 0
+    if (job->audio.dec) {
+        if (avcodec_send_packet(job->audio.dec, NULL) < 0
                 || drain_audio(job) != PIIRIT_OK
                 || queue_audio(job, NULL) != PIIRIT_OK) {
             return PIIRIT_FAILED;
         }
-        if (avcodec_send_frame(job->audio_enc, NULL) < 0
+        if (avcodec_send_frame(job->audio.enc, NULL) < 0
                 || write_audio_packets(job) != PIIRIT_OK) {
             return PIIRIT_FAILED;
         }
@@ -742,30 +762,30 @@ static int run(struct job *job, const char *input, const char *output)
 
     ret = avformat_open_input(&job->in, input, NULL, NULL);
     if (ret < 0) {
-        say_av(job->error, job->error_len, "open", ret);
+        say_av(job->report.error, job->report.error_len, "open", ret);
         return PIIRIT_FAILED;
     }
     job->video_in = av_find_best_stream(job->in, AVMEDIA_TYPE_VIDEO, -1, -1, NULL, 0);
     if (job->video_in < 0) {
-        say(job->error, job->error_len, "no video in the file");
+        say(job->report.error, job->report.error_len, "no video in the file");
         return PIIRIT_FAILED;
     }
-    job->audio_in = av_find_best_stream(job->in, AVMEDIA_TYPE_AUDIO, -1,
+    job->audio.in = av_find_best_stream(job->in, AVMEDIA_TYPE_AUDIO, -1,
                                         job->video_in, NULL, 0);
     video = job->in->streams[job->video_in];
-    job->start = video->start_time != AV_NOPTS_VALUE ? video->start_time : 0;
-    job->length = video->duration > 0 ? video->duration
+    job->report.start = video->start_time != AV_NOPTS_VALUE ? video->start_time : 0;
+    job->report.length = video->duration > 0 ? video->duration
                 : av_rescale_q(job->in->duration, AV_TIME_BASE_Q, video->time_base);
 
     ret = avformat_alloc_output_context2(&job->out, NULL, "mp4", output);
     if (ret < 0) {
-        say_av(job->error, job->error_len, "start the new file", ret);
+        say_av(job->report.error, job->report.error_len, "start the new file", ret);
         return PIIRIT_FAILED;
     }
     if (open_video(job) != PIIRIT_OK) {
         return PIIRIT_FAILED;
     }
-    if (job->audio_in >= 0 && open_audio(job) != PIIRIT_OK) {
+    if (job->audio.in >= 0 && open_audio(job) != PIIRIT_OK) {
         return PIIRIT_FAILED;
     }
     ret = avio_open(&job->out->pb, output, AVIO_FLAG_WRITE);
@@ -773,22 +793,26 @@ static int run(struct job *job, const char *input, const char *output)
         ret = avformat_write_header(job->out, NULL);
     }
     if (ret < 0) {
-        say_av(job->error, job->error_len, "write the new file", ret);
+        say_av(job->report.error, job->report.error_len, "write the new file", ret);
         return PIIRIT_FAILED;
     }
 
-    while (!job->cancelled && (ret = av_read_frame(job->in, job->packet)) >= 0) {
+    for (;;) {
+        if (job->report.cancelled) {
+            return PIIRIT_CANCELLED;
+        }
+        ret = av_read_frame(job->in, job->packet);
+        if (ret < 0) {
+            break;
+        }
         ret = take(job, job->packet);
         av_packet_unref(job->packet);
         if (ret != PIIRIT_OK) {
             return ret;
         }
     }
-    if (job->cancelled) {
-        return PIIRIT_CANCELLED;
-    }
     if (ret != AVERROR_EOF) {
-        say_av(job->error, job->error_len, "read", ret);
+        say_av(job->report.error, job->report.error_len, "read", ret);
         return PIIRIT_FAILED;
     }
     if (finish(job) != PIIRIT_OK) {
@@ -796,10 +820,10 @@ static int run(struct job *job, const char *input, const char *output)
     }
     ret = av_write_trailer(job->out);
     if (ret < 0) {
-        say_av(job->error, job->error_len, "finish the new file", ret);
+        say_av(job->report.error, job->report.error_len, "finish the new file", ret);
         return PIIRIT_FAILED;
     }
-    report(job, job->start + job->length);
+    report(job, job->report.start + job->report.length);
     return PIIRIT_OK;
 }
 
@@ -814,13 +838,13 @@ int piirit_video_recode(const char *input, const char *output,
     quiet();
     memset(&job, 0, sizeof job);
     job.target = target;
-    job.progress = progress;
-    job.context = context;
-    job.error = error;
-    job.error_len = error_len;
+    job.report.progress = progress;
+    job.report.context = context;
+    job.report.error = error;
+    job.report.error_len = error_len;
     job.last_pts = INT64_MIN;
-    job.permille = -1;
-    job.audio_in = -1;
+    job.report.permille = -1;
+    job.audio.in = -1;
     job.frame = av_frame_alloc();
     job.packet = av_packet_alloc();
     if (!job.frame || !job.packet) {
@@ -829,9 +853,11 @@ int piirit_video_recode(const char *input, const char *output,
     } else if (target->width <= 0 || target->height <= 0
             || (target->width | target->height) & 1
             || target->video_bit_rate < 1000) {
-        say(error, error_len, "cannot make %dx%d at %lld bit/s",
-            (int)target->width, (int)target->height,
-            (long long)target->video_bit_rate);
+        if (error && error_len > 0) {
+            snprintf(error, error_len, "cannot make %dx%d at %lld bit/s",
+                     (int)target->width, (int)target->height,
+                     (long long)target->video_bit_rate);
+        }
         result = PIIRIT_FAILED;
     } else {
         result = run(&job, input, output);

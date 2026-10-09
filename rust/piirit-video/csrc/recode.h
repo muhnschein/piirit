@@ -60,11 +60,20 @@ int piirit_video_recode(const char *input, const char *output,
                         piirit_progress progress, void *context,
                         char *error, size_t error_len);
 
-/* A test clip: `seconds` of moving H.264 at `width` x `height`, with a
- * tone in AAC when `with_sound`, turned by `rotation`. For the tests,
- * which have no camera and should not carry a binary fixture. */
-int piirit_video_synth(const char *path, int32_t width, int32_t height,
-                       int32_t seconds, int64_t bit_rate, int32_t rotation,
-                       int32_t with_sound, char *error, size_t error_len);
+/* A test clip to make: `seconds` of moving H.264 at `width` x `height`
+ * and `bit_rate`, with a tone in AAC when `with_sound`, turned by
+ * `rotation`. For the tests, which have no camera and should not carry
+ * a binary fixture. */
+struct piirit_clip {
+    int32_t width;
+    int32_t height;
+    int32_t seconds;
+    int32_t rotation;
+    int64_t bit_rate;
+    int32_t with_sound;
+};
+
+int piirit_video_synth(const char *path, const struct piirit_clip *clip,
+                       char *error, size_t error_len);
 
 #endif
