@@ -6,6 +6,8 @@
 
 use std::cell::RefCell;
 use std::collections::{BTreeMap, HashSet};
+use std::sync::atomic::{AtomicBool, Ordering};
+use std::sync::Arc;
 
 use chrono::{DateTime, Local, TimeZone};
 use deltachat_jsonrpc::RpcClient;
@@ -14,7 +16,8 @@ use qmetaobject::*;
 use crate::core::connection;
 use crate::json;
 use crate::models::{MessageListItem, MessageListModel};
-use crate::{calls, links, markdown, media, webxdc};
+use crate::video::Prepared;
+use crate::{calls, links, markdown, media, video, webxdc};
 
 /// `DC_STATE_IN_FRESH` and `DC_STATE_IN_NOTICED`: an incoming message the
 /// account has not read yet.
@@ -264,10 +267,13 @@ pub struct ChatMessages {
     pub pending_file: qt_property!(QString; WRITE set_pending_file NOTIFY pending_file_changed),
     /// Emitted when [`Self::pending_file`] changes.
     pub pending_file_changed: qt_signal!(),
-    /// What [`Self::pending_file`] weighs on the phone, in bytes, 0 when
-    /// there is none or it cannot be measured. What the bar says about a
-    /// large file. Through f64 because QML has no 64-bit integer.
-    pub attachment_bytes: qt_property!(f64; NOTIFY pending_file_changed),
+    /// What [`Self::pending_file`] will weigh when it is sent, in bytes,
+    /// 0 when there is none or it cannot be measured. What the bar says
+    /// about a large file. A video that is going to be made smaller
+    /// weighs what it will come out at (`video.rs`), and anything else
+    /// what it weighs on the phone. Through f64 because QML has no
+    /// 64-bit integer.
+    pub attachment_bytes: qt_property!(f64; NOTIFY attachment_large_changed),
     /// The largest attachment the core recommends, in bytes; 0 until it
     /// has said. A recommendation, not what this profile's relay takes:
     /// see `media.rs`. A real for the reason above.
@@ -279,8 +285,28 @@ pub struct ChatMessages {
     /// false for a picture whatever it weighs: the core recodes those on
     /// the way out.
     pub attachment_large: qt_property!(bool; NOTIFY attachment_large_changed),
-    /// Emitted when [`Self::attachment_large`] changes.
+    /// Emitted when [`Self::attachment_large`] or
+    /// [`Self::attachment_bytes`] changes.
     pub attachment_large_changed: qt_signal!(),
+
+    /// The reader's outgoing media quality, the core's `media_quality`:
+    /// 0 balanced, 1 worse. What a picked video is made smaller to before
+    /// it is sent (`video.rs`); the core reads the same setting for a
+    /// picture.
+    pub media_quality: qt_property!(u32; WRITE set_media_quality NOTIFY media_quality_changed),
+    /// Emitted when [`Self::media_quality`] changes.
+    pub media_quality_changed: qt_signal!(),
+    /// A picked video is being made smaller, and is sent once it is.
+    /// [`Self::sending`] is true meanwhile too: the send has been asked
+    /// for.
+    pub preparing: qt_property!(bool; NOTIFY preparing_changed),
+    /// How far along that is, from 0 to 1.
+    pub preparing_progress: qt_property!(f64; NOTIFY preparing_changed),
+    /// Emitted when [`Self::preparing`] or its progress changes.
+    pub preparing_changed: qt_signal!(),
+    /// Stop making the video smaller. Nothing is sent, and the file stays
+    /// on the bar for the reader to send again or put away.
+    pub cancel_preparing: qt_method!(fn(&mut self)),
 
     /// Fetch the rest of a message the core holds only the header of.
     /// The core announces the result as a change to the message.
@@ -374,6 +400,16 @@ pub struct ChatMessages {
     /// keeps the line where it was rather than asking again and being
     /// told, correctly, that there is nothing unread any more.
     unread_marked_chat: u32,
+
+    /// How to make the file on the bar smaller, when it is a video worth
+    /// making smaller: planned as it is picked, so the bar can say what
+    /// will be sent, and planned again as the limit or the quality move.
+    pending_plan: Option<piirit_video::Target>,
+    /// Set to stop the video being made smaller, while one is.
+    recode_cancel: Option<Arc<AtomicBool>>,
+    /// The smaller video handed to the core, removed once it has answered:
+    /// it copies the file into its blob directory.
+    recoded_file: Option<String>,
 
     /// Which account `attachment_limit` was read for, 0 for none: the
     /// core answers per profile, so it is asked for once per profile
@@ -472,12 +508,18 @@ impl ChatMessages {
             return;
         }
         self.pending_file = file_path;
-        // Exact to 2^53 bytes, which no phone holds.
-        #[allow(clippy::cast_precision_loss)]
-        {
-            self.attachment_bytes = media::file_bytes(&self.pending_path()) as f64;
-        }
         self.pending_file_changed();
+        self.weigh_pending_file();
+    }
+
+    /// Take the reader's outgoing media quality, and plan the file on the
+    /// bar again by it.
+    pub fn set_media_quality(&mut self, quality: u32) {
+        if self.media_quality == quality {
+            return;
+        }
+        self.media_quality = quality;
+        self.media_quality_changed();
         self.weigh_pending_file();
     }
 
@@ -488,11 +530,32 @@ impl ChatMessages {
     }
 
     /// Measure whatever is on the bar against the limit, and say so when
-    /// the answer changed. Called when either of the two moves.
+    /// the answer changed. Called when the file, the limit or the quality
+    /// moves.
+    ///
+    /// A video that is going to be made smaller is measured as it will
+    /// be sent: one that comes out under the limit is not large, however
+    /// large the phone's copy is, and one that still does not fit is said
+    /// to be large at the size it will be.
     fn weigh_pending_file(&mut self) {
-        let large = media::exceeds_limit(&self.pending_path(), self.recommended_limit());
-        if self.attachment_large != large {
+        let path = self.pending_path();
+        let limit = self.recommended_limit();
+        self.pending_plan = video::plan(&path, self.media_quality, limit);
+        let (bytes, large) = match &self.pending_plan {
+            Some(plan) => {
+                let bytes = plan.predicted_bytes();
+                (bytes, limit > 0 && bytes > limit)
+            }
+            None => (media::file_bytes(&path), media::exceeds_limit(&path, limit)),
+        };
+        // Exact to 2^53 bytes, which no phone holds.
+        #[allow(clippy::cast_precision_loss)]
+        let bytes = bytes as f64;
+        #[allow(clippy::float_cmp)]
+        let changed = self.attachment_large != large || self.attachment_bytes != bytes;
+        if changed {
             self.attachment_large = large;
+            self.attachment_bytes = bytes;
             self.attachment_large_changed();
         }
     }
@@ -1593,7 +1656,109 @@ impl ChatMessages {
         // which the page gives, and a relay that takes more is common.
         // One that does not fails the message like any other refusal.
         let name = file_name_of(&path);
-        self.send_message(self.outgoing_text(&text.to_string()), Some((path, name)));
+        let text = self.outgoing_text(&text.to_string());
+        // Planned again rather than taken from the bar: what is sent is
+        // what was asked for, whether or not the bar was told about it.
+        match video::plan(&path, self.media_quality, self.recommended_limit()) {
+            Some(target) => self.prepare_video(text, path, name, target),
+            None => self.send_message(text, Some((path, name))),
+        }
+    }
+
+    /// Make a picked video smaller, then send that in its place.
+    ///
+    /// The send counts as asked for from here: [`Self::sending`] is set,
+    /// so a second tap waits, and the compose state stays until the core
+    /// answers, as for any send.
+    fn prepare_video(
+        &mut self,
+        text: String,
+        path: String,
+        name: String,
+        target: piirit_video::Target,
+    ) {
+        if self.sending || self.account_id == 0 || self.chat_id == 0 {
+            return;
+        }
+        let cancel = Arc::new(AtomicBool::new(false));
+        let input = path.clone();
+        let chat = (self.account_id, self.chat_id);
+        let ptr: QPointer<Self> = QPointer::from(&*self);
+        let progress = queued_callback(move |fraction: f64| {
+            let Some(this) = ptr.as_pinned() else { return };
+            if this.borrow().preparing {
+                this.borrow_mut().preparing_progress = fraction;
+                this.borrow().preparing_changed();
+            }
+        });
+        let ptr: QPointer<Self> = QPointer::from(&*self);
+        let done = queued_callback(move |prepared: Prepared| {
+            let Some(this) = ptr.as_pinned() else {
+                // The conversation went while this ran; nothing will send
+                // it now.
+                if let Prepared::Made(made) = prepared {
+                    video::discard(&made);
+                }
+                return;
+            };
+            let here = (this.borrow().account_id, this.borrow().chat_id);
+            // Moved to another chat meanwhile: what was asked for here is
+            // not for that one.
+            let prepared = if here == chat {
+                prepared
+            } else {
+                if let Prepared::Made(made) = prepared {
+                    video::discard(&made);
+                }
+                Prepared::Cancelled
+            };
+            this.borrow_mut()
+                .prepared(prepared, text.clone(), path.clone(), name.clone());
+        });
+        let started = video::start(input, target, Arc::clone(&cancel), progress, done);
+        if let Err(err) = started {
+            self.error(err.into());
+            return;
+        }
+        self.recode_cancel = Some(cancel);
+        self.sending = true;
+        self.preparing = true;
+        self.preparing_progress = 0.0;
+        self.sending_changed();
+        self.preparing_changed();
+    }
+
+    /// A video has been made smaller, or not: send what there is to send.
+    fn prepared(&mut self, prepared: Prepared, text: String, path: String, name: String) {
+        self.recode_cancel = None;
+        self.preparing = false;
+        self.preparing_progress = 0.0;
+        self.preparing_changed();
+        // Cleared so that the send below is not refused as a second one,
+        // and said, since a send that goes no further leaves it so.
+        self.sending = false;
+        self.sending_changed();
+        match prepared {
+            Prepared::Made(made) => {
+                self.recoded_file = Some(made.clone());
+                self.send_message(text, Some((made, video::recoded_name(&name))));
+            }
+            // Recoding is a courtesy to the relay: a video it could not
+            // read goes as it is, with the bar's notice if it is large,
+            // as every video did before.
+            Prepared::Failed(reason) => {
+                eprintln!("piirit: sending the video as it is: {reason}");
+                self.send_message(text, Some((path, name)));
+            }
+            Prepared::Cancelled => {}
+        }
+    }
+
+    /// Stop making a video smaller; see [`Self::cancel_preparing`].
+    pub fn cancel_preparing(&mut self) {
+        if let Some(cancel) = &self.recode_cancel {
+            cancel.store(true, Ordering::Relaxed);
+        }
     }
 
     /// Send a recording as a voice message.
@@ -1651,6 +1816,10 @@ impl ChatMessages {
         // failed has to leave the reader able to try again.
         self.sending = false;
         self.sending_changed();
+        // The core has copied it, or will not: either way it is done with.
+        if let Some(made) = self.recoded_file.take() {
+            video::discard(&made);
+        }
         match result {
             Ok(item) => self.place_sent(quoted, item),
             Err(err) => self.error(err.into()),
@@ -1681,6 +1850,14 @@ impl ChatMessages {
             self.quote_changed();
         }
         self.sent(message_id);
+    }
+}
+
+impl Drop for ChatMessages {
+    /// A video still being made smaller for this conversation is not
+    /// going to be sent from it.
+    fn drop(&mut self) {
+        self.cancel_preparing();
     }
 }
 

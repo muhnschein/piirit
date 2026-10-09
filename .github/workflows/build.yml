@@ -54,6 +54,13 @@ jobs:
         with:
           fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
 
+      # FFmpeg and x264, which piirit-video builds. Not `submodules: true`
+      # on the checkout above: with fetch-depth 0 that would fetch both
+      # projects' whole history too, which the analysis never reads --
+      # third_party/ is excluded from it.
+      - name: Fetch the submodules
+        run: git submodule update --init --depth 1
+
       # The same Qt set ci.yml's `test` job installs: the coverage run below
       # runs the whole suite, and the shim's tests drive a real QtQuick
       # engine. The -dev packages omit the QtQuick runtime plugin.

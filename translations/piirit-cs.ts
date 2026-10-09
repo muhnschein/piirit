@@ -157,6 +157,11 @@
         <extracomment>Shown above the message field once a file has been picked. %1 is the file name.</extracomment>
         <translation>Odesílá se %1</translation>
     </message>
+    <message>
+        <source>Making %1 smaller before sending it: %2%</source>
+        <extracomment>Shown above the message field while a picked video is made smaller, which happens before it is sent so that relays take it. %1 is the file name, %2 how much of it is done, as a number from 0 to 100.</extracomment>
+        <translation>Zmenšování %1 před odesláním: %2 %</translation>
+    </message>
 </context>
 <context>
     <name>AttachmentPreview</name>

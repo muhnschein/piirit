@@ -32,6 +32,9 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        # FFmpeg and x264, which piirit-video builds (docs/BUILDING.md).
+        with:
+          submodules: true
       # qml-module-qtquick2 is the QtQuick runtime plugin, which the -dev
       # packages do not pull in. qttools5-dev-tools is lrelease, which the
       # app's translation test compiles a catalog with. qtmultimedia5-dev
@@ -74,6 +77,9 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        # FFmpeg and x264, which piirit-video builds (docs/BUILDING.md).
+        with:
+          submodules: true
       - run: ./ci/apt-install.sh qtbase5-dev qtdeclarative5-dev qtmultimedia5-dev
       - run: rustup toolchain install 1.75.0 --profile minimal
       - uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
@@ -96,6 +102,9 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        # FFmpeg and x264, which piirit-video builds (docs/BUILDING.md).
+        with:
+          submodules: true
       # real_core drives the shim through a QML probe.
       - run: ./ci/apt-install.sh qtbase5-dev qtdeclarative5-dev qtmultimedia5-dev qml-module-qtquick2
       - uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
@@ -144,6 +153,9 @@ jobs:
     timeout-minutes: 25
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        # FFmpeg and x264, which piirit-video builds (docs/BUILDING.md).
+        with:
+          submodules: true
       # rpm for rpmspec (the %files layout), file for the icons, binutils
       # for the binary's symbols.
       - run: ./ci/apt-install.sh rpm file binutils qtbase5-dev qtdeclarative5-dev qtmultimedia5-dev

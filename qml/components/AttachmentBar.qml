@@ -17,7 +17,20 @@ Item {
     property string filePath
     /// What to call it. Falls back to the path when a picker gave no name.
     property string fileName
+    /// The file is a video being made smaller before it is sent, and
+    /// how far along that is, from 0 to 1. See ChatMessages.preparing.
+    property bool preparing: false
+    property real progress: 0
+    /// The file is put away.
     signal cancelled()
+    /// Making the video smaller is stopped, and nothing is sent; the file
+    /// stays. What the same button means while that runs: putting the
+    /// file away under a send that is using it would leave the send
+    /// holding a file the bar no longer shows.
+    signal stopped()
+
+    readonly property string shownName:
+        root.fileName.length > 0 ? root.fileName : root.filePath
 
     // Sized by its own reason to be here rather than by `visible`: see
     // ReplyBar.
@@ -38,10 +51,30 @@ Item {
         font.pixelSize: Theme.fontSizeExtraSmall
         color: Theme.secondaryColor
         textFormat: Text.PlainText
-        //: Shown above the message field once a file has been picked. %1 is
-        //: the file name.
-        text: qsTr("Sending %1").arg(
-                  root.fileName.length > 0 ? root.fileName : root.filePath)
+        text: root.preparing
+              //: Shown above the message field while a picked video is
+              //: made smaller, which happens before it is sent so that
+              //: relays take it. %1 is the file name, %2 how much of it
+              //: is done, as a number from 0 to 100.
+              ? qsTr("Making %1 smaller before sending it: %2%")
+                .arg(root.shownName).arg(Math.round(root.progress * 100))
+              //: Shown above the message field once a file has been
+              //: picked. %1 is the file name.
+              : qsTr("Sending %1").arg(root.shownName)
+    }
+
+    // How far along making the video smaller is: a line along the bottom
+    // of the bar, filling as it goes.
+    Rectangle {
+        objectName: "preparingProgress"
+        anchors {
+            left: parent.left
+            bottom: parent.bottom
+        }
+        visible: root.preparing
+        height: Math.max(2, Theme.paddingSmall / 2)
+        width: parent.width * Math.max(0, Math.min(1, root.progress))
+        color: Theme.highlightColor
     }
 
     IconButton {
@@ -53,6 +86,6 @@ Item {
             rightMargin: Theme.horizontalPageMargin
         }
         icon.source: "image://theme/icon-m-clear"
-        onClicked: root.cancelled()
+        onClicked: root.preparing ? root.stopped() : root.cancelled()
     }
 }

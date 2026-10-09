@@ -379,12 +379,20 @@ dependencies = [
  "cpp_build",
  "deltachat-jsonrpc",
  "mp3lame-encoder",
+ "piirit-video",
  "qmetaobject",
  "qrcode",
  "qttypes",
  "rqrr",
  "serde_json",
  "tokio",
+]
+
+[[package]]
+name = "piirit-video"
+version = "2.1.0"
+dependencies = [
+ "cc",
 ]
 
 [[package]]
