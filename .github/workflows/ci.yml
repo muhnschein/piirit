@@ -36,7 +36,7 @@ jobs:
       # packages do not pull in. qttools5-dev-tools is lrelease, which the
       # app's translation test compiles a catalog with. qtmultimedia5-dev
       # is QAudioRecorder, which the shim's voice recorder is built on.
-      - run: ./ci/apt-install.sh qtbase5-dev qtdeclarative5-dev qtmultimedia5-dev qtdeclarative5-dev-tools qml-module-qtquick2 qml-module-qtgraphicaleffects qttools5-dev-tools
+      - run: ./ci/apt-install.sh qtbase5-dev qtdeclarative5-dev qtmultimedia5-dev qtdeclarative5-dev-tools qml-module-qtquick2 qttools5-dev-tools
       - uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
         with:
           workspaces: rust
@@ -95,7 +95,7 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       # real_core drives the shim through a QML probe.
-      - run: ./ci/apt-install.sh qtbase5-dev qtdeclarative5-dev qtmultimedia5-dev qml-module-qtquick2 qml-module-qtgraphicaleffects
+      - run: ./ci/apt-install.sh qtbase5-dev qtdeclarative5-dev qtmultimedia5-dev qml-module-qtquick2
       - uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
         with:
           workspaces: rust
@@ -116,7 +116,7 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - run: ./ci/apt-install.sh qtdeclarative5-dev-tools qttools5-dev-tools qml-module-qtgraphicaleffects rpm desktop-file-utils shellcheck
+      - run: ./ci/apt-install.sh qtdeclarative5-dev-tools qttools5-dev-tools rpm desktop-file-utils shellcheck
       - run: ./ci/qml-lint.sh
       # Strict: a checker that is not installed fails here, so the job
       # cannot quietly stop checking when the apt line above changes.

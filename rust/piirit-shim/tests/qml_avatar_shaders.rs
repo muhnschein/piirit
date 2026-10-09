@@ -1,26 +1,30 @@
-//! Nothing between an avatar's picture and the screen is drawn into a
-//! framebuffer of its own (issue #102).
+//! Nothing between an avatar's picture and the screen is drawn by a
+//! shader of the app's own, in any state an avatar is drawn in.
 //!
-//! After a long while the cover's faces would turn into flat squares:
-//! grey where the faces were, tinted where someone had written, with the
-//! pill and the quick actions beside them drawn as ever. Each face was
-//! drawn through four or five framebuffers -- the mask and the picture
-//! each copied into one for an `OpacityMask`, the mask's result kept in
-//! another (`cached`), the greying drawn out of a layer, the tint kept in
-//! one more -- and the cover makes every face again for every message.
-//! Qt 5.6 never asks whether a framebuffer it made is any good
-//! (`QSGDefaultLayer` binds `QOpenGLFramebufferObject::texture()`, which
-//! is 0 for one that failed), so when the phone cannot give it one the
-//! face draws texture 0: opaque black, a square, grey under the cover's
-//! opacity and tinted under the overlay, for as long as that face lives.
-//! Forcing framebuffer allocation to fail under a real GL context draws
-//! exactly that picture.
+//! The cover's faces kept turning into squares. In 2.0 they were flat
+//! grey and tinted ones (issue #102); in 2.1, after the framebuffers were
+//! taken out, new faces came out as white squares of their whole picture
+//! with only their foot showing. The second is, and the first fits, one
+//! bug in Sailfish's Qt 5.6: every time a window is hidden, its render
+//! thread deletes the
+//! `QSGMaterialType` of every `ShaderEffect` (`invalidateOpenGL()` calls
+//! `QQuickShaderEffectMaterial::cleanupMaterialCache()` whether or not the
+//! scene graph is kept), while the effects' materials, and the renderer's
+//! cache of compiled programs keyed by that type's address, live on. A
+//! `ShaderEffect` made afterwards can be given a type at an address an old
+//! one had, and is then drawn with the old one's program, its uniforms set
+//! by position into the other's slots: the face's `diameter` lands in the
+//! cover fade's `qt_Opacity`, a white square. The cover is hidden whenever
+//! the home screen is left and makes its faces again for every message,
+//! so it gets there in a day. Fixed only in Qt 5.15.
 //!
-//! So the rule is structural: in every state the cover or a page draws
-//! an avatar in, no item inside it is a `ShaderEffectSource` and none has
-//! `layer.enabled` -- the two things that give a Qt Quick item a
-//! framebuffer. `QtGraphicalEffects` builds its effects out of
-//! `ShaderEffectSource`s, and this reads the whole tree, theirs included.
+//! So the rule is structural: no `ShaderEffect`, no `ShaderEffectSource`
+//! and no `layer` -- and so nothing from `QtGraphicalEffects`, which is
+//! built of them -- inside an avatar, read off the whole live tree. A
+//! picture is made the way it is seen before it reaches the screen
+//! (`src/pictures.rs`), and drawn by a plain `Image` with Qt's own
+//! material. `qml_syntax.rs` holds the rest of the app to the same rule;
+//! `qml_quick_actions_cover.rs` the cover.
 
 // Qt harness: see qml_chat_row.rs.
 #![allow(
@@ -64,12 +68,13 @@ const PROBE_QML: &str = r"
             if (!item) { return 'missing:' + name }
             return '' + item[property]
         }
-        // Every item in the avatar that owns a framebuffer, by what it
-        // is: a ShaderEffectSource, or an item drawn through a layer.
-        function framebuffers(node, found) {
+        // Every item in the avatar drawn by a program of its own, by what
+        // it is: a ShaderEffect or ShaderEffectSource, or an item drawn
+        // through a layer.
+        function shaders(node, found) {
             if (!node) { return found }
             var what = '' + node
-            if (what.indexOf('QQuickShaderEffectSource') === 0) {
+            if (what.indexOf('QQuickShaderEffect') === 0) {
                 found.push(what.split('(')[0])
             }
             if (node.layer && node.layer.enabled) {
@@ -77,23 +82,24 @@ const PROBE_QML: &str = r"
             }
             var kids = node.children
             for (var i = 0; kids && i < kids.length; i++) {
-                framebuffers(kids[i], found)
+                shaders(kids[i], found)
             }
             return found
         }
-        function owned() { return framebuffers(loader.item, []).join(';') }
+        function owned() { return shaders(loader.item, []).join(';') }
     }
 ";
 
 #[test]
 #[allow(clippy::too_many_lines)]
-fn an_avatar_draws_its_picture_without_a_framebuffer_in_any_state() {
+fn an_avatar_draws_its_picture_without_a_shader_in_any_state() {
     // SAFETY: single-threaded test binary; set before Qt starts.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
     }
 
     let mut engine = QmlEngine::new();
+    piirit_shim::install_pictures(&engine);
     engine.add_import_path(QString::from(
         common::stubs_dir().to_string_lossy().into_owned(),
     ));
@@ -143,14 +149,21 @@ fn an_avatar_draws_its_picture_without_a_framebuffer_in_any_state() {
         );
         record!(
             "face",
-            call!("get", QString::from("avatarFace"), QString::from("visible"))
+            call!(
+                "get",
+                QString::from("avatarImage"),
+                QString::from("visible")
+            )
         );
         // In its own colours, as a page draws it.
         record!("page", call!("owned"));
 
-        // Grey, as the cover draws everyone with nothing new.
+        // Grey, as the cover draws everyone with nothing new, and fading
+        // into the strip its quick actions are drawn in.
         call!("set", QString::from("monochrome"), true);
         call!("set", QString::from("opacity"), 0.6);
+        call!("set", QString::from("fadeTo"), 1.5);
+        call!("set", QString::from("fadeFrom"), 0.5);
         record!("cover-quiet", call!("owned"));
 
         // Lit, as the cover draws whoever has written.
@@ -158,6 +171,10 @@ fn an_avatar_draws_its_picture_without_a_framebuffer_in_any_state() {
         call!("set", QString::from("highlight"), true);
         call!("set", QString::from("opacity"), 1.0);
         record!("cover-lit", call!("owned"));
+
+        // And with no picture, the disc fading the same way.
+        call!("set", QString::from("picturePath"), QString::from(""));
+        record!("cover-disc", call!("owned"));
 
         (*engine_ptr).quit();
     });
@@ -182,13 +199,19 @@ fn an_avatar_draws_its_picture_without_a_framebuffer_in_any_state() {
         "the picture never loaded, so nothing here was read off a drawn \
          face. {context}"
     );
-    for state in ["no-picture", "page", "cover-quiet", "cover-lit"] {
+    for state in [
+        "no-picture",
+        "page",
+        "cover-quiet",
+        "cover-lit",
+        "cover-disc",
+    ] {
         assert_eq!(
             value(state),
             "",
-            "the avatar ({state}) draws through a framebuffer of its own, \
-             which Qt 5.6 draws as a flat black square when the phone \
-             could not give it one (issue #102). {context}"
+            "the avatar ({state}) is drawn by a shader of its own, which \
+             Qt 5.6 can draw with another one's program once its window \
+             has been hidden: a square, white or flat. {context}"
         );
     }
     assert_eq!(

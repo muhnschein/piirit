@@ -77,13 +77,12 @@ Source2:    vendor.toml
 # it is an error of its own.
 Requires:   sailfishsilica-qt5
 # One package per QML module the UI imports beyond Silica: QtMultimedia,
-# QtSensors, QtGraphicalEffects, Nemo.Thumbnailer, Nemo.Notifications.
+# QtSensors, Nemo.Thumbnailer, Nemo.Notifications.
 # All on Harbour's allowed list, and all on every device image -- but a
 # package that relies on a module and does not say so depends on it by
 # luck.
 Requires:   qt5-qtdeclarative-import-multimedia
 Requires:   qt5-qtdeclarative-import-sensors
-Requires:   qt5-qtgraphicaleffects
 Requires:   nemo-qml-plugin-notifications-qt5
 Requires:   nemo-qml-plugin-thumbnailer-qt5
 # Nemo.DBus, for the name a tapped notification calls back to.

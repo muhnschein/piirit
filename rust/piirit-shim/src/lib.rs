@@ -14,6 +14,9 @@
     clippy::type_complexity,
     clippy::needless_pass_by_value
 )]
+// The `cpp!` block in src/pictures.rs carries `rust!` callbacks, and the
+// macro that reads it recurses once per token past the default 128.
+#![recursion_limit = "512"]
 
 mod backup;
 mod call_host;
@@ -33,6 +36,7 @@ mod links;
 mod markdown;
 mod media;
 mod models;
+mod pictures;
 mod prefetch;
 mod profile;
 mod qr;
@@ -60,6 +64,7 @@ pub use crate::core::{
     HANDLED_EVENT_KINDS,
 };
 pub use crate::full_text::FullText;
+pub use crate::pictures::{install as install_pictures, render as render_picture};
 pub use crate::prefetch::ChatPrefetch;
 pub use crate::profile::Profile;
 pub use crate::qr::{QrCode, QrScanner};

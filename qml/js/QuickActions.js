@@ -81,27 +81,20 @@ function isLight(colour) {
 }
 
 /// The fade that makes room for the actions: whatever it is drawn over
-/// runs out towards the bottom edge, from `fadeFrom` down to `fadeTo`,
-/// eased rather than straight, as vuo's cover eases its texture away --
-/// most of the way down the faces keep their strength, and they give up
-/// the rest near the bottom. For a layer's ShaderEffect with those two
-/// and `gridHeight`, the layer's height, in pixels: the cover's grid, and
-/// the previews on the quick actions' page, which are drawn the same way
-/// so they look the same.
+/// runs out towards the bottom edge, from `from` down to `to`, eased
+/// rather than straight, as vuo's cover eases its texture away -- most of
+/// the way down the faces keep their strength, and they give up the rest
+/// near the bottom. How much is kept at `at`, in whatever units the two
+/// are in: the cover's grid, and the previews on the quick actions' page,
+/// which are drawn the same way so they look the same.
 ///
-/// highp for the ramp, which runs over a good part of the cover and would
-/// band in steps at lowp. The colour is premultiplied, so the whole of it
-/// goes with the fade. Pieced together line by line rather than written as
-/// one string over several lines, which QML takes and a script need not.
-var fadeShader =
-    "varying highp vec2 qt_TexCoord0;\n" +
-    "uniform sampler2D source;\n" +
-    "uniform highp float fadeFrom;\n" +
-    "uniform highp float fadeTo;\n" +
-    "uniform highp float gridHeight;\n" +
-    "uniform lowp float qt_Opacity;\n" +
-    "void main() {\n" +
-    "    highp float y = qt_TexCoord0.y * gridHeight;\n" +
-    "    highp float sink = clamp((fadeTo - y) / max(1.0, fadeTo - fadeFrom), 0.0, 1.0);\n" +
-    "    gl_FragColor = texture2D(source, qt_TexCoord0) * (sink * sink) * qt_Opacity;\n" +
-    "}\n"
+/// The same curve src/pictures.rs fades a face's picture by. It was a
+/// ShaderEffect over the whole grid; see Avatar.qml for why nothing here
+/// is drawn by a shader any more.
+function fade(at, from, to) {
+    if (!(to > from)) {
+        return 1
+    }
+    var sink = Math.max(0, Math.min(1, (to - at) / (to - from)))
+    return sink * sink
+}

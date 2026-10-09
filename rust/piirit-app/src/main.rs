@@ -76,6 +76,10 @@ fn main() {
     view.engine()
         .set_property("rpcServerPath".into(), QString::from(server).into());
 
+    // Avatars, the introduction's drawings and a call's backdrop are made
+    // by the shim and drawn as plain images (piirit-shim/src/pictures.rs).
+    piirit_shim::install_pictures(view.engine());
+
     let main_qml = qml_dir().join("piirit.qml");
     view.set_source(QString::from(main_qml.to_string_lossy().into_owned()));
     view.show();

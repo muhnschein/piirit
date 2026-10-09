@@ -121,6 +121,10 @@ CoverBackground {
     readonly property real floor: cover.actionsShown
                                   ? cover.height - cover.actionStrip
                                   : cover.height
+    /// The band the faces fade out over while there are actions: from
+    /// twice the strip's height above the bottom edge, to the edge.
+    readonly property real fadeFrom: cover.height - 2 * cover.actionStrip
+    readonly property real fadeTo: cover.height
     /// What the grid draws: `{person, row, col, loud}` per cell, `person`
     /// null for an empty circle and `loud` on the cell of each person
     /// with something new.
@@ -334,27 +338,6 @@ CoverBackground {
         anchors.fill: parent
         clip: true
 
-        // The room for the actions, made by the grid rather than over it:
-        // towards the bottom edge the faces run out, over a band twice the
-        // strip's height, so the icons sit on the cover's own ground with
-        // the faces nearly gone around them. Eased rather than straight,
-        // as vuo's cover eases its texture away: most of the way down the
-        // band the faces keep their strength, and they give up the rest
-        // near the bottom -- a straight ramp reads as a wash laid over
-        // them. Off while there are no actions, so the faces run whole to
-        // the edge.
-        layer.enabled: cover.actionsShown
-        layer.effect: ShaderEffect {
-            objectName: "actionFade"
-            property real fadeFrom: grid.height - 2 * cover.actionStrip
-            property real fadeTo: grid.height
-            property real gridHeight: Math.max(1, grid.height)
-
-            // The shader is shared with the previews on the quick actions'
-            // page, so what is picked there is what the cover shows.
-            fragmentShader: QuickActions.fadeShader
-        }
-
         Repeater {
             model: cover.cells
 
@@ -377,6 +360,22 @@ CoverBackground {
                 highlight: modelData.loud
                 opacity: modelData.loud ? 1.0 : filled ? 0.6 : 0.35
                 z: modelData.loud ? 1 : 0
+                // The room for the actions, made by the grid rather than
+                // over it: towards the bottom edge the faces run out, over
+                // a band twice the strip's height, so the icons sit on the
+                // cover's own ground with the faces nearly gone around
+                // them (QuickActions.fade says how). Each face is told
+                // where the band crosses it, as fractions of its own
+                // height. Off while there are no actions, so the faces run
+                // whole to the edge.
+                //
+                // Each face fades itself rather than the grid being drawn
+                // through one fade: that was a layer and a ShaderEffect,
+                // and on the phone's Qt the faces made after the cover had
+                // once been hidden were drawn with the fade's program
+                // instead of their own -- white squares. See Avatar.qml.
+                fadeFrom: cover.actionsShown ? (cover.fadeFrom - y) / Math.max(1, height) : 0
+                fadeTo: cover.actionsShown ? (cover.fadeTo - y) / Math.max(1, height) : 0
             }
         }
 

@@ -1,7 +1,6 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
 import QtSensors 5.0
-import QtGraphicalEffects 1.0
 import "../components"
 
 /*
@@ -221,26 +220,22 @@ Page {
         anchors.fill: parent
         visible: picture.status === Image.Ready
 
+        // Blurred off the main thread, small, and drawn large and smooth
+        // (src/pictures.rs) -- a blur this wide keeps nothing a small
+        // copy has not got. Not a FastBlur: that is a shader, and one made
+        // after the window had once been hidden, as a call's page
+        // is when the call rings in the background, could be drawn on the
+        // phone's Qt with another one's program (Avatar.qml says how).
         Image {
             id: picture
             anchors.fill: parent
-            visible: false
             fillMode: Image.PreserveAspectCrop
             asynchronous: true
-            // Small: a blur this wide keeps nothing a larger one would.
-            sourceSize.width: 256
-            sourceSize.height: 256
-            // Encoded per segment; see AttachmentPreview.qml's fileUrl.
+            smooth: true
             source: page.call && page.call.peer_avatar.length > 0
-                    ? Qt.resolvedUrl("file://" + page.call.peer_avatar.split("/")
-                                                     .map(encodeURIComponent).join("/"))
+                    ? "image://piirit/blur?file="
+                      + encodeURIComponent(page.call.peer_avatar)
                     : ""
-        }
-
-        FastBlur {
-            anchors.fill: parent
-            source: picture
-            radius: 64
         }
 
         Rectangle {

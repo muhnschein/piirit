@@ -8,8 +8,9 @@
 //! tap only says which side it was; what it does is the window's
 //! (`qml_quick_actions_window.rs`).
 //!
-//! With actions on, the grid fades out into their strip, and the faces
-//! that matter stay above it.
+//! With actions on, the grid fades out into their strip -- each face told
+//! where the band crosses it -- and the faces that matter stay above it.
+//! Nothing on the cover is drawn by a shader of its own while it does.
 
 // Qt harness: see qml_cover.rs.
 #![allow(
@@ -97,7 +98,36 @@ const PROBE_QML: &str = r"
             return 'ok'
         }
         function ink(colour) { Theme.primaryColor = colour; return 'ok' }
-        function fade() { return '' + findIn(loader.item, 'avatarGrid').layer.enabled }
+        // Whether the faces fade into the strip: 'true' when some do and
+        // every one that does reaches into the band above the bottom edge,
+        // twice the strip's height, that the fade runs over.
+        function fade() {
+            var cells = allIn(loader.item, 'gridCell', [])
+            var band = loader.item.height - 2 * loader.item.actionStrip
+            var any = false
+            for (var i = 0; i < cells.length; i++) {
+                if (!cells[i].fades) { continue }
+                any = true
+                if (cells[i].y + cells[i].height <= band) { return 'above-the-band' }
+                var from = cells[i].y + cells[i].fadeFrom * cells[i].height
+                if (Math.abs(from - band) > 0.5) { return 'band-at-' + from }
+            }
+            return '' + any
+        }
+        // Everything on the cover drawn by a program of its own -- a
+        // ShaderEffect, a ShaderEffectSource, an item through a layer --
+        // by what it is. See qml_avatar_shaders.rs for why there must be
+        // none.
+        function shaders(node, found) {
+            if (!node) { return found }
+            var what = ('' + node).split('(')[0]
+            if (what.indexOf('QQuickShaderEffect') === 0) { found.push(what) }
+            if (node.layer && node.layer.enabled) { found.push('layer:' + what) }
+            var kids = node.data !== undefined ? node.data : node.children
+            for (var i = 0; kids && i < kids.length; i++) { shaders(kids[i], found) }
+            return found
+        }
+        function drawnThrough() { return shaders(loader.item, []).join(';') }
         function floor() { return '' + loader.item.floor }
         function markUnread(list, chatId) {
             allIn(loader.item, 'coverChats', [])[list].mark_unread(chatId)
@@ -207,6 +237,7 @@ fn the_cover_offers_the_actions_that_are_set_and_makes_room_for_them() {
         record!("one-lists", call!("lists"));
         record!("one-icon", call!("icon", QString::from("oneAction"), 0));
         record!("one-fade", call!("fade"));
+        record!("one-shaders", call!("drawnThrough"));
         record!("one-floor", call!("floor"));
         record!("one-tap", call!("tap", QString::from("oneAction"), 0));
 
@@ -261,6 +292,7 @@ fn the_cover_offers_the_actions_that_are_set_and_makes_room_for_them() {
 
     single_shot(Duration::from_secs(6), move || unsafe {
         record!("lit-places", call!("litPlaces"));
+        record!("lit-shaders", call!("drawnThrough"));
         record!("final-lists", call!("lists"));
         (*engine_ptr).quit();
     });
@@ -303,6 +335,20 @@ fn the_cover_offers_the_actions_that_are_set_and_makes_room_for_them() {
         "true",
         "the grid runs on under the action strip. {context}"
     );
+    // The fade used to be one ShaderEffect over the whole grid. On Qt 5.6
+    // a ShaderEffect made after the cover has once been hidden can be
+    // drawn with another one's program, and the cover is hidden and its
+    // faces made again all day: new faces came out as white squares of
+    // their whole picture, drawn through this fade's program.
+    for state in ["one-shaders", "lit-shaders"] {
+        assert_eq!(
+            value(state),
+            "",
+            "the cover ({state}) draws something through a program of its \
+             own, which Qt 5.6 can mix up with another's once the cover \
+             has been hidden. {context}"
+        );
+    }
     // The stub's small item is 60 high.
     assert_eq!(
         value("one-floor"),
