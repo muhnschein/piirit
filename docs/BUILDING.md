@@ -23,10 +23,12 @@ outside tests, `missing_docs` and `unsafe_code` denied.
 
 `unsafe_code` is deny rather than forbid because the Qt harness tests need
 `env::set_var` before Qt initialises, and because two things the app does
-have no safe binding: installing a `QTranslator`, and recording a voice
-message through `QAudioRecorder`, neither of which qmetaobject wraps.
-Those are the two `cpp!` files in the tree, `piirit-app/src/translations.rs`
-and `piirit-shim/src/recorder.rs`, and the C++ build step in each
+have no safe binding: installing a `QTranslator`, recording a voice
+message through `QAudioRecorder`, and handing QML pictures through a
+`QQuickImageProvider`, none of which qmetaobject wraps. Those are the
+three `cpp!` files in the tree, `piirit-app/src/translations.rs`,
+`piirit-shim/src/recorder.rs` and `piirit-shim/src/pictures.rs`, and the
+C++ build step in each
 crate's `build.rs` exists for them alone. Every exception is at the
 narrowest scope and says why, and every block is short enough to be
 checked by reading.

@@ -1749,3 +1749,91 @@ fn qml_reads_no_name_that_is_not_there() {
         offenders.join("\n  ")
     );
 }
+
+/// The text of a QML file with its comments taken out, so that a comment
+/// explaining why something is not used is not taken for a use of it.
+fn without_comments(text: &str) -> String {
+    let mut out = String::new();
+    let mut in_block = false;
+    for line in text.lines() {
+        let mut rest = line;
+        let mut kept = String::new();
+        loop {
+            if in_block {
+                match rest.find("*/") {
+                    Some(end) => {
+                        rest = &rest[end + 2..];
+                        in_block = false;
+                    }
+                    None => break,
+                }
+            } else if let Some(start) = rest.find("/*") {
+                kept.push_str(&rest[..start]);
+                rest = &rest[start + 2..];
+                in_block = true;
+            } else {
+                kept.push_str(rest);
+                break;
+            }
+        }
+        if !kept.trim_start().starts_with("//") {
+            out.push_str(&kept);
+        }
+        out.push('\n');
+    }
+    out
+}
+
+/// Whether `line` has `word` in it as a word of its own: `player.` is not
+/// `layer.`.
+fn names(line: &str, word: &str) -> bool {
+    line.match_indices(word).any(|(at, _)| {
+        !line[..at]
+            .chars()
+            .next_back()
+            .is_some_and(|before| before.is_alphanumeric() || before == '_')
+    })
+}
+
+/// No QML in the app draws through a shader of its own.
+///
+/// Sailfish's Qt 5.6 deletes every `ShaderEffect`'s material type each
+/// time a window is hidden while the effects and the renderer's programs
+/// keyed by that type's address live on, so an effect made afterwards can
+/// be drawn with another effect's program: the cover's faces came out as
+/// white squares (see `qml_avatar_shaders.rs`). A `layer` with an effect
+/// and everything in `QtGraphicalEffects` are `ShaderEffect`s too. A
+/// picture that needs work is made the way it is seen first, by the app's
+/// image provider (`image://piirit/`, `src/pictures.rs`).
+#[test]
+fn qml_draws_nothing_through_a_shader_of_its_own() {
+    let files = qml_files();
+    assert!(!files.is_empty(), "found no .qml files to check");
+
+    let mut offenders = Vec::new();
+    for file in &files {
+        let text = without_comments(&fs::read_to_string(file).expect("read qml"));
+        for (number, line) in text.lines().enumerate() {
+            if ["ShaderEffect", "layer.", "layer {", "QtGraphicalEffects"]
+                .iter()
+                .any(|banned| names(line, banned))
+            {
+                offenders.push(format!(
+                    "{}:{}: {}",
+                    file.display(),
+                    number + 1,
+                    line.trim()
+                ));
+            }
+        }
+    }
+
+    assert!(
+        offenders.is_empty(),
+        "a ShaderEffect, a layer or a QtGraphicalEffects effect can be drawn \
+         with another effect's program on Qt 5.6 once its window has been \
+         hidden. Make the picture as it is to be seen in src/pictures.rs \
+         and draw it with a plain Image instead.\n  {}",
+        offenders.join("\n  ")
+    );
+}

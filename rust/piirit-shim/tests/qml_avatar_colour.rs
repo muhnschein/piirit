@@ -6,6 +6,10 @@
 //!
 //! The stub's `Theme.highlightColor` is what the assertions read, so this
 //! is about which colour is asked for, not what an ambience makes of it.
+//! A picture's colours are made before it reaches the screen, by the app's
+//! image provider, so what is read here is what the avatar asks it for;
+//! `qml_pictures.rs` checks that a face asked for grey or tinted comes
+//! out that way.
 
 // Qt harness: see qml_chat_row.rs.
 #![allow(
@@ -51,14 +55,20 @@ const PROBE_QML: &str = r"
         }
         // The loaded component itself, which has no name to be found by.
         function root(property) { return '' + loader.item[property] }
-        // What the face is drawn through: how much colour is taken out,
-        // and the tint over it as 0-255 channels and an alpha.
+        // What the face is asked to be made as: grey or not, and the tint
+        // over it with how much of it, read back out of its recipe.
         function face() {
-            var face = findIn(loader.item, 'avatarFace')
-            if (!face) { return 'missing:avatarFace' }
-            var t = face.tint
-            return face.desaturation + '|' + [Math.round(t.r * 255), Math.round(t.g * 255),
-                                              Math.round(t.b * 255), t.a.toFixed(2)].join(',')
+            var image = findIn(loader.item, 'avatarImage')
+            if (!image) { return 'missing:avatarImage' }
+            var source = '' + image.source
+            if (source.indexOf('image://piirit/face?') !== 0) { return 'raw:' + source }
+            var recipe = {}
+            source.split('?')[1].split('&').forEach(function (pair) {
+                var kv = pair.split('=')
+                recipe[kv[0]] = decodeURIComponent(kv[1])
+            })
+            return (recipe.grey === '1' ? 1 : 0) + '|' + (recipe.tint || 'none')
+                   + '|' + (recipe.strength || '0')
         }
     }
 ";
@@ -72,6 +82,7 @@ fn an_avatar_with_news_wears_the_ambiences_colour_rather_than_its_own() {
     }
 
     let mut engine = QmlEngine::new();
+    piirit_shim::install_pictures(&engine);
     engine.add_import_path(QString::from(
         common::stubs_dir().to_string_lossy().into_owned(),
     ));
@@ -131,16 +142,17 @@ fn an_avatar_with_news_wears_the_ambiences_colour_rather_than_its_own() {
     single_shot(Duration::from_secs(2), move || unsafe {
         record!(
             "lit-visible",
-            call!("get", QString::from("avatarFace"), QString::from("visible"))
-        );
-        record!("lit-face", call!("face"));
-        record!(
-            "lit-raw",
             call!(
                 "get",
                 QString::from("avatarImage"),
                 QString::from("visible")
             )
+        );
+        record!("lit-face", call!("face"));
+        // Read now: each change below asks for the picture made again.
+        record!(
+            "picture-status",
+            call!("get", QString::from("avatarImage"), QString::from("status"))
         );
 
         call!("set", QString::from("highlight"), false);
@@ -148,10 +160,6 @@ fn an_avatar_with_news_wears_the_ambiences_colour_rather_than_its_own() {
 
         call!("set", QString::from("monochrome"), false);
         record!("own-face", call!("face"));
-        record!(
-            "picture-status",
-            call!("get", QString::from("avatarImage"), QString::from("status"))
-        );
 
         (*engine_ptr).quit();
     });
@@ -193,30 +201,23 @@ fn an_avatar_with_news_wears_the_ambiences_colour_rather_than_its_own() {
     );
     assert_eq!(
         value("lit-face"),
-        "1|128,192,255,0.75",
+        "1|#80c0ff|0.75",
         "a lit picture is not a grey face through three quarters of the \
          ambience's highlight (the stub's Theme.highlightColor). {context}"
     );
     assert_eq!(
-        value("lit-raw"),
-        "false",
-        "the raw image is on screen, so a lit avatar renders square. \
-         {context}"
-    );
-    assert_eq!(
         value("quiet-face"),
-        "1|0,0,0,0.00",
+        "1|none|0",
         "a picture with nothing new is not grey, or is still put through \
          the ambience's colour. {context}"
     );
     assert_eq!(
         value("own-face"),
-        "0|0,0,0,0.00",
+        "0|none|0",
         "a picture on a page is not drawn in its own colours. {context}"
     );
-    // Image.Ready is 1. Without it the three above would all be false
-    // for the honest reason that there is no picture yet, and would say
-    // nothing about the colour it is drawn in.
+    // Image.Ready is 1. Without it the lit picture was never there to be
+    // drawn in any colour.
     assert_eq!(
         value("picture-status"),
         "1",

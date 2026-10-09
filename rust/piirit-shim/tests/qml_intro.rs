@@ -213,6 +213,7 @@ fn the_introduction_walks_the_facts_and_ends_in_the_setup_path() {
     let stack_box = QObjectBox::new(PageStackProbe::default());
 
     let mut engine = QmlEngine::new();
+    piirit_shim::install_pictures(&engine);
     engine.add_import_path(QString::from(
         common::stubs_dir().to_string_lossy().into_owned(),
     ));

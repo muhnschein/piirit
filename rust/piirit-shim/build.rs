@@ -1,5 +1,5 @@
-//! Compile the C++ side of the `cpp!` blocks in `src/recorder.rs`, and
-//! link the Qt module they call into.
+//! Compile the C++ side of the `cpp!` blocks in `src/recorder.rs` and
+//! `src/pictures.rs`, and link the Qt module they call into.
 //!
 //! The same arrangement as `piirit-app/build.rs` and the vendored
 //! qmetaobject's own: the C++ is compiled against the Qt that qttypes
@@ -10,11 +10,12 @@
 fn main() {
     // The C++ compiler's crate names the environment it watches, which
     // turns off cargo's own rule of re-running on any change in the
-    // package; so the two files with `cpp!` blocks are named here, or a
+    // package; so the files with `cpp!` blocks are named here, or a
     // block added to them is not compiled until the next clean build.
     println!("cargo:rerun-if-changed=build.rs");
     println!("cargo:rerun-if-changed=src/lib.rs");
     println!("cargo:rerun-if-changed=src/recorder.rs");
+    println!("cargo:rerun-if-changed=src/pictures.rs");
     let Ok(include) = std::env::var("DEP_QT_INCLUDE_PATH") else {
         panic!("qttypes found no Qt; its build script says why above");
     };

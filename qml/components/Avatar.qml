@@ -1,5 +1,6 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
+import "../js/QuickActions.js" as QuickActions
 
 /*
  * A round avatar: the subject's own colour with their initial on it, or
@@ -31,6 +32,14 @@ Rectangle {
     /// the colour the unread badge in the chat list is already drawn in
     /// -- rather than as one more photograph among grey ones.
     property bool highlight: false
+    /// Where the avatar fades out, as fractions of its height from its
+    /// top: whole above `fadeFrom`, gone by `fadeTo`. The cover's grid
+    /// sinks away into the strip its quick actions are drawn in. Equal,
+    /// as they start, is no fade, and so is one that starts below the
+    /// avatar's foot.
+    property real fadeFrom: 0
+    property real fadeTo: 0
+    readonly property bool fades: avatar.fadeTo > avatar.fadeFrom && avatar.fadeFrom < 1
 
     /// The picture is what is on screen: there is one, and it has
     /// loaded. Everything that draws a picture and everything that
@@ -58,15 +67,40 @@ Rectangle {
     // softened, and as a full tinted disc whenever the masked picture
     // was not drawn for a frame -- a row highlighted under its context
     // menu was where that was noticed.
-    color: avatar.showsPicture ? "transparent"
+    readonly property color discColor: avatar.showsPicture ? "transparent"
            : avatar.highlight ? Theme.highlightColor
            : avatar.monochrome ? Theme.rgba(Theme.primaryColor, 0.25)
            : ownColor.length > 0 ? ownColor : Theme.highlightColor
+    color: avatar.discColor
+    // Fading, the disc goes the way the picture does, in steps close
+    // enough that the eye takes them for the curve.
+    gradient: avatar.fades && !avatar.showsPicture ? fade : null
+
+    /// The disc's colour where it is `at` of the way down.
+    function faded(at) {
+        var c = avatar.discColor
+        return Qt.rgba(c.r, c.g, c.b, c.a * QuickActions.fade(at, avatar.fadeFrom, avatar.fadeTo))
+    }
+
+    Gradient {
+        id: fade
+        GradientStop { position: 0.0; color: avatar.faded(0.0) }
+        GradientStop { position: 0.2; color: avatar.faded(0.2) }
+        GradientStop { position: 0.4; color: avatar.faded(0.4) }
+        GradientStop { position: 0.6; color: avatar.faded(0.6) }
+        GradientStop { position: 0.7; color: avatar.faded(0.7) }
+        GradientStop { position: 0.8; color: avatar.faded(0.8) }
+        GradientStop { position: 0.9; color: avatar.faded(0.9) }
+        GradientStop { position: 1.0; color: avatar.faded(1.0) }
+    }
 
     Label {
         objectName: "avatarInitial"
         anchors.centerIn: parent
         visible: !avatar.showsPicture
+        // A letter is too small to fade across; it takes the fade where
+        // it stands.
+        opacity: avatar.fades ? QuickActions.fade(0.5, avatar.fadeFrom, avatar.fadeTo) : 1
         color: Theme.primaryColor
         font.pixelSize: Theme.fontSizeLarge
         textFormat: Text.PlainText
@@ -77,83 +111,31 @@ Rectangle {
         id: picture
         objectName: "avatarImage"
         anchors.fill: parent
-        // Never drawn itself: the face below draws its texture.
-        visible: false
-        fillMode: Image.PreserveAspectCrop
-        asynchronous: true
-        // Encoded per segment; see AttachmentPreview.qml's fileUrl.
-        source: avatar.picturePath.length > 0
-                ? Qt.resolvedUrl("file://" + avatar.picturePath.split("/")
-                                                 .map(encodeURIComponent).join("/"))
-                : ""
-    }
-
-    // The picture as it is seen: cut to a circle, grey where it is drawn
-    // without its colour, and through the ambience's colour where the
-    // cover lights it -- all of it arithmetic on each pixel of the
-    // picture's own texture, in one pass straight to the screen.
-    //
-    // Nothing here is drawn into a texture of its own first, and that is
-    // the point (issue #102). This used to be a Rectangle drawn as a mask,
-    // an OpacityMask kept in a texture (`cached`), a Desaturate drawn out
-    // of a layer, and a ColorOverlay kept in another: four or five
-    // framebuffers per face, and every one of them made again whenever
-    // the cover laid its grid out, which it does for every message. Qt
-    // 5.6 never asks whether a framebuffer it made is any good. When the
-    // phone cannot give it one, the texture it draws from is no texture,
-    // which reads as opaque black -- a flat square, grey under the cover's
-    // opacity, tinted under the overlay -- and it stays that way for as
-    // long as the face does. A face with no framebuffer cannot lose one.
-    //
-    // The texture is the whole picture, not the part PreserveAspectCrop
-    // would show, so the crop is done here too; and it may be a corner of
-    // a texture atlas, which `qt_SubRect_source` says where, rather than
-    // have Qt copy it out into a texture of its own.
-    ShaderEffect {
-        id: face
-        objectName: "avatarFace"
-        anchors.fill: parent
         visible: avatar.showsPicture
-
-        property variant source: picture
-        /// How much of the picture's width and height the circle takes:
-        /// the middle of its long side, the whole of its short one.
-        property size crop: picture.implicitWidth > picture.implicitHeight
-                            ? Qt.size(picture.implicitHeight / picture.implicitWidth, 1)
-                            : Qt.size(1, picture.implicitHeight > 0
-                                         ? picture.implicitWidth / picture.implicitHeight
-                                         : 1)
-        /// Across, in pixels: the circle's rim is softened over one.
-        property real diameter: Math.max(1, width)
-        /// 1 takes the colour out. Taken out for the tint too: what goes
-        /// through the highlight colour is a grey face, not a green one.
-        property real desaturation: avatar.monochrome || avatar.highlight ? 1.0 : 0.0
-        /// Kept to a part of the way so the face is still a face -- a
-        /// full overlay is a silhouette, which says nothing about who
-        /// wrote. Transparent is no tint at all.
-        property color tint: avatar.highlight ? Theme.rgba(Theme.highlightColor, 0.75)
-                                              : "transparent"
-
-        fragmentShader: "
-            varying highp vec2 qt_TexCoord0;
-            uniform lowp float qt_Opacity;
-            uniform lowp sampler2D source;
-            uniform highp vec4 qt_SubRect_source;
-            uniform highp vec2 crop;
-            uniform highp float diameter;
-            uniform lowp float desaturation;
-            uniform highp vec4 tint;
-            void main() {
-                highp vec2 at = vec2(0.5) + (qt_TexCoord0 - vec2(0.5)) * crop;
-                highp vec4 pixel = texture2D(source, qt_SubRect_source.xy + qt_SubRect_source.zw * at);
-                highp float grey = (pixel.r + pixel.g + pixel.b) / 3.0;
-                pixel.rgb = mix(pixel.rgb, vec3(grey), desaturation);
-                pixel.rgb = mix(pixel.rgb / max(pixel.a, 0.00390625),
-                                tint.rgb / max(tint.a, 0.00390625), tint.a) * pixel.a;
-                highp float rim = clamp(diameter * 0.5 - length(qt_TexCoord0 - vec2(0.5)) * diameter + 0.5,
-                                        0.0, 1.0);
-                gl_FragColor = pixel * rim * qt_Opacity;
-            }
-        "
+        asynchronous: true
+        // Made at the size it is drawn, so the circle's rim is one pixel
+        // wide on screen as it was in the shader.
+        sourceSize.width: Math.round(avatar.width)
+        sourceSize.height: Math.round(avatar.height)
+        // The picture as it is seen, made ready before it reaches the
+        // screen (src/pictures.rs): cut to a circle, grey where it is drawn
+        // without its colour, through the ambience's colour where the
+        // cover lights it, and fading where the cover's grid does.
+        //
+        // Not drawn by a shader, and that is the point. A ShaderEffect
+        // made after its window has once been hidden can be drawn on
+        // Sailfish's Qt 5.6 with another ShaderEffect's program -- the
+        // cover's own fade, which turned every new face into a white
+        // square of its whole picture -- and the cover makes faces for
+        // every message. An Image is drawn with Qt's own texture
+        // material, which nothing can mistake for another.
+        source: avatar.picturePath.length > 0 && avatar.width > 0
+                ? "image://piirit/face?file=" + encodeURIComponent(avatar.picturePath)
+                  + (avatar.monochrome ? "&grey=1" : "")
+                  + (avatar.highlight
+                     ? "&tint=" + encodeURIComponent("" + Theme.highlightColor) + "&strength=0.75"
+                     : "")
+                  + (avatar.fades ? "&from=" + avatar.fadeFrom + "&to=" + avatar.fadeTo : "")
+                : ""
     }
 }

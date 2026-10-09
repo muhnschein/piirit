@@ -103,14 +103,6 @@ BackgroundItem {
             anchors.fill: parent
             clip: true
 
-            layer.enabled: true
-            layer.effect: ShaderEffect {
-                property real fadeFrom: faces.height - 2 * preview.strip
-                property real fadeTo: faces.height
-                property real gridHeight: Math.max(1, faces.height)
-                fragmentShader: QuickActions.fadeShader
-            }
-
             Repeater {
                 model: preview.cells
 
@@ -123,7 +115,14 @@ BackgroundItem {
                     color: "transparent"
                     border.width: Math.max(1, Math.round(2 * preview.ratio))
                     border.color: Theme.secondaryColor
-                    opacity: 0.6
+                    // The cover's fade into the actions' strip
+                    // (QuickActions.fade), taken where each ring's middle
+                    // is: a ring is too thin a thing to fade across, and a
+                    // shader that did it is what the cover's faces were
+                    // mistaken for (Avatar.qml).
+                    opacity: 0.6 * QuickActions.fade(y + height / 2,
+                                                     faces.height - 2 * preview.strip,
+                                                     faces.height)
                 }
             }
         }

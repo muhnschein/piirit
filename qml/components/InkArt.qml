@@ -1,5 +1,4 @@
-// 2.3 for `Image.mipmap`; Harbour allows up to 2.6 (ci/harbour/).
-import QtQuick 2.3
+import QtQuick 2.0
 import Sailfish.Silica 1.0
 
 /*
@@ -30,49 +29,30 @@ Item {
     property real litInk: 1.0
 
     /// True once there is something to draw.
-    readonly property bool ready: mask.status === Image.Ready
+    readonly property bool ready: drawing.status === Image.Ready
 
-    // Loaded off the main thread and never drawn itself, only sampled.
-    // Mipmapped: every phone scales the master down, and a drawing scaled
-    // down without them crawls at its edges.
+    // Painted off the main thread at the size it is drawn, in the
+    // ambience's colours (src/pictures.rs): red is how much of `colour`,
+    // green how much of `litColour`. Scaled down from the master before
+    // it is painted, smoothly, which is what mipmaps did for the shader
+    // this was.
+    //
+    // Not a shader any more: one made after the window had once been
+    // hidden -- the introduction can come up after the app was in the
+    // background -- could be drawn on the phone's Qt with another one's
+    // program (Avatar.qml says how).
     Image {
-        id: mask
-        source: art.source
-        visible: false
-        asynchronous: true
-        mipmap: true
-    }
-
-    ShaderEffect {
+        id: drawing
         anchors.fill: parent
-        // A shader over a texture that is not there yet draws a block of
-        // colour.
         visible: art.ready
-
-        property variant source: mask
-        property color tint: art.colour
-        property color litTint: art.litColour
-        property real ink: art.ink
-        property real litInk: art.litInk
-
-        // Fixed text; the colours arrive premultiplied and opaque, and
-        // what goes out is premultiplied too, which is what the scene
-        // graph composites.
-        fragmentShader: "
-            varying highp vec2 qt_TexCoord0;
-            uniform sampler2D source;
-            uniform lowp vec4 tint;
-            uniform lowp vec4 litTint;
-            uniform lowp float ink;
-            uniform lowp float litInk;
-            uniform lowp float qt_Opacity;
-
-            void main() {
-                lowp vec4 drawn = texture2D(source, qt_TexCoord0);
-                lowp float body = drawn.r * ink * qt_Opacity;
-                lowp float accent = drawn.g * litInk * qt_Opacity;
-                gl_FragColor = vec4(tint.rgb, 1.0) * body
-                             + vec4(litTint.rgb, 1.0) * accent;
-            }"
+        asynchronous: true
+        sourceSize.width: Math.round(art.width)
+        sourceSize.height: Math.round(art.height)
+        source: ("" + art.source).length > 0 && art.width > 0
+                ? "image://piirit/ink?file=" + encodeURIComponent("" + art.source)
+                  + "&ink=" + encodeURIComponent("" + art.colour)
+                  + "&lit=" + encodeURIComponent("" + art.litColour)
+                  + "&inkStrength=" + art.ink + "&litStrength=" + art.litInk
+                : ""
     }
 }

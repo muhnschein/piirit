@@ -2,9 +2,11 @@
 //! initials beside it do.
 //!
 //! An `Image` does not inherit its parent's corner radius, and `clip` cuts
-//! only to the bounding box, so the picture is drawn by a shader that cuts
-//! it to a circle instead. This pins that: the raw image must not be what
-//! is on screen, and the circle is as wide as the avatar.
+//! only to the bounding box, so the picture is cut to a circle before it
+//! reaches the screen, by the app's own image provider (`src/pictures.rs`;
+//! `qml_pictures.rs` checks what it makes). This pins that the avatar asks
+//! for that circle rather than for the raw file, and at the size it is
+//! drawn, so the circle is as wide as the avatar.
 //!
 //! And what an avatar is drawn *in*: its own colour on a page, the
 //! ambience's where the cover lights up whoever has written -- and what
@@ -66,6 +68,7 @@ fn a_picture_avatar_is_drawn_cut_to_a_circle() {
     }
 
     let mut engine = QmlEngine::new();
+    piirit_shim::install_pictures(&engine);
     engine.add_import_path(QString::from(
         common::stubs_dir().to_string_lossy().into_owned(),
     ));
@@ -111,7 +114,7 @@ fn a_picture_avatar_is_drawn_cut_to_a_circle() {
         );
 
         // No picture: the initial stands in, and no picture is drawn.
-        record!("plain-face", get!("avatarFace", "visible"));
+        record!("plain-picture", get!("avatarImage", "visible"));
         record!("plain-initial", get!("avatarInitial", "visible"));
 
         // A picture, from the frame the path arrives in. It is loaded
@@ -127,18 +130,20 @@ fn a_picture_avatar_is_drawn_cut_to_a_circle() {
             )
         );
         record!("loading-initial", get!("avatarInitial", "visible"));
-        record!("loading-face", get!("avatarFace", "visible"));
+        record!("loading-picture", get!("avatarImage", "visible"));
     });
 
     // A second later the picture has loaded, and it is what is drawn.
     single_shot(Duration::from_secs(2), move || unsafe {
         record!("picture-status", get!("avatarImage", "status"));
-        record!("picture-face", get!("avatarFace", "visible"));
-        record!("picture-raw", get!("avatarImage", "visible"));
+        record!("picture-shown", get!("avatarImage", "visible"));
         record!("picture-initial", get!("avatarInitial", "visible"));
-        record!("face-diameter", get!("avatarFace", "diameter"));
-        record!("face-width", get!("avatarFace", "width"));
-        record!("face-height", get!("avatarFace", "height"));
+        record!("picture-source", get!("avatarImage", "source"));
+        // What the provider made, which is what is drawn.
+        record!("made-width", get!("avatarImage", "implicitWidth"));
+        record!("made-height", get!("avatarImage", "implicitHeight"));
+        record!("face-width", get!("avatarImage", "width"));
+        record!("face-height", get!("avatarImage", "height"));
 
         (*engine_ptr).quit();
     });
@@ -161,7 +166,7 @@ fn assert_avatar(steps: &[(&str, String)]) {
 
     assert_eq!(value("load"), "ok", "the row did not load. {context}");
     assert_eq!(
-        value("plain-face"),
+        value("plain-picture"),
         "false",
         "a chat with no picture still drew a picture. {context}"
     );
@@ -191,7 +196,7 @@ fn assert_avatar(steps: &[(&str, String)]) {
          holes that fill in one by one. {context}"
     );
     assert_eq!(
-        value("loading-face"),
+        value("loading-picture"),
         "false",
         "a picture that has not loaded is on screen, which is nothing. \
          {context}"
@@ -202,26 +207,34 @@ fn assert_avatar(steps: &[(&str, String)]) {
         "the initial is still drawn under the loaded picture. {context}"
     );
     assert_eq!(
-        value("picture-face"),
+        value("picture-shown"),
         "true",
-        "a chat with a picture did not draw it cut to a circle. {context}"
+        "a chat with a picture did not draw it. {context}"
     );
-    assert_eq!(
-        value("picture-raw"),
-        "false",
-        "the raw image is on screen, so the avatar renders square. {context}"
+    let source = value("picture-source");
+    assert!(
+        source.starts_with("image://piirit/face?file="),
+        "the avatar draws its file as it is, square, rather than the face \
+         the app cuts to a circle: {source}. {context}"
+    );
+    assert!(
+        !source.contains("grey=1") && !source.contains("tint="),
+        "a chat-list avatar asked for its picture without its colours: \
+         {source}. {context}"
     );
 
-    // A circle, not an oval or a disc inside a square: the face is
-    // square, and the shader cuts it at half its `diameter` from the
-    // middle, so that has to be the face's own width.
-    let diameter: f64 = value("face-diameter").parse().unwrap_or_default();
-    let width: f64 = value("face-width").parse().unwrap_or_default();
-    let height: f64 = value("face-height").parse().unwrap_or_default();
+    // A circle, not an oval or a disc inside a square: the face is made
+    // square, at the size it is drawn, so its one-pixel rim is one pixel
+    // on screen too.
+    let number = |label: &str| value(label).parse::<f64>().unwrap_or_default();
+    let (width, height) = (number("face-width"), number("face-height"));
+    let (made_width, made_height) = (number("made-width"), number("made-height"));
     assert!(width > 0.0, "the face has no width. {context}");
     assert!(
-        (width - height).abs() < 0.5 && (diameter - width).abs() < 0.5,
-        "the face is not a circle: {diameter} across in a face {width} by \
-         {height}. {context}"
+        (width - height).abs() < 0.5
+            && (made_width - width).abs() < 1.0
+            && (made_height - height).abs() < 1.0,
+        "the face is not a circle the size of the avatar: made {made_width} \
+         by {made_height} for a face {width} by {height}. {context}"
     );
 }
