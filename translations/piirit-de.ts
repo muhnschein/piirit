@@ -1933,16 +1933,8 @@ In anderen Gruppen mit blockierten Kontakten werden deren Nachrichten weiterhin 
         <translation>Anrufbildschirm bei eingehenden Anrufen</translation>
     </message>
     <message>
-        <source>Enable calls (experimental)</source>
-        <translation>Anrufe aktivieren (experimentell)</translation>
-    </message>
-    <message>
         <source>Runs small apps inside chats.</source>
         <translation>Führt kleine Apps in Chats aus.</translation>
-    </message>
-    <message>
-        <source>Makes and answers voice calls in one-to-one chats.</source>
-        <translation>Tätigt und beantwortet Sprachanrufe in Einzelchats.</translation>
     </message>
 </context>
 <context>

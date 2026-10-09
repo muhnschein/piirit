@@ -1922,16 +1922,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Hívásképernyő megjelenítése az elfogadott partnereknél</translation>
     </message>
     <message>
-        <source>Enable calls (experimental)</source>
-        <translation>Hívások engedélyezése (kísérleti)</translation>
-    </message>
-    <message>
         <source>Runs small apps inside chats.</source>
         <translation>Kis alkalmazásokat futtat a csevegéseken belül.</translation>
-    </message>
-    <message>
-        <source>Makes and answers voice calls in one-to-one chats.</source>
-        <translation>Hanghívásokat indít és fogad kétszemélyes csevegésekben.</translation>
     </message>
 </context>
 <context>

@@ -1926,16 +1926,8 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
         <translation>Kabul edilen kişiler için arama ekranını göster</translation>
     </message>
     <message>
-        <source>Enable calls (experimental)</source>
-        <translation>Aramaları etkinleştir (deneysel)</translation>
-    </message>
-    <message>
         <source>Runs small apps inside chats.</source>
         <translation>Sohbetlerin içinde küçük uygulamalar çalıştırır.</translation>
-    </message>
-    <message>
-        <source>Makes and answers voice calls in one-to-one chats.</source>
-        <translation>Bire bir sohbetlerde sesli arama yapar ve aramaları yanıtlar.</translation>
     </message>
 </context>
 <context>

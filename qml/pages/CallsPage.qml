@@ -67,9 +67,8 @@ Page {
         }
     }
 
-    /// A call can be placed from here now. `=== true` because dconf
-    /// hands back `undefined` before it has read the key.
-    readonly property bool canCall: Settings.callsEnabled === true && chat.can_call
+    /// A call can be placed from here now.
+    readonly property bool canCall: chat.can_call
 
     /// Call them, or go back to the call there is: one call at a time.
     function call() {
@@ -84,7 +83,7 @@ Page {
     /// A row was tapped. As in the chat: one still ringing here is
     /// answered, and any other is called back.
     function callFromRow(messageId, outgoing, callState) {
-        if (Settings.callsEnabled !== true || typeof appWindow === "undefined") {
+        if (typeof appWindow === "undefined") {
             return
         }
         if (!outgoing && callState === "Alerting") {

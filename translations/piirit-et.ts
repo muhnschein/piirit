@@ -1933,16 +1933,8 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
         <translation>Näita kinnitatud kontaktide kõnede puhul kõneakent</translation>
     </message>
     <message>
-        <source>Enable calls (experimental)</source>
-        <translation>Luba kõned (katseline)</translation>
-    </message>
-    <message>
         <source>Runs small apps inside chats.</source>
         <translation>Käitab vestlustes väikeseid rakendusi.</translation>
-    </message>
-    <message>
-        <source>Makes and answers voice calls in one-to-one chats.</source>
-        <translation>Teeb ja võtab vastu häälkõnesid üks-ühele vestlustes.</translation>
     </message>
 </context>
 <context>

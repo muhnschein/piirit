@@ -1929,16 +1929,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Vis anropsskjerm for godkjente kontakter</translation>
     </message>
     <message>
-        <source>Enable calls (experimental)</source>
-        <translation>Slå på anrop (eksperimentelt)</translation>
-    </message>
-    <message>
         <source>Runs small apps inside chats.</source>
         <translation>Kjører små apper inne i samtaler.</translation>
-    </message>
-    <message>
-        <source>Makes and answers voice calls in one-to-one chats.</source>
-        <translation>Ringer og besvarer taleanrop i samtaler med én person.</translation>
     </message>
 </context>
 <context>

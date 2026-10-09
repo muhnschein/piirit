@@ -1940,16 +1940,8 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
         <translation>Zobrazit obrazovku hovoru pro přijaté kontakty</translation>
     </message>
     <message>
-        <source>Enable calls (experimental)</source>
-        <translation>Povolit hovory (experimentální)</translation>
-    </message>
-    <message>
         <source>Runs small apps inside chats.</source>
         <translation>Spouští malé aplikace uvnitř chatů.</translation>
-    </message>
-    <message>
-        <source>Makes and answers voice calls in one-to-one chats.</source>
-        <translation>Uskutečňuje a přijímá hlasové hovory v individuálních chatech.</translation>
     </message>
 </context>
 <context>

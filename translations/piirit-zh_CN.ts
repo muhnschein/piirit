@@ -1926,16 +1926,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>为已接受的联系人显示通话界面</translation>
     </message>
     <message>
-        <source>Enable calls (experimental)</source>
-        <translation>启用通话（实验性）</translation>
-    </message>
-    <message>
         <source>Runs small apps inside chats.</source>
         <translation>在聊天中运行小应用。</translation>
-    </message>
-    <message>
-        <source>Makes and answers voice calls in one-to-one chats.</source>
-        <translation>在一对一聊天中拨打和接听语音通话。</translation>
     </message>
 </context>
 <context>

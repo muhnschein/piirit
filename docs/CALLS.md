@@ -3,9 +3,11 @@
 *How a call works in Piirit, how much of the phone's own call handling
 an app can have, and what only a phone can still answer.*
 
-**Voice calls are built, and experimental**: off until *Settings →
-Advanced → Enable calls (experimental)* is switched on. Video calls are
-not built. Voice calls have been made on a phone, Sailfish OS 5.2; the
+**Voice calls are on for everybody**, as they are in the reference
+clients since Delta Chat 2.51: they were experimental, behind a switch
+under *Settings → Advanced*, until the call bugs in #119 were fixed.
+Whether a call rings here is *Settings → Notifications → Calls*, the
+reference clients' own switch. Video calls are not built. Voice calls have been made on a phone, Sailfish OS 5.2; the
 questions at the end are the ones a source tree cannot answer, and the
 ones still open say so.
 
@@ -62,8 +64,7 @@ of it the app reads against the binary itself.
   is still stored, and can still be answered from its chat. Not synced,
   but kept in the profile's database, so a backup or a second device
   takes it along: Piirit writes 2 only when the reader switches ringing
-  off, and leaves the default otherwise -- calls being off here is not a
-  choice for a client the profile is copied to.
+  off, and leaves the default otherwise.
 
 ## How a call works here
 
@@ -78,14 +79,10 @@ English sentence, and is shown only when the core will not say what
 state a call is in. A tap on a call still ringing here takes it up; a tap
 on any other calls back -- deltachat-android's rule.
 
-The drawing is not behind the switch -- it is what a call from another
-client looks like whether or not calls are on -- but the tap is: with
-calls off, a call's row does nothing.
-
 ### Placing one
 
 From the contact: their page's tiles (`MediaKinds.qml`) have a **Calls**
-tile while calls are on and the chat is one a call can be placed in --
+tile while the chat is one a call can be placed in --
 one-to-one, encrypted, taking messages, the core's own conditions asked
 in advance (`chat.rs`'s `takes_calls`). Behind it, `CallsPage.qml`
 lists the chat's calls from the chat's own media index (`chat_media.rs`,
@@ -199,9 +196,9 @@ What is here is the rest of it:
 
 | | How | Allowed |
 |---|---|---|
-| **Ringtone** | ngfd, the daemon that makes every sound the phone makes, plays `voip_ringtone`: the phone's own tone for a call that is not a phone call, at the ringing volume, silenced by the silent profile, repeating until stopped | ngfd's system-bus interface, which sailjail opens to every app; not a listed Harbour API |
-| **Screen and call state** | mce is told `ringing`, then `active`, then `none`: it lights the screen for a ringing call and treats the phone as being in one. It forgets by itself if the app goes | mce's request interface, open to every app; not a listed Harbour API |
-| **Lock screen** | a Critical notification with Decline and Answer on it, and the app brought forward | `Nemo.Notifications` |
+| **Ringtone** | ngfd, the daemon that makes every sound the phone makes, plays `voip_ringtone`: the phone's own tone for a call that is not a phone call -- the profile's `voip.alert.tone`, and silent when its `voip.alert.enabled` is off -- at the ringing volume, silenced by the silent profile, repeating until stopped. Should ngfd refuse it, or say it failed, the phone's own `ringtone` with `type` `voip` instead, as voicecall plays it for a call that is not a SIM call | ngfd's system-bus interface, which sailjail opens to every app; not a listed Harbour API |
+| **Screen and call state** | mce is told `ringing`, then `active`, then `none`: it lights the screen for a ringing call and treats the phone as being in one. It forgets by itself if the app goes. `ringing` only once ngfd has answered the ringtone's Play, or a second has passed: ngfd follows mce's call state, and the event set's `voip_ringtone` plays a call-waiting beep instead of the ringtone while mce says a call is on, ringing included -- which is what told it first did (#98) | mce's request interface, open to every app; not a listed Harbour API |
+| **Lock screen** | once mce says the screen is on, `req_tklock_mode_change("unlocked")` and the app brought forward, so the call's page is what is on screen; raised behind the lock screen, it showed for a moment and was covered again (#99). mce turns the screen on for a ringing call only when it would for a phone call -- not in a pocket -- and puts the lock back when the call is over. A device lock, a code or a fingerprint, is left alone: the call's page is behind it. A Critical notification with Decline and Answer on it besides, which the lock screen shows | mce's request interface; `Nemo.Notifications` |
 | **Missed calls** | left in the notification area in the phone's own category for one, `x-nemo.call.missed`, with Call back on it | `Nemo.Notifications` |
 | **Staying awake** | the CPU kept up while a call is up: a phone that suspends takes the call's sound with it | `Nemo.KeepAlive` |
 | **At the ear** | the proximity sensor puts a black screen that takes no touch over the call while it is held there -- an app cannot switch the display off | `QtSensors` |
@@ -214,7 +211,13 @@ Left out on purpose:
   app with the Audio permission, and would make a voice call sound like
   one. It is also kept after the app has gone: a crash mid-call would
   leave every sound the phone makes on the earpiece. Calls are on the
-  speaker until that can be made safe on a device.
+  speaker until that can be made safe on a device. A call heard from the
+  earpiece and the loudspeaker both (#100) is not a route Piirit picks:
+  Gecko's streams carry no media role, so the policy puts them with any
+  other app's sound, and nothing a call here does -- mce's call state
+  included -- moves the audio policy or the phone's audio HAL into a
+  call. Whether the phone's own loudspeaker output drives the earpiece
+  too is the fourth question below.
 - **Being a call to the audio policy.** The `call` resource class is
   voicecall's. `libaudioresource`, which Harbour allows, would put the
   app's streams in the `player` class -- pausing music, and keeping the
@@ -227,7 +230,7 @@ Left out on purpose:
 ## What only a phone can answer
 
 Ranked by what would sink the feature. None of them needs another line
-of Piirit: two phones, a calls-enabled build, and an afternoon.
+of Piirit: two phones and an afternoon.
 
 1. **Does a peer connection complete on the device, with the
    microphone?** Yes: calls have gone through on 5.2.
@@ -239,8 +242,11 @@ of Piirit: two phones, a calls-enabled build, and an afternoon.
    player, an event or a call holds audio. If a call goes silent when
    music is playing, or when the microphone starts, `libaudioresource`
    is the fix above.
-4. **Does `voip_ringtone` exist in the phone's event set**, and does mce
-   blank the screen at the ear with the call on the speaker?
+4. **Does the phone's loudspeaker output play from the earpiece too?**
+   Music in the Media app, heard from both, would say the call's sound
+   is no different (#100); `pactl list sinks` names the active port.
+   And does mce blank the screen at the ear with the call on the
+   speaker?
 5. **What it sounds like.** Echo on speakerphone, and what a call costs
    in battery.
 
