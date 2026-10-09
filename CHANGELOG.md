@@ -6,6 +6,10 @@ of the GitHub release, which `scripts/release-notes.sh` cuts out of this
 file when the release is made (`.github/workflows/rpm.yml`;
 docs/BUILDING.md, "Cutting a release").
 
+## Unreleased
+
+- Enter in the chat search closes the keyboard and keeps the search.
+
 ## 2.1.0 — 2026-10-08
 
 - **Unread filter.** Search and Unread pills at the top of the chat list; Unread shows only chats with unread messages.
