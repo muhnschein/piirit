@@ -65,6 +65,7 @@ jobs:
             qtmultimedia5-dev \
             qtdeclarative5-dev-tools \
             qml-module-qtquick2 \
+            qml-module-qtquick-window2 \
             qttools5-dev-tools
 
       # `toolchain` is passed explicitly because dtolnay/rust-toolchain takes
