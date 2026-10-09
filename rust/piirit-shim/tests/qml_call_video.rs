@@ -229,6 +229,9 @@ fn a_video_call_shows_its_pictures_under_lines_a_tap_puts_away() {
             record!("url", url.clone());
             record!("engine", call!("engine"));
             record!("hidden-before", get!("callViewLoader", "opacity"));
+            // No picture yet, but the camera is on: held in front of the
+            // face, not to the ear.
+            record!("ear-camera", get!("proximity", "active"));
             record!(
                 "report",
                 report(
@@ -280,7 +283,19 @@ fn a_video_call_shows_its_pictures_under_lines_a_tap_puts_away() {
                 ))
                 .to_string()
             );
+            // Only their picture now.
+            report(
+                &url,
+                "/video",
+                r#"{"local":false,"remote":true,"front":false}"#,
+            );
+        }),
+        Box::new(move || unsafe {
+            // Their picture is watched with the camera off: still not
+            // a call held to the ear.
+            record!("ear-watching", get!("proximity", "active"));
             // No pictures any more: the page is unseen again.
+            let url = (*url_ptr).clone();
             report(
                 &url,
                 "/video",
@@ -376,6 +391,11 @@ fn a_video_call_shows_its_pictures_under_lines_a_tap_puts_away() {
         "0",
         "the page is shown before it has any pictures. {context}"
     );
+    assert_eq!(
+        value("ear-camera"),
+        "false",
+        "the camera is on, yet a hand over the sensor blacks the screen out. {context}"
+    );
     assert_eq!(value("report"), "HTTP/1.1 204 No Content", "{context}");
 
     assert_eq!(
@@ -453,6 +473,11 @@ fn a_video_call_shows_its_pictures_under_lines_a_tap_puts_away() {
         value("ear-voice"),
         "true",
         "the ear shield is off in a voice call held to the ear. {context}"
+    );
+    assert_eq!(
+        value("ear-watching"),
+        "false",
+        "watching their picture with the camera off, a hand over the sensor blacks the screen out. {context}"
     );
 
     assert_eq!(value("ring-voice"), "ringing", "{context}");
