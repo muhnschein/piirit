@@ -455,6 +455,61 @@ Gli altri gruppi con contatti bloccati continueranno a visualizzare i loro messa
     </message>
 </context>
 <context>
+    <name>CameraSettingsPanel</name>
+    <message>
+        <source>Flash automatic</source>
+        <translation>Flash automatico</translation>
+    </message>
+    <message>
+        <source>Flash on</source>
+        <translation>Flash attivo</translation>
+    </message>
+    <message>
+        <source>Flashlight on</source>
+        <translation>Torcia attiva</translation>
+    </message>
+    <message>
+        <source>Flash off</source>
+        <translation>Flash disattivato</translation>
+    </message>
+    <message>
+        <source>Self-timer %1 s</source>
+        <translation>Autoscatto %1 s</translation>
+    </message>
+    <message>
+        <source>Self-timer off</source>
+        <translation>Autoscatto disattivato</translation>
+    </message>
+    <message>
+        <source>Sunny</source>
+        <translation>Sole</translation>
+    </message>
+    <message>
+        <source>Cloudy</source>
+        <translation>Nuvoloso</translation>
+    </message>
+    <message>
+        <source>Fluorescent</source>
+        <translation>Fluorescente</translation>
+    </message>
+    <message>
+        <source>Tungsten</source>
+        <translation>Incandescente</translation>
+    </message>
+    <message>
+        <source>Automatic white balance</source>
+        <translation>Bilanciamento del bianco automatico</translation>
+    </message>
+    <message>
+        <source>Grid on</source>
+        <translation>Griglia attiva</translation>
+    </message>
+    <message>
+        <source>Grid off</source>
+        <translation>Griglia disattivata</translation>
+    </message>
+</context>
+<context>
     <name>CapturePage</name>
     <message>
         <source>The video could not be saved</source>

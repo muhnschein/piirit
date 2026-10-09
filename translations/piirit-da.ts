@@ -451,6 +451,61 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>CameraSettingsPanel</name>
+    <message>
+        <source>Flash automatic</source>
+        <translation>Blitz automatisk</translation>
+    </message>
+    <message>
+        <source>Flash on</source>
+        <translation>Blitz til</translation>
+    </message>
+    <message>
+        <source>Flashlight on</source>
+        <translation>Lommelygte til</translation>
+    </message>
+    <message>
+        <source>Flash off</source>
+        <translation>Blitz fra</translation>
+    </message>
+    <message>
+        <source>Self-timer %1 s</source>
+        <translation>Selvudløser %1 s</translation>
+    </message>
+    <message>
+        <source>Self-timer off</source>
+        <translation>Selvudløser fra</translation>
+    </message>
+    <message>
+        <source>Sunny</source>
+        <translation>Solskin</translation>
+    </message>
+    <message>
+        <source>Cloudy</source>
+        <translation>Skyet</translation>
+    </message>
+    <message>
+        <source>Fluorescent</source>
+        <translation>Lysstofrør</translation>
+    </message>
+    <message>
+        <source>Tungsten</source>
+        <translation>Glødepære</translation>
+    </message>
+    <message>
+        <source>Automatic white balance</source>
+        <translation>Automatisk hvidbalance</translation>
+    </message>
+    <message>
+        <source>Grid on</source>
+        <translation>Gitter til</translation>
+    </message>
+    <message>
+        <source>Grid off</source>
+        <translation>Gitter fra</translation>
+    </message>
+</context>
+<context>
     <name>CapturePage</name>
     <message>
         <source>The video could not be saved</source>

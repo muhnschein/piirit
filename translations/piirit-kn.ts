@@ -455,6 +455,61 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>CameraSettingsPanel</name>
+    <message>
+        <source>Flash automatic</source>
+        <translation>ಫ್ಲ್ಯಾಶ್ ಸ್ವಯಂಚಾಲಿತ</translation>
+    </message>
+    <message>
+        <source>Flash on</source>
+        <translation>ಫ್ಲ್ಯಾಶ್ ಆನ್</translation>
+    </message>
+    <message>
+        <source>Flashlight on</source>
+        <translation>ಟಾರ್ಚ್ ಆನ್</translation>
+    </message>
+    <message>
+        <source>Flash off</source>
+        <translation>ಫ್ಲ್ಯಾಶ್ ಆಫ್</translation>
+    </message>
+    <message>
+        <source>Self-timer %1 s</source>
+        <translation>ಸೆಲ್ಫ್-ಟೈಮರ್ %1 ಸೆ</translation>
+    </message>
+    <message>
+        <source>Self-timer off</source>
+        <translation>ಸೆಲ್ಫ್-ಟೈಮರ್ ಆಫ್</translation>
+    </message>
+    <message>
+        <source>Sunny</source>
+        <translation>ಬಿಸಿಲು</translation>
+    </message>
+    <message>
+        <source>Cloudy</source>
+        <translation>ಮೋಡ ಕವಿದ</translation>
+    </message>
+    <message>
+        <source>Fluorescent</source>
+        <translation>ಫ್ಲೋರೆಸೆಂಟ್</translation>
+    </message>
+    <message>
+        <source>Tungsten</source>
+        <translation>ಟಂಗ್ಸ್ಟನ್</translation>
+    </message>
+    <message>
+        <source>Automatic white balance</source>
+        <translation>ಸ್ವಯಂಚಾಲಿತ ವೈಟ್ ಬ್ಯಾಲೆನ್ಸ್</translation>
+    </message>
+    <message>
+        <source>Grid on</source>
+        <translation>ಗ್ರಿಡ್ ಆನ್</translation>
+    </message>
+    <message>
+        <source>Grid off</source>
+        <translation>ಗ್ರಿಡ್ ಆಫ್</translation>
+    </message>
+</context>
+<context>
     <name>CapturePage</name>
     <message>
         <source>The video could not be saved</source>

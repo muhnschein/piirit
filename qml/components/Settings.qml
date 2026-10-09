@@ -9,8 +9,9 @@ import Nemo.Configuration 1.0
  * whether anything is announced at all and if so how much a notification
  * gives away and whether a muted group can still raise one, whether
  * webxdc apps are offered at all, whether calls are and whether one rings
- * here, how many quick actions the cover offers and which, and the
- * emoji last reacted with from the picker.
+ * here, how many quick actions the cover offers and which, the emoji
+ * last reacted with from the picker, and the camera's flash, self-timer
+ * and grid.
  *
  * They live in dconf under the app's own path, and every page reads
  * them through this one object: the settings page (qml/pages/
@@ -103,6 +104,14 @@ QtObject {
     /// first, which it offers before everything else. Only the picker's:
     /// the quick reactions are a tap away already.
     property alias recentReactions: recentReactionsValue.value
+    /// The camera's own settings, kept between one picture and the next
+    /// the way the platform camera keeps them: the flash mode asked for
+    /// (Camera.FlashMode's value; see qml/js/Viewfinder.js), the
+    /// self-timer's delay in seconds, and whether the viewfinder draws
+    /// its grid.
+    property alias cameraFlash: cameraFlashValue.value
+    property alias cameraTimer: cameraTimerValue.value
+    property alias cameraGrid: cameraGridValue.value
 
     // The keys, named here and nowhere else: tests/qml_syntax.rs holds
     // every other file to reading them through this object.
@@ -256,5 +265,24 @@ QtObject {
         id: recentReactionsValue
         key: "/apps/harbour-piirit/recent_reactions"
         defaultValue: []
+    }
+
+    property ConfigurationValue cameraFlashConfig: ConfigurationValue {
+        id: cameraFlashValue
+        key: "/apps/harbour-piirit/camera_flash"
+        // Automatic, the platform camera's own default.
+        defaultValue: 1
+    }
+
+    property ConfigurationValue cameraTimerConfig: ConfigurationValue {
+        id: cameraTimerValue
+        key: "/apps/harbour-piirit/camera_timer"
+        defaultValue: 0
+    }
+
+    property ConfigurationValue cameraGridConfig: ConfigurationValue {
+        id: cameraGridValue
+        key: "/apps/harbour-piirit/camera_grid"
+        defaultValue: false
     }
 }

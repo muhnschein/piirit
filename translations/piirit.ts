@@ -449,6 +449,61 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>CameraSettingsPanel</name>
+    <message>
+        <source>Flash automatic</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Flash on</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Flashlight on</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Flash off</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Self-timer %1 s</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Self-timer off</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sunny</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cloudy</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Fluorescent</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Tungsten</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Automatic white balance</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Grid on</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Grid off</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>CapturePage</name>
     <message>
         <source>The video could not be saved</source>

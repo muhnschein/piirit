@@ -455,6 +455,61 @@ Vous continuerez à voir les messages des contacts bloqués dans les autres grou
     </message>
 </context>
 <context>
+    <name>CameraSettingsPanel</name>
+    <message>
+        <source>Flash automatic</source>
+        <translation>Flash automatique</translation>
+    </message>
+    <message>
+        <source>Flash on</source>
+        <translation>Flash activé</translation>
+    </message>
+    <message>
+        <source>Flashlight on</source>
+        <translation>Torche activée</translation>
+    </message>
+    <message>
+        <source>Flash off</source>
+        <translation>Flash désactivé</translation>
+    </message>
+    <message>
+        <source>Self-timer %1 s</source>
+        <translation>Retardateur %1 s</translation>
+    </message>
+    <message>
+        <source>Self-timer off</source>
+        <translation>Retardateur désactivé</translation>
+    </message>
+    <message>
+        <source>Sunny</source>
+        <translation>Ensoleillé</translation>
+    </message>
+    <message>
+        <source>Cloudy</source>
+        <translation>Nuageux</translation>
+    </message>
+    <message>
+        <source>Fluorescent</source>
+        <translation>Fluorescent</translation>
+    </message>
+    <message>
+        <source>Tungsten</source>
+        <translation>Incandescent</translation>
+    </message>
+    <message>
+        <source>Automatic white balance</source>
+        <translation>Balance des blancs automatique</translation>
+    </message>
+    <message>
+        <source>Grid on</source>
+        <translation>Grille activée</translation>
+    </message>
+    <message>
+        <source>Grid off</source>
+        <translation>Grille désactivée</translation>
+    </message>
+</context>
+<context>
     <name>CapturePage</name>
     <message>
         <source>The video could not be saved</source>

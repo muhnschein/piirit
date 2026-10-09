@@ -4,6 +4,7 @@ import QtSensors 5.0
 import Sailfish.Silica 1.0
 import Piirit 1.0
 import "../components"
+import "../js/Viewfinder.js" as Viewfinder
 
 /*
  * The camera, for a picture or a video to send.
@@ -17,13 +18,22 @@ import "../components"
  * sent file into its own directory, and the page that sent it discards
  * the capture afterwards.
  *
- * Laid out as the platform's own camera lays itself out: the viewfinder
- * on black, as large as the sensor's frame lets it be above the
- * controls, and the controls in the black below it -- the two modes
- * stacked on the left with the current one lit, the shutter in the
- * middle, the other camera on the right. The time sits over the bottom
- * of the viewfinder, above the shutter, while a video records: the top
- * of the screen is under a notch on some phones.
+ * Laid out, and working, as the platform's own camera (jolla-camera) in
+ * portrait: the sensor's frame on black at the full width of the screen,
+ * pushed down below the notch on a tall phone, and the controls over and
+ * under it.
+ *  - Along the top, what is in force -- flash, self-timer, white balance,
+ *    grid -- and a tap there pulls the settings down (CameraSettingsPanel).
+ *  - On the picture: pinch to zoom, with the platform's zoom line while it
+ *    moves; tap to focus there, with a ring that lights once the lens has
+ *    found it; the rule-of-thirds grid when it is on; and the exposure
+ *    slider standing at the right edge.
+ *  - At the foot: the two modes stacked on the left, the current one lit;
+ *    the shutter in the middle, counting down when the self-timer is set;
+ *    the other side's camera on the right, and above the shutter one ring
+ *    per back camera on a phone with more than one.
+ * While a video records only the shutter and the zoom are left, as in the
+ * platform's camera, and the time runs at the top.
  *
  * The sensor's frame is the phone's landscape whichever way the phone
  * is held. The platform's camera writes the turn into the file rather
@@ -71,6 +81,38 @@ Page {
     readonly property int recordingState: 1
     readonly property int recordingStatus: 5
     readonly property int finalizingStatus: 7
+
+    /// The cameras on each side, as device ids, in the platform's order.
+    readonly property var backCameras:
+        Viewfinder.camerasFacing(QtMultimedia.availableCameras, Viewfinder.backFace)
+    readonly property var frontCameras:
+        Viewfinder.camerasFacing(QtMultimedia.availableCameras, Viewfinder.frontFace)
+    /// Which side the camera in use faces.
+    readonly property int facing: page.frontCameras.indexOf(camera.deviceId) >= 0
+                                  ? Viewfinder.frontFace : Viewfinder.backFace
+    /// The back camera last used, for the way back from the front.
+    property string lastBackCamera: ""
+    /// Where the switch button goes; empty on a phone with one side.
+    readonly property string otherCamera:
+        Viewfinder.otherSide(QtMultimedia.availableCameras, page.facing, page.lastBackCamera)
+
+    /// The torch, in video. Not kept: the platform camera starts with it
+    /// off too, and a light left on from last time is a surprise.
+    property bool torch: false
+    /// The white balance and exposure compensation, for this page only.
+    property int whiteBalance: Viewfinder.whiteBalanceAuto
+    property real exposure: 0
+
+    /// What the flash panel offers, and what it is set to: the setting
+    /// kept for a picture, the torch for a video.
+    readonly property var flashModes: Viewfinder.flashModes(page.mode === 1, page.facing)
+    readonly property int flash: page.mode === 1
+                                 ? (page.torch ? Viewfinder.flashTorch : Viewfinder.flashOff)
+                                 : Viewfinder.effectiveFlash(Settings.cameraFlash, false, page.facing)
+
+    /// The self-timer: seconds still to go, while it runs.
+    property real countdown: 0
+    readonly property bool counting: selfTimer.running
 
     /// The shutter's face: the platform's own, a ring for a picture, a
     /// red dot to start a video and a square to stop it.
@@ -121,13 +163,19 @@ Page {
         // The turn written into the file: the sensor's own mounting plus
         // the phone's, the front camera the other way round, which is the
         // sum the platform's camera apps write.
-        metaData.orientation: camera.position === Camera.FrontFace
+        metaData.orientation: page.facing === Viewfinder.frontFace
                               ? (720 + camera.orientation - page.pictureRotation) % 360
                               : (720 + camera.orientation + page.pictureRotation) % 360
+        // Continuous, except for the few seconds after a tap: plain
+        // autofocus on the point tapped, which is how the platform's
+        // camera focuses where it is told to.
         focus {
-            focusMode: Camera.FocusContinuous
-            focusPointMode: Camera.FocusPointAuto
+            focusMode: focusHold.running ? Camera.FocusAuto : Camera.FocusContinuous
+            focusPointMode: focusHold.running ? Camera.FocusPointCustom : Camera.FocusPointAuto
         }
+        flash.mode: page.flash
+        exposure.exposureCompensation: page.exposure
+        imageProcessing.whiteBalanceMode: page.whiteBalance
 
         imageCapture {
             onImageSaved: page.report(path)
@@ -166,6 +214,7 @@ Page {
         if (index === page.mode || page.recording || page.stopping || page.done) {
             return
         }
+        selfTimer.stop()
         camera.stop()
         page.mode = index
         camera.captureMode = index === 0 ? Camera.CaptureStillImage
@@ -175,14 +224,85 @@ Page {
         }
     }
 
-    /// A picture, or the start or end of a video.
+    /// Change to another camera: the other side's, or another lens on the
+    /// back. The zoom and a tap's focus belong to the camera they were
+    /// set on, so both start over, as they do in the platform's camera.
+    function useCamera(deviceId) {
+        if (deviceId.length === 0 || deviceId === camera.deviceId
+                || page.recording || page.stopping || page.done) {
+            return
+        }
+        selfTimer.stop()
+        focusHold.stop()
+        if (page.facing === Viewfinder.backFace && camera.deviceId.length > 0) {
+            page.lastBackCamera = camera.deviceId
+        }
+        if (page.backCameras.indexOf(deviceId) >= 0) {
+            page.lastBackCamera = deviceId
+        }
+        camera.deviceId = deviceId
+        camera.digitalZoom = 1
+    }
+
+    /// Zoom to `value`, inside what the camera can do.
+    function zoomTo(value) {
+        camera.digitalZoom = Viewfinder.clampZoom(value, camera.maximumDigitalZoom)
+        zoomIndicator.show()
+    }
+
+    /// Focus on a tap at `x`, `y` in the viewfinder. The ring goes where
+    /// the finger was; the camera is told the point in its own frame.
+    function focusAt(x, y) {
+        var mapped = typeof viewfinder.mapPointToSourceNormalized === "function"
+                ? viewfinder.mapPointToSourceNormalized(Qt.point(x, y)) : null
+        var point = Viewfinder.focusPoint(mapped, x, y, viewfinder.width, viewfinder.height)
+        if (!point) {
+            return
+        }
+        reticle.at = Qt.point(x, y)
+        focusHold.restart()
+        camera.unlock()
+        camera.focus.customFocusPoint = Qt.point(point.x, point.y)
+        camera.searchAndLock()
+    }
+
+    // How long a tap's focus is kept: the platform camera's five seconds.
+    // Then the lock comes off and continuous focus takes the lens back.
+    Timer {
+        id: focusHold
+        objectName: "focusHold"
+        interval: 5000
+        onTriggered: camera.unlock()
+    }
+
+    /// The shutter: a picture, or the start or end of a video -- after
+    /// the self-timer, when it is set. A tap while it counts calls it off.
     function shutter() {
+        if (page.done) {
+            return
+        }
+        if (selfTimer.running) {
+            selfTimer.stop()
+            page.countdown = 0
+            return
+        }
+        if (Settings.cameraTimer > 0 && !page.recording && !page.stopping) {
+            page.countdown = Settings.cameraTimer
+            selfTimer.restart()
+            return
+        }
+        page.fire()
+    }
+
+    /// What the shutter does once any wait is over.
+    function fire() {
         if (page.done) {
             return
         }
         if (page.mode === 0) {
             var path = captures.new_path("photo", "jpg")
             if (path.length > 0) {
+                blink.restart()
                 camera.imageCapture.captureToLocation(path)
             }
         } else if (page.recording) {
@@ -196,6 +316,18 @@ Page {
                 camera.videoRecorder.record()
             }
         }
+    }
+
+    SequentialAnimation {
+        id: selfTimer
+        objectName: "selfTimer"
+        NumberAnimation {
+            target: page
+            property: "countdown"
+            to: 0
+            duration: Math.max(0, page.countdown) * 1000
+        }
+        ScriptAction { script: page.fire() }
     }
 
     function stopRecording() {
@@ -277,6 +409,7 @@ Page {
         if (page.status === PageStatus.Active && !page.done) {
             camera.start()
         } else if (page.status !== PageStatus.Active) {
+            selfTimer.stop()
             if (page.recording) {
                 camera.videoRecorder.stop()
             }
@@ -309,42 +442,91 @@ Page {
         color: "black"
     }
 
-    // The sensor's frame, on black, as large as the room above the
-    // controls lets it be.
-    VideoOutput {
-        id: viewfinder
-        objectName: "viewfinder"
-        anchors {
-            top: parent.top
-            left: parent.left
-            right: parent.right
-            bottom: controls.top
-        }
-        source: camera
-        fillMode: VideoOutput.PreserveAspectFit
+    /// How tall the sensor's frame is for its width, once the camera says;
+    /// four by three, the platform camera's default, until it does. The
+    /// long side over the short: the page is upright and the frame is
+    /// drawn upright, whichever way round the source reports itself.
+    readonly property real frameRatio: Viewfinder.frameRatio(viewfinder.sourceRect.width,
+                                                             viewfinder.sourceRect.height)
+    /// The notch, where the phone has one.
+    readonly property real topInset: Screen.topCutout.height
 
-        // Tap to focus on what is under the finger, as the scanner does.
-        MouseArea {
-            objectName: "focusTap"
+    // The sensor's frame, the full width of the screen. On a phone tall
+    // enough to have room under it, it is pushed down past the notch and
+    // the settings row, as the platform camera does on such a phone, so
+    // neither covers the top of the picture.
+    Item {
+        id: frame
+        objectName: "frame"
+        width: parent.width
+        height: Math.min(parent.height, Math.round(width * page.frameRatio))
+        y: Math.max(0, Math.min(parent.height - height,
+                                parent.height / Math.max(1, parent.width) >= 2
+                                ? page.topInset + Theme.itemSizeLarge : 0))
+
+        VideoOutput {
+            id: viewfinder
+            objectName: "viewfinder"
             anchors.fill: parent
-            onClicked: {
-                camera.focus.focusPointMode = Camera.FocusPointCustom
-                camera.focus.customFocusPoint = Qt.point(mouse.x / width, mouse.y / height)
-                camera.unlock()
-                camera.searchAndLock()
+            source: camera
+            fillMode: VideoOutput.PreserveAspectFit
+
+            SequentialAnimation {
+                id: blink
+                PropertyAction { target: viewfinder; property: "opacity"; value: 0 }
+                PauseAnimation { duration: 100 }
+                NumberAnimation { target: viewfinder; property: "opacity"; to: 1; duration: 300 }
+            }
+        }
+
+        ViewfinderGrid {
+            objectName: "grid"
+            anchors.fill: parent
+            visible: Settings.cameraGrid === true
+        }
+
+        FocusReticle {
+            id: reticle
+            objectName: "reticle"
+            visible: focusHold.running
+            locked: camera.lockStatus === Viewfinder.lockLocked
+        }
+
+        // Pinch to zoom, and tap to focus on what is under the finger.
+        PinchArea {
+            objectName: "pinchArea"
+            anchors.fill: parent
+            enabled: !page.done
+            onPinchUpdated: page.zoomTo(Viewfinder.pinchZoom(camera.digitalZoom,
+                                                             camera.maximumDigitalZoom,
+                                                             pinch.scale, pinch.previousScale))
+
+            MouseArea {
+                objectName: "focusTap"
+                anchors.fill: parent
+                onClicked: page.focusAt(mouse.x, mouse.y)
             }
         }
     }
 
-    // The time, while a video runs: a pill over the bottom of the
-    // viewfinder, centred above the shutter.
-    Rectangle {
-        objectName: "recordingIndicator"
+    ZoomIndicator {
+        id: zoomIndicator
+        objectName: "zoomIndicator"
         anchors {
             horizontalCenter: parent.horizontalCenter
-            bottom: controls.top
-            bottomMargin: Theme.paddingMedium
+            top: frame.top
+            topMargin: Theme.itemSizeSmall + Theme.paddingLarge
         }
+        zoom: camera.digitalZoom
+        maximumZoom: camera.maximumDigitalZoom
+    }
+
+    // The time, while a video runs: at the top, below the notch, where
+    // the platform camera writes it.
+    Rectangle {
+        objectName: "recordingIndicator"
+        anchors.horizontalCenter: parent.horizontalCenter
+        y: page.topInset + Theme.paddingMedium
         width: indicator.width + 2 * Theme.paddingLarge
         height: indicator.height + 2 * Theme.paddingSmall
         radius: height / 2
@@ -368,13 +550,37 @@ Page {
                 objectName: "recordingTime"
                 anchors.verticalCenter: parent.verticalCenter
                 color: "white"
-                font.pixelSize: Theme.fontSizeMedium
+                font.pixelSize: Theme.fontSizeLarge
                 text: page.clock(page.seconds)
             }
         }
     }
 
-    // The controls, in the black under the viewfinder.
+    // Exposure, at the right edge of the picture. Not while recording.
+    ExposureSlider {
+        objectName: "exposureSlider"
+        anchors {
+            right: parent.right
+            verticalCenter: frame.verticalCenter
+        }
+        height: Theme.itemSizeSmall * 5
+        visible: !page.recording && !page.stopping && !page.done
+        value: page.exposure
+        onMoved: page.exposure = value
+    }
+
+    // The self-timer, counting, large over the middle of the picture.
+    Label {
+        objectName: "countdown"
+        anchors.centerIn: frame
+        visible: page.counting
+        color: "white"
+        font.pixelSize: Theme.fontSizeHuge
+        text: Viewfinder.countdownText(page.countdown)
+    }
+
+    // The controls, at the foot: in the black under the picture where
+    // there is room, over its bottom edge where there is not.
     Item {
         id: controls
         anchors {
@@ -382,10 +588,8 @@ Page {
             right: parent.right
             bottom: parent.bottom
         }
-        // Tall enough for the two stacked modes with a margin, which
-        // the shutter's own size is not: the lower mode sat on the
-        // screen's edge.
-        height: modes.height + 2 * Theme.paddingLarge
+        height: Math.max(modes.height + 2 * Theme.paddingLarge,
+                         parent.height - frame.y - frame.height)
 
         // The two modes, stacked, the current one on a lit disc. Not
         // while a video runs: the pipeline it would switch is the one
@@ -400,6 +604,8 @@ Page {
             }
             spacing: Theme.paddingSmall
             enabled: !page.recording && !page.stopping
+            opacity: enabled ? 1 : 0
+            Behavior on opacity { NumberAnimation { duration: 200 } }
 
             Repeater {
                 model: ["image://theme/icon-camera-camera-mode", "image://theme/icon-camera-video"]
@@ -425,7 +631,25 @@ Page {
             }
         }
 
-        // The shutter, in the platform's own drawing.
+        // One ring per back camera, above the shutter, on a phone that
+        // has more than one. Not on the front, and not while a video
+        // runs.
+        CameraLensToggle {
+            objectName: "lensToggle"
+            anchors {
+                horizontalCenter: parent.horizontalCenter
+                bottom: shutter.top
+                bottomMargin: Theme.paddingMedium
+            }
+            cameras: page.backCameras
+            current: camera.deviceId
+            visible: page.backCameras.length > 1 && page.facing === Viewfinder.backFace
+                     && !page.recording && !page.stopping
+            onSelected: page.useCamera(deviceId)
+        }
+
+        // The shutter, in the platform's own drawing; the seconds left
+        // on it while the self-timer runs.
         IconButton {
             id: shutter
             objectName: "shutter"
@@ -433,10 +657,17 @@ Page {
             enabled: !page.done
             icon.source: page.shutterIcon
             onClicked: page.shutter()
+
+            Label {
+                anchors.centerIn: parent
+                visible: Settings.cameraTimer > 0 && !page.recording && !page.counting
+                color: "black"
+                font.pixelSize: Theme.fontSizeTiny
+                text: Settings.cameraTimer
+            }
         }
 
-        // The other camera: the one facing the reader. Not while a video
-        // runs.
+        // The other side's camera. Not while a video runs.
         IconButton {
             objectName: "flipButton"
             anchors {
@@ -444,19 +675,44 @@ Page {
                 rightMargin: Theme.horizontalPageMargin
                 verticalCenter: parent.verticalCenter
             }
+            visible: page.otherCamera.length > 0
             enabled: !page.recording && !page.stopping
+            opacity: enabled ? 1 : 0
             icon.source: "image://theme/icon-camera-switch"
-            onClicked: camera.position = camera.position === Camera.FrontFace
-                                         ? Camera.BackFace : Camera.FrontFace
+            onClicked: page.useCamera(page.otherCamera)
         }
     }
 
     // The capture is being written: nothing to tap meanwhile.
     BusyIndicator {
         objectName: "writing"
-        anchors.centerIn: viewfinder
+        anchors.centerIn: frame
         running: page.done || page.stopping || camera.imageCapture.capturing
         size: BusyIndicatorSize.Large
+    }
+
+    // Last, so that when it is down it lies over everything else and a
+    // tap outside it puts it away rather than reaching what is under it.
+    CameraSettingsPanel {
+        objectName: "settingsPanel"
+        anchors.fill: parent
+        topInset: page.topInset
+        visible: !page.recording && !page.stopping && !page.done
+        flashModes: page.flashModes
+        flash: page.flash
+        timer: Settings.cameraTimer
+        whiteBalance: page.whiteBalance
+        grid: Settings.cameraGrid === true
+        onFlashChosen: {
+            if (page.mode === 1) {
+                page.torch = mode === Viewfinder.flashTorch
+            } else {
+                Settings.cameraFlash = mode
+            }
+        }
+        onTimerChosen: Settings.cameraTimer = seconds
+        onWhiteBalanceChosen: page.whiteBalance = mode
+        onGridChosen: Settings.cameraGrid = on
     }
 
     Banner {

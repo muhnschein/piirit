@@ -453,6 +453,61 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>CameraSettingsPanel</name>
+    <message>
+        <source>Flash automatic</source>
+        <translation>Флэш автомат</translation>
+    </message>
+    <message>
+        <source>Flash on</source>
+        <translation>Флэш кабызылган</translation>
+    </message>
+    <message>
+        <source>Flashlight on</source>
+        <translation>Фонарь кабызылган</translation>
+    </message>
+    <message>
+        <source>Flash off</source>
+        <translation>Флэш сүндерелгән</translation>
+    </message>
+    <message>
+        <source>Self-timer %1 s</source>
+        <translation>Таймер %1 с</translation>
+    </message>
+    <message>
+        <source>Self-timer off</source>
+        <translation>Таймер сүндерелгән</translation>
+    </message>
+    <message>
+        <source>Sunny</source>
+        <translation>Кояшлы</translation>
+    </message>
+    <message>
+        <source>Cloudy</source>
+        <translation>Болытлы</translation>
+    </message>
+    <message>
+        <source>Fluorescent</source>
+        <translation>Люминесцент</translation>
+    </message>
+    <message>
+        <source>Tungsten</source>
+        <translation>Вольфрам</translation>
+    </message>
+    <message>
+        <source>Automatic white balance</source>
+        <translation>Автомат ак баланс</translation>
+    </message>
+    <message>
+        <source>Grid on</source>
+        <translation>Тор кабызылган</translation>
+    </message>
+    <message>
+        <source>Grid off</source>
+        <translation>Тор сүндерелгән</translation>
+    </message>
+</context>
+<context>
     <name>CapturePage</name>
     <message>
         <source>The video could not be saved</source>

@@ -449,6 +449,61 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>CameraSettingsPanel</name>
+    <message>
+        <source>Flash automatic</source>
+        <translation>Flash tự động</translation>
+    </message>
+    <message>
+        <source>Flash on</source>
+        <translation>Flash bật</translation>
+    </message>
+    <message>
+        <source>Flashlight on</source>
+        <translation>Đèn pin bật</translation>
+    </message>
+    <message>
+        <source>Flash off</source>
+        <translation>Flash tắt</translation>
+    </message>
+    <message>
+        <source>Self-timer %1 s</source>
+        <translation>Hẹn giờ %1 giây</translation>
+    </message>
+    <message>
+        <source>Self-timer off</source>
+        <translation>Hẹn giờ tắt</translation>
+    </message>
+    <message>
+        <source>Sunny</source>
+        <translation>Nắng</translation>
+    </message>
+    <message>
+        <source>Cloudy</source>
+        <translation>Nhiều mây</translation>
+    </message>
+    <message>
+        <source>Fluorescent</source>
+        <translation>Huỳnh quang</translation>
+    </message>
+    <message>
+        <source>Tungsten</source>
+        <translation>Sợi đốt</translation>
+    </message>
+    <message>
+        <source>Automatic white balance</source>
+        <translation>Cân bằng trắng tự động</translation>
+    </message>
+    <message>
+        <source>Grid on</source>
+        <translation>Lưới bật</translation>
+    </message>
+    <message>
+        <source>Grid off</source>
+        <translation>Lưới tắt</translation>
+    </message>
+</context>
+<context>
     <name>CapturePage</name>
     <message>
         <source>The video could not be saved</source>

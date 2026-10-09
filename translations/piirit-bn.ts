@@ -455,6 +455,61 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>CameraSettingsPanel</name>
+    <message>
+        <source>Flash automatic</source>
+        <translation>ফ্ল্যাশ স্বয়ংক্রিয়</translation>
+    </message>
+    <message>
+        <source>Flash on</source>
+        <translation>ফ্ল্যাশ চালু</translation>
+    </message>
+    <message>
+        <source>Flashlight on</source>
+        <translation>টর্চ চালু</translation>
+    </message>
+    <message>
+        <source>Flash off</source>
+        <translation>ফ্ল্যাশ বন্ধ</translation>
+    </message>
+    <message>
+        <source>Self-timer %1 s</source>
+        <translation>সেলফ-টাইমার %1 সে</translation>
+    </message>
+    <message>
+        <source>Self-timer off</source>
+        <translation>সেলফ-টাইমার বন্ধ</translation>
+    </message>
+    <message>
+        <source>Sunny</source>
+        <translation>রৌদ্রোজ্জ্বল</translation>
+    </message>
+    <message>
+        <source>Cloudy</source>
+        <translation>মেঘলা</translation>
+    </message>
+    <message>
+        <source>Fluorescent</source>
+        <translation>ফ্লুরোসেন্ট</translation>
+    </message>
+    <message>
+        <source>Tungsten</source>
+        <translation>টাংস্টেন</translation>
+    </message>
+    <message>
+        <source>Automatic white balance</source>
+        <translation>স্বয়ংক্রিয় হোয়াইট ব্যালেন্স</translation>
+    </message>
+    <message>
+        <source>Grid on</source>
+        <translation>গ্রিড চালু</translation>
+    </message>
+    <message>
+        <source>Grid off</source>
+        <translation>গ্রিড বন্ধ</translation>
+    </message>
+</context>
+<context>
     <name>CapturePage</name>
     <message>
         <source>The video could not be saved</source>

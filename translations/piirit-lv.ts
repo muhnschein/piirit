@@ -457,6 +457,61 @@ Citās grupās, kurās ir bloķēti kontakti, viņu ziņas joprojām būs redzam
     </message>
 </context>
 <context>
+    <name>CameraSettingsPanel</name>
+    <message>
+        <source>Flash automatic</source>
+        <translation>Zibspuldze automātiski</translation>
+    </message>
+    <message>
+        <source>Flash on</source>
+        <translation>Zibspuldze ieslēgta</translation>
+    </message>
+    <message>
+        <source>Flashlight on</source>
+        <translation>Lukturis ieslēgts</translation>
+    </message>
+    <message>
+        <source>Flash off</source>
+        <translation>Zibspuldze izslēgta</translation>
+    </message>
+    <message>
+        <source>Self-timer %1 s</source>
+        <translation>Taimeris %1 s</translation>
+    </message>
+    <message>
+        <source>Self-timer off</source>
+        <translation>Taimeris izslēgts</translation>
+    </message>
+    <message>
+        <source>Sunny</source>
+        <translation>Saulains</translation>
+    </message>
+    <message>
+        <source>Cloudy</source>
+        <translation>Mākoņains</translation>
+    </message>
+    <message>
+        <source>Fluorescent</source>
+        <translation>Luminiscentais</translation>
+    </message>
+    <message>
+        <source>Tungsten</source>
+        <translation>Kvēlspuldze</translation>
+    </message>
+    <message>
+        <source>Automatic white balance</source>
+        <translation>Automātisks baltās krāsas balanss</translation>
+    </message>
+    <message>
+        <source>Grid on</source>
+        <translation>Režģis ieslēgts</translation>
+    </message>
+    <message>
+        <source>Grid off</source>
+        <translation>Režģis izslēgts</translation>
+    </message>
+</context>
+<context>
     <name>CapturePage</name>
     <message>
         <source>The video could not be saved</source>

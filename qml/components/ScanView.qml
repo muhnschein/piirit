@@ -2,6 +2,7 @@ import QtQuick 2.0
 import QtMultimedia 5.6
 import Sailfish.Silica 1.0
 import Piirit 1.0
+import "../js/Viewfinder.js" as Viewfinder
 
 /*
  * Point the camera at a QR code -- or, from the button under the
@@ -50,6 +51,14 @@ import Piirit 1.0
  * opened alongside, took the lens over and focused it.
  * CodeReader and Foil Auth, which read codes on the same platform, run
  * continuous focus the same way and only search on a tap.
+ *
+ * A code that is small or far off is brought closer the platform
+ * camera's way, with a pinch and its zoom line, or a thumb's: a button
+ * steps through one, two and four times. Over the bottom of the picture,
+ * as in the platform camera, are the torch -- a code on paper in a dim
+ * room is otherwise unreadable -- one ring per back camera on a phone with
+ * more than one, and the switch to the other side, for a code shown on a
+ * screen held up to the front.
  */
 Item {
     id: root
@@ -153,11 +162,51 @@ Item {
         onError: root.failed(message)
     }
 
+    /// The cameras on each side, as device ids, in the platform's order.
+    readonly property var backCameras:
+        Viewfinder.camerasFacing(QtMultimedia.availableCameras, Viewfinder.backFace)
+    readonly property var frontCameras:
+        Viewfinder.camerasFacing(QtMultimedia.availableCameras, Viewfinder.frontFace)
+    readonly property int facing: root.frontCameras.indexOf(camera.deviceId) >= 0
+                                  ? Viewfinder.frontFace : Viewfinder.backFace
+    property string lastBackCamera: ""
+    readonly property string otherCamera:
+        Viewfinder.otherSide(QtMultimedia.availableCameras, root.facing, root.lastBackCamera)
+
+    /// The torch is on. Only on the back, which is where the light is.
+    property bool torch: false
+
+    /// Change to another camera. The zoom and a tap's focus belong to the
+    /// one they were set on, and the torch to the back.
+    function useCamera(deviceId) {
+        if (deviceId.length === 0 || deviceId === camera.deviceId || root.done) {
+            return
+        }
+        focusHold.stop()
+        if (root.facing === Viewfinder.backFace && camera.deviceId.length > 0) {
+            root.lastBackCamera = camera.deviceId
+        }
+        if (root.backCameras.indexOf(deviceId) >= 0) {
+            root.lastBackCamera = deviceId
+        }
+        camera.deviceId = deviceId
+        camera.digitalZoom = 1
+    }
+
+    /// Zoom to `value`, inside what the camera can do.
+    function zoomTo(value) {
+        camera.digitalZoom = Viewfinder.clampZoom(value, camera.maximumDigitalZoom)
+        zoomIndicator.show()
+    }
+
     Camera {
         id: camera
         objectName: "camera"
-        // The video pipeline is where continuous autofocus runs.
+        // The video pipeline is where continuous autofocus runs, and
+        // where the flash is a torch.
         captureMode: Camera.CaptureVideo
+        flash.mode: root.torch && root.facing === Viewfinder.backFace
+                    ? Viewfinder.flashTorch : Viewfinder.flashOff
         // Continuous, except for the few seconds after a tap: a search in
         // continuous video focus locks the lens where it is rather than
         // looking, so a tap switches to plain autofocus, which does look,
@@ -241,6 +290,20 @@ Item {
         camera.searchAndLock()
     }
 
+    /// A tap on the viewfinder at `x`, `y` in its own coordinates: the
+    /// ring goes under the finger, and the camera is told the point in
+    /// its own frame.
+    function tapAt(x, y) {
+        var mapped = typeof viewfinder.mapPointToSourceNormalized === "function"
+                ? viewfinder.mapPointToSourceNormalized(Qt.point(x, y)) : null
+        var point = Viewfinder.focusPoint(mapped, x, y, viewfinder.width, viewfinder.height)
+        if (!point) {
+            return
+        }
+        reticle.at = Qt.point(x, y)
+        root.focusAt(point.x, point.y)
+    }
+
     // How long a tap's focus is kept. Once it is over the lock comes off
     // and continuous focus takes the lens back: a lock kept for good is
     // a fixed focus, which the next code held up at another distance
@@ -321,11 +384,126 @@ Item {
         // means what the reader sees is what is being read.
         fillMode: VideoOutput.PreserveAspectCrop
 
-        // Tap to focus on what is under the finger.
-        MouseArea {
-            objectName: "focusTap"
+        // Pinch to zoom, and tap to focus on what is under the finger.
+        PinchArea {
+            objectName: "pinchArea"
             anchors.fill: parent
-            onClicked: root.focusAt(mouse.x / width, mouse.y / height)
+            enabled: !root.done
+            onPinchUpdated: root.zoomTo(Viewfinder.pinchZoom(camera.digitalZoom,
+                                                             camera.maximumDigitalZoom,
+                                                             pinch.scale, pinch.previousScale))
+
+            MouseArea {
+                objectName: "focusTap"
+                anchors.fill: parent
+                onClicked: root.tapAt(mouse.x, mouse.y)
+            }
+        }
+    }
+
+    // Beside the viewfinder rather than in it, which the viewfinder
+    // shares its coordinates with: a frame is grabbed off the viewfinder
+    // and everything in it, and a ring drawn over the code is a ring the
+    // decoder has to read through.
+    FocusReticle {
+        id: reticle
+        objectName: "reticle"
+        visible: focusHold.running && !root.done
+        locked: camera.lockStatus === Viewfinder.lockLocked
+    }
+
+    ZoomIndicator {
+        id: zoomIndicator
+        objectName: "zoomIndicator"
+        anchors {
+            horizontalCenter: parent.horizontalCenter
+            top: hint.bottom
+            topMargin: Theme.paddingLarge
+        }
+        zoom: camera.digitalZoom
+        maximumZoom: camera.maximumDigitalZoom
+    }
+
+    // The camera's own controls, over the bottom of the picture and above
+    // the way to type the link: the torch on the left, the zoom step in
+    // the middle with the back cameras' rings above it, the other side on
+    // the right. Gone once a code is read, and while the link is typed.
+    Item {
+        id: cameraControls
+        objectName: "cameraControls"
+        visible: !root.done && !root.typing
+        anchors {
+            left: parent.left
+            right: parent.right
+            bottom: typeLinkButton.visible ? typeLinkButton.top : parent.bottom
+            bottomMargin: Theme.paddingLarge
+        }
+        height: Theme.itemSizeMedium
+
+        IconButton {
+            objectName: "torchButton"
+            anchors {
+                left: parent.left
+                leftMargin: Theme.horizontalPageMargin
+                verticalCenter: parent.verticalCenter
+            }
+            visible: root.facing === Viewfinder.backFace
+            icon.source: Viewfinder.flashIcon(root.torch ? Viewfinder.flashTorch
+                                                         : Viewfinder.flashOff)
+            onClicked: root.torch = !root.torch
+        }
+
+        CameraLensToggle {
+            objectName: "lensToggle"
+            anchors {
+                horizontalCenter: parent.horizontalCenter
+                bottom: zoomButton.top
+                bottomMargin: Theme.paddingSmall
+            }
+            cameras: root.backCameras
+            current: camera.deviceId
+            visible: root.backCameras.length > 1 && root.facing === Viewfinder.backFace
+            onSelected: root.useCamera(deviceId)
+        }
+
+        // The zoom, one step at a time: one, two, four times, and back.
+        MouseArea {
+            id: zoomButton
+            objectName: "zoomButton"
+            anchors.centerIn: parent
+            width: Theme.itemSizeSmall
+            height: width
+            visible: camera.maximumDigitalZoom > 1
+            onClicked: root.zoomTo(Viewfinder.nextZoomPreset(camera.digitalZoom,
+                                                             camera.maximumDigitalZoom))
+
+            Rectangle {
+                anchors.fill: parent
+                radius: width / 2
+                color: Qt.rgba(0, 0, 0, 0.4)
+                border.width: 2
+                border.color: zoomButton.pressed ? Theme.highlightColor : "white"
+            }
+
+            Label {
+                objectName: "zoomLabel"
+                anchors.centerIn: parent
+                color: zoomButton.pressed ? Theme.highlightColor : "white"
+                font.pixelSize: Theme.fontSizeSmall
+                text: Viewfinder.zoomText(camera.digitalZoom)
+            }
+        }
+
+        IconButton {
+            objectName: "flipButton"
+            anchors {
+                right: parent.right
+                rightMargin: Theme.horizontalPageMargin
+                verticalCenter: parent.verticalCenter
+            }
+            visible: root.otherCamera.length > 0
+            icon.source: "image://theme/icon-camera-switch"
+            onClicked: root.useCamera(root.otherCamera)
         }
     }
 
