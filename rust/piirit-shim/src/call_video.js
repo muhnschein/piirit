@@ -38,11 +38,16 @@
 var piiritVideo = (function () {
     "use strict";
 
-    /* What the camera is asked for. */
+    /* What the camera is asked for: preferences only. A required value
+     * -- a max, a min, an exact -- is one every mode of the camera has to
+     * meet or the engine opens nothing, and Gecko holds a frame rate
+     * against the most a mode can do: a phone camera that runs at 30
+     * fails `max: 24` in every mode. The senders are held to 24 instead
+     * (`cap`). */
     var CAPTURE = {
         width: { ideal: 640 },
         height: { ideal: 480 },
-        frameRate: { ideal: 24, max: 24 }
+        frameRate: { ideal: 24 }
     };
     /* What one encoding may send. */
     var MAX_BITRATE = 700000;
@@ -77,8 +82,10 @@ var piiritVideo = (function () {
         && window.location.search.indexOf("disableVideoCompletely") < 0;
     /* Which way the camera faces: "user" or "environment". */
     var facing = "user";
-    /* The last camera asked for would not open. */
+    /* The last camera asked for would not open, and what the engine said
+     * of it. */
     var failed = false;
+    var failure = "";
     /* The stream handed to the page, once it has asked. */
     var stream = null;
     /* The blank track that stands in for the camera. */
@@ -303,12 +310,16 @@ var piiritVideo = (function () {
     /* Say how the pictures stand, when that has changed. */
     function report() {
         layout();
-        var now = JSON.stringify({
+        var state = {
             local: camera !== null,
             remote: remoteShown(),
             front: facing === "user",
             failed: failed
-        });
+        };
+        if (failed) {
+            state.error = failure;
+        }
+        var now = JSON.stringify(state);
         if (now === lastReport) {
             return;
         }
@@ -316,10 +327,22 @@ var piiritVideo = (function () {
         send("/video", now);
     }
 
+    /* What an engine's refusal says: its name, which is the reason, and
+     * its message. */
+    function describe(err) {
+        if (!err) {
+            return "";
+        }
+        var name = err.name && err.name !== "Error" ? err.name : "";
+        var message = err.message || "";
+        return name && message ? name + ": " + message : name || message;
+    }
+
     /* The camera would not open: the page is told it is off, and the app
-     * that it failed. */
-    function giveUp() {
+     * that it failed, and why. */
+    function giveUp(err) {
         failed = true;
+        failure = describe(err);
         wanted = false;
         if (camera) {
             camera.stop();
@@ -347,10 +370,10 @@ var piiritVideo = (function () {
             camera = track;
             failed = false;
             report();
-        }, function () {
+        }, function (err) {
             opening = false;
             if (wanted) {
-                otherwise();
+                otherwise(err);
             }
         });
     }
@@ -507,13 +530,13 @@ var piiritVideo = (function () {
                         }
                         report();
                         return given;
-                    }, function () {
+                    }, function (err) {
                         opening = false;
                         var stand = placeholder();
                         if (stand) {
                             given.addTrack(stand);
                         }
-                        giveUp();
+                        giveUp(err);
                         return given;
                     });
                 });

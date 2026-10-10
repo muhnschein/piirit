@@ -213,11 +213,25 @@ served ahead of `calls.js`):
 - **One camera at a time.** Turned, the open camera is stopped before
   the other is asked for; a phone opens one at a time. If the other will
   not open, the first is opened again; if neither will, the camera is
-  reported as failed and the app switches it off.
+  reported as failed, with what the engine said -- written to the app's
+  log as `piirit: the camera would not open: …` -- and the app switches
+  it off.
 - **Held to what a phone needs.** Asked for at 640×480, 24 frames, and
   every video sender capped at 700 kbit/s and 24 frames once negotiated.
-  Encoding is software in the engine; every pixel not captured is
-  battery kept.
+  Every pixel not captured is battery kept. The camera is only ever
+  asked for preferences: a required value (a `max`, a `min`, an `exact`)
+  is one some mode must meet or Gecko opens nothing, and it weighs a
+  frame rate against the most a mode can do -- a phone camera that runs
+  at 30 fails `max: 24` in every mode. The cap is the sender's instead.
+- **VP8 first.** On the phone, a call answered here showed the other
+  end's picture and a call placed here did not. Sailfish's Gecko turns
+  hardware H264 on for WebRTC (`media.webrtc.hw.h264.enabled`), and an
+  engine with it lists H264 ahead of VP8 in the offers it makes; the
+  other end answers in the offer's order. So a call placed here would be
+  sent H264, where a call answered here is sent what the other end's
+  offer puts first, VP8 -- inferred, not yet seen in a log. The offer the other end is sent lists
+  VP8 first (`calls.js`); nothing else in it changes, so the answer is
+  still one this end offered.
 - **Let go in the background.** With the app away the camera is
   stopped -- the other end is told it is off -- and the pictures are not
   drawn; back in front, it is opened again if it was on.

@@ -136,7 +136,7 @@ pub(crate) enum Report {
 /// How a call's pictures stand, as the bridge reports them on `/video`.
 // Four flags the bridge reports side by side, each read on its own.
 #[allow(clippy::struct_excessive_bools)]
-#[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
+#[derive(Debug, Clone, Default, PartialEq, Eq)]
 pub(crate) struct Video {
     /// The camera is open and sending.
     pub(crate) local: bool,
@@ -146,6 +146,9 @@ pub(crate) struct Video {
     pub(crate) front: bool,
     /// The last camera asked for would not open.
     pub(crate) failed: bool,
+    /// What the engine said when it would not: the error's name and
+    /// message, empty when it said nothing.
+    pub(crate) error: String,
 }
 
 impl Video {
@@ -158,6 +161,7 @@ impl Video {
             remote: json::flag(&value, "remote"),
             front: json::flag(&value, "front"),
             failed: json::flag(&value, "failed"),
+            error: json::str_at(&value, "error").to_owned(),
         })
     }
 }
@@ -810,7 +814,16 @@ mod tests {
                 local: true,
                 remote: false,
                 front: true,
-                failed: false,
+                ..Video::default()
+            })
+        );
+        // A camera that would not open, with what the engine said.
+        assert_eq!(
+            Video::from_json(r#"{"failed":true,"error":"NotReadableError: busy"}"#),
+            Some(Video {
+                failed: true,
+                error: "NotReadableError: busy".to_owned(),
+                ..Video::default()
             })
         );
         // A field left out is false, and anything but an object nothing.

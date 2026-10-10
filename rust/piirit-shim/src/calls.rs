@@ -461,6 +461,15 @@ impl Call {
         // A camera that will not open is switched off, as the reader
         // would see it -- not one that was let go for the background.
         if video.failed && self.camera_live() {
+            // What only a phone can say: written where its log is read.
+            eprintln!(
+                "piirit: the camera would not open: {}",
+                if video.error.is_empty() {
+                    "no reason given"
+                } else {
+                    video.error.as_str()
+                }
+            );
             self.camera = false;
             changed = true;
         }

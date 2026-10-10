@@ -124,13 +124,41 @@ function makeWorld(search, options) {
         return track;
     }
 
+    // What a phone camera can do, as Gecko weighs it: a mode's size, and
+    // the most frames it runs at. A required value -- min, max, exact --
+    // that no mode meets opens nothing.
+    const MODES = [
+        { width: 640, height: 480, frameRate: 30 },
+        { width: 1280, height: 720, frameRate: 30 },
+    ];
+    function meets(mode, video) {
+        return ["width", "height", "frameRate"].every((key) => {
+            const asked = video[key];
+            if (typeof asked !== "object" || asked === null) {
+                return true;
+            }
+            const have = mode[key];
+            return !(asked.min > have || asked.max < have
+                     || (asked.exact !== undefined && asked.exact !== have));
+        });
+    }
+    function refusal(name, message) {
+        const err = new Error(message);
+        err.name = name;
+        return err;
+    }
+
     const mediaDevices = {
         getUserMedia(asked) {
             log.push("gum:" + JSON.stringify(asked));
             if (asked.video) {
                 const facing = asked.video.facingMode ? asked.video.facingMode.ideal : "user";
+                if (typeof asked.video === "object"
+                    && !MODES.some((mode) => meets(mode, asked.video))) {
+                    return Promise.reject(refusal("OverconstrainedError", "Constraints could be not satisfied."));
+                }
                 if (world.cameraFails(facing)) {
-                    return Promise.reject(new Error("NotReadableError"));
+                    return Promise.reject(refusal("NotReadableError", "Failed to allocate videosource"));
                 }
                 const given = new Stream([camera(facing)]);
                 if (world.cameraDelay) {
@@ -403,7 +431,7 @@ test("a voice call opens no camera, and the page still has a video track", async
         { local: false, remote: false, front: true, failed: false });
 });
 
-test("a video call opens the front camera, held to VGA at 24 frames", async () => {
+test("a video call opens the front camera, asked for VGA at 24 frames and nothing it must meet", async () => {
     const world = makeWorld(VIDEO);
     const { stream } = await page(world);
 
@@ -413,8 +441,9 @@ test("a video call opens the front camera, held to VGA at 24 frames", async () =
     assert.deepEqual(video.facingMode, { ideal: "user" });
     assert.deepEqual(video.width, { ideal: 640 });
     assert.deepEqual(video.height, { ideal: 480 });
-    assert.deepEqual(video.frameRate, { ideal: 24, max: 24 });
-    assert.deepEqual(stream.getVideoTracks().map((t) => t.label), ["camera-user"]);
+    assert.deepEqual(video.frameRate, { ideal: 24 });
+    assert.deepEqual(stream.getVideoTracks().map((t) => t.label), ["camera-user"],
+        "a camera that runs at 30 frames did not open");
     assert.equal(lastVideo(world).local, true);
 });
 
@@ -492,6 +521,8 @@ test("a camera that will not open is reported, and the page told it is off", asy
     assert.deepEqual(stream.getVideoTracks().map((t) => t.label), ["blank"],
         "the call has no video track to switch on later");
     assert.equal(lastVideo(world).failed, true, "the failure was not reported");
+    assert.equal(lastVideo(world).error, "NotReadableError: Failed to allocate videosource",
+        "the app is not told why the camera would not open");
     assert.equal(lastVideo(world).local, false);
     assert.ok(world.log.includes("press:Stop camera"));
     assert.equal(pageSwitch.on, false);
@@ -638,4 +669,52 @@ test("without a canvas to stand in, a voice call goes ahead without video", asyn
     // Not asked for the camera: the page's own audio-only retry.
     const audio = await world.window.navigator.mediaDevices.getUserMedia({ audio: true });
     assert.equal(audio.getVideoTracks().length, 0);
+});
+
+test("a call placed here offers VP8 first, its retransmissions beside it", async () => {
+    const world = makeWorld(VIDEO);
+    await page(world);
+    // As Sailfish's Gecko writes an offer with hardware H264 on: H264
+    // first, VP8 after, each with its retransmission type.
+    const offer = [
+        "v=0",
+        "m=audio 9 UDP/TLS/RTP/SAVPF 109 9 0 8 101",
+        "a=rtpmap:109 opus/48000/2",
+        "m=video 9 UDP/TLS/RTP/SAVPF 126 127 97 98 120 124 121 125 123 122 119",
+        "a=rtpmap:126 H264/90000",
+        "a=rtpmap:97 H264/90000",
+        "a=rtpmap:120 VP8/90000",
+        "a=rtpmap:121 VP9/90000",
+        "a=rtpmap:123 ulpfec/90000",
+        "a=rtpmap:122 red/90000",
+        "a=rtpmap:127 rtx/90000",
+        "a=fmtp:127 apt=126",
+        "a=rtpmap:98 rtx/90000",
+        "a=fmtp:98 apt=97",
+        "a=rtpmap:124 rtx/90000",
+        "a=fmtp:124 apt=120",
+        "a=rtpmap:125 rtx/90000",
+        "a=fmtp:125 apt=121",
+        "a=rtpmap:119 rtx/90000",
+        "a=fmtp:119 apt=122",
+        "",
+    ].join("\r\n");
+    world.window.calls.startCall(offer);
+
+    const sent = posts(world, "/start");
+    assert.equal(sent.length, 1, "the offer was not sent");
+    const lines = sent[0].split("\r\n");
+    assert.equal(lines.find((line) => line.startsWith("m=video")),
+        "m=video 9 UDP/TLS/RTP/SAVPF 120 124 126 127 97 98 121 125 123 122 119",
+        "VP8 is not what the other end is asked for first");
+    assert.equal(lines.find((line) => line.startsWith("m=audio")),
+        "m=audio 9 UDP/TLS/RTP/SAVPF 109 9 0 8 101", "the voice's codecs moved");
+    assert.deepEqual(lines.filter((line) => !line.startsWith("m=")),
+        offer.split("\r\n").filter((line) => !line.startsWith("m=")),
+        "more of the offer changed than the order of its picture's codecs");
+
+    // An offer with no VP8 in it goes as it is.
+    const noVp8 = "v=0\r\nm=video 9 UDP/TLS/RTP/SAVPF 126 97\r\na=rtpmap:126 H264/90000\r\n";
+    world.window.calls.startCall(noVp8);
+    assert.equal(posts(world, "/start")[1], noVp8);
 });
