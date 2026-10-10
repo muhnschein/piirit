@@ -47,17 +47,22 @@ Item {
         anchors.verticalCenter: parent.verticalCenter
         x: Theme.horizontalPageMargin
         width: parent.width - x - cancel.width - Theme.paddingMedium
-        truncationMode: TruncationMode.Fade
+        // A file name is cut rather than let grow the bar. While the video
+        // is made smaller there is no name, and the line wraps instead:
+        // in a long language the number at its end is what matters.
+        truncationMode: root.preparing ? TruncationMode.None : TruncationMode.Fade
+        wrapMode: root.preparing ? Text.Wrap : Text.NoWrap
         font.pixelSize: Theme.fontSizeExtraSmall
         color: Theme.secondaryColor
         textFormat: Text.PlainText
         text: root.preparing
               //: Shown above the message field while a picked video is
               //: made smaller, which happens before it is sent so that
-              //: relays take it. %1 is the file name, %2 how much of it
-              //: is done, as a number from 0 to 100.
-              ? qsTr("Making %1 smaller before sending it: %2%")
-                .arg(root.shownName).arg(Math.round(root.progress * 100))
+              //: relays take it. %1 is how much of it is done, as a
+              //: number from 0 to 100. Keep it short: it shares a line
+              //: with a button on a phone.
+              ? qsTr("Making video smaller for sending: %1%")
+                .arg(Math.round(root.progress * 100))
               //: Shown above the message field once a file has been
               //: picked. %1 is the file name.
               : qsTr("Sending %1").arg(root.shownName)

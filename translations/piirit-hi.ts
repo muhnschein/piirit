@@ -158,9 +158,9 @@
         <translation>%1 भेजा जा रहा है</translation>
     </message>
     <message>
-        <source>Making %1 smaller before sending it: %2%</source>
-        <extracomment>Shown above the message field while a picked video is made smaller, which happens before it is sent so that relays take it. %1 is the file name, %2 how much of it is done, as a number from 0 to 100.</extracomment>
-        <translation>भेजने से पहले %1 को छोटा किया जा रहा है: %2%</translation>
+        <source>Making video smaller for sending: %1%</source>
+        <extracomment>Shown above the message field while a picked video is made smaller, which happens before it is sent so that relays take it. %1 is how much of it is done, as a number from 0 to 100. Keep it short: it shares a line with a button on a phone.</extracomment>
+        <translation>भेजने के लिए वीडियो छोटा किया जा रहा है: %1%</translation>
     </message>
 </context>
 <context>

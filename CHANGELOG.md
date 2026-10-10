@@ -9,7 +9,7 @@ docs/BUILDING.md, "Cutting a release").
 ## Unreleased
 
 - Enter in the chat search closes the keyboard and keeps the search.
-- **Smaller videos.** A picked video is recoded to the outgoing media quality before it is sent, with progress and a way to stop it; a phone's recording no longer goes out at several times what the relay recommends.
+- **Smaller videos.** A picked video close to the relay's recommended size is made smaller before it is sent, with progress and a way to stop it; with media quality set to worse, every picked video is.
 
 ## 2.1.0 — 2026-10-08
 

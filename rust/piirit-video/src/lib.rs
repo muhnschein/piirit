@@ -129,6 +129,13 @@ const WORSE_QUALITY: Quality = Quality {
 /// large, as it says of any file.
 const LEAST_VIDEO: u64 = 150_000;
 
+/// How close to the recommended size, in percent of it, a video has to
+/// come before balanced quality makes it smaller. Below it the video is
+/// sent as it was recorded: it fits, and recoding would only cost
+/// picture. Worse quality asks for small files, so it recodes whatever
+/// size the video is.
+const NEAR_LIMIT_PERCENT: u64 = 80;
+
 /// What the container costs on top of the streams, as a share of the
 /// budget held back: a few percent for the index of a long file.
 const CONTAINER_SHARE: u64 = 5;
@@ -136,10 +143,13 @@ const CONTAINER_SHARE: u64 = 5;
 /// Whether to recode a file and at what size, or `None` to send it as it
 /// is.
 ///
-/// As it is when it is not a video this can decode, when it does not say
-/// how long it is, or when recoding would not save at least a fifth of
-/// it -- a video the in-app camera recorded is already at these rates,
-/// and recoding one again would only cost picture.
+/// At balanced quality only a video that comes near the recommended size
+/// (`NEAR_LIMIT_PERCENT`) is recoded; at worse quality any video is.
+/// Either way it is sent as it is when it is not a video this can
+/// decode, when it does not say how long it is, or when recoding would
+/// not save at least a fifth of it -- a video the in-app camera recorded
+/// is already at these rates, and recoding one again would only cost
+/// picture.
 ///
 /// `limit` is the core's recommended largest attachment, 0 while unknown.
 /// A video that would come out past it is given a lower bit rate to fit,
@@ -155,8 +165,12 @@ pub fn plan(probe: &Probe, file_bytes: u64, media_quality: i32, limit: u64) -> O
     }
     let quality = if media_quality == WORSE {
         &WORSE_QUALITY
-    } else {
+    } else if limit > 0
+        && file_bytes.saturating_mul(100) >= limit.saturating_mul(NEAR_LIMIT_PERCENT)
+    {
         &BALANCED_QUALITY
+    } else {
+        return None;
     };
     let (audio_bit_rate, copied_audio_bit_rate) = match probe.audio_codec {
         AudioCodec::None => (0, 0),
@@ -531,11 +545,28 @@ mod tests {
     }
 
     #[test]
-    fn without_a_known_limit_the_quality_alone_decides() {
+    fn at_balanced_quality_only_a_video_near_the_limit_is_made_smaller() {
+        let (mut probe, _) = phone_minute();
+        probe.duration_ms = 5_000;
+        // 17 Mbit/s for five seconds: about 10.7 MB, half the limit.
+        let bytes = 17_128_000 / 8 * 5;
+        assert_eq!(plan(&probe, bytes, BALANCED, LIMIT), None);
+        // Just under four fifths of it is still sent as it is ...
+        assert_eq!(plan(&probe, LIMIT * 4 / 5 - 1, BALANCED, LIMIT), None);
+        // ... and from there on it is made smaller.
+        let target = plan(&probe, LIMIT * 4 / 5 + 1, BALANCED, LIMIT).unwrap();
+        assert_eq!(target.video_bit_rate, 1_500_000);
+        // At worse quality the half-limit one is made smaller too.
+        assert!(plan(&probe, bytes, WORSE, LIMIT).is_some());
+    }
+
+    #[test]
+    fn without_a_known_limit_only_worse_quality_recodes() {
         let (mut probe, _) = phone_minute();
         probe.duration_ms = 10 * 60_000;
-        let target = plan(&probe, u64::MAX / 2, BALANCED, 0).unwrap();
-        assert_eq!(target.video_bit_rate, 1_500_000);
+        assert_eq!(plan(&probe, u64::MAX / 2, BALANCED, 0), None);
+        let target = plan(&probe, u64::MAX / 2, WORSE, 0).unwrap();
+        assert_eq!(target.video_bit_rate, 500_000);
     }
 
     #[test]

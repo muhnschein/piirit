@@ -158,9 +158,9 @@
         <translation>Skickar %1</translation>
     </message>
     <message>
-        <source>Making %1 smaller before sending it: %2%</source>
-        <extracomment>Shown above the message field while a picked video is made smaller, which happens before it is sent so that relays take it. %1 is the file name, %2 how much of it is done, as a number from 0 to 100.</extracomment>
-        <translation>Gör %1 mindre innan den skickas: %2 %</translation>
+        <source>Making video smaller for sending: %1%</source>
+        <extracomment>Shown above the message field while a picked video is made smaller, which happens before it is sent so that relays take it. %1 is how much of it is done, as a number from 0 to 100. Keep it short: it shares a line with a button on a phone.</extracomment>
+        <translation>Gör videon mindre för att skicka: %1 %</translation>
     </message>
 </context>
 <context>

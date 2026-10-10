@@ -237,7 +237,7 @@ fn a_picked_video_is_made_smaller_before_it_is_sent() {
     );
     assert_eq!(
         value("label-preparing"),
-        "Making lake at dusk.mov smaller before sending it: 0%",
+        "Making video smaller for sending: 0%",
         "the bar does not say the video is being made smaller. {context}"
     );
     assert_eq!(

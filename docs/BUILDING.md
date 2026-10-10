@@ -274,10 +274,12 @@ work.
 
 ### Making a video smaller
 
-A video picked to send is recoded first when it is bigger than the
-outgoing media quality allows (`rust/piirit-shim/src/video.rs`, issue
-#111): the phone's recorder writes several times what the core recommends
-for a message, and the core sends a video as it is. Nothing on a
+A video picked to send is recoded first when it comes near the core's
+recommended message size (four fifths of it), or whenever the outgoing
+media quality is set to worse (`rust/piirit-shim/src/video.rs`,
+`plan` in `rust/piirit-video`, issue #111): the phone's recorder writes
+several times what the core recommends for a message, and the core sends
+a video as it is. Nothing on a
 Sailfish phone that Harbour lets an app link can do that -- GStreamer is
 not on the allowed list, and neither is any codec library -- so
 `rust/piirit-video` builds the codecs into the binary, as `mp3lame-sys`
