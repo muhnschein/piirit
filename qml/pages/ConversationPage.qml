@@ -28,6 +28,9 @@ Page {
         // The reader's setting, from the settings page: known tracking
         // parameters come out of links on the way out.
         clean_links: Settings.cleanLinks === true
+        // And the outgoing media quality, which a picked video is made
+        // smaller to before it is sent.
+        media_quality: Settings.mediaQuality === 1 ? 1 : 0
         // What is waiting on the attachment bar, so the model can weigh
         // it against the size the core recommends. Put aside with the
         // bar itself while a message is being edited, since an edit
@@ -683,7 +686,12 @@ Page {
         // be saying something untrue. The file is still here afterwards.
         filePath: page.editing ? "" : page.attachmentPath
         fileName: page.attachmentName
+        // A picked video is made smaller before it is sent; the bar says
+        // so, and its button stops that rather than dropping the file.
+        preparing: messages.preparing
+        progress: messages.preparing_progress
         onCancelled: page.dropAttachment()
+        onStopped: messages.cancel_preparing()
     }
 
     // Under the file it is about: this one is bigger than the core
@@ -691,8 +699,9 @@ Page {
     // the size is the core's one recommendation for every relay, and many
     // take more (issue #101), so the send button stays on. Said before
     // the upload rather than only after a send that failed -- a picture
-    // is never this, since the core shrinks those on the way out. See
-    // rust/piirit-shim/src/media.rs.
+    // is never this, since the core shrinks those on the way out, and a
+    // video is weighed at the size it will be made smaller to. See
+    // rust/piirit-shim/src/media.rs and video.rs.
     Banner {
         id: largeFileBar
         objectName: "largeFileBar"

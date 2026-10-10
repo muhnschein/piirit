@@ -398,6 +398,19 @@ fn resolve(path: &str) -> String {
         .into_owned()
 }
 
+/// The core version `scripts/fetch-rpc-server.sh` pins, from its
+/// `VERSION="..."` line.
+fn pinned_core_version() -> String {
+    let script = std::fs::read_to_string(resolve("scripts/fetch-rpc-server.sh"))
+        .unwrap_or_else(|err| panic!("read scripts/fetch-rpc-server.sh: {err}"));
+    script
+        .lines()
+        .find_map(|line| line.strip_prefix("VERSION=\""))
+        .and_then(|rest| rest.strip_suffix('"'))
+        .unwrap_or_else(|| panic!("scripts/fetch-rpc-server.sh has no VERSION=\"...\" line"))
+        .to_string()
+}
+
 fn real_server() -> Option<String> {
     match std::env::var("DELTACHAT_RPC_SERVER") {
         Ok(path) if !path.is_empty() => Some(resolve(&path)),
@@ -444,6 +457,23 @@ async fn offline_round_trip_against_real_core() {
         info.contains_key("deltachat_core_version"),
         "unexpected get_system_info keys: {:?}",
         info.keys().collect::<Vec<_>>()
+    );
+    // What this test pins is the core the RPM bundles, so it says which
+    // one that is: the binary under test is the version the fetch script
+    // pins, and SOURCE.md -- the MPL notice shipped beside it -- names
+    // that same tag. A bump that misses one of the three stops here.
+    let pinned = pinned_core_version();
+    assert_eq!(
+        info.get("deltachat_core_version").map(String::as_str),
+        Some(format!("v{pinned}").as_str()),
+        "the server under test is not the core scripts/fetch-rpc-server.sh pins"
+    );
+    let notice = std::fs::read_to_string(resolve("vendor/deltachat-rpc-server/SOURCE.md"))
+        .expect("read vendor/deltachat-rpc-server/SOURCE.md");
+    assert!(
+        notice.contains(&format!("**Version / tag:** `v{pinned}`"))
+            && notice.contains(&format!("deltachat-rpc-server=={pinned}")),
+        "vendor/deltachat-rpc-server/SOURCE.md does not describe v{pinned}"
     );
 
     // Account bootstrap, exactly as DeltaChatCore::add_account does it.
@@ -1678,6 +1708,12 @@ async fn offline_round_trip_against_real_core() {
             "the chat list row lost the {field} field: {row:?}"
         );
     }
+    // Core 2.63 took the thumbnail off the row. The list never drew it,
+    // and the fake core never sent it; this says the real one agrees.
+    assert!(
+        row.get("summaryPreviewImage").is_none(),
+        "the chat list row has a summaryPreviewImage again: {row:?}"
+    );
     // The chat with oneself says so, which is how the cover keeps it out
     // of the people it draws; the group is nobody's self.
     assert_eq!(
@@ -2228,27 +2264,8 @@ async fn offline_round_trip_against_real_core() {
 /// and change them (transports.rs, signup.rs), and as the fake core
 /// answers for them. On an account of its own, three relays on the
 /// loopback stub, so the sending account above keeps the one it has.
-async fn relays_against(client: &RpcClient, mailbox: (u16, u16)) {
-    let account: u32 = client
-        .call_unit("add_account")
-        .await
-        .unwrap_or_else(|err| panic!("add_account for the relays probe: {err}"));
-    let addrs = [
-        "one@example.invalid",
-        "two@example.invalid",
-        "three@example.invalid",
-    ];
-    for addr in addrs {
-        client
-            .call::<_, ()>("add_transport_from_qr", (account, dclogin(addr, mailbox)))
-            .await
-            .unwrap_or_else(|err| panic!("add_transport_from_qr {addr}: {err}"));
-    }
-    client
-        .call::<_, ()>("stop_io", (account,))
-        .await
-        .unwrap_or_else(|err| panic!("stop_io on the relays probe: {err}"));
-
+/// The relays `relays_against` added, as the core reports them back.
+async fn relays_listed_as_added(client: &RpcClient, account: u32, addrs: &[&str]) {
     // Each relay by the address on it, in the order they were added; the
     // profile's own address is the first one's, and stays that as more
     // are added.
@@ -2274,6 +2291,45 @@ async fn relays_against(client: &RpcClient, mailbox: (u16, u16)) {
         .await
         .unwrap_or_else(|err| panic!("get_config configured_addr: {err}"));
     assert_eq!(own.as_deref(), Some(addrs[0]));
+    // Since core 2.63 adding a relay no longer writes the legacy login
+    // keys: `addr`, `mail_pw` and the rest stay unset, and the relays are
+    // only in `list_transports`. Nothing in the shim reads them, and this
+    // is why nothing may start to.
+    for key in ["addr", "mail_pw", "mail_server", "send_server"] {
+        let legacy: Option<String> = client
+            .call("get_config", (account, key))
+            .await
+            .unwrap_or_else(|err| panic!("get_config {key}: {err}"));
+        assert_eq!(
+            legacy.as_deref().filter(|value| !value.is_empty()),
+            None,
+            "adding a relay wrote the legacy {key} config"
+        );
+    }
+}
+
+async fn relays_against(client: &RpcClient, mailbox: (u16, u16)) {
+    let account: u32 = client
+        .call_unit("add_account")
+        .await
+        .unwrap_or_else(|err| panic!("add_account for the relays probe: {err}"));
+    let addrs = [
+        "one@example.invalid",
+        "two@example.invalid",
+        "three@example.invalid",
+    ];
+    for addr in addrs {
+        client
+            .call::<_, ()>("add_transport_from_qr", (account, dclogin(addr, mailbox)))
+            .await
+            .unwrap_or_else(|err| panic!("add_transport_from_qr {addr}: {err}"));
+    }
+    client
+        .call::<_, ()>("stop_io", (account,))
+        .await
+        .unwrap_or_else(|err| panic!("stop_io on the relays probe: {err}"));
+
+    relays_listed_as_added(client, account, &addrs).await;
 
     // The refusals the profile page shows in the core's words, and the
     // fake core gives in the same ones.

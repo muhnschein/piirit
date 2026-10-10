@@ -2,13 +2,14 @@
 #
 # Modeled on real-world prior art for Rust+Qt5/QML Sailfish apps -- notably
 # Whisperfish's rpm/harbour-whisperfish.spec, which docs/PROJECT.md names as
-# the architectural and build-tooling template -- but simplified: Piirit
-# vendors no C/C++ of its own (no sqlcipher, no protobuf, etc.), just the
+# the architectural and build-tooling template -- but simplified: the
 # Rust workspace under rust/, the qml/ tree, and a *separately obtained*
 # deltachat-rpc-server binary (scripts/fetch-rpc-server.sh, see
-# vendor/deltachat-rpc-server/). The one C library linked in, LAME, comes
-# as the source inside the mp3lame-sys crate, whose build script runs its
-# configure and make with the target's compiler (docs/BUILDING.md).
+# vendor/deltachat-rpc-server/). Three C libraries are linked in, each
+# from source by a build script that runs its configure and make with the
+# target's compiler: LAME, inside the mp3lame-sys crate, and FFmpeg and
+# x264, the git submodules under third_party/, which Source0 has to carry
+# (docs/BUILDING.md, "Making a video smaller").
 #
 # Two build modes:
 #   sfdk build                  -- crates are fetched from crates.io by the
@@ -49,12 +50,13 @@ Release:    1
 # calls-webapp with Preact (MIT) and Material Symbols icons (Apache-2.0)
 # built into it (vendor/calls-webapp/SOURCE.md); and the emoji are
 # Twemoji's pictures (CC-BY-4.0) with emojibase's list of them (MIT) and
-# CLDR's names (Unicode-3.0) (vendor/emoji/SOURCE.md). The tag describes
-# the contents of the binary package.
+# CLDR's names (Unicode-3.0) (vendor/emoji/SOURCE.md); and FFmpeg
+# (LGPL-2.1-or-later) and x264 (GPL-2.0-or-later) are built into the
+# binary. The tag describes the contents of the binary package.
 %if 0%{?bundle_rpc_server}
-License:    GPL-3.0-or-later AND MPL-2.0 AND MIT AND Apache-2.0 AND CC-BY-4.0 AND Unicode-3.0
+License:    GPL-3.0-or-later AND MPL-2.0 AND MIT AND Apache-2.0 AND CC-BY-4.0 AND Unicode-3.0 AND LGPL-2.1-or-later AND GPL-2.0-or-later
 %else
-License:    GPL-3.0-or-later AND MIT AND Apache-2.0 AND CC-BY-4.0 AND Unicode-3.0
+License:    GPL-3.0-or-later AND MIT AND Apache-2.0 AND CC-BY-4.0 AND Unicode-3.0 AND LGPL-2.1-or-later AND GPL-2.0-or-later
 %endif
 Group:      Qt/Qt
 URL:        https://github.com/muhnschein/piirit

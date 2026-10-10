@@ -47,6 +47,7 @@ mod search;
 mod second_device;
 mod signup;
 mod transports;
+mod video;
 mod voice;
 mod webxdc;
 mod webxdc_host;

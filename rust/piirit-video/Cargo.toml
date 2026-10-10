@@ -1,0 +1,23 @@
+[package]
+name = "piirit-video"
+version = "2.1.0"
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+description = "Makes a video small enough to send: FFmpeg decodes it, x264 encodes it again at the outgoing media quality's bit rate. Both are built from source into the app; see build.rs."
+# FFmpeg's configure, and x264's, are run by build.rs; it is what has
+# to know when either needs running again.
+build = "build.rs"
+links = "piirit_video"
+
+[dependencies]
+
+[build-dependencies]
+# The compiler cargo would use for this target, handed to both configure
+# scripts so that they build what the rest of the binary is built for.
+# Already in the tree through cpp_build, at the same version.
+cc = "1"
+
+[lints]
+workspace = true
