@@ -59,10 +59,12 @@ fn a_large_video_comes_out_smaller_and_plays_the_same_way() {
 
     // At the relay's limit, so balanced quality makes it smaller.
     let target = plan(&before, bytes, BALANCED, bytes).expect("worth recoding");
-    // Below the quality's own size, so the scaling is exercised too.
+    // Below the quality's own size and rate, so the scaling is exercised
+    // too and the result is well under the clip.
     let target = piirit_video::Target {
         width: 640,
         height: 360,
+        video_bit_rate: 1_500_000,
         ..target
     };
     let mut seen = Vec::new();

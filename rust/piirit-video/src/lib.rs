@@ -107,13 +107,15 @@ struct Quality {
     long_side: u32,
 }
 
-/// The rates `CapturePage.qml` records at for each quality, which are
-/// deltachat-android's ceiling for a recoded video and roughly what
-/// deltachat-ios's low preset comes to. The picture sizes are what x264
-/// spends those rates on well: 720p at 1.5 Mbit/s, and a phone screen's
-/// width at 500 kbit/s.
+/// What a second of a recoded video may cost at each quality. Worse is
+/// what `CapturePage.qml` records at for it, deltachat-ios's low preset,
+/// at a phone screen's width. Balanced is recoded only to fit under the
+/// recommended size, so it spends twice what the camera records: at
+/// 1.5 Mbit/s, 720p smears wherever the picture moves, and a video that
+/// came near the limit has the room. A long one is squeezed below it to
+/// fit, as `plan` says.
 const BALANCED_QUALITY: Quality = Quality {
-    video: 1_500_000,
+    video: 3_000_000,
     audio: 64_000,
     long_side: 1280,
 };
@@ -505,13 +507,28 @@ mod tests {
 
     #[test]
     fn a_phone_video_is_made_720p_at_the_balanced_rates() {
-        let (probe, bytes) = phone_minute();
+        let (mut probe, _) = phone_minute();
+        probe.duration_ms = 30_000;
+        let bytes = 17_128_000 / 8 * 30;
         let target = plan(&probe, bytes, BALANCED, LIMIT).unwrap();
         assert_eq!((target.width, target.height), (1280, 720));
-        assert_eq!(target.video_bit_rate, 1_500_000);
+        assert_eq!(target.video_bit_rate, 3_000_000);
         assert_eq!(target.audio_bit_rate, 64_000);
-        // 1.564 Mbit/s for a minute.
-        assert_eq!(target.predicted_bytes(), 11_730_000);
+        // 3.064 Mbit/s for half a minute.
+        assert_eq!(target.predicted_bytes(), 11_490_000);
+    }
+
+    #[test]
+    fn a_minute_is_given_what_fits_under_the_recommendation() {
+        let (probe, bytes) = phone_minute();
+        let target = plan(&probe, bytes, BALANCED, LIMIT).unwrap();
+        // 3 Mbit/s would come out past 22 MiB; still enough for 720p.
+        assert!(
+            (2_500_000..3_000_000).contains(&target.video_bit_rate),
+            "{target:?}"
+        );
+        assert!(target.predicted_bytes() <= LIMIT, "{target:?}");
+        assert_eq!((target.width, target.height), (1280, 720));
     }
 
     #[test]
@@ -529,7 +546,7 @@ mod tests {
         probe.duration_ms = 10 * 60_000;
         let bytes = 17_128_000 / 8 * 600;
         let target = plan(&probe, bytes, BALANCED, LIMIT).unwrap();
-        assert!(target.video_bit_rate < 1_500_000, "{target:?}");
+        assert!(target.video_bit_rate < 1_000_000, "{target:?}");
         assert!(target.predicted_bytes() <= LIMIT, "{target:?}");
         // Fewer bits buy fewer pixels.
         assert_eq!((target.width, target.height), (640, 360));
@@ -555,7 +572,7 @@ mod tests {
         assert_eq!(plan(&probe, LIMIT * 4 / 5 - 1, BALANCED, LIMIT), None);
         // ... and from there on it is made smaller.
         let target = plan(&probe, LIMIT * 4 / 5 + 1, BALANCED, LIMIT).unwrap();
-        assert_eq!(target.video_bit_rate, 1_500_000);
+        assert_eq!(target.video_bit_rate, 3_000_000);
         // At worse quality the half-limit one is made smaller too.
         assert!(plan(&probe, bytes, WORSE, LIMIT).is_some());
     }
@@ -571,7 +588,8 @@ mod tests {
 
     #[test]
     fn a_video_already_at_these_rates_is_left_alone() {
-        // What the in-app camera records: 1.5 Mbit/s and 64 kbit/s.
+        // What the in-app camera records: 1.5 Mbit/s and 64 kbit/s, at the
+        // recommended size itself, so only the rates decide.
         let probe = Probe {
             duration_ms: 30_000,
             width: 1280,
@@ -582,9 +600,10 @@ mod tests {
             audio_codec: AudioCodec::Aac,
             audio_bit_rate: 64_000,
         };
-        assert_eq!(plan(&probe, 1_564_000 * 30 / 8, BALANCED, LIMIT), None);
+        let bytes = 1_564_000 * 30 / 8;
+        assert_eq!(plan(&probe, bytes, BALANCED, bytes), None);
         // ... but at worse quality, a third of that is worth making.
-        assert!(plan(&probe, 1_564_000 * 30 / 8, WORSE, LIMIT).is_some());
+        assert!(plan(&probe, bytes, WORSE, bytes).is_some());
     }
 
     #[test]
@@ -611,15 +630,17 @@ mod tests {
 
     #[test]
     fn sound_that_is_not_aac_is_copied_and_counted() {
-        let (probe, bytes) = phone_minute();
+        let (probe, _) = phone_minute();
         let probe = Probe {
+            duration_ms: 30_000,
             audio_codec: AudioCodec::Other,
             audio_bit_rate: 256_000,
             ..probe
         };
+        let bytes = 17_256_000 / 8 * 30;
         let target = plan(&probe, bytes, BALANCED, LIMIT).unwrap();
         assert_eq!(target.audio_bit_rate, 0, "copied, not encoded again");
-        assert_eq!(target.predicted_bytes(), (1_500_000 + 256_000) * 60 / 8);
+        assert_eq!(target.predicted_bytes(), (3_000_000 + 256_000) * 30 / 8);
 
         let silent = Probe {
             audio_codec: AudioCodec::None,
@@ -627,7 +648,7 @@ mod tests {
             ..probe
         };
         let target = plan(&silent, bytes, BALANCED, LIMIT).unwrap();
-        assert_eq!(target.predicted_bytes(), 1_500_000 * 60 / 8);
+        assert_eq!(target.predicted_bytes(), 3_000_000 * 30 / 8);
     }
 
     #[test]
