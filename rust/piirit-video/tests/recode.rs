@@ -57,7 +57,8 @@ fn a_large_video_comes_out_smaller_and_plays_the_same_way() {
     let before = probe(&clip).expect("probe the clip");
     let bytes = std::fs::metadata(&clip).expect("measure the clip").len();
 
-    let target = plan(&before, bytes, BALANCED, 0).expect("worth recoding");
+    // At the relay's limit, so balanced quality makes it smaller.
+    let target = plan(&before, bytes, BALANCED, bytes).expect("worth recoding");
     // Below the quality's own size, so the scaling is exercised too.
     let target = piirit_video::Target {
         width: 640,
@@ -102,7 +103,8 @@ fn a_cancel_stops_it() {
     let out = scratch.file("smaller.mp4");
     synth(&clip, (640, 360), 3, 4_000_000, 0, false).expect("make a clip");
     let before = probe(&clip).expect("probe the clip");
-    let target = plan(&before, u64::MAX / 2, BALANCED, 0).expect("worth recoding");
+    let bytes = std::fs::metadata(&clip).expect("measure the clip").len();
+    let target = plan(&before, bytes, BALANCED, bytes).expect("worth recoding");
 
     let mut calls = 0;
     let outcome = recode(&clip, &out, &target, |fraction| {
