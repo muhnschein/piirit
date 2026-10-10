@@ -6,7 +6,7 @@ upstream builds**:
 
 - **Project:** Delta Chat core (chatmail core library)
 - **Source code:** https://github.com/chatmail/core
-- **Version / tag:** `v2.62.0`
+- **Version / tag:** `v2.63.0`
 - **License:** MPL-2.0. Piirit itself is GPL-3.0-or-later; the two sit
   side by side in the RPM as separate works, and this file is installed
   with the package to satisfy MPL-2.0 §3.2(a)'s requirement that recipients
@@ -18,7 +18,7 @@ upstream builds**:
   incompatibility", per that workflow). Target triples:
   `aarch64-unknown-linux-musl`, `armv7-unknown-linux-musleabihf`
   (hard-float, matching Sailfish `armv7hl`), `x86_64-unknown-linux-musl`.
-- **Distribution channel used:** the PyPI `deltachat-rpc-server==2.62.0`
+- **Distribution channel used:** the PyPI `deltachat-rpc-server==2.63.0`
   wheels, which contain the same binaries upstream attaches to its GitHub
   release (both are the nix build output). Fetched, checksum-verified, and
   placed here by `scripts/fetch-rpc-server.sh` — that script pins the
@@ -28,9 +28,9 @@ upstream builds**:
 
 ```
 vendor/deltachat-rpc-server/
-  aarch64/deltachat-rpc-server   sha256 a81a75e2de356c5b0074100aee655a7a1884dcc747c79e2b57e7b6f4316a70ee
-  armv7hl/deltachat-rpc-server   sha256 ec968b307d0e82ba9012e2d194dcdab123ce4c1289b8c756b715e8b27e176973
-  x86_64/deltachat-rpc-server    sha256 62aa375904aeea88f356a20cb5d7bb6b90728f5e14d81c2b0f689c6c7341af2d
+  aarch64/deltachat-rpc-server   sha256 040b0c3699361c9aa9776caf259d73b70c5892937f6f85836e26143ba1cdbd13
+  armv7hl/deltachat-rpc-server   sha256 1d8eabf8641b27122817dfb9fb0940db461202d444356ada1840717eae5f0652
+  x86_64/deltachat-rpc-server    sha256 57cab3291ecc55736f97964b3a2979e5e23a70abcc270f1ed515e995f540d517
 ```
 
 Directory names are Sailfish's architecture names (`%{_target_cpu}` in

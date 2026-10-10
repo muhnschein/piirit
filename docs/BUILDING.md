@@ -11,6 +11,14 @@ binaries.
 device floor is **1.75.0**, enforced by CI's `msrv` job with warnings
 denied. It is a rustup mechanism, and the Sailfish SDK's cargo ignores it.
 
+FFmpeg and x264 are git submodules under `third_party/`, built from
+source by `rust/piirit-video`'s build script. A fresh clone needs them
+before anything builds:
+
+```sh
+git submodule update --init --depth 1
+```
+
 `rust/Cargo.lock` stays at **v3**: cargo learned v4 in 1.78 and the SDK's
 cargo 1.75 cannot read it, while a `cargo update` on a modern host rewrites
 it silently. `ci/check-lockfile.sh` catches that.
@@ -263,6 +271,48 @@ builds the C++ above already has. It is the one C dependency in the tree
 that is not Qt, and the reason `rust/deny.toml` allows LGPL-3.0 for its
 two crates and nothing else: LGPL code may be conveyed as part of a GPLv3
 work.
+
+### Making a video smaller
+
+A video picked to send is recoded first when it comes near the core's
+recommended message size (four fifths of it), or whenever the outgoing
+media quality is set to worse (`rust/piirit-shim/src/video.rs`,
+`plan` in `rust/piirit-video`, issue #111): the phone's recorder writes
+several times what the core recommends for a message, and the core sends
+a video as it is. Nothing on a
+Sailfish phone that Harbour lets an app link can do that -- GStreamer is
+not on the allowed list, and neither is any codec library -- so
+`rust/piirit-video` builds the codecs into the binary, as `mp3lame-sys`
+does LAME:
+
+- **FFmpeg 7.1** (LGPL-2.1-or-later), `third_party/ffmpeg`, on its
+  `release/7.1` branch. Configured with `--disable-everything` and then
+  only what the job reads and writes: the `mov` demuxer, the H.264, HEVC
+  and AAC decoders and parsers, the AAC encoder, the `mp4` muxer,
+  swscale and swresample. No network, no devices, no filters, no
+  autodetected system library. That trimming is most of the security
+  story too: the code that parses a picked file is a few demuxers and
+  decoders, not FFmpeg's hundreds.
+- **x264** (GPL-2.0-or-later), `third_party/x264`, on its `stable`
+  branch, 8-bit 4:2:0 only. FFmpeg's own H.264 encoders are wrappers
+  around external libraries, and openh264, the other candidate, has no
+  B-frames: at the same bit rate it looked visibly worse.
+
+Both are compatible with Piirit's GPL-3.0-or-later, and both come in as
+source, so they are code in one executable like the rest, not another
+bundled binary like the core. `build.rs` runs each project's own
+`configure` with the compiler cargo uses for the target, which under
+scratchbox2 is the target's own, so the device build is a native build
+as LAME's is. Hand-written assembly is on for ARM and off for x86, where
+it would need nasm and x86 is only ever the test host.
+
+What it costs: the binary is a few megabytes heavier, and a clean build
+spends a couple of minutes configuring and compiling the two (cargo
+keeps the result in `target/` after that). The C between them and Rust
+is `rust/piirit-video/csrc`, small enough to read; its tests are in Rust
+(`rust/piirit-video/tests`), against clips made by the same libraries
+rather than binary fixtures. Dependabot moves the submodules along their
+branches.
 
 `tokio`'s `net` feature is what the webxdc host binds its loopback socket
 with, and it brings `socket2` -- tokio's own platform layer for sockets,
