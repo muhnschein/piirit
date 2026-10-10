@@ -4,6 +4,7 @@ members = [
     "deltachat-jsonrpc",
     "piirit-shim",
     "piirit-app",
+    "piirit-video",
 ]
 
 [workspace.package]

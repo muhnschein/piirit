@@ -157,6 +157,11 @@
         <extracomment>Shown above the message field once a file has been picked. %1 is the file name.</extracomment>
         <translation>%1 ಕಳುಹಿಸಲಾಗುತ್ತಿದೆ</translation>
     </message>
+    <message>
+        <source>Making video smaller for sending: %1%</source>
+        <extracomment>Shown above the message field while a picked video is made smaller, which happens before it is sent so that relays take it. %1 is how much of it is done, as a number from 0 to 100. Keep it short: it shares a line with a button on a phone.</extracomment>
+        <translation>ಕಳುಹಿಸಲು ವೀಡಿಯೊ ಚಿಕ್ಕದಾಗಿಸಲಾಗುತ್ತಿದೆ: %1%</translation>
+    </message>
 </context>
 <context>
     <name>AttachmentPreview</name>

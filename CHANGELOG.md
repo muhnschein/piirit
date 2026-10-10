@@ -10,6 +10,7 @@ docs/BUILDING.md, "Cutting a release").
 
 - Bundles deltachat-rpc-server 2.63.0 (was 2.62.0).
 - Enter in the chat search closes the keyboard and keeps the search.
+- **Smaller videos.** A picked video close to the relay's recommended size is made smaller before it is sent, with progress and a way to stop it; with media quality set to worse, every picked video is.
 
 ## 2.1.0 — 2026-10-08
 
