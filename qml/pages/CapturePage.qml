@@ -262,9 +262,14 @@ Page {
     /// Focus on a tap at `x`, `y` in the viewfinder. The ring goes where
     /// the finger was; the camera is told the point in its own frame.
     function focusAt(x, y) {
+        // The tap in the picture's own terms: the viewfinder is turned
+        // against the page, so a point on the frame is somewhere else on
+        // it.
+        var local = viewfinder.mapFromItem(frame, x, y)
         var mapped = typeof viewfinder.mapPointToSourceNormalized === "function"
-                ? viewfinder.mapPointToSourceNormalized(Qt.point(x, y)) : null
-        var point = Viewfinder.focusPoint(mapped, x, y, viewfinder.width, viewfinder.height)
+                ? viewfinder.mapPointToSourceNormalized(Qt.point(local.x, local.y)) : null
+        var point = Viewfinder.focusPoint(mapped, local.x, local.y,
+                                          viewfinder.width, viewfinder.height)
         if (!point) {
             return
         }
@@ -453,6 +458,8 @@ Page {
 
     /// Wider than tall: the frame at the left, the controls down the right.
     readonly property bool landscape: page.width > page.height
+    /// How far Silica has turned the page, clockwise.
+    readonly property int turn: Viewfinder.pageTurn(page.orientation)
 
     /// How tall the sensor's frame is for its width, once the camera says;
     /// four by three, the platform camera's default, until it does. The
@@ -486,15 +493,20 @@ Page {
                                   parent.height / Math.max(1, parent.width) >= 2
                                   ? page.topInset + Theme.itemSizeLarge : 0))
 
+        // Turned against the page, so on the screen it stays where it
+        // is in portrait, the way the lens sees: the item itself, rather
+        // than VideoOutput's own `orientation`, which on Qt 5.6 keeps the
+        // shape it had before the turn and squeezes the picture into it.
         VideoOutput {
             id: viewfinder
             objectName: "viewfinder"
-            anchors.fill: parent
+            readonly property bool across: page.turn % 180 !== 0
+            anchors.centerIn: parent
+            width: across ? parent.height : parent.width
+            height: across ? parent.width : parent.height
+            rotation: -page.turn
             source: camera
             fillMode: VideoOutput.PreserveAspectFit
-            // The page's turn, undone: the picture stays the way the lens
-            // sees it. A tap is mapped through it too.
-            orientation: Viewfinder.pageTurn(page.orientation)
 
             SequentialAnimation {
                 id: blink

@@ -121,10 +121,9 @@ function lensLabel(labels, index) {
 /// down, three quarters for the other landscape -- the turn the platform
 /// camera reads off the page.
 ///
-/// The viewfinder turns the picture back by as much: the camera's frame
-/// is fixed to the phone, and a page that turns with the phone would take
-/// the picture round with it. `VideoOutput.orientation` counts the other
-/// way, anticlockwise, so the same number undoes the page's turn.
+/// The viewfinder is turned back by as much: the camera's frame is fixed
+/// to the phone, and a page that turns with the phone would take the
+/// picture round with it.
 function pageTurn(orientation) {
     switch (orientation) {
     case landscape: return 90

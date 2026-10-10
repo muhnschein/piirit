@@ -103,6 +103,14 @@ const PROBE_QML: &str = r"
                 Settings.backLensLabelsConfig.value = []
                 return { plain: plain, labelled: labelled }
             })
+            // The viewfinder as it lies on the frame: how far it is turned,
+            // its own size, and where its own top-left corner landed.
+            function lie() {
+                var v = item('viewfinder')
+                var corner = v.mapToItem(item('frame'), 0, 0)
+                return [v.rotation, v.width, v.height,
+                        Math.round(corner.x), Math.round(corner.y)]
+            }
             // Turned on its side: the picture turned back, the frame the
             // full height at the left, the controls in a column down the
             // right -- modes at the top, switch at the foot, rings beside
@@ -118,7 +126,7 @@ const PROBE_QML: &str = r"
                 page.orientation = 2
                 var answer = {
                     allowed: page.allowedOrientations,
-                    turn: item('viewfinder').orientation,
+                    turn: lie(),
                     frame: [frame.x, frame.y, frame.width, frame.height],
                     controls: [controls.x, controls.y, controls.width, controls.height],
                     shutter: [shutter.x + shutter.width / 2, shutter.y + shutter.height / 2],
@@ -129,12 +137,17 @@ const PROBE_QML: &str = r"
                                   && lenses.y + lenses.height > shutter.y,
                     slider: slider.x + slider.width === frame.x + frame.width
                 }
+                // A tap near the frame's top left is near the picture's
+                // top right, as the lens has it.
+                page.focusAt(180, 135)
+                answer.tap = rounded(camera().focus.customFocusPoint)
+                answer.ring = [item('reticle').at.x, item('reticle').at.y]
                 page.orientation = 8
-                answer.inverted = item('viewfinder').orientation
+                answer.inverted = lie()
                 page.orientation = 1
                 page.width = 540
                 page.height = 960
-                answer.upright = [item('viewfinder').orientation, frame.width, frame.height,
+                answer.upright = [lie(), frame.width, frame.height,
                                   controls.x, controls.width, lenses.vertical]
                 return answer
             })
@@ -355,13 +368,17 @@ fn the_camera_page_has_the_platform_cameras_controls() {
     );
     assert_eq!(
         out["landscape"],
-        json!({"allowed": 15, "turn": 90,
+        json!({"allowed": 15, "turn": [-90, 540, 720, 0, 540],
                "frame": [0, 0, 720, 540], "controls": [720, 0, 240, 540],
                "shutter": [120, 270], "modesAbove": true, "flipBelow": true,
-               "lensesBeside": true, "slider": true, "inverted": 270,
-               "upright": [0, 540, 720, 0, 540, false]}),
-        "on its side the page does not turn, the picture is not turned back, or the frame \
-         and the controls are not laid out the platform camera's landscape way. {context}"
+               "lensesBeside": true, "slider": true,
+               "tap": [0.75, 0.25], "ring": [180, 135],
+               "inverted": [-270, 540, 720, 720, 0],
+               "upright": [[0, 540, 720, 0, 0], 540, 720, 0, 540, false]}),
+        "on its side the page does not turn, the picture is not turned back against it \
+         at the shape the frame has, a tap does not land on its point in the picture, or \
+         the frame and the controls are not laid out the platform camera's landscape \
+         way. {context}"
     );
     assert_eq!(
         out["frame"],
@@ -419,7 +436,7 @@ fn the_camera_page_has_the_platform_cameras_controls() {
         out["focus"],
         json!({"before": false, "shown": true, "locked": true, "unlit": false,
                "centre": [135, 360], "mode": 8, "pointMode": 3,
-               "point": [0.25, 0.5], "searches": 1, "size": [540, 720]}),
+               "point": [0.25, 0.5], "searches": 2, "size": [540, 720]}),
         "a tap did not focus on its point in plain autofocus with a ring under the finger \
          that lights once the lens locks. {context}"
     );

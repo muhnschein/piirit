@@ -307,7 +307,9 @@ Item {
         if (!point) {
             return
         }
-        reticle.at = Qt.point(x, y)
+        // The ring is beside the viewfinder, which may be turned.
+        var shown = viewfinder.mapToItem(root, x, y)
+        reticle.at = Qt.point(shown.x, shown.y)
         root.focusAt(point.x, point.y)
     }
 
@@ -383,9 +385,17 @@ Item {
     VideoOutput {
         id: viewfinder
         objectName: "viewfinder"
-        anchors.fill: parent
+        // Turned against the host page, so it stays upright on the
+        // screen: the item itself rather than VideoOutput's own
+        // `orientation`, which on Qt 5.6 keeps the shape it had before
+        // the turn and squeezes the picture into it.
+        readonly property int turn: Viewfinder.pageTurn(root.pageOrientation)
+        readonly property bool across: turn % 180 !== 0
+        anchors.centerIn: parent
+        width: across ? parent.height : parent.width
+        height: across ? parent.width : parent.height
+        rotation: -turn
         source: camera
-        orientation: Viewfinder.pageTurn(root.pageOrientation)
         // Filled rather than fitted. Fitted leaves bars down the sides
         // of a tall view, and those bars are grabbed and decoded along
         // with the picture -- pixels the code does not get. It also

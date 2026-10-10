@@ -96,13 +96,29 @@ const PROBE_QML: &str = r"
             })
             // On a page turned with the phone, the picture is turned back.
             step('turned', function() {
-                var seen = [item('viewfinder').orientation]
+                function lie() {
+                    var v = item('viewfinder')
+                    return [v.rotation, v.width, v.height]
+                }
+                var seen = [lie()]
+                loader.width = 960
+                loader.height = 540
                 view.pageOrientation = 2
-                seen.push(item('viewfinder').orientation)
+                seen.push(lie())
+                // A tap on the turned picture puts the ring under the
+                // finger on the view.
+                var v = item('viewfinder')
+                var finger = v.mapToItem(view, 100, 200)
+                view.tapAt(100, 200)
+                var ring = item('reticle')
+                seen.push([Math.round(finger.x), Math.round(finger.y),
+                           ring.x + ring.width / 2, ring.y + ring.height / 2])
                 view.pageOrientation = 8
-                seen.push(item('viewfinder').orientation)
+                seen.push(lie())
                 view.pageOrientation = 1
-                seen.push(item('viewfinder').orientation)
+                loader.width = 540
+                loader.height = 960
+                seen.push(lie())
                 return seen
             })
             step('torch', function() {
@@ -225,7 +241,13 @@ fn the_scanner_zooms_lights_and_switches_cameras() {
     );
     assert_eq!(
         out["turned"],
-        json!([0, 90, 270, 0]),
+        json!([
+            [0, 540, 960],
+            [-90, 540, 960],
+            [200, 440, 200, 440],
+            [-270, 540, 960],
+            [0, 540, 960]
+        ]),
         "the scanner's picture is not turned back on a page turned with the phone. \
          {context}"
     );
