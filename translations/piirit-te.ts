@@ -162,6 +162,16 @@
         <extracomment>Shown above the message field while a picked video is made smaller, which happens before it is sent so that relays take it. %1 is how much of it is done, as a number from 0 to 100. Keep it short: it shares a line with a button on a phone.</extracomment>
         <translation>పంపడానికి వీడియోను చిన్నదిగా చేస్తోంది: %1%</translation>
     </message>
+    <message>
+        <source>%1 → ~%2</source>
+        <extracomment>Under the line saying a picked video is being made smaller: %1 is what the video weighs as picked, %2 what it is planned to come out at, each such as &quot;24 MB&quot;. The second is a guess until it is made, hence the tilde.</extracomment>
+        <translation>%1 → ~%2</translation>
+    </message>
+    <message>
+        <source>%1 → %2</source>
+        <extracomment>Under the line saying a picked video is sent, once it has been made smaller: %1 is what the video weighed as picked, %2 what is sent, each such as &quot;24 MB&quot;.</extracomment>
+        <translation>%1 → %2</translation>
+    </message>
 </context>
 <context>
     <name>AttachmentPreview</name>
@@ -761,9 +771,14 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Delta Chat కోర్‌తో కనెక్షన్ తెగిపోయింది. మళ్లీ కనెక్ట్ అవుతోంది…</translation>
     </message>
     <message>
-        <source>This file is %1. Some relays refuse files larger than %2, so sending this might fail.</source>
+        <source>Even made smaller, this file is bigger than the %1 most relays accept. Sending may fail.</source>
+        <extracomment>Shown above the message field when a video is being made smaller for sending and is still bigger than Delta Chat recommends. The file is still sent. %1 is the recommended largest size, such as &quot;24 MB&quot;.</extracomment>
+        <translation>చిన్నదిగా చేసిన తర్వాత కూడా ఈ ఫైల్ చాలా రిలేలు అంగీకరించే %1 కంటే పెద్దది. పంపడం విఫలం కావచ్చు.</translation>
+    </message>
+    <message>
+        <source>At %1, this file is bigger than the %2 most relays accept. Sending may fail.</source>
         <extracomment>Shown above the message field when the attached file is bigger than Delta Chat recommends. The file is still sent. %1 is the file&apos;s size and %2 the recommended largest size, each such as &quot;24 MB&quot;.</extracomment>
-        <translation>ఈ ఫైల్ పరిమాణం %1 ఉంది. కొన్ని రిలేలు %2 కంటే పెద్ద ఫైళ్లను తిరస్కరిస్తాయి, కాబట్టి దీన్ని పంపడం విఫలం కావచ్చు.</translation>
+        <translation>%1 ఉన్న ఈ ఫైల్ చాలా రిలేలు అంగీకరించే %2 కంటే పెద్దది. పంపడం విఫలం కావచ్చు.</translation>
     </message>
 </context>
 <context>

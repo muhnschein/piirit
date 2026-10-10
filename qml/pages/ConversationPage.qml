@@ -685,10 +685,14 @@ Page {
         // be saying something untrue. The file is still here afterwards.
         filePath: page.editing ? "" : page.attachmentPath
         fileName: page.attachmentName
-        // A picked video is made smaller before it is sent; the bar says
-        // so, and its button stops that rather than dropping the file.
+        // A picked video is made smaller as soon as it is picked; the bar
+        // says so, and its button stops that and keeps the file as it is.
+        // Tapped again, it drops the file.
         preparing: messages.preparing
         progress: messages.preparing_progress
+        // How much smaller it went, or is planned to go while it is made.
+        originalBytes: page.editing ? 0 : messages.original_bytes
+        bytes: messages.attachment_bytes
         onCancelled: page.dropAttachment()
         onStopped: messages.cancel_preparing()
     }
@@ -709,15 +713,23 @@ Page {
         // Not transient: it is true for as long as the file is on the
         // bar.
         timeout: 0
-        text: messages.attachment_large
+        // For a video sent smaller, the size it was picked at no longer
+        // matters here: the bar above says both.
+        text: !messages.attachment_large ? ""
+              : messages.original_bytes > 0
+              //: Shown above the message field when a video is being
+              //: made smaller for sending and is still bigger than Delta
+              //: Chat recommends. The file is still sent. %1 is the
+              //: recommended largest size, such as "24 MB".
+              ? qsTr("Even made smaller, this file is bigger than the %1 most relays accept. Sending may fail.")
+                .arg(Format.readableSize(messages.attachment_limit))
               //: Shown above the message field when the attached file is
               //: bigger than Delta Chat recommends. The file is still
               //: sent. %1 is the file's size and %2 the recommended
               //: largest size, each such as "24 MB".
-              ? qsTr("This file is %1. Some relays refuse files larger than %2, so sending this might fail.")
+              : qsTr("At %1, this file is bigger than the %2 most relays accept. Sending may fail.")
                 .arg(Format.readableSize(messages.attachment_bytes))
                 .arg(Format.readableSize(messages.attachment_limit))
-              : ""
         anchors {
             left: parent.left
             right: parent.right
@@ -740,6 +752,11 @@ Page {
         }
         onDismissed: notice.text = ""
     }
+
+    /// The file on the bar is a video still being made smaller, which
+    /// holds the send until it is ready. Not while a message is edited:
+    /// that carries no file.
+    readonly property bool videoPreparing: messages.preparing && !page.editing
 
     /// The text and the file: what send has to send. While a message is
     /// being edited the file is put aside, and only the text counts.
@@ -896,8 +913,11 @@ Page {
             // recording under way is what send stops and sends. And
             // nothing is sendable twice: copying a large video into the
             // core's blob directory takes long enough for a second tap to
-            // land, and that sent the whole thing again.
+            // land, and that sent the whole thing again. Nor is a video
+            // still being made smaller: it goes once it is ready and the
+            // reader says so, never on its own.
             enabled: !messages.sending
+                     && (!page.videoPreparing || voiceBar.recording)
                      && (page.hasSomethingToSend || voiceBar.recording)
             onClicked: page.sendCurrentText()
 
@@ -987,6 +1007,11 @@ Page {
         // A recording under way is what the button sends.
         if (voiceBar.recording) {
             voiceBar.send()
+            return
+        }
+        // The picked video is still being made smaller: the button waits
+        // for it, and so does the keyboard's.
+        if (page.videoPreparing) {
             return
         }
         // A message being edited: the change goes to the core, and the
