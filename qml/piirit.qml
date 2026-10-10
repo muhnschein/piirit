@@ -186,9 +186,10 @@ ApplicationWindow {
     /// forward, and does not take the reader out of a call.
     readonly property bool callBusy: callCenter.busy
 
-    /// Call a chat. False when the app is in a call already.
-    function placeCall(accountId, chatId) {
-        return callCenter.place(accountId, chatId)
+    /// Call a chat, with the camera on for a video call. False when the
+    /// app is in a call already.
+    function placeCall(accountId, chatId, video) {
+        return callCenter.place(accountId, chatId, video === true)
     }
 
     /// Bring the call there is back to the front.

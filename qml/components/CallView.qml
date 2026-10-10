@@ -67,19 +67,27 @@ Item {
         view.url = Qt.binding(function () { return root.target })
     }
 
-    /// The origin the microphone is granted to, while it is.
+    /// The origin the microphone and the camera are granted to, while
+    /// they are.
     property string granted: ""
 
-    /// Grant the call's own page the microphone before it asks.
+    /// What the call's page is granted: what a call is made with. The
+    /// camera opens only when it is switched on (call_video.js), and the
+    /// grant is what keeps that switch from opening on a prompt too.
+    readonly property var devices: ["microphone", "camera"]
+
+    /// Grant the call's own page the microphone and the camera before it
+    /// asks.
     ///
-    /// The engine asks the reader about every page that wants the
-    /// microphone, per origin, and the call's origin is a new port every
-    /// call -- so "remember" never would, and every call would open on a
-    /// browser's permission prompt. The reader has already said: they
-    /// placed the call, or answered it. So the page is granted it for the
-    /// session, exactly as the prompt's own allow does, and it is taken
-    /// back when the call goes. Only this origin: the engine-wide switch
-    /// that would do the same would do it for every webxdc app as well.
+    /// The engine asks the reader about every page that wants either,
+    /// per origin, and the call's origin is a new port every call -- so
+    /// "remember" never would, and every call would open on a browser's
+    /// permission prompt. The reader has already said: they placed the
+    /// call, or answered it, or switched the camera on. So the page is
+    /// granted both for the session, exactly as the prompt's own allow
+    /// does, and they are taken back when the call goes. Only this
+    /// origin: the engine-wide switch that would do the same would do it
+    /// for every webxdc app as well.
     function grant(origin) {
         if (root.granted === origin) {
             return
@@ -88,14 +96,16 @@ Item {
         if (origin.length === 0) {
             return
         }
-        WebEngine.notifyObservers("embedui:perms", {
-            "msg": "add",
-            "uri": "http://" + origin,
-            "type": "microphone",
-            // ALLOW_ACTION, for the session: the prompt's own answer.
-            "permission": 1,
-            "expireType": 1
-        })
+        for (var i = 0; i < root.devices.length; i++) {
+            WebEngine.notifyObservers("embedui:perms", {
+                "msg": "add",
+                "uri": "http://" + origin,
+                "type": root.devices[i],
+                // ALLOW_ACTION, for the session: the prompt's own answer.
+                "permission": 1,
+                "expireType": 1
+            })
+        }
         root.granted = origin
     }
 
@@ -103,11 +113,13 @@ Item {
         if (root.granted.length === 0) {
             return
         }
-        WebEngine.notifyObservers("embedui:perms", {
-            "msg": "remove",
-            "uri": "http://" + root.granted,
-            "type": "microphone"
-        })
+        for (var i = 0; i < root.devices.length; i++) {
+            WebEngine.notifyObservers("embedui:perms", {
+                "msg": "remove",
+                "uri": "http://" + root.granted,
+                "type": root.devices[i]
+            })
+        }
         root.granted = ""
     }
 

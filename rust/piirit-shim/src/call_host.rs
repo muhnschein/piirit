@@ -50,6 +50,7 @@ use tokio::runtime::Handle;
 use tokio::sync::Notify;
 use tokio::task::JoinHandle;
 
+use crate::json;
 use crate::webxdc_host::{content_type, read_body, read_head, token};
 
 /// The page itself: upstream's release build, byte for byte. Compiled in
@@ -58,8 +59,9 @@ use crate::webxdc_host::{content_type, read_body, read_head, token};
 /// nowhere else. `scripts/fetch-calls-webapp.sh` pins what it is.
 const PAGE: &str = include_str!("../../../vendor/calls-webapp/index.html");
 
-/// `window.calls`, as JavaScript.
-const BRIDGE: &str = include_str!("calls.js");
+/// `window.calls`, as JavaScript: the camera's half (`call_video.js`)
+/// ahead of the bridge, which hands it what it needs.
+const BRIDGE: &str = concat!(include_str!("call_video.js"), include_str!("calls.js"));
 
 /// What the page may do from inside the `WebView`. Its own script and
 /// style are inline, and it draws the other end's picture from here;
@@ -121,10 +123,47 @@ pub(crate) enum Report {
     /// `checking`, `connected`, `completed`, `disconnected`, `failed`,
     /// `closed`.
     Connection(String),
+    /// How the pictures stand: the camera live here, the other end's
+    /// picture drawn, which way the camera faces, and whether the last
+    /// camera asked for would not open.
+    Video(Video),
     /// The page asked for the call to end: its red button.
     EndedByPage,
     /// The core refused something, in its own words.
     Failed(String),
+}
+
+/// How a call's pictures stand, as the bridge reports them on `/video`.
+// Four flags the bridge reports side by side, each read on its own.
+#[allow(clippy::struct_excessive_bools)]
+#[derive(Debug, Clone, Default, PartialEq, Eq)]
+pub(crate) struct Video {
+    /// The camera is open and sending.
+    pub(crate) local: bool,
+    /// The other end's picture is being drawn.
+    pub(crate) remote: bool,
+    /// The camera faces the reader.
+    pub(crate) front: bool,
+    /// The last camera asked for would not open.
+    pub(crate) failed: bool,
+    /// What the engine said when it would not: the error's name and
+    /// message, empty when it said nothing.
+    pub(crate) error: String,
+}
+
+impl Video {
+    /// Read the bridge's report: a JSON object, a missing field false.
+    /// None for anything that is not an object.
+    pub(crate) fn from_json(text: &str) -> Option<Self> {
+        let value: serde_json::Value = serde_json::from_str(text).ok()?;
+        value.is_object().then(|| Self {
+            local: json::flag(&value, "local"),
+            remote: json::flag(&value, "remote"),
+            front: json::flag(&value, "front"),
+            failed: json::flag(&value, "failed"),
+            error: json::str_at(&value, "error").to_owned(),
+        })
+    }
 }
 
 /// Where reports go: to the call on the Qt thread, through a queued
@@ -433,6 +472,13 @@ async fn route(
                 (shared.report)(Report::Connection(text.trim().to_string()));
                 Response::empty("204 No Content")
             }
+            ("POST", "/video") => match Video::from_json(&text) {
+                Some(video) => {
+                    (shared.report)(Report::Video(video));
+                    Response::empty("204 No Content")
+                }
+                None => Response::empty("400 Bad Request"),
+            },
             ("GET", "/commands") => commands(shared).await,
             ("GET", "/ice") => ice_servers(shared),
             ("GET", "/avatar") => avatar(shared).await,
@@ -589,6 +635,28 @@ pub(crate) fn mute_command(on: bool) -> String {
     (if on { "mute" } else { "unmute" }).to_string()
 }
 
+/// The commands that have the bridge (`call_video.js`) switch the camera
+/// on or off, and turn it to face the reader or away.
+pub(crate) fn camera_command(on: bool) -> String {
+    (if on { "camera-on" } else { "camera-off" }).to_string()
+}
+
+/// See [`camera_command`].
+pub(crate) fn facing_command(front: bool) -> String {
+    (if front {
+        "facing-user"
+    } else {
+        "facing-environment"
+    })
+    .to_string()
+}
+
+/// The command that has the bridge stop drawing the pictures, the app
+/// having gone to the background, or draw them again.
+pub(crate) fn shown_command(shown: bool) -> String {
+    (if shown { "shown" } else { "hidden" }).to_string()
+}
+
 /// Standard base64 with padding: what the page's `atob` reads.
 fn encode_base64(bytes: &[u8]) -> String {
     const ALPHABET: &[u8; 64] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
@@ -650,7 +718,10 @@ async fn write_response(stream: &mut TcpStream, response: &Response) -> std::io:
 
 #[cfg(test)]
 mod tests {
-    use super::{command, encode_base64, percent_encode, BRIDGE, PAGE};
+    use super::{
+        camera_command, command, encode_base64, facing_command, percent_encode, shown_command,
+        Video, BRIDGE, PAGE,
+    };
     use crate::webxdc_host::decode_base64;
 
     #[test]
@@ -732,6 +803,88 @@ mod tests {
             !BRIDGE.contains("__"),
             "the bridge has a placeholder in it, which would be filled with \
              something a page elsewhere could read"
+        );
+    }
+
+    #[test]
+    fn a_video_report_reads_as_the_bridge_writes_it() {
+        assert_eq!(
+            Video::from_json(r#"{"local":true,"remote":false,"front":true,"failed":false}"#),
+            Some(Video {
+                local: true,
+                remote: false,
+                front: true,
+                ..Video::default()
+            })
+        );
+        // A camera that would not open, with what the engine said.
+        assert_eq!(
+            Video::from_json(r#"{"failed":true,"error":"NotReadableError: busy"}"#),
+            Some(Video {
+                failed: true,
+                error: "NotReadableError: busy".to_owned(),
+                ..Video::default()
+            })
+        );
+        // A field left out is false, and anything but an object nothing.
+        assert_eq!(
+            Video::from_json(r#"{"remote":true}"#),
+            Some(Video {
+                remote: true,
+                ..Video::default()
+            })
+        );
+        assert_eq!(Video::from_json("[true]"), None);
+        assert_eq!(Video::from_json("camera"), None);
+    }
+
+    #[test]
+    fn the_camera_commands_are_the_ones_the_bridge_takes() {
+        // call_video.js's `take` names these; a command it does not know
+        // would be set on the page as a hash, and do nothing.
+        for (made, name) in [
+            (camera_command(true), "camera-on"),
+            (camera_command(false), "camera-off"),
+            (facing_command(true), "facing-user"),
+            (facing_command(false), "facing-environment"),
+            (shown_command(true), "shown"),
+            (shown_command(false), "hidden"),
+        ] {
+            assert_eq!(made, name);
+            assert!(
+                BRIDGE.contains(&format!("case \"{name}\":")),
+                "the bridge does not take {name}"
+            );
+        }
+    }
+
+    #[test]
+    fn the_page_still_has_what_the_camera_half_reads_off_it() {
+        // call_video.js presses the page's camera switch by its labels,
+        // reads its option the way it does, and listens on its channel
+        // for the other end's camera: a new release that renamed any of
+        // them would leave the camera switched one way and the page
+        // telling the other end the other.
+        for needle in [
+            "Start camera",
+            "Stop camera",
+            "noOutgoingVideoInitially",
+            "mutedState",
+        ] {
+            assert!(
+                PAGE.contains(needle),
+                "the vendored page no longer has {needle:?}"
+            );
+        }
+    }
+
+    #[test]
+    fn the_camera_half_is_served_ahead_of_the_bridge_that_uses_it() {
+        let defined = BRIDGE.find("var piiritVideo =");
+        let used = BRIDGE.find("piiritVideo.attach(");
+        assert!(
+            matches!((defined, used), (Some(at), Some(use_at)) if at < use_at),
+            "the bridge uses the camera's half before it is defined"
         );
     }
 }

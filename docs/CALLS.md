@@ -7,9 +7,11 @@ an app can have, and what only a phone can still answer.*
 clients since Delta Chat 2.51: they were experimental, behind a switch
 under *Settings → Advanced*, until the call bugs in #119 were fixed.
 Whether a call rings here is *Settings → Notifications → Calls*, the
-reference clients' own switch. Video calls are not built. Voice calls have been made on a phone, Sailfish OS 5.2; the
-questions at the end are the ones a source tree cannot answer, and the
-ones still open say so.
+reference clients' own switch. Video calls are
+built on the same page, and have not yet been made on a phone. Voice
+calls have been made on a phone, Sailfish OS 5.2; the questions at the
+end are the ones a source tree cannot answer, and the ones still open
+say so.
 
 The shape of it: **the core does the call, Gecko does the media, and
 Piirit is the glue.** The core places, rings, accepts and ends a call, and
@@ -153,7 +155,9 @@ across origins -- finds no key and reaches nothing. What the bridge does:
   out of the candidate line.
 
 The page is opened on `#startCall` or `#acceptCall=<offer>`, with
-`?disableVideoCompletely`: audio only, no camera asked for. Its policy
+`?noOutgoingVideoInitially` unless the camera is to start on (Video,
+below). Never `?disableVideoCompletely`, which would drop the other
+end's picture as well as never opening the camera. Its policy
 keeps every fetch on its own origin; the peer connection is not a fetch,
 and is not governed by one. The offer goes to the core only once the page
 has gathered enough ICE, and a call hung up while the core was still
@@ -181,6 +185,77 @@ The page the media runs in draws controls of its own, in English. It is
 kept running under the call screen, unseen and behind a catch that takes
 every tap, and what its controls did is done from the screen.
 
+### Video
+
+A video call is the same call with the camera on: the same page, the
+same peer connection -- the page negotiates a video track for every
+call, voice or not -- and the same five methods, the core told
+`has_video` when it is placed. The engine encodes and decodes; nothing
+of FFmpeg's or anybody else's is linked for it.
+
+The camera is the bridge's (`rust/piirit-shim/src/call_video.js`,
+served ahead of `calls.js`):
+
+- **Closed until it is wanted.** The page asks for the camera and the
+  microphone once, as the call starts, and would keep the camera open
+  behind a disabled track for the whole call. It is handed the
+  microphone and, for a voice call, a blank video track -- a canvas never
+  asked for a frame -- so its camera switch is still drawn and a voice
+  call can become a video call. Switched on, the camera's track replaces
+  the blank one on the page's stream and on the peer connection's sender
+  (`replaceTrack`, no renegotiation, which the page cannot do); switched
+  off, it is stopped and the blank one goes back.
+- **The page's switch pressed, not bypassed.** The page tells the other
+  end whether its camera is on, over its own data channel, and the other
+  end hides a picture that has been switched off rather than freezing
+  its last frame. So the bridge presses the page's own *Start camera* or
+  *Stop camera*, as it presses the microphone's.
+- **One camera at a time.** Turned, the open camera is stopped before
+  the other is asked for; a phone opens one at a time. If the other will
+  not open, the first is opened again; if neither will, the camera is
+  reported as failed, with what the engine said -- written to the app's
+  log as `piirit: the camera would not open: …` -- and the app switches
+  it off.
+- **Held to what a phone needs.** Asked for at 640×480, 24 frames, and
+  every video sender capped at 700 kbit/s and 24 frames once negotiated.
+  Every pixel not captured is battery kept. The camera is only ever
+  asked for preferences: a required value (a `max`, a `min`, an `exact`)
+  is one some mode must meet or Gecko opens nothing, and it weighs a
+  frame rate against the most a mode can do -- a phone camera that runs
+  at 30 fails `max: 24` in every mode. The cap is the sender's instead.
+- **VP8 first.** On the phone, a call answered here showed the other
+  end's picture and a call placed here did not. Sailfish's Gecko turns
+  hardware H264 on for WebRTC (`media.webrtc.hw.h264.enabled`), and an
+  engine with it lists H264 ahead of VP8 in the offers it makes; the
+  other end answers in the offer's order. So a call placed here would be
+  sent H264, where a call answered here is sent what the other end's
+  offer puts first, VP8 -- inferred, not yet seen in a log. The offer the other end is sent lists
+  VP8 first (`calls.js`); nothing else in it changes, so the answer is
+  still one this end offered.
+- **Let go in the background.** With the app away the camera is
+  stopped -- the other end is told it is off -- and the pictures are not
+  drawn; back in front, it is opened again if it was on.
+- **Reported.** Whether the camera is live and whether the other end's
+  picture is being drawn (a video track with frames, not switched off at
+  their end) goes back on `/video`, which is what `Call`'s
+  `local_video` and `remote_video` are.
+
+The call screen shows the page while there are pictures -- its pictures
+and nothing else of it: the bridge hides every element but the two
+videos -- with its own lines and switches over them, on a shade. This
+end's picture fills the screen until the other end's comes, then sits
+in the corner, mirrored only from the front camera. A tap puts the lines
+away, and they go by themselves once both ends are seen; the time of day
+gives way to how long, and the large clock goes. The camera switch is
+there in every call, and on the ringing screen of a video call, so it
+can be answered without the camera; turning it is a button beside it.
+While there are pictures the screen is kept lit and the ear shield is
+off: a video call is held in front of the face, not to the ear.
+
+Placing one is the contact's Calls page, *Video call Ada*, under *Call
+Ada*; a tap on a video call's row calls back with the camera on, as the
+reference clients do.
+
 ## What the phone gives a call
 
 What a phone call has that an app's call cannot is the system call screen,
@@ -203,7 +278,8 @@ What is here is the rest of it:
 | **Staying awake** | the CPU kept up while a call is up: a phone that suspends takes the call's sound with it | `Nemo.KeepAlive` |
 | **At the ear** | the proximity sensor puts a black screen that takes no touch over the call while it is held there -- an app cannot switch the display off | `QtSensors` |
 | **In the background** | the call's `WebView` is held active once its page is up: an inactive view is a hidden document, and the engine pauses a hidden document's media | `Sailfish.WebView` |
-| **Microphone** | granted to the call's own page, for the session, before it asks -- the engine's prompt would otherwise open every call, since the origin is a new port each time. Never engine-wide: that would grant it to every webxdc app too | `Sailfish.WebEngine` |
+| **Microphone and camera** | granted to the call's own page, for the session, before it asks -- the engine's prompt would otherwise open every call, since the origin is a new port each time. Never engine-wide: that would grant them to every webxdc app too | `Sailfish.WebEngine` |
+| **Screen on** | kept lit while a call shows pictures, and while one rings | `Nemo.KeepAlive` |
 
 Left out on purpose:
 
@@ -249,6 +325,11 @@ of Piirit: two phones and an afternoon.
    speaker?
 5. **What it sounds like.** Echo on speakerphone, and what a call costs
    in battery.
+6. **Does the camera open in the engine, and turn?** Gecko reaches the
+   phone's cameras through `gecko-camera`; that `facingMode` picks the
+   back one, and that the engine lets one go before the next opens, is
+   the claim. What a video call costs in battery and heat at VGA, 24
+   frames, is the other half of it.
 
 ## What would not change
 
@@ -269,11 +350,9 @@ of Piirit: two phones and an afternoon.
 ## Next
 
 1. **The phone questions above**, before anything else.
-2. **Video**: `?noOutgoingVideoInitially`, the camera granted as the
-   microphone is, and the page's own camera button.
-3. **The earpiece**, once it can be released even when the app is not
+2. **The earpiece**, once it can be released even when the app is not
    there to release it.
-4. **The chat list's preview** of a call is still the core's English
+3. **The chat list's preview** of a call is still the core's English
    sentence (`📞 Outgoing audio call`). The reference clients hand the
    core translations of its call strings (`set_stock_strings`); Piirit
    hands it none of any kind yet.

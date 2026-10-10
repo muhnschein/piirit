@@ -339,6 +339,10 @@ Vous continuerez à voir les messages des contacts bloqués dans les autres grou
         <source>Call back</source>
         <translation>Rappeler</translation>
     </message>
+    <message>
+        <source>Incoming video call</source>
+        <translation>Appel vidéo entrant</translation>
+    </message>
 </context>
 <context>
     <name>CallPage</name>
@@ -392,6 +396,10 @@ Vous continuerez à voir les messages des contacts bloqués dans les autres grou
         <source>Answer</source>
         <extracomment>Answers a call that is ringing. A verb.</extracomment>
         <translation>Décrocher</translation>
+    </message>
+    <message>
+        <source>Incoming video call</source>
+        <translation>Appel vidéo entrant</translation>
     </message>
 </context>
 <context>
@@ -457,6 +465,11 @@ Vous continuerez à voir les messages des contacts bloqués dans les autres grou
         <source>Call %1</source>
         <extracomment>Places a call. %1 is the name of whoever is called.</extracomment>
         <translation>Appeler %1</translation>
+    </message>
+    <message>
+        <source>Video call %1</source>
+        <extracomment>Places a video call. %1 is the name of whoever is called.</extracomment>
+        <translation>Appel vidéo à %1</translation>
     </message>
 </context>
 <context>

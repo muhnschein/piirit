@@ -421,19 +421,20 @@ Page {
     /// One call at a time, as both reference clients have it: asking for
     /// a second brings the first back to the front, which is where the
     /// reader can see that it is still going.
-    function placeCall() {
+    function placeCall(video) {
         if (typeof appWindow === "undefined") {
             return
         }
-        if (!appWindow.placeCall(page.accountId, page.chatId)) {
+        if (!appWindow.placeCall(page.accountId, page.chatId, video === true)) {
             appWindow.showCall()
         }
     }
 
     /// A call's row was tapped. One still ringing is answered from here,
     /// as the reference clients have it -- it may have rung while nothing
-    /// here was listening -- and any other is called back.
-    function callFromRow(messageId, outgoing, callState) {
+    /// here was listening -- and any other is called back, the way it was
+    /// made: a video call with the camera on.
+    function callFromRow(messageId, outgoing, callState, hasVideo) {
         if (typeof appWindow === "undefined") {
             return
         }
@@ -442,7 +443,7 @@ Page {
             return
         }
         if (messages.can_call) {
-            page.placeCall()
+            page.placeCall(hasVideo)
         }
     }
 
@@ -538,7 +539,7 @@ Page {
             markdownMode: Settings.markdownMode
         })
         onAppRequested: page.openApp(messageId)
-        onCallRequested: page.callFromRow(messageId, outgoing, callState)
+        onCallRequested: page.callFromRow(messageId, outgoing, callState, hasVideo)
         onDownloadRequested: messages.download_full(messageId)
         // On or off is the model's call: it knows what the reader already
         // sent, and the core takes the whole list either way.

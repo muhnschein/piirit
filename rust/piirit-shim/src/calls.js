@@ -51,12 +51,59 @@
         });
     }
 
+    /*
+     * The offer, with VP8 first among each picture's codecs. Sailfish's
+     * Gecko turns hardware H264 on for WebRTC, and an engine that has it
+     * lists H264 ahead of VP8 in every offer it makes; the other end
+     * answers in the offer's order, so a call this end places would be
+     * sent H264 -- which the engine here does not reliably draw -- where
+     * a call it answers is sent VP8, as the other end's offer puts first.
+     * Only the order changes, and only in what the other end is sent:
+     * each codec is still in the offer this end made, so whichever it is
+     * answered with is one it has. A codec's retransmission stream stays
+     * next to it.
+     */
+    function preferVp8(sdp) {
+        var lines = sdp.split("\r\n");
+        var vp8 = {};
+        var rtxOf = {};
+        lines.forEach(function (line) {
+            var map = /^a=rtpmap:(\d+) VP8\/90000/i.exec(line);
+            if (map) {
+                vp8[map[1]] = true;
+            }
+            var rtx = /^a=fmtp:(\d+) apt=(\d+)$/.exec(line);
+            if (rtx) {
+                rtxOf[rtx[1]] = rtx[2];
+            }
+        });
+        return lines.map(function (line) {
+            var media = /^(m=video \d+ [A-Z/]+) (.+)$/.exec(line);
+            if (!media) {
+                return line;
+            }
+            var types = media[2].split(" ");
+            var first = types.filter(function (type) {
+                return vp8[type] || vp8[rtxOf[type]];
+            });
+            var rest = types.filter(function (type) {
+                return first.indexOf(type) < 0;
+            });
+            return media[1] + " " + first.concat(rest).join(" ");
+        }).join("\r\n");
+    }
+
     function post(path, body) {
         var xhr = new XMLHttpRequest();
         xhr.open("POST", API + path, true);
         xhr.setRequestHeader("Content-Type", "text/plain; charset=utf-8");
         xhr.send(body);
     }
+
+    /* Video is its own file's (`call_video.js`, served ahead of this):
+     * it reports on the same route, hears every peer connection the page
+     * makes, and takes the commands that are about the camera. */
+    piiritVideo.attach(post);
 
     /*
      * The page says nothing about how the connection is doing -- nothing
@@ -107,6 +154,7 @@
             if (fixedServers) {
                 connection.setConfiguration = function () {};
             }
+            piiritVideo.watch(connection);
             connection.addEventListener("iceconnectionstatechange", function () {
                 post("/state", connection.iceConnectionState);
             });
@@ -186,7 +234,7 @@
                     if (commands[i] === "mute" || commands[i] === "unmute") {
                         wantMuted = commands[i] === "mute";
                         switched = true;
-                    } else {
+                    } else if (!piiritVideo.take(commands[i])) {
                         waiting.push(commands[i]);
                     }
                 }
@@ -210,7 +258,7 @@
     window.calls = {
         /* The page's offer, gathered: placing the call is the core's. */
         startCall: function (offer) {
-            post("/start", offer);
+            post("/start", preferVp8(offer));
         },
         /* The page's answer to the call it was opened on. */
         acceptCall: function (answer) {

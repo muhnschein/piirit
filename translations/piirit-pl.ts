@@ -340,6 +340,10 @@ Wiadomości innych grup z zablokowanymi kontaktami nadal będą wyświetlane.</t
         <source>Call back</source>
         <translation>Oddzwoń</translation>
     </message>
+    <message>
+        <source>Incoming video call</source>
+        <translation>Przychodzące połączenie wideo</translation>
+    </message>
 </context>
 <context>
     <name>CallPage</name>
@@ -393,6 +397,10 @@ Wiadomości innych grup z zablokowanymi kontaktami nadal będą wyświetlane.</t
         <source>Answer</source>
         <extracomment>Answers a call that is ringing. A verb.</extracomment>
         <translation>Odbierz</translation>
+    </message>
+    <message>
+        <source>Incoming video call</source>
+        <translation>Przychodzące połączenie wideo</translation>
     </message>
 </context>
 <context>
@@ -459,6 +467,11 @@ Wiadomości innych grup z zablokowanymi kontaktami nadal będą wyświetlane.</t
         <source>Call %1</source>
         <extracomment>Places a call. %1 is the name of whoever is called.</extracomment>
         <translation>Zadzwoń: %1</translation>
+    </message>
+    <message>
+        <source>Video call %1</source>
+        <extracomment>Places a video call. %1 is the name of whoever is called.</extracomment>
+        <translation>Połączenie wideo: %1</translation>
     </message>
 </context>
 <context>

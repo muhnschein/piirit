@@ -339,6 +339,10 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Call back</source>
         <translation>परत कॉल करा</translation>
     </message>
+    <message>
+        <source>Incoming video call</source>
+        <translation>येणारा व्हिडिओ कॉल</translation>
+    </message>
 </context>
 <context>
     <name>CallPage</name>
@@ -392,6 +396,10 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Answer</source>
         <extracomment>Answers a call that is ringing. A verb.</extracomment>
         <translation>उत्तर द्या</translation>
+    </message>
+    <message>
+        <source>Incoming video call</source>
+        <translation>येणारा व्हिडिओ कॉल</translation>
     </message>
 </context>
 <context>
@@ -457,6 +465,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Call %1</source>
         <extracomment>Places a call. %1 is the name of whoever is called.</extracomment>
         <translation>%1 ला कॉल करा</translation>
+    </message>
+    <message>
+        <source>Video call %1</source>
+        <extracomment>Places a video call. %1 is the name of whoever is called.</extracomment>
+        <translation>%1 ला व्हिडिओ कॉल करा</translation>
     </message>
 </context>
 <context>

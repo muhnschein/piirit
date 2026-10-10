@@ -339,6 +339,10 @@ Mensagens de contactos bloqueados não serão ocultadas noutros grupos.</transla
         <source>Call back</source>
         <translation>Ligar de volta</translation>
     </message>
+    <message>
+        <source>Incoming video call</source>
+        <translation>Chamada de vídeo recebida</translation>
+    </message>
 </context>
 <context>
     <name>CallPage</name>
@@ -392,6 +396,10 @@ Mensagens de contactos bloqueados não serão ocultadas noutros grupos.</transla
         <source>Answer</source>
         <extracomment>Answers a call that is ringing. A verb.</extracomment>
         <translation>Atender</translation>
+    </message>
+    <message>
+        <source>Incoming video call</source>
+        <translation>Chamada de vídeo recebida</translation>
     </message>
 </context>
 <context>
@@ -457,6 +465,11 @@ Mensagens de contactos bloqueados não serão ocultadas noutros grupos.</transla
         <source>Call %1</source>
         <extracomment>Places a call. %1 is the name of whoever is called.</extracomment>
         <translation>Ligar a %1</translation>
+    </message>
+    <message>
+        <source>Video call %1</source>
+        <extracomment>Places a video call. %1 is the name of whoever is called.</extracomment>
+        <translation>Videochamada para %1</translation>
     </message>
 </context>
 <context>

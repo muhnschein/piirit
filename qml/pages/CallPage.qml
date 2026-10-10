@@ -21,6 +21,14 @@ import "../components"
  * from here -- the microphone through the call, which has the page press
  * its own switch, and hanging up through the call as it always was.
  *
+ * Pictures are the exception. While the camera is on, or the other end
+ * is sending a picture, the page is shown -- its pictures and nothing
+ * else of it (call_video.js) -- with this page's lines and switches over
+ * it, which a tap puts away and brings back. The time of day gives way
+ * to how long, and the large clock goes. The camera switch is there in
+ * every call, so a voice call can become a video call, and on the
+ * ringing screen of a video call, so it can be answered without one.
+ *
  * That page is loaded rather than declared, so a phone without the
  * browser engine loses the call and keeps this page -- a call that rings
  * there can still be seen, and declined.
@@ -42,6 +50,24 @@ Page {
     /// The two ends have agreed to talk: the call's page is where it
     /// goes on.
     readonly property bool inCall: page.busy && page.call.state !== "ringing"
+
+    /// A video call is ringing here: the camera can be switched off
+    /// before it is answered.
+    readonly property bool ringingVideo: page.call !== null && page.call.state === "ringing"
+                                         && page.call.has_video
+    /// Pictures are on screen: this end's camera, or the other end's.
+    readonly property bool video: page.inCall
+                                  && (page.call.local_video || page.call.remote_video)
+    /// Over the pictures, the lines and the switches are shown: put away
+    /// by a tap, and by themselves once both ends are seen; back with a
+    /// tap.
+    property bool controlsShown: true
+    /// What is drawn over the call, now.
+    readonly property bool overlay: !page.video || page.controlsShown
+
+    /// The app is the one in front. Not read-only: a test, which has no
+    /// app in front, says it is.
+    property bool appActive: Qt.application.state === Qt.ApplicationActive
 
     /// Now, moved on once a second while the clock is shown.
     property real now: Date.now()
@@ -86,7 +112,7 @@ Page {
         }
         var state = page.call.state
         if (state === "ringing") {
-            return qsTr("Incoming call")
+            return page.call.has_video ? qsTr("Incoming video call") : qsTr("Incoming call")
         }
         if (state === "calling") {
             return qsTr("Ringing…")
@@ -117,6 +143,42 @@ Page {
             return qsTr("Call ended")
         }
         return ""
+    }
+
+    // The lines and switches go by themselves while both ends' pictures
+    // are up and the reader has done nothing for a while, and come back
+    // with the first tap. Shown again whenever the pictures go.
+    Timer {
+        id: tuck
+        objectName: "tuck"
+        interval: 5000
+        running: page.video && page.controlsShown && page.call.remote_video
+                 && page.connected
+        onTriggered: page.controlsShown = false
+    }
+
+    onVideoChanged: {
+        if (!page.video) {
+            page.controlsShown = true
+        }
+    }
+
+    /// The reader touched something: the lines stay a while longer.
+    function touched() {
+        page.controlsShown = true
+        tuck.restart()
+    }
+
+    /// A tap on the pictures: the lines and switches away, or back.
+    function toggleControls() {
+        if (!page.video) {
+            return
+        }
+        if (page.controlsShown) {
+            page.controlsShown = false
+        } else {
+            page.touched()
+        }
     }
 
     // For the call's clock and the time of day, both.
@@ -218,7 +280,7 @@ Page {
         id: backdrop
         objectName: "callBackdrop"
         anchors.fill: parent
-        visible: picture.status === Image.Ready
+        visible: picture.status === Image.Ready && !page.video
 
         // Blurred off the main thread, small, and drawn large and smooth
         // (src/pictures.rs) -- a blur this wide keeps nothing a small
@@ -244,14 +306,15 @@ Page {
         }
     }
 
-    // The call's page: the media, and nothing on screen. Its own controls
-    // are this page's to draw, so it runs unseen -- running, not hidden,
-    // which the engine would pause -- under what is drawn here.
+    // The call's page: the media, and nothing on screen but its pictures,
+    // when there are any. Its own controls are this page's to draw, so it
+    // runs unseen otherwise -- running, not hidden, which the engine would
+    // pause -- under what is drawn here.
     Loader {
         id: view
         objectName: "callViewLoader"
         anchors.fill: parent
-        opacity: 0
+        opacity: page.video ? 1 : 0
         active: page.call !== null && page.call.url.length > 0
         source: Qt.resolvedUrl("../components/CallView.qml")
         onLoaded: {
@@ -270,9 +333,44 @@ Page {
 
     // Unseen is not untouchable: a tap anywhere the page's own buttons
     // are not would land on one of that page's, drawn or not. Taken here.
+    // Over the pictures, a tap puts the lines and switches away, or
+    // brings them back.
     MouseArea {
         objectName: "callViewShield"
         anchors.fill: parent
+        onClicked: page.toggleControls()
+    }
+
+    // Shade at the top and the foot, so the lines read over a picture.
+    // A gradient, not a blur: see the backdrop.
+    Rectangle {
+        objectName: "topShade"
+        anchors {
+            top: parent.top
+            left: parent.left
+            right: parent.right
+        }
+        height: who.y + who.height + statusLine.height + 2 * Theme.paddingLarge
+        visible: page.video && page.overlay
+        gradient: Gradient {
+            GradientStop { position: 0.0; color: Theme.rgba("black", 0.6) }
+            GradientStop { position: 1.0; color: "transparent" }
+        }
+    }
+
+    Rectangle {
+        objectName: "footShade"
+        anchors {
+            bottom: parent.bottom
+            left: parent.left
+            right: parent.right
+        }
+        height: parent.height - switches.y + Theme.paddingLarge
+        visible: page.video && page.overlay
+        gradient: Gradient {
+            GradientStop { position: 0.0; color: "transparent" }
+            GradientStop { position: 1.0; color: Theme.rgba("black", 0.6) }
+        }
     }
 
     // Who, on the left, and the time of day, on the right: the line the
@@ -289,6 +387,7 @@ Page {
             rightMargin: Theme.horizontalPageMargin
         }
         height: name.height
+        visible: page.overlay
 
         Label {
             id: name
@@ -309,8 +408,11 @@ Page {
             font.pixelSize: Theme.fontSizeLarge
             color: Theme.secondaryColor
             textFormat: Text.PlainText
-            // The same form as a message's time.
-            text: Qt.formatTime(new Date(page.now), "hh:mm")
+            // The same form as a message's time. Over pictures, how long
+            // the call has gone on instead: the large clock is not drawn
+            // over a face.
+            text: page.video && page.connected ? page.elapsed()
+                                               : Qt.formatTime(new Date(page.now), "hh:mm")
         }
     }
 
@@ -325,6 +427,7 @@ Page {
         }
         width: parent.width
         height: clockMetric.height
+        visible: !page.video || (page.controlsShown && !page.connected)
 
         // One line of the clock's font, measured.
         Label {
@@ -351,22 +454,56 @@ Page {
         }
     }
 
-    // The switches, under the clock. The microphone is the one a call
-    // here has: the phone's own screen also has the loudspeaker, the
-    // keypad and recording, which belong to a phone call.
-    Switch {
-        id: mute
-        objectName: "muteSwitch"
-        visible: page.inCall
-        anchors {
-            top: statusLine.bottom
-            topMargin: 2 * Theme.paddingLarge
-            horizontalCenter: parent.horizontalCenter
+    // The switches, under the clock; over pictures, just above the red
+    // button, out of the way of a face. The microphone and the camera
+    // are what a call here has: the phone's own screen also has the
+    // loudspeaker, the keypad and recording, which belong to a phone
+    // call. While a video call rings, the camera alone, so it can be
+    // answered without one.
+    Row {
+        id: switches
+        objectName: "callSwitches"
+        visible: (page.inCall || page.ringingVideo) && page.overlay
+        anchors.horizontalCenter: parent.horizontalCenter
+        y: page.video ? hangUp.y - height - 2 * Theme.paddingLarge
+                      : statusLine.y + statusLine.height + 2 * Theme.paddingLarge
+        spacing: Theme.paddingLarge
+
+        Switch {
+            id: mute
+            objectName: "muteSwitch"
+            visible: page.inCall
+            icon.source: "image://theme/icon-m-mic-mute"
+            automaticCheck: false
+            checked: page.call !== null && page.call.muted
+            onClicked: {
+                page.touched()
+                page.call.mute(!page.call.muted)
+            }
         }
-        icon.source: "image://theme/icon-m-mic-mute"
-        automaticCheck: false
-        checked: page.call !== null && page.call.muted
-        onClicked: page.call.mute(!page.call.muted)
+
+        Switch {
+            objectName: "cameraSwitch"
+            icon.source: "image://theme/icon-m-video"
+            automaticCheck: false
+            checked: page.call !== null && page.call.camera
+            onClicked: {
+                page.touched()
+                page.call.set_camera(!page.call.camera)
+            }
+        }
+
+        // Which way the camera faces: a press, not a state.
+        IconButton {
+            objectName: "flipButton"
+            visible: page.call !== null && page.call.camera
+            anchors.verticalCenter: parent.verticalCenter
+            icon.source: "image://theme/icon-camera-switch"
+            onClicked: {
+                page.touched()
+                page.call.flip_camera()
+            }
+        }
     }
 
     // Answering and declining, while it rings. Declining is on the left
@@ -400,8 +537,9 @@ Page {
 
     // Hanging up, at the foot of the screen, where the phone's own is.
     Button {
+        id: hangUp
         objectName: "hangUpButton"
-        visible: page.inCall
+        visible: page.inCall && page.overlay
         anchors {
             bottom: parent.bottom
             bottomMargin: Theme.itemSizeLarge
@@ -415,11 +553,13 @@ Page {
     // Held to the ear, the screen is a cheek's to press. The phone app
     // has the display switched off for it; an app cannot, so what is
     // under the cheek is black and takes no touch. Only for a call the
-    // phone is held to: while it rings the reader is looking at it.
+    // phone is held to: while it rings the reader is looking at it, and
+    // through a video call -- pictures, or the camera on -- it is held
+    // in front of the face, where a hand over the sensor is not a cheek.
     ProximitySensor {
         id: proximity
         objectName: "proximity"
-        active: page.inCall && Qt.application.state === Qt.ApplicationActive
+        active: page.inCall && !page.video && !page.call.camera && page.appActive
     }
 
     Rectangle {

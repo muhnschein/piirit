@@ -304,7 +304,7 @@ fn a_call_is_placed_answered_connected_and_hung_up() {
     let url = value("url");
     assert!(
         url.starts_with("http://127.0.0.1:")
-            && url.contains("/index.html?disableVideoCompletely&key=")
+            && url.contains("/index.html?noOutgoingVideoInitially&key=")
             && url.ends_with("#startCall"),
         "the page was not pointed at an audio-only call it is to start, with \
          its key: {url}. {context}"

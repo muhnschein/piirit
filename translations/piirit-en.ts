@@ -335,6 +335,10 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Call back</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Incoming video call</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>CallPage</name>
@@ -387,6 +391,10 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Answer</source>
         <extracomment>Answers a call that is ringing. A verb.</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Incoming video call</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -452,6 +460,11 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Call %1</source>
         <extracomment>Places a call. %1 is the name of whoever is called.</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Video call %1</source>
+        <extracomment>Places a video call. %1 is the name of whoever is called.</extracomment>
         <translation type="unfinished"></translation>
     </message>
 </context>
