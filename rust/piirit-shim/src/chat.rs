@@ -305,8 +305,8 @@ pub struct ChatMessages {
     pub preparing_progress: qt_property!(f64; NOTIFY preparing_changed),
     /// Emitted when [`Self::preparing`] or its progress changes.
     pub preparing_changed: qt_signal!(),
-    /// Stop making the video smaller and put away what was made. Nothing
-    /// is sent; the page drops the file from the bar beside it.
+    /// Stop making the video smaller. Nothing is sent, and the file stays
+    /// on the bar to be sent as it is or put away.
     pub cancel_preparing: qt_method!(fn(&mut self)),
 
     /// Fetch the rest of a message the core holds only the header of.
@@ -539,10 +539,14 @@ impl ChatMessages {
         let path = self.pending_path();
         let limit = self.recommended_limit();
         let plan = video::plan(&path, self.media_quality, limit);
-        let same = matches!(
-            (&self.recode, &plan),
-            (Some(recode), Some(target)) if recode.source == path && recode.target == *target
-        );
+        // Kept while it is still the file on the bar and still the plan
+        // for it; and a file that goes as it is -- the reader stopped it,
+        // or it could not be made smaller -- keeps going as it is.
+        let same = match (&self.recode, &plan) {
+            (Some(recode), _) if recode.source == path && recode.as_is => true,
+            (Some(recode), Some(target)) => recode.source == path && recode.target == *target,
+            _ => false,
+        };
         if !same {
             self.drop_recode();
             if let Some(target) = plan {
@@ -565,7 +569,7 @@ impl ChatMessages {
         let path = self.pending_path();
         let limit = self.recommended_limit();
         let smaller = self.recode.as_ref().and_then(|recode| {
-            if recode.failed {
+            if recode.as_is {
                 None
             } else if let Some(made) = &recode.made {
                 Some(media::file_bytes(made))
@@ -619,7 +623,7 @@ impl ChatMessages {
             this.borrow_mut().recoded(id, prepared);
         });
         let started = video::start(source.clone(), target, Arc::clone(&cancel), progress, done);
-        let failed = match started {
+        let as_is = match started {
             Ok(()) => false,
             Err(err) => {
                 eprintln!("piirit: sending the video as it is: {err}");
@@ -632,9 +636,9 @@ impl ChatMessages {
             target,
             cancel,
             made: None,
-            failed,
+            as_is,
         });
-        if !failed {
+        if !as_is {
             self.set_preparing(true);
         }
     }
@@ -650,15 +654,28 @@ impl ChatMessages {
             return;
         };
         match prepared {
+            // Planned smaller, but a picture x264 cannot hold to the rate
+            // -- a short clip that is mostly its first frame, say -- can
+            // come out no smaller than it went in. Then the reader's own
+            // file is the better one to send.
+            Prepared::Made(made)
+                if media::file_bytes(&made) >= media::file_bytes(&recode.source) =>
+            {
+                eprintln!("piirit: sending the video as it is: it came out no smaller");
+                video::discard(&made);
+                recode.as_is = true;
+            }
             Prepared::Made(made) => recode.made = Some(made),
             // Recoding is a courtesy to the relay: a video it could not
             // read goes as it is, with the bar's notice if it is large,
             // as every video did before.
             Prepared::Failed(reason) => {
                 eprintln!("piirit: sending the video as it is: {reason}");
-                recode.failed = true;
+                recode.as_is = true;
             }
-            Prepared::Cancelled => self.recode = None,
+            // Stopped by the reader, who keeps the file as it is; see
+            // `cancel_preparing`.
+            Prepared::Cancelled => {}
         }
         self.set_preparing(false);
         self.weigh();
@@ -1796,7 +1813,7 @@ impl ChatMessages {
         let text = self.outgoing_text(&text.to_string());
         let ours = self.recode.as_ref().filter(|recode| recode.source == path);
         match ours {
-            Some(recode) if recode.failed => self.send_message(text, Some((path, name))),
+            Some(recode) if recode.as_is => self.send_message(text, Some((path, name))),
             Some(recode) => {
                 if let Some(made) = recode.made.clone() {
                     self.in_flight = Some(made.clone());
@@ -1815,8 +1832,22 @@ impl ChatMessages {
     }
 
     /// Stop making a video smaller; see [`Self::cancel_preparing`].
+    ///
+    /// The file stays on the bar and goes as it is: kept as a recode that
+    /// is not to be made, so a moving limit or quality does not start it
+    /// again behind the reader's back.
     pub fn cancel_preparing(&mut self) {
-        self.drop_recode();
+        let Some(recode) = self.recode.as_mut() else {
+            return;
+        };
+        recode.cancel.store(true, Ordering::Relaxed);
+        if let Some(made) = recode.made.take() {
+            if self.in_flight.as_deref() != Some(made.as_str()) {
+                video::discard(&made);
+            }
+        }
+        recode.as_is = true;
+        self.set_preparing(false);
         self.weigh();
     }
 
@@ -1947,8 +1978,9 @@ struct Recode {
     cancel: Arc<AtomicBool>,
     /// The smaller file, once it is made.
     made: Option<String>,
-    /// It could not be made, and the picked file goes as it is.
-    failed: bool,
+    /// The picked file goes as it is: it could not be made smaller, came
+    /// out no smaller, or the reader stopped it.
+    as_is: bool,
 }
 
 /// One message on its way to the core.

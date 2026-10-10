@@ -686,10 +686,12 @@ Page {
         filePath: page.editing ? "" : page.attachmentPath
         fileName: page.attachmentName
         // A picked video is made smaller as soon as it is picked; the bar
-        // says so, and its button drops the file, which stops that too.
+        // says so, and its button stops that and keeps the file as it is.
+        // Tapped again, it drops the file.
         preparing: messages.preparing
         progress: messages.preparing_progress
         onCancelled: page.dropAttachment()
+        onStopped: messages.cancel_preparing()
     }
 
     // Under the file it is about: this one is bigger than the core

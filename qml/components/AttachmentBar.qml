@@ -21,8 +21,11 @@ Item {
     /// how far along that is, from 0 to 1. See ChatMessages.preparing.
     property bool preparing: false
     property real progress: 0
-    /// The file is put away, and with it whatever was being made of it.
+    /// The file is put away.
     signal cancelled()
+    /// Making the video smaller is stopped; the file stays, to be sent as
+    /// it is. What the same button means while that runs.
+    signal stopped()
 
     readonly property string shownName:
         root.fileName.length > 0 ? root.fileName : root.filePath
@@ -86,6 +89,6 @@ Item {
             rightMargin: Theme.horizontalPageMargin
         }
         icon.source: "image://theme/icon-m-clear"
-        onClicked: root.cancelled()
+        onClicked: root.preparing ? root.stopped() : root.cancelled()
     }
 }

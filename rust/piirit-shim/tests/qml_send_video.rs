@@ -155,7 +155,11 @@ fn a_picked_video_is_made_smaller_and_waits_for_the_reader() {
     let clip_path = clip.to_string_lossy().into_owned();
     let again = clip_path.clone();
     let direct = clip_path.clone();
-    let switched = clip_path.clone();
+    // A second video, so the stopped one's "as it is" does not carry
+    // over to it.
+    let other = temp.join("pond at noon.mov");
+    std::fs::copy(&clip, &other).expect("copy the clip");
+    let switched = other.to_string_lossy().into_owned();
     let journal_mid = journal.clone();
     let recoded_dir = cache.join("piirit/piirit/recoded");
     let recoded_mid = recoded_dir.clone();
@@ -221,16 +225,24 @@ fn a_picked_video_is_made_smaller_and_waits_for_the_reader() {
             call!("attach", QString::from(again.as_str())),
         ));
         probe!("preparing-again", "messages", "preparing");
+        // Stopped straight away with the bar's button: the file stays, to
+        // go as it is, and a new quality does not start it again.
         (*steps_ptr).push((
-            "drop",
+            "stop-bar",
             call!("click", QString::from("cancelAttachmentButton")),
         ));
+        probe!("preparing-stopped-bar", "messages", "preparing");
+        probe!("sending-stopped-bar", "messages", "sending");
+        probe!("bar-kept", "attachmentBar", "visible");
+        probe!("label-kept", "pendingAttachmentLabel", "text");
+        (*steps_ptr).push(("quality-kept", call!("quality", 1)));
+        probe!("preparing-kept", "messages", "preparing");
+        (*steps_ptr).push(("type-kept", call!("type", QString::from("as it was"))));
+        (*steps_ptr).push(("send-kept", call!("send")));
     });
 
     single_shot(Duration::from_secs(19), move || unsafe {
-        probe!("preparing-dropped", "messages", "preparing");
-        probe!("sending-dropped", "messages", "sending");
-        probe!("bar-dropped", "attachmentBar", "visible");
+        probe!("bar-sent-kept", "attachmentBar", "visible");
         // Handed a video that is not on the bar, the model makes it
         // smaller and sends nothing; stopped, it puts the work away.
         (*steps_ptr).push((
@@ -246,19 +258,23 @@ fn a_picked_video_is_made_smaller_and_waits_for_the_reader() {
             "attach-switch",
             call!("attach", QString::from(switched.as_str())),
         ));
-        (*steps_ptr).push(("quality", call!("quality", 1)));
+        (*steps_ptr).push(("quality", call!("quality", 0)));
         probe!("preparing-switched", "messages", "preparing");
     });
 
     single_shot(Duration::from_secs(21), move || unsafe {
-        (*steps_ptr).push((
-            "drop-switched",
-            call!("click", QString::from("cancelAttachmentButton")),
-        ));
+        // Stopped, then dropped: the same button, twice.
+        for step in ["stop-switched", "drop-switched"] {
+            (*steps_ptr).push((
+                step,
+                call!("click", QString::from("cancelAttachmentButton")),
+            ));
+        }
     });
 
     single_shot(Duration::from_secs(23), move || unsafe {
         probe!("preparing-end", "messages", "preparing");
+        probe!("bar-end", "attachmentBar", "visible");
         (*engine_ptr).quit();
     });
 
@@ -339,8 +355,9 @@ fn a_picked_video_is_made_smaller_and_waits_for_the_reader() {
         .collect();
     assert_eq!(
         sends.len(),
-        1,
-        "one send, and none for the dropped one. {context}. Sends: {sends:?}"
+        2,
+        "one send of the smaller video, one of the stopped one as it was, \
+         and none for the rest. {context}. Sends: {sends:?}"
     );
     let params = &sends[0].1;
     assert_eq!(
@@ -379,19 +396,38 @@ fn a_picked_video_is_made_smaller_and_waits_for_the_reader() {
         "picking it again did not start. {context}"
     );
     assert_eq!(
-        value("preparing-dropped"),
+        value("preparing-stopped-bar"),
         "false",
         "the bar's button did not stop it. {context}"
     );
     assert_eq!(
-        value("sending-dropped"),
+        value("sending-stopped-bar"),
         "false",
-        "a dropped video still holds the send button. {context}"
+        "a stopped video still holds the send button. {context}"
     );
     assert_eq!(
-        value("bar-dropped"),
+        (value("bar-kept").as_str(), value("label-kept").as_str()),
+        ("true", "Sending lake at dusk.mov"),
+        "stopping it dropped the file the reader picked. {context}"
+    );
+    assert_eq!(
+        value("preparing-kept"),
         "false",
-        "the bar's button did not drop the file. {context}"
+        "a new quality started a stopped video again. {context}"
+    );
+    let kept = &sends[1].1;
+    assert_eq!(
+        (
+            kept.get(2).and_then(serde_json::Value::as_str),
+            kept.get(3).and_then(serde_json::Value::as_str),
+        ),
+        (Some("as it was"), Some(clip.to_string_lossy().as_ref())),
+        "a stopped video did not go as it was picked. Sends: {sends:?}"
+    );
+    assert_eq!(
+        value("bar-sent-kept"),
+        "false",
+        "the bar still holds the video after it was sent. {context}"
     );
     assert_eq!(
         value("preparing-direct"),
@@ -409,9 +445,9 @@ fn a_picked_video_is_made_smaller_and_waits_for_the_reader() {
         "a new quality did not start the video again. {context}"
     );
     assert_eq!(
-        value("preparing-end"),
-        "false",
-        "dropping the file left it being made. {context}"
+        (value("preparing-end").as_str(), value("bar-end").as_str()),
+        ("false", "false"),
+        "the button, tapped twice, did not stop and then drop it. {context}"
     );
 
     let left = std::fs::read_dir(&recoded_dir)
