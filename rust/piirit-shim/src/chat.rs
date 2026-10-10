@@ -274,6 +274,11 @@ pub struct ChatMessages {
     /// what it weighs on the phone. Through f64 because QML has no
     /// 64-bit integer.
     pub attachment_bytes: qt_property!(f64; NOTIFY attachment_large_changed),
+    /// What [`Self::pending_file`] weighs on the phone, while what is sent
+    /// is a smaller video made from it; 0 otherwise. Beside
+    /// [`Self::attachment_bytes`], the bar says how much smaller the video
+    /// went. A real for the same reason.
+    pub original_bytes: qt_property!(f64; NOTIFY attachment_large_changed),
     /// The largest attachment the core recommends, in bytes; 0 until it
     /// has said. A recommendation, not what this profile's relay takes:
     /// see `media.rs`. A real for the reason above.
@@ -285,8 +290,8 @@ pub struct ChatMessages {
     /// false for a picture whatever it weighs: the core recodes those on
     /// the way out.
     pub attachment_large: qt_property!(bool; NOTIFY attachment_large_changed),
-    /// Emitted when [`Self::attachment_large`] or
-    /// [`Self::attachment_bytes`] changes.
+    /// Emitted when [`Self::attachment_large`],
+    /// [`Self::attachment_bytes`] or [`Self::original_bytes`] changes.
     pub attachment_large_changed: qt_signal!(),
 
     /// The reader's outgoing media quality, the core's `media_quality`:
@@ -577,18 +582,25 @@ impl ChatMessages {
                 Some(recode.target.predicted_bytes())
             }
         });
-        let (bytes, large) = match smaller {
-            Some(bytes) => (bytes, limit > 0 && bytes > limit),
-            None => (media::file_bytes(&path), media::exceeds_limit(&path, limit)),
+        let (bytes, large, original) = match smaller {
+            Some(bytes) => (bytes, limit > 0 && bytes > limit, media::file_bytes(&path)),
+            None => (
+                media::file_bytes(&path),
+                media::exceeds_limit(&path, limit),
+                0,
+            ),
         };
         // Exact to 2^53 bytes, which no phone holds.
         #[allow(clippy::cast_precision_loss)]
-        let bytes = bytes as f64;
+        let (bytes, original) = (bytes as f64, original as f64);
         #[allow(clippy::float_cmp)]
-        let changed = self.attachment_large != large || self.attachment_bytes != bytes;
+        let changed = self.attachment_large != large
+            || self.attachment_bytes != bytes
+            || self.original_bytes != original;
         if changed {
             self.attachment_large = large;
             self.attachment_bytes = bytes;
+            self.original_bytes = original;
             self.attachment_large_changed();
         }
     }

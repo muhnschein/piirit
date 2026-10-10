@@ -690,6 +690,9 @@ Page {
         // Tapped again, it drops the file.
         preparing: messages.preparing
         progress: messages.preparing_progress
+        // How much smaller it went, or is planned to go while it is made.
+        originalBytes: page.editing ? 0 : messages.original_bytes
+        bytes: messages.attachment_bytes
         onCancelled: page.dropAttachment()
         onStopped: messages.cancel_preparing()
     }

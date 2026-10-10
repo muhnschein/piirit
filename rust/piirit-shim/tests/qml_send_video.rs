@@ -190,6 +190,7 @@ fn a_picked_video_is_made_smaller_and_waits_for_the_reader() {
         probe!("label-preparing", "pendingAttachmentLabel", "text");
         probe!("large", "largeFileBar", "visible");
         probe!("planned-bytes", "messages", "attachment_bytes");
+        probe!("sizes-preparing", "attachmentSizesLabel", "text");
         probe!("send-enabled-preparing", "sendButton", "enabled");
         // The caption is written meanwhile, and a send asked for now --
         // the keyboard's, say -- does nothing.
@@ -203,6 +204,8 @@ fn a_picked_video_is_made_smaller_and_waits_for_the_reader() {
         probe!("send-enabled-done", "sendButton", "enabled");
         probe!("bar-done", "attachmentBar", "visible");
         probe!("made-bytes", "messages", "attachment_bytes");
+        probe!("original-bytes", "messages", "original_bytes");
+        probe!("sizes-done", "attachmentSizesLabel", "text");
         (*steps_ptr).push(("sends-before-tap", sends_in(&journal_mid).to_string()));
         let made: Vec<u64> = std::fs::read_dir(&recoded_mid)
             .map(|dir| {
@@ -235,6 +238,7 @@ fn a_picked_video_is_made_smaller_and_waits_for_the_reader() {
         probe!("sending-stopped-bar", "messages", "sending");
         probe!("bar-kept", "attachmentBar", "visible");
         probe!("label-kept", "pendingAttachmentLabel", "text");
+        probe!("sizes-kept", "attachmentSizesLabel", "visible");
         (*steps_ptr).push(("quality-kept", call!("quality", 1)));
         probe!("preparing-kept", "messages", "preparing");
         (*steps_ptr).push(("type-kept", call!("type", QString::from("as it was"))));
@@ -316,6 +320,15 @@ fn a_picked_video_is_made_smaller_and_waits_for_the_reader() {
         planned > 0.0 && planned < 1_000_000.0,
         "the bar does not weigh the video at the size it is planned at. {context}"
     );
+    // A few megabytes, exact as a real.
+    #[allow(clippy::cast_precision_loss)]
+    let picked = std::fs::metadata(&clip).expect("measure the clip").len() as f64;
+    // How much smaller it is planned to go, said beside the progress.
+    assert_eq!(
+        value("sizes-preparing"),
+        format!("{} → ~{}", readable(picked), readable(planned)),
+        "the bar does not say what the video weighs and is planned at. {context}"
+    );
     assert_eq!(
         value("send-enabled-preparing"),
         "false",
@@ -347,6 +360,20 @@ fn a_picked_video_is_made_smaller_and_waits_for_the_reader() {
         value("made-on-disk"),
         format!("[{made_bytes}]"),
         "the bar does not weigh the video at the size it came out at. {context}"
+    );
+    assert_eq!(
+        value("original-bytes"),
+        picked.to_string(),
+        "the bar does not weigh the video as it was picked. {context}"
+    );
+    assert!(
+        made_bytes < picked,
+        "the smaller video came out no smaller and was kept. {context}"
+    );
+    assert_eq!(
+        value("sizes-done"),
+        format!("{} → {}", readable(picked), readable(made_bytes)),
+        "the bar does not say how much smaller the video went. {context}"
     );
 
     let sends: Vec<(String, serde_json::Value)> = common::calls(&journal)
@@ -411,6 +438,11 @@ fn a_picked_video_is_made_smaller_and_waits_for_the_reader() {
         "stopping it dropped the file the reader picked. {context}"
     );
     assert_eq!(
+        value("sizes-kept"),
+        "false",
+        "a video going as it was still says it went smaller. {context}"
+    );
+    assert_eq!(
         value("preparing-kept"),
         "false",
         "a new quality started a stopped video again. {context}"
@@ -465,4 +497,20 @@ fn a_picked_video_is_made_smaller_and_waits_for_the_reader() {
     assert_eq!(left, 0, "a dropped or sent video left its file behind");
 
     let _ = std::fs::remove_dir_all(&temp);
+}
+
+/// `Format.readableSize`, which the bar's size line is written in.
+fn readable(bytes: f64) -> String {
+    let units = ["B", "kB", "MB", "GB"];
+    let mut size = bytes;
+    let mut step = 0;
+    while size >= 1000.0 && step < units.len() - 1 {
+        size /= 1000.0;
+        step += 1;
+    }
+    if step == 0 {
+        format!("{} {}", size.round(), units[step])
+    } else {
+        format!("{size:.1} {}", units[step])
+    }
 }
