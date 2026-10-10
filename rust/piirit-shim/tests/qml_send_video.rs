@@ -71,6 +71,10 @@ const PROBE_QML: &str = r"
             return 'ok'
         }
         function send() { loader.item.sendCurrentText(); return 'ok' }
+        function model() { return findIn(loader.item, 'messages') }
+        function sendFile(path) { model().send_file('', path); return 'ok' }
+        function stopPreparing() { model().cancel_preparing(); return 'ok' }
+        function quality(value) { model().media_quality = value; return 'ok' }
         function type(text) {
             var field = findIn(loader.item, 'messageField')
             if (!field) { return 'missing:messageField' }
@@ -150,6 +154,8 @@ fn a_picked_video_is_made_smaller_and_waits_for_the_reader() {
 
     let clip_path = clip.to_string_lossy().into_owned();
     let again = clip_path.clone();
+    let direct = clip_path.clone();
+    let switched = clip_path.clone();
     let journal_mid = journal.clone();
     let recoded_dir = cache.join("piirit/piirit/recoded");
     let recoded_mid = recoded_dir.clone();
@@ -225,6 +231,34 @@ fn a_picked_video_is_made_smaller_and_waits_for_the_reader() {
         probe!("preparing-dropped", "messages", "preparing");
         probe!("sending-dropped", "messages", "sending");
         probe!("bar-dropped", "attachmentBar", "visible");
+        // Handed a video that is not on the bar, the model makes it
+        // smaller and sends nothing; stopped, it puts the work away.
+        (*steps_ptr).push((
+            "send-file",
+            call!("sendFile", QString::from(direct.as_str())),
+        ));
+        probe!("preparing-direct", "messages", "preparing");
+        (*steps_ptr).push(("stop", call!("stopPreparing")));
+        probe!("preparing-stopped", "messages", "preparing");
+        // Picked again, and the quality moved under it: what was being
+        // made is put away and made again to the new plan.
+        (*steps_ptr).push((
+            "attach-switch",
+            call!("attach", QString::from(switched.as_str())),
+        ));
+        (*steps_ptr).push(("quality", call!("quality", 1)));
+        probe!("preparing-switched", "messages", "preparing");
+    });
+
+    single_shot(Duration::from_secs(21), move || unsafe {
+        (*steps_ptr).push((
+            "drop-switched",
+            call!("click", QString::from("cancelAttachmentButton")),
+        ));
+    });
+
+    single_shot(Duration::from_secs(23), move || unsafe {
+        probe!("preparing-end", "messages", "preparing");
         (*engine_ptr).quit();
     });
 
@@ -359,6 +393,27 @@ fn a_picked_video_is_made_smaller_and_waits_for_the_reader() {
         "false",
         "the bar's button did not drop the file. {context}"
     );
+    assert_eq!(
+        value("preparing-direct"),
+        "true",
+        "a video handed to the model directly was not made smaller. {context}"
+    );
+    assert_eq!(
+        value("preparing-stopped"),
+        "false",
+        "stopping did not stop it. {context}"
+    );
+    assert_eq!(
+        value("preparing-switched"),
+        "true",
+        "a new quality did not start the video again. {context}"
+    );
+    assert_eq!(
+        value("preparing-end"),
+        "false",
+        "dropping the file left it being made. {context}"
+    );
+
     let left = std::fs::read_dir(&recoded_dir)
         .map(|dir| {
             dir.flatten()
