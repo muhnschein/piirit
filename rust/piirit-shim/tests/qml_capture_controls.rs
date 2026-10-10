@@ -137,13 +137,20 @@ const PROBE_QML: &str = r"
                                   && lenses.y < shutter.y + shutter.height
                                   && lenses.y + lenses.height > shutter.y,
                     lensGap: shutter.x - (lenses.x + lenses.width),
-                    slider: [slider.x - frame.x, slider.labelOnLeft]
+                    slider: [slider.x - frame.x, slider.width, slider.labelOnLeft]
                 }
                 // A tap near the frame's top left is near the picture's
                 // top right, as the lens has it.
                 page.focusAt(180, 135)
                 answer.tap = rounded(camera().focus.customFocusPoint)
                 answer.ring = [item('reticle').at.x, item('reticle').at.y]
+                // A notch: the page is clear of it, so the frame starts at
+                // the page's edge, and the black reaches past both sides
+                // over the strip Silica leaves beside the page.
+                Screen.topCutout = Qt.rect(0, 0, 540, 40)
+                var backdrop = item('backdrop')
+                answer.notch = [frame.x, backdrop.x, backdrop.width]
+                Screen.topCutout = Qt.rect(0, 0, 0, 0)
                 page.orientation = 8
                 answer.inverted = lie()
                 page.orientation = 1
@@ -152,7 +159,7 @@ const PROBE_QML: &str = r"
                 answer.upright = [lie(), frame.width, frame.height,
                                   controls.x, controls.width, lenses.vertical,
                                   slider.x + slider.width === frame.x + frame.width,
-                                  slider.labelOnLeft]
+                                  slider.width, slider.labelOnLeft]
                 return answer
             })
             // The frame: the full width, four by three, at the top of a
@@ -375,10 +382,10 @@ fn the_camera_page_has_the_platform_cameras_controls() {
         json!({"allowed": 15, "turn": [-90, 540, 720, 0, 540],
                "frame": [0, 0, 720, 540], "controls": [720, 0, 240, 540],
                "shutter": [120, 270], "modesAbove": true, "flipBelow": true,
-               "lensesBeside": true, "lensGap": 32, "slider": [16, false],
-               "tap": [0.75, 0.25], "ring": [180, 135],
+               "lensesBeside": true, "lensGap": 32, "slider": [16, 90, false],
+               "tap": [0.75, 0.25], "ring": [180, 135], "notch": [0, -40, 1040],
                "inverted": [-270, 540, 720, 720, 0],
-               "upright": [[0, 540, 720, 0, 0], 540, 720, 0, 540, false, true, true]}),
+               "upright": [[0, 540, 720, 0, 0], 540, 720, 0, 540, false, true, 90, true]}),
         "on its side the page does not turn, the picture is not turned back against it \
          at the shape the frame has, a tap does not land on its point in the picture, or \
          the frame and the controls are not laid out the platform camera's landscape \

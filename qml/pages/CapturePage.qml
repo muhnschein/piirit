@@ -451,8 +451,16 @@ Page {
         return Math.floor(seconds / 60) + ":" + (rest < 10 ? "0" : "") + rest
     }
 
+    // Black behind everything. In landscape Silica keeps the page clear
+    // of the notch, which leaves a strip of the window beside it; the
+    // black reaches over that strip on either side, whichever it is on.
     Rectangle {
-        anchors.fill: parent
+        objectName: "backdrop"
+        anchors {
+            fill: parent
+            leftMargin: -page.sideInset
+            rightMargin: -page.sideInset
+        }
         color: "black"
     }
 
@@ -468,7 +476,8 @@ Page {
     readonly property real frameRatio: Viewfinder.frameRatio(viewfinder.sourceRect.width,
                                                              viewfinder.sourceRect.height)
     /// The notch, where the phone has one: at the top in portrait, at a
-    /// side in landscape.
+    /// side in landscape -- outside the page there, which Silica moves
+    /// clear of it.
     readonly property real topInset: page.landscape ? 0 : Screen.topCutout.height
     readonly property real sideInset: page.landscape ? Screen.topCutout.height : 0
 
@@ -476,7 +485,7 @@ Page {
     // enough to have room under it, it is pushed down past the notch and
     // the settings row, as the platform camera does on such a phone, so
     // neither covers the top of the picture. In landscape the full
-    // height, at the left past the notch.
+    // height, at the left.
     Item {
         id: frame
         objectName: "frame"
@@ -486,7 +495,7 @@ Page {
         height: page.landscape
                 ? parent.height
                 : Math.min(parent.height, Math.round(width * page.frameRatio))
-        x: page.landscape ? Math.max(0, Math.min(parent.width - width, page.sideInset)) : 0
+        x: 0
         y: page.landscape
            ? 0
            : Math.max(0, Math.min(parent.height - height,
@@ -598,12 +607,11 @@ Page {
     // has it. Not while recording.
     ExposureSlider {
         objectName: "exposureSlider"
-        anchors {
-            left: page.landscape ? frame.left : undefined
-            leftMargin: page.landscape ? Theme.paddingLarge : 0
-            right: page.landscape ? undefined : frame.right
-            verticalCenter: frame.verticalCenter
-        }
+        // Placed by x rather than by swapping anchors: for a moment in
+        // the turn both sides were anchored, which stretched the slider
+        // across the frame, and its own width never came back.
+        x: page.landscape ? frame.x + Theme.paddingLarge : frame.x + frame.width - width
+        anchors.verticalCenter: frame.verticalCenter
         labelOnLeft: !page.landscape
         height: Theme.itemSizeSmall * 5
         visible: !page.recording && !page.stopping && !page.done
