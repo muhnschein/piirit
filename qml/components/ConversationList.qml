@@ -359,8 +359,13 @@ SilicaListView {
         }
         // A held row first: the content changing height is exactly what
         // moves the reader off it, so this is the moment to put them back.
+        // Not from in here while the page is away; see `keepPlaceSoon`.
         if (root.pendingRow >= 0) {
-            root.putBack()
+            if (root.away) {
+                root.keepPlaceSoon()
+            } else {
+                root.putBack()
+            }
         } else if (root.following) {
             toEnd.restart()
         }
@@ -379,16 +384,10 @@ SilicaListView {
         root.lastContentY = root.contentY
         // While the page is away nobody is scrolling, so anything moving
         // the view is the list losing its place rather than the reader
-        // choosing to: put it back in the same turn, before a frame of
-        // the wrong place is drawn.
+        // choosing to, and it is put back. A turn later, not from here:
+        // see `keepPlaceSoon`.
         if (root.away) {
-            if (root.pendingRow >= 0) {
-                root.putBack()
-            } else if (root.stickToBottom && !root.restoring) {
-                root.restoring = true
-                root.positionViewAtEnd()
-                root.restoring = false
-            }
+            root.keepPlaceSoon()
             return
         }
         // Scrolling through rows that are all still placeholders does not
@@ -632,6 +631,47 @@ SilicaListView {
             root.pendingPlaced = true
             root.pendingOffset = root.rememberedOffset
             holdDeadline.stop()
+        }
+    }
+
+    /// Put the view back where it was left, once whatever moved it has
+    /// finished moving it.
+    ///
+    /// Never in the same turn as the move. A view that has lost its place
+    /// says so from inside its own layout -- `contentY` and
+    /// `contentHeight` change while it is still working out where its
+    /// rows are -- and a jump asked for from in there is not a jump the
+    /// view can make: it lets go of every row it has, makes none in their
+    /// place, and is left with nothing to measure the next jump from.
+    /// Every jump after that lands at the top. So the loss was undone
+    /// only where the layout happened to go another way: on CI's font,
+    /// and not on the one the next machine had.
+    ///
+    /// The turn in between is not one the reader is looking at: the page
+    /// is under another, or on its way there or back. A turn of the wrong
+    /// place there is nothing beside coming back to the top of the chat.
+    function keepPlaceSoon() {
+        if (!root.restoring && !keepPlace.running) {
+            keepPlace.start()
+        }
+    }
+
+    Timer {
+        id: keepPlace
+        interval: 0
+        onTriggered: {
+            // Back already, and `restorePlace` has put the view where it
+            // belongs; the hold it armed takes it from there.
+            if (!root.away) {
+                return
+            }
+            if (root.pendingRow >= 0) {
+                root.putBack()
+            } else if (root.stickToBottom) {
+                root.restoring = true
+                root.positionViewAtEnd()
+                root.restoring = false
+            }
         }
     }
 

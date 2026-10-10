@@ -10,6 +10,7 @@ docs/BUILDING.md, "Cutting a release").
 
 - Bundles deltachat-rpc-server 2.63.0 (was 2.62.0).
 - Enter in the chat search closes the keyboard and keeps the search.
+- A chat that moves under a picture or another page comes back where you left it, rather than at the top.
 
 ## 2.1.0 — 2026-10-08
 

@@ -9,7 +9,8 @@
 //!
 //! Pinned here: a view that has not moved while away does not move on the
 //! way back, and one that lost its place while away is put back to the
-//! pixel, not to the nearest row's centre.
+//! pixel, not to the nearest row's centre -- however many times it loses
+//! it, and whatever font the rows are measured in.
 
 // Qt harness: see qml_conversation_list.rs.
 #![allow(
@@ -190,12 +191,25 @@ fn coming_back_puts_the_view_where_it_was_to_the_pixel() {
         // the other page.
         (*steps_ptr).push(("leave-again", call!("leave")));
     });
+    // Lost twice while away, and each read a moment after the loss
+    // rather than in the same turn: the view says it has moved from
+    // inside its own layout, and is put back once that layout is done.
+    // Twice, because a put-back made from inside the layout breaks the
+    // view on every font, but which of two losses that shows on depends
+    // on the font's metrics -- the first here, the second on CI's.
+    //
+    // Timed from the loss itself rather than from the start, and back
+    // only after both: the shots above can fall behind and bunch up.
     single_shot(Duration::from_secs(6), move || unsafe {
         (*steps_ptr).push(("lose", call!("lose")));
-        (*steps_ptr).push(("while-away", call!("position")));
-    });
-    single_shot(Duration::from_secs(7), move || unsafe {
-        (*steps_ptr).push(("back-again", call!("comeBack")));
+        single_shot(Duration::from_millis(300), move || unsafe {
+            (*steps_ptr).push(("while-away", call!("position")));
+            (*steps_ptr).push(("lose-again", call!("lose")));
+            single_shot(Duration::from_millis(300), move || unsafe {
+                (*steps_ptr).push(("still-away", call!("position")));
+                (*steps_ptr).push(("back-again", call!("comeBack")));
+            });
+        });
     });
     single_shot(Duration::from_secs(8), move || unsafe {
         (*steps_ptr).push(("after-losing", call!("position")));
@@ -263,12 +277,12 @@ fn coming_back_puts_the_view_where_it_was_to_the_pixel() {
          the moment the swipe back finishes. {context}"
     );
 
-    // The list lost its place while away and was put back at once, and
-    // coming back changed nothing more. Judged by the row at the top of
-    // the view and where its top is, not by the view's position: a list
-    // that has jumped to its beginning and back has re-estimated where
-    // its content begins, and reads a different position for the same
-    // rows in the same place.
+    // The list lost its place while away and was put back while still
+    // away, both times, and coming back changed nothing more. Judged by
+    // the row at the top of the view and where its top is, not by the
+    // view's position: a list that has jumped to its beginning and back
+    // has re-estimated where its content begins, and reads a different
+    // position for the same rows in the same place.
     let row_at_top = |label: &str| {
         value(label)
             .split_once(' ')
@@ -279,7 +293,13 @@ fn coming_back_puts_the_view_where_it_was_to_the_pixel() {
         row_at_top("while-away"),
         before_row,
         "the list lost its place under the other page and was not put \
-         back in the same turn. {context}"
+         back while it was there. {context}"
+    );
+    assert_eq!(
+        row_at_top("still-away"),
+        before_row,
+        "the list lost its place under the other page a second time and \
+         was not put back while it was there. {context}"
     );
     assert_eq!(
         row_at_top("after-losing"),
