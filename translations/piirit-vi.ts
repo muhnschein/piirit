@@ -1927,16 +1927,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Hiện màn hình cuộc gọi cho các liên hệ đã chấp nhận</translation>
     </message>
     <message>
-        <source>Enable calls (experimental)</source>
-        <translation>Bật cuộc gọi (thử nghiệm)</translation>
-    </message>
-    <message>
         <source>Runs small apps inside chats.</source>
         <translation>Chạy các ứng dụng nhỏ bên trong cuộc trò chuyện.</translation>
-    </message>
-    <message>
-        <source>Makes and answers voice calls in one-to-one chats.</source>
-        <translation>Thực hiện và trả lời cuộc gọi thoại trong cuộc trò chuyện một-một.</translation>
     </message>
 </context>
 <context>

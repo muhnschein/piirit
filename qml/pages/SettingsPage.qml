@@ -371,15 +371,12 @@ Page {
             // still gets through, when the reader wants it to. The
             // reference clients' name for it, and their default.
             // Whether a call from a contact rings here -- the reference
-            // clients' own setting, words and default. Only while calls
-            // are on, and greyed out rather than hidden while they are
-            // not, so the reader sees what comes back.
+            // clients' own setting, words and default.
             TextSwitch {
                 objectName: "callsRingSwitch"
                 //: Whether calls ring. A plural noun, not a verb.
                 text: qsTr("Calls")
                 description: qsTr("Show call screen for accepted contacts")
-                enabled: Settings.callsEnabled === true
                 automaticCheck: false
                 checked: Settings.callsRing !== false
                 onClicked: Settings.callsRing = !checked
@@ -496,20 +493,6 @@ Page {
                 onClicked: page.toggleExperimental(webxdcSwitch, "webxdcEnabled")
             }
 
-            // Off until it is asked for, as apps are: a call's media runs
-            // in the browser engine, and whether that holds up on this
-            // hardware is still being found out (docs/CALLS.md). What it
-            // turns on is the call button in a chat, a call ringing here,
-            // and calling back from a call's row; each reads the setting.
-            TextSwitch {
-                id: callsSwitch
-                objectName: "callsSwitch"
-                text: qsTr("Enable calls (experimental)")
-                description: qsTr("Makes and answers voice calls in one-to-one chats.")
-                automaticCheck: false
-                checked: Settings.callsEnabled === true
-                onClicked: page.toggleExperimental(callsSwitch, "callsEnabled")
-            }
         }
     }
 

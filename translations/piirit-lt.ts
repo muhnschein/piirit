@@ -1941,16 +1941,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Rodyti skambučio ekraną priimtiems kontaktams</translation>
     </message>
     <message>
-        <source>Enable calls (experimental)</source>
-        <translation>Įjungti skambučius (eksperimentinė)</translation>
-    </message>
-    <message>
         <source>Runs small apps inside chats.</source>
         <translation>Paleidžia mažas programėles pokalbiuose.</translation>
-    </message>
-    <message>
-        <source>Makes and answers voice calls in one-to-one chats.</source>
-        <translation>Skambina ir atsiliepia balso skambučiais asmeniniuose pokalbiuose.</translation>
     </message>
 </context>
 <context>

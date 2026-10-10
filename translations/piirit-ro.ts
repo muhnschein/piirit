@@ -1941,16 +1941,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Afișează ecranul de apel pentru contactele acceptate</translation>
     </message>
     <message>
-        <source>Enable calls (experimental)</source>
-        <translation>Activează apelurile (experimental)</translation>
-    </message>
-    <message>
         <source>Runs small apps inside chats.</source>
         <translation>Rulează aplicații mici în conversații.</translation>
-    </message>
-    <message>
-        <source>Makes and answers voice calls in one-to-one chats.</source>
-        <translation>Efectuează și primește apeluri vocale în conversațiile unu-la-unu.</translation>
     </message>
 </context>
 <context>

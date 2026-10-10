@@ -11,6 +11,10 @@ docs/BUILDING.md, "Cutting a release").
 - Bundles deltachat-rpc-server 2.63.0 (was 2.62.0).
 - Enter in the chat search closes the keyboard and keeps the search.
 - **Smaller videos.** A picked video close to the relay's recommended size is made smaller before it is sent, with progress and a way to stop it; with media quality set to worse, every picked video is.
+- **Voice calls are no longer experimental**: on for everybody, no switch to turn them on. Settings → Notifications → Calls still decides whether a call rings.
+- A ringing call plays the ringtone rather than a short beep.
+- A call that rings while the screen is off takes the lock screen away, so the call screen stays up.
+- A call declined just as the last call's screen was closing still says so.
 
 ## 2.1.0 — 2026-10-08
 

@@ -26,9 +26,9 @@ itself *never* touches a mail server or a key.
 
 - No protocol or crypto reimplementation — ever. We never roll our own crypto.
 - Chats via regular email or any non-chatmail servers.
-- Video calls. Voice calls are experimental and off until switched on in
-  the settings — see [`docs/CALLS.md`](docs/CALLS.md) for what is built and
-  what only a phone can confirm.
+- Video calls. Voice calls are built and on — see
+  [`docs/CALLS.md`](docs/CALLS.md) for how they work and what an app on
+  Sailfish OS can and cannot do in a call.
 - No OpenRepos/Chum.
 
 See the non-goals in [`docs/PROJECT.md`](docs/PROJECT.md) for more information.

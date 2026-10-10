@@ -1934,16 +1934,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>ఆమోదించిన పరిచయాలకు కాల్ స్క్రీన్ చూపించు</translation>
     </message>
     <message>
-        <source>Enable calls (experimental)</source>
-        <translation>కాల్స్‌ను ప్రారంభించు (ప్రయోగాత్మకం)</translation>
-    </message>
-    <message>
         <source>Runs small apps inside chats.</source>
         <translation>సంభాషణల లోపల చిన్న యాప్‌లను నడుపుతుంది.</translation>
-    </message>
-    <message>
-        <source>Makes and answers voice calls in one-to-one chats.</source>
-        <translation>ఒకరితో ఒకరు సంభాషణలలో వాయిస్ కాల్స్ చేస్తుంది, వాటికి సమాధానం ఇస్తుంది.</translation>
     </message>
 </context>
 <context>

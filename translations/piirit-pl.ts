@@ -1945,16 +1945,8 @@ Wiadomości innych grup z zablokowanymi kontaktami nadal będą wyświetlane.</t
         <translation>Pokaż ekran połączenia dla zaakceptowanych kontaktów</translation>
     </message>
     <message>
-        <source>Enable calls (experimental)</source>
-        <translation>Włącz połączenia (eksperymentalne)</translation>
-    </message>
-    <message>
         <source>Runs small apps inside chats.</source>
         <translation>Uruchamia małe aplikacje wewnątrz czatów.</translation>
-    </message>
-    <message>
-        <source>Makes and answers voice calls in one-to-one chats.</source>
-        <translation>Wykonuje i odbiera połączenia głosowe w czatach jeden na jeden.</translation>
     </message>
 </context>
 <context>

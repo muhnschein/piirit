@@ -1927,15 +1927,7 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Enable calls (experimental)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Runs small apps inside chats.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Makes and answers voice calls in one-to-one chats.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

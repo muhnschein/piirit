@@ -1945,16 +1945,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Показывать экран вызова для принятых контактов</translation>
     </message>
     <message>
-        <source>Enable calls (experimental)</source>
-        <translation>Включить звонки (эксперимент)</translation>
-    </message>
-    <message>
         <source>Runs small apps inside chats.</source>
         <translation>Запускает небольшие приложения внутри чатов.</translation>
-    </message>
-    <message>
-        <source>Makes and answers voice calls in one-to-one chats.</source>
-        <translation>Совершает голосовые звонки и отвечает на них в личных чатах.</translation>
     </message>
 </context>
 <context>

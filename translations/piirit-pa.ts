@@ -1938,16 +1938,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>ਸਵੀਕਾਰ ਕੀਤੇ ਸੰਪਰਕਾਂ ਲਈ ਕਾਲ ਸਕ੍ਰੀਨ ਦਿਖਾਓ</translation>
     </message>
     <message>
-        <source>Enable calls (experimental)</source>
-        <translation>ਕਾਲਾਂ ਚਾਲੂ ਕਰੋ (ਪ੍ਰਯੋਗਾਤਮਕ)</translation>
-    </message>
-    <message>
         <source>Runs small apps inside chats.</source>
         <translation>ਗੱਲਬਾਤਾਂ ਵਿੱਚ ਛੋਟੇ ਐਪ ਚਲਾਉਂਦਾ ਹੈ।</translation>
-    </message>
-    <message>
-        <source>Makes and answers voice calls in one-to-one chats.</source>
-        <translation>ਇੱਕ-ਤੋਂ-ਇੱਕ ਗੱਲਬਾਤਾਂ ਵਿੱਚ ਵੌਇਸ ਕਾਲਾਂ ਕਰਦਾ ਹੈ ਅਤੇ ਉਨ੍ਹਾਂ ਦਾ ਜਵਾਬ ਦਿੰਦਾ ਹੈ।</translation>
     </message>
 </context>
 <context>

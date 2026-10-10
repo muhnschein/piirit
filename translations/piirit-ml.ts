@@ -1938,16 +1938,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>സ്വീകരിച്ച കോൺടാക്റ്റുകൾക്കായി കോൾ സ്ക്രീൻ കാണിക്കുക</translation>
     </message>
     <message>
-        <source>Enable calls (experimental)</source>
-        <translation>കോളുകൾ പ്രവർത്തനക്ഷമമാക്കുക (പരീക്ഷണാത്മകം)</translation>
-    </message>
-    <message>
         <source>Runs small apps inside chats.</source>
         <translation>സംഭാഷണങ്ങൾക്കുള്ളിൽ ചെറിയ ആപ്പുകൾ പ്രവർത്തിപ്പിക്കുന്നു.</translation>
-    </message>
-    <message>
-        <source>Makes and answers voice calls in one-to-one chats.</source>
-        <translation>ഒരാളുമായുള്ള സംഭാഷണങ്ങളിൽ വോയ്സ് കോളുകൾ ചെയ്യുകയും അവയ്ക്ക് മറുപടി നൽകുകയും ചെയ്യുന്നു.</translation>
     </message>
 </context>
 <context>

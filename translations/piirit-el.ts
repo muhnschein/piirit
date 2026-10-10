@@ -1934,16 +1934,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Εμφάνιση οθόνης κλήσης για αποδεκτές επαφές</translation>
     </message>
     <message>
-        <source>Enable calls (experimental)</source>
-        <translation>Ενεργοποίηση κλήσεων (πειραματικό)</translation>
-    </message>
-    <message>
         <source>Runs small apps inside chats.</source>
         <translation>Εκτελεί μικρές εφαρμογές μέσα στις συνομιλίες.</translation>
-    </message>
-    <message>
-        <source>Makes and answers voice calls in one-to-one chats.</source>
-        <translation>Πραγματοποιεί και απαντά σε φωνητικές κλήσεις σε ατομικές συνομιλίες.</translation>
     </message>
 </context>
 <context>

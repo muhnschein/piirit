@@ -1934,16 +1934,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Belscherm tonen voor geaccepteerde contacten</translation>
     </message>
     <message>
-        <source>Enable calls (experimental)</source>
-        <translation>Oproepen inschakelen (experimenteel)</translation>
-    </message>
-    <message>
         <source>Runs small apps inside chats.</source>
         <translation>Voert kleine apps uit in chats.</translation>
-    </message>
-    <message>
-        <source>Makes and answers voice calls in one-to-one chats.</source>
-        <translation>Plaatst en beantwoordt spraakoproepen in één-op-éénchats.</translation>
     </message>
 </context>
 <context>

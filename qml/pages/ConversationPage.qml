@@ -434,7 +434,7 @@ Page {
     /// as the reference clients have it -- it may have rung while nothing
     /// here was listening -- and any other is called back.
     function callFromRow(messageId, outgoing, callState) {
-        if (Settings.callsEnabled !== true || typeof appWindow === "undefined") {
+        if (typeof appWindow === "undefined") {
             return
         }
         if (!outgoing && callState === "Alerting") {
