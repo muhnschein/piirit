@@ -8,7 +8,7 @@ docs/BUILDING.md, "Cutting a release").
 
 ## Unreleased
 
-- **A camera like the system's.** The in-app camera now has the system camera's layout and controls: pinch to zoom, a ring per back camera on phones with more than one, front/back switch, flash and self-timer, white balance, exposure, grid, and a focus ring where you tap.
+- **A camera like the system's.** The in-app camera now has the system camera's layout and controls: pinch to zoom, a ring per back camera on phones with more than one (labelled 1.0, 0.5 and so on, as in the system camera), front/back switch, flash and self-timer, white balance, exposure, grid, and a focus ring where you tap. It turns to landscape with the phone.
 - The QR scanner can zoom (pinch, or the 1×/2×/4× button), light the torch, and switch cameras.
 - Enter in the chat search closes the keyboard and keeps the search.
 

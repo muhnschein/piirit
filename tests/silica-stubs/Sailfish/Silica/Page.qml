@@ -8,7 +8,7 @@ Item {
     property int status: PageStatus.Active
     // True in Silica once a page is attached to the right.
     property bool canNavigateForward: false
-    property bool allowedOrientations
+    property int allowedOrientations: 1
     property int orientation
     property string backNavigation
     width: 540

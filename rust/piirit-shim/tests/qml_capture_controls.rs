@@ -3,7 +3,9 @@
 //! the camera can do, the flash offered per mode and side, the settings
 //! panel's white balance, grid and self-timer, the exposure slider, and a
 //! tap's focus ring -- and while a video records, all of it out of the
-//! way but the shutter.
+//! way but the shutter. The rings wear the platform's lens labels, and
+//! the page turns with the phone into the platform camera's landscape
+//! layout, with the picture turned back.
 //!
 //! Driven through the `QtMultimedia` stubs: a phone with two cameras on the
 //! back and one on the front unless a step says otherwise, which zooms
@@ -47,6 +49,7 @@ const PROBE_QML: &str = r"
     import QtQuick 2.0
     import QtMultimedia 5.6
     import Sailfish.Silica 1.0
+    import 'file://__COMPONENTS__'
     Item {
         Loader { id: loader }
         property var defaultCameras
@@ -90,6 +93,50 @@ const PROBE_QML: &str = r"
             step('start', function() {
                 return { device: cam.deviceId, lenses: item('lensToggle').visible,
                          flip: item('flipButton').visible, flash: cam.flash.mode }
+            })
+            // The rings wear the platform's label for each lens, and
+            // their place where the phone gives none.
+            step('labels', function() {
+                var plain = [item('lensLabel0').text, item('lensLabel1').text]
+                Settings.backLensLabelsConfig.value = ['1.0', '0.5']
+                var labelled = [item('lensLabel0').text, item('lensLabel1').text]
+                Settings.backLensLabelsConfig.value = []
+                return { plain: plain, labelled: labelled }
+            })
+            // Turned on its side: the picture turned back, the frame the
+            // full height at the left, the controls in a column down the
+            // right -- modes at the top, switch at the foot, rings beside
+            // the shutter -- and the exposure slider at the picture's edge.
+            step('landscape', function() {
+                var frame = item('frame')
+                var controls = item('controls')
+                var shutter = item('shutter')
+                var lenses = item('lensToggle')
+                var slider = item('exposureSlider')
+                page.width = 960
+                page.height = 540
+                page.orientation = 2
+                var answer = {
+                    allowed: page.allowedOrientations,
+                    turn: item('viewfinder').orientation,
+                    frame: [frame.x, frame.y, frame.width, frame.height],
+                    controls: [controls.x, controls.y, controls.width, controls.height],
+                    shutter: [shutter.x + shutter.width / 2, shutter.y + shutter.height / 2],
+                    modesAbove: item('modeColumn').y + item('modeColumn').height <= shutter.y,
+                    flipBelow: item('flipButton').y >= shutter.y + shutter.height,
+                    lensesBeside: lenses.vertical && lenses.x + lenses.width <= shutter.x
+                                  && lenses.y < shutter.y + shutter.height
+                                  && lenses.y + lenses.height > shutter.y,
+                    slider: slider.x + slider.width === frame.x + frame.width
+                }
+                page.orientation = 8
+                answer.inverted = item('viewfinder').orientation
+                page.orientation = 1
+                page.width = 540
+                page.height = 960
+                answer.upright = [item('viewfinder').orientation, frame.width, frame.height,
+                                  controls.x, controls.width, lenses.vertical]
+                return answer
             })
             // The frame: the full width, four by three, at the top of a
             // phone too short to push it down -- and below the settings
@@ -190,6 +237,7 @@ const PROBE_QML: &str = r"
                 tap('modeOption1')
                 tap('shutter')
                 return { recording: page.recording,
+                         held: page.allowedOrientations,
                          panel: item('settingsPanel').visible,
                          exposure: item('exposureSlider').visible,
                          lenses: item('lensToggle').visible,
@@ -253,7 +301,10 @@ fn the_camera_page_has_the_platform_cameras_controls() {
         common::stubs_dir().to_string_lossy().into_owned(),
     ));
     engine.set_object_property("pageStack".into(), stack_box.pinned());
-    engine.load_data(QByteArray::from(PROBE_QML));
+    let components =
+        std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../qml/components");
+    let probe = PROBE_QML.replace("__COMPONENTS__", &components.display().to_string());
+    engine.load_data(QByteArray::from(probe.as_str()));
 
     let engine_ptr = std::ptr::addr_of_mut!(engine);
     let mut answers: Vec<String> = Vec::new();
@@ -295,6 +346,22 @@ fn the_camera_page_has_the_platform_cameras_controls() {
         json!({"device": "back-0", "lenses": true, "flip": true, "flash": 1}),
         "a phone with two back cameras and a front one does not offer the rings and the \
          switch, or the flash does not start on automatic. {context}"
+    );
+    assert_eq!(
+        out["labels"],
+        json!({"plain": ["1", "2"], "labelled": ["1.0", "0.5"]}),
+        "the rings do not wear the platform's lens labels, or are not numbered where \
+         the phone gives none. {context}"
+    );
+    assert_eq!(
+        out["landscape"],
+        json!({"allowed": 15, "turn": 90,
+               "frame": [0, 0, 720, 540], "controls": [720, 0, 240, 540],
+               "shutter": [120, 270], "modesAbove": true, "flipBelow": true,
+               "lensesBeside": true, "slider": true, "inverted": 270,
+               "upright": [0, 540, 720, 0, 540, false]}),
+        "on its side the page does not turn, the picture is not turned back, or the frame \
+         and the controls are not laid out the platform camera's landscape way. {context}"
     );
     assert_eq!(
         out["frame"],
@@ -364,10 +431,10 @@ fn the_camera_page_has_the_platform_cameras_controls() {
     );
     assert_eq!(
         out["recording"],
-        json!({"recording": true, "panel": false, "exposure": false, "lenses": false,
+        json!({"recording": true, "held": 1, "panel": false, "exposure": false, "lenses": false,
                "flip": false, "modes": false}),
-        "while a video records, more than the shutter and the zoom is left to tap. \
-         {context}"
+        "while a video records, more than the shutter and the zoom is left to tap, or \
+         the page still turns with the phone. {context}"
     );
     assert_eq!(
         out["single"],

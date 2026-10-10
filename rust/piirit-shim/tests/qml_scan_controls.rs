@@ -2,7 +2,9 @@
 //! small code closer, never past what the camera can do; the torch lights
 //! a code on paper; the rings and the switch change cameras, which starts
 //! the zoom over and puts the torch out on the front; and a tap focuses on
-//! its point, with the ring the camera page has.
+//! its point, with the ring the camera page has. The rings wear the
+//! platform's lens labels, and on a page turned with the phone the picture
+//! is turned back.
 //!
 //! The decoding itself is `qml_scan.rs`'s. This is what is around it.
 
@@ -26,6 +28,7 @@ const PROBE_QML: &str = r"
     import QtQuick 2.0
     import QtMultimedia 5.6
     import Sailfish.Silica 1.0
+    import 'file://__COMPONENTS__'
     Item {
         Loader { id: loader; width: 540; height: 960 }
         property var defaultCameras
@@ -84,6 +87,23 @@ const PROBE_QML: &str = r"
                 var shown = item('zoomIndicator').shown
                 view.zoomTo(-1)
                 return [high, cam.digitalZoom, shown]
+            })
+            step('labels', function() {
+                Settings.backLensLabelsConfig.value = ['1.0', '0.5']
+                var labelled = [item('lensLabel0').text, item('lensLabel1').text]
+                Settings.backLensLabelsConfig.value = []
+                return labelled
+            })
+            // On a page turned with the phone, the picture is turned back.
+            step('turned', function() {
+                var seen = [item('viewfinder').orientation]
+                view.pageOrientation = 2
+                seen.push(item('viewfinder').orientation)
+                view.pageOrientation = 8
+                seen.push(item('viewfinder').orientation)
+                view.pageOrientation = 1
+                seen.push(item('viewfinder').orientation)
+                return seen
             })
             step('torch', function() {
                 tap('torchButton')
@@ -153,7 +173,10 @@ fn the_scanner_zooms_lights_and_switches_cameras() {
     engine.add_import_path(QString::from(
         common::stubs_dir().to_string_lossy().into_owned(),
     ));
-    engine.load_data(QByteArray::from(PROBE_QML));
+    let components =
+        std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../qml/components");
+    let probe = PROBE_QML.replace("__COMPONENTS__", &components.display().to_string());
+    engine.load_data(QByteArray::from(probe.as_str()));
 
     let engine_ptr = std::ptr::addr_of_mut!(engine);
     let mut answer = String::new();
@@ -194,6 +217,17 @@ fn the_scanner_zooms_lights_and_switches_cameras() {
         out["clamped"],
         json!([4, 1, true]),
         "the scanner asked for a zoom the camera cannot do, or did not show it. {context}"
+    );
+    assert_eq!(
+        out["labels"],
+        json!(["1.0", "0.5"]),
+        "the scanner's rings do not wear the platform's lens labels. {context}"
+    );
+    assert_eq!(
+        out["turned"],
+        json!([0, 90, 270, 0]),
+        "the scanner's picture is not turned back on a page turned with the phone. \
+         {context}"
     );
     assert_eq!(
         out["torch"],

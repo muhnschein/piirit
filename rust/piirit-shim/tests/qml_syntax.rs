@@ -681,7 +681,8 @@ fn text_from_the_other_end_is_pinned_to_plain() {
     );
 }
 
-/// The dconf keys are named in `Settings.qml` and nowhere else.
+/// The dconf keys are named in `Settings.qml` and nowhere else, and are
+/// the app's own -- but for the platform's few it reads.
 ///
 /// Every page reads and writes the settings through that one object; a
 /// second file naming a key would be a second definition of it, and the
@@ -721,12 +722,50 @@ fn only_the_settings_object_names_the_dconf_keys() {
          Markdown, clean links, the download limit, notification detail, \
          and whether webxdc apps are offered: {keys:?}"
     );
+    let foreign: Vec<&String> = keys
+        .iter()
+        .filter(|key| !key.starts_with("/apps/harbour-piirit/"))
+        .filter(|key| !PLATFORM_KEYS_READ.contains(&key.as_str()))
+        .collect();
     assert!(
-        keys.iter()
-            .all(|key| key.starts_with("/apps/harbour-piirit/")),
-        "a key is outside the app's own dconf path: {keys:?}"
+        foreign.is_empty(),
+        "a key is outside the app's own dconf path, and not one of the platform's \
+         it reads: {foreign:?}"
+    );
+
+    // The platform's keys are read, never written: each is a read-only
+    // property's, and nothing sets the object behind it.
+    let settings = fs::read_to_string(root.join("components/Settings.qml")).expect("read");
+    for key in PLATFORM_KEYS_READ {
+        assert!(
+            settings.contains(&format!("key: \"{key}\"")),
+            "{key} is listed as read but Settings.qml no longer names it"
+        );
+    }
+    assert!(
+        settings.contains("readonly property var backLensLabels: backLensLabelsValue.value"),
+        "the platform's lens labels are not a read-only property"
+    );
+    let writers: Vec<String> = qml_files()
+        .into_iter()
+        .filter(|file| {
+            let text = fs::read_to_string(file).expect("read qml");
+            text.contains("backLensLabelsValue.value =")
+                || text.contains("backLensLabelsConfig.value =")
+                || text.contains("alias backLensLabels")
+        })
+        .map(|file| file.display().to_string())
+        .collect();
+    assert!(
+        writers.is_empty(),
+        "these could write the platform camera's own key: {writers:?}"
     );
 }
+
+/// dconf keys outside the app's path that it reads and never writes: the
+/// lens labels each phone's adaptation gives the platform camera, which
+/// the camera page's rings wear too.
+const PLATFORM_KEYS_READ: [&str; 1] = ["/apps/jolla-camera/backCameraLabels"];
 
 /// A file that reads its own directory's singleton imports that directory
 /// by name, with `import "."`.

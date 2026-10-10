@@ -5,7 +5,7 @@
 // own frame.
 //
 // A library rather than functions on each view, so the two agree and the
-// arithmetic is tested on its own (tests/qml_viewfinder.rs).
+// arithmetic is tested on its own (tests/qml_viewfinder_math.rs).
 //
 // Layout and choices follow the platform's camera app (jolla-camera, BSD);
 // the eased zoom steps follow RAWfish's ZoomController (BSD). Neither's
@@ -37,6 +37,14 @@ var whiteBalanceFluorescent = 6
 
 /// `Camera.LockStatus`: Unlocked 0, Searching 1, Locked 2.
 var lockLocked = 2
+
+/// Silica's `Orientation`: Portrait 1, Landscape 2, PortraitInverted 4,
+/// LandscapeInverted 8, and All of them, 15.
+var portrait = 1
+var landscape = 2
+var portraitInverted = 4
+var landscapeInverted = 8
+var allOrientations = 15
 
 /// The white balance modes offered, in the platform camera's order.
 var whiteBalanceModes = [whiteBalanceAuto, whiteBalanceSunlight, whiteBalanceCloudy,
@@ -91,6 +99,39 @@ function otherSide(cameras, currentPosition, lastBackId) {
     }
     var fronts = camerasFacing(cameras, frontFace)
     return fronts.length > 0 ? fronts[0] : ""
+}
+
+/// What the back cameras' rings say: the platform's label for each lens
+/// ("1.0" for the main one, "0.5" or "0.6" for the wide one, "2.0" for a
+/// telephoto) where the phone's adaptation gives one, and its place in
+/// the list where it does not.
+///
+/// `labels` is that list, in the order the platform lists the back
+/// cameras -- the order `camerasFacing` keeps.
+function lensLabel(labels, index) {
+    var label = labels && index < labels.length ? labels[index] : undefined
+    if (label === undefined || label === null || ("" + label).length === 0) {
+        return "" + (index + 1)
+    }
+    return "" + label
+}
+
+/// How far, in degrees clockwise, Silica turns a page held in
+/// `orientation`: none upright, a quarter for landscape, half for upside
+/// down, three quarters for the other landscape -- the turn the platform
+/// camera reads off the page.
+///
+/// The viewfinder turns the picture back by as much: the camera's frame
+/// is fixed to the phone, and a page that turns with the phone would take
+/// the picture round with it. `VideoOutput.orientation` counts the other
+/// way, anticlockwise, so the same number undoes the page's turn.
+function pageTurn(orientation) {
+    switch (orientation) {
+    case landscape: return 90
+    case portraitInverted: return 180
+    case landscapeInverted: return 270
+    default: return 0
+    }
 }
 
 /// The zoom a pinch leads to: the platform camera's rule, which moves the

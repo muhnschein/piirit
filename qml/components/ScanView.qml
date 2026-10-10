@@ -2,6 +2,7 @@ import QtQuick 2.0
 import QtMultimedia 5.6
 import Sailfish.Silica 1.0
 import Piirit 1.0
+import "."
 import "../js/Viewfinder.js" as Viewfinder
 
 /*
@@ -65,6 +66,12 @@ Item {
 
     /// The view is the one on screen. The camera runs only then.
     property bool active: false
+
+    /// How the host page is turned, as Silica's `Orientation`. The
+    /// camera's frame is fixed to the phone, so the picture is turned
+    /// back by as much as the page is: upright on a page that turns with
+    /// the phone.
+    property int pageOrientation: Viewfinder.portrait
 
     /// A code was read, or a link typed, and this is its text.
     signal scanned(string text)
@@ -378,6 +385,7 @@ Item {
         objectName: "viewfinder"
         anchors.fill: parent
         source: camera
+        orientation: Viewfinder.pageTurn(root.pageOrientation)
         // Filled rather than fitted. Fitted leaves bars down the sides
         // of a tall view, and those bars are grabbed and decoded along
         // with the picture -- pixels the code does not get. It also
@@ -461,6 +469,7 @@ Item {
                 bottomMargin: Theme.paddingSmall
             }
             cameras: root.backCameras
+            labels: Settings.backLensLabels
             current: camera.deviceId
             visible: root.backCameras.length > 1 && root.facing === Viewfinder.backFace
             onSelected: root.useCamera(deviceId)

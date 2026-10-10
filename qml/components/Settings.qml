@@ -11,7 +11,9 @@ import Nemo.Configuration 1.0
  * webxdc apps are offered at all, whether calls are and whether one rings
  * here, how many quick actions the cover offers and which, the emoji
  * last reacted with from the picker, and the camera's flash, self-timer
- * and grid.
+ * and grid. One more key is read and never written: the labels the
+ * phone gives the platform camera's lenses, which the camera page's
+ * rings wear too.
  *
  * They live in dconf under the app's own path, and every page reads
  * them through this one object: the settings page (qml/pages/
@@ -112,6 +114,12 @@ QtObject {
     property alias cameraFlash: cameraFlashValue.value
     property alias cameraTimer: cameraTimerValue.value
     property alias cameraGrid: cameraGridValue.value
+    /// What the platform camera writes on its back cameras' rings
+    /// ("1.0", "0.5"), one per camera in the platform's order. Not this
+    /// app's setting: the phone's adaptation gives it to the platform
+    /// camera, and it is read here and never written. Empty on a phone
+    /// whose adaptation gives none.
+    readonly property var backLensLabels: backLensLabelsValue.value || []
 
     // The keys, named here and nowhere else: tests/qml_syntax.rs holds
     // every other file to reading them through this object.
@@ -284,5 +292,11 @@ QtObject {
         id: cameraGridValue
         key: "/apps/harbour-piirit/camera_grid"
         defaultValue: false
+    }
+
+    property ConfigurationValue backLensLabelsConfig: ConfigurationValue {
+        id: backLensLabelsValue
+        key: "/apps/jolla-camera/backCameraLabels"
+        defaultValue: []
     }
 }

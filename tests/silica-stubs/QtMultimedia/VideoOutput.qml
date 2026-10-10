@@ -8,6 +8,8 @@ Item {
     property var source
     property var fillMode
     property bool autoOrientation: false
+    // Degrees anticlockwise the picture is turned, in quarter turns.
+    property int orientation: 0
     // The source's frame, as the phone's back camera gives it: landscape,
     // four by three. A real one is empty until the first frame arrives.
     property rect sourceRect: Qt.rect(0, 0, 1280, 960)

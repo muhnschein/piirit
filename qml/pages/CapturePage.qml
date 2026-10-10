@@ -18,10 +18,11 @@ import "../js/Viewfinder.js" as Viewfinder
  * sent file into its own directory, and the page that sent it discards
  * the capture afterwards.
  *
- * Laid out, and working, as the platform's own camera (jolla-camera) in
+ * Laid out, and working, as the platform's own camera (jolla-camera). In
  * portrait: the sensor's frame on black at the full width of the screen,
  * pushed down below the notch on a tall phone, and the controls over and
- * under it.
+ * under it. In landscape: the frame the full height of the screen at the
+ * left, clear of the notch, and the controls in a column down the right.
  *  - Along the top, what is in force -- flash, self-timer, white balance,
  *    grid -- and a tap there pulls the settings down (CameraSettingsPanel).
  *  - On the picture: pinch to zoom, with the platform's zoom line while it
@@ -31,14 +32,19 @@ import "../js/Viewfinder.js" as Viewfinder
  *  - At the foot: the two modes stacked on the left, the current one lit;
  *    the shutter in the middle, counting down when the self-timer is set;
  *    the other side's camera on the right, and above the shutter one ring
- *    per back camera on a phone with more than one.
+ *    per back camera on a phone with more than one. In landscape the same
+ *    turned a quarter: the modes at the top of the column, the switch at
+ *    its foot, and the rings beside the shutter.
  * While a video records only the shutter and the zoom are left, as in the
  * platform's camera, and the time runs at the top.
  *
  * The sensor's frame is the phone's landscape whichever way the phone
  * is held. The platform's camera writes the turn into the file rather
  * than turning the pixels -- a still's EXIF orientation, a video's
- * rotation -- from the orientation sensor, and so does this page.
+ * rotation -- from the orientation sensor, and so does this page. The
+ * page turns with the phone; the picture is turned back by as much, so
+ * it stays the way the lens sees it. The page holds still while a video
+ * records: its turn was written when it started.
  *
  * A still is written where it is asked to go. A video is written where
  * the recorder decides to put it, and is not done when it is stopped:
@@ -54,6 +60,9 @@ import "../js/Viewfinder.js" as Viewfinder
  */
 Page {
     id: page
+
+    allowedOrientations: page.recording || page.stopping ? page.orientation
+                                                         : Viewfinder.allOrientations
 
     /// The absolute path of the picture or video made.
     signal picked(string path)
@@ -442,27 +451,40 @@ Page {
         color: "black"
     }
 
+    /// Wider than tall: the frame at the left, the controls down the right.
+    readonly property bool landscape: page.width > page.height
+
     /// How tall the sensor's frame is for its width, once the camera says;
     /// four by three, the platform camera's default, until it does. The
     /// long side over the short: the page is upright and the frame is
     /// drawn upright, whichever way round the source reports itself.
     readonly property real frameRatio: Viewfinder.frameRatio(viewfinder.sourceRect.width,
                                                              viewfinder.sourceRect.height)
-    /// The notch, where the phone has one.
-    readonly property real topInset: Screen.topCutout.height
+    /// The notch, where the phone has one: at the top in portrait, at a
+    /// side in landscape.
+    readonly property real topInset: page.landscape ? 0 : Screen.topCutout.height
+    readonly property real sideInset: page.landscape ? Screen.topCutout.height : 0
 
     // The sensor's frame, the full width of the screen. On a phone tall
     // enough to have room under it, it is pushed down past the notch and
     // the settings row, as the platform camera does on such a phone, so
-    // neither covers the top of the picture.
+    // neither covers the top of the picture. In landscape the full
+    // height, at the left past the notch.
     Item {
         id: frame
         objectName: "frame"
-        width: parent.width
-        height: Math.min(parent.height, Math.round(width * page.frameRatio))
-        y: Math.max(0, Math.min(parent.height - height,
-                                parent.height / Math.max(1, parent.width) >= 2
-                                ? page.topInset + Theme.itemSizeLarge : 0))
+        width: page.landscape
+               ? Math.min(parent.width, Math.round(parent.height * page.frameRatio))
+               : parent.width
+        height: page.landscape
+                ? parent.height
+                : Math.min(parent.height, Math.round(width * page.frameRatio))
+        x: page.landscape ? Math.max(0, Math.min(parent.width - width, page.sideInset)) : 0
+        y: page.landscape
+           ? 0
+           : Math.max(0, Math.min(parent.height - height,
+                                  parent.height / Math.max(1, parent.width) >= 2
+                                  ? page.topInset + Theme.itemSizeLarge : 0))
 
         VideoOutput {
             id: viewfinder
@@ -470,6 +492,9 @@ Page {
             anchors.fill: parent
             source: camera
             fillMode: VideoOutput.PreserveAspectFit
+            // The page's turn, undone: the picture stays the way the lens
+            // sees it. A tap is mapped through it too.
+            orientation: Viewfinder.pageTurn(page.orientation)
 
             SequentialAnimation {
                 id: blink
@@ -513,7 +538,7 @@ Page {
         id: zoomIndicator
         objectName: "zoomIndicator"
         anchors {
-            horizontalCenter: parent.horizontalCenter
+            horizontalCenter: frame.horizontalCenter
             top: frame.top
             topMargin: Theme.itemSizeSmall + Theme.paddingLarge
         }
@@ -525,7 +550,7 @@ Page {
     // the platform camera writes it.
     Rectangle {
         objectName: "recordingIndicator"
-        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.horizontalCenter: frame.horizontalCenter
         y: page.topInset + Theme.paddingMedium
         width: indicator.width + 2 * Theme.paddingLarge
         height: indicator.height + 2 * Theme.paddingSmall
@@ -560,7 +585,7 @@ Page {
     ExposureSlider {
         objectName: "exposureSlider"
         anchors {
-            right: parent.right
+            right: frame.right
             verticalCenter: frame.verticalCenter
         }
         height: Theme.itemSizeSmall * 5
@@ -580,16 +605,20 @@ Page {
     }
 
     // The controls, at the foot: in the black under the picture where
-    // there is room, over its bottom edge where there is not.
+    // there is room, over its bottom edge where there is not. In
+    // landscape, the same down the right.
     Item {
         id: controls
-        anchors {
-            left: parent.left
-            right: parent.right
-            bottom: parent.bottom
-        }
-        height: Math.max(modes.height + 2 * Theme.paddingLarge,
-                         parent.height - frame.y - frame.height)
+        objectName: "controls"
+        readonly property real depth: page.landscape
+            ? Math.max(modes.width + 2 * Theme.paddingLarge,
+                       parent.width - frame.x - frame.width)
+            : Math.max(modes.height + 2 * Theme.paddingLarge,
+                       parent.height - frame.y - frame.height)
+        x: page.landscape ? parent.width - width : 0
+        y: page.landscape ? 0 : parent.height - height
+        width: page.landscape ? depth : parent.width
+        height: page.landscape ? parent.height : depth
 
         // The two modes, stacked, the current one on a lit disc. Not
         // while a video runs: the pipeline it would switch is the one
@@ -597,11 +626,8 @@ Page {
         Column {
             id: modes
             objectName: "modeColumn"
-            anchors {
-                left: parent.left
-                leftMargin: Theme.horizontalPageMargin
-                verticalCenter: parent.verticalCenter
-            }
+            x: page.landscape ? (parent.width - width) / 2 : Theme.horizontalPageMargin
+            y: page.landscape ? Theme.horizontalPageMargin : (parent.height - height) / 2
             spacing: Theme.paddingSmall
             enabled: !page.recording && !page.stopping
             opacity: enabled ? 1 : 0
@@ -636,12 +662,13 @@ Page {
         // runs.
         CameraLensToggle {
             objectName: "lensToggle"
-            anchors {
-                horizontalCenter: parent.horizontalCenter
-                bottom: shutter.top
-                bottomMargin: Theme.paddingMedium
-            }
+            x: page.landscape ? shutter.x - width - Theme.paddingMedium
+                              : (parent.width - width) / 2
+            y: page.landscape ? (parent.height - height) / 2
+                              : shutter.y - height - Theme.paddingMedium
+            vertical: page.landscape
             cameras: page.backCameras
+            labels: Settings.backLensLabels
             current: camera.deviceId
             visible: page.backCameras.length > 1 && page.facing === Viewfinder.backFace
                      && !page.recording && !page.stopping
@@ -670,11 +697,10 @@ Page {
         // The other side's camera. Not while a video runs.
         IconButton {
             objectName: "flipButton"
-            anchors {
-                right: parent.right
-                rightMargin: Theme.horizontalPageMargin
-                verticalCenter: parent.verticalCenter
-            }
+            x: page.landscape ? (parent.width - width) / 2
+                              : parent.width - width - Theme.horizontalPageMargin
+            y: page.landscape ? parent.height - height - Theme.horizontalPageMargin
+                              : (parent.height - height) / 2
             visible: page.otherCamera.length > 0
             enabled: !page.recording && !page.stopping
             opacity: enabled ? 1 : 0

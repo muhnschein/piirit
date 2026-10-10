@@ -1,7 +1,8 @@
 //! The arithmetic both viewfinders share (`qml/js/Viewfinder.js`): which
 //! camera the switch goes to, how far a pinch zooms, which flash modes a
 //! camera offers, the scanner's zoom steps, the exposure slider's travel,
-//! and where a tap lands in the camera's frame.
+//! where a tap lands in the camera's frame, how far the picture is turned
+//! back on a turned page, and what each lens's ring says.
 //!
 //! Run in a real QML engine, because that is where the library runs: a
 //! JavaScript port of it here would test the port.
@@ -90,6 +91,12 @@ fn probe(library: &str) -> String {
             out.focusOutside = V.focusPoint({{ x: -0.1, y: 0.5 }}, 10, 10, 100, 100)
             out.focusRaw = V.focusPoint(null, 50, 25, 100, 100)
             out.focusNoSize = V.focusPoint(null, 50, 25, 0, 0)
+            out.turns = [V.pageTurn(V.portrait), V.pageTurn(V.landscape),
+                         V.pageTurn(V.portraitInverted), V.pageTurn(V.landscapeInverted),
+                         V.pageTurn(0), V.allOrientations]
+            out.lensLabels = [V.lensLabel(["1.0", "0.5"], 0), V.lensLabel(["1.0", "0.5"], 1),
+                              V.lensLabel(["1.0"], 1), V.lensLabel([], 0),
+                              V.lensLabel(undefined, 2), V.lensLabel(["", "2.0"], 0)]
             return JSON.stringify(out)
         }}
     }}
@@ -320,4 +327,17 @@ fn the_viewfinder_arithmetic_agrees_with_the_platform_camera() {
     );
     assert_eq!(at("focusRaw"), serde_json::json!({"x": 0.5, "y": 0.25}));
     assert_eq!(at("focusNoSize"), Value::Null);
+
+    assert_eq!(
+        at("turns"),
+        serde_json::json!([0, 90, 180, 270, 0, 15]),
+        "the picture is not turned back by the page's own turn in each orientation \
+         (the platform camera's quarter turns), or all orientations are not Silica's 15"
+    );
+    assert_eq!(
+        at("lensLabels"),
+        serde_json::json!(["1.0", "0.5", "2", "1", "3", "1"]),
+        "a ring does not wear the platform's label for its lens, or the number of its \
+         place where the platform gives none"
+    );
 }
