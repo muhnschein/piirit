@@ -47,6 +47,9 @@ rqrr = { version = "0.10", default-features = false }
 # compiler. Sailfish's recorder offers no encoder that iOS plays; see
 # src/voice.rs.
 mp3lame-encoder = "0.2"
+# A picked video made small enough to send (src/video.rs): FFmpeg and
+# x264, built from source into the binary as LAME is. See its build.rs.
+piirit-video = { path = "../piirit-video" }
 
 [build-dependencies]
 cpp_build = "0.5"

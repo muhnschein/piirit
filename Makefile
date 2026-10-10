@@ -166,6 +166,10 @@ SONAR_COV_ARGS = --workspace \
 ## doctests out on either runner (instrumenting them needs nightly), and
 ## this target measures rather than gates. `test` is what runs them.
 ##
+## Beside the coverage, the compilation database piirit-video's build
+## script writes for its C (rust/piirit-video/build.rs): the scanner
+## reads C only through one.
+##
 ## Clippy findings are deliberately NOT handed over: `make lint` denies
 ## warnings, so nothing Sonar could report survives to a branch it analyses,
 ## and gathering them costs a `cargo clean` and a full recompile in the scan
@@ -194,6 +198,12 @@ sonar-reports:
 		cd rust && $(CARGO) llvm-cov $(SONAR_COV_ARGS); \
 	fi
 	@echo "== wrote rust/target/sonar/lcov.info =="
+	@db=$$(find rust/target -path '*/build/piirit-video-*/out/compile_commands.json' | head -n 1); \
+	if [ -z "$$db" ]; then \
+		echo "sonar-reports: piirit-video wrote no compile_commands.json" >&2; exit 1; \
+	fi; \
+	cp "$$db" rust/target/sonar/compile_commands.json
+	@echo "== wrote rust/target/sonar/compile_commands.json =="
 
 ## The tests that drive the real core, offline. Needs `make fetch-server`.
 integration:

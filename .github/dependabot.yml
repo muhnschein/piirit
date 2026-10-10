@@ -9,3 +9,11 @@ updates:
     directory: /
     schedule:
       interval: monthly
+  # FFmpeg and x264 (third_party/, built into the binary by piirit-video).
+  # Each submodule tracks a branch that only takes fixes -- FFmpeg's
+  # release/7.1, x264's stable -- so a bump here is the security and bug
+  # fixes for the code that reads every video a reader picks.
+  - package-ecosystem: gitsubmodule
+    directory: /
+    schedule:
+      interval: weekly
