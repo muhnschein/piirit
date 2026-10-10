@@ -458,6 +458,61 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>CameraSettingsPanel</name>
+    <message>
+        <source>Flash automatic</source>
+        <translation>Bliț automat</translation>
+    </message>
+    <message>
+        <source>Flash on</source>
+        <translation>Bliț pornit</translation>
+    </message>
+    <message>
+        <source>Flashlight on</source>
+        <translation>Lanternă pornită</translation>
+    </message>
+    <message>
+        <source>Flash off</source>
+        <translation>Bliț oprit</translation>
+    </message>
+    <message>
+        <source>Self-timer %1 s</source>
+        <translation>Temporizator %1 s</translation>
+    </message>
+    <message>
+        <source>Self-timer off</source>
+        <translation>Temporizator oprit</translation>
+    </message>
+    <message>
+        <source>Sunny</source>
+        <translation>Însorit</translation>
+    </message>
+    <message>
+        <source>Cloudy</source>
+        <translation>Noros</translation>
+    </message>
+    <message>
+        <source>Fluorescent</source>
+        <translation>Fluorescent</translation>
+    </message>
+    <message>
+        <source>Tungsten</source>
+        <translation>Incandescent</translation>
+    </message>
+    <message>
+        <source>Automatic white balance</source>
+        <translation>Balans de alb automat</translation>
+    </message>
+    <message>
+        <source>Grid on</source>
+        <translation>Grilă pornită</translation>
+    </message>
+    <message>
+        <source>Grid off</source>
+        <translation>Grilă oprită</translation>
+    </message>
+</context>
+<context>
     <name>CapturePage</name>
     <message>
         <source>The video could not be saved</source>

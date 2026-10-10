@@ -8,6 +8,8 @@ docs/BUILDING.md, "Cutting a release").
 
 ## Unreleased
 
+- **A camera like the system's.** The in-app camera now has the system camera's layout and controls: pinch to zoom, a ring per back camera on phones with more than one (labelled 1.0, 0.5 and so on, as in the system camera), front/back switch, flash and self-timer, white balance, exposure, grid, and a focus ring where you tap. It turns to landscape with the phone.
+- The QR scanner can zoom (pinch, or the 1×/2×/4× button), light the torch, and switch cameras.
 - Bundles deltachat-rpc-server 2.63.0 (was 2.62.0).
 - Enter in the chat search closes the keyboard and keeps the search.
 - **Smaller videos.** A picked video close to the relay's recommended size is made smaller before it is sent, with progress and a way to stop it; with media quality set to worse, every picked video is.

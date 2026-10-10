@@ -458,6 +458,61 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>CameraSettingsPanel</name>
+    <message>
+        <source>Flash automatic</source>
+        <translation>Blykstė automatinė</translation>
+    </message>
+    <message>
+        <source>Flash on</source>
+        <translation>Blykstė įjungta</translation>
+    </message>
+    <message>
+        <source>Flashlight on</source>
+        <translation>Žibintuvėlis įjungtas</translation>
+    </message>
+    <message>
+        <source>Flash off</source>
+        <translation>Blykstė išjungta</translation>
+    </message>
+    <message>
+        <source>Self-timer %1 s</source>
+        <translation>Laikmatis %1 s</translation>
+    </message>
+    <message>
+        <source>Self-timer off</source>
+        <translation>Laikmatis išjungtas</translation>
+    </message>
+    <message>
+        <source>Sunny</source>
+        <translation>Saulėta</translation>
+    </message>
+    <message>
+        <source>Cloudy</source>
+        <translation>Debesuota</translation>
+    </message>
+    <message>
+        <source>Fluorescent</source>
+        <translation>Fluorescencinė</translation>
+    </message>
+    <message>
+        <source>Tungsten</source>
+        <translation>Kaitrinė</translation>
+    </message>
+    <message>
+        <source>Automatic white balance</source>
+        <translation>Automatinis baltos spalvos balansas</translation>
+    </message>
+    <message>
+        <source>Grid on</source>
+        <translation>Tinklelis įjungtas</translation>
+    </message>
+    <message>
+        <source>Grid off</source>
+        <translation>Tinklelis išjungtas</translation>
+    </message>
+</context>
+<context>
     <name>CapturePage</name>
     <message>
         <source>The video could not be saved</source>

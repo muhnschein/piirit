@@ -460,6 +460,61 @@ In anderen Gruppen mit blockierten Kontakten werden deren Nachrichten weiterhin 
     </message>
 </context>
 <context>
+    <name>CameraSettingsPanel</name>
+    <message>
+        <source>Flash automatic</source>
+        <translation>Blitz automatisch</translation>
+    </message>
+    <message>
+        <source>Flash on</source>
+        <translation>Blitz ein</translation>
+    </message>
+    <message>
+        <source>Flashlight on</source>
+        <translation>Taschenlampe ein</translation>
+    </message>
+    <message>
+        <source>Flash off</source>
+        <translation>Blitz aus</translation>
+    </message>
+    <message>
+        <source>Self-timer %1 s</source>
+        <translation>Selbstauslöser %1 s</translation>
+    </message>
+    <message>
+        <source>Self-timer off</source>
+        <translation>Selbstauslöser aus</translation>
+    </message>
+    <message>
+        <source>Sunny</source>
+        <translation>Sonnig</translation>
+    </message>
+    <message>
+        <source>Cloudy</source>
+        <translation>Bewölkt</translation>
+    </message>
+    <message>
+        <source>Fluorescent</source>
+        <translation>Neonlicht</translation>
+    </message>
+    <message>
+        <source>Tungsten</source>
+        <translation>Glühlampe</translation>
+    </message>
+    <message>
+        <source>Automatic white balance</source>
+        <translation>Automatischer Weißabgleich</translation>
+    </message>
+    <message>
+        <source>Grid on</source>
+        <translation>Raster ein</translation>
+    </message>
+    <message>
+        <source>Grid off</source>
+        <translation>Raster aus</translation>
+    </message>
+</context>
+<context>
     <name>CapturePage</name>
     <message>
         <source>The video could not be saved</source>

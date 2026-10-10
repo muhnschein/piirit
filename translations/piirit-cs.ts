@@ -462,6 +462,61 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
     </message>
 </context>
 <context>
+    <name>CameraSettingsPanel</name>
+    <message>
+        <source>Flash automatic</source>
+        <translation>Blesk automaticky</translation>
+    </message>
+    <message>
+        <source>Flash on</source>
+        <translation>Blesk zapnut</translation>
+    </message>
+    <message>
+        <source>Flashlight on</source>
+        <translation>Svítilna zapnuta</translation>
+    </message>
+    <message>
+        <source>Flash off</source>
+        <translation>Blesk vypnut</translation>
+    </message>
+    <message>
+        <source>Self-timer %1 s</source>
+        <translation>Samospoušť %1 s</translation>
+    </message>
+    <message>
+        <source>Self-timer off</source>
+        <translation>Samospoušť vypnuta</translation>
+    </message>
+    <message>
+        <source>Sunny</source>
+        <translation>Slunečno</translation>
+    </message>
+    <message>
+        <source>Cloudy</source>
+        <translation>Zataženo</translation>
+    </message>
+    <message>
+        <source>Fluorescent</source>
+        <translation>Zářivka</translation>
+    </message>
+    <message>
+        <source>Tungsten</source>
+        <translation>Žárovka</translation>
+    </message>
+    <message>
+        <source>Automatic white balance</source>
+        <translation>Automatické vyvážení bílé</translation>
+    </message>
+    <message>
+        <source>Grid on</source>
+        <translation>Mřížka zapnuta</translation>
+    </message>
+    <message>
+        <source>Grid off</source>
+        <translation>Mřížka vypnuta</translation>
+    </message>
+</context>
+<context>
     <name>CapturePage</name>
     <message>
         <source>The video could not be saved</source>

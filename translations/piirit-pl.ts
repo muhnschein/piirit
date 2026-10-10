@@ -462,6 +462,61 @@ Wiadomości innych grup z zablokowanymi kontaktami nadal będą wyświetlane.</t
     </message>
 </context>
 <context>
+    <name>CameraSettingsPanel</name>
+    <message>
+        <source>Flash automatic</source>
+        <translation>Błysk automatyczny</translation>
+    </message>
+    <message>
+        <source>Flash on</source>
+        <translation>Błysk włączony</translation>
+    </message>
+    <message>
+        <source>Flashlight on</source>
+        <translation>Latarka włączona</translation>
+    </message>
+    <message>
+        <source>Flash off</source>
+        <translation>Błysk wyłączony</translation>
+    </message>
+    <message>
+        <source>Self-timer %1 s</source>
+        <translation>Samowyzwalacz %1 s</translation>
+    </message>
+    <message>
+        <source>Self-timer off</source>
+        <translation>Samowyzwalacz wyłączony</translation>
+    </message>
+    <message>
+        <source>Sunny</source>
+        <translation>Słonecznie</translation>
+    </message>
+    <message>
+        <source>Cloudy</source>
+        <translation>Pochmurnie</translation>
+    </message>
+    <message>
+        <source>Fluorescent</source>
+        <translation>Jarzeniowe</translation>
+    </message>
+    <message>
+        <source>Tungsten</source>
+        <translation>Żarowe</translation>
+    </message>
+    <message>
+        <source>Automatic white balance</source>
+        <translation>Automatyczny balans bieli</translation>
+    </message>
+    <message>
+        <source>Grid on</source>
+        <translation>Siatka włączona</translation>
+    </message>
+    <message>
+        <source>Grid off</source>
+        <translation>Siatka wyłączona</translation>
+    </message>
+</context>
+<context>
     <name>CapturePage</name>
     <message>
         <source>The video could not be saved</source>

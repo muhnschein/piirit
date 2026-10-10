@@ -456,6 +456,61 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>CameraSettingsPanel</name>
+    <message>
+        <source>Flash automatic</source>
+        <translation>Salama automaattinen</translation>
+    </message>
+    <message>
+        <source>Flash on</source>
+        <translation>Salama päällä</translation>
+    </message>
+    <message>
+        <source>Flashlight on</source>
+        <translation>Taskulamppu päällä</translation>
+    </message>
+    <message>
+        <source>Flash off</source>
+        <translation>Salama pois</translation>
+    </message>
+    <message>
+        <source>Self-timer %1 s</source>
+        <translation>Itselaukaisin %1 s</translation>
+    </message>
+    <message>
+        <source>Self-timer off</source>
+        <translation>Itselaukaisin pois</translation>
+    </message>
+    <message>
+        <source>Sunny</source>
+        <translation>Aurinkoinen</translation>
+    </message>
+    <message>
+        <source>Cloudy</source>
+        <translation>Pilvinen</translation>
+    </message>
+    <message>
+        <source>Fluorescent</source>
+        <translation>Loistelamppu</translation>
+    </message>
+    <message>
+        <source>Tungsten</source>
+        <translation>Hehkulamppu</translation>
+    </message>
+    <message>
+        <source>Automatic white balance</source>
+        <translation>Automaattinen valkotasapaino</translation>
+    </message>
+    <message>
+        <source>Grid on</source>
+        <translation>Ruudukko päällä</translation>
+    </message>
+    <message>
+        <source>Grid off</source>
+        <translation>Ruudukko pois</translation>
+    </message>
+</context>
+<context>
     <name>CapturePage</name>
     <message>
         <source>The video could not be saved</source>

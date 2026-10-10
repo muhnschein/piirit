@@ -458,6 +458,61 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
     </message>
 </context>
 <context>
+    <name>CameraSettingsPanel</name>
+    <message>
+        <source>Flash automatic</source>
+        <translation>Flaş otomatik</translation>
+    </message>
+    <message>
+        <source>Flash on</source>
+        <translation>Flaş açık</translation>
+    </message>
+    <message>
+        <source>Flashlight on</source>
+        <translation>El feneri açık</translation>
+    </message>
+    <message>
+        <source>Flash off</source>
+        <translation>Flaş kapalı</translation>
+    </message>
+    <message>
+        <source>Self-timer %1 s</source>
+        <translation>Zamanlayıcı %1 sn</translation>
+    </message>
+    <message>
+        <source>Self-timer off</source>
+        <translation>Zamanlayıcı kapalı</translation>
+    </message>
+    <message>
+        <source>Sunny</source>
+        <translation>Güneşli</translation>
+    </message>
+    <message>
+        <source>Cloudy</source>
+        <translation>Bulutlu</translation>
+    </message>
+    <message>
+        <source>Fluorescent</source>
+        <translation>Floresan</translation>
+    </message>
+    <message>
+        <source>Tungsten</source>
+        <translation>Akkor</translation>
+    </message>
+    <message>
+        <source>Automatic white balance</source>
+        <translation>Otomatik beyaz dengesi</translation>
+    </message>
+    <message>
+        <source>Grid on</source>
+        <translation>Izgara açık</translation>
+    </message>
+    <message>
+        <source>Grid off</source>
+        <translation>Izgara kapalı</translation>
+    </message>
+</context>
+<context>
     <name>CapturePage</name>
     <message>
         <source>The video could not be saved</source>

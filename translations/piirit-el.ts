@@ -456,6 +456,61 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>CameraSettingsPanel</name>
+    <message>
+        <source>Flash automatic</source>
+        <translation>Φλας αυτόματο</translation>
+    </message>
+    <message>
+        <source>Flash on</source>
+        <translation>Φλας ενεργό</translation>
+    </message>
+    <message>
+        <source>Flashlight on</source>
+        <translation>Φακός ενεργός</translation>
+    </message>
+    <message>
+        <source>Flash off</source>
+        <translation>Φλας ανενεργό</translation>
+    </message>
+    <message>
+        <source>Self-timer %1 s</source>
+        <translation>Χρονοκαθυστέρηση %1 δευτ.</translation>
+    </message>
+    <message>
+        <source>Self-timer off</source>
+        <translation>Χρονοκαθυστέρηση ανενεργή</translation>
+    </message>
+    <message>
+        <source>Sunny</source>
+        <translation>Ηλιόλουστο</translation>
+    </message>
+    <message>
+        <source>Cloudy</source>
+        <translation>Συννεφιά</translation>
+    </message>
+    <message>
+        <source>Fluorescent</source>
+        <translation>Φθορισμού</translation>
+    </message>
+    <message>
+        <source>Tungsten</source>
+        <translation>Πυρακτώσεως</translation>
+    </message>
+    <message>
+        <source>Automatic white balance</source>
+        <translation>Αυτόματη ισορροπία λευκού</translation>
+    </message>
+    <message>
+        <source>Grid on</source>
+        <translation>Πλέγμα ενεργό</translation>
+    </message>
+    <message>
+        <source>Grid off</source>
+        <translation>Πλέγμα ανενεργό</translation>
+    </message>
+</context>
+<context>
     <name>CapturePage</name>
     <message>
         <source>The video could not be saved</source>

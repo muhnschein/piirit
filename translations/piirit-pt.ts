@@ -460,6 +460,61 @@ Mensagens de contactos bloqueados não serão ocultadas noutros grupos.</transla
     </message>
 </context>
 <context>
+    <name>CameraSettingsPanel</name>
+    <message>
+        <source>Flash automatic</source>
+        <translation>Flash automático</translation>
+    </message>
+    <message>
+        <source>Flash on</source>
+        <translation>Flash ligado</translation>
+    </message>
+    <message>
+        <source>Flashlight on</source>
+        <translation>Lanterna ligada</translation>
+    </message>
+    <message>
+        <source>Flash off</source>
+        <translation>Flash desligado</translation>
+    </message>
+    <message>
+        <source>Self-timer %1 s</source>
+        <translation>Temporizador %1 s</translation>
+    </message>
+    <message>
+        <source>Self-timer off</source>
+        <translation>Temporizador desligado</translation>
+    </message>
+    <message>
+        <source>Sunny</source>
+        <translation>Luz solar</translation>
+    </message>
+    <message>
+        <source>Cloudy</source>
+        <translation>Nublado</translation>
+    </message>
+    <message>
+        <source>Fluorescent</source>
+        <translation>Fluorescente</translation>
+    </message>
+    <message>
+        <source>Tungsten</source>
+        <translation>Incandescente</translation>
+    </message>
+    <message>
+        <source>Automatic white balance</source>
+        <translation>Equilíbrio de brancos automático</translation>
+    </message>
+    <message>
+        <source>Grid on</source>
+        <translation>Grelha ligada</translation>
+    </message>
+    <message>
+        <source>Grid off</source>
+        <translation>Grelha desligada</translation>
+    </message>
+</context>
+<context>
     <name>CapturePage</name>
     <message>
         <source>The video could not be saved</source>

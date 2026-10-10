@@ -460,6 +460,61 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
     </message>
 </context>
 <context>
+    <name>CameraSettingsPanel</name>
+    <message>
+        <source>Flash automatic</source>
+        <translation>Välk automaatne</translation>
+    </message>
+    <message>
+        <source>Flash on</source>
+        <translation>Välk sees</translation>
+    </message>
+    <message>
+        <source>Flashlight on</source>
+        <translation>Taskulamp sees</translation>
+    </message>
+    <message>
+        <source>Flash off</source>
+        <translation>Välk väljas</translation>
+    </message>
+    <message>
+        <source>Self-timer %1 s</source>
+        <translation>Enesetaimer %1 s</translation>
+    </message>
+    <message>
+        <source>Self-timer off</source>
+        <translation>Enesetaimer väljas</translation>
+    </message>
+    <message>
+        <source>Sunny</source>
+        <translation>Päikeseline</translation>
+    </message>
+    <message>
+        <source>Cloudy</source>
+        <translation>Pilves</translation>
+    </message>
+    <message>
+        <source>Fluorescent</source>
+        <translation>Luminofoor</translation>
+    </message>
+    <message>
+        <source>Tungsten</source>
+        <translation>Hõõglamp</translation>
+    </message>
+    <message>
+        <source>Automatic white balance</source>
+        <translation>Automaatne valgebalanss</translation>
+    </message>
+    <message>
+        <source>Grid on</source>
+        <translation>Ruudustik sees</translation>
+    </message>
+    <message>
+        <source>Grid off</source>
+        <translation>Ruudustik väljas</translation>
+    </message>
+</context>
+<context>
     <name>CapturePage</name>
     <message>
         <source>The video could not be saved</source>
