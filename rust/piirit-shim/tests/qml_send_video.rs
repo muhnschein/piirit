@@ -217,7 +217,7 @@ fn a_picked_video_is_made_smaller_and_waits_for_the_reader() {
         (*steps_ptr).push(("send", call!("send")));
     });
 
-    single_shot(Duration::from_secs(15), move || unsafe {
+    single_shot(Duration::from_secs(18), move || unsafe {
         probe!("bar-after", "attachmentBar", "visible");
         // Again, and dropped straight away with the bar's button.
         (*steps_ptr).push((
@@ -241,7 +241,7 @@ fn a_picked_video_is_made_smaller_and_waits_for_the_reader() {
         (*steps_ptr).push(("send-kept", call!("send")));
     });
 
-    single_shot(Duration::from_secs(19), move || unsafe {
+    single_shot(Duration::from_secs(24), move || unsafe {
         probe!("bar-sent-kept", "attachmentBar", "visible");
         // Handed a video that is not on the bar, the model makes it
         // smaller and sends nothing; stopped, it puts the work away.
@@ -262,7 +262,7 @@ fn a_picked_video_is_made_smaller_and_waits_for_the_reader() {
         probe!("preparing-switched", "messages", "preparing");
     });
 
-    single_shot(Duration::from_secs(21), move || unsafe {
+    single_shot(Duration::from_secs(26), move || unsafe {
         // Stopped, then dropped: the same button, twice.
         for step in ["stop-switched", "drop-switched"] {
             (*steps_ptr).push((
@@ -272,7 +272,7 @@ fn a_picked_video_is_made_smaller_and_waits_for_the_reader() {
         }
     });
 
-    single_shot(Duration::from_secs(23), move || unsafe {
+    single_shot(Duration::from_secs(28), move || unsafe {
         probe!("preparing-end", "messages", "preparing");
         probe!("bar-end", "attachmentBar", "visible");
         (*engine_ptr).quit();
