@@ -6,10 +6,12 @@
 //! recommends, and so past what some relays take (issue #111). This asks
 //! `piirit-video` what the file holds as it is picked, plans a smaller
 //! one at the outgoing media quality's rates, and makes it on a thread of
-//! its own when the reader sends.
+//! its own straight away, while the reader writes the caption. It is sent
+//! when the reader sends it, never before.
 //!
 //! What is made goes in the app's cache, beside the captures, and is
-//! gone once the core has copied it into its blob directory. The reader
+//! gone once the core has copied it into its blob directory, or once the
+//! reader puts the file away. The reader
 //! sees the file named as they picked it, with the suffix of what it now
 //! is.
 

@@ -685,12 +685,11 @@ Page {
         // be saying something untrue. The file is still here afterwards.
         filePath: page.editing ? "" : page.attachmentPath
         fileName: page.attachmentName
-        // A picked video is made smaller before it is sent; the bar says
-        // so, and its button stops that rather than dropping the file.
+        // A picked video is made smaller as soon as it is picked; the bar
+        // says so, and its button drops the file, which stops that too.
         preparing: messages.preparing
         progress: messages.preparing_progress
         onCancelled: page.dropAttachment()
-        onStopped: messages.cancel_preparing()
     }
 
     // Under the file it is about: this one is bigger than the core
@@ -740,6 +739,11 @@ Page {
         }
         onDismissed: notice.text = ""
     }
+
+    /// The file on the bar is a video still being made smaller, which
+    /// holds the send until it is ready. Not while a message is edited:
+    /// that carries no file.
+    readonly property bool videoPreparing: messages.preparing && !page.editing
 
     /// The text and the file: what send has to send. While a message is
     /// being edited the file is put aside, and only the text counts.
@@ -896,8 +900,11 @@ Page {
             // recording under way is what send stops and sends. And
             // nothing is sendable twice: copying a large video into the
             // core's blob directory takes long enough for a second tap to
-            // land, and that sent the whole thing again.
+            // land, and that sent the whole thing again. Nor is a video
+            // still being made smaller: it goes once it is ready and the
+            // reader says so, never on its own.
             enabled: !messages.sending
+                     && (!page.videoPreparing || voiceBar.recording)
                      && (page.hasSomethingToSend || voiceBar.recording)
             onClicked: page.sendCurrentText()
 
@@ -987,6 +994,11 @@ Page {
         // A recording under way is what the button sends.
         if (voiceBar.recording) {
             voiceBar.send()
+            return
+        }
+        // The picked video is still being made smaller: the button waits
+        // for it, and so does the keyboard's.
+        if (page.videoPreparing) {
             return
         }
         // A message being edited: the change goes to the core, and the

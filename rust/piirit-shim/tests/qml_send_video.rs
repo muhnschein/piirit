@@ -2,10 +2,12 @@
 //! is what is sent (issue #111).
 //!
 //! The core recodes a picture on its way out and sends a video as it is,
-//! so the conversation does it: it plans a smaller file as the video is
-//! picked, says so on the bar while it makes it, and hands the core the
-//! smaller file under the picked file's name. The ✕ on the bar stops it,
-//! and then nothing is sent and the file stays.
+//! so the conversation does it: it starts making a smaller file as soon as
+//! the video is picked, says so on the bar while it does, and holds the
+//! send until it is done -- nothing goes out until the reader sends, with
+//! whatever caption they wrote meanwhile. The bar then weighs what was
+//! made, and the core is handed it under the picked file's name. The ✕ on
+//! the bar drops the file and stops the work.
 //!
 //! The clip is made here, as a phone's camera would leave one, by
 //! `piirit_video::synth`. The fake core is told a ceiling between the
@@ -80,14 +82,14 @@ const PROBE_QML: &str = r"
 
 #[test]
 #[allow(clippy::too_many_lines)]
-fn a_picked_video_is_made_smaller_before_it_is_sent() {
+fn a_picked_video_is_made_smaller_and_waits_for_the_reader() {
     let temp = std::env::temp_dir().join(format!("piirit-qml-video-{}", std::process::id()));
     let journal = common::fresh_journal(&temp);
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
     let tree = common::qml_tree_without_enter_key();
 
-    // Three seconds at 4 Mbit/s, about 1.5 MB; planned at 1.5 Mbit/s and
-    // 64 kbit/s, about 590 kB. The ceiling is between the two.
+    // Three seconds at 4 Mbit/s, about 1.5 MB; planned to fit under the
+    // ceiling below, which is between the two.
     let clip = temp.join("lake at dusk.mov");
     piirit_video::synth(&clip, (640, 360), 3, 4_000_000, 90, true).expect("make a clip");
     let clip_bytes = std::fs::metadata(&clip).expect("measure the clip").len();
@@ -148,6 +150,15 @@ fn a_picked_video_is_made_smaller_before_it_is_sent() {
 
     let clip_path = clip.to_string_lossy().into_owned();
     let again = clip_path.clone();
+    let journal_mid = journal.clone();
+    let recoded_dir = cache.join("piirit/piirit/recoded");
+    let recoded_mid = recoded_dir.clone();
+    let sends_in = |journal: &std::path::Path| {
+        common::calls(journal)
+            .into_iter()
+            .filter(|(method, _)| method == "misc_send_msg" || method == "send_msg")
+            .count()
+    };
 
     single_shot(Duration::from_secs(1), move || unsafe {
         (*steps_ptr).push((
@@ -164,40 +175,56 @@ fn a_picked_video_is_made_smaller_before_it_is_sent() {
 
     single_shot(Duration::from_secs(3), move || unsafe {
         (*steps_ptr).push(("attach", call!("attach", QString::from(clip_path.as_str()))));
-    });
-
-    single_shot(Duration::from_secs(4), move || unsafe {
-        probe!("large", "largeFileBar", "visible");
-        probe!("planned-bytes", "messages", "attachment_bytes");
-        (*steps_ptr).push(("send", call!("send")));
-        // At once: the send has started making the video smaller.
+        // At once: picking it started making it smaller.
         probe!("preparing", "messages", "preparing");
         probe!("label-preparing", "pendingAttachmentLabel", "text");
+        probe!("large", "largeFileBar", "visible");
+        probe!("planned-bytes", "messages", "attachment_bytes");
         probe!("send-enabled-preparing", "sendButton", "enabled");
+        // The caption is written meanwhile, and a send asked for now --
+        // the keyboard's, say -- does nothing.
+        (*steps_ptr).push(("type", call!("type", QString::from("ice on the lake"))));
+        (*steps_ptr).push(("send-early", call!("send")));
     });
 
-    // Sent by now: a few seconds of small video is quick even unoptimised.
+    // Made by now: a few seconds of small video is quick even unoptimised.
     single_shot(Duration::from_secs(12), move || unsafe {
-        probe!("preparing-after", "messages", "preparing");
+        probe!("preparing-done", "messages", "preparing");
+        probe!("send-enabled-done", "sendButton", "enabled");
+        probe!("bar-done", "attachmentBar", "visible");
+        probe!("made-bytes", "messages", "attachment_bytes");
+        (*steps_ptr).push(("sends-before-tap", sends_in(&journal_mid).to_string()));
+        let made: Vec<u64> = std::fs::read_dir(&recoded_mid)
+            .map(|dir| {
+                dir.flatten()
+                    .filter_map(|entry| entry.metadata().ok().map(|meta| meta.len()))
+                    .filter(|bytes| *bytes > 0)
+                    .collect()
+            })
+            .unwrap_or_default();
+        (*steps_ptr).push(("made-on-disk", format!("{made:?}")));
+        // Only now does the reader send it.
+        (*steps_ptr).push(("send", call!("send")));
+    });
+
+    single_shot(Duration::from_secs(15), move || unsafe {
         probe!("bar-after", "attachmentBar", "visible");
-        // Again, and stopped straight away with the bar's button.
+        // Again, and dropped straight away with the bar's button.
         (*steps_ptr).push((
             "attach-again",
             call!("attach", QString::from(again.as_str())),
         ));
-        (*steps_ptr).push(("send-again", call!("send")));
         probe!("preparing-again", "messages", "preparing");
         (*steps_ptr).push((
-            "stop",
+            "drop",
             call!("click", QString::from("cancelAttachmentButton")),
         ));
     });
 
-    single_shot(Duration::from_secs(16), move || unsafe {
-        probe!("preparing-stopped", "messages", "preparing");
-        probe!("sending-stopped", "messages", "sending");
-        probe!("bar-stopped", "attachmentBar", "visible");
-        probe!("label-stopped", "pendingAttachmentLabel", "text");
+    single_shot(Duration::from_secs(19), move || unsafe {
+        probe!("preparing-dropped", "messages", "preparing");
+        probe!("sending-dropped", "messages", "sending");
+        probe!("bar-dropped", "attachmentBar", "visible");
         (*engine_ptr).quit();
     });
 
@@ -217,6 +244,16 @@ fn a_picked_video_is_made_smaller_before_it_is_sent() {
         "the conversation did not load. {context}"
     );
 
+    assert_eq!(
+        value("preparing"),
+        "true",
+        "picking the video did not start making it smaller. {context}"
+    );
+    assert_eq!(
+        value("label-preparing"),
+        "Making video smaller for sending: 0%",
+        "the bar does not say the video is being made smaller. {context}"
+    );
     // Measured as it will be sent, not as it is on the phone.
     assert_eq!(
         value("large"),
@@ -229,32 +266,37 @@ fn a_picked_video_is_made_smaller_before_it_is_sent() {
         planned > 0.0 && planned < 1_000_000.0,
         "the bar does not weigh the video at the size it is planned at. {context}"
     );
-
-    assert_eq!(
-        value("preparing"),
-        "true",
-        "the send did not start making the video smaller. {context}"
-    );
-    assert_eq!(
-        value("label-preparing"),
-        "Making video smaller for sending: 0%",
-        "the bar does not say the video is being made smaller. {context}"
-    );
     assert_eq!(
         value("send-enabled-preparing"),
         "false",
-        "the send button is on while the video is made smaller, so a second \
-         tap sends it twice. {context}"
+        "the send button is on while the video is still being made smaller. {context}"
     );
+
     assert_eq!(
-        value("preparing-after"),
+        value("preparing-done"),
         "false",
         "it never finished. {context}"
     );
     assert_eq!(
-        value("bar-after"),
-        "false",
-        "the bar still holds the video after it was sent. {context}"
+        value("sends-before-tap"),
+        "0",
+        "the video went out before the reader sent it. {context}"
+    );
+    assert_eq!(
+        value("bar-done"),
+        "true",
+        "the bar let go of the video once it was made. {context}"
+    );
+    assert_eq!(
+        value("send-enabled-done"),
+        "true",
+        "the send button stayed off once the video was ready. {context}"
+    );
+    let made_bytes: f64 = value("made-bytes").parse().unwrap_or(0.0);
+    assert_eq!(
+        value("made-on-disk"),
+        format!("[{made_bytes}]"),
+        "the bar does not weigh the video at the size it came out at. {context}"
     );
 
     let sends: Vec<(String, serde_json::Value)> = common::calls(&journal)
@@ -264,9 +306,14 @@ fn a_picked_video_is_made_smaller_before_it_is_sent() {
     assert_eq!(
         sends.len(),
         1,
-        "one send, and none for the stopped one. {context}. Sends: {sends:?}"
+        "one send, and none for the dropped one. {context}. Sends: {sends:?}"
     );
     let params = &sends[0].1;
+    assert_eq!(
+        params.get(2).and_then(serde_json::Value::as_str),
+        Some("ice on the lake"),
+        "the caption written while the video was made is not what was sent. Sends: {sends:?}"
+    );
     let sent = params
         .get(3)
         .and_then(serde_json::Value::as_str)
@@ -286,33 +333,33 @@ fn a_picked_video_is_made_smaller_before_it_is_sent() {
         "the smaller video was left in the cache after the core took it"
     );
     assert!(clip.exists(), "the reader's own video was removed");
+    assert_eq!(
+        value("bar-after"),
+        "false",
+        "the bar still holds the video after it was sent. {context}"
+    );
 
     assert_eq!(
         value("preparing-again"),
         "true",
-        "the second send did not start. {context}"
+        "picking it again did not start. {context}"
     );
     assert_eq!(
-        value("preparing-stopped"),
+        value("preparing-dropped"),
         "false",
         "the bar's button did not stop it. {context}"
     );
     assert_eq!(
-        value("sending-stopped"),
+        value("sending-dropped"),
         "false",
-        "a stopped send still holds the send button. {context}"
+        "a dropped video still holds the send button. {context}"
     );
     assert_eq!(
-        value("bar-stopped"),
-        "true",
-        "stopping it dropped the file the reader picked. {context}"
+        value("bar-dropped"),
+        "false",
+        "the bar's button did not drop the file. {context}"
     );
-    assert_eq!(
-        value("label-stopped"),
-        "Sending lake at dusk.mov",
-        "the bar did not go back to the file. {context}"
-    );
-    let left = std::fs::read_dir(cache.join("piirit/piirit/recoded"))
+    let left = std::fs::read_dir(&recoded_dir)
         .map(|dir| {
             dir.flatten()
                 .filter(|entry| {
@@ -324,7 +371,7 @@ fn a_picked_video_is_made_smaller_before_it_is_sent() {
                 .count()
         })
         .unwrap_or(0);
-    assert_eq!(left, 0, "a stopped recoding left its file behind");
+    assert_eq!(left, 0, "a dropped or sent video left its file behind");
 
     let _ = std::fs::remove_dir_all(&temp);
 }

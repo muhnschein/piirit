@@ -21,13 +21,8 @@ Item {
     /// how far along that is, from 0 to 1. See ChatMessages.preparing.
     property bool preparing: false
     property real progress: 0
-    /// The file is put away.
+    /// The file is put away, and with it whatever was being made of it.
     signal cancelled()
-    /// Making the video smaller is stopped, and nothing is sent; the file
-    /// stays. What the same button means while that runs: putting the
-    /// file away under a send that is using it would leave the send
-    /// holding a file the bar no longer shows.
-    signal stopped()
 
     readonly property string shownName:
         root.fileName.length > 0 ? root.fileName : root.filePath
@@ -91,6 +86,6 @@ Item {
             rightMargin: Theme.horizontalPageMargin
         }
         icon.source: "image://theme/icon-m-clear"
-        onClicked: root.preparing ? root.stopped() : root.cancelled()
+        onClicked: root.cancelled()
     }
 }
