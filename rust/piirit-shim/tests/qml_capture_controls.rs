@@ -114,7 +114,8 @@ const PROBE_QML: &str = r"
             // Turned on its side: the picture turned back, the frame the
             // full height at the left, the controls in a column down the
             // right -- modes at the top, switch at the foot, rings beside
-            // the shutter -- and the exposure slider at the picture's edge.
+            // the shutter, two paddings clear of it -- and the exposure
+            // slider at the picture's far edge, across from the shutter.
             step('landscape', function() {
                 var frame = item('frame')
                 var controls = item('controls')
@@ -132,10 +133,11 @@ const PROBE_QML: &str = r"
                     shutter: [shutter.x + shutter.width / 2, shutter.y + shutter.height / 2],
                     modesAbove: item('modeColumn').y + item('modeColumn').height <= shutter.y,
                     flipBelow: item('flipButton').y >= shutter.y + shutter.height,
-                    lensesBeside: lenses.vertical && lenses.x + lenses.width <= shutter.x
+                    lensesBeside: lenses.vertical
                                   && lenses.y < shutter.y + shutter.height
                                   && lenses.y + lenses.height > shutter.y,
-                    slider: slider.x + slider.width === frame.x + frame.width
+                    lensGap: shutter.x - (lenses.x + lenses.width),
+                    slider: [slider.x - frame.x, slider.labelOnLeft]
                 }
                 // A tap near the frame's top left is near the picture's
                 // top right, as the lens has it.
@@ -148,7 +150,9 @@ const PROBE_QML: &str = r"
                 page.width = 540
                 page.height = 960
                 answer.upright = [lie(), frame.width, frame.height,
-                                  controls.x, controls.width, lenses.vertical]
+                                  controls.x, controls.width, lenses.vertical,
+                                  slider.x + slider.width === frame.x + frame.width,
+                                  slider.labelOnLeft]
                 return answer
             })
             // The frame: the full width, four by three, at the top of a
@@ -371,10 +375,10 @@ fn the_camera_page_has_the_platform_cameras_controls() {
         json!({"allowed": 15, "turn": [-90, 540, 720, 0, 540],
                "frame": [0, 0, 720, 540], "controls": [720, 0, 240, 540],
                "shutter": [120, 270], "modesAbove": true, "flipBelow": true,
-               "lensesBeside": true, "slider": true,
+               "lensesBeside": true, "lensGap": 32, "slider": [16, false],
                "tap": [0.75, 0.25], "ring": [180, 135],
                "inverted": [-270, 540, 720, 720, 0],
-               "upright": [[0, 540, 720, 0, 0], 540, 720, 0, 540, false]}),
+               "upright": [[0, 540, 720, 0, 0], 540, 720, 0, 540, false, true, true]}),
         "on its side the page does not turn, the picture is not turned back against it \
          at the shape the frame has, a tap does not land on its point in the picture, or \
          the frame and the controls are not laid out the platform camera's landscape \

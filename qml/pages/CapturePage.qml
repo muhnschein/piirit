@@ -593,13 +593,18 @@ Page {
         }
     }
 
-    // Exposure, at the right edge of the picture. Not while recording.
+    // Exposure, at the right edge of the picture; in landscape at the
+    // left, across the picture from the shutter, as the platform camera
+    // has it. Not while recording.
     ExposureSlider {
         objectName: "exposureSlider"
         anchors {
-            right: frame.right
+            left: page.landscape ? frame.left : undefined
+            leftMargin: page.landscape ? Theme.paddingLarge : 0
+            right: page.landscape ? undefined : frame.right
             verticalCenter: frame.verticalCenter
         }
+        labelOnLeft: !page.landscape
         height: Theme.itemSizeSmall * 5
         visible: !page.recording && !page.stopping && !page.done
         value: page.exposure
@@ -674,7 +679,9 @@ Page {
         // runs.
         CameraLensToggle {
             objectName: "lensToggle"
-            x: page.landscape ? shutter.x - width - Theme.paddingMedium
+            // Two paddings clear of the shutter in landscape, the
+            // platform camera's gap.
+            x: page.landscape ? shutter.x - width - 2 * Theme.paddingLarge
                               : (parent.width - width) / 2
             y: page.landscape ? (parent.height - height) / 2
                               : shutter.y - height - Theme.paddingMedium
