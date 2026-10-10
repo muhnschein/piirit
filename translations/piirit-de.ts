@@ -775,9 +775,14 @@ In anderen Gruppen mit blockierten Kontakten werden deren Nachrichten weiterhin 
         <translation>Verbindung zum Delta-Chat-Kern verloren. Verbinde erneut…</translation>
     </message>
     <message>
-        <source>This file is %1. Some relays refuse files larger than %2, so sending this might fail.</source>
+        <source>Even made smaller, this file is bigger than the %1 most relays accept. Sending may fail.</source>
+        <extracomment>Shown above the message field when a video is being made smaller for sending and is still bigger than Delta Chat recommends. The file is still sent. %1 is the recommended largest size, such as &quot;24 MB&quot;.</extracomment>
+        <translation>Auch verkleinert ist diese Datei größer als die %1, die die meisten Relays annehmen. Das Senden kann fehlschlagen.</translation>
+    </message>
+    <message>
+        <source>At %1, this file is bigger than the %2 most relays accept. Sending may fail.</source>
         <extracomment>Shown above the message field when the attached file is bigger than Delta Chat recommends. The file is still sent. %1 is the file&apos;s size and %2 the recommended largest size, each such as &quot;24 MB&quot;.</extracomment>
-        <translation>Diese Datei ist %1 groß. Manche Relays lehnen Dateien ab, die größer als %2 sind, daher kann das Senden fehlschlagen.</translation>
+        <translation>Mit %1 ist diese Datei größer als die %2, die die meisten Relays annehmen. Das Senden kann fehlschlagen.</translation>
     </message>
 </context>
 <context>

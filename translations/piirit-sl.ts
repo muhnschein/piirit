@@ -781,9 +781,14 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
         <translation>Povezava z jedrom Delta Chat je izgubljena. Ponovno povezovanje…</translation>
     </message>
     <message>
-        <source>This file is %1. Some relays refuse files larger than %2, so sending this might fail.</source>
+        <source>Even made smaller, this file is bigger than the %1 most relays accept. Sending may fail.</source>
+        <extracomment>Shown above the message field when a video is being made smaller for sending and is still bigger than Delta Chat recommends. The file is still sent. %1 is the recommended largest size, such as &quot;24 MB&quot;.</extracomment>
+        <translation>Tudi pomanjšana je ta datoteka večja od %1, ki jih sprejme večina posrednikov. Pošiljanje morda ne bo uspelo.</translation>
+    </message>
+    <message>
+        <source>At %1, this file is bigger than the %2 most relays accept. Sending may fail.</source>
         <extracomment>Shown above the message field when the attached file is bigger than Delta Chat recommends. The file is still sent. %1 is the file&apos;s size and %2 the recommended largest size, each such as &quot;24 MB&quot;.</extracomment>
-        <translation>Ta datoteka je velika %1. Nekateri posredniki zavrnejo datoteke, večje od %2, zato pošiljanje morda ne bo uspelo.</translation>
+        <translation>Z %1 je ta datoteka večja od %2, ki jih sprejme večina posrednikov. Pošiljanje morda ne bo uspelo.</translation>
     </message>
 </context>
 <context>

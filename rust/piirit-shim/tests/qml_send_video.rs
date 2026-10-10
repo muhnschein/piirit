@@ -97,6 +97,11 @@ fn a_picked_video_is_made_smaller_and_waits_for_the_reader() {
     let clip = temp.join("lake at dusk.mov");
     piirit_video::synth(&clip, (640, 360), 3, 4_000_000, 90, true).expect("make a clip");
     let clip_bytes = std::fs::metadata(&clip).expect("measure the clip").len();
+    // Fifteen seconds, which even at the least balanced rate comes out
+    // past the ceiling.
+    let long = temp.join("long walk.mov");
+    piirit_video::synth(&long, (640, 360), 15, 4_000_000, 0, true).expect("make a long clip");
+    let long = long.to_string_lossy().into_owned();
     assert!(
         clip_bytes > 1_000_000,
         "the clip came out at {clip_bytes} bytes"
@@ -239,6 +244,7 @@ fn a_picked_video_is_made_smaller_and_waits_for_the_reader() {
         probe!("bar-kept", "attachmentBar", "visible");
         probe!("label-kept", "pendingAttachmentLabel", "text");
         probe!("sizes-kept", "attachmentSizesLabel", "visible");
+        probe!("large-kept", "largeFileLabel", "text");
         (*steps_ptr).push(("quality-kept", call!("quality", 1)));
         probe!("preparing-kept", "messages", "preparing");
         (*steps_ptr).push(("type-kept", call!("type", QString::from("as it was"))));
@@ -269,6 +275,16 @@ fn a_picked_video_is_made_smaller_and_waits_for_the_reader() {
     single_shot(Duration::from_secs(26), move || unsafe {
         // Stopped, then dropped: the same button, twice.
         for step in ["stop-switched", "drop-switched"] {
+            (*steps_ptr).push((
+                step,
+                call!("click", QString::from("cancelAttachmentButton")),
+            ));
+        }
+        // Too long to fit even made smaller: the warning says so.
+        (*steps_ptr).push(("attach-long", call!("attach", QString::from(long.as_str()))));
+        probe!("preparing-long", "messages", "preparing");
+        probe!("large-long", "largeFileLabel", "text");
+        for step in ["stop-long", "drop-long"] {
             (*steps_ptr).push((
                 step,
                 call!("click", QString::from("cancelAttachmentButton")),
@@ -442,6 +458,16 @@ fn a_picked_video_is_made_smaller_and_waits_for_the_reader() {
         "false",
         "a video going as it was still says it went smaller. {context}"
     );
+    // Going as it was, it is warned about at the size it is.
+    assert_eq!(
+        value("large-kept"),
+        format!(
+            "At {}, this file is bigger than the 1.0 MB most relays accept. \
+             Sending may fail.",
+            readable(picked)
+        ),
+        "a video going as it was is not warned about at its own size. {context}"
+    );
     assert_eq!(
         value("preparing-kept"),
         "false",
@@ -475,6 +501,17 @@ fn a_picked_video_is_made_smaller_and_waits_for_the_reader() {
         value("preparing-switched"),
         "true",
         "a new quality did not start the video again. {context}"
+    );
+    assert_eq!(
+        value("preparing-long"),
+        "true",
+        "the long video was not being made smaller. {context}"
+    );
+    assert_eq!(
+        value("large-long"),
+        "Even made smaller, this file is bigger than the 1.0 MB most relays \
+         accept. Sending may fail.",
+        "a video too big even made smaller is not warned about as such. {context}"
     );
     assert_eq!(
         (value("preparing-end").as_str(), value("bar-end").as_str()),

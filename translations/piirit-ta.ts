@@ -771,9 +771,14 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Delta Chat மையத்துடனான இணைப்பு துண்டிக்கப்பட்டது. மீண்டும் இணைக்கப்படுகிறது…</translation>
     </message>
     <message>
-        <source>This file is %1. Some relays refuse files larger than %2, so sending this might fail.</source>
+        <source>Even made smaller, this file is bigger than the %1 most relays accept. Sending may fail.</source>
+        <extracomment>Shown above the message field when a video is being made smaller for sending and is still bigger than Delta Chat recommends. The file is still sent. %1 is the recommended largest size, such as &quot;24 MB&quot;.</extracomment>
+        <translation>சிறியதாக்கிய பிறகும் இந்தக் கோப்பு பெரும்பாலான ரிலேக்கள் ஏற்கும் %1-ஐ விடப் பெரியது. அனுப்புவது தோல்வியடையலாம்.</translation>
+    </message>
+    <message>
+        <source>At %1, this file is bigger than the %2 most relays accept. Sending may fail.</source>
         <extracomment>Shown above the message field when the attached file is bigger than Delta Chat recommends. The file is still sent. %1 is the file&apos;s size and %2 the recommended largest size, each such as &quot;24 MB&quot;.</extracomment>
-        <translation>இந்தக் கோப்பின் அளவு %1 ஆகும். சில ரிலேக்கள் %2 ஐ விடப் பெரிய கோப்புகளை நிராகரிக்கின்றன, எனவே இதை அனுப்புவது தோல்வியடையக்கூடும்.</translation>
+        <translation>%1 அளவுள்ள இந்தக் கோப்பு பெரும்பாலான ரிலேக்கள் ஏற்கும் %2-ஐ விடப் பெரியது. அனுப்புவது தோல்வியடையலாம்.</translation>
     </message>
 </context>
 <context>

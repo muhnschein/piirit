@@ -772,9 +772,14 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>与 Delta Chat 核心的连接已断开。正在重新连接…</translation>
     </message>
     <message>
-        <source>This file is %1. Some relays refuse files larger than %2, so sending this might fail.</source>
+        <source>Even made smaller, this file is bigger than the %1 most relays accept. Sending may fail.</source>
+        <extracomment>Shown above the message field when a video is being made smaller for sending and is still bigger than Delta Chat recommends. The file is still sent. %1 is the recommended largest size, such as &quot;24 MB&quot;.</extracomment>
+        <translation>即使缩小后，此文件仍超过大多数中继接受的 %1。发送可能失败。</translation>
+    </message>
+    <message>
+        <source>At %1, this file is bigger than the %2 most relays accept. Sending may fail.</source>
         <extracomment>Shown above the message field when the attached file is bigger than Delta Chat recommends. The file is still sent. %1 is the file&apos;s size and %2 the recommended largest size, each such as &quot;24 MB&quot;.</extracomment>
-        <translation>此文件大小为 %1。部分中继会拒收大于 %2 的文件，因此发送此文件可能会失败。</translation>
+        <translation>此文件大小为 %1，超过大多数中继接受的 %2。发送可能失败。</translation>
     </message>
 </context>
 <context>

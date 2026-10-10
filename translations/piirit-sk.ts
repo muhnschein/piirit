@@ -778,9 +778,14 @@ Správy od zablokovaných kontaktov v ostatných skupinách sa budú naďalej zo
         <translation>Spojenie s jadrom Delta Chatu sa stratilo. Znova sa pripája…</translation>
     </message>
     <message>
-        <source>This file is %1. Some relays refuse files larger than %2, so sending this might fail.</source>
+        <source>Even made smaller, this file is bigger than the %1 most relays accept. Sending may fail.</source>
+        <extracomment>Shown above the message field when a video is being made smaller for sending and is still bigger than Delta Chat recommends. The file is still sent. %1 is the recommended largest size, such as &quot;24 MB&quot;.</extracomment>
+        <translation>Aj po zmenšení je tento súbor väčší ako %1, ktoré prijíma väčšina relé. Odoslanie môže zlyhať.</translation>
+    </message>
+    <message>
+        <source>At %1, this file is bigger than the %2 most relays accept. Sending may fail.</source>
         <extracomment>Shown above the message field when the attached file is bigger than Delta Chat recommends. The file is still sent. %1 is the file&apos;s size and %2 the recommended largest size, each such as &quot;24 MB&quot;.</extracomment>
-        <translation>Tento súbor má %1. Niektoré relaye odmietajú súbory väčšie ako %2, takže jeho odoslanie môže zlyhať.</translation>
+        <translation>S %1 je tento súbor väčší ako %2, ktoré prijíma väčšina relé. Odoslanie môže zlyhať.</translation>
     </message>
 </context>
 <context>

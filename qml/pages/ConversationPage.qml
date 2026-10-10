@@ -713,15 +713,23 @@ Page {
         // Not transient: it is true for as long as the file is on the
         // bar.
         timeout: 0
-        text: messages.attachment_large
+        // For a video sent smaller, the size it was picked at no longer
+        // matters here: the bar above says both.
+        text: !messages.attachment_large ? ""
+              : messages.original_bytes > 0
+              //: Shown above the message field when a video is being
+              //: made smaller for sending and is still bigger than Delta
+              //: Chat recommends. The file is still sent. %1 is the
+              //: recommended largest size, such as "24 MB".
+              ? qsTr("Even made smaller, this file is bigger than the %1 most relays accept. Sending may fail.")
+                .arg(Format.readableSize(messages.attachment_limit))
               //: Shown above the message field when the attached file is
               //: bigger than Delta Chat recommends. The file is still
               //: sent. %1 is the file's size and %2 the recommended
               //: largest size, each such as "24 MB".
-              ? qsTr("This file is %1. Some relays refuse files larger than %2, so sending this might fail.")
+              : qsTr("At %1, this file is bigger than the %2 most relays accept. Sending may fail.")
                 .arg(Format.readableSize(messages.attachment_bytes))
                 .arg(Format.readableSize(messages.attachment_limit))
-              : ""
         anchors {
             left: parent.left
             right: parent.right

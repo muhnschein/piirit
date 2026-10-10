@@ -778,9 +778,14 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Втрачено зв&apos;язок із ядром Delta Chat. Повторне під&apos;єднання…</translation>
     </message>
     <message>
-        <source>This file is %1. Some relays refuse files larger than %2, so sending this might fail.</source>
+        <source>Even made smaller, this file is bigger than the %1 most relays accept. Sending may fail.</source>
+        <extracomment>Shown above the message field when a video is being made smaller for sending and is still bigger than Delta Chat recommends. The file is still sent. %1 is the recommended largest size, such as &quot;24 MB&quot;.</extracomment>
+        <translation>Навіть після зменшення цей файл більший за %1, які приймає більшість ретрансляторів. Надсилання може не вдатися.</translation>
+    </message>
+    <message>
+        <source>At %1, this file is bigger than the %2 most relays accept. Sending may fail.</source>
         <extracomment>Shown above the message field when the attached file is bigger than Delta Chat recommends. The file is still sent. %1 is the file&apos;s size and %2 the recommended largest size, each such as &quot;24 MB&quot;.</extracomment>
-        <translation>Розмір цього файлу — %1. Деякі релеї відхиляють файли, більші за %2, тому його надсилання може не вдатися.</translation>
+        <translation>Розміром %1 цей файл більший за %2, які приймає більшість ретрансляторів. Надсилання може не вдатися.</translation>
     </message>
 </context>
 <context>

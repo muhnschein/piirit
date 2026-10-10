@@ -771,9 +771,14 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Χάθηκε η σύνδεση με τον πυρήνα του Delta Chat. Επανασύνδεση…</translation>
     </message>
     <message>
-        <source>This file is %1. Some relays refuse files larger than %2, so sending this might fail.</source>
+        <source>Even made smaller, this file is bigger than the %1 most relays accept. Sending may fail.</source>
+        <extracomment>Shown above the message field when a video is being made smaller for sending and is still bigger than Delta Chat recommends. The file is still sent. %1 is the recommended largest size, such as &quot;24 MB&quot;.</extracomment>
+        <translation>Ακόμη και μετά τη σμίκρυνση, αυτό το αρχείο είναι μεγαλύτερο από τα %1 που δέχονται τα περισσότερα relay. Η αποστολή μπορεί να αποτύχει.</translation>
+    </message>
+    <message>
+        <source>At %1, this file is bigger than the %2 most relays accept. Sending may fail.</source>
         <extracomment>Shown above the message field when the attached file is bigger than Delta Chat recommends. The file is still sent. %1 is the file&apos;s size and %2 the recommended largest size, each such as &quot;24 MB&quot;.</extracomment>
-        <translation>Αυτό το αρχείο έχει μέγεθος %1. Ορισμένοι αναμεταδότες απορρίπτουν αρχεία μεγαλύτερα από %2, οπότε η αποστολή του ενδέχεται να αποτύχει.</translation>
+        <translation>Με %1, αυτό το αρχείο είναι μεγαλύτερο από τα %2 που δέχονται τα περισσότερα relay. Η αποστολή μπορεί να αποτύχει.</translation>
     </message>
 </context>
 <context>
