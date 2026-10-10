@@ -99,12 +99,13 @@ impl Target {
     }
 }
 
-/// One outgoing media quality: what a second of video may cost, and how
-/// large a picture that buys.
+/// One outgoing media quality: what a second of video may cost, how
+/// large a picture that buys, and the least it may be squeezed to.
 struct Quality {
     video: u64,
     audio: u64,
     long_side: u32,
+    least_video: u64,
 }
 
 /// What a second of a recoded video may cost at each quality. Worse is
@@ -114,22 +115,24 @@ struct Quality {
 /// 1.5 Mbit/s, 720p smears wherever the picture moves, and a video that
 /// came near the limit has the room. A long one is squeezed below it to
 /// fit, as `plan` says.
+///
+/// The least is how far a long video is squeezed, and no further: 480p
+/// at 700 kbit/s and 360p at 300 kbit/s still show faces and moving
+/// hands. Below them the picture is mush, so a video that cannot fit at
+/// its least is sent at it, past the recommended size, and the
+/// conversation says it is large, as it says of any file.
 const BALANCED_QUALITY: Quality = Quality {
     video: 3_000_000,
     audio: 64_000,
     long_side: 1280,
+    least_video: 700_000,
 };
 const WORSE_QUALITY: Quality = Quality {
     video: 500_000,
     audio: 24_000,
     long_side: 640,
+    least_video: 300_000,
 };
-
-/// The least a second of picture is given when a long video is squeezed
-/// under the recommended size. Below it the picture is mush; a video that
-/// cannot fit above it is sent at it, and the conversation says it is
-/// large, as it says of any file.
-const LEAST_VIDEO: u64 = 150_000;
 
 /// How close to the recommended size, in percent of it, a video has to
 /// come before balanced quality makes it smaller. Below it the video is
@@ -155,7 +158,8 @@ const CONTAINER_SHARE: u64 = 5;
 ///
 /// `limit` is the core's recommended largest attachment, 0 while unknown.
 /// A video that would come out past it is given a lower bit rate to fit,
-/// down to a floor below which the picture is not worth sending.
+/// down to the quality's least, below which the picture is not worth
+/// sending.
 #[must_use]
 pub fn plan(probe: &Probe, file_bytes: u64, media_quality: i32, limit: u64) -> Option<Target> {
     if !matches!(probe.video_codec, VideoCodec::H264 | VideoCodec::Hevc)
@@ -184,7 +188,8 @@ pub fn plan(probe: &Probe, file_bytes: u64, media_quality: i32, limit: u64) -> O
     let mut video_bit_rate = quality.video;
     if limit > 0 {
         let budget = limit.saturating_mul(8000) / probe.duration_ms * (100 - CONTAINER_SHARE) / 100;
-        video_bit_rate = video_bit_rate.min(budget.saturating_sub(audio_cost).max(LEAST_VIDEO));
+        video_bit_rate =
+            video_bit_rate.min(budget.saturating_sub(audio_cost).max(quality.least_video));
     }
     // Fewer pixels for fewer bits, so each one is worth having.
     let long_side = if video_bit_rate >= 1_000_000 {
@@ -543,21 +548,41 @@ mod tests {
     #[test]
     fn a_long_video_is_squeezed_under_the_recommendation() {
         let (mut probe, _) = phone_minute();
-        probe.duration_ms = 10 * 60_000;
-        let bytes = 17_128_000 / 8 * 600;
+        probe.duration_ms = 3 * 60_000;
+        let bytes = 17_128_000 / 8 * 180;
         let target = plan(&probe, bytes, BALANCED, LIMIT).unwrap();
-        assert!(target.video_bit_rate < 1_000_000, "{target:?}");
+        assert!(
+            (700_000..1_000_000).contains(&target.video_bit_rate),
+            "{target:?}"
+        );
         assert!(target.predicted_bytes() <= LIMIT, "{target:?}");
         // Fewer bits buy fewer pixels.
-        assert_eq!((target.width, target.height), (640, 360));
+        assert_eq!((target.width, target.height), (854, 480));
     }
 
     #[test]
-    fn a_video_too_long_to_fit_still_gets_a_watchable_rate() {
+    fn a_video_too_long_to_fit_is_not_squeezed_past_watchable() {
         let (mut probe, _) = phone_minute();
+        probe.duration_ms = 10 * 60_000;
+        let bytes = 17_128_000 / 8 * 600;
+        let target = plan(&probe, bytes, BALANCED, LIMIT).unwrap();
+        assert_eq!(target.video_bit_rate, 700_000);
+        assert_eq!((target.width, target.height), (854, 480));
+        assert!(target.predicted_bytes() > LIMIT);
+
+        // Worse quality squeezes eight minutes ...
+        probe.duration_ms = 8 * 60_000;
+        let target = plan(&probe, bytes, WORSE, LIMIT).unwrap();
+        assert!(
+            (300_000..500_000).contains(&target.video_bit_rate),
+            "{target:?}"
+        );
+        assert!(target.predicted_bytes() <= LIMIT, "{target:?}");
+        // ... but not an hour.
         probe.duration_ms = 60 * 60_000;
-        let target = plan(&probe, u64::MAX / 2, BALANCED, LIMIT).unwrap();
-        assert_eq!(target.video_bit_rate, 150_000);
+        let target = plan(&probe, bytes * 6, WORSE, LIMIT).unwrap();
+        assert_eq!(target.video_bit_rate, 300_000);
+        assert_eq!((target.width, target.height), (640, 360));
         assert!(target.predicted_bytes() > LIMIT);
     }
 
