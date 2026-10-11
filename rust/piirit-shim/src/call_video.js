@@ -59,6 +59,11 @@ var piiritVideo = (function () {
      * yet, and how many looks before giving up. */
     var AGAIN = 250;
     var LOOKS = 40;
+    /* Milliseconds after the call connects, and after the camera changes
+     * in it, at which what goes each way is logged: a picture the other
+     * end sees black is one that is sent black, or one it cannot decode,
+     * and only the counts tell which. */
+    var SAMPLES = [4000, 15000, 45000];
     /* This end's picture, while the other end's is drawn: in the corner
      * the call screen leaves free under its top line. */
     var CORNER = {
@@ -105,6 +110,10 @@ var piiritVideo = (function () {
     var lookingAgain = false;
     var looks = 0;
     var layoutDue = false;
+    /* The call is connected; and which round of samples is the current
+     * one, a later round taking the place of an earlier. */
+    var connected = false;
+    var round = 0;
 
     function noop() {}
 
@@ -452,6 +461,7 @@ var piiritVideo = (function () {
             camera = track;
             failed = false;
             report();
+            sampleSoon();
         }, function (err) {
             opening = false;
             if (wanted) {
@@ -549,8 +559,106 @@ var piiritVideo = (function () {
         }).join("; ") || "none";
     }
 
+    /* Which track a sender sends, for the log. */
+    function sending(sender) {
+        var track = sender.track;
+        if (!track) {
+            return "nothing";
+        }
+        var which = track === camera ? "camera" : track === blank ? "blank" : "other";
+        return which + " " + (track.enabled ? "on" : "off") + " " + track.readyState;
+    }
+
+    /* One way's counts, from its RTP stats: the codec, the size, how
+     * many frames and how big each is -- a black frame is a few dozen
+     * bytes, a picture thousands -- and how often a keyframe was asked
+     * for, which a receiver that cannot decode does over and over. */
+    function counts(rtp, codecs, frames, bytes) {
+        if (!rtp) {
+            return "none";
+        }
+        var parts = [];
+        var codec = codecs[rtp.codecId];
+        if (codec) {
+            parts.push(codec.replace(/^video\//, ""));
+        }
+        if (rtp.frameWidth) {
+            parts.push(rtp.frameWidth + "x" + rtp.frameHeight);
+        }
+        var n = rtp[frames] || 0;
+        parts.push(n + " frames");
+        if (n > 0) {
+            parts.push(Math.round((rtp[bytes] || 0) / n) + " B/frame");
+        }
+        if (rtp.keyFramesEncoded !== undefined) {
+            parts.push(rtp.keyFramesEncoded + " key");
+        }
+        parts.push("PLI " + (rtp.pliCount || 0) + " FIR " + (rtp.firCount || 0)
+            + " NACK " + (rtp.nackCount || 0));
+        if (rtp.packetsLost !== undefined) {
+            parts.push("lost " + rtp.packetsLost);
+        }
+        return parts.join(" ");
+    }
+
+    /* Log what one connection sends and receives of video, now. */
+    function sample(connection) {
+        if (!connection.getStats) {
+            return;
+        }
+        var senders = videoSenders(connection).map(sending).join(", ") || "no sender";
+        connection.getStats(null).then(function (stats) {
+            var sent = null;
+            var got = null;
+            var codecs = {};
+            stats.forEach(function (one) {
+                if (one.type === "codec") {
+                    codecs[one.id] = one.mimeType || "";
+                }
+                if ((one.kind || one.mediaType) !== "video" || one.isRemote) {
+                    return;
+                }
+                if (one.type === "outbound-rtp") {
+                    sent = one;
+                } else if (one.type === "inbound-rtp") {
+                    got = one;
+                }
+            });
+            note("video sent: " + counts(sent, codecs, "framesEncoded", "bytesSent")
+                + " (" + senders + ") | got: "
+                + counts(got, codecs, "framesDecoded", "bytesReceived"));
+        }, function (err) {
+            note("video stats: " + describe(err));
+        });
+    }
+
+    /* Log what goes each way a few times from now, in place of any
+     * round still to come. Only on a connected call: before, nothing
+     * goes. */
+    function sampleSoon() {
+        if (!connected) {
+            return;
+        }
+        round += 1;
+        var mine = round;
+        SAMPLES.forEach(function (delay) {
+            window.setTimeout(function () {
+                if (mine === round) {
+                    connections.forEach(sample);
+                }
+            }, delay);
+        });
+    }
+
     function watch(connection) {
         connections.push(connection);
+        connection.addEventListener("iceconnectionstatechange", function () {
+            var state = connection.iceConnectionState;
+            if ((state === "connected" || state === "completed") && !connected) {
+                connected = true;
+                sampleSoon();
+            }
+        });
         connection.addEventListener("track", function (event) {
             if (event.streams && event.streams[0]) {
                 remote = event.streams[0];

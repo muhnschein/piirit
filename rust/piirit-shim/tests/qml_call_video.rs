@@ -357,7 +357,11 @@ fn a_video_call_shows_its_pictures_under_lines_a_tap_puts_away() {
         "a microphone switch on a call nobody has answered. {context}"
     );
     assert_eq!(value("camera-ringing"), "true", "{context}");
-    assert_eq!(value("flip-ringing"), "true", "{context}");
+    assert_eq!(
+        value("flip-ringing"),
+        "false",
+        "the camera can be turned before the call is answered. {context}"
+    );
     assert_eq!(value("camera-tap"), "ok", "{context}");
     assert_eq!(
         value("camera-off-ringing"),

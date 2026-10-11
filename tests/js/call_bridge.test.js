@@ -885,4 +885,94 @@ test("what only a phone shows is written to the app's log", async () => {
     const lines = posts(world, "/log");
     assert.ok(lines.includes("their picture: track muted, in no stream"), String(lines));
     assert.ok(lines.includes("their picture: frames"), String(lines));
+
+    // An engine with no stats to give: connected, and nothing logged of them.
+    await connect(world, connection, "connected");
+    assert.equal(statLines(world).length, 0);
+});
+
+/* What Gecko's getStats gives for a call: RTP stats each way, and the
+ * codecs they name. */
+function callStats(extra) {
+    return new Map([
+        ["c1", { id: "c1", type: "codec", mimeType: "video/VP8" }],
+        ["c2", { id: "c2", type: "codec", mimeType: "video/H264" }],
+        ["o1", {
+            type: "outbound-rtp", kind: "video", codecId: "c1", frameWidth: 480, frameHeight: 640,
+            framesEncoded: 100, bytesSent: 300000, pliCount: 2, firCount: 0, nackCount: 1
+        }],
+        ["o2", { type: "outbound-rtp", kind: "audio", bytesSent: 5 }],
+        ["i1", {
+            type: "inbound-rtp", mediaType: "video", codecId: "c2",
+            framesDecoded: 50, bytesReceived: 100000, packetsLost: 3
+        }],
+        ["r1", { type: "inbound-rtp", kind: "video", isRemote: true, framesDecoded: 9 }],
+    ].concat(extra || []));
+}
+
+function statLines(world) {
+    return posts(world, "/log").filter((line) => line.startsWith("video sent:"));
+}
+
+async function connect(world, connection, state) {
+    connection.iceConnectionState = state;
+    connection.fire("iceconnectionstatechange");
+    runTimers(world);
+    await settleAll();
+}
+
+test("once the call connects, what goes each way is logged, and again when the camera turns", async () => {
+    const world = makeWorld(VIDEO);
+    const { connection } = await page(world);
+    connection.getStats = () => Promise.resolve(callStats());
+    const line = "video sent: VP8 480x640 100 frames 3000 B/frame PLI 2 FIR 0 NACK 1"
+        + " (camera on live) | got: H264 50 frames 2000 B/frame PLI 0 FIR 0 NACK 0 lost 3";
+
+    // Turned while the call is still connecting: nothing goes yet.
+    await command(world, "facing-environment");
+    runTimers(world);
+    await settleAll();
+    await connect(world, connection, "checking");
+    assert.equal(statLines(world).length, 0, "logged before the call connected");
+
+    await connect(world, connection, "connected");
+    assert.deepEqual(statLines(world), [line, line, line]);
+
+    // Connected again is not a new call: nothing more.
+    await connect(world, connection, "completed");
+    assert.equal(statLines(world).length, 3, "logged again for the same connection");
+
+    // Turned twice before anything was logged: one round, the last.
+    await command(world, "facing-user");
+    await command(world, "facing-environment");
+    runTimers(world);
+    await settleAll();
+    assert.equal(statLines(world).length, 6, String(statLines(world)));
+});
+
+test("what a sender sends is told apart, and stats that say little say what they can", async () => {
+    const world = makeWorld(VOICE);
+    const { connection } = await page(world);
+    connection.getStats = () => Promise.resolve(new Map([
+        ["o1", { type: "outbound-rtp", kind: "video", framesEncoded: 0, keyFramesEncoded: 0 }],
+    ]));
+    connection.iceConnectionState = "completed";
+    connection.fire("iceconnectionstatechange");
+    // The first sample with the blank track on the sender, the others
+    // with none.
+    const due = world.timers.splice(0);
+    due.slice(0, -2).forEach((fn) => fn());
+    videoSender(connection).track = null;
+    due.slice(-2).forEach((fn) => fn());
+    await settleAll();
+    assert.deepEqual(statLines(world).map((line) => line.replace(/.* \(|\).*/g, "")),
+        ["blank off live", "nothing", "nothing"]);
+    assert.equal(statLines(world)[0],
+        "video sent: 0 frames 0 key PLI 0 FIR 0 NACK 0 (blank off live) | got: none");
+
+    connection.getStats = () => Promise.reject(new Error("closed"));
+    await command(world, "camera-on");
+    runTimers(world);
+    await settleAll();
+    assert.ok(posts(world, "/log").includes("video stats: closed"), String(posts(world, "/log")));
 });

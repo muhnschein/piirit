@@ -41,7 +41,7 @@ use std::collections::VecDeque;
 use std::net::{Ipv4Addr, SocketAddr};
 use std::sync::atomic::{AtomicBool, AtomicU32, AtomicU64, Ordering};
 use std::sync::{Arc, Mutex, Weak};
-use std::time::Duration;
+use std::time::{Duration, Instant};
 
 use deltachat_jsonrpc::RpcClient;
 use tokio::io::AsyncWriteExt;
@@ -211,6 +211,8 @@ struct Shared {
     /// Woken when a command is queued and when the host goes.
     changed: Notify,
     report: Reporter,
+    /// What the page asked to have logged.
+    log: CallLog,
 }
 
 impl Shared {
@@ -326,6 +328,7 @@ pub(crate) async fn start(
         commands: Mutex::new(VecDeque::new()),
         changed: Notify::new(),
         report,
+        log: CallLog::begin(crate::qr::cache_file(LOG_FILE).ok()),
     });
     {
         let mut hosts = HOSTS
@@ -448,6 +451,48 @@ async fn answer(mut stream: TcpStream, shared: Arc<Shared>) -> std::io::Result<(
 /// The longest line the page may put in the app's log.
 const LOG_LINE_MAX: usize = 300;
 
+/// The file the last call's log is kept in, among the app's cache files.
+const LOG_FILE: &str = "call.log";
+
+/// A call's log: each line on stderr, where a phone's log has it when
+/// the app is started from a terminal, and in a file of its own -- the
+/// app's stderr goes nowhere when the launcher starts it. One call's
+/// lines, each with the seconds since the call was served: the file is
+/// begun afresh with every call, so it holds the call that has just
+/// gone wrong, and never grows.
+struct CallLog {
+    path: Option<std::path::PathBuf>,
+    started: Instant,
+}
+
+impl CallLog {
+    /// A log for a call starting now, in the file at `path` -- emptied --
+    /// or on stderr alone when there is nowhere for the file.
+    fn begin(path: Option<std::path::PathBuf>) -> Self {
+        let path = path.filter(|path| std::fs::write(path, "").is_ok());
+        Self {
+            path,
+            started: Instant::now(),
+        }
+    }
+
+    /// Log what the page sent, as one line.
+    fn write(&self, text: &str) {
+        let line = log_line(text);
+        eprintln!("piirit: call: {line}");
+        let Some(path) = &self.path else { return };
+        let seconds = self.started.elapsed().as_secs_f64();
+        let appended = std::fs::OpenOptions::new()
+            .append(true)
+            .open(path)
+            .and_then(|mut file| {
+                std::io::Write::write_all(&mut file, format!("{seconds:7.1} {line}\n").as_bytes())
+            });
+        // A full disk takes nothing from the call: the line is on stderr.
+        drop(appended);
+    }
+}
+
 /// What the page asked to have logged, as one line of the log: what only
 /// a phone shows about a call -- which camera opened, which codecs were
 /// agreed, whether the other end's picture has frames -- read where the
@@ -495,7 +540,7 @@ async fn route(
                 None => Response::empty("400 Bad Request"),
             },
             ("POST", "/log") => {
-                eprintln!("piirit: call: {}", log_line(&text));
+                shared.log.write(&text);
                 Response::empty("204 No Content")
             }
             ("GET", "/commands") => commands(shared).await,
@@ -739,7 +784,7 @@ async fn write_response(stream: &mut TcpStream, response: &Response) -> std::io:
 mod tests {
     use super::{
         camera_command, command, encode_base64, facing_command, log_line, percent_encode,
-        shown_command, Video, BRIDGE, LOG_LINE_MAX, PAGE,
+        shown_command, CallLog, Video, BRIDGE, LOG_LINE_MAX, PAGE,
     };
     use crate::webxdc_host::decode_base64;
 
@@ -865,6 +910,33 @@ mod tests {
         );
         assert_eq!(log_line("two\nlines\r\nhere"), "two lines  here");
         assert_eq!(log_line(&"x".repeat(1000)).chars().count(), LOG_LINE_MAX);
+    }
+
+    #[test]
+    fn a_call_log_holds_one_call_line_by_line() {
+        let path = std::env::temp_dir().join(format!("piirit-call-log-{}", std::process::id()));
+        std::fs::write(&path, "the call before\n").unwrap();
+
+        let log = CallLog::begin(Some(path.clone()));
+        log.write("camera open: front");
+        log.write("video stats:\nsent");
+        let kept = std::fs::read_to_string(&path).unwrap();
+        std::fs::remove_file(&path).unwrap();
+
+        let lines: Vec<&str> = kept.lines().collect();
+        assert_eq!(lines.len(), 2, "{kept:?}");
+        // Seconds since the call began, then the line.
+        assert!(lines[0].starts_with("    0.0 "), "{kept:?}");
+        assert!(lines[0].ends_with(" camera open: front"), "{kept:?}");
+        assert!(lines[1].ends_with(" video stats: sent"), "{kept:?}");
+
+        // Nowhere for the file: stderr alone, and nothing breaks.
+        CallLog::begin(None).write("camera open: front");
+        let missing = std::env::temp_dir()
+            .join("piirit-no-such-dir")
+            .join("call.log");
+        CallLog::begin(Some(missing.clone())).write("camera open: front");
+        assert!(!missing.exists());
     }
 
     #[test]

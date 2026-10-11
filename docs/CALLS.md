@@ -244,12 +244,19 @@ served ahead of `calls.js`):
   picture is being drawn (a video track with frames, not switched off at
   their end) goes back on `/video`, which is what `Call`'s
   `local_video` and `remote_video` are.
-- **Logged.** What only a phone shows about a call goes to the app's log
-  as `piirit: call: …` lines, through `/log`: which camera opened and at
-  what size, a camera that would not open or turn and why, the picture
-  sections both ends agreed and their codecs in order, and whether the
-  other end's picture has frames. `journalctl -f | grep piirit` on the
-  phone, as root, shows them.
+- **Logged.** What only a phone shows about a call goes through `/log`:
+  which camera opened and at what size, a camera that would not open or
+  turn and why, the picture sections both ends agreed and their codecs
+  in order, whether the other end's picture has frames, and -- a few
+  seconds, then a quarter and three quarters of a minute after the call
+  connects or the camera changes -- what goes each way: frames, bytes a
+  frame (a black frame is a few dozen, a picture thousands), keyframes
+  asked for (a receiver that cannot decode asks over and over), and
+  which track the sender has. Each line goes to stderr as
+  `piirit: call: …`, and to `~/.cache/piirit/piirit/call.log`, begun
+  afresh with every call and each line stamped with the seconds since.
+  The file is what to read on the phone: the launcher sends the app's
+  stderr nowhere, and the journal has none of it.
 
 The call screen shows the page while there are pictures -- its pictures
 and nothing else of it: the bridge hides every element but the two
@@ -259,7 +266,8 @@ in the corner, mirrored only from the front camera. A tap puts the lines
 away, and they go by themselves once both ends are seen; the time of day
 gives way to how long, and the large clock goes. The camera switch is
 there in every call, and on the ringing screen of a video call, so it
-can be answered without the camera; turning it is a button beside it.
+can be answered without the camera; turning it is a button beside it,
+once the call is up. A video call is answered with the front camera.
 While there are pictures the screen is kept lit and the ear shield is
 off: a video call is held in front of the face, not to the ear.
 
