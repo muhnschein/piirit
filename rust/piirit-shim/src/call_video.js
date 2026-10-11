@@ -93,6 +93,9 @@ var piiritVideo = (function () {
     /* The camera's track, while it is open; and a camera on its way. */
     var camera = null;
     var opening = false;
+    /* The device the open camera is, kept when it is let go: a camera
+     * turned is one that is not this. */
+    var device = "";
     /* Every peer connection the page has made. */
     var connections = [];
     /* The other end's stream, and what it last said about its camera. */
@@ -101,8 +104,22 @@ var piiritVideo = (function () {
     var lastReport = "";
     var lookingAgain = false;
     var looks = 0;
+    var layoutDue = false;
 
     function noop() {}
+
+    /* A line for the app's log: what only a phone shows, seen there. */
+    function note(text) {
+        send("/log", text);
+    }
+
+    /* What a track is, for the log. */
+    function described(track) {
+        var settings = track.getSettings ? track.getSettings() : {};
+        return (track.label || "camera") + " " + (settings.width || "?") + "x"
+            + (settings.height || "?") + "@" + (settings.frameRate || "?")
+            + (settings.facingMode ? " " + settings.facingMode : "");
+    }
 
     function labelled(label) {
         return document.querySelector("[aria-label=\"" + label + "\"]");
@@ -154,20 +171,74 @@ var piiritVideo = (function () {
         return blank;
     }
 
-    /* Open the camera that faces the way asked for. */
-    function capture() {
+    /* Whether a camera's name says it faces `which`. */
+    var NAMED = {
+        user: /front|user|selfie/i,
+        environment: /back|rear|environment|main/i
+    };
+
+    /* The camera to open to face `which`, as a device id, or "" to let
+     * the engine pick by facingMode. A facingMode is only a preference,
+     * and Gecko on a phone may weigh it at nothing -- turned, the same
+     * camera came back -- so a camera whose name says which way it faces
+     * is asked for by its id; and turning from one, when no name says,
+     * asks for any camera that is not the one that was open. */
+    function cameraFor(which, avoid) {
+        if (!media.enumerateDevices) {
+            return Promise.resolve("");
+        }
+        return media.enumerateDevices().then(function (all) {
+            var cameras = all.filter(function (one) {
+                return one.kind === "videoinput" && one.deviceId;
+            });
+            if (cameras.length < 2) {
+                return "";
+            }
+            var named = cameras.filter(function (one) {
+                return NAMED[which].test(one.label || "");
+            });
+            if (named.length > 0) {
+                return named[0].deviceId;
+            }
+            var other = cameras.filter(function (one) {
+                return one.deviceId !== avoid;
+            });
+            return avoid && other.length > 0 ? other[0].deviceId : "";
+        }, function () {
+            return "";
+        });
+    }
+
+    /* Open the camera that faces the way asked for; `avoid` is the one
+     * that was open, when it was turned from. */
+    function capture(avoid) {
         if (!ask) {
             return Promise.reject(new Error("no camera"));
         }
-        var video = { facingMode: { ideal: facing } };
-        for (var key in CAPTURE) {
-            video[key] = CAPTURE[key];
-        }
-        return ask({ video: video }).then(function (given) {
+        return cameraFor(facing, avoid).then(function (id) {
+            var video = id ? { deviceId: { exact: id } } : { facingMode: { ideal: facing } };
+            for (var key in CAPTURE) {
+                video[key] = CAPTURE[key];
+            }
+            return ask({ video: video });
+        }).then(function (given) {
             var track = given.getVideoTracks()[0];
             if (!track) {
                 throw new Error("no camera");
             }
+            var settings = track.getSettings ? track.getSettings() : {};
+            device = settings.deviceId || "";
+            /* What the camera says it faces wins over what was asked:
+             * the picture is mirrored, and the app told, by it. */
+            if (settings.facingMode === "user" || settings.facingMode === "environment") {
+                facing = settings.facingMode;
+            }
+            note("camera open: " + described(track));
+            track.addEventListener("ended", function () {
+                if (track === camera) {
+                    note("camera ended by the engine: " + described(track));
+                }
+            });
             return track;
         });
     }
@@ -281,9 +352,19 @@ var piiritVideo = (function () {
     function layout() {
         var picture = preview();
         if (!picture) {
-            if (stream && looks < LOOKS) {
+            /* One look at a time, however often this is asked: each ask
+             * starting its own would spend the looks in a fraction of
+             * the time, and a camera slow to open would find none left. */
+            if (stream && !layoutDue && looks < LOOKS) {
                 looks += 1;
-                window.setTimeout(layout, AGAIN);
+                layoutDue = true;
+                window.setTimeout(function () {
+                    layoutDue = false;
+                    layout();
+                }, AGAIN);
+            } else if (stream && !layoutDue && looks === LOOKS) {
+                looks += 1;
+                note("our picture: the page never drew it");
             }
             return;
         }
@@ -343,6 +424,7 @@ var piiritVideo = (function () {
     function giveUp(err) {
         failed = true;
         failure = describe(err);
+        note("camera would not open: " + (failure || "no reason given"));
         wanted = false;
         if (camera) {
             camera.stop();
@@ -357,9 +439,9 @@ var piiritVideo = (function () {
 
     /* Open the camera and put it in place; `otherwise` if it will not.
      * A camera switched off while it was opening is let go again. */
-    function open(otherwise) {
+    function open(otherwise, avoid) {
         opening = true;
-        capture().then(function (track) {
+        capture(avoid).then(function (track) {
             opening = false;
             if (!wanted || !stream) {
                 track.stop();
@@ -413,16 +495,58 @@ var piiritVideo = (function () {
             return;
         }
         var before = facing;
+        var was = device;
         facing = which;
         if (!camera || opening) {
             report();
             return;
         }
         camera.stop();
-        open(function () {
+        open(function (err) {
+            note("camera would not turn: " + describe(err));
             facing = before;
             open(giveUp);
+        }, was);
+    }
+
+    /* Each picture section of a description, for the log: which way it
+     * goes, and its codecs in the order given. */
+    function videoSections(description) {
+        if (!description || !description.sdp) {
+            return "none";
+        }
+        var found = [];
+        var names = {};
+        var current = null;
+        description.sdp.split(/\r?\n/).forEach(function (line) {
+            var media = /^m=(\w+) (\d+) [^ ]+ (.*)$/.exec(line);
+            if (media) {
+                current = media[1] === "video"
+                    ? { port: media[2], types: media[3].split(" "), way: "" }
+                    : null;
+                if (current) {
+                    found.push(current);
+                }
+                return;
+            }
+            var map = /^a=rtpmap:(\d+) ([^/]+)/.exec(line);
+            if (map) {
+                names[map[1]] = map[2];
+            }
+            var way = /^a=(sendrecv|sendonly|recvonly|inactive)$/.exec(line);
+            if (way && current) {
+                current.way = way[1];
+            }
         });
+        return found.map(function (section) {
+            var codecs = section.types.map(function (type) {
+                return names[type] || type;
+            }).filter(function (name) {
+                return !/^(rtx|red|ulpfec)$/i.test(name);
+            });
+            return [section.port === "0" ? "rejected" : "", section.way, codecs.join(",")]
+                .filter(function (part) { return part; }).join(" ");
+        }).join("; ") || "none";
     }
 
     function watch(connection) {
@@ -433,8 +557,16 @@ var piiritVideo = (function () {
             }
             var track = event.track;
             if (track && track.kind === "video") {
-                track.addEventListener("mute", report);
-                track.addEventListener("unmute", report);
+                note("their picture: track " + (track.muted ? "muted" : "live")
+                    + (event.streams && event.streams[0] ? "" : ", in no stream"));
+                track.addEventListener("mute", function () {
+                    note("their picture: no frames");
+                    report();
+                });
+                track.addEventListener("unmute", function () {
+                    note("their picture: frames");
+                    report();
+                });
                 track.addEventListener("ended", report);
             }
             report();
@@ -442,6 +574,8 @@ var piiritVideo = (function () {
         /* Negotiated: there are encodings to hold to the caps. */
         connection.addEventListener("signalingstatechange", function () {
             if (connection.signalingState === "stable") {
+                note("video, ours: " + videoSections(connection.localDescription)
+                    + " | theirs: " + videoSections(connection.remoteDescription));
                 videoSenders(connection).forEach(cap);
             }
         });
@@ -541,6 +675,25 @@ var piiritVideo = (function () {
                     });
                 });
         };
+    }
+
+    /* The page puts the stream on its picture when it draws it: placed
+     * then, rather than whenever the next look comes round. */
+    var Media = window.HTMLMediaElement;
+    var source = Media && Object.getOwnPropertyDescriptor
+        ? Object.getOwnPropertyDescriptor(Media.prototype, "srcObject") : null;
+    if (source && source.set && source.configurable) {
+        Object.defineProperty(Media.prototype, "srcObject", {
+            configurable: true,
+            enumerable: source.enumerable,
+            get: source.get,
+            set: function (value) {
+                source.set.call(this, value);
+                if (value && value === stream) {
+                    window.setTimeout(layout, 0);
+                }
+            }
+        });
     }
 
     /* Nothing of the page but its pictures: the app draws the rest. */

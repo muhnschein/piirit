@@ -211,7 +211,12 @@ served ahead of `calls.js`):
   its last frame. So the bridge presses the page's own *Start camera* or
   *Stop camera*, as it presses the microphone's.
 - **One camera at a time.** Turned, the open camera is stopped before
-  the other is asked for; a phone opens one at a time. If the other will
+  the other is asked for; a phone opens one at a time. The other is asked
+  for by its device id -- the camera whose name says it faces that way,
+  or else any that is not the one just open -- because a `facingMode` is
+  only a preference, and on the phone Gecko gave the same camera back.
+  What the camera's own settings say it faces is what is mirrored and
+  reported. If the other will
   not open, the first is opened again; if neither will, the camera is
   reported as failed, with what the engine said -- written to the app's
   log as `piirit: the camera would not open: …` -- and the app switches
@@ -239,6 +244,12 @@ served ahead of `calls.js`):
   picture is being drawn (a video track with frames, not switched off at
   their end) goes back on `/video`, which is what `Call`'s
   `local_video` and `remote_video` are.
+- **Logged.** What only a phone shows about a call goes to the app's log
+  as `piirit: call: …` lines, through `/log`: which camera opened and at
+  what size, a camera that would not open or turn and why, the picture
+  sections both ends agreed and their codecs in order, and whether the
+  other end's picture has frames. `journalctl -f | grep piirit` on the
+  phone, as root, shows them.
 
 The call screen shows the page while there are pictures -- its pictures
 and nothing else of it: the bridge hides every element but the two

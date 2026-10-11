@@ -445,6 +445,21 @@ async fn answer(mut stream: TcpStream, shared: Arc<Shared>) -> std::io::Result<(
     write_response(&mut stream, &response).await
 }
 
+/// The longest line the page may put in the app's log.
+const LOG_LINE_MAX: usize = 300;
+
+/// What the page asked to have logged, as one line of the log: what only
+/// a phone shows about a call -- which camera opened, which codecs were
+/// agreed, whether the other end's picture has frames -- read where the
+/// app's log is. Kept to one line, and to a length, whatever the page
+/// sends.
+fn log_line(text: &str) -> String {
+    text.chars()
+        .map(|c| if c.is_control() { ' ' } else { c })
+        .take(LOG_LINE_MAX)
+        .collect()
+}
+
 /// Pick the answer.
 async fn route(
     shared: &Arc<Shared>,
@@ -479,6 +494,10 @@ async fn route(
                 }
                 None => Response::empty("400 Bad Request"),
             },
+            ("POST", "/log") => {
+                eprintln!("piirit: call: {}", log_line(&text));
+                Response::empty("204 No Content")
+            }
             ("GET", "/commands") => commands(shared).await,
             ("GET", "/ice") => ice_servers(shared),
             ("GET", "/avatar") => avatar(shared).await,
@@ -719,8 +738,8 @@ async fn write_response(stream: &mut TcpStream, response: &Response) -> std::io:
 #[cfg(test)]
 mod tests {
     use super::{
-        camera_command, command, encode_base64, facing_command, percent_encode, shown_command,
-        Video, BRIDGE, PAGE,
+        camera_command, command, encode_base64, facing_command, log_line, percent_encode,
+        shown_command, Video, BRIDGE, LOG_LINE_MAX, PAGE,
     };
     use crate::webxdc_host::decode_base64;
 
@@ -836,6 +855,16 @@ mod tests {
         );
         assert_eq!(Video::from_json("[true]"), None);
         assert_eq!(Video::from_json("camera"), None);
+    }
+
+    #[test]
+    fn a_log_line_is_one_line_and_short() {
+        assert_eq!(
+            log_line("camera open: front 640x480@30"),
+            "camera open: front 640x480@30"
+        );
+        assert_eq!(log_line("two\nlines\r\nhere"), "two lines  here");
+        assert_eq!(log_line(&"x".repeat(1000)).chars().count(), LOG_LINE_MAX);
     }
 
     #[test]

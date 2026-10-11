@@ -41,6 +41,9 @@ class Track {
         this.listeners = {};
         this.log = null;
     }
+    getSettings() {
+        return this.settings;
+    }
     stop() {
         this.readyState = "ended";
         if (this.log) {
@@ -118,10 +121,30 @@ function makeWorld(search, options) {
         cameraDelay: null
     };
 
-    function camera(facing) {
-        const track = new Track("video", "camera-" + facing, { facingMode: facing });
+    // The phone's cameras, as the engine lists them. By default as
+    // Gecko on a phone was seen to: names that say nothing of which way
+    // a camera faces, a facingMode weighed at nothing (the first camera
+    // opens whatever is asked), and no facingMode in a track's settings.
+    const cameras = opts.cameras || [
+        { deviceId: "cam-a", label: "camera 0", facing: "user" },
+        { deviceId: "cam-b", label: "camera 1", facing: "environment" },
+    ];
+    function camera(one) {
+        const settings = { deviceId: one.deviceId, width: 640, height: 480, frameRate: 30 };
+        if (opts.reportsFacing) {
+            settings.facingMode = one.facing;
+        }
+        const track = new Track("video", "camera-" + one.facing, settings);
         track.log = log;
         return track;
+    }
+    function pick(video) {
+        if (typeof video === "object" && video.deviceId && video.deviceId.exact) {
+            return cameras.find((one) => one.deviceId === video.deviceId.exact) || null;
+        }
+        const wanted = typeof video === "object" && video.facingMode ? video.facingMode.ideal : "";
+        const facing = opts.honoursFacing && cameras.find((one) => one.facing === wanted);
+        return facing || cameras[0];
     }
 
     // What a phone camera can do, as Gecko weighs it: a mode's size, and
@@ -152,15 +175,15 @@ function makeWorld(search, options) {
         getUserMedia(asked) {
             log.push("gum:" + JSON.stringify(asked));
             if (asked.video) {
-                const facing = asked.video.facingMode ? asked.video.facingMode.ideal : "user";
-                if (typeof asked.video === "object"
-                    && !MODES.some((mode) => meets(mode, asked.video))) {
+                const one = pick(asked.video);
+                if (!one || (typeof asked.video === "object"
+                    && !MODES.some((mode) => meets(mode, asked.video)))) {
                     return Promise.reject(refusal("OverconstrainedError", "Constraints could be not satisfied."));
                 }
-                if (world.cameraFails(facing)) {
+                if (world.cameraFails(one.facing)) {
                     return Promise.reject(refusal("NotReadableError", "Failed to allocate videosource"));
                 }
-                const given = new Stream([camera(facing)]);
+                const given = new Stream([camera(one)]);
                 if (world.cameraDelay) {
                     return new Promise((resolve) => {
                         world.cameraDelay = () => resolve(given);
@@ -173,6 +196,12 @@ function makeWorld(search, options) {
             const given = new Stream([mic]);
             world.streams.push(given);
             return Promise.resolve(given);
+        },
+        enumerateDevices() {
+            return Promise.resolve([{ kind: "audioinput", deviceId: "mic", label: "mic" }]
+                .concat(cameras.map((one) => ({
+                    kind: "videoinput", deviceId: one.deviceId, label: one.label
+                }))));
         }
     };
 
@@ -291,12 +320,30 @@ function makeWorld(search, options) {
         }
     }
 
+    // An engine's media element, whose srcObject is an accessor on its
+    // prototype, as Gecko's is.
+    function HTMLMediaElement() {}
+    Object.defineProperty(HTMLMediaElement.prototype, "srcObject", {
+        configurable: true,
+        enumerable: true,
+        get() { return this.held; },
+        set(value) { this.held = value; }
+    });
+    world.newVideo = () => {
+        const element = new Element("video");
+        Object.setPrototypeOf(element, Object.assign(Object.create(HTMLMediaElement.prototype), {
+            appendChild: Element.prototype.appendChild
+        }));
+        return element;
+    };
+
     const window = {
         location: { search, hash: "" },
         navigator: { mediaDevices },
         document,
         XMLHttpRequest,
         RTCPeerConnection: PeerConnection,
+        HTMLMediaElement: opts.mediaElement ? HTMLMediaElement : undefined,
         Promise,
         JSON,
         setTimeout(fn) {
@@ -480,7 +527,7 @@ test("switched off, the camera is let go and the blank track goes back", async (
     assert.equal(box.style.display, "none", "an empty picture is still drawn");
 });
 
-test("turned, the open camera is let go before the other is opened", async () => {
+test("turned, the open camera is let go before the other is opened, by its id", async () => {
     const world = makeWorld(VIDEO);
     const { connection, picture } = await page(world);
     assert.equal(picture.style.transform, "scaleX(-1)",
@@ -490,7 +537,7 @@ test("turned, the open camera is let go before the other is opened", async () =>
     await command(world, "facing-environment");
 
     const stop = world.log.indexOf("stop:camera-user");
-    const open = world.log.findIndex((line) => line.includes('"environment"'));
+    const open = world.log.findIndex((line) => line.startsWith("gum:") && line.includes('"cam-b"'));
     assert.ok(stop >= 0 && open > stop,
         "the second camera was asked for while the first was open: " + world.log);
     assert.equal(videoSender(connection).track.label, "camera-environment");
@@ -717,4 +764,125 @@ test("a call placed here offers VP8 first, its retransmissions beside it", async
     const noVp8 = "v=0\r\nm=video 9 UDP/TLS/RTP/SAVPF 126 97\r\na=rtpmap:126 H264/90000\r\n";
     world.window.calls.startCall(noVp8);
     assert.equal(posts(world, "/start")[1], noVp8);
+});
+
+test("a camera whose name says which way it faces is the one opened for that way", async () => {
+    const world = makeWorld(VIDEO, {
+        cameras: [
+            { deviceId: "cam-r", label: "Back camera", facing: "environment" },
+            { deviceId: "cam-f", label: "Front camera", facing: "user" },
+        ],
+    });
+    const { connection, picture } = await page(world);
+    assert.equal(videoSender(connection).track.label, "camera-user",
+        "the front camera was not the one opened first");
+    assert.equal(picture.style.transform, "scaleX(-1)");
+
+    await command(world, "facing-environment");
+    assert.equal(videoSender(connection).track.label, "camera-environment");
+    await command(world, "facing-user");
+    assert.equal(videoSender(connection).track.label, "camera-user",
+        "turned back, the front camera was not found by its name");
+});
+
+test("what the camera says it faces is what is mirrored and reported", async () => {
+    // One camera, on the back, that says so: asked for the front, the
+    // back is what there is.
+    const world = makeWorld(VIDEO, {
+        reportsFacing: true,
+        cameras: [{ deviceId: "cam-x", label: "camera 0", facing: "environment" }],
+    });
+    const { picture } = await page(world);
+    assert.equal(lastVideo(world).front, false, "the back camera was reported as the front");
+    assert.equal(picture.style.transform, "none", "the back camera's picture is mirrored");
+});
+
+test("a picture the page draws late is placed, however often it was looked for", async () => {
+    const world = makeWorld(VIDEO);
+    const connection = new world.window.RTCPeerConnection({});
+    const channel = connection.createDataChannel("mutedState", { negotiated: true, id: 3 });
+    const stream = await world.window.navigator.mediaDevices.getUserMedia({
+        video: true, audio: true
+    });
+    stream.getTracks().forEach((track) => connection.addTrack(track, stream));
+    await settleAll();
+    // The other end says things about its camera while this end's camera
+    // is still on its way to the page's picture: each is a report, and
+    // each report looks for the picture.
+    for (let i = 0; i < 8; i++) {
+        channel.say(JSON.stringify({ audioEnabled: true, videoEnabled: i % 2 === 0 }));
+    }
+    for (let round = 0; round < 8; round++) {
+        runTimers(world);
+    }
+    const box = new Element("div");
+    const picture = box.appendChild(new Element("video"));
+    picture.srcObject = stream;
+    world.videos.push(picture);
+    runTimers(world);
+
+    assert.equal(box.style.display, "block",
+        "the looks ran out before a picture drawn two seconds late");
+});
+
+test("the moment the page puts the stream on its picture, it is placed", async () => {
+    const world = makeWorld(VIDEO, { mediaElement: true });
+    const connection = new world.window.RTCPeerConnection({});
+    const stream = await world.window.navigator.mediaDevices.getUserMedia({
+        video: true, audio: true
+    });
+    stream.getTracks().forEach((track) => connection.addTrack(track, stream));
+    await settleAll();
+    // Long after every look has been spent.
+    for (let round = 0; round < 60; round++) {
+        runTimers(world);
+    }
+    const box = new Element("div");
+    const picture = box.appendChild(world.newVideo());
+    world.videos.push(picture);
+    picture.srcObject = stream;
+    assert.equal(picture.held, stream, "the page's own srcObject was not kept");
+    runTimers(world);
+
+    assert.equal(box.style.display, "block", "the picture was not placed when it was drawn");
+});
+
+test("what only a phone shows is written to the app's log", async () => {
+    const world = makeWorld(VIDEO);
+    const { connection } = await page(world);
+    assert.ok(posts(world, "/log").some((line) => /^camera open: camera-user 640x480@30/.test(line)),
+        "the camera that opened is not logged: " + posts(world, "/log"));
+
+    connection.localDescription = { sdp: [
+        "v=0",
+        "m=audio 9 UDP/TLS/RTP/SAVPF 109",
+        "a=rtpmap:109 opus/48000/2",
+        "m=video 9 UDP/TLS/RTP/SAVPF 120 124 126",
+        "a=sendrecv",
+        "a=rtpmap:120 VP8/90000",
+        "a=rtpmap:124 rtx/90000",
+        "a=rtpmap:126 H264/90000",
+    ].join("\r\n") };
+    connection.remoteDescription = { sdp: [
+        "v=0",
+        "m=video 9 UDP/TLS/RTP/SAVPF 126",
+        "a=recvonly",
+        "a=rtpmap:126 H264/90000",
+        "m=video 0 UDP/TLS/RTP/SAVPF 120",
+        "a=rtpmap:120 VP8/90000",
+    ].join("\r\n") };
+    connection.signalingState = "stable";
+    connection.fire("signalingstatechange");
+    assert.ok(posts(world, "/log").includes(
+        "video, ours: sendrecv VP8,H264 | theirs: recvonly H264; rejected VP8"),
+        "the negotiated codecs are not logged: " + posts(world, "/log"));
+
+    const track = connection.transceivers[1].receiver.track;
+    track.muted = true;
+    connection.fire("track", { track, streams: [] });
+    track.muted = false;
+    track.fire("unmute");
+    const lines = posts(world, "/log");
+    assert.ok(lines.includes("their picture: track muted, in no stream"), String(lines));
+    assert.ok(lines.includes("their picture: frames"), String(lines));
 });
