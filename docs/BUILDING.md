@@ -274,7 +274,8 @@ work.
 
 ### Making a video smaller
 
-A video picked to send is recoded first when it comes near the core's
+A video picked to send is recoded, as soon as it is picked and before the
+reader sends it, when it comes near the core's
 recommended message size (four fifths of it), or whenever the outgoing
 media quality is set to worse (`rust/piirit-shim/src/video.rs`,
 `plan` in `rust/piirit-video`, issue #111): the phone's recorder writes
