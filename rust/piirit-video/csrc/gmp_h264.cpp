@@ -399,7 +399,7 @@ private:
             encoded->Destroy();
             return;
         }
-        std::byte *at = reinterpret_cast<std::byte *>(encoded->Buffer());
+        auto *at = reinterpret_cast<std::byte *>(encoded->Buffer());
         for (int i = 0; i < count; i++) {
             if (nals[i].i_type == NAL_SEI) {
                 continue;
