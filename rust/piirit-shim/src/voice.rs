@@ -731,13 +731,13 @@ mod tests {
 
     #[test]
     fn what_is_not_a_readable_wav_is_said_so() {
-        assert!(parse_header(b"OggS\0\0\0\0\0\0\0\0\0\0").is_err());
+        parse_header(b"OggS\0\0\0\0\0\0\0\0\0\0").unwrap_err();
         // The samples before any word of what they are.
-        assert!(parse_header(b"RIFF\0\0\0\0WAVEdata\0\0\0\0").is_err());
+        parse_header(b"RIFF\0\0\0\0WAVEdata\0\0\0\0").unwrap_err();
         // Twelve-bit samples, which nothing writes.
-        assert!(parse_header(&header(1, 16_000, 12, 1, 0)).is_err());
+        parse_header(&header(1, 16_000, 12, 1, 0)).unwrap_err();
         // Compressed WAV, format 2 (ADPCM).
-        assert!(parse_header(&header(1, 16_000, 16, 2, 0)).is_err());
+        parse_header(&header(1, 16_000, 16, 2, 0)).unwrap_err();
     }
 
     #[test]
@@ -916,7 +916,7 @@ mod tests {
 
         // Once samples have been read from where it was asked to go, that
         // is where the recording is.
-        let mut transcoder = Transcoder::new(asked.clone(), mp3.clone(), 32_000, 0).unwrap();
+        let mut transcoder = Transcoder::new(asked.clone(), mp3, 32_000, 0).unwrap();
         append(&asked, &header(1, SAMPLE_RATE, 16, 1, 0));
         append(&asked, &tone(SAMPLE_RATE, 500));
         transcoder.pump().unwrap();
@@ -966,7 +966,7 @@ mod tests {
         // It wrote something that is not a WAV.
         let transcoder = Transcoder::new(wav.clone(), mp3.clone(), 32_000, 0).unwrap();
         append(&wav, b"this is not a recording at all");
-        assert!(transcoder.finish().is_err());
+        transcoder.finish().unwrap_err();
         assert!(!mp3.exists() && !wav.exists());
 
         // Cancelled halfway.

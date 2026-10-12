@@ -150,7 +150,7 @@ fn the_preparing_line_fits_two_lines_in_every_language() {
     let measured_ptr: *mut Vec<(String, String)> = std::ptr::addr_of_mut!(measured);
     let mut bars: Vec<String> = Vec::new();
     let bars_ptr: *mut Vec<String> = std::ptr::addr_of_mut!(bars);
-    let texts = wanted.clone();
+    let texts = wanted;
 
     single_shot(Duration::from_millis(200), move || unsafe {
         for (language, text) in &texts {

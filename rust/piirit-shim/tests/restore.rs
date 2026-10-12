@@ -153,7 +153,7 @@ fn a_profile_is_taken_over_from_a_device_or_a_file_and_never_half_kept() {
         }
     });
 
-    let engine_ptr = &engine as *const QmlEngine;
+    let engine_ptr: *const QmlEngine = &engine;
     single_shot(Duration::from_secs(10), move || {
         // SAFETY: see tests/smoke.rs -- the callback only fires while
         // `exec()` is still running on this thread.
@@ -264,19 +264,13 @@ fn assert_imports_and_io(calls: &[(String, Value)], context: &str) {
 /// on was stopped in the core rather than left running, taking its own
 /// account with it when it answered too late to matter.
 fn assert_nothing_half_kept(calls: &[(String, Value)], context: &str) {
-    let checked: Vec<String> = calls
-        .iter()
-        .filter(|(method, _)| method == "check_qr")
-        .map(|(_, params)| {
-            params
-                .get(1)
-                .and_then(Value::as_str)
-                .unwrap_or_default()
-                .to_string()
-        })
-        .collect();
     assert!(
-        checked.contains(&"DCBACKUP2:toonew.example".to_string()),
+        calls
+            .iter()
+            .filter(|(method, _)| method == "check_qr")
+            .any(|(_, params)| {
+                params.get(1).and_then(Value::as_str) == Some("DCBACKUP2:toonew.example")
+            }),
         "the code was not read before the transfer. {context}"
     );
     let removed: Vec<u64> = calls

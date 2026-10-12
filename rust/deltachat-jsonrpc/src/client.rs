@@ -90,14 +90,19 @@ async fn read_responses(stdout: ChildStdout, pending: &PendingMap) {
         let Some((id, outcome)) = parse_response(&line) else {
             continue;
         };
-        if let Some(sender) = lock(pending).remove(&id) {
-            let _ = sender.send(outcome);
+        // Out of the map first, so the lock is not held while the answer
+        // is handed over.
+        let waiting = lock(pending).remove(&id);
+        if let Some(sender) = waiting {
+            // A closed receiver is a caller that stopped waiting (its
+            // timeout ran out); there is no one left to tell.
+            sender.send(outcome).ok();
         }
     }
     // Transport is gone: wake up anyone still waiting rather than leaving
     // them hanging forever.
     for (_, sender) in lock(pending).drain() {
-        let _ = sender.send(Err(RpcError::TransportClosed));
+        sender.send(Err(RpcError::TransportClosed)).ok();
     }
 }
 
@@ -127,10 +132,8 @@ async fn keep_stderr_tail(stderr: ChildStderr, tail: &Mutex<Vec<String>>) {
     while let Ok(Some(line)) = lines.next_line().await {
         let mut kept = lock(tail);
         kept.push(line);
-        if kept.len() > STDERR_TAIL_CAPACITY {
-            let excess = kept.len() - STDERR_TAIL_CAPACITY;
-            kept.drain(0..excess);
-        }
+        let excess = kept.len().saturating_sub(STDERR_TAIL_CAPACITY);
+        kept.drain(..excess);
     }
 }
 
@@ -321,9 +324,7 @@ impl RpcClient {
     /// profile of the core reads `/proc/<pid>` by.
     #[must_use]
     pub fn pid(&self) -> Option<u32> {
-        lock(&self.child)
-            .as_ref()
-            .and_then(tokio::process::Child::id)
+        lock(&self.child).as_ref().and_then(Child::id)
     }
 
     /// Terminate the child process and wait for the reader/writer tasks to
@@ -335,12 +336,16 @@ impl RpcClient {
     pub async fn shutdown(&self) -> std::io::Result<()> {
         let child = lock(&self.child).take();
         if let Some(mut child) = child {
-            let _ = child.start_kill();
+            // Fails only for a child that has already exited, which is
+            // what this is for; the wait below says how it went.
+            child.start_kill().ok();
             child.wait().await?;
         }
         let reader_task = lock(&self.reader_task).take();
         if let Some(task) = reader_task {
-            let _ = task.await;
+            // Its only result is whether it panicked or was cancelled, and
+            // either way it has stopped, which is all shutdown waits for.
+            task.await.ok();
         }
         let writer_task = lock(&self.writer_task).take();
         if let Some(task) = writer_task {

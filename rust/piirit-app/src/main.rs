@@ -1,6 +1,21 @@
 //! Locates the server binary, the `qml/` directory and the translations,
 //! registers the context properties, and hands off to the QML engine.
 
+// Shipped code is held to more than tests are; piirit-shim/src/lib.rs
+// says the rest.
+#![cfg_attr(
+    not(test),
+    deny(
+        clippy::indexing_slicing,
+        clippy::string_slice,
+        clippy::arithmetic_side_effects,
+        clippy::let_underscore_must_use,
+        clippy::panic,
+        clippy::panic_in_result_fn,
+        clippy::unwrap_in_result,
+        clippy::get_unwrap
+    )
+)]
 // See piirit-shim/src/lib.rs: qmetaobject's macros expand to references
 // across that crate, and upstream's own examples use the glob.
 #![allow(clippy::wildcard_imports)]

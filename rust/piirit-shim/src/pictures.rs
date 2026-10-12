@@ -61,7 +61,7 @@ cpp! {{
     static QImage piirit_picture(const QString &id, const QSize &requested) {
         QString file;
         int kind = rust!(PiiritPictures_kind [id: &QString as "const QString &", file: &mut QString as "QString &"] -> i32 as "int" {
-            match crate::pictures::Recipe::parse(&id.to_string()) {
+            match Recipe::parse(&id.to_string()) {
                 Some(recipe) => {
                     *file = QString::from(recipe.file.as_str());
                     recipe.kind as i32
@@ -108,7 +108,7 @@ cpp! {{
                 (usize::try_from(width), usize::try_from(height), usize::try_from(stride)) else {
                 return false;
             };
-            let Some(recipe) = crate::pictures::Recipe::parse(&id.to_string()) else {
+            let Some(recipe) = Recipe::parse(&id.to_string()) else {
                 return false;
             };
             if bits.is_null() || width == 0 || height == 0 || stride < width {

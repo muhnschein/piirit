@@ -15,6 +15,22 @@
 //! happens: [`probe`] reads a file's header, [`plan`] decides from that
 //! whether recoding is worth it and at what size, and [`recode`] does it.
 
+// Shipped code is held to more than tests are; piirit-shim/src/lib.rs
+// says the rest.
+#![cfg_attr(
+    not(test),
+    deny(
+        clippy::indexing_slicing,
+        clippy::string_slice,
+        clippy::arithmetic_side_effects,
+        clippy::let_underscore_must_use,
+        clippy::panic,
+        clippy::panic_in_result_fn,
+        clippy::unwrap_in_result,
+        clippy::get_unwrap
+    )
+)]
+
 use std::ffi::{c_char, c_int, c_void, CStr, CString};
 use std::path::Path;
 

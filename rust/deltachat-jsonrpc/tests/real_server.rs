@@ -1967,9 +1967,7 @@ async fn offline_round_trip_against_real_core() {
         .await
         .expect("get_messages after clearing the reaction");
     assert!(
-        cleared[&first]
-            .get("reactions")
-            .is_some_and(serde_json::Value::is_null),
+        cleared[&first].get("reactions").is_some_and(Value::is_null),
         "an empty list did not take the reaction off: {:?}",
         cleared[&first]
     );

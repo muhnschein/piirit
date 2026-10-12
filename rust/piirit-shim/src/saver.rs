@@ -115,7 +115,8 @@ fn free_name(folder: &std::path::Path, name: &str) -> std::path::PathBuf {
     }
     let (stem, extension) = match name.rfind('.') {
         // A leading dot is a hidden file's name, not an extension.
-        Some(dot) if dot > 0 => (&name[..dot], &name[dot..]),
+        // `rfind` answers with a character boundary, so this split is one.
+        Some(dot) if dot > 0 => name.split_at(dot),
         _ => (name, ""),
     };
     (2..=u32::MAX)
@@ -161,14 +162,14 @@ mod tests {
         .expect("copy from a url");
         assert_eq!(saved, pictures.join("notes").to_string_lossy());
 
-        assert!(copy_into("", &pictures.to_string_lossy(), "").is_err());
-        assert!(copy_into(&source.to_string_lossy(), "", "").is_err());
-        assert!(copy_into(
+        copy_into("", &pictures.to_string_lossy(), "").unwrap_err();
+        copy_into(&source.to_string_lossy(), "", "").unwrap_err();
+        copy_into(
             &temp.join("missing.png").to_string_lossy(),
             &pictures.to_string_lossy(),
-            ""
+            "",
         )
-        .is_err());
+        .unwrap_err();
         let _ = std::fs::remove_dir_all(&temp);
     }
 

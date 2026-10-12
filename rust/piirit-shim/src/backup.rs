@@ -145,9 +145,9 @@ impl Backup {
         runtime.spawn(async move {
             // Fire and forget: the write's own answer is what clears the
             // page, and it comes either way.
-            let _ = rpc
-                .call::<_, ()>("stop_ongoing_process", (account_id,))
-                .await;
+            rpc.call::<_, ()>("stop_ongoing_process", (account_id,))
+                .await
+                .ok();
         });
     }
 

@@ -2960,7 +2960,7 @@ mod tests {
             &mp4_box(*b"trak", &mp4_box(*b"tkhd", &tkhd(1920, 1080, true))),
         );
         let turned = dir.join("upright.mp4");
-        std::fs::write(&turned, [ftyp.clone(), upright, mdat.clone()].concat()).expect("write");
+        std::fs::write(&turned, [ftyp.clone(), upright, mdat].concat()).expect("write");
         assert_eq!(
             video_dimensions(&turned.to_string_lossy()),
             Some((1080, 1920))
@@ -2994,7 +2994,7 @@ mod tests {
         std::fs::write(&gif, b"GIF89a\x2c\x01\x02\x00rest").expect("write");
         assert_eq!(video_dimensions(&gif.to_string_lossy()), None);
         let sound = dir.join("sound.mp4");
-        std::fs::write(&sound, [ftyp.clone(), mp4_box(*b"moov", &audio)].concat()).expect("write");
+        std::fs::write(&sound, [ftyp, mp4_box(*b"moov", &audio)].concat()).expect("write");
         assert_eq!(video_dimensions(&sound.to_string_lossy()), None);
         assert_eq!(
             video_dimensions(&dir.join("missing.mp4").to_string_lossy()),

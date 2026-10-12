@@ -56,7 +56,7 @@ fn methods_properties_and_signals_are_exposed_verbatim_snake_case() {
     ";
     engine.load_data(QByteArray::from(qml));
 
-    let engine_ptr = &engine as *const QmlEngine;
+    let engine_ptr: *const QmlEngine = &engine;
     single_shot(Duration::from_secs(8), move || {
         // SAFETY: see tests/smoke.rs -- same lifetime argument.
         unsafe {

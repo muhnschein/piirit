@@ -434,6 +434,6 @@ mod tests {
         assert_eq!(decode_grey(&blank), None);
         assert!(parse_pnm(b"not an image").is_none());
         assert!(parse_pnm(b"P5\n4 4\n255\nshort").is_none());
-        assert!(encode_modules("").is_ok());
+        encode_modules("").unwrap();
     }
 }

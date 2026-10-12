@@ -408,8 +408,11 @@ impl Call {
             return;
         };
         runtime.spawn(async move {
-            let _: Result<serde_json::Value, _> =
-                rpc.call("end_call", (account_id, message_id)).await;
+            // Without waiting means without an answer to act on: the call
+            // ending reaches this page as the core's own event.
+            rpc.call::<_, serde_json::Value>("end_call", (account_id, message_id))
+                .await
+                .ok();
         });
     }
 

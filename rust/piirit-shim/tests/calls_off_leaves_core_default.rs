@@ -104,7 +104,7 @@ fn calls_off_leave_the_core_at_its_default_and_only_the_reader_says_nobody() {
     let window = format!("file://{}", tree.join("piirit.qml").display());
     let mut steps: Vec<(&str, Vec<String>)> = Vec::new();
     let steps_ptr: *mut Vec<(&str, Vec<String>)> = std::ptr::addr_of_mut!(steps);
-    let seen = journal.clone();
+    let seen = journal;
 
     macro_rules! call {
         ($name:expr $(, $arg:expr)*) => {{

@@ -360,7 +360,7 @@ fn a_chats_media_has_pages_of_its_own_behind_the_tiles() {
     });
 
     let page = media_page.clone();
-    let folder = downloads_for_probe.clone();
+    let folder = downloads_for_probe;
     single_shot(Duration::from_secs(7), move || unsafe {
         record!("files-count", get!("media", "count"));
         record!("file-name", get!("fileName", "text"));
@@ -397,7 +397,7 @@ fn a_chats_media_has_pages_of_its_own_behind_the_tiles() {
         );
     });
 
-    let page = media_page.clone();
+    let page = media_page;
     single_shot(Duration::from_secs(11), move || unsafe {
         record!("apps-count", get!("media", "count"));
         record!("app-name", get!("webxdcName", "text"));
@@ -414,7 +414,7 @@ fn a_chats_media_has_pages_of_its_own_behind_the_tiles() {
         );
     });
 
-    let page = contact_page.clone();
+    let page = contact_page;
     single_shot(Duration::from_secs(13), move || unsafe {
         record!("empty-loaded", get!("media", "loaded"));
         record!("empty-count", get!("media", "count"));
@@ -427,8 +427,8 @@ fn a_chats_media_has_pages_of_its_own_behind_the_tiles() {
         );
     });
 
-    let tiles_url = tiles.clone();
-    let page = group_page.clone();
+    let tiles_url = tiles;
+    let page = group_page;
     single_shot(Duration::from_secs(15), move || unsafe {
         record!("contact-tiles", get!("mediaKinds", "visible"));
         record!("contact-apps", get!("appsTile", "objectName"));

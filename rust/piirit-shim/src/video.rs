@@ -96,7 +96,9 @@ pub(crate) fn discard(path: &str) {
     };
     let path = Path::new(path);
     if path.parent() == dir.parent() && path.file_name().is_some() {
-        let _ = std::fs::remove_file(path);
+        if let Err(err) = std::fs::remove_file(path) {
+            eprintln!("piirit: removing recoded video {}: {err}", path.display());
+        }
     }
 }
 

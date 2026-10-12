@@ -471,7 +471,8 @@ impl ChatList {
             // counts back.
             let pinned = target.iter().filter(|row| row.is_pinned).count();
             this_mut.pinned_count = u32::try_from(pinned).unwrap_or(u32::MAX);
-            this_mut.unpinned_count = u32::try_from(target.len() - pinned).unwrap_or(u32::MAX);
+            this_mut.unpinned_count =
+                u32::try_from(target.len().saturating_sub(pinned)).unwrap_or(u32::MAX);
             target
         };
         {
@@ -598,10 +599,9 @@ impl ChatList {
     /// each chat's name, preview and unread count. A chat no longer in
     /// the list has no row to say anything from, and is dropped.
     fn settled_restatements(&mut self) -> Vec<(u32, QString, QString, QString, u32)> {
-        let waiting: Vec<u32> = self.pending_restatements.drain().collect();
         let rows = self.rows.borrow();
-        waiting
-            .into_iter()
+        self.pending_restatements
+            .drain()
             .filter_map(|chat_id| rows.iter().find(|row| row.chat_id == chat_id))
             .map(|row| {
                 (
@@ -815,9 +815,9 @@ fn reconcile(rows: &mut ChatListModel, target: Vec<ChatListItem>) {
     // Gone from the core: dropped first, so what follows only ever moves
     // rows that are staying.
     let mut index = 0;
-    while index < current.len() {
-        if keep.contains(&current[index]) {
-            index += 1;
+    while let Some(id) = current.get(index) {
+        if keep.contains(id) {
+            index = index.saturating_add(1);
         } else {
             rows.remove(index);
             current.remove(index);
@@ -831,7 +831,7 @@ fn reconcile(rows: &mut ChatListModel, target: Vec<ChatListItem>) {
             .iter()
             .skip(index)
             .position(|id| *id == wanted.chat_id)
-            .map(|offset| index + offset);
+            .map(|offset| index.saturating_add(offset));
         match found {
             Some(at) if at == index => {
                 if rows[index] != *wanted {
