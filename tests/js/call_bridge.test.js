@@ -923,10 +923,14 @@ async function connect(world, connection, state) {
 
 test("once the call connects, what goes each way is logged, and again when the camera turns", async () => {
     const world = makeWorld(VIDEO);
-    const { connection } = await page(world);
+    const { connection, picture } = await page(world);
+    picture.paused = false;
+    picture.videoWidth = 480;
+    picture.videoHeight = 640;
     connection.getStats = () => Promise.resolve(callStats());
     const line = "video sent: VP8 480x640 100 frames 3000 B/frame PLI 2 FIR 0 NACK 1"
-        + " (camera on live) | got: H264 50 frames 2000 B/frame PLI 0 FIR 0 NACK 0 lost 3";
+        + " (camera on live; ours playing 480x640)"
+        + " | got: H264 50 frames 2000 B/frame PLI 0 FIR 0 NACK 0 lost 3";
 
     // Turned while the call is still connecting: nothing goes yet.
     await command(world, "facing-environment");
@@ -952,7 +956,8 @@ test("once the call connects, what goes each way is logged, and again when the c
 
 test("what a sender sends is told apart, and stats that say little say what they can", async () => {
     const world = makeWorld(VOICE);
-    const { connection } = await page(world);
+    const { connection, picture } = await page(world);
+    picture.paused = true;
     connection.getStats = () => Promise.resolve(new Map([
         ["o1", { type: "outbound-rtp", kind: "video", framesEncoded: 0, keyFramesEncoded: 0 }],
     ]));
@@ -965,14 +970,57 @@ test("what a sender sends is told apart, and stats that say little say what they
     videoSender(connection).track = null;
     due.slice(-2).forEach((fn) => fn());
     await settleAll();
-    assert.deepEqual(statLines(world).map((line) => line.replace(/.* \(|\).*/g, "")),
+    assert.deepEqual(statLines(world).map((line) => line.replace(/.* \(|;.*/g, "")),
         ["blank off live", "nothing", "nothing"]);
-    assert.equal(statLines(world)[0],
-        "video sent: 0 frames 0 key PLI 0 FIR 0 NACK 0 (blank off live) | got: none");
+    assert.equal(statLines(world)[0], "video sent: 0 frames 0 key PLI 0 FIR 0 NACK 0"
+        + " (blank off live; ours paused 0x0) | got: none");
 
     connection.getStats = () => Promise.reject(new Error("closed"));
     await command(world, "camera-on");
     runTimers(world);
     await settleAll();
     assert.ok(posts(world, "/log").includes("video stats: closed"), String(posts(world, "/log")));
+});
+
+test("this end's picture, left paused, is asked to play until it does", async () => {
+    const world = makeWorld(VIDEO);
+    const { connection, picture } = await page(world);
+    let plays = 0;
+    picture.paused = true;
+    // Refused, as an engine refuses a play it will not allow yet.
+    picture.play = () => {
+        plays += 1;
+        return Promise.reject(new Error("NotAllowedError"));
+    };
+    connection.channels.mutedState.say(JSON.stringify({ audioEnabled: true, videoEnabled: true }));
+    await settleAll();
+    assert.equal(plays, 1, "a paused picture was not asked to play");
+    runTimers(world);
+    await settleAll();
+    assert.equal(plays, 2, "a picture still paused was not asked again");
+
+    picture.paused = false;
+    runTimers(world);
+    runTimers(world);
+    assert.equal(plays, 2, "a playing picture was asked to play");
+});
+
+test("a picture that never plays is asked a bounded number of times, and logged", async () => {
+    const world = makeWorld(VIDEO);
+    const { connection, picture } = await page(world);
+    let plays = 0;
+    picture.paused = true;
+    picture.play = () => {
+        plays += 1;
+    };
+    connection.channels.mutedState.say(JSON.stringify({ audioEnabled: true, videoEnabled: false }));
+    for (let round = 0; round < 60; round++) {
+        runTimers(world);
+    }
+    // Laid out again afterwards: the looks stay spent, and said once.
+    connection.channels.mutedState.say(JSON.stringify({ audioEnabled: true, videoEnabled: true }));
+    runTimers(world);
+    assert.ok(plays > 10 && plays <= 42, "asked to play " + plays + " times");
+    assert.deepEqual(posts(world, "/log").filter((line) => line.startsWith("our picture:")),
+        ["our picture: it never played"]);
 });

@@ -232,6 +232,8 @@ fn a_video_call_shows_its_pictures_under_lines_a_tap_puts_away() {
             // No picture yet, but the camera is on: held in front of the
             // face, not to the ear.
             record!("ear-camera", get!("proximity", "active"));
+            // Nothing to see turn yet.
+            record!("flip-no-picture", get!("flipButton", "visible"));
             record!(
                 "report",
                 report(
@@ -249,6 +251,7 @@ fn a_video_call_shows_its_pictures_under_lines_a_tap_puts_away() {
             record!("top-shade", get!("topShade", "visible"));
             record!("foot-shade", get!("footShade", "visible"));
             record!("mute-video", get!("muteSwitch", "visible"));
+            record!("flip-picture", get!("flipButton", "visible"));
             // Their picture comes, and the two ends hear each other.
             report(&url, "/state", "connected");
             report(
@@ -401,6 +404,11 @@ fn a_video_call_shows_its_pictures_under_lines_a_tap_puts_away() {
         "the camera is on, yet a hand over the sensor blacks the screen out. {context}"
     );
     assert_eq!(value("report"), "HTTP/1.1 204 No Content", "{context}");
+    assert_eq!(
+        value("flip-no-picture"),
+        "false",
+        "the camera can be turned before its picture shows. {context}"
+    );
 
     assert_eq!(
         value("shown"),
@@ -420,6 +428,11 @@ fn a_video_call_shows_its_pictures_under_lines_a_tap_puts_away() {
     assert_eq!(value("top-shade"), "true", "{context}");
     assert_eq!(value("foot-shade"), "true", "{context}");
     assert_eq!(value("mute-video"), "true", "{context}");
+    assert_eq!(
+        value("flip-picture"),
+        "true",
+        "the camera cannot be turned while its picture shows. {context}"
+    );
 
     let clock = value("clock");
     assert!(

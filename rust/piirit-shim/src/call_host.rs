@@ -330,6 +330,9 @@ pub(crate) async fn start(
         report,
         log: CallLog::begin(crate::qr::cache_file(LOG_FILE).ok()),
     });
+    shared.log.write(&media_plugins(
+        std::env::var("MOZ_GMP_PATH").ok().as_deref(),
+    ));
     {
         let mut hosts = HOSTS
             .lock()
@@ -453,6 +456,39 @@ const LOG_LINE_MAX: usize = 300;
 
 /// The file the last call's log is kept in, among the app's cache files.
 const LOG_FILE: &str = "call.log";
+
+/// What the engine's media plugins say they do, for the log: the
+/// directories in `MOZ_GMP_PATH`, each with the `APIs:` line of its
+/// `.info` file. Gecko encodes H264 only through such a plugin --
+/// Sailfish's is gmp-droid, the phone's hardware encoder -- and an iPhone
+/// at the other end offers no other codec, so a call that sends no
+/// picture there starts here.
+fn media_plugins(path: Option<&str>) -> String {
+    let Some(path) = path.filter(|path| !path.is_empty()) else {
+        return "media plugins: MOZ_GMP_PATH is not set".to_string();
+    };
+    let found: Vec<String> = path
+        .split(':')
+        .filter(|dir| !dir.is_empty())
+        .map(|dir| {
+            let apis = std::fs::read_dir(dir)
+                .ok()
+                .into_iter()
+                .flatten()
+                .flatten()
+                .map(|entry| entry.path())
+                .filter(|file| file.extension().is_some_and(|ext| ext == "info"))
+                .filter_map(|file| std::fs::read_to_string(file).ok())
+                .find_map(|info| {
+                    info.lines()
+                        .find_map(|line| line.strip_prefix("APIs:"))
+                        .map(|apis| apis.trim().to_string())
+                });
+            format!("{dir} {}", apis.as_deref().unwrap_or("(no APIs found)"))
+        })
+        .collect();
+    format!("media plugins: {}", found.join("; "))
+}
 
 /// A call's log: each line on stderr, where a phone's log has it when
 /// the app is started from a terminal, and in a file of its own -- the
@@ -783,8 +819,8 @@ async fn write_response(stream: &mut TcpStream, response: &Response) -> std::io:
 #[cfg(test)]
 mod tests {
     use super::{
-        camera_command, command, encode_base64, facing_command, log_line, percent_encode,
-        shown_command, CallLog, Video, BRIDGE, LOG_LINE_MAX, PAGE,
+        camera_command, command, encode_base64, facing_command, log_line, media_plugins,
+        percent_encode, shown_command, CallLog, Video, BRIDGE, LOG_LINE_MAX, PAGE,
     };
     use crate::webxdc_host::decode_base64;
 
@@ -910,6 +946,37 @@ mod tests {
         );
         assert_eq!(log_line("two\nlines\r\nhere"), "two lines  here");
         assert_eq!(log_line(&"x".repeat(1000)).chars().count(), LOG_LINE_MAX);
+    }
+
+    #[test]
+    fn the_media_plugins_are_logged_with_what_they_do() {
+        let dir = std::env::temp_dir().join(format!("piirit-gmp-{}", std::process::id()));
+        std::fs::create_dir_all(&dir).unwrap();
+        std::fs::write(dir.join("libdroid.so"), "").unwrap();
+        std::fs::write(
+            dir.join("droid.info"),
+            "Name: gmp-droid\nAPIs: decode-video[h264], encode-video[h264]\n",
+        )
+        .unwrap();
+        let shown = dir.to_string_lossy().into_owned();
+        let line = media_plugins(Some(&format!("{shown}:/piirit-no-such-dir")));
+        std::fs::remove_dir_all(&dir).unwrap();
+
+        assert_eq!(
+            line,
+            format!(
+                "media plugins: {shown} decode-video[h264], encode-video[h264]; \
+                 /piirit-no-such-dir (no APIs found)"
+            )
+        );
+        assert_eq!(
+            media_plugins(None),
+            "media plugins: MOZ_GMP_PATH is not set"
+        );
+        assert_eq!(
+            media_plugins(Some("")),
+            "media plugins: MOZ_GMP_PATH is not set"
+        );
     }
 
     #[test]

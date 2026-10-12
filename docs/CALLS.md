@@ -234,9 +234,14 @@ served ahead of `calls.js`):
   engine with it lists H264 ahead of VP8 in the offers it makes; the
   other end answers in the offer's order. So a call placed here would be
   sent H264, where a call answered here is sent what the other end's
-  offer puts first, VP8 -- inferred, not yet seen in a log. The offer the other end is sent lists
-  VP8 first (`calls.js`); nothing else in it changes, so the answer is
-  still one this end offered.
+  offer puts first. The offer the other end is sent lists VP8 first
+  (`calls.js`); nothing else in it changes, so the answer is still one
+  this end offered. Against an iPhone that is moot: Delta Chat on iOS
+  offers and answers H264 alone (seen in a log), and Gecko encodes H264
+  only through a media plugin -- on Sailfish gmp-droid, the phone's
+  hardware encoder, found through `MOZ_GMP_PATH` -- which the log names
+  at the start of every call. A call to one that sent no frames at all
+  is open.
 - **Let go in the background.** With the app away the camera is
   stopped -- the other end is told it is off -- and the pictures are not
   drawn; back in front, it is opened again if it was on.
@@ -251,8 +256,8 @@ served ahead of `calls.js`):
   seconds, then a quarter and three quarters of a minute after the call
   connects or the camera changes -- what goes each way: frames, bytes a
   frame (a black frame is a few dozen, a picture thousands), keyframes
-  asked for (a receiver that cannot decode asks over and over), and
-  which track the sender has. Each line goes to stderr as
+  asked for (a receiver that cannot decode asks over and over), which
+  track the sender has, and whether this end's picture plays. Each line goes to stderr as
   `piirit: call: …`, and to `~/.cache/piirit/piirit/call.log`, begun
   afresh with every call and each line stamped with the seconds since.
   The file is what to read on the phone: the launcher sends the app's
@@ -267,7 +272,9 @@ away, and they go by themselves once both ends are seen; the time of day
 gives way to how long, and the large clock goes. The camera switch is
 there in every call, and on the ringing screen of a video call, so it
 can be answered without the camera; turning it is a button beside it,
-once the call is up. A video call is answered with the front camera.
+once this end's picture shows. A video call is answered with the front
+camera. This end's picture plays by itself, muted, when the engine lets
+it; one that sits paused is asked to play until it does.
 While there are pictures the screen is kept lit and the ear shield is
 off: a video call is held in front of the face, not to the ear.
 

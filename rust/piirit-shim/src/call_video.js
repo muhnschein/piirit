@@ -361,20 +361,7 @@ var piiritVideo = (function () {
     function layout() {
         var picture = preview();
         if (!picture) {
-            /* One look at a time, however often this is asked: each ask
-             * starting its own would spend the looks in a fraction of
-             * the time, and a camera slow to open would find none left. */
-            if (stream && !layoutDue && looks < LOOKS) {
-                looks += 1;
-                layoutDue = true;
-                window.setTimeout(function () {
-                    layoutDue = false;
-                    layout();
-                }, AGAIN);
-            } else if (stream && !layoutDue && looks === LOOKS) {
-                looks += 1;
-                note("our picture: the page never drew it");
-            }
+            lookAgain("the page never drew it");
             return;
         }
         picture.style.transform = facing === "user" ? "scaleX(-1)" : "none";
@@ -395,6 +382,44 @@ var piiritVideo = (function () {
         var whole = !remoteShown();
         place(box, whole ? WHOLE : CORNER);
         box.style.boxShadow = whole ? "none" : "";
+        start(picture);
+    }
+
+    /* Look at this end's picture again in a moment. One look at a time,
+     * however often this is asked: each ask starting its own would spend
+     * the looks in a fraction of the time, and a camera slow to open
+     * would find none left. Once they are spent, `why` is logged. */
+    function lookAgain(why) {
+        if (!stream || layoutDue) {
+            return;
+        }
+        if (looks < LOOKS) {
+            looks += 1;
+            layoutDue = true;
+            window.setTimeout(function () {
+                layoutDue = false;
+                layout();
+            }, AGAIN);
+        } else if (looks === LOOKS) {
+            looks += 1;
+            note("our picture: " + why);
+        }
+    }
+
+    /* The page's picture of this end plays by itself, muted -- when the
+     * engine lets it: given the stream while the call screen still hid
+     * the page, it was seen to sit there paused until something gave it
+     * the stream again. So it is asked to play, and looked at again,
+     * until it does; as the page itself does with the other end's. */
+    function start(picture) {
+        if (!picture.paused || !picture.play) {
+            return;
+        }
+        var playing = picture.play();
+        if (playing && playing.catch) {
+            playing.catch(noop);
+        }
+        lookAgain("it never played");
     }
 
     /* Say how the pictures stand, when that has changed. */
@@ -607,6 +632,10 @@ var piiritVideo = (function () {
             return;
         }
         var senders = videoSenders(connection).map(sending).join(", ") || "no sender";
+        var picture = preview();
+        var shown = !picture ? "not drawn"
+            : (picture.paused ? "paused " : "playing ")
+                + (picture.videoWidth || 0) + "x" + (picture.videoHeight || 0);
         connection.getStats(null).then(function (stats) {
             var sent = null;
             var got = null;
@@ -625,7 +654,7 @@ var piiritVideo = (function () {
                 }
             });
             note("video sent: " + counts(sent, codecs, "framesEncoded", "bytesSent")
-                + " (" + senders + ") | got: "
+                + " (" + senders + "; ours " + shown + ") | got: "
                 + counts(got, codecs, "framesDecoded", "bytesReceived"));
         }, function (err) {
             note("video stats: " + describe(err));

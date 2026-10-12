@@ -493,12 +493,13 @@ Page {
             }
         }
 
-        // Which way the camera faces: a press, not a state. Not while
-        // it rings: a call is answered with the front camera, and turned
-        // once it is up.
+        // Which way the camera faces: a press, not a state. Only once
+        // this end's picture shows: a call is answered with the front
+        // camera, and the camera is turned when there is a picture to see
+        // turn.
         IconButton {
             objectName: "flipButton"
-            visible: page.inCall && page.call.camera
+            visible: page.inCall && page.call.camera && page.call.local_video
             anchors.verticalCenter: parent.verticalCenter
             icon.source: "image://theme/icon-camera-switch"
             onClicked: {
