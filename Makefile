@@ -17,7 +17,7 @@
 # is built on.
 
 .PHONY: check test lint fmt qml-lint packaging-lint lockfile-lint doc-lint \
-        msrv deny workflow-lint integration harbour vendor-check fetch-server \
+        msrv deny workflow-lint leak-check integration harbour vendor-check fetch-server \
         sonar-report-test apt-install-test sonar-reports translations \
         cover-icons clean
 
@@ -124,6 +124,12 @@ workflow-lint:
 	@command -v zizmor >/dev/null 2>&1 || \
 		{ echo "workflow-lint: SKIP (zizmor not installed)"; exit 0; }
 	zizmor --offline .github/workflows/
+
+## Every test under AddressSanitizer and LeakSanitizer, FFmpeg and the C
+## glue included. Slow, and not part of `check`: scheduled.yml runs it
+## weekly. ci/leak-check.sh says what it needs and what it can see.
+leak-check:
+	./ci/leak-check.sh
 
 ## Fetch the pinned upstream deltachat-rpc-server binaries (network).
 fetch-server:

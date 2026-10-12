@@ -67,6 +67,46 @@ jobs:
       - run: rustc +stable --version
       - run: cd rust && cargo +stable clippy --locked --workspace --all-targets -- -D warnings
 
+  # Every test in the workspace under AddressSanitizer and LeakSanitizer,
+  # with FFmpeg, x264 and our C glue instrumented too: ci/leak-check.sh
+  # says what that can and cannot see. Too slow for every pull request,
+  # and a leak is rarely urgent enough to need one. Red means a test's
+  # process lost memory or touched memory it should not have; the log
+  # names the allocation's stack. A leak that is Qt's on purpose goes in
+  # ci/lsan.supp, by the narrowest name that matches it.
+  leak-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        # FFmpeg and x264, which piirit-video builds (docs/BUILDING.md).
+        with:
+          persist-credentials: false
+          submodules: true
+      # Every test binary links an instrumented FFmpeg: about 16 GB of
+      # build, most of what a fresh runner has free.
+      - name: Make room for the instrumented build
+        run: |
+          df -h / | tail -1
+          sudo rm -rf /usr/local/lib/android "$AGENT_TOOLSDIRECTORY" \
+                      /usr/share/dotnet /opt/ghc /usr/local/share/boost
+          df -h / | tail -1
+      # The same packages as ci.yml's test job: the same tests run.
+      - run: ./ci/apt-install.sh qtbase5-dev qtdeclarative5-dev qtmultimedia5-dev qtdeclarative5-dev-tools qml-module-qtquick2 qml-module-qtquick-window2 qttools5-dev-tools
+      # The nightly ci/leak-check.sh names. No rust-cache: nothing this
+      # builds is shared with another job, and a week-old cache of it
+      # would be gigabytes to restore for little.
+      - run: rustup toolchain install nightly-2026-10-12 --profile minimal --component rust-src
+      - uses: taiki-e/install-action@183e4297cca2404691e9380e1307288dced5c82a # v2.87.25
+        with:
+          tool: cargo-nextest
+      # So real_server and real_core run too, as in ci.yml's integration
+      # job.
+      - run: ./scripts/fetch-rpc-server.sh
+      - run: ./ci/leak-check.sh
+        env:
+          DELTACHAT_RPC_SERVER: ${{ github.workspace }}/vendor/deltachat-rpc-server/x86_64/deltachat-rpc-server
+
   # ci.yml runs zizmor offline, on what is in the tree. Online it also asks
   # GitHub whether an action pinned here has a known advisory, and whether
   # each pinned commit is really on the action's own repository -- facts
