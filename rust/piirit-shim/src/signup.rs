@@ -547,7 +547,7 @@ pub(crate) async fn discard(rpc: &RpcClient, account_id: u32) {
     // Left behind, it is an empty profile in the switcher; nothing the
     // reader is waiting on, so it is only logged.
     if let Err(err) = rpc.call::<_, ()>("remove_account", (account_id,)).await {
-        eprintln!("piirit: removing abandoned profile {account_id}: {err}");
+        eprintln!("piirit: removing an abandoned profile: {err}");
     }
 }
 

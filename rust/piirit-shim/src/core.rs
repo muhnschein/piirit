@@ -1641,9 +1641,7 @@ impl DeltaChatCore {
                     if let Some((rpc, runtime)) = this.borrow().connection() {
                         runtime.spawn(async move {
                             if let Err(err) = start_io(&rpc, Some(account_id)).await {
-                                eprintln!(
-                                    "piirit: starting IO for restored profile {account_id}: {err}"
-                                );
+                                eprintln!("piirit: starting IO for a restored profile: {err}");
                             }
                         });
                     }
