@@ -38,6 +38,10 @@ jobs:
       SFOS: ${{ inputs.sfos_version || '5.2.0.15' }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          # Nothing here pushes with git, so the token is not left behind in
+          # .git/config for a later step to find. Every checkout in this file.
+          persist-credentials: false
 
       # The upstream image unpacks to about 20 GB of layers, and the
       # flattened one is written beside it. A fresh runner has around 25 GB
@@ -49,14 +53,18 @@ jobs:
                       /usr/share/dotnet /opt/ghc /usr/local/share/boost
           df -h / | tail -1
 
+      # Through the environment, not spliced into the script: a `${{ }}`
+      # in `run:` is pasted in as shell text before the shell reads it.
       - name: Sign in to the registry
+        env:
+          TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          echo "${{ secrets.GITHUB_TOKEN }}" |
-            docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+          echo "$TOKEN" |
+            docker login ghcr.io -u "$GITHUB_ACTOR" --password-stdin
 
       - name: Derive the image
         run: |
-          owner=$(echo "${{ github.repository_owner }}" | tr 'A-Z' 'a-z')
+          owner=$(echo "$GITHUB_REPOSITORY_OWNER" | tr 'A-Z' 'a-z')
           image="ghcr.io/$owner/piirit-sdk:$SFOS-$ARCH"
           ./ci/build-sdk-image.sh "$SFOS" "$ARCH" "$image"
           echo "IMAGE=$image" >> "$GITHUB_ENV"

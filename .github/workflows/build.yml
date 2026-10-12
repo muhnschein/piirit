@@ -52,6 +52,9 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          # Nothing here pushes with git, so the token is not left behind in
+          # .git/config for a later step to find. Every checkout in this file.
+          persist-credentials: false
           fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
 
       # FFmpeg and x264, which piirit-video builds. Not `submodules: true`
