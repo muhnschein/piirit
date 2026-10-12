@@ -357,6 +357,11 @@ function makeWorld(search, options) {
         HTMLMediaElement: opts.mediaElement ? HTMLMediaElement : undefined,
         Promise,
         JSON,
+        console: {
+            log(...words) { world.console.push(["log", ...words]); },
+            warn(...words) { world.console.push(["warn", ...words]); },
+            error(...words) { world.console.push(["error", ...words]); }
+        },
         setTimeout(fn) {
             timers.push(fn);
             return timers.length;
@@ -367,6 +372,7 @@ function makeWorld(search, options) {
     };
     window.window = window;
     world.window = window;
+    world.console = [];
     world.context = vm.createContext(window);
     for (const { file, code } of FILES) {
         vm.runInContext(code, world.context, { filename: file });
@@ -645,6 +651,42 @@ test("the other end's picture is reported while it comes and they have it on", a
 
     connection.channels.mutedState.say("not json");
     assert.equal(lastVideo(world).remote, false);
+});
+
+test("what the page says of the pictures and its commands is logged, and nothing else", async () => {
+    const world = makeWorld(VIDEO);
+    const { connection } = await page(world);
+    const said = () => posts(world, "/log").filter((line) => line.startsWith("page"));
+    const { console } = world.window;
+    console.log("incStream.videoTracks() muted states:", [true]);
+    console.log("sending ICE candidate to remote peer", { candidate: "candidate:1 1 udp 1 192.0.2.1 9 typ host" });
+    console.log("incoming media not playing, will .play() it");
+    console.log("incoming media not playing, will .play() it");
+    console.log("incoming media is playing");
+    console.warn("cannot set source for fallback audio element: element is not mounted");
+    console.error("remote sent an invalid mutedState message", { videoEnabled: 1 });
+    const cyclic = {};
+    cyclic.self = cyclic;
+    console.error("odd", cyclic);
+    world.windowListeners.unhandledrejection[0]({ reason: new TypeError("no answer") });
+    world.windowListeners.error[0]({});
+    assert.deepEqual(said(), [
+        "page: incStream.videoTracks() muted states: [true]",
+        "page: incoming media not playing, will .play() it",
+        "page: incoming media is playing",
+        "page warn: cannot set source for fallback audio element: element is not mounted",
+        "page error: remote sent an invalid mutedState message {\"videoEnabled\":1}",
+        "page error: odd [object Object]",
+        "page error: TypeError: no answer",
+        "page error: an error"
+    ]);
+    assert.equal(world.console.length, 8, "the page's console no longer says what it is told");
+    assert.deepEqual(world.console[1].slice(0, 2), ["log", "sending ICE candidate to remote peer"]);
+
+    // Where the call stands, in order with the rest.
+    connection.signalingState = "have-local-offer";
+    connection.fire("signalingstatechange");
+    assert.equal(posts(world, "/log").at(-1), "signalling: have-local-offer");
 });
 
 test("negotiated, every video sender is held to the bitrate and frame caps", async () => {

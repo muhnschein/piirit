@@ -829,6 +829,7 @@ var piiritVideo = (function () {
         });
         /* Negotiated: there are encodings to hold to the caps. */
         connection.addEventListener("signalingstatechange", function () {
+            note("signalling: " + connection.signalingState);
             if (connection.signalingState === "stable") {
                 note("video, ours: " + videoSections(connection.localDescription)
                     + " | theirs: " + videoSections(connection.remoteDescription));
@@ -973,6 +974,61 @@ var piiritVideo = (function () {
     /* Turned, the screen is another shape. */
     if (window.addEventListener) {
         window.addEventListener("resize", fitTheirs);
+    }
+
+    /* What the page says to its console, which nothing on the phone
+     * reads, into the call log: its warnings and errors, and of the rest
+     * only what it says of the other end's picture and camera and of its
+     * own commands -- the rest is candidates and descriptions, addresses
+     * among them. A line said over and over, as the page says while it
+     * asks a paused picture to play, is logged once until another comes;
+     * and a failure nothing caught, which the page would leave unsaid. */
+    var PAGE_SAYS = new RegExp("^(incStream\\.videoTracks\\(\\) muted states:"
+        + "|incoming media |Sending our muted state "
+        + "|Want to report muted state |mutedStateDataChannel |URL hash CMD"
+        + "|unexpected URL hash|Accept call prompt )");
+    var pageSaid = "";
+
+    function heard(level, words) {
+        var text = Array.prototype.map.call(words, function (one) {
+            if (typeof one === "string") {
+                return one;
+            }
+            try {
+                return JSON.stringify(one);
+            } catch (err) {
+                return String(one);
+            }
+        }).join(" ");
+        if (level === "log" && !PAGE_SAYS.test(text)) {
+            return;
+        }
+        var line = "page" + (level === "log" ? "" : " " + level) + ": " + text;
+        if (line !== pageSaid) {
+            pageSaid = line;
+            note(line);
+        }
+    }
+
+    var pageConsole = window.console;
+    if (pageConsole) {
+        ["log", "warn", "error"].forEach(function (level) {
+            var own = pageConsole[level];
+            if (typeof own === "function") {
+                pageConsole[level] = function () {
+                    heard(level, arguments);
+                    return own.apply(pageConsole, arguments);
+                };
+            }
+        });
+    }
+    if (window.addEventListener) {
+        window.addEventListener("error", function (event) {
+            heard("error", [event.message || "an error"]);
+        });
+        window.addEventListener("unhandledrejection", function (event) {
+            heard("error", [describe(event.reason) || "a promise failed"]);
+        });
     }
 
     return {

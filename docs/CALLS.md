@@ -280,13 +280,18 @@ served ahead of `calls.js`):
 - **Logged.** What only a phone shows about a call goes through `/log`:
   which camera opened and at what size, a camera that would not open or
   turn and why, how long a turn took to open the other camera and to
-  draw its first picture, the picture sections both ends agreed and their codecs
-  in order, whether the other end's picture has frames, and -- a few
-  seconds, then a quarter and three quarters of a minute after the call
-  connects or the camera changes -- what goes each way: frames, bytes a
-  frame (a black frame is a few dozen, a picture thousands), keyframes
-  asked for (a receiver that cannot decode asks over and over), which
-  track the sender has, and whether this end's picture plays. Each line goes to stderr as
+  draw its first picture, each step of the negotiation, the picture
+  sections both ends agreed and their codecs in order, whether the other
+  end's picture has frames and what the other end says of its camera,
+  and -- a few seconds, then a quarter and three quarters of a minute
+  after the call connects or the camera changes -- what goes each way:
+  frames, bytes a frame (a black frame is a few dozen, a picture
+  thousands), keyframes asked for (a receiver that cannot decode asks over
+  and over), which track the sender has, and whether each picture is
+  hidden, plays, and at what size. The page's own console is read too:
+  its warnings and errors, failures nothing caught, and what it says of
+  the other end's picture and its own commands, but none of its
+  candidates or descriptions, which carry addresses. Each line goes to stderr as
   `piirit: call: …`, and to `~/.cache/piirit/piirit/call.log`, begun
   afresh with every call and each line stamped with the seconds since;
   the H264 encoder's lines are in the same file, marked `encoder`.
