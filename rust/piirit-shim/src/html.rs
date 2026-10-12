@@ -236,9 +236,15 @@ fn find_ignoring_case(haystack: &str, needle: &str) -> Option<usize> {
 
 /// `text.strip_prefix(prefix)` without regard to case, for ASCII
 /// prefixes.
+///
+/// `get` rather than indexing: `prefix.len()` bytes into `text` can land
+/// inside a multi-byte character -- `<ab😀` against `head` does -- and a
+/// slice there panics. Such a text cannot start with an ASCII prefix
+/// anyway, so it is simply not a match.
 fn strip_prefix_ignoring_case<'a>(text: &'a str, prefix: &str) -> Option<&'a str> {
-    if text.len() >= prefix.len() && text[..prefix.len()].eq_ignore_ascii_case(prefix) {
-        Some(&text[prefix.len()..])
+    let head = text.get(..prefix.len())?;
+    if head.eq_ignore_ascii_case(prefix) {
+        text.get(prefix.len()..)
     } else {
         None
     }
@@ -279,6 +285,14 @@ mod tests {
             ),
             "kept"
         );
+    }
+
+    #[test]
+    fn a_tag_name_that_breaks_off_inside_a_character_is_only_text() {
+        // `head` is four bytes, and four bytes past this `<` is the middle
+        // of the emoji. That used to panic, and a message's HTML part is
+        // whatever its sender wrote.
+        assert_eq!(to_text("<ab😀 and more"), "<ab😀 and more");
     }
 
     #[test]
