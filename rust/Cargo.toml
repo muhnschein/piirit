@@ -12,7 +12,10 @@ edition = "2021"
 license = "GPL-3.0-or-later"
 # Sailfish OS ships Rust 1.75.0 (sailfishos/rust). Declaring it here keeps
 # `cargo update` on a newer host from resolving dependencies that no longer
-# build on the toolchain the device target actually has.
+# build on the toolchain the device target actually has -- together with
+# .cargo/config.toml at the top of the tree, without which resolver "2"
+# ignores this line. Clippy reads it too: `incompatible_msrv` flags a std
+# API newer than this on the pinned stable toolchain.
 rust-version = "1.75"
 # Never published: these are workspace-internal crates wired by path, and an
 # application, not a library. Saying so is also what lets cargo-deny treat the

@@ -1,0 +1,17 @@
+# Resolve dependencies for the toolchain floor in rust/Cargo.toml
+# (`rust-version = "1.75"`), not for whatever cargo happens to run.
+#
+# Under `resolver = "2"` cargo ignores `rust-version` when it picks
+# versions: `cargo update` on a current host takes the newest release of
+# everything, and the msrv job is the first to learn that one of them
+# needs a newer compiler than Sailfish ships. This makes it prefer the
+# newest release that still builds on 1.75, which is what resolver "3"
+# does by default -- and resolver "3" is not an option, because the
+# SDK's cargo 1.75 cannot read it. Cargo older than 1.84 ignores this
+# key.
+[resolver]
+incompatible-rust-versions = "fallback"
+#
+# At the top of the tree rather than in rust/.cargo/, which is the
+# vendored build's: the spec writes its source replacement there, and
+# cargo reads both.
