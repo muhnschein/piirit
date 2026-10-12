@@ -46,9 +46,9 @@ pub(crate) struct Quota {
 /// always was.
 pub(crate) fn quota_from_report(html: &str, address: &str) -> Option<Quota> {
     let blocks = transport_blocks(html);
-    match blocks.len() {
-        0 => quota_in(html),
-        1 => quota_in(blocks[0]),
+    match blocks.as_slice() {
+        [] => quota_in(html),
+        [only] => quota_in(only),
         // Several relays and none of them with the profile's own
         // address on it: no quota rather than another relay's.
         _ => quota_in(block_for(&blocks, address)?),
@@ -125,13 +125,11 @@ fn status_in(block: &str) -> String {
 fn transport_blocks(html: &str) -> Vec<&str> {
     const MARK: &str = "<li class=\"transport\">";
     let starts: Vec<usize> = html.match_indices(MARK).map(|(at, _)| at).collect();
+    let ends = starts.iter().skip(1).copied().chain([html.len()]);
     starts
         .iter()
-        .enumerate()
-        .map(|(nth, &start)| {
-            let end = starts.get(nth + 1).copied().unwrap_or(html.len());
-            &html[start..end]
-        })
+        .zip(ends)
+        .filter_map(|(&start, end)| html.get(start..end))
         .collect()
 }
 
@@ -165,19 +163,18 @@ fn quota_in(html: &str) -> Option<Quota> {
     // 12%">12%</div>`. The number inside the div is the real percentage;
     // the width is capped at 100.
     let bar = html.find("class=\"progress")?;
-    let after_bar = &html[bar..];
-    let open_end = after_bar.find('>')? + 1;
-    let inner_end = after_bar[open_end..].find('<')? + open_end;
-    let percent: u32 = after_bar[open_end..inner_end]
-        .trim()
-        .trim_end_matches('%')
-        .parse()
-        .ok()?;
+    let before_bar = html.get(..bar)?;
+    let (_, after_open) = html.get(bar..)?.split_once('>')?;
+    let (inner, _) = after_open.split_once('<')?;
+    let percent: u32 = inner.trim().trim_end_matches('%').parse().ok()?;
     // The sentence before the bar, inside the same list item: back from
-    // the bar to the `<li>` that holds it, then its tags dropped.
-    let item_start = html[..bar].rfind("<li>")? + "<li>".len();
-    let bar_div = html[..bar].rfind("<div")?;
-    let text = strip_tags(&html[item_start..bar_div]);
+    // the bar to the `<li>` that holds it, then its tags dropped. A
+    // `<div` before that `<li>` is not the bar's: the item has no sentence
+    // in the shape the core writes, so no words, and the percentage still
+    // read.
+    let item_start = before_bar.rfind("<li>")?.saturating_add("<li>".len());
+    let bar_div = before_bar.rfind("<div")?;
+    let text = strip_tags(before_bar.get(item_start..bar_div).unwrap_or_default());
     let (used_bytes, limit_bytes) = amounts(&text).unwrap_or((0, 0));
     Some(Quota {
         percent,
@@ -195,11 +192,12 @@ fn amounts(text: &str) -> Option<(u64, u64)> {
     let of = words
         .iter()
         .position(|word| word.eq_ignore_ascii_case("of"))?;
-    if of < 2 || of + 3 > words.len() {
+    let from = of.checked_sub(2)?;
+    let [used_number, used_unit, _of, limit_number, limit_unit, ..] = words.get(from..)? else {
         return None;
-    }
-    let used = bytes(words[of - 2], words[of - 1])?;
-    let limit = bytes(words[of + 1], words[of + 2])?;
+    };
+    let used = bytes(used_number, used_unit)?;
+    let limit = bytes(limit_number, limit_unit)?;
     Some((used, limit))
 }
 
@@ -236,9 +234,8 @@ fn bytes(number: &str, unit: &str) -> Option<u64> {
 fn strip_tags(html: &str) -> String {
     let mut out = String::with_capacity(html.len());
     let mut in_tag = false;
-    let mut rest = html;
-    while let Some(c) = rest.chars().next() {
-        rest = &rest[c.len_utf8()..];
+    let mut chars = html.chars();
+    while let Some(c) = chars.next() {
         match c {
             '<' => in_tag = true,
             '>' if in_tag => {
@@ -247,9 +244,9 @@ fn strip_tags(html: &str) -> String {
             }
             _ if in_tag => {}
             '&' => {
-                let (decoded, skip) = decode_entity(rest);
+                let (decoded, after) = decode_entity(chars.as_str());
                 out.push_str(decoded);
-                rest = &rest[skip..];
+                chars = after.chars();
             }
             _ => out.push(c),
         }
@@ -257,9 +254,9 @@ fn strip_tags(html: &str) -> String {
     out.split_whitespace().collect::<Vec<_>>().join(" ")
 }
 
-/// The character an entity stands for, and how much of the text it took.
-/// An entity this does not know is left as its ampersand.
-fn decode_entity(rest: &str) -> (&'static str, usize) {
+/// The character an entity stands for, and the text after it. An entity
+/// this does not know is left as its ampersand.
+fn decode_entity(rest: &str) -> (&'static str, &str) {
     for (entity, decoded) in [
         ("amp;", "&"),
         ("lt;", "<"),
@@ -269,11 +266,11 @@ fn decode_entity(rest: &str) -> (&'static str, usize) {
         ("nbsp;", " "),
         ("#39;", "'"),
     ] {
-        if rest.starts_with(entity) {
-            return (decoded, entity.len());
+        if let Some(after) = rest.strip_prefix(entity) {
+            return (decoded, after);
         }
     }
-    ("&", 0)
+    ("&", rest)
 }
 
 #[cfg(test)]
@@ -509,6 +506,25 @@ mod tests {
         assert_eq!(
             quota_from_report(&full, "ada@nine.testrun.org").map(|quota| quota.percent),
             Some(120)
+        );
+    }
+
+    /// A bar whose last `<div` comes before the item it is in: the
+    /// sentence ran from after the `<li>` back to the `<div`, a slice that
+    /// ends before it starts. That panicked; it is a bar with no words.
+    #[test]
+    fn a_bar_outside_the_shape_the_core_writes_does_not_panic() {
+        assert_eq!(
+            quota_from_report(
+                "<div><li>a<span class=\"progress\">5%</span>",
+                "ada@nine.testrun.org"
+            ),
+            Some(Quota {
+                percent: 5,
+                text: String::new(),
+                used_bytes: 0,
+                limit_bytes: 0,
+            })
         );
     }
 

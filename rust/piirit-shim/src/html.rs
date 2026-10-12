@@ -47,39 +47,34 @@ fn drop_hidden(html: &str) -> String {
     let mut out = String::with_capacity(html.len());
     let mut rest = html;
     'outer: while !rest.is_empty() {
-        let Some(open) = rest.find('<') else {
+        let Some((before, after_bracket)) = rest.split_once('<') else {
             out.push_str(rest);
             break;
         };
-        let (before, from_tag) = rest.split_at(open);
         out.push_str(before);
         for name in HIDDEN {
-            if opens(from_tag, name) {
+            if opens(after_bracket, name) {
                 // Everything up to the matching close, or -- for markup
                 // that never closes it -- the rest of the document,
                 // which is the safer of the two readings.
                 let closing = format!("</{name}");
-                rest = match find_ignoring_case(from_tag, &closing) {
-                    Some(at) => &from_tag[at..],
-                    None => "",
-                };
+                rest = find_ignoring_case(after_bracket, &closing)
+                    .and_then(|at| after_bracket.get(at..))
+                    .unwrap_or("");
                 // Past the close tag itself.
-                rest = rest.find('>').map_or("", |at| &rest[at + 1..]);
+                rest = rest.split_once('>').map_or("", |(_, after)| after);
                 continue 'outer;
             }
         }
         out.push('<');
-        rest = &from_tag[1..];
+        rest = after_bracket;
     }
     out
 }
 
-/// Whether `text` starts with an opening tag named `name`.
-fn opens(text: &str, name: &str) -> bool {
-    let Some(after) = text.strip_prefix('<') else {
-        return false;
-    };
-    let Some(after) = strip_prefix_ignoring_case(after, name) else {
+/// Whether the text after a `<` makes it an opening tag named `name`.
+fn opens(after_bracket: &str, name: &str) -> bool {
+    let Some(after) = strip_prefix_ignoring_case(after_bracket, name) else {
         return false;
     };
     // `<head>` and `<style type=...>` open one; `<header>` does not.
@@ -118,28 +113,27 @@ fn replace_tags(html: &str) -> String {
     let mut fresh = true;
     let mut rest = html;
     while !rest.is_empty() {
-        let Some(open) = rest.find('<') else {
+        let Some((words, after_bracket)) = rest.split_once('<') else {
             push_words(rest, &mut out, &mut space, &mut fresh);
             break;
         };
-        push_words(&rest[..open], &mut out, &mut space, &mut fresh);
-        let from_tag = &rest[open..];
+        push_words(words, &mut out, &mut space, &mut fresh);
         // A `<` that does not begin a tag is a stray angle bracket in
         // the text -- "3 < 4" -- and stays one. A tag's name starts
         // with a letter, a `/`, or the `!` of a comment or a doctype;
         // anything else after the bracket is arithmetic.
-        if !from_tag[1..].starts_with(|c: char| c.is_ascii_alphabetic() || c == '/' || c == '!') {
+        if !after_bracket.starts_with(|c: char| c.is_ascii_alphabetic() || c == '/' || c == '!') {
             push_words("<", &mut out, &mut space, &mut fresh);
-            rest = &from_tag[1..];
+            rest = after_bracket;
             continue;
         }
         // A `<` with no `>` after it is the same thing at the end of the
         // text: keep it and stop.
-        let Some(close) = from_tag.find('>') else {
-            push_words(from_tag, &mut out, &mut space, &mut fresh);
+        let Some((tag, after_tag)) = after_bracket.split_once('>') else {
+            push_words("<", &mut out, &mut space, &mut fresh);
+            push_words(after_bracket, &mut out, &mut space, &mut fresh);
             break;
         };
-        let tag = &from_tag[1..close];
         let name = tag
             .trim_start_matches('/')
             .split(|c: char| c.is_ascii_whitespace() || c == '/')
@@ -154,7 +148,7 @@ fn replace_tags(html: &str) -> String {
             fresh = true;
             out.push('\n');
         }
-        rest = &from_tag[close + 1..];
+        rest = after_tag;
     }
     out
 }
@@ -198,11 +192,11 @@ fn decode_entities(text: &str) -> String {
 /// is nothing they can have meant.
 fn collapse_blank_lines(text: &str) -> String {
     let mut out: Vec<&str> = Vec::new();
-    let mut blanks = 0;
+    let mut blanks: u32 = 0;
     for line in text.lines() {
         let line = line.trim_end();
         if line.trim().is_empty() {
-            blanks += 1;
+            blanks = blanks.saturating_add(1);
             if blanks > 1 {
                 continue;
             }
