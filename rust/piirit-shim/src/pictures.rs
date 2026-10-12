@@ -114,10 +114,13 @@ cpp! {{
             if bits.is_null() || width == 0 || height == 0 || stride < width {
                 return false;
             }
+            let Some(length) = stride.checked_mul(height) else {
+                return false;
+            };
             // SAFETY: `bits` is the QImage's own buffer, `stride` 32-bit
             // pixels a line for `height` lines, and the image outlives
             // this call.
-            let pixels = unsafe { std::slice::from_raw_parts_mut(bits, stride * height) };
+            let pixels = unsafe { std::slice::from_raw_parts_mut(bits, length) };
             recipe.bake(pixels, width, height, stride);
             true
         });
@@ -226,7 +229,7 @@ impl Colour {
             _ => return None,
         };
         let channel = |at: usize| {
-            u8::from_str_radix(hex.get(at..at + 2)?, 16)
+            u8::from_str_radix(hex.get(at..at.checked_add(2)?)?, 16)
                 .ok()
                 .map(|value| f64::from(value) / 255.0)
         };
@@ -332,6 +335,11 @@ impl Recipe {
     /// Make the picture out of `pixels`, straight ARGB32 as Qt's
     /// `Format_ARGB32` lays them out, `stride` to a line.
     pub fn bake(&self, pixels: &mut [u32], width: usize, height: usize, stride: usize) {
+        // What the provider refuses before it gets here; said again so
+        // that the walks below, `stride` at a step, never step by 0.
+        if width == 0 || height == 0 || stride < width {
+            return;
+        }
         match self.kind {
             Kind::Face => self.face(pixels, width, height, stride),
             Kind::Ink => self.colour_ink(pixels, width, height, stride),
@@ -344,12 +352,11 @@ impl Recipe {
     fn face(&self, pixels: &mut [u32], width: usize, height: usize, stride: usize) {
         let diameter = to_f64(width.min(height));
         let (middle_x, middle_y) = (to_f64(width) / 2.0, to_f64(height) / 2.0);
-        for y in 0..height {
+        for (y, line) in pixels.chunks_mut(stride).take(height).enumerate() {
             let across = (to_f64(y) + 0.5) / to_f64(height);
             let kept = self.fade.map_or(1.0, |(from, to)| eased(across, from, to));
-            for x in 0..width {
-                let at = y * stride + x;
-                let [alpha, mut red, mut green, mut blue] = unpack(pixels[at]);
+            for (x, pixel) in line.iter_mut().take(width).enumerate() {
+                let [alpha, mut red, mut green, mut blue] = unpack(*pixel);
                 if self.grey || self.tint.is_some() {
                     let grey = (red + green + blue) / 3.0;
                     red = grey;
@@ -364,7 +371,7 @@ impl Recipe {
                 let dx = to_f64(x) + 0.5 - middle_x;
                 let dy = to_f64(y) + 0.5 - middle_y;
                 let rim = (diameter / 2.0 - dx.hypot(dy) + 0.5).clamp(0.0, 1.0);
-                pixels[at] = pack([alpha * rim * kept, red, green, blue]);
+                *pixel = pack([alpha * rim * kept, red, green, blue]);
             }
         }
     }
@@ -390,10 +397,9 @@ impl Recipe {
                 1.0,
             ),
         ));
-        for y in 0..height {
-            for x in 0..width {
-                let at = y * stride + x;
-                let [_, red, green, _] = unpack(pixels[at]);
+        for line in pixels.chunks_mut(stride).take(height) {
+            for pixel in line.iter_mut().take(width) {
+                let [_, red, green, _] = unpack(*pixel);
                 let body = red * ink_strength;
                 let accent = green * lit_strength;
                 let alpha = (body + accent).clamp(0.0, 1.0);
@@ -404,7 +410,7 @@ impl Recipe {
                         0.0
                     }
                 };
-                pixels[at] = pack([
+                *pixel = pack([
                     alpha,
                     colour(ink.red, lit.red),
                     colour(ink.green, lit.green),
@@ -432,20 +438,22 @@ fn blur(pixels: &mut [u32], width: usize, height: usize, stride: usize, radius: 
     }
     let mut line = Vec::new();
     for _ in 0..3 {
-        for y in 0..height {
+        for row in pixels.chunks_mut(stride).take(height) {
             line.clear();
-            line.extend((0..width).map(|x| pixels[y * stride + x]));
+            line.extend(row.iter().take(width));
             let averaged = box_pass(&line, radius);
-            for (x, pixel) in averaged.into_iter().enumerate() {
-                pixels[y * stride + x] = pixel;
+            for (pixel, value) in row.iter_mut().zip(averaged) {
+                *pixel = value;
             }
         }
         for x in 0..width {
+            // The column: every `stride`th pixel, from `x`.
             line.clear();
-            line.extend((0..height).map(|y| pixels[y * stride + x]));
+            line.extend(pixels.iter().skip(x).step_by(stride).take(height));
             let averaged = box_pass(&line, radius);
-            for (y, pixel) in averaged.into_iter().enumerate() {
-                pixels[y * stride + x] = pixel;
+            let column = pixels.iter_mut().skip(x).step_by(stride).take(height);
+            for (pixel, value) in column.zip(averaged) {
+                *pixel = value;
             }
         }
     }
@@ -454,14 +462,17 @@ fn blur(pixels: &mut [u32], width: usize, height: usize, stride: usize, radius: 
 /// Each pixel of a line as the mean of those within `radius` of it, the
 /// line's ends standing in for what is past them.
 fn box_pass(line: &[u32], radius: usize) -> Vec<u32> {
-    let last = line.len().saturating_sub(1);
+    let (Some(&first), Some(&last)) = (line.first(), line.last()) else {
+        return Vec::new();
+    };
+    let first = unpack(first);
     (0..line.len())
         .map(|at| {
             let mut sum = [0.0_f64; 4];
-            let span = at.saturating_sub(radius)..=(at + radius);
+            let span = at.saturating_sub(radius)..=at.saturating_add(radius);
             let mut count = 0.0;
             for near in span {
-                let channels = unpack(line[near.min(last)]);
+                let channels = unpack(line.get(near).copied().unwrap_or(last));
                 for (total, channel) in sum.iter_mut().zip(channels) {
                     *total += channel;
                 }
@@ -470,7 +481,6 @@ fn box_pass(line: &[u32], radius: usize) -> Vec<u32> {
             // Pixels before the start are the first one, as many times as
             // the window reaches past it.
             let before = radius.saturating_sub(at);
-            let first = unpack(line[0]);
             for (total, channel) in sum.iter_mut().zip(first) {
                 *total += channel * to_f64(before);
             }
@@ -505,17 +515,19 @@ fn to_f64(count: usize) -> f64 {
 /// `encodeURIComponent` undone. `None` for a broken escape or bytes that
 /// are not UTF-8.
 fn percent_decode(text: &str) -> Option<String> {
-    let bytes = text.as_bytes();
-    let mut out = Vec::with_capacity(bytes.len());
-    let mut at = 0;
-    while at < bytes.len() {
-        if bytes[at] == b'%' {
-            let hex = text.get(at + 1..at + 3)?;
-            out.push(u8::from_str_radix(hex, 16).ok()?);
-            at += 3;
+    let mut rest = text.as_bytes();
+    let mut out = Vec::with_capacity(rest.len());
+    while let Some((&byte, after)) = rest.split_first() {
+        rest = after;
+        if byte == b'%' {
+            let [high, low, after @ ..] = rest else {
+                return None;
+            };
+            let hex = [*high, *low];
+            out.push(u8::from_str_radix(std::str::from_utf8(&hex).ok()?, 16).ok()?);
+            rest = after;
         } else {
-            out.push(bytes[at]);
-            at += 1;
+            out.push(byte);
         }
     }
     String::from_utf8(out).ok()

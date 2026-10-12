@@ -111,7 +111,10 @@ impl Target {
         } else {
             self.copied_audio_bit_rate
         };
-        (self.video_bit_rate + audio).saturating_mul(self.duration_ms) / 8000
+        self.video_bit_rate
+            .saturating_add(audio)
+            .saturating_mul(self.duration_ms)
+            / 8000
     }
 }
 
@@ -203,7 +206,13 @@ pub fn plan(probe: &Probe, file_bytes: u64, media_quality: i32, limit: u64) -> O
 
     let mut video_bit_rate = quality.video;
     if limit > 0 {
-        let budget = limit.saturating_mul(8000) / probe.duration_ms * (100 - CONTAINER_SHARE) / 100;
+        // `duration_ms` is not 0, by the first check.
+        let budget = limit
+            .saturating_mul(8000)
+            .checked_div(probe.duration_ms)
+            .unwrap_or(0)
+            .saturating_mul(100 - CONTAINER_SHARE)
+            / 100;
         video_bit_rate =
             video_bit_rate.min(budget.saturating_sub(audio_cost).max(quality.least_video));
     }
@@ -239,8 +248,12 @@ fn fit(width: u32, height: u32, long_side: u32) -> (u32, u32) {
     } else {
         let scale = |side: u32| {
             // Rounded, in integers: the sides are a few thousand at most.
-            let scaled =
-                (u64::from(side) * u64::from(long_side) + u64::from(long) / 2) / u64::from(long);
+            // `long` is past `long_side`, so it is not 0.
+            let scaled = u64::from(side)
+                .saturating_mul(u64::from(long_side))
+                .saturating_add(u64::from(long) / 2)
+                .checked_div(u64::from(long))
+                .unwrap_or(0);
             u32::try_from(scaled).unwrap_or(long_side)
         };
         (scale(width), scale(height))
@@ -266,7 +279,7 @@ pub enum Outcome {
 pub fn probe(path: &Path) -> Result<Probe, String> {
     let path = c_path(path)?;
     let mut raw = ffi::Probe::default();
-    let mut error = [0 as c_char; ERROR_LEN];
+    let mut error: [c_char; ERROR_LEN] = [0; ERROR_LEN];
     // SAFETY: `path` is a NUL-terminated string that outlives the call,
     // `raw` is a struct of the layout recode.h declares, and the error
     // buffer's length is passed beside it.
@@ -320,13 +333,13 @@ where
     let input = c_path(input)?;
     let output = c_path(output)?;
     let raw = ffi::Target {
-        width: i32::try_from(target.width).map_err(|_| "too wide".to_string())?,
-        height: i32::try_from(target.height).map_err(|_| "too tall".to_string())?,
+        width: i32::try_from(target.width).map_err(|err| format!("too wide: {err}"))?,
+        height: i32::try_from(target.height).map_err(|err| format!("too tall: {err}"))?,
         video_bit_rate: i64::try_from(target.video_bit_rate).unwrap_or(i64::MAX),
         audio_bit_rate: i64::try_from(target.audio_bit_rate).unwrap_or(i64::MAX),
     };
     let mut progress = progress;
-    let mut error = [0 as c_char; ERROR_LEN];
+    let mut error: [c_char; ERROR_LEN] = [0; ERROR_LEN];
     // SAFETY: both paths are NUL-terminated and outlive the call; `raw`
     // has recode.h's layout; `context` points at `progress`, which lives
     // on this frame for the whole call, and is only ever handed back to
@@ -367,8 +380,9 @@ pub fn synth(
     with_sound: bool,
 ) -> Result<(), String> {
     let path = c_path(path)?;
-    let mut error = [0 as c_char; ERROR_LEN];
-    let int = |value: u32| i32::try_from(value).map_err(|_| format!("{value} is too large"));
+    let mut error: [c_char; ERROR_LEN] = [0; ERROR_LEN];
+    let int =
+        |value: u32| i32::try_from(value).map_err(|err| format!("{value} is too large: {err}"));
     let clip = ffi::Clip {
         width: int(width)?,
         height: int(height)?,
@@ -411,8 +425,13 @@ extern "C" fn report<F: FnMut(f64) -> bool>(context: *mut c_void, permille: i32)
 
 fn c_path(path: &Path) -> Result<CString, String> {
     use std::os::unix::ffi::OsStrExt;
-    CString::new(path.as_os_str().as_bytes())
-        .map_err(|_| format!("{} has a NUL in it", path.display()))
+    CString::new(path.as_os_str().as_bytes()).map_err(|err| {
+        format!(
+            "{} has a NUL in it, at byte {}",
+            path.display(),
+            err.nul_position()
+        )
+    })
 }
 
 fn message(error: &[c_char]) -> String {
