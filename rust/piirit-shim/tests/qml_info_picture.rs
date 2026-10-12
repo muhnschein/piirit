@@ -43,6 +43,8 @@ struct PageStackProbe {
     log: qt_property!(QString; NOTIFY log_changed),
     log_changed: qt_signal!(),
     push: qt_method!(fn(&mut self, page: QString, properties: QVariantMap) -> QVariant),
+    /// What has been pushed since the last call, which starts afresh.
+    take: qt_method!(fn(&mut self) -> QString),
 }
 
 impl PageStackProbe {
@@ -57,6 +59,12 @@ impl PageStackProbe {
         self.log = format!("{current}push:{name}={file}|").into();
         self.log_changed();
         QVariant::default()
+    }
+
+    fn take(&mut self) -> QString {
+        let log = std::mem::take(&mut self.log);
+        self.log_changed();
+        log
     }
 }
 
@@ -115,6 +123,10 @@ const PROBE_QML: &str = r"
             item.clicked(null)
             return 'ok'
         }
+        // What the page stack has been asked for since the last look.
+        function pushed() {
+            return stackProbe.take()
+        }
         // What the gallery hands back once a picture is picked.
         function pick(path) {
             var chat = findIn(loader.item, 'chat')
@@ -158,7 +170,6 @@ fn a_tap_on_the_picture_shows_it_larger() {
         .start(QString::from(env!("CARGO_BIN_EXE_fake-core-server")));
 
     let engine_ptr = std::ptr::addr_of_mut!(engine);
-    let stack_ptr = std::ptr::addr_of!(stack_box);
     let mut steps: Vec<(&str, String)> = Vec::new();
     let steps_ptr: *mut Vec<(&str, String)> = std::ptr::addr_of_mut!(steps);
 
@@ -183,16 +194,6 @@ fn a_tap_on_the_picture_shows_it_larger() {
             (*steps_ptr).push(($label, $value))
         };
     }
-    /// What the page stack has been asked for since the last look.
-    macro_rules! pushed {
-        () => {{
-            let probe = (*stack_ptr).pinned();
-            let mut probe = probe.borrow_mut();
-            let log = probe.log.to_string();
-            probe.log = QString::default();
-            log
-        }};
-    }
 
     // Ada: chat 1, whose one member has a picture.
     single_shot(Duration::from_secs(1), move || unsafe {
@@ -210,7 +211,7 @@ fn a_tap_on_the_picture_shows_it_larger() {
         record!("contact-picture", get!("contactAvatar", "picturePath"));
         record!("contact-tappable", get!("pictureTap", "enabled"));
         record!("contact-tap", call!("tap", QString::from("pictureTap")));
-        record!("contact-opened", pushed!());
+        record!("contact-opened", call!("pushed"));
         // The group: chat 2, with no picture yet.
         record!(
             "load-group",
@@ -223,11 +224,11 @@ fn a_tap_on_the_picture_shows_it_larger() {
         record!("group-badge", get!("editBadge", "visible"));
         record!("group-tappable", get!("pictureTap", "enabled"));
         record!("group-tap", call!("tap", QString::from("pictureTap")));
-        record!("group-opened-bare", pushed!());
+        record!("group-opened-bare", call!("pushed"));
         // Changing the picture is in the pull-down, and opens the gallery.
         record!("change-offered", get!("changePicture", "visible"));
         record!("change", call!("click", QString::from("changePicture")));
-        record!("change-opened", pushed!());
+        record!("change-opened", call!("pushed"));
         record!("pick", call!("pick", QString::from(GROUP_PICTURE)));
     });
 
@@ -235,7 +236,7 @@ fn a_tap_on_the_picture_shows_it_larger() {
         record!("group-picture", get!("groupAvatar", "picturePath"));
         record!("group-tappable-now", get!("pictureTap", "enabled"));
         record!("group-tap-now", call!("tap", QString::from("pictureTap")));
-        record!("group-opened", pushed!());
+        record!("group-opened", call!("pushed"));
         // A one-to-one chat on the group page has nothing to change.
         record!(
             "load-single",
