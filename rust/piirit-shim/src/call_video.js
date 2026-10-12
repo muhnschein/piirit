@@ -69,6 +69,11 @@ var piiritVideo = (function () {
      * screen, as this end's does, and for one held sideways to lose some
      * of its bars rather than half of itself. */
     var ZOOM_MOST = 1.35;
+    /* Milliseconds between looks at whether the pictures on the screen
+     * are being painted, and how many times in a call one that is not is
+     * put back before it is left as it is. */
+    var PAINT_LOOK = 2000;
+    var PUT_BACK_MOST = 3;
     /* This end's picture, while the other end's is drawn: in the corner
      * the call screen leaves free under its top line. */
     var CORNER = {
@@ -136,6 +141,13 @@ var piiritVideo = (function () {
      * one, a later round taking the place of an earlier. */
     var connected = false;
     var round = 0;
+    /* The app is in the background, where nothing is drawn. */
+    var away = false;
+    /* What each picture had painted when last looked at, while it is on
+     * the screen; how often each has been put back; and a look to come. */
+    var paints = { ours: null, theirs: null };
+    var putBacks = { ours: 0, theirs: 0 };
+    var paintDue = false;
 
     function noop() {}
 
@@ -435,11 +447,14 @@ var piiritVideo = (function () {
 
     /* Enlarge the other end's picture towards filling the screen, as
      * this end's does, by no more than ZOOM_MOST; what goes past the
-     * screen's edge is cut. Again whenever its size or the screen's
-     * changes. */
+     * screen's edge is cut. Laid out larger, around its middle, rather
+     * than scaled: a scaled picture is one more layer for the engine to
+     * put together, and the pictures are what it was seen to leave
+     * unpainted. Again whenever its size or the screen's changes. */
     function fitTheirs() {
         var picture = theirs();
-        if (!picture) {
+        var box = picture?.parentElement;
+        if (!box) {
             return;
         }
         if (picture !== fitting && picture.addEventListener) {
@@ -448,18 +463,133 @@ var piiritVideo = (function () {
         }
         var width = picture.videoWidth;
         var height = picture.videoHeight;
-        var boxWidth = picture.clientWidth;
-        var boxHeight = picture.clientHeight;
+        var boxWidth = box.clientWidth;
+        var boxHeight = box.clientHeight;
         var zoom = 1;
         if (width > 0 && height > 0 && boxWidth > 0 && boxHeight > 0) {
             var fit = Math.min(boxWidth / width, boxHeight / height);
             var fill = Math.max(boxWidth / width, boxHeight / height);
             zoom = Math.min(fill / fit, ZOOM_MOST);
         }
-        picture.style.transform = zoom > 1.001 ? "scale(" + zoom.toFixed(3) + ")" : "none";
-        if (picture.parentElement) {
-            picture.parentElement.style.overflow = "hidden";
+        if (zoom < 1.001) {
+            zoom = 1;
         }
+        var size = (zoom * 100).toFixed(1) + "%";
+        var shift = ((1 - zoom) * 50).toFixed(1) + "%";
+        place(picture, { position: "relative", width: size, height: size, left: shift, top: shift });
+        box.style.overflow = "hidden";
+    }
+
+    /* Whether the page hides a picture: with an inline display: none, on
+     * it or around it, as it hides what it will not show. */
+    function hidden(picture) {
+        for (var at = picture; at; at = at.parentElement) {
+            if (at.style?.display === "none") {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /* How many of a picture's frames the engine has painted -- put on the
+     * screen, not only decoded -- or null where it does not say. */
+    function paintedOf(picture) {
+        var count = picture.mozPaintedFrames;
+        return typeof count === "number" ? count : null;
+    }
+
+    /* Whether a picture is meant to be seen: there, not hidden, and the
+     * page in front. */
+    function meant(picture) {
+        return Boolean(picture) && !hidden(picture) && !away
+            && document.visibilityState !== "hidden";
+    }
+
+    /* Ask a picture to play, if it is paused. */
+    function play(picture) {
+        if (!picture.paused || !picture.play) {
+            return;
+        }
+        var playing = picture.play();
+        if (playing?.catch) {
+            playing.catch(noop);
+        }
+    }
+
+    /* Look at what the pictures paint in a moment, while one is meant to
+     * be seen. */
+    function paintSoon() {
+        if (paintDue || !(meant(preview()) || meant(theirs()))) {
+            return;
+        }
+        paintDue = true;
+        window.setTimeout(lookAtPaint, PAINT_LOOK);
+    }
+
+    function lookAtPaint() {
+        paintDue = false;
+        var ours = lookedAt("ours", preview());
+        var other = lookedAt("theirs", theirs());
+        if (ours || other) {
+            paintSoon();
+        }
+    }
+
+    /* A picture meant to be seen, playing, with frames, that has painted
+     * none since the last look is put back. Where the engine does not
+     * count, each is put back once, a look after it first shows. True
+     * while the picture is worth looking at again. */
+    function lookedAt(which, picture) {
+        if (picture && putBacks[which] > 0 && picture.paused) {
+            /* Put back, and not yet playing again: what it plays is the
+             * other end's voice, too. */
+            play(picture);
+        }
+        if (!meant(picture)) {
+            paints[which] = null;
+            return false;
+        }
+        /* Paused, or with no frame yet: nothing to paint, and the look's
+         * time starts once there is. */
+        var last = paints[which];
+        paints[which] = null;
+        if (picture.paused || !picture.videoWidth) {
+            return true;
+        }
+        var count = paintedOf(picture);
+        if (last?.picture !== picture || count !== last.count) {
+            paints[which] = { picture: picture, count: count };
+            return true;
+        }
+        var most = count === null ? 1 : PUT_BACK_MOST;
+        if (putBacks[which] < most) {
+            putBacks[which] += 1;
+            putBack(which, picture, count);
+        } else if (putBacks[which] === most && count !== null) {
+            putBacks[which] += 1;
+            note((which === "ours" ? "our" : "their") + " picture: still not painted");
+        }
+        return true;
+    }
+
+    /* Put a picture back: its frames taken off its stream and put on it
+     * again, and the stream given to it again -- what turning the camera
+     * does, which was seen to draw this end's picture where nothing had
+     * before. */
+    function putBack(which, picture, count) {
+        var source = picture.srcObject;
+        var tracks = source.getVideoTracks();
+        tracks.forEach(function (track) {
+            source.removeTrack(track);
+        });
+        tracks.forEach(function (track) {
+            source.addTrack(track);
+        });
+        picture.srcObject = source;
+        play(picture);
+        note((which === "ours" ? "our" : "their") + " picture put back: "
+            + (count === null ? "the engine does not say what it painted"
+                : "nothing painted in " + PAINT_LOOK / 1000 + " s"));
     }
 
     /* Look at this end's picture again in a moment. One look at a time,
@@ -492,10 +622,7 @@ var piiritVideo = (function () {
         if (!picture.paused || !picture.play) {
             return;
         }
-        var playing = picture.play();
-        if (playing?.catch) {
-            playing.catch(noop);
-        }
+        play(picture);
         lookAgain("it never played");
     }
 
@@ -503,6 +630,7 @@ var piiritVideo = (function () {
     function report() {
         layout();
         fitTheirs();
+        paintSoon();
         var state = {
             local: camera !== null,
             remote: remoteShown(),
@@ -517,6 +645,7 @@ var piiritVideo = (function () {
             return;
         }
         lastReport = now;
+        note("reported: " + now);
         send("/video", now);
     }
 
@@ -731,21 +860,16 @@ var piiritVideo = (function () {
 
     /* How a picture is drawn, for the log: hidden where it is not -- this
      * end's without a camera, the other end's while the page holds their
-     * camera off or their picture frameless -- playing or paused, and at
-     * what size. */
+     * camera off or their picture frameless -- playing or paused, at what
+     * size, and how many of its frames reached the screen. */
     function drawn(picture) {
         if (!picture) {
             return "not drawn";
         }
-        var hidden = "";
-        for (var at = picture; at; at = at.parentElement) {
-            if (at.style?.display === "none") {
-                hidden = "hidden ";
-                break;
-            }
-        }
-        return hidden + (picture.paused ? "paused " : "playing ")
-            + (picture.videoWidth || 0) + "x" + (picture.videoHeight || 0);
+        var count = paintedOf(picture);
+        return (hidden(picture) ? "hidden " : "") + (picture.paused ? "paused " : "playing ")
+            + (picture.videoWidth || 0) + "x" + (picture.videoHeight || 0)
+            + " painted " + (count === null ? "?" : count);
     }
 
     /* Log what one connection sends and receives of video, now. */
@@ -885,10 +1009,13 @@ var piiritVideo = (function () {
         case "hidden":
             /* In the background: the pictures are not drawn, and what
              * they carry -- the other end's voice -- still plays. */
+            away = true;
             document.documentElement.classList.add("piirit-hidden");
             return true;
         case "shown":
+            away = false;
             document.documentElement.classList.remove("piirit-hidden");
+            paintSoon();
             return true;
         default:
             return false;
@@ -1030,6 +1157,25 @@ var piiritVideo = (function () {
             }
         });
     }
+    /* Whether the engine holds the page in front, and every press of one
+     * of its buttons -- a touch, or the app's own -- in the log too: a
+     * page held hidden paints nothing, and a switch pressed by nobody
+     * knows whom is a microphone off that nobody chose. */
+    if (document.addEventListener) {
+        document.addEventListener("visibilitychange", function () {
+            note("visibility: " + document.visibilityState);
+            paintSoon();
+        });
+        document.addEventListener("click", function (event) {
+            for (var at = event.target; at; at = at.parentElement) {
+                var label = at.getAttribute ? at.getAttribute("aria-label") : null;
+                if (label) {
+                    note("pressed: " + label + (event.isTrusted ? ", by a touch" : ", by the app"));
+                    return;
+                }
+            }
+        }, true);
+    }
     if (window.addEventListener) {
         window.addEventListener("error", function (event) {
             heard("error", [event.message || "an error"]);
@@ -1043,6 +1189,9 @@ var piiritVideo = (function () {
         /* How to reach the host: the bridge's own post(path, body). */
         attach: function (post) {
             send = post;
+            if (typeof document.visibilityState === "string") {
+                note("visibility: " + document.visibilityState);
+            }
         },
         watch: watch,
         take: take

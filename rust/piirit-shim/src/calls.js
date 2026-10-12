@@ -93,11 +93,36 @@
         }).join("\r\n");
     }
 
+    /*
+     * What the page says to the host, one at a time and in the order it
+     * was said. Each request reaches the host on a connection of its
+     * own, and two in flight together were seen taken the wrong way
+     * round: the call screen, told where the pictures stand by the last
+     * report to arrive, would be left with the older one. A request the
+     * host never answers holds the rest no longer than WAIT.
+     */
+    var WAIT = 10000;
+    var outbox = [];
+    var posting = false;
     function post(path, body) {
+        outbox.push({ path: path, body: body });
+        if (!posting) {
+            postNext();
+        }
+    }
+    function postNext() {
+        var next = outbox.shift();
+        posting = Boolean(next);
+        if (!next) {
+            return;
+        }
         var xhr = new XMLHttpRequest();
-        xhr.open("POST", API + path, true);
+        xhr.open("POST", API + next.path, true);
         xhr.setRequestHeader("Content-Type", "text/plain; charset=utf-8");
-        xhr.send(body);
+        xhr.timeout = WAIT;
+        /* Answered, refused, failed or timed out alike. */
+        xhr.onloadend = postNext;
+        xhr.send(next.body);
     }
 
     /* Video is its own file's (`call_video.js`, served ahead of this):

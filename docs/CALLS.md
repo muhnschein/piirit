@@ -149,6 +149,10 @@ across origins -- finds no key and reaches nothing. What the bridge does:
   watches the peer connection and reports ICE's own states -- which is
   where *Connected* and the clock come from, and what ends a call whose
   connection has failed;
+- what the bridge sends the host goes one request at a time, in the
+  order it was said: each reaches the host on a connection of its own,
+  and two in flight together were seen taken the wrong way round, which
+  for `/video` would leave the call screen with the older report;
 - Gecko before 126 has no `RTCIceCandidate.type`, which the page reads
   to send its offer as soon as it has a relay candidate; without it the
   offer would wait for gathering to finish. The bridge reads the type
@@ -288,7 +292,11 @@ served ahead of `calls.js`):
   frames, bytes a frame (a black frame is a few dozen, a picture
   thousands), keyframes asked for (a receiver that cannot decode asks over
   and over), which track the sender has, and whether each picture is
-  hidden, plays, and at what size. The page's own console is read too:
+  hidden, plays, at what size, and how many of its frames Gecko has
+  painted (`mozPaintedFrames`). Every `/video` report is logged as it
+  goes, and so are whether the engine holds the page hidden, every press
+  of one of its buttons and whether it was a touch or the bridge, and a
+  picture put back (below). The page's own console is read too:
   its warnings and errors, failures nothing caught, and what it says of
   the other end's picture and its own commands, but none of its
   candidates or descriptions, which carry addresses. Each line goes to stderr as
@@ -305,7 +313,18 @@ end's picture fills the screen until the other end's comes, then sits
 in the corner, mirrored only from the front camera. The other end's is
 enlarged towards filling the screen too, but by no more than 1.35
 times: an upright phone's picture fills a taller screen, and one held
-sideways loses some of its bars rather than half of itself. A tap puts the lines
+sideways loses some of its bars rather than half of itself. It is laid
+out larger, not scaled with a transform, which would be one more layer
+for the engine to put together. A picture meant to be seen -- not
+hidden, playing, with frames, the page in front -- that Gecko has
+painted none of in two seconds is put back: its frames taken off its
+stream and put on again, and the stream given to it again, which is
+what turning the camera does, and was seen to draw this end's picture
+where on a phone nothing had been drawn. Three times a call at most,
+then logged; where the engine does not count what it paints, once,
+two seconds after it first shows. One put back paused is asked to play
+until it does, since the other end's picture carries their voice too.
+A tap puts the lines
 away, and they go by themselves once both ends are seen; the time of day
 gives way to how long, and the large clock goes. The camera switch is
 there in every call, and on the ringing screen of a video call, so it
