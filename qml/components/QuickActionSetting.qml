@@ -27,6 +27,9 @@ import "../js/QuickActions.js" as QuickActions
  * one of those, and only there, is whether it then goes at once or waits
  * in the chat for a caption and the send button. Waiting is the default,
  * as a share waits.
+ *
+ * The choice is Silica's own ComboBox, which lists this many kinds on a
+ * page of their own.
  */
 Column {
     id: setting
@@ -38,6 +41,8 @@ Column {
     property int accountId
     /// What the choice is called.
     property string label
+    /// The page this is on: the chat picker waits for it to be on screen.
+    property Item hostPage
 
     readonly property string prefix: setting.side === "right" ? "quickActionRight"
                                                               : "quickActionLeft"
@@ -45,6 +50,18 @@ Column {
 
     /// The action's chat has gone since it was picked.
     property bool chatGone: false
+
+    /// The kinds, in the order the choice lists them; "" is none.
+    readonly property var kinds: ["", "chat", "search", "qr", "scan", "profiles",
+                                  "photo", "video", "selfie", "selfie-video"]
+
+    /// What the choice says.
+    readonly property string shown: setting.valueText()
+    onShownChanged: choice.value = setting.shown
+
+    /// "Chat" was chosen, and the picker waits for Silica's page of
+    /// choices to have gone (`openWantedPicker`).
+    property bool chatWanted: false
 
     width: parent ? parent.width : 0
 
@@ -97,11 +114,26 @@ Column {
 
     function choose(kind) {
         if (kind === "chat") {
-            setting.pickChat()
+            // Silica has already moved the choice to what was tapped; it
+            // stays on what the setting holds until a chat is picked.
+            setting.refresh()
+            setting.chatWanted = true
+            setting.openWantedPicker()
             return
         }
         Settings[setting.prefix] = kind
     }
+
+    /// Put the choice back to what the setting holds. Silica writes
+    /// currentIndex itself on a tap, which detaches a binding -- the
+    /// arrangement DisappearingMessages uses.
+    function refresh() {
+        choice.currentIndex = Math.max(0, setting.kinds.indexOf(setting.action.kind))
+    }
+
+    readonly property string kind: setting.action.kind
+    onKindChanged: setting.refresh()
+    Component.onCompleted: setting.refresh()
 
     /// Ask which chat. Until one is picked the choice shows what it was.
     ///
@@ -134,6 +166,30 @@ Column {
         })
     }
 
+    /// Ask for the chat once this page is back on screen with nothing
+    /// moving. The choice is tapped on Silica's page of choices, which can
+    /// still be on the stack, or on its way off it, when the tap is
+    /// reported: a picker pushed then would go on top of it, and be taken
+    /// down with it.
+    function openWantedPicker() {
+        if (!setting.chatWanted || !setting.hostPage
+                || setting.hostPage.status !== PageStatus.Active || pageStack.busy) {
+            return
+        }
+        setting.chatWanted = false
+        setting.pickChat()
+    }
+
+    Connections {
+        target: setting.hostPage
+        onStatusChanged: setting.openWantedPicker()
+    }
+
+    Connections {
+        target: pageStack
+        onBusyChanged: setting.openWantedPicker()
+    }
+
     ChatInfo {
         id: chat
         objectName: "quickActionChat"
@@ -143,92 +199,33 @@ Column {
         onError: setting.chatGone = true
     }
 
-    // The choice: what the action is called, and what it does now, in a
-    // row drawn the way Silica draws a ComboBox, with the kinds in a menu
-    // that opens under it on a tap. Not a ComboBox: Silica shows one's
-    // choices on a page of their own once there are more than five of
-    // them, and there are ten. A row's context menu opens where it is,
-    // however many items it holds -- the conversation's own holds eight.
-    ListItem {
+    // The choice: what the action is called, and what it does now. Stock
+    // Silica: with this many kinds, its ComboBox lists them on a page of
+    // their own. What it says is the setting's, not the item tapped, so a
+    // chat's action says which chat.
+    ComboBox {
         id: choice
         objectName: setting.side + "ActionChoice"
         width: parent.width
-        contentHeight: Theme.itemSizeSmall
-        onClicked: choice.openMenu()
-
-        Label {
-            id: choiceLabel
-            objectName: setting.side + "ActionLabel"
-            x: Theme.horizontalPageMargin
-            anchors.verticalCenter: parent.verticalCenter
-            color: choice.highlighted ? Theme.highlightColor : Theme.primaryColor
-            text: setting.label
-        }
-
-        Label {
-            objectName: setting.side + "ActionValue"
-            anchors {
-                left: choiceLabel.right
-                leftMargin: Theme.paddingMedium
-                right: parent.right
-                rightMargin: Theme.horizontalPageMargin
-                verticalCenter: parent.verticalCenter
+        label: setting.label
+        value: setting.shown
+        // Silica writes the item's own text in here when one is tapped,
+        // which says "Chat" for a chat that is not picked yet: put back.
+        onValueChanged: {
+            if (choice.value !== setting.shown) {
+                choice.value = setting.shown
             }
-            color: Theme.highlightColor
-            truncationMode: TruncationMode.Fade
-            text: setting.valueText()
         }
 
         menu: ContextMenu {
-            MenuItem {
-                objectName: setting.side + "Action-none"
-                text: setting.kindLabel("")
-                onClicked: setting.choose("")
-            }
-            MenuItem {
-                objectName: setting.side + "Action-chat"
-                text: setting.kindLabel("chat")
-                onClicked: setting.choose("chat")
-            }
-            MenuItem {
-                objectName: setting.side + "Action-search"
-                text: setting.kindLabel("search")
-                onClicked: setting.choose("search")
-            }
-            MenuItem {
-                objectName: setting.side + "Action-qr"
-                text: setting.kindLabel("qr")
-                onClicked: setting.choose("qr")
-            }
-            MenuItem {
-                objectName: setting.side + "Action-scan"
-                text: setting.kindLabel("scan")
-                onClicked: setting.choose("scan")
-            }
-            MenuItem {
-                objectName: setting.side + "Action-profiles"
-                text: setting.kindLabel("profiles")
-                onClicked: setting.choose("profiles")
-            }
-            MenuItem {
-                objectName: setting.side + "Action-photo"
-                text: setting.kindLabel("photo")
-                onClicked: setting.choose("photo")
-            }
-            MenuItem {
-                objectName: setting.side + "Action-video"
-                text: setting.kindLabel("video")
-                onClicked: setting.choose("video")
-            }
-            MenuItem {
-                objectName: setting.side + "Action-selfie"
-                text: setting.kindLabel("selfie")
-                onClicked: setting.choose("selfie")
-            }
-            MenuItem {
-                objectName: setting.side + "Action-selfie-video"
-                text: setting.kindLabel("selfie-video")
-                onClicked: setting.choose("selfie-video")
+            Repeater {
+                model: setting.kinds
+
+                MenuItem {
+                    objectName: setting.side + "Action-" + (modelData || "none")
+                    text: setting.kindLabel(modelData)
+                    onClicked: setting.choose(modelData)
+                }
             }
         }
     }
