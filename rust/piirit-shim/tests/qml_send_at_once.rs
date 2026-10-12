@@ -259,47 +259,57 @@ fn a_capture_set_to_send_at_once_goes_once_it_is_ready() {
     });
 
     // A video stopped while it is made smaller goes as it is -- when the
-    // reader sends it, not on its own.
+    // reader sends it, not on its own. Stopped once it is being made
+    // smaller, asked four times a second for up to three seconds: a
+    // machine measuring coverage takes its time to start.
     let page_f = page.clone();
     let stopped_path = stopped.to_string_lossy().into_owned();
     single_shot(Duration::from_secs(13), move || unsafe {
         open!("stopped-load", page_f, stopped_path, true);
     });
 
-    single_shot(Duration::from_secs(14), move || unsafe {
-        probe!("stopped-preparing", "messages", "preparing");
-        (*steps_ptr).push((
-            "stopped-stop",
-            call!("click", QString::from("cancelAttachmentButton")),
-        ));
-    });
+    let stopped_done = std::rc::Rc::new(std::cell::Cell::new(false));
+    for quarter in 1..=12 {
+        let stopped_done = stopped_done.clone();
+        single_shot(
+            Duration::from_millis(13_000 + quarter * 250),
+            move || unsafe {
+                if stopped_done.get() {
+                    return;
+                }
+                let preparing = call!("get", QString::from("messages"), QString::from("preparing"));
+                if preparing != "true" && quarter < 12 {
+                    return;
+                }
+                stopped_done.set(true);
+                (*steps_ptr).push(("stopped-preparing", preparing));
+                (*steps_ptr).push((
+                    "stopped-stop",
+                    call!("click", QString::from("cancelAttachmentButton")),
+                ));
+            },
+        );
+    }
 
     let journal_g = journal.clone();
-    single_shot(Duration::from_secs(16), move || unsafe {
+    single_shot(Duration::from_secs(18), move || unsafe {
         (*steps_ptr).push(("stopped-sends", sends_in(&journal_g).len().to_string()));
         probe!("stopped-bar", "attachmentBar", "visible");
     });
 
-    // A video, set to send at once: made smaller first, then sent.
+    // A video, set to send at once: made smaller first, then sent. What
+    // the core is handed says which: how long the making smaller takes
+    // is the machine's.
     let page_c = page;
-    let journal_d = journal.clone();
-    single_shot(Duration::from_secs(17), move || unsafe {
+    single_shot(Duration::from_secs(19), move || unsafe {
         open!("video-load", page_c, video_path, true);
-    });
-
-    single_shot(Duration::from_secs(18), move || unsafe {
-        probe!("video-preparing", "messages", "preparing");
-        (*steps_ptr).push((
-            "video-sends-preparing",
-            sends_in(&journal_d).len().to_string(),
-        ));
     });
 
     // Made, and sent: asked once a second until it has gone, or for as
     // long as a slow machine could need to make three seconds of video,
     // and well inside the two minutes nextest gives a test.
     let done = std::rc::Rc::new(std::cell::Cell::new(false));
-    for second in 19..=75 {
+    for second in 20..=75 {
         let (done, journal) = (done.clone(), journal.clone());
         single_shot(Duration::from_secs(second), move || unsafe {
             if done.get() || (sends_in(&journal).len() < 2 && second < 75) {
@@ -432,16 +442,6 @@ fn a_capture_set_to_send_at_once_goes_once_it_is_ready() {
          large as it was taken. {sends_context}"
     );
 
-    assert_eq!(
-        value("video-preparing"),
-        "true",
-        "the video was not made smaller first. {context}"
-    );
-    assert_eq!(
-        value("video-sends-preparing"),
-        "1",
-        "the video was sent before it was made smaller. {sends_context}"
-    );
     assert_eq!(
         sends.len(),
         2,
