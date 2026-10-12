@@ -14,10 +14,7 @@
     unused_unsafe,
     clippy::borrow_as_ptr,
     clippy::disallowed_methods,
-    clippy::expect_used,
-    // qt_method! declarations must match the generated dispatcher's
-    // by-value parameters; see piirit-shim/src/lib.rs.
-    clippy::needless_pass_by_value
+    clippy::expect_used
 )]
 
 use std::time::Duration;
@@ -26,27 +23,17 @@ use qmetaobject::*;
 
 mod common;
 
-/// Silica's `pageStack`, recorded rather than performed.
-#[derive(QObject, Default)]
-struct StackProbe {
-    base: qt_base_class!(trait QObject),
-    pops: qt_property!(i32; NOTIFY pops_changed),
-    pops_changed: qt_signal!(),
-    pop: qt_method!(fn(&mut self)),
-}
-
-impl StackProbe {
-    fn pop(&mut self) {
-        self.pops += 1;
-        self.pops_changed();
-    }
-}
-
 const PROBE_QML: &str = r"
     import QtQuick 2.0
     import Sailfish.Silica 1.0
     Item {
         property string picked: ''
+        // Silica's `pageStack`, counted rather than performed.
+        property QtObject pageStack: QtObject {
+            property int pops: 0
+            function pop() { pops += 1 }
+        }
+        function pops() { return '' + pageStack.pops }
         Loader { id: loader }
         function load(url, properties) {
             loader.setSource('', {})
@@ -100,16 +87,13 @@ fn the_camera_opens_in_the_mode_and_on_the_side_it_is_asked_for() {
 
     piirit_shim::register_qml_types();
 
-    let stack_box = QObjectBox::new(StackProbe::default());
     let mut engine = QmlEngine::new();
     engine.add_import_path(QString::from(
         common::stubs_dir().to_string_lossy().into_owned(),
     ));
-    engine.set_object_property("pageStack".into(), stack_box.pinned());
     engine.load_data(QByteArray::from(PROBE_QML));
 
     let engine_ptr = std::ptr::addr_of_mut!(engine);
-    let stack_ptr = std::ptr::addr_of!(stack_box);
     let mut steps: Vec<(&str, String)> = Vec::new();
     let steps_ptr: *mut Vec<(&str, String)> = std::ptr::addr_of_mut!(steps);
 
@@ -138,7 +122,6 @@ fn the_camera_opens_in_the_mode_and_on_the_side_it_is_asked_for() {
             )
         };
     }
-    let pops = move || unsafe { (*stack_ptr).pinned().borrow().pops.to_string() };
 
     single_shot(Duration::from_secs(1), move || unsafe {
         // As the conversation opens it: a still, on the back camera.
@@ -164,10 +147,10 @@ fn the_camera_opens_in_the_mode_and_on_the_side_it_is_asked_for() {
             "stopping-paused",
             call!("page", QString::from("pausesQuickActions"))
         );
-        record!("pops-before-video", pops());
+        record!("pops-before-video", call!("pops"));
         record!("finished", call!("videoFinished"));
         record!("video-picked", call!("pickedPath"));
-        record!("pops-after-video", pops());
+        record!("pops-after-video", call!("pops"));
         record!(
             "done-paused",
             call!("page", QString::from("pausesQuickActions"))
@@ -180,11 +163,11 @@ fn the_camera_opens_in_the_mode_and_on_the_side_it_is_asked_for() {
         // The switch goes back to the back camera from there.
         record!("switch", call!("tap", QString::from("flipButton")));
         record!("switched-opened", call!("opened"));
-        record!("pops-before-still", pops());
+        record!("pops-before-still", call!("pops"));
         record!("shutter", call!("tap", QString::from("shutter")));
         record!("written", call!("stillWritten"));
         record!("still-picked", call!("pickedPath"));
-        record!("pops-after-still", pops());
+        record!("pops-after-still", call!("pops"));
 
         // A video on the front camera, as Selfie video asks.
         record!(
@@ -195,10 +178,10 @@ fn the_camera_opens_in_the_mode_and_on_the_side_it_is_asked_for() {
 
         // Left at its default, the page still takes itself down.
         record!("closing", load!("{}"));
-        record!("pops-before-close", pops());
+        record!("pops-before-close", call!("pops"));
         record!("close-shutter", call!("tap", QString::from("shutter")));
         record!("close-written", call!("stillWritten"));
-        record!("pops-after-close", pops());
+        record!("pops-after-close", call!("pops"));
         (*engine_ptr).quit();
     });
 
