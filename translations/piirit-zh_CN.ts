@@ -162,6 +162,16 @@
         <extracomment>Shown above the message field while a picked video is made smaller, which happens before it is sent so that relays take it. %1 is how much of it is done, as a number from 0 to 100. Keep it short: it shares a line with a button on a phone.</extracomment>
         <translation>正在缩小视频以便发送：%1%</translation>
     </message>
+    <message>
+        <source>%1 → ~%2</source>
+        <extracomment>Under the line saying a picked video is being made smaller: %1 is what the video weighs as picked, %2 what it is planned to come out at, each such as &quot;24 MB&quot;. The second is a guess until it is made, hence the tilde.</extracomment>
+        <translation>%1 → ~%2</translation>
+    </message>
+    <message>
+        <source>%1 → %2</source>
+        <extracomment>Under the line saying a picked video is sent, once it has been made smaller: %1 is what the video weighed as picked, %2 what is sent, each such as &quot;24 MB&quot;.</extracomment>
+        <translation>%1 → %2</translation>
+    </message>
 </context>
 <context>
     <name>AttachmentPreview</name>
@@ -471,6 +481,61 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>CameraSettingsPanel</name>
+    <message>
+        <source>Flash automatic</source>
+        <translation>闪光灯自动</translation>
+    </message>
+    <message>
+        <source>Flash on</source>
+        <translation>闪光灯开</translation>
+    </message>
+    <message>
+        <source>Flashlight on</source>
+        <translation>手电筒开</translation>
+    </message>
+    <message>
+        <source>Flash off</source>
+        <translation>闪光灯关</translation>
+    </message>
+    <message>
+        <source>Self-timer %1 s</source>
+        <translation>自拍倒计时 %1 秒</translation>
+    </message>
+    <message>
+        <source>Self-timer off</source>
+        <translation>自拍倒计时关</translation>
+    </message>
+    <message>
+        <source>Sunny</source>
+        <translation>晴天</translation>
+    </message>
+    <message>
+        <source>Cloudy</source>
+        <translation>阴天</translation>
+    </message>
+    <message>
+        <source>Fluorescent</source>
+        <translation>荧光灯</translation>
+    </message>
+    <message>
+        <source>Tungsten</source>
+        <translation>白炽灯</translation>
+    </message>
+    <message>
+        <source>Automatic white balance</source>
+        <translation>自动白平衡</translation>
+    </message>
+    <message>
+        <source>Grid on</source>
+        <translation>网格开</translation>
+    </message>
+    <message>
+        <source>Grid off</source>
+        <translation>网格关</translation>
+    </message>
+</context>
+<context>
     <name>CapturePage</name>
     <message>
         <source>The video could not be saved</source>
@@ -775,9 +840,14 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>与 Delta Chat 核心的连接已断开。正在重新连接…</translation>
     </message>
     <message>
-        <source>This file is %1. Some relays refuse files larger than %2, so sending this might fail.</source>
+        <source>Even made smaller, this file is bigger than the %1 most relays accept. Sending may fail.</source>
+        <extracomment>Shown above the message field when a video is being made smaller for sending and is still bigger than Delta Chat recommends. The file is still sent. %1 is the recommended largest size, such as &quot;24 MB&quot;.</extracomment>
+        <translation>即使缩小后，此文件仍超过大多数中继接受的 %1。发送可能失败。</translation>
+    </message>
+    <message>
+        <source>At %1, this file is bigger than the %2 most relays accept. Sending may fail.</source>
         <extracomment>Shown above the message field when the attached file is bigger than Delta Chat recommends. The file is still sent. %1 is the file&apos;s size and %2 the recommended largest size, each such as &quot;24 MB&quot;.</extracomment>
-        <translation>此文件大小为 %1。部分中继会拒收大于 %2 的文件，因此发送此文件可能会失败。</translation>
+        <translation>此文件大小为 %1，超过大多数中继接受的 %2。发送可能失败。</translation>
     </message>
 </context>
 <context>

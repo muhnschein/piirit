@@ -217,8 +217,8 @@ fn a_file_over_the_recommended_size_is_said_to_be_large_and_is_sent() {
     // this whether to send a file the relay may refuse.
     assert_eq!(
         value("bar-text"),
-        "This file is 4.1 kB. Some relays refuse files larger than 1.0 kB, \
-         so sending this might fail.",
+        "At 4.1 kB, this file is bigger than the 1.0 kB most relays accept. \
+         Sending may fail.",
         "the notice does not say how big the file is, how big the core \
          recommends, and that the send may fail. {context}"
     );

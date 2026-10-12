@@ -162,6 +162,16 @@
         <extracomment>Shown above the message field while a picked video is made smaller, which happens before it is sent so that relays take it. %1 is how much of it is done, as a number from 0 to 100. Keep it short: it shares a line with a button on a phone.</extracomment>
         <translation>पाठवण्यासाठी व्हिडिओ लहान करत आहे: %1%</translation>
     </message>
+    <message>
+        <source>%1 → ~%2</source>
+        <extracomment>Under the line saying a picked video is being made smaller: %1 is what the video weighs as picked, %2 what it is planned to come out at, each such as &quot;24 MB&quot;. The second is a guess until it is made, hence the tilde.</extracomment>
+        <translation>%1 → ~%2</translation>
+    </message>
+    <message>
+        <source>%1 → %2</source>
+        <extracomment>Under the line saying a picked video is sent, once it has been made smaller: %1 is what the video weighed as picked, %2 what is sent, each such as &quot;24 MB&quot;.</extracomment>
+        <translation>%1 → %2</translation>
+    </message>
 </context>
 <context>
     <name>AttachmentPreview</name>
@@ -473,6 +483,61 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>CameraSettingsPanel</name>
+    <message>
+        <source>Flash automatic</source>
+        <translation>फ्लॅश स्वयंचलित</translation>
+    </message>
+    <message>
+        <source>Flash on</source>
+        <translation>फ्लॅश चालू</translation>
+    </message>
+    <message>
+        <source>Flashlight on</source>
+        <translation>टॉर्च चालू</translation>
+    </message>
+    <message>
+        <source>Flash off</source>
+        <translation>फ्लॅश बंद</translation>
+    </message>
+    <message>
+        <source>Self-timer %1 s</source>
+        <translation>सेल्फ-टायमर %1 से.</translation>
+    </message>
+    <message>
+        <source>Self-timer off</source>
+        <translation>सेल्फ-टायमर बंद</translation>
+    </message>
+    <message>
+        <source>Sunny</source>
+        <translation>ऊन</translation>
+    </message>
+    <message>
+        <source>Cloudy</source>
+        <translation>ढगाळ</translation>
+    </message>
+    <message>
+        <source>Fluorescent</source>
+        <translation>फ्लोरेसंट</translation>
+    </message>
+    <message>
+        <source>Tungsten</source>
+        <translation>टंगस्टन</translation>
+    </message>
+    <message>
+        <source>Automatic white balance</source>
+        <translation>स्वयंचलित व्हाइट बॅलन्स</translation>
+    </message>
+    <message>
+        <source>Grid on</source>
+        <translation>ग्रिड चालू</translation>
+    </message>
+    <message>
+        <source>Grid off</source>
+        <translation>ग्रिड बंद</translation>
+    </message>
+</context>
+<context>
     <name>CapturePage</name>
     <message>
         <source>The video could not be saved</source>
@@ -778,9 +843,14 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Delta Chat कोअरशी जोडणी तुटली. पुन्हा जोडत आहे…</translation>
     </message>
     <message>
-        <source>This file is %1. Some relays refuse files larger than %2, so sending this might fail.</source>
+        <source>Even made smaller, this file is bigger than the %1 most relays accept. Sending may fail.</source>
+        <extracomment>Shown above the message field when a video is being made smaller for sending and is still bigger than Delta Chat recommends. The file is still sent. %1 is the recommended largest size, such as &quot;24 MB&quot;.</extracomment>
+        <translation>लहान केल्यानंतरही ही फाइल बहुतेक रिले स्वीकारतात त्या %1 पेक्षा मोठी आहे. पाठवणे अयशस्वी होऊ शकते.</translation>
+    </message>
+    <message>
+        <source>At %1, this file is bigger than the %2 most relays accept. Sending may fail.</source>
         <extracomment>Shown above the message field when the attached file is bigger than Delta Chat recommends. The file is still sent. %1 is the file&apos;s size and %2 the recommended largest size, each such as &quot;24 MB&quot;.</extracomment>
-        <translation>या फाइलचा आकार %1 आहे. काही रिले %2 पेक्षा मोठ्या फाइल्स नाकारतात, त्यामुळे ती पाठवणे अयशस्वी होऊ शकते.</translation>
+        <translation>%1 असलेली ही फाइल बहुतेक रिले स्वीकारतात त्या %2 पेक्षा मोठी आहे. पाठवणे अयशस्वी होऊ शकते.</translation>
     </message>
 </context>
 <context>

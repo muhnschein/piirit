@@ -162,6 +162,16 @@
         <extracomment>Shown above the message field while a picked video is made smaller, which happens before it is sent so that relays take it. %1 is how much of it is done, as a number from 0 to 100. Keep it short: it shares a line with a button on a phone.</extracomment>
         <translation>Zmenšování videa k odeslání: %1 %</translation>
     </message>
+    <message>
+        <source>%1 → ~%2</source>
+        <extracomment>Under the line saying a picked video is being made smaller: %1 is what the video weighs as picked, %2 what it is planned to come out at, each such as &quot;24 MB&quot;. The second is a guess until it is made, hence the tilde.</extracomment>
+        <translation>%1 → ~%2</translation>
+    </message>
+    <message>
+        <source>%1 → %2</source>
+        <extracomment>Under the line saying a picked video is sent, once it has been made smaller: %1 is what the video weighed as picked, %2 what is sent, each such as &quot;24 MB&quot;.</extracomment>
+        <translation>%1 → %2</translation>
+    </message>
 </context>
 <context>
     <name>AttachmentPreview</name>
@@ -475,6 +485,61 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
     </message>
 </context>
 <context>
+    <name>CameraSettingsPanel</name>
+    <message>
+        <source>Flash automatic</source>
+        <translation>Blesk automaticky</translation>
+    </message>
+    <message>
+        <source>Flash on</source>
+        <translation>Blesk zapnut</translation>
+    </message>
+    <message>
+        <source>Flashlight on</source>
+        <translation>Svítilna zapnuta</translation>
+    </message>
+    <message>
+        <source>Flash off</source>
+        <translation>Blesk vypnut</translation>
+    </message>
+    <message>
+        <source>Self-timer %1 s</source>
+        <translation>Samospoušť %1 s</translation>
+    </message>
+    <message>
+        <source>Self-timer off</source>
+        <translation>Samospoušť vypnuta</translation>
+    </message>
+    <message>
+        <source>Sunny</source>
+        <translation>Slunečno</translation>
+    </message>
+    <message>
+        <source>Cloudy</source>
+        <translation>Zataženo</translation>
+    </message>
+    <message>
+        <source>Fluorescent</source>
+        <translation>Zářivka</translation>
+    </message>
+    <message>
+        <source>Tungsten</source>
+        <translation>Žárovka</translation>
+    </message>
+    <message>
+        <source>Automatic white balance</source>
+        <translation>Automatické vyvážení bílé</translation>
+    </message>
+    <message>
+        <source>Grid on</source>
+        <translation>Mřížka zapnuta</translation>
+    </message>
+    <message>
+        <source>Grid off</source>
+        <translation>Mřížka vypnuta</translation>
+    </message>
+</context>
+<context>
     <name>CapturePage</name>
     <message>
         <source>The video could not be saved</source>
@@ -781,9 +846,14 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
         <translation>Spojení s jádrem Delta Chatu bylo ztraceno. Znovu se připojuje…</translation>
     </message>
     <message>
-        <source>This file is %1. Some relays refuse files larger than %2, so sending this might fail.</source>
+        <source>Even made smaller, this file is bigger than the %1 most relays accept. Sending may fail.</source>
+        <extracomment>Shown above the message field when a video is being made smaller for sending and is still bigger than Delta Chat recommends. The file is still sent. %1 is the recommended largest size, such as &quot;24 MB&quot;.</extracomment>
+        <translation>I po zmenšení je tento soubor větší než %1, které přijímá většina relé. Odeslání se nemusí podařit.</translation>
+    </message>
+    <message>
+        <source>At %1, this file is bigger than the %2 most relays accept. Sending may fail.</source>
         <extracomment>Shown above the message field when the attached file is bigger than Delta Chat recommends. The file is still sent. %1 is the file&apos;s size and %2 the recommended largest size, each such as &quot;24 MB&quot;.</extracomment>
-        <translation>Tento soubor má %1. Některé relaye odmítají soubory větší než %2, takže jeho odeslání může selhat.</translation>
+        <translation>Se %1 je tento soubor větší než %2, které přijímá většina relé. Odeslání se nemusí podařit.</translation>
     </message>
 </context>
 <context>
