@@ -272,6 +272,16 @@ builddir=%{builddir}
 install -Dm 755 "$builddir/%{name}" \
     %{buildroot}%{_bindir}/%{name}
 
+# The H.264 encoder video calls send through, which the browser engine
+# loads as a media plugin of its own: rust/piirit-video/build.rs builds it
+# from the same x264 the binary carries and lays it out beside the binary
+# the way Gecko looks for one. A private library under %%{appdatadir}/lib,
+# the one place Harbour allows one; piirit-app points Gecko at it.
+install -Dm 755 "$builddir/gmp-piirit/1.0/libpiirit.so" \
+    %{buildroot}%{appdatadir}/lib/gmp-piirit/1.0/libpiirit.so
+install -Dm 644 "$builddir/gmp-piirit/1.0/piirit.info" \
+    %{buildroot}%{appdatadir}/lib/gmp-piirit/1.0/piirit.info
+
 # QML UI, installed under our own app-private data dir (not /usr/bin) so
 # piirit-app's qml_dir() lookup (PIIRIT_QML_DIR env var, then this
 # path, then a source-tree-relative fallback for local dev) finds it.

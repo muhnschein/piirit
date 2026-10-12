@@ -53,6 +53,7 @@ mod webxdc;
 mod webxdc_host;
 
 pub use crate::backup::Backup;
+pub use crate::call_host::prepare_media_plugins;
 pub use crate::calls::Call;
 pub use crate::capture::Captures;
 pub use crate::chat::{local_day_number, ChatMessages};

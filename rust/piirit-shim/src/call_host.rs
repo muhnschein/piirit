@@ -39,6 +39,7 @@
 
 use std::collections::VecDeque;
 use std::net::{Ipv4Addr, SocketAddr};
+use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicBool, AtomicU32, AtomicU64, Ordering};
 use std::sync::{Arc, Mutex, Weak};
 use std::time::{Duration, Instant};
@@ -471,23 +472,107 @@ fn media_plugins(path: Option<&str>) -> String {
         .split(':')
         .filter(|dir| !dir.is_empty())
         .map(|dir| {
-            let apis = std::fs::read_dir(dir)
-                .ok()
-                .into_iter()
-                .flatten()
-                .flatten()
-                .map(|entry| entry.path())
-                .filter(|file| file.extension().is_some_and(|ext| ext == "info"))
-                .filter_map(|file| std::fs::read_to_string(file).ok())
-                .find_map(|info| {
-                    info.lines()
-                        .find_map(|line| line.strip_prefix("APIs:"))
-                        .map(|apis| apis.trim().to_string())
-                });
+            let apis = plugin_apis(Path::new(dir));
             format!("{dir} {}", apis.as_deref().unwrap_or("(no APIs found)"))
         })
         .collect();
     format!("media plugins: {}", found.join("; "))
+}
+
+/// The `APIs:` line of the `.info` file in a media plugin's directory:
+/// `decode-video[h264:vp8], encode-video[h264]` for gmp-droid on a phone
+/// whose hardware does both.
+fn plugin_apis(dir: &Path) -> Option<String> {
+    std::fs::read_dir(dir)
+        .ok()
+        .into_iter()
+        .flatten()
+        .flatten()
+        .map(|entry| entry.path())
+        .filter(|file| file.extension().is_some_and(|ext| ext == "info"))
+        .filter_map(|file| std::fs::read_to_string(file).ok())
+        .find_map(|info| {
+            info.lines()
+                .find_map(|line| line.strip_prefix("APIs:"))
+                .map(|apis| apis.trim().to_string())
+        })
+}
+
+/// Whether an `APIs:` line offers an H.264 encoder, read as Gecko reads
+/// it (`GMPParent::ReadGMPInfoFile`): capabilities apart at ", ", each a
+/// name and its tags in brackets, apart at ":".
+fn encodes_h264(apis: &str) -> bool {
+    apis.split(", ").any(|capability| {
+        capability
+            .strip_prefix("encode-video[")
+            .and_then(|tags| tags.strip_suffix(']'))
+            .is_some_and(|tags| tags.split(':').any(|tag| tag == "h264"))
+    })
+}
+
+/// Where the package installs the app's own H.264 encoder: a media
+/// plugin built from the binary's x264 (`piirit-video/build.rs`).
+const BUNDLED_ENCODER: &str = "/usr/share/harbour-piirit/lib/gmp-piirit/1.0";
+
+/// What `MOZ_GMP_PATH` should be for a call to send H.264, given what it
+/// is: the same, and `ours` after it -- unless a plugin it already names
+/// encodes H.264. That is gmp-droid, which sets the variable for the
+/// whole session when it is installed, and the phone's hardware encoder
+/// costs less than any software one -- or `ours` itself, already there.
+/// `None` leaves the variable alone, as it does when `ours` is not
+/// installed.
+fn encoder_path(existing: Option<&str>, ours: &Path) -> Option<String> {
+    let ours_text = ours.to_str()?;
+    if !ours.join("piirit.info").is_file() {
+        return None;
+    }
+    let dirs: Vec<&str> = existing
+        .unwrap_or("")
+        .split(':')
+        .filter(|dir| !dir.is_empty())
+        .collect();
+    if dirs
+        .iter()
+        .any(|&dir| plugin_apis(Path::new(dir)).is_some_and(|apis| encodes_h264(&apis)))
+    {
+        return None;
+    }
+    Some(
+        dirs.into_iter()
+            .chain(std::iter::once(ours_text))
+            .collect::<Vec<_>>()
+            .join(":"),
+    )
+}
+
+/// Before the app starts a thread, and so before the browser engine
+/// does: point Gecko at an H.264 encoder (see `encoder_path`), and tell
+/// the encoder where the call's log is. Gecko starts the plugin as a
+/// process of its own, which inherits both. `PIIRIT_GMP_DIR` names
+/// another encoder than the one the package installs, for trying a
+/// build on a phone.
+pub fn prepare_media_plugins() {
+    let log = crate::qr::cache_file(LOG_FILE).ok();
+    for (name, value) in media_environment(|name| std::env::var(name).ok(), log) {
+        std::env::set_var(name, value);
+    }
+}
+
+/// The variables [`prepare_media_plugins`] sets, from the ones it reads
+/// through `var` and the call log's path.
+fn media_environment(
+    var: impl Fn(&str) -> Option<String>,
+    log: Option<PathBuf>,
+) -> Vec<(&'static str, String)> {
+    let ours = var("PIIRIT_GMP_DIR").map_or_else(|| PathBuf::from(BUNDLED_ENCODER), PathBuf::from);
+    let mut set = Vec::new();
+    if let Some(path) = encoder_path(var("MOZ_GMP_PATH").as_deref(), &ours) {
+        set.push(("MOZ_GMP_PATH", path));
+    }
+    if let Some(log) = log.as_deref().and_then(Path::to_str) {
+        set.push(("PIIRIT_CALL_LOG", log.to_owned()));
+    }
+    set
 }
 
 /// A call's log: each line on stderr, where a phone's log has it when
@@ -497,14 +582,14 @@ fn media_plugins(path: Option<&str>) -> String {
 /// begun afresh with every call, so it holds the call that has just
 /// gone wrong, and never grows.
 struct CallLog {
-    path: Option<std::path::PathBuf>,
+    path: Option<PathBuf>,
     started: Instant,
 }
 
 impl CallLog {
     /// A log for a call starting now, in the file at `path` -- emptied --
     /// or on stderr alone when there is nowhere for the file.
-    fn begin(path: Option<std::path::PathBuf>) -> Self {
+    fn begin(path: Option<PathBuf>) -> Self {
         let path = path.filter(|path| std::fs::write(path, "").is_ok());
         Self {
             path,
@@ -819,10 +904,12 @@ async fn write_response(stream: &mut TcpStream, response: &Response) -> std::io:
 #[cfg(test)]
 mod tests {
     use super::{
-        camera_command, command, encode_base64, facing_command, log_line, media_plugins,
-        percent_encode, shown_command, CallLog, Video, BRIDGE, LOG_LINE_MAX, PAGE,
+        camera_command, command, encode_base64, encoder_path, encodes_h264, facing_command,
+        log_line, media_environment, media_plugins, percent_encode, shown_command, CallLog, Video,
+        BRIDGE, BUNDLED_ENCODER, LOG_LINE_MAX, PAGE,
     };
     use crate::webxdc_host::decode_base64;
+    use std::path::{Path, PathBuf};
 
     #[test]
     fn base64_is_what_atob_reads_and_round_trips() {
@@ -977,6 +1064,120 @@ mod tests {
             media_plugins(Some("")),
             "media plugins: MOZ_GMP_PATH is not set"
         );
+    }
+
+    /// A media plugin's directory, `<name>.info` in it saying `apis`,
+    /// under a directory of the test's own.
+    fn plugin(test: &str, name: &str, apis: &str) -> PathBuf {
+        let dir = std::env::temp_dir()
+            .join(format!("piirit-plugins-{test}-{}", std::process::id()))
+            .join(format!("gmp-{name}"))
+            .join("1.0");
+        std::fs::create_dir_all(&dir).unwrap();
+        std::fs::write(
+            dir.join(format!("{name}.info")),
+            format!("Name: {name}\nDescription: a plugin\nVersion: 1.0\nAPIs: {apis}\n"),
+        )
+        .unwrap();
+        dir
+    }
+
+    fn text(dir: &Path) -> String {
+        dir.to_string_lossy().into_owned()
+    }
+
+    #[test]
+    fn an_h264_encoder_is_read_from_its_apis_as_gecko_reads_them() {
+        assert!(encodes_h264("encode-video[h264]"));
+        assert!(encodes_h264(
+            "decode-video[h264:vp8], encode-video[vp8:h264]"
+        ));
+        assert!(!encodes_h264("decode-video[h264]"));
+        assert!(!encodes_h264("encode-video[vp8]"));
+        assert!(!encodes_h264("encode-video[h2645]"));
+        assert!(!encodes_h264("encode-video"));
+        // Gecko splits capabilities at ", " and nothing else; this is one
+        // capability whose tags end at the first "]".
+        assert!(!encodes_h264("encode-video[vp8],encode-video[h264]"));
+    }
+
+    #[test]
+    fn gecko_is_pointed_at_the_bundled_encoder_unless_the_phone_has_one() {
+        let ours = plugin("path", "piirit", "encode-video[h264]");
+        let decoder = text(&plugin("path", "droid", "decode-video[h264:vp8]"));
+        let vp8 = text(&plugin("path", "vp8", "encode-video[vp8]"));
+        let hardware = text(&plugin(
+            "path",
+            "hardware",
+            "decode-video[h264], encode-video[vp8:h264]",
+        ));
+        let missing = ours.join("not-installed");
+        let our = text(&ours);
+
+        let paths = [
+            encoder_path(None, &ours),
+            encoder_path(Some(""), &ours),
+            // gmp-droid where the phone decodes H.264 but cannot encode it.
+            encoder_path(Some(&decoder), &ours),
+            encoder_path(Some(&format!(":{vp8}::{decoder}:")), &ours),
+            // gmp-droid where it can: the hardware does it for less.
+            encoder_path(Some(&hardware), &ours),
+            encoder_path(Some(&format!("{decoder}:{hardware}")), &ours),
+            // Already there, however it was written.
+            encoder_path(Some(&format!("{decoder}:{our}/")), &ours),
+            // Not installed: nothing to point at.
+            encoder_path(None, &missing),
+        ];
+        std::fs::remove_dir_all(ours.parent().unwrap().parent().unwrap()).unwrap();
+
+        assert_eq!(
+            paths,
+            [
+                Some(our.clone()),
+                Some(our.clone()),
+                Some(format!("{decoder}:{our}")),
+                Some(format!("{vp8}:{decoder}:{our}")),
+                None,
+                None,
+                None,
+                None,
+            ]
+        );
+    }
+
+    #[test]
+    fn the_environment_names_the_encoder_and_the_call_log() {
+        let ours = plugin("env", "piirit", "encode-video[h264]");
+        let our = text(&ours);
+        let hardware = text(&plugin("env", "hardware", "encode-video[h264]"));
+        let log = PathBuf::from("/home/me/.cache/piirit/piirit/call.log");
+        let vars = |moz: Option<&str>| {
+            let moz = moz.map(str::to_owned);
+            let our = our.clone();
+            move |name: &str| match name {
+                "PIIRIT_GMP_DIR" => Some(our.clone()),
+                "MOZ_GMP_PATH" => moz.clone(),
+                _ => None,
+            }
+        };
+
+        let fresh = media_environment(vars(None), Some(log.clone()));
+        let with_hardware = media_environment(vars(Some(&hardware)), None);
+        let installed = media_environment(|_| None, Some(log.clone()));
+        std::fs::remove_dir_all(ours.parent().unwrap().parent().unwrap()).unwrap();
+
+        assert_eq!(
+            fresh,
+            [
+                ("MOZ_GMP_PATH", our.clone()),
+                ("PIIRIT_CALL_LOG", text(&log)),
+            ]
+        );
+        assert!(with_hardware.is_empty(), "{with_hardware:?}");
+        // Without PIIRIT_GMP_DIR, the package's own path -- not
+        // installed where the tests run, so left out.
+        assert!(!Path::new(BUNDLED_ENCODER).exists());
+        assert_eq!(installed, [("PIIRIT_CALL_LOG", text(&log))]);
     }
 
     #[test]

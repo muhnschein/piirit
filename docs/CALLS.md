@@ -237,11 +237,32 @@ served ahead of `calls.js`):
   offer puts first. The offer the other end is sent lists VP8 first
   (`calls.js`); nothing else in it changes, so the answer is still one
   this end offered. Against an iPhone that is moot: Delta Chat on iOS
-  offers and answers H264 alone (seen in a log), and Gecko encodes H264
-  only through a media plugin -- on Sailfish gmp-droid, the phone's
-  hardware encoder, found through `MOZ_GMP_PATH` -- which the log names
-  at the start of every call. A call to one that sent no frames at all
-  is open.
+  offers and answers H264 alone (seen in a log).
+- **An H264 encoder of its own.** Gecko decodes H264 with the phone's
+  decoder but encodes it only through a media plugin, a library it loads
+  in a process of its own from the directories `MOZ_GMP_PATH` names. On
+  Sailfish that is gmp-droid, the phone's hardware encoder, and it is
+  not on every phone -- nor installable on every one -- so a call to an
+  iPhone sent no frames at all. The package carries one:
+  `/usr/share/harbour-piirit/lib/gmp-piirit/1.0/`, x264 behind Gecko's
+  plugin interface (`rust/piirit-video/csrc/gmp_h264.cpp`), built from
+  the same x264 as the app (docs/BUILDING.md). The app points Gecko at it
+  before anything starts (`prepare_media_plugins`, `call_host.rs`), after
+  whatever `MOZ_GMP_PATH` already holds -- and not at all when a plugin
+  there already encodes H264, which is gmp-droid on a phone whose
+  hardware can, and cheaper than software. It is set up to cost little
+  for as long as a picture goes out: Constrained Baseline, which every
+  receiver decodes, at x264's fastest preset that keeps the deblocking
+  filter, one thread and no lookahead, so no picture waits for the next;
+  the camera's own buffers read in place; the bit rate Gecko's
+  congestion control asks for, made good per second when the camera
+  gives fewer pictures than the call was set up for; and a keyframe,
+  with SPS and PPS before it, when the far end asks for one. Android
+  ends answer VP8 and never start it. The plugin writes to the call log
+  itself, named by `PIIRIT_CALL_LOG`: the size and rate it started at,
+  its first picture, and every half minute and at the end the pictures,
+  keyframes, CPU time each and bit rate sent. `rust/piirit-video/tests/
+  gmp_h264.rs` drives it as Gecko does, through `tests/gmp_check.cpp`.
 - **Let go in the background.** With the app away the camera is
   stopped -- the other end is told it is off -- and the pictures are not
   drawn; back in front, it is opened again if it was on.
@@ -259,7 +280,8 @@ served ahead of `calls.js`):
   asked for (a receiver that cannot decode asks over and over), which
   track the sender has, and whether this end's picture plays. Each line goes to stderr as
   `piirit: call: …`, and to `~/.cache/piirit/piirit/call.log`, begun
-  afresh with every call and each line stamped with the seconds since.
+  afresh with every call and each line stamped with the seconds since;
+  the H264 encoder's lines are in the same file, marked `encoder`.
   The file is what to read on the phone: the launcher sends the app's
   stderr nowhere, and the journal has none of it.
 

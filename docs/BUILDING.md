@@ -306,9 +306,22 @@ scratchbox2 is the target's own, so the device build is a native build
 as LAME's is. Hand-written assembly is on for ARM and off for x86, where
 it would need nasm and x86 is only ever the test host.
 
-What it costs: the binary is a few megabytes heavier, and a clean build
-spends a couple of minutes configuring and compiling the two (cargo
-keeps the result in `target/` after that). The C between them and Rust
+The same x264 is linked a second time, into the H.264 encoder video
+calls send through: Gecko encodes H.264 only through a media plugin it
+loads from disk, never through the app's binary (docs/CALLS.md). `build.rs`
+builds `csrc/gmp_h264.cpp` into `libpiirit.so` with the target's C++
+compiler, against Gecko's plugin headers in `third_party/gmp-api`
+(BSD and Apache-2.0, `SOURCE.md` there), and lays it out as Gecko looks
+for one: `gmp-piirit/1.0/libpiirit.so` beside `piirit.info`, in
+`OUT_DIR` and again beside the binary, where the spec installs it from.
+Only its three entry points are visible; x264 is inside it, hidden. For
+the tests it also builds `gmp-check` (`tests/gmp_check.cpp`), a stand-in
+for Gecko's side of the plugin interface, which `tests/gmp_h264.rs`
+runs.
+
+What it costs: the binary is a few megabytes heavier, the plugin weighs
+what x264 does, and a clean build spends a couple of minutes configuring
+and compiling the two (cargo keeps the result in `target/` after that). The C between them and Rust
 is `rust/piirit-video/csrc`, small enough to read; its tests are in Rust
 (`rust/piirit-video/tests`), against clips made by the same libraries
 rather than binary fixtures. Dependabot moves the submodules along their
