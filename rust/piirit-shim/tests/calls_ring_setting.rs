@@ -1,12 +1,13 @@
-//! With calls off, the core is left ringing for contacts, as it does by
-//! default; only the reader switching ringing off tells it "nobody".
+//! The core rings for contacts, as it does by default, until the reader
+//! switches ringing off -- and only that tells it "nobody".
 //!
 //! `who_can_call_me` is per device and never synced, but it lives in the
 //! profile's database, and a backup or a second device takes that
-//! database whole. The window used to write "nobody" for every profile
-//! whenever calls were off -- the default here -- so a Delta Chat set up
-//! from a Piirit profile never rang for anyone, without its reader having
-//! chosen that anywhere.
+//! database whole. The window once wrote "nobody" for every profile
+//! whenever calls were off, as they were by default while they were
+//! experimental, so a Delta Chat set up from a Piirit profile never rang
+//! for anyone without its reader having chosen that anywhere. Calls are
+//! not a setting any more (#119); ringing still is.
 
 // Qt harness: see qml_share.rs.
 #![allow(
@@ -49,7 +50,6 @@ const PROBE_QML: &str = r"
         // What every page that lists the profiles does, and what writes
         // the settings to each profile the core has.
         function refresh() { core.refresh_accounts(); return 'ok' }
-        function calls(on) { Settings.callsEnabled = on === 'true'; return 'ok' }
         function ring(on) { Settings.callsRing = on === 'true'; return 'ok' }
     }
 ";
@@ -64,8 +64,8 @@ fn written(journal: &std::path::Path) -> Vec<String> {
 }
 
 #[test]
-fn calls_off_leave_the_core_at_its_default_and_only_the_reader_says_nobody() {
-    let temp = std::env::temp_dir().join(format!("piirit-calls-default-{}", std::process::id()));
+fn the_core_rings_for_contacts_until_the_reader_says_nobody() {
+    let temp = std::env::temp_dir().join(format!("piirit-calls-ring-{}", std::process::id()));
     let journal = common::fresh_journal(&temp);
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
     // `EnterKey` has no stub; the window reaches pages that use it.
@@ -128,29 +128,22 @@ fn calls_off_leave_the_core_at_its_default_and_only_the_reader_says_nobody() {
         call!("refresh");
     });
 
-    // The core is up and has been told, calls being off.
-    let off = seen.clone();
+    // The core is up and has been told, nothing having been set.
+    let fresh = seen.clone();
     single_shot(Duration::from_secs(3), move || unsafe {
-        (*steps_ptr).push(("off", written(&off)));
-        call!("calls", QString::from("true"));
-    });
-
-    // On, ringing as it is by default; then ringing switched off.
-    let on = seen.clone();
-    single_shot(Duration::from_secs(4), move || unsafe {
-        (*steps_ptr).push(("on", written(&on)));
+        (*steps_ptr).push(("fresh", written(&fresh)));
         call!("ring", QString::from("false"));
     });
 
-    // And calls off again, with ringing still switched off.
+    // Ringing switched off; then on again.
     let silent = seen.clone();
-    single_shot(Duration::from_secs(5), move || unsafe {
+    single_shot(Duration::from_secs(4), move || unsafe {
         (*steps_ptr).push(("silent", written(&silent)));
-        call!("calls", QString::from("false"));
+        call!("ring", QString::from("true"));
     });
 
-    single_shot(Duration::from_secs(6), move || unsafe {
-        (*steps_ptr).push(("off-again", written(&seen)));
+    single_shot(Duration::from_secs(5), move || unsafe {
+        (*steps_ptr).push(("ringing-again", written(&seen)));
         (*engine_ptr).quit();
     });
 
@@ -165,23 +158,21 @@ fn calls_off_leave_the_core_at_its_default_and_only_the_reader_says_nobody() {
     };
     let context = format!("steps: {steps:?}");
 
-    let off = value("off");
+    let fresh = value("fresh");
     assert!(
-        !off.is_empty() && off.iter().all(|who| who == "1"),
-        "with calls off the core was told something other than its own \
-         default, which goes with the profile to wherever it is copied. \
-         {context}"
+        !fresh.is_empty() && fresh.iter().all(|who| who == "1"),
+        "a phone that has never been asked told the core something other \
+         than its own default, which goes with the profile to wherever it \
+         is copied. {context}"
     );
-    // Calls coming on changes nothing the core is told.
-    assert_eq!(value("on"), off, "{context}");
     let silent = value("silent");
     assert!(
-        silent.len() > off.len() && silent[off.len()..].iter().all(|who| who == "2"),
+        silent.len() > fresh.len() && silent[fresh.len()..].iter().all(|who| who == "2"),
         "the reader switching ringing off did not tell the core. {context}"
     );
-    let again = value("off-again");
+    let again = value("ringing-again");
     assert!(
         again.len() > silent.len() && again[silent.len()..].iter().all(|who| who == "1"),
-        "calls switched off left the reader's \"nobody\" behind. {context}"
+        "ringing switched back on left the reader's \"nobody\" behind. {context}"
     );
 }
