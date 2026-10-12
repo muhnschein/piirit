@@ -983,10 +983,16 @@ var piiritVideo = (function () {
      * among them. A line said over and over, as the page says while it
      * asks a paused picture to play, is logged once until another comes;
      * and a failure nothing caught, which the page would leave unsaid. */
-    var PAGE_SAYS = new RegExp("^(incStream\\.videoTracks\\(\\) muted states:"
-        + "|incoming media |Sending our muted state "
-        + "|Want to report muted state |mutedStateDataChannel |URL hash CMD"
-        + "|unexpected URL hash|Accept call prompt )");
+    var PAGE_SAYS = [
+        "incStream.videoTracks() muted states:",
+        "incoming media ",
+        "Sending our muted state ",
+        "Want to report muted state ",
+        "mutedStateDataChannel ",
+        "URL hash CMD",
+        "unexpected URL hash",
+        "Accept call prompt "
+    ];
     var pageSaid = "";
 
     function heard(level, words) {
@@ -1000,7 +1006,9 @@ var piiritVideo = (function () {
                 return String(one);
             }
         }).join(" ");
-        if (level === "log" && !PAGE_SAYS.test(text)) {
+        if (level === "log" && !PAGE_SAYS.some(function (start) {
+            return text.startsWith(start);
+        })) {
             return;
         }
         var line = "page" + (level === "log" ? "" : " " + level) + ": " + text;

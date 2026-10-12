@@ -660,6 +660,7 @@ test("what the page says of the pictures and its commands is logged, and nothing
     const { console } = world.window;
     console.log("incStream.videoTracks() muted states:", [true]);
     console.log("sending ICE candidate to remote peer", { candidate: "candidate:1 1 udp 1 192.0.2.1 9 typ host" });
+    console.log("a candidate, not about incoming media at all");
     console.log("incoming media not playing, will .play() it");
     console.log("incoming media not playing, will .play() it");
     console.log("incoming media is playing");
@@ -680,7 +681,7 @@ test("what the page says of the pictures and its commands is logged, and nothing
         "page error: TypeError: no answer",
         "page error: an error"
     ]);
-    assert.equal(world.console.length, 8, "the page's console no longer says what it is told");
+    assert.equal(world.console.length, 9, "the page's console no longer says what it is told");
     assert.deepEqual(world.console[1].slice(0, 2), ["log", "sending ICE candidate to remote peer"]);
 
     // Where the call stands, in order with the rest.
