@@ -729,18 +729,32 @@ var piiritVideo = (function () {
         return parts.join(" ");
     }
 
+    /* How a picture is drawn, for the log: hidden where it is not -- this
+     * end's without a camera, the other end's while the page holds their
+     * camera off or their picture frameless -- playing or paused, and at
+     * what size. */
+    function drawn(picture) {
+        if (!picture) {
+            return "not drawn";
+        }
+        var hidden = "";
+        for (var at = picture; at; at = at.parentElement) {
+            if (at.style?.display === "none") {
+                hidden = "hidden ";
+                break;
+            }
+        }
+        return hidden + (picture.paused ? "paused " : "playing ")
+            + (picture.videoWidth || 0) + "x" + (picture.videoHeight || 0);
+    }
+
     /* Log what one connection sends and receives of video, now. */
     function sample(connection) {
         if (!connection.getStats) {
             return;
         }
         var senders = videoSenders(connection).map(sending).join(", ") || "no sender";
-        var picture = preview();
-        var shown = "not drawn";
-        if (picture) {
-            shown = (picture.paused ? "paused " : "playing ")
-                + (picture.videoWidth || 0) + "x" + (picture.videoHeight || 0);
-        }
+        var shown = drawn(preview()) + "; theirs " + drawn(theirs());
         connection.getStats(null).then(function (stats) {
             var sent = null;
             var got = null;
@@ -830,7 +844,11 @@ var piiritVideo = (function () {
                 channel.addEventListener("message", function (event) {
                     try {
                         var said = JSON.parse(event.data);
-                        if (said && typeof said.videoEnabled === "boolean") {
+                        /* Only what the page itself takes: both said. */
+                        if (said && typeof said.videoEnabled === "boolean"
+                            && typeof said.audioEnabled === "boolean") {
+                            note("their camera: " + (said.videoEnabled ? "on" : "off")
+                                + ", they say");
                             remoteEnabled = said.videoEnabled;
                             report();
                         }

@@ -633,6 +633,12 @@ test("the other end's picture is reported while it comes and they have it on", a
     connection.channels.mutedState.say(JSON.stringify({ audioEnabled: true, videoEnabled: true }));
     assert.equal(lastVideo(world).remote, true);
 
+    // Half a word, which the page itself rejects: not taken here either.
+    connection.channels.mutedState.say(JSON.stringify({ videoEnabled: false }));
+    assert.equal(lastVideo(world).remote, true, "a word the page rejects was taken");
+    assert.deepEqual(posts(world, "/log").filter((line) => line.startsWith("their camera:")),
+        ["their camera: off, they say", "their camera: on, they say"]);
+
     theirs.muted = true;
     theirs.fire("mute");
     assert.equal(lastVideo(world).remote, false, "a picture with no frames still counts");
@@ -1113,9 +1119,16 @@ test("once the call connects, what goes each way is logged, and again when the c
     picture.paused = false;
     picture.videoWidth = 480;
     picture.videoHeight = 640;
+    // Theirs, which the page holds hidden.
+    const holder = new Element("div");
+    const theirs = holder.appendChild(new Element("video"));
+    theirs.srcObject = new Stream([new Track("video", "theirs")]);
+    Object.assign(theirs, { paused: false, videoWidth: 352, videoHeight: 640 });
+    holder.style.display = "none";
+    world.videos.push(theirs);
     connection.getStats = () => Promise.resolve(callStats());
     const line = "video sent: VP8 480x640 100 frames 3000 B/frame PLI 2 FIR 0 NACK 1"
-        + " (camera on live; ours playing 480x640)"
+        + " (camera on live; ours playing 480x640; theirs hidden playing 352x640)"
         + " | got: H264 50 frames 2000 B/frame PLI 0 FIR 0 NACK 0 lost 3";
 
     // Turned while the call is still connecting: nothing goes yet.
@@ -1159,7 +1172,7 @@ test("what a sender sends is told apart, and stats that say little say what they
     assert.deepEqual(statLines(world).map((line) => line.replace(/.* \(|;.*/g, "")),
         ["blank off live", "nothing", "nothing"]);
     assert.equal(statLines(world)[0], "video sent: 0 frames 0 key PLI 0 FIR 0 NACK 0"
-        + " (blank off live; ours paused 0x0) | got: none");
+        + " (blank off live; ours hidden paused 0x0; theirs not drawn) | got: none");
 
     connection.getStats = () => Promise.reject(new Error("closed"));
     await command(world, "camera-on");
