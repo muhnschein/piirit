@@ -991,6 +991,11 @@ In anderen Gruppen mit blockierten Kontakten werden deren Nachrichten weiterhin 
         <extracomment>Label of the text that says what a group or channel is for, on its info page, and the prompt in its empty field.</extracomment>
         <translation>Beschreibung</translation>
     </message>
+    <message>
+        <source>Change picture</source>
+        <extracomment>Pull-down entry on a group&apos;s page: opens the gallery to pick a new picture for the group.</extracomment>
+        <translation>Bild ändern</translation>
+    </message>
 </context>
 <context>
     <name>IntroPage</name>

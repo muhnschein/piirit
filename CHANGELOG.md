@@ -10,6 +10,7 @@ docs/BUILDING.md, "Cutting a release").
 
 - Bundles deltachat-rpc-server 2.63.0 (was 2.62.0).
 - Enter in the chat search closes the keyboard and keeps the search.
+- A tap on a contact's or a group's picture shows it full screen. A group's picture is changed from the pull-down menu.
 - **Smaller videos.** A picked video close to the relay's recommended size is made smaller as soon as it is picked, with progress on the attachment bar, and sent when you send it; with media quality set to worse, every picked video is. The bar says how much smaller it went, such as 50 MB → 6 MB, and the size warning weighs the smaller video, saying so when even that is too big. Stopping it, or a result that came out no smaller, sends the video as it was picked.
 
 ## 2.1.0 — 2026-10-08

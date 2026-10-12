@@ -410,6 +410,9 @@ impl State {
     /// not, with the values the real core gives a contact nobody has seen
     /// (`lastSeen` 0): "Old" freshness, which it reserves for key
     /// contacts. Its own contact is never highlighted, so "Normal".
+    ///
+    /// Nobody has a picture, unless `PIIRIT_FAKE_CONTACT_PICTURE` gives
+    /// Ada one: the path the core would hand back for it.
     fn contact_object(&self, contact: u32) -> Option<Value> {
         let address = if contact == SELF {
             "me@example.org"
@@ -439,7 +442,11 @@ impl State {
             "isBot": false,
             "status": if contact == 10 { "Poet and mathematician" } else { "" },
             "color": "#00875a",
-            "profileImage": null,
+            "profileImage": if contact == 10 {
+                std::env::var("PIIRIT_FAKE_CONTACT_PICTURE").ok()
+            } else {
+                None
+            },
             "lastSeen": 0,
             "freshness": if contact == SELF { "Normal" } else { "Old" },
         }))

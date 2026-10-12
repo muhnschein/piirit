@@ -1,13 +1,14 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
 import "../components"
+import "../js/Media.js" as Media
 import Piirit 1.0
 
 /*
  * Who a one-to-one chat is with: their picture, their name, the line they
  * wrote about themselves, and whether the connection is encrypted.
  * Reached by swiping left from the conversation, the way the group page
- * is from a group.
+ * is from a group. A tap on the picture shows it larger.
  *
  * Nothing here is an address. A reader of a chatmail app has no use for
  * one, and the core's own words for a contact are the name, the picture
@@ -142,6 +143,19 @@ Page {
         })
     }
 
+    // Their picture, as big as the screen will show it, on the page a
+    // picture in the chat opens on. Nothing to show for a contact who has
+    // none: the disc with their initial is not a picture.
+    function showPicture() {
+        if (page.avatarPath.length === 0) {
+            return
+        }
+        pageStack.push(Qt.resolvedUrl("PicturePage.qml"), {
+            fileUrl: Media.fileUrl(page.avatarPath),
+            fileName: ""
+        })
+    }
+
     // One row, the contact, read into the page: a Repeater is how a model
     // row is read from QML, and the one here has exactly one. Nothing is
     // drawn in here, so the reload behind every save rebuilds nothing on
@@ -191,6 +205,13 @@ Page {
                     initial: page.displayName
                     ownColor: page.contactColor
                     picturePath: page.avatarPath
+                }
+
+                MouseArea {
+                    objectName: "pictureTap"
+                    anchors.fill: bigAvatar
+                    enabled: page.avatarPath.length > 0
+                    onClicked: page.showPicture()
                 }
             }
 
