@@ -3,8 +3,9 @@
 //! camera or the front, as the action says -- and the picture or video it
 //! takes is asked a chat for, in the camera's place. The chat picked opens
 //! in the picker's place with it on the attachment bar, told whether to
-//! send it at once. Backing out of the picker throws the capture away; a
-//! chat that took it keeps it until it is sent. One reported after the
+//! send it at once. Backing out of the picker throws the capture away, as
+//! does another camera action over it; a chat that took it keeps it until
+//! it is sent. One reported after the
 //! reader had left the camera is thrown away without asking.
 
 // Qt harness: see qml_chat_list.rs.
@@ -262,6 +263,17 @@ fn a_camera_quick_action_takes_a_picture_and_asks_which_chat_it_is_for() {
         record!("late-stack", call!("stackLog"));
         record!("late-kept", exists(&late));
 
+        // Tapped again while the picker still asks about the last one:
+        // that one is not going anywhere now.
+        let earlier = capture!();
+        act!("photo", "false");
+        call!("leave");
+        call!("take", QString::from(earlier.as_str()));
+        call!("stackLog");
+        act!("video", "false");
+        record!("earlier-kept", exists(&earlier));
+        call!("arrive");
+
         (*engine_ptr).quit();
     });
 
@@ -342,5 +354,11 @@ fn a_camera_quick_action_takes_a_picture_and_asks_which_chat_it_is_for() {
         ("", "false"),
         "a capture reported after the camera had left put a picker in \
          place of whatever was there, or was kept. {context}"
+    );
+    assert_eq!(
+        value("earlier-kept"),
+        "false",
+        "a capture still waiting for a chat was kept when the camera was \
+         opened again over it. {context}"
     );
 }
