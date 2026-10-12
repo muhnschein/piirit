@@ -14,10 +14,7 @@
     unused_unsafe,
     clippy::borrow_as_ptr,
     clippy::disallowed_methods,
-    clippy::expect_used,
-    // qt_method! declarations must match the generated dispatcher's
-    // by-value parameters; see piirit-shim/src/lib.rs.
-    clippy::needless_pass_by_value
+    clippy::expect_used
 )]
 
 use std::time::Duration;
@@ -34,52 +31,23 @@ const ADA_URL: &str = "file:///tmp/piirit-blobs/ada%20%231.jpg";
 const GROUP_PICTURE: &str = "/tmp/piirit-blobs/hikers.png";
 const GROUP_URL: &str = "file:///tmp/piirit-blobs/hikers.png";
 
-/// Silica's `pageStack`, recorded rather than performed: which page each
-/// tap opens, and on which file.
-#[derive(QObject, Default)]
-struct PageStackProbe {
-    base: qt_base_class!(trait QObject),
-    /// `push:PicturePage.qml=file:///...|push:AttachPhotoPage.qml=|...`
-    log: qt_property!(QString; NOTIFY log_changed),
-    log_changed: qt_signal!(),
-    push: qt_method!(fn(&mut self, page: QString, properties: QVariantMap) -> QVariant),
-    /// What has been pushed since the last call, which starts afresh.
-    take: qt_method!(fn(&mut self) -> QString),
-}
-
-impl PageStackProbe {
-    fn push(&mut self, page: QString, properties: QVariantMap) -> QVariant {
-        let page = page.to_string();
-        let name = page.rsplit('/').next().unwrap_or(&page);
-        let file =
-            QString::from_qvariant(properties.value(QString::from("fileUrl"), QVariant::default()))
-                .map(|url| url.to_string())
-                .unwrap_or_default();
-        let current = self.log.to_string();
-        self.log = format!("{current}push:{name}={file}|").into();
-        self.log_changed();
-        QVariant::default()
-    }
-
-    fn take(&mut self) -> QString {
-        let log = std::mem::take(&mut self.log);
-        self.log_changed();
-        log
-    }
-}
-
 const PROBE_QML: &str = r"
     import QtQuick 2.0
     import Sailfish.Silica 1.0
     Item {
         Loader { id: loader }
-        // Silica's own takes the properties as optional, and the gallery
-        // is pushed without any; a Rust method cannot leave one out. The
-        // pages find this by id, up the loader's context.
+        // Silica's `pageStack`, recorded rather than performed: which page
+        // each tap opens, and on which file. The pages find it by id, up
+        // the loader's context.
         QtObject {
             id: pageStack
+            /// `push:PicturePage.qml=file:///...|push:AttachPhotoPage.qml=|`
+            property string log: ''
             function push(page, properties) {
-                return stackProbe.push(page, properties || {})
+                var name = String(page).split('/').pop()
+                var file = properties && properties.fileUrl ? String(properties.fileUrl) : ''
+                log += 'push:' + name + '=' + file + '|'
+                return null
             }
         }
         function load(url, chatId) {
@@ -125,7 +93,9 @@ const PROBE_QML: &str = r"
         }
         // What the page stack has been asked for since the last look.
         function pushed() {
-            return stackProbe.take()
+            var log = pageStack.log
+            pageStack.log = ''
+            return log
         }
         // What the gallery hands back once a picture is picked.
         function pick(path) {
@@ -155,13 +125,11 @@ fn a_tap_on_the_picture_shows_it_larger() {
     piirit_shim::register_qml_types();
 
     let core_box = QObjectBox::new(DeltaChatCore::default());
-    let stack_box = QObjectBox::new(PageStackProbe::default());
     let mut engine = QmlEngine::new();
     engine.add_import_path(QString::from(
         common::stubs_dir().to_string_lossy().into_owned(),
     ));
     engine.set_object_property("core".into(), core_box.pinned());
-    engine.set_object_property("stackProbe".into(), stack_box.pinned());
     engine.load_data(QByteArray::from(PROBE_QML));
 
     core_box
