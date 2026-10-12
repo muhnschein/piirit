@@ -30,8 +30,10 @@
  * Every method is called on the plugin process's main thread, one at a
  * time, and an encoded picture is handed back from inside Encode().
  */
+#include <array>
 #include <cerrno>
 #include <cstdarg>
+#include <cstddef>
 #include <cstdint>
 #include <cstdio>
 #include <cstdlib>
@@ -92,18 +94,18 @@ void note(const char *line)
         return;
     }
     /* "encoder" fills the column the call host writes its seconds in. */
-    char text[400];
-    int length = std::snprintf(text, sizeof text, "encoder %s\n", line);
-    if (length > 0) {
-        size_t size = static_cast<size_t>(length);
-        if (size >= sizeof text) {
+    std::array<char, 400> text{};
+    if (int length = std::snprintf(text.data(), text.size(), "encoder %s\n", line);
+        length > 0) {
+        auto size = static_cast<size_t>(length);
+        if (size >= text.size()) {
             /* Cut short, and still a line of its own. */
-            size = sizeof text - 1;
+            size = text.size() - 1;
             text[size - 1] = '\n';
         }
         ssize_t written;
         do {
-            written = write(fd, text, size);
+            written = write(fd, text.data(), size);
         } while (written < 0 && errno == EINTR);
     }
     close(fd);
@@ -112,15 +114,21 @@ void note(const char *line)
 /* x264's own complaints, which are errors only (see open_x264). */
 void note_x264(void *, int, const char *format, va_list args)
 {
-    char line[300];
-    std::vsnprintf(line, sizeof line, format, args);
-    size_t length = std::strlen(line);
+    std::array<char, 300> line{};
+    int length = std::vsnprintf(line.data(), line.size(), format, args);
+    /* A format that failed leaves nothing; a line cut short has its last
+     * byte given to the NUL. */
+    if (length < 0) {
+        length = 0;
+    } else if (length >= static_cast<int>(line.size())) {
+        length = static_cast<int>(line.size()) - 1;
+    }
     if (length > 0 && line[length - 1] == '\n') {
         line[length - 1] = '\0';
     }
-    char text[320];
-    std::snprintf(text, sizeof text, "x264: %s", line);
-    note(text);
+    std::array<char, 320> text{};
+    std::snprintf(text.data(), text.size(), "x264: %s", line.data());
+    note(text.data());
 }
 
 /* CPU time this thread has used, in nanoseconds: what encoding costs in
@@ -172,7 +180,11 @@ public:
         input->Destroy();
     }
 
-    void SetChannelParameters(uint32_t, uint32_t) override {}
+    void SetChannelParameters(uint32_t, uint32_t) override
+    {
+        /* The loss and round trip are already in the rate Gecko asks for,
+         * which comes in SetRates. */
+    }
 
     void SetRates(uint32_t kbps, uint32_t) override
     {
@@ -184,8 +196,10 @@ public:
         reconfigure();
     }
 
-    /* Gecko never asks, and keyframes come when the far end asks. */
-    void SetPeriodicKeyFrames(bool) override {}
+    void SetPeriodicKeyFrames(bool) override
+    {
+        /* Gecko never asks, and keyframes come when the far end asks. */
+    }
 
     void EncodingComplete() override
     {
@@ -211,7 +225,7 @@ private:
     void set_rate(x264_param_t &param) const
     {
         uint32_t paced = paced_fps_ == 0 ? fps_ : paced_fps_;
-        int kbps = static_cast<int>(
+        auto kbps = static_cast<int>(
             paced == 0 ? kbps_ : static_cast<uint64_t>(kbps_) * fps_ / paced);
         param.rc.i_rc_method = X264_RC_ABR;
         param.rc.i_bitrate = kbps;
@@ -245,7 +259,7 @@ private:
         if (span < PACE_WINDOW_US) {
             return;
         }
-        uint64_t fps = ((window_frames_ - 1) * 1000000ull + span / 2) / span;
+        uint64_t fps = ((window_frames_ - 1) * 1000000ULL + span / 2) / span;
         window_pts_ = pts;
         window_frames_ = 1;
         if (fps < MIN_FPS) {
@@ -255,9 +269,9 @@ private:
             fps = fps_;
         }
         uint32_t current = paced_fps_ == 0 ? fps_ : paced_fps_;
-        uint32_t moved = fps > current ? static_cast<uint32_t>(fps) - current
-                                       : current - static_cast<uint32_t>(fps);
-        if (moved * 10 <= current) {
+        if (uint32_t moved = fps > current ? static_cast<uint32_t>(fps) - current
+                                           : current - static_cast<uint32_t>(fps);
+            moved * 10 <= current) {
             return;
         }
         paced_fps_ = static_cast<uint32_t>(fps);
@@ -269,8 +283,8 @@ private:
         close_x264();
         /* 4:2:0 halves each side for colour, so x264 takes even sizes
          * only; an odd column or row is left off. */
-        width &= ~1u;
-        height &= ~1u;
+        width &= ~1U;
+        height &= ~1U;
         if (width == 0 || height == 0) {
             return false;
         }
@@ -309,11 +323,11 @@ private:
         }
         width_ = width;
         height_ = height;
-        char line[160];
-        std::snprintf(line, sizeof line,
+        std::array<char, 160> line{};
+        std::snprintf(line.data(), line.size(),
                       "x264 %ux%u, up to %u fps, %u kbps, constrained baseline",
                       width_, height_, fps_, kbps_);
-        note(line);
+        note(line.data());
         return true;
     }
 
@@ -327,12 +341,11 @@ private:
 
     void encode(GMPVideoi420Frame &input, bool key)
     {
-        uint32_t width = static_cast<uint32_t>(input.Width()) & ~1u;
-        uint32_t height = static_cast<uint32_t>(input.Height()) & ~1u;
         /* Gecko starts a new encoder when the camera's size changes, but
          * a picture of another size must not reach x264 either way. */
-        if ((width != width_ || height != height_) &&
-            !open_x264(width, height)) {
+        if (uint32_t width = static_cast<uint32_t>(input.Width()) & ~1U,
+                             height = static_cast<uint32_t>(input.Height()) & ~1U;
+            (width != width_ || height != height_) && !open_x264(width, height)) {
             fail("cannot change size");
             return;
         }
@@ -340,7 +353,8 @@ private:
         x264_picture_init(&picture);
         picture.img.i_csp = X264_CSP_I420;
         picture.img.i_plane = 3;
-        const GMPPlaneType planes[] = {kGMPYPlane, kGMPUPlane, kGMPVPlane};
+        const std::array<GMPPlaneType, 3> planes = {kGMPYPlane, kGMPUPlane,
+                                                    kGMPVPlane};
         for (int i = 0; i < 3; i++) {
             picture.img.plane[i] = input.Buffer(planes[i]);
             picture.img.i_stride[i] = input.Stride(planes[i]);
@@ -385,14 +399,14 @@ private:
             encoded->Destroy();
             return;
         }
-        uint8_t *at = encoded->Buffer();
+        std::byte *at = reinterpret_cast<std::byte *>(encoded->Buffer());
         for (int i = 0; i < count; i++) {
             if (nals[i].i_type == NAL_SEI) {
                 continue;
             }
-            size_t payload = static_cast<size_t>(nals[i].i_payload);
+            auto payload = static_cast<size_t>(nals[i].i_payload);
             std::memcpy(at, nals[i].p_payload, payload);
-            uint32_t length = static_cast<uint32_t>(payload - LENGTH_BYTES);
+            auto length = static_cast<uint32_t>(payload - LENGTH_BYTES);
             std::memcpy(at, &length, LENGTH_BYTES);
             at += payload;
         }
@@ -408,23 +422,27 @@ private:
         GMPCodecSpecificInfo info{};
         info.mCodecType = kGMPVideoCodecH264;
         info.mBufferType = GMP_BufferLength32;
-        callback_->Encoded(encoded, reinterpret_cast<const uint8_t *>(&info),
-                           sizeof info);
+        /* The API takes the info as uint8_t bytes, so a copy of the struct's
+         * bytes goes out rather than the struct's address being cast. */
+        std::array<uint8_t, sizeof info> info_bytes{};
+        std::memcpy(info_bytes.data(), &info, sizeof info);
+        callback_->Encoded(encoded, info_bytes.data(), sizeof info);
     }
 
     void count_frame(uint32_t bytes, const x264_picture_t &out)
     {
-        uint64_t pts = static_cast<uint64_t>(out.i_pts);
+        auto pts = static_cast<uint64_t>(out.i_pts);
         frames_++;
         keys_ += out.b_keyframe ? 1 : 0;
         bytes_ += bytes;
         if (frames_ == 1) {
             first_pts_ = pts;
             summary_pts_ = pts;
-            char line[120];
-            std::snprintf(line, sizeof line, "first picture: %u bytes, %s",
-                          bytes, out.b_keyframe ? "key" : "not key");
-            note(line);
+            std::array<char, 120> line{};
+            std::snprintf(line.data(), line.size(),
+                          "first picture: %u bytes, %s", bytes,
+                          out.b_keyframe ? "key" : "not key");
+            note(line.data());
         }
         last_pts_ = pts;
         if (pts - summary_pts_ >= SUMMARY_EVERY_US) {
@@ -434,7 +452,7 @@ private:
     }
 
     /* "1440 frames (2 key) in 60 s, 4.1 ms CPU each, 290 kbps of 300". */
-    void summarize(const char *when)
+    void summarize(const char *when) const
     {
         if (frames_ == 0) {
             return;
@@ -442,14 +460,14 @@ private:
         double seconds = static_cast<double>(last_pts_ - first_pts_) / 1e6;
         double kbps = seconds > 0 ? static_cast<double>(bytes_) * 8 / seconds / 1000 : 0;
         double ms = static_cast<double>(cpu_ns_) / 1e6 / static_cast<double>(frames_);
-        char line[200];
-        std::snprintf(line, sizeof line,
+        std::array<char, 200> line{};
+        std::snprintf(line.data(), line.size(),
                       "%s: %llu frames (%llu key) in %.0f s, %.1f ms CPU each, "
                       "%.0f kbps of %u, %ux%u",
                       when, static_cast<unsigned long long>(frames_),
                       static_cast<unsigned long long>(keys_), seconds, ms, kbps,
                       kbps_, width_, height_);
-        note(line);
+        note(line.data());
     }
 
     /* Gecko sends nothing more once told; the call goes on without a
@@ -458,10 +476,10 @@ private:
     {
         failed_ = true;
         close_x264();
-        char line[120];
-        std::snprintf(line, sizeof line, "%s %ux%u at %u kbps", why, width_,
-                      height_, kbps_);
-        note(line);
+        std::array<char, 120> line{};
+        std::snprintf(line.data(), line.size(), "%s %ux%u at %u kbps", why,
+                      width_, height_, kbps_);
+        note(line.data());
         if (callback_ != nullptr) {
             callback_->Error(GMPEncodeErr);
         }
