@@ -95,11 +95,20 @@ class Element {
             props
         };
         this.textContent = "";
+        this.listeners = {};
     }
     appendChild(child) {
         child.parentElement = this;
         this.children.push(child);
         return child;
+    }
+    addEventListener(name, fn, options) {
+        (this.listeners[name] = this.listeners[name] || []).push({ fn, once: Boolean(options && options.once) });
+    }
+    fire(name) {
+        const all = this.listeners[name] || [];
+        this.listeners[name] = all.filter((one) => !one.once);
+        all.forEach((one) => one.fn({ type: name }));
     }
 }
 
@@ -198,6 +207,7 @@ function makeWorld(search, options) {
             return Promise.resolve(given);
         },
         enumerateDevices() {
+            log.push("enumerate");
             return Promise.resolve([{ kind: "audioinput", deviceId: "mic", label: "mic" }]
                 .concat(cameras.map((one) => ({
                     kind: "videoinput", deviceId: one.deviceId, label: one.label
@@ -783,6 +793,83 @@ test("a camera whose name says which way it faces is the one opened for that way
     await command(world, "facing-user");
     assert.equal(videoSender(connection).track.label, "camera-user",
         "turned back, the front camera was not found by its name");
+});
+
+test("a turn logs how long the other camera took to open, and to be drawn", async () => {
+    const world = makeWorld(VIDEO);
+    const { picture } = await page(world);
+    assert.ok(posts(world, "/log").some((line) => line === "camera open: camera-user 640x480@30"),
+        "the camera the call opened with is timed as a turn: " + posts(world, "/log"));
+    // The page's picture loading its first stream is not a turn either.
+    picture.fire("loadeddata");
+    assert.ok(!posts(world, "/log").some((line) => line.startsWith("camera drawn")),
+        "a picture drawn with no turn was timed: " + posts(world, "/log"));
+
+    await command(world, "facing-environment");
+    assert.ok(posts(world, "/log").some((line) =>
+        /^camera open: camera-environment 640x480@30, \d+ ms after the turn$/.test(line)),
+    "the turned-to camera's opening is not timed: " + posts(world, "/log"));
+    picture.fire("loadeddata");
+    picture.fire("loadeddata");
+    const drawn = posts(world, "/log").filter((line) => line.startsWith("camera drawn"));
+    assert.equal(drawn.length, 1, "its first picture is not timed, once: " + drawn);
+    assert.match(drawn[0], /^camera drawn: \d+ ms after the turn$/);
+
+    // Switched on after being off, the camera has not been turned.
+    await command(world, "camera-off");
+    await command(world, "camera-on");
+    picture.fire("loadeddata");
+    const opens = posts(world, "/log").filter((line) => line.startsWith("camera open"));
+    assert.match(opens[opens.length - 1], /^camera open: camera-\w+ 640x480@30$/,
+        "a camera switched back on is timed as a turn");
+    assert.equal(posts(world, "/log").filter((line) => line.startsWith("camera drawn")).length, 1);
+});
+
+test("a turn that fails, or ends switched off, leaves nothing timed for later", async () => {
+    const world = makeWorld(VIDEO, { cameraFails: (facing) => facing === "environment" });
+    const { picture } = await page(world);
+    await command(world, "facing-environment");
+    picture.fire("loadeddata");
+    assert.ok(!posts(world, "/log").some((line) => line.includes("after the turn")),
+        "the camera it fell back to is timed as the turn's: " + posts(world, "/log"));
+
+    const slow = makeWorld(VIDEO);
+    const shown = await page(slow);
+    slow.cameraDelay = true;
+    await command(slow, "facing-environment");
+    await command(slow, "camera-off");
+    slow.cameraDelay();
+    await settleAll();
+    slow.cameraDelay = null;
+    await command(slow, "camera-on");
+    shown.picture.fire("loadeddata");
+    const opens = posts(slow, "/log").filter((line) => line.startsWith("camera open"));
+    assert.match(opens[opens.length - 1], /^camera open: camera-\w+ 640x480@30$/,
+        "a camera switched on later is timed from a turn switched off");
+    assert.ok(!posts(slow, "/log").some((line) => line.startsWith("camera drawn")),
+        "a camera switched on later is drawn as a turn's: " + posts(slow, "/log"));
+});
+
+test("the cameras are listed until the engine names them, then not again on every turn", async () => {
+    const world = makeWorld(VIDEO);
+    await page(world);
+    await command(world, "facing-environment");
+    await command(world, "facing-user");
+    assert.equal(world.log.filter((line) => line === "enumerate").length, 1,
+        "named cameras were listed again: " + world.log);
+
+    const unnamed = makeWorld(VIDEO, {
+        cameras: [
+            { deviceId: "cam-a", label: "", facing: "user" },
+            { deviceId: "cam-b", label: "", facing: "environment" },
+        ],
+    });
+    const { connection } = await page(unnamed);
+    await command(unnamed, "facing-environment");
+    await command(unnamed, "facing-user");
+    assert.equal(unnamed.log.filter((line) => line === "enumerate").length, 3,
+        "cameras with no names yet were kept as they were: " + unnamed.log);
+    assert.equal(videoSender(connection).track.label, "camera-user");
 });
 
 test("what the camera says it faces is what is mirrored and reported", async () => {

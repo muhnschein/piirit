@@ -272,7 +272,8 @@ served ahead of `calls.js`):
   `local_video` and `remote_video` are.
 - **Logged.** What only a phone shows about a call goes through `/log`:
   which camera opened and at what size, a camera that would not open or
-  turn and why, the picture sections both ends agreed and their codecs
+  turn and why, how long a turn took to open the other camera and to
+  draw its first picture, the picture sections both ends agreed and their codecs
   in order, whether the other end's picture has frames, and -- a few
   seconds, then a quarter and three quarters of a minute after the call
   connects or the camera changes -- what goes each way: frames, bytes a
@@ -386,6 +387,15 @@ of Piirit: two phones and an afternoon.
   is heard only if the app is alive to receive its message, minimised
   included, inside the core's 120 seconds. Anything else is a missed
   call's row.
+- **The camera's focus.** Gecko opens the phone's camera through
+  `gecko-camera`, which sets one parameter on it, `video-size`: no focus
+  mode, and no focus search is ever started, so the lens stays wherever
+  the camera's own default leaves it. The QR scanner and the in-app
+  camera set continuous focus and focus on a tap, through QtMultimedia;
+  a page has no such control (Gecko ESR 91 has no focus constraint), and
+  `gecko-camera` loads its plugins from a directory fixed when it was
+  built, so an app cannot put its own in front. The fix is upstream: a
+  `focus-mode` of `continuous-video` where the camera offers one.
 - **Harbour.** Calls add no executable, no library off the list and no
   permission that was not already asked for. They add two system-bus
   services Harbour does not list -- ngfd and mce -- which its validator

@@ -77,14 +77,15 @@ var piiritVideo = (function () {
     };
 
     var media = navigator.mediaDevices;
-    var ask = media && media.getUserMedia ? media.getUserMedia.bind(media) : null;
+    var ask = media?.getUserMedia ? media.getUserMedia.bind(media) : null;
 
-    /* How the bridge reaches the host: post(path, body). */
-    var send = function () {};
+    /* How the bridge reaches the host: post(path, body). Nowhere, until
+     * the bridge attaches. */
+    var send = noop;
     /* Whether the camera is wanted. The page's own query says so for the
      * start of the call, as the page itself reads it. */
-    var wanted = window.location.search.indexOf("noOutgoingVideoInitially") < 0
-        && window.location.search.indexOf("disableVideoCompletely") < 0;
+    var wanted = !window.location.search.includes("noOutgoingVideoInitially")
+        && !window.location.search.includes("disableVideoCompletely");
     /* Which way the camera faces: "user" or "environment". */
     var facing = "user";
     /* The last camera asked for would not open, and what the engine said
@@ -101,6 +102,14 @@ var piiritVideo = (function () {
     /* The device the open camera is, kept when it is let go: a camera
      * turned is one that is not this. */
     var device = "";
+    /* The cameras, once the engine has named them. A turn asks for one
+     * by its name, and listing them costs the engine a round trip to its
+     * camera service: listed again only while their names are not out,
+     * as they are not before a camera has first been opened. */
+    var listed = null;
+    /* When the camera was last turned, while the other one is on its way
+     * and drawn: what a turn takes, logged. */
+    var turned = 0;
     /* Every peer connection the page has made. */
     var connections = [];
     /* The other end's stream, and what it last said about its camera. */
@@ -146,7 +155,7 @@ var piiritVideo = (function () {
         if (labelled(wanted ? STOP_LABEL : START_LABEL) || lookingAgain) {
             return;
         }
-        if (stream && stream.getVideoTracks().length === 0) {
+        if (stream?.getVideoTracks().length === 0) {
             return;
         }
         lookingAgain = true;
@@ -196,10 +205,7 @@ var piiritVideo = (function () {
         if (!media.enumerateDevices) {
             return Promise.resolve("");
         }
-        return media.enumerateDevices().then(function (all) {
-            var cameras = all.filter(function (one) {
-                return one.kind === "videoinput" && one.deviceId;
-            });
+        return cameraList().then(function (cameras) {
             if (cameras.length < 2) {
                 return "";
             }
@@ -215,6 +221,22 @@ var piiritVideo = (function () {
             return avoid && other.length > 0 ? other[0].deviceId : "";
         }, function () {
             return "";
+        });
+    }
+
+    /* The cameras the engine lists: the ones kept, once they are named. */
+    function cameraList() {
+        if (listed) {
+            return Promise.resolve(listed);
+        }
+        return media.enumerateDevices().then(function (all) {
+            var found = all.filter(function (one) {
+                return one.kind === "videoinput" && one.deviceId;
+            });
+            if (found.length > 0 && found.every(function (one) { return one.label; })) {
+                listed = found;
+            }
+            return found;
         });
     }
 
@@ -242,7 +264,8 @@ var piiritVideo = (function () {
             if (settings.facingMode === "user" || settings.facingMode === "environment") {
                 facing = settings.facingMode;
             }
-            note("camera open: " + described(track));
+            note("camera open: " + described(track)
+                + (turned ? ", " + (Date.now() - turned) + " ms after the turn" : ""));
             track.addEventListener("ended", function () {
                 if (track === camera) {
                     note("camera ended by the engine: " + described(track));
@@ -265,12 +288,12 @@ var piiritVideo = (function () {
             if (encodings.length === 0) {
                 return;
             }
-            for (var i = 0; i < encodings.length; i++) {
-                encodings[i].maxBitrate = MAX_BITRATE;
-                encodings[i].maxFramerate = MAX_FRAMERATE;
+            for (var encoding of encodings) {
+                encoding.maxBitrate = MAX_BITRATE;
+                encoding.maxFramerate = MAX_FRAMERATE;
             }
             var done = sender.setParameters(parameters);
-            if (done && done.catch) {
+            if (done?.catch) {
                 done.catch(noop);
             }
         } catch (err) {
@@ -283,8 +306,7 @@ var piiritVideo = (function () {
         var found = [];
         if (connection.getTransceivers) {
             connection.getTransceivers().forEach(function (transceiver) {
-                var kind = transceiver.receiver && transceiver.receiver.track
-                    ? transceiver.receiver.track.kind : "";
+                var kind = transceiver.receiver?.track?.kind || "";
                 if (kind === "video" && !transceiver.stopped) {
                     found.push(transceiver.sender);
                 }
@@ -301,10 +323,9 @@ var piiritVideo = (function () {
         if (!stream) {
             return null;
         }
-        var videos = document.getElementsByTagName("video");
-        for (var i = 0; i < videos.length; i++) {
-            if (videos[i].srcObject === stream) {
-                return videos[i];
+        for (var video of document.getElementsByTagName("video")) {
+            if (video.srcObject === stream) {
+                return video;
             }
         }
         return null;
@@ -314,9 +335,8 @@ var piiritVideo = (function () {
      * which is what the page's own picture plays, and on every sender
      * that carries video. */
     function use(track) {
-        var old = stream.getVideoTracks();
-        for (var i = 0; i < old.length; i++) {
-            stream.removeTrack(old[i]);
+        for (var old of stream.getVideoTracks()) {
+            stream.removeTrack(old);
         }
         if (track) {
             stream.addTrack(track);
@@ -324,7 +344,7 @@ var piiritVideo = (function () {
         connections.forEach(function (connection) {
             videoSenders(connection).forEach(function (sender) {
                 var done = sender.replaceTrack(track);
-                if (done && done.catch) {
+                if (done?.catch) {
                     done.catch(noop);
                 }
                 cap(sender);
@@ -416,7 +436,7 @@ var piiritVideo = (function () {
             return;
         }
         var playing = picture.play();
-        if (playing && playing.catch) {
+        if (playing?.catch) {
             playing.catch(noop);
         }
         lookAgain("it never played");
@@ -478,6 +498,7 @@ var piiritVideo = (function () {
         capture(avoid).then(function (track) {
             opening = false;
             if (!wanted || !stream) {
+                turned = 0;
                 track.stop();
                 return;
             }
@@ -485,10 +506,12 @@ var piiritVideo = (function () {
             use(track);
             camera = track;
             failed = false;
+            timeDrawing();
             report();
             sampleSoon();
         }, function (err) {
             opening = false;
+            turned = 0;
             if (wanted) {
                 otherwise(err);
             }
@@ -536,6 +559,7 @@ var piiritVideo = (function () {
             report();
             return;
         }
+        turned = Date.now();
         camera.stop();
         open(function (err) {
             note("camera would not turn: " + describe(err));
@@ -544,10 +568,26 @@ var piiritVideo = (function () {
         }, was);
     }
 
+    /* After a turn, log when the other camera's first picture is drawn:
+     * given the stream again, the page's picture loads it afresh, and has
+     * its data once a frame has come. The rest of what a turn takes is
+     * the phone's camera starting up, which `camera open` times. */
+    function timeDrawing() {
+        var since = turned;
+        turned = 0;
+        var picture = preview();
+        if (!since || !picture?.addEventListener) {
+            return;
+        }
+        picture.addEventListener("loadeddata", function () {
+            note("camera drawn: " + (Date.now() - since) + " ms after the turn");
+        }, { once: true });
+    }
+
     /* Each picture section of a description, for the log: which way it
      * goes, and its codecs in the order given. */
     function videoSections(description) {
-        if (!description || !description.sdp) {
+        if (!description?.sdp) {
             return "none";
         }
         var found = [];
@@ -580,7 +620,7 @@ var piiritVideo = (function () {
                 return !/^(rtx|red|ulpfec)$/i.test(name);
             });
             return [section.port === "0" ? "rejected" : "", section.way, codecs.join(",")]
-                .filter(function (part) { return part; }).join(" ");
+                .filter(Boolean).join(" ");
         }).join("; ") || "none";
     }
 
@@ -590,7 +630,12 @@ var piiritVideo = (function () {
         if (!track) {
             return "nothing";
         }
-        var which = track === camera ? "camera" : track === blank ? "blank" : "other";
+        var which = "other";
+        if (track === camera) {
+            which = "camera";
+        } else if (track === blank) {
+            which = "blank";
+        }
         return which + " " + (track.enabled ? "on" : "off") + " " + track.readyState;
     }
 
@@ -633,9 +678,11 @@ var piiritVideo = (function () {
         }
         var senders = videoSenders(connection).map(sending).join(", ") || "no sender";
         var picture = preview();
-        var shown = !picture ? "not drawn"
-            : (picture.paused ? "paused " : "playing ")
+        var shown = "not drawn";
+        if (picture) {
+            shown = (picture.paused ? "paused " : "playing ")
                 + (picture.videoWidth || 0) + "x" + (picture.videoHeight || 0);
+        }
         connection.getStats(null).then(function (stats) {
             var sent = null;
             var got = null;
@@ -689,13 +736,13 @@ var piiritVideo = (function () {
             }
         });
         connection.addEventListener("track", function (event) {
-            if (event.streams && event.streams[0]) {
+            if (event.streams?.[0]) {
                 remote = event.streams[0];
             }
             var track = event.track;
-            if (track && track.kind === "video") {
+            if (track?.kind === "video") {
                 note("their picture: track " + (track.muted ? "muted" : "live")
-                    + (event.streams && event.streams[0] ? "" : ", in no stream"));
+                    + (event.streams?.[0] ? "" : ", in no stream"));
                 track.addEventListener("mute", function () {
                     note("their picture: no frames");
                     report();
@@ -773,7 +820,7 @@ var piiritVideo = (function () {
      * is not a call that cannot start. */
     if (ask) {
         media.getUserMedia = function (asked) {
-            if (!asked || !asked.video) {
+            if (!asked?.video) {
                 return ask(asked);
             }
             return ask({ audio: asked.audio === undefined ? true : asked.audio })
@@ -819,7 +866,7 @@ var piiritVideo = (function () {
     var Media = window.HTMLMediaElement;
     var source = Media && Object.getOwnPropertyDescriptor
         ? Object.getOwnPropertyDescriptor(Media.prototype, "srcObject") : null;
-    if (source && source.set && source.configurable) {
+    if (source?.set && source.configurable) {
         Object.defineProperty(Media.prototype, "srcObject", {
             configurable: true,
             enumerable: source.enumerable,
