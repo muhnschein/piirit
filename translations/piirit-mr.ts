@@ -470,6 +470,61 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>CameraSettingsPanel</name>
+    <message>
+        <source>Flash automatic</source>
+        <translation>फ्लॅश स्वयंचलित</translation>
+    </message>
+    <message>
+        <source>Flash on</source>
+        <translation>फ्लॅश चालू</translation>
+    </message>
+    <message>
+        <source>Flashlight on</source>
+        <translation>टॉर्च चालू</translation>
+    </message>
+    <message>
+        <source>Flash off</source>
+        <translation>फ्लॅश बंद</translation>
+    </message>
+    <message>
+        <source>Self-timer %1 s</source>
+        <translation>सेल्फ-टायमर %1 से.</translation>
+    </message>
+    <message>
+        <source>Self-timer off</source>
+        <translation>सेल्फ-टायमर बंद</translation>
+    </message>
+    <message>
+        <source>Sunny</source>
+        <translation>ऊन</translation>
+    </message>
+    <message>
+        <source>Cloudy</source>
+        <translation>ढगाळ</translation>
+    </message>
+    <message>
+        <source>Fluorescent</source>
+        <translation>फ्लोरेसंट</translation>
+    </message>
+    <message>
+        <source>Tungsten</source>
+        <translation>टंगस्टन</translation>
+    </message>
+    <message>
+        <source>Automatic white balance</source>
+        <translation>स्वयंचलित व्हाइट बॅलन्स</translation>
+    </message>
+    <message>
+        <source>Grid on</source>
+        <translation>ग्रिड चालू</translation>
+    </message>
+    <message>
+        <source>Grid off</source>
+        <translation>ग्रिड बंद</translation>
+    </message>
+</context>
+<context>
     <name>CapturePage</name>
     <message>
         <source>The video could not be saved</source>
@@ -1958,16 +2013,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>स्वीकारलेल्या संपर्कांसाठी कॉल स्क्रीन दाखवा</translation>
     </message>
     <message>
-        <source>Enable calls (experimental)</source>
-        <translation>कॉल सक्षम करा (प्रायोगिक)</translation>
-    </message>
-    <message>
         <source>Runs small apps inside chats.</source>
         <translation>संभाषणांमध्ये छोटे अॅप चालवते.</translation>
-    </message>
-    <message>
-        <source>Makes and answers voice calls in one-to-one chats.</source>
-        <translation>एकास-एक संभाषणांमध्ये व्हॉइस कॉल करते आणि त्यांना उत्तर देते.</translation>
     </message>
 </context>
 <context>

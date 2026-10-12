@@ -468,6 +468,61 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>CameraSettingsPanel</name>
+    <message>
+        <source>Flash automatic</source>
+        <translation>闪光灯自动</translation>
+    </message>
+    <message>
+        <source>Flash on</source>
+        <translation>闪光灯开</translation>
+    </message>
+    <message>
+        <source>Flashlight on</source>
+        <translation>手电筒开</translation>
+    </message>
+    <message>
+        <source>Flash off</source>
+        <translation>闪光灯关</translation>
+    </message>
+    <message>
+        <source>Self-timer %1 s</source>
+        <translation>自拍倒计时 %1 秒</translation>
+    </message>
+    <message>
+        <source>Self-timer off</source>
+        <translation>自拍倒计时关</translation>
+    </message>
+    <message>
+        <source>Sunny</source>
+        <translation>晴天</translation>
+    </message>
+    <message>
+        <source>Cloudy</source>
+        <translation>阴天</translation>
+    </message>
+    <message>
+        <source>Fluorescent</source>
+        <translation>荧光灯</translation>
+    </message>
+    <message>
+        <source>Tungsten</source>
+        <translation>白炽灯</translation>
+    </message>
+    <message>
+        <source>Automatic white balance</source>
+        <translation>自动白平衡</translation>
+    </message>
+    <message>
+        <source>Grid on</source>
+        <translation>网格开</translation>
+    </message>
+    <message>
+        <source>Grid off</source>
+        <translation>网格关</translation>
+    </message>
+</context>
+<context>
     <name>CapturePage</name>
     <message>
         <source>The video could not be saved</source>
@@ -1951,16 +2006,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>为已接受的联系人显示通话界面</translation>
     </message>
     <message>
-        <source>Enable calls (experimental)</source>
-        <translation>启用通话（实验性）</translation>
-    </message>
-    <message>
         <source>Runs small apps inside chats.</source>
         <translation>在聊天中运行小应用。</translation>
-    </message>
-    <message>
-        <source>Makes and answers voice calls in one-to-one chats.</source>
-        <translation>在一对一聊天中拨打和接听语音通话。</translation>
     </message>
 </context>
 <context>

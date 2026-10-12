@@ -466,6 +466,61 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>CameraSettingsPanel</name>
+    <message>
+        <source>Flash automatic</source>
+        <translation>ஃபிளாஷ் தானியங்கி</translation>
+    </message>
+    <message>
+        <source>Flash on</source>
+        <translation>ஃபிளாஷ் ஆன்</translation>
+    </message>
+    <message>
+        <source>Flashlight on</source>
+        <translation>டார்ச் ஆன்</translation>
+    </message>
+    <message>
+        <source>Flash off</source>
+        <translation>ஃபிளாஷ் ஆஃப்</translation>
+    </message>
+    <message>
+        <source>Self-timer %1 s</source>
+        <translation>சுய-டைமர் %1 வி</translation>
+    </message>
+    <message>
+        <source>Self-timer off</source>
+        <translation>சுய-டைமர் ஆஃப்</translation>
+    </message>
+    <message>
+        <source>Sunny</source>
+        <translation>வெயில்</translation>
+    </message>
+    <message>
+        <source>Cloudy</source>
+        <translation>மேகமூட்டம்</translation>
+    </message>
+    <message>
+        <source>Fluorescent</source>
+        <translation>ஃபுளோரசன்ட்</translation>
+    </message>
+    <message>
+        <source>Tungsten</source>
+        <translation>டங்ஸ்டன்</translation>
+    </message>
+    <message>
+        <source>Automatic white balance</source>
+        <translation>தானியங்கி வெள்ளை சமநிலை</translation>
+    </message>
+    <message>
+        <source>Grid on</source>
+        <translation>கிரிட் ஆன்</translation>
+    </message>
+    <message>
+        <source>Grid off</source>
+        <translation>கிரிட் ஆஃப்</translation>
+    </message>
+</context>
+<context>
     <name>CapturePage</name>
     <message>
         <source>The video could not be saved</source>
@@ -1954,16 +2009,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>ஏற்கப்பட்ட தொடர்புகளுக்கு அழைப்புத் திரையைக் காட்டு</translation>
     </message>
     <message>
-        <source>Enable calls (experimental)</source>
-        <translation>அழைப்புகளை இயக்கு (சோதனை முறை)</translation>
-    </message>
-    <message>
         <source>Runs small apps inside chats.</source>
         <translation>அரட்டைகளுக்குள் சிறு செயலிகளை இயக்குகிறது.</translation>
-    </message>
-    <message>
-        <source>Makes and answers voice calls in one-to-one chats.</source>
-        <translation>தனிநபர் அரட்டைகளில் குரல் அழைப்புகளைச் செய்கிறது, அவற்றுக்குப் பதிலளிக்கிறது.</translation>
     </message>
 </context>
 <context>

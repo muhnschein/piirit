@@ -472,6 +472,61 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>CameraSettingsPanel</name>
+    <message>
+        <source>Flash automatic</source>
+        <translation>Спалах автоматично</translation>
+    </message>
+    <message>
+        <source>Flash on</source>
+        <translation>Спалах увімкнено</translation>
+    </message>
+    <message>
+        <source>Flashlight on</source>
+        <translation>Ліхтарик увімкнено</translation>
+    </message>
+    <message>
+        <source>Flash off</source>
+        <translation>Спалах вимкнено</translation>
+    </message>
+    <message>
+        <source>Self-timer %1 s</source>
+        <translation>Таймер %1 с</translation>
+    </message>
+    <message>
+        <source>Self-timer off</source>
+        <translation>Таймер вимкнено</translation>
+    </message>
+    <message>
+        <source>Sunny</source>
+        <translation>Сонячно</translation>
+    </message>
+    <message>
+        <source>Cloudy</source>
+        <translation>Хмарно</translation>
+    </message>
+    <message>
+        <source>Fluorescent</source>
+        <translation>Люмінесцентне</translation>
+    </message>
+    <message>
+        <source>Tungsten</source>
+        <translation>Лампа розжарювання</translation>
+    </message>
+    <message>
+        <source>Automatic white balance</source>
+        <translation>Автоматичний баланс білого</translation>
+    </message>
+    <message>
+        <source>Grid on</source>
+        <translation>Сітка увімкнена</translation>
+    </message>
+    <message>
+        <source>Grid off</source>
+        <translation>Сітка вимкнена</translation>
+    </message>
+</context>
+<context>
     <name>CapturePage</name>
     <message>
         <source>The video could not be saved</source>
@@ -1965,16 +2020,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Показувати екран виклику для прийнятих контактів</translation>
     </message>
     <message>
-        <source>Enable calls (experimental)</source>
-        <translation>Увімкнути виклики (експериментально)</translation>
-    </message>
-    <message>
         <source>Runs small apps inside chats.</source>
         <translation>Запускає невеликі застосунки всередині чатів.</translation>
-    </message>
-    <message>
-        <source>Makes and answers voice calls in one-to-one chats.</source>
-        <translation>Здійснює голосові виклики та відповідає на них в особистих чатах.</translation>
     </message>
 </context>
 <context>

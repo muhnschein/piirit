@@ -474,6 +474,61 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
     </message>
 </context>
 <context>
+    <name>CameraSettingsPanel</name>
+    <message>
+        <source>Flash automatic</source>
+        <translation>Bliskavica samodejno</translation>
+    </message>
+    <message>
+        <source>Flash on</source>
+        <translation>Bliskavica vklopljena</translation>
+    </message>
+    <message>
+        <source>Flashlight on</source>
+        <translation>Svetilka vklopljena</translation>
+    </message>
+    <message>
+        <source>Flash off</source>
+        <translation>Bliskavica izklopljena</translation>
+    </message>
+    <message>
+        <source>Self-timer %1 s</source>
+        <translation>Samosprožilec %1 s</translation>
+    </message>
+    <message>
+        <source>Self-timer off</source>
+        <translation>Samosprožilec izklopljen</translation>
+    </message>
+    <message>
+        <source>Sunny</source>
+        <translation>Sončno</translation>
+    </message>
+    <message>
+        <source>Cloudy</source>
+        <translation>Oblačno</translation>
+    </message>
+    <message>
+        <source>Fluorescent</source>
+        <translation>Fluorescentna</translation>
+    </message>
+    <message>
+        <source>Tungsten</source>
+        <translation>Žarnica</translation>
+    </message>
+    <message>
+        <source>Automatic white balance</source>
+        <translation>Samodejno ravnovesje beline</translation>
+    </message>
+    <message>
+        <source>Grid on</source>
+        <translation>Mreža vklopljena</translation>
+    </message>
+    <message>
+        <source>Grid off</source>
+        <translation>Mreža izklopljena</translation>
+    </message>
+</context>
+<context>
     <name>CapturePage</name>
     <message>
         <source>The video could not be saved</source>
@@ -1972,16 +2027,8 @@ V drugih skupinah z blokiranimi stiki bodo njihova sporočila še vedno prikazan
         <translation>Prikaži zaslon za klic za sprejete stike</translation>
     </message>
     <message>
-        <source>Enable calls (experimental)</source>
-        <translation>Omogoči klice (poskusno)</translation>
-    </message>
-    <message>
         <source>Runs small apps inside chats.</source>
         <translation>Znotraj klepetov poganja majhne aplikacije.</translation>
-    </message>
-    <message>
-        <source>Makes and answers voice calls in one-to-one chats.</source>
-        <translation>Opravlja in sprejema glasovne klice v klepetih z eno osebo.</translation>
     </message>
 </context>
 <context>

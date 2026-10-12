@@ -51,17 +51,53 @@ const PROBE_QML: &str = r"
             id: stack
             property bool busy: false
             property int pushes: 0
+            // What each page said as it came up, one per push: read here
+            // rather than a second later, when a page for a call already
+            // over may have gone again.
+            property var said: []
             function push(url, props) {
                 pushes += 1
                 pageHolder.setSource(url, props)
+                var status = probe.findIn(pageHolder.item, 'callStatus')
+                said.push(status ? status.text : 'missing:callStatus')
                 return pageHolder.item
             }
         }
         function load(url) {
-            centerLoader.setSource(url, { stack: stack, enabled: true })
+            centerLoader.setSource(url, { stack: stack })
             if (centerLoader.status !== Loader.Ready) { return 'load-failed' }
             // ngfd numbers the event it plays.
             find(centerLoader.item, 'feedback').reply = 42
+            centerLoader.item.raise.connect(function () { probe.raises += 1 })
+            return 'ok'
+        }
+        // How often the window was asked to come forward.
+        property int raises: 0
+        function raised() { return '' + probe.raises }
+        // What ngfd answers Play with: a number, or 'none' for no answer.
+        function ngfdReplies(value) {
+            find(centerLoader.item, 'feedback').reply =
+                value === 'none' ? undefined : parseInt(value)
+            return 'ok'
+        }
+        // ngfd and mce's call logs, emptied, so a round reads only its own.
+        function mark() {
+            find(centerLoader.item, 'feedback').called = ''
+            find(centerLoader.item, 'mce').called = ''
+            return 'ok'
+        }
+        // ngfd saying what became of an event it plays.
+        function ngfdStatus(id, status) {
+            var feedback = find(centerLoader.item, 'feedback')
+            if (typeof feedback.rcStatus !== 'function') { return 'missing:rcStatus' }
+            feedback.rcStatus(id, status)
+            return 'ok'
+        }
+        // mce saying the screen has come on.
+        function displayOn() {
+            var signals = find(centerLoader.item, 'mceSignals')
+            if (!signals) { return 'missing:mceSignals' }
+            signals.display_status_ind('on')
             return 'ok'
         }
         function findIn(node, name) {
@@ -103,6 +139,9 @@ const PROBE_QML: &str = r"
             return names.join(',')
         }
         function pushes() { return '' + stack.pushes }
+        function saidOnPush(index) {
+            return index < stack.said.length ? stack.said[index] : 'not pushed'
+        }
         function popped() { return probe.pageStack.log }
         function engine() { return WebEngine.notified }
         function callState() {
@@ -337,14 +376,87 @@ fn a_call_rings_is_answered_on_its_page_and_ends_with_the_platform_told() {
         record!("declined-fifth", call!("decline"));
     });
 
-    single_shot(Duration::from_secs(19), move || unsafe {
+    // Read a second later than it could be: the single-shots here fire
+    // late and back to back on a loaded machine, ahead of the page's own
+    // push. What the page said is what it said as it came up.
+    single_shot(Duration::from_secs(20), move || unsafe {
         record!("pushes-fifth", call!("pushes"));
-        record!("fifth-status", get!("callStatus", "text"));
+        record!("fifth-status", call!("saidOnPush", 4));
     });
 
     single_shot(Duration::from_secs(21), move || unsafe {
         record!("popped-fifth", call!("popped"));
         record!("after-fifth", call!("callState"));
+        // A sixth rings while the fifth's page is still on its way out --
+        // popped, and not yet gone -- and is declined before that page
+        // goes (#110). Held here rather than raced: the page is dropped
+        // only once the call is over.
+        record!("ring-sixth", call!("ring", 9500));
+        record!("pushes-sixth-ringing", call!("pushes"));
+        record!("declined-sixth", call!("decline"));
+        call!("dropPage");
+    });
+
+    // Its page comes once the old one has gone, says so, and goes.
+    single_shot(Duration::from_secs(23), move || unsafe {
+        record!("pushes-sixth", call!("pushes"));
+        record!("sixth-status", call!("saidOnPush", 5));
+    });
+
+    single_shot(Duration::from_secs(25), move || unsafe {
+        record!("popped-sixth", call!("popped"));
+        record!("after-sixth", call!("callState"));
+        call!("dropPage");
+    });
+
+    // A seventh rings with ngfd not answering (#98, #99). mce is told it
+    // rings only once ngfd has picked the ringtone, or has been given a
+    // second to: told first, ngfd plays the call-waiting beep instead.
+    single_shot(Duration::from_secs(26), move || unsafe {
+        call!("ngfdReplies", QString::from("none"));
+        call!("mark");
+        record!("ring-seventh", call!("ring", 9600));
+        record!("seventh-play", get!("feedback", "called"));
+        record!("seventh-mce-early", get!("mce", "called"));
+    });
+
+    // Told by now -- three seconds on, the timers here being loose -- and
+    // the screen coming on takes the lock screen off, once, and brings
+    // the app forward.
+    single_shot(Duration::from_secs(29), move || unsafe {
+        record!("seventh-mce-late", get!("mce", "called"));
+        let before: i32 = call!("raised").parse().unwrap_or(-1);
+        record!("display-on", call!("displayOn"));
+        call!("displayOn");
+        let after: i32 = call!("raised").parse().unwrap_or(-1);
+        record!("seventh-raises", (after - before).to_string());
+        record!("seventh-unlocked", get!("mce", "called"));
+        call!("decline");
+        // Not for a call that is not ringing.
+        call!("mark");
+        call!("displayOn");
+        record!("declined-seventh-mce", get!("mce", "called"));
+    });
+
+    single_shot(Duration::from_secs(31), move || unsafe {
+        call!("dropPage");
+    });
+
+    // An eighth, whose VoIP ringtone ngfd says has failed: the phone's
+    // own ringtone instead, once.
+    single_shot(Duration::from_secs(32), move || unsafe {
+        call!("ngfdReplies", QString::from("77"));
+        call!("mark");
+        record!("ring-eighth", call!("ring", 9700));
+        record!("eighth-failed", call!("ngfdStatus", 77, 0));
+        call!("ngfdStatus", 77, 0);
+        record!("eighth-play", get!("feedback", "called"));
+        call!("decline");
+        record!("eighth-stopped", get!("feedback", "called"));
+    });
+
+    single_shot(Duration::from_secs(34), move || unsafe {
+        call!("dropPage");
         (*engine_ptr).quit();
     });
 
@@ -579,5 +691,85 @@ fn a_call_rings_is_answered_on_its_page_and_ends_with_the_platform_told() {
         value("after-fifth"),
         "|",
         "a page pushed for a call already over never let it go. {context}"
+    );
+
+    assert_eq!(value("ring-sixth"), "ringing", "{context}");
+    assert_eq!(
+        value("pushes-sixth-ringing"),
+        "5",
+        "a call that rang over the last call's leaving page was pushed on \
+         top of it. {context}"
+    );
+    assert_eq!(value("declined-sixth"), "ended", "{context}");
+    assert_eq!(
+        value("pushes-sixth"),
+        "6",
+        "a call declined while the last call's page was still going never \
+         got a page of its own (#110). {context}"
+    );
+    assert_eq!(value("sixth-status"), "Declined call", "{context}");
+    assert_eq!(
+        value("popped-sixth"),
+        "pop;pop;pop;pop;pop;",
+        "the late page for a declined call stayed up. {context}"
+    );
+    assert_eq!(value("after-sixth"), "|", "{context}");
+
+    assert_eq!(value("ring-seventh"), "ringing", "{context}");
+    assert!(
+        value("seventh-play").contains("voip_ringtone"),
+        "the seventh call did not ring: {}. {context}",
+        value("seventh-play")
+    );
+    assert!(
+        !value("seventh-mce-early").contains("ringing"),
+        "mce was told the call rings before ngfd had picked its ringtone, \
+         which then plays as a call-waiting beep (#98): {}. {context}",
+        value("seventh-mce-early")
+    );
+    assert!(
+        value("seventh-mce-late").contains("\"value\":\"ringing\"")
+            && value("seventh-mce-late").contains("get_display_status"),
+        "with ngfd silent, mce was never told the call rings, or never \
+         asked whether the screen is on: {}. {context}",
+        value("seventh-mce-late")
+    );
+    assert_eq!(value("display-on"), "ok", "{context}");
+    assert_eq!(
+        value("seventh-unlocked")
+            .matches("req_tklock_mode_change [{\"type\":\"s\",\"value\":\"unlocked\"}]")
+            .count(),
+        1,
+        "the lock screen was not taken off, once, when the screen came on \
+         for a ringing call (#99): {}. {context}",
+        value("seventh-unlocked")
+    );
+    assert_eq!(
+        value("seventh-raises"),
+        "1",
+        "the app was not brought forward once the lock screen was off. {context}"
+    );
+    assert!(
+        !value("declined-seventh-mce").contains("req_tklock_mode_change"),
+        "the lock screen was taken off for a call no longer ringing: {}. {context}",
+        value("declined-seventh-mce")
+    );
+
+    assert_eq!(value("ring-eighth"), "ringing", "{context}");
+    assert_eq!(value("eighth-failed"), "ok", "{context}");
+    let eighth = value("eighth-play");
+    assert_eq!(
+        eighth.matches("Play ").count(),
+        2,
+        "a failed VoIP ringtone was not followed by exactly one other: {eighth}. {context}"
+    );
+    assert!(
+        eighth.contains("{\"type\":\"s\",\"value\":\"ringtone\"},{\"type\":\"a{sv}\",\"value\":{\"type\":\"voip\"}}"),
+        "the fallback is not the phone's own ringtone for a VoIP call: {eighth}. {context}"
+    );
+    assert!(
+        value("eighth-stopped").contains("Stop [{\"type\":\"u\",\"value\":77}]"),
+        "the fallback ringtone was not stopped with the call: {}. {context}",
+        value("eighth-stopped")
     );
 }

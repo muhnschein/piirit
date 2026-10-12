@@ -289,7 +289,7 @@ Page {
                 // `=== true` because dconf hands back `undefined` before it
                 // has read the key.
                 appsAvailable: Settings.webxdcEnabled === true
-                callsAvailable: Settings.callsEnabled === true && chat.can_call
+                callsAvailable: chat.can_call
                 onKindRequested: page.openMedia(kind)
             }
 

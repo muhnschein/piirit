@@ -470,6 +470,61 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>CameraSettingsPanel</name>
+    <message>
+        <source>Flash automatic</source>
+        <translation>ਫਲੈਸ਼ ਆਟੋਮੈਟਿਕ</translation>
+    </message>
+    <message>
+        <source>Flash on</source>
+        <translation>ਫਲੈਸ਼ ਚਾਲੂ</translation>
+    </message>
+    <message>
+        <source>Flashlight on</source>
+        <translation>ਟਾਰਚ ਚਾਲੂ</translation>
+    </message>
+    <message>
+        <source>Flash off</source>
+        <translation>ਫਲੈਸ਼ ਬੰਦ</translation>
+    </message>
+    <message>
+        <source>Self-timer %1 s</source>
+        <translation>ਸੈਲਫ਼-ਟਾਈਮਰ %1 ਸਕਿੰਟ</translation>
+    </message>
+    <message>
+        <source>Self-timer off</source>
+        <translation>ਸੈਲਫ਼-ਟਾਈਮਰ ਬੰਦ</translation>
+    </message>
+    <message>
+        <source>Sunny</source>
+        <translation>ਧੁੱਪ</translation>
+    </message>
+    <message>
+        <source>Cloudy</source>
+        <translation>ਬੱਦਲਵਾਈ</translation>
+    </message>
+    <message>
+        <source>Fluorescent</source>
+        <translation>ਫਲੋਰੋਸੈਂਟ</translation>
+    </message>
+    <message>
+        <source>Tungsten</source>
+        <translation>ਟੰਗਸਟਨ</translation>
+    </message>
+    <message>
+        <source>Automatic white balance</source>
+        <translation>ਆਟੋਮੈਟਿਕ ਵ੍ਹਾਈਟ ਬੈਲੈਂਸ</translation>
+    </message>
+    <message>
+        <source>Grid on</source>
+        <translation>ਗਰਿੱਡ ਚਾਲੂ</translation>
+    </message>
+    <message>
+        <source>Grid off</source>
+        <translation>ਗਰਿੱਡ ਬੰਦ</translation>
+    </message>
+</context>
+<context>
     <name>CapturePage</name>
     <message>
         <source>The video could not be saved</source>
@@ -1958,16 +2013,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>ਸਵੀਕਾਰ ਕੀਤੇ ਸੰਪਰਕਾਂ ਲਈ ਕਾਲ ਸਕ੍ਰੀਨ ਦਿਖਾਓ</translation>
     </message>
     <message>
-        <source>Enable calls (experimental)</source>
-        <translation>ਕਾਲਾਂ ਚਾਲੂ ਕਰੋ (ਪ੍ਰਯੋਗਾਤਮਕ)</translation>
-    </message>
-    <message>
         <source>Runs small apps inside chats.</source>
         <translation>ਗੱਲਬਾਤਾਂ ਵਿੱਚ ਛੋਟੇ ਐਪ ਚਲਾਉਂਦਾ ਹੈ।</translation>
-    </message>
-    <message>
-        <source>Makes and answers voice calls in one-to-one chats.</source>
-        <translation>ਇੱਕ-ਤੋਂ-ਇੱਕ ਗੱਲਬਾਤਾਂ ਵਿੱਚ ਵੌਇਸ ਕਾਲਾਂ ਕਰਦਾ ਹੈ ਅਤੇ ਉਨ੍ਹਾਂ ਦਾ ਜਵਾਬ ਦਿੰਦਾ ਹੈ।</translation>
     </message>
 </context>
 <context>

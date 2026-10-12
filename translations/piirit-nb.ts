@@ -466,6 +466,61 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>CameraSettingsPanel</name>
+    <message>
+        <source>Flash automatic</source>
+        <translation>Blits automatisk</translation>
+    </message>
+    <message>
+        <source>Flash on</source>
+        <translation>Blits på</translation>
+    </message>
+    <message>
+        <source>Flashlight on</source>
+        <translation>Lommelykt på</translation>
+    </message>
+    <message>
+        <source>Flash off</source>
+        <translation>Blits av</translation>
+    </message>
+    <message>
+        <source>Self-timer %1 s</source>
+        <translation>Selvutløser %1 s</translation>
+    </message>
+    <message>
+        <source>Self-timer off</source>
+        <translation>Selvutløser av</translation>
+    </message>
+    <message>
+        <source>Sunny</source>
+        <translation>Solskinn</translation>
+    </message>
+    <message>
+        <source>Cloudy</source>
+        <translation>Skyet</translation>
+    </message>
+    <message>
+        <source>Fluorescent</source>
+        <translation>Lysstoffrør</translation>
+    </message>
+    <message>
+        <source>Tungsten</source>
+        <translation>Glødelampe</translation>
+    </message>
+    <message>
+        <source>Automatic white balance</source>
+        <translation>Automatisk hvitbalanse</translation>
+    </message>
+    <message>
+        <source>Grid on</source>
+        <translation>Rutenett på</translation>
+    </message>
+    <message>
+        <source>Grid off</source>
+        <translation>Rutenett av</translation>
+    </message>
+</context>
+<context>
     <name>CapturePage</name>
     <message>
         <source>The video could not be saved</source>
@@ -1954,16 +2009,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Vis anropsskjerm for godkjente kontakter</translation>
     </message>
     <message>
-        <source>Enable calls (experimental)</source>
-        <translation>Slå på anrop (eksperimentelt)</translation>
-    </message>
-    <message>
         <source>Runs small apps inside chats.</source>
         <translation>Kjører små apper inne i samtaler.</translation>
-    </message>
-    <message>
-        <source>Makes and answers voice calls in one-to-one chats.</source>
-        <translation>Ringer og besvarer taleanrop i samtaler med én person.</translation>
     </message>
 </context>
 <context>

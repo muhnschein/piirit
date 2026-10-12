@@ -8,10 +8,16 @@ docs/BUILDING.md, "Cutting a release").
 
 ## Unreleased
 
+- **A camera like the system's.** The in-app camera now has the system camera's layout and controls: pinch to zoom, a ring per back camera on phones with more than one (labelled 1.0, 0.5 and so on, as in the system camera), front/back switch, flash and self-timer, white balance, exposure, grid, and a focus ring where you tap. It turns to landscape with the phone.
+- The QR scanner can zoom (pinch, or the 1×/2×/4× button), light the torch, and switch cameras.
 - Bundles deltachat-rpc-server 2.63.0 (was 2.62.0).
 - Enter in the chat search closes the keyboard and keeps the search.
 - A tap on a contact's or a group's picture shows it full screen. A group's picture is changed from the pull-down menu.
 - **Smaller videos.** A picked video close to the relay's recommended size is made smaller as soon as it is picked, with progress on the attachment bar, and sent when you send it; with media quality set to worse, every picked video is. The bar says how much smaller it went, such as 50 MB → 6 MB, and the size warning weighs the smaller video, saying so when even that is too big. Stopping it, or a result that came out no smaller, sends the video as it was picked.
+- **Voice calls are no longer experimental**: on for everybody, no switch to turn them on. Settings → Notifications → Calls still decides whether a call rings.
+- A ringing call plays the ringtone rather than a short beep.
+- A call that rings while the screen is off takes the lock screen away, so the call screen stays up.
+- A call declined just as the last call's screen was closing still says so.
 
 ## 2.1.0 — 2026-10-08
 

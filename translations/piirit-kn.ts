@@ -470,6 +470,61 @@ Other groups with blocked contacts will still show their messages.</source>
     </message>
 </context>
 <context>
+    <name>CameraSettingsPanel</name>
+    <message>
+        <source>Flash automatic</source>
+        <translation>ಫ್ಲ್ಯಾಶ್ ಸ್ವಯಂಚಾಲಿತ</translation>
+    </message>
+    <message>
+        <source>Flash on</source>
+        <translation>ಫ್ಲ್ಯಾಶ್ ಆನ್</translation>
+    </message>
+    <message>
+        <source>Flashlight on</source>
+        <translation>ಟಾರ್ಚ್ ಆನ್</translation>
+    </message>
+    <message>
+        <source>Flash off</source>
+        <translation>ಫ್ಲ್ಯಾಶ್ ಆಫ್</translation>
+    </message>
+    <message>
+        <source>Self-timer %1 s</source>
+        <translation>ಸೆಲ್ಫ್-ಟೈಮರ್ %1 ಸೆ</translation>
+    </message>
+    <message>
+        <source>Self-timer off</source>
+        <translation>ಸೆಲ್ಫ್-ಟೈಮರ್ ಆಫ್</translation>
+    </message>
+    <message>
+        <source>Sunny</source>
+        <translation>ಬಿಸಿಲು</translation>
+    </message>
+    <message>
+        <source>Cloudy</source>
+        <translation>ಮೋಡ ಕವಿದ</translation>
+    </message>
+    <message>
+        <source>Fluorescent</source>
+        <translation>ಫ್ಲೋರೆಸೆಂಟ್</translation>
+    </message>
+    <message>
+        <source>Tungsten</source>
+        <translation>ಟಂಗ್ಸ್ಟನ್</translation>
+    </message>
+    <message>
+        <source>Automatic white balance</source>
+        <translation>ಸ್ವಯಂಚಾಲಿತ ವೈಟ್ ಬ್ಯಾಲೆನ್ಸ್</translation>
+    </message>
+    <message>
+        <source>Grid on</source>
+        <translation>ಗ್ರಿಡ್ ಆನ್</translation>
+    </message>
+    <message>
+        <source>Grid off</source>
+        <translation>ಗ್ರಿಡ್ ಆಫ್</translation>
+    </message>
+</context>
+<context>
     <name>CapturePage</name>
     <message>
         <source>The video could not be saved</source>
@@ -1958,16 +2013,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>ಸ್ವೀಕರಿಸಿದ ಸಂಪರ್ಕಗಳಿಗೆ ಕರೆ ಪರದೆಯನ್ನು ತೋರಿಸಿ</translation>
     </message>
     <message>
-        <source>Enable calls (experimental)</source>
-        <translation>ಕರೆಗಳನ್ನು ಸಕ್ರಿಯಗೊಳಿಸಿ (ಪ್ರಯೋಗಾತ್ಮಕ)</translation>
-    </message>
-    <message>
         <source>Runs small apps inside chats.</source>
         <translation>ಸಂಭಾಷಣೆಗಳ ಒಳಗೆ ಸಣ್ಣ ಅನ್ವಯಗಳನ್ನು ಚಲಾಯಿಸುತ್ತದೆ.</translation>
-    </message>
-    <message>
-        <source>Makes and answers voice calls in one-to-one chats.</source>
-        <translation>ಒಬ್ಬರಿಗೊಬ್ಬರ ಸಂಭಾಷಣೆಗಳಲ್ಲಿ ಧ್ವನಿ ಕರೆಗಳನ್ನು ಮಾಡುತ್ತದೆ ಮತ್ತು ಉತ್ತರಿಸುತ್ತದೆ.</translation>
     </message>
 </context>
 <context>

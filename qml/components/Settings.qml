@@ -8,9 +8,11 @@ import Nemo.Configuration 1.0
  * how much of an attachment arrives unasked, how long a message is kept,
  * whether anything is announced at all and if so how much a notification
  * gives away and whether a muted group can still raise one, whether
- * webxdc apps are offered at all, whether calls are and whether one rings
- * here, how many quick actions the cover offers and which, and the
- * emoji last reacted with from the picker.
+ * webxdc apps are offered at all, whether a call rings here, how many
+ * quick actions the cover offers and which, the emoji last reacted with
+ * from the picker, and the camera's flash, self-timer and grid. One more
+ * key is read and never written: the labels the phone gives the platform
+ * camera's lenses, which the camera page's rings wear too.
  *
  * They live in dconf under the app's own path, and every page reads
  * them through this one object: the settings page (qml/pages/
@@ -73,14 +75,14 @@ QtObject {
     /// for, and every one of those three reads this rather than deciding
     /// for itself.
     property alias webxdcEnabled: webxdcEnabledValue.value
-    /// Whether calls are offered: the Calls tile on a contact's page,
-    /// answering one that rings, and calling back from a call's row. Off
-    /// until it is asked for, as apps are.
-    property alias callsEnabled: callsEnabledValue.value
     /// Whether a call from a contact rings here. The reference clients'
-    /// "Calls" notification setting, and on by default as they have it;
-    /// it means something only while calls are on. The core's own
-    /// `who_can_call_me`, applied to every profile.
+    /// "Calls" notification setting, and on by default as they have it.
+    /// The core's own `who_can_call_me`, applied to every profile.
+    ///
+    /// Calls themselves are not a setting: they were an experimental one,
+    /// off until asked for, and are on for everybody now, as they are in
+    /// the reference clients (#119). The old key,
+    /// /apps/harbour-piirit/calls_enabled, is no longer read.
     property alias callsRing: callsRingValue.value
     /// How many quick actions the cover has room for: 1, or 2. With one,
     /// the left action is the one, and what was set up on the right is
@@ -103,6 +105,20 @@ QtObject {
     /// first, which it offers before everything else. Only the picker's:
     /// the quick reactions are a tap away already.
     property alias recentReactions: recentReactionsValue.value
+    /// The camera's own settings, kept between one picture and the next
+    /// the way the platform camera keeps them: the flash mode asked for
+    /// (Camera.FlashMode's value; see qml/js/Viewfinder.js), the
+    /// self-timer's delay in seconds, and whether the viewfinder draws
+    /// its grid.
+    property alias cameraFlash: cameraFlashValue.value
+    property alias cameraTimer: cameraTimerValue.value
+    property alias cameraGrid: cameraGridValue.value
+    /// What the platform camera writes on its back cameras' rings
+    /// ("1.0", "0.5"), one per camera in the platform's order. Not this
+    /// app's setting: the phone's adaptation gives it to the platform
+    /// camera, and it is read here and never written. Empty on a phone
+    /// whose adaptation gives none.
+    readonly property var backLensLabels: backLensLabelsValue.value || []
 
     // The keys, named here and nowhere else: tests/qml_syntax.rs holds
     // every other file to reading them through this object.
@@ -180,16 +196,6 @@ QtObject {
         defaultValue: false
     }
 
-    // Off on a phone that has never been asked, for the reason apps are:
-    // the media half of a call runs in the browser engine, and whether
-    // it holds up on this hardware is still being found out
-    // (docs/CALLS.md).
-    property ConfigurationValue callsEnabledConfig: ConfigurationValue {
-        id: callsEnabledValue
-        key: "/apps/harbour-piirit/calls_enabled"
-        defaultValue: false
-    }
-
     property ConfigurationValue callsRingConfig: ConfigurationValue {
         id: callsRingValue
         key: "/apps/harbour-piirit/calls_ring"
@@ -255,6 +261,31 @@ QtObject {
     property ConfigurationValue recentReactionsConfig: ConfigurationValue {
         id: recentReactionsValue
         key: "/apps/harbour-piirit/recent_reactions"
+        defaultValue: []
+    }
+
+    property ConfigurationValue cameraFlashConfig: ConfigurationValue {
+        id: cameraFlashValue
+        key: "/apps/harbour-piirit/camera_flash"
+        // Automatic, the platform camera's own default.
+        defaultValue: 1
+    }
+
+    property ConfigurationValue cameraTimerConfig: ConfigurationValue {
+        id: cameraTimerValue
+        key: "/apps/harbour-piirit/camera_timer"
+        defaultValue: 0
+    }
+
+    property ConfigurationValue cameraGridConfig: ConfigurationValue {
+        id: cameraGridValue
+        key: "/apps/harbour-piirit/camera_grid"
+        defaultValue: false
+    }
+
+    property ConfigurationValue backLensLabelsConfig: ConfigurationValue {
+        id: backLensLabelsValue
+        key: "/apps/jolla-camera/backCameraLabels"
         defaultValue: []
     }
 }
