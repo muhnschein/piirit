@@ -78,7 +78,8 @@ ApplicationWindow {
         if (appWindow.chatList === null || action.kind === "") {
             return
         }
-        appWindow.chatList.quickAction(action.kind, action.accountId, action.chatId)
+        appWindow.chatList.quickAction(action.kind, action.accountId, action.chatId,
+                                       action.sendNow)
     }
 
     /// The profile the app is on, as the chat list last opened it.

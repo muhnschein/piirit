@@ -666,6 +666,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <extracomment>%1 is the label of the unread filter, a button at the right of the search field.</extracomment>
         <translation>બધી ચેટ બતાવવા &quot;%1&quot; પર ટેપ કરો</translation>
     </message>
+    <message>
+        <source>Send to</source>
+        <extracomment>Over the list of chats, when picking the one to send a picture or a video just taken to.</extracomment>
+        <translation>આમાં મોકલો</translation>
+    </message>
 </context>
 <context>
     <name>ChatMediaPage</name>
@@ -1563,6 +1568,36 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Profiles</source>
         <extracomment>A quick action on the cover that opens the list of profiles.</extracomment>
         <translation>પ્રોફાઇલ</translation>
+    </message>
+    <message>
+        <source>Photo</source>
+        <extracomment>A quick action on the cover that opens the camera to take a photo with the back camera, then asks which chat to send it to.</extracomment>
+        <translation>ફોટો</translation>
+    </message>
+    <message>
+        <source>Video</source>
+        <extracomment>A quick action on the cover that opens the camera to record a video with the back camera, then asks which chat to send it to.</extracomment>
+        <translation>વિડિઓ</translation>
+    </message>
+    <message>
+        <source>Selfie</source>
+        <extracomment>A quick action on the cover that opens the camera to take a photo with the front camera, then asks which chat to send it to.</extracomment>
+        <translation>સેલ્ફી</translation>
+    </message>
+    <message>
+        <source>Selfie video</source>
+        <extracomment>A quick action on the cover that opens the camera to record a video with the front camera, then asks which chat to send it to.</extracomment>
+        <translation>સેલ્ફી વિડિઓ</translation>
+    </message>
+    <message>
+        <source>Send right away</source>
+        <extracomment>Under a quick action on the cover that takes a photo or a video: whether it is sent as soon as a chat is picked for it.</extracomment>
+        <translation>તરત મોકલો</translation>
+    </message>
+    <message>
+        <source>Sends it as soon as you pick the chat, without a caption.</source>
+        <extracomment>Under &quot;Send right away&quot;. Off, the chat opens with the photo or video on it, ready for a caption and the send button.</extracomment>
+        <translation>ચેટ પસંદ કરતાં જ કૅપ્શન વગર તરત મોકલી દે છે.</translation>
     </message>
 </context>
 <context>

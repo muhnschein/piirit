@@ -21,6 +21,12 @@ import "../js/QuickActions.js" as QuickActions
  * The name is looked up rather than kept, so a renamed chat reads as it
  * is called now, and a deleted one says so. Under a chat's action, and
  * only there, are the icons it can wear.
+ *
+ * The camera's actions -- a photo or a video, with the back camera or the
+ * front -- ask which chat after the picture is taken, not here. Under
+ * one of those, and only there, is whether it then goes at once or waits
+ * in the chat for a caption and the send button. Waiting is the default,
+ * as a share waits.
  */
 Column {
     id: setting
@@ -54,6 +60,18 @@ Column {
         case "scan": return qsTr("Scan QR code")
         //: A quick action on the cover that opens the list of profiles.
         case "profiles": return qsTr("Profiles")
+        //: A quick action on the cover that opens the camera to take a
+        //: photo with the back camera, then asks which chat to send it to.
+        case "photo": return qsTr("Photo")
+        //: A quick action on the cover that opens the camera to record a
+        //: video with the back camera, then asks which chat to send it to.
+        case "video": return qsTr("Video")
+        //: A quick action on the cover that opens the camera to take a
+        //: photo with the front camera, then asks which chat to send it to.
+        case "selfie": return qsTr("Selfie")
+        //: A quick action on the cover that opens the camera to record a
+        //: video with the front camera, then asks which chat to send it to.
+        case "selfie-video": return qsTr("Selfie video")
         //: No quick action on this side of the cover.
         default: return qsTr("None")
         }
@@ -129,7 +147,7 @@ Column {
     // row drawn the way Silica draws a ComboBox, with the kinds in a menu
     // that opens under it on a tap. Not a ComboBox: Silica shows one's
     // choices on a page of their own once there are more than five of
-    // them, and there are six. A row's context menu opens where it is,
+    // them, and there are ten. A row's context menu opens where it is,
     // however many items it holds -- the conversation's own holds eight.
     ListItem {
         id: choice
@@ -192,7 +210,43 @@ Column {
                 text: setting.kindLabel("profiles")
                 onClicked: setting.choose("profiles")
             }
+            MenuItem {
+                objectName: setting.side + "Action-photo"
+                text: setting.kindLabel("photo")
+                onClicked: setting.choose("photo")
+            }
+            MenuItem {
+                objectName: setting.side + "Action-video"
+                text: setting.kindLabel("video")
+                onClicked: setting.choose("video")
+            }
+            MenuItem {
+                objectName: setting.side + "Action-selfie"
+                text: setting.kindLabel("selfie")
+                onClicked: setting.choose("selfie")
+            }
+            MenuItem {
+                objectName: setting.side + "Action-selfie-video"
+                text: setting.kindLabel("selfie-video")
+                onClicked: setting.choose("selfie-video")
+            }
         }
+    }
+
+    // Whether a camera action's picture or video goes as soon as its chat
+    // is picked. Only under one of those: no other action sends anything.
+    TextSwitch {
+        objectName: setting.side + "ActionSendNow"
+        visible: QuickActions.isCapture(setting.action.kind)
+        //: Under a quick action on the cover that takes a photo or a
+        //: video: whether it is sent as soon as a chat is picked for it.
+        text: qsTr("Send right away")
+        //: Under "Send right away". Off, the chat opens with the photo or
+        //: video on it, ready for a caption and the send button.
+        description: qsTr("Sends it as soon as you pick the chat, without a caption.")
+        checked: setting.action.sendNow
+        automaticCheck: false
+        onClicked: Settings[setting.prefix + "SendNow"] = !setting.action.sendNow
     }
 
     // The icons a chat's action can wear, the one it wears lit, in rows

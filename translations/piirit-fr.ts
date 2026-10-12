@@ -666,6 +666,11 @@ Vous continuerez à voir les messages des contacts bloqués dans les autres grou
         <extracomment>%1 is the label of the unread filter, a button at the right of the search field.</extracomment>
         <translation>Touchez « %1 » pour afficher toutes les discussions</translation>
     </message>
+    <message>
+        <source>Send to</source>
+        <extracomment>Over the list of chats, when picking the one to send a picture or a video just taken to.</extracomment>
+        <translation>Envoyer à</translation>
+    </message>
 </context>
 <context>
     <name>ChatMediaPage</name>
@@ -1563,6 +1568,36 @@ Vous continuerez à voir les messages des contacts bloqués dans les autres grou
         <source>Profiles</source>
         <extracomment>A quick action on the cover that opens the list of profiles.</extracomment>
         <translation>Profils</translation>
+    </message>
+    <message>
+        <source>Photo</source>
+        <extracomment>A quick action on the cover that opens the camera to take a photo with the back camera, then asks which chat to send it to.</extracomment>
+        <translation>Photo</translation>
+    </message>
+    <message>
+        <source>Video</source>
+        <extracomment>A quick action on the cover that opens the camera to record a video with the back camera, then asks which chat to send it to.</extracomment>
+        <translation>Vidéo</translation>
+    </message>
+    <message>
+        <source>Selfie</source>
+        <extracomment>A quick action on the cover that opens the camera to take a photo with the front camera, then asks which chat to send it to.</extracomment>
+        <translation>Selfie</translation>
+    </message>
+    <message>
+        <source>Selfie video</source>
+        <extracomment>A quick action on the cover that opens the camera to record a video with the front camera, then asks which chat to send it to.</extracomment>
+        <translation>Vidéo selfie</translation>
+    </message>
+    <message>
+        <source>Send right away</source>
+        <extracomment>Under a quick action on the cover that takes a photo or a video: whether it is sent as soon as a chat is picked for it.</extracomment>
+        <translation>Envoyer immédiatement</translation>
+    </message>
+    <message>
+        <source>Sends it as soon as you pick the chat, without a caption.</source>
+        <extracomment>Under &quot;Send right away&quot;. Off, the chat opens with the photo or video on it, ready for a caption and the send button.</extracomment>
+        <translation>Envoie dès que vous choisissez la discussion, sans légende.</translation>
     </message>
 </context>
 <context>

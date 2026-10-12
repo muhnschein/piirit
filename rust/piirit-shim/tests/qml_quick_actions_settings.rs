@@ -11,8 +11,10 @@
 //! for it now, lets the icon be chosen, and says so when the chat has been
 //! deleted since. The chat can be any profile's: the picker opens on the
 //! one the action's chat is in, and the chat is whichever profile's it
-//! was picked from. With room for one, the right action is hidden and
-//! kept.
+//! was picked from. Under one of the camera's actions -- a photo or a
+//! video, back or front -- and only there, a switch says whether what it
+//! takes is sent at once; off unless turned on, and each side's own. With
+//! room for one, the right action is hidden and kept.
 
 // Qt harness: see qml_pages.rs.
 #![allow(
@@ -119,7 +121,14 @@ const PROBE_QML: &str = r"
             if (!spot) { return 'missing:previewAction' + index }
             return ('' + spot.source).split('/').pop()
         }
+        // Whether a side sends what its camera takes at once.
+        function sendsNow(side) {
+            return '' + Settings[side === 'right' ? 'quickActionRightSendNow'
+                                                  : 'quickActionLeftSendNow']
+        }
         function clear() {
+            Settings.quickActionLeftSendNow = false
+            Settings.quickActionRightSendNow = false
             Settings.quickActionCount = 1
             Settings.quickActionLeft = ''
             Settings.quickActionLeftAccount = 0
@@ -188,6 +197,15 @@ const PROBE_QML: &str = r"
         }
     }
 ";
+
+/// The camera's actions: the kind, what the choice says for it, and the
+/// step it is recorded under.
+const CAMERA_KINDS: [(&str, &str, &str); 4] = [
+    ("photo", "Photo", "camera-photo"),
+    ("video", "Video", "camera-video"),
+    ("selfie", "Selfie", "camera-selfie"),
+    ("selfie-video", "Selfie video", "camera-selfie-video"),
+];
 
 #[test]
 #[allow(clippy::too_many_lines)]
@@ -372,7 +390,56 @@ fn the_quick_actions_are_set_up_on_a_page_of_their_own() {
             "two-right-profiles",
             call!("previewIcon", QString::from("twoActionsPreview"), 1)
         );
+        // No switch to send at once under an action that takes nothing.
+        record!("qr-switch", get!("rightActionSendNow", "visible"));
+        // The camera's four, each written on the tap with the switch under
+        // it, off until it is turned on.
+        for (kind, label) in CAMERA_KINDS.map(|(kind, _, label)| (kind, label)) {
+            let item = format!("rightAction-{kind}");
+            let held = call!("click", QString::from(item.as_str()));
+            let held = format!(
+                "{held}|{}|{}|{}|{}|{}",
+                call!("holds", QString::from("right")),
+                get!("rightActionValue", "text"),
+                get!("rightActionSendNow", "visible"),
+                get!("rightActionSendNow", "checked"),
+                call!("previewIcon", QString::from("twoActionsPreview"), 1),
+            );
+            record!(label, held);
+        }
+        // Turned on for this side only, and off again.
+        record!("send-now-on", click!("rightActionSendNow"));
+        record!(
+            "send-now-held",
+            format!(
+                "{}|{}|{}",
+                call!("sendsNow", QString::from("right")),
+                get!("rightActionSendNow", "checked"),
+                call!("sendsNow", QString::from("left"))
+            )
+        );
+        record!("left-switch", get!("leftActionSendNow", "visible"));
+        record!("send-now-off", click!("rightActionSendNow"));
+        record!(
+            "send-now-released",
+            format!(
+                "{}|{}",
+                call!("sendsNow", QString::from("right")),
+                get!("rightActionSendNow", "checked")
+            )
+        );
+        record!("send-now-again", click!("rightActionSendNow"));
         record!("pick-qr-again", click!("rightAction-qr"));
+        // Kept for when a camera's action is chosen again, but not shown
+        // under one that takes nothing.
+        record!(
+            "qr-again-switch",
+            format!(
+                "{}|{}",
+                get!("rightActionSendNow", "visible"),
+                call!("sendsNow", QString::from("right"))
+            )
+        );
 
         // A chat is asked for, and nothing changes until one is picked.
         record!("pick-chat", click!("leftAction-chat"));
@@ -582,6 +649,44 @@ fn the_quick_actions_are_set_up_on_a_page_of_their_own() {
     assert_eq!(value("right-scan"), "scan|0|0|", "{context}");
     assert_eq!(value("right-profiles"), "profiles|0|0|", "{context}");
     assert_eq!(value("right-profiles-shown"), "Profiles", "{context}");
+    assert_eq!(
+        value("qr-switch"),
+        "false",
+        "the switch to send at once is under an action that takes nothing. \
+         {context}"
+    );
+    for (kind, said, label) in CAMERA_KINDS {
+        let expected = format!("ok|{kind}|0|0||{said}|true|false|{kind}-");
+        assert!(
+            value(label).starts_with(&expected),
+            "the {kind} action is not written on the tap, said by name, \
+             drawn with its icon, and shown with the switch to send at once \
+             off: {:?} is not {expected:?}... {context}",
+            value(label)
+        );
+    }
+    assert_eq!(
+        value("send-now-held"),
+        "true|true|false",
+        "turning the switch on is not written for this side, and this side \
+         only, or the switch does not show it. {context}"
+    );
+    assert_eq!(
+        value("left-switch"),
+        "false",
+        "the left action, which takes nothing, shows the switch. {context}"
+    );
+    assert_eq!(
+        value("send-now-released"),
+        "false|false",
+        "turning the switch off again is not written. {context}"
+    );
+    assert_eq!(
+        value("qr-again-switch"),
+        "false|true",
+        "the switch shows under an action that takes nothing, or choosing \
+         one forgot what was set for the camera. {context}"
+    );
     assert!(
         value("two-right-profiles").starts_with("profiles-"),
         "the picture does not show the profiles' icon. {context}"

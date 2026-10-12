@@ -4,8 +4,9 @@
 //! Not before there is a chat list to land on, and not while a page is up
 //! that must not be jumped away from -- a backup, a restore, a code being
 //! shown or read, anywhere in the stack. A tap is read against the
-//! settings and handed to the chat list with what it needs; one of a kind
-//! this version does not know goes nowhere.
+//! settings and handed to the chat list with what it needs -- for a
+//! camera's action, whether that side sends what it takes at once; one of
+//! a kind this version does not know goes nowhere.
 
 // Qt harness: see qml_startup.rs.
 #![allow(
@@ -53,8 +54,8 @@ const PROBE_QML: &str = r"
         Item {
             id: fakeList
             property string asked: ''
-            function quickAction(kind, accountId, chatId) {
-                asked += kind + '|' + accountId + '|' + chatId + ';'
+            function quickAction(kind, accountId, chatId, sendNow) {
+                asked += kind + '|' + accountId + '|' + chatId + '|' + sendNow + ';'
             }
         }
 
@@ -77,6 +78,11 @@ const PROBE_QML: &str = r"
             Settings[prefix] = kind
             Settings[prefix + 'Account'] = account
             Settings[prefix + 'Chat'] = chat
+            return 'ok'
+        }
+        function sendNow(side, on) {
+            Settings[side === 'right' ? 'quickActionRightSendNow'
+                                      : 'quickActionLeftSendNow'] = on === 'true'
             return 'ok'
         }
         function tap(side) {
@@ -198,6 +204,18 @@ fn the_window_offers_quick_actions_when_it_can_take_them_and_passes_them_on() {
         record!("set-odd", set!("left", "teapot", 0, 0));
         record!("tap-odd", call!("tap", QString::from("left")));
 
+        // A camera's action, handed over with whether it sends at once;
+        // the other side's setting is not this side's.
+        record!("set-camera", set!("left", "selfie-video", 0, 0));
+        record!("tap-camera", call!("tap", QString::from("left")));
+        record!(
+            "send-now",
+            call!("sendNow", QString::from("left"), QString::from("true"))
+        );
+        record!("tap-camera-now", call!("tap", QString::from("left")));
+        record!("set-right-camera", set!("right", "photo", 0, 0));
+        record!("tap-right-not-now", call!("tap", QString::from("right")));
+
         // The stack decides, wherever in it the page that pauses is.
         record!("plain", call!("stack", QString::from("conversation,chats")));
         record!("paused-top", call!("stack", QString::from("backup,chats")));
@@ -246,30 +264,47 @@ fn the_window_offers_quick_actions_when_it_can_take_them_and_passes_them_on() {
     );
     assert_eq!(
         value("tap-left"),
-        "search|0|0;",
+        "search|0|0|false;",
         "the left action is not handed to the chat list. {context}"
     );
     assert_eq!(
         value("tap-right"),
-        "search|0|0;chat|2|7;",
+        "search|0|0|false;chat|2|7|false;",
         "a chat's action is not handed over with its profile and chat. \
          {context}"
     );
     assert_eq!(
         value("tap-cover"),
-        "search|0|0;chat|2|7;search|0|0;",
+        "search|0|0|false;chat|2|7|false;search|0|0|false;",
         "the window does not act on a tap on the cover. {context}"
     );
     assert_eq!(
         value("tap-held"),
-        "search|0|0;chat|2|7;search|0|0;",
+        "search|0|0|false;chat|2|7|false;search|0|0|false;",
         "the right action was handed on with room for one. {context}"
     );
     assert_eq!(
         value("tap-odd"),
-        "search|0|0;chat|2|7;search|0|0;",
+        "search|0|0|false;chat|2|7|false;search|0|0|false;",
         "an action of a kind this version does not know was handed on. \
          {context}"
+    );
+    let before_camera = "search|0|0|false;chat|2|7|false;search|0|0|false;";
+    assert_eq!(
+        value("tap-camera"),
+        format!("{before_camera}selfie-video|0|0|false;"),
+        "a camera's action is not handed to the chat list, or sends at once \
+         without being asked to. {context}"
+    );
+    assert_eq!(
+        value("tap-camera-now"),
+        format!("{before_camera}selfie-video|0|0|false;selfie-video|0|0|true;"),
+        "a camera's action set to send at once is not handed over so. {context}"
+    );
+    assert_eq!(
+        value("tap-right-not-now"),
+        format!("{before_camera}selfie-video|0|0|false;selfie-video|0|0|true;photo|0|0|false;"),
+        "one side's send-at-once reached the other side's action. {context}"
     );
     assert_eq!(
         value("plain"),
