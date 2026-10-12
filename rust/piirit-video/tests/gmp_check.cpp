@@ -41,8 +41,9 @@ public:
         strides_[0] = width + 16;
         strides_[1] = (width + 1) / 2 + 8;
         strides_[2] = strides_[1];
-        planes_[0].assign(static_cast<size_t>(strides_[0] * height), 0);
-        planes_[1].assign(static_cast<size_t>(strides_[1] * ((height + 1) / 2)), 128);
+        planes_[0].assign(static_cast<size_t>(strides_[0]) * static_cast<size_t>(height), 0);
+        planes_[1].assign(static_cast<size_t>(strides_[1]) * static_cast<size_t>((height + 1) / 2),
+                          128);
         planes_[2].assign(planes_[1].size(), 128);
     }
 

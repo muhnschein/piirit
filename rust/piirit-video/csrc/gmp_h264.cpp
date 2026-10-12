@@ -189,9 +189,7 @@ public:
 
     void EncodingComplete() override
     {
-        if (frames_ > 0) {
-            summarize("stopped");
-        }
+        summarize("stopped");
         delete this;
     }
 
@@ -213,7 +211,8 @@ private:
     void set_rate(x264_param_t &param) const
     {
         uint32_t paced = paced_fps_ == 0 ? fps_ : paced_fps_;
-        int kbps = static_cast<int>(static_cast<uint64_t>(kbps_) * fps_ / paced);
+        int kbps = static_cast<int>(
+            paced == 0 ? kbps_ : static_cast<uint64_t>(kbps_) * fps_ / paced);
         param.rc.i_rc_method = X264_RC_ABR;
         param.rc.i_bitrate = kbps;
         param.rc.i_vbv_max_bitrate = kbps;
@@ -437,6 +436,9 @@ private:
     /* "1440 frames (2 key) in 60 s, 4.1 ms CPU each, 290 kbps of 300". */
     void summarize(const char *when)
     {
+        if (frames_ == 0) {
+            return;
+        }
         double seconds = static_cast<double>(last_pts_ - first_pts_) / 1e6;
         double kbps = seconds > 0 ? static_cast<double>(bytes_) * 8 / seconds / 1000 : 0;
         double ms = static_cast<double>(cpu_ns_) / 1e6 / static_cast<double>(frames_);
