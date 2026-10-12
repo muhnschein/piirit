@@ -85,8 +85,8 @@ pub(crate) fn opening_page(entries: &[Entry], find: u32) -> &[Entry] {
         Some(index) => index.saturating_sub(PAGE / 2),
         None => entries.len().saturating_sub(PAGE),
     };
-    let end = (start + PAGE).min(entries.len());
-    &entries[start..end]
+    let end = start.saturating_add(PAGE).min(entries.len());
+    entries.get(start..end).unwrap_or_default()
 }
 
 /// The message ids of a run of entries, for handing to `get_messages`.
@@ -607,7 +607,7 @@ impl ChatMessages {
 
     /// Start making `source` smaller to `target`, on a thread of its own.
     fn start_recode(&mut self, source: String, target: piirit_video::Target) {
-        self.next_recode += 1;
+        self.next_recode = self.next_recode.wrapping_add(1);
         let id = self.next_recode;
         let cancel = Arc::new(AtomicBool::new(false));
         let ptr: QPointer<Self> = QPointer::from(&*self);
@@ -1021,7 +1021,7 @@ impl ChatMessages {
         };
 
         self.pending.extend(wanted.iter().copied());
-        self.fetches += 1;
+        self.fetches = self.fetches.saturating_add(1);
         self.set_hydrating(true);
         let generation = self.generation;
 
@@ -1504,9 +1504,12 @@ impl ChatMessages {
             return;
         };
         runtime.spawn(async move {
-            let _ = rpc
+            if let Err(err) = rpc
                 .call::<_, ()>("marknoticed_chat", (account_id, chat_id))
-                .await;
+                .await
+            {
+                eprintln!("piirit: marknoticed_chat: {err}");
+            }
             mark_seen(&rpc, account_id, unseen).await;
         });
     }
@@ -2209,12 +2212,12 @@ fn place_arrivals(rows: &mut MessageListModel, entries: &[Entry], arrived: &[u32
     for entry in entries {
         if arrived.contains(&entry.message_id) {
             rows.insert(at, placeholder(*entry));
-            held += 1;
-            at += 1;
+            held = held.saturating_add(1);
+            at = at.saturating_add(1);
         } else if let Some(offset) =
             (at..held).position(|index| rows[index].message_id == entry.message_id)
         {
-            at += offset + 1;
+            at = at.saturating_add(offset).saturating_add(1);
         }
     }
 }
@@ -2223,15 +2226,15 @@ fn place_arrivals(rows: &mut MessageListModel, entries: &[Entry], arrived: &[u32
 /// the screen first: what is on it, then the margin below and the margin
 /// above turn and turn about, closest first.
 fn fill_order(first: usize, last: usize, count: usize) -> Vec<usize> {
-    if count == 0 || first > last {
+    let Some(bottom) = count.checked_sub(1).filter(|_| first <= last) else {
         return Vec::new();
-    }
-    let last = last.min(count - 1);
+    };
+    let last = last.min(bottom);
     let first = first.min(last);
     let mut order: Vec<usize> = (first..=last).collect();
     for distance in 1..=MARGIN {
-        if last + distance < count {
-            order.push(last + distance);
+        if let Some(below) = last.checked_add(distance).filter(|&below| below < count) {
+            order.push(below);
         }
         if let Some(above) = first.checked_sub(distance) {
             order.push(above);
@@ -2384,9 +2387,12 @@ async fn mark_seen(rpc: &RpcClient, account_id: u32, unseen: Vec<u32>) {
     if unseen.is_empty() {
         return;
     }
-    let _ = rpc
+    if let Err(err) = rpc
         .call::<_, ()>("markseen_msgs", (account_id, unseen))
-        .await;
+        .await
+    {
+        eprintln!("piirit: markseen_msgs: {err}");
+    }
 }
 
 /// True for a chat where a message has to say who sent it.
@@ -2662,18 +2668,20 @@ fn video_dimensions(path: &str) -> Option<(i32, i32)> {
     }
     let mut file = std::fs::File::open(path).ok()?;
     let len = file.metadata().ok()?.len();
-    let mut at = 0;
+    // `box_header` keeps every box inside the file, so neither sum here
+    // can come near the top of a u64.
+    let mut at = 0_u64;
     let mut first = true;
-    while at + 8 <= len {
+    while at.saturating_add(8) <= len {
         let (size, kind) = mp4::box_header(&mut file, at, len)?;
         if first && &kind != b"ftyp" {
             return None;
         }
         first = false;
         if &kind == b"moov" {
-            return mp4::video_track_size(&mut file, at + 8, at + size);
+            return mp4::video_track_size(&mut file, at.saturating_add(8), at.saturating_add(size));
         }
-        at += size;
+        at = at.saturating_add(size);
     }
     None
 }
@@ -2704,7 +2712,9 @@ mod mp4 {
             }
             size => u64::from(size),
         };
-        (size >= 8 && at + size <= end).then_some((size, kind))
+        // Checked: a 64-bit size is whatever the file says, and one that
+        // wrapped past the end would walk back to the start, and on forever.
+        (size >= 8 && at.checked_add(size).is_some_and(|stop| stop <= end)).then_some((size, kind))
     }
 
     /// The first track between `from` and `to` with a size: audio tracks
@@ -2715,14 +2725,15 @@ mod mp4 {
         to: u64,
     ) -> Option<(i32, i32)> {
         let mut at = from;
-        while at + 8 <= to {
+        while at.saturating_add(8) <= to {
             let (size, kind) = box_header(file, at, to)?;
             if &kind == b"trak" {
-                if let Some(found) = track_size(file, at + 8, at + size) {
+                if let Some(found) = track_size(file, at.saturating_add(8), at.saturating_add(size))
+                {
                     return Some(found);
                 }
             }
-            at += size;
+            at = at.saturating_add(size);
         }
         None
     }
@@ -2730,12 +2741,12 @@ mod mp4 {
     /// The size the track's `tkhd` gives, turned as its matrix says.
     fn track_size(file: &mut std::fs::File, from: u64, to: u64) -> Option<(i32, i32)> {
         let mut at = from;
-        while at + 8 <= to {
+        while at.saturating_add(8) <= to {
             let (size, kind) = box_header(file, at, to)?;
             if &kind == b"tkhd" {
-                return header_size(file, at + 8, size - 8);
+                return header_size(file, at.saturating_add(8), size.saturating_sub(8));
             }
-            at += size;
+            at = at.saturating_add(size);
         }
         None
     }
@@ -2748,23 +2759,22 @@ mod mp4 {
         // Version 1's fields reach 96 bytes with the size at the end.
         let mut body = [0_u8; 96];
         let wanted = usize::try_from(size.min(96)).ok()?;
+        let body = body.get_mut(..wanted)?;
         file.seek(SeekFrom::Start(at)).ok()?;
-        file.read_exact(&mut body[..wanted]).ok()?;
-        let matrix = if body[0] == 1 { 52 } else { 40 };
-        if wanted < matrix + 44 {
-            return None;
-        }
-        let fixed = |offset: usize| {
-            i32::from_be_bytes([
-                body[offset],
-                body[offset + 1],
-                body[offset + 2],
-                body[offset + 3],
-            ])
+        file.read_exact(body).ok()?;
+        // The matrix, then the width and the height: eleven numbers.
+        let (start, stop) = if body.first() == Some(&1) {
+            (52, 96)
+        } else {
+            (40, 84)
         };
-        let (a, d) = (fixed(matrix), fixed(matrix + 16));
-        let width = fixed(matrix + 36) >> 16;
-        let height = fixed(matrix + 40) >> 16;
+        let fields = body.get(start..stop)?;
+        let mut numbers = [0_i32; 11];
+        for (number, field) in numbers.iter_mut().zip(fields.chunks_exact(4)) {
+            *number = i32::from_be_bytes(field.try_into().ok()?);
+        }
+        let [a, _, _, _, d, _, _, _, _, width, height] = numbers;
+        let (width, height) = (width >> 16, height >> 16);
         if width <= 0 || height <= 0 {
             return None;
         }
@@ -2838,24 +2848,29 @@ pub(crate) fn local_path(raw: &str) -> String {
         return path.to_string();
     }
     let mut out = Vec::with_capacity(path.len());
-    let bytes = path.as_bytes();
-    let mut index = 0;
-    while index < bytes.len() {
+    let mut rest = path.as_bytes();
+    while let Some((&byte, tail)) = rest.split_first() {
         // Anything that is not a complete, valid escape is a literal '%':
         // a file really can be called "100%.png".
         // Both digits checked here rather than left to `from_str_radix`,
         // which accepts a leading sign: without this, "%+A" would decode.
-        let decoded = (bytes[index] == b'%' && index + 2 < bytes.len())
-            .then(|| &bytes[index + 1..index + 3])
-            .filter(|hex| hex.iter().all(u8::is_ascii_hexdigit))
-            .and_then(|hex| std::str::from_utf8(hex).ok())
-            .and_then(|hex| u8::from_str_radix(hex, 16).ok());
-        if let Some(byte) = decoded {
-            out.push(byte);
-            index += 3;
+        let escape = match tail {
+            [high, low, after @ ..]
+                if byte == b'%' && high.is_ascii_hexdigit() && low.is_ascii_hexdigit() =>
+            {
+                std::str::from_utf8(&[*high, *low])
+                    .ok()
+                    .and_then(|hex| u8::from_str_radix(hex, 16).ok())
+                    .map(|decoded| (decoded, after))
+            }
+            _ => None,
+        };
+        if let Some((decoded, after)) = escape {
+            out.push(decoded);
+            rest = after;
         } else {
-            out.push(bytes[index]);
-            index += 1;
+            out.push(byte);
+            rest = tail;
         }
     }
     // A percent-escape that does not spell UTF-8 is not a path we can use;
@@ -3001,6 +3016,25 @@ mod tests {
             None
         );
         assert_eq!(video_dimensions(""), None);
+        let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    #[test]
+    fn a_box_whose_size_wraps_past_the_end_ends_the_walk() {
+        // A 64-bit size that, added to where the box starts, wraps round
+        // to 0: unchecked, the walk stepped back to the `ftyp` and went
+        // round forever in a release build, and overflowed in a debug one.
+        let dir = std::env::temp_dir().join(format!("piirit-mp4-wrap-{}", std::process::id()));
+        std::fs::create_dir_all(&dir).expect("temp dir");
+        let ftyp = mp4_box(*b"ftyp", b"isom\0\0\0\0isomiso2mp41");
+        let at = u64::try_from(ftyp.len()).expect("ftyp size");
+        let mut wraps = Vec::new();
+        wraps.extend_from_slice(&1_u32.to_be_bytes());
+        wraps.extend_from_slice(b"free");
+        wraps.extend_from_slice(&0_u64.wrapping_sub(at).to_be_bytes());
+        let path = dir.join("wraps.mp4");
+        std::fs::write(&path, [ftyp, wraps].concat()).expect("write");
+        assert_eq!(video_dimensions(&path.to_string_lossy()), None);
         let _ = std::fs::remove_dir_all(&dir);
     }
 
