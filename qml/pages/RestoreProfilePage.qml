@@ -233,6 +233,14 @@ Page {
             value: deviceChrome.height
         }
 
+        // This page turns with the phone; the camera's picture is turned
+        // back, so it stays upright.
+        Binding {
+            target: scanLoader.item
+            property: "pageOrientation"
+            value: page.orientation
+        }
+
         Label {
             objectName: "noCamera"
             visible: scanLoader.status === Loader.Error
