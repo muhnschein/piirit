@@ -82,6 +82,33 @@ fn page_options(camera: bool) -> &'static str {
     }
 }
 
+/// Which of the phone's back cameras is the main lens, as its place
+/// among them: the label nearest "1.0" in what the platform camera
+/// writes on its back cameras' rings, given in their order ("1.0,0.5"),
+/// or the first camera where there are none to go by. The engine names
+/// every back camera alike, and the first it lists may be the wide one.
+fn main_back_camera(labels: &str) -> usize {
+    labels
+        .split(',')
+        .enumerate()
+        .filter_map(|(place, label)| {
+            let zoom: f64 = label
+                .trim()
+                .trim_end_matches(['x', '\u{d7}'])
+                .parse()
+                .ok()?;
+            Some((place, (zoom - 1.0).abs()))
+        })
+        .fold(
+            None,
+            |best: Option<(usize, f64)>, (place, off)| match best {
+                Some((_, nearest)) if nearest <= off => best,
+                _ => Some((place, off)),
+            },
+        )
+        .map_or(0, |(place, _)| place)
+}
+
 /// What one call's page needs before the host can come up.
 struct Prepared {
     ice_servers: String,
@@ -222,6 +249,12 @@ pub struct Call {
     /// out, in milliseconds; 0 for the app's own limit, a little over the
     /// core's 120 seconds. Only a test sets it.
     pub ring_limit_ms: qt_property!(u32),
+
+    /// What the platform camera writes on the phone's back cameras'
+    /// rings, in their order, comma-separated ("1.0,0.5"): how the page
+    /// is told which back camera is the main lens. Empty on a phone whose
+    /// adaptation gives none.
+    pub back_lenses: qt_property!(QString),
 
     /// The loopback host the page is served from, while there is a page.
     host: Option<Host>,
@@ -640,6 +673,10 @@ impl Call {
                         if this_mut.muted {
                             host.command(call_host::mute_command(true));
                         }
+                        let back = main_back_camera(&this_mut.back_lenses.to_string());
+                        if back > 0 {
+                            host.command(call_host::back_camera_command(back));
+                        }
                         // Turned, or away, before there was a page to tell.
                         if this_mut.rear_camera {
                             host.command(call_host::facing_command(false));
@@ -917,8 +954,26 @@ fn now() -> f64 {
 
 #[cfg(test)]
 mod tests {
-    use super::Summary;
+    use super::{main_back_camera, Summary};
     use serde_json::json;
+
+    #[test]
+    fn the_main_back_camera_is_the_one_labelled_nearest_one() {
+        // As the platform camera has them, in the order it lists them.
+        assert_eq!(main_back_camera("1.0,0.5"), 0);
+        assert_eq!(main_back_camera("0.5,1.0"), 1);
+        assert_eq!(main_back_camera("0.6, 1.0, 2.0"), 1);
+        assert_eq!(main_back_camera("0.5x,1x"), 1);
+        // No main one: the nearest, and the first of two as near.
+        assert_eq!(main_back_camera("0.6,3.0"), 0);
+        assert_eq!(main_back_camera("3.0,0.6"), 1);
+        assert_eq!(main_back_camera("2.0,0.5"), 1);
+        assert_eq!(main_back_camera("0.5,1.5"), 0);
+        // Nothing to go by: the first, as the engine lists them.
+        assert_eq!(main_back_camera(""), 0);
+        assert_eq!(main_back_camera("wide,main"), 0);
+        assert_eq!(main_back_camera("wide,1.0"), 1);
+    }
 
     #[test]
     fn a_call_reads_as_the_core_serialises_it() {

@@ -64,6 +64,11 @@ var piiritVideo = (function () {
      * end sees black is one that is sent black, or one it cannot decode,
      * and only the counts tell which. */
     var SAMPLES = [4000, 15000, 45000];
+    /* The most the other end's picture is enlarged past fitting the
+     * screen: enough for a phone's upright picture to fill a taller
+     * screen, as this end's does, and for one held sideways to lose some
+     * of its bars rather than half of itself. */
+    var ZOOM_MOST = 1.35;
     /* This end's picture, while the other end's is drawn: in the corner
      * the call screen leaves free under its top line. */
     var CORNER = {
@@ -107,6 +112,12 @@ var piiritVideo = (function () {
      * camera service: listed again only while their names are not out,
      * as they are not before a camera has first been opened. */
     var listed = null;
+    /* Which of the back cameras the engine names to open, by its place
+     * among them: the engine calls every back camera alike, and the
+     * host says which is the main lens, from the platform camera's own
+     * labels. Said of the camera opened, for the log. */
+    var backCamera = 0;
+    var chosen = "";
     /* When the camera was last turned, while the other one is on its way
      * and drawn: what a turn takes, logged. */
     var turned = 0;
@@ -116,6 +127,8 @@ var piiritVideo = (function () {
     var remote = null;
     var remoteEnabled = null;
     var lastReport = "";
+    /* The other end's picture, once it is watched for a new size. */
+    var fitting = null;
     var lookingAgain = false;
     var looks = 0;
     var layoutDue = false;
@@ -206,6 +219,7 @@ var piiritVideo = (function () {
             return Promise.resolve("");
         }
         return cameraList().then(function (cameras) {
+            chosen = "";
             if (cameras.length < 2) {
                 return "";
             }
@@ -213,7 +227,11 @@ var piiritVideo = (function () {
                 return NAMED[which].test(one.label || "");
             });
             if (named.length > 0) {
-                return named[0].deviceId;
+                var place = which === "environment" ? Math.min(backCamera, named.length - 1) : 0;
+                if (named.length > 1) {
+                    chosen = " (" + (place + 1) + " of " + named.length + ")";
+                }
+                return named[place].deviceId;
             }
             var other = cameras.filter(function (one) {
                 return one.deviceId !== avoid;
@@ -264,7 +282,7 @@ var piiritVideo = (function () {
             if (settings.facingMode === "user" || settings.facingMode === "environment") {
                 facing = settings.facingMode;
             }
-            note("camera open: " + described(track)
+            note("camera open: " + described(track) + chosen
                 + (turned ? ", " + (Date.now() - turned) + " ms after the turn" : ""));
             track.addEventListener("ended", function () {
                 if (track === camera) {
@@ -405,6 +423,45 @@ var piiritVideo = (function () {
         start(picture);
     }
 
+    /* The other end's picture: the page's other one. */
+    function theirs() {
+        for (var video of document.getElementsByTagName("video")) {
+            if (video.srcObject && video.srcObject !== stream) {
+                return video;
+            }
+        }
+        return null;
+    }
+
+    /* Enlarge the other end's picture towards filling the screen, as
+     * this end's does, by no more than ZOOM_MOST; what goes past the
+     * screen's edge is cut. Again whenever its size or the screen's
+     * changes. */
+    function fitTheirs() {
+        var picture = theirs();
+        if (!picture) {
+            return;
+        }
+        if (picture !== fitting && picture.addEventListener) {
+            fitting = picture;
+            picture.addEventListener("resize", fitTheirs);
+        }
+        var width = picture.videoWidth;
+        var height = picture.videoHeight;
+        var boxWidth = picture.clientWidth;
+        var boxHeight = picture.clientHeight;
+        var zoom = 1;
+        if (width > 0 && height > 0 && boxWidth > 0 && boxHeight > 0) {
+            var fit = Math.min(boxWidth / width, boxHeight / height);
+            var fill = Math.max(boxWidth / width, boxHeight / height);
+            zoom = Math.min(fill / fit, ZOOM_MOST);
+        }
+        picture.style.transform = zoom > 1.001 ? "scale(" + zoom.toFixed(3) + ")" : "none";
+        if (picture.parentElement) {
+            picture.parentElement.style.overflow = "hidden";
+        }
+    }
+
     /* Look at this end's picture again in a moment. One look at a time,
      * however often this is asked: each ask starting its own would spend
      * the looks in a fraction of the time, and a camera slow to open
@@ -445,6 +502,7 @@ var piiritVideo = (function () {
     /* Say how the pictures stand, when that has changed. */
     function report() {
         layout();
+        fitTheirs();
         var state = {
             local: camera !== null,
             remote: remoteShown(),
@@ -787,6 +845,11 @@ var piiritVideo = (function () {
 
     /* One command from the host. False for one that is not this file's. */
     function take(command) {
+        var lens = /^back-camera-(\d+)$/.exec(command);
+        if (lens) {
+            backCamera = Number(lens[1]);
+            return true;
+        }
         switch (command) {
         case "camera-on":
             cameraOn();
@@ -862,7 +925,8 @@ var piiritVideo = (function () {
     }
 
     /* The page puts the stream on its picture when it draws it: placed
-     * then, rather than whenever the next look comes round. */
+     * then, rather than whenever the next look comes round; and the other
+     * end's on the other picture, fitted then. */
     var Media = window.HTMLMediaElement;
     var source = Media && Object.getOwnPropertyDescriptor
         ? Object.getOwnPropertyDescriptor(Media.prototype, "srcObject") : null;
@@ -875,6 +939,8 @@ var piiritVideo = (function () {
                 source.set.call(this, value);
                 if (value && value === stream) {
                     window.setTimeout(layout, 0);
+                } else if (value) {
+                    window.setTimeout(fitTheirs, 0);
                 }
             }
         });
@@ -886,6 +952,10 @@ var piiritVideo = (function () {
         + "video { visibility: visible !important; }\n"
         + "html.piirit-hidden video { visibility: hidden !important; }\n";
     (document.head || document.documentElement).appendChild(sheet);
+    /* Turned, the screen is another shape. */
+    if (window.addEventListener) {
+        window.addEventListener("resize", fitTheirs);
+    }
 
     return {
         /* How to reach the host: the bridge's own post(path, body). */

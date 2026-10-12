@@ -3,6 +3,7 @@ import Nemo.Notifications 1.0
 import Nemo.DBus 2.0
 import Nemo.KeepAlive 1.2
 import Piirit 1.0
+import "."
 
 /*
  * The app's one call: the window's, because a call belongs to no page.
@@ -88,6 +89,9 @@ Item {
     Call {
         id: call
         objectName: "call"
+        // Which back camera is the main lens, as the platform camera
+        // labels them.
+        back_lenses: String(Settings.backLensLabels)
         onRinging: center.ring()
         onEnded: center.over(reason)
         onError: center.errorMessage = message

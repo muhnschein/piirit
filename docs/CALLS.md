@@ -216,7 +216,14 @@ served ahead of `calls.js`):
   or else any that is not the one just open -- because a `facingMode` is
   only a preference, and on the phone Gecko gave the same camera back.
   What the camera's own settings say it faces is what is mirrored and
-  reported. If the other will
+  reported. Gecko calls every back camera alike, and a phone with a wide
+  lens as well may list that one first; so the back camera opened is the
+  one at the place of the label nearest `1.0` among those the platform
+  camera writes on its back cameras' rings
+  (`/apps/jolla-camera/backCameraLabels`, read and never written), the
+  first where there are none, and the log says which (`(2 of 2)`). That
+  the two list the cameras in the same order is inferred, not checked
+  against the platform's sources. If the other will
   not open, the first is opened again; if neither will, the camera is
   reported as failed, with what the engine said -- written to the app's
   log as `piirit: the camera would not open: …` -- and the app switches
@@ -290,7 +297,10 @@ The call screen shows the page while there are pictures -- its pictures
 and nothing else of it: the bridge hides every element but the two
 videos -- with its own lines and switches over them, on a shade. This
 end's picture fills the screen until the other end's comes, then sits
-in the corner, mirrored only from the front camera. A tap puts the lines
+in the corner, mirrored only from the front camera. The other end's is
+enlarged towards filling the screen too, but by no more than 1.35
+times: an upright phone's picture fills a taller screen, and one held
+sideways loses some of its bars rather than half of itself. A tap puts the lines
 away, and they go by themselves once both ends are seen; the time of day
 gives way to how long, and the large clock goes. The camera switch is
 there in every call, and on the ringing screen of a video call, so it

@@ -836,6 +836,13 @@ pub(crate) fn facing_command(front: bool) -> String {
     .to_string()
 }
 
+/// The command that tells the bridge which of the phone's back cameras
+/// to open, as its place among them: the main lens, where the engine
+/// would take the first it lists.
+pub(crate) fn back_camera_command(place: usize) -> String {
+    format!("back-camera-{place}")
+}
+
 /// The command that has the bridge stop drawing the pictures, the app
 /// having gone to the background, or draw them again.
 pub(crate) fn shown_command(shown: bool) -> String {
@@ -904,9 +911,9 @@ async fn write_response(stream: &mut TcpStream, response: &Response) -> std::io:
 #[cfg(test)]
 mod tests {
     use super::{
-        camera_command, command, encode_base64, encoder_path, encodes_h264, facing_command,
-        log_line, media_environment, media_plugins, percent_encode, shown_command, CallLog, Video,
-        BRIDGE, BUNDLED_ENCODER, LOG_LINE_MAX, PAGE,
+        back_camera_command, camera_command, command, encode_base64, encoder_path, encodes_h264,
+        facing_command, log_line, media_environment, media_plugins, percent_encode, shown_command,
+        CallLog, Video, BRIDGE, BUNDLED_ENCODER, LOG_LINE_MAX, PAGE,
     };
     use crate::webxdc_host::decode_base64;
     use std::path::{Path, PathBuf};
@@ -1225,6 +1232,11 @@ mod tests {
                 "the bridge does not take {name}"
             );
         }
+        assert_eq!(back_camera_command(2), "back-camera-2");
+        assert!(
+            BRIDGE.contains(r"/^back-camera-(\d+)$/"),
+            "the bridge does not take back-camera-N"
+        );
     }
 
     #[test]

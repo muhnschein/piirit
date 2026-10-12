@@ -102,6 +102,12 @@ QtObject {
     /// first, which it offers before everything else. Only the picker's:
     /// the quick reactions are a tap away already.
     property alias recentReactions: recentReactionsValue.value
+    /// What the platform camera writes on its back cameras' rings
+    /// ("1.0", "0.5"), one per camera in the platform's order. Not this
+    /// app's setting: the phone's adaptation gives it to the platform
+    /// camera, and it is read here and never written. Empty on a phone
+    /// whose adaptation gives none.
+    readonly property var backLensLabels: backLensLabelsValue.value || []
 
     // The keys, named here and nowhere else: tests/qml_syntax.rs holds
     // every other file to reading them through this object.
@@ -244,6 +250,12 @@ QtObject {
     property ConfigurationValue recentReactionsConfig: ConfigurationValue {
         id: recentReactionsValue
         key: "/apps/harbour-piirit/recent_reactions"
+        defaultValue: []
+    }
+
+    property ConfigurationValue backLensLabelsConfig: ConfigurationValue {
+        id: backLensLabelsValue
+        key: "/apps/jolla-camera/backCameraLabels"
         defaultValue: []
     }
 }

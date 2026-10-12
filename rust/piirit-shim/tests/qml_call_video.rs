@@ -32,6 +32,7 @@ const PROBE_QML: &str = r"
     import QtQuick 2.0
     import Sailfish.Silica 1.0
     import Sailfish.WebEngine 1.0
+    import 'file://__COMPONENTS__'
     Item {
         id: probe
 
@@ -94,6 +95,11 @@ const PROBE_QML: &str = r"
             return call.state + ' camera=' + call.camera + ' rear=' + call.rear_camera
         }
         function url() { return centerLoader.item.call.url }
+        // A phone whose platform camera lists its wide lens first.
+        function lenses() {
+            Settings.backLensLabelsConfig.value = ['0.5', '1.0']
+            return centerLoader.item.call.back_lenses
+        }
         function ring(messageId, video) {
             centerLoader.item.call.handle_event(1, 'IncomingCall', JSON.stringify({
                 kind: 'IncomingCall', msg_id: messageId, chat_id: 1,
@@ -151,7 +157,13 @@ fn a_video_call_shows_its_pictures_under_lines_a_tap_puts_away() {
         common::stubs_dir().to_string_lossy().into_owned(),
     ));
     engine.set_object_property("core".into(), core_box.pinned());
-    engine.load_data(QByteArray::from(PROBE_QML));
+    let components =
+        std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../qml/components");
+    engine.load_data(QByteArray::from(
+        PROBE_QML
+            .replace("__COMPONENTS__", &components.display().to_string())
+            .as_str(),
+    ));
 
     core_box
         .pinned()
@@ -202,6 +214,7 @@ fn a_video_call_shows_its_pictures_under_lines_a_tap_puts_away() {
                     QString::from(common::component_url("CallCenter.qml"))
                 )
             );
+            record!("lenses", call!("lenses"));
             record!("ring", call!("ring", 9200, true));
         }),
         // A video call rings: said so, and the camera can be switched off
@@ -472,9 +485,15 @@ fn a_video_call_shows_its_pictures_under_lines_a_tap_puts_away() {
         "the switches did not reach the call. {context}"
     );
     assert_eq!(
+        value("lenses"),
+        "0.5,1.0",
+        "the call does not have the platform camera's lens labels. {context}"
+    );
+    assert_eq!(
         value("told"),
-        r#"["facing-environment","camera-off"]"#,
-        "the page was not told what the switches did. {context}"
+        r#"["back-camera-1","facing-environment","camera-off"]"#,
+        "the page was not told which back camera is the main lens, or what \
+         the switches did. {context}"
     );
 
     assert_eq!(

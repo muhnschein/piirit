@@ -126,6 +126,7 @@ function makeWorld(search, options) {
     const world = {
         log, requests, timers, videos, buttons, classes, connections, head,
         streams: [],
+        windowListeners: {},
         cameraFails: opts.cameraFails || (() => false),
         cameraDelay: null
     };
@@ -359,6 +360,9 @@ function makeWorld(search, options) {
         setTimeout(fn) {
             timers.push(fn);
             return timers.length;
+        },
+        addEventListener(name, fn) {
+            (world.windowListeners[name] = world.windowListeners[name] || []).push(fn);
         }
     };
     window.window = window;
@@ -870,6 +874,101 @@ test("the cameras are listed until the engine names them, then not again on ever
     assert.equal(unnamed.log.filter((line) => line === "enumerate").length, 3,
         "cameras with no names yet were kept as they were: " + unnamed.log);
     assert.equal(videoSender(connection).track.label, "camera-user");
+});
+
+test("the back camera opened is the one the host names, and the log says which", async () => {
+    const cameras = [
+        { deviceId: "cam-f", label: "Droid front camera", facing: "user" },
+        { deviceId: "cam-w", label: "Droid rear camera", facing: "environment" },
+        { deviceId: "cam-m", label: "Droid rear camera", facing: "environment" },
+    ];
+    const opened = (world) => world.log.filter((line) => line.startsWith("gum:{\"video\""))
+        .map((line) => JSON.parse(line.slice(4)).video.deviceId.exact);
+    const opens = (world) => posts(world, "/log").filter((line) => line.startsWith("camera open"));
+
+    const told = makeWorld(VIDEO, { cameras });
+    await page(told);
+    await command(told, "back-camera-1");
+    await command(told, "facing-environment");
+    assert.deepEqual(opened(told), ["cam-f", "cam-m"], "the main lens was not the one opened");
+    assert.match(opens(told)[0], /^camera open: camera-user 640x480@30$/,
+        "the one front camera is numbered");
+    assert.match(opens(told)[1], /^camera open: camera-environment 640x480@30 \(2 of 2\), \d+ ms after the turn$/);
+    assert.equal(told.window.location.hash, "", "the lens was passed on to the page");
+    await command(told, "facing-user");
+    assert.match(opens(told)[2], /^camera open: camera-user 640x480@30, \d+ ms after the turn$/,
+        "the back lens's number was said of the front camera");
+
+    // The host's lens is a back one: the front camera is the first.
+    const fronts = makeWorld(VIDEO, { cameras: [
+        { deviceId: "cam-f", label: "Droid front camera", facing: "user" },
+        { deviceId: "cam-g", label: "Droid front camera", facing: "user" },
+        ...cameras.slice(1),
+    ] });
+    await page(fronts);
+    await command(fronts, "back-camera-1", "camera-off", "camera-on");
+    assert.equal(opened(fronts).at(-1), "cam-f");
+
+    // Told nothing, the first the engine lists; told of one past the
+    // last, the last.
+    const untold = makeWorld(VIDEO, { cameras });
+    await page(untold);
+    await command(untold, "facing-environment");
+    assert.equal(opened(untold)[1], "cam-w");
+    assert.match(opens(untold)[1], / \(1 of 2\), /);
+    const past = makeWorld(VIDEO, { cameras });
+    await page(past);
+    await command(past, "back-camera-5", "facing-environment");
+    assert.equal(opened(past)[1], "cam-m");
+});
+
+test("their picture is enlarged towards filling the screen, by no more than a third", async () => {
+    const world = makeWorld(VIDEO);
+    const { connection, picture: ours } = await page(world);
+    const holder = new Element("div");
+    const picture = holder.appendChild(new Element("video"));
+    const theirs = new Track("video", "theirs");
+    picture.srcObject = new Stream([theirs]);
+    Object.assign(picture, { videoWidth: 0, videoHeight: 0, clientWidth: 540, clientHeight: 1200 });
+    world.videos.push(picture);
+
+    // No frame yet, so no size to go by.
+    connection.fire("track", { track: theirs, streams: [picture.srcObject] });
+    assert.equal(picture.style.transform, "none");
+
+    // An upright phone's picture on a taller screen: filled, as ours is.
+    Object.assign(picture, { videoWidth: 720, videoHeight: 1280 });
+    picture.fire("resize");
+    assert.equal(picture.style.transform, "scale(1.250)");
+    assert.equal(holder.style.overflow, "hidden", "what is enlarged past the screen is not cut");
+    assert.equal(ours.style.transform, "scaleX(-1)", "our own picture was fitted as theirs");
+
+    // Held sideways: some of its bars go, not half of it.
+    Object.assign(picture, { videoWidth: 1280, videoHeight: 720 });
+    picture.fire("resize");
+    assert.equal(picture.style.transform, "scale(1.350)");
+
+    // The screen's own shape: nothing to enlarge.
+    Object.assign(picture, { videoWidth: 540, videoHeight: 1200 });
+    picture.fire("resize");
+    assert.equal(picture.style.transform, "none");
+
+    // The phone turned to landscape, with an upright picture.
+    Object.assign(picture, { videoWidth: 720, videoHeight: 1280, clientWidth: 1200, clientHeight: 540 });
+    world.windowListeners.resize.forEach((fn) => fn());
+    assert.equal(picture.style.transform, "scale(1.350)");
+});
+
+test("their picture is fitted the moment the page gives it its stream", async () => {
+    const world = makeWorld(VIDEO, { mediaElement: true });
+    await page(world);
+    const holder = new Element("div");
+    const picture = holder.appendChild(world.newVideo());
+    Object.assign(picture, { videoWidth: 720, videoHeight: 1280, clientWidth: 540, clientHeight: 1200 });
+    world.videos.push(picture);
+    picture.srcObject = new Stream([new Track("video", "theirs")]);
+    runTimers(world);
+    assert.equal(picture.style.transform, "scale(1.250)");
 });
 
 test("what the camera says it faces is what is mirrored and reported", async () => {
