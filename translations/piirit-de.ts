@@ -162,6 +162,16 @@
         <extracomment>Shown above the message field while a picked video is made smaller, which happens before it is sent so that relays take it. %1 is how much of it is done, as a number from 0 to 100. Keep it short: it shares a line with a button on a phone.</extracomment>
         <translation>Video wird zum Senden verkleinert: %1 %</translation>
     </message>
+    <message>
+        <source>%1 → ~%2</source>
+        <extracomment>Under the line saying a picked video is being made smaller: %1 is what the video weighs as picked, %2 what it is planned to come out at, each such as &quot;24 MB&quot;. The second is a guess until it is made, hence the tilde.</extracomment>
+        <translation>%1 → ~%2</translation>
+    </message>
+    <message>
+        <source>%1 → %2</source>
+        <extracomment>Under the line saying a picked video is sent, once it has been made smaller: %1 is what the video weighed as picked, %2 what is sent, each such as &quot;24 MB&quot;.</extracomment>
+        <translation>%1 → %2</translation>
+    </message>
 </context>
 <context>
     <name>AttachmentPreview</name>
@@ -457,6 +467,61 @@ In anderen Gruppen mit blockierten Kontakten werden deren Nachrichten weiterhin 
         <source>Call %1</source>
         <extracomment>Places a call. %1 is the name of whoever is called.</extracomment>
         <translation>%1 anrufen</translation>
+    </message>
+</context>
+<context>
+    <name>CameraSettingsPanel</name>
+    <message>
+        <source>Flash automatic</source>
+        <translation>Blitz automatisch</translation>
+    </message>
+    <message>
+        <source>Flash on</source>
+        <translation>Blitz ein</translation>
+    </message>
+    <message>
+        <source>Flashlight on</source>
+        <translation>Taschenlampe ein</translation>
+    </message>
+    <message>
+        <source>Flash off</source>
+        <translation>Blitz aus</translation>
+    </message>
+    <message>
+        <source>Self-timer %1 s</source>
+        <translation>Selbstauslöser %1 s</translation>
+    </message>
+    <message>
+        <source>Self-timer off</source>
+        <translation>Selbstauslöser aus</translation>
+    </message>
+    <message>
+        <source>Sunny</source>
+        <translation>Sonnig</translation>
+    </message>
+    <message>
+        <source>Cloudy</source>
+        <translation>Bewölkt</translation>
+    </message>
+    <message>
+        <source>Fluorescent</source>
+        <translation>Neonlicht</translation>
+    </message>
+    <message>
+        <source>Tungsten</source>
+        <translation>Glühlampe</translation>
+    </message>
+    <message>
+        <source>Automatic white balance</source>
+        <translation>Automatischer Weißabgleich</translation>
+    </message>
+    <message>
+        <source>Grid on</source>
+        <translation>Raster ein</translation>
+    </message>
+    <message>
+        <source>Grid off</source>
+        <translation>Raster aus</translation>
     </message>
 </context>
 <context>
@@ -765,9 +830,14 @@ In anderen Gruppen mit blockierten Kontakten werden deren Nachrichten weiterhin 
         <translation>Verbindung zum Delta-Chat-Kern verloren. Verbinde erneut…</translation>
     </message>
     <message>
-        <source>This file is %1. Some relays refuse files larger than %2, so sending this might fail.</source>
+        <source>Even made smaller, this file is bigger than the %1 most relays accept. Sending may fail.</source>
+        <extracomment>Shown above the message field when a video is being made smaller for sending and is still bigger than Delta Chat recommends. The file is still sent. %1 is the recommended largest size, such as &quot;24 MB&quot;.</extracomment>
+        <translation>Auch verkleinert ist diese Datei größer als die %1, die die meisten Relays annehmen. Das Senden kann fehlschlagen.</translation>
+    </message>
+    <message>
+        <source>At %1, this file is bigger than the %2 most relays accept. Sending may fail.</source>
         <extracomment>Shown above the message field when the attached file is bigger than Delta Chat recommends. The file is still sent. %1 is the file&apos;s size and %2 the recommended largest size, each such as &quot;24 MB&quot;.</extracomment>
-        <translation>Diese Datei ist %1 groß. Manche Relays lehnen Dateien ab, die größer als %2 sind, daher kann das Senden fehlschlagen.</translation>
+        <translation>Mit %1 ist diese Datei größer als die %2, die die meisten Relays annehmen. Das Senden kann fehlschlagen.</translation>
     </message>
 </context>
 <context>

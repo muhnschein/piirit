@@ -162,6 +162,16 @@
         <extracomment>Shown above the message field while a picked video is made smaller, which happens before it is sent so that relays take it. %1 is how much of it is done, as a number from 0 to 100. Keep it short: it shares a line with a button on a phone.</extracomment>
         <translation>Зменшення відео для надсилання: %1%</translation>
     </message>
+    <message>
+        <source>%1 → ~%2</source>
+        <extracomment>Under the line saying a picked video is being made smaller: %1 is what the video weighs as picked, %2 what it is planned to come out at, each such as &quot;24 MB&quot;. The second is a guess until it is made, hence the tilde.</extracomment>
+        <translation>%1 → ~%2</translation>
+    </message>
+    <message>
+        <source>%1 → %2</source>
+        <extracomment>Under the line saying a picked video is sent, once it has been made smaller: %1 is what the video weighed as picked, %2 what is sent, each such as &quot;24 MB&quot;.</extracomment>
+        <translation>%1 → %2</translation>
+    </message>
 </context>
 <context>
     <name>AttachmentPreview</name>
@@ -459,6 +469,61 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Call %1</source>
         <extracomment>Places a call. %1 is the name of whoever is called.</extracomment>
         <translation>Зателефонувати: %1</translation>
+    </message>
+</context>
+<context>
+    <name>CameraSettingsPanel</name>
+    <message>
+        <source>Flash automatic</source>
+        <translation>Спалах автоматично</translation>
+    </message>
+    <message>
+        <source>Flash on</source>
+        <translation>Спалах увімкнено</translation>
+    </message>
+    <message>
+        <source>Flashlight on</source>
+        <translation>Ліхтарик увімкнено</translation>
+    </message>
+    <message>
+        <source>Flash off</source>
+        <translation>Спалах вимкнено</translation>
+    </message>
+    <message>
+        <source>Self-timer %1 s</source>
+        <translation>Таймер %1 с</translation>
+    </message>
+    <message>
+        <source>Self-timer off</source>
+        <translation>Таймер вимкнено</translation>
+    </message>
+    <message>
+        <source>Sunny</source>
+        <translation>Сонячно</translation>
+    </message>
+    <message>
+        <source>Cloudy</source>
+        <translation>Хмарно</translation>
+    </message>
+    <message>
+        <source>Fluorescent</source>
+        <translation>Люмінесцентне</translation>
+    </message>
+    <message>
+        <source>Tungsten</source>
+        <translation>Лампа розжарювання</translation>
+    </message>
+    <message>
+        <source>Automatic white balance</source>
+        <translation>Автоматичний баланс білого</translation>
+    </message>
+    <message>
+        <source>Grid on</source>
+        <translation>Сітка увімкнена</translation>
+    </message>
+    <message>
+        <source>Grid off</source>
+        <translation>Сітка вимкнена</translation>
     </message>
 </context>
 <context>
@@ -768,9 +833,14 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>Втрачено зв&apos;язок із ядром Delta Chat. Повторне під&apos;єднання…</translation>
     </message>
     <message>
-        <source>This file is %1. Some relays refuse files larger than %2, so sending this might fail.</source>
+        <source>Even made smaller, this file is bigger than the %1 most relays accept. Sending may fail.</source>
+        <extracomment>Shown above the message field when a video is being made smaller for sending and is still bigger than Delta Chat recommends. The file is still sent. %1 is the recommended largest size, such as &quot;24 MB&quot;.</extracomment>
+        <translation>Навіть після зменшення цей файл більший за %1, які приймає більшість ретрансляторів. Надсилання може не вдатися.</translation>
+    </message>
+    <message>
+        <source>At %1, this file is bigger than the %2 most relays accept. Sending may fail.</source>
         <extracomment>Shown above the message field when the attached file is bigger than Delta Chat recommends. The file is still sent. %1 is the file&apos;s size and %2 the recommended largest size, each such as &quot;24 MB&quot;.</extracomment>
-        <translation>Розмір цього файлу — %1. Деякі релеї відхиляють файли, більші за %2, тому його надсилання може не вдатися.</translation>
+        <translation>Розміром %1 цей файл більший за %2, які приймає більшість ретрансляторів. Надсилання може не вдатися.</translation>
     </message>
 </context>
 <context>

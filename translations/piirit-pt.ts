@@ -162,6 +162,16 @@
         <extracomment>Shown above the message field while a picked video is made smaller, which happens before it is sent so that relays take it. %1 is how much of it is done, as a number from 0 to 100. Keep it short: it shares a line with a button on a phone.</extracomment>
         <translation>A reduzir o vídeo para enviar: %1%</translation>
     </message>
+    <message>
+        <source>%1 → ~%2</source>
+        <extracomment>Under the line saying a picked video is being made smaller: %1 is what the video weighs as picked, %2 what it is planned to come out at, each such as &quot;24 MB&quot;. The second is a guess until it is made, hence the tilde.</extracomment>
+        <translation>%1 → ~%2</translation>
+    </message>
+    <message>
+        <source>%1 → %2</source>
+        <extracomment>Under the line saying a picked video is sent, once it has been made smaller: %1 is what the video weighed as picked, %2 what is sent, each such as &quot;24 MB&quot;.</extracomment>
+        <translation>%1 → %2</translation>
+    </message>
 </context>
 <context>
     <name>AttachmentPreview</name>
@@ -457,6 +467,61 @@ Mensagens de contactos bloqueados não serão ocultadas noutros grupos.</transla
         <source>Call %1</source>
         <extracomment>Places a call. %1 is the name of whoever is called.</extracomment>
         <translation>Ligar a %1</translation>
+    </message>
+</context>
+<context>
+    <name>CameraSettingsPanel</name>
+    <message>
+        <source>Flash automatic</source>
+        <translation>Flash automático</translation>
+    </message>
+    <message>
+        <source>Flash on</source>
+        <translation>Flash ligado</translation>
+    </message>
+    <message>
+        <source>Flashlight on</source>
+        <translation>Lanterna ligada</translation>
+    </message>
+    <message>
+        <source>Flash off</source>
+        <translation>Flash desligado</translation>
+    </message>
+    <message>
+        <source>Self-timer %1 s</source>
+        <translation>Temporizador %1 s</translation>
+    </message>
+    <message>
+        <source>Self-timer off</source>
+        <translation>Temporizador desligado</translation>
+    </message>
+    <message>
+        <source>Sunny</source>
+        <translation>Luz solar</translation>
+    </message>
+    <message>
+        <source>Cloudy</source>
+        <translation>Nublado</translation>
+    </message>
+    <message>
+        <source>Fluorescent</source>
+        <translation>Fluorescente</translation>
+    </message>
+    <message>
+        <source>Tungsten</source>
+        <translation>Incandescente</translation>
+    </message>
+    <message>
+        <source>Automatic white balance</source>
+        <translation>Equilíbrio de brancos automático</translation>
+    </message>
+    <message>
+        <source>Grid on</source>
+        <translation>Grelha ligada</translation>
+    </message>
+    <message>
+        <source>Grid off</source>
+        <translation>Grelha desligada</translation>
     </message>
 </context>
 <context>
@@ -765,9 +830,14 @@ Mensagens de contactos bloqueados não serão ocultadas noutros grupos.</transla
         <translation>Perdeu-se a ligação ao núcleo do Delta Chat. A voltar a ligar…</translation>
     </message>
     <message>
-        <source>This file is %1. Some relays refuse files larger than %2, so sending this might fail.</source>
+        <source>Even made smaller, this file is bigger than the %1 most relays accept. Sending may fail.</source>
+        <extracomment>Shown above the message field when a video is being made smaller for sending and is still bigger than Delta Chat recommends. The file is still sent. %1 is the recommended largest size, such as &quot;24 MB&quot;.</extracomment>
+        <translation>Mesmo reduzido, este ficheiro excede os %1 que a maioria dos relays aceita. O envio pode falhar.</translation>
+    </message>
+    <message>
+        <source>At %1, this file is bigger than the %2 most relays accept. Sending may fail.</source>
         <extracomment>Shown above the message field when the attached file is bigger than Delta Chat recommends. The file is still sent. %1 is the file&apos;s size and %2 the recommended largest size, each such as &quot;24 MB&quot;.</extracomment>
-        <translation>Este ficheiro tem %1. Alguns relays recusam ficheiros com mais de %2, por isso o envio pode falhar.</translation>
+        <translation>Com %1, este ficheiro excede os %2 que a maioria dos relays aceita. O envio pode falhar.</translation>
     </message>
 </context>
 <context>

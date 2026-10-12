@@ -25,7 +25,21 @@ QtObject {
     // The sensor's mounting, in degrees, as a phone's back camera reports
     // it: its frame is the phone's landscape.
     property int orientation: 90
+    // Which camera this is: QtMultimedia's own default until a page
+    // picks one out of `QtMultimedia.availableCameras`.
+    property string deviceId: "back-0"
+    // A camera that zooms four times, digitally, as a phone's does. The
+    // real one clamps a zoom past its maximum; a test checks that a page
+    // never asks for one.
+    property real digitalZoom: 1
+    property real maximumDigitalZoom: 4
+    // QCamera::LockStatus: Unlocked 0, Searching 1, Locked 2. A test sets
+    // it to say the lens has found focus.
+    property int lockStatus: 0
     property CameraFocus focus: CameraFocus {}
+    property CameraFlash flash: CameraFlash {}
+    property CameraExposure exposure: CameraExposure {}
+    property CameraImageProcessing imageProcessing: CameraImageProcessing {}
     property CameraMetaData metaData: CameraMetaData {}
     property CameraCapture imageCapture: CameraCapture {}
     property CameraRecorder videoRecorder: CameraRecorder {}

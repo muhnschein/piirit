@@ -141,6 +141,17 @@ const PROBE_QML: &str = r"
             if (!host.item) { return 'no-view:' + host.status }
             return '' + host.item[property]
         }
+        // The page turned on its side, and what the view was told: the
+        // camera's picture is turned back by the page's turn.
+        function turnPage(orientation) {
+            var host = findIn(loader.item, 'scanLoader')
+            if (!host || !host.item) { return 'no-view' }
+            var before = loader.item.orientation
+            loader.item.orientation = parseInt(orientation)
+            var told = '' + host.item.pageOrientation
+            loader.item.orientation = before
+            return told
+        }
         // What the file browser hands the page.
         function begin(text) {
             if (!loader.item) { return 'no-page' }
@@ -314,6 +325,7 @@ fn a_profile_that_exists_already_is_asked_after_and_brought_over() {
             call!("get", "linkField", "placeholderText"),
         );
         common::record(&s, "device-prefixes", call!("viewProperty", "linkPrefixes"));
+        common::record(&s, "device-turned", call!("turnPage", "2"));
         common::record(
             &s,
             "device-begin",
@@ -448,6 +460,7 @@ fn assert_pages(steps: &[(String, String)], navigation: &str) {
     );
 
     assert_device_half(steps, &context);
+    assert_scanner_turns(steps, &context);
 }
 
 /// The half that reads a code: the camera has the page down to its
@@ -561,5 +574,16 @@ fn assert_device_half(steps: &[(String, String)], context: &str) {
         said.contains("newer"),
         "the refusal was not put into words for the reader: {said:?}. \
          {context}"
+    );
+}
+
+/// The page turns with the phone; the scanner it loaded is told, so the
+/// camera's picture is turned back rather than turned with the page.
+fn assert_scanner_turns(steps: &[(String, String)], context: &str) {
+    assert_eq!(
+        common::value_of(steps, "device-turned"),
+        "2",
+        "the page turned with the phone and the scanner was not told, so its picture \
+         turns with the page. {context}"
     );
 }
