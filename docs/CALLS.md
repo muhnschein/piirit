@@ -322,9 +322,14 @@ it out of the corner: it stays where it is let go, anywhere between the
 top line and the switches, whether or not those are shown. The call
 screen owns where it is -- an invisible item over it takes the touches
 and carries the button that turns the camera -- and tells the bridge
-(`corner=LEFT,TOP`, fractions of the screen); a drag is told at most
-every 32 ms, and the host keeps only the last place still waiting, so
-the page draws where the finger is rather than where it was. The other end's is
+(`corner=LEFT,TOP`, fractions of the screen); a drag is told with
+every touch event, as soon as the event is through, and the host keeps
+only the last place still waiting, so the page draws where the finger
+is rather than where it was. In the corner the picture is placed at the
+top left and shifted there with a transform, on a layer of its own
+(`will-change: transform`): a move changes the shift and nothing else,
+so the engine moves the layer without laying out or painting anything
+again. The other end's is
 enlarged towards filling the screen too, but by no more than 1.35
 times: an upright phone's picture fills a taller screen, and one held
 sideways loses some of its bars rather than half of itself. It is laid
@@ -346,7 +351,11 @@ each picture shows yet goes with every `/video` report
 (`localPainted`, `remotePainted`), and the call screen draws a spinner
 over a picture that does not: the whole screen, or this end's corner. A
 picture given up on -- put back three times, still nothing -- is said
-to show, so the spinner does not turn for ever over it.
+to show, so the spinner does not turn for ever over it. Turning the
+camera makes this end's picture black from the press until the other
+camera's first frame is drawn, which on a phone can take a second or
+two: the spinner shows, and the picture is not looked at while the
+other camera is opening -- waited for, not put back or given up on.
 A tap puts the lines
 away, and they go by themselves once both ends are seen; the time of day
 gives way to how long, and the large clock goes. The camera switch is
@@ -354,7 +363,11 @@ there in every call, and on the ringing screen of a video call, so it
 can be answered without the camera; turning it is a button beside it
 while this end's picture fills the screen, and in the picture's lower
 corner nearer the middle of the screen once it has its corner, going
-with the lines and switches -- either only once the picture shows. A video call is answered with the front
+with the lines and switches -- either only once the picture shows. On
+the picture it is small, a disc a little larger than its icon, with
+room round it to press. Pressed, it stays where it is, dimmed and not
+pressable, until the other camera's picture shows, so nothing moves
+under the finger; ten seconds at most. A video call is answered with the front
 camera. This end's picture plays by itself, muted, when the engine lets
 it; one that sits paused is asked to play until it does.
 While there are pictures the screen is kept lit and the ear shield is

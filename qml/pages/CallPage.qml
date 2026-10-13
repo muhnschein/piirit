@@ -67,6 +67,11 @@ Page {
     property bool controlsShown: true
     /// What is drawn over the call, now.
     readonly property bool overlay: !page.video || page.controlsShown
+    /// The camera is turning: from the press until the other camera's
+    /// first frame shows, which on a phone can take a second or two. Its
+    /// button stays where it was, dimmed, so that nothing moves under the
+    /// finger, and a spinner says the picture is on its way.
+    property bool turning: false
 
     /// The app is the one in front. Not read-only: a test, which has no
     /// app in front, says it is.
@@ -172,6 +177,33 @@ Page {
         tuck.restart()
     }
 
+    /// Turn the camera. Turning is said after the call is told, which
+    /// says at once which way it faces: what the page says next is about
+    /// the turn.
+    function turn() {
+        page.touched()
+        page.call.flip_camera()
+        page.turning = true
+        turnLimit.restart()
+    }
+
+    /// The turn is over: the other camera's picture shows, or there is
+    /// no camera to wait for.
+    function lookAtTurn() {
+        if (page.call === null || page.call.local_painted || !page.call.camera) {
+            page.turning = false
+        }
+    }
+
+    // A turn the page never says more of is not waited for for ever:
+    // the button is not left dimmed.
+    Timer {
+        id: turnLimit
+        objectName: "turnLimit"
+        interval: 10000
+        onTriggered: page.turning = false
+    }
+
     /// A tap on the pictures: the lines and switches away, or back.
     function toggleControls() {
         if (!page.video) {
@@ -253,6 +285,7 @@ Page {
         target: page.call
         // Qt 5.6 handler syntax; see WelcomePage.qml.
         onEnded: leave.restart()
+        onVideo_changed: page.lookAtTurn()
     }
 
     // Pushed for a call that was over before the page was up -- one that
@@ -403,11 +436,14 @@ Page {
         onXChanged: told.start()
         onYChanged: told.start()
 
-        // Dragged, it moves many times a second: the page is told where
-        // it is now at most this often, and once more where it stops.
+        // Dragged, it moves with every touch event: the page is told
+        // where it is now as soon as the event is through, once for both
+        // of x and y. Told any later, the picture trails the finger; the
+        // host keeps only the last place the page has yet to hear.
         Timer {
             id: told
-            interval: 32
+            objectName: "told"
+            interval: 0
             onTriggered: ownPicture.tell()
         }
 
@@ -443,33 +479,37 @@ Page {
             }
         }
 
-        // Which way the camera faces, on the picture it turns: in its
-        // lower corner nearer the middle of the screen, and with the
+        // Which way the camera faces, on the picture it turns: small, in
+        // its lower corner nearer the middle of the screen, and with the
         // lines and switches. Only once the picture shows, as in the row.
+        // What takes the press is larger than the disc drawn.
         Rectangle {
             objectName: "pictureFlip"
             visible: ownPicture.cornered && page.overlay && page.call.camera
-                     && page.call.local_painted
-            width: pictureFlipButton.width
-            height: pictureFlipButton.height
+                     && (page.call.local_painted || page.turning)
+            opacity: page.turning ? Theme.opacityLow : 1.0
+            width: Theme.iconSizeSmallPlus
+            height: Theme.iconSizeSmallPlus
             radius: width / 2
             color: Theme.rgba("black", 0.45)
-            x: ownPicture.onRight ? Theme.paddingSmall
-                                  : ownPicture.width - width - Theme.paddingSmall
+            x: ownPicture.onRight ? Theme.paddingMedium
+                                  : ownPicture.width - width - Theme.paddingMedium
             anchors {
                 bottom: parent.bottom
-                bottomMargin: Theme.paddingSmall
+                bottomMargin: Theme.paddingMedium
             }
 
             IconButton {
                 id: pictureFlipButton
                 objectName: "pictureFlipButton"
                 anchors.centerIn: parent
+                width: Theme.iconSizeMedium
+                height: Theme.iconSizeMedium
+                enabled: !page.turning
                 icon.source: "image://theme/icon-camera-switch"
-                onClicked: {
-                    page.touched()
-                    page.call.flip_camera()
-                }
+                icon.width: Theme.iconSizeSmall
+                icon.height: Theme.iconSizeSmall
+                onClicked: page.turn()
             }
         }
     }
@@ -634,13 +674,12 @@ Page {
         IconButton {
             objectName: "flipButton"
             visible: page.inCall && page.call.camera && page.call.local_video
-                     && page.call.local_painted && !page.call.remote_video
+                     && (page.call.local_painted || page.turning) && !page.call.remote_video
+            enabled: !page.turning
+            opacity: page.turning ? Theme.opacityLow : 1.0
             anchors.verticalCenter: parent.verticalCenter
             icon.source: "image://theme/icon-camera-switch"
-            onClicked: {
-                page.touched()
-                page.call.flip_camera()
-            }
+            onClicked: page.turn()
         }
     }
 

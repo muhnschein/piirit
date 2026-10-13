@@ -79,15 +79,22 @@ var piiritVideo = (function () {
     var FIRST_LOOK = 500;
     var PUT_BACK_MOST = 3;
     /* This end's picture, while the other end's is drawn: in the corner
-     * the call screen leaves free under its top line. */
+     * the call screen leaves free under its top line, 4% in from its
+     * right and 10% down from its top. It is put at the top left and
+     * shifted there, so that a move is a new shift and nothing else: the
+     * engine has its own layer for it and moves that, with nothing laid
+     * out or painted again, and the picture keeps up with the finger. */
     var CORNER = {
-        top: "10vh", right: "4vw", bottom: "auto", left: "auto",
-        width: "27vw", height: "36vw", borderRadius: "2vw"
+        top: "0", right: "auto", bottom: "auto", left: "0",
+        width: "27vw", height: "36vw", borderRadius: "2vw",
+        willChange: "transform"
     };
+    var CORNER_AT = { left: 0.69, top: 0.1 };
     /* And the whole screen, while it is not. */
     var WHOLE = {
         top: "0", right: "0", bottom: "0", left: "0",
-        width: "100%", height: "100%", borderRadius: "0"
+        width: "100%", height: "100%", borderRadius: "0",
+        transform: "none", willChange: "auto"
     };
 
     var media = navigator.mediaDevices;
@@ -161,8 +168,10 @@ var piiritVideo = (function () {
     var firsts = { ours: null, theirs: null };
     var shows = { ours: false, theirs: false };
     /* Where the call screen has this end's picture, once the reader has
-     * moved it: its top left corner, as lengths of the screen. */
+     * moved it: its top left corner, as lengths of the screen. And the
+     * picture's box while it is in the corner, which a move shifts. */
     var spot = null;
+    var cornered = null;
 
     function noop() {}
 
@@ -438,6 +447,7 @@ var piiritVideo = (function () {
         }
         if (!camera) {
             box.style.display = "none";
+            cornered = null;
             return;
         }
         box.style.display = "block";
@@ -448,28 +458,35 @@ var piiritVideo = (function () {
         }
         var whole = !remoteShown();
         place(box, whole ? WHOLE : corner());
+        cornered = whole ? null : box;
         box.style.boxShadow = whole ? "none" : "";
         start(picture);
     }
 
     /* The corner, or where the reader moved the picture to. */
     function corner() {
-        return spot ? { ...CORNER, ...spot } : CORNER;
+        return { ...CORNER, transform: shift(spot || CORNER_AT) };
+    }
+
+    function shift(at) {
+        return "translate(" + (at.left * 100).toFixed(2) + "vw, "
+            + (at.top * 100).toFixed(2) + "vh)";
     }
 
     /* The reader moved this end's picture: `left` and `top` are where its
      * top left corner now is, as lengths of the screen, which is what the
-     * call screen and the page both measure in. */
+     * call screen and the page both measure in. A drag moves it many
+     * times a second, so the picture in the corner is shifted and nothing
+     * else; one on the whole screen goes there when it is next put in
+     * the corner. */
     function moveTo(left, top) {
         if (!(left >= 0 && left <= 1 && top >= 0 && top <= 1)) {
             return;
         }
-        spot = {
-            left: (left * 100).toFixed(2) + "vw",
-            top: (top * 100).toFixed(2) + "vh",
-            right: "auto"
-        };
-        layout();
+        spot = { left: left, top: top };
+        if (cornered) {
+            cornered.style.transform = shift(spot);
+        }
     }
 
     /* The other end's picture: the page's other one. */
@@ -623,11 +640,13 @@ var piiritVideo = (function () {
             return false;
         }
         firstSeen(which, picture);
-        /* Paused, or with no frame yet: nothing to paint, and the look's
-         * time starts once there is. */
+        /* Paused, with no frame yet, or this end's with a camera on its
+         * way: nothing to paint, and the look's time starts once there
+         * is. A camera that is slow to turn is waited for, not put back
+         * or given up on. */
         var last = paints[which];
         paints[which] = null;
-        if (picture.paused || !picture.videoWidth) {
+        if (picture.paused || !picture.videoWidth || (which === "ours" && opening)) {
             return true;
         }
         var count = paintedOf(picture);
@@ -842,6 +861,10 @@ var piiritVideo = (function () {
         }
         turned = Date.now();
         camera.stop();
+        /* Black, or the last frame held, until the other camera's first
+         * one is drawn: the spinner says it is on its way. */
+        firsts.ours = null;
+        report();
         open(function (err) {
             note("camera would not turn: " + describe(err));
             facing = before;
