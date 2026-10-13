@@ -512,7 +512,7 @@ fn an_app_is_served_to_itself_alone_and_its_updates_reach_the_chat() {
         .find(|path| path.ends_with("/video.mp4"))
         .unwrap_or_default();
     assert_eq!(
-        std::fs::metadata(video).map(|file| file.len()).unwrap_or(0),
+        std::fs::metadata(video).map_or(0, |file| file.len()),
         101 * 1024 * 1024,
         "the 101 MB file did not reach the disk whole: {video:?}. It is \
          written as it arrives, so a short one here is a body the host \

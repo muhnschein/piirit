@@ -66,7 +66,7 @@ pub(crate) fn file_bytes(path: &str) -> u64 {
     if path.is_empty() {
         return 0;
     }
-    std::fs::metadata(path).map(|file| file.len()).unwrap_or(0)
+    std::fs::metadata(path).map_or(0, |file| file.len())
 }
 
 /// Whether this file is bigger than the core recommends, and so bigger

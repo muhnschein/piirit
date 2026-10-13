@@ -461,12 +461,15 @@ mod tests {
                 .collect::<Vec<_>>(),
             vec![(String::new(), "Connected".to_string())]
         );
-        assert!(transport_reports("<html><body><h3>Not connected</h3></body></html>").is_empty());
-        assert!(transport_reports("").is_empty());
+        assert_eq!(
+            transport_reports("<html><body><h3>Not connected</h3></body></html>"),
+            Vec::new()
+        );
+        assert_eq!(transport_reports(""), Vec::new());
         // A block the core never headed is a block with no relay to
         // list under.
         let unheaded = REPORT.replace("<b>nine.testrun.org:</b>", "");
-        assert!(transport_reports(&unheaded).is_empty());
+        assert_eq!(transport_reports(&unheaded), Vec::new());
         assert_eq!(
             quota_from_report(&unheaded, "ada@nine.testrun.org").map(|quota| quota.percent),
             Some(67),

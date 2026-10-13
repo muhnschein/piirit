@@ -42,6 +42,15 @@ toolchain=${LEAK_CHECK_TOOLCHAIN:-nightly-2026-10-12}
 # uninstrumented, and everything that ends up in a test binary is.
 target=x86_64-unknown-linux-gnu
 
+# ci/lsan.supp names Qt's own leaks by function, and LeakSanitizer reads a
+# function's name only through llvm-symbolizer. Without one every frame is
+# a bare address, no suppression matches, and every Qt test "leaks" -- the
+# first weekly run, on a runner that had none, failed exactly that way.
+if ! command -v llvm-symbolizer >/dev/null 2>&1; then
+    echo "leak-check: FAIL llvm-symbolizer is not on PATH (apt install llvm)" >&2
+    exit 1
+fi
+
 # The C and C++ compilers, with the sanitizer. Wrappers rather than flags in
 # CC/CXX, because piirit-video's build hands its compiler to FFmpeg's and
 # x264's configure scripts as a single path.
