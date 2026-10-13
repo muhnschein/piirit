@@ -279,13 +279,11 @@ fn assert_outcome(steps: &[(&str, String)], navigation: &str, calls: &[(String, 
         "true",
         "searching for Grace did not find her, or found her greyed. {context}"
     );
-    let searched: Vec<Value> = calls
-        .iter()
-        .filter(|(name, _)| name == "get_contacts")
-        .map(|(_, params)| params.clone())
-        .collect();
+    let grace = serde_json::json!([1, 0, "grace"]);
     assert!(
-        searched.contains(&serde_json::json!([1, 0, "grace"])),
+        calls
+            .iter()
+            .any(|(name, params)| name == "get_contacts" && *params == grace),
         "the typed search never reached the core as a query. {context}"
     );
     assert_eq!(

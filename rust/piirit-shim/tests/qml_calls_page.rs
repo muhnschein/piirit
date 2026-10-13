@@ -162,10 +162,7 @@ fn a_contacts_calls_are_listed_and_called_from_their_own_page() {
             "tiles-off",
             call!("tileKinds", QString::from(tiles.clone()), false)
         );
-        record!(
-            "tiles-on",
-            call!("tileKinds", QString::from(tiles.clone()), true)
-        );
+        record!("tiles-on", call!("tileKinds", QString::from(tiles), true));
         // No setting is written first: calls are on for everybody, as
         // they are in the reference clients (#119).
         record!(

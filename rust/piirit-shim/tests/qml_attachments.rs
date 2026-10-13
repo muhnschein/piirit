@@ -148,7 +148,7 @@ fn each_view_type_reaches_the_renderer_meant_for_it() {
         };
     }
 
-    let png_for_load = png.clone();
+    let png_for_load = png;
     single_shot(Duration::from_secs(1), move || unsafe {
         (*steps_ptr).push((
             "load",
@@ -241,7 +241,7 @@ fn each_view_type_reaches_the_renderer_meant_for_it() {
         ));
     });
 
-    let gif_for_new = gif.clone();
+    let gif_for_new = gif;
     single_shot(Duration::from_secs(8), move || unsafe {
         (*steps_ptr).push(("xdc-showing", call!("showing")));
         (*steps_ptr).push((

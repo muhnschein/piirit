@@ -106,7 +106,7 @@ fn the_dialog_picks_one_of_the_two_and_accepts_only_then() {
     let mut steps: Vec<(&str, String)> = Vec::new();
     let steps_ptr: *mut Vec<(&str, String)> = std::ptr::addr_of_mut!(steps);
     let dialog = common::page_url("DeleteMessageDialog.qml");
-    let (own, theirs) = (dialog.clone(), dialog.clone());
+    let (own, theirs) = (dialog.clone(), dialog);
 
     macro_rules! call {
         ($name:expr $(, $arg:expr)*) => {{

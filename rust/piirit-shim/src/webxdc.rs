@@ -338,7 +338,7 @@ impl WebxdcApp {
             }
         });
         let to_chat: crate::webxdc_host::HandedOver =
-            std::sync::Arc::new(move |path, text| raise((path, text)));
+            Arc::new(move |path, text| raise((path, text)));
 
         let done = queued_callback(move |result: Result<Host, String>| {
             let Some(this) = ptr.as_pinned() else { return };

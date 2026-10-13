@@ -123,8 +123,8 @@ fn a_file_that_is_not_a_video_is_an_error_not_a_crash() {
     let scratch = Scratch::new("garbage");
     let junk = scratch.file("junk.mp4");
     std::fs::write(&junk, b"this is not a video at all").expect("write junk");
-    assert!(probe(&junk).is_err());
-    assert!(probe(&scratch.file("missing.mp4")).is_err());
+    probe(&junk).unwrap_err();
+    probe(&scratch.file("missing.mp4")).unwrap_err();
 
     let target = piirit_video::Target {
         width: 640,

@@ -3,6 +3,25 @@
 //!
 //! Needs Qt5 dev headers to build.
 
+// What a phone runs, held to more than tests are: a panic there ends a
+// Qt callback or a tokio task with nobody to see it, and overflow wraps
+// silently in a release build. Not in Cargo.toml's lints table because
+// that table cannot leave tests out, and a test indexing into what it just
+// built is fine. Tests, build scripts and the fake servers in src/bin are
+// all other crates, or this one compiled with `cfg(test)`.
+#![cfg_attr(
+    not(test),
+    deny(
+        clippy::indexing_slicing,
+        clippy::string_slice,
+        clippy::arithmetic_side_effects,
+        clippy::let_underscore_must_use,
+        clippy::panic,
+        clippy::panic_in_result_fn,
+        clippy::unwrap_in_result,
+        clippy::get_unwrap
+    )
+)]
 // All four are forced by qmetaobject's derive macros, not by code here:
 // the macros expand to a wide, unstable set of items from that crate
 // (`wildcard_imports`), generate the `QObject` impl and dispatcher

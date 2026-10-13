@@ -439,7 +439,9 @@ impl VoiceRecorder {
         }
         let actual = read_actual_location(handle);
         if !actual.is_empty() {
-            let _ = std::fs::remove_file(actual);
+            if let Err(err) = std::fs::remove_file(&actual) {
+                eprintln!("piirit: removing abandoned recording {actual}: {err}");
+            }
         }
         self.path.clear();
         self.finishing = false;

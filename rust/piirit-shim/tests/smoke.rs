@@ -36,7 +36,7 @@ fn health_check_round_trips_through_qt_event_loop() {
     let server_path = QString::from(env!("CARGO_BIN_EXE_fake-health-server"));
     core_box.pinned().borrow_mut().start(server_path);
 
-    let health_check_ptr = core_ptr.clone();
+    let health_check_ptr = core_ptr;
     // Whole seconds only; see clippy.toml.
     single_shot(Duration::from_secs(1), move || {
         if let Some(this) = health_check_ptr.as_pinned() {
@@ -44,7 +44,7 @@ fn health_check_round_trips_through_qt_event_loop() {
         }
     });
 
-    let engine_ptr = &engine as *const QmlEngine;
+    let engine_ptr: *const QmlEngine = &engine;
     single_shot(Duration::from_secs(3), move || {
         // SAFETY: fires only while `exec()` is running on this thread, and
         // `engine` outlives it.

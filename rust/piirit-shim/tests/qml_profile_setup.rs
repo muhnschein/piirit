@@ -355,13 +355,11 @@ fn assert_cancel(
         "the second attempt did not take a fresh account while the core \
          was still on the first. {context}"
     );
-    let stopped: Vec<u64> = calls
-        .iter()
-        .filter(|(method, _)| method == "stop_ongoing_process")
-        .map(|(_, params)| params.get(0).and_then(Value::as_u64).unwrap_or(0))
-        .collect();
     assert!(
-        stopped.contains(&2),
+        calls
+            .iter()
+            .filter(|(method, _)| method == "stop_ongoing_process")
+            .any(|(_, params)| params.get(0).and_then(Value::as_u64) == Some(2)),
         "Cancel did not stop the process on the account it was holding. {context}"
     );
 }

@@ -238,10 +238,13 @@ impl Shared {
             return;
         }
         self.told.store(true, Ordering::SeqCst);
-        let _: Result<serde_json::Value, _> = self
+        let ended: Result<serde_json::Value, _> = self
             .rpc
             .call("end_call", (self.account_id, message_id))
             .await;
+        if let Err(err) = ended {
+            eprintln!("piirit: end_call: {err}");
+        }
     }
 }
 
@@ -426,7 +429,9 @@ async fn accept(listener: TcpListener, shared: Arc<Shared>) {
         };
         let shared = Arc::clone(&shared);
         tokio::spawn(async move {
-            let _ = answer(stream, shared).await;
+            // A connection that fails is one the page has given up on, and
+            // there is nobody left on it to answer.
+            answer(stream, shared).await.ok();
         });
     }
 }
@@ -779,7 +784,8 @@ async fn end(shared: &Arc<Shared>) -> Response {
 /// [`COMMAND_WAIT`] has passed. A 404 once the call is over, which is the
 /// bridge's cue to stop asking.
 async fn commands(shared: &Arc<Shared>) -> Response {
-    let deadline = tokio::time::Instant::now() + COMMAND_WAIT;
+    let now = tokio::time::Instant::now();
+    let deadline = now.checked_add(COMMAND_WAIT).unwrap_or(now);
     let batch = loop {
         // Listening before looking, so a command queued between the two
         // still wakes this.
@@ -881,20 +887,19 @@ pub(crate) fn shown_command(shown: bool) -> String {
 /// Standard base64 with padding: what the page's `atob` reads.
 fn encode_base64(bytes: &[u8]) -> String {
     const ALPHABET: &[u8; 64] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-    let mut out = String::with_capacity(bytes.len().div_ceil(3) * 4);
+    let mut out = String::with_capacity(bytes.len().div_ceil(3).saturating_mul(4));
     for chunk in bytes.chunks(3) {
+        // A short last chunk is read as if zeros filled it out.
         let packed = chunk
             .iter()
-            .enumerate()
-            .fold(0_u32, |packed, (index, byte)| {
-                packed | (u32::from(*byte) << (16 - 8 * index))
-            });
-        for index in 0..4 {
-            if index <= chunk.len() {
-                let sextet = (packed >> (18 - 6 * index)) & 0x3f;
-                out.push(char::from(ALPHABET[sextet as usize]));
-            } else {
-                out.push('=');
+            .chain(&[0, 0])
+            .take(3)
+            .fold(0_u32, |packed, byte| (packed << 8) | u32::from(*byte));
+        // A chunk of n bytes fills n + 1 sextets; padding stands for the rest.
+        for (index, shift) in [18, 12, 6, 0].into_iter().enumerate() {
+            match ALPHABET.get(((packed >> shift) & 0x3f) as usize) {
+                Some(&symbol) if index <= chunk.len() => out.push(char::from(symbol)),
+                _ => out.push('='),
             }
         }
     }
@@ -904,14 +909,17 @@ fn encode_base64(bytes: &[u8]) -> String {
 /// Percent-encode everything but what `encodeURIComponent` leaves alone.
 fn percent_encode(text: &str) -> String {
     const HEX: &[u8; 16] = b"0123456789ABCDEF";
-    let mut out = String::with_capacity(text.len() * 3 / 2);
+    let mut out = String::with_capacity(text.len().saturating_mul(3) / 2);
     for byte in text.bytes() {
         if byte.is_ascii_alphanumeric() || b"-_.!~*'()".contains(&byte) {
             out.push(char::from(byte));
         } else {
             out.push('%');
-            out.push(char::from(HEX[usize::from(byte >> 4)]));
-            out.push(char::from(HEX[usize::from(byte & 0x0f)]));
+            for nibble in [byte >> 4, byte & 0x0f] {
+                if let Some(&digit) = HEX.get(usize::from(nibble)) {
+                    out.push(char::from(digit));
+                }
+            }
         }
     }
     out
