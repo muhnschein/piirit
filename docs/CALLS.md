@@ -227,7 +227,8 @@ served ahead of `calls.js`):
   or else any that is not the one just open -- because a `facingMode` is
   only a preference, and on the phone Gecko gave the same camera back.
   What the camera's own settings say it faces is what is mirrored and
-  reported. Gecko calls every back camera alike, and a phone with a wide
+  reported; through a turn the old camera's mirroring stays until the
+  new camera is in place, so its last frame does not flip round first. Gecko calls every back camera alike, and a phone with a wide
   lens as well may list that one first; so the back camera opened is the
   one at the place of the label nearest `1.0` among those the platform
   camera writes on its back cameras' rings
@@ -319,7 +320,8 @@ videos -- with its own lines and switches over them, on a shade. This
 end's picture fills the screen until the other end's comes, then sits
 in the top right corner, mirrored only from the front camera, and stays
 there, as the reference clients have it. An invisible item on the call
-screen, over the same corner, carries the button that turns the camera.
+screen, over the same corner, carries the button that turns the camera:
+the only one, so nothing turns it while its picture fills the screen.
 Dragging it was tried and dropped: the picture trailed the finger on a
 phone, even moved on a layer of its own. The other end's is
 enlarged towards filling the screen too, but by no more than 1.35

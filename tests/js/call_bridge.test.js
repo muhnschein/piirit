@@ -589,6 +589,23 @@ test("turned, the open camera is let go before the other is opened, by its id", 
     assert.equal(lastVideo(world).front, true);
 });
 
+test("through a turn the picture keeps its mirroring until the other camera is in place", async () => {
+    const world = makeWorld(VIDEO);
+    const { picture } = await page(world);
+    world.cameraDelay = true;
+
+    await command(world, "facing-environment");
+    assert.equal(picture.style.transform, "scaleX(-1)",
+        "the front camera's last frame flipped round before the turn");
+    assert.equal(lastVideo(world).front, false, "the app was not told of the turn at once");
+
+    const finish = world.cameraDelay;
+    world.cameraDelay = null;
+    finish();
+    await settleAll();
+    assert.equal(picture.style.transform, "none", "the back camera's picture is mirrored");
+});
+
 test("a camera that will not turn falls back to the one it had", async () => {
     const world = makeWorld(VIDEO, { cameraFails: (facing) => facing === "environment" });
     const { connection } = await page(world);

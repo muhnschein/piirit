@@ -271,7 +271,6 @@ fn a_video_call_shows_its_pictures_under_lines_a_tap_puts_away() {
             record!("switches-ringing", get!("callSwitches", "visible"));
             record!("mute-ringing", get!("muteSwitch", "visible"));
             record!("camera-ringing", get!("cameraSwitch", "checked"));
-            record!("flip-ringing", get!("flipButton", "visible"));
             // Nothing about the sound while it rings: the ringtone is the
             // phone's.
             record!("speaker-ringing", get!("speakerSwitch", "visible"));
@@ -279,7 +278,6 @@ fn a_video_call_shows_its_pictures_under_lines_a_tap_puts_away() {
             record!("front", call!("front"));
             record!("camera-tap", tap!("cameraSwitch"));
             record!("camera-off-ringing", get!("cameraSwitch", "checked"));
-            record!("flip-off-ringing", get!("flipButton", "visible"));
             tap!("cameraSwitch");
             record!("camera-back", call!("call"));
             record!("answer", tap!("answerButton"));
@@ -297,8 +295,6 @@ fn a_video_call_shows_its_pictures_under_lines_a_tap_puts_away() {
             // No picture yet, but the camera is on: held in front of the
             // face, not to the ear.
             record!("ear-camera", get!("proximity", "active"));
-            // Nothing to see turn yet.
-            record!("flip-no-picture", get!("flipButton", "visible"));
             record!(
                 "report",
                 report(
@@ -310,7 +306,6 @@ fn a_video_call_shows_its_pictures_under_lines_a_tap_puts_away() {
         }),
         // The camera is open, and its picture still black.
         Box::new(move || unsafe {
-            record!("flip-black", get!("flipButton", "visible"));
             record!("our-spinner-black", get!("ourSpinner", "running"));
             record!("their-spinner-none", get!("theirSpinner", "running"));
             let url = (*url_ptr).clone();
@@ -330,28 +325,17 @@ fn a_video_call_shows_its_pictures_under_lines_a_tap_puts_away() {
             record!("top-shade", get!("topShade", "visible"));
             record!("foot-shade", get!("footShade", "visible"));
             record!("mute-video", get!("muteSwitch", "visible"));
-            record!("flip-picture", get!("flipButton", "visible"));
-            // Turned from the row: held where it is, dimmed, while the
-            // other camera's picture is black.
-            record!("row-turn", tap!("flipButton"));
-            report(
-                &url,
-                "/video",
-                r#"{"local":true,"remote":false,"localPainted":false,"front":false}"#,
-            );
-        }),
-        Box::new(move || unsafe {
-            let url = (*url_ptr).clone();
-            record!("flip-row-turning", get!("flipButton", "visible"));
-            record!("flip-row-turning-enabled", get!("flipButton", "enabled"));
-            record!("flip-row-turning-dim", get!("flipButton", "opacity"));
+            // Nothing turns the camera while its picture fills the
+            // screen: no button in the row, none on the picture.
+            record!("flip-row", get!("flipButton", "visible"));
+            record!("flip-picture", get!("pictureFlip", "visible"));
             // Their picture comes, black at first, and the two ends hear
-            // each other; this end's shows, turned.
+            // each other.
             report(&url, "/state", "connected");
             report(
                 &url,
                 "/video",
-                r#"{"local":true,"remote":true,"localPainted":true,"front":false}"#,
+                r#"{"local":true,"remote":true,"localPainted":true,"front":true}"#,
             );
         }),
         Box::new(move || unsafe {
@@ -378,7 +362,6 @@ fn a_video_call_shows_its_pictures_under_lines_a_tap_puts_away() {
                     get!("ownPicture", "height")
                 )
             );
-            record!("flip-row-corner", get!("flipButton", "visible"));
             record!("flip-on-picture", get!("pictureFlip", "visible"));
             record!("flip-inner", get!("pictureFlip", "x"));
             record!(
@@ -436,6 +419,7 @@ fn a_video_call_shows_its_pictures_under_lines_a_tap_puts_away() {
             // Turned on the picture: the button dimmed where it was, from
             // the press on, until the other camera's picture shows.
             record!("turn", tap!("pictureFlipButton"));
+            record!("our-spinner-turning", get!("ourSpinner", "running"));
             record!("turning", call!("turning"));
             record!("turn-limit", get!("turnLimit", "running"));
             record!("flip-turning-dim", get!("pictureFlip", "opacity"));
@@ -444,7 +428,7 @@ fn a_video_call_shows_its_pictures_under_lines_a_tap_puts_away() {
             report(
                 &url,
                 "/video",
-                r#"{"local":true,"remote":true,"localPainted":false,"remotePainted":true,"front":true}"#,
+                r#"{"local":true,"remote":true,"localPainted":false,"remotePainted":true,"front":false}"#,
             );
         }),
         Box::new(move || unsafe {
@@ -466,7 +450,7 @@ fn a_video_call_shows_its_pictures_under_lines_a_tap_puts_away() {
             report(
                 &url,
                 "/video",
-                r#"{"local":true,"remote":true,"localPainted":true,"remotePainted":true,"front":true}"#,
+                r#"{"local":true,"remote":true,"localPainted":true,"remotePainted":true,"front":false}"#,
             );
         }),
         Box::new(move || unsafe {
@@ -478,12 +462,20 @@ fn a_video_call_shows_its_pictures_under_lines_a_tap_puts_away() {
             report(
                 &url,
                 "/video",
-                r#"{"local":true,"remote":true,"localPainted":false,"remotePainted":true,"front":true}"#,
+                r#"{"local":true,"remote":true,"localPainted":false,"remotePainted":true,"front":false}"#,
             );
         }),
         Box::new(move || unsafe {
             record!("flip-on-picture-black", get!("pictureFlip", "visible"));
-            // Turned, and switched off: no turn left to wait for.
+            let url = (*url_ptr).clone();
+            report(
+                &url,
+                "/video",
+                r#"{"local":true,"remote":true,"localPainted":true,"remotePainted":true,"front":false}"#,
+            );
+        }),
+        Box::new(move || unsafe {
+            // Turned back, and switched off: no turn left to wait for.
             record!("flip", tap!("pictureFlipButton"));
             record!("camera-off", tap!("cameraSwitch"));
             record!("turning-off", call!("turning"));
@@ -574,11 +566,6 @@ fn a_video_call_shows_its_pictures_under_lines_a_tap_puts_away() {
         "a microphone switch on a call nobody has answered. {context}"
     );
     assert_eq!(value("camera-ringing"), "true", "{context}");
-    assert_eq!(
-        value("flip-ringing"),
-        "false",
-        "the camera can be turned before the call is answered. {context}"
-    );
     assert_eq!(value("camera-tap"), "ok", "{context}");
     assert_eq!(
         value("speaker-ringing"),
@@ -594,11 +581,6 @@ fn a_video_call_shows_its_pictures_under_lines_a_tap_puts_away() {
         value("camera-off-ringing"),
         "false",
         "the camera could not be switched off before answering. {context}"
-    );
-    assert_eq!(
-        value("flip-off-ringing"),
-        "false",
-        "a camera that is off can still be turned. {context}"
     );
     assert_eq!(
         value("camera-back"),
@@ -633,16 +615,6 @@ fn a_video_call_shows_its_pictures_under_lines_a_tap_puts_away() {
         "the camera is on, yet a hand over the sensor blacks the screen out. {context}"
     );
     assert_eq!(value("report"), "HTTP/1.1 204 No Content", "{context}");
-    assert_eq!(
-        value("flip-no-picture"),
-        "false",
-        "the camera can be turned before its picture shows. {context}"
-    );
-    assert_eq!(
-        value("flip-black"),
-        "false",
-        "the camera can be turned while its picture is still black. {context}"
-    );
     assert_eq!(
         value("our-spinner-black"),
         "true",
@@ -679,9 +651,14 @@ fn a_video_call_shows_its_pictures_under_lines_a_tap_puts_away() {
     assert_eq!(value("foot-shade"), "true", "{context}");
     assert_eq!(value("mute-video"), "true", "{context}");
     assert_eq!(
+        value("flip-row"),
+        "missing:flipButton",
+        "the row has a button that turns the camera. {context}"
+    );
+    assert_eq!(
         value("flip-picture"),
-        "true",
-        "the camera cannot be turned while its picture shows. {context}"
+        "false",
+        "the camera can be turned while its picture fills the screen. {context}"
     );
 
     assert_eq!(
@@ -692,7 +669,7 @@ fn a_video_call_shows_its_pictures_under_lines_a_tap_puts_away() {
     assert_eq!(value("our-spinner-corner"), "false", "{context}");
     assert_eq!(
         value("told-corner"),
-        r#"["back-camera-1","facing-environment"]"#,
+        r#"["back-camera-1"]"#,
         "the page was told where the picture's corner is, which it has. {context}"
     );
     assert_eq!(
@@ -712,11 +689,6 @@ fn a_video_call_shows_its_pictures_under_lines_a_tap_puts_away() {
             "this end's picture is not where the page draws it: {place:?}. {context}"
         );
     }
-    assert_eq!(
-        value("flip-row-corner"),
-        "false",
-        "the camera's button stays in the row once the picture has its corner. {context}"
-    );
     assert_eq!(
         value("flip-on-picture"),
         "true",
@@ -752,17 +724,6 @@ fn a_video_call_shows_its_pictures_under_lines_a_tap_puts_away() {
         "false",
         "the camera can be turned while its picture is black. {context}"
     );
-    assert_eq!(value("row-turn"), "ok", "{context}");
-    assert_eq!(
-        format!(
-            "{} {} {}",
-            value("flip-row-turning"),
-            value("flip-row-turning-enabled"),
-            value("flip-row-turning-dim")
-        ),
-        "true false 0.4",
-        "turning, the row's button left its place or was not held. {context}"
-    );
     assert_eq!(value("turn"), "ok", "{context}");
     assert_eq!(
         format!(
@@ -774,6 +735,11 @@ fn a_video_call_shows_its_pictures_under_lines_a_tap_puts_away() {
         ),
         "true true 0.4 false",
         "pressed, the button is not dimmed and held from the press. {context}"
+    );
+    assert_eq!(
+        value("our-spinner-turning"),
+        "true",
+        "pressed, nothing says the other camera's picture is on its way. {context}"
     );
     assert_eq!(
         format!(
@@ -842,7 +808,7 @@ fn a_video_call_shows_its_pictures_under_lines_a_tap_puts_away() {
     assert_eq!(value("camera-off"), "ok", "{context}");
     assert_eq!(
         value("after-switches"),
-        "connected camera=false rear=true",
+        "connected camera=false rear=false",
         "the switches did not reach the call. {context}"
     );
     assert_eq!(
@@ -852,7 +818,7 @@ fn a_video_call_shows_its_pictures_under_lines_a_tap_puts_away() {
     );
     assert_eq!(
         value("told"),
-        r#"["facing-user","facing-environment","camera-off"]"#,
+        r#"["facing-environment","facing-user","camera-off"]"#,
         "the page was not told what the switches did. {context}"
     );
 

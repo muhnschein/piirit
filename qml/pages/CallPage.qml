@@ -75,7 +75,8 @@ Page {
     /// The camera is turning: from the press until the other camera's
     /// first frame shows, which on a phone can take a second or two. Its
     /// button stays where it was, dimmed, so that nothing moves under the
-    /// finger, and a spinner says the picture is on its way.
+    /// finger, and a spinner says the picture is on its way, from the
+    /// press on.
     property bool turning: false
 
     /// The app is the one in front. Not read-only: a test, which has no
@@ -397,7 +398,8 @@ Page {
         objectName: "ourSpinner"
         anchors.centerIn: ownPicture.cornered ? ownPicture : parent
         size: ownPicture.cornered ? BusyIndicatorSize.Medium : BusyIndicatorSize.Large
-        running: page.video && page.call.local_video && !page.call.local_painted
+        running: page.video && page.call.local_video
+                 && (!page.call.local_painted || page.turning)
     }
 
     // Where this end's picture is while the other end's is drawn: the
@@ -422,8 +424,9 @@ Page {
 
         // Which way the camera faces, on the picture it turns: small, in
         // its lower left corner, nearer the middle of the screen, and
-        // with the lines and switches. Only once the picture shows, as in
-        // the row. What takes the press is larger than the disc drawn.
+        // with the lines and switches. The only one: nothing turns the
+        // camera while its picture fills the screen, or before it shows.
+        // What takes the press is larger than the disc drawn.
         Rectangle {
             objectName: "pictureFlip"
             visible: ownPicture.cornered && page.overlay && page.call.camera
@@ -621,22 +624,6 @@ Page {
                 page.touched()
                 page.call.set_camera(!page.call.camera)
             }
-        }
-
-        // Which way the camera faces: a press, not a state. Only once
-        // this end's picture shows: a call is answered with the front
-        // camera, and the camera is turned when there is a picture to see
-        // turn. Here while the picture fills the screen; on the picture
-        // once it has its corner.
-        IconButton {
-            objectName: "flipButton"
-            visible: page.inCall && page.call.camera && page.call.local_video
-                     && (page.call.local_painted || page.turning) && !page.call.remote_video
-            enabled: !page.turning
-            opacity: page.turning ? Theme.opacityLow : 1.0
-            anchors.verticalCenter: parent.verticalCenter
-            icon.source: "image://theme/icon-camera-switch"
-            onClicked: page.turn()
         }
     }
 

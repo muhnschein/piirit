@@ -104,6 +104,12 @@ var piiritVideo = (function () {
         && !window.location.search.includes("disableVideoCompletely");
     /* Which way the camera faces: "user" or "environment". */
     var facing = "user";
+    /* Which way the camera whose frames are on the picture faces, which
+     * is what the picture is mirrored by. Through a turn that is still
+     * the camera turned from: its last frame stays on screen until the
+     * other camera's track is in place, and mirrored the other way it
+     * would flip round before the turn. */
+    var onScreen = "user";
     /* The last camera asked for would not open, and what the engine said
      * of it. */
     var failed = false;
@@ -308,6 +314,7 @@ var piiritVideo = (function () {
             if (settings.facingMode === "user" || settings.facingMode === "environment") {
                 facing = settings.facingMode;
             }
+            onScreen = facing;
             note("camera open: " + described(track) + chosen
                 + (turned ? ", " + (Date.now() - turned) + " ms after the turn" : ""));
             track.addEventListener("ended", function () {
@@ -430,7 +437,7 @@ var piiritVideo = (function () {
             lookAgain("the page never drew it");
             return;
         }
-        picture.style.transform = facing === "user" ? "scaleX(-1)" : "none";
+        picture.style.transform = onScreen === "user" ? "scaleX(-1)" : "none";
         var box = picture.parentElement;
         if (!box) {
             return;
