@@ -17,6 +17,7 @@ docs/BUILDING.md, "Cutting a release").
 - A ringing call plays the ringtone rather than a short beep.
 - A call that rings while the screen is off takes the lock screen away, so the call screen stays up.
 - A call declined just as the last call's screen was closing still says so.
+- **The cover shows a call** while one is up: who, with their picture behind, how long, whether your microphone is off or your camera paused, and one quick action to switch the microphone off and on.
 
 ## 2.1.0 — 2026-10-08
 

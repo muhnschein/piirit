@@ -3,6 +3,7 @@ import Sailfish.Silica 1.0
 import Piirit 1.0
 import "../components"
 import "../js/QuickActions.js" as QuickActions
+import "../js/Media.js" as Media
 
 /*
  * What the cover has to say while the app is minimised: who is there,
@@ -39,6 +40,30 @@ import "../js/QuickActions.js" as QuickActions
  * rather than running under the icons -- the faces fade out towards the
  * bottom, nothing is laid over them. What a tap does is the window's (piirit.qml); the cover
  * only says which one it was.
+ *
+ * While a call is up -- ringing here, being placed, or in progress --
+ * the cover is the call's, and the grid, its count and those actions
+ * give way to it. The other end's picture fills it, larger than the
+ * cover and faint, under a shade that is darkest at the top, where
+ * their name is, and at the foot, where the home screen draws the
+ * action, and lightest over their face. Without a picture it is the
+ * plain cover with their avatar, the circle of their colour and
+ * initial, over the name. Under the name, how long the call has gone
+ * on, or how it stands until it is connected, in the call page's own
+ * words; in the middle, what the reader may want to know at a glance,
+ * each on a pill of its own: that the microphone is off, and that the
+ * camera, which is let go while the app is in the background, is
+ * paused. And one action, the microphone: off, or on again. Not
+ * hanging up, which a tap meant for something else would do by
+ * mistake, and not the camera, which stays let go while the cover is
+ * what is on screen. A call ringing unanswered has no action and no pills:
+ * there is nothing yet to switch, and it is answered on its page.
+ *
+ * The picture is the plain file, the face as it is, rather than the
+ * blurred copy the call page is drawn over: on a cover a face out of
+ * focus is hardly one, and who is on the call is what it is there to
+ * show. Faded and shaded, not blurred by a shader either: nothing on
+ * the cover is drawn by one (Avatar.qml says why).
  */
 CoverBackground {
     id: cover
@@ -95,20 +120,112 @@ CoverBackground {
 
     readonly property var leftAction: QuickActions.shown(Settings, "left")
     readonly property var rightAction: QuickActions.shown(Settings, "right")
-    /// Whether the home screen is drawing any actions: one set, and the
-    /// app able to take it.
-    readonly property bool actionsShown: cover.quickActionsAllowed
+    /// Whether the home screen is drawing any of the reader's actions: one
+    /// set, the app able to take it, and no call on the cover, which has
+    /// its own.
+    readonly property bool actionsShown: cover.quickActionsAllowed && !cover.callUp
         && (cover.leftAction.kind !== "" || cover.rightAction.kind !== "")
 
-    /// The picture for an action, as a whole URL: the home screen reads
-    /// the file itself, from outside the app. None for no action.
+    /// An icon's picture, as a whole URL: the home screen reads the file
+    /// itself, from outside the app.
+    function iconUrl(name) {
+        return Qt.resolvedUrl("../" + QuickActions.iconFile(
+            name, Theme.iconSizeSmall, QuickActions.isLight(Theme.primaryColor)))
+    }
+
+    /// The picture for an action. None for no action.
     function actionIcon(action) {
         if (action.kind === "") {
             return ""
         }
-        return Qt.resolvedUrl("../" + QuickActions.iconFile(
-            QuickActions.iconName(action), Theme.iconSizeSmall,
-            QuickActions.isLight(Theme.primaryColor)))
+        return cover.iconUrl(QuickActions.iconName(action))
+    }
+
+    /// The window's call (CallCenter.qml), handed over so the cover can
+    /// show it; null for none.
+    property QtObject call: null
+
+    /// A call is up: ringing here, being placed, or in progress -- as long
+    /// as the call page keeps itself on the stack. The cover is the
+    /// call's for that time.
+    readonly property bool callUp: cover.call !== null && cover.call.state !== ""
+                                   && cover.call.state !== "ended"
+    /// The call is past ringing here: there is a microphone to switch, and
+    /// a camera that may have been let go. Placed calls are from the
+    /// start.
+    readonly property bool callUnderWay: cover.callUp && cover.call.state !== "ringing"
+
+    /// The other end's picture, a file; empty for none.
+    readonly property string callPicturePath: cover.callUp ? "" + cover.call.peer_avatar : ""
+    /// Their picture is what the call is drawn over: there is one, and it
+    /// has loaded. Until then, and for a file that never loads, the plain
+    /// cover -- as an avatar is its colour and initial until its picture
+    /// is ready.
+    readonly property bool callPictured: cover.callUp && callPicture.status === Image.Ready
+
+    /// What the call is drawn over, under the shade and behind the pills:
+    /// black in a dark ambience, white in a light one, so the ambience's
+    /// own text reads on it either way.
+    readonly property color callGround: QuickActions.isLight(Theme.primaryColor)
+                                        ? Qt.rgba(0, 0, 0, 1) : Qt.rgba(1, 1, 1, 1)
+
+    /// Now, moved on once a second while the call's clock is seen.
+    property real now: Date.now()
+
+    /// How long the call has been connected, as the call page counts it
+    /// (CallPage.qml): hours, minutes and seconds, two digits each.
+    function callElapsed() {
+        if (!cover.callUp || cover.call.connected_at <= 0) {
+            return ""
+        }
+        var seconds = Math.max(0, Math.floor(cover.now / 1000 - cover.call.connected_at))
+        var parts = [Math.floor(seconds / 3600), Math.floor(seconds / 60) % 60, seconds % 60]
+        return parts.map(function (part) { return (part < 10 ? "0" : "") + part }).join(":")
+    }
+
+    /// What is said under the name: how long, once the two ends hear each
+    /// other, and how the call stands until then. The call page's own
+    /// words, asked for in its context, so they are translated wherever
+    /// the call page is.
+    function callStatus() {
+        if (!cover.callUp) {
+            return ""
+        }
+        var state = cover.call.state
+        if (state === "ringing") {
+            return cover.call.has_video ? qsTranslate("CallPage", "Incoming video call")
+                                        : qsTranslate("CallPage", "Incoming call")
+        }
+        if (state === "calling") {
+            return qsTranslate("CallPage", "Ringing…")
+        }
+        if (state === "starting" || state === "connecting") {
+            return qsTranslate("CallPage", "Connecting…")
+        }
+        if (state === "reconnecting") {
+            return qsTranslate("CallPage", "Reconnecting…")
+        }
+        return cover.callElapsed()
+    }
+
+    // The call's clock, only while it is seen. Most of a call nobody is
+    // looking at the cover -- the phone is at an ear, or its screen is off
+    // -- and a timer that ran through all of it would wake the phone once
+    // a second for nothing.
+    Timer {
+        id: callClock
+        objectName: "callClock"
+        interval: 1000
+        repeat: true
+        running: cover.looking && cover.callUp && cover.call.state === "connected"
+        onTriggered: cover.now = Date.now()
+        // Then and there rather than on the first tick, which comes later:
+        // a cover looked at again does not say the time it went away.
+        onRunningChanged: {
+            if (callClock.running) {
+                cover.now = Date.now()
+            }
+        }
     }
 
     /// How tall the strip is that the home screen draws the actions in. A
@@ -210,6 +327,11 @@ CoverBackground {
     /// screen to redraw.
     readonly property bool looking: cover.status === Cover.Active
 
+    /// Whether the grid is what is being looked at: the cover is, and no
+    /// call has it. The lists follow every arrival through a call as well;
+    /// the grid is laid out again once it is seen again.
+    readonly property bool gridSeen: cover.looking && !cover.callUp
+
     /// Something changed while nothing was looking, so the cells are not
     /// the current answer. True to start with: nothing has been read yet.
     property bool stale: true
@@ -226,7 +348,7 @@ CoverBackground {
     /// Called on every change to any list and whenever the shape changes,
     /// so the cells are the right number by the time they are drawn.
     function gather() {
-        if (!cover.ready || !cover.looking) {
+        if (!cover.ready || !cover.gridSeen) {
             cover.stale = true
             return
         }
@@ -234,10 +356,11 @@ CoverBackground {
         cover.rebuild()
     }
 
-    // Whatever was missed while the cover was away, done once on the way
-    // back rather than once per arrival while it was gone.
-    onLookingChanged: {
-        if (cover.looking && cover.stale) {
+    // Whatever was missed while the cover was away, or a call had it,
+    // done once on the way back rather than once per arrival while it was
+    // gone.
+    onGridSeenChanged: {
+        if (cover.gridSeen && cover.stale) {
             cover.gather()
         }
     }
@@ -337,6 +460,7 @@ CoverBackground {
         objectName: "avatarGrid"
         anchors.fill: parent
         clip: true
+        visible: !cover.callUp
 
         Repeater {
             model: cover.cells
@@ -420,6 +544,175 @@ CoverBackground {
                 //: messages are unread. %1 is the number, or "99+".
                 text: qsTr("%1 new").arg(cover.unreadTotal > 99 ? "99+"
                                                                   : cover.unreadTotal)
+            }
+        }
+    }
+
+    // The call, in the grid's place while one is up.
+    Item {
+        id: callView
+        objectName: "callView"
+        anchors.fill: parent
+        clip: true
+        visible: cover.callUp
+
+        // Their face, larger than the cover and a little above its
+        // middle, where the shade over it is lightest. Faint: it says who
+        // is on the call rather than being looked at, and the words are
+        // read over it. Read off the main thread, at the size it is drawn.
+        Image {
+            id: callPicture
+            objectName: "callPicture"
+            width: Math.round(parent.width * 1.2)
+            height: Math.round(parent.height * 1.2)
+            x: Math.round((parent.width - width) / 2)
+            y: Math.round((parent.height - height) / 2 - parent.height * 0.08)
+            fillMode: Image.PreserveAspectCrop
+            asynchronous: true
+            smooth: true
+            sourceSize.height: height
+            opacity: 0.4
+            visible: cover.callPictured
+            source: cover.callPicturePath.length > 0 ? Media.fileUrl(cover.callPicturePath) : ""
+        }
+
+        // The shade, so the name and the action read over any face: dark
+        // at the top and darker at the foot, nearly clear between. A
+        // gradient, not a blur; see the picture above.
+        Rectangle {
+            objectName: "callShade"
+            anchors.fill: parent
+            visible: cover.callPictured
+            gradient: Gradient {
+                GradientStop { position: 0.0; color: cover.shade(0.6) }
+                GradientStop { position: 0.45; color: cover.shade(0.1) }
+                GradientStop { position: 0.6; color: cover.shade(0.15) }
+                GradientStop { position: 1.0; color: cover.shade(0.85) }
+            }
+        }
+
+        // Who, near the top, large: it is what the cover is for while the
+        // call is up. Over the name, without a picture, their avatar.
+        Column {
+            id: callHead
+            objectName: "callHead"
+            anchors {
+                top: parent.top
+                topMargin: cover.callPictured ? 2 * Theme.paddingLarge : Theme.paddingLarge
+                left: parent.left
+                leftMargin: Theme.paddingMedium
+                right: parent.right
+                rightMargin: Theme.paddingMedium
+            }
+            spacing: Theme.paddingSmall
+
+            Avatar {
+                objectName: "callAvatar"
+                anchors.horizontalCenter: parent.horizontalCenter
+                visible: !cover.callPictured
+                width: Math.round(cover.width * 0.4)
+                initial: cover.callUp ? cover.call.peer_name : ""
+                ownColor: cover.callUp ? cover.call.peer_color : ""
+            }
+
+            // A little more room between the avatar and the name than
+            // between the name and the time, which belong together.
+            Item {
+                visible: !cover.callPictured
+                width: 1
+                height: Theme.paddingSmall
+            }
+
+            Label {
+                objectName: "callName"
+                width: parent.width
+                horizontalAlignment: Text.AlignHCenter
+                wrapMode: Text.Wrap
+                maximumLineCount: 2
+                truncationMode: TruncationMode.Elide
+                font.pixelSize: Theme.fontSizeLarge
+                color: Theme.primaryColor
+                // The other end's own name for themselves.
+                textFormat: Text.PlainText
+                text: cover.callUp ? cover.call.peer_name : ""
+            }
+
+            Label {
+                objectName: "callTime"
+                width: parent.width
+                horizontalAlignment: Text.AlignHCenter
+                truncationMode: TruncationMode.Fade
+                font.pixelSize: Theme.fontSizeMedium
+                color: Theme.highlightColor
+                textFormat: Text.PlainText
+                text: cover.callStatus()
+            }
+        }
+
+        // What is so of the call, a pill each, in the middle of the room
+        // between the name and the action.
+        Column {
+            id: callNotes
+            objectName: "callNotes"
+            readonly property real roomTop: callHead.y + callHead.height + Theme.paddingLarge
+            readonly property real roomBottom: cover.height
+                                               - (cover.callUnderWay ? cover.actionStrip : 0)
+            anchors.horizontalCenter: parent.horizontalCenter
+            y: Math.round(callNotes.roomTop
+                          + Math.max(0, (callNotes.roomBottom - callNotes.roomTop - height) / 2))
+            spacing: Theme.paddingMedium
+
+            // Something the reader can undo, from right here: loud.
+            CallNote {
+                objectName: "micNote"
+                anchors.horizontalCenter: parent.horizontalCenter
+                visible: cover.callUnderWay && cover.call.muted
+                loud: true
+                ground: cover.callGround
+                maximumWidth: cover.width - 2 * Theme.paddingMedium
+                iconName: "icon-m-mic-mute"
+                //: On the cover during a call: the reader's microphone is
+                //: switched off, so the other end hears nothing.
+                text: qsTr("Microphone off")
+            }
+
+            // Wanted, and let go while the app is in the background --
+            // which, the cover being seen, it is. Back by itself once the
+            // app is in front, so only said.
+            CallNote {
+                objectName: "cameraNote"
+                anchors.horizontalCenter: parent.horizontalCenter
+                visible: cover.callUnderWay && cover.call.camera
+                ground: cover.callGround
+                maximumWidth: cover.width - 2 * Theme.paddingMedium
+                iconName: "icon-m-video"
+                //: On the cover during a video call: the camera sends
+                //: nothing while the app is in the background, and comes
+                //: back on when the app is opened.
+                text: qsTr("Camera paused")
+            }
+        }
+    }
+
+    /// The call's shade at `strength`, in its ground's colour.
+    function shade(strength) {
+        var ground = cover.callGround
+        return Qt.rgba(ground.r, ground.g, ground.b, strength)
+    }
+
+    // The call's one action, the microphone: off, or on again. Its icon
+    // is what a tap does.
+    CoverActionList {
+        objectName: "callActions"
+        enabled: cover.callUnderWay
+
+        CoverAction {
+            objectName: "micAction"
+            iconSource: cover.callUp ? cover.iconUrl(cover.call.muted ? "mic" : "mic-off") : ""
+            onTriggered: {
+                if (cover.callUnderWay) {
+                    cover.call.mute(!cover.call.muted)
+                }
             }
         }
     }

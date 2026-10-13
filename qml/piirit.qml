@@ -40,11 +40,13 @@ ApplicationWindow {
     }
 
     // The cover offers the quick actions the reader set up, and hands a
-    // tap on one back here.
+    // tap on one back here. While a call is up it shows the call, with an
+    // action of its own that it does itself.
     cover: Component {
         CoverPage {
             quickActionsAllowed: appWindow.chatList !== null
                                  && !appWindow.quickActionsPaused
+            call: callCenter.call
             onQuickAction: appWindow.quickAction(side)
         }
     }

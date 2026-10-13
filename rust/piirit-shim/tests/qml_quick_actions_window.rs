@@ -67,6 +67,17 @@ const PROBE_QML: &str = r"
             return cover ? 'ok' : 'no-cover'
         }
         function allowed() { return '' + cover.quickActionsAllowed }
+        // Whether the cover is handed the window's call, which it shows
+        // while one is up.
+        function callWired() {
+            var kids = loader.item.data
+            for (var i = 0; i < kids.length; i++) {
+                if (kids[i].objectName === 'callCenter') {
+                    return '' + (cover.call !== null && cover.call === kids[i].call)
+                }
+            }
+            return 'no-call-center'
+        }
         function land(there) {
             loader.item.chatList = there === 'true' ? fakeList : null
             return 'ok'
@@ -178,6 +189,7 @@ fn the_window_offers_quick_actions_when_it_can_take_them_and_passes_them_on() {
         record!("set-left", set!("left", "search", 0, 0));
         record!("set-right", set!("right", "chat", 2, 7));
         record!("load", call!("load", QString::from(root.clone())));
+        record!("call-wired", call!("callWired"));
 
         // Nothing to land on yet: a phone still on its way to a profile.
         record!("no-list", call!("allowed"));
@@ -228,6 +240,11 @@ fn the_window_offers_quick_actions_when_it_can_take_them_and_passes_them_on() {
         value("load"),
         "ok",
         "the window or its cover did not load. {context}"
+    );
+    assert_eq!(
+        value("call-wired"),
+        "true",
+        "the cover is not handed the window's call. {context}"
     );
     assert_eq!(
         value("no-list"),
