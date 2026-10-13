@@ -1602,6 +1602,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <extracomment>Under &quot;Send right away&quot;. Off, the chat opens with the photo or video on it, ready for a caption and the send button.</extracomment>
         <translation>Trimite imediat ce alegi conversația, fără descriere.</translation>
     </message>
+    <message>
+        <source>The photo or video goes out the moment you tap a chat, with no chance to look it over first. Tap the wrong chat by mistake, and it goes there.</source>
+        <extracomment>Asked before &quot;Send right away&quot; is turned on for a camera quick action on the cover.</extracomment>
+        <translation>Fotografia sau videoclipul pleacă în clipa în care atingi o conversație, fără să-l poți verifica înainte. Dacă atingi din greșeală conversația greșită, ajunge acolo.</translation>
+    </message>
 </context>
 <context>
     <name>QuickActionsPage</name>

@@ -1599,6 +1599,11 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
         <extracomment>Under &quot;Send right away&quot;. Off, the chat opens with the photo or video on it, ready for a caption and the send button.</extracomment>
         <translation>Saadab kohe, kui oled vestluse valinud, ilma pealkirjata.</translation>
     </message>
+    <message>
+        <source>The photo or video goes out the moment you tap a chat, with no chance to look it over first. Tap the wrong chat by mistake, and it goes there.</source>
+        <extracomment>Asked before &quot;Send right away&quot; is turned on for a camera quick action on the cover.</extracomment>
+        <translation>Foto või video saadetakse kohe, kui vestlust puudutad, ilma võimaluseta seda enne üle vaadata. Kui puudutad kogemata vale vestlust, läheb see sinna.</translation>
+    </message>
 </context>
 <context>
     <name>QuickActionsPage</name>

@@ -1606,6 +1606,11 @@ V ostatních skupinách, ve kterých se zablokované kontakty nacházejí, se je
         <extracomment>Under &quot;Send right away&quot;. Off, the chat opens with the photo or video on it, ready for a caption and the send button.</extracomment>
         <translation>Odešle se hned po výběru chatu, bez popisku.</translation>
     </message>
+    <message>
+        <source>The photo or video goes out the moment you tap a chat, with no chance to look it over first. Tap the wrong chat by mistake, and it goes there.</source>
+        <extracomment>Asked before &quot;Send right away&quot; is turned on for a camera quick action on the cover.</extracomment>
+        <translation>Fotka nebo video odejde ve chvíli, kdy klepnete na chat, bez možnosti si je nejdřív prohlédnout. Klepnete-li omylem na špatný chat, odejde tam.</translation>
+    </message>
 </context>
 <context>
     <name>QuickActionsPage</name>

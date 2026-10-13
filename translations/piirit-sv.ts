@@ -1595,6 +1595,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <extracomment>Under &quot;Send right away&quot;. Off, the chat opens with the photo or video on it, ready for a caption and the send button.</extracomment>
         <translation>Skickas direkt när du har valt chatten, utan bildtext.</translation>
     </message>
+    <message>
+        <source>The photo or video goes out the moment you tap a chat, with no chance to look it over first. Tap the wrong chat by mistake, and it goes there.</source>
+        <extracomment>Asked before &quot;Send right away&quot; is turned on for a camera quick action on the cover.</extracomment>
+        <translation>Fotot eller videon skickas i samma stund som du trycker på en chatt, utan chans att titta igenom den först. Trycker du på fel chatt av misstag hamnar den där.</translation>
+    </message>
 </context>
 <context>
     <name>QuickActionsPage</name>

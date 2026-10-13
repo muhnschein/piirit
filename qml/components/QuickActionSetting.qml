@@ -26,7 +26,9 @@ import "../js/QuickActions.js" as QuickActions
  * front -- ask which chat after the picture is taken, not here. Under
  * one of those, and only there, is whether it then goes at once or waits
  * in the chat for a caption and the send button. Waiting is the default,
- * as a share waits.
+ * as a share waits, and what a camera action is chosen with anew: going
+ * at once is turned on only past a word on what a chat tapped by mistake
+ * then gets.
  *
  * The choice is Silica's own ComboBox, which lists this many kinds on a
  * page of their own.
@@ -121,7 +123,32 @@ Column {
             setting.openWantedPicker()
             return
         }
+        // Whatever the action was set to do with what it takes, a camera
+        // action chosen now sends nothing on its own until that is turned
+        // on again, knowingly.
+        Settings[setting.prefix + "SendNow"] = false
         Settings[setting.prefix] = kind
+    }
+
+    /// Off at once; on only once the reader has been told what it means
+    /// for a chat tapped by mistake, and has said go ahead -- the
+    /// arrangement the experimental features' switches use.
+    function toggleSendNow() {
+        if (setting.action.sendNow) {
+            Settings[setting.prefix + "SendNow"] = false
+            return
+        }
+        var dialog = pageStack.push(Qt.resolvedUrl("../pages/ExperimentalFeatureDialog.qml"), {
+            title: sendNow.text,
+            //: Asked before "Send right away" is turned on for a camera
+            //: quick action on the cover.
+            text: qsTr("The photo or video goes out the moment you tap a chat, with no chance to look it over first. Tap the wrong chat by mistake, and it goes there.")
+        })
+        if (dialog) {
+            dialog.accepted.connect(function () {
+                Settings[setting.prefix + "SendNow"] = true
+            })
+        }
     }
 
     /// Put the choice back to what the setting holds. Silica writes
@@ -233,6 +260,7 @@ Column {
     // Whether a camera action's picture or video goes as soon as its chat
     // is picked. Only under one of those: no other action sends anything.
     TextSwitch {
+        id: sendNow
         objectName: setting.side + "ActionSendNow"
         visible: QuickActions.isCapture(setting.action.kind)
         //: Under a quick action on the cover that takes a photo or a
@@ -243,7 +271,7 @@ Column {
         description: qsTr("Sends it as soon as you pick the chat, without a caption.")
         checked: setting.action.sendNow
         automaticCheck: false
-        onClicked: Settings[setting.prefix + "SendNow"] = !setting.action.sendNow
+        onClicked: setting.toggleSendNow()
     }
 
     // The icons a chat's action can wear, the one it wears lit, in rows

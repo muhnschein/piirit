@@ -1606,6 +1606,11 @@ Správy od zablokovaných kontaktov v ostatných skupinách sa budú naďalej zo
         <extracomment>Under &quot;Send right away&quot;. Off, the chat opens with the photo or video on it, ready for a caption and the send button.</extracomment>
         <translation>Odošle hneď po výbere chatu, bez popisu.</translation>
     </message>
+    <message>
+        <source>The photo or video goes out the moment you tap a chat, with no chance to look it over first. Tap the wrong chat by mistake, and it goes there.</source>
+        <extracomment>Asked before &quot;Send right away&quot; is turned on for a camera quick action on the cover.</extracomment>
+        <translation>Fotka alebo video odíde v okamihu, keď ťuknete na čet, bez možnosti si ho najprv pozrieť. Ak omylom ťuknete na nesprávny čet, odíde tam.</translation>
+    </message>
 </context>
 <context>
     <name>QuickActionsPage</name>

@@ -1595,6 +1595,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <extracomment>Under &quot;Send right away&quot;. Off, the chat opens with the photo or video on it, ready for a caption and the send button.</extracomment>
         <translation>చాట్‌ను ఎంచుకున్న వెంటనే శీర్షిక లేకుండా పంపుతుంది.</translation>
     </message>
+    <message>
+        <source>The photo or video goes out the moment you tap a chat, with no chance to look it over first. Tap the wrong chat by mistake, and it goes there.</source>
+        <extracomment>Asked before &quot;Send right away&quot; is turned on for a camera quick action on the cover.</extracomment>
+        <translation>మీరు చాట్‌ను ట్యాప్ చేసిన క్షణమే ఫోటో లేదా వీడియో పంపబడుతుంది, ముందుగా చూసే అవకాశం ఉండదు. పొరపాటున తప్పు చాట్‌ను ట్యాప్ చేస్తే, అది అక్కడికే వెళ్తుంది.</translation>
+    </message>
 </context>
 <context>
     <name>QuickActionsPage</name>

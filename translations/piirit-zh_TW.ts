@@ -1588,6 +1588,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <extracomment>Under &quot;Send right away&quot;. Off, the chat opens with the photo or video on it, ready for a caption and the send button.</extracomment>
         <translation>選擇聊天後立即傳送，不附加說明文字。</translation>
     </message>
+    <message>
+        <source>The photo or video goes out the moment you tap a chat, with no chance to look it over first. Tap the wrong chat by mistake, and it goes there.</source>
+        <extracomment>Asked before &quot;Send right away&quot; is turned on for a camera quick action on the cover.</extracomment>
+        <translation>點按聊天的那一刻，照片或影片就會送出，沒有機會先檢查。如果誤點了錯誤的聊天，就會傳到那裡。</translation>
+    </message>
 </context>
 <context>
     <name>QuickActionsPage</name>

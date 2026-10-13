@@ -1599,6 +1599,11 @@ Vous continuerez à voir les messages des contacts bloqués dans les autres grou
         <extracomment>Under &quot;Send right away&quot;. Off, the chat opens with the photo or video on it, ready for a caption and the send button.</extracomment>
         <translation>Envoie dès que vous choisissez la discussion, sans légende.</translation>
     </message>
+    <message>
+        <source>The photo or video goes out the moment you tap a chat, with no chance to look it over first. Tap the wrong chat by mistake, and it goes there.</source>
+        <extracomment>Asked before &quot;Send right away&quot; is turned on for a camera quick action on the cover.</extracomment>
+        <translation>La photo ou la vidéo part dès que vous touchez une discussion, sans possibilité de la vérifier avant. Si vous touchez la mauvaise discussion par erreur, elle part là.</translation>
+    </message>
 </context>
 <context>
     <name>QuickActionsPage</name>

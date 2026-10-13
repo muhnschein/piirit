@@ -1599,6 +1599,11 @@ Gli altri gruppi con contatti bloccati continueranno a visualizzare i loro messa
         <extracomment>Under &quot;Send right away&quot;. Off, the chat opens with the photo or video on it, ready for a caption and the send button.</extracomment>
         <translation>Invia subito dopo aver scelto la chat, senza didascalia.</translation>
     </message>
+    <message>
+        <source>The photo or video goes out the moment you tap a chat, with no chance to look it over first. Tap the wrong chat by mistake, and it goes there.</source>
+        <extracomment>Asked before &quot;Send right away&quot; is turned on for a camera quick action on the cover.</extracomment>
+        <translation>La foto o il video parte nel momento in cui tocchi una chat, senza possibilità di controllarlo prima. Se tocchi per errore la chat sbagliata, finisce lì.</translation>
+    </message>
 </context>
 <context>
     <name>QuickActionsPage</name>

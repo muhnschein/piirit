@@ -13,7 +13,8 @@
 //! one the action's chat is in, and the chat is whichever profile's it
 //! was picked from. Under one of the camera's actions -- a photo or a
 //! video, back or front -- and only there, a switch says whether what it
-//! takes is sent at once; off unless turned on, and each side's own. With
+//! takes is sent at once; off unless turned on, which asks first, off
+//! again whenever an action is chosen, and each side's own. With
 //! room for one, the right action is hidden and kept.
 
 // Qt harness: see qml_pages.rs.
@@ -60,9 +61,18 @@ const PROBE_QML: &str = r"
                 signal chatPicked(int chatId, string chatName)
             }
             function name(page) { return ('' + page).split('/').pop() }
+            // What turning on a switch worth stopping for asks.
+            property QtObject dialog: QtObject {
+                property string text: ''
+                signal accepted()
+            }
             function push(page, properties) {
                 log += 'push:' + name(page) + ':' + properties.accountId + ':'
                        + properties.title + ':' + properties.profileChoice + '|'
+                if (name(page) === 'ExperimentalFeatureDialog.qml') {
+                    dialog.text = properties.text
+                    return dialog
+                }
                 picker.accountId = properties.accountId || 0
                 return picker
             }
@@ -126,6 +136,8 @@ const PROBE_QML: &str = r"
             var combo = findIn(loader.item, side + 'ActionChoice')
             return combo ? (kinds[combo.currentIndex] || 'none') : 'missing'
         }
+        function accept() { pageStack.dialog.accepted(); return 'ok' }
+        function warning() { return pageStack.dialog.text }
         function setBusy(busy) { pageStack.busy = busy === 'true'; return 'ok' }
         // The page under Silica's page of choices, or back on screen.
         function setActive(active) {
@@ -431,8 +443,19 @@ fn the_quick_actions_are_set_up_on_a_page_of_their_own() {
             );
             record!(label, held);
         }
-        // Turned on for this side only, and off again.
+        // Turned on for this side only, once the reader has been told
+        // what a chat tapped by mistake gets, and has said go ahead.
         record!("send-now-on", click!("rightActionSendNow"));
+        record!(
+            "send-now-asked",
+            format!(
+                "{}|{}",
+                call!("stackLog"),
+                call!("sendsNow", QString::from("right"))
+            )
+        );
+        record!("send-now-warning", call!("warning"));
+        record!("send-now-accept", call!("accept"));
         record!(
             "send-now-held",
             format!(
@@ -443,19 +466,37 @@ fn the_quick_actions_are_set_up_on_a_page_of_their_own() {
             )
         );
         record!("left-switch", get!("leftActionSendNow", "visible"));
+        // Off again at once, with nothing asked.
         record!("send-now-off", click!("rightActionSendNow"));
         record!(
             "send-now-released",
+            format!(
+                "{}|{}|{}",
+                call!("stackLog"),
+                call!("sendsNow", QString::from("right")),
+                get!("rightActionSendNow", "checked")
+            )
+        );
+        // On again, and a camera action chosen anew -- the same one --
+        // starts off again.
+        click!("rightActionSendNow");
+        call!("accept");
+        call!("stackLog");
+        record!("send-now-again", call!("sendsNow", QString::from("right")));
+        record!("pick-photo-again", click!("rightAction-photo"));
+        record!(
+            "photo-again-switch",
             format!(
                 "{}|{}",
                 call!("sendsNow", QString::from("right")),
                 get!("rightActionSendNow", "checked")
             )
         );
-        record!("send-now-again", click!("rightActionSendNow"));
+        // And so does any other action chosen.
+        click!("rightActionSendNow");
+        call!("accept");
+        call!("stackLog");
         record!("pick-qr-again", click!("rightAction-qr"));
-        // Kept for when a camera's action is chosen again, but not shown
-        // under one that takes nothing.
         record!(
             "qr-again-switch",
             format!(
@@ -731,6 +772,17 @@ fn the_quick_actions_are_set_up_on_a_page_of_their_own() {
         );
     }
     assert_eq!(
+        value("send-now-asked"),
+        "push:ExperimentalFeatureDialog.qml:undefined:Send right away:undefined||false",
+        "turning the switch on did not ask first, or did not wait for the \
+         answer. {context}"
+    );
+    assert!(
+        value("send-now-warning").contains("wrong chat"),
+        "what is asked does not say a chat tapped by mistake gets it. \
+         {context}"
+    );
+    assert_eq!(
         value("send-now-held"),
         "true|true|false",
         "turning the switch on is not written for this side, and this side \
@@ -743,14 +795,23 @@ fn the_quick_actions_are_set_up_on_a_page_of_their_own() {
     );
     assert_eq!(
         value("send-now-released"),
-        "false|false",
-        "turning the switch off again is not written. {context}"
+        "|false|false",
+        "turning the switch off again asked something, or is not written. \
+         {context}"
+    );
+    assert_eq!(
+        (
+            value("send-now-again").as_str(),
+            value("photo-again-switch").as_str()
+        ),
+        ("true", "false|false"),
+        "a camera action chosen anew keeps sending at once. {context}"
     );
     assert_eq!(
         value("qr-again-switch"),
-        "false|true",
+        "false|false",
         "the switch shows under an action that takes nothing, or choosing \
-         one forgot what was set for the camera. {context}"
+         one kept sending at once. {context}"
     );
     assert!(
         value("two-right-profiles").starts_with("profiles-"),

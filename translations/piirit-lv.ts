@@ -1606,6 +1606,11 @@ Citās grupās, kurās ir bloķēti kontakti, viņu ziņas joprojām būs redzam
         <extracomment>Under &quot;Send right away&quot;. Off, the chat opens with the photo or video on it, ready for a caption and the send button.</extracomment>
         <translation>Nosūta uzreiz, tiklīdz izvēlaties sarunu, bez paraksta.</translation>
     </message>
+    <message>
+        <source>The photo or video goes out the moment you tap a chat, with no chance to look it over first. Tap the wrong chat by mistake, and it goes there.</source>
+        <extracomment>Asked before &quot;Send right away&quot; is turned on for a camera quick action on the cover.</extracomment>
+        <translation>Foto vai video tiek nosūtīts brīdī, kad pieskaraties tērzēšanai, bez iespējas to vispirms apskatīt. Ja kļūdas pēc pieskarsieties nepareizai tērzēšanai, tas aizies tur.</translation>
+    </message>
 </context>
 <context>
     <name>QuickActionsPage</name>

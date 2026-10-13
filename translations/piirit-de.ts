@@ -1599,6 +1599,11 @@ In anderen Gruppen mit blockierten Kontakten werden deren Nachrichten weiterhin 
         <extracomment>Under &quot;Send right away&quot;. Off, the chat opens with the photo or video on it, ready for a caption and the send button.</extracomment>
         <translation>Sendet es sofort, sobald du den Chat auswählst, ohne Beschriftung.</translation>
     </message>
+    <message>
+        <source>The photo or video goes out the moment you tap a chat, with no chance to look it over first. Tap the wrong chat by mistake, and it goes there.</source>
+        <extracomment>Asked before &quot;Send right away&quot; is turned on for a camera quick action on the cover.</extracomment>
+        <translation>Das Foto oder Video geht in dem Moment raus, in dem du auf einen Chat tippst, ohne dass du es vorher noch einmal ansehen kannst. Tippst du versehentlich auf den falschen Chat, geht es dorthin.</translation>
+    </message>
 </context>
 <context>
     <name>QuickActionsPage</name>
