@@ -54,8 +54,10 @@ for pair in cc:gcc c++:g++; do
         "$compiler" >"$wrappers/$name"
     chmod +x "$wrappers/$name"
 done
-export CC_x86_64_unknown_linux_gnu="$wrappers/cc"
-export CXX_x86_64_unknown_linux_gnu="$wrappers/c++"
+# Plain CC and CXX rather than the cc crate's per-target CC_<triple>: the
+# host is the target here, so those would reach exactly the same compiles.
+export CC="$wrappers/cc"
+export CXX="$wrappers/c++"
 
 # --cap-lints=warn: the workspace denies warnings, and a lint this nightly
 # has that the pinned stable does not is scheduled.yml's next-stable-clippy
@@ -80,7 +82,12 @@ export LSAN_OPTIONS="suppressions=$root/ci/lsan.supp:print_suppressions=0"
 
 cd "$root/rust"
 rustc "+$toolchain" --version
+# The whole workspace unless told which part: cargo takes `--workspace`
+# over `-p`, so the two cannot both be passed.
+if [ $# -eq 0 ]; then
+    set -- --workspace
+fi
 # Only the tests: nextest does not run doctests, and a doctest has nothing
 # to leak that the unit tests beside it would not show.
-exec cargo "+$toolchain" nextest run --locked --workspace \
+exec cargo "+$toolchain" nextest run --locked \
     --target "$target" --profile leak-check "$@"

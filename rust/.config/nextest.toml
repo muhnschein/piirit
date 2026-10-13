@@ -46,3 +46,9 @@ failure-output = "immediate-final"
 fail-fast = false
 failure-output = "immediate-final"
 slow-timeout = { period = "60s", terminate-after = 4 }
+# One retry here, unlike every other profile. What this profile judges is
+# leaks, and a leak fails every attempt; what fails once and then passes
+# is a test asserting on a clock that ASan has slowed -- a recode that
+# "never finished", an update that arrived late. A retried pass still had
+# its leaks checked, and nextest still names it FLAKY in the log.
+retries = 1
