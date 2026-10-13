@@ -59,7 +59,7 @@ jobs:
       # wait on Qt timers, so the step went from about ten minutes to about
       # two and a half. rust/.config/nextest.toml says the rest, including
       # what the `ci` profile changes.
-      - uses: taiki-e/install-action@183e4297cca2404691e9380e1307288dced5c82a # v2.87.25
+      - uses: taiki-e/install-action@ab6895351a88b908e96a4697860d4ffea5e57dbe # v2.87.27
         with:
           tool: cargo-nextest
       # Also set by the tests; here so a failure is never a missing
@@ -201,7 +201,7 @@ jobs:
       # Docker Hub's anonymous pull limit failed the job for every pull
       # request at once. By commit, as the other actions are; Dependabot
       # moves the pin.
-      - uses: taiki-e/install-action@183e4297cca2404691e9380e1307288dced5c82a # v2.87.25
+      - uses: taiki-e/install-action@ab6895351a88b908e96a4697860d4ffea5e57dbe # v2.87.27
         with:
           tool: cargo-deny
       - run: cd rust && cargo deny check
@@ -219,7 +219,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - uses: taiki-e/install-action@183e4297cca2404691e9380e1307288dced5c82a # v2.87.25
+      - uses: taiki-e/install-action@ab6895351a88b908e96a4697860d4ffea5e57dbe # v2.87.27
         with:
           tool: zizmor@1.30.1
       - run: zizmor --offline .github/workflows/
