@@ -2557,6 +2557,13 @@ async fn serve() {
                         .as_array()
                         .map(|array| array.iter().filter_map(Value::as_u64).collect())
                         .unwrap_or_default();
+                    // A page of a chat, as it opens, and not the one
+                    // message a send reads back: what a phone takes its
+                    // time over, with a long chat of pictures, while a
+                    // send of its own is answered.
+                    if ids.len() > 1 {
+                        tokio::time::sleep(delay("PIIRIT_FAKE_PAGE_DELAY_MS")).await;
+                    }
                     let mut state = state.lock().await;
                     state.seed_chats();
                     let mut loaded = serde_json::Map::new();

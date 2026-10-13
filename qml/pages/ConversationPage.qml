@@ -76,10 +76,12 @@ Page {
         }
         // The core has said how large an attachment it recommends, or
         // that it will not say, and what a video on the bar is to be made
-        // smaller to is settled; or a video has been made smaller. Either
-        // can be what a file sent at once waits for: see `sendWhenReady`.
+        // smaller to is settled; or a video has been made smaller; or the
+        // chat's rows are in. Each can be what a file sent at once waits
+        // for: see `sendWhenReady`.
         onAttachment_limit_changed: sharedSend.restart()
         onPreparing_changed: sharedSend.restart()
+        onLoaded_changed: sharedSend.restart()
         // An edit is not a send: the row shows the new text, and the
         // field goes back to whatever was in it before the edit began.
         onEdited: page.finishEdit()
@@ -146,7 +148,12 @@ Page {
     /// has said how large an attachment it recommends, and once a video
     /// is no longer being made smaller to fit that. Sending before either
     /// would send a video as it was taken however large it is, so only
-    /// those two, as the model announces them, try it. Cleared once it
+    /// those two, as the model announces them, try it. And once the
+    /// chat's rows are in: a send answered while they are being read
+    /// lands on rows the read then replaces with what the chat held
+    /// before it, and the message is not on the page until the chat is
+    /// opened again -- a video, slow to copy into the core, did just
+    /// that. Cleared once it
     /// has gone, once the core has refused it, and once the reader takes
     /// it over: puts something else on the bar, stops a video being made
     /// smaller, starts a reply or an edit, or sends it themselves.
@@ -167,8 +174,8 @@ Page {
         id: sharedSend
         interval: 0
         onTriggered: {
-            if (!page.sendWhenReady || messages.preparing || messages.sending
-                    || page.attachmentPath.length === 0) {
+            if (!page.sendWhenReady || !messages.loaded || messages.preparing
+                    || messages.sending || page.attachmentPath.length === 0) {
                 return
             }
             if (page.editing || messages.quoted_message_id !== 0) {
