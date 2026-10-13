@@ -404,25 +404,69 @@ What is here is the rest of it:
 
 Left out on purpose:
 
-- **The earpiece.** ohm's `Route.Manager.Prefer("earpiece")` is open to an
-  app with the Audio permission, and would make a voice call sound like
-  one. It is also kept after the app has gone: a crash mid-call would
-  leave every sound the phone makes on the earpiece. Calls are on the
-  speaker until that can be made safe on a device. A call heard from the
-  earpiece and the loudspeaker both (#100) is not a route Piirit picks:
-  Gecko's streams carry no media role, so the policy puts them with any
-  other app's sound, and nothing a call here does -- mce's call state
-  included -- moves the audio policy or the phone's audio HAL into a
-  call. Whether the phone's own loudspeaker output drives the earpiece
-  too is the fourth question below.
-- **Being a call to the audio policy.** The `call` resource class is
-  voicecall's. `libaudioresource`, which Harbour allows, would put the
-  app's streams in the `player` class -- pausing music, and keeping the
-  call from being corked while something else plays -- and would set the
-  whole process's `media.role` doing it. Whether Gecko's streams need it
-  is the third question below.
+- **ohm's route preference.** `Route.Manager.Prefer("earpiece")` is open
+  to an app with the Audio permission, but it holds for every sound the
+  phone makes and ohm does not know who asked for it: a crash mid-call
+  would leave the phone on the earpiece until the next phone call or
+  restart. The Phone app's own loudspeaker button,
+  `Playback.Manager.RequestPrivacyOverride`, is the same kind of global.
+  Neither is used; the next section is what is.
+- **The `call` resource class**, which is voicecall's, needs the
+  Cellular credential and drives the modem's call paths.
+  `libaudioresource`, the resource library Harbour lists, offers only
+  `player` and `game`, neither of which reaches the earpiece.
 - **`Nemo.Ngf`**, which would ring from QML: not on Harbour's list, hence
   the bus.
+
+### Earpiece and loudspeaker
+
+A voice call is on the earpiece, as a phone call is; a video call on the
+loudspeaker, as the reference clients have it, being held in front of
+the face. A voice call whose pictures come on goes to the loudspeaker
+too, unless the reader has switched this call. The loudspeaker switch on
+the call page goes between the two at any time, and holds for the rest of
+the call. A headset, headphones or a Bluetooth device takes the sound by
+itself; the switch is dimmed then, having nothing to move it from, and
+also when the policy did not take the call.
+
+How (`CallAudio.qml`): from when a call carries sound -- placed, or
+answered -- until it is over, the app holds a resource set of class
+`aliencall` with ohm's resource manager (`org.maemo.resource.manager`,
+system bus; the Audio permission opens it). `aliencall` is the class
+Sailfish has for calls that are not phone calls, the one Android App
+Support's VoIP apps get. ohm routes the sound of whichever set owns
+audio playback by that set's class: for `aliencall`, a Bluetooth or USB
+device, then a wired headset or headphones, then the earpiece
+(`earpieceforalien`), then the loudspeaker (`ihfforalien`). The policy
+rules out the earpiece for an `aliencall` set that also owns video
+playback, so the loudspeaker is the same set with `VideoPlayback` added
+-- one `update`, nothing global.
+
+The set is spoken to over the bus in libresource's own message layout
+(`register`, `audio`, `acquire`, `update`, `release`, `unregister`;
+`dbus-msg.c`), since no library for it is on Harbour's list. Its `audio`
+message names the app's streams: every stream whose client carries the
+app's `policy.application.id` -- the process's start time from
+`/proc/self/stat`, in hex, which Sailfish's libpulse puts on every
+stream it opens and `Call.audio_id` reads the same way -- joins group
+`aliencall`, including streams already playing. Without that the call
+would be worse off than with no set at all: while an `aliencall` set is
+active the policy corks the catch-all group Gecko's streams otherwise
+fall in. So with no id nothing is asked for, and a set the manager
+refuses any part of, or that has no manager to answer, is let go of at
+once.
+
+What makes it safe is where the set lives. ohm watches each client's
+bus connection and drops every set of a client whose connection goes:
+a crash, a kill, the OOM killer, or closing the app puts the sound back
+where it was with nobody doing anything. Nothing is written that
+outlives the app, so there is nothing for a next run to clean up. While
+the app runs, the set is held exactly while the call carries sound, and
+given back on the way out besides.
+
+Read-only besides: ohm's `Route.Manager.ActiveRoutes` and its
+`AudioRouteChanged` signal, for whether the sound is on something
+plugged in or paired.
 
 ## What only a phone can answer
 
@@ -434,16 +478,19 @@ of Piirit: two phones and an afternoon.
 2. **Does the other end's voice keep playing with the app in the
    background?** The view is held active for it; that this is enough is
    the claim.
-3. **Is the call corked?** Gecko's streams carry no media role, which
-   puts them in the audio policy's catch-all class -- corked while a
-   player, an event or a call holds audio. If a call goes silent when
-   music is playing, or when the microphone starts, `libaudioresource`
-   is the fix above.
-4. **Does the phone's loudspeaker output play from the earpiece too?**
-   Music in the Media app, heard from both, would say the call's sound
-   is no different (#100); `pactl list sinks` names the active port.
-   And does mce blank the screen at the ear with the call on the
-   speaker?
+3. **Do the call's streams join the call group?** The `aliencall` set
+   names them by the app's process; that the engine's audio streams are
+   opened by the app's own process (ESR 91 runs the engine in it), and
+   so carry its id, is the claim. Silence in a call would say they are
+   not. `pactl list sink-inputs` shows each stream's `policy.group` and
+   `application.process.id`; `pactl list sinks` the active port. ESR
+   153 moves a page's audio into a process of its own, which will want
+   this looked at again.
+4. **Does the earpiece route play from the earpiece alone?** Music in the
+   Media app plays from the earpiece and the loudspeaker both (#100):
+   the phone's loudspeaker output drives the two. `earpieceforalien` is
+   the earpiece port by name; that it is quiet at arm's length is the
+   claim.
 5. **What it sounds like.** Echo on speakerphone, and what a call costs
    in battery.
 6. **Does the camera open in the engine, and turn?** Gecko reaches the
@@ -469,11 +516,12 @@ of Piirit: two phones and an afternoon.
   built, so an app cannot put its own in front. The fix is upstream: a
   `focus-mode` of `continuous-video` where the camera offers one.
 - **Harbour.** Calls add no executable, no library off the list and no
-  permission that was not already asked for. They add two system-bus
-  services Harbour does not list -- ngfd and mce -- which its validator
-  cannot see and its QA may or may not accept; both are one
-  `DBusInterface` each in `CallCenter.qml`, and a call works without
-  either. And they promote the browser engine, a separate package on
+  permission that was not already asked for. They add system-bus
+  services Harbour does not list -- ngfd, mce, and ohm's resource and
+  route managers -- which its validator cannot see and its QA may or may
+  not accept; each is a `DBusInterface` in `CallCenter.qml` or
+  `CallAudio.qml`, and a call works without any of them, on the
+  loudspeaker. And they promote the browser engine, a separate package on
   this platform, from a webxdc feature to the load-bearing part of a
   headline one.
 

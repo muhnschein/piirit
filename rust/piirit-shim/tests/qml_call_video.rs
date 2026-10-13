@@ -138,6 +138,34 @@ const PROBE_QML: &str = r"
             return call.state + ' camera=' + call.camera + ' rear=' + call.rear_camera
         }
         function url() { return centerLoader.item.call.url }
+        // What the call's sound has had sent to the audio policy since
+        // the last look: the methods in order, a register or an update
+        // with the resources it asks for.
+        function audioSaid() {
+            var manager = findIn(centerLoader.item, 'resourceManager')
+            if (!manager) { return 'missing:resourceManager' }
+            var said = manager.called.trim().split('\n').filter(function (line) {
+                return line.length > 0
+            }).map(function (line) {
+                var method = line.substring(0, line.indexOf(' '))
+                var args = JSON.parse(line.substring(line.indexOf(' ') + 1))
+                return method === 'register' || method === 'update' ? method + ':' + args[3].value : method
+            })
+            manager.called = ''
+            return said.join(',')
+        }
+        // The audio policy refuses what it is sent from now on, answering
+        // when told to; or no longer does.
+        function audioRefuses(on) {
+            var manager = findIn(centerLoader.item, 'resourceManager')
+            manager.failure = on ? ['org.freedesktop.DBus.Error.AccessDenied', 'no'] : undefined
+            manager.deferred = on
+            return 'ok'
+        }
+        function audioAnswers() {
+            findIn(centerLoader.item, 'resourceManager').answer()
+            return 'ok'
+        }
         // A phone whose platform camera lists its wide lens first.
         function lenses() {
             Settings.backLensLabelsConfig.value = ['0.5', '1.0']
@@ -269,6 +297,10 @@ fn a_video_call_shows_its_pictures_under_lines_a_tap_puts_away() {
             record!("mute-ringing", get!("muteSwitch", "visible"));
             record!("camera-ringing", get!("cameraSwitch", "checked"));
             record!("flip-ringing", get!("flipButton", "visible"));
+            // Nothing about the sound while it rings: the ringtone is the
+            // phone's.
+            record!("speaker-ringing", get!("speakerSwitch", "visible"));
+            record!("audio-ringing", call!("audioSaid"));
             record!("front", call!("front"));
             record!("camera-tap", tap!("cameraSwitch"));
             record!("camera-off-ringing", get!("cameraSwitch", "checked"));
@@ -284,6 +316,8 @@ fn a_video_call_shows_its_pictures_under_lines_a_tap_puts_away() {
             *url_ptr = url.clone();
             record!("url", url.clone());
             record!("engine", call!("engine"));
+            // Answered: the call's sound is held with the policy.
+            record!("audio-answered", call!("audioSaid"));
             record!("hidden-before", get!("callViewLoader", "opacity"));
             // No picture yet, but the camera is on: held in front of the
             // face, not to the ear.
@@ -383,6 +417,29 @@ fn a_video_call_shows_its_pictures_under_lines_a_tap_puts_away() {
                 )
             );
             record!("told-at-once", get!("told", "interval"));
+            // A video call is on the loudspeaker; the switch puts it on
+            // the earpiece and back.
+            record!(
+                "speaker-video",
+                format!(
+                    "{},{},{}",
+                    get!("speakerSwitch", "visible"),
+                    get!("speakerSwitch", "enabled"),
+                    get!("speakerSwitch", "checked")
+                )
+            );
+            record!("speaker-tap", tap!("speakerSwitch"));
+            record!("speaker-earpiece", get!("speakerSwitch", "checked"));
+            record!("audio-earpiece", call!("audioSaid"));
+            tap!("speakerSwitch");
+            record!("audio-speaker", call!("audioSaid"));
+            // Refused by the policy: given back, and the switch dimmed.
+            call!("audioRefuses", true);
+            tap!("speakerSwitch");
+            call!("audioAnswers");
+            record!("audio-refused", call!("audioSaid"));
+            record!("speaker-refused", get!("speakerSwitch", "enabled"));
+            call!("audioRefuses", false);
             record!("clock", get!("callClock", "text"));
             record!("status-video", get!("callStatus", "visible"));
             record!("tuck", get!("tuck", "running"));
@@ -536,6 +593,9 @@ fn a_video_call_shows_its_pictures_under_lines_a_tap_puts_away() {
             record!("who-voice", get!("callWho", "visible"));
             record!("ear-voice", get!("proximity", "active"));
             call!("hangUp");
+            // Over: nothing held, nothing more to give back.
+            record!("audio-over", call!("audioSaid"));
+            record!("audio-talking-over", get!("callAudio", "talking"));
         }),
         Box::new(move || unsafe {
             call!("dropPage");
@@ -590,6 +650,16 @@ fn a_video_call_shows_its_pictures_under_lines_a_tap_puts_away() {
     );
     assert_eq!(value("camera-tap"), "ok", "{context}");
     assert_eq!(
+        value("speaker-ringing"),
+        "false",
+        "the loudspeaker can be switched while the call rings. {context}"
+    );
+    assert_eq!(
+        value("audio-ringing"),
+        "",
+        "the call's sound was held with the policy while it rang. {context}"
+    );
+    assert_eq!(
         value("camera-off-ringing"),
         "false",
         "the camera could not be switched off before answering. {context}"
@@ -610,6 +680,11 @@ fn a_video_call_shows_its_pictures_under_lines_a_tap_puts_away() {
     assert!(
         url.contains("/index.html?&key=") && url.contains("#acceptCall="),
         "the call was not answered with the camera: {url}. {context}"
+    );
+    assert_eq!(
+        value("audio-answered"),
+        "register:3,audio,acquire",
+        "a video call's sound was not held with the policy, on the loudspeaker, once answered. {context}"
     );
     let granted = value("engine");
     assert!(
@@ -917,6 +992,43 @@ fn a_video_call_shows_its_pictures_under_lines_a_tap_puts_away() {
         "watching their picture with the camera off, a hand over the sensor blacks the screen out. {context}"
     );
 
+    assert_eq!(
+        value("speaker-video"),
+        "true,true,true",
+        "a video call is not on the loudspeaker, or its switch is not there to use. {context}"
+    );
+    assert_eq!(value("speaker-tap"), "ok", "{context}");
+    assert_eq!(value("speaker-earpiece"), "false", "{context}");
+    assert_eq!(
+        value("audio-earpiece"),
+        "update:1,acquire",
+        "the switch did not put the call on the earpiece. {context}"
+    );
+    assert_eq!(
+        value("audio-speaker"),
+        "update:3,acquire",
+        "the switch did not put the call back on the loudspeaker. {context}"
+    );
+    assert_eq!(
+        value("audio-refused"),
+        "update:1,acquire,release,unregister",
+        "a set the policy refused was not given back. {context}"
+    );
+    assert_eq!(
+        value("speaker-refused"),
+        "false",
+        "the switch is still there to use with nothing held. {context}"
+    );
+    assert_eq!(
+        value("audio-over"),
+        "",
+        "a set already given back was given back again. {context}"
+    );
+    assert_eq!(
+        value("audio-talking-over"),
+        "false",
+        "a call that is over still carries sound for the policy. {context}"
+    );
     assert_eq!(value("ring-voice"), "ringing", "{context}");
     assert_eq!(value("status-voice"), "Incoming call", "{context}");
     assert!(

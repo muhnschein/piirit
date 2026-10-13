@@ -109,6 +109,19 @@ fn main_back_camera(labels: &str) -> usize {
         .map_or(0, |(place, _)| place)
 }
 
+/// The id the phone's audio policy knows this process's sound by, from
+/// the process's own line in `/proc/<pid>/stat`: the 22nd field, its
+/// start time in clock ticks since boot, in lower-case hex. Sailfish's
+/// libpulse puts this on every stream the process opens
+/// (`policy.application.id`), and libresource sends the same for a
+/// resource set's streams; both split the line at single spaces, and so
+/// does this, so the three agree on any line. None for a line too short
+/// or a field that is not a number.
+fn audio_app_id(stat: &str) -> Option<String> {
+    let ticks: u64 = stat.split(' ').nth(21)?.parse().ok()?;
+    Some(format!("{ticks:x}"))
+}
+
 /// What one call's page needs before the host can come up.
 struct Prepared {
     ice_servers: String,
@@ -250,6 +263,10 @@ pub struct Call {
     /// and the other end is told it is off -- and the pictures are not
     /// drawn. Back in front, the camera is opened again if it was on.
     pub set_background: qt_method!(fn(&mut self, away: bool)),
+    /// The id the phone's audio policy knows this app's sound by: what
+    /// a call's resource set names its streams with (CallAudio.qml).
+    /// Empty where `/proc` does not say.
+    pub audio_id: qt_method!(fn(&self) -> QString),
     /// Apply one core event. Only the four call events are acted on.
     pub handle_event:
         qt_method!(fn(&mut self, context_id: u32, kind: QString, payload_json: QString)),
@@ -483,6 +500,17 @@ impl Call {
         if let (Some(host), Some(command)) = (&self.host, call_host::corner_command(left, top)) {
             host.restate(command);
         }
+    }
+
+    /// This process's id with the audio policy, from its own
+    /// `/proc/self/stat`: see `audio_app_id`.
+    #[must_use]
+    pub fn audio_id(&self) -> QString {
+        std::fs::read_to_string("/proc/self/stat")
+            .ok()
+            .and_then(|stat| audio_app_id(&stat))
+            .unwrap_or_default()
+            .into()
     }
 
     /// The app away, or back.
@@ -983,7 +1011,7 @@ fn now() -> f64 {
 
 #[cfg(test)]
 mod tests {
-    use super::{main_back_camera, Summary};
+    use super::{audio_app_id, main_back_camera, Summary};
     use serde_json::json;
 
     #[test]
@@ -1002,6 +1030,24 @@ mod tests {
         assert_eq!(main_back_camera(""), 0);
         assert_eq!(main_back_camera("wide,main"), 0);
         assert_eq!(main_back_camera("wide,1.0"), 1);
+    }
+
+    #[test]
+    fn the_audio_id_is_the_start_time_in_hex() {
+        // A line as the kernel writes it: the start time is the 22nd
+        // field, 4660 ticks, 0x1234.
+        let stat = "4242 (harbour-piirit) S 1 4242 4242 0 -1 4194560 2915 0 \
+                    0 0 12 4 0 0 20 0 9 0 4660 917504000 9000 18446744073709551615 \
+                    1 1 0 0 0 0 0 4096 17663 0 0 0 17 3 0 0 0 0 0\n";
+        assert_eq!(audio_app_id(stat).as_deref(), Some("1234"));
+        // Split at single spaces, as libpulse and libresource split it:
+        // a name with a space in it moves the field along for all three.
+        let spaced = stat.replace("(harbour-piirit)", "(harbour piirit)");
+        assert_eq!(audio_app_id(&spaced).as_deref(), Some("0"));
+        // Too short, or not a number there: none, not a wrong id.
+        assert_eq!(audio_app_id("4242 (piirit) S 1"), None);
+        let garbled = stat.replace(" 4660 ", " x4660 ");
+        assert_eq!(audio_app_id(&garbled), None);
     }
 
     #[test]

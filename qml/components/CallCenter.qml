@@ -279,7 +279,7 @@ Item {
             pushLater.stop()
             center.pageOwed = false
             var shown = center.stack.push(Qt.resolvedUrl("../pages/CallPage.qml"),
-                                          { call: call })
+                                          { call: call, audio: callAudio })
             if (shown) {
                 center.page = shown
             }
@@ -424,6 +424,19 @@ Item {
         function display_status_ind(status) {
             center.displayIs(status)
         }
+    }
+
+    // Where the call's sound comes out: the earpiece for a voice call,
+    // the loudspeaker for a video call, and whichever the reader switches
+    // to. Held from when the call carries sound -- placed, or answered --
+    // until it is over.
+    CallAudio {
+        id: callAudio
+        objectName: "callAudio"
+        talking: center.busy && call.state !== "ringing"
+        video: call.has_video
+        watching: center.watching
+        appId: call.audio_id()
     }
 
     // Awake while a call is up: a phone that suspends takes the call's

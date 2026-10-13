@@ -47,6 +47,10 @@ Page {
     /// The window's call.
     property QtObject call: null
 
+    /// Where the call's sound comes out (CallAudio), when the window has
+    /// it to hand over.
+    property QtObject audio: null
+
     /// A call is under way: anything short of over.
     readonly property bool busy: page.call !== null && page.call.state !== ""
                                  && page.call.state !== "ended"
@@ -628,11 +632,11 @@ Page {
     }
 
     // The switches, under the clock; over pictures, just above the red
-    // button, out of the way of a face. The microphone and the camera
-    // are what a call here has: the phone's own screen also has the
-    // loudspeaker, the keypad and recording, which belong to a phone
-    // call. While a video call rings, the camera alone, so it can be
-    // answered without one.
+    // button, out of the way of a face. The microphone, the loudspeaker
+    // and the camera are what a call here has: the phone's own screen
+    // also has the keypad and recording, which belong to a phone call.
+    // While a video call rings, the camera alone, so it can be answered
+    // without one.
     Row {
         id: switches
         objectName: "callSwitches"
@@ -652,6 +656,22 @@ Page {
             onClicked: {
                 page.touched()
                 page.call.mute(!page.call.muted)
+            }
+        }
+
+        // The loudspeaker, or the earpiece. Dimmed while the sound is on
+        // something plugged in or paired, which it does not move it from,
+        // and on a phone whose audio policy did not take the call.
+        Switch {
+            objectName: "speakerSwitch"
+            visible: page.inCall && page.audio !== null
+            icon.source: "image://theme/icon-m-speaker"
+            automaticCheck: false
+            enabled: page.audio !== null && page.audio.held !== 0 && !page.audio.elsewhere
+            checked: page.audio !== null && page.audio.speaker
+            onClicked: {
+                page.touched()
+                page.audio.choose(!page.audio.speaker)
             }
         }
 
