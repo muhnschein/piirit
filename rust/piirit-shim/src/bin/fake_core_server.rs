@@ -2432,8 +2432,7 @@ async fn serve() {
                     let mut items = serde_json::Map::new();
                     for chat in ids {
                         let fresh = u32::try_from(chat)
-                            .ok()
-                            .is_some_and(|chat| state.fresh.contains(&(account, chat)));
+                            .is_ok_and(|chat| state.fresh.contains(&(account, chat)));
                         // A chat holding a draft previews the draft, and
                         // names it in the prefix the row shows in front:
                         // "Draft", and DC_STATE_OUT_DRAFT for the state.

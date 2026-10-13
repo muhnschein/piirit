@@ -91,8 +91,10 @@ jobs:
           sudo rm -rf /usr/local/lib/android "$AGENT_TOOLSDIRECTORY" \
                       /usr/share/dotnet /opt/ghc /usr/local/share/boost
           df -h / | tail -1
-      # The same packages as ci.yml's test job: the same tests run.
-      - run: ./ci/apt-install.sh qtbase5-dev qtdeclarative5-dev qtmultimedia5-dev qtdeclarative5-dev-tools qml-module-qtquick2 qml-module-qtquick-window2 qttools5-dev-tools
+      # The same packages as ci.yml's test job, because the same tests run,
+      # and llvm for llvm-symbolizer: ci/lsan.supp matches by function
+      # name, which a report only has once it is symbolized.
+      - run: ./ci/apt-install.sh qtbase5-dev qtdeclarative5-dev qtmultimedia5-dev qtdeclarative5-dev-tools qml-module-qtquick2 qml-module-qtquick-window2 qttools5-dev-tools llvm
       # The nightly ci/leak-check.sh names. No rust-cache: nothing this
       # builds is shared with another job, and a week-old cache of it
       # would be gigabytes to restore for little.
