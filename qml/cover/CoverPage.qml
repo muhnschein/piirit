@@ -48,16 +48,23 @@ import "../js/Media.js" as Media
  * their name is, and at the foot, where the home screen draws the
  * action, and lightest over their face. Without a picture it is the
  * plain cover with their avatar, the circle of their colour and
- * initial, over the name. Under the name, how long the call has gone
- * on, or how it stands until it is connected, in the call page's own
- * words; in the middle, what the reader may want to know at a glance,
- * each on a pill of its own: that the microphone is off, and that the
- * camera, which is let go while the app is in the background, is
- * paused. And one action, the microphone: off, or on again. Not
- * hanging up, which a tap meant for something else would do by
- * mistake, and not the camera, which stays let go while the cover is
- * what is on screen. A call ringing unanswered has no action and no pills:
- * there is nothing yet to switch, and it is answered on its page.
+ * initial, over the name -- small, and only while there is room for it.
+ * The name is the largest words on the cover, on one line if shrinking
+ * it a little puts it on one, and on two at most. Under the name, how
+ * long the call has gone on, or how it stands until it is connected, in
+ * the call page's own words; in the middle, what the reader may want to
+ * know at a glance, each on a small pill of its own: that the microphone
+ * is off, and that the camera, which is let go while the app is in the
+ * background, is paused. And one action, the microphone: off, or on
+ * again. Not hanging up, which a tap meant for something else would do
+ * by mistake, and not the camera, which stays let go while the cover is
+ * what is on screen. A call ringing unanswered has no action and no
+ * pills: there is nothing yet to switch, and it is answered on its page.
+ *
+ * However long the name, and whichever pills are up, all of it stays
+ * inside the side margins and above the strip the home screen draws the
+ * action in. A cover smaller than the large one has all of it smaller
+ * in proportion.
  *
  * The picture is the plain file, the face as it is, rather than the
  * blurred copy the call page is drawn over: on a cover a face out of
@@ -591,105 +598,196 @@ CoverBackground {
             }
         }
 
-        // Who, near the top, large: it is what the cover is for while the
-        // call is up. Over the name, without a picture, their avatar.
-        Column {
-            id: callHead
-            objectName: "callHead"
-            anchors {
-                top: parent.top
-                topMargin: cover.callPictured ? 2 * Theme.paddingLarge : Theme.paddingLarge
-                left: parent.left
-                leftMargin: Theme.paddingMedium
-                right: parent.right
-                rightMargin: Theme.paddingMedium
-            }
-            spacing: Theme.paddingSmall
+        // Everything said over it: who, how long, and the pills. In from
+        // the sides, down from the top, and clear of the strip the home
+        // screen draws the action in -- kept clear while the call only
+        // rings too, so nothing jumps when the action comes. Nothing in it
+        // is drawn outside it: what does not fit is given up, the avatar
+        // first and then the name's second line, and if it still does not
+        // fit, the whole of it is drawn smaller.
+        Item {
+            id: callBody
+            objectName: "callBody"
+            x: Theme.paddingMedium
+            y: callBody.sized(Theme.paddingLarge)
+            width: parent.width - 2 * Theme.paddingMedium
+            height: Math.max(0, cover.height - cover.actionStrip
+                                - callBody.sized(Theme.paddingSmall) - y)
 
-            Avatar {
-                objectName: "callAvatar"
-                anchors.horizontalCenter: parent.horizontalCenter
-                visible: !cover.callPictured
-                width: Math.round(cover.width * 0.4)
-                initial: cover.callUp ? cover.call.peer_name : ""
-                ownColor: cover.callUp ? cover.call.peer_color : ""
-            }
-
-            // A little more room between the avatar and the name than
-            // between the name and the time, which belong together.
-            Item {
-                visible: !cover.callPictured
-                width: 1
-                height: Theme.paddingSmall
+            /// The theme's sizes are for the large cover. On a smaller one
+            /// all of the call is that much smaller, as if the large one
+            /// were drawn smaller -- all but the margins at the sides, which
+            /// would leave too little between them.
+            readonly property real ratio: cover.width > 0 && cover.height > 0
+                ? Math.min(1, cover.width / Theme.coverSizeLarge.width,
+                           cover.height / Theme.coverSizeLarge.height)
+                : 1
+            /// One of the theme's sizes, for this cover.
+            function sized(size) {
+                return Math.round(size * callBody.ratio)
             }
 
+            /// The name's size, and the least it is shrunk to so it can
+            /// stay on one line: a little smaller, no more, so a long name
+            /// still reads as the name. Smaller than a page's title, as
+            /// fits a cover, and still the largest words on it.
+            readonly property real nameSize: callBody.sized(Theme.fontSizeMedium)
+            readonly property real nameLeast: callBody.sized(Theme.fontSizeSmall)
+            /// How wide the name is on one line at its own size.
+            readonly property real nameNatural: Math.max(1, nameRuler.implicitWidth)
+            /// The name fits on one line somewhere between the two sizes.
+            readonly property bool nameOnOneLine: callBody.nameNatural * callBody.nameLeast
+                                                  / callBody.nameSize <= callBody.width
+            /// The size it is drawn at: as large as one line allows, and
+            /// the least size over two lines when one will not do.
+            readonly property real nameFont: callBody.nameOnOneLine
+                ? Math.max(callBody.nameLeast,
+                           Math.min(callBody.nameSize,
+                                    Math.floor(callBody.nameSize * callBody.width
+                                               / callBody.nameNatural)))
+                : callBody.nameLeast
+            /// One line of the name, at that size.
+            readonly property real nameLine: nameRuler.implicitHeight * callBody.nameFont
+                                             / Math.max(1, callBody.nameSize)
+
+            /// The room under the name, and the pills with that room over
+            /// them; nothing when there are none.
+            readonly property real gap: callBody.sized(Theme.paddingMedium)
+            readonly property real notesNeed: callNotes.implicitHeight > 0
+                                              ? callBody.gap + callNotes.implicitHeight : 0
+            /// What has to fit whatever else is given up: one line of the
+            /// name, the time and the pills.
+            readonly property real least: callBody.nameLine + callHead.spacing
+                                          + callTime.implicitHeight + callBody.notesNeed
+            /// The name over two lines, when it wants them and they fit.
+            readonly property int nameLines: !callBody.nameOnOneLine
+                                             && callBody.height >= callBody.least + callBody.nameLine
+                                             ? 2 : 1
+            /// Their avatar, without a picture: well short of the cover's
+            /// width, and only when it fits over all the rest.
+            readonly property real avatarSize: Math.min(callBody.sized(Theme.iconSizeMedium),
+                                                        Math.round(callBody.width * 0.3))
+            readonly property real avatarGap: callBody.sized(Theme.paddingMedium)
+            readonly property bool avatarShown: !cover.callPictured
+                && callBody.height >= callBody.least
+                                      + (callBody.nameLines - 1) * callBody.nameLine
+                                      + callBody.avatarSize + callBody.avatarGap
+
+            /// How tall it all is at its own size, and how much smaller it
+            /// is drawn when that is more than there is room for.
+            readonly property real needed: callHead.height + callBody.notesNeed
+            scale: callBody.needed > callBody.height && callBody.needed > 0
+                   ? callBody.height / callBody.needed : 1
+            transformOrigin: Item.Top
+
+            // The name on one line at its own size, never shown: how wide
+            // it is says what size it is drawn at.
             Label {
-                objectName: "callName"
-                width: parent.width
-                horizontalAlignment: Text.AlignHCenter
-                wrapMode: Text.Wrap
-                maximumLineCount: 2
-                truncationMode: TruncationMode.Elide
-                font.pixelSize: Theme.fontSizeLarge
-                color: Theme.primaryColor
-                // The other end's own name for themselves.
+                id: nameRuler
+                visible: false
+                font.pixelSize: callBody.nameSize
                 textFormat: Text.PlainText
                 text: cover.callUp ? cover.call.peer_name : ""
             }
 
-            Label {
-                objectName: "callTime"
+            // Who, at the top: it is what the cover is for while the call
+            // is up. Over the name, without a picture, their avatar.
+            Column {
+                id: callHead
+                objectName: "callHead"
                 width: parent.width
-                horizontalAlignment: Text.AlignHCenter
-                truncationMode: TruncationMode.Fade
-                font.pixelSize: Theme.fontSizeMedium
-                color: Theme.highlightColor
-                textFormat: Text.PlainText
-                text: cover.callStatus()
+                spacing: callBody.sized(Theme.paddingSmall)
+
+                Avatar {
+                    objectName: "callAvatar"
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    visible: callBody.avatarShown
+                    width: callBody.avatarSize
+                    initial: cover.callUp ? cover.call.peer_name : ""
+                    ownColor: cover.callUp ? cover.call.peer_color : ""
+                }
+
+                // A little more room between the avatar and the name than
+                // between the name and the time, which belong together.
+                Item {
+                    visible: callBody.avatarShown
+                    width: 1
+                    height: callBody.avatarGap - callHead.spacing
+                }
+
+                Label {
+                    id: callName
+                    objectName: "callName"
+                    width: parent.width
+                    horizontalAlignment: Text.AlignHCenter
+                    wrapMode: Text.Wrap
+                    maximumLineCount: callBody.nameLines
+                    truncationMode: TruncationMode.Elide
+                    font.pixelSize: callBody.nameFont
+                    color: Theme.primaryColor
+                    // The other end's own name for themselves.
+                    textFormat: Text.PlainText
+                    text: cover.callUp ? cover.call.peer_name : ""
+                }
+
+                Label {
+                    id: callTime
+                    objectName: "callTime"
+                    width: parent.width
+                    horizontalAlignment: Text.AlignHCenter
+                    truncationMode: TruncationMode.Fade
+                    font.pixelSize: callBody.sized(Theme.fontSizeExtraSmall)
+                    color: Theme.highlightColor
+                    textFormat: Text.PlainText
+                    text: cover.callStatus()
+                }
             }
-        }
 
-        // What is so of the call, a pill each, in the middle of the room
-        // between the name and the action.
-        Column {
-            id: callNotes
-            objectName: "callNotes"
-            readonly property real roomTop: callHead.y + callHead.height + Theme.paddingLarge
-            readonly property real roomBottom: cover.height
-                                               - (cover.callUnderWay ? cover.actionStrip : 0)
-            anchors.horizontalCenter: parent.horizontalCenter
-            y: Math.round(callNotes.roomTop
-                          + Math.max(0, (callNotes.roomBottom - callNotes.roomTop - height) / 2))
-            spacing: Theme.paddingMedium
-
-            // Something the reader can undo, from right here: loud.
-            CallNote {
-                objectName: "micNote"
+            // What is so of the call, a pill each, in the middle of the
+            // room between the name and the action.
+            Column {
+                id: callNotes
+                objectName: "callNotes"
+                readonly property real roomTop: callHead.height + callBody.gap
+                // In the body's own measure, which is all it needs when it
+                // is drawn smaller.
+                readonly property real roomBottom: Math.max(callBody.height, callBody.needed)
                 anchors.horizontalCenter: parent.horizontalCenter
-                visible: cover.callUnderWay && cover.call.muted
-                loud: true
-                ground: cover.callGround
-                maximumWidth: cover.width - 2 * Theme.paddingMedium
-                iconName: "icon-m-mic-mute"
-                //: On the cover during a call: the reader's microphone is
-                //: switched off, so the other end hears nothing.
-                text: qsTr("Microphone off")
-            }
+                y: Math.round(callNotes.roomTop
+                              + Math.max(0, (callNotes.roomBottom - callNotes.roomTop - height) / 2))
+                spacing: callBody.sized(Theme.paddingSmall)
 
-            // Wanted, and let go while the app is in the background --
-            // which, the cover being seen, it is. Back by itself once the
-            // app is in front, so only said.
-            CallNote {
-                objectName: "cameraNote"
-                anchors.horizontalCenter: parent.horizontalCenter
-                visible: cover.callUnderWay && cover.call.camera
-                ground: cover.callGround
-                maximumWidth: cover.width - 2 * Theme.paddingMedium
-                iconName: "icon-m-video"
-                //: On the cover during a video call: the camera sends
-                //: nothing while the app is in the background, and comes
-                //: back on when the app is opened.
-                text: qsTr("Camera paused")
+                // Something the reader can undo, from right here: loud.
+                CallNote {
+                    objectName: "micNote"
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    visible: cover.callUnderWay && cover.call.muted
+                    loud: true
+                    ground: cover.callGround
+                    maximumWidth: callBody.width
+                    ratio: callBody.ratio
+                    iconName: "icon-m-mic-mute"
+                    //: On the cover during a call: the reader's microphone is
+                    //: switched off, so the other end hears nothing.
+                    text: qsTr("Microphone off")
+                }
+
+                // Wanted, and let go while the app is in the background --
+                // which, the cover being seen, it is. Back by itself once
+                // the app is in front, so only said.
+                CallNote {
+                    objectName: "cameraNote"
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    visible: cover.callUnderWay && cover.call.camera
+                    ground: cover.callGround
+                    maximumWidth: callBody.width
+                    ratio: callBody.ratio
+                    iconName: "icon-m-video"
+                    //: On the cover during a video call: the camera sends
+                    //: nothing while the app is in the background, and comes
+                    //: back on when the app is opened.
+                    text: qsTr("Camera paused")
+                }
             }
         }
     }

@@ -43,6 +43,7 @@ const PROBE_QML: &str = r"
     import QtQuick 2.0
     import Sailfish.Silica 1.0
     import Piirit 1.0
+    import QtQuick.Window 2.0
     import 'file://__COMPONENTS__'
     Item {
         id: probe
@@ -68,7 +69,21 @@ const PROBE_QML: &str = r"
         // The real one, to hold the stand-in to its names.
         Call { id: realCall }
 
-        Loader { id: loader }
+        // A shown window, so the cover can be grabbed to a picture of it;
+        // on the cover's ground, more or less, so its words read in it.
+        Window {
+            id: shotWindow
+            visible: true
+            width: 240
+            height: 360
+            Rectangle {
+                id: shotFrame
+                width: loader.item ? loader.item.width : 0
+                height: loader.item ? loader.item.height : 0
+                color: '#5c4636'
+                Loader { id: loader }
+            }
+        }
         function load(url) {
             loader.setSource(url, { width: 240, height: 360, call: fakeCall })
             return loader.status === Loader.Ready ? 'ok' : 'load-failed'
@@ -194,6 +209,133 @@ const PROBE_QML: &str = r"
             return found
         }
         function drawnThrough() { return shaders(loader.item, []).join(';') }
+
+        // The theme's sizes as a phone has them, at a pixel ratio of one:
+        // the stub's own are only there to resolve, and how the call fits
+        // the cover is a matter of how large the words are next to it.
+        function phoneTheme() {
+            Theme.paddingSmall = 6
+            Theme.paddingMedium = 12
+            Theme.paddingLarge = 24
+            Theme.fontSizeTiny = 20
+            Theme.fontSizeExtraSmall = 24
+            Theme.fontSizeSmall = 28
+            Theme.fontSizeMedium = 32
+            Theme.fontSizeLarge = 40
+            Theme.fontSizeExtraLarge = 50
+            Theme.iconSizeSmall = 32
+            Theme.iconSizeMedium = 64
+            Theme.itemSizeExtraSmall = 70
+            Theme.itemSizeSmall = 80
+            Theme.itemSizeMedium = 100
+            Theme.coverSizeLarge = Qt.size(234, 374)
+            return 'ok'
+        }
+        function size(w, h) {
+            loader.item.width = w
+            loader.item.height = h
+            shotWindow.width = w
+            shotWindow.height = h
+            return 'ok'
+        }
+        function setName(name) { fakeCall.peer_name = name; return 'ok' }
+        // Where an item is drawn on the cover, scaled or not.
+        function box(item) {
+            var from = item.mapToItem(loader.item, 0, 0)
+            var to = item.mapToItem(loader.item, item.width, item.height)
+            return { x: from.x, y: from.y, r: to.x, b: to.y }
+        }
+        function label(item) {
+            return item.objectName !== '' ? item.objectName : ('' + item).split('(')[0]
+        }
+        // Everything drawn of the call that is outside the room it has: in
+        // from the side margins, and above the strip the home screen draws
+        // the action in. The picture and its shade fill the cover on
+        // purpose; everything else -- every piece, not only the outer
+        // ones -- has to keep in. Words wider or taller than their own box
+        // run out of it too.
+        function strays(node, room, found) {
+            var kids = node.children
+            for (var i = 0; kids && i < kids.length; i++) {
+                var kid = kids[i]
+                if (!kid.visible || kid.objectName === 'callPicture'
+                        || kid.objectName === 'callShade') { continue }
+                if (kid.width > 0 && kid.height > 0) {
+                    var at = box(kid)
+                    if (at.x < room.x - 0.5 || at.r > room.r + 0.5
+                            || at.y < room.y - 0.5 || at.b > room.b + 0.5) {
+                        found.push(label(kid) + '@' + Math.round(at.x) + ',' + Math.round(at.y)
+                                   + '-' + Math.round(at.r) + ',' + Math.round(at.b))
+                    }
+                }
+                if (kid.contentWidth !== undefined && kid.lineCount !== undefined
+                        && (kid.contentWidth > kid.width + 0.5
+                            || kid.contentHeight > kid.height + 0.5)) {
+                    found.push(label(kid) + ':spills')
+                }
+                strays(kid, room, found)
+            }
+            return found
+        }
+        // The pieces that must not be drawn over one another.
+        function crowding() {
+            var names = ['callAvatar', 'callName', 'callTime', 'micNote', 'cameraNote']
+            var boxes = []
+            for (var i = 0; i < names.length; i++) {
+                var item = findIn(loader.item, names[i])
+                if (item && item.visible) { boxes.push({ name: names[i], at: box(item) }) }
+            }
+            var found = []
+            for (var a = 0; a < boxes.length; a++) {
+                for (var b = a + 1; b < boxes.length; b++) {
+                    var one = boxes[a].at
+                    var other = boxes[b].at
+                    if (one.x < other.r - 0.5 && other.x < one.r - 0.5
+                            && one.y < other.b - 0.5 && other.y < one.b - 0.5) {
+                        found.push(boxes[a].name + '/' + boxes[b].name)
+                    }
+                }
+            }
+            return found
+        }
+        // How the call is laid out, as `key=value` pairs: what is drawn out
+        // of bounds or over something else (nothing, for a good layout),
+        // whether the avatar is up, how many lines the name takes, and how
+        // large the name, the time and the pills' words are, scaled as
+        // drawn.
+        function layout() {
+            var cover = loader.item
+            // A column places its pieces before the next frame rather than
+            // at once; the cover is read here as that frame would draw it.
+            for (var pass = 0; pass < 3; pass++) {
+                findIn(cover, 'callNotes').forceLayout()
+                findIn(cover, 'callHead').forceLayout()
+            }
+            var room = { x: Theme.paddingMedium, r: cover.width - Theme.paddingMedium,
+                         y: 0, b: cover.height - cover.actionStrip }
+            var name = findIn(cover, 'callName')
+            var time = findIn(cover, 'callTime')
+            var body = findIn(cover, 'callBody')
+            var scale = body ? body.scale : 1
+            var note = findIn(findIn(cover, 'micNote'), 'callNoteText')
+            return 'strays=' + strays(findIn(cover, 'callView'), room, []).join(',')
+                + '|crowded=' + crowding().join(',')
+                + '|avatar=' + shown('callAvatar')
+                + '|picture=' + shown('callPicture')
+                + '|lines=' + name.lineCount
+                + '|name=' + Math.round(name.font.pixelSize * scale)
+                + '|time=' + Math.round(time.font.pixelSize * scale)
+                + '|note=' + Math.round(note.font.pixelSize * scale)
+        }
+        // The cover as it is drawn, to a file, once the scene has a frame.
+        property string saved: ''
+        function savedShots() { return saved }
+        function shoot(path) {
+            var ok = shotFrame.grabToImage(function (result) {
+                if (result.saveToFile(path)) { saved += path + ';' }
+            })
+            return ok ? 'ok' : 'no-grab'
+        }
     }
 ";
 
@@ -222,6 +364,9 @@ fn the_cover_shows_the_call_while_one_is_up() {
     // grid has something to be stale about.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
+        // The probe's window needs a scene graph to grab the cover from;
+        // the software one needs no GL context.
+        std::env::set_var("QT_QUICK_BACKEND", "software");
         std::env::set_var("PIIRIT_ACCOUNTS_DIR", temp.join("accounts"));
         std::env::set_var("PIIRIT_FAKE_ACCOUNTS", "1,2");
     }
@@ -436,6 +581,132 @@ fn the_cover_shows_the_call_while_one_is_up() {
         record!("ended-grid", call!("grid"));
         record!("reset", state!("", "", "", -1, "false", "false"));
         record!("reset-mode", call!("mode"));
+    });
+
+    // How the call fits the cover, with the theme's sizes as a phone has
+    // them: the worst a name, a missing picture and both pills can do, on
+    // the large cover and on the small one. Each case is grabbed to a
+    // picture on a tick of its own, as the grab is taken on the next frame.
+    let picture_dir = std::env::var_os("PIIRIT_COVER_SHOTS")
+        .map_or_else(|| temp.join("shots"), std::path::PathBuf::from);
+    std::fs::create_dir_all(&picture_dir).expect("create the shots directory");
+    let picture_at = move |name: &str| QString::from(picture_dir.join(name).display().to_string());
+    let long_name = "Maximiliane Schwarzenberg-Hohenlohe";
+    let short_name = "Horst Horstensen";
+    macro_rules! case {
+        ($label:expr, $name:expr, $avatar:expr, $video:expr, $muted:expr, $camera:expr) => {{
+            state!("connected", $name, $avatar, 12, $video, $camera);
+            call!("setMuted", QString::from($muted));
+            record!($label, call!("layout"));
+        }};
+    }
+
+    let to_file = picture_at.clone();
+    single_shot(Duration::from_secs(12), move || unsafe {
+        record!("phone-theme", call!("phoneTheme"));
+        record!("large", call!("size", 234, 374));
+        // Before it is connected, and while it rings: nothing to switch.
+        state!("ringing", long_name, "", -1, "true", "true");
+        record!("fit-ringing", call!("layout"));
+        state!("calling", long_name, "", -1, "true", "true");
+        record!("fit-calling", call!("layout"));
+        case!("fit-voice-bare", short_name, "", "false", "true", "false");
+        case!(
+            "fit-short-bare-mic",
+            short_name,
+            "",
+            "true",
+            "true",
+            "false"
+        );
+        case!(
+            "fit-short-bare-camera",
+            short_name,
+            "",
+            "true",
+            "false",
+            "true"
+        );
+        case!("fit-long-bare-both", long_name, "", "true", "true", "true");
+        record!(
+            "shot-long-bare",
+            call!("shoot", to_file("long-bare-both.png"))
+        );
+    });
+
+    let to_file = picture_at.clone();
+    single_shot(Duration::from_secs(13), move || unsafe {
+        case!(
+            "fit-short-bare-both",
+            short_name,
+            "",
+            "true",
+            "true",
+            "true"
+        );
+        record!(
+            "shot-short-bare",
+            call!("shoot", to_file("short-bare-both.png"))
+        );
+    });
+
+    let to_file = picture_at.clone();
+    let pictured = common::a_real_picture();
+    single_shot(Duration::from_secs(14), move || unsafe {
+        record!("small", call!("size", 148, 237));
+        case!(
+            "fit-small-short-bare",
+            short_name,
+            "",
+            "false",
+            "true",
+            "false"
+        );
+        case!(
+            "fit-small-long-bare-both",
+            long_name,
+            "",
+            "true",
+            "true",
+            "true"
+        );
+        record!(
+            "shot-small",
+            call!("shoot", to_file("small-long-bare-both.png"))
+        );
+    });
+
+    // Back to the large cover, with their picture, which loads off the
+    // main thread.
+    single_shot(Duration::from_secs(15), move || unsafe {
+        call!("size", 234, 374);
+        state!("connected", long_name, pictured.clone(), 12, "true", "true");
+    });
+
+    let to_file = picture_at.clone();
+    single_shot(Duration::from_secs(16), move || unsafe {
+        record!("fit-long-pictured-both", call!("layout"));
+        record!(
+            "shot-long-pictured",
+            call!("shoot", to_file("long-pictured-both.png"))
+        );
+    });
+
+    // The voice call, with the microphone off: the same picture, so it
+    // stays loaded.
+    let to_file = picture_at;
+    single_shot(Duration::from_secs(17), move || unsafe {
+        call!("setName", QString::from(short_name));
+        call!("setCamera", QString::from("false"));
+        record!("fit-voice-pictured", call!("layout"));
+        record!(
+            "shot-voice-pictured",
+            call!("shoot", to_file("voice-pictured-mic.png"))
+        );
+    });
+
+    single_shot(Duration::from_secs(18), move || unsafe {
+        record!("saved", call!("savedShots"));
         (*engine_ptr).quit();
     });
 
@@ -665,4 +936,104 @@ fn the_cover_shows_the_call_while_one_is_up() {
     );
     assert_eq!(value("ended-drawn"), "search-32-white.png", "{context}");
     assert_eq!(value("reset-mode"), "false|true", "{context}");
+
+    // How the call fits the cover, at a phone's sizes. Every case: nothing
+    // past the side margins or into the action's strip, nothing over
+    // anything else, the name on one line or two, and the largest words.
+    assert_eq!(value("phone-theme"), "ok", "{context}");
+    let fit = |label: &str| {
+        let layout = value(label);
+        let pairs: std::collections::HashMap<String, String> = layout
+            .split('|')
+            .filter_map(|pair| pair.split_once('='))
+            .map(|(key, value)| (key.to_string(), value.to_string()))
+            .collect();
+        move |key: &str| {
+            pairs
+                .get(key)
+                .cloned()
+                .unwrap_or_else(|| format!("<no {key} in {layout}>"))
+        }
+    };
+    let size = |label: &str, key: &str| -> i32 {
+        fit(label)(key)
+            .parse()
+            .unwrap_or_else(|_| panic!("{label}: no {key}. {context}"))
+    };
+    for label in [
+        "fit-ringing",
+        "fit-calling",
+        "fit-voice-bare",
+        "fit-short-bare-mic",
+        "fit-short-bare-camera",
+        "fit-long-bare-both",
+        "fit-short-bare-both",
+        "fit-small-short-bare",
+        "fit-small-long-bare-both",
+        "fit-long-pictured-both",
+        "fit-voice-pictured",
+    ] {
+        let got = fit(label);
+        assert_eq!(
+            got("strays"),
+            "",
+            "{label}: the call is drawn past the cover's side margins or into \
+             the strip the home screen draws the action in. {context}"
+        );
+        assert_eq!(
+            got("crowded"),
+            "",
+            "{label}: the call's pieces are drawn over one another. {context}"
+        );
+        let lines = size(label, "lines");
+        assert!(
+            (1..=2).contains(&lines),
+            "{label}: the name takes {lines} lines. {context}"
+        );
+        let (name, time, note) = (
+            size(label, "name"),
+            size(label, "time"),
+            size(label, "note"),
+        );
+        assert!(
+            name > time && time >= note,
+            "{label}: the name is not the largest words on the cover, or the \
+             pills' are larger than the time's ({name}, {time}, {note}). {context}"
+        );
+        assert!(
+            name < 40,
+            "{label}: the name is drawn as large as a page's title ({name}). {context}"
+        );
+    }
+
+    // A long name takes two lines, and is cut short after them. (Whether
+    // a shorter one fits on one line depends on the font the test machine
+    // has.) Without a picture, the avatar is there while there is room
+    // for it over the rest, and gone when there is not.
+    assert_eq!(size("fit-long-bare-both", "lines"), 2, "{context}");
+    assert_eq!(size("fit-long-pictured-both", "lines"), 2, "{context}");
+    assert_eq!(
+        fit("fit-voice-bare")("avatar"),
+        "true",
+        "a voice call without a picture has no avatar, room or not. {context}"
+    );
+    assert_eq!(fit("fit-short-bare-mic")("avatar"), "true", "{context}");
+    assert_eq!(
+        fit("fit-long-bare-both")("avatar"),
+        "false",
+        "the avatar is squeezed in over a long name and both pills. {context}"
+    );
+    assert_eq!(
+        fit("fit-small-long-bare-both")("avatar"),
+        "false",
+        "the avatar is squeezed into the small cover. {context}"
+    );
+    for label in ["fit-long-pictured-both", "fit-voice-pictured"] {
+        assert_eq!(
+            fit(label)("picture"),
+            "true",
+            "{label}: their picture did not load. {context}"
+        );
+        assert_eq!(fit(label)("avatar"), "false", "{label}. {context}");
+    }
 }
