@@ -478,7 +478,7 @@ impl Call {
 
     /// This end's picture, where the reader moved it. Only the last of
     /// the places still waiting for the page is told: see
-    /// [`Host::restate`].
+    /// `Host::restate`.
     pub fn move_picture(&mut self, left: f64, top: f64) {
         if let (Some(host), Some(command)) = (&self.host, call_host::corner_command(left, top)) {
             host.restate(command);

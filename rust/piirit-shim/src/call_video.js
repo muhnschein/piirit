@@ -454,7 +454,7 @@ var piiritVideo = (function () {
 
     /* The corner, or where the reader moved the picture to. */
     function corner() {
-        return spot ? Object.assign({}, CORNER, spot) : CORNER;
+        return spot ? { ...CORNER, ...spot } : CORNER;
     }
 
     /* The reader moved this end's picture: `left` and `top` are where its
