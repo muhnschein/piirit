@@ -1602,7 +1602,7 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>The photo or video goes out the moment you tap a chat, with no chance to look it over first. Tap the wrong chat by mistake, and it goes there.</source>
         <extracomment>Asked before &quot;Send right away&quot; is turned on for a camera quick action on the cover.</extracomment>
-        <translation>ਜਿਵੇਂ ਹੀ ਤੁਸੀਂ ਕਿਸੇ ਚੈਟ 'ਤੇ ਟੈਪ ਕਰਦੇ ਹੋ, ਫ਼ੋਟੋ ਜਾਂ ਵੀਡੀਓ ਭੇਜ ਦਿੱਤੀ ਜਾਂਦੀ ਹੈ, ਪਹਿਲਾਂ ਦੇਖਣ ਦਾ ਮੌਕਾ ਨਹੀਂ ਮਿਲਦਾ। ਗਲਤੀ ਨਾਲ ਗਲਤ ਚੈਟ 'ਤੇ ਟੈਪ ਕੀਤਾ ਤਾਂ ਉਹ ਉੱਥੇ ਹੀ ਚਲੀ ਜਾਵੇਗੀ।</translation>
+        <translation>ਜਿਵੇਂ ਹੀ ਤੁਸੀਂ ਕਿਸੇ ਚੈਟ &apos;ਤੇ ਟੈਪ ਕਰਦੇ ਹੋ, ਫ਼ੋਟੋ ਜਾਂ ਵੀਡੀਓ ਭੇਜ ਦਿੱਤੀ ਜਾਂਦੀ ਹੈ, ਪਹਿਲਾਂ ਦੇਖਣ ਦਾ ਮੌਕਾ ਨਹੀਂ ਮਿਲਦਾ। ਗਲਤੀ ਨਾਲ ਗਲਤ ਚੈਟ &apos;ਤੇ ਟੈਪ ਕੀਤਾ ਤਾਂ ਉਹ ਉੱਥੇ ਹੀ ਚਲੀ ਜਾਵੇਗੀ।</translation>
     </message>
 </context>
 <context>
