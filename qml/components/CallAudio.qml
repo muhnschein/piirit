@@ -67,6 +67,12 @@ Item {
     /// The last request's number, which the manager answers by.
     property int reqno: 0
 
+    /// What is still to be sent, oldest first: `{ id, method, args }`.
+    property var queue: []
+
+    /// A message is out, and its answer not in yet.
+    property bool waiting: false
+
     // From libresource (res-msg.h, res-types.h): message types, and the
     // resources a set holds.
     readonly property int msgRegister: 0
@@ -142,31 +148,52 @@ Item {
     }
 
     /// Give the set back. Unregistering is what matters; releasing first
-    /// is how libresource's own clients let go.
+    /// is how libresource's own clients let go. Whatever was still to be
+    /// said about the set goes unsaid, and the two go out after the
+    /// message already out, so a register is answered before them.
     function letGo() {
         var id = audio.held
         if (id === 0) {
             return
         }
         audio.held = 0
-        manager.typedCall("release", audio.plain(audio.msgRelease, id),
-                          function () {}, function () {})
-        manager.typedCall("unregister", audio.plain(audio.msgUnregister, id),
-                          function () {}, function () {})
+        audio.queue = audio.queue.filter(function (message) {
+            return message.id !== id
+        })
+        audio.send(id, "release", audio.plain(audio.msgRelease, id))
+        audio.send(id, "unregister", audio.plain(audio.msgUnregister, id))
     }
 
-    /// Send one message about set `id`. Should the manager refuse it, or
-    /// not be there to answer, the set is let go of -- as long as it is
-    /// still the one held. The answer comes later, after whatever else
-    /// was sent meanwhile: a set's messages go out together, and the
-    /// first refusal lets go of it.
+    /// Send one message about set `id`, once every message before it is
+    /// answered, as libresource's own clients do. The manager needs it:
+    /// it answers a register only after asking the bus whose connection
+    /// the app's is, and refuses anything else about the set that comes
+    /// before then. Should the manager refuse a message, or not be there
+    /// to answer, the set is let go of -- as long as it is still the one
+    /// held: a refusal can come for a set already given back.
     function send(id, method, args) {
-        manager.typedCall(method, args, function (kind, setId, number, errcod) {
+        audio.queue = audio.queue.concat([{ "id": id, "method": method, "args": args }])
+        audio.pump()
+    }
+
+    /// Send the oldest message waiting, unless one is out.
+    function pump() {
+        if (audio.waiting || audio.queue.length === 0) {
+            return
+        }
+        var message = audio.queue[0]
+        audio.queue = audio.queue.slice(1)
+        audio.waiting = true
+        manager.typedCall(message.method, message.args, function (kind, setId, number, errcod) {
+            audio.waiting = false
             if (typeof errcod === "number" && errcod !== 0) {
-                audio.refused(id)
+                audio.refused(message.id)
             }
+            audio.pump()
         }, function () {
-            audio.refused(id)
+            audio.waiting = false
+            audio.refused(message.id)
+            audio.pump()
         })
     }
 
@@ -248,6 +275,16 @@ Item {
     }
 
     // On the way out, with a call still up. Belt and braces: the manager
-    // drops the set anyway once the app's connection goes.
-    Component.onDestruction: audio.letGo()
+    // drops the set anyway once the app's connection goes. Nothing is
+    // answered once the component is gone, so what is left goes now,
+    // without waiting: an unregister that overtakes a register still
+    // being answered drops the set all the same.
+    Component.onDestruction: {
+        audio.letGo()
+        var left = audio.queue
+        audio.queue = []
+        for (var i = 0; i < left.length; i++) {
+            manager.typedCall(left[i].method, left[i].args, function () {}, function () {})
+        }
+    }
 }

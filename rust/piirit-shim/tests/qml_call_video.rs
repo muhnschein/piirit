@@ -53,7 +53,13 @@ const PROBE_QML: &str = r"
         function load(url) {
             // In front, as the app is when the reader is in a call.
             centerLoader.setSource(url, { stack: stack, enabled: true, away: false })
-            return centerLoader.status === Loader.Ready ? 'ok' : 'load-failed'
+            if (centerLoader.status !== Loader.Ready) { return 'load-failed' }
+            // The audio policy answers what it is sent at once, and takes
+            // it: the next message goes once the last is answered.
+            var manager = findIn(centerLoader.item, 'resourceManager')
+            if (!manager) { return 'missing:resourceManager' }
+            manager.replies = [9, 1, 1, 0, 'OK']
+            return 'ok'
         }
         function front() {
             if (!pageHolder.item) { return 'no-page' }
@@ -162,8 +168,11 @@ const PROBE_QML: &str = r"
             manager.deferred = on
             return 'ok'
         }
+        // Every message out is answered, and each one sent after it, until
+        // nothing is left to send.
         function audioAnswers() {
-            findIn(centerLoader.item, 'resourceManager').answer()
+            var manager = findIn(centerLoader.item, 'resourceManager')
+            while (manager.held.length > 0) { manager.answer() }
             return 'ok'
         }
         // A phone whose platform camera lists its wide lens first.
@@ -1011,7 +1020,7 @@ fn a_video_call_shows_its_pictures_under_lines_a_tap_puts_away() {
     );
     assert_eq!(
         value("audio-refused"),
-        "update:1,acquire,release,unregister",
+        "update:1,release,unregister",
         "a set the policy refused was not given back. {context}"
     );
     assert_eq!(

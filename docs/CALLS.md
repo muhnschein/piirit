@@ -444,7 +444,13 @@ playback, so the loudspeaker is the same set with `VideoPlayback` added
 
 The set is spoken to over the bus in libresource's own message layout
 (`register`, `audio`, `acquire`, `update`, `release`, `unregister`;
-`dbus-msg.c`), since no library for it is on Harbour's list. Its `audio`
+`dbus-msg.c`), since no library for it is on Harbour's list, and in its
+order: one message at a time, each once the last is answered. The
+manager needs that. It answers a register only after asking the bus
+whose connection sent it, and refuses anything else about the set that
+comes in before then, as `EUCLEAN` (ohm's `manager.c`). Sent all at
+once, as the first build sent them, the `audio` and `acquire` were
+refused on a phone every time, and the set let go of. Its `audio`
 message names the app's streams: every stream whose client carries the
 app's `policy.application.id` -- the process's start time from
 `/proc/self/stat`, in hex, which Sailfish's libpulse puts on every
@@ -481,8 +487,13 @@ of Piirit: two phones and an afternoon.
 3. **Do the call's streams join the call group?** The `aliencall` set
    names them by the app's process; that the engine's audio streams are
    opened by the app's own process (ESR 91 runs the engine in it), and
-   so carry its id, is the claim. Silence in a call would say they are
-   not. `pactl list sink-inputs` shows each stream's `policy.group` and
+   so carry its id, is the claim. On a phone they do carry it: the
+   engine's client is the app's process, with the `policy.application.id`
+   `Call.audio_id` reads. Outside a call they are in group `player`:
+   some library in the process holds a set of that class for the same
+   id *(inferred; which one is not known)*, and the `aliencall` set,
+   naming the id the same way, takes its place for the call. Silence in
+   a call would say they are not. `pactl list sink-inputs` shows each stream's `policy.group` and
    `application.process.id`; `pactl list sinks` the active port. ESR
    153 moves a page's audio into a process of its own, which will want
    this looked at again.
