@@ -335,7 +335,9 @@ history of its own subject.
 ## Packaging: the supported path
 
 `.github/workflows/rpm.yml` builds a device RPM unattended on an
-`ubuntu-latest` runner, from a `docker run` of the Sailfish SDK. Dispatch
+`ubuntu-latest` runner, from a `docker run` of the Sailfish SDK, through
+`scripts/build-in-docker.sh` -- which anyone with Docker can run to build
+the same way. Dispatch
 it from the Actions tab (the SDK version and cargo's job count are inputs)
 or push a `v*` tag. It builds **aarch64**, which is the only architecture
 this project targets and the only one it has ever built.
@@ -370,7 +372,8 @@ Environment requirements, each of which cost an attempt:
 - **Not root.** `sdk-manage` refuses ("Cannot determine Mer SDK user") and
   the target snapshot never initialises. Chown the checkout to the
   container's `mersdk` uid — read it from the image, don't assume it — and
-  hand it back so the artifact upload can read the result.
+  hand it back so the artifact upload can read the result. The script does
+  both as root inside the container, so the host needs no sudo.
 
 `scripts/build-rpm.sh` wraps the ordinary developer path, `sfdk build`.
 

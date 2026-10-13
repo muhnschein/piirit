@@ -122,21 +122,6 @@ jobs:
           id=$(docker image inspect --format '{{.Id}}' "$SDK_IMAGE")
           echo "SDK_IMAGE_ID=${id#sha256:}" >> "$GITHUB_ENV"
 
-      # The image ships one target, named by the SDK's own convention.
-      # Asked for rather than assumed, so an image whose naming differs
-      # fails here with the list rather than deep inside rpmbuild.
-      - name: Resolve the build target
-        run: |
-          targets=$(docker run --rm "$SDK_IMAGE" sb2-config -l 2>/dev/null || true)
-          echo "available targets:"; echo "$targets"
-          target=$(echo "$targets" | grep -- "-$ARCH\$" | tail -1)
-          if [ -z "$target" ]; then
-            echo "::error::no $ARCH target in $SDK_IMAGE; see the list above"
-            exit 1
-          fi
-          echo "Building against $target"
-          echo "TARGET=$target" >> "$GITHUB_ENV"
-
       # Every build used to produce harbour-piirit-0.1.0-1.aarch64.rpm,
       # because the spec pins both fields and mb2 runs with -X so nothing derives
       # them from git. Same name, same NEVRA, every time -- so `rpm -U`
@@ -220,83 +205,22 @@ jobs:
           key: rpm-cargo-${{ hashFiles('rust/Cargo.lock') }}
           restore-keys: rpm-cargo-
 
-      # Running as root is explicitly wrong -- sdk-manage refuses, saying
-      # it cannot determine the Mer SDK user -- so the build stays as the
-      # image's own mersdk, and everything it writes has to belong to it.
-      - name: Hand the checkout to the SDK's build user
-        run: |
-          uid=$(docker run --rm "$SDK_IMAGE" id -u)
-          gid=$(docker run --rm "$SDK_IMAGE" id -g)
-          home=$(docker run --rm "$SDK_IMAGE" sh -c 'echo $HOME')
-          echo "SDK builds as uid=$uid gid=$gid, HOME=$home"
-          echo "BUILDDIR=$home/harbour-piirit" >> "$GITHUB_ENV"
-          mkdir -p ~/.cache/piirit-cargo
-          sudo chown -R "$uid:$gid" "$PWD" ~/.cache/piirit-cargo
-
-      # Mounted inside the SDK user's home, and that placement is the
-      # whole fix. rpm runs under scratchbox2, which redirects absolute
-      # paths it does not recognise into the target rootfs -- so with the
-      # tree at /build/harbour-piirit, mb2 wrote .mb2/spec (it is right
-      # there afterwards, 10 KB of it) and rpm then looked for the same
-      # path inside the target and found nothing:
-      #
-      #   error: Unable to open /build/harbour-piirit/.mb2/spec: No such file
-      #
-      # A file that exists and cannot be opened is two different roots.
-      # docs/BUILDING.md bind-mounted under /home/mersdk for this
-      # reason. The directory keeps the project's name either way: mb2
-      # derives the package from it, so rpm/harbour-piirit.spec is found.
-      #
-      # `build-init` because mb2's help says a build directory is
-      # initialised before it is built in, and `-X` (--no-fix-version)
-      # because otherwise build-init asks `git describe` for a version,
-      # finds no tags here, and stops before writing the spec at all.
-      # `--no-check` matches that document too; the spec has no %check.
-      #
-      # `build-requires` has nothing to install against the derived image,
-      # which already carries them -- it stays because a BuildRequires
-      # added to the spec before the image is rebuilt would otherwise fail
-      # much later and less clearly.
-      #
-      # `--privileged` is what the SDK image's own instructions run it
-      # with; whether sb2 needs all of it has not been tried. The script is
-      # single-quoted, so nothing the image printed above is spliced into
-      # shell text; TARGET and CARGO_JOBS go in as environment variables.
+      # The steps a local build runs too, so the two cannot drift: the
+      # script resolves the target, hands the tree to the SDK's build user
+      # and back, and runs mb2. Its comments say why each of those is done
+      # the way it is. The image is the one named above, and the crates go
+      # where the cache above keeps them.
       - name: Build the RPM
-        run: |
-          docker run --rm --privileged \
-            -e TARGET -e CARGO_JOBS \
-            -v "$PWD:$BUILDDIR" -w "$BUILDDIR" \
-            -v "$HOME/.cache/piirit-cargo:/home/mersdk/.cargo" \
-            "$SDK_IMAGE" \
-            /bin/bash -c 'set -e
-              since=$(date +%s)
-              took() { echo "::notice::$1 took $(( $(date +%s) - since ))s"; since=$(date +%s); }
-
-              mb2 -t "$TARGET" -X build-init
-              took build-init
-              mb2 -t "$TARGET" -X build-requires ||
-                echo "::warning::mb2 build-requires failed; the SDK image may be behind the spec"
-              took build-requires
-              mb2 -t "$TARGET" -X build --no-check --define "jobs $CARGO_JOBS"
-              took "the build at -j$CARGO_JOBS"'
+        env:
+          PIIRIT_SDK_IMAGE: ${{ env.SDK_IMAGE }}
+          PIIRIT_CARGO_JOBS: ${{ env.CARGO_JOBS }}
+        run: PIIRIT_CARGO_HOME=~/.cache/piirit-cargo ./scripts/build-in-docker.sh "$SFOS"
 
       # `|| true` on both: the step runs under `bash -e`, and a missing
       # .mb2 would end it before the logs were shown.
       - name: Show mb2's state
         if: failure()
         run: ls -la .mb2 2>/dev/null || true; tail -60 .mb2/*.log 2>/dev/null || true
-
-      # Back to the runner, or neither the upload nor the cache save can
-      # read what was built. `mkdir` first because this runs even when the
-      # step that creates that directory did not: `chown` on a path that is
-      # not there fails, and failing here would bury the error that
-      # actually stopped the build.
-      - name: Take the tree back
-        if: always()
-        run: |
-          mkdir -p ~/.cache/piirit-cargo
-          sudo chown -R "$(id -u):$(id -g)" "$PWD" ~/.cache/piirit-cargo
 
       - name: Show what was built
         run: |

@@ -46,15 +46,12 @@ the phone's own call handling an app can have, and what is still unproven
 
 ## Building
 
-Device packages need the Sailfish SDK with the **Docker** build engine — the
-VirtualBox one cannot compile Rust — and a build target for your device's
-architecture.
+A device package, built in the Sailfish SDK image releases use (needs Docker):
 
 ```
-$ git clone https://github.com/muhnschein/piirit.git
+$ git clone --recurse-submodules https://github.com/muhnschein/piirit.git
 $ cd piirit
-$ scripts/fetch-rpc-server.sh     # bundled deltachat-rpc-server binaries
-$ scripts/build-rpm.sh aarch64    # or: armv7hl; add a version, e.g. 5.2.0.15
+$ scripts/build-in-docker.sh
 ```
 
 Everything else needs no phone or account, and mostly no network (`msrv`
