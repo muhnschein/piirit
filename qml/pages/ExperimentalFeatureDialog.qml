@@ -7,12 +7,17 @@ import Sailfish.Silica 1.0
  * one thing worth stopping for, so it is said on the way in rather than
  * every time the settings page is read. The settings page connects to
  * `accepted` and turns the feature on; turning it off asks nothing.
+ *
+ * Any other switch worth the same stop says its own one thing in `text`:
+ * a camera quick action's "Send right away" (QuickActionSetting).
  */
 Dialog {
     id: dialog
 
     /// The switch's own label, for the header.
     property string title
+    /// The one thing worth stopping for.
+    property string text: qsTr("This feature may be unstable and may be changed or removed.")
 
     Column {
         width: parent.width
@@ -31,7 +36,7 @@ Dialog {
             width: parent.width - 2 * Theme.horizontalPageMargin
             wrapMode: Text.Wrap
             color: Theme.highlightColor
-            text: qsTr("This feature may be unstable and may be changed or removed.")
+            text: dialog.text
         }
     }
 }
