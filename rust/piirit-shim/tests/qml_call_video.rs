@@ -96,19 +96,6 @@ const PROBE_QML: &str = r"
             hit.clicked()
             return 'ok'
         }
-        // A tap on a touch area, which hands its handler the touch.
-        function touch(name) {
-            var hit = findIn(pageHolder.item, name)
-            if (!hit) { return 'missing:' + name }
-            hit.clicked(null)
-            return 'ok'
-        }
-        function setOn(name, property, value) {
-            var hit = findIn(pageHolder.item, name)
-            if (!hit) { return 'missing:' + name }
-            hit[property] = value
-            return 'ok'
-        }
         // Where a spinner is, against the middle of what it is over: to
         // the pixel, which is what centring aligns to.
         function centredOn(name, over) {
@@ -116,27 +103,6 @@ const PROBE_QML: &str = r"
             var under = findIn(pageHolder.item, over)
             return Math.abs(spinner.x + spinner.width / 2 - under.x - under.width / 2) <= 1
                     && Math.abs(spinner.y + spinner.height / 2 - under.y - under.height / 2) <= 1
-        }
-        // Where a drag leaves this end's picture.
-        function movePicture(x, y) {
-            var hit = findIn(pageHolder.item, 'ownPicture')
-            if (!hit) { return 'missing:ownPicture' }
-            hit.x = x
-            hit.y = y
-            return 'ok'
-        }
-        // The room this end's picture is dragged in, against the lines
-        // and switches it is kept between.
-        function pictureRoom() {
-            var grip = findIn(pageHolder.item, 'ownPictureGrip')
-            var who = findIn(pageHolder.item, 'callWho')
-            var switches = findIn(pageHolder.item, 'callSwitches')
-            var picture = findIn(pageHolder.item, 'ownPicture')
-            return [grip.drag.minimumY >= who.y + who.height,
-                    grip.drag.maximumY + picture.height <= switches.y,
-                    grip.drag.minimumX >= 0,
-                    grip.drag.maximumX + picture.width <= pageHolder.width,
-                    grip.drag.target === picture].join(',')
         }
         function engine() { return WebEngine.notified }
         function call() {
@@ -391,7 +357,7 @@ fn a_video_call_shows_its_pictures_under_lines_a_tap_puts_away() {
         Box::new(move || unsafe {
             record!("their-spinner-black", get!("theirSpinner", "running"));
             record!("our-spinner-corner", get!("ourSpinner", "running"));
-            // Told where its corner is, the moment it has one.
+            // Told nothing of where its corner is: the page has it.
             let url = (*url_ptr).clone();
             record!(
                 "told-corner",
@@ -412,10 +378,9 @@ fn a_video_call_shows_its_pictures_under_lines_a_tap_puts_away() {
                     get!("ownPicture", "height")
                 )
             );
-            record!("picture-room", call!("pictureRoom"));
             record!("flip-row-corner", get!("flipButton", "visible"));
             record!("flip-on-picture", get!("pictureFlip", "visible"));
-            record!("flip-inner-right", get!("pictureFlip", "x"));
+            record!("flip-inner", get!("pictureFlip", "x"));
             record!(
                 "flip-size",
                 format!(
@@ -425,7 +390,6 @@ fn a_video_call_shows_its_pictures_under_lines_a_tap_puts_away() {
                     get!("pictureFlipButton", "width")
                 )
             );
-            record!("told-at-once", get!("told", "interval"));
             // A video call is on the loudspeaker; the switch puts it on
             // the earpiece and back.
             record!(
@@ -466,51 +430,9 @@ fn a_video_call_shows_its_pictures_under_lines_a_tap_puts_away() {
             call!("tapPictures");
             record!("who-back", get!("callWho", "visible"));
             record!("hang-up-back", get!("hangUpButton", "visible"));
-            // A tap on the picture itself is a tap on the pictures.
-            record!("grip-tap", call!("touch", QString::from("ownPictureGrip")));
-            record!("grip-tap-away", get!("callWho", "visible"));
-            call!("touch", QString::from("ownPictureGrip"));
-            record!("grip-tap-back", get!("callWho", "visible"));
-            // Let go after a drag: no tap.
-            call!(
-                "setOn",
-                QString::from("ownPictureGrip"),
-                QString::from("dragged"),
-                true
-            );
-            call!("touch", QString::from("ownPictureGrip"));
-            record!("grip-drag-let-go", get!("callWho", "visible"));
-            // Dragged to the left: the button goes to its other side,
-            // and the page is told where it went -- once, however often
-            // it moved in between.
-            record!("move", call!("movePicture", 8, 280));
-            record!("move-again", call!("movePicture", 8, 300));
-            record!("flip-inner-left", get!("pictureFlip", "x"));
-        }),
-        // Across, then down: each told.
-        Box::new(move || unsafe {
-            let url = (*url_ptr).clone();
-            record!(
-                "told-move",
-                body_of(&get(
-                    &authority_of(&url),
-                    &format!("{}/commands", api_of(&url))
-                ))
-                .to_string()
-            );
-            record!("move-across", call!("movePicture", 20, 300));
         }),
         Box::new(move || unsafe {
             let url = (*url_ptr).clone();
-            record!(
-                "told-across",
-                body_of(&get(
-                    &authority_of(&url),
-                    &format!("{}/commands", api_of(&url))
-                ))
-                .to_string()
-            );
-            record!("move-down", call!("movePicture", 20, 240));
             // Turned on the picture: the button dimmed where it was, from
             // the press on, until the other camera's picture shows.
             record!("turn", tap!("pictureFlipButton"));
@@ -735,7 +657,7 @@ fn a_video_call_shows_its_pictures_under_lines_a_tap_puts_away() {
     assert_eq!(
         value("own-picture-whole"),
         "false",
-        "the picture filling the screen has a corner to drag. {context}"
+        "the picture filling the screen has a corner of its own. {context}"
     );
 
     assert_eq!(
@@ -770,13 +692,13 @@ fn a_video_call_shows_its_pictures_under_lines_a_tap_puts_away() {
     assert_eq!(value("our-spinner-corner"), "false", "{context}");
     assert_eq!(
         value("told-corner"),
-        r#"["back-camera-1","facing-environment","corner=0.6900,0.1000"]"#,
-        "the page was not told where the picture's corner is. {context}"
+        r#"["back-camera-1","facing-environment"]"#,
+        "the page was told where the picture's corner is, which it has. {context}"
     );
     assert_eq!(
         value("own-picture-corner"),
         "true",
-        "this end's picture in its corner cannot be dragged. {context}"
+        "this end's picture in its corner has nothing on it. {context}"
     );
     // The page's own corner: 27% of 540 by 36%, 4% in from the right,
     // 10% of 960 down.
@@ -791,11 +713,6 @@ fn a_video_call_shows_its_pictures_under_lines_a_tap_puts_away() {
         );
     }
     assert_eq!(
-        value("picture-room"),
-        "true,true,true,true,true",
-        "the picture can be dragged over the lines or the switches, or off the screen. {context}"
-    );
-    assert_eq!(
         value("flip-row-corner"),
         "false",
         "the camera's button stays in the row once the picture has its corner. {context}"
@@ -806,7 +723,7 @@ fn a_video_call_shows_its_pictures_under_lines_a_tap_puts_away() {
         "the picture in its corner has no button to turn the camera. {context}"
     );
     assert_eq!(
-        value("flip-inner-right"),
+        value("flip-inner"),
         "8",
         "the button is not on the picture's inner side. {context}"
     );
@@ -817,11 +734,6 @@ fn a_video_call_shows_its_pictures_under_lines_a_tap_puts_away() {
          with room round it to press. {context}"
     );
     assert_eq!(
-        value("told-at-once"),
-        "0",
-        "a move waits to be told: the picture trails the finger. {context}"
-    );
-    assert_eq!(
         value("flip-on-picture-away"),
         "false",
         "the button stays when the lines go. {context}"
@@ -829,40 +741,6 @@ fn a_video_call_shows_its_pictures_under_lines_a_tap_puts_away() {
     assert!(
         value("own-picture-place").starts_with(&format!("{},", value("own-picture-away"))),
         "the picture moved when the lines went. {context}"
-    );
-    assert_eq!(value("grip-tap"), "ok", "{context}");
-    assert_eq!(
-        value("grip-tap-away"),
-        "false",
-        "a tap on the picture does not put the lines away. {context}"
-    );
-    assert_eq!(value("grip-tap-back"), "true", "{context}");
-    assert_eq!(
-        value("grip-drag-let-go"),
-        "true",
-        "letting go of the picture after a drag is taken for a tap. {context}"
-    );
-    assert_eq!(value("move"), "ok", "{context}");
-    assert_eq!(value("move-again"), "ok", "{context}");
-    assert_eq!(value("move-across"), "ok", "{context}");
-    assert_eq!(value("move-down"), "ok", "{context}");
-    // 8 of 540 across, 300 of 960 down; then 20 across.
-    assert_eq!(
-        value("told-move"),
-        r#"["corner=0.0148,0.3125"]"#,
-        "the page was not told where the picture went, or told each place \
-         it passed. {context}"
-    );
-    assert_eq!(
-        value("told-across"),
-        r#"["corner=0.0370,0.3125"]"#,
-        "the page was not told the picture went across. {context}"
-    );
-    // The picture's width, less the button's and a small margin.
-    let inner: f64 = value("flip-inner-left").parse().unwrap_or(f64::NAN);
-    assert!(
-        (inner - (145.8 - 48.0 - 8.0)).abs() < 0.01,
-        "dragged left, the button is not on the picture's inner side: {inner}. {context}"
     );
     assert_eq!(
         value("their-spinner-shown"),
@@ -972,13 +850,10 @@ fn a_video_call_shows_its_pictures_under_lines_a_tap_puts_away() {
         "0.5,1.0",
         "the call does not have the platform camera's lens labels. {context}"
     );
-    // Where the picture was dragged to, the last place only: 20 of 540
-    // across and 240 of 960 down.
     assert_eq!(
         value("told"),
-        r#"["facing-user","corner=0.0370,0.2500","facing-environment","camera-off"]"#,
-        "the page was not told which back camera is the main lens, where \
-         the picture went, or what the switches did. {context}"
+        r#"["facing-user","facing-environment","camera-off"]"#,
+        "the page was not told what the switches did. {context}"
     );
 
     assert_eq!(

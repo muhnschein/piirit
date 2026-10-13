@@ -733,10 +733,18 @@ test("this end's picture fills the screen until theirs comes, then a corner", as
     const theirs = new Track("video", "theirs");
     connection.fire("track", { track: theirs, streams: [new Stream([theirs])] });
     assert.equal(box.style.width, "27vw");
-    assert.deepEqual([box.style.left, box.style.top, box.style.right], ["0", "0", "auto"]);
-    assert.equal(box.style.transform, "translate(69.00vw, 10.00vh)",
+    assert.deepEqual([box.style.left, box.style.top, box.style.right], ["auto", "10vh", "4vw"],
         "the picture is not 4% in from the right and 10% down");
-    assert.equal(box.style.willChange, "transform", "the picture has no layer of its own to move");
+
+    // Theirs gone: the whole screen. Back: the same corner.
+    theirs.muted = true;
+    theirs.fire("mute");
+    assert.deepEqual([box.style.left, box.style.top, box.style.right, box.style.width],
+        ["0", "0", "0", "100%"]);
+    theirs.muted = false;
+    theirs.fire("unmute");
+    assert.deepEqual([box.style.left, box.style.top, box.style.right, box.style.width],
+        ["auto", "10vh", "4vw", "27vw"]);
 });
 
 test("in the background the pictures are not drawn", async () => {
@@ -1762,51 +1770,4 @@ test("their picture given a new stream has yet to show it, and given the same on
     picture.mozPaintedFrames += 1;
     runTimers(world);
     assert.equal(lastVideo(world).remotePainted, true, "a picture counted afresh is never said to show");
-});
-
-test("this end's picture goes where the reader moves it, and nowhere off the screen", async () => {
-    const world = makeWorld(VIDEO);
-    const { connection, box } = await page(world);
-    const theirs = new Track("video", "theirs");
-    connection.fire("track", { track: theirs, streams: [new Stream([theirs])] });
-    await command(world, "corner=0.0500,0.4250");
-    assert.deepEqual([box.style.transform, box.style.width],
-        ["translate(5.00vw, 42.50vh)", "27vw"]);
-
-    // Off the screen, or not a place at all: left where it was.
-    await command(world, "corner=1.5,0.1", "corner=0.1,2", "corner=.,.");
-    assert.equal(box.style.transform, "translate(5.00vw, 42.50vh)");
-    assert.equal(world.window.location.hash, "", "a move was handed to the page as a command");
-    await command(world, "corner=1,0");
-    assert.equal(box.style.transform, "translate(100.00vw, 0.00vh)");
-
-    // A move shifts the picture and touches nothing else of it: placed
-    // anew on every move of a drag, it lags behind the finger.
-    box.style.width = "untouched";
-    box.style.boxShadow = "untouched";
-    await command(world, "corner=0.0500,0.4250");
-    assert.equal(box.style.transform, "translate(5.00vw, 42.50vh)");
-    assert.deepEqual([box.style.width, box.style.boxShadow], ["untouched", "untouched"],
-        "a move placed the picture anew");
-    box.style.width = "27vw";
-    box.style.boxShadow = "";
-
-    // Theirs gone: the whole screen, which a move leaves. Back: where it
-    // was moved to last.
-    theirs.muted = true;
-    theirs.fire("mute");
-    assert.deepEqual([box.style.left, box.style.top, box.style.right, box.style.transform],
-        ["0", "0", "0", "none"]);
-    await command(world, "corner=0.2000,0.3000");
-    assert.equal(box.style.transform, "none", "a move took the picture off the whole screen");
-    theirs.muted = false;
-    theirs.fire("unmute");
-    assert.deepEqual([box.style.left, box.style.top, box.style.right, box.style.transform],
-        ["0", "0", "auto", "translate(20.00vw, 30.00vh)"]);
-
-    // Without a camera there is no picture to move.
-    await command(world, "camera-off");
-    await command(world, "corner=0.4000,0.5000");
-    assert.equal(box.style.transform, "translate(20.00vw, 30.00vh)",
-        "a picture put away was moved");
 });

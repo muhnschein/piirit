@@ -19,7 +19,7 @@ docs/BUILDING.md, "Cutting a release").
 - A ringing call plays the ringtone rather than a short beep.
 - A call that rings while the screen is off takes the lock screen away, so the call screen stays up.
 - A call declined just as the last call's screen was closing still says so.
-- **Video calls.** Call with the camera on from a contact's Calls page, or switch it on in any call; their picture fills the screen and yours sits in a corner you can drag anywhere between the top line and the switches. The button on your picture turns the camera, a tap puts the lines and switches away, and a spinner shows while a picture is on its way.
+- **Video calls.** Call with the camera on from a contact's Calls page, or switch it on in any call; their picture fills the screen and yours sits in the top right corner. The button on your picture turns the camera, a tap puts the lines and switches away, and a spinner shows while a picture is on its way.
 - **Earpiece and loudspeaker.** A voice call is on the earpiece, as a phone call is, and a video call on the loudspeaker; the switch on the call screen goes between the two. A headset or a Bluetooth device takes the sound by itself. Nothing stays behind: should the app close or crash mid-call, the phone's sound goes back to where it was.
 - **The cover shows a call** while one is up: who, with their picture behind, how long, whether your microphone is off or your camera paused, and one quick action to switch the microphone off and on.
 

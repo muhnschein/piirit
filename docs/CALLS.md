@@ -317,19 +317,11 @@ The call screen shows the page while there are pictures -- its pictures
 and nothing else of it: the bridge hides every element but the two
 videos -- with its own lines and switches over them, on a shade. This
 end's picture fills the screen until the other end's comes, then sits
-in the corner, mirrored only from the front camera. The reader can drag
-it out of the corner: it stays where it is let go, anywhere between the
-top line and the switches, whether or not those are shown. The call
-screen owns where it is -- an invisible item over it takes the touches
-and carries the button that turns the camera -- and tells the bridge
-(`corner=LEFT,TOP`, fractions of the screen); a drag is told with
-every touch event, as soon as the event is through, and the host keeps
-only the last place still waiting, so the page draws where the finger
-is rather than where it was. In the corner the picture is placed at the
-top left and shifted there with a transform, on a layer of its own
-(`will-change: transform`): a move changes the shift and nothing else,
-so the engine moves the layer without laying out or painting anything
-again. The other end's is
+in the top right corner, mirrored only from the front camera, and stays
+there, as the reference clients have it. An invisible item on the call
+screen, over the same corner, carries the button that turns the camera.
+Dragging it was tried and dropped: the picture trailed the finger on a
+phone, even moved on a layer of its own. The other end's is
 enlarged towards filling the screen too, but by no more than 1.35
 times: an upright phone's picture fills a taller screen, and one held
 sideways loses some of its bars rather than half of itself. It is laid

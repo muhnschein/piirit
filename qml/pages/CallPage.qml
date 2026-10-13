@@ -28,9 +28,10 @@ import "../components"
  * to how long, and the large clock goes. The camera switch is there in
  * every call, so a voice call can become a video call, and on the
  * ringing screen of a video call, so it can be answered without one.
- * This end's picture, once the other end's is drawn, sits in a corner
- * the reader can drag it out of, and carries the button that turns the
- * camera; a picture still black has a spinner over it until it shows.
+ * This end's picture, once the other end's is drawn, sits in the top
+ * right corner, as the reference clients have it, and carries the button
+ * that turns the camera; a picture still black has a spinner over it
+ * until it shows.
  *
  * That page is loaded rather than declared, so a phone without the
  * browser engine loses the call and keeps this page -- a call that rings
@@ -400,11 +401,9 @@ Page {
     }
 
     // Where this end's picture is while the other end's is drawn: the
-    // page draws it where this says (call_video.js), and this takes the
-    // touches on it. In the corner under the top line at first, the
-    // size the page gives it; dragged, it stays where it is let go,
-    // anywhere between the top line and the switches -- whether or not
-    // those are shown, so that it does not move when they go.
+    // top right corner, where the page draws it (call_video.js), the
+    // size the page gives it. What it carries is laid out on it; a tap
+    // on it is a tap on the pictures, and falls through to the shield.
     Item {
         id: ownPicture
         objectName: "ownPicture"
@@ -412,81 +411,19 @@ Page {
         /// The picture is in a corner rather than the whole screen.
         readonly property bool cornered: page.video && page.call.local_video
                                          && page.call.remote_video
-        /// The room it has.
-        readonly property real minX: Theme.paddingMedium
-        readonly property real maxX: page.width - ownPicture.width - Theme.paddingMedium
-        readonly property real minY: who.y + who.height + Theme.paddingMedium
-        readonly property real maxY: Math.max(ownPicture.minY,
-                                              switches.y - Theme.paddingMedium - ownPicture.height)
-        /// It is right of the middle: the button is on its inner side.
-        readonly property bool onRight: ownPicture.x + ownPicture.width / 2 > page.width / 2
 
         visible: ownPicture.cornered
         // The page's corner (call_video.js): 27% of the screen's width
         // by 36%, 4% in from its right and 10% down from its top.
         width: page.width * 0.27
         height: page.width * 0.36
-        x: Math.max(ownPicture.minX, Math.min(page.width * 0.69, ownPicture.maxX))
-        y: Math.max(ownPicture.minY, Math.min(page.height * 0.1, ownPicture.maxY))
-
-        /// Tell the page where it is now.
-        function tell() {
-            if (ownPicture.cornered) {
-                page.call.move_picture(ownPicture.x / page.width, ownPicture.y / page.height)
-            }
-        }
-
-        onCorneredChanged: ownPicture.tell()
-        onXChanged: told.start()
-        onYChanged: told.start()
-
-        // Dragged, it moves with every touch event: the page is told
-        // where it is now as soon as the event is through, once for both
-        // of x and y. Told any later, the picture trails the finger; the
-        // host keeps only the last place the page has yet to hear.
-        Timer {
-            id: told
-            objectName: "told"
-            interval: 0
-            onTriggered: ownPicture.tell()
-        }
-
-        MouseArea {
-            id: grip
-            objectName: "ownPictureGrip"
-            anchors.fill: parent
-            drag.target: ownPicture
-            drag.minimumX: ownPicture.minX
-            drag.maximumX: ownPicture.maxX
-            drag.minimumY: ownPicture.minY
-            drag.maximumY: ownPicture.maxY
-
-            /// This press has dragged: let go, it is no tap.
-            property bool dragged: false
-
-            onPressed: {
-                grip.dragged = false
-                if (page.controlsShown) {
-                    tuck.restart()
-                }
-            }
-            onPositionChanged: {
-                if (grip.drag.active) {
-                    grip.dragged = true
-                }
-            }
-            // A tap on it is a tap on the pictures.
-            onClicked: {
-                if (!grip.dragged) {
-                    page.toggleControls()
-                }
-            }
-        }
+        x: page.width * 0.69
+        y: page.height * 0.1
 
         // Which way the camera faces, on the picture it turns: small, in
-        // its lower corner nearer the middle of the screen, and with the
-        // lines and switches. Only once the picture shows, as in the row.
-        // What takes the press is larger than the disc drawn.
+        // its lower left corner, nearer the middle of the screen, and
+        // with the lines and switches. Only once the picture shows, as in
+        // the row. What takes the press is larger than the disc drawn.
         Rectangle {
             objectName: "pictureFlip"
             visible: ownPicture.cornered && page.overlay && page.call.camera
@@ -496,9 +433,9 @@ Page {
             height: Theme.iconSizeSmallPlus
             radius: width / 2
             color: Theme.rgba("black", 0.45)
-            x: ownPicture.onRight ? Theme.paddingMedium
-                                  : ownPicture.width - width - Theme.paddingMedium
             anchors {
+                left: parent.left
+                leftMargin: Theme.paddingMedium
                 bottom: parent.bottom
                 bottomMargin: Theme.paddingMedium
             }

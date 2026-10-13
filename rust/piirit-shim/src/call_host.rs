@@ -276,20 +276,6 @@ impl Host {
         self.shared.changed.notify_waiters();
     }
 
-    /// The same, in place of any command of its name still waiting: one
-    /// that says where something is now, which makes where it was before
-    /// nothing to act on. A picture dragged is told where it is many
-    /// times a second, and the page has only the last of them to draw.
-    pub(crate) fn restate(&self, command: String) {
-        let name = command.split('=').next().unwrap_or_default();
-        {
-            let mut queue = self.shared.queue();
-            queue.retain(|waiting| waiting.split('=').next() != Some(name));
-            queue.push_back(command);
-        }
-        self.shared.changed.notify_waiters();
-    }
-
     /// The call is over at the other end, and the core knows: nothing
     /// is to be told to it when this host goes.
     pub(crate) fn settle(&self) {
@@ -870,14 +856,6 @@ pub(crate) fn back_camera_command(place: usize) -> String {
     format!("back-camera-{place}")
 }
 
-/// The command that has the bridge put this end's picture where the reader
-/// moved it: its top left corner, as fractions of the screen's width and
-/// height. None for a place that is not on the screen.
-pub(crate) fn corner_command(left: f64, top: f64) -> Option<String> {
-    let on_screen = |at: f64| (0.0..=1.0).contains(&at);
-    (on_screen(left) && on_screen(top)).then(|| format!("corner={left:.4},{top:.4}"))
-}
-
 /// The command that has the bridge stop drawing the pictures, the app
 /// having gone to the background, or draw them again.
 pub(crate) fn shown_command(shown: bool) -> String {
@@ -948,9 +926,9 @@ async fn write_response(stream: &mut TcpStream, response: &Response) -> std::io:
 #[cfg(test)]
 mod tests {
     use super::{
-        back_camera_command, camera_command, command, corner_command, encode_base64, encoder_path,
-        encodes_h264, facing_command, log_line, media_environment, media_plugins, percent_encode,
-        shown_command, CallLog, Video, BRIDGE, BUNDLED_ENCODER, LOG_LINE_MAX, PAGE,
+        back_camera_command, camera_command, command, encode_base64, encoder_path, encodes_h264,
+        facing_command, log_line, media_environment, media_plugins, percent_encode, shown_command,
+        CallLog, Video, BRIDGE, BUNDLED_ENCODER, LOG_LINE_MAX, PAGE,
     };
     use crate::webxdc_host::decode_base64;
     use std::path::{Path, PathBuf};
@@ -1292,26 +1270,6 @@ mod tests {
         assert!(
             BRIDGE.contains(r"/^back-camera-(\d+)$/"),
             "the bridge does not take back-camera-N"
-        );
-        assert_eq!(
-            corner_command(0.05, 0.425).as_deref(),
-            Some("corner=0.0500,0.4250")
-        );
-        assert_eq!(
-            corner_command(0.0, 1.0).as_deref(),
-            Some("corner=0.0000,1.0000")
-        );
-        for (left, top) in [
-            (-0.01, 0.5),
-            (0.5, 1.01),
-            (f64::NAN, 0.5),
-            (0.5, f64::INFINITY),
-        ] {
-            assert_eq!(corner_command(left, top), None, "{left},{top}");
-        }
-        assert!(
-            BRIDGE.contains(r"/^corner=([\d.]+),([\d.]+)$/"),
-            "the bridge does not take corner=LEFT,TOP"
         );
     }
 

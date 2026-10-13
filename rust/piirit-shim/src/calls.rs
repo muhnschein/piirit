@@ -254,10 +254,6 @@ pub struct Call {
     pub set_camera: qt_method!(fn(&mut self, on: bool)),
     /// Turn the camera to face the other way.
     pub flip_camera: qt_method!(fn(&mut self)),
-    /// The reader moved this end's picture: its top left corner is now
-    /// at `left` and `top`, as fractions of the screen's width and
-    /// height. Nothing for a place off the screen.
-    pub move_picture: qt_method!(fn(&mut self, left: f64, top: f64)),
     /// The app has gone to the background, or come back: the camera is
     /// let go while it is away -- nobody is looking at what it shows,
     /// and the other end is told it is off -- and the pictures are not
@@ -491,15 +487,6 @@ impl Call {
         self.rear_camera = !self.rear_camera;
         self.video_changed();
         self.tell(call_host::facing_command(!self.rear_camera));
-    }
-
-    /// This end's picture, where the reader moved it. Only the last of
-    /// the places still waiting for the page is told: see
-    /// `Host::restate`.
-    pub fn move_picture(&mut self, left: f64, top: f64) {
-        if let (Some(host), Some(command)) = (&self.host, call_host::corner_command(left, top)) {
-            host.restate(command);
-        }
     }
 
     /// This process's id with the audio policy, from its own
