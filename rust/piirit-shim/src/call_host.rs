@@ -135,7 +135,7 @@ pub(crate) enum Report {
 }
 
 /// How a call's pictures stand, as the bridge reports them on `/video`.
-// Four flags the bridge reports side by side, each read on its own.
+// Flags the bridge reports side by side, each read on its own.
 #[allow(clippy::struct_excessive_bools)]
 #[derive(Debug, Clone, Default, PartialEq, Eq)]
 pub(crate) struct Video {
@@ -143,6 +143,11 @@ pub(crate) struct Video {
     pub(crate) local: bool,
     /// The other end's picture is being drawn.
     pub(crate) remote: bool,
+    /// The camera's picture has painted a frame since it was last given
+    /// one -- shown, not black -- or has been given up on.
+    pub(crate) local_painted: bool,
+    /// The same, of the other end's picture.
+    pub(crate) remote_painted: bool,
     /// The camera faces the reader.
     pub(crate) front: bool,
     /// The last camera asked for would not open.
@@ -160,6 +165,8 @@ impl Video {
         value.is_object().then(|| Self {
             local: json::flag(&value, "local"),
             remote: json::flag(&value, "remote"),
+            local_painted: json::flag(&value, "localPainted"),
+            remote_painted: json::flag(&value, "remotePainted"),
             front: json::flag(&value, "front"),
             failed: json::flag(&value, "failed"),
             error: json::str_at(&value, "error").to_owned(),
@@ -263,6 +270,20 @@ impl Host {
     /// command, or one of the bridge's own.
     pub(crate) fn command(&self, command: String) {
         self.shared.queue().push_back(command);
+        self.shared.changed.notify_waiters();
+    }
+
+    /// The same, in place of any command of its name still waiting: one
+    /// that says where something is now, which makes where it was before
+    /// nothing to act on. A picture dragged is told where it is many
+    /// times a second, and the page has only the last of them to draw.
+    pub(crate) fn restate(&self, command: String) {
+        let name = command.split('=').next().unwrap_or_default();
+        {
+            let mut queue = self.shared.queue();
+            queue.retain(|waiting| waiting.split('=').next() != Some(name));
+            queue.push_back(command);
+        }
         self.shared.changed.notify_waiters();
     }
 
@@ -843,6 +864,14 @@ pub(crate) fn back_camera_command(place: usize) -> String {
     format!("back-camera-{place}")
 }
 
+/// The command that has the bridge put this end's picture where the reader
+/// moved it: its top left corner, as fractions of the screen's width and
+/// height. None for a place that is not on the screen.
+pub(crate) fn corner_command(left: f64, top: f64) -> Option<String> {
+    let on_screen = |at: f64| (0.0..=1.0).contains(&at);
+    (on_screen(left) && on_screen(top)).then(|| format!("corner={left:.4},{top:.4}"))
+}
+
 /// The command that has the bridge stop drawing the pictures, the app
 /// having gone to the background, or draw them again.
 pub(crate) fn shown_command(shown: bool) -> String {
@@ -911,9 +940,9 @@ async fn write_response(stream: &mut TcpStream, response: &Response) -> std::io:
 #[cfg(test)]
 mod tests {
     use super::{
-        back_camera_command, camera_command, command, encode_base64, encoder_path, encodes_h264,
-        facing_command, log_line, media_environment, media_plugins, percent_encode, shown_command,
-        CallLog, Video, BRIDGE, BUNDLED_ENCODER, LOG_LINE_MAX, PAGE,
+        back_camera_command, camera_command, command, corner_command, encode_base64, encoder_path,
+        encodes_h264, facing_command, log_line, media_environment, media_plugins, percent_encode,
+        shown_command, CallLog, Video, BRIDGE, BUNDLED_ENCODER, LOG_LINE_MAX, PAGE,
     };
     use crate::webxdc_host::decode_base64;
     use std::path::{Path, PathBuf};
@@ -1017,6 +1046,25 @@ mod tests {
             Some(Video {
                 failed: true,
                 error: "NotReadableError: busy".to_owned(),
+                ..Video::default()
+            })
+        );
+        // Which pictures show yet.
+        assert_eq!(
+            Video::from_json(
+                r#"{"local":true,"remote":true,"localPainted":true,"remotePainted":false}"#
+            ),
+            Some(Video {
+                local: true,
+                remote: true,
+                local_painted: true,
+                ..Video::default()
+            })
+        );
+        assert_eq!(
+            Video::from_json(r#"{"remotePainted":true}"#),
+            Some(Video {
+                remote_painted: true,
                 ..Video::default()
             })
         );
@@ -1236,6 +1284,26 @@ mod tests {
         assert!(
             BRIDGE.contains(r"/^back-camera-(\d+)$/"),
             "the bridge does not take back-camera-N"
+        );
+        assert_eq!(
+            corner_command(0.05, 0.425).as_deref(),
+            Some("corner=0.0500,0.4250")
+        );
+        assert_eq!(
+            corner_command(0.0, 1.0).as_deref(),
+            Some("corner=0.0000,1.0000")
+        );
+        for (left, top) in [
+            (-0.01, 0.5),
+            (0.5, 1.01),
+            (f64::NAN, 0.5),
+            (0.5, f64::INFINITY),
+        ] {
+            assert_eq!(corner_command(left, top), None, "{left},{top}");
+        }
+        assert!(
+            BRIDGE.contains(r"/^corner=([\d.]+),([\d.]+)$/"),
+            "the bridge does not take corner=LEFT,TOP"
         );
     }
 

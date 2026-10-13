@@ -28,6 +28,9 @@ import "../components"
  * to how long, and the large clock goes. The camera switch is there in
  * every call, so a voice call can become a video call, and on the
  * ringing screen of a video call, so it can be answered without one.
+ * This end's picture, once the other end's is drawn, sits in a corner
+ * the reader can drag it out of, and carries the button that turns the
+ * camera; a picture still black has a spinner over it until it shows.
  *
  * That page is loaded rather than declared, so a phone without the
  * browser engine loses the call and keeps this page -- a call that rings
@@ -341,6 +344,136 @@ Page {
         onClicked: page.toggleControls()
     }
 
+    // A picture that has yet to show its first frame is black, and the
+    // engine can take a moment over it (call_video.js): a spinner says
+    // nothing is broken. The other end's fills the screen; this end's
+    // does until theirs comes, and has its corner after.
+    BusyIndicator {
+        objectName: "theirSpinner"
+        anchors.centerIn: parent
+        size: BusyIndicatorSize.Large
+        running: page.video && page.call.remote_video && !page.call.remote_painted
+    }
+
+    BusyIndicator {
+        objectName: "ourSpinner"
+        anchors.centerIn: ownPicture.cornered ? ownPicture : parent
+        size: ownPicture.cornered ? BusyIndicatorSize.Medium : BusyIndicatorSize.Large
+        running: page.video && page.call.local_video && !page.call.local_painted
+    }
+
+    // Where this end's picture is while the other end's is drawn: the
+    // page draws it where this says (call_video.js), and this takes the
+    // touches on it. In the corner under the top line at first, the
+    // size the page gives it; dragged, it stays where it is let go,
+    // anywhere between the top line and the switches -- whether or not
+    // those are shown, so that it does not move when they go.
+    Item {
+        id: ownPicture
+        objectName: "ownPicture"
+
+        /// The picture is in a corner rather than the whole screen.
+        readonly property bool cornered: page.video && page.call.local_video
+                                         && page.call.remote_video
+        /// The room it has.
+        readonly property real minX: Theme.paddingMedium
+        readonly property real maxX: page.width - ownPicture.width - Theme.paddingMedium
+        readonly property real minY: who.y + who.height + Theme.paddingMedium
+        readonly property real maxY: Math.max(ownPicture.minY,
+                                              switches.y - Theme.paddingMedium - ownPicture.height)
+        /// It is right of the middle: the button is on its inner side.
+        readonly property bool onRight: ownPicture.x + ownPicture.width / 2 > page.width / 2
+
+        visible: ownPicture.cornered
+        // The page's corner (call_video.js): 27% of the screen's width
+        // by 36%, 4% in from its right and 10% down from its top.
+        width: page.width * 0.27
+        height: page.width * 0.36
+        x: Math.max(ownPicture.minX, Math.min(page.width * 0.69, ownPicture.maxX))
+        y: Math.max(ownPicture.minY, Math.min(page.height * 0.1, ownPicture.maxY))
+
+        /// Tell the page where it is now.
+        function tell() {
+            if (ownPicture.cornered) {
+                page.call.move_picture(ownPicture.x / page.width, ownPicture.y / page.height)
+            }
+        }
+
+        onCorneredChanged: ownPicture.tell()
+        onXChanged: told.start()
+        onYChanged: told.start()
+
+        // Dragged, it moves many times a second: the page is told where
+        // it is now at most this often, and once more where it stops.
+        Timer {
+            id: told
+            interval: 32
+            onTriggered: ownPicture.tell()
+        }
+
+        MouseArea {
+            id: grip
+            objectName: "ownPictureGrip"
+            anchors.fill: parent
+            drag.target: ownPicture
+            drag.minimumX: ownPicture.minX
+            drag.maximumX: ownPicture.maxX
+            drag.minimumY: ownPicture.minY
+            drag.maximumY: ownPicture.maxY
+
+            /// This press has dragged: let go, it is no tap.
+            property bool dragged: false
+
+            onPressed: {
+                grip.dragged = false
+                if (page.controlsShown) {
+                    tuck.restart()
+                }
+            }
+            onPositionChanged: {
+                if (grip.drag.active) {
+                    grip.dragged = true
+                }
+            }
+            // A tap on it is a tap on the pictures.
+            onClicked: {
+                if (!grip.dragged) {
+                    page.toggleControls()
+                }
+            }
+        }
+
+        // Which way the camera faces, on the picture it turns: in its
+        // lower corner nearer the middle of the screen, and with the
+        // lines and switches. Only once the picture shows, as in the row.
+        Rectangle {
+            objectName: "pictureFlip"
+            visible: ownPicture.cornered && page.overlay && page.call.camera
+                     && page.call.local_painted
+            width: pictureFlipButton.width
+            height: pictureFlipButton.height
+            radius: width / 2
+            color: Theme.rgba("black", 0.45)
+            x: ownPicture.onRight ? Theme.paddingSmall
+                                  : ownPicture.width - width - Theme.paddingSmall
+            anchors {
+                bottom: parent.bottom
+                bottomMargin: Theme.paddingSmall
+            }
+
+            IconButton {
+                id: pictureFlipButton
+                objectName: "pictureFlipButton"
+                anchors.centerIn: parent
+                icon.source: "image://theme/icon-camera-switch"
+                onClicked: {
+                    page.touched()
+                    page.call.flip_camera()
+                }
+            }
+        }
+    }
+
     // Shade at the top and the foot, so the lines read over a picture.
     // A gradient, not a blur: see the backdrop.
     Rectangle {
@@ -496,10 +629,12 @@ Page {
         // Which way the camera faces: a press, not a state. Only once
         // this end's picture shows: a call is answered with the front
         // camera, and the camera is turned when there is a picture to see
-        // turn.
+        // turn. Here while the picture fills the screen; on the picture
+        // once it has its corner.
         IconButton {
             objectName: "flipButton"
             visible: page.inCall && page.call.camera && page.call.local_video
+                     && page.call.local_painted && !page.call.remote_video
             anchors.verticalCenter: parent.verticalCenter
             icon.source: "image://theme/icon-camera-switch"
             onClicked: {

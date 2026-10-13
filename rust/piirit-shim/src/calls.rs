@@ -197,7 +197,12 @@ pub struct Call {
     /// The other end's picture is being drawn, as the page says: they
     /// are sending one and have not switched it off.
     pub remote_video: qt_property!(bool; NOTIFY video_changed),
-    /// Emitted when any of the four above changes.
+    /// The camera's picture shows: it has painted a frame since it was
+    /// last given one, as the page says. Black on the screen until then.
+    pub local_painted: qt_property!(bool; NOTIFY video_changed),
+    /// The same, of the other end's picture.
+    pub remote_painted: qt_property!(bool; NOTIFY video_changed),
+    /// Emitted when any of the six above changes.
     pub video_changed: qt_signal!(),
 
     /// Where the call's page is, with the command it opens on. Empty
@@ -236,6 +241,10 @@ pub struct Call {
     pub set_camera: qt_method!(fn(&mut self, on: bool)),
     /// Turn the camera to face the other way.
     pub flip_camera: qt_method!(fn(&mut self)),
+    /// The reader moved this end's picture: its top left corner is now
+    /// at `left` and `top`, as fractions of the screen's width and
+    /// height. Nothing for a place off the screen.
+    pub move_picture: qt_method!(fn(&mut self, left: f64, top: f64)),
     /// The app has gone to the background, or come back: the camera is
     /// let go while it is away -- nobody is looking at what it shows,
     /// and the other end is told it is off -- and the pictures are not
@@ -330,6 +339,8 @@ impl Call {
         self.rear_camera = false;
         self.local_video = false;
         self.remote_video = false;
+        self.local_painted = false;
+        self.remote_painted = false;
         self.video_changed();
         if self.muted {
             self.muted = false;
@@ -465,6 +476,15 @@ impl Call {
         self.tell(call_host::facing_command(!self.rear_camera));
     }
 
+    /// This end's picture, where the reader moved it. Only the last of
+    /// the places still waiting for the page is told: see
+    /// [`Host::restate`].
+    pub fn move_picture(&mut self, left: f64, top: f64) {
+        if let (Some(host), Some(command)) = (&self.host, call_host::corner_command(left, top)) {
+            host.restate(command);
+        }
+    }
+
     /// The app away, or back.
     pub fn set_background(&mut self, away: bool) {
         if self.away == away {
@@ -485,9 +505,13 @@ impl Call {
         }
         let mut changed = self.local_video != video.local
             || self.remote_video != video.remote
+            || self.local_painted != video.local_painted
+            || self.remote_painted != video.remote_painted
             || self.rear_camera == video.front;
         self.local_video = video.local;
         self.remote_video = video.remote;
+        self.local_painted = video.local_painted;
+        self.remote_painted = video.remote_painted;
         // The page turns back to the camera it had when the other one
         // will not open: what it faces is what it says.
         self.rear_camera = !video.front;
@@ -540,9 +564,11 @@ impl Call {
             self.url_changed();
         }
         self.end_reason = QString::default();
-        if self.local_video || self.remote_video {
+        if self.local_video || self.remote_video || self.local_painted || self.remote_painted {
             self.local_video = false;
             self.remote_video = false;
+            self.local_painted = false;
+            self.remote_painted = false;
             self.video_changed();
         }
         self.set_state("ended");

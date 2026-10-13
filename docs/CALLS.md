@@ -113,6 +113,13 @@ be swiped away while a call is up -- that would take the call's sound
 with it -- and a tap on a notification or a cover quick action brings
 the call back to the front rather than popping it.
 
+While a call is up the app's cover is the call's: the other end's
+picture behind, faint and enlarged (their avatar instead where they
+have none), their name, how long, and a note for a microphone that is
+off and for a camera paused while the app is away. Its one quick action
+is the microphone: hanging up from the home screen would be too easy
+to do by mistake, and the camera is let go in the background anyway.
+
 ### The page
 
 The media is upstream's [`calls-webapp`][calls-webapp] v0.12.1: WebRTC
@@ -310,7 +317,14 @@ The call screen shows the page while there are pictures -- its pictures
 and nothing else of it: the bridge hides every element but the two
 videos -- with its own lines and switches over them, on a shade. This
 end's picture fills the screen until the other end's comes, then sits
-in the corner, mirrored only from the front camera. The other end's is
+in the corner, mirrored only from the front camera. The reader can drag
+it out of the corner: it stays where it is let go, anywhere between the
+top line and the switches, whether or not those are shown. The call
+screen owns where it is -- an invisible item over it takes the touches
+and carries the button that turns the camera -- and tells the bridge
+(`corner=LEFT,TOP`, fractions of the screen); a drag is told at most
+every 32 ms, and the host keeps only the last place still waiting, so
+the page draws where the finger is rather than where it was. The other end's is
 enlarged towards filling the screen too, but by no more than 1.35
 times: an upright phone's picture fills a taller screen, and one held
 sideways loses some of its bars rather than half of itself. It is laid
@@ -320,16 +334,27 @@ hidden, playing, with frames, the page in front -- that Gecko has
 painted none of in two seconds is put back: its frames taken off its
 stream and put on again, and the stream given to it again, which is
 what turning the camera does, and was seen to draw this end's picture
-where on a phone nothing had been drawn. Three times a call at most,
-then logged; where the engine does not count what it paints, once,
-two seconds after it first shows. One put back paused is asked to play
-until it does, since the other end's picture carries their voice too.
+where on a phone nothing had been drawn. Until a picture has painted
+its first frame -- since it came on the screen, or was given a stream
+it had not had -- it is black, and it is looked at every half second
+rather than every two, so one the engine leaves unpainted is put back
+within a second of having frames. Three times a call at most, then
+logged; where the engine does not count what it paints, once, a look
+after it first shows. One put back paused is asked to play until it
+does, since the other end's picture carries their voice too. Whether
+each picture shows yet goes with every `/video` report
+(`localPainted`, `remotePainted`), and the call screen draws a spinner
+over a picture that does not: the whole screen, or this end's corner. A
+picture given up on -- put back three times, still nothing -- is said
+to show, so the spinner does not turn for ever over it.
 A tap puts the lines
 away, and they go by themselves once both ends are seen; the time of day
 gives way to how long, and the large clock goes. The camera switch is
 there in every call, and on the ringing screen of a video call, so it
-can be answered without the camera; turning it is a button beside it,
-once this end's picture shows. A video call is answered with the front
+can be answered without the camera; turning it is a button beside it
+while this end's picture fills the screen, and in the picture's lower
+corner nearer the middle of the screen once it has its corner, going
+with the lines and switches -- either only once the picture shows. A video call is answered with the front
 camera. This end's picture plays by itself, muted, when the engine lets
 it; one that sits paused is asked to play until it does.
 While there are pictures the screen is kept lit and the ear shield is

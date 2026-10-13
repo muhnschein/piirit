@@ -378,8 +378,11 @@ function makeWorld(search, options) {
             warn(...words) { world.console.push(["warn", ...words]); },
             error(...words) { world.console.push(["error", ...words]); }
         },
-        setTimeout(fn) {
-            timers.push(fn);
+        setTimeout(fn, delay) {
+            // Run when the test says, whatever the delay; which is kept.
+            const timer = () => fn();
+            timer.delay = delay;
+            timers.push(timer);
             return timers.length;
         },
         addEventListener(name, fn) {
@@ -511,7 +514,7 @@ test("a voice call opens no camera, and the page still has a video track", async
     assert.ok(world.log.includes("captureStream:0"),
         "the blank track is a canvas that may draw frames");
     assert.deepEqual(lastVideo(world),
-        { local: false, remote: false, front: true, failed: false });
+        { local: false, remote: false, localPainted: false, remotePainted: false, front: true, failed: false });
 });
 
 test("a video call opens the front camera, asked for VGA at 24 frames and nothing it must meet", async () => {
@@ -594,7 +597,7 @@ test("a camera that will not turn falls back to the one it had", async () => {
 
     assert.equal(videoSender(connection).track.label, "camera-user");
     assert.deepEqual(lastVideo(world),
-        { local: true, remote: false, front: true, failed: false });
+        { local: true, remote: false, localPainted: false, remotePainted: false, front: true, failed: false });
 });
 
 test("a camera that will not open is reported, and the page told it is off", async () => {
@@ -787,7 +790,7 @@ test("without a canvas to stand in, a voice call goes ahead without video", asyn
     const { stream } = await page(world);
     assert.equal(stream.getVideoTracks().length, 0);
     assert.deepEqual(lastVideo(world),
-        { local: false, remote: false, front: true, failed: false });
+        { local: false, remote: false, localPainted: false, remotePainted: false, front: true, failed: false });
     // No switch drawn, and none ever will be: nothing keeps looking.
     world.timers.length = 0;
     await command(world, "camera-off");
@@ -1320,8 +1323,8 @@ test("what goes to the host goes one request at a time, in the order it was said
     }
     const said = sent().map((r) => r.url.replace(/.*\//, "/") + " " + r.body);
     assert.ok(/^\/log camera open: /.test(said[0]), String(said));
-    assert.equal(said[said.length - 2], '/log reported: {"local":true,"remote":false,"front":true,"failed":false}');
-    assert.equal(said[said.length - 1], '/video {"local":true,"remote":false,"front":true,"failed":false}');
+    assert.equal(said[said.length - 2], '/log reported: {"local":true,"remote":false,"localPainted":false,"remotePainted":false,"front":true,"failed":false}');
+    assert.equal(said[said.length - 1], '/video {"local":true,"remote":false,"localPainted":false,"remotePainted":false,"front":true,"failed":false}');
 
     // Nothing waiting: the next is sent at once.
     world.holdPosts = false;
@@ -1392,7 +1395,8 @@ test("a picture on the screen that paints nothing is put back, and only so often
     picture.mozPaintedFrames += 24;
     assert.equal(paintLines(world).length, 0, "put back before it had a look's time to paint");
     runTimers(world);
-    assert.deepEqual(paintLines(world), ["our picture put back: nothing painted in 2 s"]);
+    // Looked at soon while it has yet to show.
+    assert.deepEqual(paintLines(world), ["our picture put back: nothing painted in 0.5 s"]);
     assert.deepEqual(moves, ["off:camera-user"], "our picture's frames were not taken off and put on");
     assert.deepEqual(stream.getVideoTracks().map((t) => t.label), ["camera-user"]);
     assert.equal(ours.srcObject, stream);
@@ -1414,8 +1418,9 @@ test("a picture on the screen that paints nothing is put back, and only so often
         picture.mozPaintedFrames += 24;
         runTimers(world);
     }
+    // Once it has shown, it is looked at less often.
     assert.deepEqual(paintLines(world), [
-        "our picture put back: nothing painted in 2 s",
+        "our picture put back: nothing painted in 0.5 s",
         "our picture put back: nothing painted in 2 s",
         "our picture put back: nothing painted in 2 s",
         "our picture: still not painted"
@@ -1558,4 +1563,189 @@ test("every press of one of the page's buttons is logged, and by whom", async ()
         "pressed: Mute microphone, by a touch",
         "pressed: Mute microphone, by the app"
     ]);
+});
+
+test("a picture is said to show once it paints a frame, and black until then", async () => {
+    const world = makeWorld(VIDEO);
+    const { connection, picture: ours } = await page(world);
+    Object.assign(ours, { paused: false, videoWidth: 480, videoHeight: 640, mozPaintedFrames: 7 });
+    // Turned: the picture is given the other camera, which it has yet to
+    // show, whatever it painted of the one before.
+    await command(world, "facing-environment");
+    assert.equal(lastVideo(world).localPainted, false);
+    runTimers(world);
+    assert.equal(lastVideo(world).localPainted, false, "said to show what it has not painted");
+    ours.mozPaintedFrames += 1;
+    runTimers(world);
+    assert.equal(lastVideo(world).localPainted, true, "a picture that painted is still said to be black");
+    // Turned back: black again until it paints.
+    await command(world, "facing-user");
+    assert.equal(lastVideo(world).localPainted, false, "turned, the picture is still said to show");
+    ours.mozPaintedFrames += 1;
+    runTimers(world);
+    assert.equal(lastVideo(world).localPainted, true);
+
+    // Theirs comes, black at first.
+    const { picture } = theirPicture(world, connection, 3);
+    assert.equal(lastVideo(world).remote, true);
+    assert.equal(lastVideo(world).remotePainted, false);
+    runTimers(world);
+    assert.equal(lastVideo(world).remotePainted, false);
+    picture.mozPaintedFrames += 1;
+    runTimers(world);
+    assert.equal(lastVideo(world).remotePainted, true);
+    assert.equal(lastVideo(world).localPainted, true, "theirs coming made ours black");
+
+    // Hidden, it shows nothing; back, it has a frame to paint again.
+    picture.parentElement.style.display = "none";
+    runTimers(world);
+    assert.equal(lastVideo(world).remotePainted, false, "a hidden picture is said to show");
+    picture.parentElement.style.display = "block";
+    runTimers(world);
+    assert.equal(lastVideo(world).remotePainted, false, "shown again, said to show before it painted");
+    assert.deepEqual(paintLines(world).filter((line) => line.startsWith("their")), [],
+        "shown again, put back without a look's time to paint");
+    picture.mozPaintedFrames += 1;
+    runTimers(world);
+    assert.equal(lastVideo(world).remotePainted, true);
+
+    // Drawn anew, on another picture: black until that one paints.
+    world.videos.splice(world.videos.indexOf(picture), 1);
+    const again = theirPicture(world, connection, 9).picture;
+    assert.equal(lastVideo(world).remotePainted, false, "a picture drawn anew is said to show");
+    again.mozPaintedFrames += 1;
+    runTimers(world);
+    assert.equal(lastVideo(world).remotePainted, true);
+});
+
+test("a picture yet to show is looked at sooner than one that shows", async () => {
+    const world = makeWorld(VIDEO);
+    const { connection, picture: ours } = await page(world);
+    Object.assign(ours, { paused: false, videoWidth: 480, videoHeight: 640, mozPaintedFrames: 0 });
+    await command(world, "shown");
+    ours.mozPaintedFrames += 1;
+    runTimers(world);
+    assert.equal(lastVideo(world).localPainted, true);
+    // Said of again and again: still the one look to come.
+    const timers = world.timers.length;
+    for (let i = 0; i < 4; i++) {
+        connection.channels.mutedState.say(JSON.stringify({ audioEnabled: true, videoEnabled: true }));
+    }
+    assert.equal(world.timers.length, timers, "each report started a look of its own");
+
+    // Theirs comes, and never paints: looked at sooner, in place of the
+    // look that was due, and put back a look's time after it came.
+    const { picture } = theirPicture(world, connection, 0);
+    assert.equal(world.timers.at(-1).delay, 500, "the look due was left to come in its own time");
+    ours.mozPaintedFrames += 1;
+    runTimers(world);
+    assert.deepEqual(paintLines(world), [], "put back without a look's time to paint");
+    ours.mozPaintedFrames += 1;
+    runTimers(world);
+    assert.deepEqual(paintLines(world), ["their picture put back: nothing painted in 0.5 s"]);
+
+    // Theirs gone, and ours, which shows, stops painting: looked at as
+    // often as a picture that shows.
+    world.videos.splice(world.videos.indexOf(picture), 1);
+    ours.mozPaintedFrames += 1;
+    runTimers(world);
+    runTimers(world);
+    assert.deepEqual(paintLines(world).slice(1), ["our picture put back: nothing painted in 2 s"]);
+});
+
+test("a picture that never shows is given up on, rather than waited for", async () => {
+    const world = makeWorld(VIDEO);
+    const { picture: ours } = await page(world);
+    Object.assign(ours, { paused: false, videoWidth: 480, videoHeight: 640, mozPaintedFrames: 0 });
+    await command(world, "shown");
+    // Put back three times, a look apart; looked at, and said, once more.
+    for (let round = 0; round < 7; round++) {
+        runTimers(world);
+    }
+    assert.equal(paintLines(world).length, 3, String(paintLines(world)));
+    assert.equal(lastVideo(world).localPainted, false);
+    runTimers(world);
+    assert.equal(paintLines(world).at(-1), "our picture: still not painted");
+    assert.equal(lastVideo(world).localPainted, true, "a picture given up on is still waited for");
+});
+
+test("where the engine does not count what it paints, a picture with a frame shows", async () => {
+    const world = makeWorld(VIDEO);
+    const { picture: ours } = await page(world);
+    Object.assign(ours, { paused: true, videoWidth: 480, videoHeight: 640 });
+    await command(world, "shown");
+    runTimers(world);
+    assert.equal(lastVideo(world).localPainted, false, "a paused picture is said to show");
+    Object.assign(ours, { paused: false, videoWidth: 0 });
+    runTimers(world);
+    assert.equal(lastVideo(world).localPainted, false, "a picture with no frame is said to show");
+    ours.videoWidth = 480;
+    runTimers(world);
+    assert.equal(lastVideo(world).localPainted, true);
+});
+
+test("their picture given a new stream has yet to show it, and given the same one again still shows", async () => {
+    const world = makeWorld(VIDEO, { mediaElement: true });
+    const { connection, stream } = await page(world);
+    const holder = new Element("div");
+    const picture = holder.appendChild(world.newVideo());
+    Object.assign(picture, { paused: false, videoWidth: 352, videoHeight: 640, mozPaintedFrames: 50 });
+    world.videos.push(picture);
+    const track = new Track("video", "theirs");
+    const first = new Stream([track]);
+    connection.fire("track", { track, streams: [first] });
+    picture.srcObject = first;
+    runTimers(world);
+    picture.mozPaintedFrames += 1;
+    runTimers(world);
+    assert.equal(lastVideo(world).remotePainted, true);
+
+    // Given it again, as a picture put back is: still showing.
+    const reports = posts(world, "/video").length;
+    picture.srcObject = first;
+    runTimers(world);
+    assert.equal(lastVideo(world).remotePainted, true, "the same stream given again is said to be black");
+    assert.equal(posts(world, "/video").length, reports);
+
+    // This end's stream put on a picture is nothing to do with theirs.
+    const mine = world.newVideo();
+    mine.srcObject = stream;
+    runTimers(world);
+    assert.equal(lastVideo(world).remotePainted, true, "our stream given made their picture black");
+
+    // A new stream: black until it paints, the engine counting afresh.
+    picture.srcObject = new Stream([new Track("video", "theirs-again")]);
+    runTimers(world);
+    assert.equal(lastVideo(world).remotePainted, false, "a new stream is said to show before it painted");
+    picture.mozPaintedFrames = 0;
+    runTimers(world);
+    picture.mozPaintedFrames += 1;
+    runTimers(world);
+    assert.equal(lastVideo(world).remotePainted, true, "a picture counted afresh is never said to show");
+});
+
+test("this end's picture goes where the reader moves it, and nowhere off the screen", async () => {
+    const world = makeWorld(VIDEO);
+    const { connection, box } = await page(world);
+    const theirs = new Track("video", "theirs");
+    connection.fire("track", { track: theirs, streams: [new Stream([theirs])] });
+    await command(world, "corner=0.0500,0.4250");
+    assert.deepEqual([box.style.left, box.style.top, box.style.right, box.style.width],
+        ["5.00vw", "42.50vh", "auto", "27vw"]);
+
+    // Off the screen, or not a place at all: left where it was.
+    await command(world, "corner=1.5,0.1", "corner=0.1,2", "corner=.,.");
+    assert.deepEqual([box.style.left, box.style.top], ["5.00vw", "42.50vh"]);
+    assert.equal(world.window.location.hash, "", "a move was handed to the page as a command");
+    await command(world, "corner=1,0");
+    assert.deepEqual([box.style.left, box.style.top], ["100.00vw", "0.00vh"]);
+    await command(world, "corner=0.0500,0.4250");
+
+    // Theirs gone: the whole screen. Back: where it was moved to.
+    theirs.muted = true;
+    theirs.fire("mute");
+    assert.deepEqual([box.style.left, box.style.top, box.style.right], ["0", "0", "0"]);
+    theirs.muted = false;
+    theirs.fire("unmute");
+    assert.deepEqual([box.style.left, box.style.top, box.style.right], ["5.00vw", "42.50vh", "auto"]);
 });

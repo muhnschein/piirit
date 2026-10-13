@@ -71,8 +71,12 @@ var piiritVideo = (function () {
     var ZOOM_MOST = 1.35;
     /* Milliseconds between looks at whether the pictures on the screen
      * are being painted, and how many times in a call one that is not is
-     * put back before it is left as it is. */
+     * put back before it is left as it is. Sooner while one has not shown
+     * a frame yet: the screen is black until it does, and a picture the
+     * engine leaves unpainted is one put back as soon as it is seen to
+     * be. */
     var PAINT_LOOK = 2000;
+    var FIRST_LOOK = 500;
     var PUT_BACK_MOST = 3;
     /* This end's picture, while the other end's is drawn: in the corner
      * the call screen leaves free under its top line. */
@@ -144,10 +148,21 @@ var piiritVideo = (function () {
     /* The app is in the background, where nothing is drawn. */
     var away = false;
     /* What each picture had painted when last looked at, while it is on
-     * the screen; how often each has been put back; and a look to come. */
+     * the screen; how often each has been put back; and when the next
+     * look is, with which round of looks it is, a sooner look taking the
+     * place of a later. */
     var paints = { ours: null, theirs: null };
     var putBacks = { ours: 0, theirs: 0 };
-    var paintDue = false;
+    var paintAt = 0;
+    var paintRound = 0;
+    /* What each picture had painted when it came on the screen, or was
+     * given its stream; and whether it has painted since -- shown, rather
+     * than black -- or has been given up on. */
+    var firsts = { ours: null, theirs: null };
+    var shows = { ours: false, theirs: false };
+    /* Where the call screen has this end's picture, once the reader has
+     * moved it: its top left corner, as lengths of the screen. */
+    var spot = null;
 
     function noop() {}
 
@@ -381,7 +396,9 @@ var piiritVideo = (function () {
             });
         });
         /* The picture plays the stream it was given when it was given
-         * it: given it again, it plays what is on it now. */
+         * it: given it again, it plays what is on it now -- which it has
+         * yet to show. */
+        firsts.ours = null;
         var picture = preview();
         if (picture) {
             picture.srcObject = stream;
@@ -430,9 +447,29 @@ var piiritVideo = (function () {
             box.parentElement.style.setProperty("display", "block", "important");
         }
         var whole = !remoteShown();
-        place(box, whole ? WHOLE : CORNER);
+        place(box, whole ? WHOLE : corner());
         box.style.boxShadow = whole ? "none" : "";
         start(picture);
+    }
+
+    /* The corner, or where the reader moved the picture to. */
+    function corner() {
+        return spot ? Object.assign({}, CORNER, spot) : CORNER;
+    }
+
+    /* The reader moved this end's picture: `left` and `top` are where its
+     * top left corner now is, as lengths of the screen, which is what the
+     * call screen and the page both measure in. */
+    function moveTo(left, top) {
+        if (!(left >= 0 && left <= 1 && top >= 0 && top <= 1)) {
+            return;
+        }
+        spot = {
+            left: (left * 100).toFixed(2) + "vw",
+            top: (top * 100).toFixed(2) + "vh",
+            right: "auto"
+        };
+        layout();
     }
 
     /* The other end's picture: the page's other one. */
@@ -517,20 +554,54 @@ var piiritVideo = (function () {
     }
 
     /* Look at what the pictures paint in a moment, while one is meant to
-     * be seen. */
+     * be seen: in FIRST_LOOK while one has yet to show, so that a picture
+     * is said to show, or is put back, before the reader wonders. A look
+     * sooner than the one due takes its place. */
     function paintSoon() {
-        if (paintDue || !(meant(preview()) || meant(theirs()))) {
+        var ours = preview();
+        var other = theirs();
+        if (!(meant(ours) || meant(other))) {
             return;
         }
-        paintDue = true;
-        window.setTimeout(lookAtPaint, PAINT_LOOK);
+        var oursShown = firstSeen("ours", ours);
+        var otherShown = firstSeen("theirs", other);
+        var wait = oursShown && otherShown ? PAINT_LOOK : FIRST_LOOK;
+        var at = Date.now() + wait;
+        if (paintAt && paintAt <= at) {
+            return;
+        }
+        paintAt = at;
+        paintRound += 1;
+        var round = paintRound;
+        window.setTimeout(function () {
+            if (round === paintRound) {
+                lookAtPaint(wait);
+            }
+        }, wait);
     }
 
-    function lookAtPaint() {
-        paintDue = false;
-        var ours = lookedAt("ours", preview());
-        var other = lookedAt("theirs", theirs());
-        if (ours || other) {
+    /* Whether a picture is shown, or not meant to be: one newly on the
+     * screen has what it has painted so far noted, to tell its first
+     * frame by. */
+    function firstSeen(which, picture) {
+        if (!meant(picture)) {
+            return true;
+        }
+        if (firsts[which]?.picture !== picture) {
+            firsts[which] = { picture: picture, count: paintedOf(picture) };
+            shows[which] = false;
+        }
+        return shows[which];
+    }
+
+    function lookAtPaint(wait) {
+        paintAt = 0;
+        var before = shows.ours + " " + shows.theirs;
+        var ours = lookedAt("ours", preview(), wait);
+        var other = lookedAt("theirs", theirs(), wait);
+        if (shows.ours + " " + shows.theirs !== before) {
+            report();
+        } else if (ours || other) {
             paintSoon();
         }
     }
@@ -539,7 +610,7 @@ var piiritVideo = (function () {
      * none since the last look is put back. Where the engine does not
      * count, each is put back once, a look after it first shows. True
      * while the picture is worth looking at again. */
-    function lookedAt(which, picture) {
+    function lookedAt(which, picture, wait) {
         if (picture && putBacks[which] > 0 && picture.paused) {
             /* Put back, and not yet playing again: what it plays is the
              * other end's voice, too. */
@@ -547,8 +618,11 @@ var piiritVideo = (function () {
         }
         if (!meant(picture)) {
             paints[which] = null;
+            firsts[which] = null;
+            shows[which] = false;
             return false;
         }
+        firstSeen(which, picture);
         /* Paused, or with no frame yet: nothing to paint, and the look's
          * time starts once there is. */
         var last = paints[which];
@@ -557,6 +631,7 @@ var piiritVideo = (function () {
             return true;
         }
         var count = paintedOf(picture);
+        showing(which, count);
         if (last?.picture !== picture || count !== last.count) {
             paints[which] = { picture: picture, count: count };
             return true;
@@ -564,19 +639,36 @@ var piiritVideo = (function () {
         var most = count === null ? 1 : PUT_BACK_MOST;
         if (putBacks[which] < most) {
             putBacks[which] += 1;
-            putBack(which, picture, count);
-        } else if (putBacks[which] === most && count !== null) {
+            putBack(which, picture, count, wait);
+            return true;
+        }
+        if (putBacks[which] === most && count !== null) {
             putBacks[which] += 1;
             note((which === "ours" ? "our" : "their") + " picture: still not painted");
         }
+        /* Given up on: not waited for any more. */
+        shows[which] = true;
         return true;
+    }
+
+    /* A picture playing with a frame shows once it has painted one since
+     * it came on the screen; where the engine does not count, at once. A
+     * count that went down is one the engine started again. */
+    function showing(which, count) {
+        var first = firsts[which];
+        if (count !== null && count < first.count) {
+            first.count = count;
+        }
+        if (count === null || count > first.count) {
+            shows[which] = true;
+        }
     }
 
     /* Put a picture back: its frames taken off its stream and put on it
      * again, and the stream given to it again -- what turning the camera
      * does, which was seen to draw this end's picture where nothing had
      * before. */
-    function putBack(which, picture, count) {
+    function putBack(which, picture, count, wait) {
         var source = picture.srcObject;
         var tracks = source.getVideoTracks();
         tracks.forEach(function (track) {
@@ -589,7 +681,7 @@ var piiritVideo = (function () {
         play(picture);
         note((which === "ours" ? "our" : "their") + " picture put back: "
             + (count === null ? "the engine does not say what it painted"
-                : "nothing painted in " + PAINT_LOOK / 1000 + " s"));
+                : "nothing painted in " + wait / 1000 + " s"));
     }
 
     /* Look at this end's picture again in a moment. One look at a time,
@@ -634,6 +726,8 @@ var piiritVideo = (function () {
         var state = {
             local: camera !== null,
             remote: remoteShown(),
+            localPainted: shows.ours,
+            remotePainted: shows.theirs,
             front: facing === "user",
             failed: failed
         };
@@ -993,6 +1087,11 @@ var piiritVideo = (function () {
             backCamera = Number(lens[1]);
             return true;
         }
+        var moved = /^corner=([\d.]+),([\d.]+)$/.exec(command);
+        if (moved) {
+            moveTo(Number(moved[1]), Number(moved[2]));
+            return true;
+        }
         switch (command) {
         case "camera-on":
             cameraOn();
@@ -1072,7 +1171,9 @@ var piiritVideo = (function () {
 
     /* The page puts the stream on its picture when it draws it: placed
      * then, rather than whenever the next look comes round; and the other
-     * end's on the other picture, fitted then. */
+     * end's on the other picture, fitted then; and either looked at for
+     * its first frame. A stream that is not the one the picture had is
+     * one it has yet to show. */
     var Media = window.HTMLMediaElement;
     var source = Media && Object.getOwnPropertyDescriptor
         ? Object.getOwnPropertyDescriptor(Media.prototype, "srcObject") : null;
@@ -1082,11 +1183,13 @@ var piiritVideo = (function () {
             enumerable: source.enumerable,
             get: source.get,
             set: function (value) {
+                var before = source.get.call(this);
                 source.set.call(this, value);
-                if (value && value === stream) {
-                    window.setTimeout(layout, 0);
-                } else if (value) {
-                    window.setTimeout(fitTheirs, 0);
+                if (value && value !== stream && value !== before) {
+                    firsts.theirs = null;
+                }
+                if (value) {
+                    window.setTimeout(report, 0);
                 }
             }
         });
