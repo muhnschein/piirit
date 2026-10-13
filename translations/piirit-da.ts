@@ -675,6 +675,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <extracomment>%1 is the label of the unread filter, a button at the right of the search field.</extracomment>
         <translation>Tryk på &quot;%1&quot; for at vise alle chats</translation>
     </message>
+    <message>
+        <source>Send to</source>
+        <extracomment>Over the list of chats, when picking the one to send a picture or a video just taken to.</extracomment>
+        <translation>Send til</translation>
+    </message>
 </context>
 <context>
     <name>ChatMediaPage</name>
@@ -1064,6 +1069,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Description</source>
         <extracomment>Label of the text that says what a group or channel is for, on its info page, and the prompt in its empty field.</extracomment>
         <translation>Beskrivelse</translation>
+    </message>
+    <message>
+        <source>Change picture</source>
+        <extracomment>Pull-down entry on a group&apos;s page: opens the gallery to pick a new picture for the group.</extracomment>
+        <translation>Skift billede</translation>
     </message>
 </context>
 <context>
@@ -1582,6 +1592,41 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Profiles</source>
         <extracomment>A quick action on the cover that opens the list of profiles.</extracomment>
         <translation>Profiler</translation>
+    </message>
+    <message>
+        <source>Photo</source>
+        <extracomment>A quick action on the cover that opens the camera to take a photo with the back camera, then asks which chat to send it to.</extracomment>
+        <translation>Foto</translation>
+    </message>
+    <message>
+        <source>Video</source>
+        <extracomment>A quick action on the cover that opens the camera to record a video with the back camera, then asks which chat to send it to.</extracomment>
+        <translation>Video</translation>
+    </message>
+    <message>
+        <source>Selfie</source>
+        <extracomment>A quick action on the cover that opens the camera to take a photo with the front camera, then asks which chat to send it to.</extracomment>
+        <translation>Selfie</translation>
+    </message>
+    <message>
+        <source>Selfie video</source>
+        <extracomment>A quick action on the cover that opens the camera to record a video with the front camera, then asks which chat to send it to.</extracomment>
+        <translation>Selfie-video</translation>
+    </message>
+    <message>
+        <source>Send right away</source>
+        <extracomment>Under a quick action on the cover that takes a photo or a video: whether it is sent as soon as a chat is picked for it.</extracomment>
+        <translation>Send med det samme</translation>
+    </message>
+    <message>
+        <source>Sends it as soon as you pick the chat, without a caption.</source>
+        <extracomment>Under &quot;Send right away&quot;. Off, the chat opens with the photo or video on it, ready for a caption and the send button.</extracomment>
+        <translation>Sender med det samme, når du har valgt chatten, uden billedtekst.</translation>
+    </message>
+    <message>
+        <source>The photo or video goes out the moment you tap a chat, with no chance to look it over first. Tap the wrong chat by mistake, and it goes there.</source>
+        <extracomment>Asked before &quot;Send right away&quot; is turned on for a camera quick action on the cover.</extracomment>
+        <translation>Billedet eller videoen sendes, i samme øjeblik du trykker på en chat, uden mulighed for at se den igennem først. Trykker du ved en fejl på den forkerte chat, sendes den dertil.</translation>
     </message>
 </context>
 <context>

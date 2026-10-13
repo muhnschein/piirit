@@ -487,8 +487,8 @@ fn every_quick_action_icon_is_drawn_at_every_size_in_both_inks() {
         .collect();
     assert_eq!(
         icons.len(),
-        19,
-        "the icons are not the seventeen offered and the call's two: {icons:?}"
+        23,
+        "the icons are not the twenty-one offered and the call's two: {icons:?}"
     );
     assert_eq!(sizes, [32, 40, 48, 56, 64], "the sizes moved");
 

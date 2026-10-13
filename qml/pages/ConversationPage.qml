@@ -41,17 +41,29 @@ Page {
             // A voice message that could not be sent is still on the
             // phone for nothing.
             page.dropVoice()
+            // Nor is a file the core refused tried again on its own: it
+            // stays on the bar for the reader to send.
+            if (page.sendingOnItsOwn) {
+                page.sendingOnItsOwn = false
+                page.sendWhenReady = false
+            }
         }
         // Sending is its own answer to "have I read this": go to the
         // message just sent rather than counting it as one that was missed.
         onSent: {
-            textField.text = ""
-            // Now, not a second from now: the chat list would otherwise
-            // show the message as a draft it is still holding, next to the
-            // same message as the one just sent.
-            page.storeDraft()
-            page.replyBody = ""
-            page.replyAuthor = ""
+            // A file sent on its own (`sendWhenReady`) carried none of
+            // the field, the reply or the draft: they stay.
+            var onItsOwn = page.sendingOnItsOwn
+            page.sendingOnItsOwn = false
+            if (!onItsOwn) {
+                textField.text = ""
+                // Now, not a second from now: the chat list would
+                // otherwise show the message as a draft it is still
+                // holding, next to the same message as the one just sent.
+                page.storeDraft()
+                page.replyBody = ""
+                page.replyAuthor = ""
+            }
             // A capture -- a picture taken here, a voice message -- has
             // been copied by the core and is not needed any more. A
             // file picked from a library is not a capture, and is left
@@ -59,8 +71,17 @@ Page {
             captures.discard(page.attachmentPath)
             page.attachmentPath = ""
             page.dropVoice()
+            page.sendWhenReady = false
             listView.jumpToNewest()
         }
+        // The core has said how large an attachment it recommends, or
+        // that it will not say, and what a video on the bar is to be made
+        // smaller to is settled; or a video has been made smaller; or the
+        // chat's rows are in. Each can be what a file sent at once waits
+        // for: see `sendWhenReady`.
+        onAttachment_limit_changed: sharedSend.restart()
+        onPreparing_changed: sharedSend.restart()
+        onLoaded_changed: sharedSend.restart()
         // An edit is not a send: the row shows the new text, and the
         // field goes back to whatever was in it before the edit began.
         onEdited: page.finishEdit()
@@ -98,9 +119,14 @@ Page {
     // chat read before the page is even on it.
     /// What a share handed this chat, when the page was opened from one:
     /// a file to put on the attachment bar, text to put in the field.
-    /// See qml/share/ShareTarget.qml.
+    /// See qml/share/ShareTarget.qml. A camera quick action hands one
+    /// over the same way (ChatListPage.capture).
     property string sharedFile: ""
     property string sharedText: ""
+    /// Whether the shared file goes without waiting for the send button:
+    /// a camera quick action set to send at once. Read as the page is
+    /// made.
+    property bool sendShared: false
 
     Component.onCompleted: {
         messages.chat_id = page.chatId
@@ -111,9 +137,54 @@ Page {
         // rather than over it.
         if (page.sharedFile.length > 0) {
             page.attach(page.sharedFile)
+            page.sendWhenReady = page.sendShared
         }
         if (page.sharedText.length > 0) {
             textField.text = page.sharedText
+        }
+    }
+
+    /// The shared file is to be sent as soon as it can be: once the core
+    /// has said how large an attachment it recommends, and once a video
+    /// is no longer being made smaller to fit that. Sending before either
+    /// would send a video as it was taken however large it is, so only
+    /// those two, as the model announces them, try it. And once the
+    /// chat's rows are in: a send answered while they are being read
+    /// lands on rows the read then replaces with what the chat held
+    /// before it, and the message is not on the page until the chat is
+    /// opened again -- a video, slow to copy into the core, did just
+    /// that. Cleared once it
+    /// has gone, once the core has refused it, and once the reader takes
+    /// it over: puts something else on the bar, stops a video being made
+    /// smaller, starts a reply or an edit, or sends it themselves.
+    property bool sendWhenReady: false
+    /// The send under way is that one, not the reader's.
+    property bool sendingOnItsOwn: false
+
+    // A turn of the event loop after the model has said something moved,
+    // not inside its signal: the model is still in the middle of the
+    // change it is announcing, and cannot take a send there.
+    //
+    // The file alone, without the field: whatever is in it is the
+    // reader's draft for this chat, not a caption they chose for this.
+    // A reply or an edit begun meanwhile is the reader writing: the
+    // file waits for them, rather than going as a reply they had not
+    // finished or under an edit.
+    Timer {
+        id: sharedSend
+        interval: 0
+        onTriggered: {
+            if (!page.sendWhenReady || !messages.loaded || messages.preparing
+                    || messages.sending || page.attachmentPath.length === 0) {
+                return
+            }
+            if (page.editing || messages.quoted_message_id !== 0) {
+                page.sendWhenReady = false
+                return
+            }
+            page.errorMessage = ""
+            page.sendingOnItsOwn = true
+            messages.send_file("", page.attachmentPath)
         }
     }
 
@@ -347,6 +418,8 @@ Page {
             // anywhere.
             captures.discard(page.attachmentPath)
             page.attachmentPath = path
+            // Only the shared file was ever to go on its own.
+            page.sendWhenReady = false
         }
     }
 
@@ -695,7 +768,13 @@ Page {
         originalBytes: page.editing ? 0 : messages.original_bytes
         bytes: messages.attachment_bytes
         onCancelled: page.dropAttachment()
-        onStopped: messages.cancel_preparing()
+        // Stopped, the video goes as it is -- when the reader sends it,
+        // even from a chat that was to send it at once: a large file was
+        // what that was waiting to avoid.
+        onStopped: {
+            page.sendWhenReady = false
+            messages.cancel_preparing()
+        }
     }
 
     // Under the file it is about: this one is bigger than the core
@@ -916,7 +995,8 @@ Page {
             // core's blob directory takes long enough for a second tap to
             // land, and that sent the whole thing again. Nor is a video
             // still being made smaller: it goes once it is ready and the
-            // reader says so, never on its own.
+            // reader says so, never on its own -- unless a camera quick
+            // action said so first (`sendWhenReady`).
             enabled: !messages.sending
                      && (!page.videoPreparing || voiceBar.recording)
                      && (page.hasSomethingToSend || voiceBar.recording)
@@ -1033,6 +1113,8 @@ Page {
         // Trimmed: a message of nothing but whitespace is not a message,
         // and a trailing newline from the keyboard is not part of one.
         var text = textField.text.trim()
+        // The reader is sending it themselves, with whatever they typed.
+        page.sendWhenReady = false
         if (page.attachmentPath.length > 0) {
             page.errorMessage = ""
             messages.send_file(text, page.attachmentPath)

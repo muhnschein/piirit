@@ -89,18 +89,23 @@ QtObject {
     /// kept for when there are two again.
     property alias quickActionCount: quickActionCountValue.value
     /// The cover's quick actions, the left one and the right: what each
-    /// does -- "" for nothing, "chat", "search", "qr", "scan" or
-    /// "profiles" -- and, for a chat, the profile and chat it opens and the
-    /// icon it wears.
+    /// does -- "" for nothing, "chat", "search", "qr", "scan", "profiles",
+    /// or one of the camera's: "photo", "video", "selfie" or
+    /// "selfie-video" -- and, for a chat, the profile and chat it opens and
+    /// the icon it wears; for the camera's, whether what is taken is sent
+    /// as soon as its chat is picked rather than waiting on the chat's
+    /// send button.
     /// qml/js/QuickActions.js reads them.
     property alias quickActionLeft: quickActionLeftValue.value
     property alias quickActionLeftAccount: quickActionLeftAccountValue.value
     property alias quickActionLeftChat: quickActionLeftChatValue.value
     property alias quickActionLeftIcon: quickActionLeftIconValue.value
+    property alias quickActionLeftSendNow: quickActionLeftSendNowValue.value
     property alias quickActionRight: quickActionRightValue.value
     property alias quickActionRightAccount: quickActionRightAccountValue.value
     property alias quickActionRightChat: quickActionRightChatValue.value
     property alias quickActionRightIcon: quickActionRightIconValue.value
+    property alias quickActionRightSendNow: quickActionRightSendNowValue.value
     /// The emoji last reacted with from the reaction picker, newest
     /// first, which it offers before everything else. Only the picker's:
     /// the quick reactions are a tap away already.
@@ -234,6 +239,12 @@ QtObject {
         defaultValue: ""
     }
 
+    property ConfigurationValue quickActionLeftSendNowConfig: ConfigurationValue {
+        id: quickActionLeftSendNowValue
+        key: "/apps/harbour-piirit/quick_action_left_send_now"
+        defaultValue: false
+    }
+
     property ConfigurationValue quickActionRightConfig: ConfigurationValue {
         id: quickActionRightValue
         key: "/apps/harbour-piirit/quick_action_right"
@@ -256,6 +267,12 @@ QtObject {
         id: quickActionRightIconValue
         key: "/apps/harbour-piirit/quick_action_right_icon"
         defaultValue: ""
+    }
+
+    property ConfigurationValue quickActionRightSendNowConfig: ConfigurationValue {
+        id: quickActionRightSendNowValue
+        key: "/apps/harbour-piirit/quick_action_right_send_now"
+        defaultValue: false
     }
 
     property ConfigurationValue recentReactionsConfig: ConfigurationValue {
