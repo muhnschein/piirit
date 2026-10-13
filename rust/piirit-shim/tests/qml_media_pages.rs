@@ -316,7 +316,7 @@ fn pictures_and_video_open_here_and_everything_else_goes_to_the_system() {
     // Opened from a row, still transitioning in: the row's own decode is
     // asked for at the row's width, and the full picture waits for the
     // page to be in place.
-    let from_row = png_url.clone();
+    let from_row = png_url;
     single_shot(Duration::from_millis(5500), move || unsafe {
         let mut properties = QVariantMap::default();
         properties.insert("fileUrl".into(), QString::from(from_row.clone()).into());

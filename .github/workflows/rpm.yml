@@ -72,6 +72,9 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         # FFmpeg and x264, which piirit-video builds (docs/BUILDING.md).
         with:
+          # Nothing here pushes with git, so the token is not left behind in
+          # .git/config for a later step to find. Every checkout in this file.
+          persist-credentials: false
           submodules: true
 
       # Bundled beside the app; checksum-pinned by the script itself.
@@ -84,13 +87,17 @@ jobs:
         run: |
           [[ $SFOS =~ ^[0-9]+(\.[0-9]+){3}$ ]] || {
             echo "::error::sfos_version '$SFOS' is not a dotted version"; exit 1; }
-          owner=$(echo "${{ github.repository_owner }}" | tr 'A-Z' 'a-z')
+          owner=$(echo "$GITHUB_REPOSITORY_OWNER" | tr 'A-Z' 'a-z')
           echo "SDK_IMAGE=ghcr.io/$owner/piirit-sdk:$SFOS-$ARCH" >> "$GITHUB_ENV"
 
+      # Through the environment, not spliced into the script: a `${{ }}`
+      # in `run:` is pasted in as shell text before the shell reads it.
       - name: Sign in to the registry
+        env:
+          TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          echo "${{ secrets.GITHUB_TOKEN }}" |
-            docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+          echo "$TOKEN" |
+            docker login ghcr.io -u "$GITHUB_ACTOR" --password-stdin
 
       # ci/build-sdk-image.sh says what this image is and why it is not
       # upstream's. Deriving one takes about as long as this whole workflow,
@@ -185,7 +192,14 @@ jobs:
       #
       # Keyed on the image as well as the lockfile: these are artifacts for
       # one target triple, built by the rust that image ships.
+      #
+      # Not for a release, here or for the crates below. What a cache holds
+      # was written by some earlier run, and a release is the one build
+      # whose binary should come from nothing but the commit it is tagged
+      # on; it pays the cold compile for that. zizmor cannot read the `if`,
+      # which is why its cache-poisoning finding is ignored on both.
       - name: Restore the cross-compiled dependencies
+        if: env.RELEASE == '' && !startsWith(github.ref, 'refs/tags/v')  # zizmor: ignore[cache-poisoning]
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: rust/target
@@ -199,6 +213,7 @@ jobs:
       # little in seconds and a great deal in not depending on crates.io
       # being up while a release is being cut.
       - name: Restore the crates
+        if: env.RELEASE == '' && !startsWith(github.ref, 'refs/tags/v')  # zizmor: ignore[cache-poisoning]
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ~/.cache/piirit-cargo
@@ -342,6 +357,8 @@ jobs:
       RELEASE: ${{ inputs.release || '' }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       - name: Fetch the package this run built
         run: gh run download "$GITHUB_RUN_ID" --dir rpms

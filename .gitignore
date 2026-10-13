@@ -41,7 +41,9 @@ build-*/
 /rpm/vendor.toml
 /rust/vendor/
 /rust/.cargo/
-/.cargo/
+# Except the one setting every checkout shares: see .cargo/config.toml.
+/.cargo/*
+!/.cargo/config.toml
 
 # Python 3 leaves these beside tools/faces/faces.py when it runs.
 __pycache__/

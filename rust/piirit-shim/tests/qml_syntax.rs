@@ -369,10 +369,7 @@ fn a_time_label_does_not_depend_on_the_label_it_sizes() {
 
 /// The role names a model row exposes to QML.
 fn names_of<T: qmetaobject::listmodel::SimpleListItem>() -> Vec<String> {
-    T::names()
-        .iter()
-        .map(std::string::ToString::to_string)
-        .collect()
+    T::names().iter().map(ToString::to_string).collect()
 }
 
 /// A list draws its delegates outside its own box unless told not to, and
@@ -1486,7 +1483,7 @@ fn the_pages_the_app_pushes_are_there() {
             let Some(path) = rest.1.split('"').nth(1) else {
                 continue;
             };
-            let kind = std::path::Path::new(path)
+            let kind = Path::new(path)
                 .extension()
                 .map(|kind| kind.to_string_lossy().into_owned())
                 .unwrap_or_default();

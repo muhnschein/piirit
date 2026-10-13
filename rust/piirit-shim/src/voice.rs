@@ -24,7 +24,7 @@
 use std::fs::File;
 use std::io::{Read, Seek, SeekFrom, Write};
 use std::num::NonZeroU32;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 use mp3lame_encoder::{Bitrate, Builder, Encoder, FlushGap, Mode, MonoPcm, Quality, VbrMode};
 
@@ -81,7 +81,11 @@ pub(crate) fn longest_ms(limit_bytes: u64, bits_per_second: u32) -> u32 {
         return 0;
     }
     let usable = limit_bytes.saturating_sub(HEADROOM_BYTES);
-    let ms = usable.saturating_mul(8000) / u64::from(bits_per_second);
+    // `bits_per_second` is not 0, by the check above.
+    let ms = usable
+        .saturating_mul(8000)
+        .checked_div(u64::from(bits_per_second))
+        .unwrap_or(0);
     u32::try_from(ms).unwrap_or(u32::MAX).max(1)
 }
 
@@ -109,7 +113,7 @@ struct WavFormat {
 impl WavFormat {
     /// Bytes to one sample of every channel.
     fn frame_bytes(&self) -> usize {
-        usize::from(self.channels) * usize::from(self.bits / 8)
+        usize::from(self.channels).saturating_mul(usize::from(self.bits / 8))
     }
 }
 
@@ -123,7 +127,7 @@ fn parse_header(bytes: &[u8]) -> Result<Option<WavFormat>, String> {
     if bytes.len() < 12 {
         return Ok(None);
     }
-    if &bytes[0..4] != b"RIFF" || &bytes[8..12] != b"WAVE" {
+    if !bytes.starts_with(b"RIFF") || bytes.get(8..12) != Some(b"WAVE".as_slice()) {
         return Err(not_wav());
     }
     let mut format: Option<(Encoding, u16, u32, u16)> = None;
@@ -135,8 +139,10 @@ fn parse_header(bytes: &[u8]) -> Result<Option<WavFormat>, String> {
         ) else {
             return Ok(None);
         };
-        // Both reads above reached this far, so this cannot overflow.
-        let body = at + 8;
+        // Both reads above reached this far, so this does not saturate,
+        // and nor do the offsets into the body below: they are past the
+        // data, and read as `None`, before they come near `usize::MAX`.
+        let body = at.saturating_add(8);
         if id == b"data" {
             let Some((encoding, channels, sample_rate, bits)) = format else {
                 return Err(not_wav());
@@ -153,16 +159,16 @@ fn parse_header(bytes: &[u8]) -> Result<Option<WavFormat>, String> {
         if id == b"fmt " {
             let (Some(tag), Some(channels), Some(sample_rate), Some(bits)) = (
                 u16_at(bytes, body),
-                u16_at(bytes, body + 2),
-                u32_at(bytes, body + 4),
-                u16_at(bytes, body + 14),
+                u16_at(bytes, body.saturating_add(2)),
+                u32_at(bytes, body.saturating_add(4)),
+                u16_at(bytes, body.saturating_add(14)),
             ) else {
                 return Ok(None);
             };
             // WAVE_FORMAT_EXTENSIBLE names the real format in the first
             // two bytes of the GUID that ends the chunk.
             let tag = if tag == 0xFFFE {
-                let Some(real) = u16_at(bytes, body + 24) else {
+                let Some(real) = u16_at(bytes, body.saturating_add(24)) else {
                     return Ok(None);
                 };
                 real
@@ -195,26 +201,36 @@ fn parse_header(bytes: &[u8]) -> Result<Option<WavFormat>, String> {
 /// A little-endian `u16` at `at`, if the bytes reach that far.
 fn u16_at(bytes: &[u8], at: usize) -> Option<u16> {
     let two = bytes.get(at..at.checked_add(2)?)?;
-    Some(u16::from_le_bytes([two[0], two[1]]))
+    Some(u16::from_le_bytes(two.try_into().ok()?))
 }
 
 /// A little-endian `u32` at `at`, if the bytes reach that far.
 fn u32_at(bytes: &[u8], at: usize) -> Option<u32> {
     let four = bytes.get(at..at.checked_add(4)?)?;
-    Some(u32::from_le_bytes([four[0], four[1], four[2], four[3]]))
+    Some(u32::from_le_bytes(four.try_into().ok()?))
 }
 
 /// Whole frames of `bytes` as one channel of 16-bit samples, the
 /// channels averaged: what LAME is given.
 fn to_mono(bytes: &[u8], format: &WavFormat, out: &mut Vec<i16>) {
     let width = usize::from(format.bits / 8);
+    let frame_bytes = format.frame_bytes();
+    // Never so for a header `parse_header` read, but `chunks_exact` takes
+    // no 0.
+    if width == 0 || frame_bytes == 0 {
+        return;
+    }
     let channels = i64::from(format.channels);
-    for frame in bytes.chunks_exact(format.frame_bytes()) {
+    for frame in bytes.chunks_exact(frame_bytes) {
         let sum: i64 = frame
             .chunks_exact(width)
             .map(|sample| i64::from(sample_value(sample, format.encoding)))
             .sum();
-        let mean = (sum / channels).clamp(i64::from(i16::MIN), i64::from(i16::MAX));
+        // `channels` is not 0, or `frame_bytes` would be.
+        let mean = sum
+            .checked_div(channels)
+            .unwrap_or(0)
+            .clamp(i64::from(i16::MIN), i64::from(i16::MAX));
         out.push(i16::try_from(mean).unwrap_or_default());
     }
 }
@@ -222,8 +238,9 @@ fn to_mono(bytes: &[u8], format: &WavFormat, out: &mut Vec<i16>) {
 /// One sample, on the scale of a 16-bit one.
 fn sample_value(bytes: &[u8], encoding: Encoding) -> i32 {
     match (encoding, bytes) {
-        // 8-bit WAV is unsigned, centred on 128.
-        (Encoding::Int, [byte]) => (i32::from(*byte) - 128) << 8,
+        // 8-bit WAV is unsigned, centred on 128: with its top bit turned
+        // over it is signed, and it is the top byte of a 16-bit sample.
+        (Encoding::Int, [byte]) => i32::from(i16::from_le_bytes([0, *byte ^ 0x80])),
         // Little-endian, so the last two bytes of a wider sample are its
         // top sixteen bits.
         (Encoding::Int, [.., low, high]) => i32::from(i16::from_le_bytes([*low, *high])),
@@ -298,9 +315,16 @@ impl Stream {
     fn feed(&mut self, bytes: &[u8], max_samples: u64, mp3: &mut File) -> Result<(), String> {
         self.partial.extend_from_slice(bytes);
         let frame = self.format.frame_bytes();
-        let whole = self.partial.len() / frame * frame;
+        // `frame` is never 0 for a header `parse_header` read.
+        let whole = self
+            .partial
+            .len()
+            .checked_div(frame)
+            .map_or(0, |frames| frames.saturating_mul(frame));
         self.mono.clear();
-        to_mono(&self.partial[..whole], &self.format, &mut self.mono);
+        // `to_mono` takes the whole frames, `whole` bytes of them, and
+        // leaves the rest.
+        to_mono(&self.partial, &self.format, &mut self.mono);
         self.partial.drain(..whole);
 
         let room = max_samples.saturating_sub(self.samples);
@@ -308,8 +332,9 @@ impl Stream {
             .mono
             .len()
             .min(usize::try_from(room).unwrap_or(usize::MAX));
-        self.samples += take as u64;
-        for piece in self.mono[..take].chunks(ENCODE_CHUNK) {
+        self.samples = self.samples.saturating_add(take as u64);
+        self.mono.truncate(take);
+        for piece in self.mono.chunks(ENCODE_CHUNK) {
             self.out.clear();
             self.out
                 .reserve(mp3lame_encoder::max_required_buffer_size(piece.len()));
@@ -406,7 +431,7 @@ impl Transcoder {
     /// there, that is where the recording is.
     pub(crate) fn follow(&mut self, path: PathBuf) {
         if self.stream.is_none() && path != self.wav_path {
-            let _ = std::fs::remove_file(&self.wav_path);
+            remove_scratch(&self.wav_path);
             self.wav_path = path;
             self.wav = None;
         }
@@ -416,7 +441,8 @@ impl Transcoder {
     fn max_samples(&self, sample_rate: u32) -> u64 {
         match self.limit_ms() {
             0 => u64::MAX,
-            ms => u64::from(ms) * u64::from(sample_rate) / 1000,
+            // Two `u32`s: their product fits.
+            ms => u64::from(ms).saturating_mul(u64::from(sample_rate)) / 1000,
         }
     }
 
@@ -467,8 +493,10 @@ impl Transcoder {
         let (Some(wav), Some(stream)) = (self.wav.as_mut(), self.stream.as_mut()) else {
             return Ok(());
         };
-        wav.seek(SeekFrom::Start(stream.format.data_start + self.consumed))
-            .map_err(read_failed)?;
+        wav.seek(SeekFrom::Start(
+            stream.format.data_start.saturating_add(self.consumed),
+        ))
+        .map_err(read_failed)?;
         let mut chunk = vec![0_u8; READ_CHUNK];
         loop {
             let want = end.map_or(READ_CHUNK, |end| {
@@ -479,12 +507,16 @@ impl Transcoder {
             if want == 0 {
                 break;
             }
-            let got = wav.read(&mut chunk[..want]).map_err(read_failed)?;
-            if got == 0 {
+            // `want` is at most `READ_CHUNK`, and `got` at most `want`.
+            let Some(buffer) = chunk.get_mut(..want) else {
                 break;
-            }
-            self.consumed += got as u64;
-            stream.feed(&chunk[..got], max_samples, &mut self.mp3)?;
+            };
+            let got = wav.read(buffer).map_err(read_failed)?;
+            let Some(read) = buffer.get(..got).filter(|read| !read.is_empty()) else {
+                break;
+            };
+            self.consumed = self.consumed.saturating_add(got as u64);
+            stream.feed(read, max_samples, &mut self.mp3)?;
         }
         Ok(())
     }
@@ -497,9 +529,9 @@ impl Transcoder {
     /// too. The WAV is removed whatever the answer.
     pub(crate) fn finish(mut self) -> Result<Option<u64>, String> {
         let result = self.finish_mp3();
-        let _ = std::fs::remove_file(&self.wav_path);
+        remove_scratch(&self.wav_path);
         if !matches!(result, Ok(Some(_))) {
-            let _ = std::fs::remove_file(&self.mp3_path);
+            remove_scratch(&self.mp3_path);
         }
         result
     }
@@ -525,8 +557,20 @@ impl Transcoder {
 
     /// Stop, and remove both files.
     pub(crate) fn discard(self) {
-        let _ = std::fs::remove_file(&self.wav_path);
-        let _ = std::fs::remove_file(&self.mp3_path);
+        remove_scratch(&self.wav_path);
+        remove_scratch(&self.mp3_path);
+    }
+}
+
+/// Remove a file this made or was to read. One that was never made --
+/// a recording stopped before the recorder wrote anything -- is nothing
+/// to say; one left behind is said, as it stays in the cache.
+fn remove_scratch(path: &Path) {
+    match std::fs::remove_file(path) {
+        Err(err) if err.kind() != std::io::ErrorKind::NotFound => {
+            eprintln!("piirit: cannot remove {}: {err}", path.display());
+        }
+        _ => {}
     }
 }
 
@@ -555,7 +599,10 @@ fn final_data_len(wav: &mut File, format: &WavFormat) -> Result<Option<u64>, Str
     let believable = header.data_start == format.data_start
         && header.data_len != 0
         && header.data_len != u64::from(u32::MAX)
-        && header.data_start + header.data_len <= file_len;
+        && header
+            .data_start
+            .checked_add(header.data_len)
+            .is_some_and(|end| end <= file_len);
     Ok(believable.then_some(header.data_len))
 }
 
@@ -731,13 +778,13 @@ mod tests {
 
     #[test]
     fn what_is_not_a_readable_wav_is_said_so() {
-        assert!(parse_header(b"OggS\0\0\0\0\0\0\0\0\0\0").is_err());
+        parse_header(b"OggS\0\0\0\0\0\0\0\0\0\0").unwrap_err();
         // The samples before any word of what they are.
-        assert!(parse_header(b"RIFF\0\0\0\0WAVEdata\0\0\0\0").is_err());
+        parse_header(b"RIFF\0\0\0\0WAVEdata\0\0\0\0").unwrap_err();
         // Twelve-bit samples, which nothing writes.
-        assert!(parse_header(&header(1, 16_000, 12, 1, 0)).is_err());
+        parse_header(&header(1, 16_000, 12, 1, 0)).unwrap_err();
         // Compressed WAV, format 2 (ADPCM).
-        assert!(parse_header(&header(1, 16_000, 16, 2, 0)).is_err());
+        parse_header(&header(1, 16_000, 16, 2, 0)).unwrap_err();
     }
 
     #[test]
@@ -916,7 +963,7 @@ mod tests {
 
         // Once samples have been read from where it was asked to go, that
         // is where the recording is.
-        let mut transcoder = Transcoder::new(asked.clone(), mp3.clone(), 32_000, 0).unwrap();
+        let mut transcoder = Transcoder::new(asked.clone(), mp3, 32_000, 0).unwrap();
         append(&asked, &header(1, SAMPLE_RATE, 16, 1, 0));
         append(&asked, &tone(SAMPLE_RATE, 500));
         transcoder.pump().unwrap();
@@ -966,7 +1013,7 @@ mod tests {
         // It wrote something that is not a WAV.
         let transcoder = Transcoder::new(wav.clone(), mp3.clone(), 32_000, 0).unwrap();
         append(&wav, b"this is not a recording at all");
-        assert!(transcoder.finish().is_err());
+        transcoder.finish().unwrap_err();
         assert!(!mp3.exists() && !wav.exists());
 
         // Cancelled halfway.

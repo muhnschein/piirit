@@ -347,7 +347,7 @@ fn the_camera_page_has_the_platform_cameras_controls() {
         }};
     }
 
-    let first = url.clone();
+    let first = url;
     single_shot(Duration::from_millis(500), move || unsafe {
         (*answers_ptr).push(call!("run", QString::from(first.as_str())));
         (*answers_ptr).push(call!("arm", QString::from(first.as_str())));

@@ -49,7 +49,8 @@ impl CoreRuntime {
                 {
                     Ok(runtime) => runtime,
                     Err(err) => {
-                        let _ = handle_tx.send(Err(err.to_string()));
+                        // Gone only if the caller stopped waiting.
+                        handle_tx.send(Err(err.to_string())).ok();
                         return;
                     }
                 };
@@ -57,8 +58,9 @@ impl CoreRuntime {
                     return;
                 }
                 // Parks until every clone is gone, then drops the runtime
-                // here rather than on the Qt thread.
-                let _ = shutdown_rx.recv();
+                // here rather than on the Qt thread. A message and a
+                // hung-up channel both mean exactly that.
+                shutdown_rx.recv().ok();
             })
             .map_err(|err| format!("could not start runtime thread: {err}"))?;
 

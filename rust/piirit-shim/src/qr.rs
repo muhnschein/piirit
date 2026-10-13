@@ -25,9 +25,9 @@ pub(crate) fn encode_modules(text: &str) -> Result<(usize, String), String> {
     let code = qrcode::QrCode::new(text.as_bytes()).map_err(|err| err.to_string())?;
     let size = code.width();
     let colors = code.to_colors();
-    let mut rows = String::with_capacity(size * (size + 1));
+    let mut rows = String::with_capacity(size.saturating_mul(size.saturating_add(1)));
     for (index, color) in colors.iter().enumerate() {
-        if index > 0 && index % size == 0 {
+        if index > 0 && index.checked_rem(size) == Some(0) {
             rows.push('\n');
         }
         rows.push(match color {
@@ -49,21 +49,24 @@ pub(crate) struct Grey {
 /// `.pgm` or `.ppm` path. Colour is averaged down to grey.
 pub(crate) fn parse_pnm(bytes: &[u8]) -> Option<Grey> {
     let (tokens, at) = pnm_header(bytes)?;
-    let width: usize = tokens[1].parse().ok()?;
-    let height: usize = tokens[2].parse().ok()?;
-    let maximum: u32 = tokens[3].parse().ok()?;
+    let [magic, width, height, maximum] = tokens.as_slice() else {
+        return None;
+    };
+    let width: usize = width.parse().ok()?;
+    let height: usize = height.parse().ok()?;
+    let maximum: u32 = maximum.parse().ok()?;
     if width == 0 || height == 0 || maximum == 0 || maximum > 255 {
         return None;
     }
     let count = width.checked_mul(height)?;
     let data = bytes.get(at..)?;
-    let pixels = match tokens[0].as_str() {
+    let pixels = match magic.as_str() {
         "P5" => data.get(..count)?.to_vec(),
         "P6" => data
             .get(..count.checked_mul(3)?)?
             .chunks_exact(3)
             .map(|rgb| {
-                let sum = u32::from(rgb[0]) + u32::from(rgb[1]) + u32::from(rgb[2]);
+                let sum: u32 = rgb.iter().copied().map(u32::from).sum();
                 u8::try_from(sum / 3).unwrap_or(u8::MAX)
             })
             .collect(),
@@ -85,48 +88,47 @@ pub(crate) fn parse_pnm(bytes: &[u8]) -> Option<Grey> {
 fn pnm_header(bytes: &[u8]) -> Option<(Vec<String>, usize)> {
     let mut at = 0;
     let mut tokens: Vec<String> = Vec::new();
-    while tokens.len() < 4 && at < bytes.len() {
-        let byte = bytes[at];
+    while tokens.len() < 4 {
+        let byte = *bytes.get(at)?;
         if byte == b'#' {
             at = end_of_line(bytes, at);
         } else if byte.is_ascii_whitespace() {
-            at += 1;
+            at = at.saturating_add(1);
         } else {
             let end = end_of_token(bytes, at);
-            tokens.push(String::from_utf8_lossy(&bytes[at..end]).into_owned());
+            tokens.push(String::from_utf8_lossy(bytes.get(at..end)?).into_owned());
             at = end;
         }
     }
-    if tokens.len() < 4 {
-        return None;
-    }
-    Some((tokens, at + 1))
+    // `at` is within the data, so this cannot overflow.
+    Some((tokens, at.saturating_add(1)))
 }
 
 /// Where the line starting at `at` ends: its newline, which is left to be
 /// read as whitespace, or the end of the data.
 fn end_of_line(bytes: &[u8], at: usize) -> usize {
-    at + bytes[at..]
-        .iter()
-        .take_while(|byte| **byte != b'\n')
-        .count()
+    let rest = bytes.get(at..).unwrap_or_default();
+    at.saturating_add(rest.iter().take_while(|byte| **byte != b'\n').count())
 }
 
 /// Where the token starting at `at` ends: the first whitespace byte, or
 /// the end of the data.
 fn end_of_token(bytes: &[u8], at: usize) -> usize {
-    at + bytes[at..]
-        .iter()
-        .take_while(|byte| !byte.is_ascii_whitespace())
-        .count()
+    let rest = bytes.get(at..).unwrap_or_default();
+    at.saturating_add(
+        rest.iter()
+            .take_while(|byte| !byte.is_ascii_whitespace())
+            .count(),
+    )
 }
 
 /// The text of the first code found in the image, if any.
 pub(crate) fn decode_grey(grey: &Grey) -> Option<String> {
     let mut prepared =
         rqrr::PreparedImage::prepare_from_greyscale(grey.width, grey.height, |x, y| {
-            grey.pixels
-                .get(y * grey.width + x)
+            y.checked_mul(grey.width)
+                .and_then(|row| row.checked_add(x))
+                .and_then(|at| grey.pixels.get(at))
                 .copied()
                 .unwrap_or(u8::MAX)
         });
@@ -146,7 +148,7 @@ pub(crate) fn cache_file(name: &str) -> Result<std::path::PathBuf, String> {
         .or_else(|_| {
             std::env::var("HOME").map(|home| std::path::PathBuf::from(home).join(".cache"))
         })
-        .map_err(|_| "neither XDG_CACHE_HOME nor HOME is set".to_string())?;
+        .map_err(|err| format!("neither XDG_CACHE_HOME nor HOME is set: {err}"))?;
     let path = base.join("piirit/piirit").join(name);
     let dir = path.parent().unwrap_or(&path);
     std::fs::create_dir_all(dir)
@@ -165,17 +167,25 @@ const QUIET_ZONE: usize = 4;
 /// reloaded from the file when the window's textures are lost -- which is
 /// what happens to an app put in the background.
 pub(crate) fn write_pgm(size: usize, modules: &str, path: &std::path::Path) -> Result<(), String> {
-    let edge = (size + 2 * QUIET_ZONE) * MODULE_PIXELS;
-    let mut pixels = vec![u8::MAX; edge * edge];
-    for (row, line) in modules.lines().enumerate() {
-        for (column, module) in line.chars().enumerate() {
-            if module != '1' {
-                continue;
-            }
-            let left = (column + QUIET_ZONE) * MODULE_PIXELS;
-            for dy in 0..MODULE_PIXELS {
-                let top = ((row + QUIET_ZONE) * MODULE_PIXELS + dy) * edge;
-                pixels[top + left..top + left + MODULE_PIXELS].fill(0);
+    let too_large = || format!("a code of {size} modules is too large to draw");
+    let edge = size
+        .checked_add(2 * QUIET_ZONE)
+        .and_then(|modules| modules.checked_mul(MODULE_PIXELS))
+        .ok_or_else(too_large)?;
+    // The pixels of one row of modules: `MODULE_PIXELS` lines of `edge`.
+    let band = edge.checked_mul(MODULE_PIXELS).ok_or_else(too_large)?;
+    let mut pixels = vec![u8::MAX; edge.checked_mul(edge).ok_or_else(too_large)?];
+    // Walked as bands of lines and cells of `MODULE_PIXELS`, the quiet
+    // zone skipped at the top and the left: nothing is placed by
+    // arithmetic, so nothing can land outside the picture.
+    let bands = pixels.chunks_exact_mut(band).skip(QUIET_ZONE);
+    for (band, row) in bands.zip(modules.lines()) {
+        for line in band.chunks_exact_mut(edge) {
+            let cells = line.chunks_exact_mut(MODULE_PIXELS).skip(QUIET_ZONE);
+            for (cell, module) in cells.zip(row.chars()) {
+                if module == '1' {
+                    cell.fill(0);
+                }
             }
         }
     }
@@ -434,6 +444,6 @@ mod tests {
         assert_eq!(decode_grey(&blank), None);
         assert!(parse_pnm(b"not an image").is_none());
         assert!(parse_pnm(b"P5\n4 4\n255\nshort").is_none());
-        assert!(encode_modules("").is_ok());
+        encode_modules("").unwrap();
     }
 }

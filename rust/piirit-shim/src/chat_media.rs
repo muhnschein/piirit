@@ -290,11 +290,11 @@ impl ChatMedia {
             .enumerate()
             .map(|(index, row)| (row.message_id, index))
             .collect();
-        let mut landed = 0;
+        let mut landed: usize = 0;
         for item in items {
             if let Some(index) = index_of.get(&item.message_id).copied() {
                 rows.change_line(index, item);
-                landed += 1;
+                landed = landed.saturating_add(1);
             }
         }
         landed

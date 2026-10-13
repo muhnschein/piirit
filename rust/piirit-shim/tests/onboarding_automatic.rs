@@ -74,7 +74,7 @@ fn no_relay_named_leaves_the_relays_to_the_core() {
         }
     });
 
-    let engine_ptr = &engine as *const QmlEngine;
+    let engine_ptr: *const QmlEngine = &engine;
     single_shot(Duration::from_secs(3), move || {
         // SAFETY: see tests/smoke.rs -- the callback only fires while
         // `exec()` is still running on this thread.

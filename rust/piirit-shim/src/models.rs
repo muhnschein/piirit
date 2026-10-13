@@ -6,7 +6,7 @@ use qmetaobject::QString;
 // Each flag is a role QML reads by name, so they cannot be folded into
 // one field.
 #[allow(clippy::struct_excessive_bools)]
-#[derive(Default, Clone, PartialEq, qmetaobject::SimpleListItem)]
+#[derive(Default, Clone, PartialEq, Eq, qmetaobject::SimpleListItem)]
 pub struct ChatListItem {
     /// The core's chat id.
     pub chat_id: u32,
@@ -179,7 +179,7 @@ pub struct MessageListItem {
 pub type MessageListModel = SimpleListModel<MessageListItem>;
 
 /// One account from `get_all_accounts`.
-#[derive(Default, Clone, PartialEq, qmetaobject::SimpleListItem)]
+#[derive(Default, Clone, PartialEq, Eq, qmetaobject::SimpleListItem)]
 pub struct AccountItem {
     /// The core's account id.
     pub account_id: u32,
@@ -265,7 +265,7 @@ pub struct TransportItem {
 pub type TransportListModel = SimpleListModel<TransportItem>;
 
 /// One contact from `get_contacts`.
-#[derive(Default, Clone, PartialEq, qmetaobject::SimpleListItem)]
+#[derive(Default, Clone, PartialEq, Eq, qmetaobject::SimpleListItem)]
 pub struct ContactItem {
     /// The core's contact id.
     pub contact_id: u32,
