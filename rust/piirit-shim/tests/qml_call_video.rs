@@ -59,7 +59,27 @@ const PROBE_QML: &str = r"
             var manager = findIn(centerLoader.item, 'resourceManager')
             if (!manager) { return 'missing:resourceManager' }
             manager.replies = [9, 1, 1, 0, 'OK']
+            // What the microphone watcher would say on a phone, where
+            // PulseAudio is: it can tell, and nothing is open yet.
+            var audio = findIn(centerLoader.item, 'callAudio')
+            audio.micKnown = true
+            audio.micOpen = false
             return 'ok'
+        }
+        // PulseAudio has the page's microphone open, or not.
+        function micOpen(on) {
+            findIn(centerLoader.item, 'callAudio').micOpen = on
+            return 'ok'
+        }
+        // The audio policy answers when told to, or at once again.
+        function audioHolds(on) {
+            findIn(centerLoader.item, 'resourceManager').deferred = on
+            return 'ok'
+        }
+        // Where the call's view is pointed.
+        function viewTarget() {
+            var view = findIn(pageHolder.item, 'callView')
+            return view ? '' + view.url : 'missing:callView'
         }
         function front() {
             if (!pageHolder.item) { return 'no-page' }
@@ -280,6 +300,8 @@ fn a_video_call_shows_its_pictures_under_lines_a_tap_puts_away() {
             record!("camera-off-ringing", get!("cameraSwitch", "checked"));
             tap!("cameraSwitch");
             record!("camera-back", call!("call"));
+            // The policy slow to answer: the call's page waits for it.
+            call!("audioHolds", true);
             record!("answer", tap!("answerButton"));
         }),
         // Answered with the camera: the page is granted the camera too,
@@ -287,10 +309,21 @@ fn a_video_call_shows_its_pictures_under_lines_a_tap_puts_away() {
         Box::new(move || unsafe {
             let url = call!("url");
             *url_ptr = url.clone();
-            record!("url", url.clone());
-            record!("engine", call!("engine"));
-            // Answered: the call's sound is held with the policy.
+            record!("url", url);
+            // Answered: the call's sound is being held with the policy,
+            // and until it is, the page is not brought up -- it could
+            // open the microphone before the sound has its way out.
             record!("audio-answered", call!("audioSaid"));
+            record!("engine-held", call!("engine"));
+            record!("view-held", call!("viewTarget"));
+            call!("audioHolds", false);
+            call!("audioAnswers");
+        }),
+        Box::new(move || unsafe {
+            let url = (*url_ptr).clone();
+            record!("audio-had", call!("audioSaid"));
+            record!("engine", call!("engine"));
+            record!("view", call!("viewTarget"));
             record!("hidden-before", get!("callViewLoader", "opacity"));
             // No picture yet, but the camera is on: held in front of the
             // face, not to the ear.
@@ -373,8 +406,8 @@ fn a_video_call_shows_its_pictures_under_lines_a_tap_puts_away() {
                     get!("pictureFlipButton", "width")
                 )
             );
-            // A video call is on the loudspeaker; the switch puts it on
-            // the earpiece and back.
+            // A video call is on the loudspeaker. The page has the
+            // microphone open; the switch has it shut first, and is busy.
             record!(
                 "speaker-video",
                 format!(
@@ -384,26 +417,52 @@ fn a_video_call_shows_its_pictures_under_lines_a_tap_puts_away() {
                     get!("speakerSwitch", "checked")
                 )
             );
+            call!("micOpen", true);
             record!("speaker-tap", tap!("speakerSwitch"));
-            record!("speaker-earpiece", get!("speakerSwitch", "checked"));
-            record!("audio-earpiece", call!("audioSaid"));
-            tap!("speakerSwitch");
-            record!("audio-speaker", call!("audioSaid"));
-            // Refused by the policy: given back, the call on the
-            // loudspeaker for good, and the switch dimmed.
-            call!("audioRefuses", true);
-            tap!("speakerSwitch");
-            call!("audioAnswers");
-            record!("audio-refused", call!("audioSaid"));
             record!(
-                "speaker-refused",
+                "speaker-busy",
                 format!(
-                    "{},{}",
+                    "{},{},{}",
+                    get!("speakerSwitch", "busy"),
                     get!("speakerSwitch", "enabled"),
                     get!("speakerSwitch", "checked")
                 )
             );
-            call!("audioRefuses", false);
+            record!("audio-mic-open", call!("audioSaid"));
+            record!(
+                "told-shut",
+                body_of(&get(
+                    &authority_of(&url),
+                    &format!("{}/commands", api_of(&url))
+                ))
+                .to_string()
+            );
+            // Shut, as PulseAudio says.
+            call!("micOpen", false);
+        }),
+        Box::new(move || unsafe {
+            let url = (*url_ptr).clone();
+            // The sound moved with the microphone shut, and the page told
+            // to open it again; once it has, the switch is done.
+            record!("audio-earpiece", call!("audioSaid"));
+            record!(
+                "told-open",
+                body_of(&get(
+                    &authority_of(&url),
+                    &format!("{}/commands", api_of(&url))
+                ))
+                .to_string()
+            );
+            call!("micOpen", true);
+            record!(
+                "speaker-earpiece",
+                format!(
+                    "{},{},{}",
+                    get!("speakerSwitch", "busy"),
+                    get!("speakerSwitch", "enabled"),
+                    get!("speakerSwitch", "checked")
+                )
+            );
             record!("clock", get!("callClock", "text"));
             record!("status-video", get!("callStatus", "visible"));
             record!("tuck", get!("tuck", "running"));
@@ -524,9 +583,14 @@ fn a_video_call_shows_its_pictures_under_lines_a_tap_puts_away() {
             record!("who-voice", get!("callWho", "visible"));
             record!("ear-voice", get!("proximity", "active"));
             call!("hangUp");
-            // Over: nothing held, nothing more to give back.
+            // Over: nothing given back while the microphone is open; once
+            // it has shut, the set is.
             record!("audio-over", call!("audioSaid"));
             record!("audio-talking-over", get!("callAudio", "talking"));
+            call!("micOpen", false);
+        }),
+        Box::new(move || unsafe {
+            record!("audio-given-back", call!("audioSaid"));
         }),
         Box::new(move || unsafe {
             call!("dropPage");
@@ -604,8 +668,24 @@ fn a_video_call_shows_its_pictures_under_lines_a_tap_puts_away() {
     );
     assert_eq!(
         value("audio-answered"),
+        "register:3",
+        "a video call does not ask the policy for its sound with video playback: the loudspeaker. {context}"
+    );
+    assert_eq!(
+        value("engine-held"),
         "",
-        "a video call, on the loudspeaker, held a set with the policy once answered. {context}"
+        "the call's page was granted the microphone before its sound had its way out. {context}"
+    );
+    assert_eq!(
+        value("view-held"),
+        "",
+        "the call's page came up before its sound had its way out. {context}"
+    );
+    assert_eq!(value("audio-had"), "audio,acquire", "{context}");
+    assert_eq!(
+        value("view"),
+        url,
+        "once the call's sound had its way out, the page did not come up. {context}"
     );
     let granted = value("engine");
     assert!(
@@ -856,31 +936,45 @@ fn a_video_call_shows_its_pictures_under_lines_a_tap_puts_away() {
         "a video call is not on the loudspeaker, or its switch is not there to use. {context}"
     );
     assert_eq!(value("speaker-tap"), "ok", "{context}");
-    assert_eq!(value("speaker-earpiece"), "false", "{context}");
+    assert_eq!(
+        value("speaker-busy"),
+        "true,true,false",
+        "the switch is not busy while the sound moves, or does not show where it is going. {context}"
+    );
+    assert_eq!(
+        value("audio-mic-open"),
+        "",
+        "the sound was moved with the microphone open. {context}"
+    );
+    assert_eq!(
+        value("told-shut"),
+        r#"["microphone-off"]"#,
+        "the page was not told to shut the microphone. {context}"
+    );
     assert_eq!(
         value("audio-earpiece"),
-        "register:1,audio,acquire",
-        "the switch did not put the call on the earpiece. {context}"
+        "update:1,acquire",
+        "with the microphone shut, the switch did not put the call on the earpiece. {context}"
     );
     assert_eq!(
-        value("audio-speaker"),
-        "release,unregister",
-        "the switch did not put the call back on the loudspeaker. {context}"
+        value("told-open"),
+        r#"["microphone-on"]"#,
+        "the page was not told to open the microphone again. {context}"
     );
     assert_eq!(
-        value("audio-refused"),
-        "register:1,release,unregister",
-        "a set the policy refused was not given back. {context}"
-    );
-    assert_eq!(
-        value("speaker-refused"),
-        "false,true",
-        "refused, the switch is still there to use, or the call is not on the loudspeaker. {context}"
+        value("speaker-earpiece"),
+        "false,true,false",
+        "with the microphone back, the switch is still busy. {context}"
     );
     assert_eq!(
         value("audio-over"),
         "",
-        "a set already given back was given back again. {context}"
+        "the set was given back with the microphone open. {context}"
+    );
+    assert_eq!(
+        value("audio-given-back"),
+        "release,unregister",
+        "once the microphone shut, the call's set was not given back. {context}"
     );
     assert_eq!(
         value("audio-talking-over"),

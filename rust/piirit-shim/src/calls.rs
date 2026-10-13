@@ -254,6 +254,11 @@ pub struct Call {
     pub set_camera: qt_method!(fn(&mut self, on: bool)),
     /// Turn the camera to face the other way.
     pub flip_camera: qt_method!(fn(&mut self)),
+    /// Let the page have the microphone, or have it shut it and keep it
+    /// shut: while the call's sound moves (CallAudio.qml), which must not
+    /// happen with it open. Not muting: the page's own switch, and what
+    /// the other end is told, stay as they are.
+    pub set_microphone: qt_method!(fn(&mut self, on: bool)),
     /// The app has gone to the background, or come back: the camera is
     /// let go while it is away -- nobody is looking at what it shows,
     /// and the other end is told it is off -- and the pictures are not
@@ -301,6 +306,8 @@ pub struct Call {
     settled: Arc<AtomicBool>,
     /// The app is in the background; see `set_background`.
     away: bool,
+    /// The page is to keep the microphone shut; see `set_microphone`.
+    mic_shut: bool,
 }
 
 /// How long a call may ring here before it is taken to have rung out
@@ -450,6 +457,17 @@ impl Call {
         if let Some(host) = &self.host {
             host.command(call_host::mute_command(on));
         }
+    }
+
+    /// The microphone, let have or shut. Kept from call to call, as
+    /// CallAudio.qml last said; a page not up yet is told once it is,
+    /// see `serve`.
+    pub fn set_microphone(&mut self, on: bool) {
+        if self.mic_shut != on {
+            return;
+        }
+        self.mic_shut = !on;
+        self.tell(call_host::microphone_command(on));
     }
 
     /// Whether the camera is to be open now: wanted, and the app in
@@ -716,6 +734,10 @@ impl Call {
                         // Muted before there was a page to tell.
                         if this_mut.muted {
                             host.command(call_host::mute_command(true));
+                        }
+                        // And the microphone to be kept shut.
+                        if this_mut.mic_shut {
+                            host.command(call_host::microphone_command(false));
                         }
                         let back = main_back_camera(&this_mut.back_lenses.to_string());
                         if back > 0 {

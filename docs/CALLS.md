@@ -188,9 +188,9 @@ call screen: who, top left, and the time of day, top right; how long, in
 hours, minutes and seconds, large, under them; the switches under that;
 and *End call* at the foot. The other end's picture, where they have one
 of their own, fills the screen behind it, blurred and dimmed. Of the
-phone screen's four switches the microphone is the one a call here has:
-the keypad and recording are a phone call's, and the loudspeaker is the
-earpiece question below.
+phone screen's four switches a call here has the microphone and the
+loudspeaker ("Earpiece and loudspeaker", below), and the camera besides:
+the keypad and recording are a phone call's.
 
 The page the media runs in draws controls of its own, in English. It is
 kept running under the call screen, unseen and behind a catch that takes
@@ -419,35 +419,72 @@ loudspeaker, as the reference clients have it, being held in front of
 the face. A voice call whose pictures come on goes to the loudspeaker
 too, unless the reader has switched this call. The loudspeaker switch on
 the call page goes between the two at any time, and holds for the rest of
-the call. A headset, headphones or a Bluetooth device takes the sound by
+the call. Switching takes about a second, during which this end's
+microphone is off; the switch shows that it is busy until the microphone
+is back. A headset, headphones or a Bluetooth device takes the sound by
 itself; the switch is dimmed then, having nothing to move it from. When
 the policy does not take the call, it is on the loudspeaker for good and
 the switch dimmed.
 
-How (`CallAudio.qml`): while a call's sound is meant for the earpiece,
-the app holds a resource set of class `aliencall` with ohm's resource
-manager (`org.maemo.resource.manager`, system bus; the Audio permission
-opens it). `aliencall` is the class Sailfish has for calls that are not
-phone calls, the one Android App Support's VoIP apps get. ohm routes the
-sound of whichever set owns audio playback by that set's class: for
+How (`CallAudio.qml`): for the whole of a call the app holds a resource
+set of class `aliencall` with ohm's resource manager
+(`org.maemo.resource.manager`, system bus; the Audio permission opens
+it). `aliencall` is the class Sailfish has for calls that are not phone
+calls, the one Android App Support's VoIP apps get. ohm routes the sound
+of whichever set owns audio playback by that set's class: for
 `aliencall`, a Bluetooth or USB device, then a wired headset or
-headphones, then the earpiece (`earpieceforalien`). For the loudspeaker
-the set is given back, and the call's sound goes where any app's goes:
-the phone's speakers, or what is plugged in or paired. Switching is
-giving one set back or asking for a new one, nothing global.
+headphones, then the earpiece (`earpieceforalien`). A set that owns
+video playback as well is kept off the earpiece and routed to the
+loudspeaker (`ihfforalien`). So the earpiece is the set with audio
+playback alone, the loudspeaker the same set with video playback added,
+and switching is updating that one set. Either way other apps' music
+pauses for the call. Nothing global is touched.
 
-The policy has a loudspeaker of its own for such a call: it rules out
-the earpiece for an `aliencall` set that also owns video playback, and
-routes to `ihfforalien`. On a phone that took all sound away -- the
-call's and every other app's -- and neither switching back, hanging up
-nor closing the app brought it back: only restarting PulseAudio did. So
-what broke is the sound server's state, which no set held by the app
-can be trusted to undo, for reasons not known yet. It is not used. Its price: on the
-loudspeaker, other apps' music keeps playing, and the volume keys are
-the media volume.
+The microphone is what makes this delicate. Moving the call's sound
+while its microphone is open brings the phone's sound server down. The
+policy's PulseAudio module moves every stream of the call's group to the
+new route and asserts that each one moved (`policy-group.c`,
+`pa_policy_group_start_move_all`). The browser engine opens the
+microphone on a named device, and cubeb's PulseAudio backend marks such
+a stream as not to be moved (`PA_STREAM_DONT_MOVE`). The move fails, the
+assertion aborts PulseAudio, and systemd restarts it. The restarted one
+has forgotten which streams were the call's, so the call goes silent; a
+few aborts in a row and systemd stops restarting it, and the phone has no
+sound at all until someone who knows how starts it again. That was what
+the first builds' loudspeaker did (#146), and what giving the set back
+at the end of an earpiece call with the microphone still open did too
+*(inferred from the captures: the abort at hang-up is in them)*. A
+headset plugged in mid-call does the same. Nothing in the app can stop
+that one; it is the platform's to fix.
+
+So the app never moves the sound while a microphone of its may be open:
+
+- **Before it opens.** The set is had, and the policy has had half a
+  second to act on it, before the call's page comes up at all
+  (`CallView.allowed`): ohm answers the acquire a few milliseconds before
+  it tells PulseAudio where the sound goes.
+- **To switch**, the page is told to stop the microphone (the host's
+  `microphone-off`). The bridge stops the track and takes it off the
+  connection's sender; the page's own stream keeps it, so the page's
+  mute switch still has something to act on. Once PulseAudio itself has
+  had no recording stream of the app's for 300 ms, the set is updated;
+  half a second after the policy answers, the page is told
+  `microphone-on`, and the bridge opens a new track in the old one's
+  place, on or off as the page last had it. A switch that has not
+  finished in 5 seconds is given up on: the microphone is back, and the
+  sound where it was.
+- **Once the call is over**, the set is given back only after the
+  microphone has shut.
+
+What PulseAudio has open comes from `MicWatch`, which watches the app's
+own recording streams with PulseAudio's client library (on Harbour's
+list): every stream whose client is the app's process. When it cannot
+tell -- PulseAudio down, or not letting the app see -- the switch is
+dimmed while the microphone is open, and a call's set is given back 3
+seconds after its page was told to stop it.
 
 The set is spoken to over the bus in libresource's own message layout
-(`register`, `audio`, `acquire`, `release`, `unregister`;
+(`register`, `audio`, `update`, `acquire`, `release`, `unregister`;
 `dbus-msg.c`), since no library for it is on Harbour's list, and in its
 order: one message at a time, each once the last is answered. The
 manager needs that. It answers a register only after asking the bus
@@ -471,8 +508,11 @@ bus connection and drops every set of a client whose connection goes:
 a crash, a kill, the OOM killer, or closing the app puts the sound back
 where it was with nobody doing anything. Nothing is written that
 outlives the app, so there is nothing for a next run to clean up. While
-the app runs, the set is held exactly while the call's sound is meant
-for the earpiece, and given back on the way out besides.
+the app runs, the set is held exactly while a call is on, and given back
+on the way out besides -- unless the microphone may still be open, when
+nothing is sent and the set goes with the bus connection, which is after
+the process's streams have gone *(inferred: PulseAudio sees its client's
+socket close at once, while ohm's word about it comes over the bus)*.
 
 Read-only besides: ohm's `Route.Manager.ActiveRoutes` and its
 `AudioRouteChanged` signal, for whether the sound is on something
@@ -505,11 +545,17 @@ of Piirit: two phones and an afternoon.
    phone a voice call played from the earpiece only, with the Media
    app's music paused. Music itself plays from the earpiece and the
    loudspeaker both (#100): the phone's loudspeaker output drives the
-   two, which is where the call goes on the loudspeaker too. Why the
-   policy's own loudspeaker for the call took all sound away is open.
-5. **What it sounds like.** Echo on speakerphone, and what a call costs
+   two. What the policy's own loudspeaker for the call did to the sound
+   was PulseAudio aborting over the open microphone ("Earpiece and
+   loudspeaker"); whether it plays from the loudspeaker once the
+   microphone is out of the way is the claim.
+5. **Does the app see its own microphone in PulseAudio?** The app runs
+   sandboxed; that PulseAudio lists its recording streams to it is the
+   claim. If it does not, the loudspeaker switch stays dimmed while the
+   microphone is open.
+6. **What it sounds like.** Echo on speakerphone, and what a call costs
    in battery.
-6. **Does the camera open in the engine, and turn?** Gecko reaches the
+7. **Does the camera open in the engine, and turn?** Gecko reaches the
    phone's cameras through `gecko-camera`; that `facingMode` picks the
    back one, and that the engine lets one go before the next opens, is
    the claim. What a video call costs in battery and heat at VGA, 24
@@ -537,16 +583,15 @@ of Piirit: two phones and an afternoon.
   route managers -- which its validator cannot see and its QA may or may
   not accept; each is a `DBusInterface` in `CallCenter.qml` or
   `CallAudio.qml`, and a call works without any of them, on the
-  loudspeaker. And they promote the browser engine, a separate package on
+  loudspeaker. PulseAudio's client library, which watches the app's own
+  microphone, is on the list. And they promote the browser engine, a separate package on
   this platform, from a webxdc feature to the load-bearing part of a
   headline one.
 
 ## Next
 
 1. **The phone questions above**, before anything else.
-2. **The earpiece**, once it can be released even when the app is not
-   there to release it.
-3. **The chat list's preview** of a call is still the core's English
+2. **The chat list's preview** of a call is still the core's English
    sentence (`📞 Outgoing audio call`). The reference clients hand the
    core translations of its call strings (`set_stock_strings`); Piirit
    hands it none of any kind yet.

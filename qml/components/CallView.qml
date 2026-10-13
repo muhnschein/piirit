@@ -38,6 +38,13 @@ Item {
     /// The page has drawn at least once.
     readonly property bool loaded: view.loaded
 
+    /// Whether the page may come up: once the call's sound has its way
+    /// out (CallAudio.ready). Up any sooner, it could open the microphone
+    /// before the sound is moved, and moving it then brings the phone's
+    /// sound server down (CallAudio.qml says why). Only coming up waits:
+    /// a page that is up is not taken down for it.
+    property bool allowed: true
+
     /// Where the view goes: `url`, once the microphone has been granted
     /// to it. Set rather than bound, so the grant is always first.
     property string target: ""
@@ -124,7 +131,8 @@ Item {
     }
 
     /// Grant the page's origin, then point the view at the page: before
-    /// the page is there, it cannot ask.
+    /// the page is there, it cannot ask. A page not allowed yet is
+    /// nowhere, and a page that was somewhere else goes.
     ///
     /// Not before the engine is up. It starts on the event loop after
     /// this file first imports it -- on the first call of a run, that is
@@ -135,8 +143,9 @@ Item {
         if (!WebEngine.isInitialized()) {
             return
         }
-        root.grant(root.authorityOf(root.url))
-        root.target = root.url
+        var where = root.allowed ? root.url : ""
+        root.grant(root.authorityOf(where))
+        root.target = where
     }
 
     Connections {
@@ -146,6 +155,11 @@ Item {
     }
 
     onUrlChanged: root.go()
+    onAllowedChanged: {
+        if (root.allowed) {
+            root.go()
+        }
+    }
     Component.onCompleted: root.go()
     Component.onDestruction: root.revoke()
 

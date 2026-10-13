@@ -7,14 +7,17 @@
 # Qt5 packages (Debian/Ubuntu):
 #   apt install qtbase5-dev qtdeclarative5-dev qtmultimedia5-dev \
 #               qtdeclarative5-dev-tools qml-module-qtquick2 \
-#               qml-module-qtquick-window2 qttools5-dev-tools
+#               qml-module-qtquick-window2 qttools5-dev-tools \
+#               libpulse-dev pulseaudio pulseaudio-utils
 #
 # qml-module-qtquick2 is the QtQuick runtime plugin, which the -dev
 # packages omit; qml-module-qtquick-window2 is QtQuick.Window, which a
 # test shows a window through; qttools5-dev-tools is lupdate and
 # lrelease, for the catalogs, and the app's own test compiles one;
 # qtmultimedia5-dev is QAudioRecorder, which the shim's voice recorder
-# is built on.
+# is built on; libpulse-dev is the call's microphone watch, and
+# pulseaudio and pulseaudio-utils the sound server and recorder its test
+# runs it against.
 
 .PHONY: check test lint fmt qml-lint packaging-lint lockfile-lint doc-lint \
         msrv deny workflow-lint leak-check integration harbour vendor-check fetch-server \

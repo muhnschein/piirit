@@ -1,22 +1,29 @@
 //! Where a call's sound comes out (`CallAudio.qml`): the earpiece for a
 //! voice call, the loudspeaker for a video call, the reader's switch over
-//! both, and nothing at all left behind.
+//! both -- and the sound never moved while a microphone of the call's may
+//! be open.
 //!
-//! The call holds a resource set of class `aliencall` with ohm's resource
-//! manager while its sound is meant for the earpiece, and none for the
-//! loudspeaker. What is checked is what the manager is sent, in
-//! libresource's own message layout: the set registered, its streams
-//! named by the app's id, acquired, and given back for the loudspeaker,
-//! when the call is over, when the manager refuses any of it -- which
-//! leaves the call on the loudspeaker for good -- and on the way out; and
-//! that nothing is asked for without the app's id, which would leave the
-//! call's own streams held back.
+//! On Sailfish, moving the sound while the browser engine's microphone is
+//! open aborts PulseAudio, and a few of those in a row leave the phone
+//! with no sound at all. So what is checked first is when things are
+//! sent: the set had before the call's page may come up (`ready`);
+//! nothing sent while a microphone may be open (`open`) -- not for the
+//! switch, not for pictures, not for a refusal that comes late, not on
+//! the way out; a switch that has the page shut the microphone
+//! (`micWanted`) and moves the sound only once the watcher says PulseAudio
+//! has no recording stream of the app's left (`micKnown`, `micOpen`), then
+//! lets the microphone back; and the set given back once the call is over
+//! the same way -- or, with no watcher to tell, a while after.
 //!
-//! And that it goes one message at a time, each once the last is
-//! answered, as libresource's own clients send them: the manager answers
-//! a register only after asking the bus who sent it, and refuses anything
-//! else about the set that comes before then. On a phone, a set whose
-//! messages all went out at once was refused and let go of every time.
+//! And what is sent, in libresource's own message layout: a set of class
+//! `aliencall` registered, its streams named by the app's id, acquired,
+//! with video playback for the loudspeaker (the policy's own loudspeaker
+//! for a call); updated for a switch; given back when the manager refuses
+//! any of it, or is not there; and nothing asked for without the app's
+//! id, which would leave the call's own streams held back. One message at
+//! a time, each once the last is answered, as libresource's own clients
+//! send them: the manager answers a register only after asking the bus who
+//! sent it, and refuses anything else about the set that comes before.
 
 // Qt harness: see qml_chat_list.rs.
 #![allow(
@@ -44,13 +51,8 @@ const PROBE_QML: &str = r"
         property string log: ''
         function load(url, appId) {
             holder.setSource(url, { appId: appId })
-            manager = null
-            routes = null
-            var data = holder.item ? holder.item.data : []
-            for (var i = 0; i < data.length; i++) {
-                if (data[i].objectName === 'resourceManager') { manager = data[i] }
-                if (data[i].objectName === 'routes') { routes = data[i] }
-            }
+            manager = find('resourceManager')
+            routes = find('routes')
             if (manager === null || routes === null) { return 'load-failed' }
             // The manager answers every message at once, and takes it.
             manager.replies = [9, 0, 1, 0, 'OK']
@@ -59,9 +61,34 @@ const PROBE_QML: &str = r"
             watched.calledChanged.connect(function () { log = watched.called })
             return 'ok'
         }
-        function unload() { holder.source = ''; return 'ok' }
+        function find(name) {
+            var data = holder.item ? holder.item.data : []
+            for (var i = 0; i < data.length; i++) {
+                if (data[i].objectName === name) { return data[i] }
+            }
+            return null
+        }
+        function unload() { holder.source = ''; return said() }
         function set(name, on) { holder.item[name] = on; return said() }
         function choose(loud) { holder.item.choose(loud); return said() }
+        // A timer's time is up, as if it had run: stopped, so that it
+        // does not come round again.
+        function fire(name) {
+            var timer = find(name)
+            if (timer === null) { return 'missing:' + name }
+            timer.stop()
+            timer.triggered()
+            return said()
+        }
+        function running(name) {
+            var timer = find(name)
+            return timer === null ? 'missing:' + name : '' + timer.running
+        }
+        function intervals() {
+            return ['settling', 'quieting', 'shutting', 'patience', 'stalled'].map(function (name) {
+                return find(name).interval
+            }).join(',')
+        }
         // The manager answers every message sent from now on with this
         // status.
         function answer(errcod) {
@@ -106,16 +133,50 @@ const PROBE_QML: &str = r"
                 return [line.substring(0, space)].concat(args.map(function (arg) { return arg.value })).join(' ')
             }).join(';')
         }
+        // The set held and whether it is the loudspeaker's; the switch;
+        // whether the page may be up, a microphone may be open, the page
+        // may have it; a switch under way; and whether the reader can
+        // switch.
         function state() {
             var item = holder.item
-            return item.held + '|' + item.speaker + '|' + item.elsewhere + '|' + item.switchable
+            return [item.held, item.heldLoud ? 'loud' : 'ear', item.speaker ? 'speaker' : 'earpiece',
+                    item.ready ? 'ready' : 'held-back', item.open ? 'open' : 'shut',
+                    item.micWanted ? 'mic' : 'no-mic', item.switching ? 'switching' : 'still',
+                    item.switchable ? 'switchable' : 'fixed'].join('|')
         }
     }
 ";
 
+/// A whole set asked for: set `id`, its requests numbered from `first`,
+/// for the loudspeaker or not.
+fn asked(id: u32, first: u32, loud: bool) -> String {
+    let all = if loud { 3 } else { 1 };
+    format!(
+        "register 0 {id} {first} {all} 0 0 0 1234 aliencall 0;\
+         audio 7 {id} {} aliencall 1234 media.name 0 *;\
+         acquire 3 {id} {}",
+        first + 1,
+        first + 2
+    )
+}
+
+/// A set turned the other way out: updated, and acquired again.
+fn changed(id: u32, first: u32, loud: bool) -> String {
+    let all = if loud { 3 } else { 1 };
+    format!(
+        "update 2 {id} {first} {all} 0 0 0 1234 aliencall 0;acquire 3 {id} {}",
+        first + 1
+    )
+}
+
+/// A set given back: set `id`, its requests numbered from `first`.
+fn given_back(id: u32, first: u32) -> String {
+    format!("release 4 {id} {first};unregister 1 {id} {}", first + 1)
+}
+
 #[test]
 #[allow(clippy::too_many_lines)]
-fn a_call_holds_its_sound_and_gives_it_back() {
+fn a_call_moves_its_sound_only_with_the_microphone_shut() {
     // SAFETY: single-threaded test binary; set before Qt starts.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
@@ -153,6 +214,16 @@ fn a_call_holds_its_sound_and_gives_it_back() {
             call!("set", QString::from($name), $on)
         };
     }
+    macro_rules! fire {
+        ($name:expr) => {
+            call!("fire", QString::from($name))
+        };
+    }
+    macro_rules! running {
+        ($name:expr) => {
+            call!("running", QString::from($name))
+        };
+    }
 
     let url = common::component_url("CallAudio.qml");
 
@@ -162,121 +233,257 @@ fn a_call_holds_its_sound_and_gives_it_back() {
         let load = |app: &str| call!("load", QString::from(url.as_str()), QString::from(app));
         record!("load", load("1234"));
         record!("start", call!("said"));
+        record!("intervals", call!("intervals"));
+        // The watcher is connected, and no microphone is open.
+        set!("micKnown", true);
 
-        // One message at a time, with a manager that answers when told
-        // to: the register alone, then each of the rest once the last is
-        // answered.
+        // A voice call, with a manager that answers when told to: the
+        // register alone, then each of the rest once the last is
+        // answered; the page held back all the while.
         call!("defer");
-        record!("first", set!("talking", true));
-        record!("first-state", call!("state"));
-        record!("second", call!("flush"));
-        // The loudspeaker, tapped before the set is had: what was still
-        // to be said about it goes unsaid, and it is given back once the
-        // message out is answered.
-        record!("switch-early", call!("choose", true));
-        record!("third", call!("flush"));
-        record!("fourth", call!("flush"));
-        record!("drained", call!("flush"));
-        // Back to the earpiece: a set of its own. Over with its register
-        // out: given back once the answer is in.
-        record!("quiet-out", call!("choose", false));
-        record!("over-out", set!("talking", false));
-        record!("over-out-release", call!("flush"));
-        record!("over-out-unregister", call!("flush"));
-        record!("over-out-done", call!("flush"));
-        call!("heal");
-
-        // A voice call: on the earpiece, with a set registered, its
-        // streams named, acquired.
         record!("voice", set!("talking", true));
         record!("voice-state", call!("state"));
-        // The loudspeaker gives the set back; the earpiece takes a new
-        // one.
-        record!("loud", call!("choose", true));
-        record!("loud-state", call!("state"));
-        record!("quiet", call!("choose", false));
-        // Pictures come: the reader has chosen, so it stays.
-        record!("pictures-chosen", set!("watching", true));
-        set!("watching", false);
-        // Over: given back.
-        record!("over", set!("talking", false));
-        record!("over-state", call!("state"));
-        record!("over-switch", call!("choose", true));
-        // A second voice call: a set of its own, back on the earpiece;
-        // its pictures coming put it on the loudspeaker.
-        record!("again", set!("talking", true));
-        record!("pictures", set!("watching", true));
-        set!("watching", false);
-        record!("again-over", set!("talking", false));
+        record!("voice-patience", running!("patience"));
+        record!("voice-audio", call!("flush"));
+        record!("voice-acquire", call!("flush"));
+        record!("voice-acquire-settling", running!("settling"));
+        record!("voice-had", call!("flush"));
+        record!("voice-had-state", call!("state"));
+        record!("voice-had-settling", running!("settling"));
+        // The policy's moment to move the sound: then the page comes up
+        // and may open the microphone.
+        record!("voice-in", fire!("settling"));
+        record!("voice-in-state", call!("state"));
+        record!("voice-in-patience", running!("patience"));
+        // The page has yet to open it: that is not a microphone shut.
+        record!("voice-in-quieting", running!("quieting"));
+        call!("heal");
+        record!("voice-mic", set!("micOpen", true));
 
-        // A video call: the loudspeaker from the start, nothing held.
-        set!("video", true);
-        record!("video", set!("talking", true));
-        record!("video-state", call!("state"));
-        // Where the sound is: a headset dims the switch, the loudspeaker
-        // does not; not looked at once the call is over.
+        // A headset: the switch is dimmed; the loudspeaker does not dim
+        // it.
         record!(
             "headset",
             call!("route", QString::from("headset"), 1 | 8 | 256 | (1 << 27))
         );
         record!("headset-state", call!("state"));
+        record!("headset-tap", call!("choose", true));
         record!(
-            "speaker",
+            "speaker-route",
             call!("route", QString::from("speaker"), 1 | 4 | (1 << 27))
         );
-        record!("speaker-state", call!("state"));
-        // Built in and wired at once is still the phone's own, as ohm
-        // reads its route types.
-        record!(
-            "built-in-wired",
-            call!("route", QString::from("lineout"), 1 | 4 | 8 | (1 << 27))
-        );
-        record!("built-in-wired-state", call!("state"));
+        record!("speaker-route-state", call!("state"));
+
+        // The loudspeaker, tapped: nothing moves while the microphone is
+        // open; the page is told to shut it, and the switch is busy.
+        record!("loud-tap", call!("choose", true));
+        record!("loud-tap-state", call!("state"));
+        record!("loud-tap-stalled", running!("stalled"));
+        record!("loud-tap-again", call!("choose", false));
+        record!("loud-tap-again-state", call!("state"));
+        // Nothing that keeps time moves the sound or lets the microphone
+        // back early.
+        fire!("settling");
+        fire!("shutting");
+        fire!("patience");
+        record!("loud-early", fire!("quieting"));
+        record!("loud-early-state", call!("state"));
+        // Shut for a moment, then not: not shut at all.
+        set!("micOpen", false);
+        record!("loud-flicker", running!("quieting"));
+        set!("micOpen", true);
+        record!("loud-flicker-quieting", running!("quieting"));
+        record!("loud-flicker-state", call!("state"));
+        // PulseAudio says it has shut, and still does a moment later: the
+        // set turned for the loudspeaker.
+        record!("loud-shut", set!("micOpen", false));
+        record!("loud-shut-quieting", running!("quieting"));
+        record!("loud-moved", fire!("quieting"));
+        record!("loud-moved-state", call!("state"));
+        // The policy's moment, and the microphone back.
+        record!("loud-in", fire!("settling"));
+        record!("loud-in-state", call!("state"));
+        record!("loud-back", set!("micOpen", true));
+        record!("loud-back-state", call!("state"));
+        record!("loud-back-stalled", running!("stalled"));
+
+        // Over: nothing until the microphone has shut, then given back.
+        record!("over", set!("talking", false));
+        record!("over-state", call!("state"));
+        record!("over-quieting", running!("quieting"));
+        set!("micOpen", false);
+        record!("over-shut", fire!("quieting"));
+        record!("over-shut-state", call!("state"));
+
+        // A video call: the loudspeaker from the start, video playback in
+        // the set; switched to the earpiece.
+        set!("video", true);
+        record!("video", set!("talking", true));
+        record!("video-state", call!("state"));
+        fire!("settling");
+        set!("micOpen", true);
+        call!("choose", false);
+        set!("micOpen", false);
+        record!("video-ear", fire!("quieting"));
+        fire!("settling");
+        set!("micOpen", true);
+        // Over, with the watcher gone: given back a while after.
+        set!("talking", false);
+        record!("blind-over", set!("micKnown", false));
+        // A watcher that cannot tell says no microphone is open.
+        set!("micOpen", false);
+        record!("blind-over-shutting", running!("shutting"));
+        record!("blind-over-quieting", running!("quieting"));
+        record!("blind-shut", fire!("shutting"));
+        set!("micOpen", false);
+        set!("micKnown", true);
+        set!("video", false);
+
+        // No watcher, a microphone open: the switch is dimmed, and
+        // pictures do not move the sound either.
+        record!("blind", set!("talking", true));
+        fire!("settling");
+        set!("micOpen", true);
+        set!("micKnown", false);
+        record!("blind-tap", call!("choose", true));
+        record!("blind-state", call!("state"));
+        record!("blind-pictures", set!("watching", true));
+        record!("blind-pictures-state", call!("state"));
+        set!("watching", false);
+        set!("micKnown", true);
+
+        // A microphone that does not shut: given up on, back on, the
+        // sound where it was.
+        call!("choose", true);
+        record!("stuck", fire!("stalled"));
+        record!("stuck-state", call!("state"));
+        // A policy that does not answer the switch: given up on, the
+        // microphone back, and the rest not sent while it is open.
+        call!("defer");
+        call!("choose", true);
+        set!("micOpen", false);
+        record!("silent-switch", fire!("quieting"));
+        record!("silent-switch-gave-up", fire!("stalled"));
+        record!("silent-switch-state", call!("state"));
+        record!("silent-switch-late", call!("flush"));
+        set!("micOpen", true);
+        set!("talking", false);
+        set!("micOpen", false);
+        record!("silent-switch-over", fire!("quieting"));
+        record!("silent-switch-rest", call!("drain"));
+        call!("heal");
+
+        // Pictures coming put a voice call on the loudspeaker, unless the
+        // reader has switched it.
+        record!("pictures-call", set!("talking", true));
+        fire!("settling");
+        set!("micOpen", true);
+        record!("pictures", set!("watching", true));
+        record!("pictures-state", call!("state"));
+        set!("micOpen", false);
+        record!("pictures-moved", fire!("quieting"));
+        fire!("settling");
+        set!("micOpen", true);
+        set!("watching", false);
+        call!("choose", false);
+        set!("micOpen", false);
+        record!("chosen-moved", fire!("quieting"));
+        fire!("settling");
+        set!("micOpen", true);
+        record!("chosen-pictures", set!("watching", true));
+        record!("chosen-pictures-state", call!("state"));
+        set!("watching", false);
+        set!("talking", false);
+        set!("micOpen", false);
+        record!("pictures-over", fire!("quieting"));
+
+        // A call that starts while the last one's microphone is still
+        // open waits for it to shut; one like it keeps the set.
+        record!("first-call", set!("talking", true));
+        fire!("settling");
+        set!("micOpen", true);
+        set!("talking", false);
+        record!("next-call", set!("talking", true));
+        record!("next-call-state", call!("state"));
+        // Tapped meanwhile: nothing is open of this call's to shut.
+        call!("choose", true);
+        record!("next-call-tap", call!("state"));
+        call!("choose", false);
+        set!("micOpen", false);
+        record!("next-call-shut", fire!("quieting"));
+        record!("next-call-settling", running!("settling"));
+        fire!("settling");
+        record!("next-call-state-in", call!("state"));
+        set!("micOpen", true);
+        set!("talking", false);
+        set!("micOpen", false);
+        record!("next-call-over", fire!("quieting"));
+
         // The manager refuses the earpiece: the rest of the set is not
-        // sent, it is given back, the call is on the loudspeaker for
-        // good, and the switch then does nothing.
+        // sent, it is given back, and the call is on the loudspeaker for
+        // good, with the switch dimmed.
         call!("defer");
         call!("answer", 13);
-        record!("refused-sent", call!("choose", false));
+        record!("refused-sent", set!("talking", true));
         record!("refused", call!("drain"));
         record!("refused-state", call!("state"));
         call!("heal");
-        record!("refused-after", call!("choose", false));
-        record!("refused-after-state", call!("state"));
+        fire!("settling");
+        set!("micOpen", true);
+        record!("refused-tap", call!("choose", false));
         set!("talking", false);
-        record!("refused-over", call!("said"));
-        record!(
-            "over-route",
-            call!("route", QString::from("headset"), 1 | 8)
-        );
-
-        // The policy still says a headset, which a call looks at as it
-        // starts; and the refusal was the last call's.
-        set!("video", false);
-        record!("ok", set!("talking", true));
-        record!("ok-state", call!("state"));
+        set!("micOpen", false);
+        record!("refused-over", fire!("quieting"));
+        // The refusal was that call's. Over before the microphone ever
+        // opened: given back once the moment is up.
+        record!("after-refusal", set!("talking", true));
+        fire!("settling");
         set!("talking", false);
-        call!("said");
+        record!("after-refusal-quieting", running!("quieting"));
+        record!("after-refusal-over", fire!("quieting"));
 
-        // No manager on the bus: let go of once that is known, before
-        // anything more is sent about the set.
+        // Refused mid-switch: given back with the microphone shut, and
+        // the microphone back on the loudspeaker.
+        record!("mid-call", set!("talking", true));
+        fire!("settling");
+        set!("micOpen", true);
+        call!("choose", true);
+        set!("micOpen", false);
+        call!("defer");
+        call!("answer", 13);
+        record!("mid-update", fire!("quieting"));
+        record!("mid-refused", call!("drain"));
+        call!("heal");
+        fire!("settling");
+        set!("micOpen", true);
+        record!("mid-refused-state", call!("state"));
+        set!("talking", false);
+        set!("micOpen", false);
+        record!("mid-over", fire!("quieting"));
+
+        // No manager on the bus: let go of once that is known.
         call!("defer");
         call!("fail");
         record!("absent-sent", set!("talking", true));
         record!("absent", call!("drain"));
         record!("absent-state", call!("state"));
+        fire!("settling");
         set!("talking", false);
+        record!("absent-over", fire!("quieting"));
         call!("heal");
-        call!("said");
 
-        // Pictures already up as the call starts carrying sound: the
-        // loudspeaker from the start.
-        set!("watching", true);
-        record!("watched", set!("talking", true));
-        record!("watched-state", call!("state"));
+        // A manager that does not answer the call's set at all: the page
+        // comes up without it, and the rest waits for the call to be
+        // over and its microphone shut.
+        call!("defer");
+        record!("silent-sent", set!("talking", true));
+        record!("silent-in", fire!("patience"));
+        record!("silent-state", call!("state"));
+        record!("silent-late", call!("flush"));
         set!("talking", false);
-        set!("watching", false);
-        call!("said");
+        record!("silent-over", fire!("quieting"));
+        record!("silent-rest", call!("drain"));
+        call!("heal");
 
         // A refusal that comes late, for a call already over: the next
         // call's set is kept.
@@ -290,22 +497,33 @@ fn a_call_holds_its_sound_and_gives_it_back() {
         record!("late", call!("drain"));
         record!("late-state", call!("state"));
         call!("heal");
+        fire!("settling");
         set!("talking", false);
-        call!("said");
+        record!("late-over", fire!("quieting"));
 
-        // Gone mid-call, with the register not answered yet: given back
-        // on the way out all the same, without waiting for an answer
-        // that would come to nobody.
+        // Gone mid-call, the microphone open: nothing sent on the way out.
+        set!("talking", true);
+        fire!("settling");
+        set!("micOpen", true);
+        call!("said");
+        record!("left-open", call!("unload"));
+
+        // Gone with the register not answered yet, before the page could
+        // come up: given back on the way out, without waiting for an
+        // answer that would come to nobody.
+        load("1234");
+        set!("micKnown", true);
         call!("defer");
         set!("talking", true);
         call!("said");
-        record!("unload", call!("unload"));
-        record!("left", call!("said"));
+        record!("left", call!("unload"));
 
         // Without the app's id, nothing is asked for: the loudspeaker,
-        // for good.
+        // for good, and the page need not wait for the policy.
         load("");
         record!("no-id", set!("talking", true));
+        record!("no-id-settling", running!("settling"));
+        fire!("settling");
         record!("no-id-state", call!("state"));
         (*engine_ptr).quit();
     });
@@ -321,225 +539,323 @@ fn a_call_holds_its_sound_and_gives_it_back() {
     };
     let context = format!("steps: {steps:?}");
 
-    assert_eq!(value("load"), "ok", "the component did not load. {context}");
-    assert_eq!(
-        value("start"),
-        "",
-        "a fresh start sent something. {context}"
-    );
-    assert_eq!(
-        value("first"),
-        "register 0 1 1 1 0 0 0 1234 aliencall 0",
-        "more than the register went out before the manager answered it. {context}"
-    );
-    assert_eq!(value("first-state"), "1|false|false|true", "{context}");
-    assert_eq!(
-        value("second"),
-        "audio 7 1 2 aliencall 1234 media.name 0 *",
-        "the set's streams were not named once it was registered. {context}"
-    );
-    assert_eq!(
-        value("switch-early"),
-        "",
-        "the set was given back before the message out was answered. {context}"
-    );
-    assert_eq!(
-        value("third"),
-        "release 4 1 4",
-        "the acquire meant for the earpiece still went out, or the set was not given back. {context}"
-    );
-    assert_eq!(value("fourth"), "unregister 1 1 5", "{context}");
-    assert_eq!(value("drained"), "", "{context}");
-    assert_eq!(
-        value("quiet-out"),
-        "register 0 2 6 1 0 0 0 1234 aliencall 0",
-        "back on the earpiece, no set was asked for. {context}"
-    );
-    assert_eq!(
-        value("over-out"),
-        "",
-        "the set was given back before the message out was answered. {context}"
-    );
-    assert_eq!(
-        value("over-out-release"),
-        "release 4 2 9",
-        "what was meant for a call that is over still went out, or the set was not given back. {context}"
-    );
-    assert_eq!(
-        value("over-out-unregister"),
-        "unregister 1 2 10",
-        "{context}"
-    );
-    assert_eq!(value("over-out-done"), "", "{context}");
-    assert_eq!(
-        value("voice"),
-        "register 0 3 11 1 0 0 0 1234 aliencall 0;\
-         audio 7 3 12 aliencall 1234 media.name 0 *;\
-         acquire 3 3 13",
-        "a voice call does not hold an aliencall set for the earpiece. {context}"
-    );
-    assert_eq!(value("voice-state"), "3|false|false|true", "{context}");
-    assert_eq!(
-        value("loud"),
-        "release 4 3 14;unregister 1 3 15",
-        "the loudspeaker switch did not give the set back. {context}"
-    );
-    assert_eq!(
-        value("loud-state"),
-        "0|true|false|true",
-        "on the loudspeaker, a set is held or the switch is not there to use. {context}"
-    );
-    assert_eq!(
-        value("quiet"),
-        "register 0 4 16 1 0 0 0 1234 aliencall 0;\
-         audio 7 4 17 aliencall 1234 media.name 0 *;\
-         acquire 3 4 18",
-        "switched back, the call did not take a set for the earpiece. {context}"
-    );
-    assert_eq!(
-        value("pictures-chosen"),
-        "",
-        "pictures overrode the reader's choice. {context}"
-    );
-    assert_eq!(
-        value("over"),
-        "release 4 4 19;unregister 1 4 20",
-        "a call that is over did not give its set back. {context}"
-    );
-    assert_eq!(value("over-state"), "0|false|false|false", "{context}");
-    assert_eq!(
-        value("over-switch"),
-        "",
-        "the switch sent something with no call. {context}"
-    );
-    assert_eq!(
-        value("again"),
-        "register 0 5 21 1 0 0 0 1234 aliencall 0;\
-         audio 7 5 22 aliencall 1234 media.name 0 *;\
-         acquire 3 5 23",
-        "a second call does not get a set of its own on the earpiece. {context}"
-    );
-    assert_eq!(
-        value("pictures"),
-        "release 4 5 24;unregister 1 5 25",
-        "a voice call whose pictures came on stayed on the earpiece. {context}"
-    );
-    assert_eq!(
-        value("again-over"),
-        "",
-        "a set already given back was given back again. {context}"
-    );
-    assert_eq!(
-        value("video"),
-        "",
-        "a video call on the loudspeaker asked for a set. {context}"
-    );
-    assert_eq!(
-        value("video-state"),
-        "0|true|false|true",
-        "a video call does not start on the loudspeaker, with the switch there to use. {context}"
-    );
-    assert_eq!(value("headset"), "ActiveRoutes", "{context}");
-    assert_eq!(
-        value("headset-state"),
-        "0|true|true|false",
-        "a headset does not dim the switch. {context}"
-    );
-    assert_eq!(value("speaker"), "ActiveRoutes", "{context}");
-    assert_eq!(value("speaker-state"), "0|true|false|true", "{context}");
-    assert_eq!(value("built-in-wired"), "ActiveRoutes", "{context}");
-    assert_eq!(
-        value("built-in-wired-state"),
-        "0|true|false|true",
-        "a route built into the phone dimmed the switch. {context}"
-    );
-    assert_eq!(
-        value("refused-sent"),
-        "register 0 6 26 1 0 0 0 1234 aliencall 0",
-        "{context}"
-    );
-    assert_eq!(
-        value("refused"),
-        "release 4 6 29;unregister 1 6 30",
-        "a set the manager refused was not given back, or acquired anyway. {context}"
-    );
-    assert_eq!(
-        value("refused-state"),
-        "0|true|false|false",
-        "refused, the call is not on the loudspeaker, or the switch is still there to use. {context}"
-    );
-    assert_eq!(
-        value("refused-after"),
-        "",
-        "refused once, the switch asked again. {context}"
-    );
-    assert_eq!(
-        value("refused-after-state"),
-        "0|true|false|false",
-        "{context}"
-    );
-    assert_eq!(
-        value("refused-over"),
-        "",
-        "a set already given back was given back again. {context}"
-    );
-    assert_eq!(
-        value("over-route"),
-        "",
-        "a route change after the call was looked at. {context}"
-    );
-    assert_eq!(
-        value("ok"),
-        "register 0 7 31 1 0 0 0 1234 aliencall 0;\
-         audio 7 7 32 aliencall 1234 media.name 0 *;\
-         acquire 3 7 33",
-        "a refusal outlived its call. {context}"
-    );
-    assert_eq!(
-        value("ok-state"),
-        "7|false|true|false",
-        "a set the manager took was given back, or the route was not looked at. {context}"
-    );
-    assert_eq!(
-        value("absent-sent"),
-        "register 0 8 36 1 0 0 0 1234 aliencall 0",
-        "{context}"
-    );
-    assert_eq!(
-        value("absent"),
-        "release 4 8 39;unregister 1 8 40",
-        "with no manager there, the set was not let go of at once. {context}"
-    );
-    assert_eq!(value("absent-state"), "0|true|true|false", "{context}");
-    assert_eq!(
-        value("watched"),
-        "",
-        "a call whose pictures were up as it started asked for the earpiece. {context}"
-    );
-    assert_eq!(value("watched-state"), "0|true|true|false", "{context}");
-    assert_eq!(
-        value("late"),
-        "release 4 9 44;unregister 1 9 45;\
-         register 0 10 46 1 0 0 0 1234 aliencall 0;\
-         audio 7 10 47 aliencall 1234 media.name 0 *;\
-         acquire 3 10 48",
-        "a late refusal for a call that is over gave back the next one's set. {context}"
-    );
-    assert_eq!(value("late-state"), "10|false|true|false", "{context}");
-    assert_eq!(value("unload"), "ok", "{context}");
-    assert_eq!(
-        value("left"),
-        "release 4 11 54;unregister 1 11 55",
-        "a set held on the way out was not given back. {context}"
-    );
-    assert_eq!(
-        value("no-id"),
-        "",
-        "a set was asked for without the app's id. {context}"
-    );
-    assert_eq!(
-        value("no-id-state"),
-        "0|true|false|false",
-        "without the app's id, the call is not on the loudspeaker for good. {context}"
-    );
+    let expected: Vec<(&str, String, &str)> = vec![
+        ("load", "ok".into(), "the component did not load"),
+        ("start", String::new(), "a fresh start sent something"),
+        (
+            "intervals",
+            "500,300,3000,5000,5000".into(),
+            "a wait changed: the sound's moment, the microphone staying shut, a microphone \
+             taken as shut without the watcher, the policy at the start, a switch",
+        ),
+        (
+            "voice",
+            "register 0 1 1 1 0 0 0 1234 aliencall 0".into(),
+            "more than the register went out before the manager answered it",
+        ),
+        (
+            "voice-state",
+            "1|ear|earpiece|held-back|shut|no-mic|still|switchable".into(),
+            "a voice call is not meant for the earpiece, or its page is let up before its set is had",
+        ),
+        ("voice-patience", "true".into(), "the call does not keep time on the policy"),
+        (
+            "voice-audio",
+            "audio 7 1 2 aliencall 1234 media.name 0 *".into(),
+            "the set's streams were not named once it was registered",
+        ),
+        ("voice-acquire", "acquire 3 1 3".into(), "the set was not acquired"),
+        ("voice-acquire-settling", "false".into(), "the page's moment came with the acquire still out"),
+        ("voice-had", String::new(), "something went out after the acquire"),
+        (
+            "voice-had-state",
+            "1|ear|earpiece|held-back|shut|no-mic|still|switchable".into(),
+            "the page is let up the moment the set is had, before the policy moves the sound",
+        ),
+        ("voice-had-settling", "true".into(), "the page is not given its moment once the set is had"),
+        ("voice-in", String::new(), "something went out as the page was let up"),
+        (
+            "voice-in-state",
+            "1|ear|earpiece|ready|open|mic|still|switchable".into(),
+            "the page was not let up, or not let have the microphone",
+        ),
+        ("voice-in-patience", "false".into(), "the call still waits on the policy once its page is up"),
+        (
+            "voice-in-quieting",
+            "false".into(),
+            "a microphone the page has yet to open is taken as one shut",
+        ),
+        ("voice-mic", String::new(), "the microphone opening sent something"),
+        ("headset", "ActiveRoutes".into(), "a route change was not looked at"),
+        (
+            "headset-state",
+            "1|ear|earpiece|ready|open|mic|still|fixed".into(),
+            "a headset does not dim the switch",
+        ),
+        ("headset-tap", String::new(), "a dimmed switch did something"),
+        ("speaker-route", "ActiveRoutes".into(), "{context}"),
+        ("speaker-route-state", "1|ear|earpiece|ready|open|mic|still|switchable".into(), "{context}"),
+        (
+            "loud-tap",
+            String::new(),
+            "the sound was moved with the microphone open",
+        ),
+        (
+            "loud-tap-state",
+            "1|ear|speaker|ready|open|no-mic|switching|fixed".into(),
+            "the page was not told to shut the microphone, or the switch is not busy",
+        ),
+        ("loud-tap-stalled", "true".into(), "a switch does not keep time"),
+        ("loud-tap-again", String::new(), "a busy switch did something"),
+        (
+            "loud-tap-again-state",
+            "1|ear|speaker|ready|open|no-mic|switching|fixed".into(),
+            "a busy switch was turned back",
+        ),
+        ("loud-early", String::new(), "a timer moved the sound with the microphone open"),
+        (
+            "loud-early-state",
+            "1|ear|speaker|ready|open|no-mic|switching|fixed".into(),
+            "a timer let the microphone back, or took it as shut, mid-switch",
+        ),
+        ("loud-flicker", "true".into(), "{context}"),
+        (
+            "loud-flicker-quieting",
+            "false".into(),
+            "a microphone open again is still waited on as shut",
+        ),
+        (
+            "loud-flicker-state",
+            "1|ear|speaker|ready|open|no-mic|switching|fixed".into(),
+            "a microphone open again, before the sound moved, ended the switch",
+        ),
+        ("loud-shut", String::new(), "the sound moved the moment the watcher spoke, not a moment after"),
+        ("loud-shut-quieting", "true".into(), "the microphone shutting is not waited on"),
+        (
+            "loud-moved",
+            changed(1, 4, true),
+            "with the microphone shut, the set was not turned for the loudspeaker",
+        ),
+        (
+            "loud-moved-state",
+            "1|loud|speaker|ready|shut|no-mic|switching|fixed".into(),
+            "{context}",
+        ),
+        ("loud-in", String::new(), "{context}"),
+        (
+            "loud-in-state",
+            "1|loud|speaker|ready|open|mic|switching|fixed".into(),
+            "the microphone was not let back once the sound had moved",
+        ),
+        ("loud-back", String::new(), "{context}"),
+        (
+            "loud-back-state",
+            "1|loud|speaker|ready|open|mic|still|switchable".into(),
+            "the switch is still busy with the microphone back",
+        ),
+        ("loud-back-stalled", "false".into(), "a finished switch still keeps time"),
+        (
+            "over",
+            String::new(),
+            "the set was given back with the call's microphone still open",
+        ),
+        (
+            "over-state",
+            "1|loud|speaker|held-back|open|no-mic|still|fixed".into(),
+            "a call that is over still lets its page up, or forgot its microphone is open",
+        ),
+        ("over-quieting", "false".into(), "a microphone still open is taken as shut"),
+        ("over-shut", given_back(1, 6), "once the microphone shut, the set was not given back"),
+        (
+            "over-shut-state",
+            "0|loud|speaker|held-back|shut|no-mic|still|fixed".into(),
+            "{context}",
+        ),
+        (
+            "video",
+            asked(2, 8, true),
+            "a video call does not ask for video playback with its sound: the loudspeaker",
+        ),
+        (
+            "video-state",
+            "2|loud|speaker|held-back|shut|no-mic|still|switchable".into(),
+            "{context}",
+        ),
+        ("video-ear", changed(2, 11, false), "a video call was not switched to the earpiece"),
+        ("blind-over", String::new(), "{context}"),
+        ("blind-over-shutting", "true".into(), "without the watcher, nothing waits for the microphone"),
+        ("blind-over-quieting", "false".into(), "{context}"),
+        (
+            "blind-shut",
+            given_back(2, 13),
+            "without the watcher, the set was not given back a while after the call",
+        ),
+        ("blind", asked(3, 15, false), "{context}"),
+        ("blind-tap", String::new(), "without the watcher, the switch moved the sound"),
+        (
+            "blind-state",
+            "3|ear|earpiece|ready|open|mic|still|fixed".into(),
+            "without the watcher, the switch is not dimmed",
+        ),
+        ("blind-pictures", String::new(), "without the watcher, pictures moved the sound"),
+        (
+            "blind-pictures-state",
+            "3|ear|earpiece|ready|open|mic|still|fixed".into(),
+            "without the watcher, pictures left the switch saying the loudspeaker",
+        ),
+        ("stuck", String::new(), "{context}"),
+        (
+            "stuck-state",
+            "3|ear|earpiece|ready|open|mic|still|switchable".into(),
+            "a switch given up on did not put the microphone back, or the switch as the sound is",
+        ),
+        ("silent-switch", "update 2 3 18 3 0 0 0 1234 aliencall 0".into(), "{context}"),
+        ("silent-switch-gave-up", String::new(), "{context}"),
+        (
+            "silent-switch-state",
+            "3|loud|speaker|ready|open|mic|still|switchable".into(),
+            "a switch the policy did not answer left the microphone shut",
+        ),
+        (
+            "silent-switch-late",
+            String::new(),
+            "the rest of the switch went out with the microphone back",
+        ),
+        ("silent-switch-over", "release 4 3 20".into(), "{context}"),
+        ("silent-switch-rest", "unregister 1 3 21".into(), "{context}"),
+        ("pictures-call", asked(4, 22, false), "{context}"),
+        ("pictures", String::new(), "pictures moved the sound with the microphone open"),
+        (
+            "pictures-state",
+            "4|ear|speaker|ready|open|no-mic|switching|fixed".into(),
+            "pictures did not start a switch to the loudspeaker",
+        ),
+        ("pictures-moved", changed(4, 25, true), "{context}"),
+        ("chosen-moved", changed(4, 27, false), "{context}"),
+        ("chosen-pictures", String::new(), "pictures overrode the reader's choice"),
+        (
+            "chosen-pictures-state",
+            "4|ear|earpiece|ready|open|mic|still|switchable".into(),
+            "pictures overrode the reader's choice",
+        ),
+        ("pictures-over", given_back(4, 29), "{context}"),
+        ("first-call", asked(5, 31, false), "{context}"),
+        (
+            "next-call",
+            String::new(),
+            "a call asked the policy for something with the last call's microphone open",
+        ),
+        (
+            "next-call-state",
+            "5|ear|earpiece|held-back|open|no-mic|still|switchable".into(),
+            "a new call let its page up with the last call's microphone open",
+        ),
+        (
+            "next-call-tap",
+            "5|ear|speaker|held-back|open|no-mic|still|switchable".into(),
+            "a call not yet let up waits on a switch of its own",
+        ),
+        ("next-call-shut", String::new(), "a set like the one held was given back and asked for again"),
+        ("next-call-settling", "true".into(), "the new call's page is not given its moment"),
+        (
+            "next-call-state-in",
+            "5|ear|earpiece|ready|open|mic|still|switchable".into(),
+            "{context}",
+        ),
+        ("next-call-over", given_back(5, 34), "{context}"),
+        ("refused-sent", "register 0 6 36 1 0 0 0 1234 aliencall 0".into(), "{context}"),
+        (
+            "refused",
+            given_back(6, 39),
+            "a set the manager refused was not given back, or acquired anyway",
+        ),
+        (
+            "refused-state",
+            "0|ear|speaker|held-back|shut|no-mic|still|fixed".into(),
+            "refused, the call is not on the loudspeaker, or the switch is not dimmed",
+        ),
+        ("refused-tap", String::new(), "refused once, the switch asked again"),
+        ("refused-over", String::new(), "a set already given back was given back again"),
+        ("after-refusal", asked(7, 41, false), "a refusal outlived its call"),
+        (
+            "after-refusal-quieting",
+            "true".into(),
+            "a page let up and gone is not waited out before the set goes",
+        ),
+        ("after-refusal-over", given_back(7, 44), "{context}"),
+        ("mid-call", asked(8, 46, false), "{context}"),
+        ("mid-update", "update 2 8 49 3 0 0 0 1234 aliencall 0".into(), "{context}"),
+        (
+            "mid-refused",
+            given_back(8, 51),
+            "an update the manager refused did not give the set back",
+        ),
+        (
+            "mid-refused-state",
+            "0|loud|speaker|ready|open|mic|still|fixed".into(),
+            "refused mid-switch, the microphone did not come back, or the switch is not dimmed",
+        ),
+        ("mid-over", String::new(), "{context}"),
+        ("absent-sent", "register 0 9 53 1 0 0 0 1234 aliencall 0".into(), "{context}"),
+        (
+            "absent",
+            given_back(9, 56),
+            "with no manager there, the set was not let go of at once",
+        ),
+        (
+            "absent-state",
+            "0|ear|speaker|held-back|shut|no-mic|still|fixed".into(),
+            "{context}",
+        ),
+        ("absent-over", String::new(), "{context}"),
+        ("silent-sent", "register 0 10 58 1 0 0 0 1234 aliencall 0".into(), "{context}"),
+        ("silent-in", String::new(), "{context}"),
+        (
+            "silent-state",
+            "10|ear|earpiece|ready|open|mic|still|switchable".into(),
+            "a manager that does not answer keeps the call's page back for good",
+        ),
+        (
+            "silent-late",
+            String::new(),
+            "the rest of the set went out with the page up",
+        ),
+        (
+            "silent-over",
+            "release 4 10 61".into(),
+            "what was not sent was sent after all, or the set not given back",
+        ),
+        ("silent-rest", "unregister 1 10 62".into(), "{context}"),
+        (
+            "late",
+            format!("{};{}", given_back(11, 66), asked(12, 68, false)),
+            "a late refusal for a call that is over gave back the next one's set",
+        ),
+        (
+            "late-state",
+            "12|ear|earpiece|held-back|shut|no-mic|still|switchable".into(),
+            "{context}",
+        ),
+        ("late-over", given_back(12, 71), "{context}"),
+        (
+            "left-open",
+            String::new(),
+            "the set was given back on the way out with the microphone open",
+        ),
+        (
+            "left",
+            given_back(1, 4),
+            "a set held on the way out, the page not yet up, was not given back",
+        ),
+        ("no-id", String::new(), "a set was asked for without the app's id"),
+        ("no-id-settling", "true".into(), "{context}"),
+        (
+            "no-id-state",
+            "0|ear|speaker|ready|open|mic|still|fixed".into(),
+            "without the app's id, the call is not on the loudspeaker for good",
+        ),
+    ];
+    for (label, want, why) in expected {
+        assert_eq!(value(label), want, "{label}: {why}. {context}");
+    }
 }

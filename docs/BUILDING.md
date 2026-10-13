@@ -32,18 +32,24 @@ outside tests, `missing_docs` and `unsafe_code` denied.
 `unsafe_code` is deny rather than forbid because the Qt harness tests need
 `env::set_var` before Qt initialises, and because two things the app does
 have no safe binding: installing a `QTranslator`, recording a voice
-message through `QAudioRecorder`, and handing QML pictures through a
-`QQuickImageProvider`, none of which qmetaobject wraps. Those are the
-three `cpp!` files in the tree, `piirit-app/src/translations.rs`,
-`piirit-shim/src/recorder.rs` and `piirit-shim/src/pictures.rs`, and the
-C++ build step in each
+message through `QAudioRecorder`, handing QML pictures through a
+`QQuickImageProvider`, and watching the call's microphone through
+libpulse, none of which qmetaobject wraps. Those are the four `cpp!`
+files in the tree, `piirit-app/src/translations.rs`,
+`piirit-shim/src/recorder.rs`, `piirit-shim/src/pictures.rs` and
+`piirit-shim/src/mic_watch.rs`, and the C++ build step in each
 crate's `build.rs` exists for them alone. Every exception is at the
 narrowest scope and says why, and every block is short enough to be
 checked by reading.
 
 The recorder is also why the host build needs `qtmultimedia5-dev` (the
 `Makefile` lists the packages) and the spec `pkgconfig(Qt5Multimedia)`:
-the shim links `libQt5Multimedia`, which Harbour allows.
+the shim links `libQt5Multimedia`, which Harbour allows. The microphone
+watch is why it needs `libpulse-dev` and the spec `pkgconfig(libpulse)`:
+the shim links `libpulse.so.0`, which Harbour allows too. Its test runs
+it against a sound server of its own, which is `pulseaudio` and
+`pulseaudio-utils`; without them it is skipped, except under CI, where
+it fails.
 
 `rust/clippy.toml` bans two methods that have already caused device-only
 failures: `tokio::runtime::Runtime::new` (must go through `CoreRuntime`) and

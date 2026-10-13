@@ -135,6 +135,9 @@ BuildRequires:  pkgconfig(Qt5Quick)
 # The runtime package it links, qt5-qtmultimedia, is one rpm derives from
 # the binary itself; Harbour allows it.
 BuildRequires:  pkgconfig(Qt5Multimedia)
+# libpulse, for the call's microphone watch (piirit-shim/src/mic_watch.rs):
+# libpulse.so.0, which Harbour allows.
+BuildRequires:  pkgconfig(libpulse)
 # lrelease, which compiles the translation catalogs in %%build.
 BuildRequires:  qt5-qttools-linguist
 

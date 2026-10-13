@@ -64,10 +64,10 @@ jobs:
       - name: Fetch the submodules
         run: git submodule update --init --depth 1
 
-      # The same Qt set ci.yml's `test` job installs: the coverage run below
+      # The same set ci.yml's `test` job installs: the coverage run below
       # runs the whole suite, and the shim's tests drive a real QtQuick
       # engine. The -dev packages omit the QtQuick runtime plugin.
-      - name: Install Qt
+      - name: Install Qt and PulseAudio
         run: |
           ./ci/apt-install.sh \
             qtbase5-dev \
@@ -76,7 +76,10 @@ jobs:
             qtdeclarative5-dev-tools \
             qml-module-qtquick2 \
             qml-module-qtquick-window2 \
-            qttools5-dev-tools
+            qttools5-dev-tools \
+            libpulse-dev \
+            pulseaudio \
+            pulseaudio-utils
 
       # `toolchain` is passed explicitly because dtolnay/rust-toolchain takes
       # it from the REF NAME it was called with, and a SHA has no name. The

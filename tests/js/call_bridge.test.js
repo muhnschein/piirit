@@ -202,7 +202,11 @@ function makeWorld(search, options) {
                 }
                 return Promise.resolve(given);
             }
-            const mic = new Track("audio", "mic");
+            if (world.micFails && world.micFails()) {
+                return Promise.reject(refusal("NotReadableError", "Failed to allocate audiosource"));
+            }
+            world.mics = (world.mics || 0) + 1;
+            const mic = new Track("audio", "mic-" + world.mics);
             mic.log = log;
             const given = new Stream([mic]);
             world.streams.push(given);
@@ -1787,4 +1791,159 @@ test("their picture given a new stream has yet to show it, and given the same on
     picture.mozPaintedFrames += 1;
     runTimers(world);
     assert.equal(lastVideo(world).remotePainted, true, "a picture counted afresh is never said to show");
+});
+
+/* ---- the microphone, shut while the call's sound moves ---------------- */
+
+function audioSender(connection) {
+    return connection.transceivers.find((t) => t.receiver.track.kind === "audio").sender;
+}
+
+function asks(world) {
+    return world.log.filter((line) => line === 'gum:{"audio":true}').length;
+}
+
+test("shut for the sound to move, the microphone is stopped and taken off its sender, then opened in its place", async () => {
+    for (const search of [VOICE, VIDEO]) {
+        const world = makeWorld(search);
+        const { connection, stream } = await page(world);
+        const mic = stream.getAudioTracks()[0];
+        const sender = audioSender(connection);
+        const others = connection.getSenders().filter((one) => one !== sender);
+        const carried = others.map((one) => one.track);
+
+        await command(world, "microphone-off");
+        assert.equal(mic.readyState, "ended", "the microphone was not stopped: the engine keeps it open");
+        assert.equal(sender.track, null, "the sender still carries the stopped microphone");
+        assert.deepEqual(others.map((one) => one.track), carried, "a sender of something else was emptied");
+        assert.deepEqual(stream.getAudioTracks(), [mic],
+            "the page's own switch has no microphone left to turn");
+        assert.equal(asks(world), 1, "the microphone was asked for while shut");
+        // The reader mutes while it is shut: the page's switch acts on the
+        // track it has.
+        mic.enabled = false;
+
+        await command(world, "microphone-on");
+        const now = stream.getAudioTracks();
+        assert.equal(now.length, 1, "the page's stream has more or fewer microphones than one");
+        assert.notEqual(now[0], mic, "the stopped microphone was left in place");
+        assert.equal(now[0].readyState, "live");
+        assert.equal(now[0].enabled, false, "the new microphone is not off as the page last had it");
+        assert.equal(sender.track, now[0], "the sender does not carry the new microphone");
+        assert.deepEqual(others.map((one) => one.track), carried,
+            "a sender of something else was given the microphone");
+        assert.equal(asks(world), 2, "the microphone was not asked for again, once");
+        assert.ok(world.requests.some((r) => r.url.endsWith("/log") && r.body === "microphone: open again"),
+            "the microphone opening again is not in the log");
+    }
+});
+
+test("a microphone of two tracks, one of them off, comes back off", async () => {
+    const world = makeWorld(VOICE);
+    const { stream } = await page(world);
+    const extra = new Track("audio", "extra");
+    extra.enabled = false;
+    stream.addTrack(extra);
+
+    await command(world, "microphone-off", "microphone-on");
+    const now = stream.getAudioTracks();
+    assert.equal(now.length, 1, "the stopped tracks were not both replaced by the one opened");
+    assert.equal(now[0].enabled, false, "a microphone the page had off in part came back on");
+});
+
+test("the page asking while the microphone is shut waits until it opens", async () => {
+    const world = makeWorld(VOICE);
+    await settleAll();
+    await command(world, "microphone-off");
+    let given = null;
+    world.window.navigator.mediaDevices.getUserMedia({ audio: true }).then((stream) => {
+        given = stream;
+    });
+    await settleAll();
+    assert.equal(given, null, "the page was given the microphone while it is shut");
+    assert.equal(asks(world), 0, "the engine was asked for the microphone while it is shut");
+
+    await command(world, "microphone-on");
+    assert.ok(given, "the page's ask never went on");
+    assert.equal(asks(world), 1);
+
+    // Its microphone is the one shut the next time.
+    await command(world, "microphone-off");
+    assert.equal(given.getAudioTracks()[0].readyState, "ended",
+        "a microphone asked for alone is not the one shut");
+});
+
+test("shut again while it opens, the new microphone goes too, and the next opening has it", async () => {
+    const world = makeWorld(VOICE);
+    const { connection, stream } = await page(world);
+    const sender = audioSender(connection);
+
+    await command(world, "microphone-off", "microphone-on", "microphone-off");
+    const opened = world.log.filter((line) => /^stop:mic-/.test(line));
+    assert.deepEqual(opened, ["stop:mic-1", "stop:mic-2"],
+        "the microphone opened while shut again was left open");
+    assert.equal(sender.track, null, "the sender carries a microphone while it is shut");
+    assert.equal(stream.getAudioTracks()[0].label, "mic-1");
+
+    await command(world, "microphone-on");
+    assert.equal(sender.track.label, "mic-3", "the next opening did not put a microphone back");
+    assert.deepEqual(stream.getAudioTracks().map((t) => t.label), ["mic-3"]);
+});
+
+test("a microphone that will not open again is asked for again, a second apart, a few times", async () => {
+    const world = makeWorld(VOICE);
+    const { connection } = await page(world);
+    let failures = 2;
+    world.micFails = () => failures-- > 0;
+
+    await command(world, "microphone-off", "microphone-on");
+    assert.equal(world.timers.filter((fn) => fn.delay === 1000).length, 1,
+        "a microphone that would not open is not asked for again");
+    runTimers(world);
+    await settleAll();
+    runTimers(world);
+    await settleAll();
+    assert.equal(audioSender(connection).track.label, "mic-2",
+        "asked again, the microphone was not put back");
+
+    world.micFails = () => true;
+    await command(world, "microphone-off", "microphone-on");
+    for (let i = 0; i < 5; i++) {
+        runTimers(world);
+        await settleAll();
+    }
+    const failed = world.requests.filter((r) => r.url.endsWith("/log")
+        && r.body.startsWith("microphone: would not open again")).length;
+    assert.equal(failed, 2 + 3, "a microphone that will not open is asked for more or fewer than three times");
+    assert.equal(world.timers.length, 0, "it is asked for again without end");
+});
+
+test("shut again while an opening fails, it is not tried again until opened, and then at once", async () => {
+    const world = makeWorld(VOICE);
+    const { connection } = await page(world);
+    world.micFails = () => true;
+
+    await command(world, "microphone-off", "microphone-on", "microphone-off");
+    assert.equal(world.timers.filter((fn) => fn.delay === 1000).length, 0,
+        "a microphone that failed to open while shut is tried again while shut");
+    world.micFails = () => false;
+    await command(world, "microphone-on");
+    assert.equal(audioSender(connection).track?.label, "mic-2",
+        "opened again, the microphone was not put back at once");
+});
+
+test("shut while a failed opening waits to try again, it is not tried until opened", async () => {
+    const world = makeWorld(VOICE);
+    const { connection } = await page(world);
+    let failures = 1;
+    world.micFails = () => failures-- > 0;
+
+    await command(world, "microphone-off", "microphone-on");
+    await command(world, "microphone-off");
+    runTimers(world);
+    await settleAll();
+    assert.equal(audioSender(connection).track, null, "a microphone was opened while shut");
+
+    await command(world, "microphone-on");
+    assert.equal(audioSender(connection).track.label, "mic-2");
 });

@@ -5,7 +5,8 @@
  * Served ahead of the bridge (`calls.js`), as one script with it: the
  * bridge hands this its way to the host, every peer connection the page
  * makes, and the commands that are this file's -- the camera on or off,
- * which way it faces, and whether the app is in front. It reports back,
+ * which way it faces, whether the app is in front, and the microphone
+ * shut while the call's sound moves, and open again. It reports back,
  * on `/video`, whether the camera is live and whether the other end's
  * picture is being drawn: what the call screen decides from whether the
  * page is shown at all.
@@ -140,6 +141,22 @@ var piiritVideo = (function () {
     var turned = 0;
     /* Every peer connection the page has made. */
     var connections = [];
+    /* The stream the page's microphone is on, once it has asked -- the
+     * same one as `stream` when it asked for the camera too -- and what
+     * it asked the microphone for. */
+    var voice = null;
+    var voiceAsked = true;
+    /* The host has the microphone shut, for the call's sound to move:
+     * moved with it open, it brings the phone's sound server down
+     * (CallAudio.qml says why). Meanwhile the page's own asks wait, and
+     * each track stopped for it is kept with the senders that carried
+     * it, until the microphone opens again. */
+    var micShut = false;
+    var micWaits = [];
+    var micStopped = [];
+    /* How many times a microphone that will not open again is asked
+     * for, a second apart. */
+    var MIC_TRIES = 3;
     /* The other end's stream, and what it last said about its camera. */
     var remote = null;
     var remoteEnabled = null;
@@ -366,6 +383,106 @@ var piiritVideo = (function () {
         }
         return connection.getSenders().filter(function (sender) {
             return sender.track !== null && sender.track.kind === "video";
+        });
+    }
+
+    /* Once the microphone is not shut: at once, or when it opens. */
+    function micFree() {
+        if (!micShut) {
+            return Promise.resolve();
+        }
+        return new Promise(function (resolve) {
+            micWaits.push(resolve);
+        });
+    }
+
+    /* Shut the microphone: every live track the page has of it stopped,
+     * and taken off every sender that carries it -- stopped, the engine
+     * lets the device go. The tracks stay on the page's stream, so its
+     * own switch still has them to turn on and off. */
+    function micOff() {
+        micShut = true;
+        if (!voice) {
+            return;
+        }
+        voice.getAudioTracks().forEach(function (track) {
+            if (track.readyState === "ended") {
+                return;
+            }
+            var senders = [];
+            connections.forEach(function (connection) {
+                connection.getSenders().forEach(function (sender) {
+                    if (sender.track === track) {
+                        senders.push(sender);
+                        var done = sender.replaceTrack(null);
+                        if (done?.catch) {
+                            done.catch(noop);
+                        }
+                    }
+                });
+            });
+            track.stop();
+            micStopped.push({ track: track, senders: senders });
+            note("microphone: stopped while the sound moves");
+        });
+    }
+
+    /* Open it again: the page's waiting asks go on, and a new track goes
+     * where the stopped ones were, on or off as the page last had them. */
+    function micOn() {
+        micShut = false;
+        var waits = micWaits;
+        micWaits = [];
+        waits.forEach(function (resolve) {
+            resolve();
+        });
+        var stopped = micStopped;
+        micStopped = [];
+        if (stopped.length > 0) {
+            reopen(stopped, MIC_TRIES);
+        }
+    }
+
+    function reopen(stopped, tries) {
+        ask({ audio: voiceAsked }).then(function (given) {
+            var track = given.getAudioTracks()[0];
+            /* Shut again while it opened: this one goes too. */
+            if (micShut || !track) {
+                given.getTracks().forEach(function (one) {
+                    one.stop();
+                });
+                micStopped = stopped.concat(micStopped);
+                return;
+            }
+            track.enabled = stopped.every(function (one) {
+                return one.track.enabled;
+            });
+            stopped.forEach(function (one) {
+                voice.removeTrack(one.track);
+            });
+            voice.addTrack(track);
+            stopped.forEach(function (one) {
+                one.senders.forEach(function (sender) {
+                    var done = sender.replaceTrack(track);
+                    if (done?.catch) {
+                        done.catch(noop);
+                    }
+                });
+            });
+            note("microphone: open again");
+        }, function (err) {
+            note("microphone: would not open again: " + describe(err));
+            if (micShut) {
+                micStopped = stopped.concat(micStopped);
+            } else if (tries > 1) {
+                window.setTimeout(function () {
+                    if (micShut) {
+                        micStopped = stopped.concat(micStopped);
+                    } else {
+                        reopen(stopped, tries - 1);
+                    }
+                }, 1000);
+            }
         });
     }
 
@@ -1086,6 +1203,12 @@ var piiritVideo = (function () {
         case "camera-off":
             cameraOff();
             return true;
+        case "microphone-off":
+            micOff();
+            return true;
+        case "microphone-on":
+            micOn();
+            return true;
         case "facing-user":
             face("user");
             return true;
@@ -1112,47 +1235,61 @@ var piiritVideo = (function () {
      * It is given the microphone, and the camera only if it is wanted --
      * the blank track otherwise, so that its switch is drawn and the
      * call can be turned into a video call. A camera that will not open
-     * is not a call that cannot start. */
+     * is not a call that cannot start. Asked while the host has the
+     * microphone shut, the page waits for it to open. */
+    function askFor(asked) {
+        if (!asked?.video) {
+            return ask(asked).then(function (given) {
+                if (asked?.audio) {
+                    voice = given;
+                    voiceAsked = asked.audio;
+                }
+                return given;
+            });
+        }
+        voiceAsked = asked.audio === undefined ? true : asked.audio;
+        return ask({ audio: voiceAsked }).then(function (given) {
+            stream = given;
+            voice = given;
+            if (!wanted) {
+                var stand = placeholder();
+                if (stand) {
+                    given.addTrack(stand);
+                }
+                report();
+                return given;
+            }
+            opening = true;
+            return capture().then(function (track) {
+                opening = false;
+                if (!wanted) {
+                    track.stop();
+                    track = placeholder();
+                } else {
+                    camera = track;
+                }
+                if (track) {
+                    given.addTrack(track);
+                }
+                report();
+                return given;
+            }, function (err) {
+                opening = false;
+                var stand = placeholder();
+                if (stand) {
+                    given.addTrack(stand);
+                }
+                giveUp(err);
+                return given;
+            });
+        });
+    }
+
     if (ask) {
         media.getUserMedia = function (asked) {
-            if (!asked?.video) {
-                return ask(asked);
-            }
-            return ask({ audio: asked.audio === undefined ? true : asked.audio })
-                .then(function (given) {
-                    stream = given;
-                    if (!wanted) {
-                        var stand = placeholder();
-                        if (stand) {
-                            given.addTrack(stand);
-                        }
-                        report();
-                        return given;
-                    }
-                    opening = true;
-                    return capture().then(function (track) {
-                        opening = false;
-                        if (!wanted) {
-                            track.stop();
-                            track = placeholder();
-                        } else {
-                            camera = track;
-                        }
-                        if (track) {
-                            given.addTrack(track);
-                        }
-                        report();
-                        return given;
-                    }, function (err) {
-                        opening = false;
-                        var stand = placeholder();
-                        if (stand) {
-                            given.addTrack(stand);
-                        }
-                        giveUp(err);
-                        return given;
-                    });
-                });
+            return micFree().then(function () {
+                return askFor(asked);
+            });
         };
     }
 

@@ -429,7 +429,8 @@ Item {
     // Where the call's sound comes out: the earpiece for a voice call,
     // the loudspeaker for a video call, and whichever the reader switches
     // to. Looked after from when the call carries sound -- placed, or
-    // answered -- until it is over.
+    // answered -- until it is over; the call's page waits for it
+    // (CallPage.qml), and shuts its microphone while the sound moves.
     CallAudio {
         id: callAudio
         objectName: "callAudio"
@@ -437,6 +438,18 @@ Item {
         video: call.has_video
         watching: center.watching
         appId: call.audio_id()
+        micKnown: micWatch.known
+        micOpen: micWatch.open
+        onMicWantedChanged: call.set_microphone(callAudio.micWanted)
+    }
+
+    // Whether a microphone of the app's is open, as PulseAudio itself
+    // says: what the call's sound waits for before it moves. Connected
+    // only while there may be one.
+    MicWatch {
+        id: micWatch
+        objectName: "micWatch"
+        active: callAudio.talking || callAudio.open
     }
 
     // Awake while a call is up: a phone that suspends takes the call's

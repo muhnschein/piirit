@@ -49,7 +49,7 @@ Page {
     property QtObject call: null
 
     /// Where the call's sound comes out (CallAudio), when the window has
-    /// it to hand over.
+    /// it to hand over: the call's page comes up once it is ready.
     property QtObject audio: null
 
     /// A call is under way: anything short of over.
@@ -360,6 +360,11 @@ Page {
         active: page.call !== null && page.call.url.length > 0
         source: Qt.resolvedUrl("../components/CallView.qml")
         onLoaded: {
+            // Before the page's address: it comes up once the call's
+            // sound has its way out, not before.
+            view.item.allowed = Qt.binding(function () {
+                return page.audio === null || page.audio.ready
+            })
             view.item.holding = Qt.binding(function () { return page.busy })
             // What WebView.qml would bind `active` to itself.
             view.item.shown = Qt.binding(function () {
@@ -599,16 +604,18 @@ Page {
             }
         }
 
-        // The loudspeaker, or the earpiece. Dimmed while the sound is on
-        // something plugged in or paired, which it does not move it from,
-        // and on the loudspeaker for good once the phone's audio policy
-        // did not take the call.
+        // The loudspeaker, or the earpiece. Busy from the tap until the
+        // sound has moved and the microphone is back, which takes a
+        // moment (CallAudio.qml). Dimmed while the sound is on something
+        // plugged in or paired, which it does not move it from, and for
+        // good once the phone's audio policy did not take the call.
         Switch {
             objectName: "speakerSwitch"
             visible: page.inCall && page.audio !== null
             icon.source: "image://theme/icon-m-speaker"
             automaticCheck: false
-            enabled: page.audio !== null && page.audio.switchable
+            busy: page.audio !== null && page.audio.switching
+            enabled: page.audio !== null && (page.audio.switchable || page.audio.switching)
             checked: page.audio !== null && page.audio.speaker
             onClicked: {
                 page.touched()

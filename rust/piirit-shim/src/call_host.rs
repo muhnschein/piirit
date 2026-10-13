@@ -849,6 +849,18 @@ pub(crate) fn facing_command(front: bool) -> String {
     .to_string()
 }
 
+/// The commands that have the bridge (`call_video.js`) shut the
+/// microphone and keep it shut, or open it again: around moving the
+/// call's sound, which must not happen with it open (CallAudio.qml).
+pub(crate) fn microphone_command(on: bool) -> String {
+    (if on {
+        "microphone-on"
+    } else {
+        "microphone-off"
+    })
+    .to_string()
+}
+
 /// The command that tells the bridge which of the phone's back cameras
 /// to open, as its place among them: the main lens, where the engine
 /// would take the first it lists.
@@ -927,8 +939,8 @@ async fn write_response(stream: &mut TcpStream, response: &Response) -> std::io:
 mod tests {
     use super::{
         back_camera_command, camera_command, command, encode_base64, encoder_path, encodes_h264,
-        facing_command, log_line, media_environment, media_plugins, percent_encode, shown_command,
-        CallLog, Video, BRIDGE, BUNDLED_ENCODER, LOG_LINE_MAX, PAGE,
+        facing_command, log_line, media_environment, media_plugins, microphone_command,
+        percent_encode, shown_command, CallLog, Video, BRIDGE, BUNDLED_ENCODER, LOG_LINE_MAX, PAGE,
     };
     use crate::webxdc_host::decode_base64;
     use std::path::{Path, PathBuf};
@@ -1249,7 +1261,7 @@ mod tests {
     }
 
     #[test]
-    fn the_camera_commands_are_the_ones_the_bridge_takes() {
+    fn the_camera_and_microphone_commands_are_the_ones_the_bridge_takes() {
         // call_video.js's `take` names these; a command it does not know
         // would be set on the page as a hash, and do nothing.
         for (made, name) in [
@@ -1259,6 +1271,8 @@ mod tests {
             (facing_command(false), "facing-environment"),
             (shown_command(true), "shown"),
             (shown_command(false), "hidden"),
+            (microphone_command(true), "microphone-on"),
+            (microphone_command(false), "microphone-off"),
         ] {
             assert_eq!(made, name);
             assert!(
