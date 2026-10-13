@@ -164,8 +164,10 @@ impl RpcClient {
     ///
     /// Same as [`RpcClient::spawn`].
     // Stays `async` though nothing awaits: `Command::spawn` needs an active
-    // reactor, and an `async fn` can only run inside one.
-    #[allow(clippy::unused_async)]
+    // reactor, and an `async fn` can only run inside one. Clippy 1.99 says
+    // the same thing again as `unused_async_trait_impl`; `unknown_lints`
+    // is for the pinned 1.94.1, which has not heard of it yet.
+    #[allow(unknown_lints, clippy::unused_async, clippy::unused_async_trait_impl)]
     pub async fn spawn_with_env<S, I, A, E, K, V>(
         program: S,
         args: I,

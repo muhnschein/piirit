@@ -3159,7 +3159,7 @@ mod tests {
         // is holding is still in the chat's order, so it is an arrival.
         match RowDiff::between(&[1, 2, 3], &[1, 2, 7, 3]) {
             RowDiff::Changed { gone, arrived } => {
-                assert!(gone.is_empty());
+                assert_eq!(gone, Vec::<usize>::new());
                 assert_eq!(arrived, vec![7]);
             }
             _ => panic!("a message sorted into the middle should be an arrival"),
@@ -3167,7 +3167,7 @@ mod tests {
         // Arrived in the chat's order, wherever they landed.
         match RowDiff::between(&[2, 4], &[1, 2, 3, 4, 5]) {
             RowDiff::Changed { gone, arrived } => {
-                assert!(gone.is_empty());
+                assert_eq!(gone, Vec::<usize>::new());
                 assert_eq!(arrived, vec![1, 3, 5]);
             }
             _ => panic!("arrivals around the held rows should be a change"),
@@ -3284,7 +3284,7 @@ mod tests {
 
         // A view past the end, and no rows at all.
         assert_eq!(fill_order(count + 20, count + 30, count)[0], count - 1);
-        assert!(fill_order(0, 0, 0).is_empty());
-        assert!(fill_order(5, 2, count).is_empty());
+        assert_eq!(fill_order(0, 0, 0), Vec::<usize>::new());
+        assert_eq!(fill_order(5, 2, count), Vec::<usize>::new());
     }
 }

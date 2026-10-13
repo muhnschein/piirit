@@ -83,10 +83,12 @@ jobs:
 
       # `toolchain` is passed explicitly because dtolnay/rust-toolchain takes
       # it from the REF NAME it was called with, and a SHA has no name. The
-      # pinned commit is the head of the action's `stable` branch, whose
-      # action.yml defaults to the same value -- the explicit input is what
-      # keeps that readable.
-      - uses: dtolnay/rust-toolchain@6bed0761d98439e5a578e2877258200ad565ba87 # stable
+      # pin is the `v1` tag, not the `stable` branch: that branch is rebuilt
+      # on top of master with each release, so a commit pinned from it
+      # stops belonging to the repository at the next one -- zizmor's
+      # online audit calls that an impostor commit, and it is right that
+      # nothing then vouches for it. v1 only moves forward.
+      - uses: dtolnay/rust-toolchain@e2a55d2ffb04f378e9626c28d38b36d230d1e12f # v1
         with:
           toolchain: stable
           components: clippy, llvm-tools-preview
@@ -101,7 +103,7 @@ jobs:
       # hundred of them, each waiting on Qt timers -- when it does not.
       # That fallback is what the step below took ten minutes on.
       - name: Install cargo-llvm-cov and cargo-nextest
-        uses: taiki-e/install-action@183e4297cca2404691e9380e1307288dced5c82a # v2.87.25
+        uses: taiki-e/install-action@f7e5d7c961414b23f5b25b2da9294395d08513ad # v2.87.26
         with:
           tool: cargo-llvm-cov,cargo-nextest
 

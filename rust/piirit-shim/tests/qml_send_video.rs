@@ -519,18 +519,16 @@ fn a_picked_video_is_made_smaller_and_waits_for_the_reader() {
         "the button, tapped twice, did not stop and then drop it. {context}"
     );
 
-    let left = std::fs::read_dir(&recoded_dir)
-        .map(|dir| {
-            dir.flatten()
-                .filter(|entry| {
-                    entry
-                        .path()
-                        .extension()
-                        .is_some_and(|s| s.eq_ignore_ascii_case("mp4"))
-                })
-                .count()
-        })
-        .unwrap_or(0);
+    let left = std::fs::read_dir(&recoded_dir).map_or(0, |dir| {
+        dir.flatten()
+            .filter(|entry| {
+                entry
+                    .path()
+                    .extension()
+                    .is_some_and(|s| s.eq_ignore_ascii_case("mp4"))
+            })
+            .count()
+    });
     assert_eq!(left, 0, "a dropped or sent video left its file behind");
 
     let _ = std::fs::remove_dir_all(&temp);
