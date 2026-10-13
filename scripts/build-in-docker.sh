@@ -29,6 +29,7 @@ jobs=${PIIRIT_CARGO_JOBS:-1}
 
 case "$sfos" in
     *[!0-9.]* | '') echo "build-in-docker: '$sfos' is not a dotted SDK version" >&2; exit 2 ;;
+    *) ;;
 esac
 
 repo_root=$(CDPATH='' cd -- "$(dirname -- "$0")/.." && pwd)
@@ -95,8 +96,10 @@ in_image() {
     fi
 }
 hand_to() {
+    # A plain assignment: POSIX sh has no `local`.
+    owner=$1
     in_image --user root "$image" \
-        chown -R "$1" "$builddir" ${cargo_home:+"$home/.cargo"}
+        chown -R "$owner" "$builddir" ${cargo_home:+"$home/.cargo"}
 }
 # Handed back on failure too, or the host user cannot read or delete what
 # the build left.
