@@ -68,6 +68,13 @@ const PROBE_QML: &str = r"
             if (centerLoader.status !== Loader.Ready) { return 'load-failed' }
             // ngfd numbers the event it plays.
             find(centerLoader.item, 'feedback').reply = 42
+            // The audio policy answers at once and takes what it is sent,
+            // and the microphone watcher can tell, as on a phone: the
+            // call's page comes up once its sound has its way out.
+            find(centerLoader.item, 'resourceManager').replies = [9, 1, 1, 0, 'OK']
+            var audio = find(centerLoader.item, 'callAudio')
+            audio.micKnown = true
+            audio.micOpen = false
             centerLoader.item.raise.connect(function () { probe.raises += 1 })
             return 'ok'
         }

@@ -146,14 +146,6 @@ const PROBE_QML: &str = r"
             manager.called = ''
             return said.join(',')
         }
-        // The audio policy refuses what it is sent from now on, answering
-        // when told to; or no longer does.
-        function audioRefuses(on) {
-            var manager = findIn(centerLoader.item, 'resourceManager')
-            manager.failure = on ? ['org.freedesktop.DBus.Error.AccessDenied', 'no'] : undefined
-            manager.deferred = on
-            return 'ok'
-        }
         // Every message out is answered, and each one sent after it, until
         // nothing is left to send.
         function audioAnswers() {
