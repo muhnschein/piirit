@@ -601,13 +601,14 @@ Page {
 
         // The loudspeaker, or the earpiece. Dimmed while the sound is on
         // something plugged in or paired, which it does not move it from,
-        // and on a phone whose audio policy did not take the call.
+        // and on the loudspeaker for good once the phone's audio policy
+        // did not take the call.
         Switch {
             objectName: "speakerSwitch"
             visible: page.inCall && page.audio !== null
             icon.source: "image://theme/icon-m-speaker"
             automaticCheck: false
-            enabled: page.audio !== null && page.audio.held !== 0 && !page.audio.elsewhere
+            enabled: page.audio !== null && page.audio.switchable
             checked: page.audio !== null && page.audio.speaker
             onClicked: {
                 page.touched()

@@ -389,12 +389,20 @@ fn a_video_call_shows_its_pictures_under_lines_a_tap_puts_away() {
             record!("audio-earpiece", call!("audioSaid"));
             tap!("speakerSwitch");
             record!("audio-speaker", call!("audioSaid"));
-            // Refused by the policy: given back, and the switch dimmed.
+            // Refused by the policy: given back, the call on the
+            // loudspeaker for good, and the switch dimmed.
             call!("audioRefuses", true);
             tap!("speakerSwitch");
             call!("audioAnswers");
             record!("audio-refused", call!("audioSaid"));
-            record!("speaker-refused", get!("speakerSwitch", "enabled"));
+            record!(
+                "speaker-refused",
+                format!(
+                    "{},{}",
+                    get!("speakerSwitch", "enabled"),
+                    get!("speakerSwitch", "checked")
+                )
+            );
             call!("audioRefuses", false);
             record!("clock", get!("callClock", "text"));
             record!("status-video", get!("callStatus", "visible"));
@@ -596,8 +604,8 @@ fn a_video_call_shows_its_pictures_under_lines_a_tap_puts_away() {
     );
     assert_eq!(
         value("audio-answered"),
-        "register:3,audio,acquire",
-        "a video call's sound was not held with the policy, on the loudspeaker, once answered. {context}"
+        "",
+        "a video call, on the loudspeaker, held a set with the policy once answered. {context}"
     );
     let granted = value("engine");
     assert!(
@@ -851,23 +859,23 @@ fn a_video_call_shows_its_pictures_under_lines_a_tap_puts_away() {
     assert_eq!(value("speaker-earpiece"), "false", "{context}");
     assert_eq!(
         value("audio-earpiece"),
-        "update:1,acquire",
+        "register:1,audio,acquire",
         "the switch did not put the call on the earpiece. {context}"
     );
     assert_eq!(
         value("audio-speaker"),
-        "update:3,acquire",
+        "release,unregister",
         "the switch did not put the call back on the loudspeaker. {context}"
     );
     assert_eq!(
         value("audio-refused"),
-        "update:1,release,unregister",
+        "register:1,release,unregister",
         "a set the policy refused was not given back. {context}"
     );
     assert_eq!(
         value("speaker-refused"),
-        "false",
-        "the switch is still there to use with nothing held. {context}"
+        "false,true",
+        "refused, the switch is still there to use, or the call is not on the loudspeaker. {context}"
     );
     assert_eq!(
         value("audio-over"),

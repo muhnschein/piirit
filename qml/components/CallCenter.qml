@@ -428,8 +428,8 @@ Item {
 
     // Where the call's sound comes out: the earpiece for a voice call,
     // the loudspeaker for a video call, and whichever the reader switches
-    // to. Held from when the call carries sound -- placed, or answered --
-    // until it is over.
+    // to. Looked after from when the call carries sound -- placed, or
+    // answered -- until it is over.
     CallAudio {
         id: callAudio
         objectName: "callAudio"

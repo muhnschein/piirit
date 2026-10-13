@@ -420,24 +420,32 @@ the face. A voice call whose pictures come on goes to the loudspeaker
 too, unless the reader has switched this call. The loudspeaker switch on
 the call page goes between the two at any time, and holds for the rest of
 the call. A headset, headphones or a Bluetooth device takes the sound by
-itself; the switch is dimmed then, having nothing to move it from, and
-also when the policy did not take the call.
+itself; the switch is dimmed then, having nothing to move it from. When
+the policy does not take the call, it is on the loudspeaker for good and
+the switch dimmed.
 
-How (`CallAudio.qml`): from when a call carries sound -- placed, or
-answered -- until it is over, the app holds a resource set of class
-`aliencall` with ohm's resource manager (`org.maemo.resource.manager`,
-system bus; the Audio permission opens it). `aliencall` is the class
-Sailfish has for calls that are not phone calls, the one Android App
-Support's VoIP apps get. ohm routes the sound of whichever set owns
-audio playback by that set's class: for `aliencall`, a Bluetooth or USB
-device, then a wired headset or headphones, then the earpiece
-(`earpieceforalien`), then the loudspeaker (`ihfforalien`). The policy
-rules out the earpiece for an `aliencall` set that also owns video
-playback, so the loudspeaker is the same set with `VideoPlayback` added
--- one `update`, nothing global.
+How (`CallAudio.qml`): while a call's sound is meant for the earpiece,
+the app holds a resource set of class `aliencall` with ohm's resource
+manager (`org.maemo.resource.manager`, system bus; the Audio permission
+opens it). `aliencall` is the class Sailfish has for calls that are not
+phone calls, the one Android App Support's VoIP apps get. ohm routes the
+sound of whichever set owns audio playback by that set's class: for
+`aliencall`, a Bluetooth or USB device, then a wired headset or
+headphones, then the earpiece (`earpieceforalien`). For the loudspeaker
+the set is given back, and the call's sound goes where any app's goes:
+the phone's speakers, or what is plugged in or paired. Switching is
+giving one set back or asking for a new one, nothing global.
+
+The policy has a loudspeaker of its own for such a call: it rules out
+the earpiece for an `aliencall` set that also owns video playback, and
+routes to `ihfforalien`. On a phone that took all sound away -- the
+call's and every other app's -- and switching back did not bring it
+back, for reasons not known yet. So it is not used. Its price: on the
+loudspeaker, other apps' music keeps playing, and the volume keys are
+the media volume.
 
 The set is spoken to over the bus in libresource's own message layout
-(`register`, `audio`, `acquire`, `update`, `release`, `unregister`;
+(`register`, `audio`, `acquire`, `release`, `unregister`;
 `dbus-msg.c`), since no library for it is on Harbour's list, and in its
 order: one message at a time, each once the last is answered. The
 manager needs that. It answers a register only after asking the bus
@@ -461,8 +469,8 @@ bus connection and drops every set of a client whose connection goes:
 a crash, a kill, the OOM killer, or closing the app puts the sound back
 where it was with nobody doing anything. Nothing is written that
 outlives the app, so there is nothing for a next run to clean up. While
-the app runs, the set is held exactly while the call carries sound, and
-given back on the way out besides.
+the app runs, the set is held exactly while the call's sound is meant
+for the earpiece, and given back on the way out besides.
 
 Read-only besides: ohm's `Route.Manager.ActiveRoutes` and its
 `AudioRouteChanged` signal, for whether the sound is on something
@@ -491,11 +499,12 @@ of Piirit: two phones and an afternoon.
    `application.process.id`; `pactl list sinks` the active port. ESR
    153 moves a page's audio into a process of its own, which will want
    this looked at again.
-4. **Does the earpiece route play from the earpiece alone?** Music in the
-   Media app plays from the earpiece and the loudspeaker both (#100):
-   the phone's loudspeaker output drives the two. `earpieceforalien` is
-   the earpiece port by name; that it is quiet at arm's length is the
-   claim.
+4. **Does the earpiece route play from the earpiece alone?** Yes: on a
+   phone a voice call played from the earpiece only, with the Media
+   app's music paused. Music itself plays from the earpiece and the
+   loudspeaker both (#100): the phone's loudspeaker output drives the
+   two, which is where the call goes on the loudspeaker too. Why the
+   policy's own loudspeaker for the call took all sound away is open.
 5. **What it sounds like.** Echo on speakerphone, and what a call costs
    in battery.
 6. **Does the camera open in the engine, and turn?** Gecko reaches the

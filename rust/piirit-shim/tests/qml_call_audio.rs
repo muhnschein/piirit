@@ -3,13 +3,14 @@
 //! both, and nothing at all left behind.
 //!
 //! The call holds a resource set of class `aliencall` with ohm's resource
-//! manager for as long as it carries sound, holding video playback too
-//! for the loudspeaker. What is checked is what the manager is sent, in
+//! manager while its sound is meant for the earpiece, and none for the
+//! loudspeaker. What is checked is what the manager is sent, in
 //! libresource's own message layout: the set registered, its streams
-//! named by the app's id, acquired, updated by the switch, and given back
-//! when the call is over, when the manager refuses any of it, and on the
-//! way out -- and that nothing is asked for without the app's id, which
-//! would leave the call's own streams held back.
+//! named by the app's id, acquired, and given back for the loudspeaker,
+//! when the call is over, when the manager refuses any of it -- which
+//! leaves the call on the loudspeaker for good -- and on the way out; and
+//! that nothing is asked for without the app's id, which would leave the
+//! call's own streams held back.
 //!
 //! And that it goes one message at a time, each once the last is
 //! answered, as libresource's own clients send them: the manager answers
@@ -107,7 +108,7 @@ const PROBE_QML: &str = r"
         }
         function state() {
             var item = holder.item
-            return item.held + '|' + item.speaker + '|' + item.elsewhere
+            return item.held + '|' + item.speaker + '|' + item.elsewhere + '|' + item.switchable
         }
     }
 ";
@@ -164,18 +165,20 @@ fn a_call_holds_its_sound_and_gives_it_back() {
 
         // One message at a time, with a manager that answers when told
         // to: the register alone, then each of the rest once the last is
-        // answered -- the switch too, tapped before the set is had.
+        // answered.
         call!("defer");
         record!("first", set!("talking", true));
         record!("first-state", call!("state"));
-        record!("switch-early", call!("choose", true));
         record!("second", call!("flush"));
+        // The loudspeaker, tapped before the set is had: what was still
+        // to be said about it goes unsaid, and it is given back once the
+        // message out is answered.
+        record!("switch-early", call!("choose", true));
         record!("third", call!("flush"));
         record!("fourth", call!("flush"));
-        record!("fifth", call!("flush"));
         record!("drained", call!("flush"));
-        // Over with a message out: what was still to be said goes
-        // unsaid, and the set is given back once the answer is in.
+        // Back to the earpiece: a set of its own. Over with its register
+        // out: given back once the answer is in.
         record!("quiet-out", call!("choose", false));
         record!("over-out", set!("talking", false));
         record!("over-out-release", call!("flush"));
@@ -183,12 +186,14 @@ fn a_call_holds_its_sound_and_gives_it_back() {
         record!("over-out-done", call!("flush"));
         call!("heal");
 
-        // A voice call: registered without video playback -- the
-        // earpiece -- its streams named, acquired.
+        // A voice call: on the earpiece, with a set registered, its
+        // streams named, acquired.
         record!("voice", set!("talking", true));
         record!("voice-state", call!("state"));
-        // The switch: the same set, with video playback and without.
+        // The loudspeaker gives the set back; the earpiece takes a new
+        // one.
         record!("loud", call!("choose", true));
+        record!("loud-state", call!("state"));
         record!("quiet", call!("choose", false));
         // Pictures come: the reader has chosen, so it stays.
         record!("pictures-chosen", set!("watching", true));
@@ -197,16 +202,14 @@ fn a_call_holds_its_sound_and_gives_it_back() {
         record!("over", set!("talking", false));
         record!("over-state", call!("state"));
         record!("over-switch", call!("choose", true));
-
         // A second voice call: a set of its own, back on the earpiece;
         // its pictures coming put it on the loudspeaker.
         record!("again", set!("talking", true));
         record!("pictures", set!("watching", true));
         set!("watching", false);
-        set!("talking", false);
-        call!("said");
+        record!("again-over", set!("talking", false));
 
-        // A video call: the loudspeaker from the start.
+        // A video call: the loudspeaker from the start, nothing held.
         set!("video", true);
         record!("video", set!("talking", true));
         record!("video-state", call!("state"));
@@ -229,16 +232,17 @@ fn a_call_holds_its_sound_and_gives_it_back() {
             call!("route", QString::from("lineout"), 1 | 4 | 8 | (1 << 27))
         );
         record!("built-in-wired-state", call!("state"));
-        // The manager refuses the switch: the acquire meant to follow
-        // is not sent, the set is given back, and the switch then sends
-        // nothing.
+        // The manager refuses the earpiece: the rest of the set is not
+        // sent, it is given back, the call is on the loudspeaker for
+        // good, and the switch then does nothing.
         call!("defer");
         call!("answer", 13);
         record!("refused-sent", call!("choose", false));
         record!("refused", call!("drain"));
         record!("refused-state", call!("state"));
         call!("heal");
-        record!("refused-after", call!("choose", true));
+        record!("refused-after", call!("choose", false));
+        record!("refused-after-state", call!("state"));
         set!("talking", false);
         record!("refused-over", call!("said"));
         record!(
@@ -247,7 +251,7 @@ fn a_call_holds_its_sound_and_gives_it_back() {
         );
 
         // The policy still says a headset, which a call looks at as it
-        // starts.
+        // starts; and the refusal was the last call's.
         set!("video", false);
         record!("ok", set!("talking", true));
         record!("ok-state", call!("state"));
@@ -269,6 +273,7 @@ fn a_call_holds_its_sound_and_gives_it_back() {
         // loudspeaker from the start.
         set!("watching", true);
         record!("watched", set!("talking", true));
+        record!("watched-state", call!("state"));
         set!("talking", false);
         set!("watching", false);
         call!("said");
@@ -297,7 +302,8 @@ fn a_call_holds_its_sound_and_gives_it_back() {
         record!("unload", call!("unload"));
         record!("left", call!("said"));
 
-        // Without the app's id, nothing is asked for.
+        // Without the app's id, nothing is asked for: the loudspeaker,
+        // for good.
         load("");
         record!("no-id", set!("talking", true));
         record!("no-id-state", call!("state"));
@@ -326,29 +332,28 @@ fn a_call_holds_its_sound_and_gives_it_back() {
         "register 0 1 1 1 0 0 0 1234 aliencall 0",
         "more than the register went out before the manager answered it. {context}"
     );
-    assert_eq!(value("first-state"), "1|false|false", "{context}");
-    assert_eq!(
-        value("switch-early"),
-        "",
-        "the switch went out before the set was had. {context}"
-    );
+    assert_eq!(value("first-state"), "1|false|false|true", "{context}");
     assert_eq!(
         value("second"),
         "audio 7 1 2 aliencall 1234 media.name 0 *",
         "the set's streams were not named once it was registered. {context}"
     );
-    assert_eq!(value("third"), "acquire 3 1 3", "{context}");
     assert_eq!(
-        value("fourth"),
-        "update 2 1 4 3 0 0 0 1234 aliencall 0",
-        "the switch tapped early was lost, or went out of turn. {context}"
+        value("switch-early"),
+        "",
+        "the set was given back before the message out was answered. {context}"
     );
-    assert_eq!(value("fifth"), "acquire 3 1 5", "{context}");
+    assert_eq!(
+        value("third"),
+        "release 4 1 4",
+        "the acquire meant for the earpiece still went out, or the set was not given back. {context}"
+    );
+    assert_eq!(value("fourth"), "unregister 1 1 5", "{context}");
     assert_eq!(value("drained"), "", "{context}");
     assert_eq!(
         value("quiet-out"),
-        "update 2 1 6 1 0 0 0 1234 aliencall 0",
-        "{context}"
+        "register 0 2 6 1 0 0 0 1234 aliencall 0",
+        "back on the earpiece, no set was asked for. {context}"
     );
     assert_eq!(
         value("over-out"),
@@ -357,32 +362,39 @@ fn a_call_holds_its_sound_and_gives_it_back() {
     );
     assert_eq!(
         value("over-out-release"),
-        "release 4 1 8",
-        "the acquire meant for a call that is over still went out, or the set was not given back. {context}"
+        "release 4 2 9",
+        "what was meant for a call that is over still went out, or the set was not given back. {context}"
     );
     assert_eq!(
         value("over-out-unregister"),
-        "unregister 1 1 9",
+        "unregister 1 2 10",
         "{context}"
     );
     assert_eq!(value("over-out-done"), "", "{context}");
     assert_eq!(
         value("voice"),
-        "register 0 2 10 1 0 0 0 1234 aliencall 0;\
-         audio 7 2 11 aliencall 1234 media.name 0 *;\
-         acquire 3 2 12",
+        "register 0 3 11 1 0 0 0 1234 aliencall 0;\
+         audio 7 3 12 aliencall 1234 media.name 0 *;\
+         acquire 3 3 13",
         "a voice call does not hold an aliencall set for the earpiece. {context}"
     );
-    assert_eq!(value("voice-state"), "2|false|false", "{context}");
+    assert_eq!(value("voice-state"), "3|false|false|true", "{context}");
     assert_eq!(
         value("loud"),
-        "update 2 2 13 3 0 0 0 1234 aliencall 0;acquire 3 2 14",
-        "the loudspeaker switch does not add video playback. {context}"
+        "release 4 3 14;unregister 1 3 15",
+        "the loudspeaker switch did not give the set back. {context}"
+    );
+    assert_eq!(
+        value("loud-state"),
+        "0|true|false|true",
+        "on the loudspeaker, a set is held or the switch is not there to use. {context}"
     );
     assert_eq!(
         value("quiet"),
-        "update 2 2 15 1 0 0 0 1234 aliencall 0;acquire 3 2 16",
-        "switched back, the set still holds video playback. {context}"
+        "register 0 4 16 1 0 0 0 1234 aliencall 0;\
+         audio 7 4 17 aliencall 1234 media.name 0 *;\
+         acquire 3 4 18",
+        "switched back, the call did not take a set for the earpiece. {context}"
     );
     assert_eq!(
         value("pictures-chosen"),
@@ -391,10 +403,10 @@ fn a_call_holds_its_sound_and_gives_it_back() {
     );
     assert_eq!(
         value("over"),
-        "release 4 2 17;unregister 1 2 18",
+        "release 4 4 19;unregister 1 4 20",
         "a call that is over did not give its set back. {context}"
     );
-    assert_eq!(value("over-state"), "0|false|false", "{context}");
+    assert_eq!(value("over-state"), "0|false|false|false", "{context}");
     assert_eq!(
         value("over-switch"),
         "",
@@ -402,47 +414,70 @@ fn a_call_holds_its_sound_and_gives_it_back() {
     );
     assert_eq!(
         value("again"),
-        "register 0 3 19 1 0 0 0 1234 aliencall 0;\
-         audio 7 3 20 aliencall 1234 media.name 0 *;\
-         acquire 3 3 21",
+        "register 0 5 21 1 0 0 0 1234 aliencall 0;\
+         audio 7 5 22 aliencall 1234 media.name 0 *;\
+         acquire 3 5 23",
         "a second call does not get a set of its own on the earpiece. {context}"
     );
     assert_eq!(
         value("pictures"),
-        "update 2 3 22 3 0 0 0 1234 aliencall 0;acquire 3 3 23",
+        "release 4 5 24;unregister 1 5 25",
         "a voice call whose pictures came on stayed on the earpiece. {context}"
     );
-    assert!(
-        value("video").starts_with("register 0 4 26 3 0 0 0 1234 aliencall 0;"),
-        "a video call does not start on the loudspeaker. {context}"
+    assert_eq!(
+        value("again-over"),
+        "",
+        "a set already given back was given back again. {context}"
     );
-    assert_eq!(value("video-state"), "4|true|false", "{context}");
+    assert_eq!(
+        value("video"),
+        "",
+        "a video call on the loudspeaker asked for a set. {context}"
+    );
+    assert_eq!(
+        value("video-state"),
+        "0|true|false|true",
+        "a video call does not start on the loudspeaker, with the switch there to use. {context}"
+    );
     assert_eq!(value("headset"), "ActiveRoutes", "{context}");
     assert_eq!(
         value("headset-state"),
-        "4|true|true",
+        "0|true|true|false",
         "a headset does not dim the switch. {context}"
     );
     assert_eq!(value("speaker"), "ActiveRoutes", "{context}");
-    assert_eq!(value("speaker-state"), "4|true|false", "{context}");
+    assert_eq!(value("speaker-state"), "0|true|false|true", "{context}");
     assert_eq!(value("built-in-wired"), "ActiveRoutes", "{context}");
     assert_eq!(
         value("built-in-wired-state"),
-        "4|true|false",
+        "0|true|false|true",
         "a route built into the phone dimmed the switch. {context}"
     );
     assert_eq!(
         value("refused-sent"),
-        "update 2 4 29 1 0 0 0 1234 aliencall 0",
+        "register 0 6 26 1 0 0 0 1234 aliencall 0",
         "{context}"
     );
     assert_eq!(
         value("refused"),
-        "release 4 4 31;unregister 1 4 32",
-        "a set the manager refused was not given back, or acquired again. {context}"
+        "release 4 6 29;unregister 1 6 30",
+        "a set the manager refused was not given back, or acquired anyway. {context}"
     );
-    assert_eq!(value("refused-state"), "0|false|false", "{context}");
-    assert_eq!(value("refused-after"), "", "{context}");
+    assert_eq!(
+        value("refused-state"),
+        "0|true|false|false",
+        "refused, the call is not on the loudspeaker, or the switch is still there to use. {context}"
+    );
+    assert_eq!(
+        value("refused-after"),
+        "",
+        "refused once, the switch asked again. {context}"
+    );
+    assert_eq!(
+        value("refused-after-state"),
+        "0|true|false|false",
+        "{context}"
+    );
     assert_eq!(
         value("refused-over"),
         "",
@@ -455,47 +490,46 @@ fn a_call_holds_its_sound_and_gives_it_back() {
     );
     assert_eq!(
         value("ok"),
-        "register 0 5 33 1 0 0 0 1234 aliencall 0;\
-         audio 7 5 34 aliencall 1234 media.name 0 *;\
-         acquire 3 5 35",
-        "{context}"
+        "register 0 7 31 1 0 0 0 1234 aliencall 0;\
+         audio 7 7 32 aliencall 1234 media.name 0 *;\
+         acquire 3 7 33",
+        "a refusal outlived its call. {context}"
     );
     assert_eq!(
         value("ok-state"),
-        "5|false|true",
+        "7|false|true|false",
         "a set the manager took was given back, or the route was not looked at. {context}"
     );
     assert_eq!(
         value("absent-sent"),
-        "register 0 6 38 1 0 0 0 1234 aliencall 0",
+        "register 0 8 36 1 0 0 0 1234 aliencall 0",
         "{context}"
     );
     assert_eq!(
         value("absent"),
-        "release 4 6 41;unregister 1 6 42",
+        "release 4 8 39;unregister 1 8 40",
         "with no manager there, the set was not let go of at once. {context}"
     );
-    assert_eq!(value("absent-state"), "0|false|true", "{context}");
+    assert_eq!(value("absent-state"), "0|true|true|false", "{context}");
     assert_eq!(
         value("watched"),
-        "register 0 7 43 3 0 0 0 1234 aliencall 0;\
-         audio 7 7 44 aliencall 1234 media.name 0 *;\
-         acquire 3 7 45",
-        "a call whose pictures were up as it started was not on the loudspeaker. {context}"
+        "",
+        "a call whose pictures were up as it started asked for the earpiece. {context}"
     );
+    assert_eq!(value("watched-state"), "0|true|true|false", "{context}");
     assert_eq!(
         value("late"),
-        "release 4 8 51;unregister 1 8 52;\
-         register 0 9 53 1 0 0 0 1234 aliencall 0;\
-         audio 7 9 54 aliencall 1234 media.name 0 *;\
-         acquire 3 9 55",
+        "release 4 9 44;unregister 1 9 45;\
+         register 0 10 46 1 0 0 0 1234 aliencall 0;\
+         audio 7 10 47 aliencall 1234 media.name 0 *;\
+         acquire 3 10 48",
         "a late refusal for a call that is over gave back the next one's set. {context}"
     );
-    assert_eq!(value("late-state"), "9|false|true", "{context}");
+    assert_eq!(value("late-state"), "10|false|true|false", "{context}");
     assert_eq!(value("unload"), "ok", "{context}");
     assert_eq!(
         value("left"),
-        "release 4 10 61;unregister 1 10 62",
+        "release 4 11 54;unregister 1 11 55",
         "a set held on the way out was not given back. {context}"
     );
     assert_eq!(
@@ -503,5 +537,9 @@ fn a_call_holds_its_sound_and_gives_it_back() {
         "",
         "a set was asked for without the app's id. {context}"
     );
-    assert_eq!(value("no-id-state"), "0|false|false", "{context}");
+    assert_eq!(
+        value("no-id-state"),
+        "0|true|false|false",
+        "without the app's id, the call is not on the loudspeaker for good. {context}"
+    );
 }

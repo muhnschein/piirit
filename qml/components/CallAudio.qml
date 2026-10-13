@@ -14,22 +14,26 @@ import Nemo.DBus 2.0
  * - A headset, headphones or a Bluetooth device takes the sound by
  *   itself, and the switch has nothing to move it from.
  *
- * How: for as long as the call carries sound, the app holds a resource
- * set of class `aliencall` with the phone's audio policy (ohm's resource
- * manager, on the system bus): the class Sailfish has for calls that are
- * not phone calls, which the policy routes as a call -- the earpiece
- * first, or the loudspeaker when the same set also holds video playback,
- * and a headset or a paired device before either. The set names the
- * app's streams by the id libpulse gives them (Call.audio_id), so the
- * call's sound joins the call group rather than being held back as any
- * other app's sound is while a call is on.
+ * How: for as long as the call's sound is meant for the earpiece, the
+ * app holds a resource set of class `aliencall` with the phone's audio
+ * policy (ohm's resource manager, on the system bus): the class Sailfish
+ * has for calls that are not phone calls, which the policy routes as a
+ * call -- the earpiece, or a headset or a paired device before it. The
+ * set names the app's streams by the id libpulse gives them
+ * (Call.audio_id), so the call's sound joins the call group rather than
+ * being held back as any other app's sound is while a call is on. For
+ * the loudspeaker the set is given back, and the sound goes where any
+ * app's goes. The policy's own loudspeaker for such a call -- the same
+ * set holding video playback too -- took all sound away on a phone, and
+ * tapping back did not bring it back.
  *
  * Nothing is written that outlives the app. ohm drops a client's sets
  * the moment its bus connection goes, so a crash or a kill puts the sound
  * back where it was without anybody doing anything, and closing the app
  * always does. A set that cannot be had whole -- refused, or its streams
  * not named -- is let go of at once: half of one would keep the call's
- * own sound back. docs/CALLS.md, "Earpiece and loudspeaker".
+ * own sound back. The call is then on the loudspeaker, and stays there.
+ * docs/CALLS.md, "Earpiece and loudspeaker".
  */
 Item {
     id: audio
@@ -57,6 +61,14 @@ Item {
     /// says: the loudspeaker switch has nothing to move it from.
     property bool elsewhere: false
 
+    /// The policy would not take this call's set, or there is no id to
+    /// name its streams by: the earpiece is out of reach this call.
+    property bool denied: false
+
+    /// The reader can switch: there is a call, its sound is on the phone
+    /// itself, and the earpiece is within reach.
+    readonly property bool switchable: talking && !denied && !elsewhere
+
     /// The resource set held for this call, by its number; 0 for none.
     property int held: 0
 
@@ -77,12 +89,10 @@ Item {
     // resources a set holds.
     readonly property int msgRegister: 0
     readonly property int msgUnregister: 1
-    readonly property int msgUpdate: 2
     readonly property int msgAcquire: 3
     readonly property int msgRelease: 4
     readonly property int msgAudio: 7
     readonly property int audioPlayback: 1
-    readonly property int videoPlayback: 2
 
     // Route types, from ohm's route interface (ohm-ext/route.h).
     readonly property int routeBuiltin: 4
@@ -91,16 +101,21 @@ Item {
 
     /// The reader's switch: the loudspeaker, or not.
     function choose(loud) {
+        if (!audio.switchable) {
+            return
+        }
         audio.chosen = true
         audio.speaker = loud
     }
 
     onTalkingChanged: {
         if (audio.talking) {
-            audio.hold()
-        } else {
-            audio.letGo()
+            audio.chosen = false
+            audio.denied = audio.appId.length === 0
+            audio.speaker = audio.video || audio.watching || audio.denied
+            audio.lookAtRoute()
         }
+        audio.settle()
     }
 
     onWatchingChanged: {
@@ -109,23 +124,21 @@ Item {
         }
     }
 
-    // The loudspeaker is the same set holding video playback too: the
-    // policy keeps a call's sound off the earpiece while it does.
-    onSpeakerChanged: {
-        var id = audio.held
-        if (id === 0) {
-            return
+    onSpeakerChanged: audio.settle()
+
+    /// The set held while the sound is meant for the earpiece, and only
+    /// then. Denied, the call is on the loudspeaker for good.
+    function settle() {
+        if (audio.talking && !audio.speaker) {
+            audio.hold()
+        } else {
+            audio.letGo()
         }
-        audio.send(id, "update", audio.record(audio.msgUpdate, id))
-        audio.send(id, "acquire", audio.plain(audio.msgAcquire, id))
     }
 
     /// Ask for the call's set: register it, name its streams, acquire it.
     function hold() {
-        audio.chosen = false
-        audio.speaker = audio.video || audio.watching
-        audio.lookAtRoute()
-        if (audio.held !== 0 || audio.appId.length === 0) {
+        if (audio.held !== 0) {
             return
         }
         audio.count += 1
@@ -197,9 +210,12 @@ Item {
         })
     }
 
+    /// Refused: the set given back, and the call on the loudspeaker.
     function refused(id) {
         if (id === audio.held) {
             audio.letGo()
+            audio.denied = true
+            audio.speaker = true
         }
     }
 
@@ -208,15 +224,15 @@ Item {
         return audio.reqno
     }
 
-    /// A register or an update: the resources, and who asks.
+    /// A register: the resources, and who asks.
     function record(type, id) {
         return [
             { "type": "i", "value": type },
             { "type": "u", "value": id },
             { "type": "u", "value": audio.next() },
-            // All of them mandatory: a loudspeaker the policy will not
-            // give is better as no set at all than as the earpiece.
-            { "type": "u", "value": audio.audioPlayback | (audio.speaker ? audio.videoPlayback : 0) },
+            // Mandatory: an earpiece the policy will not give is better
+            // as no set at all.
+            { "type": "u", "value": audio.audioPlayback },
             { "type": "u", "value": 0 },
             { "type": "u", "value": 0 },
             { "type": "u", "value": 0 },
