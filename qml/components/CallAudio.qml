@@ -161,18 +161,17 @@ Item {
     /// was sent meanwhile: a set's messages go out together, and the
     /// first refusal lets go of it.
     function send(id, method, args) {
-        manager.typedCall(method, args, function (kind, setId, number, errcod, errmsg) {
+        manager.typedCall(method, args, function (kind, setId, number, errcod) {
             if (typeof errcod === "number" && errcod !== 0) {
-                audio.refused(id, method + ": " + errmsg)
+                audio.refused(id)
             }
-        }, function (name, message) {
-            audio.refused(id, method + ": " + name + " " + message)
+        }, function () {
+            audio.refused(id)
         })
     }
 
-    function refused(id, why) {
+    function refused(id) {
         if (id === audio.held) {
-            console.warn("call audio: " + why)
             audio.letGo()
         }
     }
