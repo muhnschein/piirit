@@ -1046,6 +1046,11 @@ Vous continuerez à voir les messages des contacts bloqués dans les autres grou
         <extracomment>Label of the text that says what a group or channel is for, on its info page, and the prompt in its empty field.</extracomment>
         <translation>Description</translation>
     </message>
+    <message>
+        <source>Change picture</source>
+        <extracomment>Pull-down entry on a group&apos;s page: opens the gallery to pick a new picture for the group.</extracomment>
+        <translation>Changer l&apos;image</translation>
+    </message>
 </context>
 <context>
     <name>IntroPage</name>

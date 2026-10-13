@@ -12,6 +12,7 @@ docs/BUILDING.md, "Cutting a release").
 - The QR scanner can zoom (pinch, or the 1×/2×/4× button), light the torch, and switch cameras.
 - Bundles deltachat-rpc-server 2.63.0 (was 2.62.0).
 - Enter in the chat search closes the keyboard and keeps the search.
+- A tap on a contact's or a group's picture shows it full screen. A group's picture is changed from the pull-down menu.
 - **Smaller videos.** A picked video close to the relay's recommended size is made smaller as soon as it is picked, with progress on the attachment bar, and sent when you send it; with media quality set to worse, every picked video is. The bar says how much smaller it went, such as 50 MB → 6 MB, and the size warning weighs the smaller video, saying so when even that is too big. Stopping it, or a result that came out no smaller, sends the video as it was picked.
 - **Voice calls are no longer experimental**: on for everybody, no switch to turn them on. Settings → Notifications → Calls still decides whether a call rings.
 - A ringing call plays the ringtone rather than a short beep.

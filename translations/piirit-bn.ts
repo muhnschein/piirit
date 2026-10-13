@@ -1046,6 +1046,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <extracomment>Label of the text that says what a group or channel is for, on its info page, and the prompt in its empty field.</extracomment>
         <translation>বিবরণ</translation>
     </message>
+    <message>
+        <source>Change picture</source>
+        <extracomment>Pull-down entry on a group&apos;s page: opens the gallery to pick a new picture for the group.</extracomment>
+        <translation>ছবি পরিবর্তন করুন</translation>
+    </message>
 </context>
 <context>
     <name>IntroPage</name>
