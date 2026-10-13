@@ -113,20 +113,25 @@ vendor-check:
 ## Licences and advisories, as CI's `deny` job runs them. Needs
 ## `cargo install cargo-deny`, and the advisory database (network).
 ##
-## A missing tool is a skip; a finding is a failure. Two separate commands
-## rather than one `||`, so a SKIP can never be printed over an advisory.
+## A missing tool is a skip; a finding is a failure. An if rather than
+## one `||`, so a SKIP can never be printed over an advisory -- and one
+## shell line, since an `exit 0` ends only the line it is on.
 deny:
-	@command -v cargo-deny >/dev/null 2>&1 || \
-		{ echo "deny: SKIP (cargo-deny not installed)"; exit 0; }
-	cd rust && $(CARGO) deny check
+	@if command -v cargo-deny >/dev/null 2>&1; then \
+		cd rust && $(CARGO) deny check; \
+	else \
+		echo "deny: SKIP (cargo-deny not installed)"; \
+	fi
 
 ## The workflows in .github/, through zizmor: template injection, tokens
 ## left behind, caches a release trusts. Offline, as CI's gate runs it.
 ##   cargo install --locked zizmor      (or: pipx install zizmor)
 workflow-lint:
-	@command -v zizmor >/dev/null 2>&1 || \
-		{ echo "workflow-lint: SKIP (zizmor not installed)"; exit 0; }
-	zizmor --offline .github/workflows/
+	@if command -v zizmor >/dev/null 2>&1; then \
+		zizmor --offline .github/workflows/; \
+	else \
+		echo "workflow-lint: SKIP (zizmor not installed)"; \
+	fi
 
 ## Every test under AddressSanitizer and LeakSanitizer, FFmpeg and the C
 ## glue included. Slow, and not part of `check`: scheduled.yml runs it

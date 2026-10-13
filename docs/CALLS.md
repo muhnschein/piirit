@@ -478,10 +478,16 @@ So the app never moves the sound while a microphone of its may be open:
 
 What PulseAudio has open comes from `MicWatch`, which watches the app's
 own recording streams with PulseAudio's client library (on Harbour's
-list): every stream whose client is the app's process. When it cannot
-tell -- PulseAudio down, or not letting the app see -- the switch is
-dimmed while the microphone is open, and a call's set is given back 3
-seconds after its page was told to stop it.
+list): every stream whose client is the app's process. On a phone the
+stream that would not move was the engine's, from the app's own process
+(`AudioCallbackDriver`, `application.process.binary` `harbour-piirit`).
+The process id is the one inside the app's sandbox, which another
+sandboxed app can have as well; its recording then reads as the app's,
+which is the safe way round: the switch gives up, and the set is held
+until that recording ends. When the watch cannot tell -- PulseAudio
+down, or not letting the app see -- the switch is dimmed while the
+microphone is open, and a call's set is given back 3 seconds after its
+page was told to stop it.
 
 The set is spoken to over the bus in libresource's own message layout
 (`register`, `audio`, `update`, `acquire`, `release`, `unregister`;
