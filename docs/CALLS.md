@@ -439,8 +439,10 @@ giving one set back or asking for a new one, nothing global.
 The policy has a loudspeaker of its own for such a call: it rules out
 the earpiece for an `aliencall` set that also owns video playback, and
 routes to `ihfforalien`. On a phone that took all sound away -- the
-call's and every other app's -- and switching back did not bring it
-back, for reasons not known yet. So it is not used. Its price: on the
+call's and every other app's -- and neither switching back, hanging up
+nor closing the app brought it back: only restarting PulseAudio did. So
+what broke is the sound server's state, which no set held by the app
+can be trusted to undo, for reasons not known yet. It is not used. Its price: on the
 loudspeaker, other apps' music keeps playing, and the volume keys are
 the media volume.
 
