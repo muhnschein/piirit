@@ -212,7 +212,7 @@ fn the_camera_is_switched_turned_and_let_go_and_the_pictures_reported() {
         }),
         Box::new(move || unsafe {
             let url = call!("url");
-            record!("voice-url", url.clone());
+            record!("voice-url", url);
             call!("hangUp");
             call!("reset");
             // A video call rings, its camera on until switched off; turned
