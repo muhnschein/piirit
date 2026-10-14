@@ -283,8 +283,9 @@ fn a_video_call_shows_its_pictures_under_lines_a_tap_puts_away() {
             record!("switches-ringing", get!("callSwitches", "visible"));
             record!("mute-ringing", get!("muteSwitch", "visible"));
             record!("camera-ringing", get!("cameraSwitch", "checked"));
-            // Nothing about the sound while it rings: the ringtone is the
-            // phone's.
+            // While it rings, no switch for the sound, which is the
+            // phone's ringtone; only the ring's set with the policy, sound
+            // alone, for other apps' music to give way to.
             record!("speaker-ringing", get!("speakerSwitch", "visible"));
             record!("audio-ringing", call!("audioSaid"));
             record!("front", call!("front"));
@@ -638,8 +639,8 @@ fn a_video_call_shows_its_pictures_under_lines_a_tap_puts_away() {
     );
     assert_eq!(
         value("audio-ringing"),
-        "",
-        "the call's sound was held with the policy while it rang. {context}"
+        "register:1,acquire",
+        "a ringing call did not hold the ring's set, sound alone, or held the call's own. {context}"
     );
     assert_eq!(
         value("camera-off-ringing"),
@@ -673,7 +674,11 @@ fn a_video_call_shows_its_pictures_under_lines_a_tap_puts_away() {
         "",
         "the call's page came up before its sound had its way out. {context}"
     );
-    assert_eq!(value("audio-had"), "audio,acquire", "{context}");
+    assert_eq!(
+        value("audio-had"),
+        "audio,acquire,release,unregister",
+        "the ring's set was not given back once the call's own was had. {context}"
+    );
     assert_eq!(
         value("view"),
         url,

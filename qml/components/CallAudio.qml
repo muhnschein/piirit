@@ -58,6 +58,15 @@ import Nemo.DBus 2.0
  * cannot be had -- refused, or no manager to answer, or no id to name
  * the streams by -- is let go of, and the call's sound goes where any
  * app's goes: the loudspeaker, for good.
+ *
+ * While a call rings, a second set is held, of class `ringtone`: the
+ * class the policy has for a phone ringing, which other apps' music
+ * gives way to, as it does for a phone call. It names no streams (ngfd
+ * plays the ringtone, and the policy knows its streams for a ringtone's
+ * by themselves) and asks for nothing but sound, so it moves nothing of
+ * the app's. It goes when the ringing stops -- for a call answered, only
+ * after the call's own set is had, so that the music held off for the
+ * ring stays off for the call.
  * docs/CALLS.md, "Earpiece and loudspeaker".
  */
 Item {
@@ -65,6 +74,9 @@ Item {
 
     /// The call carries sound: placed or answered, and not over.
     property bool talking: false
+
+    /// A call is ringing here.
+    property bool ringing: false
 
     /// The call was placed or answered with pictures.
     property bool video: false
@@ -124,6 +136,13 @@ Item {
     /// Whether the set held asks for video playback too: the
     /// loudspeaker.
     property bool heldLoud: false
+
+    /// The ringing call's set, by its number; 0 for none.
+    property int ringHeld: 0
+
+    /// The policy would not take the ringing call's set: not asked for
+    /// again while this call rings.
+    property bool ringRefused: false
 
     /// The last set's number. Each set gets a new one: the manager knows
     /// a set by the client and its number.
@@ -211,6 +230,15 @@ Item {
         }
     }
 
+    // The ringing over: looked at once the call's state has settled, so
+    // that a call answered asks for its own set before the ring's goes.
+    Timer {
+        id: ringOver
+        objectName: "ringOver"
+        interval: 0
+        onTriggered: audio.settle()
+    }
+
     // How long a switch may take: the microphone not shutting, the
     // policy not answering or the microphone not coming back. Given up
     // on, the microphone is back, and the sound where it is.
@@ -247,6 +275,16 @@ Item {
         }
         audio.look()
         audio.settle()
+    }
+
+    onRingingChanged: {
+        if (audio.ringing) {
+            ringOver.stop()
+            audio.ringRefused = false
+            audio.settle()
+        } else {
+            ringOver.restart()
+        }
     }
 
     onWatchingChanged: {
@@ -305,7 +343,7 @@ Item {
 
     /// The set the call wants, and only that, and none once it is over --
     /// unless a microphone of the call's may be open: then a switch, told
-    /// to the page first.
+    /// to the page first. And the ring's set while the call rings.
     function settle() {
         if (audio.open) {
             if (audio.talking && audio.ready && audio.held !== 0
@@ -323,7 +361,26 @@ Item {
         } else if (audio.heldLoud !== audio.speaker) {
             audio.change()
         }
+        audio.ring()
         audio.pump()
+    }
+
+    /// The ring's set: asked for while the call rings, and given back
+    /// once it does not -- after whatever the call's own set has asked
+    /// for, which is queued before it.
+    function ring() {
+        if (audio.ringing) {
+            if (audio.ringHeld === 0 && !audio.ringRefused && audio.appId.length > 0) {
+                audio.count += 1
+                var id = audio.count
+                audio.ringHeld = id
+                audio.send(id, "register",
+                           audio.record(audio.msgRegister, id, "ringtone", audio.audioPlayback))
+                audio.send(id, "acquire", audio.plain(audio.msgAcquire, id))
+            }
+        } else if (!ringOver.running) {
+            audio.letGoRing()
+        }
     }
 
     /// Have the page stop the microphone, and move the sound once it has.
@@ -364,7 +421,8 @@ Item {
         var id = audio.count
         audio.held = id
         audio.heldLoud = audio.speaker
-        audio.send(id, "register", audio.record(audio.msgRegister, id))
+        audio.send(id, "register",
+                   audio.record(audio.msgRegister, id, "aliencall", audio.callResources()))
         audio.send(id, "audio", [
             { "type": "i", "value": audio.msgAudio },
             { "type": "u", "value": id },
@@ -385,20 +443,34 @@ Item {
     function change() {
         var id = audio.held
         audio.heldLoud = audio.speaker
-        audio.send(id, "update", audio.record(audio.msgUpdate, id))
+        audio.send(id, "update",
+                   audio.record(audio.msgUpdate, id, "aliencall", audio.callResources()))
         audio.send(id, "acquire", audio.plain(audio.msgAcquire, id))
     }
 
-    /// Give the set back. Unregistering is what matters; releasing first
-    /// is how libresource's own clients let go. Whatever was still to be
-    /// said about the set goes unsaid, and the two go out after the
-    /// message already out, so a register is answered before them.
+    /// Give the call's set back.
     function letGo() {
         var id = audio.held
+        audio.held = 0
+        audio.drop(id)
+    }
+
+    /// Give the ring's set back.
+    function letGoRing() {
+        var id = audio.ringHeld
+        audio.ringHeld = 0
+        audio.drop(id)
+    }
+
+    /// Give set `id` back, if there is one. Unregistering is what
+    /// matters; releasing first is how libresource's own clients let go.
+    /// Whatever was still to be said about the set goes unsaid, and the
+    /// two go out after the message already out, so a register is
+    /// answered before them.
+    function drop(id) {
         if (id === 0) {
             return
         }
-        audio.held = 0
         audio.queue = audio.queue.filter(function (message) {
             return message.id !== id
         })
@@ -451,6 +523,10 @@ Item {
             audio.letGo()
             audio.denied = true
             audio.speaker = true
+        } else if (id === audio.ringHeld) {
+            // Music that plays on through the ring, as it did before.
+            audio.letGoRing()
+            audio.ringRefused = true
         }
     }
 
@@ -459,21 +535,26 @@ Item {
         return audio.reqno
     }
 
-    /// A register or an update: the resources, and who asks.
-    function record(type, id) {
+    /// What the call's set asks for: video playback as well for the
+    /// loudspeaker.
+    function callResources() {
+        return audio.heldLoud ? audio.audioPlayback | audio.videoPlayback : audio.audioPlayback
+    }
+
+    /// A register or an update: the resources, the class, and who asks.
+    function record(type, id, klass, resources) {
         return [
             { "type": "i", "value": type },
             { "type": "u", "value": id },
             { "type": "u", "value": audio.next() },
             // Mandatory: a route the policy will not give is better as
             // no set at all.
-            { "type": "u", "value": audio.heldLoud
-                    ? audio.audioPlayback | audio.videoPlayback : audio.audioPlayback },
+            { "type": "u", "value": resources },
             { "type": "u", "value": 0 },
             { "type": "u", "value": 0 },
             { "type": "u", "value": 0 },
             { "type": "s", "value": audio.appId },
-            { "type": "s", "value": "aliencall" },
+            { "type": "s", "value": klass },
             { "type": "u", "value": 0 }
         ]
     }
@@ -537,6 +618,7 @@ Item {
             return
         }
         audio.letGo()
+        audio.letGoRing()
         var left = audio.queue
         audio.queue = []
         for (var i = 0; i < left.length; i++) {

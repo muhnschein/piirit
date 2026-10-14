@@ -20,7 +20,8 @@ import "."
  * - It rings with the phone's own VoIP ringtone, played by the feedback
  *   daemon (ngfd) that plays every sound the phone makes: the tone, the
  *   volume and the silent profile are the reader's own settings, and it
- *   stops when told or when the app goes.
+ *   stops when told or when the app goes. Other apps' music pauses while
+ *   it rings, as it does for a phone call (CallAudio.qml).
  * - It tells the display daemon (mce) that a call is ringing -- once
  *   the ringtone has been picked, which mce's call state would turn into
  *   a call-waiting beep -- and then that one is up: the screen comes on
@@ -431,10 +432,12 @@ Item {
     // to. Looked after from when the call carries sound -- placed, or
     // answered -- until it is over; the call's page waits for it
     // (CallPage.qml), and shuts its microphone while the sound moves.
+    // While the call rings, other apps' music gives way to it.
     CallAudio {
         id: callAudio
         objectName: "callAudio"
         talking: center.busy && call.state !== "ringing"
+        ringing: call.state === "ringing"
         video: call.has_video
         watching: center.watching
         appId: call.audio_id()

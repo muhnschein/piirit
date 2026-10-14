@@ -24,6 +24,12 @@
 //! a time, each once the last is answered, as libresource's own clients
 //! send them: the manager answers a register only after asking the bus who
 //! sent it, and refuses anything else about the set that comes before.
+//!
+//! And while a call rings, a set of class `ringtone`, which other apps'
+//! music gives way to: sound alone, naming no streams; given back once
+//! the ringing stops, and for a call answered only after the call's own
+//! set is had, so the music does not come back in between; not asked for
+//! again for a ring the manager refused.
 
 // Qt harness: see qml_chat_list.rs.
 #![allow(
@@ -80,12 +86,13 @@ const PROBE_QML: &str = r"
             timer.triggered()
             return said()
         }
+        function ringHeld() { return '' + holder.item.ringHeld }
         function running(name) {
             var timer = find(name)
             return timer === null ? 'missing:' + name : '' + timer.running
         }
         function intervals() {
-            return ['settling', 'quieting', 'shutting', 'patience', 'stalled'].map(function (name) {
+            return ['settling', 'quieting', 'shutting', 'patience', 'stalled', 'ringOver'].map(function (name) {
                 return find(name).interval
             }).join(',')
         }
@@ -157,6 +164,15 @@ fn asked(id: u32, first: u32, loud: bool) -> String {
          acquire 3 {id} {}",
         first + 1,
         first + 2
+    )
+}
+
+/// A ringing call's set asked for: set `id`, its requests numbered from
+/// `first`. Sound alone, and no streams named.
+fn rung(id: u32, first: u32) -> String {
+    format!(
+        "register 0 {id} {first} 1 0 0 0 1234 ringtone 0;acquire 3 {id} {}",
+        first + 1
     )
 }
 
@@ -501,6 +517,67 @@ fn a_call_moves_its_sound_only_with_the_microphone_shut() {
         set!("talking", false);
         record!("late-over", fire!("quieting"));
 
+        // A call ringing: the ring's set, given back a moment after the
+        // ringing stops -- declined, missed, or taken elsewhere.
+        record!("ring", set!("ringing", true));
+        record!("ring-state", call!("state"));
+        record!("ring-held", call!("ringHeld"));
+        record!("ring-over", set!("ringing", false));
+        record!("ring-over-waits", running!("ringOver"));
+        record!("ring-gone", fire!("ringOver"));
+        record!("ring-gone-held", call!("ringHeld"));
+
+        // Answered, with a manager that answers when told to: no longer
+        // ringing, then carrying sound, as an answer changes the call.
+        // The call's set is had before the ring's goes, one message at a
+        // time, and the page's moment comes only after both.
+        call!("defer");
+        record!("answer-ring", set!("ringing", true));
+        record!("answer-ring-acquire", call!("flush"));
+        record!("answer-ring-had", call!("flush"));
+        set!("ringing", false);
+        // Looked at in between, the ring's set still stays.
+        record!("answered-between", set!("speaker", true));
+        record!("answered", set!("talking", true));
+        record!("answered-turn", fire!("ringOver"));
+        record!("answered-rest", call!("drain"));
+        record!("answered-state", call!("state"));
+        record!("answered-held", call!("ringHeld"));
+        call!("heal");
+        record!("answered-in", fire!("settling"));
+        set!("micOpen", true);
+        set!("talking", false);
+        set!("micOpen", false);
+        record!("answered-over", fire!("quieting"));
+
+        // The other way round: carrying sound, then no longer ringing.
+        record!("again-ring", set!("ringing", true));
+        record!("again-answered", set!("talking", true));
+        record!("again-unrung", set!("ringing", false));
+        record!("again-ring-gone", fire!("ringOver"));
+        record!("again-settling", running!("settling"));
+        fire!("settling");
+        set!("micOpen", true);
+        set!("talking", false);
+        set!("micOpen", false);
+        record!("again-over", fire!("quieting"));
+
+        // A ring the manager refuses: given back, and not asked for
+        // again while that call rings; the next call's ring asks anew.
+        call!("defer");
+        call!("answer", 13);
+        record!("ring-refused-sent", set!("ringing", true));
+        record!("ring-refused", call!("drain"));
+        record!("ring-refused-held", call!("ringHeld"));
+        call!("heal");
+        record!("ring-refused-again", set!("speaker", true));
+        set!("speaker", false);
+        set!("ringing", false);
+        record!("ring-refused-over", fire!("ringOver"));
+        record!("next-ring", set!("ringing", true));
+        set!("ringing", false);
+        record!("next-ring-over", fire!("ringOver"));
+
         // Gone mid-call, the microphone open: nothing sent on the way out.
         set!("talking", true);
         fire!("settling");
@@ -518,9 +595,18 @@ fn a_call_moves_its_sound_only_with_the_microphone_shut() {
         call!("said");
         record!("left", call!("unload"));
 
+        // Gone while a call rings: the ring's set given back on the way
+        // out.
+        load("1234");
+        set!("ringing", true);
+        call!("said");
+        record!("left-ringing", call!("unload"));
+
         // Without the app's id, nothing is asked for: the loudspeaker,
         // for good, and the page need not wait for the policy.
         load("");
+        record!("no-id-ring", set!("ringing", true));
+        set!("ringing", false);
         record!("no-id", set!("talking", true));
         record!("no-id-settling", running!("settling"));
         fire!("settling");
@@ -544,9 +630,10 @@ fn a_call_moves_its_sound_only_with_the_microphone_shut() {
         ("start", String::new(), "a fresh start sent something"),
         (
             "intervals",
-            "500,300,3000,5000,5000".into(),
+            "500,300,3000,5000,5000,0".into(),
             "a wait changed: the sound's moment, the microphone staying shut, a microphone \
-             taken as shut without the watcher, the policy at the start, a switch",
+             taken as shut without the watcher, the policy at the start, a switch, the ring's \
+             end looked at once the call's state has settled",
         ),
         (
             "voice",
@@ -838,6 +925,80 @@ fn a_call_moves_its_sound_only_with_the_microphone_shut() {
         ),
         ("late-over", given_back(12, 71), "{context}"),
         (
+            "ring",
+            rung(13, 73),
+            "a ringing call did not ask for the ring's set, or asked for more than sound",
+        ),
+        (
+            "ring-state",
+            "0|ear|earpiece|held-back|shut|no-mic|still|fixed".into(),
+            "a ringing call let the page up, or asked for the call's own set",
+        ),
+        ("ring-held", "13".into(), "{context}"),
+        ("ring-over", String::new(), "the ring's set went before the call's state had settled"),
+        ("ring-over-waits", "true".into(), "{context}"),
+        ("ring-gone", given_back(13, 75), "the ring's set was not given back once it stopped ringing"),
+        ("ring-gone-held", "0".into(), "{context}"),
+        (
+            "answer-ring",
+            "register 0 14 77 1 0 0 0 1234 ringtone 0".into(),
+            "more than the ring's register went out before it was answered",
+        ),
+        ("answer-ring-acquire", "acquire 3 14 78".into(), "{context}"),
+        ("answer-ring-had", String::new(), "{context}"),
+        (
+            "answered-between",
+            String::new(),
+            "the ring's set went before the call's state had settled",
+        ),
+        (
+            "answered",
+            "register 0 15 79 1 0 0 0 1234 aliencall 0".into(),
+            "an answered call did not ask for its own set, or the ring's went first",
+        ),
+        ("answered-turn", String::new(), "something went out with a message still unanswered"),
+        (
+            "answered-rest",
+            format!(
+                "audio 7 15 80 aliencall 1234 media.name 0 *;acquire 3 15 81;{}",
+                given_back(14, 82)
+            ),
+            "the ring's set went before the call's own was had: the music would come back",
+        ),
+        (
+            "answered-state",
+            "15|ear|earpiece|held-back|shut|no-mic|still|switchable".into(),
+            "{context}",
+        ),
+        ("answered-held", "0".into(), "{context}"),
+        ("answered-in", String::new(), "{context}"),
+        ("answered-over", given_back(15, 84), "{context}"),
+        ("again-ring", rung(16, 86), "{context}"),
+        ("again-answered", asked(17, 88, false), "{context}"),
+        ("again-unrung", String::new(), "{context}"),
+        ("again-ring-gone", given_back(16, 91), "{context}"),
+        ("again-settling", "true".into(), "{context}"),
+        ("again-over", given_back(17, 93), "{context}"),
+        (
+            "ring-refused-sent",
+            "register 0 18 95 1 0 0 0 1234 ringtone 0".into(),
+            "{context}",
+        ),
+        (
+            "ring-refused",
+            given_back(18, 97),
+            "a ring's set the manager refused was not given back, or acquired anyway",
+        ),
+        ("ring-refused-held", "0".into(), "{context}"),
+        (
+            "ring-refused-again",
+            String::new(),
+            "a ring's set refused was asked for again while the call rang",
+        ),
+        ("ring-refused-over", String::new(), "a ring's set already given back was given back again"),
+        ("next-ring", rung(19, 99), "a refusal outlived the ring it was for"),
+        ("next-ring-over", given_back(19, 101), "{context}"),
+        (
             "left-open",
             String::new(),
             "the set was given back on the way out with the microphone open",
@@ -847,6 +1008,12 @@ fn a_call_moves_its_sound_only_with_the_microphone_shut() {
             given_back(1, 4),
             "a set held on the way out, the page not yet up, was not given back",
         ),
+        (
+            "left-ringing",
+            given_back(1, 3),
+            "the ring's set was not given back on the way out",
+        ),
+        ("no-id-ring", String::new(), "a ring's set was asked for without the app's id"),
         ("no-id", String::new(), "a set was asked for without the app's id"),
         ("no-id-settling", "true".into(), "{context}"),
         (

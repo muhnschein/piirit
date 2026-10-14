@@ -387,6 +387,7 @@ What is here is the rest of it:
 | | How | Allowed |
 |---|---|---|
 | **Ringtone** | ngfd, the daemon that makes every sound the phone makes, plays `voip_ringtone`: the phone's own tone for a call that is not a phone call -- the profile's `voip.alert.tone`, and silent when its `voip.alert.enabled` is off -- at the ringing volume, silenced by the silent profile, repeating until stopped. Should ngfd refuse it, or say it failed, the phone's own `ringtone` with `type` `voip` instead, as voicecall plays it for a call that is not a SIM call | ngfd's system-bus interface, which sailjail opens to every app; not a listed Harbour API |
+| **Music held off** | while a call rings, a resource set of class `ringtone` with ohm's resource manager, as for a phone ringing: other apps' music pauses, and plays on again if the call is not answered ("Earpiece and loudspeaker") | ohm's resource manager, which the Audio permission opens; not a listed Harbour API |
 | **Screen and call state** | mce is told `ringing`, then `active`, then `none`: it lights the screen for a ringing call and treats the phone as being in one. It forgets by itself if the app goes. `ringing` only once ngfd has answered the ringtone's Play, or a second has passed: ngfd follows mce's call state, and the event set's `voip_ringtone` plays a call-waiting beep instead of the ringtone while mce says a call is on, ringing included -- which is what told it first did (#98) | mce's request interface, open to every app; not a listed Harbour API |
 | **Lock screen** | once mce says the screen is on, `req_tklock_mode_change("unlocked")` and the app brought forward, so the call's page is what is on screen; raised behind the lock screen, it showed for a moment and was covered again (#99). mce turns the screen on for a ringing call only when it would for a phone call -- not in a pocket -- and puts the lock back when the call is over. A device lock, a code or a fingerprint, is left alone: the call's page is behind it. A Critical notification with Decline and Answer on it besides, which the lock screen shows | mce's request interface; `Nemo.Notifications` |
 | **Missed calls** | left in the notification area in the phone's own category for one, `x-nemo.call.missed`, with Call back on it | `Nemo.Notifications` |
@@ -439,6 +440,19 @@ loudspeaker (`ihfforalien`). So the earpiece is the set with audio
 playback alone, the loudspeaker the same set with video playback added,
 and switching is updating that one set. Either way other apps' music
 pauses for the call. Nothing global is touched.
+
+Before any of that, while a call rings, the app holds a second set, of
+class `ringtone`: the policy's class for a phone ringing, which outranks
+a media player's (`resource_classes.pl`), so other apps' music pauses
+for the ring as it does for a phone call, and plays on again if the call
+is not answered. It asks for audio playback alone and names no streams:
+ngfd plays the ringtone, and the policy files a ringtone's streams by
+themselves, so the set moves nothing of the app's, and no microphone is
+open for a move to break. Answered, the call's own set is had before the
+ring's is given back, one message after the other, so the music does not
+come back in between. A ring's set the manager refuses is let go of, and
+the music plays through the ring, as it did before. *(From the policy's
+rules; not yet heard on a phone.)*
 
 The microphone is what makes this delicate. Moving the call's sound
 while its microphone is open brings the phone's sound server down. The
