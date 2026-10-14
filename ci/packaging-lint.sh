@@ -125,19 +125,19 @@ else
 fi
 
 # mb2 derives the package it is building from the directory it is run in,
-# and then looks for rpm/<that>.spec. The workflow mounts the checkout at a
-# path it chooses, so that name and the spec's have to agree or the build
-# stops before rpmbuild starts.
+# and then looks for rpm/<that>.spec. scripts/build-in-docker.sh mounts the
+# checkout at a path it chooses, so that name and the spec's have to agree
+# or the build stops before rpmbuild starts.
 ran=$((ran + 1))
 spec_base=$(basename "$(find "$root/rpm" -maxdepth 1 -name '*.spec' | sort | head -1)" .spec)
-# shellcheck disable=SC2016 # $home is the workflow's text, not ours.
-builddir=$(sed -n 's|.*BUILDDIR=\$home/\([^"]*\)".*|\1|p' \
-    "$root/.github/workflows/rpm.yml" | head -1)
+# shellcheck disable=SC2016 # $home is the script's text, not ours.
+builddir=$(sed -n 's|^builddir="\$home/\([^"]*\)".*|\1|p' \
+    "$root/scripts/build-in-docker.sh" | head -1)
 if [ "$spec_base" = "$builddir" ]; then
-    echo "packaging-lint: the rpm workflow builds in a directory named for the spec"
+    echo "packaging-lint: the docker build runs in a directory named for the spec"
 else
-    echo "packaging-lint: FAIL rpm.yml mounts the checkout as '$builddir' but the" \
-         "spec is rpm/$spec_base.spec; mb2 would not find it" >&2
+    echo "packaging-lint: FAIL scripts/build-in-docker.sh mounts the checkout as" \
+         "'$builddir' but the spec is rpm/$spec_base.spec; mb2 would not find it" >&2
     status=1
 fi
 
