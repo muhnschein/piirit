@@ -150,19 +150,47 @@ function escaped(text, lineStart) {
 ///
 /// `size` is the font's pixel size; the pictures are drawn a little
 /// taller than its letters, as an emoji in a font is.
+///
+/// Two passes: where the pictures go, then the text with them in. One
+/// pass kept where the text last left off beside where the scan was,
+/// and set both to where an emoji ended. Sailfish compiles this for
+/// ARM64 with a JIT that, copying one value into two variables at the
+/// end of a pass round the loop, can overwrite it before the second
+/// copy: some launches lost where the text left off on the first
+/// emoji, and a message that began with one showed it twice, the
+/// picture and then the character. Each pass here sets each of its
+/// variables from a value of its own.
 function inText(text, styled, size) {
+    var cuts = emojiCuts(text, styled)
+    if (cuts.length === 0) {
+        return ""
+    }
+    var edge = Math.round(size * 1.15)
+    var out = ""
+    var from = 0
+    for (var k = 0; k < cuts.length; k += 3) {
+        var before = text.substring(from, cuts[k])
+        out += styled ? before : escaped(before, from === 0)
+        out += "<img src=\"" + artBase + cuts[k + 2] + ".png\" width=\"" + edge
+               + "\" height=\"" + edge + "\" align=\"middle\">"
+        from = cuts[k + 1]
+    }
+    var rest = text.substring(from)
+    return out + (styled ? rest : escaped(rest, from === 0))
+}
+
+/// Where in `text` the emoji are that `inText` draws as pictures: the
+/// start, end and picture of each, one after the other in one list.
+function emojiCuts(text, styled) {
+    var cuts = []
     // Most messages have no emoji, and the scan below calls out for
     // nearly every character: a long body cost a millisecond of the
     // frame its row was built in.
     if (!text || !Pictures.mayHold.test(text)) {
-        return ""
+        return cuts
     }
     var known = Pictures.byKey
     var textStyle = Pictures.textStyle
-    var edge = Math.round(size * 1.15)
-    var out = ""
-    var from = 0
-    var drew = false
     var inTag = false
     var i = 0
     while (i < text.length) {
@@ -183,26 +211,15 @@ function inText(text, styled, size) {
         if (name === undefined) {
             name = known[untoned(emoji)]
         }
-        // Text, too, where the sender asked for it with U+FE0E: a star
-        // so marked is the font's. Down here only, as `textStyle` is.
-        if (name === undefined || (textStyle[bare] === true && bare === emoji)
-                || (code < 0xD800 && text.charCodeAt(end) === 0xFE0E)) {
-            i = end
-            continue
+        // Not where the sender asked for text with U+FE0E, either: a
+        // star so marked is the font's. Down here only, as `textStyle` is.
+        if (name !== undefined && !(textStyle[bare] === true && bare === emoji)
+                && !(code < 0xD800 && text.charCodeAt(end) === 0xFE0E)) {
+            cuts.push(i, end, name)
         }
-        var before = text.substring(from, i)
-        out += styled ? before : escaped(before, from === 0)
-        out += "<img src=\"" + artBase + name + ".png\" width=\"" + edge
-               + "\" height=\"" + edge + "\" align=\"middle\">"
-        drew = true
-        from = end
         i = end
     }
-    if (!drew) {
-        return ""
-    }
-    var rest = text.substring(from)
-    return out + (styled ? rest : escaped(rest, from === 0))
+    return cuts
 }
 
 /// Where the pictures are, for an <img> in text. Beside js/ as beside

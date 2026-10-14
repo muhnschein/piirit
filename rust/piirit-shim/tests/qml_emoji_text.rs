@@ -155,6 +155,7 @@ fn messages_draw_their_emoji_as_the_reactions_do() {
 
     let texts: Vec<(&'static str, &'static str, bool)> = vec![
         ("thumb", "hi 👍", false),
+        ("first", "💾 saved 💾", false),
         ("none", "no emoji at all, 1 # * 2", false),
         ("escaped", "a <b> & 👍\n  two  spaces", false),
         ("copyright-text", "(c) © 2024", false),
@@ -257,6 +258,9 @@ fn messages_draw_their_emoji_as_the_reactions_do() {
 
     for (label, expected) in [
         ("thumb", format!("hi {}", img("1f44d"))),
+        // One at the very start, and the text after it from where it
+        // ended: Sailfish's ARM64 JIT lost that once (Emoji.js, inText).
+        ("first", format!("{} saved {}", img("1f4be"), img("1f4be"))),
         ("none", String::new()),
         // The sender's markup is text, their line break a <br> and their
         // runs of spaces kept, which StyledText would fold.
