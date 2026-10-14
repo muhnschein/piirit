@@ -1579,6 +1579,9 @@ async fn serve() {
                 }
                 "get_fresh_msgs" => {
                     let account = account_id();
+                    // Held back on request: what lets a test have events
+                    // arrive while a count is still being read.
+                    tokio::time::sleep(delay("PIIRIT_FAKE_FRESH_DELAY_MS")).await;
                     let state = state.lock().await;
                     let ids: Vec<u32> = state
                         .fresh

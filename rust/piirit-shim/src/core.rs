@@ -555,6 +555,11 @@ pub struct DeltaChatCore {
     media_quality_set: bool,
     /// The same, for whose calls ring here.
     who_can_call_me_set: bool,
+    /// The profiles whose unread count is being read, each with whether
+    /// another event has asked for it since the read went out. One read
+    /// at a time per profile: a message arriving is three or four events,
+    /// and each read returns every unread message the profile has.
+    unread_reads: RefCell<BTreeMap<u32, bool>>,
     /// The attempts at a profile there have been, shared with the tasks
     /// that carry each one out.
     attempts: Arc<Attempts>,
@@ -701,6 +706,9 @@ impl DeltaChatCore {
         let next = {
             let mut this_mut = this.borrow_mut();
             this_mut.rpc = None;
+            // Whatever was in flight went with the server, or will fail
+            // against it; the next one starts from nothing.
+            this_mut.unread_reads.get_mut().clear();
             // Nothing to restart: either `start` was never called, or a
             // previous round already gave up and dropped the runtime.
             let Some(runtime) = this_mut.runtime.clone() else {
@@ -1331,9 +1339,13 @@ impl DeltaChatCore {
     }
 
     /// Re-read one profile's unread count, after an event that could have
-    /// moved it, and change its row in place. Cheap enough to do on every
-    /// such event: it is one query, and the profiles page's badge is
-    /// wrong until it is done.
+    /// moved it, and change its row in place.
+    ///
+    /// One read at a time per profile. A message arriving is three or
+    /// four events that each ask, and the read returns the id of every
+    /// unread message the profile has; so one asked for while another is
+    /// out is noted, and one more goes when that lands -- after every
+    /// event that asked, which is what the count has to follow.
     pub fn refresh_unread(&self, account_id: u32) {
         if account_id == 0 {
             return;
@@ -1341,20 +1353,38 @@ impl DeltaChatCore {
         let Some((rpc, runtime)) = self.connection() else {
             return;
         };
+        {
+            let mut reads = self.unread_reads.borrow_mut();
+            if let Some(again) = reads.get_mut(&account_id) {
+                *again = true;
+                return;
+            }
+            reads.insert(account_id, false);
+        }
         let ptr: QPointer<Self> = QPointer::from(self);
         let done = queued_callback(move |count: u32| {
             let Some(this) = ptr.as_pinned() else { return };
             let this_ref = this.borrow();
-            let mut rows = this_ref.account_list.borrow_mut();
-            // Read before the change: the iterator borrows the rows.
-            let changed = rows
-                .iter()
-                .enumerate()
-                .find(|(_, row)| row.account_id == account_id && row.unread_count != count)
-                .map(|(index, row)| (index, row.clone()));
-            if let Some((index, mut row)) = changed {
-                row.unread_count = count;
-                rows.change_line(index, row);
+            {
+                let mut rows = this_ref.account_list.borrow_mut();
+                // Read before the change: the iterator borrows the rows.
+                let changed = rows
+                    .iter()
+                    .enumerate()
+                    .find(|(_, row)| row.account_id == account_id && row.unread_count != count)
+                    .map(|(index, row)| (index, row.clone()));
+                if let Some((index, mut row)) = changed {
+                    row.unread_count = count;
+                    rows.change_line(index, row);
+                }
+            }
+            let again = this_ref
+                .unread_reads
+                .borrow_mut()
+                .remove(&account_id)
+                .unwrap_or(false);
+            if again {
+                this_ref.refresh_unread(account_id);
             }
         });
         runtime.spawn(async move {
