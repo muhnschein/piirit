@@ -263,7 +263,10 @@ fn a_still_and_a_video_are_reported_once_written_and_the_page_leaves() {
         record!("back-running", call!("running"));
         probe!("back-sensor", "orientationSensor", "active");
         // But a video being recorded goes on there.
-        record!("away-video-mode", call!("tap", QString::from("modeOption1")));
+        record!(
+            "away-video-mode",
+            call!("tap", QString::from("modeOption1"))
+        );
         record!("away-record", call!("tap", QString::from("shutter")));
         call!("background", true);
         record!("away-recording", call!("recorderState"));
