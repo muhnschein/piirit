@@ -838,17 +838,25 @@ Page {
                 /// whenever a message arrives. So it draws, and reports
                 /// the tap.
                 function raiseRemorse() {
+                    remorse.active = true
                     //: What Silica's countdown says it is doing, over
                     //: a chat the reader has asked to delete.
-                    remorse.execute(
+                    remorse.item.execute(
                         body, qsTr("Deleting"), function() {},
                         doomedChats.countdownFor(model.chat_id))
                 }
 
-                RemorseItem {
+                // Built the first time a delete is asked for, not with
+                // the row: the platform's countdown is a dozen items of
+                // its own, and every chat carried one for a tap that
+                // almost never comes. ConversationList does the same.
+                Loader {
                     id: remorse
-                    objectName: "chatRemorse"
-                    onCanceled: doomedChats.spare(model.chat_id)
+                    active: false
+                    sourceComponent: RemorseItem {
+                        objectName: "chatRemorse"
+                        onCanceled: doomedChats.spare(model.chat_id)
+                    }
                 }
 
                 // A row rebuilt mid-wait -- scrolled past, or moved by a
@@ -884,76 +892,83 @@ Page {
                     summaryState: model.summary_state
                 }
 
-                menu: ContextMenu {
-                    MenuItem {
-                        objectName: "markReadItem"
-                        visible: !page.archived && model.unread_count > 0
-                        text: qsTr("Mark as read")
-                        onClicked: chats.mark_read(model.chat_id)
-                    }
-                    // The other way: one unread message back on a chat
-                    // already read, so it stands out until it is opened.
-                    // The core puts its last incoming message back to
-                    // unread, so a chat with only the reader's own
-                    // messages in it stays as it is.
-                    MenuItem {
-                        objectName: "markUnreadItem"
-                        visible: !page.archived && model.unread_count === 0
-                        text: qsTr("Mark as unread")
-                        onClicked: chats.mark_unread(model.chat_id)
-                    }
-                    MenuItem {
-                        objectName: "pinItem"
-                        visible: !page.archived
-                        text: model.is_pinned ? qsTr("Unpin") : qsTr("Pin")
-                        onClicked: chats.set_pinned(model.chat_id, !model.is_pinned)
-                    }
-                    MenuItem {
-                        objectName: "muteItem"
-                        visible: !page.archived
-                        text: model.is_muted ? qsTr("Unmute") : qsTr("Mute")
-                        onClicked: chats.set_muted(model.chat_id, !model.is_muted)
-                    }
-                    // A request is not an ordinary chat: until it is
-                    // accepted the sender cannot be replied to, and the only
-                    // useful answers are yes and no.
-                    MenuItem {
-                        objectName: "acceptItem"
-                        visible: !page.archived && model.is_contact_request
-                        text: qsTr("Accept")
-                        onClicked: chats.accept_chat(model.chat_id)
-                    }
-                    MenuItem {
-                        objectName: "blockItem"
-                        visible: !page.archived && model.is_contact_request
-                        text: qsTr("Block")
-                        onClicked: chats.block_chat(model.chat_id)
-                    }
-                    MenuItem {
-                        objectName: "archiveItem"
-                        visible: !page.archived && !model.is_contact_request
-                        text: qsTr("Archive")
-                        onClicked: chats.archive(model.chat_id)
-                    }
-                    // The way back out. Without it an archived chat could only
-                    // be recovered by someone sending a message to it.
-                    MenuItem {
-                        objectName: "unarchiveItem"
-                        visible: page.archived
-                        text: qsTr("Unarchive")
-                        onClicked: chats.unarchive(model.chat_id)
-                    }
-                    MenuItem {
-                        objectName: "deleteItem"
-                        text: qsTr("Delete")
-                        // The page is told, not this row: a message
-                        // arriving moves this chat up the list, which is
-                        // a remove and an insert, and the row this menu
-                        // belongs to is destroyed. A wait living on it
-                        // would go too.
-                        onClicked: {
-                            doomedChats.ask(model.chat_id)
-                            delegateRoot.raiseRemorse()
+                // A Component rather than a menu built with the row, for
+                // the reason ConversationList gives: Silica builds it the
+                // first time the menu is opened, and nine items on every
+                // chat the list scrolls past were built for a long press
+                // most of them never get.
+                menu: Component {
+                    ContextMenu {
+                        MenuItem {
+                            objectName: "markReadItem"
+                            visible: !page.archived && model.unread_count > 0
+                            text: qsTr("Mark as read")
+                            onClicked: chats.mark_read(model.chat_id)
+                        }
+                        // The other way: one unread message back on a chat
+                        // already read, so it stands out until it is opened.
+                        // The core puts its last incoming message back to
+                        // unread, so a chat with only the reader's own
+                        // messages in it stays as it is.
+                        MenuItem {
+                            objectName: "markUnreadItem"
+                            visible: !page.archived && model.unread_count === 0
+                            text: qsTr("Mark as unread")
+                            onClicked: chats.mark_unread(model.chat_id)
+                        }
+                        MenuItem {
+                            objectName: "pinItem"
+                            visible: !page.archived
+                            text: model.is_pinned ? qsTr("Unpin") : qsTr("Pin")
+                            onClicked: chats.set_pinned(model.chat_id, !model.is_pinned)
+                        }
+                        MenuItem {
+                            objectName: "muteItem"
+                            visible: !page.archived
+                            text: model.is_muted ? qsTr("Unmute") : qsTr("Mute")
+                            onClicked: chats.set_muted(model.chat_id, !model.is_muted)
+                        }
+                        // A request is not an ordinary chat: until it is
+                        // accepted the sender cannot be replied to, and the
+                        // only useful answers are yes and no.
+                        MenuItem {
+                            objectName: "acceptItem"
+                            visible: !page.archived && model.is_contact_request
+                            text: qsTr("Accept")
+                            onClicked: chats.accept_chat(model.chat_id)
+                        }
+                        MenuItem {
+                            objectName: "blockItem"
+                            visible: !page.archived && model.is_contact_request
+                            text: qsTr("Block")
+                            onClicked: chats.block_chat(model.chat_id)
+                        }
+                        MenuItem {
+                            objectName: "archiveItem"
+                            visible: !page.archived && !model.is_contact_request
+                            text: qsTr("Archive")
+                            onClicked: chats.archive(model.chat_id)
+                        }
+                        // The way back out. Without it an archived chat could
+                        // only be recovered by someone sending a message to it.
+                        MenuItem {
+                            objectName: "unarchiveItem"
+                            visible: page.archived
+                            text: qsTr("Unarchive")
+                            onClicked: chats.unarchive(model.chat_id)
+                        }
+                        MenuItem {
+                            objectName: "deleteItem"
+                            text: qsTr("Delete")
+                            // The page is told, not this row: a message
+                            // arriving moves this chat up the list, which
+                            // is a remove and an insert, and the row this
+                            // menu belongs to is destroyed. A wait living
+                            // on it would go too.
+                            onClicked: {
+                                doomedChats.ask(model.chat_id)
+                                delegateRoot.raiseRemorse()
+                            }
                         }
                     }
                 }

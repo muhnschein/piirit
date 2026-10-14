@@ -306,25 +306,31 @@ Page {
                     }
                 }
 
-                menu: ContextMenu {
-                    MenuItem {
-                        objectName: "showItem"
-                        //: Goes back to the conversation, at this message.
-                        text: qsTr("Show in chat")
-                        onClicked: page.showInChat(model.message_id)
-                    }
-                    MenuItem {
-                        objectName: "deleteItem"
-                        text: qsTr("Delete")
-                        // The page is told, not this tile: the wait
-                        // before a message goes has to outlive the tile
-                        // it was asked for on; which kind of delete
-                        // this is belongs to a dialog of its own. See
-                        // PendingRemoval and DeleteMessageDialog.
-                        onClicked: page.askDelete(
-                                       model.message_id,
-                                       model.is_outgoing && model.show_padlock
-                                       && !model.is_info)
+                // A Component, which Silica builds the first time the menu
+                // is opened, rather than a menu built with every tile the
+                // grid scrolls past; see ConversationList.
+                menu: Component {
+                    ContextMenu {
+                        MenuItem {
+                            objectName: "showItem"
+                            //: Goes back to the conversation, at this message.
+                            text: qsTr("Show in chat")
+                            onClicked: page.showInChat(model.message_id)
+                        }
+                        MenuItem {
+                            objectName: "deleteItem"
+                            text: qsTr("Delete")
+                            // The page is told, not this tile: the wait
+                            // before a message goes has to outlive the
+                            // tile it was asked for on; which kind of
+                            // delete this is belongs to a dialog of its
+                            // own. See PendingRemoval and
+                            // DeleteMessageDialog.
+                            onClicked: page.askDelete(
+                                           model.message_id,
+                                           model.is_outgoing && model.show_padlock
+                                           && !model.is_info)
+                        }
                     }
                 }
 
@@ -462,33 +468,36 @@ Page {
                     }
                 }
 
-                menu: ContextMenu {
-                    MenuItem {
-                        objectName: "showItem"
-                        //: Goes back to the conversation, at this message.
-                        text: qsTr("Show in chat")
-                        onClicked: page.showInChat(model.message_id)
-                    }
-                    MenuItem {
-                        objectName: "openItem"
-                        //: Hands the attachment to whatever else on the phone
-                        //: handles files of its kind.
-                        text: qsTr("Open in another app")
-                        onClicked: Qt.openUrlExternally(row.fileUrl)
-                    }
-                    MenuItem {
-                        objectName: "saveItem"
-                        text: qsTr("Save to device")
-                        onClicked: saver.keep(row.fileUrl, model.file_name)
-                    }
-                    MenuItem {
-                        objectName: "deleteItem"
-                        text: qsTr("Delete")
-                        // The page is told, not this row; see the tile.
-                        onClicked: page.askDelete(
-                                       model.message_id,
-                                       model.is_outgoing && model.show_padlock
-                                       && !model.is_info)
+                // Built when it is first opened; see the tile.
+                menu: Component {
+                    ContextMenu {
+                        MenuItem {
+                            objectName: "showItem"
+                            //: Goes back to the conversation, at this message.
+                            text: qsTr("Show in chat")
+                            onClicked: page.showInChat(model.message_id)
+                        }
+                        MenuItem {
+                            objectName: "openItem"
+                            //: Hands the attachment to whatever else on the phone
+                            //: handles files of its kind.
+                            text: qsTr("Open in another app")
+                            onClicked: Qt.openUrlExternally(row.fileUrl)
+                        }
+                        MenuItem {
+                            objectName: "saveItem"
+                            text: qsTr("Save to device")
+                            onClicked: saver.keep(row.fileUrl, model.file_name)
+                        }
+                        MenuItem {
+                            objectName: "deleteItem"
+                            text: qsTr("Delete")
+                            // The page is told, not this row; see the tile.
+                            onClicked: page.askDelete(
+                                           model.message_id,
+                                           model.is_outgoing && model.show_padlock
+                                           && !model.is_info)
+                        }
                     }
                 }
 
