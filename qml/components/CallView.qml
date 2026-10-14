@@ -38,6 +38,13 @@ Item {
     /// The page has drawn at least once.
     readonly property bool loaded: view.loaded
 
+    /// Whether the page may come up: once the call's sound has its way
+    /// out (CallAudio.ready). Up any sooner, it could open the microphone
+    /// before the sound is moved, and moving it then brings the phone's
+    /// sound server down (CallAudio.qml says why). Only coming up waits:
+    /// a page that is up is not taken down for it.
+    property bool allowed: true
+
     /// Where the view goes: `url`, once the microphone has been granted
     /// to it. Set rather than bound, so the grant is always first.
     property string target: ""
@@ -67,19 +74,27 @@ Item {
         view.url = Qt.binding(function () { return root.target })
     }
 
-    /// The origin the microphone is granted to, while it is.
+    /// The origin the microphone and the camera are granted to, while
+    /// they are.
     property string granted: ""
 
-    /// Grant the call's own page the microphone before it asks.
+    /// What the call's page is granted: what a call is made with. The
+    /// camera opens only when it is switched on (call_video.js), and the
+    /// grant is what keeps that switch from opening on a prompt too.
+    readonly property var devices: ["microphone", "camera"]
+
+    /// Grant the call's own page the microphone and the camera before it
+    /// asks.
     ///
-    /// The engine asks the reader about every page that wants the
-    /// microphone, per origin, and the call's origin is a new port every
-    /// call -- so "remember" never would, and every call would open on a
-    /// browser's permission prompt. The reader has already said: they
-    /// placed the call, or answered it. So the page is granted it for the
-    /// session, exactly as the prompt's own allow does, and it is taken
-    /// back when the call goes. Only this origin: the engine-wide switch
-    /// that would do the same would do it for every webxdc app as well.
+    /// The engine asks the reader about every page that wants either,
+    /// per origin, and the call's origin is a new port every call -- so
+    /// "remember" never would, and every call would open on a browser's
+    /// permission prompt. The reader has already said: they placed the
+    /// call, or answered it, or switched the camera on. So the page is
+    /// granted both for the session, exactly as the prompt's own allow
+    /// does, and they are taken back when the call goes. Only this
+    /// origin: the engine-wide switch that would do the same would do it
+    /// for every webxdc app as well.
     function grant(origin) {
         if (root.granted === origin) {
             return
@@ -88,14 +103,16 @@ Item {
         if (origin.length === 0) {
             return
         }
-        WebEngine.notifyObservers("embedui:perms", {
-            "msg": "add",
-            "uri": "http://" + origin,
-            "type": "microphone",
-            // ALLOW_ACTION, for the session: the prompt's own answer.
-            "permission": 1,
-            "expireType": 1
-        })
+        for (var i = 0; i < root.devices.length; i++) {
+            WebEngine.notifyObservers("embedui:perms", {
+                "msg": "add",
+                "uri": "http://" + origin,
+                "type": root.devices[i],
+                // ALLOW_ACTION, for the session: the prompt's own answer.
+                "permission": 1,
+                "expireType": 1
+            })
+        }
         root.granted = origin
     }
 
@@ -103,16 +120,19 @@ Item {
         if (root.granted.length === 0) {
             return
         }
-        WebEngine.notifyObservers("embedui:perms", {
-            "msg": "remove",
-            "uri": "http://" + root.granted,
-            "type": "microphone"
-        })
+        for (var i = 0; i < root.devices.length; i++) {
+            WebEngine.notifyObservers("embedui:perms", {
+                "msg": "remove",
+                "uri": "http://" + root.granted,
+                "type": root.devices[i]
+            })
+        }
         root.granted = ""
     }
 
     /// Grant the page's origin, then point the view at the page: before
-    /// the page is there, it cannot ask.
+    /// the page is there, it cannot ask. A page not allowed yet is
+    /// nowhere, and a page that was somewhere else goes.
     ///
     /// Not before the engine is up. It starts on the event loop after
     /// this file first imports it -- on the first call of a run, that is
@@ -123,8 +143,9 @@ Item {
         if (!WebEngine.isInitialized()) {
             return
         }
-        root.grant(root.authorityOf(root.url))
-        root.target = root.url
+        var where = root.allowed ? root.url : ""
+        root.grant(root.authorityOf(where))
+        root.target = where
     }
 
     Connections {
@@ -134,6 +155,11 @@ Item {
     }
 
     onUrlChanged: root.go()
+    onAllowedChanged: {
+        if (root.allowed) {
+            root.go()
+        }
+    }
     Component.onCompleted: root.go()
     Component.onDestruction: root.revoke()
 

@@ -349,6 +349,10 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Call back</source>
         <translation>પાછો કૉલ કરો</translation>
     </message>
+    <message>
+        <source>Incoming video call</source>
+        <translation>આવતો વિડિઓ કૉલ</translation>
+    </message>
 </context>
 <context>
     <name>CallPage</name>
@@ -402,6 +406,10 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Answer</source>
         <extracomment>Answers a call that is ringing. A verb.</extracomment>
         <translation>જવાબ આપો</translation>
+    </message>
+    <message>
+        <source>Incoming video call</source>
+        <translation>આવતો વિડિઓ કૉલ</translation>
     </message>
 </context>
 <context>
@@ -467,6 +475,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Call %1</source>
         <extracomment>Places a call. %1 is the name of whoever is called.</extracomment>
         <translation>%1 ને કૉલ કરો</translation>
+    </message>
+    <message>
+        <source>Video call %1</source>
+        <extracomment>Places a video call. %1 is the name of whoever is called.</extracomment>
+        <translation>%1 ને વિડિઓ કૉલ કરો</translation>
     </message>
 </context>
 <context>
@@ -851,6 +864,16 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>%1 new</source>
         <extracomment>On the cover, in a pill among the avatars: how many messages are unread. %1 is the number, or &quot;99+&quot;.</extracomment>
         <translation>%1 નવા</translation>
+    </message>
+    <message>
+        <source>Microphone off</source>
+        <extracomment>On the cover during a call: the reader&apos;s microphone is switched off, so the other end hears nothing.</extracomment>
+        <translation>માઇક્રોફોન બંધ</translation>
+    </message>
+    <message>
+        <source>Camera paused</source>
+        <extracomment>On the cover during a video call: the camera sends nothing while the app is in the background, and comes back on when the app is opened.</extracomment>
+        <translation>કૅમેરા થોભાવેલ</translation>
     </message>
 </context>
 <context>

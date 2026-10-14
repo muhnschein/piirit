@@ -16,9 +16,12 @@ docs/BUILDING.md, "Cutting a release").
 - A tap on a contact's or a group's picture shows it full screen. A group's picture is changed from the pull-down menu.
 - **Smaller videos.** A picked video close to the relay's recommended size is made smaller as soon as it is picked, with progress on the attachment bar, and sent when you send it; with media quality set to worse, every picked video is. The bar says how much smaller it went, such as 50 MB → 6 MB, and the size warning weighs the smaller video, saying so when even that is too big. Stopping it, or a result that came out no smaller, sends the video as it was picked.
 - **Voice calls are no longer experimental**: on for everybody, no switch to turn them on. Settings → Notifications → Calls still decides whether a call rings.
-- A ringing call plays the ringtone rather than a short beep.
+- A ringing call plays the ringtone rather than a short beep, and other apps' music pauses as soon as it rings, as it does for a phone call. It plays on again if you don't answer.
 - A call that rings while the screen is off takes the lock screen away, so the call screen stays up.
 - A call declined just as the last call's screen was closing still says so.
+- **Video calls.** Call with the camera on from a contact's Calls page, or switch it on in any call; their picture fills the screen and yours sits in the top right corner. The button on your picture turns the camera, a tap puts the lines and switches away, and a spinner shows while a picture is on its way.
+- **Earpiece and loudspeaker.** A voice call is on the earpiece, as a phone call is, and a video call on the loudspeaker; the switch on the call screen goes between the two, with your microphone off for about a second while it does. The volume keys set the call's volume, as they do in a phone call. A headset or a Bluetooth device takes the sound by itself. Nothing stays behind: should the app close or crash mid-call, the phone's sound goes back to where it was.
+- **The cover shows a call** while one is up: who, with their picture behind, how long, whether your microphone is off or your camera paused, and one quick action to switch the microphone off and on.
 
 ## 2.1.0 — 2026-10-08
 

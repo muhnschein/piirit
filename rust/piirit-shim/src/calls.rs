@@ -69,12 +69,58 @@ pub(crate) async fn summary(
     Ok(Summary::from_json(&answer))
 }
 
-/// The page's own option a call's page is loaded with. Audio only, for
-/// now: the page asks for no camera, sends no video and drops what video
-/// comes in, so a call answered here is a voice call whatever the other
-/// end started it as. Video is the half of this that is unproven on a
-/// phone (docs/CALLS.md).
-const PAGE_OPTIONS: &str = "disableVideoCompletely";
+/// The page's own option a call's page is loaded with: whether its
+/// camera starts on. Never `disableVideoCompletely`, which would drop the
+/// other end's picture too: a voice call is one whose camera starts off,
+/// and the bridge (`call_video.js`) keeps the camera closed until it is
+/// switched on.
+fn page_options(camera: bool) -> &'static str {
+    if camera {
+        ""
+    } else {
+        "noOutgoingVideoInitially"
+    }
+}
+
+/// Which of the phone's back cameras is the main lens, as its place
+/// among them: the label nearest "1.0" in what the platform camera
+/// writes on its back cameras' rings, given in their order ("1.0,0.5"),
+/// or the first camera where there are none to go by. The engine names
+/// every back camera alike, and the first it lists may be the wide one.
+fn main_back_camera(labels: &str) -> usize {
+    labels
+        .split(',')
+        .enumerate()
+        .filter_map(|(place, label)| {
+            let zoom: f64 = label
+                .trim()
+                .trim_end_matches(['x', '\u{d7}'])
+                .parse()
+                .ok()?;
+            Some((place, (zoom - 1.0).abs()))
+        })
+        .fold(
+            None,
+            |best: Option<(usize, f64)>, (place, off)| match best {
+                Some((_, nearest)) if nearest <= off => best,
+                _ => Some((place, off)),
+            },
+        )
+        .map_or(0, |(place, _)| place)
+}
+
+/// The id the phone's audio policy knows this process's sound by, from
+/// the process's own line in `/proc/<pid>/stat`: the 22nd field, its
+/// start time in clock ticks since boot, in lower-case hex. Sailfish's
+/// libpulse puts this on every stream the process opens
+/// (`policy.application.id`), and libresource sends the same for a
+/// resource set's streams; both split the line at single spaces, and so
+/// does this, so the three agree on any line. None for a line too short
+/// or a field that is not a number.
+fn audio_app_id(stat: &str) -> Option<String> {
+    let ticks: u64 = stat.split(' ').nth(21)?.parse().ok()?;
+    Some(format!("{ticks:x}"))
+}
 
 /// What one call's page needs before the host can come up.
 struct Prepared {
@@ -105,6 +151,8 @@ struct Prepared {
 /// - `connected`: the two ends can hear each other.
 /// - `reconnecting`: the connection dropped, and may come back.
 /// - `ended`: over, for the reason in `end_reason`, until `reset`.
+// One flag per Qt property: QML binds each on its own.
+#[allow(clippy::struct_excessive_bools)]
 #[derive(QObject, Default)]
 pub struct Call {
     base: qt_base_class!(trait QObject),
@@ -148,6 +196,28 @@ pub struct Call {
     /// Emitted when the microphone goes off or on.
     pub muted_changed: qt_signal!(),
 
+    /// The reader wants the camera on: from the start of a video call,
+    /// and whenever it is switched on. Kept while the app is in the
+    /// background, where the camera itself is let go; see
+    /// `set_background`. Off again by itself when the camera will not
+    /// open.
+    pub camera: qt_property!(bool; NOTIFY video_changed),
+    /// The camera faces away from the reader: the back one. The front
+    /// one again for every new call.
+    pub rear_camera: qt_property!(bool; NOTIFY video_changed),
+    /// The camera is open and sending, as the page says.
+    pub local_video: qt_property!(bool; NOTIFY video_changed),
+    /// The other end's picture is being drawn, as the page says: they
+    /// are sending one and have not switched it off.
+    pub remote_video: qt_property!(bool; NOTIFY video_changed),
+    /// The camera's picture shows: it has painted a frame since it was
+    /// last given one, as the page says. Black on the screen until then.
+    pub local_painted: qt_property!(bool; NOTIFY video_changed),
+    /// The same, of the other end's picture.
+    pub remote_painted: qt_property!(bool; NOTIFY video_changed),
+    /// Emitted when any of the six above changes.
+    pub video_changed: qt_signal!(),
+
     /// Where the call's page is, with the command it opens on. Empty
     /// until the host is up, and again once the call is over. What a
     /// `WebView` is pointed at.
@@ -179,6 +249,25 @@ pub struct Call {
     pub reset: qt_method!(fn(&mut self)),
     /// Turn the microphone off, or back on, for the call under way.
     pub mute: qt_method!(fn(&mut self, on: bool)),
+    /// Switch the camera on or off: for the call under way, or for the
+    /// call ringing, which is then answered with it or without it.
+    pub set_camera: qt_method!(fn(&mut self, on: bool)),
+    /// Turn the camera to face the other way.
+    pub flip_camera: qt_method!(fn(&mut self)),
+    /// Let the page have the microphone, or have it shut it and keep it
+    /// shut: while the call's sound moves (CallAudio.qml), which must not
+    /// happen with it open. Not muting: the page's own switch, and what
+    /// the other end is told, stay as they are.
+    pub set_microphone: qt_method!(fn(&mut self, on: bool)),
+    /// The app has gone to the background, or come back: the camera is
+    /// let go while it is away -- nobody is looking at what it shows,
+    /// and the other end is told it is off -- and the pictures are not
+    /// drawn. Back in front, the camera is opened again if it was on.
+    pub set_background: qt_method!(fn(&mut self, away: bool)),
+    /// The id the phone's audio policy knows this app's sound by: what
+    /// a call's resource set names its streams with (CallAudio.qml).
+    /// Empty where `/proc` does not say.
+    pub audio_id: qt_method!(fn(&self) -> QString),
     /// Apply one core event. Only the four call events are acted on.
     pub handle_event:
         qt_method!(fn(&mut self, context_id: u32, kind: QString, payload_json: QString)),
@@ -187,6 +276,12 @@ pub struct Call {
     /// out, in milliseconds; 0 for the app's own limit, a little over the
     /// core's 120 seconds. Only a test sets it.
     pub ring_limit_ms: qt_property!(u32),
+
+    /// What the platform camera writes on the phone's back cameras'
+    /// rings, in their order, comma-separated ("1.0,0.5"): how the page
+    /// is told which back camera is the main lens. Empty on a phone whose
+    /// adaptation gives none.
+    pub back_lenses: qt_property!(QString),
 
     /// The loopback host the page is served from, while there is a page.
     host: Option<Host>,
@@ -209,6 +304,18 @@ pub struct Call {
     /// elsewhere would end it on the device that answered. One per call,
     /// so a host coming up late reads the flag of the call it was for.
     settled: Arc<AtomicBool>,
+    /// The app is in the background; see `set_background`.
+    away: bool,
+    /// The page is to keep the microphone shut; see `set_microphone`.
+    mic_shut: bool,
+}
+
+/// Whether a call in `state` is one the phone is in: placed or answered,
+/// and not over. Its sound is a call's for that long, as CallAudio.qml's
+/// `talking` holds the audio policy's set for it; see
+/// `call_host::label_call_audio`.
+fn talking(state: &str) -> bool {
+    !matches!(state, "" | "ringing" | "ended")
 }
 
 /// How long a call may ring here before it is taken to have rung out
@@ -233,7 +340,11 @@ impl Call {
     }
 
     fn set_state(&mut self, state: &str) {
-        if self.state.to_string() != state {
+        let before = self.state.to_string();
+        if before != state {
+            if talking(state) != talking(&before) {
+                call_host::label_call_audio(talking(state));
+            }
             self.state = state.into();
             self.state_changed();
         }
@@ -256,6 +367,13 @@ impl Call {
         self.end_reason = QString::default();
         self.connected_at = 0.0;
         self.call_changed();
+        self.camera = false;
+        self.rear_camera = false;
+        self.local_video = false;
+        self.remote_video = false;
+        self.local_painted = false;
+        self.remote_painted = false;
+        self.video_changed();
         if self.muted {
             self.muted = false;
             self.muted_changed();
@@ -272,6 +390,8 @@ impl Call {
         self.has_video = video;
         self.offer.clear();
         self.call_changed();
+        self.camera = video;
+        self.video_changed();
         self.set_state("starting");
         self.serve("startCall".to_string());
         true
@@ -300,6 +420,8 @@ impl Call {
             this_mut.has_video = call.has_video;
             this_mut.offer = call.sdp_offer;
             this_mut.call_changed();
+            this_mut.camera = call.has_video;
+            this_mut.video_changed();
             this_mut.set_state("ringing");
             this_mut.watch_ringing();
         });
@@ -349,6 +471,115 @@ impl Call {
         }
     }
 
+    /// The microphone, let have or shut. Kept from call to call, as
+    /// CallAudio.qml last said; a page not up yet is told once it is,
+    /// see `serve`.
+    pub fn set_microphone(&mut self, on: bool) {
+        if self.mic_shut != on {
+            return;
+        }
+        self.mic_shut = !on;
+        self.tell(call_host::microphone_command(on));
+    }
+
+    /// Whether the camera is to be open now: wanted, and the app in
+    /// front.
+    fn camera_live(&self) -> bool {
+        self.camera && !self.away
+    }
+
+    /// Hand the page a command, if it is up. A page still coming up is
+    /// given the state as it then is; see `serve`.
+    fn tell(&self, command: String) {
+        if let Some(host) = &self.host {
+            host.command(command);
+        }
+    }
+
+    /// The camera, on or off.
+    pub fn set_camera(&mut self, on: bool) {
+        if !self.busy() || self.camera == on {
+            return;
+        }
+        let before = self.camera_live();
+        self.camera = on;
+        self.video_changed();
+        if self.camera_live() != before {
+            self.tell(call_host::camera_command(self.camera_live()));
+        }
+    }
+
+    /// The camera, the other way round.
+    pub fn flip_camera(&mut self) {
+        if !self.busy() {
+            return;
+        }
+        self.rear_camera = !self.rear_camera;
+        self.video_changed();
+        self.tell(call_host::facing_command(!self.rear_camera));
+    }
+
+    /// This process's id with the audio policy, from its own
+    /// `/proc/self/stat`: see `audio_app_id`.
+    #[must_use]
+    pub fn audio_id(&self) -> QString {
+        std::fs::read_to_string("/proc/self/stat")
+            .ok()
+            .and_then(|stat| audio_app_id(&stat))
+            .unwrap_or_default()
+            .into()
+    }
+
+    /// The app away, or back.
+    pub fn set_background(&mut self, away: bool) {
+        if self.away == away {
+            return;
+        }
+        let before = self.camera_live();
+        self.away = away;
+        self.tell(call_host::shown_command(!away));
+        if self.camera_live() != before {
+            self.tell(call_host::camera_command(self.camera_live()));
+        }
+    }
+
+    /// What the page says of its pictures.
+    fn take_video(&mut self, video: call_host::Video) {
+        if !self.busy() {
+            return;
+        }
+        let mut changed = self.local_video != video.local
+            || self.remote_video != video.remote
+            || self.local_painted != video.local_painted
+            || self.remote_painted != video.remote_painted
+            || self.rear_camera == video.front;
+        self.local_video = video.local;
+        self.remote_video = video.remote;
+        self.local_painted = video.local_painted;
+        self.remote_painted = video.remote_painted;
+        // The page turns back to the camera it had when the other one
+        // will not open: what it faces is what it says.
+        self.rear_camera = !video.front;
+        // A camera that will not open is switched off, as the reader
+        // would see it -- not one that was let go for the background.
+        if video.failed && self.camera_live() {
+            // What only a phone can say: written where its log is read.
+            eprintln!(
+                "piirit: the camera would not open: {}",
+                if video.error.is_empty() {
+                    "no reason given"
+                } else {
+                    video.error.as_str()
+                }
+            );
+            self.camera = false;
+            changed = true;
+        }
+        if changed {
+            self.video_changed();
+        }
+    }
+
     /// Forget an ended call.
     pub fn reset(&mut self) {
         if self.state.to_string() == "ended" {
@@ -378,6 +609,13 @@ impl Call {
             self.url_changed();
         }
         self.end_reason = QString::default();
+        if self.local_video || self.remote_video || self.local_painted || self.remote_painted {
+            self.local_video = false;
+            self.remote_video = false;
+            self.local_painted = false;
+            self.remote_painted = false;
+            self.video_changed();
+        }
         self.set_state("ended");
         true
     }
@@ -501,10 +739,28 @@ impl Call {
                 Ok(host) => {
                     {
                         let mut this_mut = this.borrow_mut();
-                        this_mut.url = host.url(PAGE_OPTIONS, &command).into();
+                        // The camera as it is now, switched on or off
+                        // while the page was coming up or not.
+                        let camera = this_mut.camera_live();
+                        this_mut.url = host.url(page_options(camera), &command).into();
                         // Muted before there was a page to tell.
                         if this_mut.muted {
                             host.command(call_host::mute_command(true));
+                        }
+                        // And the microphone to be kept shut.
+                        if this_mut.mic_shut {
+                            host.command(call_host::microphone_command(false));
+                        }
+                        let back = main_back_camera(&this_mut.back_lenses.to_string());
+                        if back > 0 {
+                            host.command(call_host::back_camera_command(back));
+                        }
+                        // Turned, or away, before there was a page to tell.
+                        if this_mut.rear_camera {
+                            host.command(call_host::facing_command(false));
+                        }
+                        if this_mut.away {
+                            host.command(call_host::shown_command(false));
                         }
                         this_mut.host = Some(host);
                     }
@@ -557,6 +813,7 @@ impl Call {
                 }
             }
             Report::Connection(ice) => self.take_connection(&ice),
+            Report::Video(video) => self.take_video(video),
             // The core has already been told, by the host.
             Report::EndedByPage => self.finish("hung-up"),
             Report::Failed(message) => {
@@ -632,6 +889,8 @@ impl Call {
                 self.has_video = json::flag(&payload, "has_video");
                 self.offer = json::str_at(&payload, "place_call_info").to_string();
                 self.call_changed();
+                self.camera = self.has_video;
+                self.video_changed();
                 self.set_state("ringing");
                 self.watch_ringing();
                 self.ringing();
@@ -773,8 +1032,60 @@ fn now() -> f64 {
 
 #[cfg(test)]
 mod tests {
-    use super::Summary;
+    use super::{audio_app_id, main_back_camera, talking, Summary};
     use serde_json::json;
+
+    #[test]
+    fn the_main_back_camera_is_the_one_labelled_nearest_one() {
+        // As the platform camera has them, in the order it lists them.
+        assert_eq!(main_back_camera("1.0,0.5"), 0);
+        assert_eq!(main_back_camera("0.5,1.0"), 1);
+        assert_eq!(main_back_camera("0.6, 1.0, 2.0"), 1);
+        assert_eq!(main_back_camera("0.5x,1x"), 1);
+        // No main one: the nearest, and the first of two as near.
+        assert_eq!(main_back_camera("0.6,3.0"), 0);
+        assert_eq!(main_back_camera("3.0,0.6"), 1);
+        assert_eq!(main_back_camera("2.0,0.5"), 1);
+        assert_eq!(main_back_camera("0.5,1.5"), 0);
+        // Nothing to go by: the first, as the engine lists them.
+        assert_eq!(main_back_camera(""), 0);
+        assert_eq!(main_back_camera("wide,main"), 0);
+        assert_eq!(main_back_camera("wide,1.0"), 1);
+    }
+
+    #[test]
+    fn a_call_is_talking_from_placed_or_answered_until_over() {
+        for state in [
+            "starting",
+            "calling",
+            "connecting",
+            "connected",
+            "reconnecting",
+        ] {
+            assert!(talking(state), "{state}");
+        }
+        for state in ["", "ringing", "ended"] {
+            assert!(!talking(state), "{state:?}");
+        }
+    }
+
+    #[test]
+    fn the_audio_id_is_the_start_time_in_hex() {
+        // A line as the kernel writes it: the start time is the 22nd
+        // field, 4660 ticks, 0x1234.
+        let stat = "4242 (harbour-piirit) S 1 4242 4242 0 -1 4194560 2915 0 \
+                    0 0 12 4 0 0 20 0 9 0 4660 917504000 9000 18446744073709551615 \
+                    1 1 0 0 0 0 0 4096 17663 0 0 0 17 3 0 0 0 0 0\n";
+        assert_eq!(audio_app_id(stat).as_deref(), Some("1234"));
+        // Split at single spaces, as libpulse and libresource split it:
+        // a name with a space in it moves the field along for all three.
+        let spaced = stat.replace("(harbour-piirit)", "(harbour piirit)");
+        assert_eq!(audio_app_id(&spaced).as_deref(), Some("0"));
+        // Too short, or not a number there: none, not a wrong id.
+        assert_eq!(audio_app_id("4242 (piirit) S 1"), None);
+        let garbled = stat.replace(" 4660 ", " x4660 ");
+        assert_eq!(audio_app_id(&garbled), None);
+    }
 
     #[test]
     fn a_call_reads_as_the_core_serialises_it() {

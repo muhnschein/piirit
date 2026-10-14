@@ -274,9 +274,9 @@ fn a_call_rings_is_answered_and_ends_every_way_a_ringing_call_can() {
     let url = value("url");
     assert!(
         url.starts_with("http://127.0.0.1:")
-            && url.contains("/index.html?disableVideoCompletely&key=")
+            && url.contains("/index.html?noOutgoingVideoInitially&key=")
             && url.contains("#acceptCall="),
-        "the page was not pointed at the call it is to answer, audio only: \
+        "the page was not pointed at the call it is to answer, camera off: \
          {url}. {context}"
     );
     assert_eq!(

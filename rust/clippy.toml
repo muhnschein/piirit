@@ -18,4 +18,4 @@ allow-expect-in-tests = true
 
 # Names that are words in prose rather than code, which `doc_markdown`
 # would otherwise want in backticks. ".." keeps clippy's own list.
-doc-valid-idents = ["FFmpeg", "QuickTime", ".."]
+doc-valid-idents = ["FFmpeg", "PulseAudio", "QuickTime", ".."]

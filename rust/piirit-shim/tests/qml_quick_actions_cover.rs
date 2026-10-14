@@ -458,7 +458,8 @@ fn listed(script: &str, name: &str) -> Vec<String> {
         .collect()
 }
 
-/// Every icon an action can wear is drawn at every size the cover picks
+/// Every icon an action can wear -- the reader's, and the microphone the
+/// cover offers during a call -- is drawn at every size the cover picks
 /// from, in both inks, as the square RGBA picture the home screen is
 /// handed -- and every icon drawn is one of those, from a source that is
 /// there. The lists are the ones the cover reads.
@@ -472,14 +473,22 @@ fn every_quick_action_icon_is_drawn_at_every_size_in_both_inks() {
         .filter(|kind| kind != "chat")
         .collect();
     icons.extend(listed(&script, "chatIcons"));
+    // And the microphone the cover offers during a call, both ways.
+    let call_icons = listed(&script, "callIcons");
+    assert_eq!(
+        call_icons,
+        ["mic", "mic-off"],
+        "the call's icons are not the microphone, on and off"
+    );
+    icons.extend(call_icons);
     let sizes: Vec<u32> = listed(&script, "sizes")
         .iter()
         .map(|size| size.parse().expect("a size is a number"))
         .collect();
     assert_eq!(
         icons.len(),
-        21,
-        "the icons are not the twenty-one offered: {icons:?}"
+        23,
+        "the icons are not the twenty-one offered and the call's two: {icons:?}"
     );
     assert_eq!(sizes, [32, 40, 48, 56, 64], "the sizes moved");
 
