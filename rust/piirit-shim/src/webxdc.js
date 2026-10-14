@@ -9,7 +9,8 @@
  * The placeholders are filled in by the host as JSON literals.
  *
  * Updates travel over the same host: sending is a POST, receiving is a
- * poll. Nothing here talks to Qt -- a page cannot -- and nothing here
+ * long poll, which the host holds until the chat has something new for
+ * the app. Nothing here talks to Qt -- a page cannot -- and nothing here
  * knows the core; both are on the other side of those two requests.
  *
  * XMLHttpRequest rather than fetch: Gecko has both, and this one is
@@ -25,8 +26,10 @@
     var SELF_ADDR = __SELF_ADDR__;
     var SELF_NAME = __SELF_NAME__;
     var MAX_SIZE = __MAX_SIZE__;
-    /* Milliseconds between polls for updates from the other end. */
-    var POLL = __POLL__;
+    /* Milliseconds to wait before asking for updates again after a
+     * request for them failed. One that was answered is followed at
+     * once: the host holds it until there is something new. */
+    var RETRY = __RETRY__;
 
     /* What setUpdateListener was given, and how far it has been fed. */
     var listener = null;
@@ -34,9 +37,10 @@
     /* Resolves the promise setUpdateListener returned, once the updates
      * that existed when it was called have all been delivered. */
     var caughtUp = null;
-    /* One poll at a time: a send asks for one immediately, and that must
-     * not race the timer's. */
-    var polling = false;
+    /* The request for updates in flight, if any. One at a time: a send
+     * asks for one immediately, and that must not race the one already
+     * waiting. */
+    var current = null;
     var timer = null;
 
     function request(method, path, body, onDone, onFail, type) {
@@ -59,6 +63,7 @@
                                  type || "application/json");
             xhr.send(body);
         }
+        return xhr;
     }
 
     function settle() {
@@ -95,18 +100,24 @@
             timer = window.setTimeout(function () {
                 timer = null;
                 poll();
-            }, POLL);
+            }, RETRY);
         }
     }
 
     function poll() {
-        if (polling) {
+        if (current !== null) {
             return;
         }
-        polling = true;
-        request("GET", "/updates?serial=" + lastSerial, null,
+        /* Held by the host until there is something new -- except while
+         * catching up, which setUpdateListener's promise waits on: that
+         * one is answered with what there is now. */
+        var path = "/updates?serial=" + lastSerial + (caughtUp ? "" : "&wait=1");
+        var mine = request("GET", path, null,
             function (text) {
-                polling = false;
+                if (current !== mine) {
+                    return;
+                }
+                current = null;
                 var updates = [];
                 try {
                     updates = JSON.parse(text) || [];
@@ -115,18 +126,23 @@
                 }
                 deliver(updates);
                 settle();
-                schedule();
+                /* And straight back to waiting for the next. */
+                poll();
             },
             function () {
                 /* The host is gone -- the app was closed, or the shim
                  * stopped it. Keep asking: nothing else here can tell
                  * the difference between that and a lost connection,
                  * and an app left running with a dead listener is
-                 * worse than a request that fails every POLL ms. */
-                polling = false;
+                 * worse than a request that fails every RETRY ms. */
+                if (current !== mine) {
+                    return;
+                }
+                current = null;
                 settle();
                 schedule();
             });
+        current = mine;
     }
 
     window.webxdc = {
@@ -151,9 +167,10 @@
             }
             request("POST", "/send", body,
                 function () {
-                    /* The core has it; ask for it back rather than
-                     * waiting out the poll, so the app sees its own
-                     * move at once. */
+                    /* The core has it, and says so to the host, which
+                     * wakes the request waiting for updates: the app
+                     * sees its own move at once. Asked for here too, for
+                     * when none is waiting -- after a failed one. */
                     poll();
                 },
                 function (err) {
@@ -173,6 +190,13 @@
             lastSerial = typeof serial === "number" ? serial : 0;
             return new Promise(function (resolve) {
                 caughtUp = resolve;
+                /* A request already waiting asked from the old serial,
+                 * and may wait a while yet: this one is asked now. */
+                if (current !== null) {
+                    var waiting = current;
+                    current = null;
+                    waiting.abort();
+                }
                 poll();
             });
         },
