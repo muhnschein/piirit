@@ -35,6 +35,10 @@ const PROBE_QML: &str = r"
         property string log: ''
         property int step: 0
         property string firstDescription: ''
+        // How many of the rows marked at the first load were still the
+        // same delegates after a member joined, and after one left.
+        property int keptAfterAdd: -1
+        property int keptAfterRemove: -1
         ChatInfo {
             id: group
             account_id: 1
@@ -57,7 +61,22 @@ const PROBE_QML: &str = r"
             Item {
                 property int cid: model.contact_id
                 property bool self_: model.is_self
+                // Not from the model: set on a delegate by hand, so it
+                // survives only as long as that delegate does.
+                property bool marked: false
             }
+        }
+        function markRows() {
+            for (var i = 0; i < rows.count; i++) {
+                rows.itemAt(i).marked = true
+            }
+        }
+        function markedRows() {
+            var count = 0
+            for (var i = 0; i < rows.count; i++) {
+                if (rows.itemAt(i).marked) { count++ }
+            }
+            return count
         }
         function members() {
             var out = ''
@@ -74,6 +93,7 @@ const PROBE_QML: &str = r"
                 if (step === 0 && group.loaded && group.member_count === 2) {
                     step = 1
                     firstDescription = group.description
+                    markRows()
                     // Refused here, before the core sees it.
                     group.rename('  ')
                     // The name it already has: nothing to send.
@@ -84,9 +104,11 @@ const PROBE_QML: &str = r"
                     group.add_members([11])
                 } else if (step === 2 && group.is_member(11)) {
                     step = 3
+                    keptAfterAdd = markedRows()
                     group.remove_member(10)
                 } else if (step === 3 && !group.is_member(10)) {
                     step = 4
+                    keptAfterRemove = markedRows()
                     group.set_picture('file:///tmp/piirit%20fake/pic.png')
                 } else if (step === 4 && group.avatar_path.length > 0) {
                     step = 5
@@ -121,6 +143,7 @@ const PROBE_QML: &str = r"
             return step + '#' + group.name + '#' + group.can_edit + '#'
                 + group.avatar_path + '#' + members() + '#' + log
                 + '#' + firstDescription + '#' + group.can_edit_description
+                + '#' + keptAfterAdd + '#' + keptAfterRemove
         }
     }
 ";
@@ -191,6 +214,8 @@ fn assert_changes(calls: &[(String, Value)], report: &str) {
     let log = parts.next().unwrap_or_default();
     let first_description = parts.next().unwrap_or_default();
     let can_edit_description = parts.next().unwrap_or_default();
+    let kept_after_add = parts.next().unwrap_or_default();
+    let kept_after_remove = parts.next().unwrap_or_default();
 
     assert_eq!(step, "11", "the scenario did not run to the end. {context}");
 
@@ -209,6 +234,19 @@ fn assert_changes(calls: &[(String, Value)], report: &str) {
         asked,
         serde_json::json!([1, 10]),
         "the members were not looked up by the ids the chat named. {context}"
+    );
+
+    // Every reload -- after the rename, the add and the removal, and on
+    // each event the core sent about them -- changed the rows in place.
+    // A reset would have rebuilt every member's row each time, and the
+    // two rows marked at the first load would be gone.
+    assert_eq!(
+        kept_after_add, "2",
+        "a member joining rebuilt the rows of the members already there. {context}"
+    );
+    assert_eq!(
+        kept_after_remove, "1",
+        "a member leaving rebuilt the rows of the members who stayed. {context}"
     );
 
     // Renaming: refused before the core for an empty name, skipped for the

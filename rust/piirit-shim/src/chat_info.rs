@@ -10,7 +10,7 @@ use deltachat_jsonrpc::RpcClient;
 use qmetaobject::*;
 
 use crate::contacts::contact_row;
-use crate::core::connection;
+use crate::core::{connection, reconcile_rows};
 use crate::json;
 use crate::models::{ContactItem, ContactListModel};
 
@@ -214,7 +214,15 @@ impl ChatInfo {
                         this_mut.ephemeral_timer = found.ephemeral_timer;
                         this_mut.description = found.description.into();
                         this_mut.can_edit_description = found.can_edit_description;
-                        this_mut.members.borrow_mut().reset_data(found.members);
+                        // In place rather than reset: this runs on every
+                        // change to any contact of the account, which
+                        // mostly leaves the members as they were, and a
+                        // reset destroyed and rebuilt every row on the
+                        // page for it. Now only a member who joined, left
+                        // or changed has their row touched.
+                        reconcile_rows(&mut this_mut.members.borrow_mut(), found.members, |item| {
+                            item.contact_id
+                        });
                         this_mut.loaded = true;
                     }
                     this.borrow().loaded_changed();
