@@ -302,9 +302,22 @@ Item {
                  root.isCall ? callRow.wantedWidth : 0,
                  reactionRow.wantedWidth,
                  footerMetric.implicitWidth,
-                 attachment.item && attachment.item.wantsFullWidth
-                     ? root.maxWidth : 0,
+                 root.attachmentFillsBubble ? root.maxWidth : 0,
                  Theme.itemSizeSmall))
+    /// Whether the attachment reads better filling the bubble: the
+    /// preview's own `wantsFullWidth`, worked out here from what it is
+    /// worked out from there. The preview is null for as long as the
+    /// loader is building it, so asking it sized a picture -- and started
+    /// its decode -- at the width of its caption first, and then again
+    /// at the bubble's. Keep the two in step; qml_bubble_width.rs holds
+    /// them to each other.
+    readonly property bool attachmentFillsBubble: root.hasFile
+        && (root.viewType === "Image" || root.viewType === "Sticker"
+            || root.viewType === "Gif" || root.viewType === "Video"
+            || root.viewType === "Audio" || root.viewType === "Voice"
+            || root.viewType === "Vcard"
+            || (root.viewType === "Webxdc" && root.appsEnabled
+                && root.webxdcName.length > 0))
     /// How wide the bubble is: what its content wants, widened to hold
     /// the offer when there is one. A long message of short lines makes
     /// a narrow bubble, and the offer under it would hang out of one

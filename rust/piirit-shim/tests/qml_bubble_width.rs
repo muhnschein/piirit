@@ -10,6 +10,14 @@
 //! the shim's rendering, and a body with an emoji picture in it. Each is
 //! held against a copy of the body measured whole, as before.
 //!
+//! And that a picture's bubble is the full width from the start. The
+//! row asked the attachment whether it wanted the full width, and the
+//! attachment is built by a loader after the row: until it was, the
+//! answer was no, so a picture was first sized for the width of its
+//! caption and then again for the bubble's. The row answers for itself
+//! now, from what the attachment answers from -- and the two must agree
+//! for every kind there is.
+//!
 //! The delegate is loaded on its own, as the other QML tests load it.
 
 // Qt harness: see qml_reactions.rs.
@@ -70,6 +78,16 @@ const PROBE_QML: &str = r"
             return row.bodyWidth.toFixed(2) + '/'
                    + Math.min(row.maxWidth, whole.implicitWidth).toFixed(2)
         }
+        // Whether the row has its attachment fill the bubble, whether the
+        // attachment asks to ('-' for none built), and whether the bubble
+        // is at its full width.
+        function fills() {
+            var row = delegate.item
+            var preview = findIn(row, 'attachment')
+            return row.attachmentFillsBubble + '/'
+                   + (preview ? preview.wantsFullWidth : '-')
+                   + '/' + (row.bodyWidth === row.maxWidth)
+        }
     }
 ";
 
@@ -94,7 +112,7 @@ fn lines(count: usize, widest: usize) -> String {
 
 #[test]
 #[allow(clippy::too_many_lines)]
-fn bubbles_measure_what_they_show() {
+fn bubbles_measure_what_they_show_and_pictures_fill_them_from_the_start() {
     // SAFETY: single-threaded test binary; set before Qt starts.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
@@ -162,6 +180,33 @@ fn bubbles_measure_what_they_show() {
     ];
     let bodies_ptr = std::ptr::addr_of!(bodies);
 
+    // Every kind of attachment, and the two webxdc rows that are not
+    // drawn as an app: apps turned off, and one the core could not read.
+    let attachments: Vec<(&'static str, Value)> = vec![
+        ("image", json!({ "viewType": "Image" })),
+        ("sticker", json!({ "viewType": "Sticker" })),
+        ("gif", json!({ "viewType": "Gif" })),
+        ("video", json!({ "viewType": "Video" })),
+        ("audio", json!({ "viewType": "Audio" })),
+        ("voice", json!({ "viewType": "Voice" })),
+        ("vcard", json!({ "viewType": "Vcard", "vcardName": "Bob" })),
+        (
+            "app",
+            json!({ "viewType": "Webxdc", "appsEnabled": true, "webxdcName": "Chess" }),
+        ),
+        (
+            "app-off",
+            json!({ "viewType": "Webxdc", "appsEnabled": false, "webxdcName": "Chess" }),
+        ),
+        (
+            "app-unread",
+            json!({ "viewType": "Webxdc", "appsEnabled": true }),
+        ),
+        ("file", json!({ "viewType": "File" })),
+        ("text-file", json!({ "viewType": "Text" })),
+    ];
+    let attachments_ptr = std::ptr::addr_of!(attachments);
+
     single_shot(Duration::from_secs(1), move || unsafe {
         let url = common::component_url("MessageDelegate.qml");
         for (label, props) in &*bodies_ptr {
@@ -174,6 +219,31 @@ fn bubbles_measure_what_they_show() {
                 )
             );
             record!(*label, call!("bodyWidths"));
+        }
+        for (label, props) in &*attachments_ptr {
+            let mut with_file = props.clone();
+            with_file["filePath"] = json!("/tmp/piirit-bubble-width/a");
+            with_file["fileName"] = json!("a");
+            with_file["messageText"] = json!("look");
+            record!(
+                format!("{label}-load"),
+                call!(
+                    "load",
+                    QString::from(url.as_str()),
+                    QString::from(with_file.to_string())
+                )
+            );
+            record!(*label, call!("fills"));
+            // The same kind with no file: nothing to fill the bubble.
+            record!(
+                format!("{label}-bare-load"),
+                call!(
+                    "load",
+                    QString::from(url.as_str()),
+                    QString::from(props.to_string())
+                )
+            );
+            record!(format!("{label}-bare"), call!("fills"));
         }
         (*engine_ptr).quit();
     });
@@ -201,6 +271,27 @@ fn bubbles_measure_what_they_show() {
             body, whole,
             "the {label} bubble's body is {body} wide, where measuring the \
              whole body made it {whole:?}. {context}"
+        );
+    }
+
+    let fill = [
+        "image", "sticker", "gif", "video", "audio", "voice", "vcard", "app",
+    ];
+    for (label, _) in &attachments {
+        for load in [format!("{label}-load"), format!("{label}-bare-load")] {
+            assert_eq!(value(&load), "ok", "{load} failed. {context}");
+        }
+        let wanted = fill.contains(label);
+        assert_eq!(
+            value(label),
+            format!("{wanted}/{wanted}/{wanted}"),
+            "the row and the attachment disagree on whether a {label} fills \
+             the bubble (row/attachment/bubble at full width). {context}"
+        );
+        assert_eq!(
+            value(&format!("{label}-bare")),
+            "false/-/false",
+            "a {label} message with no file filled the bubble. {context}"
         );
     }
 }
