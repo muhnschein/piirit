@@ -339,6 +339,15 @@ Item {
         textFormat: root.bodyStyled ? Text.StyledText : Text.PlainText
         // A call's text is not drawn, so it does not size the bubble.
         text: root.isCall ? "" : root.bodyText
+        // Each line of the body unwrapped, and only as many as the label
+        // shows: the widest of them is the width the body wants. The
+        // whole of a long message used to be laid out here, on every row
+        // built, for lines below the fold. Unwrapped, so that a line
+        // wider than the bubble still says so and the bubble takes its
+        // whole width, as it did. The label's dozen lines come from at
+        // most a dozen of these, so nothing it shows is left out; a wider
+        // line further down, which it does not show, no longer widens it.
+        maximumLineCount: root.collapsedLines
     }
 
     Text {
