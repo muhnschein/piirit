@@ -167,6 +167,27 @@ def data_js(rows):
     return "\n".join(lines) + "\n"
 
 
+def utf16(text):
+    """The UTF-16 code units of `text`, which is what a JS string is."""
+    raw = text.encode("utf-16-le")
+    return [int.from_bytes(raw[i:i + 2], "little") for i in range(0, len(raw), 2)]
+
+
+def char_class(units):
+    """A regular expression's [...] matching exactly these code units."""
+    units = sorted(set(units))
+    parts = []
+    i = 0
+    while i < len(units):
+        j = i
+        while j + 1 < len(units) and units[j + 1] == units[j] + 1:
+            j += 1
+        parts.append("\\u%04X" % units[i] if i == j
+                     else "\\u%04X-\\u%04X" % (units[i], units[j]))
+        i = j + 1
+    return "[" + "".join(parts) + "]"
+
+
 def pictures_js(rows):
     """EmojiPictures.js: what Emoji.js needs to draw an emoji, out of the
     same rows, built here the way Emoji.js used to build it on the phone.
@@ -185,6 +206,16 @@ def pictures_js(rows):
             # One character and the selector: text without it.
             if len(bare) == 1 and emoji[1:2] == "\ufe0f" and bare not in text_style:
                 text_style.append(bare)
+
+    # One code unit out of every key, so that a text with none of them in
+    # it cannot hold an emoji a picture is shipped for. The first, which
+    # above the Basic Multilingual Plane is the high half of a surrogate
+    # pair -- except for a keycap: its digit, # or * is in far more text
+    # than the keycap mark after it.
+    marks = []
+    for bare in by_key:
+        units = utf16(bare)
+        marks.append(units[0] if units[0] >= 0xA9 or len(units) == 1 else units[1])
 
     def table(entries):
         return "{\n" + ",\n".join("    " + entry for entry in entries) + "\n}"
@@ -207,6 +238,8 @@ def pictures_js(rows):
         "",
         "var textStyle = " + table(json.dumps(bare, ensure_ascii=False) + ": true"
                                    for bare in sorted(text_style)),
+        "",
+        "var mayHold = /" + char_class(marks) + "/",
     ]
     return "\n".join(lines) + "\n"
 

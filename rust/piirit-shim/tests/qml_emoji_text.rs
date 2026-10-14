@@ -9,7 +9,9 @@
 //! And what it costs. Drawing reads tables built ahead of time from the
 //! picker's list (EmojiPictures.js), not the list with every emoji's
 //! search words in it, which is the picker's alone; so the tables have to
-//! agree with the list for every emoji in it.
+//! agree with the list for every emoji in it. And a text with no
+//! character of any emoji in it is passed over at a glance rather than
+//! read through.
 
 // Qt harness: see qml_pages.rs.
 #![allow(
@@ -37,6 +39,7 @@ fn probe_qml() -> String {
     import 'file://{qml}/components'
     import 'file://{qml}/js/Emoji.js' as Emoji
     import 'file://{qml}/js/EmojiData.js' as Data
+    import 'file://{qml}/js/EmojiPictures.js' as Pictures
     Item {{
         width: 540
         height: 400
@@ -63,6 +66,9 @@ fn probe_qml() -> String {
             }}
             return Data.list.length + ':' + wrong.join(' ')
         }}
+        // Whether a text gets past the quick look `inText` takes before it
+        // reads a text through.
+        function mayHold(text) {{ return '' + Pictures.mayHold.test(text) }}
 
         Loader {{ id: delegate }}
         function loadDelegate(url) {{
@@ -164,8 +170,25 @@ fn messages_draw_their_emoji_as_the_reactions_do() {
     ];
     let texts_ptr = std::ptr::addr_of!(texts);
 
+    // Text with nothing to draw, which is most of what anyone writes: a
+    // message without a character of any emoji in it is not read
+    // through a character at a time. A digit, # and * among them: they
+    // start the keycaps, and are in far more text than any keycap is.
+    let plain: Vec<&'static str> = vec![
+        "no emoji at all, 1 # * 2",
+        "Täällä on lunta -- 3 cm, ja \"pakkasta\" (10°C) <b>&amp;</b>\n  OK?",
+        "Встретимся в 19:30 у входа №2.",
+    ];
+    let plain_ptr = std::ptr::addr_of!(plain);
+
     single_shot(Duration::from_secs(1), move || unsafe {
         record!("every", call!("everyEmoji"));
+        for text in &*plain_ptr {
+            record!(
+                format!("plain:{text}"),
+                call!("mayHold", QString::from(*text))
+            );
+        }
         record!("base", call!("artBase"));
         for (label, text, styled) in &*texts_ptr {
             record!(*label, call!("inText", QString::from(*text), *styled));
@@ -212,6 +235,15 @@ fn messages_draw_their_emoji_as_the_reactions_do() {
          EmojiPictures.js is built from EmojiData.js by \
          scripts/fetch-emoji.py --pictures. {context}"
     );
+    for text in &plain {
+        assert_eq!(
+            value(&format!("plain:{text}")),
+            "false",
+            "{text:?} has no emoji in it, and is read through a character \
+             at a time anyway. {context}"
+        );
+    }
+
     let base = value("base");
     assert!(
         base.starts_with("file://") && base.ends_with("/qml/art/emoji/"),

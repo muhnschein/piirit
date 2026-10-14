@@ -30,6 +30,9 @@
 //   it. Only in the Basic Multilingual Plane, among the symbols every
 //   font has: above it the data spells even a thumbs-up with the
 //   selector, and nobody sends one as text.
+// - `mayHold`: matches a text only if it has a character of some emoji's
+//   key in it -- the first, or a keycap's mark -- so any text it does not
+//   match has nothing in it to draw, and need not be read through.
 .pragma library
 .import "EmojiPictures.js" as Pictures
 
@@ -144,7 +147,10 @@ function escaped(text, lineStart) {
 /// `size` is the font's pixel size; the pictures are drawn a little
 /// taller than its letters, as an emoji in a font is.
 function inText(text, styled, size) {
-    if (!text) {
+    // Most messages have no emoji, and the scan below calls out for
+    // nearly every character: a long body cost a millisecond of the
+    // frame its row was built in.
+    if (!text || !Pictures.mayHold.test(text)) {
         return ""
     }
     var known = Pictures.byKey
