@@ -359,7 +359,6 @@ fn a_chats_media_has_pages_of_its_own_behind_the_tiles() {
         );
     });
 
-    let page = media_page.clone();
     let folder = downloads_for_probe;
     single_shot(Duration::from_secs(7), move || unsafe {
         record!("files-count", get!("media", "count"));
@@ -369,6 +368,14 @@ fn a_chats_media_has_pages_of_its_own_behind_the_tiles() {
         record!("file-caption", get!("rowCaption", "text"));
         call!("setDownloads", QString::from(folder.clone()));
         record!("save", call!("click", QString::from("saveItem")));
+    });
+
+    // The copy is made off the Qt thread, and the notice comes once it
+    // is: a turn of the event loop later at the least, so it is read
+    // here rather than straight after the tap. Before the next list is
+    // loaded, which takes down the page that would show it.
+    let page = media_page.clone();
+    single_shot(Duration::from_secs(8), move || unsafe {
         record!("saved-notice", get!("noticeLabel", "text"));
         record!(
             "load-audio",

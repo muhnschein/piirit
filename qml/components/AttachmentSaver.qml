@@ -26,7 +26,9 @@ FileSaver {
 
     /// Copy the file at `fileUrl` into the folder under `fileName`, the
     /// name the sender gave it -- or under the file's own, when that is
-    /// empty. Answers on `saved` or `error`.
+    /// empty. Answers on `saved` or `error` once the copy is made, which
+    /// is off the Qt thread and, for a long video, a while; `busy` is
+    /// true meanwhile. Two asked for at once are answered in order.
     function keep(fileUrl, fileName) {
         saver.save_as(fileUrl, saver.folder, fileName)
     }

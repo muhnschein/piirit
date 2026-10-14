@@ -254,12 +254,14 @@ fn pictures_and_video_open_here_and_everything_else_goes_to_the_system() {
         // platform names for downloads.
         call!("setDownloads", QString::from(downloads_for_probe.clone()));
         (*steps_ptr).push(("save", call!("click", QString::from("saveToDevice"))));
+        // The copy is made off the Qt thread: while it is, the entry
+        // waits, and the notice comes once it is done (read below).
         (*steps_ptr).push((
-            "saved-notice",
+            "saving",
             call!(
                 "flagOf",
-                QString::from("noticeLabel"),
-                QString::from("text")
+                QString::from("saveToDevice"),
+                QString::from("enabled")
             ),
         ));
         (*steps_ptr).push((
@@ -296,6 +298,24 @@ fn pictures_and_video_open_here_and_everything_else_goes_to_the_system() {
     // over the still.
     let animated = png_url.clone();
     single_shot(Duration::from_secs(5), move || unsafe {
+        // The save asked for a second ago, answered by now: read before
+        // the page goes, and its notice with it.
+        (*steps_ptr).push((
+            "saved-notice",
+            call!(
+                "flagOf",
+                QString::from("noticeLabel"),
+                QString::from("text")
+            ),
+        ));
+        (*steps_ptr).push((
+            "saved-again",
+            call!(
+                "flagOf",
+                QString::from("saveToDevice"),
+                QString::from("enabled")
+            ),
+        ));
         let mut properties = QVariantMap::default();
         properties.insert("fileUrl".into(), QString::from(animated.clone()).into());
         properties.insert("viewType".into(), QString::from("Gif").into());
@@ -485,9 +505,21 @@ fn assert_outcome(steps: &[(&str, String)], navigation: &str) {
     );
     assert_eq!(value("save"), "ok", "no Save to device entry. {context}");
     assert_eq!(
+        value("saving"),
+        "false",
+        "Save to device could be pulled again while the copy was being \
+         made, or the copy was made on the Qt thread before the tap \
+         returned. {context}"
+    );
+    assert_eq!(
         value("saved-notice"),
         "Saved to Downloads/Piirit",
         "saving did not say where the copy went. {context}"
+    );
+    assert_eq!(
+        value("saved-again"),
+        "true",
+        "Save to device stayed off after the copy was made. {context}"
     );
     assert_eq!(
         value("animation-shown"),

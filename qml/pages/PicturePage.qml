@@ -177,6 +177,9 @@ Page {
             MenuItem {
                 objectName: "saveToDevice"
                 text: qsTr("Save to device")
+                // Not again while the copy is being made: a second pull
+                // would only make a second copy.
+                enabled: !saver.busy
                 onClicked: saver.keep(page.fileUrl, page.fileName)
             }
         }
