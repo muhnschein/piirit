@@ -85,6 +85,44 @@ pub const HANDLED_EVENT_KINDS: &[&str] = &[
     "WebxdcStatusUpdate",
 ];
 
+/// The kinds that could have moved a profile's unread count: a message
+/// in, a chat read or marked unread, a chat gone. `DeltaChatCore::relay`
+/// reads the count again on each. The overflow could have hidden any of
+/// those.
+const UNREAD_EVENT_KINDS: &[&str] = &[
+    "ChatDeleted",
+    "ChatModified",
+    "ChatlistChanged",
+    "ChatlistItemChanged",
+    "EventChannelOverflow",
+    "IncomingMsg",
+    "IncomingMsgBunch",
+    "MsgsChanged",
+    "MsgsNoticed",
+];
+
+/// The kinds `DeltaChatCore::relay` turns into a typed signal of its own:
+/// `core_error`, `configure_progress` and `restore_progress`. Kept in step
+/// with `relay` by hand -- there are three, and they sit side by side.
+const SIGNALLED_EVENT_KINDS: &[&str] = &["ConfigureProgress", "Error", "ImexProgress"];
+
+/// Whether an event of this kind is worth handing to the Qt thread at
+/// all: something reads it on `core_event`, or `relay` does something
+/// with it of its own. Everything else -- the core's log, most of all,
+/// which is most of what it says during a sync -- is dropped on the
+/// tokio side, before it costs the Qt thread a queued call.
+fn is_relayed(kind: &str) -> bool {
+    HANDLED_EVENT_KINDS.contains(&kind)
+        || UNREAD_EVENT_KINDS.contains(&kind)
+        || SIGNALLED_EVENT_KINDS.contains(&kind)
+}
+
+/// The most events handed to the Qt thread in one queued call. Whatever
+/// has arrived goes together, which is a whole batch from the core at a
+/// time in practice; the cap is only for a sync's flood, which then goes
+/// in several calls with the Qt event loop free to draw in between.
+const EVENT_BATCH_LIMIT: usize = 256;
+
 /// How long the app waits for the server to go at exit.
 const SHUTDOWN_TIMEOUT: Duration = Duration::from_secs(3);
 
@@ -828,6 +866,12 @@ impl DeltaChatCore {
     /// Forward the core's event stream to `core_event` via queued
     /// callbacks, for as long as the transport lives.
     ///
+    /// One callback per batch rather than per event, and only the events
+    /// `is_relayed` keeps: on Qt 5.6 each queued callback is an object
+    /// built, a functor connected and a metacall posted, and during a sync
+    /// the core says thousands of things nothing here reads. The ones
+    /// kept are relayed in the order they came.
+    ///
     /// The setup and the loop share one `runtime.spawn` because
     /// `spawn_event_loop`'s internal `tokio::spawn` needs ambient runtime
     /// context.
@@ -845,18 +889,34 @@ impl DeltaChatCore {
         let stopped = queued_callback(move |tail: Vec<String>| {
             Self::schedule_restart(stopped_ptr.clone(), path.clone(), last_words(&tail));
         });
-        let emit = queued_callback(move |event: CoreEvent| {
-            if let Some(this) = ptr.as_pinned() {
-                this.borrow().relay(&event);
+        let emit = queued_callback(move |batch: Vec<CoreEvent>| {
+            for event in &batch {
+                // Looked up per event, as when each came on its own: a
+                // handler of one could be what takes the object away.
+                let Some(this) = ptr.as_pinned() else { return };
+                this.borrow().relay(event);
             }
         });
         runtime.spawn(async move {
             let (mut events, _handle) = spawn_event_loop(rpc.clone());
-            while let Some(event) = events.recv().await {
-                // Here rather than in `relay`, which is the Qt thread's:
-                // it is read at exit, once the Qt thread has stopped.
-                crate::call_host::note_sent(json::str_at(&event.event, "kind"));
-                emit(event);
+            let mut arrived = Vec::new();
+            while events.recv_many(&mut arrived, EVENT_BATCH_LIMIT).await > 0 {
+                let batch: Vec<CoreEvent> = arrived
+                    .drain(..)
+                    .filter(|event| {
+                        let kind = json::str_at(&event.event, "kind");
+                        // Here rather than in `relay`, which is the Qt
+                        // thread's: it is read at exit, once the Qt thread
+                        // has stopped. And ahead of the filter, which
+                        // drops `SmtpMessageSent`: nothing on the Qt side
+                        // reads that one, and this counts it.
+                        crate::call_host::note_sent(kind);
+                        is_relayed(kind)
+                    })
+                    .collect();
+                if !batch.is_empty() {
+                    emit(batch);
+                }
             }
             // The stream ends only when the transport does (see
             // `spawn_event_loop`), so this is the server gone -- and what
@@ -867,9 +927,11 @@ impl DeltaChatCore {
 
     /// One event off the stream, as the signals the QML side listens for.
     ///
-    /// Every event fires `core_event`, with its payload as JSON. A few
-    /// kinds fire a typed signal too, so a progress bar need not parse
-    /// JSON, and a few are the ones that could have moved an unread count.
+    /// An event of a kind something reads fires `core_event`, with its
+    /// payload as JSON. A few kinds fire a typed signal too, so a progress
+    /// bar need not parse JSON, and a few are the ones that could have
+    /// moved an unread count. Only those reach here: `forward_events` has
+    /// dropped the rest already, by `is_relayed`.
     fn relay(&self, event: &CoreEvent) {
         let kind = match json::str_at(&event.event, "kind") {
             "" => "Unknown".to_string(),
@@ -897,29 +959,19 @@ impl DeltaChatCore {
             }
         }
         // The count on the profile's row follows whatever could have
-        // moved it: a message in, a chat read or marked unread, a chat
-        // gone. The overflow could have hidden any of those.
-        if matches!(
-            kind.as_str(),
-            "IncomingMsg"
-                | "IncomingMsgBunch"
-                | "MsgsChanged"
-                | "MsgsNoticed"
-                | "ChatModified"
-                | "ChatDeleted"
-                | "ChatlistChanged"
-                | "ChatlistItemChanged"
-                | "EventChannelOverflow"
-        ) {
+        // moved it.
+        if UNREAD_EVENT_KINDS.contains(&kind.as_str()) {
             self.refresh_unread(event.context_id);
         }
         // Everything above is this object's own business and happens
         // whatever the kind. The fan-out below is not: `core_event` reaches
         // every page still on the stack and one chat list per profile on the
-        // cover, and the core says a great deal that none of them read --
-        // its whole log, for one. Serialising that and handing it round is
-        // work done with the screen off, once per listener, during exactly
-        // the bulk syncs where there is most of it.
+        // cover, and the core says a great deal that none of them read.
+        // Serialising that and handing it round is work done with the
+        // screen off, once per listener, during exactly the bulk syncs
+        // where there is most of it. Its log is gone by now, but an
+        // `IncomingMsgBunch` or a `ConfigureProgress` is still here for the
+        // work above, and nothing reads it on `core_event`.
         if !HANDLED_EVENT_KINDS.contains(&kind.as_str()) {
             return;
         }
@@ -1878,9 +1930,27 @@ pub(crate) fn reconcile_rows<T, K>(
 #[cfg(test)]
 mod tests {
     use super::{
-        last_words, reconcile_accounts, restart_delay, resume_account, server_path, AccountItem,
-        AccountListModel, BUNDLED_SERVER, RESTART_DELAY_MAX, RESTART_DELAY_MIN, RESTART_LIMIT,
+        is_relayed, last_words, reconcile_accounts, restart_delay, resume_account, server_path,
+        AccountItem, AccountListModel, BUNDLED_SERVER, HANDLED_EVENT_KINDS, RESTART_DELAY_MAX,
+        RESTART_DELAY_MIN, RESTART_LIMIT,
     };
+
+    #[test]
+    fn the_core_log_stays_on_the_tokio_side_and_the_rest_crosses() {
+        for kind in ["Info", "Warning", "SmtpConnected", "ImapConnected", ""] {
+            assert!(!is_relayed(kind), "{kind:?} would cross for nothing");
+        }
+        // Read on `core_event`, or acted on by `relay` itself: an error
+        // for the reader, a progress bar, a count that may have moved.
+        for kind in HANDLED_EVENT_KINDS.iter().chain(&[
+            "Error",
+            "ConfigureProgress",
+            "ImexProgress",
+            "IncomingMsgBunch",
+        ]) {
+            assert!(is_relayed(kind), "{kind:?} would never reach the app");
+        }
+    }
 
     fn account(id: u32, name: &str) -> AccountItem {
         AccountItem {
