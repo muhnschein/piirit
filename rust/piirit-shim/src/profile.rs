@@ -75,8 +75,10 @@ pub struct Profile {
     /// Emitted when the connection, the quota or the storage is re-read.
     pub connectivity_changed: qt_signal!(),
     /// Ask the core again about the connection, the mailbox and the
-    /// space on the device. Asked once with the profile, and again on the
-    /// core's `ConnectivityChanged` event.
+    /// space on the device. Asked once with the profile, and again after
+    /// the core's `ConnectivityChanged` event -- at most once a second
+    /// (`ProfilePage.qml`): it is four round trips, one of which sizes
+    /// every file the profile has.
     pub refresh_connectivity: qt_method!(fn(&mut self)),
 
     /// True once the profile has been read from the core. Until then the
