@@ -6,6 +6,10 @@
 //! blanked one goes back to the group's rather than to the core, leaving
 //! the group is asked about on a page of its own, and a chat that is not
 //! a group offers no edits at all.
+//!
+//! The member rows wait for the page to come onto the screen: the page is
+//! made attached to its conversation as soon as that loads, and most of
+//! the time nobody swipes across to it.
 
 // Qt harness: see qml_chat_list.rs.
 #![allow(
@@ -58,6 +62,23 @@ const PROBE_QML: &str = r"
             loader.setSource('', {})
             loader.setSource(url, { accountId: 1, chatId: chatId, chatName: 'from the list' })
             return loader.status === Loader.Ready ? 'ok' : 'load-failed'
+        }
+        /// Made the way `pushAttached` makes it: off the screen until the
+        /// reader swipes across.
+        function loadUnseen(url, chatId) {
+            loader.setSource('', {})
+            loader.setSource(url, {
+                accountId: 1,
+                chatId: chatId,
+                chatName: 'from the list',
+                status: PageStatus.Inactive
+            })
+            return loader.status === Loader.Ready ? 'ok' : 'load-failed'
+        }
+        /// The swipe across: the page on its way onto the screen.
+        function show() {
+            loader.item.status = PageStatus.Activating
+            return 'ok'
         }
         // `data` rather than `children`: the model is a plain QObject, so
         // it is not among an Item's visual children at all.
@@ -173,16 +194,26 @@ fn the_group_page_shows_the_group_and_renames_it() {
         };
     }
 
-    // The group: chat 2, with the account itself and one contact in it.
+    // The group: chat 2, with the account itself and one contact in it,
+    // made off the screen as the conversation makes it.
     single_shot(Duration::from_secs(1), move || unsafe {
         record!(
             "load",
-            call!("load", QString::from(common::page_url("GroupPage.qml")), 2)
+            call!(
+                "loadUnseen",
+                QString::from(common::page_url("GroupPage.qml")),
+                2
+            )
         );
     });
 
     single_shot(Duration::from_secs(3), move || unsafe {
         record!("loaded", get!("chat", "loaded"));
+        // Loaded, and counted in the heading, but no row built for
+        // anyone until the page is on its way in.
+        record!("unseen-members", get!("membersHeader", "text"));
+        record!("unseen-row", get!("memberRow10", "objectName"));
+        record!("show", call!("show"));
         record!("name", get!("groupNameField", "text"));
         record!("editable", get!("groupNameField", "readOnly"));
         record!("members", get!("membersHeader", "text"));
@@ -336,6 +367,7 @@ fn assert_page(steps: &[(&str, String)], navigation: &str, calls: &[(String, Val
 
     for label in [
         "load",
+        "show",
         "typed",
         "leave",
         "blanked",
@@ -478,6 +510,16 @@ fn assert_page(steps: &[(&str, String)], navigation: &str, calls: &[(String, Val
         value("editable"),
         "false",
         "a group the account is in cannot be renamed. {context}"
+    );
+    assert!(
+        value("unseen-members").starts_with('2'),
+        "the heading of a page not yet shown does not count the two \
+         members. {context}"
+    );
+    assert_eq!(
+        value("unseen-row"),
+        "missing:memberRow10",
+        "the member rows were built before the page was shown. {context}"
     );
     assert!(
         value("members").starts_with('2'),
