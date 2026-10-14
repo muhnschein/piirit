@@ -87,6 +87,7 @@ fn a_file(path: &Path, age: Duration) {
 }
 
 #[test]
+#[allow(clippy::too_many_lines)]
 fn a_closed_chat_leaves_no_capture_behind_and_old_ones_are_swept() {
     let temp = std::env::temp_dir().join(format!("piirit-qml-cleanup-{}", std::process::id()));
     let _ = std::fs::remove_dir_all(&temp);
