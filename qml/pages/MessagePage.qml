@@ -175,7 +175,10 @@ Page {
                 focusOnClick: true
                 labelVisible: false
                 color: Theme.primaryColor
-                text: whole.text
+                // Empty until it is shown: a field lays out all of its
+                // text whether it is visible or not, and the label is
+                // already laying out the same message.
+                text: page.selecting ? whole.text : ""
                 // Each selection goes on the clipboard as it is made, as
                 // Silica does with one, and the notice says so.
                 onSelectedTextChanged: {
