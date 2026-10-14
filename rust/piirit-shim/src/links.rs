@@ -271,32 +271,41 @@ fn url_end(text: &str, start: usize) -> usize {
         })
         .next()
         .unwrap_or_default();
+    // The closers the link has no opener for, counted once and then kept
+    // in step as closers come off the end. Counting them again for every
+    // character taken off made a message ending in thousands of `)`
+    // quadratic to render.
+    let mut parens = unopened(link, b'(', b')');
+    let mut brackets = unopened(link, b'[', b']');
     while let Some((&last, shorter)) = link.split_last() {
-        let trailing = match last {
-            b'.' | b',' | b';' | b':' | b'!' | b'?' => true,
-            b')' => !balanced(link, b'(', b')'),
-            b']' => !balanced(link, b'[', b']'),
-            _ => false,
+        let unopened = match last {
+            b'.' | b',' | b';' | b':' | b'!' | b'?' => None,
+            b')' => Some(&mut parens),
+            b']' => Some(&mut brackets),
+            _ => break,
         };
-        if !trailing {
-            break;
+        if let Some(count) = unopened {
+            if *count == 0 {
+                break;
+            }
+            *count = count.saturating_sub(1);
         }
         link = shorter;
     }
     start.saturating_add(link.len())
 }
 
-/// Whether every `close` in the span has an `open` before it.
-fn balanced(span: &[u8], open: u8, close: u8) -> bool {
-    let mut depth: i32 = 0;
+/// How many more `close` than `open` the span holds.
+fn unopened(span: &[u8], open: u8, close: u8) -> usize {
+    let (mut opens, mut closes) = (0_usize, 0_usize);
     for byte in span {
         if *byte == open {
-            depth = depth.saturating_add(1);
+            opens = opens.saturating_add(1);
         } else if *byte == close {
-            depth = depth.saturating_sub(1);
+            closes = closes.saturating_add(1);
         }
     }
-    depth >= 0
+    closes.saturating_sub(opens)
 }
 
 /// One link with its tracking parameters taken out. The fragment is kept,
@@ -465,5 +474,15 @@ mod tests {
         // Not a link: no scheme separator.
         assert_eq!(clean_text("httpx and http:/x"), "httpx and http:/x");
         assert_eq!(clean_text(""), "");
+    }
+
+    #[test]
+    fn closers_after_a_link_are_counted_once() {
+        // Each `)` used to recount the whole link: half a minute for this.
+        let text = format!("https://example.org/a{}", ")".repeat(100_000));
+        assert_eq!(url_spans(&text), [(0, 21)]);
+        // The link's own pairs stay with it, the rest go to the sentence.
+        let text = "(see https://example.org/(a)[b]).]";
+        assert_eq!(url_spans(text), [(5, 31)]);
     }
 }
