@@ -11,6 +11,8 @@ permissions:
 
 jobs:
   build:
+    # Already ran (run 38560773614); the compare below reads its artifacts.
+    if: false
     runs-on: ubuntu-latest
     timeout-minutes: 120
     strategy:
@@ -59,7 +61,6 @@ jobs:
           retention-days: 7
 
   compare:
-    needs: build
     runs-on: ubuntu-latest
     timeout-minutes: 60
     permissions:
@@ -75,7 +76,7 @@ jobs:
 
       - run: ./ci/apt-install.sh rpm rpm2cpio cpio binutils diffoscope
 
-      - run: gh run download "$GITHUB_RUN_ID" --dir rpms
+      - run: gh run download 38560773614 --dir rpms
 
       - name: Compare
         run: |
@@ -88,11 +89,15 @@ jobs:
           done
           for pair in "a b" "a full-depth"; do
             set -- $pair
-            echo; echo "######## $1 vs $2: payload files that differ"
+            echo; echo "######## $1 vs $2: payload files whose contents differ"
             (cd "x/$1" && find . -type f -exec sha256sum {} + | sort -k2) > "$1.sums"
             (cd "x/$2" && find . -type f -exec sha256sum {} + | sort -k2) > "$2.sums"
-            diff "$1.sums" "$2.sums" | sed -n 's/^[<>] [0-9a-f]*  //p' | sort -u || true
-            echo "######## $1 vs $2: diffoscope (truncated)"
-            diffoscope --text - --max-diff-block-lines 30 \
-              "$(pick $1)" "$(pick $2)" 2>&1 | head -c 120000 || true
+            diff "$1.sums" "$2.sums" | sed -n 's/^[<>] [0-9a-f]*  //p' | sort -u > differ.txt || true
+            cat differ.txt; echo "($(wc -l < differ.txt) of $(wc -l < "$1.sums") files)"
+            while read -r f; do
+              echo "---- diffoscope $f"
+              diffoscope --text - --max-diff-block-lines 15 "x/$1/$f" "x/$2/$f" 2>&1 | head -c 12000 || true
+            done < differ.txt
           done
+          echo; echo "######## mtimes: distinct payload mtimes in a"
+          rpm -qp --qf '[%{FILEMTIMES}\n]' "$(pick a)" | sort -u | head -5
