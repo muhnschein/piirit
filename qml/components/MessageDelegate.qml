@@ -306,9 +306,22 @@ Item {
                  root.isCall ? callRow.wantedWidth : 0,
                  reactionRow.wantedWidth,
                  footerMetric.implicitWidth,
-                 attachment.item && attachment.item.wantsFullWidth
-                     ? root.maxWidth : 0,
+                 root.attachmentFillsBubble ? root.maxWidth : 0,
                  Theme.itemSizeSmall))
+    /// Whether the attachment reads better filling the bubble: the
+    /// preview's own `wantsFullWidth`, worked out here from what it is
+    /// worked out from there. The preview is null for as long as the
+    /// loader is building it, so asking it sized a picture -- and started
+    /// its decode -- at the width of its caption first, and then again
+    /// at the bubble's. Keep the two in step; qml_bubble_width.rs holds
+    /// them to each other.
+    readonly property bool attachmentFillsBubble: root.hasFile
+        && (root.viewType === "Image" || root.viewType === "Sticker"
+            || root.viewType === "Gif" || root.viewType === "Video"
+            || root.viewType === "Audio" || root.viewType === "Voice"
+            || root.viewType === "Vcard"
+            || (root.viewType === "Webxdc" && root.appsEnabled
+                && root.webxdcName.length > 0))
     /// How wide the bubble is: what its content wants, widened to hold
     /// the offer when there is one. A long message of short lines makes
     /// a narrow bubble, and the offer under it would hang out of one
@@ -343,6 +356,15 @@ Item {
         textFormat: root.bodyStyled ? Text.StyledText : Text.PlainText
         // A call's text is not drawn, so it does not size the bubble.
         text: root.isCall ? "" : root.bodyText
+        // Each line of the body unwrapped, and only as many as the label
+        // shows: the widest of them is the width the body wants. The
+        // whole of a long message used to be laid out here, on every row
+        // built, for lines below the fold. Unwrapped, so that a line
+        // wider than the bubble still says so and the bubble takes its
+        // whole width, as it did. The label's dozen lines come from at
+        // most a dozen of these, so nothing it shows is left out; a wider
+        // line further down, which it does not show, no longer widens it.
+        maximumLineCount: root.collapsedLines
     }
 
     Text {

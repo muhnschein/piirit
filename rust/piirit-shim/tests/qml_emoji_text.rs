@@ -5,6 +5,13 @@
 //! (Emoji.js's `inText`). What this pins is what counts as an emoji --
 //! not a digit, not a "©" sent as text -- and that nothing the sender
 //! wrote can become markup on the way.
+//!
+//! And what it costs. Drawing reads tables built ahead of time from the
+//! picker's list (EmojiPictures.js), not the list with every emoji's
+//! search words in it, which is the picker's alone; so the tables have to
+//! agree with the list for every emoji in it. And a text with no
+//! character of any emoji in it is passed over at a glance rather than
+//! read through.
 
 // Qt harness: see qml_pages.rs.
 #![allow(
@@ -31,12 +38,37 @@ fn probe_qml() -> String {
     import QtQuick 2.0
     import 'file://{qml}/components'
     import 'file://{qml}/js/Emoji.js' as Emoji
+    import 'file://{qml}/js/EmojiData.js' as Data
+    import 'file://{qml}/js/EmojiPictures.js' as Pictures
     Item {{
         width: 540
         height: 400
 
         function inText(text, styled) {{ return Emoji.inText(text, styled, 18) }}
         function artBase() {{ return '' + Emoji.artBase }}
+
+        // Every emoji the picker offers, drawn in a message on its own and
+        // between words, and looked up as a reaction: the tables drawing
+        // reads are built from the picker's list ahead of time, and have
+        // to say what it says. The ones that do not, and how many there
+        // were.
+        function everyEmoji() {{
+            var wrong = []
+            for (var i = 0; i < Data.list.length; i++) {{
+                var emoji = Data.list[i][0]
+                var picture = Data.list[i][1]
+                var img = '/' + picture + '.png'
+                if (Emoji.pictureFor(emoji) !== picture
+                        || Emoji.inText(emoji, false, 18).indexOf(img) < 0
+                        || Emoji.inText('a ' + emoji + ' b', true, 18).indexOf(img) < 0) {{
+                    wrong.push(emoji)
+                }}
+            }}
+            return Data.list.length + ':' + wrong.join(' ')
+        }}
+        // Whether a text gets past the quick look `inText` takes before it
+        // reads a text through.
+        function mayHold(text) {{ return '' + Pictures.mayHold.test(text) }}
 
         Loader {{ id: delegate }}
         function loadDelegate(url) {{
@@ -138,7 +170,25 @@ fn messages_draw_their_emoji_as_the_reactions_do() {
     ];
     let texts_ptr = std::ptr::addr_of!(texts);
 
+    // Text with nothing to draw, which is most of what anyone writes: a
+    // message without a character of any emoji in it is not read
+    // through a character at a time. A digit, # and * among them: they
+    // start the keycaps, and are in far more text than any keycap is.
+    let plain: Vec<&'static str> = vec![
+        "no emoji at all, 1 # * 2",
+        "Täällä on lunta -- 3 cm, ja \"pakkasta\" (10°C) <b>&amp;</b>\n  OK?",
+        "Встретимся в 19:30 у входа №2.",
+    ];
+    let plain_ptr = std::ptr::addr_of!(plain);
+
     single_shot(Duration::from_secs(1), move || unsafe {
+        record!("every", call!("everyEmoji"));
+        for text in &*plain_ptr {
+            record!(
+                format!("plain:{text}"),
+                call!("mayHold", QString::from(*text))
+            );
+        }
         record!("base", call!("artBase"));
         for (label, text, styled) in &*texts_ptr {
             record!(*label, call!("inText", QString::from(*text), *styled));
@@ -175,6 +225,25 @@ fn messages_draw_their_emoji_as_the_reactions_do() {
             .unwrap_or_default()
     };
     let context = format!("steps: {steps:?}");
+
+    let every = value("every");
+    let (count, wrong) = every.split_once(':').unwrap_or(("0", ""));
+    assert!(
+        count.parse::<usize>().unwrap_or(0) > 1000 && wrong.is_empty(),
+        "of the {count} emoji the picker offers, these are not drawn as \
+         their pictures in a message, or not looked up as them: {wrong:?}. \
+         EmojiPictures.js is built from EmojiData.js by \
+         scripts/fetch-emoji.py --pictures. {context}"
+    );
+    for text in &plain {
+        assert_eq!(
+            value(&format!("plain:{text}")),
+            "false",
+            "{text:?} has no emoji in it, and is read through a character \
+             at a time anyway. {context}"
+        );
+    }
+
     let base = value("base");
     assert!(
         base.starts_with("file://") && base.ends_with("/qml/art/emoji/"),
@@ -230,4 +299,50 @@ fn messages_draw_their_emoji_as_the_reactions_do() {
         "the quote's emoji is not drawn as its picture. {context}"
     );
     assert_eq!(value("glyph-on"), "picture", "{context}");
+}
+
+/// Only the picker loads the whole list. Every chat opened draws its
+/// messages through Emoji.js, and the list -- each emoji's name and search
+/// words -- is nearly three times what drawing needs, and is parsed again on
+/// every launch: on Qt 5.6 nothing keeps a compiled copy of a script.
+#[test]
+fn only_the_picker_loads_the_list_with_search_words() {
+    let qml = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../qml");
+    let mut importers = Vec::new();
+    let mut stack = vec![qml];
+    while let Some(dir) = stack.pop() {
+        for entry in std::fs::read_dir(&dir).expect("read qml dir").flatten() {
+            let path = entry.path();
+            if path.is_dir() {
+                stack.push(path);
+                continue;
+            }
+            let code = path
+                .extension()
+                .is_some_and(|extension| extension == "qml" || extension == "js");
+            let Some(name) = path.file_name().and_then(|name| name.to_str()) else {
+                continue;
+            };
+            if !code {
+                continue;
+            }
+            let text = std::fs::read_to_string(&path).expect("read qml");
+            for (what, imported) in [("EmojiData.js", "list"), ("EmojiPicker.js", "picker")] {
+                if text.lines().any(|line| {
+                    let line = line.trim();
+                    (line.starts_with(".import") || line.starts_with("import"))
+                        && line.contains(what)
+                }) {
+                    importers.push(format!("{imported}:{name}"));
+                }
+            }
+        }
+    }
+    importers.sort();
+    assert_eq!(
+        importers,
+        ["list:EmojiPicker.js", "picker:ReactionPickerPage.qml"],
+        "the emoji list with its search words is loaded by more than the \
+         picker: drawing an emoji needs only EmojiPictures.js"
+    );
 }

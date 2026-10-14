@@ -1,4 +1,4 @@
-// Which picture draws an emoji, and which emoji a search finds.
+// Which picture draws an emoji, and where the emoji in a message are.
 //
 // Sailfish draws few emoji itself: Qt 5.6 has no colour fonts, and the
 // system fonts cover a few hundred in monochrome at best. So every emoji
@@ -6,25 +6,35 @@
 // only where none is (components/EmojiGlyph.qml). The list of what is
 // shipped is generated; see scripts/fetch-emoji.py.
 //
-// A shared library: nothing here translates, and the lookup table is
-// built once rather than once per row.
+// A shared library: nothing here translates, and the lookup tables are
+// read once rather than once per row.
+//
+// Drawing needs only the tables in EmojiPictures.js, which the script
+// builds out of the picker's list ahead of time. They used to be built
+// here, out of the list itself -- every emoji's search words with it,
+// nearly three times the size -- on the first chat opened after every
+// launch, since Qt 5.6 keeps no compiled copy of a script. The list is
+// the picker's alone now (EmojiPicker.js).
+//
+// What the tables are, by the names they have there:
+//
+// - `byKey`: every emoji's picture, by `key`.
+// - `bmpStarts`: the first character of every emoji that starts in the
+//   Basic Multilingual Plane, by its code: the only ones a scan of a
+//   message has to stop at, besides the planes above it.
+// - `textStyle`: the symbols that are text unless U+FE0F says otherwise
+//   -- a heart, a copyright sign, an arrow -- by key. Unicode draws these
+//   as text by default, and so does every other client; a message that
+//   says "(c)" with the sign has not sent an emoji. One character and the
+//   selector in the data -- fully qualified only with it, so text without
+//   it. Only in the Basic Multilingual Plane, among the symbols every
+//   font has: above it the data spells even a thumbs-up with the
+//   selector, and nobody sends one as text.
+// - `mayHold`: matches a text only if it has a character of some emoji's
+//   key in it -- the first, or a keycap's mark -- so any text it does not
+//   match has nothing in it to draw, and need not be read through.
 .pragma library
-.import "EmojiData.js" as Data
-
-/// The picker's groups, in the order EmojiData.js numbers them, each
-/// with the emoji its jump button shows.
-var groupIcons = ["😀", "👋", "🐻", "🍔", "🚗", "⚽", "💡", "❤️", "🏁"]
-
-var byKey = null
-/// The first character of every emoji that starts in the Basic
-/// Multilingual Plane, by its code: the only ones a scan of a message
-/// has to stop at, besides the planes above it.
-var bmpStarts = null
-/// The symbols that are text unless U+FE0F says otherwise -- a heart, a
-/// copyright sign, an arrow -- by key. Unicode draws these as text by
-/// default, and so does every other client; a message that says "(c)"
-/// with the sign has not sent an emoji.
-var textStyle = null
+.import "EmojiPictures.js" as Pictures
 
 /// An emoji with its variation selectors taken out: the same emoji
 /// arrives with U+FE0F from one client and without it from another.
@@ -37,32 +47,6 @@ function untoned(emoji) {
     return key(emoji).replace(/\uD83C[\uDFFB-\uDFFF]/g, "")
 }
 
-function table() {
-    if (byKey === null) {
-        byKey = {}
-        bmpStarts = {}
-        textStyle = {}
-        for (var i = 0; i < Data.list.length; i++) {
-            var emoji = Data.list[i][0]
-            var bare = key(emoji)
-            byKey[bare] = Data.list[i][1]
-            var first = emoji.charCodeAt(0)
-            if (first < 0xD800 || first > 0xDFFF) {
-                bmpStarts[first] = true
-                // One character and the selector: fully qualified only
-                // with it, so text without it. Only down here, among the
-                // symbols every font has: above it the data spells even
-                // a thumbs-up with the selector, and nobody sends one as
-                // text.
-                if (bare.length === 1 && emoji.charCodeAt(1) === 0xFE0F) {
-                    textStyle[bare] = true
-                }
-            }
-        }
-    }
-    return byKey
-}
-
 /// The picture for an emoji, as its file name under qml/art/emoji/
 /// without the extension, or "" when none is shipped.
 ///
@@ -73,7 +57,7 @@ function pictureFor(emoji) {
     if (!emoji) {
         return ""
     }
-    var known = table()
+    var known = Pictures.byKey
     var name = known[key(emoji)]
     if (name === undefined) {
         name = known[untoned(emoji)]
@@ -109,7 +93,7 @@ function emojiEnd(text, i) {
     if (point < 0x1F000 || point > 0x1FAFF) {
         // A digit, # or * is an emoji only as a keycap.
         var keycap = next === 0xFE0F || next === 0x20E3
-        if (point > 0xFFFF || !(bmpStarts[point] === true && (point >= 0xA9 || keycap))) {
+        if (point > 0xFFFF || !(Pictures.bmpStarts[point] === true && (point >= 0xA9 || keycap))) {
             return i
         }
     }
@@ -163,10 +147,14 @@ function escaped(text, lineStart) {
 /// `size` is the font's pixel size; the pictures are drawn a little
 /// taller than its letters, as an emoji in a font is.
 function inText(text, styled, size) {
-    if (!text) {
+    // Most messages have no emoji, and the scan below calls out for
+    // nearly every character: a long body cost a millisecond of the
+    // frame its row was built in.
+    if (!text || !Pictures.mayHold.test(text)) {
         return ""
     }
-    var known = table()
+    var known = Pictures.byKey
+    var textStyle = Pictures.textStyle
     var edge = Math.round(size * 1.15)
     var out = ""
     var from = 0
@@ -214,61 +202,6 @@ function inText(text, styled, size) {
 /// components/ and pages/, so it is the same folder whichever file Qt
 /// resolves it against.
 var artBase = Qt.resolvedUrl("../art/emoji/")
-
-/// Every emoji on offer, as [emoji, picture, group] entries in order.
-function all() {
-    return Data.list
-}
-
-/// The emoji whose name or keywords hold every word of `query`, each as
-/// the start of one of them: "hot" finds the hot pepper, not a
-/// screenshot. Lowercase; [] for a query with no words in it.
-function search(query) {
-    var words = query.toLowerCase().split(/\s+/).filter(function(word) {
-        return word.length > 0
-    })
-    if (words.length === 0) {
-        return []
-    }
-    var found = []
-    for (var i = 0; i < Data.list.length; i++) {
-        var text = " " + Data.list[i][3]
-        var matches = true
-        for (var w = 0; w < words.length && matches; w++) {
-            matches = text.indexOf(" " + words[w]) >= 0
-        }
-        if (matches) {
-            found.push(Data.list[i])
-        }
-    }
-    return found
-}
-
-/// `list` cut into rows of `columns`, for a view whose rows are cells
-/// laid side by side. A group starting puts its heading first, as a row
-/// of its own, when `headings` is given: one title per group number.
-///
-/// Each row is {heading: "", group, cells: [[emoji, picture], ...]} or
-/// {heading: title, group, cells: []}.
-function rows(list, columns, headings) {
-    var out = []
-    var current = null
-    var group = -1
-    for (var i = 0; i < list.length; i++) {
-        var entry = list[i]
-        if (headings && entry[2] !== group) {
-            group = entry[2]
-            out.push({ heading: headings[group], group: group, cells: [] })
-            current = null
-        }
-        if (current === null || current.cells.length >= columns) {
-            current = { heading: "", group: entry[2], cells: [] }
-            out.push(current)
-        }
-        current.cells.push([entry[0], entry[1]])
-    }
-    return out
-}
 
 /// How many emoji the picker remembers having been picked.
 var recentLimit = 40
