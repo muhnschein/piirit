@@ -7,6 +7,10 @@
 //! grant sent then is lost, and the call opens on the engine's own
 //! prompt. So the view holds both the grant and the page until the engine
 //! says it is up, and then grants first.
+//!
+//! Nor does the page come up before the call's sound has its way out
+//! (`allowed`): a microphone opened before the sound is moved brings the
+//! phone's sound server down when it is.
 
 // Qt harness: see qml_chat_list.rs.
 #![allow(
@@ -38,6 +42,18 @@ const PROBE_QML: &str = r"
             return WebEngine.notified.replace(/\n/g, ';') + '|' + holder.item.target + '|' + view.url
         }
         function start() { WebEngine.start(); return 'ok' }
+        function held(url) {
+            holder.source = ''
+            WebEngine.notified = ''
+            // As the call page has it: held back before it has an address.
+            holder.setSource(url, { allowed: false })
+            if (holder.status !== Loader.Ready) {
+                return 'load-failed'
+            }
+            holder.item.url = 'http://127.0.0.1:4242/index.html?key=ab#startCall'
+            return 'ok'
+        }
+        function allow(on) { WebEngine.notified = ''; holder.item.allowed = on; return said() }
     }
 ";
 
@@ -80,6 +96,11 @@ fn the_page_waits_for_the_engine_and_is_granted_first() {
         (*steps_ptr).push(("cold", call!("said")));
         (*steps_ptr).push(("start", call!("start")));
         (*steps_ptr).push(("up", call!("said")));
+        let url = QString::from(common::component_url("CallView.qml"));
+        (*steps_ptr).push(("held-load", call!("held", url)));
+        (*steps_ptr).push(("held", call!("said")));
+        (*steps_ptr).push(("allowed", call!("allow", true)));
+        (*steps_ptr).push(("kept", call!("allow", false)));
         (*engine_ptr).quit();
     });
 
@@ -107,5 +128,22 @@ fn the_page_waits_for_the_engine_and_is_granted_first() {
             && up.ends_with(&format!(";|{url}|{url}")),
         "once the engine was up, the page's origin was not granted the \
          microphone and the view pointed at the page: {up}. {context}"
+    );
+    assert_eq!(value("held-load"), "ok", "{context}");
+    assert_eq!(
+        value("held"),
+        "||",
+        "a page not allowed yet was granted, or the view went to it. {context}"
+    );
+    let allowed = value("allowed");
+    assert!(
+        allowed.starts_with("embedui:perms {\"msg\":\"add\",\"uri\":\"http://127.0.0.1:4242\"")
+            && allowed.ends_with(&format!(";|{url}|{url}")),
+        "allowed, the page was not granted and gone to: {allowed}. {context}"
+    );
+    assert_eq!(
+        value("kept"),
+        format!("|{url}|{url}"),
+        "a page that was up was taken down, or its grant taken back. {context}"
     );
 }

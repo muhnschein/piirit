@@ -70,6 +70,7 @@ const PROBE_QML: &str = r"
         }
         function url() { return call.url }
         function mute(on) { call.mute(on); return '' + call.muted }
+        function microphone(on) { call.set_microphone(on); return '' }
         function hangUp() { call.hang_up(); return call.state + '|' + call.url }
         function reset() { call.reset(); return call.state }
         function lastRow() {
@@ -143,6 +144,8 @@ fn a_call_is_placed_answered_connected_and_hung_up() {
         record!("placing", call!("state"));
         // Switched off before the page is up to be told.
         record!("mute-early", call!("mute", true));
+        // And the microphone to be kept shut, while the sound moves.
+        call!("microphone", false);
         // One call at a time.
         record!("again", call!("again"));
     });
@@ -225,6 +228,7 @@ fn a_call_is_placed_answered_connected_and_hung_up() {
         let commands = get(&authority, &format!("{api}/commands"));
         let list: Vec<String> = serde_json::from_str(body_of(&commands)).unwrap_or_default();
         record!("page-muted", list.first().cloned().unwrap_or_default());
+        record!("page-mic", list.get(1).cloned().unwrap_or_default());
         record!(
             "answer",
             list.iter()
@@ -240,6 +244,16 @@ fn a_call_is_placed_answered_connected_and_hung_up() {
             "page-unmuted",
             body_of(&get(&authority, &format!("{api}/commands"))).to_string()
         );
+        // The microphone let have, once however often it is said, and
+        // shut again.
+        call!("microphone", true);
+        call!("microphone", true);
+        call!("microphone", false);
+        record!(
+            "page-mic-again",
+            body_of(&get(&authority, &format!("{api}/commands"))).to_string()
+        );
+        call!("microphone", true);
         // The peer connection says it is through.
         record!(
             "connected",
@@ -304,7 +318,7 @@ fn a_call_is_placed_answered_connected_and_hung_up() {
     let url = value("url");
     assert!(
         url.starts_with("http://127.0.0.1:")
-            && url.contains("/index.html?disableVideoCompletely&key=")
+            && url.contains("/index.html?noOutgoingVideoInitially&key=")
             && url.ends_with("#startCall"),
         "the page was not pointed at an audio-only call it is to start, with \
          its key: {url}. {context}"
@@ -380,6 +394,18 @@ fn a_call_is_placed_answered_connected_and_hung_up() {
         "mute",
         "a microphone switched off before the page was up was not switched \
          off on it once it was. {context}"
+    );
+    assert_eq!(
+        value("page-mic"),
+        "microphone-off",
+        "a microphone to be kept shut before the page was up was not shut \
+         on it once it was. {context}"
+    );
+    assert_eq!(
+        value("page-mic-again"),
+        "[\"microphone-on\",\"microphone-off\"]",
+        "the microphone let have and shut again was not passed to the page \
+         once each. {context}"
     );
     assert_eq!(
         value("answer"),

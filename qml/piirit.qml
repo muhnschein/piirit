@@ -40,11 +40,13 @@ ApplicationWindow {
     }
 
     // The cover offers the quick actions the reader set up, and hands a
-    // tap on one back here.
+    // tap on one back here. While a call is up it shows the call, with an
+    // action of its own that it does itself.
     cover: Component {
         CoverPage {
             quickActionsAllowed: appWindow.chatList !== null
                                  && !appWindow.quickActionsPaused
+            call: callCenter.call
             onQuickAction: appWindow.quickAction(side)
         }
     }
@@ -187,9 +189,10 @@ ApplicationWindow {
     /// forward, and does not take the reader out of a call.
     readonly property bool callBusy: callCenter.busy
 
-    /// Call a chat. False when the app is in a call already.
-    function placeCall(accountId, chatId) {
-        return callCenter.place(accountId, chatId)
+    /// Call a chat, with the camera on for a video call. False when the
+    /// app is in a call already.
+    function placeCall(accountId, chatId, video) {
+        return callCenter.place(accountId, chatId, video === true)
     }
 
     /// Bring the call there is back to the front.

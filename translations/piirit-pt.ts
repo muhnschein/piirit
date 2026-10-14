@@ -349,6 +349,10 @@ Mensagens de contactos bloqueados não serão ocultadas noutros grupos.</transla
         <source>Call back</source>
         <translation>Ligar de volta</translation>
     </message>
+    <message>
+        <source>Incoming video call</source>
+        <translation>Chamada de vídeo recebida</translation>
+    </message>
 </context>
 <context>
     <name>CallPage</name>
@@ -402,6 +406,10 @@ Mensagens de contactos bloqueados não serão ocultadas noutros grupos.</transla
         <source>Answer</source>
         <extracomment>Answers a call that is ringing. A verb.</extracomment>
         <translation>Atender</translation>
+    </message>
+    <message>
+        <source>Incoming video call</source>
+        <translation>Chamada de vídeo recebida</translation>
     </message>
 </context>
 <context>
@@ -467,6 +475,11 @@ Mensagens de contactos bloqueados não serão ocultadas noutros grupos.</transla
         <source>Call %1</source>
         <extracomment>Places a call. %1 is the name of whoever is called.</extracomment>
         <translation>Ligar a %1</translation>
+    </message>
+    <message>
+        <source>Video call %1</source>
+        <extracomment>Places a video call. %1 is the name of whoever is called.</extracomment>
+        <translation>Videochamada para %1</translation>
     </message>
 </context>
 <context>
@@ -851,6 +864,16 @@ Mensagens de contactos bloqueados não serão ocultadas noutros grupos.</transla
         <source>%1 new</source>
         <extracomment>On the cover, in a pill among the avatars: how many messages are unread. %1 is the number, or &quot;99+&quot;.</extracomment>
         <translation>%1 novas</translation>
+    </message>
+    <message>
+        <source>Microphone off</source>
+        <extracomment>On the cover during a call: the reader&apos;s microphone is switched off, so the other end hears nothing.</extracomment>
+        <translation>Microfone desligado</translation>
+    </message>
+    <message>
+        <source>Camera paused</source>
+        <extracomment>On the cover during a video call: the camera sends nothing while the app is in the background, and comes back on when the app is opened.</extracomment>
+        <translation>Câmara em pausa</translation>
     </message>
 </context>
 <context>

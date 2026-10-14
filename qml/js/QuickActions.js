@@ -1,6 +1,8 @@
 // What a quick action on the cover is, and what it is drawn as, for the
 // three places that need it: the cover, which offers the actions; the
-// window, which does them; and the settings page, which picks them.
+// window, which does them; and the settings page, which picks them. The
+// cover's action during a call is drawn the same way, from the same
+// files.
 //
 // A library for the reason Relays.js is one: nothing here is translated,
 // and the lists are shared rather than copied.
@@ -32,6 +34,11 @@ function isCapture(kind) {
 /// offers them. The first is the one a new action gets.
 var chatIcons = ["heart", "star", "person", "group", "home", "bubble", "robot", "school",
                  "work", "office", "dog", "cat", "ball"]
+
+/// The icons of the one action the cover has while a call is up, which
+/// nobody picks: the microphone, drawn as what a tap does -- `mic-off`
+/// while it is on, `mic` while it is off.
+var callIcons = ["mic", "mic-off"]
 
 /// The sizes scripts/render-cover-icons.sh draws every icon at: Silica's
 /// small icon at each scale a phone runs at, 1.0 to 2.0.

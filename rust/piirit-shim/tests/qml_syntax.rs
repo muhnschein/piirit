@@ -1712,7 +1712,7 @@ fn qualified_uses(code: &str) -> Vec<(usize, String)> {
 #[test]
 fn qml_reads_no_name_that_is_not_there() {
     // What QML puts in scope without the file saying so.
-    const IN_SCOPE: [&str; 23] = [
+    const IN_SCOPE: [&str; 24] = [
         // Grouped properties, and properties of the element being
         // configured read without qualifying them.
         "anchors",
@@ -1720,6 +1720,9 @@ fn qml_reads_no_name_that_is_not_there() {
         "icon",
         "text",
         "parent",
+        // A MouseArea's grouped property for what it drags, and how far:
+        // the call page's own picture is moved through it.
+        "drag",
         // A Rectangle's outline: the capture page's shutter wears one.
         "border",
         // Camera's grouped property for what goes into the file: the

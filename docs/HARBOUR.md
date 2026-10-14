@@ -130,6 +130,28 @@ reason the export is made there rather than left in `.symtab`.
 binutils 2.35 and so may not exist in the SDK, or `--export-dynamic`,
 which would export every symbol in the binary.
 
+## The media plugin
+
+The package ships one private library: `libpiirit.so`, the H.264
+encoder video calls send through (docs/CALLS.md), at
+`/usr/share/harbour-piirit/lib/gmp-piirit/1.0/` beside the `piirit.info`
+Gecko reads it by. Under `/usr/share/<name>/lib/`, the one place Harbour
+allows an ELF file other than the binary, and linked only against
+libraries on the allowed list -- libc, libm, libstdc++, libgcc_s -- with
+x264 built into it as it is into the binary. Neither check needs a
+waiver for it.
+
+The validator does warn about it, and the warning is right that it
+cannot tell: "The RPM contains shared libraries, but it can't be
+determined for sure if they are needed by the binary, if so then the
+rpath must be set accordingly." The binary does not link the library,
+so it needs no rpath. Gecko loads it, by its full path, in a plugin
+process of its own, from the directory the app names in `MOZ_GMP_PATH`
+before Gecko starts (`prepare_media_plugins` in
+`rust/piirit-shim/src/call_host.rs`). Setting an environment variable
+in its own process is nothing Harbour rules on, and the plugin process
+is Gecko's own `plugin-container`, run inside the app's sandbox.
+
 ## Waivers
 
 `ci/harbour/waivers.conf` records rules this package knowingly breaks, one

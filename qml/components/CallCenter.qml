@@ -3,6 +3,7 @@ import Nemo.Notifications 1.0
 import Nemo.DBus 2.0
 import Nemo.KeepAlive 1.2
 import Piirit 1.0
+import "."
 
 /*
  * The app's one call: the window's, because a call belongs to no page.
@@ -19,7 +20,8 @@ import Piirit 1.0
  * - It rings with the phone's own VoIP ringtone, played by the feedback
  *   daemon (ngfd) that plays every sound the phone makes: the tone, the
  *   volume and the silent profile are the reader's own settings, and it
- *   stops when told or when the app goes.
+ *   stops when told or when the app goes. Other apps' music pauses while
+ *   it rings, as it does for a phone call (CallAudio.qml).
  * - It tells the display daemon (mce) that a call is ringing -- once
  *   the ringtone has been picked, which mce's call state would turn into
  *   a call-waiting beep -- and then that one is up: the screen comes on
@@ -88,10 +90,23 @@ Item {
     Call {
         id: call
         objectName: "call"
+        // Which back camera is the main lens, as the platform camera
+        // labels them.
+        back_lenses: String(Settings.backLensLabels)
         onRinging: center.ring()
         onEnded: center.over(reason)
         onError: center.errorMessage = message
     }
+
+    /// The app is not the one in front. The camera is let go meanwhile,
+    /// and the pictures are not drawn (calls.rs, `set_background`). Not
+    /// read-only: a test, which has no app in front, says it is.
+    property bool away: Qt.application.state !== Qt.ApplicationActive
+    onAwayChanged: call.set_background(center.away)
+    Component.onCompleted: call.set_background(center.away)
+
+    /// Pictures are on the call's screen: the reader is watching it.
+    readonly property bool watching: center.busy && (call.local_video || call.remote_video)
 
     Connections {
         target: core
@@ -101,14 +116,13 @@ Item {
         }
     }
 
-    /// Call a chat. False when the app is in a call already, which the
-    /// caller says to the reader.
-    function place(accountId, chatId) {
+    /// Call a chat, with the camera on for a video call. False when the
+    /// app is in a call already, which the caller says to the reader.
+    function place(accountId, chatId, video) {
         if (center.busy) {
             return false
         }
-        // Audio only: see calls.rs.
-        if (!call.place(accountId, chatId, false)) {
+        if (!call.place(accountId, chatId, video === true)) {
             return false
         }
         center.show()
@@ -266,7 +280,7 @@ Item {
             pushLater.stop()
             center.pageOwed = false
             var shown = center.stack.push(Qt.resolvedUrl("../pages/CallPage.qml"),
-                                          { call: call })
+                                          { call: call, audio: callAudio })
             if (shown) {
                 center.page = shown
             }
@@ -413,6 +427,34 @@ Item {
         }
     }
 
+    // Where the call's sound comes out: the earpiece for a voice call,
+    // the loudspeaker for a video call, and whichever the reader switches
+    // to. Looked after from when the call carries sound -- placed, or
+    // answered -- until it is over; the call's page waits for it
+    // (CallPage.qml), and shuts its microphone while the sound moves.
+    // While the call rings, other apps' music gives way to it.
+    CallAudio {
+        id: callAudio
+        objectName: "callAudio"
+        talking: center.busy && call.state !== "ringing"
+        ringing: call.state === "ringing"
+        video: call.has_video
+        watching: center.watching
+        appId: call.audio_id()
+        micKnown: micWatch.known
+        micOpen: micWatch.open
+        onMicWantedChanged: call.set_microphone(callAudio.micWanted)
+    }
+
+    // Whether a microphone of the app's is open, as PulseAudio itself
+    // says: what the call's sound waits for before it moves. Connected
+    // only while there may be one.
+    MicWatch {
+        id: micWatch
+        objectName: "micWatch"
+        active: callAudio.talking || callAudio.open
+    }
+
     // Awake while a call is up: a phone that suspends takes the call's
     // sound with it. Lit while one rings, which is when the reader has
     // to see it.
@@ -421,9 +463,11 @@ Item {
         enabled: center.busy
     }
 
+    // And lit while pictures are on it: nobody touches the screen
+    // through a video call, and it is not held to the ear.
     DisplayBlanking {
         objectName: "callDisplay"
-        preventBlanking: call.state === "ringing"
+        preventBlanking: call.state === "ringing" || center.watching
     }
 
     // A tap on either notification comes back here. On a path of its own
@@ -502,8 +546,10 @@ Item {
 
         function ring() {
             ringNote.summary = call.peer_name
-            // A phone first: the line says it is a call before it is read.
-            ringNote.body = "📞 " + qsTr("Incoming call")
+            // A phone or a camera first: the line says what kind of call
+            // it is before it is read.
+            ringNote.body = call.has_video ? "🎥 " + qsTr("Incoming video call")
+                                           : "📞 " + qsTr("Incoming call")
             ringNote.previewSummary = ringNote.summary
             ringNote.previewBody = ringNote.body
             ringNote.timestamp = new Date()

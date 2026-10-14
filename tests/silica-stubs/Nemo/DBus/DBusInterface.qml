@@ -23,14 +23,47 @@ QtObject {
     // What a call answers with, when a test gives it something to: left
     // undefined, a call is answered by nothing, as a bus nobody is on.
     property var reply: undefined
+    // A reply of several values, handed to the callback one argument
+    // each, as the real one hands a reply's arguments.
+    property var replies: undefined
+    // An error the call fails with instead, as [name, message].
+    property var failure: undefined
+    // Answers held back until `answer()`, as a bus answers some time
+    // after the call: what was asked meanwhile is answered then.
+    property bool deferred: false
+    property var held: []
+
+    function answer() {
+        var waiting = held
+        held = []
+        for (var i = 0; i < waiting.length; i++) {
+            waiting[i]()
+        }
+    }
 
     // The real one puts the call on the bus and hands the reply to the
     // callback. Here there is no bus: a test either hands the reply in
     // above, or drives what it would have led to itself.
     function typedCall(method, args, onSuccess, onError) {
         called += method + " " + JSON.stringify(args) + "\n"
-        if (reply !== undefined && onSuccess) {
-            onSuccess(reply)
+        var failed = failure
+        var answers = replies
+        var answered = reply
+        var deliver = function () {
+            if (failed !== undefined) {
+                if (onError) {
+                    onError(failed[0], failed[1])
+                }
+            } else if (answers !== undefined && onSuccess) {
+                onSuccess.apply(null, answers)
+            } else if (answered !== undefined && onSuccess) {
+                onSuccess(answered)
+            }
+        }
+        if (deferred) {
+            held = held.concat([deliver])
+        } else {
+            deliver()
         }
     }
 }
