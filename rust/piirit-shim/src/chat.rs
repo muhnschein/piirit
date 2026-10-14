@@ -5,7 +5,7 @@
 //! than refetching the whole history per message.
 
 use std::cell::RefCell;
-use std::collections::{BTreeMap, HashSet};
+use std::collections::{BTreeMap, HashSet, VecDeque};
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
 
@@ -433,6 +433,21 @@ pub struct ChatMessages {
     /// replaced lands nowhere: the view asks again for whatever it is
     /// looking at once the new rows are in.
     generation: u64,
+
+    /// A read of the chat's id list is in the air. One at a time: each
+    /// is the whole chat, and a burst of arrivals -- the catch-up after a
+    /// night offline, in a busy group -- started one per message, every
+    /// one of them diffed against the rows on the Qt thread as it landed.
+    syncing: bool,
+    /// Something changed while that read was in the air, which it may
+    /// have been too early to see: one more read follows it when it
+    /// lands, and that one sees whatever came meanwhile, however much.
+    sync_again: bool,
+    /// The messages being re-read one by one, each at most once at a time,
+    /// for the same reason; and those that changed again while they were.
+    refreshing: HashSet<u32>,
+    /// See [`Self::refreshing`].
+    refresh_again: HashSet<u32>,
 }
 
 impl ChatMessages {
@@ -893,6 +908,17 @@ impl ChatMessages {
         self.pending.clear();
         self.fetches = 0;
         self.set_hydrating(false);
+        // A sync in the air read the list for the rows being replaced, and
+        // the generation drops what it finds; a re-read still lands, by
+        // id. Neither holds back the next event's own: it starts at once
+        // rather than wait behind one from before. Which also means one
+        // that never answers -- its runtime gone with a core that went
+        // away -- holds nothing back past the reload the core's return
+        // brings.
+        self.syncing = false;
+        self.sync_again = false;
+        self.refreshing.clear();
+        self.refresh_again.clear();
         // The name is its own small fetch, on both paths below: the
         // prefetch does not carry it, and the page opens with the name the
         // list handed it anyway.
@@ -959,21 +985,9 @@ impl ChatMessages {
         );
 
         runtime.spawn(async move {
-            let result = async {
-                let shape = chat_shape(&rpc, account_id, chat_id).await;
-                let entries = message_entries(&rpc, account_id, chat_id).await?;
-                // A row for every message, but the content of only one
-                // page. Ten thousand rows is a vector of ids; ten thousand
-                // *messages* would be built on the Qt thread before the
-                // page could show any of them.
-                let items =
-                    fetch_messages(&rpc, account_id, &ids_of(opening_page(&entries, 0))).await?;
-                // Marking read is the callback's job, not this one's: what
-                // the reader can see is only knowable once the rows land.
-                Ok::<_, String>((shape, entries, items))
-            }
-            .await;
-            done(result);
+            // Marking read is the callback's job, not this one's: what the
+            // reader can see is only knowable once the rows land.
+            done(open_chat(&rpc, account_id, chat_id, 0).await);
         });
     }
 
@@ -1247,24 +1261,50 @@ impl ChatMessages {
     /// id list, one for each, so the only differences are messages that
     /// have arrived and messages that have gone. Both are done in place, so
     /// neither moves the reader.
+    ///
+    /// One read at a time; see [`Self::syncing`]. An event while one is
+    /// in the air marks it to be followed by another, which reads the
+    /// list after the event and so cannot miss what the event announced.
     fn sync_rows(&mut self) {
         let (account_id, chat_id) = (self.account_id, self.chat_id);
         if account_id == 0 || chat_id == 0 {
             return;
         }
+        if self.syncing {
+            self.sync_again = true;
+            return;
+        }
         let Some((rpc, runtime)) = connection() else {
             return;
         };
+        self.syncing = true;
+        let generation = self.generation;
 
         let ptr: QPointer<Self> = QPointer::from(&*self);
         let done = queued_callback(move |result: Result<Vec<Entry>, String>| {
             let Some(this) = ptr.as_pinned() else { return };
-            if this.borrow().chat_id != chat_id {
+            // From before a reload, which read the list afresh and cleared
+            // the way for the next sync itself.
+            if this.borrow().generation != generation {
                 return;
             }
-            match result {
-                Ok(entries) => this.borrow_mut().synced(&entries),
-                Err(err) => this.borrow().error(err.into()),
+            this.borrow_mut().syncing = false;
+            let current = {
+                let this = this.borrow();
+                this.account_id == account_id && this.chat_id == chat_id
+            };
+            if current {
+                match result {
+                    Ok(entries) => this.borrow_mut().synced(&entries),
+                    Err(err) => this.borrow().error(err.into()),
+                }
+            }
+            // Taken after the rows are in, so the read that follows is
+            // diffed against them. A reorder above reloaded, which clears
+            // the mark: the reload's own read is after everything.
+            let again = std::mem::take(&mut this.borrow_mut().sync_again);
+            if again {
+                this.borrow_mut().sync_rows();
             }
         });
 
@@ -1294,6 +1334,19 @@ impl ChatMessages {
         match RowDiff::between(&current, &ids_of(entries)) {
             RowDiff::Same => {}
             RowDiff::Reordered => self.reload(),
+            // Only new messages at the end, as nearly every arrival is:
+            // their placeholders go on the end, with no walk through the
+            // rows to find where.
+            RowDiff::Extended { arrived } => {
+                {
+                    let mut rows = self.rows.borrow_mut();
+                    for entry in entries.get(current.len()..).unwrap_or_default() {
+                        rows.push(placeholder(*entry));
+                    }
+                }
+                self.rows_changed();
+                self.absorb(arrived);
+            }
             RowDiff::Changed { gone, arrived } => {
                 self.remove_rows(&gone);
                 place_arrivals(&mut self.rows.borrow_mut(), entries, &arrived);
@@ -1361,6 +1414,11 @@ impl ChatMessages {
     }
 
     /// Re-read one message and replace its row.
+    ///
+    /// At most once at a time per message; see [`Self::refreshing`]. A
+    /// delivery report, a read receipt and a reaction to the same message
+    /// in one breath are one read, and one more after it if any came
+    /// while it was in the air.
     fn refresh_one(&mut self, message_id: u32) {
         let account_id = self.account_id;
         if !self
@@ -1371,31 +1429,57 @@ impl ChatMessages {
         {
             return;
         }
+        if self.refreshing.contains(&message_id) {
+            self.refresh_again.insert(message_id);
+            return;
+        }
         let Some((rpc, runtime)) = connection() else {
             return;
         };
+        self.refreshing.insert(message_id);
+        let generation = self.generation;
 
         let ptr: QPointer<Self> = QPointer::from(&*self);
         let done = queued_callback(move |result: Result<Vec<MessageListItem>, String>| {
             let Some(this) = ptr.as_pinned() else { return };
-            if let Ok(items) = result {
-                if let Some(item) = items.into_iter().next() {
-                    // Found again here rather than carried from before the
-                    // fetch: a reload in between replaces the rows, and an
-                    // index from the old ones addresses the wrong message
-                    // -- or, once the list is shorter, nothing at all.
-                    // `change_line` indexes without checking.
-                    let existing = this
-                        .borrow()
-                        .rows
-                        .borrow()
-                        .iter()
-                        .position(|row| row.message_id == item.message_id);
-                    let Some(index) = existing else { return };
-                    this.borrow_mut().rows.borrow_mut().change_line(index, item);
-                    this.borrow().rows_changed();
+            // The marks are the generation's that set them: a reload
+            // cleared them, and one set since is a later read's.
+            let again = {
+                let mut this_mut = this.borrow_mut();
+                if this_mut.generation == generation {
+                    this_mut.refreshing.remove(&message_id);
+                    this_mut.refresh_again.remove(&message_id)
+                } else {
+                    false
                 }
+            };
+            // The read the mark asked for. Started before this answer is
+            // put in only so that no return below can skip it: each finds
+            // its row by id, so the order makes no difference.
+            if again {
+                this.borrow_mut().refresh_one(message_id);
             }
+            // Message ids are only unique within an account.
+            if this.borrow().account_id != account_id {
+                return;
+            }
+            let Some(item) = result.ok().and_then(|items| items.into_iter().next()) else {
+                return;
+            };
+            // Found again here rather than carried from before the fetch: a
+            // reload in between replaces the rows, and an index from the old
+            // ones addresses the wrong message -- or, once the list is
+            // shorter, nothing at all. `change_line` indexes without
+            // checking.
+            let existing = this
+                .borrow()
+                .rows
+                .borrow()
+                .iter()
+                .position(|row| row.message_id == item.message_id);
+            let Some(index) = existing else { return };
+            this.borrow_mut().rows.borrow_mut().change_line(index, item);
+            this.borrow().rows_changed();
         });
 
         runtime.spawn(async move {
@@ -2014,7 +2098,7 @@ impl Outgoing {
     /// Hand the message to the core and fetch the row it became.
     async fn send(
         self,
-        rpc: &RpcClient,
+        rpc: &Arc<RpcClient>,
         account_id: u32,
         chat_id: u32,
     ) -> Result<MessageListItem, String> {
@@ -2042,7 +2126,7 @@ impl Outgoing {
     /// A message whose view type the core is told, through `send_msg`.
     async fn send_as(
         self,
-        rpc: &RpcClient,
+        rpc: &Arc<RpcClient>,
         account_id: u32,
         chat_id: u32,
         viewtype: &str,
@@ -2079,7 +2163,7 @@ impl Outgoing {
     /// Text, a file, or both, through `misc_send_msg`.
     async fn send_text_or_file(
         self,
-        rpc: &RpcClient,
+        rpc: &Arc<RpcClient>,
         account_id: u32,
         chat_id: u32,
     ) -> Result<MessageListItem, String> {
@@ -2110,7 +2194,7 @@ impl Outgoing {
                 let mut row = row_from(message_id, &message);
                 // A .xdc sent from here is an app on its own row at once,
                 // rather than a file until the chat is next opened.
-                with_webxdc(rpc, account_id, &mut row).await;
+                with_extras(rpc, account_id, std::slice::from_mut(&mut row)).await;
                 Ok(row)
             }
             Err(err) => Err(err),
@@ -2124,6 +2208,9 @@ enum RowDiff {
     Same,
     /// Something moved, which only a reload can honour.
     Reordered,
+    /// The list is the rows with these after them, by id in the chat's
+    /// order: nothing gone and nothing arrived anywhere but the end.
+    Extended { arrived: Vec<u32> },
     /// Messages gone, by row index, and messages arrived, by id in the
     /// chat's order.
     Changed { gone: Vec<usize>, arrived: Vec<u32> },
@@ -2145,6 +2232,14 @@ impl RowDiff {
     fn between(current: &[u32], ids: &[u32]) -> Self {
         if current == ids {
             return Self::Same;
+        }
+        // What nearly every event is, checked first because it is one
+        // comparison of the two lists rather than a set of the whole chat
+        // built and probed on the Qt thread.
+        if let Some(tail) = ids.strip_prefix(current) {
+            return Self::Extended {
+                arrived: tail.to_vec(),
+            };
         }
         let present: HashSet<u32> = ids.iter().copied().collect();
         let newest = ids.iter().copied().max().unwrap_or(0);
@@ -2308,7 +2403,7 @@ pub(crate) async fn act_on_message(
 /// Fetch several messages in one call. The old code asked for them one at a
 /// time, which cost a round trip per message on every refresh.
 pub(crate) async fn fetch_messages(
-    rpc: &RpcClient,
+    rpc: &Arc<RpcClient>,
     account_id: u32,
     ids: &[u32],
 ) -> Result<Vec<MessageListItem>, String> {
@@ -2331,48 +2426,99 @@ pub(crate) async fn fetch_messages(
             Some(row_from(*id, message))
         })
         .collect();
-    for row in &mut rows {
-        with_webxdc(rpc, account_id, row).await;
-        with_call(rpc, account_id, row).await;
-    }
+    with_extras(rpc, account_id, &mut rows).await;
     Ok(rows)
 }
 
-/// Fill in what a webxdc row draws, for the rows that are one.
+/// How many of the rows' second round trips are in the air at once.
 ///
-/// A second round trip per app, and none at all for every other kind of
-/// message: an app is rare in a chat, and a row that showed only the
-/// file name would be the thing this feature exists to replace.
-async fn with_webxdc(rpc: &RpcClient, account_id: u32, row: &mut MessageListItem) {
-    if row.view_type.to_string() != "Webxdc" {
-        return;
-    }
-    let extras = webxdc::extras(rpc, account_id, row.message_id).await;
-    row.webxdc_name = extras.name.into();
-    row.webxdc_document = extras.document.into();
-    row.webxdc_summary = extras.summary.into();
-    row.webxdc_icon = extras.icon_path.into();
+/// A page of a Calls or an Apps list is fifty rows that each need one,
+/// and asked one after another they were fifty round trips end to end
+/// before the page could show anything. All fifty at once would queue
+/// that many requests in front of whatever else the core is asked.
+const EXTRAS_IN_FLIGHT: usize = 8;
+
+/// What a row needs from the core besides its message, for the kinds that
+/// need anything.
+enum Extra {
+    /// What an app's row draws.
+    Webxdc(webxdc::Extras),
+    /// Where a call stands, or nothing for a call the core cannot say
+    /// anything about.
+    Call(Option<calls::Summary>),
 }
 
-/// Fill in where a call stands, for the rows that are one.
+/// Fill in what the rows that are an app or a call draw.
 ///
-/// A second round trip per call, as for an app, and for the same reason:
-/// the core's text for a call is an English sentence, and the state it
-/// was written from is what the row is drawn from instead. The core says
-/// `MsgsChanged` for the message whenever that state moves, which is what
-/// re-reads the row.
-async fn with_call(rpc: &RpcClient, account_id: u32, row: &mut MessageListItem) {
-    if row.view_type.to_string() != "Call" {
-        return;
+/// A second round trip per row of those kinds, and none at all for every
+/// other kind of message. An app's is its name, icon and what it says
+/// about itself: an app is rare in a chat, and a row that showed only the
+/// file name would be the thing that feature exists to replace. A call's
+/// is where it stands: the core's text for a call is an English
+/// sentence, and the state it was written from is what the row is drawn
+/// from instead. The core says `MsgsChanged` for the message whenever
+/// that state moves, which is what re-reads the row.
+///
+/// Up to `EXTRAS_IN_FLIGHT` at once, each a task of its own on the
+/// runtime. Each answer goes back on the row it was asked for, so the
+/// rows keep their order whichever answer lands first.
+async fn with_extras(rpc: &Arc<RpcClient>, account_id: u32, rows: &mut [MessageListItem]) {
+    let mut wanted: VecDeque<(usize, u32, bool)> = rows
+        .iter()
+        .enumerate()
+        .filter_map(|(index, row)| match row.view_type.to_string().as_str() {
+            "Webxdc" => Some((index, row.message_id, false)),
+            "Call" => Some((index, row.message_id, true)),
+            _ => None,
+        })
+        .collect();
+    let mut asked = tokio::task::JoinSet::new();
+    loop {
+        while asked.len() < EXTRAS_IN_FLIGHT {
+            let Some((index, message_id, is_call)) = wanted.pop_front() else {
+                break;
+            };
+            let rpc = Arc::clone(rpc);
+            asked.spawn(async move {
+                let extra = if is_call {
+                    Extra::Call(calls::summary(&rpc, account_id, message_id).await.ok())
+                } else {
+                    Extra::Webxdc(webxdc::extras(&rpc, account_id, message_id).await)
+                };
+                (index, extra)
+            });
+        }
+        let Some(answered) = asked.join_next().await else {
+            break;
+        };
+        // A task that did not finish -- the runtime going down under it --
+        // leaves its row as `row_from` built it, as a failed call does.
+        if let Ok((index, extra)) = answered {
+            if let Some(row) = rows.get_mut(index) {
+                put_extra(row, extra);
+            }
+        }
     }
-    // A call the core cannot say anything about draws as its text, which
-    // is still the core's own sentence about it.
-    let Ok(call) = calls::summary(rpc, account_id, row.message_id).await else {
-        return;
-    };
-    row.call_state = call.state.into();
-    row.call_has_video = call.has_video;
-    row.call_duration = call.duration;
+}
+
+/// Put what `with_extras` fetched for a row on it.
+fn put_extra(row: &mut MessageListItem, extra: Extra) {
+    match extra {
+        Extra::Webxdc(extras) => {
+            row.webxdc_name = extras.name.into();
+            row.webxdc_document = extras.document.into();
+            row.webxdc_summary = extras.summary.into();
+            row.webxdc_icon = extras.icon_path.into();
+        }
+        Extra::Call(Some(call)) => {
+            row.call_state = call.state.into();
+            row.call_has_video = call.has_video;
+            row.call_duration = call.duration;
+        }
+        // A call the core cannot say anything about draws as its text,
+        // which is still the core's own sentence about it.
+        Extra::Call(None) => {}
+    }
 }
 
 /// Whether a row is an incoming message the account has not read.
@@ -2443,30 +2589,80 @@ pub(crate) struct ChatShape {
     pub member_count: u32,
 }
 
+/// Everything a conversation opens with: the chat's shape, every message
+/// in it under its day, and the content of the one page it opens at --
+/// around `find_message_id`, or at the newest messages for 0 or a message
+/// not in the chat; see `opening_page`.
+///
+/// What a page waits on before it can show anything, the prefetch's push
+/// included, so nothing in it waits on what it does not need: the shape is
+/// asked for beside the messages rather than before them.
+pub(crate) async fn open_chat(
+    rpc: &Arc<RpcClient>,
+    account_id: u32,
+    chat_id: u32,
+    find_message_id: u32,
+) -> Result<(ChatShape, Vec<Entry>, Vec<MessageListItem>), String> {
+    let shape = {
+        let rpc = Arc::clone(rpc);
+        tokio::spawn(async move { chat_shape(&rpc, account_id, chat_id).await })
+    };
+    let messages = async {
+        let entries = message_entries(rpc, account_id, chat_id).await?;
+        // A row for every message, but the content of only one page. Ten
+        // thousand rows is a vector of ids; ten thousand *messages* would
+        // be built on the Qt thread before the page could show any of
+        // them.
+        let page = ids_of(opening_page(&entries, find_message_id));
+        let items = fetch_messages(rpc, account_id, &page).await?;
+        Ok::<_, String>((entries, items))
+    }
+    .await;
+    match messages {
+        // A shape that could not be read -- its task gone with the
+        // runtime -- is the one a chat the core cannot describe gets.
+        Ok((entries, items)) => Ok((shape.await.unwrap_or_default(), entries, items)),
+        Err(err) => {
+            shape.abort();
+            Err(err)
+        }
+    }
+}
+
 /// Read the chat's shape off the core: `get_basic_chat_info` for the kind
 /// and the encryption, and `can_send` for whether it takes messages. A
 /// chat the core cannot describe reads as a one-to-one chat that takes
 /// nothing, which is the answer that offers the least.
-pub(crate) async fn chat_shape(rpc: &RpcClient, account_id: u32, chat_id: u32) -> ChatShape {
+///
+/// `can_send` is asked beside the description, since neither needs the
+/// other, and a group's member count while it is answered.
+async fn chat_shape(rpc: &Arc<RpcClient>, account_id: u32, chat_id: u32) -> ChatShape {
+    let can_send = {
+        let rpc = Arc::clone(rpc);
+        tokio::spawn(async move {
+            rpc.call::<_, bool>("can_send", (account_id, chat_id))
+                .await
+                .unwrap_or(false)
+        })
+    };
     let Some(info) = basic_chat_info(rpc, account_id, chat_id).await else {
+        can_send.abort();
         return ChatShape::default();
     };
-    let can_send = rpc
-        .call::<_, bool>("can_send", (account_id, chat_id))
-        .await
-        .unwrap_or(false);
     let is_group = is_group_info(&info);
     let is_encrypted = json::flag(&info, "isEncrypted");
+    let member_count = if is_group {
+        member_count(rpc, account_id, chat_id).await
+    } else {
+        0
+    };
+    let can_send = can_send.await.unwrap_or(false);
     ChatShape {
         is_group,
         can_send,
         is_encrypted,
         can_call: takes_calls(&info, is_group, can_send),
-        member_count: if is_group {
-            member_count(rpc, account_id, chat_id).await
-        } else {
-            0
-        },
+        member_count,
     }
 }
 
@@ -2622,7 +2818,7 @@ fn row_from(message_id: u32, message: &serde_json::Value) -> MessageListItem {
         vcard_color: json::text(message, "/vcardContact/color"),
         reactions: reactions_json(message).into(),
         my_reaction: own_reaction(message).into(),
-        // Filled in by `with_webxdc` for the rows that are an app: it
+        // Filled in by `with_extras` for the rows that are an app: it
         // takes another call to the core, and this is the shape of one
         // message rather than a place to make one.
         ..MessageListItem::default()
@@ -3198,6 +3394,41 @@ mod tests {
             }
             _ => panic!("a deletion under a newer list should be a change"),
         }
+    }
+
+    #[test]
+    fn arrivals_only_at_the_end_are_an_extension() {
+        // What nearly every event is, answered without the sets.
+        match RowDiff::between(&[1, 2, 3], &[1, 2, 3, 4, 5]) {
+            RowDiff::Extended { arrived } => assert_eq!(arrived, vec![4, 5]),
+            _ => panic!("arrivals at the end should be an extension"),
+        }
+        // From no rows at all.
+        match RowDiff::between(&[], &[1, 2]) {
+            RowDiff::Extended { arrived } => assert_eq!(arrived, vec![1, 2]),
+            _ => panic!("arrivals into no rows should be an extension"),
+        }
+        // Not with a departure beside them, nor with one put anywhere
+        // but the end.
+        assert!(matches!(
+            RowDiff::between(&[1, 2, 3], &[2, 3, 4]),
+            RowDiff::Changed { .. }
+        ));
+        assert!(matches!(
+            RowDiff::between(&[1, 2, 3], &[1, 2, 7, 3, 8]),
+            RowDiff::Changed { .. }
+        ));
+        // Nor past a row newer than the list, which keeps its place at
+        // the end and has the arrival go in before it.
+        match RowDiff::between(&[1, 2, 3, 9], &[1, 2, 3, 4]) {
+            RowDiff::Changed { gone, arrived } => {
+                assert_eq!(gone, Vec::<usize>::new());
+                assert_eq!(arrived, vec![4]);
+            }
+            _ => panic!("an arrival before a newer row should be a change"),
+        }
+        // And nothing at all is still nothing.
+        assert!(matches!(RowDiff::between(&[], &[]), RowDiff::Same));
     }
 
     fn entries(ids: &[u32]) -> Vec<Entry> {
