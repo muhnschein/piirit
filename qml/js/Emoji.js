@@ -23,15 +23,17 @@
 //   Basic Multilingual Plane, by its code: the only ones a scan of a
 //   message has to stop at, besides the planes above it.
 // - `textStyle`: the symbols that are text unless U+FE0F says otherwise
-//   -- a heart, a copyright sign, an arrow -- by key. Unicode draws these
-//   as text by default, and so does every other client; a message that
-//   says "(c)" with the sign has not sent an emoji. One character and the
-//   selector in the data -- fully qualified only with it, so text without
-//   it. A star or a check mark is an emoji bare, and the data spells it
-//   bare (scripts/fetch-emoji.py, `spelled`). Only in the Basic
-//   Multilingual Plane, among the symbols every font has: above it a
-//   dove or a sun behind a cloud sent bare would be an empty box, so it
-//   is a picture.
+//   -- a copyright sign, an arrow, a check box -- by key. Unicode draws
+//   these as text by default; a message that says "(c)" with the sign
+//   has not sent an emoji. One character and the selector in the data
+//   -- fully qualified only with it, so text without it -- and in the
+//   picker's Symbols group. A heart, a smiley or a sun is text by
+//   Unicode's default too, but whoever sends one bare means the emoji,
+//   and every phone draws it as one; a star or a check mark is an emoji
+//   bare by Unicode as well, and the data spells it bare
+//   (scripts/fetch-emoji.py, `spelled`). Only in the Basic Multilingual
+//   Plane, among the symbols every font has: above it a sign sent bare
+//   would be an empty box, so it is a picture.
 // - `mayHold`: matches a text only if it has a character of some emoji's
 //   key in it -- the first, or a keycap's mark -- so any text it does not
 //   match has nothing in it to draw, and need not be read through.

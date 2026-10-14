@@ -160,6 +160,7 @@ fn messages_draw_their_emoji_as_the_reactions_do() {
         ("copyright-text", "(c) © 2024", false),
         ("copyright-emoji", "©\u{fe0f}", false),
         ("heart-text", "\u{2764}", false),
+        ("smiley-text", "\u{263a} hi", false),
         ("heart-emoji", "\u{2764}\u{fe0f}", false),
         // An emoji whatever follows it, as every client sends it: bare.
         ("star", "\u{2b50} \u{2705}\u{2728}", false),
@@ -268,11 +269,15 @@ fn messages_draw_their_emoji_as_the_reactions_do() {
         ),
         ("copyright-text", String::new()),
         ("copyright-emoji", img("a9")),
-        ("heart-text", String::new()),
+        // A heart or a smiley is text by Unicode's default, as the
+        // copyright sign is, but whoever sends one bare means the emoji:
+        // left to the font, it was Sailfish's glyph where every phone
+        // draws the emoji.
+        ("heart-text", img("2764")),
         ("heart-emoji", img("2764")),
-        // Not a symbol that is text without the selector, as a heart is:
-        // left to the font, a star sat between pictures in Sailfish's own
-        // glyph.
+        ("smiley-text", format!("{} hi", img("263a"))),
+        // An emoji bare by Unicode: left to the font, a star sat between
+        // pictures in Sailfish's own glyph.
         (
             "star",
             format!("{} {}{}", img("2b50"), img("2705"), img("2728")),

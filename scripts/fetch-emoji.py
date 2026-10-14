@@ -59,6 +59,9 @@ TWEMOJI_REPO = "https://github.com/jdecked/twemoji.git"
 # is the skin-tone and hair components, which are not emoji anyone
 # reacts with on their own.
 GROUPS = [0, 1, 3, 4, 5, 6, 7, 8, 9]
+# Where Symbols is among them: the one group whose text-by-default
+# characters are drawn as text when they arrive without U+FE0F.
+SYMBOLS = GROUPS.index(8)
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA_JS = os.path.join("qml", "js", "EmojiData.js")
@@ -222,8 +225,12 @@ def pictures_js(rows):
         if first <= 0xFFFF:
             if first not in bmp_starts:
                 bmp_starts.append(first)
-            # One character and the selector: text without it.
-            if len(bare) == 1 and emoji[1:2] == "\ufe0f" and bare not in text_style:
+            # One character and the selector: text without it -- among
+            # the symbols. A heart, a smiley or a sun sent bare is meant
+            # as one, whatever Unicode's default; a "(c)" sign or an
+            # arrow in a sentence is not.
+            if (len(bare) == 1 and emoji[1:2] == "\ufe0f" and row[2] == SYMBOLS
+                    and bare not in text_style):
                 text_style.append(bare)
 
     # One code unit out of every key, so that a text with none of them in
