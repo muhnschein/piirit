@@ -448,6 +448,18 @@ Page {
         page.pendingVoice = ""
     }
 
+    // A capture left on the bar when the chat is closed, or a voice
+    // message the core never answered for, is not going anywhere now:
+    // nothing else knows it is there. Unless a send is still under way,
+    // which may be reading it; what that leaves behind is the sweep's
+    // (capture.rs). A recoded video is the model's to put away.
+    Component.onDestruction: {
+        if (!messages.sending) {
+            page.dropAttachment()
+            page.dropVoice()
+        }
+    }
+
     // Pushed by URL and connected to, the way forwarding pushes
     // ChatPickerPage: the picker pages are the only files that name a
     // `Sailfish.Pickers` type, and the capture page and the scanner the
