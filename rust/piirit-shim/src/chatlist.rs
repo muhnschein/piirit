@@ -316,7 +316,19 @@ impl ChatList {
             return;
         }
         let chat_id = json::u32_opt(&payload, "chatId").filter(|id| *id != 0);
-        let scope = chat_id.map_or(Refresh::All, Refresh::One);
+        let scope = match chat_id {
+            Some(chat_id) => Refresh::One(chat_id),
+            // Never a chat id, and never a change to what a row says:
+            // upstream's "set of chats or the order of the chats in the
+            // chatlist has changed". The core sends it with every message,
+            // every message sent and every draft saved, each time beside
+            // a `ChatlistItemChanged` that names the chat whose row did
+            // change. Read as `All`, it re-read every chat in the list
+            // for each of them -- seconds of the core's time per message
+            // on a long list.
+            None if kind == "ChatlistChanged" => Refresh::Order,
+            None => Refresh::All,
+        };
         // Worth telling anyone listening about, but only a genuinely new
         // message: MsgsChanged and friends fire for messages we sent, for
         // read receipts, and for a chat being pinned.
@@ -379,11 +391,16 @@ impl ChatList {
     }
 
     /// Set the query and reload if it changed.
+    ///
+    /// Only the order: a row says the same whatever was searched for, so
+    /// the chats already held are reused and only the ones the new query
+    /// brings in are read. Clearing a search would otherwise re-read the
+    /// whole list.
     pub fn set_query(&mut self, query: QString) {
         if self.query.to_string() != query.to_string() {
             self.query = query;
             self.query_changed();
-            self.refresh(Refresh::All);
+            self.refresh(Refresh::Order);
         }
     }
 
@@ -621,11 +638,28 @@ impl ChatList {
     /// not in the model yet and any chat an earlier refresh is still
     /// waiting on (see `awaiting`), and reuses every other row -- so a
     /// message arriving in one chat costs one entry listing and one item
-    /// fetch, not a rebuild. [`Refresh::All`] refetches the lot, which is
+    /// fetch, not a rebuild. [`Refresh::Order`] is the same without a
+    /// chat of its own. [`Refresh::All`] refetches the lot, which is
     /// what the core asks for when it reports a change it cannot
     /// attribute.
     fn refresh(&mut self, scope: Refresh) {
         self.refresh_announcing(scope, None);
+    }
+
+    /// Shows the first screenful of a first load before the rest is read,
+    /// unless something newer has been asked for since `generation`.
+    /// Nothing is settled by it: what is owed an answer, and what waits to
+    /// be announced, wait for the whole list.
+    fn show_early(&self, generation: u64) -> impl Fn(Vec<ChatListItem>) + Send + Sync + Clone {
+        let ptr: QPointer<Self> = QPointer::from(self);
+        queued_callback(move |rows: Vec<ChatListItem>| {
+            let Some(this) = ptr.as_pinned() else { return };
+            if this.borrow().generation != generation {
+                return;
+            }
+            this.borrow_mut().all_rows = rows;
+            Self::show(this);
+        })
     }
 
     /// [`Self::refresh`], and afterwards say that a message landed in
@@ -642,6 +676,9 @@ impl ChatList {
         let archived = self.archived;
         let for_forwarding = self.for_forwarding;
         let cached: Vec<ChatListItem> = self.all_rows.clone();
+        // Nothing held yet: the app starting, a profile switched to, the
+        // archived page opened.
+        let first_load = cached.is_empty();
         // A set, not a list: this is asked once per entry, and a long chat
         // list would otherwise make the scan quadratic.
         let known: HashSet<u32> = cached.iter().map(|row| row.chat_id).collect();
@@ -697,6 +734,8 @@ impl ChatList {
             }
         });
 
+        let early = self.show_early(generation);
+
         runtime.spawn(async move {
             let result = async {
                 let entries =
@@ -706,11 +745,30 @@ impl ChatList {
                     .copied()
                     .filter(|id| refetch_all || awaiting.contains(id) || !known.contains(id))
                     .collect();
-                let fresh = if wanted.is_empty() {
+                // The core builds the rows one after another, so asking for
+                // all of them at once leaves the page empty until the last
+                // is built: 1.9 s for 200 chats on a desktop processor, and
+                // several times that on a phone. The rows a screen shows
+                // come first, on their own.
+                let (first, rest) = if first_load {
+                    wanted.split_at(wanted.len().min(FIRST_SCREENFUL))
+                } else {
+                    (wanted.as_slice(), &[][..])
+                };
+                let mut fresh = if first.is_empty() {
                     HashMap::new()
                 } else {
-                    chat_items(&rpc, account_id, &wanted).await?
+                    chat_items(&rpc, account_id, first).await?
                 };
+                if !rest.is_empty() {
+                    early(
+                        entries
+                            .iter()
+                            .filter_map(|chat_id| fresh.get(chat_id).cloned())
+                            .collect(),
+                    );
+                    fresh.extend(chat_items(&rpc, account_id, rest).await?);
+                }
                 // Target order from the core, contents from the fetch where
                 // we have them and from the model where we do not.
                 Ok::<_, String>(
@@ -778,6 +836,8 @@ impl Awaiting {
     fn add(&mut self, scope: Refresh) {
         match (&mut *self, scope) {
             (Awaiting::Everything, _) | (_, Refresh::All) => *self = Awaiting::Everything,
+            // Nothing to re-read beyond what the listing turns up new.
+            (_, Refresh::Order) => {}
             (Awaiting::Chats(chats), Refresh::One(chat_id)) => {
                 chats.insert(chat_id);
             }
@@ -795,6 +855,9 @@ enum Refresh {
     /// without naming a chat, and what `reload` has to do to be worth
     /// calling at all.
     All,
+    /// The order, and any chat not in the model yet: every row already
+    /// held is still right.
+    Order,
     /// This chat, plus any chat not in the model yet.
     One(u32),
 }
@@ -938,6 +1001,10 @@ async fn chat_entries(
     .await
     .map_err(|err| err.to_string())
 }
+
+/// How many rows a first load reads before showing any: more than a
+/// phone's screen holds, so the list is full when it first appears.
+const FIRST_SCREENFUL: usize = 20;
 
 /// Rows for the given chats, in one call.
 pub(crate) async fn chat_items(

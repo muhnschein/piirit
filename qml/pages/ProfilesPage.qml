@@ -113,17 +113,23 @@ Page {
             /// it covers and the row goes whenever the list reloads. So
             /// it draws, and reports the tap.
             function raiseRemorse() {
+                remorse.active = true
                 //: What Silica's countdown says it is doing, over a
                 //: profile the reader has asked to delete.
-                remorse.execute(
+                remorse.item.execute(
                     body, qsTr("Deleting profile"), function() {},
                     doomedProfiles.countdownFor(model.account_id))
             }
 
-            RemorseItem {
+            // Built the first time a delete is asked for, not with the
+            // row, as the conversation and the chat list do.
+            Loader {
                 id: remorse
-                objectName: "profileRemorse"
-                onCanceled: doomedProfiles.spare(model.account_id)
+                active: false
+                sourceComponent: RemorseItem {
+                    objectName: "profileRemorse"
+                    onCanceled: doomedProfiles.spare(model.account_id)
+                }
             }
 
             // A row rebuilt mid-wait comes back with no countdown on it.
@@ -133,58 +139,65 @@ Page {
                 }
             }
 
-            menu: ContextMenu {
-                MenuItem {
-                    objectName: "profileSettingsItem"
-                    text: qsTr("Profile settings")
-                    onClicked: pageStack.push(Qt.resolvedUrl("ProfilePage.qml"),
-                                              { accountId: model.account_id })
-                }
-                // The invite code, the second device and the backup are
-                // about this profile and nothing else, so they are on
-                // the profile rather than a page deeper in. All three
-                // take the row's own account: the core's invite, its
-                // provider and its export are each per account.
-                MenuItem {
-                    objectName: "inviteItem"
-                    text: qsTr("Invite code")
-                    onClicked: pageStack.push(Qt.resolvedUrl("QrPage.qml"),
-                                              { accountId: model.account_id })
-                }
-                MenuItem {
-                    objectName: "secondDeviceItem"
-                    text: qsTr("Add a second device")
-                    onClicked: pageStack.push(
-                        Qt.resolvedUrl("SecondDevicePage.qml"), {
+            // A Component, which Silica builds the first time the menu is
+            // opened, rather than five items built with every row; see
+            // ConversationList.
+            menu: Component {
+                ContextMenu {
+                    MenuItem {
+                        objectName: "profileSettingsItem"
+                        text: qsTr("Profile settings")
+                        onClicked: pageStack.push(Qt.resolvedUrl("ProfilePage.qml"),
+                                                  { accountId: model.account_id })
+                    }
+                    // The invite code, the second device and the backup
+                    // are about this profile and nothing else, so they
+                    // are on the profile rather than a page deeper in.
+                    // All three take the row's own account: the core's
+                    // invite, its provider and its export are each per
+                    // account.
+                    MenuItem {
+                        objectName: "inviteItem"
+                        text: qsTr("Invite code")
+                        onClicked: pageStack.push(Qt.resolvedUrl("QrPage.qml"),
+                                                  { accountId: model.account_id })
+                    }
+                    MenuItem {
+                        objectName: "secondDeviceItem"
+                        text: qsTr("Add a second device")
+                        onClicked: pageStack.push(
+                            Qt.resolvedUrl("SecondDevicePage.qml"), {
+                                accountId: model.account_id,
+                                // Where the forward swipe goes once a
+                                // device has taken the profile: the chats
+                                // the app is on, which is not necessarily
+                                // the profile being offered.
+                                currentAccountId: page.currentAccountId
+                            })
+                    }
+                    MenuItem {
+                        objectName: "backupItem"
+                        text: qsTr("Back up profile")
+                        onClicked: pageStack.push(Qt.resolvedUrl("BackupPage.qml"), {
                             accountId: model.account_id,
-                            // Where the forward swipe goes once a
-                            // device has taken the profile: the chats
-                            // the app is on, which is not necessarily
-                            // the profile being offered.
+                            // Where the forward swipe goes once the
+                            // backup is written: the chats the app is on,
+                            // which is not necessarily the profile being
+                            // backed up.
                             currentAccountId: page.currentAccountId
                         })
-                }
-                MenuItem {
-                    objectName: "backupItem"
-                    text: qsTr("Back up profile")
-                    onClicked: pageStack.push(Qt.resolvedUrl("BackupPage.qml"), {
-                        accountId: model.account_id,
-                        // Where the forward swipe goes once the backup
-                        // is written: the chats the app is on, which is
-                        // not necessarily the profile being backed up.
-                        currentAccountId: page.currentAccountId
-                    })
-                }
-                MenuItem {
-                    objectName: "deleteProfileItem"
-                    text: qsTr("Delete profile")
-                    // The page is told, not this row: the row is
-                    // destroyed whenever the list reloads, and a wait
-                    // living on it would go too. Same as the chat list
-                    // and the conversation.
-                    onClicked: {
-                        doomedProfiles.ask(model.account_id)
-                        profileDelegate.raiseRemorse()
+                    }
+                    MenuItem {
+                        objectName: "deleteProfileItem"
+                        text: qsTr("Delete profile")
+                        // The page is told, not this row: the row is
+                        // destroyed whenever the list reloads, and a wait
+                        // living on it would go too. Same as the chat
+                        // list and the conversation.
+                        onClicked: {
+                            doomedProfiles.ask(model.account_id)
+                            profileDelegate.raiseRemorse()
+                        }
                     }
                 }
             }

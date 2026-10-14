@@ -52,7 +52,8 @@ const PROBE_QML: &str = r"
         function load(url) {
             loader.setSource('', {})
             picked = ''
-            loader.setSource(url, {})
+            // In front, as the app is when the reader is taking a picture.
+            loader.setSource(url, { appActive: true })
             if (loader.status !== Loader.Ready) { return 'load-failed' }
             loader.item.picked.connect(function(path) { picked = path })
             return 'ok'
@@ -100,6 +101,9 @@ const PROBE_QML: &str = r"
         function pickedPath() { return picked }
         function shutterIcon() { return loader.item.shutterIcon }
         function leave() { loader.item.status = PageStatus.Deactivating; return 'ok' }
+        // The app sent to the background, or the screen turned off, and
+        // brought back: Silica leaves the page's status as it was.
+        function background(away) { loader.item.appActive = !away; return 'ok' }
         // The phone is turned: the sensor reports it, and the page writes
         // the turn into the next capture.
         function turn(orientation) {
@@ -250,6 +254,25 @@ fn a_still_and_a_video_are_reported_once_written_and_the_page_leaves() {
             call!("load", QString::from(common::page_url("CapturePage.qml")))
         );
         record!("before-leaving", call!("running"));
+        // In the background the camera and the sensor stop, and come
+        // back with the app.
+        record!("away", call!("background", true));
+        record!("away-running", call!("running"));
+        probe!("away-sensor", "orientationSensor", "active");
+        record!("back", call!("background", false));
+        record!("back-running", call!("running"));
+        probe!("back-sensor", "orientationSensor", "active");
+        // But a video being recorded goes on there.
+        record!(
+            "away-video-mode",
+            call!("tap", QString::from("modeOption1"))
+        );
+        record!("away-record", call!("tap", QString::from("shutter")));
+        call!("background", true);
+        record!("away-recording", call!("recorderState"));
+        record!("away-recording-running", call!("running"));
+        call!("background", false);
+        record!("back-recording", call!("recorderState"));
         call!("leave");
         record!("after-leaving", call!("running"));
         (*engine_ptr).quit();
@@ -401,6 +424,38 @@ fn a_still_and_a_video_are_reported_once_written_and_the_page_leaves() {
         "the page did not leave with the video the camera's stop finished. {context}"
     );
     assert_eq!(value("before-leaving"), "true", "{context}");
+    assert_eq!(value("away"), "ok", "{context}");
+    assert_eq!(
+        value("away-running"),
+        "false",
+        "the camera kept running with the app in the background. {context}"
+    );
+    assert_eq!(
+        value("away-sensor"),
+        "false",
+        "the orientation sensor kept running with the app in the background. {context}"
+    );
+    assert_eq!(
+        value("back-running"),
+        "true",
+        "the camera did not come back with the app. {context}"
+    );
+    assert_eq!(
+        value("back-sensor"),
+        "true",
+        "the orientation sensor did not come back with the app. {context}"
+    );
+    assert_eq!(value("away-video-mode"), "1", "{context}");
+    assert_eq!(
+        [value("away-recording"), value("away-recording-running")],
+        ["1", "true"],
+        "a video being recorded was stopped when the app went to the background. {context}"
+    );
+    assert_eq!(
+        value("back-recording"),
+        "1",
+        "a video being recorded did not carry on once the app was back. {context}"
+    );
     assert_eq!(
         value("after-leaving"),
         "false",

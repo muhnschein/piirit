@@ -1175,6 +1175,7 @@ SilicaListView {
                 fileName: model.file_name
                 fileMime: model.file_mime
                 fileBytes: model.file_bytes
+                durationMs: model.duration_ms
                 viewType: model.view_type
                 imageWidth: model.image_width
                 imageHeight: model.image_height
@@ -1188,6 +1189,7 @@ SilicaListView {
                 webxdcSummary: model.webxdc_summary
                 webxdcIcon: model.webxdc_icon
                 appsEnabled: root.appsEnabled
+                scrolling: root.held
                 callState: model.call_state
                 callHasVideo: model.call_has_video
                 callDuration: model.call_duration

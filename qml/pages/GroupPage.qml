@@ -153,6 +153,7 @@ Page {
     // waiting to be removed goes now -- leaving is exactly when a timer
     // has not fired yet.
     onStatusChanged: {
+        page.showMembersOnceShown()
         if (status === PageStatus.Deactivating) {
             page.applyEdits()
             page.applyDescription()
@@ -160,6 +161,20 @@ Page {
             doomedMembers.flush()
         }
     }
+
+    /// Build the member rows the first time the page is coming onto the
+    /// screen; see `memberSection`. On its way in rather than once it is
+    /// there, so the rows are already in place as it slides across.
+    function showMembersOnceShown() {
+        if (page.status === PageStatus.Activating
+                || page.status === PageStatus.Active) {
+            memberSection.active = true
+        }
+    }
+
+    // A page made already on the screen never sees its status change on
+    // the way in.
+    Component.onCompleted: page.showMembersOnceShown()
 
     /// How long a member waits before they go, in milliseconds. Nothing
     /// sets it; a test turns it down rather than waiting.
@@ -367,81 +382,115 @@ Page {
                 text: qsTr("%n member(s)", "", chat.member_count)
             }
 
-            // A Repeater in the column rather than a list of its own: the
-            // page scrolls as one thing, and a group is short enough.
-            Repeater {
-                model: chat.members
+            // The rows themselves, built the first time the page is on
+            // its way onto the screen rather than when it is made. A
+            // group's page is made attached to its conversation as soon
+            // as the conversation has loaded, so every member's row was
+            // built while the reader was only opening the chat -- most
+            // of the time to never swipe across to it. Kept once built:
+            // the next swipe across should not build them again.
+            Loader {
+                id: memberSection
+                objectName: "memberSection"
+                width: column.width
+                active: false
 
-                delegate: ListItem {
-                    id: memberRow
-                    // Named per member, so a test can find the one it
-                    // means rather than the first.
-                    objectName: "memberRow" + model.contact_id
+                sourceComponent: Column {
                     width: column.width
-                    contentHeight: body.height
+                    // The page's own gap between rows, which the rows had
+                    // when they stood in the page's column themselves.
+                    spacing: column.spacing
 
-                    /// This member is on their way out.
-                    readonly property bool doomed:
-                        doomedMembers.pending(model.contact_id)
+                    // A Repeater in the column rather than a list of its
+                    // own: the page scrolls as one thing, and a group is
+                    // short enough.
+                    Repeater {
+                        model: chat.members
 
-                    /// Silica's own countdown, drawn over the member.
-                    /// The removal is not its business -- that belongs
-                    /// to `doomedMembers`, because a remorse item lives
-                    /// in the row it covers and removing one member
-                    /// reloads the whole member list. So it draws, and
-                    /// reports the tap.
-                    function raiseRemorse() {
-                        //: What Silica's countdown says it is doing,
-                        //: over a member the reader has asked to
-                        //: remove from the group.
-                        remorse.execute(
-                            body, qsTr("Removing"), function() {},
-                            doomedMembers.countdownFor(model.contact_id))
-                    }
+                        delegate: ListItem {
+                            id: memberRow
+                            // Named per member, so a test can find the one
+                            // it means rather than the first.
+                            objectName: "memberRow" + model.contact_id
+                            width: column.width
+                            contentHeight: body.height
 
-                    RemorseItem {
-                        id: remorse
-                        objectName: "memberRemorse"
-                        onCanceled: doomedMembers.spare(model.contact_id)
-                    }
+                            /// This member is on their way out.
+                            readonly property bool doomed:
+                                doomedMembers.pending(model.contact_id)
 
-                    // A row rebuilt mid-wait comes back bare.
-                    Component.onCompleted: {
-                        if (memberRow.doomed) {
-                            memberRow.raiseRemorse()
-                        }
-                    }
-
-                    // Removing yourself is leaving, which has its own
-                    // place in the pulley and its own countdown.
-                    menu: ContextMenu {
-                        MenuItem {
-                            objectName: "removeItem"
-                            visible: chat.can_edit && !model.is_self
-                            text: qsTr("Remove from group")
-                            // The page is told, not this row: removing
-                            // one member reloads the list, and a wait
-                            // living on a row would go with the row.
-                            onClicked: {
-                                doomedMembers.ask(model.contact_id)
-                                memberRow.raiseRemorse()
+                            /// Silica's own countdown, drawn over the
+                            /// member. The removal is not its business --
+                            /// that belongs to `doomedMembers`, because a
+                            /// remorse item lives in the row it covers and
+                            /// a member's row can go whenever the list
+                            /// changes. So it draws, and reports the tap.
+                            function raiseRemorse() {
+                                remorse.active = true
+                                //: What Silica's countdown says it is doing,
+                                //: over a member the reader has asked to
+                                //: remove from the group.
+                                remorse.item.execute(
+                                    body, qsTr("Removing"), function() {},
+                                    doomedMembers.countdownFor(model.contact_id))
                             }
+
+                            // Built the first time a removal is asked for,
+                            // not with the row, as the conversation does.
+                            Loader {
+                                id: remorse
+                                active: false
+                                sourceComponent: RemorseItem {
+                                    objectName: "memberRemorse"
+                                    onCanceled: doomedMembers.spare(model.contact_id)
+                                }
+                            }
+
+                            // A row rebuilt mid-wait comes back bare.
+                            Component.onCompleted: {
+                                if (memberRow.doomed) {
+                                    memberRow.raiseRemorse()
+                                }
+                            }
+
+                            // Removing yourself is leaving, which has its
+                            // own place in the pulley and its own
+                            // countdown. A Component, which Silica builds
+                            // the first time the menu is opened; see
+                            // ConversationList.
+                            menu: Component {
+                                ContextMenu {
+                                    MenuItem {
+                                        objectName: "removeItem"
+                                        visible: chat.can_edit && !model.is_self
+                                        text: qsTr("Remove from group")
+                                        // The page is told, not this row:
+                                        // removing one member changes the
+                                        // list, and a wait living on a row
+                                        // would go with the row.
+                                        onClicked: {
+                                            doomedMembers.ask(model.contact_id)
+                                            memberRow.raiseRemorse()
+                                        }
+                                    }
+                                }
+                            }
+
+                            ContactRow {
+                                id: body
+                                // The remorse covering this does the
+                                // fading, with its own `opacity: 0.0` on
+                                // what it was handed.
+                                enabled: !memberRow.doomed
+                                width: parent.width
+                                displayName: model.display_name
+                                ownColor: model.color
+                                picturePath: model.avatar_path
+                                isKeyContact: model.is_key_contact
+                            }
+
                         }
                     }
-
-                    ContactRow {
-                        id: body
-                        // The remorse covering this does the fading,
-                        // with its own `opacity: 0.0` on what it was
-                        // handed.
-                        enabled: !memberRow.doomed
-                        width: parent.width
-                        displayName: model.display_name
-                        ownColor: model.color
-                        picturePath: model.avatar_path
-                        isKeyContact: model.is_key_contact
-                    }
-
                 }
             }
 

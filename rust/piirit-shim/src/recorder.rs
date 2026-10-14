@@ -102,9 +102,9 @@ const RECORDING_STATE: i32 = 1;
 /// ```
 #[derive(QObject, Default)]
 // `available` and `recording` are two facts QML binds to on their own;
-// `finishing` and `probed` are the recorder's own bookkeeping. They are
-// not states of one thing, and a state machine over them would hide the
-// two bindings behind it.
+// `finishing` is the recorder's own bookkeeping. They are not states of
+// one thing, and a state machine over them would hide the two bindings
+// behind it.
 #[allow(clippy::struct_excessive_bools)]
 pub struct VoiceRecorder {
     base: qt_base_class!(trait QObject),
@@ -160,7 +160,10 @@ pub struct VoiceRecorder {
     pub error: qt_signal!(message: QString),
 
     /// The `QAudioRecorder`, made on first use: it needs the application
-    /// object, which does not exist when QML builds this.
+    /// object, which does not exist when QML builds this. First use is
+    /// the first recording, except on the recorder that asks what the
+    /// platform can record for the whole process ([`Probe`]), which
+    /// keeps the one it asked.
     handle: usize,
     /// Where the MP3 is going.
     path: String,
@@ -168,22 +171,39 @@ pub struct VoiceRecorder {
     transcoder: Option<Transcoder>,
     /// `stop` has been called and the file is still being finished.
     finishing: bool,
-    /// Cached from the recorder, so QML's bindings need not ask C++.
-    chosen: Option<Format>,
-    probed: bool,
 }
+
+/// What the platform's recorder can do, found out once for the process.
+///
+/// Asking is not cheap: a `QAudioRecorder` loads `GStreamer`'s capture
+/// service, lists the sound devices and looks up a score of element
+/// factories, all on the Qt thread, and `available` is asked as a
+/// conversation page is built. Kept on each recorder, every chat opened
+/// paid for that again between the tap and the page sliding in. None of
+/// it changes while the app runs, so the first recorder to ask answers
+/// for every one after it, and those make a `QAudioRecorder` only once
+/// they record.
+#[derive(Debug)]
+struct Probe {
+    /// What to record in; `None` when nothing can be recorded.
+    chosen: Option<Format>,
+    /// The input to record from (`choose_input`); `None` leaves the
+    /// recorder's own.
+    input: Option<String>,
+}
+
+/// The process's [`Probe`], once a recorder has made it.
+static PROBE: std::sync::OnceLock<Probe> = std::sync::OnceLock::new();
 
 impl VoiceRecorder {
     /// Whether anything can be recorded at all.
     pub fn is_available(&mut self) -> bool {
-        self.probe();
-        self.chosen.is_some()
+        self.chosen().is_some()
     }
 
     /// The extension a recording will have.
     pub fn extension_name(&mut self) -> QString {
-        self.probe();
-        if self.chosen.is_some() {
+        if self.chosen().is_some() {
             QString::from("mp3")
         } else {
             QString::default()
@@ -230,30 +250,33 @@ impl VoiceRecorder {
         }
     }
 
-    /// Make the recorder if it is not there yet, and find out what it
-    /// can write.
-    fn probe(&mut self) {
-        if self.probed {
-            return;
+    /// What to record in, `None` when nothing can be: the process's
+    /// answer ([`Probe`]), found out here with this recorder when no
+    /// recorder has asked yet.
+    ///
+    /// Nothing is kept when there is no application object to ask with:
+    /// nothing can be recorded then, and a recorder made once there is
+    /// one asks again.
+    fn chosen(&mut self) -> Option<Format> {
+        if let Some(probe) = PROBE.get() {
+            return probe.chosen.clone();
         }
-        self.probed = true;
         let handle = self.recorder();
         if handle == 0 {
-            return;
+            return None;
         }
-        let codecs = read_list(handle, ListKind::Codecs);
-        let containers = read_list(handle, ListKind::Containers);
-        self.chosen = choose_format(&codecs, &containers);
-        let inputs = read_list(handle, ListKind::Inputs);
-        let default = read_default_input(handle);
-        if let Some(input) = choose_input(&inputs, &default) {
-            set_input(handle, &input);
+        let probe = PROBE.get_or_init(|| read_probe(handle));
+        // Made before there was an answer, so `recorder` could not set
+        // its input: set here, now that there is one.
+        if let Some(input) = &probe.input {
+            set_input(handle, input);
         }
+        probe.chosen.clone()
     }
 
-    /// The `QAudioRecorder`, made on first use. 0 when there is no
-    /// application object to hang it off, which is when nothing can be
-    /// recorded either.
+    /// The `QAudioRecorder`, made on first use and set to the input the
+    /// process records from. 0 when there is no application object to
+    /// hang it off, which is when nothing can be recorded either.
     fn recorder(&mut self) -> usize {
         if self.handle == 0 {
             // SAFETY: nothing is passed in, and the recorder made here is
@@ -267,6 +290,11 @@ impl VoiceRecorder {
                 return new QAudioRecorder();
             });
             self.handle = handle as usize;
+            if self.handle != 0 {
+                if let Some(input) = PROBE.get().and_then(|probe| probe.input.as_deref()) {
+                    set_input(self.handle, input);
+                }
+            }
         }
         self.handle
     }
@@ -276,8 +304,7 @@ impl VoiceRecorder {
         if self.recording {
             return;
         }
-        self.probe();
-        let Some(format) = self.chosen.clone() else {
+        let Some(format) = self.chosen() else {
             self.error(QString::from("nothing here can record sound"));
             return;
         };
@@ -469,6 +496,19 @@ impl Drop for VoiceRecorder {
             delete recorder;
         });
         self.handle = 0;
+    }
+}
+
+/// Ask the recorder at `handle` what it can write and what it can read
+/// from, and choose.
+fn read_probe(handle: usize) -> Probe {
+    let codecs = read_list(handle, ListKind::Codecs);
+    let containers = read_list(handle, ListKind::Containers);
+    let inputs = read_list(handle, ListKind::Inputs);
+    let default = read_default_input(handle);
+    Probe {
+        chosen: choose_format(&codecs, &containers),
+        input: choose_input(&inputs, &default),
     }
 }
 

@@ -55,6 +55,19 @@ cpp! {{
         return file;
     }
 
+    // The size a picture of `natural` pixels is made at for one kind of
+    // recipe, `requested` by the Image or not.
+    static QSize piirit_want(int kind, const QSize &natural, const QSize &requested) {
+        if (kind == 2) {
+            // A blur keeps nothing a small copy does not have: blurred
+            // small and drawn large is the same picture, for a fraction
+            // of the work.
+            return natural.scaled(QSize(64, 64), Qt::KeepAspectRatio);
+        }
+        return requested.isValid() && requested.width() > 0 && requested.height() > 0
+               ? requested : natural.boundedTo(QSize(256, 256));
+    }
+
     // Decode, scale and crop for one recipe, hand the pixels to Rust, and
     // return what it made. A null image is an Image in error, which every
     // caller already falls back from.
@@ -73,19 +86,32 @@ cpp! {{
             return QImage();
         }
         QImageReader reader(piirit_local(file));
+        // Decoded no larger than it is drawn, where the file says how
+        // large it is: a photo picked from the gallery for a group is
+        // twelve megapixels, 48 MB decoded, for a circle a couple of
+        // hundred pixels across. Large enough to cover what is drawn,
+        // in the picture's own proportions, so that what follows cuts
+        // and scales it just as it did the whole of it; and never
+        // larger than the picture is.
+        QSize natural = reader.size();
+        if (natural.isValid() && !natural.isEmpty()) {
+            QSize decode = natural.scaled(piirit_want(kind, natural, requested),
+                                          Qt::KeepAspectRatioByExpanding);
+            if (!decode.isEmpty() && decode.width() < natural.width()
+                    && decode.height() < natural.height()) {
+                reader.setScaledSize(decode);
+            }
+        }
         QImage source = reader.read();
         if (source.isNull()) {
             return QImage();
         }
-        QSize natural = source.size();
-        QSize want = requested.isValid() && requested.width() > 0 && requested.height() > 0
-                     ? requested : natural.boundedTo(QSize(256, 256));
+        if (!natural.isValid() || natural.isEmpty()) {
+            natural = source.size();
+        }
+        QSize want = piirit_want(kind, natural, requested);
         QImage scaled;
         if (kind == 2) {
-            // A blur keeps nothing a small copy does not have: blurred
-            // small and drawn large is the same picture, for a fraction
-            // of the work.
-            want = natural.scaled(QSize(64, 64), Qt::KeepAspectRatio);
             scaled = source.scaled(want, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
         } else if (kind == 0) {
             // The middle of the long side, the whole of the short one:

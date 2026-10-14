@@ -15,9 +15,7 @@ use std::sync::Mutex;
 
 use qmetaobject::*;
 
-use crate::chat::{
-    chat_shape, fetch_messages, ids_of, message_entries, opening_page, ChatShape, Entry,
-};
+use crate::chat::{open_chat, ChatShape, Entry};
 use crate::core::connection;
 use crate::models::MessageListItem;
 
@@ -149,20 +147,13 @@ impl ChatPrefetch {
         });
 
         runtime.spawn(async move {
-            let loaded = async {
-                let shape = chat_shape(&rpc, account_id, chat_id).await;
-                let entries = message_entries(&rpc, account_id, chat_id).await?;
-                // The same page the model would have filled in for
-                // itself. Fetching every message in the chat here would
-                // put back exactly the cost the placeholders remove, one
-                // step earlier. Around the message a search found, when
-                // there is one, so the page arrives showing it rather than
-                // showing today and jumping.
-                let page = ids_of(opening_page(&entries, find_message_id));
-                let rows = fetch_messages(&rpc, account_id, &page).await?;
-                Ok::<_, String>((shape, entries, rows))
-            }
-            .await;
+            // The same load the model would have made for itself, the
+            // same one page of it filled in: fetching every message in
+            // the chat here would put back exactly the cost the
+            // placeholders remove, one step earlier. Around the message a
+            // search found, when there is one, so the page arrives
+            // showing it rather than showing today and jumping.
+            let loaded = open_chat(&rpc, account_id, chat_id, find_message_id).await;
             // A failure is not reported here: the page's own model will
             // run the same fetch and has somewhere to show the error.
             done(loaded.ok());

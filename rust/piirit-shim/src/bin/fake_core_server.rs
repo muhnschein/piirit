@@ -310,6 +310,16 @@ impl State {
                 self.chats.insert(2, vec![10, 12, 13, 14, 15]);
             }
             self.chat_order = vec![1, 2];
+            // More chats than a screen shows, when a test asks for them:
+            // empty ones from 201 up, below the two seeded ones.
+            let many = std::env::var("PIIRIT_FAKE_MANY_CHATS")
+                .ok()
+                .and_then(|count| count.parse::<u32>().ok())
+                .unwrap_or(0);
+            for chat in 201..201u32.saturating_add(many) {
+                self.chats.insert(chat, Vec::new());
+                self.chat_order.push(chat);
+            }
             // Chat 3 is archived, and appears in no ordinary listing.
             // Without it, a model asking for the archived list and a model
             // asking for the ordinary one are indistinguishable, and a
@@ -833,6 +843,9 @@ fn message_object(msg: u64) -> Value {
             message["fileName"] = json!("voice.aac");
             message["fileMime"] = json!("audio/aac");
             message["fileBytes"] = json!(4_096);
+            // In milliseconds, as a sending client writes it in for a
+            // recording: what the row says before anything has played.
+            message["duration"] = json!(4_000);
         }
         14 => {
             message["viewType"] = json!("Webxdc");
@@ -1579,6 +1592,9 @@ async fn serve() {
                 }
                 "get_fresh_msgs" => {
                     let account = account_id();
+                    // Held back on request: what lets a test have events
+                    // arrive while a count is still being read.
+                    tokio::time::sleep(delay("PIIRIT_FAKE_FRESH_DELAY_MS")).await;
                     let state = state.lock().await;
                     let ids: Vec<u32> = state
                         .fresh
@@ -2423,6 +2439,10 @@ async fn serve() {
                     ok(&id, &json!(entries))
                 }
                 "get_chatlist_items_by_entries" => {
+                    // A core building rows one after another takes time
+                    // over each batch; a test that wants to see the first
+                    // batch shown before the next one lands slows this.
+                    tokio::time::sleep(delay("PIIRIT_FAKE_CHATLIST_ITEMS_DELAY_MS")).await;
                     let account = account_id();
                     let ids: Vec<u64> = positional(1)
                         .as_array()

@@ -181,7 +181,8 @@ pub struct WebxdcApp {
     pub icon_path: qt_property!(QString; NOTIFY loaded_changed),
     /// The document the app is editing, empty when it edits none.
     pub document: qt_property!(QString; NOTIFY loaded_changed),
-    /// What the app says about itself: "3 votes", a score, a state.
+    /// What the app says about itself: "3 votes", a score, a state. As
+    /// of the last load: an update the app sends does not reload it.
     pub summary: qt_property!(QString; NOTIFY loaded_changed),
     /// Where the app's source is, empty when its manifest does not say.
     pub source_code_url: qt_property!(QString; NOTIFY loaded_changed),
@@ -388,22 +389,38 @@ impl WebxdcApp {
         if context_id != self.account_id || self.account_id == 0 {
             return;
         }
+        let kind = kind.to_string();
+        // The core dropped events it could not queue, and this app's
+        // update may have been one of them: its waiting request asks
+        // again rather than sleeping through it.
+        if kind == "EventChannelOverflow" {
+            self.poke();
+            return;
+        }
         let payload: serde_json::Value =
             serde_json::from_str(&payload_json.to_string()).unwrap_or_default();
         if json::u32_opt(&payload, "msgId") != Some(self.message_id) {
             return;
         }
-        match kind.to_string().as_str() {
+        match kind.as_str() {
             // Deleted here or on another device. There is nothing left to
             // serve, and the core would answer no blob for it.
             "WebxdcInstanceDeleted" => {
                 self.stop();
                 self.gone();
             }
-            // The app's own summary follows what the chat did with it,
-            // which is what the page's header shows.
-            "WebxdcStatusUpdate" => self.reload(),
+            // Something new from the chat, which the app's request for
+            // updates is waiting on. Nothing is reloaded: the page shows
+            // the app's name, and an update does not change it.
+            "WebxdcStatusUpdate" => self.poke(),
             _ => {}
+        }
+    }
+
+    /// Wake the app's waiting request for updates, if it is running.
+    fn poke(&self) {
+        if let Some(host) = &self.host {
+            host.poke();
         }
     }
 }

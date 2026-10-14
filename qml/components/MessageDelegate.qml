@@ -122,6 +122,8 @@ Item {
     property string fileMime: ""
     // A real, not an int: QML has no 64-bit integer to hold a file size in.
     property real fileBytes: 0
+    /// How long a sound is, in milliseconds, 0 when the core does not say.
+    property int durationMs: 0
     // Text, Image, Gif, Sticker, Audio, Voice, Video, File, Call, Webxdc,
     // Vcard. What the attachment is drawn as; AttachmentPreview decides.
     property string viewType: "Text"
@@ -148,6 +150,8 @@ Item {
     /// asks the attachment rather than reading this itself, so there is
     /// one answer rather than two.
     property bool appsEnabled: false
+    /// The list is being dragged or flicked; see AttachmentPreview.
+    property bool scrolling: false
     /// Where a call stands, as the core names it: Alerting, Active,
     /// Completed, Missed, Declined or Canceled. Empty for anything that
     /// is not a call, and for a call the core would say nothing about --
@@ -564,7 +568,7 @@ Item {
         // that knows the difference. Reports rather than acts, so opening
         // stays the page's decision.
         //
-        // Built only for a message that has a file. The preview holds a
+        // Built only for a message that has a file. The preview held a
         // renderer for every kind there is -- a picture and its animation,
         // the thumbnailer's poster, a sound player -- and a text message
         // carried all of them, unseen, for the height of one line. A
@@ -583,6 +587,7 @@ Item {
                 fileName: root.fileName
                 fileMime: root.fileMime
                 fileBytes: root.fileBytes
+                durationMs: root.durationMs
                 viewType: root.viewType
                 imageWidth: root.imageWidth
                 imageHeight: root.imageHeight
@@ -595,6 +600,7 @@ Item {
                 webxdcSummary: root.webxdcSummary
                 webxdcIcon: root.webxdcIcon
                 appsEnabled: root.appsEnabled
+                scrolling: root.scrolling
                 // A long press on one of its own controls is the row's menu.
                 onMenuRequested: root.menuRequested()
             }

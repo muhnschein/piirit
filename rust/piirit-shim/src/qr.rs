@@ -230,6 +230,27 @@ pub struct QrCode {
     pub image: qt_property!(QString; NOTIFY modules_changed),
     /// Emitted after every re-encode.
     pub modules_changed: qt_signal!(),
+
+    /// The file `image` names, while it names one.
+    shown: Option<std::path::PathBuf>,
+}
+
+/// The code files a [`QrCode`] is showing, once for each that is: two
+/// pages can show the same code, and the file is the same one.
+///
+/// Each code is a file of its own, and the second-device code is a new
+/// one every time it is offered, so without this the cache kept every
+/// code ever shown. A file in here may be read again at any time -- an
+/// `Image` reloads its source when the window's textures are lost --
+/// so it stays; every other code file goes as the next is written.
+static SHOWN: std::sync::Mutex<Vec<std::path::PathBuf>> = std::sync::Mutex::new(Vec::new());
+
+/// [`SHOWN`], whatever a panic while it was held left behind: at worst a
+/// file kept that could have gone.
+fn shown_codes() -> std::sync::MutexGuard<'static, Vec<std::path::PathBuf>> {
+    SHOWN
+        .lock()
+        .unwrap_or_else(std::sync::PoisonError::into_inner)
 }
 
 impl QrCode {
@@ -243,22 +264,81 @@ impl QrCode {
             encode_modules(&text).unwrap_or((0, String::new()))
         };
         self.size = u32::try_from(size).unwrap_or(0);
+        self.stop_showing();
         self.image = if size == 0 {
             QString::default()
         } else {
             Self::write_image(&text, size, &modules)
+                .map(|path| self.show(path))
                 .unwrap_or_default()
-                .into()
         };
         self.modules = modules.into();
         self.modules_changed();
     }
 
-    /// The code as a file, and its URL.
-    fn write_image(text: &str, size: usize, modules: &str) -> Result<String, String> {
+    /// Show the code's file at `path`, put away every other code's file
+    /// that nothing shows, and answer with its URL.
+    fn show(&mut self, path: std::path::PathBuf) -> QString {
+        let url = format!("file://{}", path.to_string_lossy());
+        let mut list = shown_codes();
+        list.push(path.clone());
+        if let Some(dir) = path.parent() {
+            remove_codes_not_shown(dir, &list);
+        }
+        self.shown = Some(path);
+        url.into()
+    }
+
+    /// The code as a file.
+    fn write_image(text: &str, size: usize, modules: &str) -> Result<std::path::PathBuf, String> {
         let path = cache_file(&format!("{}.pgm", file_stem(text)))?;
         write_pgm(size, modules, &path)?;
-        Ok(format!("file://{}", path.to_string_lossy()))
+        Ok(path)
+    }
+
+    /// Take this code's file off [`SHOWN`], for the next code written to
+    /// remove.
+    fn stop_showing(&mut self) {
+        let Some(path) = self.shown.take() else {
+            return;
+        };
+        let mut list = shown_codes();
+        if let Some(index) = list.iter().position(|other| *other == path) {
+            list.swap_remove(index);
+        }
+    }
+}
+
+impl Drop for QrCode {
+    fn drop(&mut self) {
+        self.stop_showing();
+    }
+}
+
+/// Whether `name` is that of a code's file, as [`file_stem`] names it --
+/// and so not the scanner's frame, which shares the directory.
+fn is_code_file(name: &str) -> bool {
+    name.strip_prefix("qr-")
+        .and_then(|rest| rest.strip_suffix(".pgm"))
+        .is_some_and(|hash| hash.len() == 16 && hash.bytes().all(|byte| byte.is_ascii_hexdigit()))
+}
+
+/// Remove every code's file in `dir` that is not in `keep`.
+fn remove_codes_not_shown(dir: &std::path::Path, keep: &[std::path::PathBuf]) {
+    let Ok(entries) = std::fs::read_dir(dir) else {
+        return;
+    };
+    for entry in entries.flatten() {
+        let path = entry.path();
+        let is_code = path
+            .file_name()
+            .and_then(|name| name.to_str())
+            .is_some_and(is_code_file);
+        if is_code && !keep.contains(&path) {
+            if let Err(err) = std::fs::remove_file(&path) {
+                eprintln!("piirit: removing old code {}: {err}", path.display());
+            }
+        }
     }
 }
 
@@ -445,5 +525,35 @@ mod tests {
         assert!(parse_pnm(b"not an image").is_none());
         assert!(parse_pnm(b"P5\n4 4\n255\nshort").is_none());
         encode_modules("").unwrap();
+    }
+
+    /// A new code puts away the old ones, but not one still on show, nor
+    /// the scanner's frame beside them.
+    #[test]
+    fn old_codes_go_and_shown_ones_and_the_frame_stay() {
+        let temp = std::env::temp_dir().join(format!("piirit-qr-old-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&temp);
+        std::fs::create_dir_all(&temp).expect("create temp dir");
+        let old = temp.join(format!("{}.pgm", file_stem("an offer from before")));
+        let other_page = temp.join(format!("{}.pgm", file_stem("my invite")));
+        let new = temp.join(format!("{}.pgm", file_stem("the offer now")));
+        let frame = temp.join("qr-frame.pgm");
+        let unrelated = temp.join("photo.jpg");
+        for path in [&old, &other_page, &new, &frame, &unrelated] {
+            std::fs::write(path, b"P5").expect("write");
+        }
+
+        remove_codes_not_shown(&temp, &[other_page.clone(), new.clone()]);
+        assert!(!old.exists(), "a code nothing shows any more was kept");
+        assert!(other_page.exists(), "a code another page shows was removed");
+        assert!(new.exists(), "the code just written was removed");
+        assert!(frame.exists(), "the scanner's frame was taken for a code");
+        assert!(unrelated.exists(), "a file that is no code was removed");
+
+        assert!(is_code_file("qr-0123456789abcdef.pgm"));
+        assert!(!is_code_file("qr-frame.pgm"));
+        assert!(!is_code_file("qr-0123456789abcdef.png"));
+        assert!(!is_code_file("qr-0123456789abcde.pgm"));
+        let _ = std::fs::remove_dir_all(&temp);
     }
 }

@@ -85,6 +85,30 @@ const PROBE_QML: &str = r"
             }
             return out.join(',')
         }
+        // Which renderers are there at all, shown or not. Each kind's is
+        // built only for that kind: a picture row that also carried a
+        // sound player, a poster and two cards built forty objects it
+        // never drew, and the player a media pipeline.
+        function built() {
+            var names = ['attachmentImage', 'attachmentVideo', 'attachmentAudio',
+                         'attachmentVcard', 'attachmentApp', 'audioPlayer']
+            var out = []
+            for (var i = 0; i < names.length; i++) {
+                if (findIn(loader.item, names[i])) { out.push(names[i]) }
+            }
+            return out.join(',')
+        }
+        function click(name) {
+            var item = findIn(loader.item, name)
+            if (!item) { return 'missing:' + name }
+            item.clicked()
+            return 'ok'
+        }
+        // The sound player, once there is one.
+        function playerOf(property) {
+            var holder = findIn(loader.item, 'audioPlayer')
+            return holder ? '' + holder.player[property] : 'missing:audioPlayer'
+        }
         function textOf(name, property) {
             var item = findIn(loader.item, name)
             return item ? '' + item[property] : 'missing:' + name
@@ -169,6 +193,7 @@ fn each_view_type_reaches_the_renderer_meant_for_it() {
         (*steps_ptr).push(("image-showing", call!("showing")));
         (*steps_ptr).push(("image-height", call!("get", QString::from("height"))));
         (*steps_ptr).push(("image-wide", call!("get", QString::from("wantsFullWidth"))));
+        (*steps_ptr).push(("image-built", call!("built")));
         // A GIF, for which the core reports no dimensions at all.
         (*steps_ptr).push(("gif", show!("Gif", gif_for_show.as_str(), "dot.gif")));
     });
@@ -182,6 +207,34 @@ fn each_view_type_reaches_the_renderer_meant_for_it() {
         (*steps_ptr).push(("gif-replay", call!("replay")));
         (*steps_ptr).push(("gif-replayed", call!("showing")));
         (*steps_ptr).push(("gif-replayed-marked", call!("marked")));
+        // Each frame decoded as it comes round, not the whole movie kept.
+        (*steps_ptr).push((
+            "gif-cache",
+            call!(
+                "textOf",
+                QString::from("attachmentAnimation"),
+                QString::from("cache")
+            ),
+        ));
+        // Held while the list moves, and carried on when it stops.
+        call!("set", QString::from("scrolling"), true);
+        (*steps_ptr).push((
+            "gif-scrolling-paused",
+            call!(
+                "textOf",
+                QString::from("attachmentAnimation"),
+                QString::from("paused")
+            ),
+        ));
+        call!("set", QString::from("scrolling"), false);
+        (*steps_ptr).push((
+            "gif-scrolled-paused",
+            call!(
+                "textOf",
+                QString::from("attachmentAnimation"),
+                QString::from("paused")
+            ),
+        ));
     });
 
     single_shot(Duration::from_secs(4), move || unsafe {
@@ -216,6 +269,37 @@ fn each_view_type_reaches_the_renderer_meant_for_it() {
         (*steps_ptr).push((
             "voice-time",
             call!("textOf", QString::from("audioTime"), QString::from("text")),
+        ));
+        // And no player until play is pressed.
+        (*steps_ptr).push(("voice-built", call!("built")));
+        // The length the message carries, said without one.
+        call!("set", QString::from("durationMs"), 65_000);
+        (*steps_ptr).push((
+            "voice-known-time",
+            call!("textOf", QString::from("audioTime"), QString::from("text")),
+        ));
+        // Play: the player is made, loaded by the press rather than by
+        // being made, and playing.
+        (*steps_ptr).push((
+            "voice-play",
+            call!("click", QString::from("audioPlayButton")),
+        ));
+        (*steps_ptr).push(("voice-played-built", call!("built")));
+        (*steps_ptr).push((
+            "voice-auto-load",
+            call!("playerOf", QString::from("autoLoad")),
+        ));
+        (*steps_ptr).push((
+            "voice-state",
+            call!("playerOf", QString::from("playbackState")),
+        ));
+        (*steps_ptr).push((
+            "voice-pause",
+            call!("click", QString::from("audioPlayButton")),
+        ));
+        (*steps_ptr).push((
+            "voice-paused-state",
+            call!("playerOf", QString::from("playbackState")),
         ));
         (*steps_ptr).push(("card", show!("Vcard", "/tmp/ada.vcf", "ada.vcf")));
         (*steps_ptr).push((
@@ -438,6 +522,21 @@ fn assert_outcome(steps: &[(&str, String)]) {
         "the mark stayed up over a playing GIF. {context}"
     );
     assert_eq!(
+        value("gif-cache"),
+        "false",
+        "a GIF keeps every frame it has decoded, at full size, for as long \
+         as its row is built. {context}"
+    );
+    assert_eq!(
+        (
+            value("gif-scrolling-paused").as_str(),
+            value("gif-scrolled-paused").as_str()
+        ),
+        ("true", "false"),
+        "a GIF does not hold its frame while the list moves, or does not \
+         carry on once it stops. {context}"
+    );
+    assert_eq!(
         value("new-gif-marked"),
         "false",
         "a GIF that has just arrived was left waiting for a tap. {context}"
@@ -482,6 +581,51 @@ fn assert_outcome(steps: &[(&str, String)]) {
         value("voice-time"),
         "",
         "a sound file claimed a length before the player had one. {context}"
+    );
+    assert_eq!(
+        value("voice-known-time"),
+        "0:00 / 1:05",
+        "a voice message whose length the core knows did not say it before \
+         it was played. {context}"
+    );
+
+    // Each kind's renderer is built for that kind and no other, and the
+    // sound player not until it is asked to play: a player is a media
+    // pipeline on the device, and a row is built for every message
+    // scrolled past.
+    assert_eq!(
+        value("image-built"),
+        "attachmentImage",
+        "a picture row built renderers for other kinds as well. {context}"
+    );
+    assert_eq!(
+        value("voice-built"),
+        "attachmentAudio",
+        "a voice row built a player, or another kind's renderer, before \
+         play was pressed. {context}"
+    );
+    assert_eq!(value("voice-play"), "ok", "no play button. {context}");
+    assert_eq!(
+        value("voice-played-built"),
+        "attachmentAudio,audioPlayer",
+        "pressing play did not make the player. {context}"
+    );
+    assert_eq!(
+        value("voice-auto-load"),
+        "false",
+        "the player loads its file by being made rather than by the press \
+         of play. {context}"
+    );
+    // 1 is QMediaPlayer's PlayingState, 2 its PausedState.
+    assert_eq!(
+        value("voice-state"),
+        "1",
+        "the first press of play made the player but did not play. {context}"
+    );
+    assert_eq!(
+        value("voice-paused-state"),
+        "2",
+        "a second press did not pause. {context}"
     );
 
     assert_eq!(

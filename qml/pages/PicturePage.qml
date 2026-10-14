@@ -79,12 +79,25 @@ Page {
         ? page.fittedWidth * page.measured.implicitHeight / page.measured.implicitWidth
         : page.height
 
-    /// The most pixels a picture is decoded to on its long edge: twice the
-    /// screen's, so a zoom of two is still sharp. Beyond that a bigger
-    /// decode is memory and upload time for nothing the eye can see --
-    /// and past the GPU's texture limit Qt scales it down again on the
-    /// render thread, which is a stall of its own.
-    readonly property int decodeBound: 2 * Math.max(Screen.width, Screen.height)
+    /// The box a picture is decoded to fit in: twice the page's, so a
+    /// zoom of two is still sharp. Beyond that a bigger decode is memory
+    /// and upload time for nothing the eye can see -- and past the GPU's
+    /// texture limit Qt scales it down again on the render thread, which
+    /// is a stall of its own.
+    ///
+    /// Both sides, and Qt fits the picture inside them keeping its shape,
+    /// which is twice what it is drawn at fitted. One bound of twice the
+    /// screen's long edge on both sides let a landscape photo through
+    /// whole on a tall screen: twelve megapixels, 48 MB, to draw 1080 wide.
+    /// Qt 5.6 fits the picture as it is stored, before the turn its
+    /// orientation tag asks for, so a 4:3 photo taken upright and stored
+    /// on its side comes out at one and a half times its fitted width
+    /// rather than twice.
+    ///
+    /// The screen's own size stands in until the page has one, which in
+    /// portrait is the same size.
+    readonly property int decodeWidth: 2 * (page.width > 0 ? page.width : Screen.width)
+    readonly property int decodeHeight: 2 * (page.height > 0 ? page.height : Screen.height)
 
     /// Kept inside the content. The flickable would do this itself, but
     /// only once it has been laid out, and this runs before that.
@@ -177,6 +190,9 @@ Page {
             MenuItem {
                 objectName: "saveToDevice"
                 text: qsTr("Save to device")
+                // Not again while the copy is being made: a second pull
+                // would only make a second copy.
+                enabled: !saver.busy
                 onClicked: saver.keep(page.fileUrl, page.fileName)
             }
         }
@@ -246,8 +262,8 @@ Page {
                     fillMode: Image.PreserveAspectFit
                     asynchronous: true
                     autoTransform: true
-                    sourceSize.width: page.decodeBound
-                    sourceSize.height: page.decodeBound
+                    sourceSize.width: page.decodeWidth
+                    sourceSize.height: page.decodeHeight
                     // Once the page is in place, when there is a preview
                     // to carry it there; at once when there is not, since
                     // an empty page is worse than a dropped frame.
@@ -259,6 +275,10 @@ Page {
                     anchors.fill: parent
                     visible: page.isAnimated
                     fillMode: Image.PreserveAspectFit
+                    // Each frame decoded as it comes round rather than the
+                    // whole movie kept at full size for as long as the page
+                    // is open: see AttachmentPreview.
+                    cache: false
                     playing: visible
                     // The movie decodes its frames on the main thread as
                     // they come round, so it starts once the transition is

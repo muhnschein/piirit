@@ -85,6 +85,44 @@ pub const HANDLED_EVENT_KINDS: &[&str] = &[
     "WebxdcStatusUpdate",
 ];
 
+/// The kinds that could have moved a profile's unread count: a message
+/// in, a chat read or marked unread, a chat gone. `DeltaChatCore::relay`
+/// reads the count again on each. The overflow could have hidden any of
+/// those.
+const UNREAD_EVENT_KINDS: &[&str] = &[
+    "ChatDeleted",
+    "ChatModified",
+    "ChatlistChanged",
+    "ChatlistItemChanged",
+    "EventChannelOverflow",
+    "IncomingMsg",
+    "IncomingMsgBunch",
+    "MsgsChanged",
+    "MsgsNoticed",
+];
+
+/// The kinds `DeltaChatCore::relay` turns into a typed signal of its own:
+/// `core_error`, `configure_progress` and `restore_progress`. Kept in step
+/// with `relay` by hand -- there are three, and they sit side by side.
+const SIGNALLED_EVENT_KINDS: &[&str] = &["ConfigureProgress", "Error", "ImexProgress"];
+
+/// Whether an event of this kind is worth handing to the Qt thread at
+/// all: something reads it on `core_event`, or `relay` does something
+/// with it of its own. Everything else -- the core's log, most of all,
+/// which is most of what it says during a sync -- is dropped on the
+/// tokio side, before it costs the Qt thread a queued call.
+fn is_relayed(kind: &str) -> bool {
+    HANDLED_EVENT_KINDS.contains(&kind)
+        || UNREAD_EVENT_KINDS.contains(&kind)
+        || SIGNALLED_EVENT_KINDS.contains(&kind)
+}
+
+/// The most events handed to the Qt thread in one queued call. Whatever
+/// has arrived goes together, which is a whole batch from the core at a
+/// time in practice; the cap is only for a sync's flood, which then goes
+/// in several calls with the Qt event loop free to draw in between.
+const EVENT_BATCH_LIMIT: usize = 256;
+
 /// How long the app waits for the server to go at exit.
 const SHUTDOWN_TIMEOUT: Duration = Duration::from_secs(3);
 
@@ -278,8 +316,9 @@ pub struct DeltaChatCore {
 
     /// Attachments larger than this many bytes are fetched only when
     /// asked for; 0 fetches everything. The reader's setting, applied to
-    /// every account the core has -- when it is set, and again each time
-    /// the account list is read, so a profile added later gets it too.
+    /// every account the core has -- when it is set, and to any account
+    /// not yet given it each time the account list is read, so a profile
+    /// added later gets it too.
     /// The core's `download_limit`, which it applies to future messages.
     pub download_limit: qt_property!(u32; WRITE set_download_limit NOTIFY download_limit_changed),
     /// Emitted when [`DeltaChatCore::download_limit`] changes.
@@ -517,6 +556,18 @@ pub struct DeltaChatCore {
     media_quality_set: bool,
     /// The same, for whose calls ring here.
     who_can_call_me_set: bool,
+    /// What `write_config` has written to each account, by account and
+    /// key, so that reading the account list again writes only what an
+    /// account does not have yet. Every write costs the core something,
+    /// and `delete_device_after` costs it a deletion pass. Forgotten with
+    /// the server, so a restart writes each value once more: nothing then
+    /// says whether a write the old one was given ever landed.
+    written_config: RefCell<BTreeMap<(u32, &'static str), String>>,
+    /// The profiles whose unread count is being read, each with whether
+    /// another event has asked for it since the read went out. One read
+    /// at a time per profile: a message arriving is three or four events,
+    /// and each read returns every unread message the profile has.
+    unread_reads: RefCell<BTreeMap<u32, bool>>,
     /// The attempts at a profile there have been, shared with the tasks
     /// that carry each one out.
     attempts: Arc<Attempts>,
@@ -663,6 +714,10 @@ impl DeltaChatCore {
         let next = {
             let mut this_mut = this.borrow_mut();
             this_mut.rpc = None;
+            // Whatever was in flight went with the server, or will fail
+            // against it; the next one starts from nothing.
+            this_mut.written_config.get_mut().clear();
+            this_mut.unread_reads.get_mut().clear();
             // Nothing to restart: either `start` was never called, or a
             // previous round already gave up and dropped the runtime.
             let Some(runtime) = this_mut.runtime.clone() else {
@@ -828,6 +883,12 @@ impl DeltaChatCore {
     /// Forward the core's event stream to `core_event` via queued
     /// callbacks, for as long as the transport lives.
     ///
+    /// One callback per batch rather than per event, and only the events
+    /// `is_relayed` keeps: on Qt 5.6 each queued callback is an object
+    /// built, a functor connected and a metacall posted, and during a sync
+    /// the core says thousands of things nothing here reads. The ones
+    /// kept are relayed in the order they came.
+    ///
     /// The setup and the loop share one `runtime.spawn` because
     /// `spawn_event_loop`'s internal `tokio::spawn` needs ambient runtime
     /// context.
@@ -845,18 +906,34 @@ impl DeltaChatCore {
         let stopped = queued_callback(move |tail: Vec<String>| {
             Self::schedule_restart(stopped_ptr.clone(), path.clone(), last_words(&tail));
         });
-        let emit = queued_callback(move |event: CoreEvent| {
-            if let Some(this) = ptr.as_pinned() {
-                this.borrow().relay(&event);
+        let emit = queued_callback(move |batch: Vec<CoreEvent>| {
+            for event in &batch {
+                // Looked up per event, as when each came on its own: a
+                // handler of one could be what takes the object away.
+                let Some(this) = ptr.as_pinned() else { return };
+                this.borrow().relay(event);
             }
         });
         runtime.spawn(async move {
             let (mut events, _handle) = spawn_event_loop(rpc.clone());
-            while let Some(event) = events.recv().await {
-                // Here rather than in `relay`, which is the Qt thread's:
-                // it is read at exit, once the Qt thread has stopped.
-                crate::call_host::note_sent(json::str_at(&event.event, "kind"));
-                emit(event);
+            let mut arrived = Vec::new();
+            while events.recv_many(&mut arrived, EVENT_BATCH_LIMIT).await > 0 {
+                let batch: Vec<CoreEvent> = arrived
+                    .drain(..)
+                    .filter(|event| {
+                        let kind = json::str_at(&event.event, "kind");
+                        // Here rather than in `relay`, which is the Qt
+                        // thread's: it is read at exit, once the Qt thread
+                        // has stopped. And ahead of the filter, which
+                        // drops `SmtpMessageSent`: nothing on the Qt side
+                        // reads that one, and this counts it.
+                        crate::call_host::note_sent(kind);
+                        is_relayed(kind)
+                    })
+                    .collect();
+                if !batch.is_empty() {
+                    emit(batch);
+                }
             }
             // The stream ends only when the transport does (see
             // `spawn_event_loop`), so this is the server gone -- and what
@@ -867,9 +944,11 @@ impl DeltaChatCore {
 
     /// One event off the stream, as the signals the QML side listens for.
     ///
-    /// Every event fires `core_event`, with its payload as JSON. A few
-    /// kinds fire a typed signal too, so a progress bar need not parse
-    /// JSON, and a few are the ones that could have moved an unread count.
+    /// An event of a kind something reads fires `core_event`, with its
+    /// payload as JSON. A few kinds fire a typed signal too, so a progress
+    /// bar need not parse JSON, and a few are the ones that could have
+    /// moved an unread count. Only those reach here: `forward_events` has
+    /// dropped the rest already, by `is_relayed`.
     fn relay(&self, event: &CoreEvent) {
         let kind = match json::str_at(&event.event, "kind") {
             "" => "Unknown".to_string(),
@@ -897,29 +976,19 @@ impl DeltaChatCore {
             }
         }
         // The count on the profile's row follows whatever could have
-        // moved it: a message in, a chat read or marked unread, a chat
-        // gone. The overflow could have hidden any of those.
-        if matches!(
-            kind.as_str(),
-            "IncomingMsg"
-                | "IncomingMsgBunch"
-                | "MsgsChanged"
-                | "MsgsNoticed"
-                | "ChatModified"
-                | "ChatDeleted"
-                | "ChatlistChanged"
-                | "ChatlistItemChanged"
-                | "EventChannelOverflow"
-        ) {
+        // moved it.
+        if UNREAD_EVENT_KINDS.contains(&kind.as_str()) {
             self.refresh_unread(event.context_id);
         }
         // Everything above is this object's own business and happens
         // whatever the kind. The fan-out below is not: `core_event` reaches
         // every page still on the stack and one chat list per profile on the
-        // cover, and the core says a great deal that none of them read --
-        // its whole log, for one. Serialising that and handing it round is
-        // work done with the screen off, once per listener, during exactly
-        // the bulk syncs where there is most of it.
+        // cover, and the core says a great deal that none of them read.
+        // Serialising that and handing it round is work done with the
+        // screen off, once per listener, during exactly the bulk syncs
+        // where there is most of it. Its log is gone by now, but an
+        // `IncomingMsgBunch` or a `ConfigureProgress` is still here for the
+        // work above, and nothing reads it on `core_event`.
         if !HANDLED_EVENT_KINDS.contains(&kind.as_str()) {
             return;
         }
@@ -1080,9 +1149,14 @@ impl DeltaChatCore {
         });
     }
 
-    /// Write every setting QML has handed over to each of these accounts:
-    /// what a profile added later gets when the list is next read.
+    /// Write every setting QML has handed over to each of these accounts
+    /// that does not have it yet: what a profile added later gets when
+    /// the list is next read. `ids` is the whole list, so whatever was
+    /// written to an account no longer on it is forgotten here.
     fn apply_settings(&self, ids: &[u32]) {
+        self.written_config
+            .borrow_mut()
+            .retain(|(account_id, _), _| ids.contains(account_id));
         if self.download_limit_set {
             self.write_config(ids, "download_limit", self.download_limit.to_string());
         }
@@ -1101,21 +1175,51 @@ impl DeltaChatCore {
         }
     }
 
-    /// Write one config value to each of these accounts. A failure is
-    /// reported and the rest still written.
+    /// Write one config value to each of these accounts that was not
+    /// last given this same value. A failure is reported, the rest still
+    /// written, and the one that failed tried again next time.
+    ///
+    /// Remembered rather than asked of the core with a `get_config`
+    /// first: the account list is read again by the cover, by every chat
+    /// list made and by every change to a profile, and a read per key per
+    /// account each time would be most of what the skipped writes save.
+    /// What the core keeps outlives the server, and this lives as long as
+    /// the server (see `schedule_restart`), so the two agree.
     fn write_config(&self, ids: &[u32], key: &'static str, value: String) {
-        if ids.is_empty() {
-            return;
-        }
         let Some((rpc, runtime)) = self.connection() else {
             return;
         };
-        let ids = ids.to_vec();
+        let ids: Vec<u32> = {
+            let mut written = self.written_config.borrow_mut();
+            ids.iter()
+                .copied()
+                .filter(|&account_id| {
+                    let unchanged = written.get(&(account_id, key)) == Some(&value);
+                    if !unchanged {
+                        written.insert((account_id, key), value.clone());
+                    }
+                    !unchanged
+                })
+                .collect()
+        };
+        if ids.is_empty() {
+            return;
+        }
         let ptr: QPointer<Self> = QPointer::from(self);
-        let failed = queued_callback(move |err: String| {
-            if let Some(this) = ptr.as_pinned() {
-                this.borrow().core_error(err.into());
+        let tried = value.clone();
+        let failed = queued_callback(move |(account_id, err): (u32, String)| {
+            let Some(this) = ptr.as_pinned() else { return };
+            // Forgotten, so the next read of the list tries it again --
+            // unless something newer has been written since, which is
+            // then the one to keep.
+            let this_ref = this.borrow();
+            {
+                let mut written = this_ref.written_config.borrow_mut();
+                if written.get(&(account_id, key)) == Some(&tried) {
+                    written.remove(&(account_id, key));
+                }
             }
+            this_ref.core_error(err.into());
         });
         runtime.spawn(async move {
             for account_id in ids {
@@ -1123,7 +1227,7 @@ impl DeltaChatCore {
                     .call::<_, ()>("set_config", (account_id, key, Some(value.clone())))
                     .await
                 {
-                    failed(format!("could not set {key}: {err}"));
+                    failed((account_id, format!("could not set {key}: {err}")));
                 }
             }
         });
@@ -1279,9 +1383,13 @@ impl DeltaChatCore {
     }
 
     /// Re-read one profile's unread count, after an event that could have
-    /// moved it, and change its row in place. Cheap enough to do on every
-    /// such event: it is one query, and the profiles page's badge is
-    /// wrong until it is done.
+    /// moved it, and change its row in place.
+    ///
+    /// One read at a time per profile. A message arriving is three or
+    /// four events that each ask, and the read returns the id of every
+    /// unread message the profile has; so one asked for while another is
+    /// out is noted, and one more goes when that lands -- after every
+    /// event that asked, which is what the count has to follow.
     pub fn refresh_unread(&self, account_id: u32) {
         if account_id == 0 {
             return;
@@ -1289,20 +1397,38 @@ impl DeltaChatCore {
         let Some((rpc, runtime)) = self.connection() else {
             return;
         };
+        {
+            let mut reads = self.unread_reads.borrow_mut();
+            if let Some(again) = reads.get_mut(&account_id) {
+                *again = true;
+                return;
+            }
+            reads.insert(account_id, false);
+        }
         let ptr: QPointer<Self> = QPointer::from(self);
         let done = queued_callback(move |count: u32| {
             let Some(this) = ptr.as_pinned() else { return };
             let this_ref = this.borrow();
-            let mut rows = this_ref.account_list.borrow_mut();
-            // Read before the change: the iterator borrows the rows.
-            let changed = rows
-                .iter()
-                .enumerate()
-                .find(|(_, row)| row.account_id == account_id && row.unread_count != count)
-                .map(|(index, row)| (index, row.clone()));
-            if let Some((index, mut row)) = changed {
-                row.unread_count = count;
-                rows.change_line(index, row);
+            {
+                let mut rows = this_ref.account_list.borrow_mut();
+                // Read before the change: the iterator borrows the rows.
+                let changed = rows
+                    .iter()
+                    .enumerate()
+                    .find(|(_, row)| row.account_id == account_id && row.unread_count != count)
+                    .map(|(index, row)| (index, row.clone()));
+                if let Some((index, mut row)) = changed {
+                    row.unread_count = count;
+                    rows.change_line(index, row);
+                }
+            }
+            let again = this_ref
+                .unread_reads
+                .borrow_mut()
+                .remove(&account_id)
+                .unwrap_or(false);
+            if again {
+                this_ref.refresh_unread(account_id);
             }
         });
         runtime.spawn(async move {
@@ -1878,9 +2004,27 @@ pub(crate) fn reconcile_rows<T, K>(
 #[cfg(test)]
 mod tests {
     use super::{
-        last_words, reconcile_accounts, restart_delay, resume_account, server_path, AccountItem,
-        AccountListModel, BUNDLED_SERVER, RESTART_DELAY_MAX, RESTART_DELAY_MIN, RESTART_LIMIT,
+        is_relayed, last_words, reconcile_accounts, restart_delay, resume_account, server_path,
+        AccountItem, AccountListModel, BUNDLED_SERVER, HANDLED_EVENT_KINDS, RESTART_DELAY_MAX,
+        RESTART_DELAY_MIN, RESTART_LIMIT,
     };
+
+    #[test]
+    fn the_core_log_stays_on_the_tokio_side_and_the_rest_crosses() {
+        for kind in ["Info", "Warning", "SmtpConnected", "ImapConnected", ""] {
+            assert!(!is_relayed(kind), "{kind:?} would cross for nothing");
+        }
+        // Read on `core_event`, or acted on by `relay` itself: an error
+        // for the reader, a progress bar, a count that may have moved.
+        for kind in HANDLED_EVENT_KINDS.iter().chain(&[
+            "Error",
+            "ConfigureProgress",
+            "ImexProgress",
+            "IncomingMsgBunch",
+        ]) {
+            assert!(is_relayed(kind), "{kind:?} would never reach the app");
+        }
+    }
 
     fn account(id: u32, name: &str) -> AccountItem {
         AccountItem {

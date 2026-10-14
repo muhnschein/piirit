@@ -11,7 +11,8 @@
 //!
 //! What is made goes in the app's cache, beside the captures, and is
 //! gone once the core has copied it into its blob directory, or once the
-//! reader puts the file away. The reader
+//! reader puts the file away; one whose chat closed while it was being
+//! sent is swept a day later (`capture.rs`). The reader
 //! sees the file named as they picked it, with the suffix of what it now
 //! is.
 
@@ -24,7 +25,7 @@ use piirit_video::{Outcome, Target};
 use crate::qr::cache_file;
 
 /// The directory under the cache a recoded video waits in.
-const RECODED_DIR: &str = "recoded";
+pub(crate) const RECODED_DIR: &str = "recoded";
 
 /// The suffixes of the files FFmpeg is built to read here: MP4 and
 /// QuickTime, which are what phones record. A video in anything else is

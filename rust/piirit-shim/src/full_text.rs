@@ -27,6 +27,18 @@ use crate::{html, markdown};
 #[derive(Default)]
 struct Loaded {
     text: String,
+    /// The text rendered, made where it was fetched rather than on the
+    /// Qt thread: there is no limit to how long a message's HTML part can
+    /// be, and the page would stop scrolling while it rendered.
+    styled: String,
+}
+
+impl Loaded {
+    /// The text, and the text rendered.
+    fn new(text: String) -> Self {
+        let styled = markdown::render(&text);
+        Self { text, styled }
+    }
 }
 
 /// The whole text of one message, or of one text file.
@@ -129,7 +141,7 @@ impl FullText {
         match result {
             Ok(found) => {
                 self.text = found.text.as_str().into();
-                self.styled_text = markdown::render(&found.text).into();
+                self.styled_text = found.styled.as_str().into();
                 self.loading = false;
                 self.loaded = true;
                 self.loaded_changed();
@@ -165,7 +177,7 @@ async fn fetch(rpc: &RpcClient, account_id: u32, message_id: u32) -> Result<Load
         .map_err(|err| err.to_string())?;
     let text = json::str_at(&message, "text").to_string();
     if !json::flag(&message, "hasHtml") {
-        return Ok(Loaded { text });
+        return Ok(Loaded::new(text));
     }
 
     let whole: Option<String> = rpc
@@ -173,13 +185,11 @@ async fn fetch(rpc: &RpcClient, account_id: u32, message_id: u32) -> Result<Load
         .await
         .map_err(|err| err.to_string())?;
     let whole = whole.unwrap_or_default();
-    Ok(Loaded {
-        // Falling back to the cut version rather than to nothing: a
-        // message whose HTML part did not survive its trip still has the
-        // words that did.
-        text: match html::to_text(&whole) {
-            found if found.is_empty() => text,
-            found => found,
-        },
-    })
+    // Falling back to the cut version rather than to nothing: a message
+    // whose HTML part did not survive its trip still has the words that
+    // did.
+    Ok(Loaded::new(match html::to_text(&whole) {
+        found if found.is_empty() => text,
+        found => found,
+    }))
 }

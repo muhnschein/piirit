@@ -139,10 +139,12 @@ fn a_part_of_the_whole_message_can_be_selected_and_copied() {
     });
 
     // The whole text is in by now. The label shows it, and the field
-    // waits until it is asked for.
+    // waits until it is asked for -- empty, so that it is not laid out
+    // a second time while nobody can see it.
     single_shot(Duration::from_secs(4), move || unsafe {
         record!("label-before", shown!("bodyLabel", "visible"));
         record!("field-before", shown!("selectableBody", "visible"));
+        record!("field-text-before", shown!("selectableBody", "text"));
         record!("offered", shown!("selectItem", "visible"));
         record!("offered-enabled", shown!("selectItem", "enabled"));
         record!("clipboard-before", call!("clipboard"));
@@ -281,6 +283,12 @@ fn a_part_of_the_whole_message_can_be_selected_and_copied() {
         value("clipboard-before"),
         "",
         "something was copied before anything was selected. {context}"
+    );
+    assert_eq!(
+        value("field-text-before"),
+        "",
+        "the hidden field holds the whole message, and Qt lays out all of \
+         it for a field nobody can see. {context}"
     );
     let _ = std::fs::remove_dir_all(&temp);
 }

@@ -86,6 +86,12 @@ const PROBE_QML: &str = r"
             pageHolder.item.appActive = true
             return 'ok'
         }
+        // The app sent to the background, or brought back.
+        function away(on) {
+            centerLoader.item.away = on
+            pageHolder.item.appActive = !on
+            return 'ok'
+        }
         // A tap on the pictures, as the shield over them passes it on.
         function tapPictures() { pageHolder.item.toggleControls(); return 'ok' }
         function turning() { return '' + pageHolder.item.turning }
@@ -560,6 +566,17 @@ fn a_video_call_shows_its_pictures_under_lines_a_tap_puts_away() {
             // Their picture is watched with the camera off: still not
             // a call held to the ear.
             record!("ear-watching", get!("proximity", "active"));
+            // Their picture keeps the screen lit, but not from the
+            // background, where nothing draws it.
+            // The same for the page's clock, which nobody sees there.
+            record!("lit-watching", get!("callDisplay", "preventBlanking"));
+            record!("ticking", get!("clock", "running"));
+            call!("away", true);
+            record!("lit-away", get!("callDisplay", "preventBlanking"));
+            record!("ticking-away", get!("clock", "running"));
+            call!("away", false);
+            record!("lit-back", get!("callDisplay", "preventBlanking"));
+            record!("ticking-back", get!("clock", "running"));
             // No pictures any more: the page is unseen again.
             let url = (*url_ptr).clone();
             report(
@@ -926,6 +943,28 @@ fn a_video_call_shows_its_pictures_under_lines_a_tap_puts_away() {
         "false",
         "watching their picture with the camera off, a hand over the sensor blacks the screen out. {context}"
     );
+    assert_eq!(
+        value("lit-watching"),
+        "true",
+        "the screen may go dark while their picture is watched. {context}"
+    );
+    assert_eq!(
+        value("lit-away"),
+        "false",
+        "a video call keeps the screen lit with the app in the background. {context}"
+    );
+    assert_eq!(
+        value("lit-back"),
+        "true",
+        "the screen is not kept lit again once the app is back. {context}"
+    );
+    assert_eq!(value("ticking"), "true", "{context}");
+    assert_eq!(
+        value("ticking-away"),
+        "false",
+        "the call page's clock ticks on in the background. {context}"
+    );
+    assert_eq!(value("ticking-back"), "true", "{context}");
 
     assert_eq!(
         value("speaker-video"),

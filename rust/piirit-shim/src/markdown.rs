@@ -178,12 +178,17 @@ fn push_escaped(out: &mut String, text: &str) {
 /// One line of ordinary text: emphasis, code, links, and everything else
 /// escaped.
 fn inline(line: &str, out: &mut String) {
-    let links = url_spans(line);
+    let mut links = url_spans(line).into_iter().peekable();
     let mut at = 0;
+    let mut searches = Searches::default();
     while let Some(rest) = line.get(at..).filter(|rest| !rest.is_empty()) {
+        // The links are in order and `at` only moves forward, so one that
+        // other markup has already taken in is passed for good, rather
+        // than every link searched again at every character.
+        while links.next_if(|(start, _)| *start < at).is_some() {}
         // A bare link, as it stands. Its own characters are never markup,
         // so a `_` in a path is a `_` and not an italic.
-        if let Some(&(_, end)) = links.iter().find(|(start, _)| *start == at) {
+        if let Some((_, end)) = links.next_if(|(start, _)| *start == at) {
             if let Some(url) = line.get(at..end) {
                 push_link(out, url, url);
                 at = end;
@@ -201,8 +206,8 @@ fn inline(line: &str, out: &mut String) {
             }
         }
         if let Some(consumed) = code_span(rest, out)
-            .or_else(|| link_span(rest, out))
-            .or_else(|| emphasis_span(line, at, out))
+            .or_else(|| link_span(line, at, &mut searches, out))
+            .or_else(|| emphasis_span(line, at, &mut searches, out))
         {
             at = at.saturating_add(consumed);
             continue;
@@ -230,19 +235,54 @@ fn code_span(rest: &str, out: &mut String) -> Option<usize> {
 /// `[text](https://...)`: the text is shown, the link is followed on a
 /// tap. Only web and mail links: a `file:` or `javascript:` one is not
 /// something a message gets to open.
-fn link_span(rest: &str, out: &mut String) -> Option<usize> {
-    let inner = rest.strip_prefix('[')?;
-    let (text, after) = inner.split_once(']')?;
-    let url_part = after.strip_prefix('(')?;
-    let (url_typed, _) = url_part.split_once(')')?;
-    let url = url_typed.trim();
-    if text.is_empty() || url.contains(char::is_whitespace) {
+fn link_span(line: &str, at: usize, searches: &mut Searches, out: &mut String) -> Option<usize> {
+    if !line.get(at..)?.starts_with('[') {
         return None;
     }
+    let bytes = line.as_bytes();
+    let text_start = at.saturating_add(1);
+    let close = searches
+        .bracket
+        .find(text_start, |from| next_byte(bytes, from, b']'))?;
+    if bytes.get(close.saturating_add(1)) != Some(&b'(') {
+        return None;
+    }
+    let url_start = close.saturating_add(2);
+    let url_end = searches
+        .paren
+        .find(url_start, |from| next_byte(bytes, from, b')'))?;
+    let text = line.get(text_start..close)?;
+    let url_typed = line.get(url_start..url_end)?;
+    if text.is_empty() {
+        return None;
+    }
+    // The URL without the spaces in front. Past its end when there is
+    // nothing but spaces, and then there is no URL.
+    let url_from = searches.url.find(url_start, |from| {
+        next_char(line, from, |c| !c.is_whitespace())
+    })?;
+    let url = line.get(url_from..url_end)?;
     if !(url.starts_with("https://") || url.starts_with("http://") || url.starts_with("mailto:")) {
         return None;
     }
-    push_link(out, url, text);
+    // A space inside the URL, rather than after it, and it is not one.
+    // Found as the first space with something other than spaces after it
+    // before the `)`, rather than by reading the URL through: a line of
+    // `[x](https://` repeated has a URL that runs on past every one of
+    // them, and reading it once for each would read it over and over.
+    let space = searches
+        .space
+        .find(url_from, |from| next_char(line, from, char::is_whitespace))
+        .filter(|space| *space < url_end);
+    if let Some(space) = space {
+        let word = searches
+            .after_space
+            .find(space, |from| next_char(line, from, |c| !c.is_whitespace()));
+        if word.is_some_and(|word| word < url_end) {
+            return None;
+        }
+    }
+    push_link(out, url.trim_end(), text);
     // The text and the URL as typed, and the `[`, `](` and `)` around them.
     Some(text.len().saturating_add(url_typed.len()).saturating_add(4))
 }
@@ -255,24 +295,30 @@ fn push_link(out: &mut String, url: &str, text: &str) {
     out.push_str("</a>");
 }
 
+/// The emphasis markers and the tags they become, doubled ones first, so
+/// that `**` is read as bold before `*` can be read as italic.
+const MARKERS: [(&str, &str); 5] = [
+    ("**", "b"),
+    ("__", "b"),
+    ("~~", "s"),
+    ("*", "i"),
+    ("_", "i"),
+];
+
 /// `**bold**`, `__bold__`, `*italic*`, `_italic_`, `~~struck~~`. The
 /// underscore forms only at word boundaries, so `snake_case_names` stay
 /// as written; the others whenever the marker hugs its text.
-fn emphasis_span(line: &str, at: usize, out: &mut String) -> Option<usize> {
+fn emphasis_span(
+    line: &str,
+    at: usize,
+    searches: &mut Searches,
+    out: &mut String,
+) -> Option<usize> {
     let rest = line.get(at..)?;
-    let (marker, tag): (&str, &str) = if rest.starts_with("**") {
-        ("**", "b")
-    } else if rest.starts_with("__") {
-        ("__", "b")
-    } else if rest.starts_with("~~") {
-        ("~~", "s")
-    } else if rest.starts_with('*') {
-        ("*", "i")
-    } else if rest.starts_with('_') {
-        ("_", "i")
-    } else {
-        return None;
-    };
+    let (kind, &(marker, tag)) = MARKERS
+        .iter()
+        .enumerate()
+        .find(|(_, (marker, _))| rest.starts_with(marker))?;
     let underscore = marker.starts_with('_');
     if underscore && is_word(line.get(..at)?.chars().next_back()) {
         return None;
@@ -283,14 +329,19 @@ fn emphasis_span(line: &str, at: usize, out: &mut String) -> Option<usize> {
     if inner.starts_with(char::is_whitespace) || inner.is_empty() {
         return None;
     }
-    let close = find_closer(inner, marker)?;
-    let text = inner.get(..close)?;
+    let start = at.saturating_add(marker.len());
+    let close =
+        searches
+            .closers
+            .get_mut(kind)?
+            .closer(line.as_bytes(), start, marker.as_bytes())?;
+    let text = line.get(start..close)?;
     if text.ends_with(char::is_whitespace) {
         return None;
     }
     // Both markers and the text between them.
-    let consumed = marker.len().saturating_mul(2).saturating_add(close);
-    if underscore && is_word(rest.get(consumed..)?.chars().next()) {
+    let end = close.saturating_add(marker.len());
+    if underscore && is_word(line.get(end..)?.chars().next()) {
         return None;
     }
     out.push('<');
@@ -300,37 +351,131 @@ fn emphasis_span(line: &str, at: usize, out: &mut String) -> Option<usize> {
     out.push_str("</");
     out.push_str(tag);
     out.push('>');
-    Some(consumed)
+    Some(end.saturating_sub(at))
 }
 
-/// Where `marker` closes `inner`, skipping a marker that would leave the
-/// text empty. A one-character marker must not match the first half of
-/// a doubled one, so `*a **b** c*` closes at the lone star.
-fn find_closer(inner: &str, marker: &str) -> Option<usize> {
-    let mut from = 0;
-    while let Some(offset) = inner.get(from..)?.find(marker) {
+/// Where `marker` closes text that starts at `start` in `line`, skipping
+/// a marker that would leave the text empty. A one-character marker must
+/// not match the first half of a doubled one, so `*a **b** c*` closes at
+/// the lone star.
+fn find_closer(line: &[u8], start: usize, marker: &[u8]) -> Option<usize> {
+    let single = marker.len() == 1;
+    let mut from = start;
+    loop {
+        let offset = line
+            .get(from..)?
+            .windows(marker.len())
+            .position(|window| window == marker)?;
         let index = from.saturating_add(offset);
-        if index == 0 {
-            from = marker.len();
+        if index == start {
+            from = start.saturating_add(marker.len());
             continue;
         }
-        let single = marker.len() == 1;
-        let doubled = inner
-            .get(index..)
-            .is_some_and(|tail| tail.starts_with(&marker.repeat(2)));
-        if single && doubled {
+        if single && line.get(index.saturating_add(1)) == marker.first() {
             from = index.saturating_add(2);
             continue;
         }
         return Some(index);
     }
-    None
 }
 
 /// Whether a character is part of a word, so an underscore beside it is
 /// part of the word too.
 fn is_word(c: Option<char>) -> bool {
     c.is_some_and(char::is_alphanumeric)
+}
+
+/// Where the next `byte` is in `line`, from `from` on.
+fn next_byte(line: &[u8], from: usize, byte: u8) -> Option<usize> {
+    let offset = line.get(from..)?.iter().position(|b| *b == byte)?;
+    Some(from.saturating_add(offset))
+}
+
+/// Where the next character that is `wanted` is in `line`, from `from`
+/// on.
+fn next_char(line: &str, from: usize, wanted: impl Fn(char) -> bool) -> Option<usize> {
+    let (offset, _) = line.get(from..)?.char_indices().find(|(_, c)| wanted(*c))?;
+    Some(from.saturating_add(offset))
+}
+
+/// What the walk along one line has looked for so far.
+///
+/// Every opener that turns out not to be one asks where its closer is,
+/// and the answer for one is often the answer for the next: in
+/// `a__a__a__...` each `_` asks where the next lone `_` is, and on a line
+/// of `[` each asks where the next `]` is. Asked afresh each time, that
+/// was a read to the end of the line for every opener on it -- half a
+/// second for twelve kilobytes of `a__`. Remembered, the line is read
+/// about once for each question.
+#[derive(Default)]
+struct Searches {
+    /// Where each kind of emphasis closes, in the order of `MARKERS`.
+    closers: [Seek; 5],
+    /// The next `]`, the end of a link's text.
+    bracket: Seek,
+    /// The next `)`, the end of its URL.
+    paren: Seek,
+    /// The next character that is not a space, where the URL starts.
+    url: Seek,
+    /// The next space from there.
+    space: Seek,
+    /// The next character after that space that is not one.
+    after_space: Seek,
+}
+
+/// One search along a line, and the last answer it gave.
+///
+/// The next of something from here is also the next of it from anywhere
+/// between here and where it was found -- or from anywhere at all past
+/// here, if nothing was. The walk only moves forward, so asking again
+/// only reads past the last answer.
+#[derive(Default)]
+struct Seek {
+    /// Where the last search started, and what it found.
+    last: Option<(usize, Option<usize>)>,
+}
+
+impl Seek {
+    /// The first place from `from` on that `search` finds, read again
+    /// only if the last answer does not hold for here.
+    fn find(&mut self, from: usize, search: impl FnOnce(usize) -> Option<usize>) -> Option<usize> {
+        if let Some((start, found)) = self.last {
+            if start <= from && !found.is_some_and(|found| found < from) {
+                return found;
+            }
+        }
+        self.search(from, search)
+    }
+
+    /// The first place from `from` on that `search` finds, read afresh.
+    fn search(
+        &mut self,
+        from: usize,
+        search: impl FnOnce(usize) -> Option<usize>,
+    ) -> Option<usize> {
+        let found = search(from);
+        self.last = Some((from, found));
+        found
+    }
+
+    /// Where `marker` closes text that starts at `start`: `find_closer`,
+    /// remembered.
+    ///
+    /// That is not quite a search for the next of something: it skips a
+    /// marker at `start` itself, and it steps over doubled markers two at
+    /// a time, so from inside a run of them it would pair them up
+    /// differently. From anywhere that is not a marker character, though,
+    /// it passes the same places in the same way as a search from earlier
+    /// on that got that far, and so finds what that one found. From a
+    /// marker character it reads afresh.
+    fn closer(&mut self, line: &[u8], start: usize, marker: &[u8]) -> Option<usize> {
+        let search = |from| find_closer(line, from, marker);
+        if line.get(start) == marker.first() {
+            self.search(start, search)
+        } else {
+            self.find(start, search)
+        }
+    }
 }
 
 #[cfg(test)]
@@ -388,6 +533,38 @@ mod tests {
     }
 
     #[test]
+    fn openers_that_never_close_cost_one_read_of_the_line() {
+        // Every `_` here and every `[` asks where it closes, and nothing
+        // does. Each used to read to the end of the line to find that
+        // out: twenty kilobytes of `a__` took over a second in a release
+        // build, and longer still in a debug one.
+        let underscores = "a__".repeat(7000);
+        assert_eq!(render(&underscores), underscores);
+        let brackets = "[".repeat(20_000);
+        assert_eq!(render(&brackets), brackets);
+        let spaced = format!("{}a]({})", "[".repeat(5000), " ".repeat(5000));
+        assert_eq!(render(&spaced), spaced);
+    }
+
+    #[test]
+    fn a_closer_found_for_one_opener_is_the_right_one_for_the_next() {
+        // The searches are remembered along the line; these are the
+        // shapes where an earlier answer could be the wrong one later.
+        assert_eq!(render("a__b _c_ d_"), "a__b <i>c</i> d_");
+        assert_eq!(render("_a_b _c_"), "_a_b <i>c</i>");
+        assert_eq!(render("a __b__ __c d__"), "a <b>b</b> <b>c d</b>");
+        assert_eq!(render("*a **b* c*"), "<i>a **b</i> c*");
+        assert_eq!(
+            render("[a [b](https://x.org/) c]"),
+            "<a href=\"https://x.org/\">a [b</a> c]"
+        );
+        assert_eq!(
+            render("[a](mailto:x y) [b]( mailto:z ) [c](http://q)"),
+            "[a](mailto:x y) <a href=\"mailto:z\">b</a> <a href=\"http://q\">c</a>"
+        );
+    }
+
+    #[test]
     fn links_are_anchors_and_only_web_and_mail_ones() {
         assert_eq!(
             render("see https://example.org/a_b?x=1, ok"),
@@ -429,6 +606,21 @@ mod tests {
         assert_eq!(
             render("[<i>](https://example.org/?a=1&b=2)"),
             "<a href=\"https://example.org/?a=1&amp;b=2\">&lt;i&gt;</a>"
+        );
+    }
+
+    #[test]
+    fn many_links_on_one_line_are_each_found_once() {
+        // Every character used to search every link: seconds for this.
+        let line = "https://a.example/ ".repeat(20_000);
+        let rendered = render(&line);
+        assert_eq!(rendered.matches("<a href=").count(), 20_000);
+        // A link inside a code span stays code, and the next one is
+        // still a link.
+        assert_eq!(
+            render("`https://a.example/` https://b.example/"),
+            "<tt>https://a.example/</tt> \
+             <a href=\"https://b.example/\">https://b.example/</a>"
         );
     }
 }

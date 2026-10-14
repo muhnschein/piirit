@@ -12,6 +12,7 @@ Item {
     // declare one on Qt 5.6.
     property url source
     property bool autoPlay: false
+    property bool autoLoad: true
     property int playbackState: 0
     property int position: 0
     property int duration: 0
