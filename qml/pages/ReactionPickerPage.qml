@@ -2,6 +2,7 @@ import QtQuick 2.0
 import Sailfish.Silica 1.0
 import "../components"
 import "../js/Emoji.js" as Emoji
+import "../js/EmojiPicker.js" as Picker
 
 /*
  * Any emoji as a reaction: what the "+" at the end of a message's quick
@@ -65,13 +66,13 @@ Page {
     readonly property string currentKey: page.current.length > 0 ? Emoji.key(page.current) : ""
 
     /// What a search finds; [] while there is no search.
-    readonly property var results: page.query.length > 0 ? Emoji.search(page.query) : []
+    readonly property var results: page.query.length > 0 ? Picker.search(page.query) : []
 
     /// What the grid shows, a row at a time: a search's results alone,
     /// or the recent ones and then every group under its heading.
     readonly property var rows: {
         if (page.query.length > 0) {
-            return Emoji.rows(page.results, page.columns, null)
+            return Picker.rows(page.results, page.columns, null)
         }
         var out = []
         var shown = []
@@ -83,9 +84,9 @@ Page {
         }
         if (shown.length > 0) {
             out.push({ heading: qsTr("Recent"), group: page.recentGroup, cells: [] })
-            out = out.concat(Emoji.rows(shown, page.columns, null))
+            out = out.concat(Picker.rows(shown, page.columns, null))
         }
-        return out.concat(Emoji.rows(Emoji.all(), page.columns, page.groupTitles))
+        return out.concat(Picker.rows(Picker.all(), page.columns, page.groupTitles))
     }
 
     /// The group whose rows are at the top of the grid now, for the
@@ -153,13 +154,13 @@ Page {
             visible: height > 0
 
             Repeater {
-                model: Emoji.groupIcons
+                model: Picker.groupIcons
 
                 BackgroundItem {
                     objectName: "groupButton"
                     readonly property int group: index
                     x: index * width
-                    width: strip.width / Emoji.groupIcons.length
+                    width: strip.width / Picker.groupIcons.length
                     height: strip.height
                     highlighted: down || page.topGroup === index
                     onClicked: page.jumpTo(index)
