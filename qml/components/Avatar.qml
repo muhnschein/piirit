@@ -74,7 +74,7 @@ Rectangle {
     color: avatar.discColor
     // Fading, the disc goes the way the picture does, in steps close
     // enough that the eye takes them for the curve.
-    gradient: avatar.fades && !avatar.showsPicture ? fade : null
+    gradient: avatar.fades && !avatar.showsPicture ? avatar.fade : null
 
     /// The disc's colour where it is `at` of the way down.
     function faded(at) {
@@ -82,16 +82,30 @@ Rectangle {
         return Qt.rgba(c.r, c.g, c.b, c.a * QuickActions.fade(at, avatar.fadeFrom, avatar.fadeTo))
     }
 
-    Gradient {
-        id: fade
-        GradientStop { position: 0.0; color: avatar.faded(0.0) }
-        GradientStop { position: 0.2; color: avatar.faded(0.2) }
-        GradientStop { position: 0.4; color: avatar.faded(0.4) }
-        GradientStop { position: 0.6; color: avatar.faded(0.6) }
-        GradientStop { position: 0.7; color: avatar.faded(0.7) }
-        GradientStop { position: 0.8; color: avatar.faded(0.8) }
-        GradientStop { position: 0.9; color: avatar.faded(0.9) }
-        GradientStop { position: 1.0; color: avatar.faded(1.0) }
+    /// The fading disc's gradient, made the first time the avatar fades
+    /// and null until then. Only the cover fades an avatar, and every
+    /// avatar in every list built eight stops and their bindings for it.
+    property QtObject fade: null
+    function makeFade() {
+        if (avatar.fades && avatar.fade === null) {
+            avatar.fade = fadeMaker.createObject(avatar)
+        }
+    }
+    onFadesChanged: avatar.makeFade()
+    Component.onCompleted: avatar.makeFade()
+
+    Component {
+        id: fadeMaker
+        Gradient {
+            GradientStop { position: 0.0; color: avatar.faded(0.0) }
+            GradientStop { position: 0.2; color: avatar.faded(0.2) }
+            GradientStop { position: 0.4; color: avatar.faded(0.4) }
+            GradientStop { position: 0.6; color: avatar.faded(0.6) }
+            GradientStop { position: 0.7; color: avatar.faded(0.7) }
+            GradientStop { position: 0.8; color: avatar.faded(0.8) }
+            GradientStop { position: 0.9; color: avatar.faded(0.9) }
+            GradientStop { position: 1.0; color: avatar.faded(1.0) }
+        }
     }
 
     Label {
