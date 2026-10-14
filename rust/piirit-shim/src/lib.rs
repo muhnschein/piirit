@@ -3,6 +3,25 @@
 //!
 //! Needs Qt5 dev headers to build.
 
+// What a phone runs, held to more than tests are: a panic there ends a
+// Qt callback or a tokio task with nobody to see it, and overflow wraps
+// silently in a release build. Not in Cargo.toml's lints table because
+// that table cannot leave tests out, and a test indexing into what it just
+// built is fine. Tests, build scripts and the fake servers in src/bin are
+// all other crates, or this one compiled with `cfg(test)`.
+#![cfg_attr(
+    not(test),
+    deny(
+        clippy::indexing_slicing,
+        clippy::string_slice,
+        clippy::arithmetic_side_effects,
+        clippy::let_underscore_must_use,
+        clippy::panic,
+        clippy::panic_in_result_fn,
+        clippy::unwrap_in_result,
+        clippy::get_unwrap
+    )
+)]
 // All four are forced by qmetaobject's derive macros, not by code here:
 // the macros expand to a wide, unstable set of items from that crate
 // (`wildcard_imports`), generate the `QObject` impl and dispatcher
@@ -14,9 +33,10 @@
     clippy::type_complexity,
     clippy::needless_pass_by_value
 )]
-// The `cpp!` block in src/pictures.rs carries `rust!` callbacks, and the
-// macro that reads it recurses once per token past the default 128.
-#![recursion_limit = "512"]
+// The macro that reads a `cpp!` block recurses once per token, past the
+// default 128 for the provider in src/pictures.rs and past 1024 for the
+// microphone watch in src/mic_watch.rs, which is longer.
+#![recursion_limit = "2048"]
 
 mod backup;
 mod call_host;
@@ -35,6 +55,7 @@ mod json;
 mod links;
 mod markdown;
 mod media;
+mod mic_watch;
 mod models;
 mod pictures;
 mod prefetch;
@@ -53,6 +74,7 @@ mod webxdc;
 mod webxdc_host;
 
 pub use crate::backup::Backup;
+pub use crate::call_host::prepare_media_plugins;
 pub use crate::calls::Call;
 pub use crate::capture::Captures;
 pub use crate::chat::{local_day_number, ChatMessages};
@@ -65,6 +87,7 @@ pub use crate::core::{
     HANDLED_EVENT_KINDS,
 };
 pub use crate::full_text::FullText;
+pub use crate::mic_watch::{MicState, MicWatch, MicWatcher};
 pub use crate::pictures::{install as install_pictures, render as render_picture};
 pub use crate::prefetch::ChatPrefetch;
 pub use crate::profile::Profile;
@@ -126,6 +149,9 @@ pub fn register_qml_types() {
     ) else {
         return;
     };
+    let Ok(mic_watch) = std::ffi::CStr::from_bytes_with_nul(b"MicWatch\0") else {
+        return;
+    };
     qmetaobject::qml_register_type::<ChatMessages>(uri, 1, 0, messages);
     qmetaobject::qml_register_type::<ChatList>(uri, 1, 0, list);
     qmetaobject::qml_register_type::<ContactList>(uri, 1, 0, contacts);
@@ -146,6 +172,7 @@ pub fn register_qml_types() {
     qmetaobject::qml_register_type::<Transports>(uri, 1, 0, transports);
     qmetaobject::qml_register_type::<SecondDevice>(uri, 1, 0, second_device);
     qmetaobject::qml_register_type::<Call>(uri, 1, 0, call);
+    qmetaobject::qml_register_type::<MicWatch>(uri, 1, 0, mic_watch);
 }
 pub use models::{
     AccountItem, ChatListItem, ChatListModel, ContactItem, ContactListModel, MessageListItem,

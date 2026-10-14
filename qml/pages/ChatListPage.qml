@@ -2,6 +2,7 @@ import QtQuick 2.0
 import Sailfish.Silica 1.0
 import "../components"
 import Piirit 1.0
+import "../js/QuickActions.js" as QuickActions
 
 Page {
     id: page
@@ -205,21 +206,25 @@ Page {
     }
 
     /// A quick action from the cover (piirit.qml): `kind` is what it does,
-    /// and for a chat, `accountId` and `chatId` say which one.
+    /// and for a chat, `accountId` and `chatId` say which one. For the
+    /// camera's, `sendNow` says whether what is taken goes as soon as its
+    /// chat is picked.
     ///
     /// Everything starts from this list, brought forward over whatever
     /// was open, the way a tapped notification comes in. A chat is looked
     /// up before it is opened, so one deleted since the action was set up
     /// is said to be gone rather than opened empty; with the core away
     /// there is no asking, and the list is where the action ends.
-    function quickAction(kind, accountId, chatId) {
+    function quickAction(kind, accountId, chatId, sendNow) {
         if (!page.comeForward()) {
             return
         }
         // A chat still being looked up for an earlier tap is not wanted
         // any more.
         page.quickChatPending = false
-        if (kind === "search") {
+        if (QuickActions.isCapture(kind)) {
+            page.capture(QuickActions.captures[kind], sendNow === true)
+        } else if (kind === "search") {
             searchField.text = ""
             page.searchWanted = true
             page.takeSearch()
@@ -244,6 +249,88 @@ Page {
 
     /// A quick action's chat is being looked up.
     property bool quickChatPending: false
+
+    /// A camera quick action: the camera, opened as `how` says (a still
+    /// or a video, the back camera or the front), then the chat to send
+    /// what it took to, then that chat with it on the attachment bar --
+    /// sent at once when `sendNow`, and otherwise waiting there for a
+    /// caption and the send button, as a share does (piirit.qml).
+    ///
+    /// Each page takes the place of the one before rather than going over
+    /// it, so the way back from the chat is to this list. Pushed rather
+    /// than through `pulleyHost`: the camera's answer is connected to, and
+    /// Silica's animated push hands back no page to connect to.
+    function capture(how, sendNow) {
+        // One still waiting from an earlier tap is not going anywhere now.
+        page.dropCapture()
+        var camera = pageStack.push(Qt.resolvedUrl("CapturePage.qml"), {
+            mode: how.mode,
+            front: how.front,
+            closeOnPick: false
+        })
+        // Null when the page could not be loaded: a phone without
+        // QtMultimedia costs this action and nothing else.
+        if (!camera) {
+            return
+        }
+        camera.picked.connect(function (path) {
+            // A video finished, or a picture written, after the reader
+            // left the camera -- backed out while it was being finished,
+            // or a call came in over it -- is not asked about: the page in
+            // the camera's place is not the camera's to replace.
+            if (pageStack.currentPage !== camera || pageStack.busy) {
+                captures.discard(path)
+                return
+            }
+            page.pickChatFor(path, sendNow)
+        })
+    }
+
+    /// Ask which chat a capture is for, in the camera's place.
+    function pickChatFor(path, sendNow) {
+        page.unsentCapture = path
+        var picker = pageStack.replace(Qt.resolvedUrl("ChatPickerPage.qml"), {
+            accountId: page.accountId,
+            closeOnPick: false,
+            //: Over the list of chats, when picking the one to send a
+            //: picture or a video just taken to.
+            title: qsTr("Send to"),
+            emptyText: qsTr("No chats yet")
+        })
+        if (!picker) {
+            page.dropCapture()
+            return
+        }
+        picker.chatPicked.connect(function (chatId, chatName) {
+            // The chat has it now, and throws it away once it is sent.
+            page.unsentCapture = ""
+            pageStack.replace(Qt.resolvedUrl("ConversationPage.qml"), {
+                accountId: page.accountId,
+                chatId: chatId,
+                chatName: chatName,
+                sharedFile: path,
+                sendShared: sendNow
+            })
+        })
+    }
+
+    /// A capture taken for a quick action that no chat has been picked
+    /// for yet, "" for none. The reader backing out of the picker comes
+    /// back here, and it is thrown away then: nothing else will send it.
+    property string unsentCapture: ""
+
+    function dropCapture() {
+        if (page.unsentCapture.length === 0) {
+            return
+        }
+        captures.discard(page.unsentCapture)
+        page.unsentCapture = ""
+    }
+
+    Captures {
+        id: captures
+        objectName: "captures"
+    }
 
     // The chat a quick action asked for, looked up before it is opened. A
     // failed lookup answers `loaded` and then `error`, one straight after
@@ -333,6 +420,7 @@ Page {
     onStatusChanged: {
         if (status === PageStatus.Active) {
             notifier.viewingChatId = 0
+            page.dropCapture()
             if (page.arrivingChatId !== 0) {
                 var arriving = page.arrivingChatId
                 page.arrivingChatId = 0

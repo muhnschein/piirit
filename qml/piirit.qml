@@ -40,11 +40,13 @@ ApplicationWindow {
     }
 
     // The cover offers the quick actions the reader set up, and hands a
-    // tap on one back here.
+    // tap on one back here. While a call is up it shows the call, with an
+    // action of its own that it does itself.
     cover: Component {
         CoverPage {
             quickActionsAllowed: appWindow.chatList !== null
                                  && !appWindow.quickActionsPaused
+            call: callCenter.call
             onQuickAction: appWindow.quickAction(side)
         }
     }
@@ -78,7 +80,8 @@ ApplicationWindow {
         if (appWindow.chatList === null || action.kind === "") {
             return
         }
-        appWindow.chatList.quickAction(action.kind, action.accountId, action.chatId)
+        appWindow.chatList.quickAction(action.kind, action.accountId, action.chatId,
+                                       action.sendNow)
     }
 
     /// The profile the app is on, as the chat list last opened it.
@@ -155,16 +158,14 @@ ApplicationWindow {
     // from somebody who may not ring is still kept, and can still be
     // answered from its chat.
     //
-    // Only the reader's own choice writes 2. With calls off the core is
-    // left at its default, 1: the key is in the profile's database and
-    // goes wherever the profile does -- a backup, a second device -- and a
-    // "nobody" written for a feature switched off here made a Delta Chat
-    // set up from it ring for nobody, never having been asked. With calls
-    // off nothing here rings anyway: CallCenter does not listen.
+    // Only the reader's own choice writes 2: the key is in the profile's
+    // database and goes wherever the profile does -- a backup, a second
+    // device -- so nothing but the reader saying so should make a Delta
+    // Chat set up from it ring for nobody.
     Binding {
         target: core
         property: "who_can_call_me"
-        value: Settings.callsEnabled === true && Settings.callsRing === false ? 2 : 1
+        value: Settings.callsRing === false ? 2 : 1
     }
 
     /// The app's one call, which belongs to no page: see
@@ -172,9 +173,6 @@ ApplicationWindow {
     CallCenter {
         id: callCenter
         objectName: "callCenter"
-        // `=== true` because dconf hands back `undefined` before it has
-        // read the key.
-        enabled: Settings.callsEnabled === true
         stack: pageStack
         onRaise: appWindow.activate()
         // A missed call's notification, tapped: its chat, the way a
@@ -191,9 +189,10 @@ ApplicationWindow {
     /// forward, and does not take the reader out of a call.
     readonly property bool callBusy: callCenter.busy
 
-    /// Call a chat. False when the app is in a call already.
-    function placeCall(accountId, chatId) {
-        return callCenter.place(accountId, chatId)
+    /// Call a chat, with the camera on for a video call. False when the
+    /// app is in a call already.
+    function placeCall(accountId, chatId, video) {
+        return callCenter.place(accountId, chatId, video === true)
     }
 
     /// Bring the call there is back to the front.

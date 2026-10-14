@@ -216,11 +216,16 @@ pub(crate) fn clean_text(text: &str) -> String {
     let mut out = String::with_capacity(text.len());
     let mut at = 0;
     for (start, end) in url_spans(text) {
-        out.push_str(&text[at..start]);
-        out.push_str(&clean_url(&text[start..end]));
-        at = end;
+        // The spans are character boundaries, so both always slice. Were
+        // one not to, the text up to the next link still goes out with it
+        // as it was: a link left uncleaned, and no words lost.
+        if let (Some(before), Some(url)) = (text.get(at..start), text.get(start..end)) {
+            out.push_str(before);
+            out.push_str(&clean_url(url));
+            at = end;
+        }
     }
-    out.push_str(&text[at..]);
+    out.push_str(text.get(at..).unwrap_or_default());
     out
 }
 
@@ -241,12 +246,12 @@ pub(crate) fn url_spans(text: &str) -> Vec<(usize, usize)> {
 fn url_start(text: &str, from: usize) -> Option<usize> {
     let mut at = from;
     while let Some(offset) = text.get(at..)?.find("http") {
-        let index = at + offset;
-        let rest = &text[index..];
+        let index = at.saturating_add(offset);
+        let rest = text.get(index..)?;
         if rest.starts_with("http://") || rest.starts_with("https://") {
             return Some(index);
         }
-        at = index + 4;
+        at = index.saturating_add("http".len());
     }
     None
 }
@@ -256,31 +261,29 @@ fn url_start(text: &str, from: usize) -> Option<usize> {
 /// sentence rather than the link. A `)` or `]` counts as the sentence's
 /// only when the link itself has no opening one for it.
 fn url_end(text: &str, start: usize) -> usize {
-    let bytes = text.as_bytes();
-    let mut end = start;
-    while end < bytes.len() {
-        if matches!(
-            bytes[end],
-            b' ' | b'\t' | b'\n' | b'\r' | b'<' | b'>' | b'"' | b'\''
-        ) {
-            break;
-        }
-        end += 1;
-    }
-    while end > start {
-        let last = bytes[end - 1];
+    let tail = text.as_bytes().get(start..).unwrap_or_default();
+    let mut link = tail
+        .split(|byte| {
+            matches!(
+                byte,
+                b' ' | b'\t' | b'\n' | b'\r' | b'<' | b'>' | b'"' | b'\''
+            )
+        })
+        .next()
+        .unwrap_or_default();
+    while let Some((&last, shorter)) = link.split_last() {
         let trailing = match last {
             b'.' | b',' | b';' | b':' | b'!' | b'?' => true,
-            b')' => !balanced(&bytes[start..end], b'(', b')'),
-            b']' => !balanced(&bytes[start..end], b'[', b']'),
+            b')' => !balanced(link, b'(', b')'),
+            b']' => !balanced(link, b'[', b']'),
             _ => false,
         };
         if !trailing {
             break;
         }
-        end -= 1;
+        link = shorter;
     }
-    end
+    start.saturating_add(link.len())
 }
 
 /// Whether every `close` in the span has an `open` before it.
@@ -288,9 +291,9 @@ fn balanced(span: &[u8], open: u8, close: u8) -> bool {
     let mut depth: i32 = 0;
     for byte in span {
         if *byte == open {
-            depth += 1;
+            depth = depth.saturating_add(1);
         } else if *byte == close {
-            depth -= 1;
+            depth = depth.saturating_sub(1);
         }
     }
     depth >= 0
@@ -300,29 +303,27 @@ fn balanced(span: &[u8], open: u8, close: u8) -> bool {
 /// and so is every parameter not on a list.
 pub(crate) fn clean_url(url: &str) -> String {
     let host = host_of(url);
-    let fragment_at = url.find('#');
-    // `?` after `#` is part of the fragment. `map_or` rather than
-    // `is_none_or`, which arrived in Rust 1.82, past the 1.75 floor.
-    let query_at = url
-        .find('?')
-        .filter(|q| fragment_at.map_or(true, |f| *q < f));
-
-    let base_end = query_at.or(fragment_at).unwrap_or(url.len());
-    let mut base = &url[..base_end];
-    let fragment = fragment_at.map_or("", |at| &url[at..]);
+    // The fragment keeps its `#`, and a `?` after it is part of it.
+    let (before_fragment, fragment) = url
+        .find('#')
+        .and_then(|at| Some((url.get(..at)?, url.get(at..)?)))
+        .unwrap_or((url, ""));
+    let (mut base, query) = match before_fragment.split_once('?') {
+        Some((base, query)) => (base, Some(query)),
+        None => (before_fragment, None),
+    };
 
     // Amazon appends the click source as a path segment rather than a
     // parameter: `/dp/B0XXXXXXXX/ref=sr_1_3`.
     if host_matches(&host, "amazon.*") {
-        if let Some(at) = base.find("/ref=") {
-            base = &base[..at];
+        if let Some((path, _)) = base.split_once("/ref=") {
+            base = path;
         }
     }
 
-    let Some(query_at) = query_at else {
+    let Some(query) = query else {
         return format!("{base}{fragment}");
     };
-    let query = &url[query_at + 1..fragment_at.unwrap_or(url.len())];
     let site = SITE_RULES.iter().find(|rule| {
         rule.hosts
             .iter()
@@ -365,18 +366,14 @@ fn is_tracking(name: &str, site: Option<&SiteRule>) -> bool {
 /// The host, lowercased, without user info, a port, or a leading `www.`
 /// or `m.`.
 fn host_of(url: &str) -> String {
-    let Some(scheme_end) = url.find("://") else {
+    let Some((_, rest)) = url.split_once("://") else {
         return String::new();
     };
-    let rest = &url[scheme_end + 3..];
-    let end = rest.find(['/', '?', '#']).unwrap_or(rest.len());
-    let mut host = rest[..end].to_ascii_lowercase();
-    if let Some(at) = host.rfind('@') {
-        host = host[at + 1..].to_string();
-    }
-    if let Some(colon) = host.find(':') {
-        host.truncate(colon);
-    }
+    let authority = rest.split(['/', '?', '#']).next().unwrap_or(rest);
+    let host = authority
+        .rsplit_once('@')
+        .map_or(authority, |(_, host)| host);
+    let host = host.split(':').next().unwrap_or(host).to_ascii_lowercase();
     for prefix in ["www.", "m."] {
         if let Some(stripped) = host.strip_prefix(prefix) {
             return stripped.to_string();
@@ -393,7 +390,8 @@ fn host_matches(host: &str, pattern: &str) -> bool {
         // at the start, and `smile.amazon.de` after a dot.
         return host
             .find(brand)
-            .is_some_and(|at| at == 0 || host.as_bytes()[at - 1] == b'.');
+            .and_then(|at| host.get(..at))
+            .is_some_and(|before| before.is_empty() || before.ends_with('.'));
     }
     host == pattern || host.ends_with(&format!(".{pattern}"))
 }

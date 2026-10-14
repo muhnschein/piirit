@@ -38,7 +38,7 @@ pub(crate) fn render(text: &str) -> String {
             fence.cross(&mut lines);
             continue;
         }
-        let mut out = String::with_capacity(line.len() + 8);
+        let mut out = String::with_capacity(line.len().saturating_add(8));
         if fence.opening {
             out.push_str("<pre>");
             fence.opening = false;
@@ -128,7 +128,7 @@ fn join_styled(lines: &[String]) -> String {
         if closes {
             in_pre = false;
         }
-        let Some(next) = lines.get(index + 1) else {
+        let Some(next) = lines.get(index.saturating_add(1)) else {
             continue;
         };
         if closes || next.starts_with("<pre>") {
@@ -147,8 +147,12 @@ fn join_styled(lines: &[String]) -> String {
 fn block(line: &str, trimmed: &str, out: &mut String) {
     // A heading: one to six hashes, a space, the text.
     let hashes = trimmed.bytes().take_while(|byte| *byte == b'#').count();
-    if (1..=6).contains(&hashes) && trimmed.as_bytes().get(hashes) == Some(&b' ') {
-        let heading = trimmed[hashes + 1..].trim();
+    let heading = trimmed
+        .get(hashes..)
+        .and_then(|after| after.strip_prefix(' '))
+        .filter(|_| (1..=6).contains(&hashes));
+    if let Some(heading) = heading {
+        let heading = heading.trim();
         out.push_str("<b>");
         inline(heading, out);
         out.push_str("</b>");
@@ -175,28 +179,27 @@ fn push_escaped(out: &mut String, text: &str) {
 /// escaped.
 fn inline(line: &str, out: &mut String) {
     let mut links = url_spans(line).into_iter().peekable();
-    let bytes = line.as_bytes();
     let mut at = 0;
-    while at < bytes.len() {
+    while let Some(rest) = line.get(at..).filter(|rest| !rest.is_empty()) {
         // The links are in order and `at` only moves forward, so one that
         // other markup has already taken in is passed for good, rather
         // than every link searched again at every character.
         while links.next_if(|(start, _)| *start < at).is_some() {}
         // A bare link, as it stands. Its own characters are never markup,
         // so a `_` in a path is a `_` and not an italic.
-        if let Some((start, end)) = links.next_if(|(start, _)| *start == at) {
-            let url = &line[start..end];
-            push_link(out, url, url);
-            at = end;
-            continue;
+        if let Some((_, end)) = links.next_if(|(start, _)| *start == at) {
+            if let Some(url) = line.get(at..end) {
+                push_link(out, url, url);
+                at = end;
+                continue;
+            }
         }
-        let rest = &line[at..];
         // A backslash escapes the marker after it.
-        if bytes[at] == b'\\' {
-            if let Some(next) = rest[1..].chars().next() {
+        if let Some(after) = rest.strip_prefix('\\') {
+            if let Some(next) = after.chars().next() {
                 if "\\`*_~[]()#".contains(next) {
-                    push_escaped(out, &rest[1..=next.len_utf8()]);
-                    at += 1 + next.len_utf8();
+                    push_escaped(out, next.encode_utf8(&mut [0; 4]));
+                    at = at.saturating_add(1).saturating_add(next.len_utf8());
                     continue;
                 }
             }
@@ -205,24 +208,27 @@ fn inline(line: &str, out: &mut String) {
             .or_else(|| link_span(rest, out))
             .or_else(|| emphasis_span(line, at, out))
         {
-            at += consumed;
+            at = at.saturating_add(consumed);
             continue;
         }
         // Whatever it is, one character of it, escaped.
-        let c = rest.chars().next().unwrap_or(' ');
-        push_escaped(out, &rest[..c.len_utf8()]);
-        at += c.len_utf8();
+        let Some(c) = rest.chars().next() else {
+            break;
+        };
+        push_escaped(out, c.encode_utf8(&mut [0; 4]));
+        at = at.saturating_add(c.len_utf8());
     }
 }
 
 /// `` `code` ``: the contents are shown as typed, markers and all.
 fn code_span(rest: &str, out: &mut String) -> Option<usize> {
     let inner = rest.strip_prefix('`')?;
-    let close = inner.find('`').filter(|close| *close > 0)?;
+    let (code, _) = inner.split_once('`').filter(|(code, _)| !code.is_empty())?;
     out.push_str("<tt>");
-    push_escaped(out, &inner[..close]);
+    push_escaped(out, code);
     out.push_str("</tt>");
-    Some(close + 2)
+    // The code and its two backticks.
+    Some(code.len().saturating_add(2))
 }
 
 /// `[text](https://...)`: the text is shown, the link is followed on a
@@ -230,12 +236,10 @@ fn code_span(rest: &str, out: &mut String) -> Option<usize> {
 /// something a message gets to open.
 fn link_span(rest: &str, out: &mut String) -> Option<usize> {
     let inner = rest.strip_prefix('[')?;
-    let close = inner.find(']')?;
-    let text = &inner[..close];
-    let after = &inner[close + 1..];
+    let (text, after) = inner.split_once(']')?;
     let url_part = after.strip_prefix('(')?;
-    let url_end = url_part.find(')')?;
-    let url = url_part[..url_end].trim();
+    let (url_typed, _) = url_part.split_once(')')?;
+    let url = url_typed.trim();
     if text.is_empty() || url.contains(char::is_whitespace) {
         return None;
     }
@@ -243,7 +247,8 @@ fn link_span(rest: &str, out: &mut String) -> Option<usize> {
         return None;
     }
     push_link(out, url, text);
-    Some(1 + close + 1 + 1 + url_end + 1)
+    // The text and the URL as typed, and the `[`, `](` and `)` around them.
+    Some(text.len().saturating_add(url_typed.len()).saturating_add(4))
 }
 
 fn push_link(out: &mut String, url: &str, text: &str) {
@@ -258,7 +263,7 @@ fn push_link(out: &mut String, url: &str, text: &str) {
 /// underscore forms only at word boundaries, so `snake_case_names` stay
 /// as written; the others whenever the marker hugs its text.
 fn emphasis_span(line: &str, at: usize, out: &mut String) -> Option<usize> {
-    let rest = &line[at..];
+    let rest = line.get(at..)?;
     let (marker, tag): (&str, &str) = if rest.starts_with("**") {
         ("**", "b")
     } else if rest.starts_with("__") {
@@ -273,22 +278,23 @@ fn emphasis_span(line: &str, at: usize, out: &mut String) -> Option<usize> {
         return None;
     };
     let underscore = marker.starts_with('_');
-    if underscore && is_word(line[..at].chars().next_back()) {
+    if underscore && is_word(line.get(..at)?.chars().next_back()) {
         return None;
     }
-    let inner = &rest[marker.len()..];
+    let inner = rest.strip_prefix(marker)?;
     // The text has to start right after the marker, and end right before
     // the closing one: `a * b * c` is arithmetic, not italics.
     if inner.starts_with(char::is_whitespace) || inner.is_empty() {
         return None;
     }
     let close = find_closer(inner, marker)?;
-    let text = &inner[..close];
+    let text = inner.get(..close)?;
     if text.ends_with(char::is_whitespace) {
         return None;
     }
-    let end = at + marker.len() + close + marker.len();
-    if underscore && is_word(line[end..].chars().next()) {
+    // Both markers and the text between them.
+    let consumed = marker.len().saturating_mul(2).saturating_add(close);
+    if underscore && is_word(rest.get(consumed..)?.chars().next()) {
         return None;
     }
     out.push('<');
@@ -298,7 +304,7 @@ fn emphasis_span(line: &str, at: usize, out: &mut String) -> Option<usize> {
     out.push_str("</");
     out.push_str(tag);
     out.push('>');
-    Some(end - at)
+    Some(consumed)
 }
 
 /// Where `marker` closes `inner`, skipping a marker that would leave the
@@ -306,16 +312,18 @@ fn emphasis_span(line: &str, at: usize, out: &mut String) -> Option<usize> {
 /// a doubled one, so `*a **b** c*` closes at the lone star.
 fn find_closer(inner: &str, marker: &str) -> Option<usize> {
     let mut from = 0;
-    while let Some(offset) = inner[from..].find(marker) {
-        let index = from + offset;
+    while let Some(offset) = inner.get(from..)?.find(marker) {
+        let index = from.saturating_add(offset);
         if index == 0 {
-            from = index + marker.len();
+            from = marker.len();
             continue;
         }
         let single = marker.len() == 1;
-        let doubled = inner[index..].starts_with(&marker.repeat(2));
+        let doubled = inner
+            .get(index..)
+            .is_some_and(|tail| tail.starts_with(&marker.repeat(2)));
         if single && doubled {
-            from = index + 2;
+            from = index.saturating_add(2);
             continue;
         }
         return Some(index);

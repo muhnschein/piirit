@@ -151,7 +151,7 @@ fn onboarding_speaks_the_current_transport_api() {
         }
     });
 
-    let engine_ptr = &engine as *const QmlEngine;
+    let engine_ptr: *const QmlEngine = &engine;
     single_shot(Duration::from_secs(7), move || {
         // SAFETY: see tests/smoke.rs -- the callback only fires while
         // `exec()` is still running on this thread.

@@ -25,7 +25,7 @@ use qmetaobject::*;
 
 mod common;
 
-const PROBE_QML: &str = r#"
+const PROBE_QML: &str = r"
     import QtQuick 2.0
     Item {
         id: probe
@@ -34,8 +34,9 @@ const PROBE_QML: &str = r#"
         // The window, as the page reaches it: what it was asked to do.
         QtObject {
             id: appWindow
-            function placeCall(accountId, chatId) {
-                probe.asked += 'place:' + accountId + ':' + chatId + ';'
+            function placeCall(accountId, chatId, video) {
+                probe.asked += 'place:' + accountId + ':' + chatId
+                               + (video ? ':video' : '') + ';'
                 return true
             }
             function showCall() { probe.asked += 'show;' }
@@ -47,12 +48,6 @@ const PROBE_QML: &str = r#"
         Loader { id: tiles; width: 540 }
         Loader { id: holder; width: 540; height: 960 }
 
-        function setSetting(dir, name, value) {
-            var writer = Qt.createQmlObject('import QtQuick 2.0; import "' + dir + '"; '
-                + 'QtObject { function set(n, v) { Settings[n] = v } }', probe)
-            writer.set(name, value)
-            return 'ok'
-        }
         function findIn(node, test) {
             if (!node) { return null }
             if (test(node)) { return node }
@@ -106,7 +101,7 @@ const PROBE_QML: &str = r#"
             return asked
         }
     }
-"#;
+";
 
 #[test]
 #[allow(clippy::too_many_lines)]
@@ -167,17 +162,9 @@ fn a_contacts_calls_are_listed_and_called_from_their_own_page() {
             "tiles-off",
             call!("tileKinds", QString::from(tiles.clone()), false)
         );
-        record!(
-            "tiles-on",
-            call!("tileKinds", QString::from(tiles.clone()), true)
-        );
-        let dir = tiles.trim_end_matches("MediaKinds.qml").to_string();
-        call!(
-            "setSetting",
-            QString::from(dir),
-            QString::from("callsEnabled"),
-            true
-        );
+        record!("tiles-on", call!("tileKinds", QString::from(tiles), true));
+        // No setting is written first: calls are on for everybody, as
+        // they are in the reference clients (#119).
         record!(
             "load",
             call!("load", QString::from(common::page_url("CallsPage.qml")))
@@ -210,6 +197,15 @@ fn a_contacts_calls_are_listed_and_called_from_their_own_page() {
             "action-enabled",
             call!("get", QString::from("callAction"), QString::from("enabled"))
         );
+        record!(
+            "video-action",
+            call!(
+                "get",
+                QString::from("videoCallActionLabel"),
+                QString::from("text")
+            )
+        );
+        record!("video-call", call!("tap", QString::from("videoCallAction")));
         record!("call", call!("tap", QString::from("callAction")));
         record!("after-call", call!("tapRow"));
         (*engine_ptr).quit();
@@ -265,12 +261,20 @@ fn a_contacts_calls_are_listed_and_called_from_their_own_page() {
     assert_eq!(
         value("action-enabled"),
         "true",
-        "a contact a call can be placed with cannot be called. {context}"
+        "a contact a call can be placed with cannot be called -- on a \
+         phone that has never touched a setting, which is every phone \
+         now that calls are not experimental. {context}"
     );
+    assert_eq!(
+        value("video-action"),
+        "Video call Ada <b>Lovelace</b>",
+        "the row to place a video call from does not name the contact. {context}"
+    );
+    assert_eq!(value("video-call"), "ok", "{context}");
     assert_eq!(value("call"), "ok", "{context}");
     let asked = value("after-call");
     assert!(
-        asked.starts_with("place:1:1;") && asked.contains(";pickUp:1:1:"),
+        asked.starts_with("place:1:1:video;place:1:1;") && asked.contains(";pickUp:1:1:"),
         "calling placed no call, or a tap on a call still ringing did not \
          take it up: {asked}. {context}"
     );

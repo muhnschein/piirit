@@ -67,8 +67,22 @@ Page {
     /// The absolute path of the picture or video made.
     signal picked(string path)
 
-    /// 0 for a still, 1 for a video.
+    /// 0 for a still, 1 for a video. What the page opens in, and
+    /// afterwards what the mode stack says.
     property int mode: 0
+    /// Whether the page opens on the front camera rather than the back:
+    /// a quick action for a selfie (QuickActions.js). Read once, as the
+    /// page is made; the switch button moves it from there.
+    property bool front: false
+    /// Whether the page takes itself down once it has reported, as a
+    /// picker does. False for a caller that puts its next page in this
+    /// one's place: a page that popped itself first would take that page
+    /// with it, as ChatPickerPage's `closeOnPick` explains.
+    property bool closeOnPick: true
+    /// A quick action on the cover would take the stack back to the chat
+    /// list, and this page and the recording with it. Once the file has
+    /// been reported there is nothing left to lose.
+    readonly property bool pausesQuickActions: (page.recording || page.stopping) && !page.done
     /// A video is being recorded: the recorder's word, not the page's.
     readonly property bool recording:
         camera.videoRecorder.recorderState === page.recordingState
@@ -414,8 +428,11 @@ Page {
         page.picked(decodeURIComponent(path))
         // The answer given, the page goes: Silica's own pickers do the
         // same. Left to the caller otherwise it would sit under the
-        // conversation with the camera off.
-        pageStack.pop()
+        // conversation with the camera off -- unless the caller has put
+        // its own page in this one's place already.
+        if (page.closeOnPick) {
+            pageStack.pop()
+        }
     }
 
     // The camera runs only while this page is the one on screen.
@@ -431,6 +448,15 @@ Page {
         }
     }
     Component.onCompleted: {
+        // What the page was opened in, before the camera first starts:
+        // the pipeline is built for one mode, and `setMode` would stop
+        // and rebuild it.
+        if (page.mode === 1) {
+            camera.captureMode = Camera.CaptureVideo
+        }
+        if (page.front && page.frontCameras.length > 0) {
+            page.useCamera(page.frontCameras[0])
+        }
         if (page.status === PageStatus.Active) {
             camera.start()
         }

@@ -39,9 +39,10 @@
 
 use std::collections::VecDeque;
 use std::net::{Ipv4Addr, SocketAddr};
+use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicBool, AtomicU32, AtomicU64, Ordering};
-use std::sync::{Arc, Mutex, Weak};
-use std::time::Duration;
+use std::sync::{Arc, Mutex, OnceLock, Weak};
+use std::time::{Duration, Instant};
 
 use deltachat_jsonrpc::RpcClient;
 use tokio::io::AsyncWriteExt;
@@ -50,6 +51,7 @@ use tokio::runtime::Handle;
 use tokio::sync::Notify;
 use tokio::task::JoinHandle;
 
+use crate::json;
 use crate::webxdc_host::{content_type, read_body, read_head, token};
 
 /// The page itself: upstream's release build, byte for byte. Compiled in
@@ -58,8 +60,9 @@ use crate::webxdc_host::{content_type, read_body, read_head, token};
 /// nowhere else. `scripts/fetch-calls-webapp.sh` pins what it is.
 const PAGE: &str = include_str!("../../../vendor/calls-webapp/index.html");
 
-/// `window.calls`, as JavaScript.
-const BRIDGE: &str = include_str!("calls.js");
+/// `window.calls`, as JavaScript: the camera's half (`call_video.js`)
+/// ahead of the bridge, which hands it what it needs.
+const BRIDGE: &str = concat!(include_str!("call_video.js"), include_str!("calls.js"));
 
 /// What the page may do from inside the `WebView`. Its own script and
 /// style are inline, and it draws the other end's picture from here;
@@ -121,10 +124,54 @@ pub(crate) enum Report {
     /// `checking`, `connected`, `completed`, `disconnected`, `failed`,
     /// `closed`.
     Connection(String),
+    /// How the pictures stand: the camera live here, the other end's
+    /// picture drawn, which way the camera faces, and whether the last
+    /// camera asked for would not open.
+    Video(Video),
     /// The page asked for the call to end: its red button.
     EndedByPage,
     /// The core refused something, in its own words.
     Failed(String),
+}
+
+/// How a call's pictures stand, as the bridge reports them on `/video`.
+// Flags the bridge reports side by side, each read on its own.
+#[allow(clippy::struct_excessive_bools)]
+#[derive(Debug, Clone, Default, PartialEq, Eq)]
+pub(crate) struct Video {
+    /// The camera is open and sending.
+    pub(crate) local: bool,
+    /// The other end's picture is being drawn.
+    pub(crate) remote: bool,
+    /// The camera's picture has painted a frame since it was last given
+    /// one -- shown, not black -- or has been given up on.
+    pub(crate) local_painted: bool,
+    /// The same, of the other end's picture.
+    pub(crate) remote_painted: bool,
+    /// The camera faces the reader.
+    pub(crate) front: bool,
+    /// The last camera asked for would not open.
+    pub(crate) failed: bool,
+    /// What the engine said when it would not: the error's name and
+    /// message, empty when it said nothing.
+    pub(crate) error: String,
+}
+
+impl Video {
+    /// Read the bridge's report: a JSON object, a missing field false.
+    /// None for anything that is not an object.
+    pub(crate) fn from_json(text: &str) -> Option<Self> {
+        let value: serde_json::Value = serde_json::from_str(text).ok()?;
+        value.is_object().then(|| Self {
+            local: json::flag(&value, "local"),
+            remote: json::flag(&value, "remote"),
+            local_painted: json::flag(&value, "localPainted"),
+            remote_painted: json::flag(&value, "remotePainted"),
+            front: json::flag(&value, "front"),
+            failed: json::flag(&value, "failed"),
+            error: json::str_at(&value, "error").to_owned(),
+        })
+    }
 }
 
 /// Where reports go: to the call on the Qt thread, through a queued
@@ -172,6 +219,8 @@ struct Shared {
     /// Woken when a command is queued and when the host goes.
     changed: Notify,
     report: Reporter,
+    /// What the page asked to have logged.
+    log: CallLog,
 }
 
 impl Shared {
@@ -189,10 +238,13 @@ impl Shared {
             return;
         }
         self.told.store(true, Ordering::SeqCst);
-        let _: Result<serde_json::Value, _> = self
+        let ended: Result<serde_json::Value, _> = self
             .rpc
             .call("end_call", (self.account_id, message_id))
             .await;
+        if let Err(err) = ended {
+            eprintln!("piirit: end_call: {err}");
+        }
     }
 }
 
@@ -287,7 +339,15 @@ pub(crate) async fn start(
         commands: Mutex::new(VecDeque::new()),
         changed: Notify::new(),
         report,
+        log: CallLog::begin(crate::qr::cache_file(LOG_FILE).ok()),
     });
+    shared.log.write(&media_plugins(
+        std::env::var("MOZ_GMP_PATH").ok().as_deref(),
+    ));
+    shared.log.write(&format!(
+        "sound server properties: {}",
+        std::env::var(PULSE_PROP).unwrap_or_default()
+    ));
     {
         let mut hosts = HOSTS
             .lock()
@@ -359,7 +419,9 @@ async fn accept(listener: TcpListener, shared: Arc<Shared>) {
         };
         let shared = Arc::clone(&shared);
         tokio::spawn(async move {
-            let _ = answer(stream, shared).await;
+            // A connection that fails is one the page has given up on, and
+            // there is nobody left on it to answer.
+            answer(stream, shared).await.ok();
         });
     }
 }
@@ -406,6 +468,244 @@ async fn answer(mut stream: TcpStream, shared: Arc<Shared>) -> std::io::Result<(
     write_response(&mut stream, &response).await
 }
 
+/// The longest line the page may put in the app's log.
+const LOG_LINE_MAX: usize = 300;
+
+/// The file the last call's log is kept in, among the app's cache files.
+const LOG_FILE: &str = "call.log";
+
+/// What the engine's media plugins say they do, for the log: the
+/// directories in `MOZ_GMP_PATH`, each with the `APIs:` line of its
+/// `.info` file. Gecko encodes H264 only through such a plugin --
+/// Sailfish's is gmp-droid, the phone's hardware encoder -- and an iPhone
+/// at the other end offers no other codec, so a call that sends no
+/// picture there starts here.
+fn media_plugins(path: Option<&str>) -> String {
+    let Some(path) = path.filter(|path| !path.is_empty()) else {
+        return "media plugins: MOZ_GMP_PATH is not set".to_string();
+    };
+    let found: Vec<String> = path
+        .split(':')
+        .filter(|dir| !dir.is_empty())
+        .map(|dir| {
+            let apis = plugin_apis(Path::new(dir));
+            format!("{dir} {}", apis.as_deref().unwrap_or("(no APIs found)"))
+        })
+        .collect();
+    format!("media plugins: {}", found.join("; "))
+}
+
+/// The `APIs:` line of the `.info` file in a media plugin's directory:
+/// `decode-video[h264:vp8], encode-video[h264]` for gmp-droid on a phone
+/// whose hardware does both.
+fn plugin_apis(dir: &Path) -> Option<String> {
+    std::fs::read_dir(dir)
+        .ok()
+        .into_iter()
+        .flatten()
+        .flatten()
+        .map(|entry| entry.path())
+        .filter(|file| file.extension().is_some_and(|ext| ext == "info"))
+        .filter_map(|file| std::fs::read_to_string(file).ok())
+        .find_map(|info| {
+            info.lines()
+                .find_map(|line| line.strip_prefix("APIs:"))
+                .map(|apis| apis.trim().to_string())
+        })
+}
+
+/// Whether an `APIs:` line offers an H.264 encoder, read as Gecko reads
+/// it (`GMPParent::ReadGMPInfoFile`): capabilities apart at ", ", each a
+/// name and its tags in brackets, apart at ":".
+fn encodes_h264(apis: &str) -> bool {
+    apis.split(", ").any(|capability| {
+        capability
+            .strip_prefix("encode-video[")
+            .and_then(|tags| tags.strip_suffix(']'))
+            .is_some_and(|tags| tags.split(':').any(|tag| tag == "h264"))
+    })
+}
+
+/// Where the package installs the app's own H.264 encoder: a media
+/// plugin built from the binary's x264 (`piirit-video/build.rs`).
+const BUNDLED_ENCODER: &str = "/usr/share/harbour-piirit/lib/gmp-piirit/1.0";
+
+/// What `MOZ_GMP_PATH` should be for a call to send H.264, given what it
+/// is: the same, and `ours` after it -- unless a plugin it already names
+/// encodes H.264. That is gmp-droid, which sets the variable for the
+/// whole session when it is installed, and the phone's hardware encoder
+/// costs less than any software one -- or `ours` itself, already there.
+/// `None` leaves the variable alone, as it does when `ours` is not
+/// installed.
+fn encoder_path(existing: Option<&str>, ours: &Path) -> Option<String> {
+    let ours_text = ours.to_str()?;
+    if !ours.join("piirit.info").is_file() {
+        return None;
+    }
+    let dirs: Vec<&str> = existing
+        .unwrap_or("")
+        .split(':')
+        .filter(|dir| !dir.is_empty())
+        .collect();
+    if dirs
+        .iter()
+        .any(|&dir| plugin_apis(Path::new(dir)).is_some_and(|apis| encodes_h264(&apis)))
+    {
+        return None;
+    }
+    Some(
+        dirs.into_iter()
+            .chain(std::iter::once(ours_text))
+            .collect::<Vec<_>>()
+            .join(":"),
+    )
+}
+
+/// Before the app starts a thread, and so before the browser engine
+/// does: point Gecko at an H.264 encoder (see `encoder_path`), and tell
+/// the encoder where the call's log is. Gecko starts the plugin as a
+/// process of its own, which inherits both. `PIIRIT_GMP_DIR` names
+/// another encoder than the one the package installs, for trying a
+/// build on a phone. And make sure there is a `PULSE_PROP`, which a call
+/// changes once threads run (`label_call_audio`).
+pub fn prepare_media_plugins() {
+    let log = crate::qr::cache_file(LOG_FILE).ok();
+    for (name, value) in media_environment(|name| std::env::var(name).ok(), log) {
+        std::env::set_var(name, value);
+    }
+    keep_pulse_properties();
+}
+
+/// Make sure there is a `PULSE_PROP`, and keep what it says: see
+/// `label_call_audio`, which is why this is done while the process has
+/// only the one thread.
+fn keep_pulse_properties() {
+    let session = match std::env::var(PULSE_PROP) {
+        Ok(session) => session,
+        Err(std::env::VarError::NotPresent) => {
+            std::env::set_var(PULSE_PROP, "");
+            String::new()
+        }
+        // Not this app's to read, nor to write over.
+        Err(std::env::VarError::NotUnicode(_)) => return,
+    };
+    SESSION_PULSE_PROP.get_or_init(|| session);
+}
+
+/// The variable PulseAudio's library adds properties from to each
+/// connection to the sound server, as the connection is opened.
+const PULSE_PROP: &str = "PULSE_PROP";
+
+/// What a call's sound is to the phone's audio policy: a call over the
+/// internet, played at the volume the keys set during a call.
+const CALL_ROLE: &str = "media.role=voip";
+
+/// `PULSE_PROP` as the app found it, set by `prepare_media_plugins`.
+/// Unset, the variable is never written later.
+static SESSION_PULSE_PROP: OnceLock<String> = OnceLock::new();
+
+/// A call's sound, said to be a call's for as long as one is on, or not.
+/// The browser engine plays it and gives it no role, so the sound server
+/// takes it for media (`x-maemo-match.table`) and plays it at the media
+/// volume, while during a call the volume keys set the call volume: the
+/// call was as quiet as the media volume happened to be, and the keys did
+/// nothing for it. A role in `PULSE_PROP` goes on every stream of a
+/// connection opened while it is there, and the engine opens its one
+/// connection when it first plays sound -- the call's page, in a session
+/// that has played none before. See docs/CALLS.md.
+///
+/// Written while other threads run, which reading the environment from
+/// them does not survive in general. It does here: the variable is made
+/// before there are other threads (`prepare_media_plugins`), so a later
+/// write replaces its string in place and never moves the environment,
+/// and glibc frees no string it has put there, so a reader holding the
+/// old one still has it.
+pub fn label_call_audio(talking: bool) {
+    if let Some(session) = SESSION_PULSE_PROP.get() {
+        std::env::set_var(PULSE_PROP, pulse_properties(session, talking));
+    }
+}
+
+/// What `PULSE_PROP` is to be: the session's own, and while a call is
+/// on the call's role after it, which wins over one the session names.
+fn pulse_properties(session: &str, talking: bool) -> String {
+    if !talking {
+        session.to_owned()
+    } else if session.trim().is_empty() {
+        CALL_ROLE.to_owned()
+    } else {
+        format!("{session} {CALL_ROLE}")
+    }
+}
+
+/// The variables [`prepare_media_plugins`] sets, from the ones it reads
+/// through `var` and the call log's path.
+fn media_environment(
+    var: impl Fn(&str) -> Option<String>,
+    log: Option<PathBuf>,
+) -> Vec<(&'static str, String)> {
+    let ours = var("PIIRIT_GMP_DIR").map_or_else(|| PathBuf::from(BUNDLED_ENCODER), PathBuf::from);
+    let mut set = Vec::new();
+    if let Some(path) = encoder_path(var("MOZ_GMP_PATH").as_deref(), &ours) {
+        set.push(("MOZ_GMP_PATH", path));
+    }
+    if let Some(log) = log.as_deref().and_then(Path::to_str) {
+        set.push(("PIIRIT_CALL_LOG", log.to_owned()));
+    }
+    set
+}
+
+/// A call's log: each line on stderr, where a phone's log has it when
+/// the app is started from a terminal, and in a file of its own -- the
+/// app's stderr goes nowhere when the launcher starts it. One call's
+/// lines, each with the seconds since the call was served: the file is
+/// begun afresh with every call, so it holds the call that has just
+/// gone wrong, and never grows.
+struct CallLog {
+    path: Option<PathBuf>,
+    started: Instant,
+}
+
+impl CallLog {
+    /// A log for a call starting now, in the file at `path` -- emptied --
+    /// or on stderr alone when there is nowhere for the file.
+    fn begin(path: Option<PathBuf>) -> Self {
+        let path = path.filter(|path| std::fs::write(path, "").is_ok());
+        Self {
+            path,
+            started: Instant::now(),
+        }
+    }
+
+    /// Log what the page sent, as one line.
+    fn write(&self, text: &str) {
+        let line = log_line(text);
+        eprintln!("piirit: call: {line}");
+        let Some(path) = &self.path else { return };
+        let seconds = self.started.elapsed().as_secs_f64();
+        let appended = std::fs::OpenOptions::new()
+            .append(true)
+            .open(path)
+            .and_then(|mut file| {
+                std::io::Write::write_all(&mut file, format!("{seconds:7.1} {line}\n").as_bytes())
+            });
+        // A full disk takes nothing from the call: the line is on stderr.
+        drop(appended);
+    }
+}
+
+/// What the page asked to have logged, as one line of the log: what only
+/// a phone shows about a call -- which camera opened, which codecs were
+/// agreed, whether the other end's picture has frames -- read where the
+/// app's log is. Kept to one line, and to a length, whatever the page
+/// sends.
+fn log_line(text: &str) -> String {
+    text.chars()
+        .map(|c| if c.is_control() { ' ' } else { c })
+        .take(LOG_LINE_MAX)
+        .collect()
+}
+
 /// Pick the answer.
 async fn route(
     shared: &Arc<Shared>,
@@ -431,6 +731,17 @@ async fn route(
             ("POST", "/end") => end(shared).await,
             ("POST", "/state") => {
                 (shared.report)(Report::Connection(text.trim().to_string()));
+                Response::empty("204 No Content")
+            }
+            ("POST", "/video") => match Video::from_json(&text) {
+                Some(video) => {
+                    (shared.report)(Report::Video(video));
+                    Response::empty("204 No Content")
+                }
+                None => Response::empty("400 Bad Request"),
+            },
+            ("POST", "/log") => {
+                shared.log.write(&text);
                 Response::empty("204 No Content")
             }
             ("GET", "/commands") => commands(shared).await,
@@ -527,7 +838,8 @@ async fn end(shared: &Arc<Shared>) -> Response {
 /// [`COMMAND_WAIT`] has passed. A 404 once the call is over, which is the
 /// bridge's cue to stop asking.
 async fn commands(shared: &Arc<Shared>) -> Response {
-    let deadline = tokio::time::Instant::now() + COMMAND_WAIT;
+    let now = tokio::time::Instant::now();
+    let deadline = now.checked_add(COMMAND_WAIT).unwrap_or(now);
     let batch = loop {
         // Listening before looking, so a command queued between the two
         // still wakes this.
@@ -589,23 +901,63 @@ pub(crate) fn mute_command(on: bool) -> String {
     (if on { "mute" } else { "unmute" }).to_string()
 }
 
+/// The commands that have the bridge (`call_video.js`) switch the camera
+/// on or off, and turn it to face the reader or away.
+pub(crate) fn camera_command(on: bool) -> String {
+    (if on { "camera-on" } else { "camera-off" }).to_string()
+}
+
+/// See [`camera_command`].
+pub(crate) fn facing_command(front: bool) -> String {
+    (if front {
+        "facing-user"
+    } else {
+        "facing-environment"
+    })
+    .to_string()
+}
+
+/// The commands that have the bridge (`call_video.js`) shut the
+/// microphone and keep it shut, or open it again: around moving the
+/// call's sound, which must not happen with it open (CallAudio.qml).
+pub(crate) fn microphone_command(on: bool) -> String {
+    (if on {
+        "microphone-on"
+    } else {
+        "microphone-off"
+    })
+    .to_string()
+}
+
+/// The command that tells the bridge which of the phone's back cameras
+/// to open, as its place among them: the main lens, where the engine
+/// would take the first it lists.
+pub(crate) fn back_camera_command(place: usize) -> String {
+    format!("back-camera-{place}")
+}
+
+/// The command that has the bridge stop drawing the pictures, the app
+/// having gone to the background, or draw them again.
+pub(crate) fn shown_command(shown: bool) -> String {
+    (if shown { "shown" } else { "hidden" }).to_string()
+}
+
 /// Standard base64 with padding: what the page's `atob` reads.
 fn encode_base64(bytes: &[u8]) -> String {
     const ALPHABET: &[u8; 64] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-    let mut out = String::with_capacity(bytes.len().div_ceil(3) * 4);
+    let mut out = String::with_capacity(bytes.len().div_ceil(3).saturating_mul(4));
     for chunk in bytes.chunks(3) {
+        // A short last chunk is read as if zeros filled it out.
         let packed = chunk
             .iter()
-            .enumerate()
-            .fold(0_u32, |packed, (index, byte)| {
-                packed | (u32::from(*byte) << (16 - 8 * index))
-            });
-        for index in 0..4 {
-            if index <= chunk.len() {
-                let sextet = (packed >> (18 - 6 * index)) & 0x3f;
-                out.push(char::from(ALPHABET[sextet as usize]));
-            } else {
-                out.push('=');
+            .chain(&[0, 0])
+            .take(3)
+            .fold(0_u32, |packed, byte| (packed << 8) | u32::from(*byte));
+        // A chunk of n bytes fills n + 1 sextets; padding stands for the rest.
+        for (index, shift) in [18, 12, 6, 0].into_iter().enumerate() {
+            match ALPHABET.get(((packed >> shift) & 0x3f) as usize) {
+                Some(&symbol) if index <= chunk.len() => out.push(char::from(symbol)),
+                _ => out.push('='),
             }
         }
     }
@@ -615,14 +967,17 @@ fn encode_base64(bytes: &[u8]) -> String {
 /// Percent-encode everything but what `encodeURIComponent` leaves alone.
 fn percent_encode(text: &str) -> String {
     const HEX: &[u8; 16] = b"0123456789ABCDEF";
-    let mut out = String::with_capacity(text.len() * 3 / 2);
+    let mut out = String::with_capacity(text.len().saturating_mul(3) / 2);
     for byte in text.bytes() {
         if byte.is_ascii_alphanumeric() || b"-_.!~*'()".contains(&byte) {
             out.push(char::from(byte));
         } else {
             out.push('%');
-            out.push(char::from(HEX[usize::from(byte >> 4)]));
-            out.push(char::from(HEX[usize::from(byte & 0x0f)]));
+            for nibble in [byte >> 4, byte & 0x0f] {
+                if let Some(&digit) = HEX.get(usize::from(nibble)) {
+                    out.push(char::from(digit));
+                }
+            }
         }
     }
     out
@@ -650,8 +1005,14 @@ async fn write_response(stream: &mut TcpStream, response: &Response) -> std::io:
 
 #[cfg(test)]
 mod tests {
-    use super::{command, encode_base64, percent_encode, BRIDGE, PAGE};
+    use super::{
+        back_camera_command, camera_command, command, encode_base64, encoder_path, encodes_h264,
+        facing_command, keep_pulse_properties, label_call_audio, log_line, media_environment,
+        media_plugins, microphone_command, percent_encode, pulse_properties, shown_command,
+        CallLog, Video, BRIDGE, BUNDLED_ENCODER, LOG_LINE_MAX, PAGE, PULSE_PROP,
+    };
     use crate::webxdc_host::decode_base64;
+    use std::path::{Path, PathBuf};
 
     #[test]
     fn base64_is_what_atob_reads_and_round_trips() {
@@ -732,6 +1093,325 @@ mod tests {
             !BRIDGE.contains("__"),
             "the bridge has a placeholder in it, which would be filled with \
              something a page elsewhere could read"
+        );
+    }
+
+    #[test]
+    fn a_video_report_reads_as_the_bridge_writes_it() {
+        assert_eq!(
+            Video::from_json(r#"{"local":true,"remote":false,"front":true,"failed":false}"#),
+            Some(Video {
+                local: true,
+                remote: false,
+                front: true,
+                ..Video::default()
+            })
+        );
+        // A camera that would not open, with what the engine said.
+        assert_eq!(
+            Video::from_json(r#"{"failed":true,"error":"NotReadableError: busy"}"#),
+            Some(Video {
+                failed: true,
+                error: "NotReadableError: busy".to_owned(),
+                ..Video::default()
+            })
+        );
+        // Which pictures show yet.
+        assert_eq!(
+            Video::from_json(
+                r#"{"local":true,"remote":true,"localPainted":true,"remotePainted":false}"#
+            ),
+            Some(Video {
+                local: true,
+                remote: true,
+                local_painted: true,
+                ..Video::default()
+            })
+        );
+        assert_eq!(
+            Video::from_json(r#"{"remotePainted":true}"#),
+            Some(Video {
+                remote_painted: true,
+                ..Video::default()
+            })
+        );
+        // A field left out is false, and anything but an object nothing.
+        assert_eq!(
+            Video::from_json(r#"{"remote":true}"#),
+            Some(Video {
+                remote: true,
+                ..Video::default()
+            })
+        );
+        assert_eq!(Video::from_json("[true]"), None);
+        assert_eq!(Video::from_json("camera"), None);
+    }
+
+    #[test]
+    fn a_log_line_is_one_line_and_short() {
+        assert_eq!(
+            log_line("camera open: front 640x480@30"),
+            "camera open: front 640x480@30"
+        );
+        assert_eq!(log_line("two\nlines\r\nhere"), "two lines  here");
+        assert_eq!(log_line(&"x".repeat(1000)).chars().count(), LOG_LINE_MAX);
+    }
+
+    #[test]
+    fn the_media_plugins_are_logged_with_what_they_do() {
+        let dir = std::env::temp_dir().join(format!("piirit-gmp-{}", std::process::id()));
+        std::fs::create_dir_all(&dir).unwrap();
+        std::fs::write(dir.join("libdroid.so"), "").unwrap();
+        std::fs::write(
+            dir.join("droid.info"),
+            "Name: gmp-droid\nAPIs: decode-video[h264], encode-video[h264]\n",
+        )
+        .unwrap();
+        let shown = dir.to_string_lossy().into_owned();
+        let line = media_plugins(Some(&format!("{shown}:/piirit-no-such-dir")));
+        std::fs::remove_dir_all(&dir).unwrap();
+
+        assert_eq!(
+            line,
+            format!(
+                "media plugins: {shown} decode-video[h264], encode-video[h264]; \
+                 /piirit-no-such-dir (no APIs found)"
+            )
+        );
+        assert_eq!(
+            media_plugins(None),
+            "media plugins: MOZ_GMP_PATH is not set"
+        );
+        assert_eq!(
+            media_plugins(Some("")),
+            "media plugins: MOZ_GMP_PATH is not set"
+        );
+    }
+
+    /// A media plugin's directory, `<name>.info` in it saying `apis`,
+    /// under a directory of the test's own.
+    fn plugin(test: &str, name: &str, apis: &str) -> PathBuf {
+        let dir = std::env::temp_dir()
+            .join(format!("piirit-plugins-{test}-{}", std::process::id()))
+            .join(format!("gmp-{name}"))
+            .join("1.0");
+        std::fs::create_dir_all(&dir).unwrap();
+        std::fs::write(
+            dir.join(format!("{name}.info")),
+            format!("Name: {name}\nDescription: a plugin\nVersion: 1.0\nAPIs: {apis}\n"),
+        )
+        .unwrap();
+        dir
+    }
+
+    fn text(dir: &Path) -> String {
+        dir.to_string_lossy().into_owned()
+    }
+
+    #[test]
+    fn an_h264_encoder_is_read_from_its_apis_as_gecko_reads_them() {
+        assert!(encodes_h264("encode-video[h264]"));
+        assert!(encodes_h264(
+            "decode-video[h264:vp8], encode-video[vp8:h264]"
+        ));
+        assert!(!encodes_h264("decode-video[h264]"));
+        assert!(!encodes_h264("encode-video[vp8]"));
+        assert!(!encodes_h264("encode-video[h2645]"));
+        assert!(!encodes_h264("encode-video"));
+        // Gecko splits capabilities at ", " and nothing else; this is one
+        // capability whose tags end at the first "]".
+        assert!(!encodes_h264("encode-video[vp8],encode-video[h264]"));
+    }
+
+    #[test]
+    fn gecko_is_pointed_at_the_bundled_encoder_unless_the_phone_has_one() {
+        let ours = plugin("path", "piirit", "encode-video[h264]");
+        let decoder = text(&plugin("path", "droid", "decode-video[h264:vp8]"));
+        let vp8 = text(&plugin("path", "vp8", "encode-video[vp8]"));
+        let hardware = text(&plugin(
+            "path",
+            "hardware",
+            "decode-video[h264], encode-video[vp8:h264]",
+        ));
+        let missing = ours.join("not-installed");
+        let our = text(&ours);
+
+        let paths = [
+            encoder_path(None, &ours),
+            encoder_path(Some(""), &ours),
+            // gmp-droid where the phone decodes H.264 but cannot encode it.
+            encoder_path(Some(&decoder), &ours),
+            encoder_path(Some(&format!(":{vp8}::{decoder}:")), &ours),
+            // gmp-droid where it can: the hardware does it for less.
+            encoder_path(Some(&hardware), &ours),
+            encoder_path(Some(&format!("{decoder}:{hardware}")), &ours),
+            // Already there, however it was written.
+            encoder_path(Some(&format!("{decoder}:{our}/")), &ours),
+            // Not installed: nothing to point at.
+            encoder_path(None, &missing),
+        ];
+        std::fs::remove_dir_all(ours.parent().unwrap().parent().unwrap()).unwrap();
+
+        assert_eq!(
+            paths,
+            [
+                Some(our.clone()),
+                Some(our.clone()),
+                Some(format!("{decoder}:{our}")),
+                Some(format!("{vp8}:{decoder}:{our}")),
+                None,
+                None,
+                None,
+                None,
+            ]
+        );
+    }
+
+    #[test]
+    fn the_environment_names_the_encoder_and_the_call_log() {
+        let ours = plugin("env", "piirit", "encode-video[h264]");
+        let our = text(&ours);
+        let hardware = text(&plugin("env", "hardware", "encode-video[h264]"));
+        let log = PathBuf::from("/home/me/.cache/piirit/piirit/call.log");
+        let vars = |moz: Option<&str>| {
+            let moz = moz.map(str::to_owned);
+            let our = our.clone();
+            move |name: &str| match name {
+                "PIIRIT_GMP_DIR" => Some(our.clone()),
+                "MOZ_GMP_PATH" => moz.clone(),
+                _ => None,
+            }
+        };
+
+        let fresh = media_environment(vars(None), Some(log.clone()));
+        let with_hardware = media_environment(vars(Some(&hardware)), None);
+        let installed = media_environment(|_| None, Some(log.clone()));
+        std::fs::remove_dir_all(ours.parent().unwrap().parent().unwrap()).unwrap();
+
+        assert_eq!(
+            fresh,
+            [
+                ("MOZ_GMP_PATH", our.clone()),
+                ("PIIRIT_CALL_LOG", text(&log)),
+            ]
+        );
+        assert!(with_hardware.is_empty(), "{with_hardware:?}");
+        // Without PIIRIT_GMP_DIR, the package's own path -- not
+        // installed where the tests run, so left out.
+        assert!(!Path::new(BUNDLED_ENCODER).exists());
+        assert_eq!(installed, [("PIIRIT_CALL_LOG", text(&log))]);
+    }
+
+    #[test]
+    fn a_call_says_its_role_after_the_sessions_properties() {
+        assert_eq!(pulse_properties("", false), "");
+        assert_eq!(pulse_properties("", true), "media.role=voip");
+        assert_eq!(pulse_properties("  ", true), "media.role=voip");
+        let session = "application.icon_name=piirit media.role=music";
+        assert_eq!(pulse_properties(session, false), session);
+        assert_eq!(
+            pulse_properties(session, true),
+            "application.icon_name=piirit media.role=music media.role=voip"
+        );
+    }
+
+    #[test]
+    fn a_call_labels_the_sound_while_it_is_on_and_puts_it_back() {
+        // The one test that writes the environment, and only a variable
+        // no other test reads.
+        let read = || std::env::var(PULSE_PROP);
+        std::env::remove_var(PULSE_PROP);
+        label_call_audio(true);
+        assert!(read().is_err(), "{:?}", read());
+        keep_pulse_properties();
+        assert_eq!(read().as_deref(), Ok(""));
+        label_call_audio(true);
+        assert_eq!(read().as_deref(), Ok("media.role=voip"));
+        label_call_audio(false);
+        assert_eq!(read().as_deref(), Ok(""));
+    }
+
+    #[test]
+    fn a_call_log_holds_one_call_line_by_line() {
+        let path = std::env::temp_dir().join(format!("piirit-call-log-{}", std::process::id()));
+        std::fs::write(&path, "the call before\n").unwrap();
+
+        let log = CallLog::begin(Some(path.clone()));
+        log.write("camera open: front");
+        log.write("video stats:\nsent");
+        let kept = std::fs::read_to_string(&path).unwrap();
+        std::fs::remove_file(&path).unwrap();
+
+        let lines: Vec<&str> = kept.lines().collect();
+        assert_eq!(lines.len(), 2, "{kept:?}");
+        // Seconds since the call began, then the line.
+        assert!(lines[0].starts_with("    0.0 "), "{kept:?}");
+        assert!(lines[0].ends_with(" camera open: front"), "{kept:?}");
+        assert!(lines[1].ends_with(" video stats: sent"), "{kept:?}");
+
+        // Nowhere for the file: stderr alone, and nothing breaks.
+        CallLog::begin(None).write("camera open: front");
+        let missing = std::env::temp_dir()
+            .join("piirit-no-such-dir")
+            .join("call.log");
+        CallLog::begin(Some(missing.clone())).write("camera open: front");
+        assert!(!missing.exists());
+    }
+
+    #[test]
+    fn the_camera_and_microphone_commands_are_the_ones_the_bridge_takes() {
+        // call_video.js's `take` names these; a command it does not know
+        // would be set on the page as a hash, and do nothing.
+        for (made, name) in [
+            (camera_command(true), "camera-on"),
+            (camera_command(false), "camera-off"),
+            (facing_command(true), "facing-user"),
+            (facing_command(false), "facing-environment"),
+            (shown_command(true), "shown"),
+            (shown_command(false), "hidden"),
+            (microphone_command(true), "microphone-on"),
+            (microphone_command(false), "microphone-off"),
+        ] {
+            assert_eq!(made, name);
+            assert!(
+                BRIDGE.contains(&format!("case \"{name}\":")),
+                "the bridge does not take {name}"
+            );
+        }
+        assert_eq!(back_camera_command(2), "back-camera-2");
+        assert!(
+            BRIDGE.contains(r"/^back-camera-(\d+)$/"),
+            "the bridge does not take back-camera-N"
+        );
+    }
+
+    #[test]
+    fn the_page_still_has_what_the_camera_half_reads_off_it() {
+        // call_video.js presses the page's camera switch by its labels,
+        // reads its option the way it does, and listens on its channel
+        // for the other end's camera: a new release that renamed any of
+        // them would leave the camera switched one way and the page
+        // telling the other end the other.
+        for needle in [
+            "Start camera",
+            "Stop camera",
+            "noOutgoingVideoInitially",
+            "mutedState",
+        ] {
+            assert!(
+                PAGE.contains(needle),
+                "the vendored page no longer has {needle:?}"
+            );
+        }
+    }
+
+    #[test]
+    fn the_camera_half_is_served_ahead_of_the_bridge_that_uses_it() {
+        let defined = BRIDGE.find("var piiritVideo =");
+        let used = BRIDGE.find("piiritVideo.attach(");
+        assert!(
+            matches!((defined, used), (Some(at), Some(use_at)) if at < use_at),
+            "the bridge uses the camera's half before it is defined"
         );
     }
 }

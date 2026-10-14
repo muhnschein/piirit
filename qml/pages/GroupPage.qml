@@ -1,6 +1,7 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
 import "../components"
+import "../js/Media.js" as Media
 import Piirit 1.0
 
 /*
@@ -176,6 +177,19 @@ Page {
         onRemove: chat.remove_member(id)
     }
 
+    // The group's picture, as big as the screen will show it, on the page
+    // a picture in the chat opens on. Nothing to show for a group that has
+    // none: the disc with its initial is not a picture.
+    function showPicture() {
+        if (chat.avatar_path.length === 0) {
+            return
+        }
+        pageStack.push(Qt.resolvedUrl("PicturePage.qml"), {
+            fileUrl: Media.fileUrl(chat.avatar_path),
+            fileName: ""
+        })
+    }
+
     // The gallery, pushed by URL and connected to, the way the settings
     // page picks a profile picture: the Attach*Page files are the only
     // ones that name a `Sailfish.Pickers` type, so a type that is not
@@ -238,14 +252,22 @@ Page {
                 text: qsTr("Leave group")
                 onClicked: page.confirmLeave()
             }
-            // Only offered when there is one to remove, and kept off the
-            // picture itself: a tap that might delete is not a tap you
-            // want under a finger reaching for the gallery.
+            // Only offered when there is one to remove.
             MenuItem {
                 objectName: "removePicture"
                 visible: chat.can_edit && chat.avatar_path.length > 0
                 text: qsTr("Remove picture")
                 onClicked: chat.clear_picture()
+            }
+            // Here rather than on the picture, which a tap shows larger,
+            // as it does on a contact's page.
+            MenuItem {
+                objectName: "changePicture"
+                visible: chat.can_edit
+                //: Pull-down entry on a group's page: opens the gallery to
+                //: pick a new picture for the group.
+                text: qsTr("Change picture")
+                onClicked: page.pickPicture()
             }
         }
 
@@ -258,8 +280,8 @@ Page {
                 title: qsTr("Group")
             }
 
-            // The picture is the control, not a preview of one: tapping
-            // it opens the gallery, and the badge says so.
+            // A tap shows the picture larger; changing it is in the
+            // pull-down.
             Item {
                 width: parent.width
                 height: bigAvatar.height + 2 * Theme.paddingLarge
@@ -274,30 +296,11 @@ Page {
                     picturePath: chat.avatar_path
                 }
 
-                Rectangle {
-                    id: editBadge
-                    objectName: "editBadge"
-                    visible: chat.can_edit
-                    anchors {
-                        right: bigAvatar.right
-                        bottom: bigAvatar.bottom
-                    }
-                    width: Theme.itemSizeExtraSmall
-                    height: width
-                    radius: width / 2
-                    color: Theme.highlightBackgroundColor
-
-                    Image {
-                        anchors.centerIn: parent
-                        source: "image://theme/icon-s-edit"
-                    }
-                }
-
                 MouseArea {
                     objectName: "pictureTap"
                     anchors.fill: bigAvatar
-                    enabled: chat.can_edit
-                    onClicked: page.pickPicture()
+                    enabled: chat.avatar_path.length > 0
+                    onClicked: page.showPicture()
                 }
             }
 

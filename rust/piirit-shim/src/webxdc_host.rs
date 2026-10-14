@@ -213,7 +213,9 @@ async fn accept(listener: TcpListener, shared: Arc<Shared>) {
         };
         let shared = Arc::clone(&shared);
         tokio::spawn(async move {
-            let _ = answer(stream, shared).await;
+            // A connection that fails is one the page has given up on, and
+            // there is nobody left on it to answer.
+            answer(stream, shared).await.ok();
         });
     }
 }
@@ -355,16 +357,16 @@ pub(crate) async fn read_head(stream: &mut TcpStream) -> std::io::Result<Option<
     let mut chunk = [0_u8; 2048];
     let body_at = loop {
         if let Some(at) = find(&head, b"\r\n\r\n") {
-            break at + 4;
+            break at.saturating_add(4);
         }
         if head.len() > MAX_HEAD {
             return Ok(None);
         }
         let read = stream.read(&mut chunk).await?;
-        if read == 0 {
+        let Some(arrived) = chunk.get(..read).filter(|arrived| !arrived.is_empty()) else {
             return Ok(None);
-        }
-        head.extend_from_slice(&chunk[..read]);
+        };
+        head.extend_from_slice(arrived);
     };
 
     let started = head.split_off(body_at);
@@ -421,17 +423,17 @@ pub(crate) async fn read_body(
             if read == 0 {
                 break;
             }
-            dropped += read;
+            dropped = dropped.saturating_add(read);
         }
         return Ok(None);
     }
     let mut body = head.started;
     while body.len() < head.length {
         let read = stream.read(&mut chunk).await?;
-        if read == 0 {
+        let Some(arrived) = chunk.get(..read).filter(|arrived| !arrived.is_empty()) else {
             break;
-        }
-        body.extend_from_slice(&chunk[..read]);
+        };
+        body.extend_from_slice(arrived);
     }
     body.truncate(head.length);
     Ok(Some(body))
@@ -673,11 +675,11 @@ async fn write_streamed(
             break;
         }
         let read = stream.read(&mut chunk).await?;
-        if read == 0 {
+        let Some(arrived) = chunk.get(..read).filter(|arrived| !arrived.is_empty()) else {
             break;
-        }
-        rest = &chunk[..read];
-        taken += read;
+        };
+        rest = arrived;
+        taken = taken.saturating_add(read);
     }
     if file.flush().await.is_err() {
         return Ok(Written::Failed);
@@ -702,7 +704,7 @@ async fn drain(stream: &mut TcpStream, taken: usize, length: usize) -> std::io::
         if read == 0 {
             break;
         }
-        dropped += read;
+        dropped = dropped.saturating_add(read);
     }
     Ok(())
 }
@@ -846,15 +848,25 @@ fn fill(script: &str, shared: &Shared) -> String {
 /// still before every script in the body.
 fn inject(html: &str) -> String {
     const TAG: &str = "<script src=\"webxdc.js\"></script>";
-    let lower = html.to_lowercase();
+    // ASCII only, so that every offset in `lower` is the same offset in
+    // `html`: full lowercasing changes the length of some characters ("İ"
+    // grows a byte), and the cut below would then miss.
+    let lower = html.to_ascii_lowercase();
     let at = lower
         .find("<head")
-        .and_then(|start| lower[start..].find('>').map(|end| start + end + 1))
+        .and_then(|start| {
+            let end = lower.get(start..)?.find('>')?;
+            Some(start.saturating_add(end).saturating_add(1))
+        })
         .unwrap_or(0);
-    let mut out = String::with_capacity(html.len() + TAG.len());
-    out.push_str(&html[..at]);
+    let (before, after) = match (html.get(..at), html.get(at..)) {
+        (Some(before), Some(after)) => (before, after),
+        _ => ("", html),
+    };
+    let mut out = String::with_capacity(html.len().saturating_add(TAG.len()));
+    out.push_str(before);
     out.push_str(TAG);
-    out.push_str(&html[at..]);
+    out.push_str(after);
     out
 }
 
@@ -882,30 +894,22 @@ fn archive_path(path: &str) -> Option<String> {
 /// leaves the path as it was written, which then simply does not name
 /// anything in the archive.
 fn percent_decode(text: &str) -> String {
-    let bytes = text.as_bytes();
-    let mut out = Vec::with_capacity(bytes.len());
-    let mut index = 0;
-    while index < bytes.len() {
-        let byte = bytes[index];
-        let decoded = if byte == b'%' && index + 2 < bytes.len() {
-            let hex = std::str::from_utf8(&bytes[index + 1..index + 3])
+    let mut out = Vec::with_capacity(text.len());
+    let mut rest = text.as_bytes();
+    while let Some((&byte, tail)) = rest.split_first() {
+        let escape = match tail {
+            [high, low, after @ ..] if byte == b'%' => std::str::from_utf8(&[*high, *low])
                 .ok()
-                .and_then(|pair| u8::from_str_radix(pair, 16).ok());
-            match hex {
-                Some(value) => {
-                    index += 3;
-                    Some(value)
-                }
-                None => None,
-            }
-        } else {
-            None
+                .and_then(|pair| u8::from_str_radix(pair, 16).ok())
+                .map(|value| (value, after)),
+            _ => None,
         };
-        if let Some(value) = decoded {
+        if let Some((value, after)) = escape {
             out.push(value);
+            rest = after;
         } else {
             out.push(byte);
-            index += 1;
+            rest = tail;
         }
     }
     String::from_utf8(out).unwrap_or_else(|_| text.to_string())
@@ -949,24 +953,28 @@ pub(crate) fn content_type(name: &str) -> &'static str {
 /// blob as (`STANDARD_NO_PAD`). Whitespace is skipped; anything else that
 /// is not in the alphabet is a blob this cannot read.
 pub(crate) fn decode_base64(text: &str) -> Option<Vec<u8>> {
-    let mut out = Vec::with_capacity(text.len() / 4 * 3);
+    let mut out = Vec::with_capacity((text.len() / 4).saturating_mul(3));
     let mut buffer = 0_u32;
     let mut bits = 0_u32;
     for byte in text.bytes() {
+        // Each range counts on from where the one before it stopped: the
+        // lower case from 26, the digits from 52. None of these can fail
+        // inside the range its arm matched.
         let value = match byte {
-            b'A'..=b'Z' => u32::from(byte - b'A'),
-            b'a'..=b'z' => u32::from(byte - b'a') + 26,
-            b'0'..=b'9' => u32::from(byte - b'0') + 52,
+            b'A'..=b'Z' => byte.checked_sub(b'A')?,
+            b'a'..=b'z' => byte.checked_sub(b'a' - 26)?,
+            b'0'..=b'9' => byte.checked_add(52 - b'0')?,
             b'+' => 62,
             b'/' => 63,
             b'=' => break,
             b'\r' | b'\n' | b' ' | b'\t' => continue,
             _ => return None,
         };
-        buffer = (buffer << 6) | value;
-        bits += 6;
-        if bits >= 8 {
-            bits -= 8;
+        buffer = (buffer << 6) | u32::from(value);
+        // Never past 13: eight come off as soon as there are eight.
+        bits = bits.saturating_add(6);
+        if let Some(left) = bits.checked_sub(8) {
+            bits = left;
             // The byte that just completed, dropping the bits that are
             // still only part of the next one.
             let shifted = buffer >> bits;
@@ -997,12 +1005,15 @@ pub(crate) fn token() -> String {
         let mixed = u64::from(nanos) ^ (u64::from(std::process::id()) << 32);
         bytes[..8].copy_from_slice(&mixed.to_le_bytes());
     }
-    let mut out = String::with_capacity(bytes.len() * 2);
+    let mut out = String::with_capacity(bytes.len().saturating_mul(2));
     for byte in bytes {
         // Two hex digits, written rather than formatted: `format!` per
         // byte builds sixteen little strings to throw away.
-        out.push(HEX[usize::from(byte >> 4)] as char);
-        out.push(HEX[usize::from(byte & 0x0f)] as char);
+        for nibble in [byte >> 4, byte & 0x0f] {
+            if let Some(&digit) = HEX.get(usize::from(nibble)) {
+                out.push(char::from(digit));
+            }
+        }
     }
     out
 }
@@ -1105,6 +1116,22 @@ mod tests {
             .starts_with("<HEAD lang=\"en\"><script src=\"webxdc.js\"></script>"));
         // And a document without one gets the API first of all.
         assert!(inject("<p>hi</p>").starts_with("<script src=\"webxdc.js\"></script>"));
+    }
+
+    #[test]
+    fn text_that_lowercases_longer_does_not_move_the_cut() {
+        // "İ" is two bytes and lowercases to three: found in a fully
+        // lowercased copy, the head ended a byte past the end of the page,
+        // and the cut panicked.
+        assert_eq!(
+            inject("İ<head>"),
+            "İ<head><script src=\"webxdc.js\"></script>"
+        );
+        // With more after it, the same shift lands inside a character.
+        assert_eq!(
+            inject("İ<head>é"),
+            "İ<head><script src=\"webxdc.js\"></script>é"
+        );
     }
 
     #[test]

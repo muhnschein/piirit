@@ -100,7 +100,7 @@ fn the_core_is_handed_the_readers_words_first_and_again_when_they_change() {
     let mut steps: Vec<(&str, String)> = Vec::new();
     let steps_ptr: *mut Vec<(&str, String)> = std::ptr::addr_of_mut!(steps);
     let first = journal.clone();
-    let later = journal.clone();
+    let later = journal;
 
     macro_rules! call {
         ($name:expr $(, $arg:expr)*) => {{

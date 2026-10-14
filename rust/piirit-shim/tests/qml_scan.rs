@@ -259,7 +259,7 @@ fn a_code_held_up_to_the_page_comes_back_as_its_text() {
         };
     }
 
-    let frame_path = frame.clone();
+    let frame_path = frame;
     single_shot(Duration::from_secs(1), move || unsafe {
         // The picture: the page's own encoder, drawn into a file.
         let encoded = call!("encode", QString::from(INVITE));

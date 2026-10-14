@@ -181,7 +181,7 @@ fn a_loss_the_core_was_away_for_still_stops_io_when_it_is_back() {
     // t=10.5: the fourth server came up at about 9 -- and must not have
     // resumed IO.
     let back = steps.clone();
-    let back_journal = journal.clone();
+    let back_journal = journal;
     single_shot(Duration::from_millis(10_500), move || unsafe {
         common::record(&back, "paused-after-restart", call!("paused").into());
         common::record(

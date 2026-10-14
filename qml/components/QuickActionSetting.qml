@@ -21,6 +21,17 @@ import "../js/QuickActions.js" as QuickActions
  * The name is looked up rather than kept, so a renamed chat reads as it
  * is called now, and a deleted one says so. Under a chat's action, and
  * only there, are the icons it can wear.
+ *
+ * The camera's actions -- a photo or a video, with the back camera or the
+ * front -- ask which chat after the picture is taken, not here. Under
+ * one of those, and only there, is whether it then goes at once or waits
+ * in the chat for a caption and the send button. Waiting is the default,
+ * as a share waits, and what a camera action is chosen with anew: going
+ * at once is turned on only past a word on what a chat tapped by mistake
+ * then gets.
+ *
+ * The choice is Silica's own ComboBox, which lists this many kinds on a
+ * page of their own.
  */
 Column {
     id: setting
@@ -32,6 +43,8 @@ Column {
     property int accountId
     /// What the choice is called.
     property string label
+    /// The page this is on: the chat picker waits for it to be on screen.
+    property Item hostPage
 
     readonly property string prefix: setting.side === "right" ? "quickActionRight"
                                                               : "quickActionLeft"
@@ -39,6 +52,18 @@ Column {
 
     /// The action's chat has gone since it was picked.
     property bool chatGone: false
+
+    /// The kinds, in the order the choice lists them; "" is none.
+    readonly property var kinds: ["", "chat", "search", "qr", "scan", "profiles",
+                                  "photo", "video", "selfie", "selfie-video"]
+
+    /// What the choice says.
+    readonly property string shown: setting.valueText()
+    onShownChanged: choice.value = setting.shown
+
+    /// "Chat" was chosen, and the picker waits for Silica's page of
+    /// choices to have gone (`openWantedPicker`).
+    property bool chatWanted: false
 
     width: parent ? parent.width : 0
 
@@ -54,6 +79,18 @@ Column {
         case "scan": return qsTr("Scan QR code")
         //: A quick action on the cover that opens the list of profiles.
         case "profiles": return qsTr("Profiles")
+        //: A quick action on the cover that opens the camera to take a
+        //: photo with the back camera, then asks which chat to send it to.
+        case "photo": return qsTr("Photo")
+        //: A quick action on the cover that opens the camera to record a
+        //: video with the back camera, then asks which chat to send it to.
+        case "video": return qsTr("Video")
+        //: A quick action on the cover that opens the camera to take a
+        //: photo with the front camera, then asks which chat to send it to.
+        case "selfie": return qsTr("Selfie")
+        //: A quick action on the cover that opens the camera to record a
+        //: video with the front camera, then asks which chat to send it to.
+        case "selfie-video": return qsTr("Selfie video")
         //: No quick action on this side of the cover.
         default: return qsTr("None")
         }
@@ -79,11 +116,51 @@ Column {
 
     function choose(kind) {
         if (kind === "chat") {
-            setting.pickChat()
+            // Silica has already moved the choice to what was tapped; it
+            // stays on what the setting holds until a chat is picked.
+            setting.refresh()
+            setting.chatWanted = true
+            setting.openWantedPicker()
             return
         }
+        // Whatever the action was set to do with what it takes, a camera
+        // action chosen now sends nothing on its own until that is turned
+        // on again, knowingly.
+        Settings[setting.prefix + "SendNow"] = false
         Settings[setting.prefix] = kind
     }
+
+    /// Off at once; on only once the reader has been told what it means
+    /// for a chat tapped by mistake, and has said go ahead -- the
+    /// arrangement the experimental features' switches use.
+    function toggleSendNow() {
+        if (setting.action.sendNow) {
+            Settings[setting.prefix + "SendNow"] = false
+            return
+        }
+        var dialog = pageStack.push(Qt.resolvedUrl("../pages/ExperimentalFeatureDialog.qml"), {
+            title: sendNow.text,
+            //: Asked before "Send right away" is turned on for a camera
+            //: quick action on the cover.
+            text: qsTr("The photo or video goes out the moment you tap a chat, with no chance to look it over first. Tap the wrong chat by mistake, and it goes there.")
+        })
+        if (dialog) {
+            dialog.accepted.connect(function () {
+                Settings[setting.prefix + "SendNow"] = true
+            })
+        }
+    }
+
+    /// Put the choice back to what the setting holds. Silica writes
+    /// currentIndex itself on a tap, which detaches a binding -- the
+    /// arrangement DisappearingMessages uses.
+    function refresh() {
+        choice.currentIndex = Math.max(0, setting.kinds.indexOf(setting.action.kind))
+    }
+
+    readonly property string kind: setting.action.kind
+    onKindChanged: setting.refresh()
+    Component.onCompleted: setting.refresh()
 
     /// Ask which chat. Until one is picked the choice shows what it was.
     ///
@@ -116,6 +193,30 @@ Column {
         })
     }
 
+    /// Ask for the chat once this page is back on screen with nothing
+    /// moving. The choice is tapped on Silica's page of choices, which can
+    /// still be on the stack, or on its way off it, when the tap is
+    /// reported: a picker pushed then would go on top of it, and be taken
+    /// down with it.
+    function openWantedPicker() {
+        if (!setting.chatWanted || !setting.hostPage
+                || setting.hostPage.status !== PageStatus.Active || pageStack.busy) {
+            return
+        }
+        setting.chatWanted = false
+        setting.pickChat()
+    }
+
+    Connections {
+        target: setting.hostPage
+        onStatusChanged: setting.openWantedPicker()
+    }
+
+    Connections {
+        target: pageStack
+        onBusyChanged: setting.openWantedPicker()
+    }
+
     ChatInfo {
         id: chat
         objectName: "quickActionChat"
@@ -125,74 +226,52 @@ Column {
         onError: setting.chatGone = true
     }
 
-    // The choice: what the action is called, and what it does now, in a
-    // row drawn the way Silica draws a ComboBox, with the kinds in a menu
-    // that opens under it on a tap. Not a ComboBox: Silica shows one's
-    // choices on a page of their own once there are more than five of
-    // them, and there are six. A row's context menu opens where it is,
-    // however many items it holds -- the conversation's own holds eight.
-    ListItem {
+    // The choice: what the action is called, and what it does now. Stock
+    // Silica: with this many kinds, its ComboBox lists them on a page of
+    // their own. What it says is the setting's, not the item tapped, so a
+    // chat's action says which chat.
+    ComboBox {
         id: choice
         objectName: setting.side + "ActionChoice"
         width: parent.width
-        contentHeight: Theme.itemSizeSmall
-        onClicked: choice.openMenu()
-
-        Label {
-            id: choiceLabel
-            objectName: setting.side + "ActionLabel"
-            x: Theme.horizontalPageMargin
-            anchors.verticalCenter: parent.verticalCenter
-            color: choice.highlighted ? Theme.highlightColor : Theme.primaryColor
-            text: setting.label
-        }
-
-        Label {
-            objectName: setting.side + "ActionValue"
-            anchors {
-                left: choiceLabel.right
-                leftMargin: Theme.paddingMedium
-                right: parent.right
-                rightMargin: Theme.horizontalPageMargin
-                verticalCenter: parent.verticalCenter
+        label: setting.label
+        value: setting.shown
+        // Silica writes the item's own text in here when one is tapped,
+        // which says "Chat" for a chat that is not picked yet: put back.
+        onValueChanged: {
+            if (choice.value !== setting.shown) {
+                choice.value = setting.shown
             }
-            color: Theme.highlightColor
-            truncationMode: TruncationMode.Fade
-            text: setting.valueText()
         }
 
         menu: ContextMenu {
-            MenuItem {
-                objectName: setting.side + "Action-none"
-                text: setting.kindLabel("")
-                onClicked: setting.choose("")
-            }
-            MenuItem {
-                objectName: setting.side + "Action-chat"
-                text: setting.kindLabel("chat")
-                onClicked: setting.choose("chat")
-            }
-            MenuItem {
-                objectName: setting.side + "Action-search"
-                text: setting.kindLabel("search")
-                onClicked: setting.choose("search")
-            }
-            MenuItem {
-                objectName: setting.side + "Action-qr"
-                text: setting.kindLabel("qr")
-                onClicked: setting.choose("qr")
-            }
-            MenuItem {
-                objectName: setting.side + "Action-scan"
-                text: setting.kindLabel("scan")
-                onClicked: setting.choose("scan")
-            }
-            MenuItem {
-                objectName: setting.side + "Action-profiles"
-                text: setting.kindLabel("profiles")
-                onClicked: setting.choose("profiles")
+            Repeater {
+                model: setting.kinds
+
+                MenuItem {
+                    objectName: setting.side + "Action-" + (modelData || "none")
+                    text: setting.kindLabel(modelData)
+                    onClicked: setting.choose(modelData)
+                }
             }
         }
+    }
+
+    // Whether a camera action's picture or video goes as soon as its chat
+    // is picked. Only under one of those: no other action sends anything.
+    TextSwitch {
+        id: sendNow
+        objectName: setting.side + "ActionSendNow"
+        visible: QuickActions.isCapture(setting.action.kind)
+        //: Under a quick action on the cover that takes a photo or a
+        //: video: whether it is sent as soon as a chat is picked for it.
+        text: qsTr("Send right away")
+        //: Under "Send right away". Off, the chat opens with the photo or
+        //: video on it, ready for a caption and the send button.
+        description: qsTr("Sends it as soon as you pick the chat, without a caption.")
+        checked: setting.action.sendNow
+        automaticCheck: false
+        onClicked: setting.toggleSendNow()
     }
 
     // The icons a chat's action can wear, the one it wears lit, in rows

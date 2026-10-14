@@ -34,6 +34,9 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         # FFmpeg and x264, which piirit-video builds (docs/BUILDING.md).
         with:
+          # Nothing here pushes with git, so the token is not left behind in
+          # .git/config for a later step to find. Every checkout in this file.
+          persist-credentials: false
           submodules: true
       # qml-module-qtquick2 is the QtQuick runtime plugin, which the -dev
       # packages do not pull in. qttools5-dev-tools is lrelease, which the
@@ -41,7 +44,9 @@ jobs:
       # is QAudioRecorder, which the shim's voice recorder is built on.
       # qml-module-qtquick-window2 is QtQuick.Window, which the chat search
       # test shows a window through; nothing else here pulls it in.
-      - run: ./ci/apt-install.sh qtbase5-dev qtdeclarative5-dev qtmultimedia5-dev qtdeclarative5-dev-tools qml-module-qtquick2 qml-module-qtquick-window2 qttools5-dev-tools
+      # libpulse-dev for the microphone watch; pulseaudio and its tools for
+      # the test that runs it against a sound server of its own.
+      - run: ./ci/apt-install.sh qtbase5-dev qtdeclarative5-dev qtmultimedia5-dev qtdeclarative5-dev-tools qml-module-qtquick2 qml-module-qtquick-window2 qttools5-dev-tools libpulse-dev pulseaudio pulseaudio-utils
       - uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
         with:
           workspaces: rust
@@ -56,7 +61,7 @@ jobs:
       # wait on Qt timers, so the step went from about ten minutes to about
       # two and a half. rust/.config/nextest.toml says the rest, including
       # what the `ci` profile changes.
-      - uses: taiki-e/install-action@183e4297cca2404691e9380e1307288dced5c82a # v2.87.25
+      - uses: taiki-e/install-action@f7e5d7c961414b23f5b25b2da9294395d08513ad # v2.87.26
         with:
           tool: cargo-nextest
       # Also set by the tests; here so a failure is never a missing
@@ -79,8 +84,9 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         # FFmpeg and x264, which piirit-video builds (docs/BUILDING.md).
         with:
+          persist-credentials: false
           submodules: true
-      - run: ./ci/apt-install.sh qtbase5-dev qtdeclarative5-dev qtmultimedia5-dev
+      - run: ./ci/apt-install.sh qtbase5-dev qtdeclarative5-dev qtmultimedia5-dev libpulse-dev
       - run: rustup toolchain install 1.75.0 --profile minimal
       - uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
         with:
@@ -104,9 +110,10 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         # FFmpeg and x264, which piirit-video builds (docs/BUILDING.md).
         with:
+          persist-credentials: false
           submodules: true
       # real_core drives the shim through a QML probe.
-      - run: ./ci/apt-install.sh qtbase5-dev qtdeclarative5-dev qtmultimedia5-dev qml-module-qtquick2
+      - run: ./ci/apt-install.sh qtbase5-dev qtdeclarative5-dev qtmultimedia5-dev qml-module-qtquick2 libpulse-dev
       - uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
         with:
           workspaces: rust
@@ -127,6 +134,8 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
       - run: ./ci/apt-install.sh qtdeclarative5-dev-tools qttools5-dev-tools rpm desktop-file-utils shellcheck
       - run: ./ci/qml-lint.sh
       # Strict: a checker that is not installed fails here, so the job
@@ -155,10 +164,11 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         # FFmpeg and x264, which piirit-video builds (docs/BUILDING.md).
         with:
+          persist-credentials: false
           submodules: true
       # rpm for rpmspec (the %files layout), file for the icons, binutils
       # for the binary's symbols.
-      - run: ./ci/apt-install.sh rpm file binutils qtbase5-dev qtdeclarative5-dev qtmultimedia5-dev
+      - run: ./ci/apt-install.sh rpm file binutils qtbase5-dev qtdeclarative5-dev qtmultimedia5-dev libpulse-dev
       - uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
         with:
           workspaces: rust
@@ -186,12 +196,32 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
       # cargo-deny as a prebuilt binary, not EmbarkStudios/cargo-deny-action:
       # that action builds a Docker image from Docker Hub on every run, and
       # Docker Hub's anonymous pull limit failed the job for every pull
       # request at once. By commit, as the other actions are; Dependabot
       # moves the pin.
-      - uses: taiki-e/install-action@183e4297cca2404691e9380e1307288dced5c82a # v2.87.25
+      - uses: taiki-e/install-action@f7e5d7c961414b23f5b25b2da9294395d08513ad # v2.87.26
         with:
           tool: cargo-deny
       - run: cd rust && cargo deny check
+
+  # The workflows themselves: a `${{ }}` pasted into a script, a token left
+  # in .git/config, a cache a release build trusts. Offline, so it judges
+  # only what is in the tree; the weekly run in scheduled.yml adds the
+  # audits that ask GitHub (actions with known advisories, pins that are
+  # not on the action's own repository). Findings it should not raise are
+  # ignored where they occur, with the reason beside them.
+  zizmor:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: taiki-e/install-action@f7e5d7c961414b23f5b25b2da9294395d08513ad # v2.87.26
+        with:
+          tool: zizmor@1.30.1
+      - run: zizmor --offline .github/workflows/

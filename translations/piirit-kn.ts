@@ -349,6 +349,10 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Call back</source>
         <translation>ಮರಳಿ ಕರೆ ಮಾಡಿ</translation>
     </message>
+    <message>
+        <source>Incoming video call</source>
+        <translation>ಒಳಬರುವ ವೀಡಿಯೊ ಕರೆ</translation>
+    </message>
 </context>
 <context>
     <name>CallPage</name>
@@ -402,6 +406,10 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Answer</source>
         <extracomment>Answers a call that is ringing. A verb.</extracomment>
         <translation>ಉತ್ತರಿಸಿ</translation>
+    </message>
+    <message>
+        <source>Incoming video call</source>
+        <translation>ಒಳಬರುವ ವೀಡಿಯೊ ಕರೆ</translation>
     </message>
 </context>
 <context>
@@ -467,6 +475,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Call %1</source>
         <extracomment>Places a call. %1 is the name of whoever is called.</extracomment>
         <translation>%1 ಅವರಿಗೆ ಕರೆ ಮಾಡಿ</translation>
+    </message>
+    <message>
+        <source>Video call %1</source>
+        <extracomment>Places a video call. %1 is the name of whoever is called.</extracomment>
+        <translation>%1 ಅವರಿಗೆ ವೀಡಿಯೊ ಕರೆ ಮಾಡಿ</translation>
     </message>
 </context>
 <context>
@@ -666,6 +679,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <extracomment>%1 is the label of the unread filter, a button at the right of the search field.</extracomment>
         <translation>ಎಲ್ಲಾ ಚಾಟ್‌ಗಳನ್ನು ತೋರಿಸಲು &quot;%1&quot; ಟ್ಯಾಪ್ ಮಾಡಿ</translation>
     </message>
+    <message>
+        <source>Send to</source>
+        <extracomment>Over the list of chats, when picking the one to send a picture or a video just taken to.</extracomment>
+        <translation>ಇಲ್ಲಿಗೆ ಕಳುಹಿಸಿ</translation>
+    </message>
 </context>
 <context>
     <name>ChatMediaPage</name>
@@ -846,6 +864,16 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>%1 new</source>
         <extracomment>On the cover, in a pill among the avatars: how many messages are unread. %1 is the number, or &quot;99+&quot;.</extracomment>
         <translation>%1 ಹೊಸ</translation>
+    </message>
+    <message>
+        <source>Microphone off</source>
+        <extracomment>On the cover during a call: the reader&apos;s microphone is switched off, so the other end hears nothing.</extracomment>
+        <translation>ಮೈಕ್ರೊಫೋನ್ ಆಫ್</translation>
+    </message>
+    <message>
+        <source>Camera paused</source>
+        <extracomment>On the cover during a video call: the camera sends nothing while the app is in the background, and comes back on when the app is opened.</extracomment>
+        <translation>ಕ್ಯಾಮೆರಾ ವಿರಾಮದಲ್ಲಿದೆ</translation>
     </message>
 </context>
 <context>
@@ -1045,6 +1073,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Description</source>
         <extracomment>Label of the text that says what a group or channel is for, on its info page, and the prompt in its empty field.</extracomment>
         <translation>ವಿವರಣೆ</translation>
+    </message>
+    <message>
+        <source>Change picture</source>
+        <extracomment>Pull-down entry on a group&apos;s page: opens the gallery to pick a new picture for the group.</extracomment>
+        <translation>ಚಿತ್ರ ಬದಲಾಯಿಸಿ</translation>
     </message>
 </context>
 <context>
@@ -1564,6 +1597,41 @@ Other groups with blocked contacts will still show their messages.</source>
         <extracomment>A quick action on the cover that opens the list of profiles.</extracomment>
         <translation>ಪ್ರೊಫೈಲ್‌ಗಳು</translation>
     </message>
+    <message>
+        <source>Photo</source>
+        <extracomment>A quick action on the cover that opens the camera to take a photo with the back camera, then asks which chat to send it to.</extracomment>
+        <translation>ಫೋಟೋ</translation>
+    </message>
+    <message>
+        <source>Video</source>
+        <extracomment>A quick action on the cover that opens the camera to record a video with the back camera, then asks which chat to send it to.</extracomment>
+        <translation>ವೀಡಿಯೊ</translation>
+    </message>
+    <message>
+        <source>Selfie</source>
+        <extracomment>A quick action on the cover that opens the camera to take a photo with the front camera, then asks which chat to send it to.</extracomment>
+        <translation>ಸೆಲ್ಫಿ</translation>
+    </message>
+    <message>
+        <source>Selfie video</source>
+        <extracomment>A quick action on the cover that opens the camera to record a video with the front camera, then asks which chat to send it to.</extracomment>
+        <translation>ಸೆಲ್ಫಿ ವೀಡಿಯೊ</translation>
+    </message>
+    <message>
+        <source>Send right away</source>
+        <extracomment>Under a quick action on the cover that takes a photo or a video: whether it is sent as soon as a chat is picked for it.</extracomment>
+        <translation>ತಕ್ಷಣ ಕಳುಹಿಸಿ</translation>
+    </message>
+    <message>
+        <source>Sends it as soon as you pick the chat, without a caption.</source>
+        <extracomment>Under &quot;Send right away&quot;. Off, the chat opens with the photo or video on it, ready for a caption and the send button.</extracomment>
+        <translation>ಚಾಟ್ ಆಯ್ಕೆ ಮಾಡಿದ ತಕ್ಷಣ ಶೀರ್ಷಿಕೆ ಇಲ್ಲದೆ ಕಳುಹಿಸುತ್ತದೆ.</translation>
+    </message>
+    <message>
+        <source>The photo or video goes out the moment you tap a chat, with no chance to look it over first. Tap the wrong chat by mistake, and it goes there.</source>
+        <extracomment>Asked before &quot;Send right away&quot; is turned on for a camera quick action on the cover.</extracomment>
+        <translation>ನೀವು ಚಾಟ್ ಅನ್ನು ಟ್ಯಾಪ್ ಮಾಡಿದ ಕ್ಷಣವೇ ಫೋಟೋ ಅಥವಾ ವೀಡಿಯೊ ಕಳುಹಿಸಲಾಗುತ್ತದೆ, ಮೊದಲು ನೋಡುವ ಅವಕಾಶವಿಲ್ಲದೆ. ತಪ್ಪಾಗಿ ಬೇರೆ ಚಾಟ್ ಟ್ಯಾಪ್ ಮಾಡಿದರೆ, ಅದು ಅಲ್ಲಿಗೇ ಹೋಗುತ್ತದೆ.</translation>
+    </message>
 </context>
 <context>
     <name>QuickActionsPage</name>
@@ -2008,16 +2076,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>ಸ್ವೀಕರಿಸಿದ ಸಂಪರ್ಕಗಳಿಗೆ ಕರೆ ಪರದೆಯನ್ನು ತೋರಿಸಿ</translation>
     </message>
     <message>
-        <source>Enable calls (experimental)</source>
-        <translation>ಕರೆಗಳನ್ನು ಸಕ್ರಿಯಗೊಳಿಸಿ (ಪ್ರಯೋಗಾತ್ಮಕ)</translation>
-    </message>
-    <message>
         <source>Runs small apps inside chats.</source>
         <translation>ಸಂಭಾಷಣೆಗಳ ಒಳಗೆ ಸಣ್ಣ ಅನ್ವಯಗಳನ್ನು ಚಲಾಯಿಸುತ್ತದೆ.</translation>
-    </message>
-    <message>
-        <source>Makes and answers voice calls in one-to-one chats.</source>
-        <translation>ಒಬ್ಬರಿಗೊಬ್ಬರ ಸಂಭಾಷಣೆಗಳಲ್ಲಿ ಧ್ವನಿ ಕರೆಗಳನ್ನು ಮಾಡುತ್ತದೆ ಮತ್ತು ಉತ್ತರಿಸುತ್ತದೆ.</translation>
     </message>
 </context>
 <context>

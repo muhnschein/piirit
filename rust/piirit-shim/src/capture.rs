@@ -59,7 +59,9 @@ impl Captures {
             return;
         };
         if is_capture(std::path::Path::new(&path), &dir) {
-            let _ = std::fs::remove_file(&path);
+            if let Err(err) = std::fs::remove_file(&path) {
+                eprintln!("piirit: removing capture {path}: {err}");
+            }
         }
     }
 }

@@ -1,6 +1,21 @@
 //! Locates the server binary, the `qml/` directory and the translations,
 //! registers the context properties, and hands off to the QML engine.
 
+// Shipped code is held to more than tests are; piirit-shim/src/lib.rs
+// says the rest.
+#![cfg_attr(
+    not(test),
+    deny(
+        clippy::indexing_slicing,
+        clippy::string_slice,
+        clippy::arithmetic_side_effects,
+        clippy::let_underscore_must_use,
+        clippy::panic,
+        clippy::panic_in_result_fn,
+        clippy::unwrap_in_result,
+        clippy::get_unwrap
+    )
+)]
 // See piirit-shim/src/lib.rs: qmetaobject's macros expand to references
 // across that crate, and upstream's own examples use the glob.
 #![allow(clippy::wildcard_imports)]
@@ -40,6 +55,11 @@ fn translations_dir() -> PathBuf {
 }
 
 fn main() {
+    // First, while this is the only thread: the environment the browser
+    // engine reads when a call starts it, and passes on to the H.264
+    // encoder it starts for a call to an iPhone.
+    piirit_shim::prepare_media_plugins();
+
     // `PIIRIT_MEMORY_LOG=<seconds>`: what the app and the core weigh,
     // on stderr, for profiling on a device. See docs/BUILDING.md.
     memory_log::start_from_env();

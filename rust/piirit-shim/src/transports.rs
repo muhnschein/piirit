@@ -458,6 +458,6 @@ mod tests {
             row_id("ada@nine.testrun.org"),
             row_id("ada@nine.testrun.org")
         );
-        assert!(i32::try_from(row_id("a very long address that hashes high@example.org")).is_ok());
+        i32::try_from(row_id("a very long address that hashes high@example.org")).unwrap();
     }
 }

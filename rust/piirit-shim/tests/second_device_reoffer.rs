@@ -22,7 +22,6 @@ use std::time::Duration;
 
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
-use serde_json::Value;
 
 mod common;
 
@@ -158,11 +157,9 @@ fn an_offer_made_again_straight_after_cancel_is_not_ended_by_the_first() {
     let stop_requests = common::calls(&journal)
         .into_iter()
         .filter(|(name, _)| name == "stop_ongoing_process")
-        .map(|(_, params)| params)
-        .collect::<Vec<Value>>();
+        .count();
     assert_eq!(
-        stop_requests.len(),
-        2,
+        stop_requests, 2,
         "the second provider could not be stopped: it was running in the \
          core with nothing on the page to stop it. {context}"
     );

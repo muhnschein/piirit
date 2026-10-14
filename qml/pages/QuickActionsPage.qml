@@ -115,6 +115,7 @@ Page {
             QuickActionSetting {
                 objectName: "leftQuickAction"
                 side: "left"
+                hostPage: page
                 accountId: page.accountId
                 label: page.actionCount === 2
                        //: The quick action on the left of the cover.
@@ -128,6 +129,7 @@ Page {
                 objectName: "rightQuickAction"
                 visible: page.actionCount === 2
                 side: "right"
+                hostPage: page
                 accountId: page.accountId
                 //: The quick action on the right of the cover.
                 label: qsTr("Right")

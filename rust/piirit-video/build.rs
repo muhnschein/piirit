@@ -25,6 +25,16 @@
 //! compiler that builds everything else assembles it. On x86 it would
 //! need nasm, which neither CI's runners nor the SDK's emulator target
 //! need otherwise, and x86 is only ever the host the tests run on.
+//!
+//! The same x264 is also linked into a library of its own: the H.264
+//! encoder video calls send through, which Gecko loads as a media plugin
+//! (`csrc/gmp_h264.cpp`). Gecko cannot call into the app's binary, only
+//! into a plugin it finds on disk, so this one is laid out as Gecko looks
+//! for one -- `gmp-piirit/<version>/libpiirit.so` beside `piirit.info` --
+//! in `OUT_DIR` and again beside the binary, where the package's spec
+//! installs it from. Harbour allows a package's own libraries under
+//! `/usr/share/<name>/lib/`, linked against the same list of system
+//! libraries; x264 is inside it, and its symbols are hidden there.
 
 use std::fmt::Write as _;
 use std::path::{Path, PathBuf};
@@ -46,6 +56,8 @@ fn main() {
     }
     println!("cargo:rerun-if-changed=build.rs");
     println!("cargo:rerun-if-changed=csrc");
+    println!("cargo:rerun-if-changed={GMP_CHECK}");
+    println!("cargo:rerun-if-changed={}", root.join("gmp-api").display());
 
     let out = PathBuf::from(env("OUT_DIR"));
     let target = Target::from_env();
@@ -59,8 +71,19 @@ fn main() {
         .include(ffmpeg.join("include"))
         .warnings(true)
         .extra_warnings(true);
-    write_compile_commands(&glue, &manifest, &out);
+    let compiler = glue.get_compiler();
+    let mut database: Vec<(PathBuf, Vec<String>)> = GLUE
+        .iter()
+        .map(|file| {
+            let path = manifest.join(file);
+            (path.clone(), compile_command(&compiler, &[], &path))
+        })
+        .collect();
     glue.compile("piirit_video");
+
+    let plugin = Plugin::new(&manifest, &root.join("gmp-api"), &x264);
+    database.extend(plugin.build(&out, &target));
+    write_compile_commands(&database, &manifest, &out);
 
     // In dependency order, each after what uses it.
     println!(
@@ -94,12 +117,182 @@ fn main() {
 /// The C between FFmpeg, x264 and Rust.
 const GLUE: [&str; 2] = ["csrc/recode.c", "csrc/synth.c"];
 
-/// How `glue` compiles each of its files, as a compilation database at
-/// `OUT_DIR/compile_commands.json`. Sonar analyses C only from
+/// The media plugin's one source file, and the stand-in for Gecko the
+/// tests drive it with.
+const GMP_SOURCE: &str = "csrc/gmp_h264.cpp";
+const GMP_CHECK: &str = "tests/gmp_check.cpp";
+/// The plugin's directory under a directory Gecko is pointed at: Gecko
+/// takes its name from this, less `gmp-`, and looks for `lib<name>.so`
+/// and `<name>.info` in the version directory below it.
+const GMP_NAME: &str = "piirit";
+const GMP_VERSION: &str = "1.0";
+/// What Gecko reads to know the plugin. It encodes H.264 and nothing
+/// else: decoding stays with the phone's own decoder, which Gecko
+/// prefers to any plugin.
+const GMP_INFO: &str = "Name: piirit\n\
+                        Description: H.264 encoder for Piirit's video calls, built on x264\n\
+                        Version: 1.0\n\
+                        APIs: encode-video[h264]\n";
+
+/// How the media plugin and its test harness are built: by the C++
+/// compiler cargo would use for this target, against the Gecko headers
+/// in `third_party/gmp-api` and the x264 built above.
+struct Plugin {
+    compiler: cc::Tool,
+    flags: Vec<String>,
+    source: PathBuf,
+    check: PathBuf,
+    x264: PathBuf,
+}
+
+impl Plugin {
+    fn new(manifest: &Path, gmp_api: &Path, x264: &Path) -> Self {
+        let compiler = cc::Build::new().cpp(true).get_compiler();
+        let flags = vec![
+            "-std=c++17".to_owned(),
+            "-O2".to_owned(),
+            "-Wall".to_owned(),
+            "-Wextra".to_owned(),
+            "-fno-exceptions".to_owned(),
+            "-fno-rtti".to_owned(),
+            format!("-I{}", gmp_api.display()),
+            format!("-I{}", x264.join("include").display()),
+        ];
+        Self {
+            compiler,
+            flags,
+            source: manifest.join(GMP_SOURCE),
+            check: manifest.join(GMP_CHECK),
+            x264: x264.to_path_buf(),
+        }
+    }
+
+    /// The plugin under `OUT_DIR`, copied beside the binary, and the
+    /// harness when the tests can run what this builds. Returns how each
+    /// file was compiled, for the compilation database.
+    fn build(&self, out: &Path, target: &Target) -> Vec<(PathBuf, Vec<String>)> {
+        let dir = out.join(format!("gmp-{GMP_NAME}")).join(GMP_VERSION);
+        std::fs::create_dir_all(&dir)
+            .unwrap_or_else(|err| panic!("mkdir {}: {err}", dir.display()));
+        let library = dir.join(format!("lib{GMP_NAME}.so"));
+        let mut link = self.command();
+        link.args([
+            "-shared",
+            "-fPIC",
+            // The three entry points and nothing else: not this file's
+            // own classes, and not x264, which another library in Gecko's
+            // plugin process could have under the same names.
+            "-fvisibility=hidden",
+            "-Wl,--exclude-libs,ALL",
+            "-Wl,-z,defs",
+            "-Wl,--as-needed",
+            "-s",
+        ])
+        .arg(&self.source)
+        .arg(self.x264.join("lib/libx264.a"))
+        .args(["-lpthread", "-lm", "-o"])
+        .arg(&library);
+        run(
+            &mut link,
+            "the media plugin's build",
+            Path::new("the compiler's output above"),
+        );
+        let info = dir.join(format!("{GMP_NAME}.info"));
+        std::fs::write(&info, GMP_INFO)
+            .unwrap_or_else(|err| panic!("write {}: {err}", info.display()));
+        println!("cargo:rustc-env=PIIRIT_GMP_PLUGIN={}", dir.display());
+        if let Some(profile) = profile_dir(out) {
+            install(
+                &dir,
+                &profile.join(format!("gmp-{GMP_NAME}")).join(GMP_VERSION),
+            );
+        }
+
+        let mut database = vec![(
+            self.source.clone(),
+            compile_command(&self.compiler, &self.flags, &self.source),
+        )];
+        // Run by the tests, so built only where they run: not for a
+        // phone, from a machine that is not one.
+        if target.cross.is_none() {
+            let check = out.join("gmp-check");
+            let mut build = self.command();
+            build.arg(&self.check).args(["-ldl", "-o"]).arg(&check);
+            run(
+                &mut build,
+                "the media plugin's test harness",
+                Path::new("the compiler's output above"),
+            );
+            println!("cargo:rustc-env=PIIRIT_GMP_CHECK={}", check.display());
+            database.push((
+                self.check.clone(),
+                compile_command(&self.compiler, &self.flags, &self.check),
+            ));
+        }
+        database
+    }
+
+    fn command(&self) -> Command {
+        let mut command = self.compiler.to_command();
+        command.args(&self.flags);
+        command
+    }
+}
+
+/// The directory cargo builds this profile into -- `target/<triple>/
+/// release` -- which `OUT_DIR` is three below. The package's spec
+/// installs the binary from there, and the plugin with it.
+fn profile_dir(out: &Path) -> Option<&Path> {
+    let build = out.parent()?.parent()?;
+    if build.file_name()? == "build" {
+        build.parent()
+    } else {
+        None
+    }
+}
+
+/// Copy the plugin's files to `to`, each through a temporary name, so a
+/// build running beside this one never finds half a library there.
+fn install(from: &Path, to: &Path) {
+    std::fs::create_dir_all(to).unwrap_or_else(|err| panic!("mkdir {}: {err}", to.display()));
+    let files =
+        std::fs::read_dir(from).unwrap_or_else(|err| panic!("read {}: {err}", from.display()));
+    for file in files {
+        let file = file.unwrap_or_else(|err| panic!("read {}: {err}", from.display()));
+        let name = file.file_name();
+        let partial = to.join(format!(
+            ".{}.{}",
+            name.to_string_lossy(),
+            std::process::id()
+        ));
+        std::fs::copy(file.path(), &partial)
+            .unwrap_or_else(|err| panic!("copy to {}: {err}", partial.display()));
+        std::fs::rename(&partial, to.join(&name))
+            .unwrap_or_else(|err| panic!("rename {}: {err}", partial.display()));
+    }
+}
+
+/// One entry's arguments: the compiler, its flags for this target less
+/// none, `extra`, and the file.
+fn compile_command(compiler: &cc::Tool, extra: &[String], file: &Path) -> Vec<String> {
+    let mut arguments = vec![compiler.path().to_string_lossy().into_owned()];
+    arguments.extend(
+        compiler
+            .args()
+            .iter()
+            .map(|arg| arg.to_string_lossy().into_owned()),
+    );
+    arguments.extend(extra.iter().cloned());
+    arguments.push("-c".into());
+    arguments.push(file.to_string_lossy().into_owned());
+    arguments
+}
+
+/// How each C and C++ file is compiled, as a compilation database at
+/// `OUT_DIR/compile_commands.json`. Sonar analyses C and C++ only from
 /// one -- it has to know the include paths to read a file at all -- and
 /// `make sonar-reports` hands it this. Nothing in the build reads it.
-fn write_compile_commands(glue: &cc::Build, manifest: &Path, out: &Path) {
-    let compiler = glue.get_compiler();
+fn write_compile_commands(entries: &[(PathBuf, Vec<String>)], manifest: &Path, out: &Path) {
     let quote = |text: &str| {
         let mut quoted = String::from("\"");
         for c in text.chars() {
@@ -117,19 +310,9 @@ fn write_compile_commands(glue: &cc::Build, manifest: &Path, out: &Path) {
         quoted.push('"');
         quoted
     };
-    let entries: Vec<String> = GLUE
+    let entries: Vec<String> = entries
         .iter()
-        .map(|file| {
-            let path = manifest.join(file);
-            let mut arguments = vec![compiler.path().to_string_lossy().into_owned()];
-            arguments.extend(
-                compiler
-                    .args()
-                    .iter()
-                    .map(|arg| arg.to_string_lossy().into_owned()),
-            );
-            arguments.push("-c".into());
-            arguments.push(path.to_string_lossy().into_owned());
+        .map(|(path, arguments)| {
             let arguments: Vec<String> = arguments.iter().map(|arg| quote(arg)).collect();
             format!(
                 "{{\"directory\":{},\"file\":{},\"arguments\":[{}]}}",
