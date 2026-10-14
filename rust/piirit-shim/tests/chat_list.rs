@@ -49,6 +49,9 @@ const PROBE_QML: &str = r"
             return out
         }
         function bump() { chatTwo.send('bump') }
+        // What the core sends beside every message, every message sent
+        // and every draft saved: the order may have changed, and no row.
+        function reorder() { chats.handle_event(1, 'ChatlistChanged', '{}') }
     }
 ";
 
@@ -103,6 +106,10 @@ fn a_message_moves_one_row_instead_of_rebuilding_the_list() {
         *second_ptr = QString::from_qvariant(value)
             .map(|text| text.to_string())
             .unwrap_or_default();
+        (*engine_ptr).invoke_method("reorder".into(), &[]);
+    });
+
+    single_shot(Duration::from_secs(8), move || unsafe {
         (*engine_ptr).quit();
     });
 
@@ -141,5 +148,18 @@ fn a_message_moves_one_row_instead_of_rebuilding_the_list() {
         fetches.last(),
         Some(&1),
         "the reorder refetched more than the chat that changed: {fetches:?}"
+    );
+
+    // A bare `ChatlistChanged` listed the chats again and read none of
+    // them: every row was already held, and none had changed.
+    let last_listing = names
+        .iter()
+        .rposition(|name| *name == "get_chatlist_entries");
+    let last_fetch = names
+        .iter()
+        .rposition(|name| *name == "get_chatlist_items_by_entries");
+    assert!(
+        last_listing > last_fetch,
+        "a change of order alone was not listed, or re-read rows: {names:?}"
     );
 }

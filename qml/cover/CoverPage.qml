@@ -469,28 +469,37 @@ CoverBackground {
         clip: true
         visible: !cover.callUp
 
+        // A count rather than the array: the array is a new one after
+        // every rebuild, and a Repeater given a new array makes every face
+        // again -- around twenty Avatars, each with its gradient, every
+        // time the home screen shows. Given a count, it keeps the faces it
+        // has and only what each one shows changes.
         Repeater {
-            model: cover.cells
+            model: cover.cells.length
 
             Avatar {
                 objectName: "gridCell"
-                x: cover.cellX(modelData.row, modelData.col) + cover.gap / 2
-                y: cover.cellY(modelData.row) + cover.gap / 2
+                /// This face's cell. Empty for the moment between the
+                /// array shrinking and the Repeater following it.
+                readonly property var cell: cover.cells[index]
+                                            || { person: null, row: 0, col: 0, loud: false }
+                x: cover.cellX(cell.row, cell.col) + cover.gap / 2
+                y: cover.cellY(cell.row) + cover.gap / 2
                 width: cover.cellSize - cover.gap
                 /// Whether anyone is drawn here, or only the circle.
-                readonly property bool filled: modelData.person !== null
-                initial: filled ? modelData.person.name : ""
-                ownColor: filled ? modelData.person.color : ""
-                picturePath: filled ? modelData.person.avatar_path : ""
+                readonly property bool filled: cell.person !== null
+                initial: filled ? cell.person.name : ""
+                ownColor: filled ? cell.person.color : ""
+                picturePath: filled ? cell.person.avatar_path : ""
                 // Nobody is drawn in their own colours here. A cover is
                 // the phone's, not the app's: whoever has written is the
                 // ambience's highlight, the same colour the unread badge
                 // in the chat list wears, everyone else is grey, and an
                 // empty circle is fainter still.
-                monochrome: !modelData.loud
-                highlight: modelData.loud
-                opacity: modelData.loud ? 1.0 : filled ? 0.6 : 0.35
-                z: modelData.loud ? 1 : 0
+                monochrome: !cell.loud
+                highlight: cell.loud
+                opacity: cell.loud ? 1.0 : filled ? 0.6 : 0.35
+                z: cell.loud ? 1 : 0
                 // The room for the actions, made by the grid rather than
                 // over it: towards the bottom edge the faces run out, over
                 // a band twice the strip's height, so the icons sit on the
