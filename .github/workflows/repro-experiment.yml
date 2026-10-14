@@ -1,0 +1,98 @@
+# Throwaway experiment for issue #166: build the same commit three times
+# and report what differs. Not for merging; the branch is deleted after.
+name: repro-experiment
+
+on:
+  push:
+    branches: [claude/repro-experiment]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      matrix:
+        # a and b are set up identically; full-depth differs only in the
+        # submodules' clone depth.
+        variant: [a, b, full-depth]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          submodules: true
+
+      - name: Unshallow the submodules
+        if: matrix.variant == 'full-depth'
+        run: git submodule foreach 'git fetch --unshallow --tags || git fetch --tags'
+
+      - name: Make room
+        run: sudo rm -rf /usr/local/lib/android /usr/share/dotnet "${AGENT_TOOLSDIRECTORY:-/opt/hostedtoolcache}"
+
+      - name: Build
+        run: ./scripts/build-in-docker.sh
+
+      - name: Toolchain facts
+        if: matrix.variant == 'a'
+        run: |
+          img=ghcr.io/muhnschein/piirit-sdk:5.2.0.15-aarch64
+          docker image inspect --format 'image id {{.Id}}' "$img"
+          docker run --rm "$img" bash -c '
+            t=SailfishOS-5.2.0.15-aarch64
+            echo "tooling rpm: $(rpm --version)"
+            echo "target rpm: $(sb2 -t $t rpm --version)"
+            echo "target rpmbuild: $(sb2 -t $t rpmbuild --version)"
+            for m in _buildhost source_date_epoch_from_changelog use_source_date_epoch_as_buildtime clamp_mtime_to_source_date_epoch _build_id_links; do
+              echo "%$m = $(sb2 -t $t rpm --eval "%{?$m}")"
+            done
+            echo "rustc: $(sb2 -t $t rustc --version)"
+            echo "gcc: $(sb2 -t $t gcc --version | head -1)"' || true
+
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: rpm-${{ matrix.variant }}
+          path: RPMS/**/*.rpm
+          if-no-files-found: error
+          retention-days: 7
+
+  compare:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    permissions:
+      contents: read
+      actions: read
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - run: ./ci/apt-install.sh rpm rpm2cpio cpio binutils diffoscope
+
+      - run: gh run download "$GITHUB_RUN_ID" --dir rpms
+
+      - name: Compare
+        run: |
+          pick() { find "rpms/rpm-$1" -name 'harbour-piirit-*.rpm' ! -name '*debug*' ! -name '*.src.rpm' | head -1; }
+          for v in a b full-depth; do
+            f=$(pick $v); mkdir -p "x/$v"
+            echo "== $v: $(sha256sum < "$f" | cut -c1-16) $(basename "$f")"
+            rpm -qp --qf 'buildtime=%{BUILDTIME} buildhost=%{BUILDHOST} size=%{SIZE} payloaddigest=%{PAYLOADDIGEST}\n' "$f"
+            (cd "x/$v" && rpm2cpio "../../$f" | cpio -idm --quiet)
+          done
+          for pair in "a b" "a full-depth"; do
+            set -- $pair
+            echo; echo "######## $1 vs $2: payload files that differ"
+            (cd "x/$1" && find . -type f -exec sha256sum {} + | sort -k2) > "$1.sums"
+            (cd "x/$2" && find . -type f -exec sha256sum {} + | sort -k2) > "$2.sums"
+            diff "$1.sums" "$2.sums" | sed -n 's/^[<>] [0-9a-f]*  //p' | sort -u || true
+            echo "######## $1 vs $2: diffoscope (truncated)"
+            diffoscope --text - --max-diff-block-lines 30 \
+              "$(pick $1)" "$(pick $2)" 2>&1 | head -c 120000 || true
+          done
