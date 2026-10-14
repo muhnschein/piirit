@@ -121,7 +121,7 @@ Page {
         // device the profile is on -- and the list follows.
         onCore_event: {
             if (kind === "ConnectivityChanged" && context_id === page.accountId) {
-                profile.refresh_connectivity()
+                connectivityRefresh.start()
                 relayRefresh.restart()
             }
             // Changed on another device the profile is on: the relay
@@ -147,6 +147,19 @@ Page {
         id: relayRefresh
         interval: 1000
         onTriggered: transports.reload()
+    }
+
+    // The same events, for the connection, the mailbox and the storage:
+    // four round trips a read, one of which sizes every file the profile
+    // has, and a fetch says the connection changed several times over.
+    // At most once a second, a second after the first of them. Started
+    // rather than restarted, unlike the rows': nothing here is under the
+    // reader's finger, and the dot is worth following while the events
+    // still come. The first read is the profile's own, as it is opened.
+    Timer {
+        id: connectivityRefresh
+        interval: 1000
+        onTriggered: profile.refresh_connectivity()
     }
 
     /// Someone has typed since the load. Guards the refill above.

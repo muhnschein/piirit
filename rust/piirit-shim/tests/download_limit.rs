@@ -2,8 +2,10 @@
 //!
 //! It is one setting for the whole app, held in dconf, and the core's
 //! `download_limit` is per account: so the core object writes it to each
-//! account when it is set, and again whenever the account list is read --
-//! which is how a profile added later gets it too. Nothing is written
+//! account when it is set, and whenever the account list is read to each
+//! account it has not been written to yet -- which is how a profile added
+//! later gets it too. Only then: the list is read again all the time, and
+//! a write each time is the core's work for nothing. Nothing is written
 //! before QML has handed a value over, so a default nobody chose is never
 //! applied.
 
@@ -46,6 +48,7 @@ const PROBE_QML: &str = r"
             onAccount_added: core.refresh_accounts()
         }
         function change(bytes) { core.download_limit = bytes; return 'ok' }
+        function refresh() { core.refresh_accounts(); return 'ok' }
     }
 ";
 
@@ -89,9 +92,17 @@ fn the_limit_is_written_to_each_account_when_set_and_when_the_list_is_read() {
         }};
     }
 
+    // The list read again, with the limit already written: nothing new.
+    single_shot(Duration::from_secs(3), move || unsafe {
+        call!("refresh");
+    });
     // Changed once the first write has had time to land.
     single_shot(Duration::from_secs(4), move || unsafe {
         call!("change", 0);
+    });
+    // And read again after the change, which wrote it already.
+    single_shot(Duration::from_secs(5), move || unsafe {
+        call!("refresh");
     });
     single_shot(Duration::from_secs(7), move || unsafe {
         (*engine_ptr).quit();
@@ -116,7 +127,8 @@ fn the_limit_is_written_to_each_account_when_set_and_when_the_list_is_read() {
     assert_eq!(
         limits,
         vec![(1, "1048576".to_string()), (1, "0".to_string())],
-        "expected the limit written to account 1 when the list was read, and \
-         again when it changed: {calls:?}"
+        "expected the limit written to account 1 when the list was first \
+         read, and again when it changed -- and not each time the list was \
+         read again: {calls:?}"
     );
 }
