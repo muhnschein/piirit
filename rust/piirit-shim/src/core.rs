@@ -316,8 +316,9 @@ pub struct DeltaChatCore {
 
     /// Attachments larger than this many bytes are fetched only when
     /// asked for; 0 fetches everything. The reader's setting, applied to
-    /// every account the core has -- when it is set, and again each time
-    /// the account list is read, so a profile added later gets it too.
+    /// every account the core has -- when it is set, and to any account
+    /// not yet given it each time the account list is read, so a profile
+    /// added later gets it too.
     /// The core's `download_limit`, which it applies to future messages.
     pub download_limit: qt_property!(u32; WRITE set_download_limit NOTIFY download_limit_changed),
     /// Emitted when [`DeltaChatCore::download_limit`] changes.
@@ -555,6 +556,13 @@ pub struct DeltaChatCore {
     media_quality_set: bool,
     /// The same, for whose calls ring here.
     who_can_call_me_set: bool,
+    /// What `write_config` has written to each account, by account and
+    /// key, so that reading the account list again writes only what an
+    /// account does not have yet. Every write costs the core something,
+    /// and `delete_device_after` costs it a deletion pass. Forgotten with
+    /// the server, so a restart writes each value once more: nothing then
+    /// says whether a write the old one was given ever landed.
+    written_config: RefCell<BTreeMap<(u32, &'static str), String>>,
     /// The profiles whose unread count is being read, each with whether
     /// another event has asked for it since the read went out. One read
     /// at a time per profile: a message arriving is three or four events,
@@ -708,6 +716,7 @@ impl DeltaChatCore {
             this_mut.rpc = None;
             // Whatever was in flight went with the server, or will fail
             // against it; the next one starts from nothing.
+            this_mut.written_config.get_mut().clear();
             this_mut.unread_reads.get_mut().clear();
             // Nothing to restart: either `start` was never called, or a
             // previous round already gave up and dropped the runtime.
@@ -1140,9 +1149,14 @@ impl DeltaChatCore {
         });
     }
 
-    /// Write every setting QML has handed over to each of these accounts:
-    /// what a profile added later gets when the list is next read.
+    /// Write every setting QML has handed over to each of these accounts
+    /// that does not have it yet: what a profile added later gets when
+    /// the list is next read. `ids` is the whole list, so whatever was
+    /// written to an account no longer on it is forgotten here.
     fn apply_settings(&self, ids: &[u32]) {
+        self.written_config
+            .borrow_mut()
+            .retain(|(account_id, _), _| ids.contains(account_id));
         if self.download_limit_set {
             self.write_config(ids, "download_limit", self.download_limit.to_string());
         }
@@ -1161,21 +1175,51 @@ impl DeltaChatCore {
         }
     }
 
-    /// Write one config value to each of these accounts. A failure is
-    /// reported and the rest still written.
+    /// Write one config value to each of these accounts that was not
+    /// last given this same value. A failure is reported, the rest still
+    /// written, and the one that failed tried again next time.
+    ///
+    /// Remembered rather than asked of the core with a `get_config`
+    /// first: the account list is read again by the cover, by every chat
+    /// list made and by every change to a profile, and a read per key per
+    /// account each time would be most of what the skipped writes save.
+    /// What the core keeps outlives the server, and this lives as long as
+    /// the server (see `schedule_restart`), so the two agree.
     fn write_config(&self, ids: &[u32], key: &'static str, value: String) {
-        if ids.is_empty() {
-            return;
-        }
         let Some((rpc, runtime)) = self.connection() else {
             return;
         };
-        let ids = ids.to_vec();
+        let ids: Vec<u32> = {
+            let mut written = self.written_config.borrow_mut();
+            ids.iter()
+                .copied()
+                .filter(|&account_id| {
+                    let unchanged = written.get(&(account_id, key)) == Some(&value);
+                    if !unchanged {
+                        written.insert((account_id, key), value.clone());
+                    }
+                    !unchanged
+                })
+                .collect()
+        };
+        if ids.is_empty() {
+            return;
+        }
         let ptr: QPointer<Self> = QPointer::from(self);
-        let failed = queued_callback(move |err: String| {
-            if let Some(this) = ptr.as_pinned() {
-                this.borrow().core_error(err.into());
+        let tried = value.clone();
+        let failed = queued_callback(move |(account_id, err): (u32, String)| {
+            let Some(this) = ptr.as_pinned() else { return };
+            // Forgotten, so the next read of the list tries it again --
+            // unless something newer has been written since, which is
+            // then the one to keep.
+            let this_ref = this.borrow();
+            {
+                let mut written = this_ref.written_config.borrow_mut();
+                if written.get(&(account_id, key)) == Some(&tried) {
+                    written.remove(&(account_id, key));
+                }
             }
+            this_ref.core_error(err.into());
         });
         runtime.spawn(async move {
             for account_id in ids {
@@ -1183,7 +1227,7 @@ impl DeltaChatCore {
                     .call::<_, ()>("set_config", (account_id, key, Some(value.clone())))
                     .await
                 {
-                    failed(format!("could not set {key}: {err}"));
+                    failed((account_id, format!("could not set {key}: {err}")));
                 }
             }
         });
