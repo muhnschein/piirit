@@ -217,15 +217,12 @@ fn an_app_is_served_to_itself_alone_and_its_updates_reach_the_chat() {
     let answered = Arc::new(AtomicBool::new(false));
     let answered_early = Arc::clone(&answered);
     // How often the app's info was asked for, before the move and after.
-    let info_calls = {
-        let journal = journal.clone();
-        move || {
-            common::methods(&journal)
-                .iter()
-                .filter(|name| *name == "get_webxdc_info")
-                .count()
-                .to_string()
-        }
+    let info_calls = move || {
+        common::methods(&journal)
+            .iter()
+            .filter(|name| *name == "get_webxdc_info")
+            .count()
+            .to_string()
     };
     let info_calls_after = info_calls.clone();
 

@@ -470,7 +470,28 @@ fn assert_pages(steps: &[(String, String)], navigation: &str) {
     );
 
     assert_device_half(steps, &context);
+    assert_scanner_sleeps(steps, &context);
     assert_scanner_turns(steps, &context);
+}
+
+/// In the background the camera stops, and frames stop being grabbed;
+/// the camera comes back with the app.
+fn assert_scanner_sleeps(steps: &[(String, String)], context: &str) {
+    assert_eq!(common::value_of(steps, "away"), "ok", "{context}");
+    assert_eq!(
+        [
+            common::value_of(steps, "away-camera"),
+            common::value_of(steps, "away-grabbing"),
+        ],
+        ["false", "false"],
+        "the camera, or the grabbing of its frames, carried on with the \
+         app in the background. {context}"
+    );
+    assert_eq!(
+        common::value_of(steps, "back-camera"),
+        "true",
+        "the camera did not come back with the app. {context}"
+    );
 }
 
 /// The half that reads a code: the camera has the page down to its
@@ -561,21 +582,6 @@ fn assert_device_half(steps: &[(String, String)], context: &str) {
         "true",
         "the retry brought back a viewfinder with the camera off behind \
          it. {context}"
-    );
-    assert_eq!(common::value_of(steps, "away"), "ok", "{context}");
-    assert_eq!(
-        [
-            common::value_of(steps, "away-camera"),
-            common::value_of(steps, "away-grabbing"),
-        ],
-        ["false", "false"],
-        "the camera, or the grabbing of its frames, carried on with the \
-         app in the background. {context}"
-    );
-    assert_eq!(
-        common::value_of(steps, "back-camera"),
-        "true",
-        "the camera did not come back with the app. {context}"
     );
 
     let hint = common::value_of(steps, "device-hint");

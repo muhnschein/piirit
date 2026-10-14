@@ -445,8 +445,10 @@ Page {
     }
 
     // The camera runs only while this page is the one on screen.
+    // Read from status itself, not `shown`: a handler on the change can
+    // run before the binding that follows it.
     onStatusChanged: {
-        if (page.shown && !page.done) {
+        if (page.status === PageStatus.Active && page.appActive && !page.done) {
             camera.start()
         } else if (page.status !== PageStatus.Active) {
             selfTimer.stop()
