@@ -87,6 +87,16 @@ const PROBE_QML: &str = r"
             return found
         }
         function owned() { return shaders(loader.item, []).join(';') }
+        // Whether the disc is drawn through a gradient, and how many
+        // gradients the avatar holds whether or not it draws one.
+        function fill() {
+            var held = 0
+            var kids = loader.item.data
+            for (var i = 0; i < kids.length; i++) {
+                if (('' + kids[i]).indexOf('QQuickGradient') === 0) { held++ }
+            }
+            return (loader.item.gradient ? 'gradient' : 'flat') + ':' + held
+        }
     }
 ";
 
@@ -134,6 +144,7 @@ fn an_avatar_draws_its_picture_without_a_shader_in_any_state() {
         call!("set", QString::from("initial"), QString::from("Ada"));
         call!("set", QString::from("ownColor"), QString::from("#ff0000"));
         record!("no-picture", call!("owned"));
+        record!("plain-fill", call!("fill"));
         // Loaded off the main thread, so read a second later.
         call!(
             "set",
@@ -175,6 +186,7 @@ fn an_avatar_draws_its_picture_without_a_shader_in_any_state() {
         // And with no picture, the disc fading the same way.
         call!("set", QString::from("picturePath"), QString::from(""));
         record!("cover-disc", call!("owned"));
+        record!("cover-disc-fill", call!("fill"));
 
         (*engine_ptr).quit();
     });
@@ -218,5 +230,17 @@ fn an_avatar_draws_its_picture_without_a_shader_in_any_state() {
         value("face"),
         "true",
         "the loaded picture is not what is drawn. {context}"
+    );
+    // The fade's gradient is the cover's alone, and made only where an
+    // avatar fades: every avatar in every list built one, eight stops
+    // and their bindings, for nothing.
+    assert_eq!(
+        value("plain-fill"),
+        "flat:0",
+        "an avatar that does not fade built a gradient anyway. {context}"
+    );
+    assert!(
+        value("cover-disc-fill").starts_with("gradient"),
+        "a fading avatar with no picture does not fade its disc. {context}"
     );
 }

@@ -115,6 +115,11 @@ pub struct MessageListItem {
     pub file_mime: QString,
     /// The attachment's size in bytes, 0 when unknown.
     pub file_bytes: f64,
+    /// How long a sound or a video is, in milliseconds, 0 when unknown.
+    /// The sending client writes it in for a recording; the core reads
+    /// nothing out of a file it is only handed. What a voice row says
+    /// before its player has been made.
+    pub duration_ms: i32,
     /// A shared contact's name, empty when this is not a vCard. The core
     /// parses the card; nothing here reads vCard syntax.
     pub vcard_name: QString,

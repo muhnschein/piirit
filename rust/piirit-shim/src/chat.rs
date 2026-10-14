@@ -2813,6 +2813,7 @@ fn row_from(message_id: u32, message: &serde_json::Value) -> MessageListItem {
                 // attachment anywhere near either bound.
                 f64::from(u32::try_from(bytes).unwrap_or(u32::MAX))
             }),
+        duration_ms: json::i32_at(message, "duration"),
         vcard_name: json::text(message, "/vcardContact/displayName"),
         vcard_addr: json::text(message, "/vcardContact/addr"),
         vcard_color: json::text(message, "/vcardContact/color"),

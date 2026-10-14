@@ -843,6 +843,9 @@ fn message_object(msg: u64) -> Value {
             message["fileName"] = json!("voice.aac");
             message["fileMime"] = json!("audio/aac");
             message["fileBytes"] = json!(4_096);
+            // In milliseconds, as a sending client writes it in for a
+            // recording: what the row says before anything has played.
+            message["duration"] = json!(4_000);
         }
         14 => {
             message["viewType"] = json!("Webxdc");
