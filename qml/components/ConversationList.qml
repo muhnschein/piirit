@@ -965,8 +965,12 @@ SilicaListView {
         /// covers and a row is what a delete destroys. So it is handed a
         /// callback that does nothing and asked only to draw and to
         /// report the tap.
+        ///
+        /// Over the message itself, so not before there is one: a row's
+        /// message can be built after the row is (see `body`), and puts
+        /// the countdown up when it is.
         function raiseRemorse() {
-            if (messageRow.countingDown) {
+            if (messageRow.countingDown || !body.item) {
                 return
             }
             messageRow.countingDown = true
@@ -974,7 +978,7 @@ SilicaListView {
             //: What Silica's countdown says it is doing, over a
             //: message the reader has asked to delete.
             remorse.item.execute(
-                body, qsTr("Deleting"), function() {},
+                body.item, qsTr("Deleting"), function() {},
                 doomedMessages.countdownFor(model.message_id))
         }
 
@@ -1004,7 +1008,12 @@ SilicaListView {
         // The row is what takes the press, so the two cannot fight. A
         // message waiting to go is covered by the remorse, which takes
         // the tap itself and calls the delete off.
-        onClicked: body.tapped()
+        // A placeholder has nothing to open.
+        onClicked: {
+            if (body.item) {
+                body.item.tapped()
+            }
+        }
 
         /// The date this row's day starts under, on the first row of each
         /// day and nowhere else.
@@ -1115,74 +1124,90 @@ SilicaListView {
 
         // Only what is on screen is built, so this is not the whole chat's
         // worth of delegates -- but a placeholder must not try to draw a
-        // message it has not got.
-        MessageDelegate {
+        // message it has not got. Nor build one: a message is three dozen
+        // items and their bindings, and a fast flick through history not
+        // yet fetched builds and drops a screenful of placeholders a
+        // frame. Hidden, every one of them was built all the same.
+        //
+        // The loader takes the message's height, which is what the row's
+        // is measured from, and hands it the row's width.
+        Loader {
             id: body
-            objectName: "messageDelegate"
-            visible: model.loaded
-            // Neither hidden nor faded here while the message waits to
-            // go: the remorse covering it does the fading, with its own
-            // `opacity: 0.0` on what it was handed. Hiding it would be
-            // wrong anyway -- that takes its children's `visible` with
-            // it, and every part of a message measures
-            // `visible ? implicitHeight : 0`, so the row would collapse
-            // under the countdown drawn over it.
-            enabled: !messageRow.doomed
             y: dayHeading.height + unreadLine.height
             width: parent.width
-            messageText: model.text
-            styledText: model.styled_text
-            isEdited: model.is_edited
-            markdownMode: root.markdownMode
-            downloadState: model.download_state
-            isOutgoing: model.is_outgoing
-            isInfo: model.is_info
-            isForwarded: model.is_forwarded
-            isFound: root.foundMessageId === model.message_id
-            showPadlock: model.show_padlock
-            deliveryState: model.state
-            sentAt: model.timestamp
-            senderName: model.sender_name
-            senderColor: model.sender_color
-            showSender: root.showSender
-            quoteText: model.quote_text
-            quoteAuthor: model.quote_author
-            filePath: model.file_path
-            fileName: model.file_name
-            fileMime: model.file_mime
-            fileBytes: model.file_bytes
-            viewType: model.view_type
-            imageWidth: model.image_width
-            imageHeight: model.image_height
-            isNew: model.is_new
-            hasHtml: model.has_html
-            vcardName: model.vcard_name
-            vcardAddr: model.vcard_addr
-            vcardColor: model.vcard_color
-            webxdcName: model.webxdc_name
-            webxdcDocument: model.webxdc_document
-            webxdcSummary: model.webxdc_summary
-            webxdcIcon: model.webxdc_icon
-            appsEnabled: root.appsEnabled
-            callState: model.call_state
-            callHasVideo: model.call_has_video
-            callDuration: model.call_duration
-            reactions: model.reactions
-            onOpenRequested: root.openRequested(fileUrl, fileName, viewType,
-                                                previewWidth)
-            onFullTextRequested: root.fullTextRequested(model.message_id,
-                                                       model.sender_name)
-            onAppRequested: root.appRequested(model.message_id)
-            onCallRequested: root.callRequested(model.message_id,
-                                                model.is_outgoing,
-                                                model.call_state,
-                                                model.call_has_video)
-            onDownloadRequested: root.downloadRequested(model.message_id)
-            onReactionRequested: root.reactionRequested(model.message_id, emoji)
-            // A long press on a chip, the download offer or a play
-            // button: those take the press for themselves, and hand the
-            // long one back to the row it means.
-            onMenuRequested: messageRow.openMenu()
+            active: model.loaded
+            // A message that arrives in a row already counting down --
+            // fetched after its delete was asked for, or built after the
+            // row was -- is covered as soon as it is there.
+            onLoaded: {
+                if (messageRow.doomed) {
+                    messageRow.raiseRemorse()
+                }
+            }
+            sourceComponent: MessageDelegate {
+                objectName: "messageDelegate"
+                // Neither hidden nor faded here while the message waits to
+                // go: the remorse covering it does the fading, with its own
+                // `opacity: 0.0` on what it was handed. Hiding it would be
+                // wrong anyway -- that takes its children's `visible` with
+                // it, and every part of a message measures
+                // `visible ? implicitHeight : 0`, so the row would collapse
+                // under the countdown drawn over it.
+                enabled: !messageRow.doomed
+                messageText: model.text
+                styledText: model.styled_text
+                isEdited: model.is_edited
+                markdownMode: root.markdownMode
+                downloadState: model.download_state
+                isOutgoing: model.is_outgoing
+                isInfo: model.is_info
+                isForwarded: model.is_forwarded
+                isFound: root.foundMessageId === model.message_id
+                showPadlock: model.show_padlock
+                deliveryState: model.state
+                sentAt: model.timestamp
+                senderName: model.sender_name
+                senderColor: model.sender_color
+                showSender: root.showSender
+                quoteText: model.quote_text
+                quoteAuthor: model.quote_author
+                filePath: model.file_path
+                fileName: model.file_name
+                fileMime: model.file_mime
+                fileBytes: model.file_bytes
+                viewType: model.view_type
+                imageWidth: model.image_width
+                imageHeight: model.image_height
+                isNew: model.is_new
+                hasHtml: model.has_html
+                vcardName: model.vcard_name
+                vcardAddr: model.vcard_addr
+                vcardColor: model.vcard_color
+                webxdcName: model.webxdc_name
+                webxdcDocument: model.webxdc_document
+                webxdcSummary: model.webxdc_summary
+                webxdcIcon: model.webxdc_icon
+                appsEnabled: root.appsEnabled
+                callState: model.call_state
+                callHasVideo: model.call_has_video
+                callDuration: model.call_duration
+                reactions: model.reactions
+                onOpenRequested: root.openRequested(fileUrl, fileName, viewType,
+                                                    previewWidth)
+                onFullTextRequested: root.fullTextRequested(model.message_id,
+                                                           model.sender_name)
+                onAppRequested: root.appRequested(model.message_id)
+                onCallRequested: root.callRequested(model.message_id,
+                                                    model.is_outgoing,
+                                                    model.call_state,
+                                                    model.call_has_video)
+                onDownloadRequested: root.downloadRequested(model.message_id)
+                onReactionRequested: root.reactionRequested(model.message_id, emoji)
+                // A long press on a chip, the download offer or a play
+                // button: those take the press for themselves, and hand the
+                // long one back to the row it means.
+                onMenuRequested: messageRow.openMenu()
+            }
         }
     }
 
