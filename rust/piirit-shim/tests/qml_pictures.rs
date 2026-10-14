@@ -101,6 +101,22 @@ fn a_face_is_the_middle_of_its_picture_cut_to_a_circle_at_its_size() {
     assert_eq!((r, g, b), RIGHT, "the face's right is not the picture's");
 }
 
+/// A picture much larger than its face -- a photo from the gallery, for
+/// a group -- is read no larger than the face needs, and is cut the
+/// same: its middle, at the face's size.
+#[test]
+fn a_face_from_a_large_picture_is_still_its_middle_at_its_size() {
+    let file = a_picture_of(&a_dir("large"), 400, 300);
+    let (pixels, width, height) = made("face", &file, 24);
+
+    assert_eq!((width, height), (24, 24), "a face is not made at its size");
+    assert_eq!(at(&pixels, width, 0, 0).0, 0, "the face is not a circle");
+    let (_, r, g, b) = at(&pixels, width, 3, 12);
+    assert_eq!((r, g, b), LEFT, "the face's left is not the picture's");
+    let (_, r, g, b) = at(&pixels, width, 20, 12);
+    assert_eq!((r, g, b), RIGHT, "the face's right is not the picture's");
+}
+
 #[test]
 fn a_face_drawn_without_its_colours_is_grey_and_a_lit_one_goes_through_the_tint() {
     let file = a_picture(&a_dir("colours"));

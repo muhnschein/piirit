@@ -218,10 +218,14 @@ fn a_capture_set_to_send_at_once_goes_once_it_is_ready() {
         open!("waiting-load", page_b, waiting_path, false);
     });
 
+    // Asked while the page is open: the page that replaces it next
+    // discards what was left on its bar, as a closed chat does.
+    let waiting_c = waiting;
     single_shot(Duration::from_secs(6), move || unsafe {
         (*steps_ptr).push(("waiting-sends", sends_in(&journal_c).len().to_string()));
         probe!("waiting-bar", "attachmentBar", "visible");
         probe!("waiting-send-enabled", "sendButton", "enabled");
+        (*steps_ptr).push(("waiting-kept", waiting_c.exists().to_string()));
     });
 
     // Swapped for another file before it could go: only what was taken
@@ -396,8 +400,9 @@ fn a_capture_set_to_send_at_once_goes_once_it_is_ready() {
         "a picture not set to send at once is not waiting on the bar for \
          the reader. {context}"
     );
-    assert!(
-        waiting.exists(),
+    assert_eq!(
+        value("waiting-kept"),
+        "true",
         "a capture waiting to be sent was thrown away"
     );
 

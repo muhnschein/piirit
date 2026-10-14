@@ -6,6 +6,13 @@
 //! into a folder the reader looks in -- Piirit's own in Downloads, which
 //! `qml/components/AttachmentSaver.qml` names -- under the name the sender
 //! gave the file, or that name and a number when it is taken.
+//!
+//! The copy is made on a thread of its own. A video is easily a few
+//! hundred megabytes, and copied on the Qt thread it froze the app for
+//! as long as the copy took.
+
+use std::collections::VecDeque;
+use std::sync::{Mutex, PoisonError};
 
 use qmetaobject::*;
 
@@ -15,15 +22,24 @@ use crate::chat::local_path;
 ///
 /// ```qml
 /// FileSaver { id: saver; onSaved: notice.show(qsTr("Saved")) }
-/// MenuItem { onClicked: saver.save_as(page.fileUrl, StandardPaths.download, page.fileName) }
+/// MenuItem { enabled: !saver.busy
+///            onClicked: saver.save_as(page.fileUrl, StandardPaths.download, page.fileName) }
 /// ```
 #[derive(QObject, Default)]
 pub struct FileSaver {
     base: qt_base_class!(trait QObject),
 
+    /// True from a save until its answer, and the answers of any asked
+    /// for meanwhile, have come.
+    pub busy: qt_property!(bool; NOTIFY busy_changed),
+    /// Emitted when [`Self::busy`] changes.
+    pub busy_changed: qt_signal!(),
+
     /// Copy the file at `file_url` -- a `file://` URL or a plain path --
     /// into `folder`, which is made if it does not exist, under the name
-    /// the file has where it is. Answers on `saved` or `error`.
+    /// the file has where it is. Answers on `saved` or `error`, once the
+    /// copy is made; a save asked for while one is being made is made
+    /// after it, and every save is answered in the order it was asked.
     pub save: qt_method!(fn(&mut self, file_url: QString, folder: QString)),
     /// [`Self::save`], under `name` rather than the file's own: the name
     /// the sender gave it, which the core does not keep on the file. An
@@ -34,6 +50,16 @@ pub struct FileSaver {
     pub saved: qt_signal!(path: QString),
     /// The copy could not be made. The message names what went wrong.
     pub error: qt_signal!(message: QString),
+
+    /// Saves asked for while one is being made, oldest first.
+    waiting: VecDeque<Request>,
+}
+
+/// A save asked for and not made yet: [`copy_into`]'s arguments.
+struct Request {
+    source: String,
+    folder: String,
+    name: String,
 }
 
 impl FileSaver {
@@ -44,16 +70,55 @@ impl FileSaver {
 
     /// Copy the file into the folder under `name`; see the declaration.
     pub fn save_as(&mut self, file_url: QString, folder: QString, name: QString) {
-        match copy_into(
-            &local_path(&file_url.to_string()),
-            &folder.to_string(),
-            &name.to_string(),
-        ) {
-            Ok(path) => self.saved(path.into()),
-            Err(message) => self.error(message.into()),
+        self.waiting.push_back(Request {
+            source: local_path(&file_url.to_string()),
+            folder: folder.to_string(),
+            name: name.to_string(),
+        });
+        // One copy at a time, so that the answers come in the order the
+        // saves were asked: a page that saves two files knows which one
+        // each answer is about.
+        if !self.busy {
+            self.busy = true;
+            self.busy_changed();
+            self.next();
         }
     }
+
+    /// Start the oldest save waiting, or, with none left, stop being
+    /// busy.
+    fn next(&mut self) {
+        while let Some(request) = self.waiting.pop_front() {
+            let ptr: QPointer<Self> = QPointer::from(&*self);
+            let done = queued_callback(move |result: Result<String, String>| {
+                // A page closed during the copy has nobody to tell; the
+                // copy is made all the same.
+                let Some(this) = ptr.as_pinned() else { return };
+                match result {
+                    Ok(path) => this.borrow().saved(path.into()),
+                    Err(message) => this.borrow().error(message.into()),
+                }
+                this.borrow_mut().next();
+            });
+            let started = std::thread::Builder::new()
+                .name("piirit-save".into())
+                .spawn(move || {
+                    done(copy_into(&request.source, &request.folder, &request.name));
+                });
+            match started {
+                Ok(_) => return,
+                Err(err) => self.error(format!("could not start saving: {err}").into()),
+            }
+        }
+        self.busy = false;
+        self.busy_changed();
+    }
 }
+
+/// Held while a name is chosen and the copy made under it. Two savers,
+/// on two pages, saving files of the same name at once would otherwise
+/// both find it free and write over each other.
+static COPYING: Mutex<()> = Mutex::new(());
 
 /// Copy `source` into `folder` under `name` -- or, when that is empty or
 /// nothing but separators, under the source's own name -- or under that
@@ -78,6 +143,9 @@ pub(crate) fn copy_into(source: &str, folder: &str, name: &str) -> Result<String
     let folder = std::path::Path::new(folder);
     std::fs::create_dir_all(folder)
         .map_err(|err| format!("cannot create {}: {err}", folder.display()))?;
+    // A copy that panicked part-way left nothing this lock guards in a
+    // bad state: the next save just looks for a free name again.
+    let _copying = COPYING.lock().unwrap_or_else(PoisonError::into_inner);
     let target = free_name(folder, &name);
     std::fs::copy(source, &target).map_err(|err| {
         format!(

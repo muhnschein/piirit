@@ -125,7 +125,7 @@ Page {
             }
             return
         }
-        handoverSaver.handedOver = filePath
+        handoverSaver.handedOver = handoverSaver.handedOver.concat([filePath])
         handoverSaver.keep(page.urlOf(filePath), "")
     }
 
@@ -148,7 +148,11 @@ Page {
         /// dead weight, so it goes either way -- a save that failed will
         /// not be retried from it, and an app that hands over a hundred
         /// files should not leave a hundred behind.
-        property string handedOver
+        ///
+        /// A list, oldest first: the copy is made off the Qt thread, so
+        /// an app can hand over a second file before the first is saved,
+        /// and the saver answers in the order it was asked.
+        property var handedOver: []
         onSaved: {
             notice.show(handoverSaver.savedText)
             handoverSaver.forget()
@@ -158,9 +162,10 @@ Page {
             handoverSaver.forget()
         }
         function forget() {
-            if (handoverSaver.handedOver.length > 0) {
-                app.discard(handoverSaver.handedOver)
-                handoverSaver.handedOver = ""
+            var waiting = handoverSaver.handedOver
+            if (waiting.length > 0) {
+                app.discard(waiting[0])
+                handoverSaver.handedOver = waiting.slice(1)
             }
         }
     }
