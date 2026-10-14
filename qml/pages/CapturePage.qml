@@ -86,6 +86,15 @@ Page {
     /// A video is being recorded: the recorder's word, not the page's.
     readonly property bool recording:
         camera.videoRecorder.recorderState === page.recordingState
+    /// A video is being recorded, or finished: what the camera is kept
+    /// running for with the app in the background.
+    readonly property bool filming: page.recording || page.stopping
+    /// The app is the one in front. Not read-only: a test, which has no
+    /// app in front, says it is.
+    property bool appActive: Qt.application.state === Qt.ApplicationActive
+    /// The page is on screen: the one Silica shows, with the app in
+    /// front. Silica keeps a page active in the background too.
+    readonly property bool shown: page.status === PageStatus.Active && page.appActive
     /// A recording was asked for and no file has been reported yet.
     property bool videoWanted: false
     /// The recorder has been asked to stop, and the file is on its way.
@@ -152,7 +161,7 @@ Page {
     OrientationSensor {
         id: orientationSensor
         objectName: "orientationSensor"
-        active: page.status === PageStatus.Active && !page.done
+        active: page.shown && !page.done
         onReadingChanged: page.turnWith(orientationSensor.reading
                                         ? orientationSensor.reading.orientation : 0)
     }
@@ -242,7 +251,7 @@ Page {
         page.mode = index
         camera.captureMode = index === 0 ? Camera.CaptureStillImage
                                          : Camera.CaptureVideo
-        if (page.status === PageStatus.Active) {
+        if (page.shown) {
             camera.start()
         }
     }
@@ -390,7 +399,7 @@ Page {
                 page.stopping = false
                 page.videoWanted = false
                 page.errorMessage = qsTr("The video could not be saved")
-                if (page.status === PageStatus.Active) {
+                if (page.shown) {
                     camera.start()
                 }
             }
@@ -437,7 +446,7 @@ Page {
 
     // The camera runs only while this page is the one on screen.
     onStatusChanged: {
-        if (page.status === PageStatus.Active && !page.done) {
+        if (page.shown && !page.done) {
             camera.start()
         } else if (page.status !== PageStatus.Active) {
             selfTimer.stop()
@@ -457,8 +466,32 @@ Page {
         if (page.front && page.frontCameras.length > 0) {
             page.useCamera(page.frontCameras[0])
         }
-        if (page.status === PageStatus.Active) {
+        if (page.shown) {
             camera.start()
+        }
+    }
+
+    // Nor while the app is in the background or the screen is off, where
+    // nobody looks through it -- except for a video: one being recorded
+    // goes on until the reader comes back to stop it, and one being
+    // finished is finished. Losing a recording to a glance at another
+    // app would cost more than the camera does.
+    onAppActiveChanged: page.followApp()
+    // A recording that ends in the background lets the camera go then.
+    onFilmingChanged: {
+        if (!page.filming && !page.appActive) {
+            page.followApp()
+        }
+    }
+    function followApp() {
+        if (page.status !== PageStatus.Active || page.done || page.filming) {
+            return
+        }
+        if (page.appActive) {
+            camera.start()
+        } else {
+            selfTimer.stop()
+            camera.stop()
         }
     }
 

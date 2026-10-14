@@ -103,6 +103,9 @@ const PROBE_QML: &str = r"
         }
         // What Silica does when a page becomes the one on screen.
         function activate() { loader.item.status = 2; return 'ok' }
+        // The app sent to the background, or the screen turned off, and
+        // brought back: Silica leaves the page's status as it was.
+        function background(away) { loader.item.appActive = away !== 'true'; return 'ok' }
         function findIn(node, name) {
             if (!node) { return null }
             if (node.objectName === name) { return node }
@@ -300,7 +303,7 @@ fn a_profile_that_exists_already_is_asked_after_and_brought_over() {
             call!(
                 "loadWith",
                 common::page_url("RestoreProfilePage.qml"),
-                r#"{"from":"device","status":2}"#
+                r#"{"from":"device","status":2,"appActive":true}"#
             ),
         );
         common::record(
@@ -351,6 +354,13 @@ fn a_profile_that_exists_already_is_asked_after_and_brought_over() {
         common::record(&s, "retried-scanner", call!("get", "scanArea", "visible"));
         common::record(&s, "retried-holding", call!("viewProperty", "done"));
         common::record(&s, "retried-camera", call!("get", "camera", "running"));
+        // In the background the camera stops, and frames stop being
+        // grabbed. The camera comes back with the app.
+        common::record(&s, "away", call!("background", "true"));
+        common::record(&s, "away-camera", call!("get", "camera", "running"));
+        common::record(&s, "away-grabbing", call!("get", "grabber", "running"));
+        common::record(&s, "back", call!("background", "false"));
+        common::record(&s, "back-camera", call!("get", "camera", "running"));
     });
 
     single_shot(Duration::from_secs(10), move || unsafe {
@@ -551,6 +561,21 @@ fn assert_device_half(steps: &[(String, String)], context: &str) {
         "true",
         "the retry brought back a viewfinder with the camera off behind \
          it. {context}"
+    );
+    assert_eq!(common::value_of(steps, "away"), "ok", "{context}");
+    assert_eq!(
+        [
+            common::value_of(steps, "away-camera"),
+            common::value_of(steps, "away-grabbing"),
+        ],
+        ["false", "false"],
+        "the camera, or the grabbing of its frames, carried on with the \
+         app in the background. {context}"
+    );
+    assert_eq!(
+        common::value_of(steps, "back-camera"),
+        "true",
+        "the camera did not come back with the app. {context}"
     );
 
     let hint = common::value_of(steps, "device-hint");

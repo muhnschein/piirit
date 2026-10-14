@@ -61,6 +61,9 @@ Page {
     /// the reader most needs to read, and dropping them straight back to
     /// a live viewfinder reads as the app having simply carried on.
     readonly property bool failed: page.errorMessage.length > 0
+    /// The app is the one in front. Not read-only: a test, which has no
+    /// app in front, says it is.
+    property bool appActive: Qt.application.state === Qt.ApplicationActive
 
     // Nothing to go back to mid-transfer: leaving would drop the page
     // that is listening for the answer, and the core would carry on.
@@ -217,11 +220,14 @@ Page {
         }
 
         // The camera runs while this page is on screen and there is
-        // nothing to read any more once a transfer is under way.
+        // nothing to read any more once a transfer is under way. Not
+        // while the app is in the background or the screen is off:
+        // Silica keeps the page active then, with nobody to hold a code
+        // up to it.
         Binding {
             target: scanLoader.item
             property: "active"
-            value: page.status === PageStatus.Active && page.fromDevice
+            value: page.status === PageStatus.Active && page.appActive && page.fromDevice
                    && !page.busy && !page.failed
         }
 

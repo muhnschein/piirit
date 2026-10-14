@@ -52,6 +52,9 @@ Page {
     property bool joining: false
     /// Which side is showing: 0 this profile's code, 1 the scanner.
     property int mode: 0
+    /// The app is the one in front. Not read-only: a test, which has no
+    /// app in front, says it is.
+    property bool appActive: Qt.application.state === Qt.ApplicationActive
 
     ContactList {
         id: contacts
@@ -288,11 +291,14 @@ Page {
 
                 // The camera runs while this page and this side are on
                 // screen, and stops while an invite is being followed.
+                // Not while the app is in the background or the screen
+                // is off either: Silica keeps the page active then, with
+                // nobody to hold a code up to it.
                 Binding {
                     target: scanLoader.item
                     property: "active"
-                    value: page.status === PageStatus.Active && page.mode === 1
-                           && !page.joining
+                    value: page.status === PageStatus.Active && page.appActive
+                           && page.mode === 1 && !page.joining
                 }
 
                 Label {
