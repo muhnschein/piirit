@@ -39,8 +39,9 @@ const MARGIN: usize = 40;
 
 /// Max fetches in flight.
 ///
-/// >1: fling outruns round trip; single fetch for rows already passed would block rows ahead,
-/// screen blank meanwhile. Bounded: long flick asks for what it passes, not all at once.
+/// More than one: fling outruns round trip; single fetch for rows already passed would block
+/// rows ahead, screen blank meanwhile. Bounded: long flick asks for what it passes, not all at
+/// once.
 const IN_FLIGHT: usize = 4;
 
 /// Message in id list: id and day.
