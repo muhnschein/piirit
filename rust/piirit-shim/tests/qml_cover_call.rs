@@ -128,12 +128,15 @@ const PROBE_QML: &str = r"
             return 'ok'
         }
         function call(state, name, avatar, connectedAgo, video, camera) {
-            fakeCall.state = state
+            // The state last, as the real call sets it: the cover reads
+            // the rest as soon as the state says a call is up, and a clock
+            // started before connected_at is set counts from 1970.
             fakeCall.peer_name = name
             fakeCall.peer_avatar = avatar
             fakeCall.connected_at = connectedAgo >= 0 ? Date.now() / 1000 - connectedAgo : 0
             fakeCall.has_video = video === 'true'
             fakeCall.camera = camera === 'true'
+            fakeCall.state = state
             return 'ok'
         }
         function setMuted(on) { fakeCall.muted = on === 'true'; return 'ok' }
