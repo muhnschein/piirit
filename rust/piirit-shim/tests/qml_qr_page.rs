@@ -83,7 +83,8 @@ const PROBE_QML: &str = r"
     Item {
         Loader { id: loader }
         function load(url) {
-            loader.setSource(url, { accountId: 1 })
+            // In front, as the app is when the reader is showing a code.
+            loader.setSource(url, { accountId: 1, appActive: true })
             return loader.status === Loader.Ready ? 'ok' : 'load-failed'
         }
         function findIn(node, name) {
@@ -105,6 +106,9 @@ const PROBE_QML: &str = r"
             return '' + item[property]
         }
         function pageProperty(property) { return '' + loader.item[property] }
+        // The app sent to the background, or the screen turned off, and
+        // brought back: Silica leaves the page's status as it was.
+        function background(away) { loader.item.appActive = !away; return 'ok' }
         // The profile row's avatar, for whose code this is.
         function profileColor() {
             var row = findIn(loader.item, 'profileRow')
@@ -218,6 +222,13 @@ fn the_page_shows_the_invite_and_follows_one_entered_on_the_scanner_side() {
         record!("scan-side-after", get!("scanArea", "visible"));
         record!("scanner-loaded", get!("scanLoader", "status"));
         record!("viewfinder", get!("viewfinder", "visible"));
+        // The camera runs on this side, but not in the background.
+        record!("scan-camera", get!("camera", "running"));
+        record!("away", call!("background", true));
+        record!("away-camera", get!("camera", "running"));
+        record!("away-grabbing", get!("grabber", "running"));
+        record!("back", call!("background", false));
+        record!("back-camera", get!("camera", "running"));
         // The link, entered under the viewfinder and followed.
         record!("panel-before", get!("linkPanel", "visible"));
         record!("button", get!("typeLinkButton", "visible"));
@@ -337,6 +348,22 @@ fn assert_page(steps: &[(&str, String)], calls: &[String]) {
         value("viewfinder"),
         "true",
         "the scanner side has no viewfinder. {context}"
+    );
+    assert_eq!(
+        value("scan-camera"),
+        "true",
+        "the camera is not running on the scanner side. {context}"
+    );
+    assert_eq!(
+        [value("away"), value("away-camera"), value("away-grabbing")],
+        ["ok", "false", "false"],
+        "the camera, or the grabbing of its frames, carried on with the \
+         app in the background. {context}"
+    );
+    assert_eq!(
+        [value("back"), value("back-camera")],
+        ["ok", "true"],
+        "the camera did not come back with the app. {context}"
     );
     assert_eq!(
         value("panel-before"),

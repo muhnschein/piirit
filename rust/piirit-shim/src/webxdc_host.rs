@@ -8,10 +8,13 @@
 //! repository.
 //!
 //! Serving it over HTTP is also what gives the app a way back: the API in
-//! `webxdc.js` sends an update with a POST and collects the others by
-//! polling, so the bridge needs nothing of the `WebView` beyond the URL it
-//! is pointed at. The alternative -- a Gecko frame script -- would put
-//! the bridge on chrome-privileged ground this app cannot test.
+//! `webxdc.js` sends an update with a POST and collects the others with a
+//! long poll, which the host holds until the core says there is something
+//! new (`Host::poke`). So the bridge needs nothing of the `WebView` beyond
+//! the URL it is pointed at, and a quiet app costs a request every
+//! [`UPDATE_WAIT`] rather than one every few hundred milliseconds. The
+//! alternative -- a Gecko frame script -- would put the bridge on
+//! chrome-privileged ground this app cannot test.
 //!
 //! The app is served from the root of that address, as every other
 //! client serves one. It has to be: an app built with a bundler's
@@ -42,10 +45,12 @@ use std::io::Read;
 use std::net::{Ipv4Addr, SocketAddr};
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
+use std::time::Duration;
 
 use deltachat_jsonrpc::RpcClient;
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
 use tokio::net::{TcpListener, TcpStream};
+use tokio::sync::Notify;
 use tokio::task::JoinHandle;
 
 /// The API the app sees, as JavaScript. Compiled in rather than installed
@@ -70,8 +75,16 @@ const POLICY: &str = "default-src 'self'; \
      form-action 'none'; \
      frame-ancestors 'none'";
 
-/// Milliseconds the bridge waits between asking for updates.
-const POLL_INTERVAL: u32 = 300;
+/// Milliseconds the bridge waits before asking for updates again after
+/// a request for them failed. One that was answered is followed at once:
+/// the host holds it until there is something to say.
+const RETRY_INTERVAL: u32 = 300;
+
+/// How long a request for updates waits for one before answering with
+/// none. The bridge asks again at once, so this only decides how often a
+/// quiet app costs a request. The same as the call page's commands wait
+/// (`call_host.rs`).
+const UPDATE_WAIT: Duration = Duration::from_secs(20);
 
 /// The most a request head may be. A webxdc's own requests are short;
 /// anything longer is not one of them.
@@ -136,6 +149,9 @@ struct Shared {
     /// Cleared when the app is closed. A connection accepted just before
     /// that stops rather than reaching the core.
     running: Arc<AtomicBool>,
+    /// Woken when the chat may have something new for the app, and when
+    /// the host goes.
+    changed: Arc<Notify>,
 }
 
 /// A served app: the URL to point a `WebView` at, and the task serving it.
@@ -145,6 +161,7 @@ pub(crate) struct Host {
     /// Where the app is. What `WebxdcApp.url` hands to QML.
     url: String,
     running: Arc<AtomicBool>,
+    changed: Arc<Notify>,
     task: JoinHandle<()>,
 }
 
@@ -152,6 +169,12 @@ impl Host {
     /// Where the app is being served.
     pub(crate) fn url(&self) -> &str {
         &self.url
+    }
+
+    /// The chat may have something new for the app: a request for
+    /// updates that is waiting asks the core again.
+    pub(crate) fn poke(&self) {
+        self.changed.notify_waiters();
     }
 }
 
@@ -161,6 +184,9 @@ impl Drop for Host {
         // abort closes the listener so no more arrive.
         self.running.store(false, Ordering::SeqCst);
         self.task.abort();
+        // A request waiting for an update answers now rather than holding
+        // its connection open for a page that has gone.
+        self.changed.notify_waiters();
     }
 }
 
@@ -187,6 +213,7 @@ pub(crate) async fn start(
     // own business, and half of what apps ask for is absolute.
     let url = format!("http://{authority}/index.html");
     let running = Arc::new(AtomicBool::new(true));
+    let changed = Arc::new(Notify::new());
     // Whatever the last run left behind; see `empty_outbox`.
     empty_outbox(instance.message_id);
     let shared = Arc::new(Shared {
@@ -196,9 +223,15 @@ pub(crate) async fn start(
         api: format!("/webxdc-api/{token}"),
         authority,
         running: Arc::clone(&running),
+        changed: Arc::clone(&changed),
     });
     let task = tokio::spawn(accept(listener, shared));
-    Ok(Host { url, running, task })
+    Ok(Host {
+        url,
+        running,
+        changed,
+        task,
+    })
 }
 
 /// One connection at a time is not enough: a page loads its script, its
@@ -516,12 +549,47 @@ async fn blob(shared: &Shared, path: &str) -> Response {
 
 /// Everything the chat has said about this app since `serial`, as the
 /// core hands it over: a JSON array, passed through unread.
+///
+/// With `wait=1` a long poll: when there is nothing new this holds on
+/// until the core says there may be ([`Host::poke`]) or [`UPDATE_WAIT`]
+/// has passed, then asks once more and answers with that. Without it the
+/// answer is the core's first one, which is what the bridge needs while
+/// it catches up: an app waits on that before it draws. A 404 once the
+/// app is closed, as for any other request.
 async fn updates(shared: &Shared, query: &str) -> Response {
     let serial = query
         .split('&')
         .find_map(|pair| pair.strip_prefix("serial="))
         .and_then(|value| value.parse::<u32>().ok())
         .unwrap_or(0);
+    let wait = query.split('&').any(|pair| pair == "wait=1");
+    let now = tokio::time::Instant::now();
+    let deadline = now.checked_add(UPDATE_WAIT).unwrap_or(now);
+    // Listening before looking, so an update that lands between the two
+    // still wakes this.
+    let changed = shared.changed.notified();
+    let mut changed = std::pin::pin!(changed);
+    changed.as_mut().enable();
+    let mut answer = status_updates(shared, serial).await;
+    if wait && answer.as_deref().is_some_and(nothing_new) {
+        // Woken or out of time, the core is asked again either way: what
+        // woke this may not have been an update after all -- an overflow
+        // wakes every app -- and a quiet stretch is answered too.
+        tokio::time::timeout_at(deadline, changed).await.ok();
+        if !shared.running.load(Ordering::SeqCst) {
+            return Response::empty("404 Not Found");
+        }
+        answer = status_updates(shared, serial).await;
+    }
+    match answer {
+        Some(json) => Response::new("application/json; charset=utf-8", json.into_bytes()),
+        None => Response::empty("502 Bad Gateway"),
+    }
+}
+
+/// The core's answer for this app's updates since `serial`, or `None`
+/// when it gave none.
+async fn status_updates(shared: &Shared, serial: u32) -> Option<String> {
     let answer: Result<String, _> = shared
         .rpc
         .call(
@@ -533,10 +601,18 @@ async fn updates(shared: &Shared, query: &str) -> Response {
             ),
         )
         .await;
-    match answer {
-        Ok(json) => Response::new("application/json; charset=utf-8", json.into_bytes()),
-        Err(_) => Response::empty("502 Bad Gateway"),
-    }
+    answer.ok()
+}
+
+/// Whether the core's answer holds no update: nothing to hand over yet.
+///
+/// Every update is an object, so an answer without a brace in it has
+/// none -- the core's `[]`, or anything else a page could make nothing
+/// of. Either is waited on rather than answered at once: the bridge asks
+/// again as soon as it is answered, and an answer it cannot use would
+/// have it asking in a loop.
+fn nothing_new(updates: &str) -> bool {
+    !updates.contains('{')
 }
 
 /// One update from the app, on its way to everyone else in the chat.
@@ -837,7 +913,7 @@ fn fill(script: &str, shared: &Shared) -> String {
             "__MAX_SIZE__",
             &shared.instance.send_update_max_size.to_string(),
         )
-        .replace("__POLL__", &POLL_INTERVAL.to_string())
+        .replace("__RETRY__", &RETRY_INTERVAL.to_string())
 }
 
 /// The app's index.html with the API loaded before any of its own code.
@@ -1042,9 +1118,20 @@ async fn write_response(stream: &mut TcpStream, response: &Response) -> std::io:
 #[cfg(test)]
 mod tests {
     use super::{
-        archive_path, content_type, decode_base64, in_outbox, inject, percent_decode, token,
-        Response,
+        archive_path, content_type, decode_base64, in_outbox, inject, nothing_new, percent_decode,
+        token, Response,
     };
+
+    #[test]
+    fn an_answer_with_no_update_in_it_is_waited_on() {
+        assert!(nothing_new("[]"));
+        assert!(nothing_new(" [ ]\n"));
+        assert!(!nothing_new("[{\"payload\":1,\"serial\":1}]"));
+        // Nothing a page could use either: answered at once, the bridge
+        // would ask again at once, and again.
+        assert!(nothing_new(""));
+        assert!(nothing_new("null"));
+    }
 
     #[test]
     fn only_a_file_in_the_outbox_itself_is_ever_deleted() {

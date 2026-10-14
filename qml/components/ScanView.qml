@@ -64,7 +64,9 @@ import "../js/Viewfinder.js" as Viewfinder
 Item {
     id: root
 
-    /// The view is the one on screen. The camera runs only then.
+    /// The view is the one on screen, with the app in front: the host
+    /// page says so, as Silica keeps a page active in the background
+    /// too. The camera runs only then, and frames are grabbed only then.
     property bool active: false
 
     /// How the host page is turned, as Silica's `Orientation`. The

@@ -38,7 +38,10 @@ const PROBE_QML: &str = r"
         function load(url, properties) {
             loader.setSource('', {})
             picked = ''
-            loader.setSource(url, JSON.parse(properties))
+            // In front, as the app is when the reader is taking a picture.
+            var given = JSON.parse(properties)
+            given.appActive = true
+            loader.setSource(url, given)
             if (loader.status !== Loader.Ready) { return 'load-failed' }
             loader.item.picked.connect(function(path) { picked = path })
             return 'ok'

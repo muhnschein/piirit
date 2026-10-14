@@ -7,9 +7,11 @@
 //! the fake core, with the same `WebxdcApp` a page instantiates.
 //!
 //! The round trip is the point of the last part: an update posted by the
-//! page reaches the core, the core says so as an event, and the object
-//! that started the app has the new summary. That is the whole bridge, in
-//! the direction that cannot be checked by reading the JavaScript.
+//! page reaches the core, the core says so as an event, and the app's
+//! request for updates -- held by the host until there is one -- wakes
+//! with it. That is the whole bridge, in the direction that cannot be
+//! checked by reading the JavaScript. The event wakes that request and
+//! nothing else: the app's info is not asked for again.
 //!
 //! `sendToChat` is the other direction and does not go to the core at
 //! all: the specification says the reader is asked which chat, so the
@@ -28,6 +30,8 @@
 )]
 
 use std::io::{Read, Write};
+use std::sync::atomic::{AtomicBool, Ordering};
+use std::sync::{mpsc, Arc};
 use std::time::Duration;
 
 use piirit_shim::DeltaChatCore;
@@ -77,10 +81,16 @@ const PROBE_QML: &str = r"
 /// One request, one answer, one closed connection: what the host does.
 /// `Err` is nothing listening, which is what a stopped app should be.
 fn ask(authority: &str, request: &str) -> Result<String, String> {
+    ask_within(authority, request, Duration::from_secs(5))
+}
+
+/// The same, waiting up to `patience` for the answer: a request for
+/// updates is held until there is one.
+fn ask_within(authority: &str, request: &str, patience: Duration) -> Result<String, String> {
     let mut stream =
         std::net::TcpStream::connect(authority).map_err(|err| format!("connect: {err}"))?;
     stream
-        .set_read_timeout(Some(Duration::from_secs(5)))
+        .set_read_timeout(Some(patience))
         .map_err(|err| err.to_string())?;
     stream
         .write_all(request.as_bytes())
@@ -199,6 +209,23 @@ fn an_app_is_served_to_itself_alone_and_its_updates_reach_the_chat() {
     let mut steps: Vec<(&str, String)> = Vec::new();
     let steps_ptr: *mut Vec<(&str, String)> = std::ptr::addr_of_mut!(steps);
 
+    // The app's request for updates, waiting on its own thread while the
+    // rest of the test goes on: what it was answered, and whether it had
+    // been by the time the app sent its move.
+    let (waited_tx, waited_rx) = mpsc::channel::<String>();
+    let mut waited_tx = Some(waited_tx);
+    let answered = Arc::new(AtomicBool::new(false));
+    let answered_early = Arc::clone(&answered);
+    // How often the app's info was asked for, before the move and after.
+    let info_calls = move || {
+        common::methods(&journal)
+            .iter()
+            .filter(|name| *name == "get_webxdc_info")
+            .count()
+            .to_string()
+    };
+    let info_calls_after = info_calls.clone();
+
     macro_rules! call {
         ($name:expr) => {{
             let result = (*engine_ptr).invoke_method($name.into(), &[]);
@@ -247,6 +274,24 @@ fn an_app_is_served_to_itself_alone_and_its_updates_reach_the_chat() {
         record!("api", api.clone());
         if api.is_empty() {
             return;
+        }
+
+        // The app's request for updates, as the bridge makes it once it
+        // has caught up. Nothing has been sent yet, so the host holds it.
+        // Made now, so that it is waiting long before the move below.
+        if let Some(waited) = waited_tx.take() {
+            let authority = authority.clone();
+            let answered = Arc::clone(&answered);
+            let request = format!(
+                "GET {api}/updates?serial=0&wait=1 HTTP/1.1\r\nHost: {authority}\r\n\
+                 Connection: close\r\n\r\n"
+            );
+            std::thread::spawn(move || {
+                let answer = ask_within(&authority, &request, Duration::from_secs(30))
+                    .unwrap_or_else(|err| err);
+                answered.store(true, Ordering::SeqCst);
+                waited.send(answer).ok();
+            });
         }
 
         // Another app on the phone, guessing the port: it can have the
@@ -331,6 +376,11 @@ fn an_app_is_served_to_itself_alone_and_its_updates_reach_the_chat() {
                 .unwrap_or_else(|err| err)
         );
 
+        record!("info-calls-before", info_calls());
+        record!(
+            "held-before-send",
+            (!answered_early.load(Ordering::SeqCst)).to_string()
+        );
         // The app sending a move, the way `webxdc.js` does.
         let update = "{\"payload\":{\"move\":\"e4\"}}";
         record!(
@@ -353,9 +403,15 @@ fn an_app_is_served_to_itself_alone_and_its_updates_reach_the_chat() {
     });
 
     // The event the send produced has had a turn of the loop to arrive,
-    // and the object reloads on it.
+    // and the request that was waiting has been woken by it.
     single_shot(Duration::from_secs(5), move || unsafe {
-        record!("after-update", call!("info"));
+        record!(
+            "woken",
+            waited_rx
+                .recv_timeout(Duration::from_secs(3))
+                .unwrap_or_else(|err| format!("not answered: {err}"))
+        );
+        record!("info-calls-after", info_calls_after());
         let url = call!("url");
         record!("stopped-url", call!("stop"));
         let authority = authority_of(&url);
@@ -555,10 +611,27 @@ fn an_app_is_served_to_itself_alone_and_its_updates_reach_the_chat() {
         updates.contains("\"payload\":{\"move\":\"e4\"}") && updates.contains("\"serial\":1"),
         "the update did not come back with a serial on it: {updates}. {context}"
     );
+    // Held, and woken by the move rather than answered with nothing.
     assert_eq!(
-        value("after-update"),
-        "Checkers|1 move(s)|icon",
-        "the app's own summary did not follow the update it sent. {context}"
+        value("held-before-send"),
+        "true",
+        "the request for updates was answered before there was anything \
+         to answer it with, so the bridge would be polling. {context}"
+    );
+    let woken = value("woken");
+    assert!(
+        woken.starts_with("HTTP/1.1 200")
+            && woken.contains("\"payload\":{\"move\":\"e4\"}")
+            && woken.contains("\"serial\":1"),
+        "the waiting request for updates was not woken with the move: \
+         {woken}. {context}"
+    );
+    // An update changes nothing the page shows, so nothing is reloaded:
+    // asking the core for the app's info makes it open the archive.
+    assert_eq!(
+        value("info-calls-after"),
+        value("info-calls-before"),
+        "the app's info was asked for again on an update. {context}"
     );
 
     assert_eq!(

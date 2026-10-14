@@ -129,10 +129,13 @@ ApplicationWindow {
     // The share sheet's side of the app. Loaded rather than declared:
     // `Sailfish.Share` resolves only on a release that ships it, and an
     // import that does not resolve would otherwise take down the window
-    // every page is loaded into. See qml/share/ShareTarget.qml.
+    // every page is loaded into. See qml/share/ShareTarget.qml. In the
+    // background, so it is not built on the way to the first frame:
+    // nothing reads it, and what it takes it hands to the window.
     Loader {
         id: shareTarget
         objectName: "shareTarget"
+        asynchronous: true
         source: Qt.resolvedUrl("share/ShareTarget.qml")
     }
 
