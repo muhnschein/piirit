@@ -21,6 +21,8 @@
 
 use std::cell::RefCell;
 use std::collections::{BTreeMap, BTreeSet};
+use std::sync::atomic::{AtomicU64, Ordering};
+use std::sync::Arc;
 
 use deltachat_jsonrpc::RpcClient;
 use qmetaobject::*;
@@ -122,7 +124,12 @@ pub struct ChatMedia {
 
     /// Counts loads, so a page of an older load cannot land in the rows
     /// of a newer one; see `ChatInfo`.
-    generation: u64,
+    ///
+    /// Shared with the load itself, which reads it before each page and
+    /// stops once a newer load has started. Every message in the chat
+    /// starts one, and a load left to run to its end read every page it
+    /// had set out to, for rows the newer load was reading again anyway.
+    generation: Arc<AtomicU64>,
 }
 
 impl ChatMedia {
@@ -187,8 +194,11 @@ impl ChatMedia {
         let Some((rpc, runtime)) = connection() else {
             return;
         };
-        self.generation = self.generation.wrapping_add(1);
-        let generation = self.generation;
+        let generation = self
+            .generation
+            .fetch_add(1, Ordering::Relaxed)
+            .wrapping_add(1);
+        let current = Arc::clone(&self.generation);
         self.set_loading(true);
         let known: BTreeSet<u32> = self
             .rows
@@ -201,7 +211,7 @@ impl ChatMedia {
         let ptr: QPointer<Self> = QPointer::from(&*self);
         let step = queued_callback(move |step: Step| {
             let Some(this) = ptr.as_pinned() else { return };
-            if this.borrow().generation != generation {
+            if this.borrow().generation.load(Ordering::Relaxed) != generation {
                 return;
             }
             this.borrow_mut().take(step);
@@ -222,6 +232,12 @@ impl ChatMedia {
                 .collect();
             step(Step::Ids(ids));
             for page in wanted.chunks(PAGE) {
+                // Overtaken by a newer load, which reads for itself
+                // whatever this one had not filled in yet: a page read now
+                // would only be dropped when it landed.
+                if current.load(Ordering::Relaxed) != generation {
+                    return;
+                }
                 match fetch_messages(&rpc, account_id, page).await {
                     Ok(items) => step(Step::Rows(items)),
                     Err(err) => {
@@ -315,11 +331,11 @@ impl ChatMedia {
         let Some((rpc, runtime)) = connection() else {
             return;
         };
-        let generation = self.generation;
+        let generation = self.generation.load(Ordering::Relaxed);
         let ptr: QPointer<Self> = QPointer::from(&*self);
         let done = queued_callback(move |result: Result<Vec<MessageListItem>, String>| {
             let Some(this) = ptr.as_pinned() else { return };
-            if this.borrow().generation != generation {
+            if this.borrow().generation.load(Ordering::Relaxed) != generation {
                 return;
             }
             if let Ok(items) = result {
