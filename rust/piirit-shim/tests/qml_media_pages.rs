@@ -144,6 +144,12 @@ const PROBE_QML: &str = r"
             if (!item) { return 'missing:' + name }
             return '' + item.sourceSize.width
         }
+        /// The box an image asks to be decoded to fit in.
+        function decodeBoxOf(name) {
+            var item = findIn(loader.item, name)
+            if (!item) { return 'missing:' + name }
+            return item.sourceSize.width + 'x' + item.sourceSize.height
+        }
         function setOn(name, property, value) {
             var item = findIn(loader.item, name)
             if (!item) { return 'missing:' + name }
@@ -270,6 +276,10 @@ fn pictures_and_video_open_here_and_everything_else_goes_to_the_system() {
                 QString::from("visible")
             ),
         ));
+        (*steps_ptr).push((
+            "full-decode-box",
+            call!("decodeBoxOf", QString::from("fullPicture")),
+        ));
         // Fitted: nothing to pan, because the whole picture is on screen.
         (*steps_ptr).push((
             "fitted-content",
@@ -309,6 +319,14 @@ fn pictures_and_video_open_here_and_everything_else_goes_to_the_system() {
                 "flagOf",
                 QString::from("fullAnimation"),
                 QString::from("visible")
+            ),
+        ));
+        (*steps_ptr).push((
+            "gif-cache",
+            call!(
+                "flagOf",
+                QString::from("fullAnimation"),
+                QString::from("cache")
             ),
         ));
     });
@@ -531,6 +549,21 @@ fn assert_outcome(steps: &[(&str, String)], navigation: &str) {
         value("gif-animated"),
         "true",
         "a GIF was shown as a still. {context}"
+    );
+    assert_eq!(
+        value("gif-cache"),
+        "false",
+        "the picture page keeps every frame of a GIF at full size for as \
+         long as it is open. {context}"
+    );
+    // Twice the stub page's 540x960, which Qt fits the picture inside:
+    // twice what it is drawn at fitted, and no more. A bound of twice the
+    // long edge on both sides let a landscape photo through whole.
+    assert_eq!(
+        value("full-decode-box"),
+        "1080x1920",
+        "the full picture is not decoded to twice the page it is fitted \
+         to. {context}"
     );
 
     assert_eq!(
