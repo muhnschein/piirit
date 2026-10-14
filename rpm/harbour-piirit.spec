@@ -135,6 +135,9 @@ BuildRequires:  pkgconfig(Qt5Quick)
 # The runtime package it links, qt5-qtmultimedia, is one rpm derives from
 # the binary itself; Harbour allows it.
 BuildRequires:  pkgconfig(Qt5Multimedia)
+# libpulse, for the call's microphone watch (piirit-shim/src/mic_watch.rs):
+# libpulse.so.0, which Harbour allows.
+BuildRequires:  pkgconfig(libpulse)
 # lrelease, which compiles the translation catalogs in %%build.
 BuildRequires:  qt5-qttools-linguist
 
@@ -271,6 +274,16 @@ builddir=%{builddir}
 [ -x "$builddir/%{name}" ] || builddir=%{nativedir}
 install -Dm 755 "$builddir/%{name}" \
     %{buildroot}%{_bindir}/%{name}
+
+# The H.264 encoder video calls send through, which the browser engine
+# loads as a media plugin of its own: rust/piirit-video/build.rs builds it
+# from the same x264 the binary carries and lays it out beside the binary
+# the way Gecko looks for one. A private library under %%{appdatadir}/lib,
+# the one place Harbour allows one; piirit-app points Gecko at it.
+install -Dm 755 "$builddir/gmp-piirit/1.0/libpiirit.so" \
+    %{buildroot}%{appdatadir}/lib/gmp-piirit/1.0/libpiirit.so
+install -Dm 644 "$builddir/gmp-piirit/1.0/piirit.info" \
+    %{buildroot}%{appdatadir}/lib/gmp-piirit/1.0/piirit.info
 
 # QML UI, installed under our own app-private data dir (not /usr/bin) so
 # piirit-app's qml_dir() lookup (PIIRIT_QML_DIR env var, then this

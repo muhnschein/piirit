@@ -1,20 +1,44 @@
 // What a quick action on the cover is, and what it is drawn as, for the
 // three places that need it: the cover, which offers the actions; the
-// window, which does them; and the settings page, which picks them.
+// window, which does them; and the settings page, which picks them. The
+// cover's action during a call is drawn the same way, from the same
+// files.
 //
 // A library for the reason Relays.js is one: nothing here is translated,
 // and the lists are shared rather than copied.
 .pragma library
 
 /// What an action can do, as Settings keeps it: open a chat, search the
-/// chat list, show this profile's QR code, read someone else's, or open
-/// the list of profiles.
-var kinds = ["chat", "search", "qr", "scan", "profiles"]
+/// chat list, show this profile's QR code, read someone else's, open the
+/// list of profiles, or take a picture or a video -- with the back camera
+/// or the front one -- and send it to a chat picked afterwards.
+var kinds = ["chat", "search", "qr", "scan", "profiles",
+             "photo", "video", "selfie", "selfie-video"]
+
+/// The kinds that start with the camera, and how each opens it: `mode` as
+/// the camera page takes it, 0 for a still and 1 for a video, and whether
+/// it opens on the front camera.
+var captures = {
+    "photo": { mode: 0, front: false },
+    "video": { mode: 1, front: false },
+    "selfie": { mode: 0, front: true },
+    "selfie-video": { mode: 1, front: true }
+}
+
+/// Whether an action of `kind` starts with the camera.
+function isCapture(kind) {
+    return Object.keys(captures).indexOf(kind) >= 0
+}
 
 /// The icons an action for a chat can wear, in the order the settings page
 /// offers them. The first is the one a new action gets.
 var chatIcons = ["heart", "star", "person", "group", "home", "bubble", "robot", "school",
                  "work", "office", "dog", "cat", "ball"]
+
+/// The icons of the one action the cover has while a call is up, which
+/// nobody picks: the microphone, drawn as what a tap does -- `mic-off`
+/// while it is on, `mic` while it is off.
+var callIcons = ["mic", "mic-off"]
 
 /// The sizes scripts/render-cover-icons.sh draws every icon at: Silica's
 /// small icon at each scale a phone runs at, 1.0 to 2.0.
@@ -32,7 +56,9 @@ function read(settings, side) {
         accountId: settings[prefix + "Account"] > 0 ? settings[prefix + "Account"] : 0,
         chatId: settings[prefix + "Chat"] > 0 ? settings[prefix + "Chat"] : 0,
         icon: chatIcons.indexOf("" + settings[prefix + "Icon"]) >= 0
-              ? "" + settings[prefix + "Icon"] : chatIcons[0]
+              ? "" + settings[prefix + "Icon"] : chatIcons[0],
+        // Only a yes is a yes: a key dconf has not read yet is no.
+        sendNow: settings[prefix + "SendNow"] === true
     }
 }
 

@@ -350,6 +350,10 @@ Správy od zablokovaných kontaktov v ostatných skupinách sa budú naďalej zo
         <source>Call back</source>
         <translation>Zavolať späť</translation>
     </message>
+    <message>
+        <source>Incoming video call</source>
+        <translation>Prichádzajúci video hovor</translation>
+    </message>
 </context>
 <context>
     <name>CallPage</name>
@@ -403,6 +407,10 @@ Správy od zablokovaných kontaktov v ostatných skupinách sa budú naďalej zo
         <source>Answer</source>
         <extracomment>Answers a call that is ringing. A verb.</extracomment>
         <translation>Prijať</translation>
+    </message>
+    <message>
+        <source>Incoming video call</source>
+        <translation>Prichádzajúci video hovor</translation>
     </message>
 </context>
 <context>
@@ -469,6 +477,11 @@ Správy od zablokovaných kontaktov v ostatných skupinách sa budú naďalej zo
         <source>Call %1</source>
         <extracomment>Places a call. %1 is the name of whoever is called.</extracomment>
         <translation>Zavolať: %1</translation>
+    </message>
+    <message>
+        <source>Video call %1</source>
+        <extracomment>Places a video call. %1 is the name of whoever is called.</extracomment>
+        <translation>Videohovor: %1</translation>
     </message>
 </context>
 <context>
@@ -668,6 +681,11 @@ Správy od zablokovaných kontaktov v ostatných skupinách sa budú naďalej zo
         <extracomment>%1 is the label of the unread filter, a button at the right of the search field.</extracomment>
         <translation>Ťuknutím na „%1“ zobrazíte všetky chaty</translation>
     </message>
+    <message>
+        <source>Send to</source>
+        <extracomment>Over the list of chats, when picking the one to send a picture or a video just taken to.</extracomment>
+        <translation>Odoslať do</translation>
+    </message>
 </context>
 <context>
     <name>ChatMediaPage</name>
@@ -849,6 +867,16 @@ Správy od zablokovaných kontaktov v ostatných skupinách sa budú naďalej zo
         <source>%1 new</source>
         <extracomment>On the cover, in a pill among the avatars: how many messages are unread. %1 is the number, or &quot;99+&quot;.</extracomment>
         <translation>%1 nových</translation>
+    </message>
+    <message>
+        <source>Microphone off</source>
+        <extracomment>On the cover during a call: the reader&apos;s microphone is switched off, so the other end hears nothing.</extracomment>
+        <translation>Mikrofón vypnutý</translation>
+    </message>
+    <message>
+        <source>Camera paused</source>
+        <extracomment>On the cover during a video call: the camera sends nothing while the app is in the background, and comes back on when the app is opened.</extracomment>
+        <translation>Kamera pozastavená</translation>
     </message>
 </context>
 <context>
@@ -1050,6 +1078,11 @@ Správy od zablokovaných kontaktov v ostatných skupinách sa budú naďalej zo
         <source>Description</source>
         <extracomment>Label of the text that says what a group or channel is for, on its info page, and the prompt in its empty field.</extracomment>
         <translation>Popis</translation>
+    </message>
+    <message>
+        <source>Change picture</source>
+        <extracomment>Pull-down entry on a group&apos;s page: opens the gallery to pick a new picture for the group.</extracomment>
+        <translation>Zmeniť obrázok</translation>
     </message>
 </context>
 <context>
@@ -1571,6 +1604,41 @@ Správy od zablokovaných kontaktov v ostatných skupinách sa budú naďalej zo
         <extracomment>A quick action on the cover that opens the list of profiles.</extracomment>
         <translation>Profily</translation>
     </message>
+    <message>
+        <source>Photo</source>
+        <extracomment>A quick action on the cover that opens the camera to take a photo with the back camera, then asks which chat to send it to.</extracomment>
+        <translation>Fotografia</translation>
+    </message>
+    <message>
+        <source>Video</source>
+        <extracomment>A quick action on the cover that opens the camera to record a video with the back camera, then asks which chat to send it to.</extracomment>
+        <translation>Video</translation>
+    </message>
+    <message>
+        <source>Selfie</source>
+        <extracomment>A quick action on the cover that opens the camera to take a photo with the front camera, then asks which chat to send it to.</extracomment>
+        <translation>Selfie</translation>
+    </message>
+    <message>
+        <source>Selfie video</source>
+        <extracomment>A quick action on the cover that opens the camera to record a video with the front camera, then asks which chat to send it to.</extracomment>
+        <translation>Selfie video</translation>
+    </message>
+    <message>
+        <source>Send right away</source>
+        <extracomment>Under a quick action on the cover that takes a photo or a video: whether it is sent as soon as a chat is picked for it.</extracomment>
+        <translation>Odoslať hneď</translation>
+    </message>
+    <message>
+        <source>Sends it as soon as you pick the chat, without a caption.</source>
+        <extracomment>Under &quot;Send right away&quot;. Off, the chat opens with the photo or video on it, ready for a caption and the send button.</extracomment>
+        <translation>Odošle hneď po výbere chatu, bez popisu.</translation>
+    </message>
+    <message>
+        <source>The photo or video goes out the moment you tap a chat, with no chance to look it over first. Tap the wrong chat by mistake, and it goes there.</source>
+        <extracomment>Asked before &quot;Send right away&quot; is turned on for a camera quick action on the cover.</extracomment>
+        <translation>Fotka alebo video odíde v okamihu, keď ťuknete na čet, bez možnosti si ho najprv pozrieť. Ak omylom ťuknete na nesprávny čet, odíde tam.</translation>
+    </message>
 </context>
 <context>
     <name>QuickActionsPage</name>
@@ -2015,16 +2083,8 @@ Správy od zablokovaných kontaktov v ostatných skupinách sa budú naďalej zo
         <translation>Zobrazovať obrazovku hovoru pre prijaté kontakty</translation>
     </message>
     <message>
-        <source>Enable calls (experimental)</source>
-        <translation>Povoliť hovory (experimentálne)</translation>
-    </message>
-    <message>
         <source>Runs small apps inside chats.</source>
         <translation>Spúšťa malé aplikácie vnútri chatov.</translation>
-    </message>
-    <message>
-        <source>Makes and answers voice calls in one-to-one chats.</source>
-        <translation>Uskutočňuje a prijíma hlasové hovory v individuálnych chatoch.</translation>
     </message>
 </context>
 <context>

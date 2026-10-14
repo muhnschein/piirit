@@ -345,6 +345,10 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Call back</source>
         <translation>తిరిగి కాల్ చేయి</translation>
     </message>
+    <message>
+        <source>Incoming video call</source>
+        <translation>ఇన్‌కమింగ్ వీడియో కాల్</translation>
+    </message>
 </context>
 <context>
     <name>CallPage</name>
@@ -398,6 +402,10 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Answer</source>
         <extracomment>Answers a call that is ringing. A verb.</extracomment>
         <translation>సమాధానం ఇవ్వు</translation>
+    </message>
+    <message>
+        <source>Incoming video call</source>
+        <translation>ఇన్‌కమింగ్ వీడియో కాల్</translation>
     </message>
 </context>
 <context>
@@ -463,6 +471,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Call %1</source>
         <extracomment>Places a call. %1 is the name of whoever is called.</extracomment>
         <translation>%1 కి కాల్ చేయండి</translation>
+    </message>
+    <message>
+        <source>Video call %1</source>
+        <extracomment>Places a video call. %1 is the name of whoever is called.</extracomment>
+        <translation>%1 కి వీడియో కాల్ చేయండి</translation>
     </message>
 </context>
 <context>
@@ -662,6 +675,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <extracomment>%1 is the label of the unread filter, a button at the right of the search field.</extracomment>
         <translation>అన్ని చాట్‌లను చూపించడానికి &quot;%1&quot;ను నొక్కండి</translation>
     </message>
+    <message>
+        <source>Send to</source>
+        <extracomment>Over the list of chats, when picking the one to send a picture or a video just taken to.</extracomment>
+        <translation>దీనికి పంపు</translation>
+    </message>
 </context>
 <context>
     <name>ChatMediaPage</name>
@@ -842,6 +860,16 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>%1 new</source>
         <extracomment>On the cover, in a pill among the avatars: how many messages are unread. %1 is the number, or &quot;99+&quot;.</extracomment>
         <translation>%1 కొత్తవి</translation>
+    </message>
+    <message>
+        <source>Microphone off</source>
+        <extracomment>On the cover during a call: the reader&apos;s microphone is switched off, so the other end hears nothing.</extracomment>
+        <translation>మైక్రోఫోన్ ఆఫ్</translation>
+    </message>
+    <message>
+        <source>Camera paused</source>
+        <extracomment>On the cover during a video call: the camera sends nothing while the app is in the background, and comes back on when the app is opened.</extracomment>
+        <translation>కెమెరా పాజ్ చేయబడింది</translation>
     </message>
 </context>
 <context>
@@ -1041,6 +1069,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Description</source>
         <extracomment>Label of the text that says what a group or channel is for, on its info page, and the prompt in its empty field.</extracomment>
         <translation>వివరణ</translation>
+    </message>
+    <message>
+        <source>Change picture</source>
+        <extracomment>Pull-down entry on a group&apos;s page: opens the gallery to pick a new picture for the group.</extracomment>
+        <translation>చిత్రాన్ని మార్చు</translation>
     </message>
 </context>
 <context>
@@ -1560,6 +1593,41 @@ Other groups with blocked contacts will still show their messages.</source>
         <extracomment>A quick action on the cover that opens the list of profiles.</extracomment>
         <translation>ప్రొఫైల్‌లు</translation>
     </message>
+    <message>
+        <source>Photo</source>
+        <extracomment>A quick action on the cover that opens the camera to take a photo with the back camera, then asks which chat to send it to.</extracomment>
+        <translation>ఫోటో</translation>
+    </message>
+    <message>
+        <source>Video</source>
+        <extracomment>A quick action on the cover that opens the camera to record a video with the back camera, then asks which chat to send it to.</extracomment>
+        <translation>వీడియో</translation>
+    </message>
+    <message>
+        <source>Selfie</source>
+        <extracomment>A quick action on the cover that opens the camera to take a photo with the front camera, then asks which chat to send it to.</extracomment>
+        <translation>సెల్ఫీ</translation>
+    </message>
+    <message>
+        <source>Selfie video</source>
+        <extracomment>A quick action on the cover that opens the camera to record a video with the front camera, then asks which chat to send it to.</extracomment>
+        <translation>సెల్ఫీ వీడియో</translation>
+    </message>
+    <message>
+        <source>Send right away</source>
+        <extracomment>Under a quick action on the cover that takes a photo or a video: whether it is sent as soon as a chat is picked for it.</extracomment>
+        <translation>వెంటనే పంపు</translation>
+    </message>
+    <message>
+        <source>Sends it as soon as you pick the chat, without a caption.</source>
+        <extracomment>Under &quot;Send right away&quot;. Off, the chat opens with the photo or video on it, ready for a caption and the send button.</extracomment>
+        <translation>చాట్‌ను ఎంచుకున్న వెంటనే శీర్షిక లేకుండా పంపుతుంది.</translation>
+    </message>
+    <message>
+        <source>The photo or video goes out the moment you tap a chat, with no chance to look it over first. Tap the wrong chat by mistake, and it goes there.</source>
+        <extracomment>Asked before &quot;Send right away&quot; is turned on for a camera quick action on the cover.</extracomment>
+        <translation>మీరు చాట్‌ను ట్యాప్ చేసిన క్షణమే ఫోటో లేదా వీడియో పంపబడుతుంది, ముందుగా చూసే అవకాశం ఉండదు. పొరపాటున తప్పు చాట్‌ను ట్యాప్ చేస్తే, అది అక్కడికే వెళ్తుంది.</translation>
+    </message>
 </context>
 <context>
     <name>QuickActionsPage</name>
@@ -2004,16 +2072,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>ఆమోదించిన పరిచయాలకు కాల్ స్క్రీన్ చూపించు</translation>
     </message>
     <message>
-        <source>Enable calls (experimental)</source>
-        <translation>కాల్స్‌ను ప్రారంభించు (ప్రయోగాత్మకం)</translation>
-    </message>
-    <message>
         <source>Runs small apps inside chats.</source>
         <translation>సంభాషణల లోపల చిన్న యాప్‌లను నడుపుతుంది.</translation>
-    </message>
-    <message>
-        <source>Makes and answers voice calls in one-to-one chats.</source>
-        <translation>ఒకరితో ఒకరు సంభాషణలలో వాయిస్ కాల్స్ చేస్తుంది, వాటికి సమాధానం ఇస్తుంది.</translation>
     </message>
 </context>
 <context>

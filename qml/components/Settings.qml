@@ -8,12 +8,11 @@ import Nemo.Configuration 1.0
  * how much of an attachment arrives unasked, how long a message is kept,
  * whether anything is announced at all and if so how much a notification
  * gives away and whether a muted group can still raise one, whether
- * webxdc apps are offered at all, whether calls are and whether one rings
- * here, how many quick actions the cover offers and which, the emoji
- * last reacted with from the picker, and the camera's flash, self-timer
- * and grid. One more key is read and never written: the labels the
- * phone gives the platform camera's lenses, which the camera page's
- * rings wear too.
+ * webxdc apps are offered at all, whether a call rings here, how many
+ * quick actions the cover offers and which, the emoji last reacted with
+ * from the picker, and the camera's flash, self-timer and grid. One more
+ * key is read and never written: the labels the phone gives the platform
+ * camera's lenses, which the camera page's rings wear too.
  *
  * They live in dconf under the app's own path, and every page reads
  * them through this one object: the settings page (qml/pages/
@@ -76,32 +75,37 @@ QtObject {
     /// for, and every one of those three reads this rather than deciding
     /// for itself.
     property alias webxdcEnabled: webxdcEnabledValue.value
-    /// Whether calls are offered: the Calls tile on a contact's page,
-    /// answering one that rings, and calling back from a call's row. Off
-    /// until it is asked for, as apps are.
-    property alias callsEnabled: callsEnabledValue.value
     /// Whether a call from a contact rings here. The reference clients'
-    /// "Calls" notification setting, and on by default as they have it;
-    /// it means something only while calls are on. The core's own
-    /// `who_can_call_me`, applied to every profile.
+    /// "Calls" notification setting, and on by default as they have it.
+    /// The core's own `who_can_call_me`, applied to every profile.
+    ///
+    /// Calls themselves are not a setting: they were an experimental one,
+    /// off until asked for, and are on for everybody now, as they are in
+    /// the reference clients (#119). The old key,
+    /// /apps/harbour-piirit/calls_enabled, is no longer read.
     property alias callsRing: callsRingValue.value
     /// How many quick actions the cover has room for: 1, or 2. With one,
     /// the left action is the one, and what was set up on the right is
     /// kept for when there are two again.
     property alias quickActionCount: quickActionCountValue.value
     /// The cover's quick actions, the left one and the right: what each
-    /// does -- "" for nothing, "chat", "search", "qr", "scan" or
-    /// "profiles" -- and, for a chat, the profile and chat it opens and the
-    /// icon it wears.
+    /// does -- "" for nothing, "chat", "search", "qr", "scan", "profiles",
+    /// or one of the camera's: "photo", "video", "selfie" or
+    /// "selfie-video" -- and, for a chat, the profile and chat it opens and
+    /// the icon it wears; for the camera's, whether what is taken is sent
+    /// as soon as its chat is picked rather than waiting on the chat's
+    /// send button.
     /// qml/js/QuickActions.js reads them.
     property alias quickActionLeft: quickActionLeftValue.value
     property alias quickActionLeftAccount: quickActionLeftAccountValue.value
     property alias quickActionLeftChat: quickActionLeftChatValue.value
     property alias quickActionLeftIcon: quickActionLeftIconValue.value
+    property alias quickActionLeftSendNow: quickActionLeftSendNowValue.value
     property alias quickActionRight: quickActionRightValue.value
     property alias quickActionRightAccount: quickActionRightAccountValue.value
     property alias quickActionRightChat: quickActionRightChatValue.value
     property alias quickActionRightIcon: quickActionRightIconValue.value
+    property alias quickActionRightSendNow: quickActionRightSendNowValue.value
     /// The emoji last reacted with from the reaction picker, newest
     /// first, which it offers before everything else. Only the picker's:
     /// the quick reactions are a tap away already.
@@ -197,16 +201,6 @@ QtObject {
         defaultValue: false
     }
 
-    // Off on a phone that has never been asked, for the reason apps are:
-    // the media half of a call runs in the browser engine, and whether
-    // it holds up on this hardware is still being found out
-    // (docs/CALLS.md).
-    property ConfigurationValue callsEnabledConfig: ConfigurationValue {
-        id: callsEnabledValue
-        key: "/apps/harbour-piirit/calls_enabled"
-        defaultValue: false
-    }
-
     property ConfigurationValue callsRingConfig: ConfigurationValue {
         id: callsRingValue
         key: "/apps/harbour-piirit/calls_ring"
@@ -245,6 +239,12 @@ QtObject {
         defaultValue: ""
     }
 
+    property ConfigurationValue quickActionLeftSendNowConfig: ConfigurationValue {
+        id: quickActionLeftSendNowValue
+        key: "/apps/harbour-piirit/quick_action_left_send_now"
+        defaultValue: false
+    }
+
     property ConfigurationValue quickActionRightConfig: ConfigurationValue {
         id: quickActionRightValue
         key: "/apps/harbour-piirit/quick_action_right"
@@ -267,6 +267,12 @@ QtObject {
         id: quickActionRightIconValue
         key: "/apps/harbour-piirit/quick_action_right_icon"
         defaultValue: ""
+    }
+
+    property ConfigurationValue quickActionRightSendNowConfig: ConfigurationValue {
+        id: quickActionRightSendNowValue
+        key: "/apps/harbour-piirit/quick_action_right_send_now"
+        defaultValue: false
     }
 
     property ConfigurationValue recentReactionsConfig: ConfigurationValue {

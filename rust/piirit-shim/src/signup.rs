@@ -137,7 +137,9 @@ pub(crate) struct Attempts {
 impl Attempts {
     /// Start an attempt, which becomes the one that counts.
     pub(crate) fn begin(self: &Arc<Self>, deadline: Duration) -> Attempt {
-        let id = self.begun.fetch_add(1, Ordering::SeqCst) + 1;
+        // Wrapping, as `fetch_add` itself does; an id only has to differ
+        // from the one before it.
+        let id = self.begun.fetch_add(1, Ordering::SeqCst).wrapping_add(1);
         self.current.store(id, Ordering::SeqCst);
         Attempt {
             id,
@@ -269,9 +271,11 @@ impl Attempt {
             Ok(Err(err)) => Outcome::Failed(err.to_string()),
             Err(_) => {
                 self.wanted.store(false, Ordering::SeqCst);
-                let _ = rpc
-                    .call::<_, ()>("stop_ongoing_process", (account_id,))
-                    .await;
+                // Best effort: the attempt is abandoned whatever the core
+                // answers, and `wanted` already keeps it from landing.
+                rpc.call::<_, ()>("stop_ongoing_process", (account_id,))
+                    .await
+                    .ok();
                 Outcome::TimedOut(u32::try_from(self.deadline.as_secs()).unwrap_or(u32::MAX))
             }
         }
@@ -338,9 +342,10 @@ impl Attempt {
             }
             Err(_) => {
                 self.wanted.store(false, Ordering::SeqCst);
-                let _ = rpc
-                    .call::<_, ()>("stop_ongoing_process", (account_id,))
-                    .await;
+                // Best effort, as for a signup that timed out.
+                rpc.call::<_, ()>("stop_ongoing_process", (account_id,))
+                    .await
+                    .ok();
                 Taken::Refused("stalled")
             }
         }
@@ -519,10 +524,15 @@ async fn transport_addrs(rpc: &RpcClient, account_id: u32) -> Vec<String> {
 /// answer to a code that is not one is about protocols, and the reader
 /// is standing there with a camera.
 async fn from_a_device(rpc: &RpcClient, account_id: u32, qr: &str) -> Result<(), &'static str> {
-    let checked: serde_json::Value = rpc
-        .call("check_qr", (account_id, qr))
-        .await
-        .map_err(|_| "not-a-backup")?;
+    let checked: serde_json::Value =
+        rpc.call("check_qr", (account_id, qr))
+            .await
+            .map_err(|err| {
+                // The reader is told it is not a code to take a profile from;
+                // why the core could not even check it is for the log.
+                eprintln!("piirit: checking a code for a profile: {err}");
+                "not-a-backup"
+            })?;
     match json::str_at(&checked, "kind") {
         "backup2" => Ok(()),
         // The other device runs a newer Delta Chat than this core can
@@ -534,7 +544,11 @@ async fn from_a_device(rpc: &RpcClient, account_id: u32, qr: &str) -> Result<(),
 
 /// Remove a profile that was made after the reader gave up on it.
 pub(crate) async fn discard(rpc: &RpcClient, account_id: u32) {
-    let _ = rpc.call::<_, ()>("remove_account", (account_id,)).await;
+    // Left behind, it is an empty profile in the switcher; nothing the
+    // reader is waiting on, so it is only logged.
+    if let Err(err) = rpc.call::<_, ()>("remove_account", (account_id,)).await {
+        eprintln!("piirit: removing an abandoned profile: {err}");
+    }
 }
 
 /// Set the display name.

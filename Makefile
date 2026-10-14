@@ -7,17 +7,20 @@
 # Qt5 packages (Debian/Ubuntu):
 #   apt install qtbase5-dev qtdeclarative5-dev qtmultimedia5-dev \
 #               qtdeclarative5-dev-tools qml-module-qtquick2 \
-#               qml-module-qtquick-window2 qttools5-dev-tools
+#               qml-module-qtquick-window2 qttools5-dev-tools \
+#               libpulse-dev pulseaudio pulseaudio-utils
 #
 # qml-module-qtquick2 is the QtQuick runtime plugin, which the -dev
 # packages omit; qml-module-qtquick-window2 is QtQuick.Window, which a
 # test shows a window through; qttools5-dev-tools is lupdate and
 # lrelease, for the catalogs, and the app's own test compiles one;
 # qtmultimedia5-dev is QAudioRecorder, which the shim's voice recorder
-# is built on.
+# is built on; libpulse-dev is the call's microphone watch, and
+# pulseaudio and pulseaudio-utils the sound server and recorder its test
+# runs it against.
 
 .PHONY: check test lint fmt qml-lint packaging-lint lockfile-lint doc-lint \
-        msrv deny integration harbour vendor-check fetch-server \
+        msrv deny workflow-lint leak-check integration harbour vendor-check fetch-server \
         sonar-report-test apt-install-test sonar-reports translations \
         cover-icons clean
 
@@ -31,7 +34,7 @@ export QT_QPA_PLATFORM = offscreen
 ## `msrv` fetches a toolchain the first time, so this is not quite
 ## network-free; `deny` needs the advisory database and is CI's job.
 check: fmt lint test doc-lint msrv qml-lint lockfile-lint packaging-lint harbour \
-       sonar-report-test apt-install-test vendor-check deny
+       sonar-report-test apt-install-test vendor-check deny workflow-lint
 
 ## Unit, integration, and Qt event-loop tests.
 ##
@@ -110,12 +113,31 @@ vendor-check:
 ## Licences and advisories, as CI's `deny` job runs them. Needs
 ## `cargo install cargo-deny`, and the advisory database (network).
 ##
-## A missing tool is a skip; a finding is a failure. Two separate commands
-## rather than one `||`, so a SKIP can never be printed over an advisory.
+## A missing tool is a skip; a finding is a failure. An if rather than
+## one `||`, so a SKIP can never be printed over an advisory -- and one
+## shell line, since an `exit 0` ends only the line it is on.
 deny:
-	@command -v cargo-deny >/dev/null 2>&1 || \
-		{ echo "deny: SKIP (cargo-deny not installed)"; exit 0; }
-	cd rust && $(CARGO) deny check
+	@if command -v cargo-deny >/dev/null 2>&1; then \
+		cd rust && $(CARGO) deny check; \
+	else \
+		echo "deny: SKIP (cargo-deny not installed)"; \
+	fi
+
+## The workflows in .github/, through zizmor: template injection, tokens
+## left behind, caches a release trusts. Offline, as CI's gate runs it.
+##   cargo install --locked zizmor      (or: pipx install zizmor)
+workflow-lint:
+	@if command -v zizmor >/dev/null 2>&1; then \
+		zizmor --offline .github/workflows/; \
+	else \
+		echo "workflow-lint: SKIP (zizmor not installed)"; \
+	fi
+
+## Every test under AddressSanitizer and LeakSanitizer, FFmpeg and the C
+## glue included. Slow, and not part of `check`: scheduled.yml runs it
+## weekly. ci/leak-check.sh says what it needs and what it can see.
+leak-check:
+	./ci/leak-check.sh
 
 ## Fetch the pinned upstream deltachat-rpc-server binaries (network).
 fetch-server:
@@ -150,8 +172,9 @@ SONAR_COV_ARGS = --workspace \
 	--ignore-filename-regex '(^|/)(third_party|vendor)/' \
 	--lcov --output-path target/sonar/lcov.info
 
-## sonar-reports: the coverage report SonarQube Cloud imports, written to
-## rust/target/sonar/lcov.info. The scanner does not measure coverage; it
+## sonar-reports: the coverage reports SonarQube Cloud imports, written to
+## rust/target/sonar/lcov.info -- and js-lcov.info, for the call page's
+## bridge, which its tests run in Node (tests/js/). The scanner does not measure coverage; it
 ## only imports what someone else measured, so without this target the
 ## reading is 0.0%.
 ##
@@ -204,6 +227,12 @@ sonar-reports:
 	fi; \
 	cp "$$db" rust/target/sonar/compile_commands.json
 	@echo "== wrote rust/target/sonar/compile_commands.json =="
+	@echo "== JavaScript coverage: the call page's bridge, under Node =="
+	node --test --experimental-test-coverage \
+		--test-reporter=lcov --test-reporter-destination=rust/target/sonar/js-lcov.info \
+		--test-reporter=dot --test-reporter-destination=stdout \
+		tests/js/*.test.js
+	@echo "== wrote rust/target/sonar/js-lcov.info =="
 
 ## The tests that drive the real core, offline. Needs `make fetch-server`.
 integration:

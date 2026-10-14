@@ -349,6 +349,10 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
         <source>Call back</source>
         <translation>Helista tagasi</translation>
     </message>
+    <message>
+        <source>Incoming video call</source>
+        <translation>Saabuv videokõne</translation>
+    </message>
 </context>
 <context>
     <name>CallPage</name>
@@ -402,6 +406,10 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
         <source>Answer</source>
         <extracomment>Answers a call that is ringing. A verb.</extracomment>
         <translation>Vasta</translation>
+    </message>
+    <message>
+        <source>Incoming video call</source>
+        <translation>Saabuv videokõne</translation>
     </message>
 </context>
 <context>
@@ -467,6 +475,11 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
         <source>Call %1</source>
         <extracomment>Places a call. %1 is the name of whoever is called.</extracomment>
         <translation>Helista: %1</translation>
+    </message>
+    <message>
+        <source>Video call %1</source>
+        <extracomment>Places a video call. %1 is the name of whoever is called.</extracomment>
+        <translation>Videokõne: %1</translation>
     </message>
 </context>
 <context>
@@ -666,6 +679,11 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
         <extracomment>%1 is the label of the unread filter, a button at the right of the search field.</extracomment>
         <translation>Kõigi vestluste nägemiseks puuduta „%1“</translation>
     </message>
+    <message>
+        <source>Send to</source>
+        <extracomment>Over the list of chats, when picking the one to send a picture or a video just taken to.</extracomment>
+        <translation>Saada vestlusesse</translation>
+    </message>
 </context>
 <context>
     <name>ChatMediaPage</name>
@@ -846,6 +864,16 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
         <source>%1 new</source>
         <extracomment>On the cover, in a pill among the avatars: how many messages are unread. %1 is the number, or &quot;99+&quot;.</extracomment>
         <translation>%1 uut</translation>
+    </message>
+    <message>
+        <source>Microphone off</source>
+        <extracomment>On the cover during a call: the reader&apos;s microphone is switched off, so the other end hears nothing.</extracomment>
+        <translation>Mikrofon väljas</translation>
+    </message>
+    <message>
+        <source>Camera paused</source>
+        <extracomment>On the cover during a video call: the camera sends nothing while the app is in the background, and comes back on when the app is opened.</extracomment>
+        <translation>Kaamera peatatud</translation>
     </message>
 </context>
 <context>
@@ -1045,6 +1073,11 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
         <source>Description</source>
         <extracomment>Label of the text that says what a group or channel is for, on its info page, and the prompt in its empty field.</extracomment>
         <translation>Kirjeldus</translation>
+    </message>
+    <message>
+        <source>Change picture</source>
+        <extracomment>Pull-down entry on a group&apos;s page: opens the gallery to pick a new picture for the group.</extracomment>
+        <translation>Muuda pilti</translation>
     </message>
 </context>
 <context>
@@ -1564,6 +1597,41 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
         <extracomment>A quick action on the cover that opens the list of profiles.</extracomment>
         <translation>Profiilid</translation>
     </message>
+    <message>
+        <source>Photo</source>
+        <extracomment>A quick action on the cover that opens the camera to take a photo with the back camera, then asks which chat to send it to.</extracomment>
+        <translation>Foto</translation>
+    </message>
+    <message>
+        <source>Video</source>
+        <extracomment>A quick action on the cover that opens the camera to record a video with the back camera, then asks which chat to send it to.</extracomment>
+        <translation>Video</translation>
+    </message>
+    <message>
+        <source>Selfie</source>
+        <extracomment>A quick action on the cover that opens the camera to take a photo with the front camera, then asks which chat to send it to.</extracomment>
+        <translation>Selfie</translation>
+    </message>
+    <message>
+        <source>Selfie video</source>
+        <extracomment>A quick action on the cover that opens the camera to record a video with the front camera, then asks which chat to send it to.</extracomment>
+        <translation>Selfie-video</translation>
+    </message>
+    <message>
+        <source>Send right away</source>
+        <extracomment>Under a quick action on the cover that takes a photo or a video: whether it is sent as soon as a chat is picked for it.</extracomment>
+        <translation>Saada kohe</translation>
+    </message>
+    <message>
+        <source>Sends it as soon as you pick the chat, without a caption.</source>
+        <extracomment>Under &quot;Send right away&quot;. Off, the chat opens with the photo or video on it, ready for a caption and the send button.</extracomment>
+        <translation>Saadab kohe, kui oled vestluse valinud, ilma pealkirjata.</translation>
+    </message>
+    <message>
+        <source>The photo or video goes out the moment you tap a chat, with no chance to look it over first. Tap the wrong chat by mistake, and it goes there.</source>
+        <extracomment>Asked before &quot;Send right away&quot; is turned on for a camera quick action on the cover.</extracomment>
+        <translation>Foto või video saadetakse kohe, kui vestlust puudutad, ilma võimaluseta seda enne üle vaadata. Kui puudutad kogemata vale vestlust, läheb see sinna.</translation>
+    </message>
 </context>
 <context>
     <name>QuickActionsPage</name>
@@ -2008,16 +2076,8 @@ Muude gruppide, kus blokeeritud kontakt on liikmeks, sõnumid saavad jätkuvalt 
         <translation>Näita kinnitatud kontaktide kõnede puhul kõneakent</translation>
     </message>
     <message>
-        <source>Enable calls (experimental)</source>
-        <translation>Luba kõned (katseline)</translation>
-    </message>
-    <message>
         <source>Runs small apps inside chats.</source>
         <translation>Käitab vestlustes väikeseid rakendusi.</translation>
-    </message>
-    <message>
-        <source>Makes and answers voice calls in one-to-one chats.</source>
-        <translation>Teeb ja võtab vastu häälkõnesid üks-ühele vestlustes.</translation>
     </message>
 </context>
 <context>

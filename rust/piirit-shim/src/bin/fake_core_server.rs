@@ -410,6 +410,9 @@ impl State {
     /// not, with the values the real core gives a contact nobody has seen
     /// (`lastSeen` 0): "Old" freshness, which it reserves for key
     /// contacts. Its own contact is never highlighted, so "Normal".
+    ///
+    /// Nobody has a picture, unless `PIIRIT_FAKE_CONTACT_PICTURE` gives
+    /// Ada one: the path the core would hand back for it.
     fn contact_object(&self, contact: u32) -> Option<Value> {
         let address = if contact == SELF {
             "me@example.org"
@@ -439,7 +442,11 @@ impl State {
             "isBot": false,
             "status": if contact == 10 { "Poet and mathematician" } else { "" },
             "color": "#00875a",
-            "profileImage": null,
+            "profileImage": if contact == 10 {
+                std::env::var("PIIRIT_FAKE_CONTACT_PICTURE").ok()
+            } else {
+                None
+            },
             "lastSeen": 0,
             "freshness": if contact == SELF { "Normal" } else { "Old" },
         }))
@@ -2425,8 +2432,7 @@ async fn serve() {
                     let mut items = serde_json::Map::new();
                     for chat in ids {
                         let fresh = u32::try_from(chat)
-                            .ok()
-                            .is_some_and(|chat| state.fresh.contains(&(account, chat)));
+                            .is_ok_and(|chat| state.fresh.contains(&(account, chat)));
                         // A chat holding a draft previews the draft, and
                         // names it in the prefix the row shows in front:
                         // "Draft", and DC_STATE_OUT_DRAFT for the state.
@@ -2557,6 +2563,13 @@ async fn serve() {
                         .as_array()
                         .map(|array| array.iter().filter_map(Value::as_u64).collect())
                         .unwrap_or_default();
+                    // A page of a chat, as it opens, and not the one
+                    // message a send reads back: what a phone takes its
+                    // time over, with a long chat of pictures, while a
+                    // send of its own is answered.
+                    if ids.len() > 1 {
+                        tokio::time::sleep(delay("PIIRIT_FAKE_PAGE_DELAY_MS")).await;
+                    }
                     let mut state = state.lock().await;
                     state.seed_chats();
                     let mut loaded = serde_json::Map::new();

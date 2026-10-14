@@ -348,6 +348,10 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
         <source>Call back</source>
         <translation>Geri ara</translation>
     </message>
+    <message>
+        <source>Incoming video call</source>
+        <translation>Gelen görüntülü arama</translation>
+    </message>
 </context>
 <context>
     <name>CallPage</name>
@@ -401,6 +405,10 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
         <source>Answer</source>
         <extracomment>Answers a call that is ringing. A verb.</extracomment>
         <translation>Yanıtla</translation>
+    </message>
+    <message>
+        <source>Incoming video call</source>
+        <translation>Gelen görüntülü arama</translation>
     </message>
 </context>
 <context>
@@ -465,6 +473,11 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
         <source>Call %1</source>
         <extracomment>Places a call. %1 is the name of whoever is called.</extracomment>
         <translation>Ara: %1</translation>
+    </message>
+    <message>
+        <source>Video call %1</source>
+        <extracomment>Places a video call. %1 is the name of whoever is called.</extracomment>
+        <translation>Görüntülü ara: %1</translation>
     </message>
 </context>
 <context>
@@ -664,6 +677,11 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
         <extracomment>%1 is the label of the unread filter, a button at the right of the search field.</extracomment>
         <translation>Tüm sohbetleri göstermek için &quot;%1&quot; öğesine dokunun</translation>
     </message>
+    <message>
+        <source>Send to</source>
+        <extracomment>Over the list of chats, when picking the one to send a picture or a video just taken to.</extracomment>
+        <translation>Şuraya gönder</translation>
+    </message>
 </context>
 <context>
     <name>ChatMediaPage</name>
@@ -843,6 +861,16 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
         <source>%1 new</source>
         <extracomment>On the cover, in a pill among the avatars: how many messages are unread. %1 is the number, or &quot;99+&quot;.</extracomment>
         <translation>%1 yeni</translation>
+    </message>
+    <message>
+        <source>Microphone off</source>
+        <extracomment>On the cover during a call: the reader&apos;s microphone is switched off, so the other end hears nothing.</extracomment>
+        <translation>Mikrofon kapalı</translation>
+    </message>
+    <message>
+        <source>Camera paused</source>
+        <extracomment>On the cover during a video call: the camera sends nothing while the app is in the background, and comes back on when the app is opened.</extracomment>
+        <translation>Kamera duraklatıldı</translation>
     </message>
 </context>
 <context>
@@ -1040,6 +1068,11 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
         <source>Description</source>
         <extracomment>Label of the text that says what a group or channel is for, on its info page, and the prompt in its empty field.</extracomment>
         <translation>Açıklama</translation>
+    </message>
+    <message>
+        <source>Change picture</source>
+        <extracomment>Pull-down entry on a group&apos;s page: opens the gallery to pick a new picture for the group.</extracomment>
+        <translation>Resmi değiştir</translation>
     </message>
 </context>
 <context>
@@ -1557,6 +1590,41 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
         <extracomment>A quick action on the cover that opens the list of profiles.</extracomment>
         <translation>Profiller</translation>
     </message>
+    <message>
+        <source>Photo</source>
+        <extracomment>A quick action on the cover that opens the camera to take a photo with the back camera, then asks which chat to send it to.</extracomment>
+        <translation>Fotoğraf</translation>
+    </message>
+    <message>
+        <source>Video</source>
+        <extracomment>A quick action on the cover that opens the camera to record a video with the back camera, then asks which chat to send it to.</extracomment>
+        <translation>Video</translation>
+    </message>
+    <message>
+        <source>Selfie</source>
+        <extracomment>A quick action on the cover that opens the camera to take a photo with the front camera, then asks which chat to send it to.</extracomment>
+        <translation>Selfie</translation>
+    </message>
+    <message>
+        <source>Selfie video</source>
+        <extracomment>A quick action on the cover that opens the camera to record a video with the front camera, then asks which chat to send it to.</extracomment>
+        <translation>Selfie videosu</translation>
+    </message>
+    <message>
+        <source>Send right away</source>
+        <extracomment>Under a quick action on the cover that takes a photo or a video: whether it is sent as soon as a chat is picked for it.</extracomment>
+        <translation>Hemen gönder</translation>
+    </message>
+    <message>
+        <source>Sends it as soon as you pick the chat, without a caption.</source>
+        <extracomment>Under &quot;Send right away&quot;. Off, the chat opens with the photo or video on it, ready for a caption and the send button.</extracomment>
+        <translation>Sohbeti seçer seçmez açıklamasız olarak gönderir.</translation>
+    </message>
+    <message>
+        <source>The photo or video goes out the moment you tap a chat, with no chance to look it over first. Tap the wrong chat by mistake, and it goes there.</source>
+        <extracomment>Asked before &quot;Send right away&quot; is turned on for a camera quick action on the cover.</extracomment>
+        <translation>Fotoğraf ya da video, bir sohbete dokunduğunuz anda gönderilir; önce gözden geçirme şansınız olmaz. Yanlışlıkla başka bir sohbete dokunursanız oraya gider.</translation>
+    </message>
 </context>
 <context>
     <name>QuickActionsPage</name>
@@ -2001,16 +2069,8 @@ Engellenen kişilerle olan diğer gruplar, onların iletilerini gösterecek.</tr
         <translation>Kabul edilen kişiler için arama ekranını göster</translation>
     </message>
     <message>
-        <source>Enable calls (experimental)</source>
-        <translation>Aramaları etkinleştir (deneysel)</translation>
-    </message>
-    <message>
         <source>Runs small apps inside chats.</source>
         <translation>Sohbetlerin içinde küçük uygulamalar çalıştırır.</translation>
-    </message>
-    <message>
-        <source>Makes and answers voice calls in one-to-one chats.</source>
-        <translation>Bire bir sohbetlerde sesli arama yapar ve aramaları yanıtlar.</translation>
     </message>
 </context>
 <context>

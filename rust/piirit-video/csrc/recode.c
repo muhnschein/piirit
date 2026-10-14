@@ -195,7 +195,12 @@ struct job {
     x264_picture_t picture;
     int picture_allocated;
     AVFrame *frame;
+    /* What is read off the input. Held by `run` while `take` passes it
+     * on, which is why what the encoders hand back goes in `encoded`:
+     * writing into this one in the middle of that would drop the read
+     * packet's buffer without freeing it. */
     AVPacket *packet;
+    AVPacket *encoded;
     const struct piirit_target *target;
     int64_t last_pts;
     struct sound audio;
@@ -221,6 +226,7 @@ static void job_free(struct job *job)
     av_frame_free(&job->frame);
     av_frame_free(&job->audio.frame);
     av_packet_free(&job->packet);
+    av_packet_free(&job->encoded);
     avformat_close_input(&job->in);
     if (job->out) {
         if (job->out->pb) {
@@ -479,21 +485,21 @@ static int encode_video(struct job *job, x264_picture_t *picture)
     if (size == 0) {
         return PIIRIT_OK;
     }
-    if (av_new_packet(job->packet, size) < 0) {
+    if (av_new_packet(job->encoded, size) < 0) {
         say(job->report.error, job->report.error_len, "out of memory");
         return PIIRIT_FAILED;
     }
     /* x264 lays a frame's units out one after another. */
-    memcpy(job->packet->data, nals[0].p_payload, size);
-    job->packet->pts = encoded.i_pts;
-    job->packet->dts = encoded.i_dts;
+    memcpy(job->encoded->data, nals[0].p_payload, size);
+    job->encoded->pts = encoded.i_pts;
+    job->encoded->dts = encoded.i_dts;
     if (encoded.b_keyframe) {
-        job->packet->flags |= AV_PKT_FLAG_KEY;
+        job->encoded->flags |= AV_PKT_FLAG_KEY;
     }
-    size = write_packet(job, job->packet,
+    size = write_packet(job, job->encoded,
                         job->in->streams[job->video_in]->time_base,
                         job->video_out);
-    av_packet_unref(job->packet);
+    av_packet_unref(job->encoded);
     return size;
 }
 
@@ -562,10 +568,10 @@ static int drain_video(struct job *job)
 static int write_audio_packets(struct job *job)
 {
     int ret;
-    while ((ret = avcodec_receive_packet(job->audio.enc, job->packet)) >= 0) {
-        ret = write_packet(job, job->packet, job->audio.enc->time_base,
+    while ((ret = avcodec_receive_packet(job->audio.enc, job->encoded)) >= 0) {
+        ret = write_packet(job, job->encoded, job->audio.enc->time_base,
                            job->audio.out);
-        av_packet_unref(job->packet);
+        av_packet_unref(job->encoded);
         if (ret != PIIRIT_OK) {
             return ret;
         }
@@ -847,7 +853,8 @@ int piirit_video_recode(const char *input, const char *output,
     job.audio.in = -1;
     job.frame = av_frame_alloc();
     job.packet = av_packet_alloc();
-    if (!job.frame || !job.packet) {
+    job.encoded = av_packet_alloc();
+    if (!job.frame || !job.packet || !job.encoded) {
         say(error, error_len, "out of memory");
         result = PIIRIT_FAILED;
     } else if (target->width <= 0 || target->height <= 0

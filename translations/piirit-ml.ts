@@ -349,6 +349,10 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Call back</source>
         <translation>തിരികെ വിളിക്കുക</translation>
     </message>
+    <message>
+        <source>Incoming video call</source>
+        <translation>ഇൻകമിംഗ് വീഡിയോ കോൾ</translation>
+    </message>
 </context>
 <context>
     <name>CallPage</name>
@@ -402,6 +406,10 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Answer</source>
         <extracomment>Answers a call that is ringing. A verb.</extracomment>
         <translation>മറുപടി നൽകുക</translation>
+    </message>
+    <message>
+        <source>Incoming video call</source>
+        <translation>ഇൻകമിംഗ് വീഡിയോ കോൾ</translation>
     </message>
 </context>
 <context>
@@ -467,6 +475,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Call %1</source>
         <extracomment>Places a call. %1 is the name of whoever is called.</extracomment>
         <translation>%1-നെ വിളിക്കുക</translation>
+    </message>
+    <message>
+        <source>Video call %1</source>
+        <extracomment>Places a video call. %1 is the name of whoever is called.</extracomment>
+        <translation>%1-നെ വീഡിയോ കോൾ ചെയ്യുക</translation>
     </message>
 </context>
 <context>
@@ -666,6 +679,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <extracomment>%1 is the label of the unread filter, a button at the right of the search field.</extracomment>
         <translation>എല്ലാ ചാറ്റുകളും കാണിക്കാൻ &quot;%1&quot; ടാപ്പ് ചെയ്യുക</translation>
     </message>
+    <message>
+        <source>Send to</source>
+        <extracomment>Over the list of chats, when picking the one to send a picture or a video just taken to.</extracomment>
+        <translation>ഇതിലേക്ക് അയയ്ക്കുക</translation>
+    </message>
 </context>
 <context>
     <name>ChatMediaPage</name>
@@ -846,6 +864,16 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>%1 new</source>
         <extracomment>On the cover, in a pill among the avatars: how many messages are unread. %1 is the number, or &quot;99+&quot;.</extracomment>
         <translation>%1 പുതിയത്</translation>
+    </message>
+    <message>
+        <source>Microphone off</source>
+        <extracomment>On the cover during a call: the reader&apos;s microphone is switched off, so the other end hears nothing.</extracomment>
+        <translation>മൈക്രോഫോൺ ഓഫ്</translation>
+    </message>
+    <message>
+        <source>Camera paused</source>
+        <extracomment>On the cover during a video call: the camera sends nothing while the app is in the background, and comes back on when the app is opened.</extracomment>
+        <translation>ക്യാമറ താൽക്കാലികമായി നിർത്തി</translation>
     </message>
 </context>
 <context>
@@ -1045,6 +1073,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Description</source>
         <extracomment>Label of the text that says what a group or channel is for, on its info page, and the prompt in its empty field.</extracomment>
         <translation>വിവരണം</translation>
+    </message>
+    <message>
+        <source>Change picture</source>
+        <extracomment>Pull-down entry on a group&apos;s page: opens the gallery to pick a new picture for the group.</extracomment>
+        <translation>ചിത്രം മാറ്റുക</translation>
     </message>
 </context>
 <context>
@@ -1564,6 +1597,41 @@ Other groups with blocked contacts will still show their messages.</source>
         <extracomment>A quick action on the cover that opens the list of profiles.</extracomment>
         <translation>പ്രൊഫൈലുകൾ</translation>
     </message>
+    <message>
+        <source>Photo</source>
+        <extracomment>A quick action on the cover that opens the camera to take a photo with the back camera, then asks which chat to send it to.</extracomment>
+        <translation>ഫോട്ടോ</translation>
+    </message>
+    <message>
+        <source>Video</source>
+        <extracomment>A quick action on the cover that opens the camera to record a video with the back camera, then asks which chat to send it to.</extracomment>
+        <translation>വീഡിയോ</translation>
+    </message>
+    <message>
+        <source>Selfie</source>
+        <extracomment>A quick action on the cover that opens the camera to take a photo with the front camera, then asks which chat to send it to.</extracomment>
+        <translation>സെൽഫി</translation>
+    </message>
+    <message>
+        <source>Selfie video</source>
+        <extracomment>A quick action on the cover that opens the camera to record a video with the front camera, then asks which chat to send it to.</extracomment>
+        <translation>സെൽഫി വീഡിയോ</translation>
+    </message>
+    <message>
+        <source>Send right away</source>
+        <extracomment>Under a quick action on the cover that takes a photo or a video: whether it is sent as soon as a chat is picked for it.</extracomment>
+        <translation>ഉടൻ അയയ്ക്കുക</translation>
+    </message>
+    <message>
+        <source>Sends it as soon as you pick the chat, without a caption.</source>
+        <extracomment>Under &quot;Send right away&quot;. Off, the chat opens with the photo or video on it, ready for a caption and the send button.</extracomment>
+        <translation>ചാറ്റ് തിരഞ്ഞെടുത്ത ഉടൻ അടിക്കുറിപ്പില്ലാതെ അയയ്ക്കും.</translation>
+    </message>
+    <message>
+        <source>The photo or video goes out the moment you tap a chat, with no chance to look it over first. Tap the wrong chat by mistake, and it goes there.</source>
+        <extracomment>Asked before &quot;Send right away&quot; is turned on for a camera quick action on the cover.</extracomment>
+        <translation>നിങ്ങൾ ഒരു ചാറ്റിൽ ടാപ്പ് ചെയ്യുന്ന നിമിഷം തന്നെ ഫോട്ടോയോ വീഡിയോയോ അയയ്ക്കപ്പെടും, ആദ്യം നോക്കാൻ അവസരമില്ല. അബദ്ധത്തിൽ തെറ്റായ ചാറ്റിൽ ടാപ്പ് ചെയ്താൽ അത് അവിടേക്ക് പോകും.</translation>
+    </message>
 </context>
 <context>
     <name>QuickActionsPage</name>
@@ -2008,16 +2076,8 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation>സ്വീകരിച്ച കോൺടാക്റ്റുകൾക്കായി കോൾ സ്ക്രീൻ കാണിക്കുക</translation>
     </message>
     <message>
-        <source>Enable calls (experimental)</source>
-        <translation>കോളുകൾ പ്രവർത്തനക്ഷമമാക്കുക (പരീക്ഷണാത്മകം)</translation>
-    </message>
-    <message>
         <source>Runs small apps inside chats.</source>
         <translation>സംഭാഷണങ്ങൾക്കുള്ളിൽ ചെറിയ ആപ്പുകൾ പ്രവർത്തിപ്പിക്കുന്നു.</translation>
-    </message>
-    <message>
-        <source>Makes and answers voice calls in one-to-one chats.</source>
-        <translation>ഒരാളുമായുള്ള സംഭാഷണങ്ങളിൽ വോയ്സ് കോളുകൾ ചെയ്യുകയും അവയ്ക്ക് മറുപടി നൽകുകയും ചെയ്യുന്നു.</translation>
     </message>
 </context>
 <context>

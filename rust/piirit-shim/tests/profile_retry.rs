@@ -136,7 +136,7 @@ fn a_relay_given_up_on_is_neither_reused_nor_kept() {
         }
     });
 
-    let engine_ptr = &engine as *const QmlEngine;
+    let engine_ptr: *const QmlEngine = &engine;
     single_shot(Duration::from_secs(11), move || {
         // SAFETY: see tests/smoke.rs -- the callback only fires while
         // `exec()` is still running on this thread.

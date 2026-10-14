@@ -158,11 +158,24 @@ pub fn shutdown() {
     };
     let (done_tx, done_rx) = std::sync::mpsc::channel::<()>();
     runtime.spawn(async move {
-        let _ = tokio::time::timeout(CALL_END_TIMEOUT, crate::call_host::end_all()).await;
-        let _ = rpc.shutdown().await;
-        let _ = done_tx.send(());
+        // A call that will not end in time is left to the server's exit.
+        if tokio::time::timeout(CALL_END_TIMEOUT, crate::call_host::end_all())
+            .await
+            .is_err()
+        {
+            eprintln!("piirit: a call did not end in time; stopping the core anyway");
+        }
+        if let Err(err) = rpc.shutdown().await {
+            eprintln!("piirit: stopping the core: {err}");
+        }
+        // The receiver is gone only if the wait below already gave up.
+        done_tx.send(()).ok();
     });
-    let _ = done_rx.recv_timeout(CALL_END_TIMEOUT + SHUTDOWN_TIMEOUT);
+    // Either answer ends the wait; a timeout means quitting without the
+    // goodbye, which is what the timeout is for.
+    done_rx
+        .recv_timeout(CALL_END_TIMEOUT.saturating_add(SHUTDOWN_TIMEOUT))
+        .ok();
 }
 
 /// The last few lines the server wrote to stderr, as one message, or
@@ -176,7 +189,7 @@ fn last_words(tail: &[String]) -> Option<String> {
     let start = tail.len().saturating_sub(KEEP);
     Some(format!(
         "the core's last output was: {}",
-        tail[start..].join(" | ")
+        tail.get(start..).unwrap_or(tail).join(" | ")
     ))
 }
 
@@ -556,7 +569,7 @@ impl DeltaChatCore {
     /// in here. So every mutation below is scoped to a callback, and every
     /// signal is emitted with no borrow held.
     fn spawn_server(ptr: QPointer<Self>, path: String, runtime: CoreRuntime, stock: StockStrings) {
-        let started_ptr = ptr.clone();
+        let started_ptr = ptr;
         let retry_path = path.clone();
         let started = queued_callback(move |result: Result<Arc<RpcClient>, String>| {
             let Some(this) = started_ptr.as_pinned() else {
@@ -678,7 +691,7 @@ impl DeltaChatCore {
                 None
             } else {
                 let delay = restart_delay(this_mut.restart_attempt);
-                this_mut.restart_attempt += 1;
+                this_mut.restart_attempt = this_mut.restart_attempt.saturating_add(1);
                 this_mut.status = QString::from("reconnecting");
                 Some((delay, runtime, this_mut.stock_strings.clone()))
             }
@@ -755,7 +768,7 @@ impl DeltaChatCore {
                     std::env::var("HOME")
                         .map(|home| std::path::PathBuf::from(home).join(".local/share"))
                 })
-                .map_err(|_| "neither XDG_DATA_HOME nor HOME is set".to_string())?;
+                .map_err(|err| format!("neither XDG_DATA_HOME nor HOME is set: {err}"))?;
             let dir = base.join("piirit/piirit/accounts");
             Self::adopt_legacy_accounts(&base.join("postivene/postivene/accounts"), &dir);
             dir
@@ -802,7 +815,13 @@ impl DeltaChatCore {
         if std::fs::create_dir_all(parent).is_ok() {
             // A failure here leaves the old directory untouched, which is
             // the right way to fail: the account is still there to move.
-            let _ = std::fs::rename(legacy, wanted);
+            if let Err(err) = std::fs::rename(legacy, wanted) {
+                eprintln!(
+                    "piirit: could not move the old profiles from {} to {}: {err}",
+                    legacy.display(),
+                    wanted.display()
+                );
+            }
         }
     }
 
@@ -935,7 +954,7 @@ impl DeltaChatCore {
 
         runtime.spawn(async move {
             let result = rpc
-                .call_unit::<std::collections::BTreeMap<String, String>>("get_system_info")
+                .call_unit::<BTreeMap<String, String>>("get_system_info")
                 .await
                 .map(|info| serde_json::to_string(&info).unwrap_or_default())
                 .map_err(|err| err.to_string());
@@ -1386,7 +1405,9 @@ impl DeltaChatCore {
             return;
         };
         runtime.spawn(async move {
-            let _ = rpc.call_unit::<()>("maybe_network").await;
+            // A hint, not a request: a core that cannot take it now
+            // reconsiders the network on its own schedule anyway.
+            rpc.call_unit::<()>("maybe_network").await.ok();
         });
     }
 
@@ -1456,9 +1477,9 @@ impl DeltaChatCore {
             // Fire and forget: the UI reacts to the core's final
             // ConfigureProgress(0), not to this call's return.
             for account_id in held {
-                let _ = rpc
-                    .call::<_, ()>("stop_ongoing_process", (account_id,))
-                    .await;
+                rpc.call::<_, ()>("stop_ongoing_process", (account_id,))
+                    .await
+                    .ok();
             }
         });
     }
@@ -1619,7 +1640,9 @@ impl DeltaChatCore {
                 Taken::Done(account_id) if wanted => {
                     if let Some((rpc, runtime)) = this.borrow().connection() {
                         runtime.spawn(async move {
-                            let _ = start_io(&rpc, Some(account_id)).await;
+                            if let Err(err) = start_io(&rpc, Some(account_id)).await {
+                                eprintln!("piirit: starting IO for a restored profile: {err}");
+                            }
                         });
                     }
                     this.borrow_mut().refresh_accounts();
@@ -1698,7 +1721,7 @@ fn parse_stock_strings(text: &str) -> Result<BTreeMap<u32, String>, String> {
         .map(|(id, value)| {
             id.parse::<u32>()
                 .map(|id| (id, value))
-                .map_err(|_| format!("{id:?} is not a stock string id"))
+                .map_err(|err| format!("{id:?} is not a stock string id: {err}"))
         })
         .collect()
 }

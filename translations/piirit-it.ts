@@ -349,6 +349,10 @@ Gli altri gruppi con contatti bloccati continueranno a visualizzare i loro messa
         <source>Call back</source>
         <translation>Richiama</translation>
     </message>
+    <message>
+        <source>Incoming video call</source>
+        <translation>Videochiamata in arrivo</translation>
+    </message>
 </context>
 <context>
     <name>CallPage</name>
@@ -402,6 +406,10 @@ Gli altri gruppi con contatti bloccati continueranno a visualizzare i loro messa
         <source>Answer</source>
         <extracomment>Answers a call that is ringing. A verb.</extracomment>
         <translation>Rispondi</translation>
+    </message>
+    <message>
+        <source>Incoming video call</source>
+        <translation>Videochiamata in arrivo</translation>
     </message>
 </context>
 <context>
@@ -467,6 +475,11 @@ Gli altri gruppi con contatti bloccati continueranno a visualizzare i loro messa
         <source>Call %1</source>
         <extracomment>Places a call. %1 is the name of whoever is called.</extracomment>
         <translation>Chiama %1</translation>
+    </message>
+    <message>
+        <source>Video call %1</source>
+        <extracomment>Places a video call. %1 is the name of whoever is called.</extracomment>
+        <translation>Videochiamata a %1</translation>
     </message>
 </context>
 <context>
@@ -666,6 +679,11 @@ Gli altri gruppi con contatti bloccati continueranno a visualizzare i loro messa
         <extracomment>%1 is the label of the unread filter, a button at the right of the search field.</extracomment>
         <translation>Tocca «%1» per mostrare tutte le chat</translation>
     </message>
+    <message>
+        <source>Send to</source>
+        <extracomment>Over the list of chats, when picking the one to send a picture or a video just taken to.</extracomment>
+        <translation>Invia a</translation>
+    </message>
 </context>
 <context>
     <name>ChatMediaPage</name>
@@ -846,6 +864,16 @@ Gli altri gruppi con contatti bloccati continueranno a visualizzare i loro messa
         <source>%1 new</source>
         <extracomment>On the cover, in a pill among the avatars: how many messages are unread. %1 is the number, or &quot;99+&quot;.</extracomment>
         <translation>%1 nuovi</translation>
+    </message>
+    <message>
+        <source>Microphone off</source>
+        <extracomment>On the cover during a call: the reader&apos;s microphone is switched off, so the other end hears nothing.</extracomment>
+        <translation>Microfono disattivato</translation>
+    </message>
+    <message>
+        <source>Camera paused</source>
+        <extracomment>On the cover during a video call: the camera sends nothing while the app is in the background, and comes back on when the app is opened.</extracomment>
+        <translation>Fotocamera in pausa</translation>
     </message>
 </context>
 <context>
@@ -1045,6 +1073,11 @@ Gli altri gruppi con contatti bloccati continueranno a visualizzare i loro messa
         <source>Description</source>
         <extracomment>Label of the text that says what a group or channel is for, on its info page, and the prompt in its empty field.</extracomment>
         <translation>Descrizione</translation>
+    </message>
+    <message>
+        <source>Change picture</source>
+        <extracomment>Pull-down entry on a group&apos;s page: opens the gallery to pick a new picture for the group.</extracomment>
+        <translation>Cambia immagine</translation>
     </message>
 </context>
 <context>
@@ -1564,6 +1597,41 @@ Gli altri gruppi con contatti bloccati continueranno a visualizzare i loro messa
         <extracomment>A quick action on the cover that opens the list of profiles.</extracomment>
         <translation>Profili</translation>
     </message>
+    <message>
+        <source>Photo</source>
+        <extracomment>A quick action on the cover that opens the camera to take a photo with the back camera, then asks which chat to send it to.</extracomment>
+        <translation>Foto</translation>
+    </message>
+    <message>
+        <source>Video</source>
+        <extracomment>A quick action on the cover that opens the camera to record a video with the back camera, then asks which chat to send it to.</extracomment>
+        <translation>Video</translation>
+    </message>
+    <message>
+        <source>Selfie</source>
+        <extracomment>A quick action on the cover that opens the camera to take a photo with the front camera, then asks which chat to send it to.</extracomment>
+        <translation>Selfie</translation>
+    </message>
+    <message>
+        <source>Selfie video</source>
+        <extracomment>A quick action on the cover that opens the camera to record a video with the front camera, then asks which chat to send it to.</extracomment>
+        <translation>Video selfie</translation>
+    </message>
+    <message>
+        <source>Send right away</source>
+        <extracomment>Under a quick action on the cover that takes a photo or a video: whether it is sent as soon as a chat is picked for it.</extracomment>
+        <translation>Invia subito</translation>
+    </message>
+    <message>
+        <source>Sends it as soon as you pick the chat, without a caption.</source>
+        <extracomment>Under &quot;Send right away&quot;. Off, the chat opens with the photo or video on it, ready for a caption and the send button.</extracomment>
+        <translation>Invia subito dopo aver scelto la chat, senza didascalia.</translation>
+    </message>
+    <message>
+        <source>The photo or video goes out the moment you tap a chat, with no chance to look it over first. Tap the wrong chat by mistake, and it goes there.</source>
+        <extracomment>Asked before &quot;Send right away&quot; is turned on for a camera quick action on the cover.</extracomment>
+        <translation>La foto o il video parte nel momento in cui tocchi una chat, senza possibilità di controllarlo prima. Se tocchi per errore la chat sbagliata, finisce lì.</translation>
+    </message>
 </context>
 <context>
     <name>QuickActionsPage</name>
@@ -2008,16 +2076,8 @@ Gli altri gruppi con contatti bloccati continueranno a visualizzare i loro messa
         <translation>Mostra la schermata di chiamata per i contatti accettati</translation>
     </message>
     <message>
-        <source>Enable calls (experimental)</source>
-        <translation>Abilita le chiamate (sperimentale)</translation>
-    </message>
-    <message>
         <source>Runs small apps inside chats.</source>
         <translation>Esegue piccole app all&apos;interno delle chat.</translation>
-    </message>
-    <message>
-        <source>Makes and answers voice calls in one-to-one chats.</source>
-        <translation>Effettua e risponde alle chiamate vocali nelle chat individuali.</translation>
     </message>
 </context>
 <context>

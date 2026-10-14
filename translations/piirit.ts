@@ -344,6 +344,10 @@ Other groups with blocked contacts will still show their messages.</source>
         <source>Call back</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Incoming video call</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>CallPage</name>
@@ -396,6 +400,10 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Answer</source>
         <extracomment>Answers a call that is ringing. A verb.</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Incoming video call</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -460,6 +468,11 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Call %1</source>
         <extracomment>Places a call. %1 is the name of whoever is called.</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Video call %1</source>
+        <extracomment>Places a video call. %1 is the name of whoever is called.</extracomment>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -660,6 +673,11 @@ Other groups with blocked contacts will still show their messages.</source>
         <extracomment>%1 is the label of the unread filter, a button at the right of the search field.</extracomment>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Send to</source>
+        <extracomment>Over the list of chats, when picking the one to send a picture or a video just taken to.</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ChatMediaPage</name>
@@ -838,6 +856,16 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>%1 new</source>
         <extracomment>On the cover, in a pill among the avatars: how many messages are unread. %1 is the number, or &quot;99+&quot;.</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Microphone off</source>
+        <extracomment>On the cover during a call: the reader&apos;s microphone is switched off, so the other end hears nothing.</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Camera paused</source>
+        <extracomment>On the cover during a video call: the camera sends nothing while the app is in the background, and comes back on when the app is opened.</extracomment>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1035,6 +1063,11 @@ Other groups with blocked contacts will still show their messages.</source>
     <message>
         <source>Description</source>
         <extracomment>Label of the text that says what a group or channel is for, on its info page, and the prompt in its empty field.</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Change picture</source>
+        <extracomment>Pull-down entry on a group&apos;s page: opens the gallery to pick a new picture for the group.</extracomment>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1553,6 +1586,41 @@ Other groups with blocked contacts will still show their messages.</source>
         <extracomment>A quick action on the cover that opens the list of profiles.</extracomment>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Photo</source>
+        <extracomment>A quick action on the cover that opens the camera to take a photo with the back camera, then asks which chat to send it to.</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Video</source>
+        <extracomment>A quick action on the cover that opens the camera to record a video with the back camera, then asks which chat to send it to.</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Selfie</source>
+        <extracomment>A quick action on the cover that opens the camera to take a photo with the front camera, then asks which chat to send it to.</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Selfie video</source>
+        <extracomment>A quick action on the cover that opens the camera to record a video with the front camera, then asks which chat to send it to.</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Send right away</source>
+        <extracomment>Under a quick action on the cover that takes a photo or a video: whether it is sent as soon as a chat is picked for it.</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sends it as soon as you pick the chat, without a caption.</source>
+        <extracomment>Under &quot;Send right away&quot;. Off, the chat opens with the photo or video on it, ready for a caption and the send button.</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The photo or video goes out the moment you tap a chat, with no chance to look it over first. Tap the wrong chat by mistake, and it goes there.</source>
+        <extracomment>Asked before &quot;Send right away&quot; is turned on for a camera quick action on the cover.</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QuickActionsPage</name>
@@ -1997,15 +2065,7 @@ Other groups with blocked contacts will still show their messages.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Enable calls (experimental)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Runs small apps inside chats.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Makes and answers voice calls in one-to-one chats.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

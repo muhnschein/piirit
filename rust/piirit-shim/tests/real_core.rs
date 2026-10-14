@@ -206,7 +206,7 @@ fn the_real_core_accepts_the_shapes_we_send() {
         }
     });
 
-    let engine_ptr = &engine as *const QmlEngine;
+    let engine_ptr: *const QmlEngine = &engine;
     single_shot(Duration::from_secs(20), move || {
         // SAFETY: see tests/smoke.rs.
         unsafe {

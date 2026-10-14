@@ -3,6 +3,7 @@ import Nemo.Notifications 1.0
 import Nemo.DBus 2.0
 import Nemo.KeepAlive 1.2
 import Piirit 1.0
+import "."
 
 /*
  * The app's one call: the window's, because a call belongs to no page.
@@ -19,22 +20,22 @@ import Piirit 1.0
  * - It rings with the phone's own VoIP ringtone, played by the feedback
  *   daemon (ngfd) that plays every sound the phone makes: the tone, the
  *   volume and the silent profile are the reader's own settings, and it
- *   stops when told or when the app goes.
- * - It tells the display daemon (mce) that a call is ringing, and then
- *   that one is up: the screen comes on for a call as it does for a
- *   phone call, and mce treats the phone as being in one. mce forgets
- *   it by itself if the app goes.
- * - It raises a notification the lock screen shows, with Decline and
- *   Answer on it, and brings the app forward.
+ *   stops when told or when the app goes. Other apps' music pauses while
+ *   it rings, as it does for a phone call (CallAudio.qml).
+ * - It tells the display daemon (mce) that a call is ringing -- once
+ *   the ringtone has been picked, which mce's call state would turn into
+ *   a call-waiting beep -- and then that one is up: the screen comes on
+ *   for a call as it does for a phone call, and mce treats the phone as
+ *   being in one. mce forgets it by itself if the app goes.
+ * - Once the screen is on, it takes the lock screen off and brings the
+ *   app forward, so the call's page is what the reader sees. It raises a
+ *   notification too, with Decline and Answer on it, for a phone whose
+ *   device lock keeps the page behind it.
  * - It keeps the phone awake while a call is up: a phone that suspends
  *   with its screen off takes the call's sound with it.
  * - A call that rang unanswered stays behind in the notification area as
  *   a missed call, in the phone's own category for one, with Call back
  *   on it.
- *
- * Only while calls are on (`enabled`, which the window binds to the
- * setting); a call already under way is followed to its end whatever
- * the setting has become meanwhile.
  */
 Item {
     id: center
@@ -55,8 +56,30 @@ Item {
     /// The page the call is shown on, while it is on the stack.
     property Item page: null
 
+    /// A page was wanted while the last call's page was still on its way
+    /// out, and is still owed: pushed once that page has gone, whatever
+    /// the call has become by then. A call can ring and be declined in
+    /// that window, and its page still says so (#110).
+    property bool pageOwed: false
+
     /// The ringtone playing, as ngfd numbers it; 0 for none.
     property int ringId: 0
+
+    /// ngfd has picked the ringtone for the call ringing now, or has
+    /// been given long enough to: mce may be told the call is ringing.
+    /// Not before. ngfd follows mce's call state, and the phone's
+    /// `voip_ringtone` event plays a short call-waiting beep rather than
+    /// the ringtone when mce already says a call is on -- ringing counts
+    /// -- at the moment it is played (#98).
+    property bool ringSettled: false
+
+    /// The ringtone for this call has fallen back from `voip_ringtone`
+    /// to the phone's own `ringtone`, which is tried once.
+    property bool ringFellBack: false
+
+    /// The lock screen is to be taken off for this call once the screen
+    /// is on, so its page is what the reader sees (#99).
+    property bool unlockWanted: false
 
     /// Bring the app forward. The window connects this to `activate`.
     signal raise()
@@ -67,29 +90,39 @@ Item {
     Call {
         id: call
         objectName: "call"
+        // Which back camera is the main lens, as the platform camera
+        // labels them.
+        back_lenses: String(Settings.backLensLabels)
         onRinging: center.ring()
         onEnded: center.over(reason)
         onError: center.errorMessage = message
     }
 
+    /// The app is not the one in front. The camera is let go meanwhile,
+    /// and the pictures are not drawn (calls.rs, `set_background`). Not
+    /// read-only: a test, which has no app in front, says it is.
+    property bool away: Qt.application.state !== Qt.ApplicationActive
+    onAwayChanged: call.set_background(center.away)
+    Component.onCompleted: call.set_background(center.away)
+
+    /// Pictures are on the call's screen: the reader is watching it.
+    readonly property bool watching: center.busy && (call.local_video || call.remote_video)
+
     Connections {
         target: core
         // Qt 5.6 handler syntax; see WelcomePage.qml.
         onCore_event: {
-            if (center.enabled || center.busy) {
-                call.handle_event(context_id, kind, payload_json)
-            }
+            call.handle_event(context_id, kind, payload_json)
         }
     }
 
-    /// Call a chat. False when the app is in a call already, which the
-    /// caller says to the reader.
-    function place(accountId, chatId) {
+    /// Call a chat, with the camera on for a video call. False when the
+    /// app is in a call already, which the caller says to the reader.
+    function place(accountId, chatId, video) {
         if (center.busy) {
             return false
         }
-        // Audio only: see calls.rs.
-        if (!call.place(accountId, chatId, false)) {
+        if (!call.place(accountId, chatId, video === true)) {
             return false
         }
         center.show()
@@ -112,6 +145,11 @@ Item {
             return
         }
         if (center.page !== null && center.stack !== null) {
+            // The last call's page, still going: this call's comes once
+            // it has gone. Not this call's own page, which is shown.
+            if (center.page.leaving === true) {
+                center.pageOwed = true
+            }
             return
         }
         pushLater.restart()
@@ -119,6 +157,7 @@ Item {
 
     /// A call came in: ring, and show it.
     function ring() {
+        center.unlockWanted = true
         center.raise()
         center.show()
         ringNote.ring()
@@ -132,17 +171,61 @@ Item {
         if (center.ringId !== 0) {
             return
         }
+        center.ringFellBack = false
+        // Should ngfd not answer, mce is told all the same, a moment
+        // later: the screen coming on matters more than the tone.
+        ringSettle.restart()
+        center.play("voip_ringtone", {})
+    }
+
+    /// Play a ringtone event, and keep the number ngfd gives it.
+    function play(event, properties) {
         feedback.typedCall("Play", [
-            { "type": "s", "value": "voip_ringtone" },
-            { "type": "a{sv}", "value": {} }
+            { "type": "s", "value": event },
+            { "type": "a{sv}", "value": properties }
         ], function (id) {
-            // Stopped before ngfd had answered: stopped at once.
-            if (call.state === "ringing") {
-                center.ringId = id
-            } else {
+            center.settleRing()
+            if (call.state !== "ringing") {
+                // Stopped before ngfd had answered: stopped at once.
                 center.stopRinging(id)
+            } else if (id === 0) {
+                // Refused: no such event on this phone.
+                center.fallBack()
+            } else {
+                center.ringId = id
             }
-        }, function () {})
+        }, function () {
+            center.settleRing()
+        })
+    }
+
+    /// The phone's own ringtone, as voicecall plays it for a call that
+    /// is not a SIM call: for a phone whose `voip_ringtone` would not
+    /// play. Once per call.
+    function fallBack() {
+        if (center.ringFellBack || call.state !== "ringing") {
+            return
+        }
+        center.ringFellBack = true
+        center.ringId = 0
+        center.play("ringtone", { "type": "voip" })
+    }
+
+    /// ngfd has had its say about the ringtone: mce may be told now. Only
+    /// for a call still ringing; an answer that comes after the call has
+    /// gone is not the next call's.
+    function settleRing() {
+        ringSettle.stop()
+        if (call.state === "ringing") {
+            center.ringSettled = true
+        }
+    }
+
+    Timer {
+        id: ringSettle
+        objectName: "ringSettle"
+        interval: 1000
+        onTriggered: center.settleRing()
     }
 
     /// Stop the ringtone, the one playing or the one named.
@@ -195,8 +278,9 @@ Item {
                 return
             }
             pushLater.stop()
+            center.pageOwed = false
             var shown = center.stack.push(Qt.resolvedUrl("../pages/CallPage.qml"),
-                                          { call: call })
+                                          { call: call, audio: callAudio })
             if (shown) {
                 center.page = shown
             }
@@ -211,11 +295,14 @@ Item {
     }
 
     // And pushed now, for a call that came in while the last page was on
-    // its way out: it was not shown then, the old page being there. A
+    // its way out: it was not shown then, the old page being there. Also
+    // for one that has ended meanwhile -- rang and was declined before
+    // the old page had gone -- which is owed its page all the same. A
     // page that has gone reads as null here whether or not the handler
     // above ran.
     onPageChanged: {
-        if (center.page === null && center.busy) {
+        if (center.page === null && (center.busy || center.pageOwed)) {
+            center.pageOwed = false
             center.show()
         }
     }
@@ -230,6 +317,9 @@ Item {
                 // whichever way that happened.
                 center.stopRinging()
                 ringNote.withdraw()
+                ringSettle.stop()
+                center.ringSettled = false
+                center.unlockWanted = false
             } else if (center.page === null) {
                 // A call taken up from its row is ringing without having
                 // rung: shown, and nothing more.
@@ -250,11 +340,24 @@ Item {
         service: "com.nokia.NonGraphicFeedback1.Backend"
         path: "/com/nokia/NonGraphicFeedback1"
         iface: "com.nokia.NonGraphicFeedback1"
+        signalsEnabled: true
+
+        // ngfd's Status signal: what became of an event it is playing, 0
+        // being "failed". The VoIP ringtone failing while the call still
+        // rings falls back to the phone's own ringtone. `rc` and the
+        // signal's own name: a QML function cannot begin with a capital,
+        // and `status` is taken by the interface's own property.
+        function rcStatus(id, status) {
+            if (status === 0 && id !== 0 && id === center.ringId) {
+                center.fallBack()
+            }
+        }
     }
 
     /// What mce is told about the call: "ringing" while it rings here,
     /// "active" while one is up either way, "none" otherwise.
-    readonly property string mceState: call.state === "ringing" ? "ringing"
+    readonly property string mceState: call.state === "ringing"
+                                       ? (center.ringSettled ? "ringing" : "none")
                                        : center.busy ? "active" : "none"
     /// Whether mce has been told anything, so that the first "none" --
     /// the app starting -- is not sent for nothing.
@@ -269,6 +372,32 @@ Item {
             { "type": "s", "value": center.mceState },
             { "type": "s", "value": "normal" }
         ], function () {}, function () {})
+        if (center.mceState === "ringing") {
+            // Lit already, mce says nothing more about the screen: asked.
+            mce.typedCall("get_display_status", [], function (status) {
+                center.displayIs(status)
+            }, function () {})
+        }
+    }
+
+    /// The screen is on, off or dimmed, as mce says it. On, with a call
+    /// ringing here, the lock screen is taken off: raised behind it, the
+    /// call's page is shown for a moment and then covered again (#99).
+    /// mce turns the screen on for a ringing call, and takes the lock
+    /// off only once it is on -- so a phone held in a pocket, whose
+    /// screen mce keeps off, stays locked. mce puts the lock back once
+    /// the call is over, as it does for a phone call. A device lock, a
+    /// code or a fingerprint, is not touched: the phone asks for it, and
+    /// the call's page is behind it.
+    function displayIs(status) {
+        if (status !== "on" || !center.unlockWanted || call.state !== "ringing") {
+            return
+        }
+        center.unlockWanted = false
+        mce.typedCall("req_tklock_mode_change", [
+            { "type": "s", "value": "unlocked" }
+        ], function () {}, function () {})
+        center.raise()
     }
 
     // mce, on the system bus: the display, the lock and the proximity
@@ -283,6 +412,49 @@ Item {
         iface: "com.nokia.mce.request"
     }
 
+    // mce's signals: the screen going on, for a call ringing while it was
+    // off.
+    DBusInterface {
+        objectName: "mceSignals"
+        bus: DBus.SystemBus
+        service: "com.nokia.mce"
+        path: "/com/nokia/mce/signal"
+        iface: "com.nokia.mce.signal"
+        signalsEnabled: true
+
+        function display_status_ind(status) {
+            center.displayIs(status)
+        }
+    }
+
+    // Where the call's sound comes out: the earpiece for a voice call,
+    // the loudspeaker for a video call, and whichever the reader switches
+    // to. Looked after from when the call carries sound -- placed, or
+    // answered -- until it is over; the call's page waits for it
+    // (CallPage.qml), and shuts its microphone while the sound moves.
+    // While the call rings, other apps' music gives way to it.
+    CallAudio {
+        id: callAudio
+        objectName: "callAudio"
+        talking: center.busy && call.state !== "ringing"
+        ringing: call.state === "ringing"
+        video: call.has_video
+        watching: center.watching
+        appId: call.audio_id()
+        micKnown: micWatch.known
+        micOpen: micWatch.open
+        onMicWantedChanged: call.set_microphone(callAudio.micWanted)
+    }
+
+    // Whether a microphone of the app's is open, as PulseAudio itself
+    // says: what the call's sound waits for before it moves. Connected
+    // only while there may be one.
+    MicWatch {
+        id: micWatch
+        objectName: "micWatch"
+        active: callAudio.talking || callAudio.open
+    }
+
     // Awake while a call is up: a phone that suspends takes the call's
     // sound with it. Lit while one rings, which is when the reader has
     // to see it.
@@ -291,9 +463,11 @@ Item {
         enabled: center.busy
     }
 
+    // And lit while pictures are on it: nobody touches the screen
+    // through a video call, and it is not held to the ear.
     DisplayBlanking {
         objectName: "callDisplay"
-        preventBlanking: call.state === "ringing"
+        preventBlanking: call.state === "ringing" || center.watching
     }
 
     // A tap on either notification comes back here. On a path of its own
@@ -372,8 +546,10 @@ Item {
 
         function ring() {
             ringNote.summary = call.peer_name
-            // A phone first: the line says it is a call before it is read.
-            ringNote.body = "📞 " + qsTr("Incoming call")
+            // A phone or a camera first: the line says what kind of call
+            // it is before it is read.
+            ringNote.body = call.has_video ? "🎥 " + qsTr("Incoming video call")
+                                           : "📞 " + qsTr("Incoming call")
             ringNote.previewSummary = ringNote.summary
             ringNote.previewBody = ringNote.body
             ringNote.timestamp = new Date()
