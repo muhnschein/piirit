@@ -21,8 +21,14 @@ import "../js/Format.js" as Format
  * Laid out by bindings rather than a Column, for the same reason
  * MessageDelegate is: a positioner sizes itself in a polish pass, which
  * never runs headlessly, so a row built from one cannot be measured. Every
- * renderer sits at y 0 and is zero-high when it is not the one showing, so
- * the height is their sum.
+ * renderer sits at y 0, and the height is the one that is there.
+ *
+ * Each kind's renderer is behind a Loader of its own, active only for that
+ * kind. A row is built for every message scrolled past, and a picture row
+ * that also built a sound player, a poster, a contact card and an app card
+ * -- all of them unseen -- was about forty objects more than it draws, and
+ * the sound player alone a media pipeline. The sound player is a step
+ * further back still: it is made on the first press of play.
  */
 Item {
     id: root
@@ -48,6 +54,16 @@ Item {
     /// while the chat was open, or was unread when it was opened. The only
     /// GIFs that play by themselves.
     property bool isNew: false
+    /// How long a sound is, in milliseconds, when the core knows: the
+    /// sending client writes it in for a recording, and the core reads
+    /// nothing out of a file it is merely handed, so it is often 0. What
+    /// the row says before the player has been made, which is until the
+    /// reader first presses play.
+    property int durationMs: 0
+    /// The list this sits in is being dragged or flicked. A GIF holds its
+    /// frame meanwhile rather than decoding the next on the thread the
+    /// scrolling is drawn on.
+    property bool scrolling: false
     /// A shared contact, for `Vcard`.
     property string vcardName: ""
     property string vcardAddr: ""
@@ -129,11 +145,18 @@ Item {
     /// a pause button, and nothing would fail.
     readonly property int playingState: 1
 
-    // Only one renderer is ever showing, and the rest measure zero. The
-    // animation is inside the still image rather than beside it, so it is
-    // not in this sum.
-    height: still.height + video.height + sound.height
-            + card.height + app.height + generic.height
+    // Only one renderer is ever built, and the rest are not there to
+    // measure. Read off the loaded item rather than the Loader, so one
+    // with nothing in it is zero by construction rather than by whatever
+    // size it was last given. The animation is
+    // inside the still image rather than beside it, so it is not in this
+    // sum.
+    height: (still.item ? still.item.height : 0)
+            + (video.item ? video.item.height : 0)
+            + (sound.item ? sound.item.height : 0)
+            + (card.item ? card.item.height : 0)
+            + (app.item ? app.item.height : 0)
+            + generic.height
 
     /// A file size a person can read: Format.readableSize, reachable on
     /// the preview because the fallback row is where a size is shown.
@@ -213,117 +236,136 @@ Item {
     // decode fails it draws nothing at all. An Image reads the first frame
     // of a GIF regardless. So the Image sizes the row and shows the still,
     // and the animation covers it when there is one to play.
-    Image {
+    Loader {
         id: still
-        objectName: "attachmentImage"
-        // Each renderer sizes itself, and loads its file, by its own
-        // reason to be here rather than by `visible`: that reads the
-        // effective visibility, which the platform takes away from the
-        // whole page while another is over it -- and a picture, a poster
-        // or a sound player that unloaded on every such hiding was loaded
-        // again on every return, while the page was still sliding in.
-        // See MessageDelegate, and qml_hidden_rows.rs.
+        // Each renderer is built, and loads its file, by its own reason
+        // to be here rather than by `visible`: that reads the effective
+        // visibility, which the platform takes away from the whole page
+        // while another is over it -- and a picture, a poster or a sound
+        // player that unloaded on every such hiding was loaded again on
+        // every return, while the page was still sliding in. See
+        // MessageDelegate, and qml_hidden_rows.rs.
         readonly property bool shown: root.isPicture && root.hasFile
-        visible: still.shown
-        width: still.shown ? root.contentWidth : 0
-        height: still.shown ? root.pictureHeight(width, still) : 0
-        fillMode: Image.PreserveAspectFit
-        asynchronous: true
-        // Decoded no wider than it is drawn. A picture is kept as a
-        // texture of four bytes a pixel for as long as its row is built,
-        // and a phone's own photo is several times the width of its
-        // screen; this is most of what a chat full of pictures costs in
-        // memory, and the bound on what a crafted file can make the app
-        // allocate. Only the width, so the height follows the picture's
-        // own shape.
-        sourceSize.width: root.contentWidth
-        // A camera reads its sensor out landscape however the phone is
-        // held and writes which way to turn it into an EXIF tag rather
-        // than into the pixels. Every other client honours the tag; Image
-        // does not unless it is asked, which is why a photo sent from here
-        // arrived upright for whoever received it and lay on its side in
-        // our own message view.
-        autoTransform: true
-        source: still.shown ? root.fileUrl : ""
+        active: still.shown
+        sourceComponent: Component {
+            Image {
+                id: picture
+                objectName: "attachmentImage"
+                width: root.contentWidth
+                height: root.pictureHeight(width, picture)
+                fillMode: Image.PreserveAspectFit
+                asynchronous: true
+                // Decoded no wider than it is drawn. A picture is kept as
+                // a texture of four bytes a pixel for as long as its row
+                // is built, and a phone's own photo is several times the
+                // width of its screen; this is most of what a chat full
+                // of pictures costs in memory, and the bound on what a
+                // crafted file can make the app allocate. Only the width,
+                // so the height follows the picture's own shape.
+                sourceSize.width: root.contentWidth
+                // A camera reads its sensor out landscape however the
+                // phone is held and writes which way to turn it into an
+                // EXIF tag rather than into the pixels. Every other client
+                // honours the tag; Image does not unless it is asked,
+                // which is why a photo sent from here arrived upright for
+                // whoever received it and lay on its side in our own
+                // message view.
+                autoTransform: true
+                source: root.fileUrl
 
-        // The movie, while there are runs left to play, and nothing at
-        // all otherwise: a stopped movie still holds every frame it
-        // decoded, and a long conversation of GIFs holding theirs is the
-        // memory a phone notices. Unloaded, the still underneath shows
-        // its first frame.
-        AnimatedImage {
-            id: animated
-            objectName: "attachmentAnimation"
-            anchors.fill: parent
-            readonly property bool shown: root.animatable && root.runsLeft > 0
-            visible: animated.shown
-            fillMode: Image.PreserveAspectFit
-            // Runs only while actually on screen -- `visible` is the
-            // effective one, and a page hidden under another has no
-            // business decoding frames -- but keeps its file by its own
-            // reason to be here, so coming back is not a reload.
-            playing: animated.visible
-            source: animated.shown ? root.fileUrl : ""
+                // The movie, while there are runs left to play, and
+                // nothing at all otherwise: a stopped movie still holds
+                // every frame it decoded, and a long conversation of GIFs
+                // holding theirs is the memory a phone notices. Unloaded,
+                // the still underneath shows its first frame.
+                AnimatedImage {
+                    id: animated
+                    objectName: "attachmentAnimation"
+                    anchors.fill: parent
+                    readonly property bool shown: root.animatable && root.runsLeft > 0
+                    visible: animated.shown
+                    fillMode: Image.PreserveAspectFit
+                    // Each frame decoded as it comes round rather than
+                    // every frame kept: Qt's default caches the whole
+                    // movie at full size, which for a GIF of a hundred
+                    // frames is tens of megabytes held for one row.
+                    cache: false
+                    // Runs only while actually on screen -- `visible` is
+                    // the effective one, and a page hidden under another
+                    // has no business decoding frames -- but keeps its
+                    // file by its own reason to be here, so coming back is
+                    // not a reload.
+                    playing: animated.visible
+                    // Held on its frame while the list moves under the
+                    // reader's finger, and carried on from there.
+                    paused: root.scrolling
+                    source: animated.shown ? root.fileUrl : ""
 
-            // The frame before this one: a smaller number now is the movie
-            // having gone round. Counted here rather than from a clock,
-            // because a GIF's frames each carry their own delay.
-            property int lastFrame: 0
-            onSourceChanged: animated.lastFrame = 0
-            onFrameChanged: {
-                if (animated.currentFrame < animated.lastFrame) {
-                    root.runsLeft -= 1
-                }
-                animated.lastFrame = animated.currentFrame
-            }
-            // A movie that is not running while it is meant to be has
-            // had its run: a GIF made to play once, or a file the movie
-            // reader could not start on at all, which the still shows as
-            // well as anything could. Asked a pass later rather than in
-            // the handler: the movie reports this from inside the load
-            // its own `source` binding started, and changing `runsLeft`
-            // there is changing what `visible` is being worked out from.
-            onPlayingChanged: if (!animated.playing) stopped.restart()
+                    // The frame before this one: a smaller number now is
+                    // the movie having gone round. Counted here rather
+                    // than from a clock, because a GIF's frames each carry
+                    // their own delay.
+                    property int lastFrame: 0
+                    onSourceChanged: animated.lastFrame = 0
+                    onFrameChanged: {
+                        if (animated.currentFrame < animated.lastFrame) {
+                            root.runsLeft -= 1
+                        }
+                        animated.lastFrame = animated.currentFrame
+                    }
+                    // A movie that is not running while it is meant to be
+                    // has had its run: a GIF made to play once, or a file
+                    // the movie reader could not start on at all, which
+                    // the still shows as well as anything could. Asked a
+                    // pass later rather than in the handler: the movie
+                    // reports this from inside the load its own `source`
+                    // binding started, and changing `runsLeft` there is
+                    // changing what `visible` is being worked out from.
+                    onPlayingChanged: if (!animated.playing) stopped.restart()
 
-            Timer {
-                id: stopped
-                interval: 0
-                onTriggered: {
-                    if (!animated.playing && animated.visible
-                            && animated.status === Image.Ready) {
-                        root.runsLeft = 0
+                    Timer {
+                        id: stopped
+                        interval: 0
+                        onTriggered: {
+                            if (!animated.playing && animated.visible
+                                    && animated.status === Image.Ready) {
+                                root.runsLeft = 0
+                            }
+                        }
                     }
                 }
-            }
-        }
 
-        // The mark on a GIF that is not playing. Its own tap, so a tap
-        // on the mark plays the movie here rather than opening the
-        // picture; a long press on it still goes to the row's menu.
-        Rectangle {
-            id: gifMark
-            objectName: "gifMark"
-            visible: root.animatable && !animated.shown
-            anchors.centerIn: parent
-            width: Theme.itemSizeSmall
-            height: width
-            radius: width / 2
-            color: Theme.rgba("black", 0.5)
+                // The mark on a GIF that is not playing. Its own tap, so a
+                // tap on the mark plays the movie here rather than opening
+                // the picture; a long press on it still goes to the row's
+                // menu.
+                Rectangle {
+                    id: gifMark
+                    objectName: "gifMark"
+                    visible: root.animatable && !animated.shown
+                    anchors.centerIn: parent
+                    width: Theme.itemSizeSmall
+                    height: width
+                    radius: width / 2
+                    color: Theme.rgba("black", 0.5)
 
-            Label {
-                anchors.centerIn: parent
-                color: "white"
-                font.pixelSize: Theme.fontSizeSmall
-                font.bold: true
-                textFormat: Text.PlainText
-                // The format's name, which is the same in every language.
-                text: "GIF"
-            }
+                    Label {
+                        anchors.centerIn: parent
+                        color: "white"
+                        font.pixelSize: Theme.fontSizeSmall
+                        font.bold: true
+                        textFormat: Text.PlainText
+                        // The format's name, which is the same in every
+                        // language.
+                        text: "GIF"
+                    }
 
-            MouseArea {
-                anchors.fill: parent
-                onClicked: root.replay()
-                onPressAndHold: root.menuRequested()
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: root.replay()
+                        onPressAndHold: root.menuRequested()
+                    }
+                }
             }
         }
     }
@@ -331,156 +373,211 @@ Item {
     // A video: the platform thumbnailer's poster frame, with a play mark
     // over it. A tap on the row opens it on the video page; nothing here
     // takes the press.
-    Item {
+    Loader {
         id: video
-        objectName: "attachmentVideo"
         readonly property bool shown: root.isVideo && root.hasFile
-        visible: video.shown
-        y: 0
-        width: video.shown ? root.contentWidth : 0
-        // The video's own shape where it is known -- what the sender
-        // wrote in, or the file's track header read by the model -- so a
-        // video taken upright stands upright; 16:9 where it is not. The
-        // thumbnailer crops to whatever it is given.
-        height: video.shown ? Math.round(width * root.videoAspect) : 0
+        active: video.shown
+        sourceComponent: Component {
+            Item {
+                objectName: "attachmentVideo"
+                width: root.contentWidth
+                // The video's own shape where it is known -- what the
+                // sender wrote in, or the file's track header read by the
+                // model -- so a video taken upright stands upright; 16:9
+                // where it is not. The thumbnailer crops to whatever it is
+                // given.
+                height: Math.round(width * root.videoAspect)
 
-        Rectangle {
-            anchors.fill: parent
-            radius: Theme.paddingSmall
-            color: Theme.rgba(Theme.highlightDimmerColor, 0.6)
-        }
+                Rectangle {
+                    anchors.fill: parent
+                    radius: Theme.paddingSmall
+                    color: Theme.rgba(Theme.highlightDimmerColor, 0.6)
+                }
 
-        Thumbnail {
-            id: poster
-            objectName: "videoThumbnail"
-            anchors.fill: parent
-            sourceSize.width: width
-            sourceSize.height: height
-            // fillMode left at the thumbnailer's own default, which crops
-            // to the size asked for. Naming a value would mean naming an
-            // enum on the type, which the headless stub cannot carry.
-            mimeType: root.fileMime
-            source: video.shown ? root.fileUrl : ""
-        }
+                Thumbnail {
+                    id: poster
+                    objectName: "videoThumbnail"
+                    anchors.fill: parent
+                    sourceSize.width: width
+                    sourceSize.height: height
+                    // fillMode left at the thumbnailer's own default,
+                    // which crops to the size asked for. Naming a value
+                    // would mean naming an enum on the type, which the
+                    // headless stub cannot carry.
+                    mimeType: root.fileMime
+                    source: root.fileUrl
+                }
 
-        // Over the frame rather than beside it: the frame is the control.
-        Rectangle {
-            anchors.centerIn: parent
-            width: Theme.itemSizeSmall
-            height: width
-            radius: width / 2
-            color: Theme.rgba("black", 0.5)
+                // Over the frame rather than beside it: the frame is the
+                // control.
+                Rectangle {
+                    anchors.centerIn: parent
+                    width: Theme.itemSizeSmall
+                    height: width
+                    radius: width / 2
+                    color: Theme.rgba("black", 0.5)
 
-            Label {
-                anchors.centerIn: parent
-                color: "white"
-                font.pixelSize: Theme.fontSizeLarge
-                textFormat: Text.PlainText
-                text: "▶"
+                    Label {
+                        anchors.centerIn: parent
+                        color: "white"
+                        font.pixelSize: Theme.fontSizeLarge
+                        textFormat: Text.PlainText
+                        text: "▶"
+                    }
+                }
             }
         }
     }
 
-    // A voice message or a music file, played where it sits. The core
-    // carries no duration for most files, so the player's own is the only
-    // honest source -- and it only has one once the media has loaded.
-    Item {
+    // A voice message or a music file, played where it sits. The length
+    // is the core's when it has one, which it has for a recording whose
+    // sender wrote it in, and the player's own once there is a player:
+    // the core reads none out of a file it is merely handed.
+    Loader {
         id: sound
-        objectName: "attachmentAudio"
         readonly property bool shown: root.isSound && root.hasFile
-        visible: sound.shown
-        y: 0
-        width: sound.shown ? root.contentWidth : 0
-        // Measured rather than fixed: the two labels and the track have to
-        // fit beside a button whose size is the theme's, not ours.
-        height: sound.shown
-                ? Math.max(playButton.height,
-                           soundName.height + soundTime.height
-                           + track.height + 2 * Theme.paddingSmall)
-                : 0
+        active: sound.shown
+        sourceComponent: Component {
+            Item {
+                id: soundRow
+                objectName: "attachmentAudio"
+                width: root.contentWidth
+                // Measured rather than fixed: the two labels and the track
+                // have to fit beside a button whose size is the theme's,
+                // not ours.
+                height: Math.max(playButton.height,
+                                 soundName.height + soundTime.height
+                                 + track.height + 2 * Theme.paddingSmall)
 
-        Audio {
-            id: player
-            source: sound.shown ? root.fileUrl : ""
-            // Nothing autoplays. A conversation that starts talking when
-            // it is scrolled past is the worst possible behaviour on a
-            // phone that may be in a pocket.
-            autoPlay: false
-        }
+                /// The reader has pressed play on this row: the player is
+                /// made then and not before. On Sailfish a player is a
+                /// GStreamer pipeline, made when the player is and, with
+                /// the default `autoLoad`, taken as far as paused on the
+                /// file straight away -- streaming threads and an audio
+                /// stream, for every sound scrolled past.
+                property bool wanted: false
+                /// The player, null until then.
+                readonly property QtObject player: playerLoader.item
+                                                   ? playerLoader.item.player : null
+                /// How long the sound is, 0 while nobody knows.
+                readonly property int duration:
+                    soundRow.player && soundRow.player.duration > 0
+                    ? soundRow.player.duration : root.durationMs
+                readonly property int position: soundRow.player
+                                                ? soundRow.player.position : 0
+                readonly property bool playing: soundRow.player !== null
+                    && soundRow.player.playbackState === root.playingState
 
-        IconButton {
-            id: playButton
-            objectName: "audioPlayButton"
-            anchors.verticalCenter: parent.verticalCenter
-            icon.source: player.playbackState === root.playingState
-                         ? "image://theme/icon-m-pause"
-                         : "image://theme/icon-m-play"
-            onClicked: {
-                if (player.playbackState === root.playingState) {
-                    player.pause()
-                } else {
-                    player.play()
+                Loader {
+                    id: playerLoader
+                    active: soundRow.wanted
+                    sourceComponent: Component {
+                        // In an Item because a Loader on Qt 5.6 loads
+                        // nothing else, and Audio is not one.
+                        Item {
+                            objectName: "audioPlayer"
+                            property alias player: audio
+
+                            Audio {
+                                id: audio
+                                source: root.fileUrl
+                                // Loaded by the press of play that made
+                                // it, and not by being made.
+                                autoLoad: false
+                                // Nothing autoplays. A conversation that
+                                // starts talking when it is scrolled past
+                                // is the worst possible behaviour on a
+                                // phone that may be in a pocket.
+                                autoPlay: false
+                            }
+                        }
+                    }
                 }
-            }
-            onPressAndHold: root.menuRequested()
-        }
 
-        Label {
-            id: soundName
-            objectName: "audioLabel"
-            anchors {
-                left: playButton.right
-                leftMargin: Theme.paddingSmall
-                right: parent.right
-                top: parent.top
-                topMargin: Theme.paddingSmall
-            }
-            truncationMode: TruncationMode.Fade
-            font.pixelSize: Theme.fontSizeExtraSmall
-            color: Theme.primaryColor
-            textFormat: Text.PlainText
-            text: root.viewType === "Voice"
-                  //: A recorded voice message, which has no useful file name.
-                  ? qsTr("Voice message")
-                  : root.fileName
-        }
+                IconButton {
+                    id: playButton
+                    objectName: "audioPlayButton"
+                    anchors.verticalCenter: parent.verticalCenter
+                    icon.source: soundRow.playing
+                                 ? "image://theme/icon-m-pause"
+                                 : "image://theme/icon-m-play"
+                    onClicked: {
+                        // Made here, the first time, and there by the
+                        // next line: a Loader that is not asynchronous
+                        // builds as it is switched on.
+                        soundRow.wanted = true
+                        var player = soundRow.player
+                        if (!player) {
+                            return
+                        }
+                        if (player.playbackState === root.playingState) {
+                            player.pause()
+                        } else {
+                            player.play()
+                        }
+                    }
+                    onPressAndHold: root.menuRequested()
+                }
 
-        // Position over duration, once there is a duration to be over.
-        // Blank rather than "0:00" before the media has loaded: a length of
-        // zero is a claim, and an empty label is not.
-        Label {
-            id: soundTime
-            objectName: "audioTime"
-            anchors {
-                left: soundName.left
-                right: parent.right
-                top: soundName.bottom
-            }
-            font.pixelSize: Theme.fontSizeExtraSmall
-            color: Theme.secondaryColor
-            textFormat: Text.PlainText
-            text: player.duration > 0
-                  ? root.clock(player.position) + " / " + root.clock(player.duration)
-                  : ""
-        }
+                Label {
+                    id: soundName
+                    objectName: "audioLabel"
+                    anchors {
+                        left: playButton.right
+                        leftMargin: Theme.paddingSmall
+                        right: parent.right
+                        top: parent.top
+                        topMargin: Theme.paddingSmall
+                    }
+                    truncationMode: TruncationMode.Fade
+                    font.pixelSize: Theme.fontSizeExtraSmall
+                    color: Theme.primaryColor
+                    textFormat: Text.PlainText
+                    text: root.viewType === "Voice"
+                          //: A recorded voice message, which has no useful file name.
+                          ? qsTr("Voice message")
+                          : root.fileName
+                }
 
-        Rectangle {
-            id: track
-            anchors {
-                left: soundName.left
-                right: parent.right
-                bottom: parent.bottom
-                bottomMargin: Theme.paddingSmall
-            }
-            height: 2
-            color: Theme.rgba(Theme.secondaryColor, 0.3)
+                // Position over duration, once there is a duration to be
+                // over. Blank rather than "0:00" while nobody knows: a
+                // length of zero is a claim, and an empty label is not.
+                Label {
+                    id: soundTime
+                    objectName: "audioTime"
+                    anchors {
+                        left: soundName.left
+                        right: parent.right
+                        top: soundName.bottom
+                    }
+                    font.pixelSize: Theme.fontSizeExtraSmall
+                    color: Theme.secondaryColor
+                    textFormat: Text.PlainText
+                    text: soundRow.duration > 0
+                          ? root.clock(soundRow.position) + " / " + root.clock(soundRow.duration)
+                          : ""
+                }
 
-            Rectangle {
-                objectName: "audioProgress"
-                height: parent.height
-                color: Theme.highlightColor
-                width: player.duration > 0
-                       ? parent.width * player.position / player.duration : 0
+                Rectangle {
+                    id: track
+                    anchors {
+                        left: soundName.left
+                        right: parent.right
+                        bottom: parent.bottom
+                        bottomMargin: Theme.paddingSmall
+                    }
+                    height: 2
+                    color: Theme.rgba(Theme.secondaryColor, 0.3)
+
+                    Rectangle {
+                        objectName: "audioProgress"
+                        height: parent.height
+                        color: Theme.highlightColor
+                        width: soundRow.duration > 0
+                               ? parent.width * Math.min(1, soundRow.position / soundRow.duration)
+                               : 0
+                    }
+                }
             }
         }
     }
@@ -488,59 +585,61 @@ Item {
     // A shared contact. The core parses the card and hands back the name,
     // the address and the colour it would give that contact; nothing here
     // reads vCard syntax.
-    Item {
+    Loader {
         id: card
-        objectName: "attachmentVcard"
         readonly property bool shown: root.isCard
-        visible: card.shown
-        y: 0
-        width: card.shown ? root.contentWidth : 0
-        height: card.shown
-                ? Math.max(cardAvatar.height,
-                           cardName.height + cardAddress.height
-                           + 2 * Theme.paddingSmall)
-                : 0
+        active: card.shown
+        sourceComponent: Component {
+            Item {
+                objectName: "attachmentVcard"
+                width: root.contentWidth
+                height: Math.max(cardAvatar.height,
+                                 cardName.height + cardAddress.height
+                                 + 2 * Theme.paddingSmall)
 
-        Avatar {
-            id: cardAvatar
-            anchors.verticalCenter: parent.verticalCenter
-            width: Theme.itemSizeExtraSmall
-            height: width
-            initial: root.vcardName
-            ownColor: root.vcardColor
-        }
+                Avatar {
+                    id: cardAvatar
+                    anchors.verticalCenter: parent.verticalCenter
+                    width: Theme.itemSizeExtraSmall
+                    height: width
+                    initial: root.vcardName
+                    ownColor: root.vcardColor
+                }
 
-        Label {
-            id: cardName
-            objectName: "vcardName"
-            anchors {
-                left: cardAvatar.right
-                leftMargin: Theme.paddingMedium
-                right: parent.right
-                top: parent.top
-                topMargin: Theme.paddingSmall
+                Label {
+                    id: cardName
+                    objectName: "vcardName"
+                    anchors {
+                        left: cardAvatar.right
+                        leftMargin: Theme.paddingMedium
+                        right: parent.right
+                        top: parent.top
+                        topMargin: Theme.paddingSmall
+                    }
+                    truncationMode: TruncationMode.Fade
+                    color: Theme.primaryColor
+                    textFormat: Text.PlainText
+                    text: root.vcardName
+                }
+
+                Label {
+                    id: cardAddress
+                    objectName: "vcardAddress"
+                    anchors {
+                        left: cardName.left
+                        right: parent.right
+                        top: cardName.bottom
+                    }
+                    truncationMode: TruncationMode.Fade
+                    font.pixelSize: Theme.fontSizeExtraSmall
+                    color: Theme.secondaryColor
+                    textFormat: Text.PlainText
+                    // The card usually carries the address as the name
+                    // too, and saying it twice reads as a bug rather than
+                    // as thoroughness.
+                    text: root.vcardAddr === root.vcardName ? "" : root.vcardAddr
+                }
             }
-            truncationMode: TruncationMode.Fade
-            color: Theme.primaryColor
-            textFormat: Text.PlainText
-            text: root.vcardName
-        }
-
-        Label {
-            id: cardAddress
-            objectName: "vcardAddress"
-            anchors {
-                left: cardName.left
-                right: parent.right
-                top: cardName.bottom
-            }
-            truncationMode: TruncationMode.Fade
-            font.pixelSize: Theme.fontSizeExtraSmall
-            color: Theme.secondaryColor
-            textFormat: Text.PlainText
-            // The card usually carries the address as the name too, and
-            // saying it twice reads as a bug rather than as thoroughness.
-            text: root.vcardAddr === root.vcardName ? "" : root.vcardAddr
         }
     }
 
@@ -548,96 +647,100 @@ Item {
     // itself -- "3 votes", a score -- which changes as the chat plays
     // with it. All three are the core's, read out of the app; a tap runs
     // it (MessageDelegate).
-    Item {
+    Loader {
         id: app
-        objectName: "attachmentApp"
         readonly property bool shown: root.isApp && root.webxdcName.length > 0
-        visible: app.shown
-        y: 0
-        width: app.shown ? root.contentWidth : 0
-        height: app.shown
-                ? Math.max(appIcon.height,
-                           appName.height + appState.height
-                           + 2 * Theme.paddingSmall)
-                : 0
+        active: app.shown
+        sourceComponent: Component {
+            Item {
+                objectName: "attachmentApp"
+                width: root.contentWidth
+                height: Math.max(appIcon.height,
+                                 appName.height + appState.height
+                                 + 2 * Theme.paddingSmall)
 
-        Rectangle {
-            id: appIcon
-            objectName: "webxdcIcon"
-            anchors.verticalCenter: parent.verticalCenter
-            width: Theme.itemSizeSmall
-            height: width
-            radius: width / 8
-            color: Theme.rgba(Theme.highlightBackgroundColor,
-                              Theme.highlightBackgroundOpacity)
+                Rectangle {
+                    id: appIcon
+                    objectName: "webxdcIcon"
+                    anchors.verticalCenter: parent.verticalCenter
+                    width: Theme.itemSizeSmall
+                    height: width
+                    radius: width / 8
+                    color: Theme.rgba(Theme.highlightBackgroundColor,
+                                      Theme.highlightBackgroundOpacity)
 
-            // The app's own icon when it has one. The mark stands in
-            // where it has not, so the row is never a blank square.
-            AppMark {
-                anchors.centerIn: parent
-                visible: root.webxdcIcon.length === 0
-                size: Theme.itemSizeSmall / 2
-            }
+                    // The app's own icon when it has one. The mark stands
+                    // in where it has not, so the row is never a blank
+                    // square.
+                    AppMark {
+                        anchors.centerIn: parent
+                        visible: root.webxdcIcon.length === 0
+                        size: Theme.itemSizeSmall / 2
+                    }
 
-            Image {
-                objectName: "webxdcIconImage"
-                anchors.fill: parent
-                anchors.margins: Theme.paddingSmall
-                fillMode: Image.PreserveAspectFit
-                asynchronous: true
-                // Encoded a segment at a time, as every file URL here is.
-                source: root.webxdcIcon.length > 0
-                        ? Qt.resolvedUrl("file://" + root.webxdcIcon.split("/")
-                                             .map(encodeURIComponent).join("/"))
-                        : ""
-            }
-        }
-
-        Label {
-            id: appName
-            objectName: "webxdcName"
-            anchors {
-                left: appIcon.right
-                leftMargin: Theme.paddingMedium
-                right: parent.right
-                top: parent.top
-                topMargin: Theme.paddingSmall
-            }
-            truncationMode: TruncationMode.Fade
-            color: Theme.primaryColor
-            // The app named itself; it is the sender's text like any
-            // other.
-            textFormat: Text.PlainText
-            text: root.webxdcName
-        }
-
-        Label {
-            id: appState
-            objectName: "webxdcSummary"
-            anchors {
-                left: appName.left
-                right: parent.right
-                top: appName.bottom
-            }
-            // An app that has said nothing about itself takes no line for
-            // saying so.
-            readonly property bool shown: text.length > 0
-            visible: appState.shown
-            height: appState.shown ? implicitHeight : 0
-            truncationMode: TruncationMode.Fade
-            font.pixelSize: Theme.fontSizeExtraSmall
-            color: Theme.secondaryColor
-            textFormat: Text.PlainText
-            // The document it is editing, then what it says about itself.
-            text: {
-                var parts = []
-                if (root.webxdcDocument.length > 0) {
-                    parts.push(root.webxdcDocument)
+                    Image {
+                        objectName: "webxdcIconImage"
+                        anchors.fill: parent
+                        anchors.margins: Theme.paddingSmall
+                        fillMode: Image.PreserveAspectFit
+                        asynchronous: true
+                        // Encoded a segment at a time, as every file URL
+                        // here is.
+                        source: root.webxdcIcon.length > 0
+                                ? Qt.resolvedUrl("file://" + root.webxdcIcon.split("/")
+                                                     .map(encodeURIComponent).join("/"))
+                                : ""
+                    }
                 }
-                if (root.webxdcSummary.length > 0) {
-                    parts.push(root.webxdcSummary)
+
+                Label {
+                    id: appName
+                    objectName: "webxdcName"
+                    anchors {
+                        left: appIcon.right
+                        leftMargin: Theme.paddingMedium
+                        right: parent.right
+                        top: parent.top
+                        topMargin: Theme.paddingSmall
+                    }
+                    truncationMode: TruncationMode.Fade
+                    color: Theme.primaryColor
+                    // The app named itself; it is the sender's text like
+                    // any other.
+                    textFormat: Text.PlainText
+                    text: root.webxdcName
                 }
-                return parts.join(" · ")
+
+                Label {
+                    id: appState
+                    objectName: "webxdcSummary"
+                    anchors {
+                        left: appName.left
+                        right: parent.right
+                        top: appName.bottom
+                    }
+                    // An app that has said nothing about itself takes no
+                    // line for saying so.
+                    readonly property bool shown: text.length > 0
+                    visible: appState.shown
+                    height: appState.shown ? implicitHeight : 0
+                    truncationMode: TruncationMode.Fade
+                    font.pixelSize: Theme.fontSizeExtraSmall
+                    color: Theme.secondaryColor
+                    textFormat: Text.PlainText
+                    // The document it is editing, then what it says about
+                    // itself.
+                    text: {
+                        var parts = []
+                        if (root.webxdcDocument.length > 0) {
+                            parts.push(root.webxdcDocument)
+                        }
+                        if (root.webxdcSummary.length > 0) {
+                            parts.push(root.webxdcSummary)
+                        }
+                        return parts.join(" · ")
+                    }
+                }
             }
         }
     }

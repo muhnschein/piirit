@@ -386,6 +386,7 @@ fn a_chats_media_has_pages_of_its_own_behind_the_tiles() {
         record!("audio-count", get!("media", "count"));
         record!("audio-row", get!("mediaRow13", "objectName"));
         record!("audio-label", get!("audioLabel", "text"));
+        record!("audio-time", get!("audioTime", "text"));
         record!(
             "load-apps",
             call!(
@@ -646,6 +647,14 @@ fn assert_pages(steps: &[(&str, String)], navigation: &str, calls: &[(String, Va
             "audio-label",
             "Voice message",
             "the voice message is not drawn as one",
+        ),
+        // The length the message carries, said before anything has
+        // played: the player is not made until play is pressed, so it
+        // has none of its own to say.
+        (
+            "audio-time",
+            "0:00 / 0:04",
+            "the voice message does not say how long it is",
         ),
         ("apps-count", "1", "the apps list does not hold the app"),
         ("app-name", "Checkers", "the app is not named"),

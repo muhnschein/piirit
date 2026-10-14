@@ -595,6 +595,7 @@ Page {
                             fileName: model.file_name
                             fileMime: model.file_mime
                             fileBytes: model.file_bytes
+                            durationMs: model.duration_ms
                             viewType: row.isFile ? "Text" : model.view_type
                             webxdcName: model.webxdc_name
                             webxdcDocument: model.webxdc_document
