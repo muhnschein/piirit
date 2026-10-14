@@ -310,6 +310,14 @@ pub struct Call {
     mic_shut: bool,
 }
 
+/// Whether a call in `state` is one the phone is in: placed or answered,
+/// and not over. Its sound is a call's for that long, as CallAudio.qml's
+/// `talking` holds the audio policy's set for it; see
+/// `call_host::label_call_audio`.
+fn talking(state: &str) -> bool {
+    !matches!(state, "" | "ringing" | "ended")
+}
+
 /// How long a call may ring here before it is taken to have rung out
 /// without the core saying so. The core rings a call for 120 seconds from
 /// when it was sent, and says `CallEnded` when that is up -- once, from a
@@ -332,7 +340,11 @@ impl Call {
     }
 
     fn set_state(&mut self, state: &str) {
-        if self.state.to_string() != state {
+        let before = self.state.to_string();
+        if before != state {
+            if talking(state) != talking(&before) {
+                call_host::label_call_audio(talking(state));
+            }
             self.state = state.into();
             self.state_changed();
         }
@@ -1020,7 +1032,7 @@ fn now() -> f64 {
 
 #[cfg(test)]
 mod tests {
-    use super::{audio_app_id, main_back_camera, Summary};
+    use super::{audio_app_id, main_back_camera, talking, Summary};
     use serde_json::json;
 
     #[test]
@@ -1039,6 +1051,22 @@ mod tests {
         assert_eq!(main_back_camera(""), 0);
         assert_eq!(main_back_camera("wide,main"), 0);
         assert_eq!(main_back_camera("wide,1.0"), 1);
+    }
+
+    #[test]
+    fn a_call_is_talking_from_placed_or_answered_until_over() {
+        for state in [
+            "starting",
+            "calling",
+            "connecting",
+            "connected",
+            "reconnecting",
+        ] {
+            assert!(talking(state), "{state}");
+        }
+        for state in ["", "ringing", "ended"] {
+            assert!(!talking(state), "{state:?}");
+        }
     }
 
     #[test]

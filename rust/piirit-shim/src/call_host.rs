@@ -41,7 +41,7 @@ use std::collections::VecDeque;
 use std::net::{Ipv4Addr, SocketAddr};
 use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicBool, AtomicU32, AtomicU64, Ordering};
-use std::sync::{Arc, Mutex, Weak};
+use std::sync::{Arc, Mutex, OnceLock, Weak};
 use std::time::{Duration, Instant};
 
 use deltachat_jsonrpc::RpcClient;
@@ -344,6 +344,10 @@ pub(crate) async fn start(
     shared.log.write(&media_plugins(
         std::env::var("MOZ_GMP_PATH").ok().as_deref(),
     ));
+    shared.log.write(&format!(
+        "sound server properties: {}",
+        std::env::var(PULSE_PROP).unwrap_or_default()
+    ));
     {
         let mut hosts = HOSTS
             .lock()
@@ -562,11 +566,75 @@ fn encoder_path(existing: Option<&str>, ours: &Path) -> Option<String> {
 /// the encoder where the call's log is. Gecko starts the plugin as a
 /// process of its own, which inherits both. `PIIRIT_GMP_DIR` names
 /// another encoder than the one the package installs, for trying a
-/// build on a phone.
+/// build on a phone. And make sure there is a `PULSE_PROP`, which a call
+/// changes once threads run (`label_call_audio`).
 pub fn prepare_media_plugins() {
     let log = crate::qr::cache_file(LOG_FILE).ok();
     for (name, value) in media_environment(|name| std::env::var(name).ok(), log) {
         std::env::set_var(name, value);
+    }
+    keep_pulse_properties();
+}
+
+/// Make sure there is a `PULSE_PROP`, and keep what it says: see
+/// `label_call_audio`, which is why this is done while the process has
+/// only the one thread.
+fn keep_pulse_properties() {
+    let session = match std::env::var(PULSE_PROP) {
+        Ok(session) => session,
+        Err(std::env::VarError::NotPresent) => {
+            std::env::set_var(PULSE_PROP, "");
+            String::new()
+        }
+        // Not this app's to read, nor to write over.
+        Err(std::env::VarError::NotUnicode(_)) => return,
+    };
+    SESSION_PULSE_PROP.get_or_init(|| session);
+}
+
+/// The variable PulseAudio's library adds properties from to each
+/// connection to the sound server, as the connection is opened.
+const PULSE_PROP: &str = "PULSE_PROP";
+
+/// What a call's sound is to the phone's audio policy: a call over the
+/// internet, played at the volume the keys set during a call.
+const CALL_ROLE: &str = "media.role=voip";
+
+/// `PULSE_PROP` as the app found it, set by `prepare_media_plugins`.
+/// Unset, the variable is never written later.
+static SESSION_PULSE_PROP: OnceLock<String> = OnceLock::new();
+
+/// A call's sound, said to be a call's for as long as one is on, or not.
+/// The browser engine plays it and gives it no role, so the sound server
+/// takes it for media (`x-maemo-match.table`) and plays it at the media
+/// volume, while during a call the volume keys set the call volume: the
+/// call was as quiet as the media volume happened to be, and the keys did
+/// nothing for it. A role in `PULSE_PROP` goes on every stream of a
+/// connection opened while it is there, and the engine opens its one
+/// connection when it first plays sound -- the call's page, in a session
+/// that has played none before. See docs/CALLS.md.
+///
+/// Written while other threads run, which reading the environment from
+/// them does not survive in general. It does here: the variable is made
+/// before there are other threads (`prepare_media_plugins`), so a later
+/// write replaces its string in place and never moves the environment,
+/// and glibc frees no string it has put there, so a reader holding the
+/// old one still has it.
+pub fn label_call_audio(talking: bool) {
+    if let Some(session) = SESSION_PULSE_PROP.get() {
+        std::env::set_var(PULSE_PROP, pulse_properties(session, talking));
+    }
+}
+
+/// What `PULSE_PROP` is to be: the session's own, and while a call is
+/// on the call's role after it, which wins over one the session names.
+fn pulse_properties(session: &str, talking: bool) -> String {
+    if !talking {
+        session.to_owned()
+    } else if session.trim().is_empty() {
+        CALL_ROLE.to_owned()
+    } else {
+        format!("{session} {CALL_ROLE}")
     }
 }
 
@@ -939,8 +1007,9 @@ async fn write_response(stream: &mut TcpStream, response: &Response) -> std::io:
 mod tests {
     use super::{
         back_camera_command, camera_command, command, encode_base64, encoder_path, encodes_h264,
-        facing_command, log_line, media_environment, media_plugins, microphone_command,
-        percent_encode, shown_command, CallLog, Video, BRIDGE, BUNDLED_ENCODER, LOG_LINE_MAX, PAGE,
+        facing_command, keep_pulse_properties, label_call_audio, log_line, media_environment,
+        media_plugins, microphone_command, percent_encode, pulse_properties, shown_command,
+        CallLog, Video, BRIDGE, BUNDLED_ENCODER, LOG_LINE_MAX, PAGE, PULSE_PROP,
     };
     use crate::webxdc_host::decode_base64;
     use std::path::{Path, PathBuf};
@@ -1231,6 +1300,35 @@ mod tests {
         // installed where the tests run, so left out.
         assert!(!Path::new(BUNDLED_ENCODER).exists());
         assert_eq!(installed, [("PIIRIT_CALL_LOG", text(&log))]);
+    }
+
+    #[test]
+    fn a_call_says_its_role_after_the_sessions_properties() {
+        assert_eq!(pulse_properties("", false), "");
+        assert_eq!(pulse_properties("", true), "media.role=voip");
+        assert_eq!(pulse_properties("  ", true), "media.role=voip");
+        let session = "application.icon_name=piirit media.role=music";
+        assert_eq!(pulse_properties(session, false), session);
+        assert_eq!(
+            pulse_properties(session, true),
+            "application.icon_name=piirit media.role=music media.role=voip"
+        );
+    }
+
+    #[test]
+    fn a_call_labels_the_sound_while_it_is_on_and_puts_it_back() {
+        // The one test that writes the environment, and only a variable
+        // no other test reads.
+        let read = || std::env::var(PULSE_PROP);
+        std::env::remove_var(PULSE_PROP);
+        label_call_audio(true);
+        assert!(read().is_err(), "{:?}", read());
+        keep_pulse_properties();
+        assert_eq!(read().as_deref(), Ok(""));
+        label_call_audio(true);
+        assert_eq!(read().as_deref(), Ok("media.role=voip"));
+        label_call_audio(false);
+        assert_eq!(read().as_deref(), Ok(""));
     }
 
     #[test]

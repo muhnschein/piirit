@@ -524,6 +524,36 @@ Read-only besides: ohm's `Route.Manager.ActiveRoutes` and its
 `AudioRouteChanged` signal, for whether the sound is on something
 plugged in or paired.
 
+The volume is the other half. While a call is on -- one the policy knows
+of, `aliencall` included -- the volume keys set the call volume, not the
+media volume: the volume of streams whose role is `voip` (nemo's
+`mainvolume`). The engine gives its streams no role, and PulseAudio
+gives a stream without one the media role, `x-maemo`
+(`x-maemo-match.table`). So on a phone the first builds' calls played at
+whatever the media volume happened to be, which on the earpiece starts
+lower still, and the keys did nothing for them: quiet at full volume,
+and barely to be heard on the earpiece. Now, while a call is on (from
+placed or answered until it is over; `calls.rs`, `talking`), the app's
+`PULSE_PROP` has `media.role=voip` in it, and afterwards is as the app
+found it (`call_host::label_call_audio`). PulseAudio's client library
+adds what that variable says to a connection to the sound server as it
+is opened, and the server adds it to every stream on the connection
+before the table is read; the table does not write over a role a stream
+already has. The engine opens one connection, the first time it plays
+anything, and keeps it for the run: in a run that has played nothing
+before, the call's page, which comes up only once the call is on. The
+variable is made before the app has a second thread, which is what lets
+it be changed while others run (the comment on `label_call_audio` says
+why). *(From the sources and a capture of the media role on the call's
+stream; not yet heard on a phone.)*
+
+What that leaves: the engine's connection keeps the role it was opened
+with, until the sound server is restarted and the engine opens another
+the next time it plays (cubeb's `pulse_stream_init`). So a webxdc app
+that played sound before the run's first call opened it as media, and
+the calls of that run play at the media volume, as before; one that
+plays sound after a call plays it at the call volume.
+
 ## What only a phone can answer
 
 Ranked by what would sink the feature. None of them needs another line
