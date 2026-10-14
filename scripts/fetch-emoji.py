@@ -115,6 +115,24 @@ def picture_for(emoji, pictures):
     return None
 
 
+def spelled(entry):
+    """An emoji as Unicode spells it, fully qualified: with U+FE0F after a
+    lone character only when that character is text unless told otherwise.
+
+    emojibase puts the selector after every lone character, a thumbs-up
+    and a star as much as a heart (its `type` says which ones need it:
+    0 is text by default, 1 an emoji). Kept, that made a star a symbol
+    that is text without the selector -- so a star as everyone sends it,
+    bare, was left to Sailfish's font beside the pictures around it -- and
+    made the picker react with a thumbs-up other than the quick row's and
+    every other client's. Sequences are left as they are: the selectors
+    inside them are Unicode's own."""
+    emoji = entry["emoji"]
+    if entry.get("type") == 1 and len(emoji) == 2 and emoji[1] == "️":
+        return emoji[0]
+    return emoji
+
+
 def search_text(entry):
     """What a search matches: the CLDR name and its keywords, lowercase,
     each word once."""
@@ -135,12 +153,13 @@ def build(data, picture_dir):
     used = []
     missing = []
     for entry in entries:
-        name = picture_for(entry["emoji"], pictures)
+        emoji = spelled(entry)
+        name = picture_for(emoji, pictures)
         if name is None:
-            missing.append(entry["emoji"])
+            missing.append(emoji)
             continue
         used.append(name)
-        rows.append([entry["emoji"], name, GROUPS.index(entry["group"]), search_text(entry)])
+        rows.append([emoji, name, GROUPS.index(entry["group"]), search_text(entry)])
     if missing:
         fail("no Twemoji picture for " + " ".join(missing))
     return rows, used

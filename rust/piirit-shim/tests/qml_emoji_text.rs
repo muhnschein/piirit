@@ -161,6 +161,9 @@ fn messages_draw_their_emoji_as_the_reactions_do() {
         ("copyright-emoji", "©\u{fe0f}", false),
         ("heart-text", "\u{2764}", false),
         ("heart-emoji", "\u{2764}\u{fe0f}", false),
+        // An emoji whatever follows it, as every client sends it: bare.
+        ("star", "\u{2b50} \u{2705}\u{2728}", false),
+        ("star-text", "\u{2b50}\u{fe0e}", false),
         ("keycap", "1\u{fe0f}\u{20e3}", false),
         ("flag", "🇫🇮!", false),
         ("family", "👨\u{200d}👩\u{200d}👧", false),
@@ -267,6 +270,15 @@ fn messages_draw_their_emoji_as_the_reactions_do() {
         ("copyright-emoji", img("a9")),
         ("heart-text", String::new()),
         ("heart-emoji", img("2764")),
+        // Not a symbol that is text without the selector, as a heart is:
+        // left to the font, a star sat between pictures in Sailfish's own
+        // glyph.
+        (
+            "star",
+            format!("{} {}{}", img("2b50"), img("2705"), img("2728")),
+        ),
+        // Unless the sender asked for text.
+        ("star-text", String::new()),
         ("keycap", img("31-20e3")),
         ("flag", format!("{}!", img("1f1eb-1f1ee"))),
         ("family", img("1f468-200d-1f469-200d-1f467")),

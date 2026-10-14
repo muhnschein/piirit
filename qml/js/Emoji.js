@@ -27,9 +27,11 @@
 //   as text by default, and so does every other client; a message that
 //   says "(c)" with the sign has not sent an emoji. One character and the
 //   selector in the data -- fully qualified only with it, so text without
-//   it. Only in the Basic Multilingual Plane, among the symbols every
-//   font has: above it the data spells even a thumbs-up with the
-//   selector, and nobody sends one as text.
+//   it. A star or a check mark is an emoji bare, and the data spells it
+//   bare (scripts/fetch-emoji.py, `spelled`). Only in the Basic
+//   Multilingual Plane, among the symbols every font has: above it a
+//   dove or a sun behind a cloud sent bare would be an empty box, so it
+//   is a picture.
 // - `mayHold`: matches a text only if it has a character of some emoji's
 //   key in it -- the first, or a keycap's mark -- so any text it does not
 //   match has nothing in it to draw, and need not be read through.
@@ -179,7 +181,10 @@ function inText(text, styled, size) {
         if (name === undefined) {
             name = known[untoned(emoji)]
         }
-        if (name === undefined || (textStyle[bare] === true && bare === emoji)) {
+        // Text, too, where the sender asked for it with U+FE0E: a star
+        // so marked is the font's. Down here only, as `textStyle` is.
+        if (name === undefined || (textStyle[bare] === true && bare === emoji)
+                || (code < 0xD800 && text.charCodeAt(end) === 0xFE0E)) {
             i = end
             continue
         }
