@@ -178,12 +178,16 @@ fn push_escaped(out: &mut String, text: &str) {
 /// One line of ordinary text: emphasis, code, links, and everything else
 /// escaped.
 fn inline(line: &str, out: &mut String) {
-    let links = url_spans(line);
+    let mut links = url_spans(line).into_iter().peekable();
     let mut at = 0;
     while let Some(rest) = line.get(at..).filter(|rest| !rest.is_empty()) {
+        // The links are in order and `at` only moves forward, so one that
+        // other markup has already taken in is passed for good, rather
+        // than every link searched again at every character.
+        while links.next_if(|(start, _)| *start < at).is_some() {}
         // A bare link, as it stands. Its own characters are never markup,
         // so a `_` in a path is a `_` and not an italic.
-        if let Some(&(_, end)) = links.iter().find(|(start, _)| *start == at) {
+        if let Some((_, end)) = links.next_if(|(start, _)| *start == at) {
             if let Some(url) = line.get(at..end) {
                 push_link(out, url, url);
                 at = end;
@@ -429,6 +433,21 @@ mod tests {
         assert_eq!(
             render("[<i>](https://example.org/?a=1&b=2)"),
             "<a href=\"https://example.org/?a=1&amp;b=2\">&lt;i&gt;</a>"
+        );
+    }
+
+    #[test]
+    fn many_links_on_one_line_are_each_found_once() {
+        // Every character used to search every link: seconds for this.
+        let line = "https://a.example/ ".repeat(20_000);
+        let rendered = render(&line);
+        assert_eq!(rendered.matches("<a href=").count(), 20_000);
+        // A link inside a code span stays code, and the next one is
+        // still a link.
+        assert_eq!(
+            render("`https://a.example/` https://b.example/"),
+            "<tt>https://a.example/</tt> \
+             <a href=\"https://b.example/\">https://b.example/</a>"
         );
     }
 }
