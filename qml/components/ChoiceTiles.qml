@@ -2,90 +2,54 @@ import QtQuick 2.0
 import Sailfish.Silica 1.0
 
 /*
- * The ways on from a page that asks something: one tile per answer, side
- * by side, an icon over the words for it.
+ * Tiles for a page that asks something: one per answer, icon over words.
+ * Same look as MediaKinds.qml's media row: these are doors too. Push button
+ * fits acting on screen content; onboarding has none, just places to go. Icon
+ * says which is which before reading: matters most on an app's first screen.
  *
- * The same thing the media row on a contact's page is (MediaKinds.qml),
- * and drawn the same way, because these are doors as well. A push button
- * is the right shape for "do this to what is already on the screen"; the
- * onboarding pages have nothing on the screen yet, and what they offer
- * is two places to go. Two buttons of the same size, one under the
- * other, say only that there are two of something -- an icon over each
- * says which is which before the words are read, and the reader who
- * needs that most is the one on the first screen of an app they have
- * never opened.
+ * Icons: theme's own (follow ambience), asked only by names seen on a device
+ * (see AppMark: a missing icon is a tile nobody sees, a reader who can't start).
+ * First-screen profile tile can't risk even that: app-drawn AccountMark.qml.
  *
- * Every icon here is the theme's own, in the theme's colours, so the
- * tiles wear whatever ambience the phone wears. They are asked for by
- * names this app has seen on a device (see AppMark for what an icon that
- * is not there looks like): a reader on a tile they cannot see is a
- * reader who cannot start. The one tile that cannot risk even that --
- * the way into a profile on the first screen -- has its mark drawn by
- * this app instead (AccountMark.qml).
- *
- * Laid out by bindings rather than a Row, for the reason MediaKinds
- * gives: a positioner sizes itself in a polish pass, which never runs
- * headlessly, so a row built from one measures as nothing in a test.
- *
- * Nothing is opened here. The page that owns the pageStack decides what
- * an answer means, which keeps this loadable, and testable, on its own.
+ * Bindings, not Row: positioner sizes in polish pass, never runs headless.
+ * Opens nothing; owning page decides what an answer means.
  */
 Item {
     id: root
 
-    /// The answers, in tile order. Each one is an object:
-    ///
-    /// - `name`: what `chosen` hands back, and what the tile is called --
-    ///   a tile is `<name>Tile`, which is how a test finds it.
-    /// - `icon`: the theme icon over the words, by name.
-    /// - `mark`: a mark drawn by this app in the icon's place, for a
-    ///   tile whose icon must be there on every phone: `account` is the
-    ///   head and shoulders in a ring (AccountMark.qml). Given, `icon`
-    ///   is not read.
-    /// - `text`: the words themselves.
-    /// - `hint`: a quieter line under them, or left out for none.
-    /// - `enabled`: false to grey the tile out and ignore taps on it.
-    ///   Left out means on.
+    /// Answers, in tile order. Each an object:
+    /// - `name`: handed back by `chosen`; tile is `<name>Tile`.
+    /// - `icon`: theme icon name, over the words.
+    /// - `mark`: app-drawn mark instead of icon, for tiles that must show on every
+    ///   phone (`account`: AccountMark.qml). Given, `icon` is not read.
+    /// - `text`: the words. `hint`: quieter line under them, optional.
+    /// - `enabled`: false greys out, ignores taps. Default on.
     property var choices: []
 
-    /// How far in from its own edges the row starts: its own margins on a
-    /// page that lays nothing out, and none inside a column that is
-    /// already inset by them.
+    /// Inset from edges: margins on bare page, none inside inset column.
     property real sideMargin: Theme.horizontalPageMargin
 
-    /// Whether the tiles stand one under another rather than side by
-    /// side. Two tiles share a screen comfortably; three leave each of
-    /// them a third of it, which is not room for a line of words with a
-    /// second line under it, so the page that asks three things at once
-    /// stacks them instead.
-    ///
-    /// Stacked, a tile is a row rather than a tile: the icon at the left
-    /// where an avatar would be, the words beside it and ranged left,
-    /// which is how every other row in this app reads
-    /// (components/ContactRow.qml).
+    /// Stacked: three side by side leave no room for two-line words.
+    /// Stacked tile is a row: icon left, words ranged left (as ContactRow.qml).
     property bool stacked: false
 
-    /// What is kept between stacked tiles, so that two of them read as
-    /// two rather than as one tall block.
+    /// Gap between stacked tiles.
     property real gap: Theme.paddingMedium
 
-    /// The reader picked one, by `name`.
+    /// Picked one, by `name`.
     signal chosen(string name)
 
-    /// How wide one tile is: the whole row stacked, and what the margins
-    /// leave shared out otherwise.
+    /// Tile width: whole row stacked, else share after margins.
     readonly property real tileWidth: root.choices.length > 0
         ? (root.stacked
            ? root.width - 2 * root.sideMargin
            : (root.width - 2 * root.sideMargin) / root.choices.length)
         : 0
 
-    /// How tall every tile is: as tall as the one that needs most room,
-    /// so the row reads as a row rather than as blocks of two heights.
-    /// A tile says what it needs and this follows the tallest.
+    /// Tile height: tallest tile's, so row reads as one.
     property real tileHeight: 0
 
-    /// Take the tallest tile's word for how tall a tile is.
+    /// Tallest tile's height.
     function measure() {
         var tallest = 0
         for (var i = 0; i < tiles.count; i++) {
@@ -106,8 +70,7 @@ Item {
     Repeater {
         id: tiles
         model: root.choices
-        // A tile that is not built yet has nothing to say about its
-        // height; this is where the last of them says it.
+        // Unbuilt tile: no height yet; last one to build reports.
         onItemAdded: root.measure()
         onItemRemoved: root.measure()
 
@@ -118,49 +81,41 @@ Item {
             y: root.stacked ? index * (root.tileHeight + root.gap) : 0
             width: root.tileWidth
             height: root.tileHeight
-            // `undefined` is a choice that never mentioned it, which is
-            // every choice that is always on.
+            // `undefined` = never mentioned: always on.
             enabled: modelData.enabled === undefined || modelData.enabled
 
-            /// The bottom of the words, whichever of them is the last.
+            /// Bottom of words.
             readonly property real wordsEnd: hint.visible
                 ? hint.y + hint.height : caption.y + caption.height
 
-            /// What this tile's own contents come to, top to bottom: the
-            /// words under the icon side by side, and whichever of the
-            /// two runs lower when they are beside each other. Read by
-            /// the row, which draws every tile at the largest.
+            /// Tile content height: icon then words under it; stacked, whichever of
+            /// icon and words runs lower. Row draws all at the largest.
             readonly property real needed:
                 Math.max(icon.y + icon.height, tile.wordsEnd) + Theme.paddingMedium
             onNeededChanged: root.measure()
 
-            // Lit under a thumb, the way an IconButton is; grey where the
-            // tile is not to be tapped, which is how Silica says so.
+            // Lit under thumb (as IconButton); grey when untappable.
             readonly property color tint: !tile.enabled
                 ? Theme.secondaryColor
                 : tile.highlighted ? Theme.highlightColor : Theme.primaryColor
 
-            // Placed rather than anchored: the two ways a tile is laid
-            // out want different edges, and a binding reads better than
-            // two sets of anchors that undo each other.
+            // Placed, not anchored: layouts want different edges.
             Image {
                 id: icon
                 objectName: "tileIcon"
-                // At the left of the row it is the mark on, the way an
-                // avatar is on a contact's row; over the words when the
-                // tiles stand side by side.
+                // Left of row, as avatar on contact row; over words when side by side.
                 x: root.stacked ? Theme.paddingMedium
                                 : (tile.width - icon.width) / 2
                 y: Theme.paddingMedium
                 width: Theme.iconSizeMedium
                 height: width
-                // Nothing asked of the theme where the mark is drawn.
+                // No theme asked where mark drawn.
                 source: modelData.mark === undefined
                         ? "image://theme/" + modelData.icon + "?" + tile.tint
                         : ""
             }
 
-            // The drawn mark, in the icon's place and the icon's colour.
+            // Drawn mark, in icon's place and colour.
             AccountMark {
                 objectName: "tileMark"
                 visible: modelData.mark === "account"
@@ -174,10 +129,7 @@ Item {
                 objectName: "tileLabel"
                 x: root.stacked ? icon.x + icon.width + Theme.paddingMedium
                                 : Theme.paddingSmall
-                // Beside the icon: at the top when there is a second
-                // line to come, and level with the middle of the icon
-                // when the one line is all there is (ContactRow.qml does
-                // the same with a name and an address).
+                // Beside icon: top if second line, else middle (as ContactRow.qml).
                 y: root.stacked
                    ? (hint.visible ? Theme.paddingMedium
                                    : icon.y + (icon.height - caption.height) / 2)
@@ -198,9 +150,7 @@ Item {
                 objectName: "tileHint"
                 visible: hint.text.length > 0
                 x: caption.x
-                // Straight under the line above it where the two are a
-                // block beside an icon, and a gap below the words where
-                // they are a column under one.
+                // Under line above if block beside icon; gap below if column.
                 y: caption.y + caption.height
                    + (root.stacked ? 0 : Theme.paddingSmall)
                 width: caption.width

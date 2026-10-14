@@ -1,16 +1,8 @@
-//! The recording strip, and the recorder under it, on a machine that
-//! cannot record.
-//!
-//! What can be checked here is the half that does not need a
-//! microphone: a recorder with no encoder says it is unavailable rather
-//! than pretending, the strip offers nothing then and starts nothing when
-//! asked, and the page shows the send button rather than a microphone
-//! that could not work. That the platform's encoders exist is a device
-//! question; docs/HARBOUR.md lists it under what to try on a phone.
-//!
-//! So is the limit: the longest recording the relay takes follows from
-//! the limit and the media quality the strip is handed, and the time on
-//! the strip says nothing of it.
+//! Recording strip and recorder, on a machine that cannot record.
+//! Checked (no mic needed): recorder without encoder says unavailable, not pretending; strip
+//! offers and starts nothing; page shows send button, not a mic. Encoders existing: device
+//! question (docs/HARBOUR.md). Limit too: longest recording relay takes follows limit and
+//! media quality strip is handed; strip time says nothing of it.
 
 // Qt harness: see qml_chat_list.rs.
 #![allow(
@@ -72,7 +64,7 @@ const PROBE_QML: &str = r"
 #[test]
 #[allow(clippy::too_many_lines)]
 fn a_machine_that_cannot_record_is_told_so_and_records_nothing() {
-    // SAFETY: single-threaded test binary; set before Qt starts.
+    // SAFETY: single-threaded; set before Qt starts.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
     }
@@ -112,8 +104,7 @@ fn a_machine_that_cannot_record_is_told_so_and_records_nothing() {
         (*steps_ptr).push(("height", call!("get", QString::from("height"))));
         (*steps_ptr).push(("start", call!("start")));
         (*steps_ptr).push(("limit-unknown", call!("limit", 0.0_f64, 0_i32)));
-        // The real core's recommendation, (30 - 1) MiB * 3/4, at both
-        // bit rates.
+        // Core recommends (30 - 1) MiB * 3/4, at both bit rates.
         (*steps_ptr).push(("limit-balanced", call!("limit", 22_806_528.0_f64, 0_i32)));
         (*steps_ptr).push(("limit-less-data", call!("limit", 22_806_528.0_f64, 1_i32)));
         (*steps_ptr).push(("time", call!("timeText")));
@@ -135,9 +126,7 @@ fn a_machine_that_cannot_record_is_told_so_and_records_nothing() {
     let context = format!("steps: {steps:?}");
 
     assert_eq!(value("load"), "ok", "the strip did not load. {context}");
-    // No multimedia backend is installed on the test runner, and the
-    // recorder has to say so rather than offer a microphone that records
-    // nothing.
+    // No multimedia backend on test runner: must say so, not offer a mic.
     assert_eq!(
         value("available"),
         "false",
@@ -169,10 +158,9 @@ fn a_machine_that_cannot_record_is_told_so_and_records_nothing() {
         "a start that could not happen was reported as something. {context}"
     );
 
-    // No limit known yet: no end but the reader's.
+    // No limit known: only reader's end.
     assert_eq!(value("limit-unknown"), "0", "{context}");
-    // At 32 kbit/s every second is 4000 bytes, and at 24 it is 3000: the
-    // limit less a little headroom, as milliseconds of MP3.
+    // 32 kbit/s = 4000 bytes/s, 24 = 3000: limit less headroom, in MP3 ms.
     assert_eq!(
         value("limit-balanced"),
         "5697536",
@@ -184,8 +172,7 @@ fn a_machine_that_cannot_record_is_told_so_and_records_nothing() {
         "7596714",
         "the lower media quality does not give a longer recording. {context}"
     );
-    // Over an hour and a half, which nobody records: the recording stops
-    // and is sent there, and the time does not say so.
+    // Over 1.5h, which nobody records: recording stops and is sent there; time doesn't say.
     assert_eq!(
         value("time"),
         "Recording 0:00",

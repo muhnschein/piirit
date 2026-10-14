@@ -9,46 +9,26 @@ description = "Qt/QML integration layer: exposes DeltaChatCore as a QObject and 
 
 [dependencies]
 deltachat-jsonrpc = { path = "../deltachat-jsonrpc" }
-# Without its `log` bridge, which nothing here installs and which is the
-# `log` crate's only reason to be in the tree.
+# No log bridge (log crate's only reason here).
 qmetaobject = { version = "0.2", default-features = false }
-# The `cpp!` blocks in src/recorder.rs: QAudioRecorder, which qmetaobject
-# does not bind. Same versions as the vendored qmetaobject's, so nothing
-# new reaches Cargo.lock.
+# cpp! blocks (src/recorder.rs, pictures.rs, mic_watch.rs): C++ APIs qmetaobject doesn't bind.
+# Same versions as vendored qmetaobject: nothing new in Cargo.lock.
 cpp = "0.5"
-# Not used from Rust. qttypes' build script is what finds Qt, and it tells
-# only its direct dependents where: build.rs reads the DEP_QT_* variables
-# it exports, which is how the C++ above finds <QtMultimedia/...> and the
-# library to link.
+# Not Rust-used. build.rs reads DEP_QT_* for <QtMultimedia/...>.
 qttypes = "0.2"
-# `net` and `io-util` are the loopback host one webxdc app is served
-# from (webxdc_host.rs): a TcpListener on 127.0.0.1 and the read/write
-# traits for one small HTTP exchange. `net` is what brings socket2 in,
-# tokio's own platform layer for sockets. `time` is the restart backoff
-# and the deadline an attempt at a profile is given (signup.rs); the
-# JSON-RPC client turns it on anyway, but it is used here too. `fs` is
-# the few files the async side writes -- a webxdc's icon, an app off the
-# store, a file an app hands over -- so that none of them blocks a
-# runtime thread the JSON-RPC client is waiting on.
+# net, io-util: webxdc loopback host (webxdc_host.rs). time: restart backoff, signup
+# deadline. fs: async writes (icon, store app, handover) without blocking JSON-RPC runtime thread.
 tokio = { version = "1", features = ["rt-multi-thread", "sync", "net", "io-util", "time", "fs"] }
-# Only for the viewer's timezone. A day separator has to ask what the
-# offset was at the message's own instant, not the one in force now,
-# and std has no timezone support -- the alternative was localtime_r,
-# which this crate denies (`unsafe_code`).
+# Viewer timezone for day separator: offset at message's instant, not now. std has no tz;
+# localtime_r denied (`unsafe_code`).
 chrono = { version = "0.4", default-features = false, features = ["clock", "std"] }
 serde_json = "1"
-# QR codes both ways, pure Rust and under the 1.75 floor. Default
-# features off: rqrr's pull in the image crate, whose current releases
-# want Rust 1.85, and the pixels come from a PGM Qt writes anyway.
+# QR both ways, pure Rust, 1.75 floor. No default features (rqrr image crate needs 1.85).
 qrcode = { version = "0.14", default-features = false }
 rqrr = { version = "0.10", default-features = false }
-# A voice message as MP3, which every other client plays as one: LAME,
-# whose C source mp3lame-sys carries and builds with the target's own
-# compiler. Sailfish's recorder offers no encoder that iOS plays; see
-# src/voice.rs.
+# Voice MP3 (every client plays it). LAME via mp3lame-sys. Sailfish: no iOS-playable encoder.
 mp3lame-encoder = "0.2"
-# A picked video made small enough to send (src/video.rs): FFmpeg and
-# x264, built from source into the binary as LAME is. See its build.rs.
+# Picked video, small enough to send (src/video.rs). FFmpeg + x264 from source.
 piirit-video = { path = "../piirit-video" }
 
 [build-dependencies]
@@ -63,8 +43,7 @@ path = "src/bin/fake_health_server.rs"
 test = false
 doc = false
 
-# The recording double the onboarding tests drive. See its module docs for
-# why the journal exists.
+# Onboarding test double. See module docs.
 [[bin]]
 name = "fake-core-server"
 path = "src/bin/fake_core_server.rs"

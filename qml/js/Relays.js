@@ -1,18 +1,10 @@
-// The public chatmail relays, for the two pages that offer a list of them
-// to pick from: the dialog that makes a profile on one, and the page that
-// adds one to a profile that exists. One list rather than two, so the two
-// cannot drift.
+// Public chatmail relays for pick lists (profile dialog, add-relay page).
+// One list so they can't drift.
 //
-// chatmail.at/relays as it stood on 2026-10-07, in its order, with what
-// it says about each. Anyone may run a relay and the page is the list
-// that is kept up to date, so this one is a starting point rather than
-// the whole of it -- the hint under the field on either page points at
-// the page itself. Refreshed by hand against that page, and one that
-// stops being listed there is dropped here.
+// chatmail.at/relays snapshot, 2026-10-07. Not whole list; anyone may run one.
+// Refresh by hand; drop relays unlisted there.
 //
-// A library rather than a component: nothing here is translated, so it
-// needs no component's context, and a list shared by reference costs one
-// copy rather than one per page.
+// Library: nothing translated, shared by reference, one copy.
 .pragma library
 
 var list = [
@@ -43,7 +35,7 @@ var list = [
     { domain: "toque.im", location: "Quebec, Canada" }
 ]
 
-/// What a row of the list says: the relay, and where or for whom it is.
+/// Row label: relay, then where or for whom.
 function label(relay) {
     return relay.domain + " (" + relay.location + ")"
 }

@@ -1,10 +1,8 @@
-//! The chat list's Search and Unread pills, and the field Search brings out.
+//! Chat list's Search and Unread pills, and field Search brings out.
 //!
-//! They are there on the ordinary list and not on the archived one, which
-//! is a mode of its own with only its field. Turning Unread on leaves the
-//! header alone, and a list with nothing unread says why it is empty and
-//! how to get back. While a search is open the pills give way to the
-//! field, since a search covers every chat.
+//! On ordinary list, not archived one (own mode, only its field). Unread on leaves header
+//! alone; list with nothing unread says why empty and how back. Open search: pills give way
+//! to field, since search covers every chat.
 
 // Qt harness: see qml_chat_list.rs.
 #![allow(
@@ -90,8 +88,7 @@ fn the_search_and_unread_pills_give_way_to_the_search_field() {
     let temp = std::env::temp_dir().join(format!("piirit-unread-switch-{}", std::process::id()));
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
 
-    // SAFETY: single-threaded test binary; set before Qt starts and before
-    // the server inherits them.
+    // SAFETY: single-threaded; set before Qt and server start.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_ACCOUNTS_DIR", temp.join("accounts"));
@@ -163,7 +160,7 @@ fn the_search_and_unread_pills_give_way_to_the_search_field() {
         );
     });
 
-    // The fake's chats have nothing unread, so the filtered list is empty.
+    // Fake's chats have nothing unread: filtered list empty.
     single_shot(Duration::from_secs(4), move || unsafe {
         record!("on-checked", get!("unreadFilterButton", "checked"));
         record!("on-description", get!("chatListHeader", "description"));
@@ -182,7 +179,7 @@ fn the_search_and_unread_pills_give_way_to_the_search_field() {
         );
     });
 
-    // The pills fade before they go, so each look is a step later.
+    // Pills fade before going: each look a step later.
     single_shot(Duration::from_secs(5), move || unsafe {
         record!("while-searching", get!("unreadFilterButton", "visible"));
         record!("field-while", get!("chatSearchField", "visible"));

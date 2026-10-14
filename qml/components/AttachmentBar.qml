@@ -3,48 +3,41 @@ import Sailfish.Silica 1.0
 import "../js/Format.js" as Format
 
 /*
- * The file the next message will carry, above the field.
+ * File the next message carries, above field.
  *
- * Its own component for the same reason ReplyBar is: ConversationPage
- * cannot be loaded headlessly, so anything whose measurement matters has to
- * be testable on its own. It also deliberately looks like ReplyBar -- both
- * say "the next message will have this in it", and one idiom for that is
- * easier to read than two.
+ * Own component like ReplyBar: ConversationPage can't load headless, so measurable parts must test alone. Looks like ReplyBar on purpose: same "next message has this" idiom.
  */
 Item {
     id: root
 
-    /// The picked file, empty for none. This is what makes the bar appear.
+    /// Picked file; empty for none. Makes bar appear.
     property string filePath
-    /// What to call it. Falls back to the path when a picker gave no name.
+    /// Display name. Falls back to path when picker gave none.
     property string fileName
-    /// The file is a video being made smaller before it is sent, and
-    /// how far along that is, from 0 to 1. See ChatMessages.preparing.
+    /// Video being shrunk before send; progress 0 to 1. See
+    /// ChatMessages.preparing.
     property bool preparing: false
     property real progress: 0
-    /// What the picked file weighs, while what is sent is a smaller video
-    /// made from it; 0 otherwise, and then no sizes are shown. See
-    /// ChatMessages.original_bytes.
+    /// Picked size while sending shrunk video; 0 otherwise (no sizes shown).
+    /// See ChatMessages.original_bytes.
     property real originalBytes: 0
-    /// What is sent: while it is still being made, what it is planned to
-    /// come out at. See ChatMessages.attachment_bytes.
+    /// Size sent; while still shrinking, planned size. See
+    /// ChatMessages.attachment_bytes.
     property real bytes: 0
-    /// The file is put away.
+    /// File removed.
     signal cancelled()
-    /// Making the video smaller is stopped; the file stays, to be sent as
-    /// it is. What the same button means while that runs.
+    /// Shrinking stopped; file kept, sent as is. Same button, other meaning
+    /// while shrinking.
     signal stopped()
 
     readonly property string shownName:
         root.fileName.length > 0 ? root.fileName : root.filePath
 
-    // Sized by its own reason to be here rather than by `visible`: see
-    // ReplyBar.
+    // Sized by `shown`, not `visible`: see ReplyBar.
     readonly property bool shown: root.filePath.length > 0
     visible: root.shown
-    // Both, not just the label: the cancel button is an icon's worth tall.
-    // Same reasoning as ReplyBar, where a one-line quote measured short and
-    // the bar overlapped the field below it.
+    // Both heights: cancel button is icon-tall. One-line quote measured short
+    // in ReplyBar, bar overlapped field.
     height: root.shown ? Math.max(lines.height, cancel.height) + 2 * Theme.paddingSmall : 0
 
     Column {
@@ -57,9 +50,8 @@ Item {
             id: attached
             objectName: "pendingAttachmentLabel"
             width: parent.width
-            // A file name is cut rather than let grow the bar. While the video
-            // is made smaller there is no name, and the line wraps instead:
-            // in a long language the number at its end is what matters.
+            // Name cut, not grown. No name while shrinking: wraps, since number
+            // at end matters in long languages.
             truncationMode: root.preparing ? TruncationMode.None : TruncationMode.Fade
             wrapMode: root.preparing ? Text.Wrap : Text.NoWrap
             font.pixelSize: Theme.fontSizeExtraSmall
@@ -78,7 +70,7 @@ Item {
                   : qsTr("Sending %1").arg(root.shownName)
         }
 
-        // How much smaller the video goes: what was picked, and what is sent.
+        // How much smaller the video goes: what was picked, what is sent.
         Label {
             objectName: "attachmentSizesLabel"
             visible: root.originalBytes > 0
@@ -104,8 +96,7 @@ Item {
         }
     }
 
-    // How far along making the video smaller is: a line along the bottom
-    // of the bar, filling as it goes.
+    // Shrink progress: line along bottom of bar, fills as it goes.
     Rectangle {
         objectName: "preparingProgress"
         anchors {

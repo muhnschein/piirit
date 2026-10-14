@@ -1,15 +1,7 @@
-//! A file the other end named becomes a URL through per-segment encoding.
-//!
-//! `encodeURI` leaves `#` and `?` alone -- to it they are URL syntax --
-//! so a blob called `a#b.png` pointed at `a`, and whatever the core wrote
-//! the file as never loaded. The path is built one segment at a time with
-//! `encodeURIComponent`, which encodes everything that is not a slash.
-//! Measured on the two components that build one, not just scanned for.
-//!
-//! An avatar's picture is asked of the shim's image provider instead
-//! (`src/pictures.rs`), the whole path one `encodeURIComponent`d value of
-//! its recipe; for it the measure is that a picture saved under such a
-//! name is found and drawn.
+//! Peer file name -> URL via per-segment encoding. `encodeURI` leaves `#`, `?` alone
+//! (`a#b.png` pointed at `a`); use `encodeURIComponent` per segment. Measured on
+//! the two components that build it. Avatars: image provider `src/pictures.rs`,
+//! one encoded value; measure: picture under such name found and drawn.
 
 // Qt harness: see qml_avatar.rs.
 #![allow(
@@ -56,20 +48,18 @@ const PROBE_QML: &str = r"
     }
 ";
 
-/// Every character a sender could put in a name that a URL would read as
-/// syntax: a percent, a space, a fragment, a query.
+/// Chars URL reads as syntax: percent, space, fragment, query.
 const AWKWARD: &str = "/home/u/.local/share/piirit/blobs/100% sure#1?.png";
 
 #[test]
 #[allow(clippy::too_many_lines)]
 fn a_file_url_encodes_every_character_that_is_not_a_slash() {
-    // SAFETY: single-threaded test binary; set before Qt starts.
+    // SAFETY: single thread; pre-Qt.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
     }
 
-    // A real picture under the awkward name, which also has the recipe's
-    // own `&` and `=` in it.
+    // Real picture under awkward name, which also holds recipe's own `&` and `=`.
     let blobs = std::env::temp_dir().join(format!("piirit-file-urls-{}", std::process::id()));
     std::fs::create_dir_all(&blobs).expect("a temporary directory");
     let awkward_picture = blobs.join("100% sure#1?&x=y.png");
@@ -136,7 +126,7 @@ fn a_file_url_encodes_every_character_that_is_not_a_slash() {
         );
     });
 
-    // Loaded off the main thread.
+    // Loaded off main thread.
     single_shot(Duration::from_secs(3), move || unsafe {
         record!(
             "avatar-status",
@@ -167,9 +157,7 @@ fn a_file_url_encodes_every_character_that_is_not_a_slash() {
     let path = url
         .strip_prefix("file:///")
         .unwrap_or_else(|| panic!("AttachmentPreview made a URL that is not file:///: {url:?}"));
-    // What a URL reads as syntax is what the file name must not be
-    // allowed to say. Qt's own string form may decode a space back, so the
-    // reserved characters are the assertion.
+    // Reserved chars are the assertion: Qt may decode a space back.
     assert!(
         !path.contains('#') && !path.contains('?'),
         "AttachmentPreview left '#' or '?' in the path, so the URL points at a \
@@ -191,7 +179,7 @@ fn a_file_url_encodes_every_character_that_is_not_a_slash() {
         url.starts_with("image://piirit/face?file=") && !url.contains('#'),
         "the avatar's picture is not one encoded value of a face's recipe: {url}"
     );
-    // Image.Ready is 1: the provider found the file the name points at.
+    // Image.Ready is 1: provider found the file.
     assert_eq!(
         value("avatar-status"),
         "1",

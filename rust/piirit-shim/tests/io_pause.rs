@@ -1,15 +1,9 @@
-//! IO stops while the phone has no network, and starts again when it does.
+//! IO stops with no network, restarts when it returns.
 //!
-//! A core whose IO is running on a network that is not there keeps trying
-//! to make a connection: a name lookup, a TCP connect, a failure, a wait,
-//! again. Every attempt wakes the radio and none of them can succeed, and
-//! an hour in a tunnel is a great many of them. Nothing is given up by
-//! stopping, because no message can arrive over a network that is not
-//! there.
+//! Core on dead network keeps retrying, waking radio, never succeeding. Stopping loses nothing: no
+//! message arrives over no network.
 //!
-//! What must never happen is the other thing that looks like it: stopping
-//! IO because the app was backgrounded. The app in the background is the
-//! only way a message reaches this platform, so that is checked here too.
+//! Never stop IO for backgrounding: background is the only way messages arrive here.
 
 // Qt harness: see qml_share.rs.
 #![allow(
@@ -27,7 +21,7 @@ use qmetaobject::*;
 
 mod common;
 
-/// Silica's `pageStack`; see `network_hint.rs`. Nothing here navigates.
+/// Silica's `pageStack`; see `network_hint.rs`. Never navigated.
 #[derive(QObject, Default)]
 struct StackProbe {
     base: qt_base_class!(trait QObject),
@@ -75,12 +69,12 @@ const PROBE_QML: &str = r"
     }
 ";
 
-/// Where a method first appears in what the core was asked, if at all.
+/// First index of method in what core was asked, if any.
 fn first(methods: &[String], name: &str) -> Option<usize> {
     methods.iter().position(|method| method == name)
 }
 
-/// Where a method last appears in what the core was asked, if at all.
+/// Last index of method in what core was asked, if any.
 fn last(methods: &[String], name: &str) -> Option<usize> {
     methods.iter().rposition(|method| method == name)
 }
@@ -91,11 +85,10 @@ fn io_stops_only_for_a_lasting_loss_of_network_and_starts_again_with_it() {
     let temp = std::env::temp_dir().join(format!("piirit-io-pause-{}", std::process::id()));
     let journal = common::fresh_journal(&temp);
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
-    // `EnterKey` has no stub; the window reaches pages that use it.
+    // `EnterKey` has no stub; window reaches pages using it.
     let tree = common::qml_tree_without_enter_key();
 
-    // SAFETY: single-threaded test binary; set before Qt starts and before
-    // the server inherits them.
+    // SAFETY: single-threaded; set before Qt starts and before server inherits env.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_FAKE_JOURNAL", &journal);
@@ -145,8 +138,7 @@ fn io_stops_only_for_a_lasting_loss_of_network_and_starts_again_with_it() {
         );
     });
 
-    // The app goes into the background, which is where it spends most of
-    // its life and where it does its only useful work. IO must survive it.
+    // Backgrounded: where app spends most life and does its only useful work. IO must survive.
     let backgrounded = steps.clone();
     let background_journal = journal.clone();
     single_shot(Duration::from_secs(4), move || unsafe {
@@ -163,7 +155,7 @@ fn io_stops_only_for_a_lasting_loss_of_network_and_starts_again_with_it() {
                 .to_string()
                 .into(),
         );
-        // The network goes, and stays gone.
+        // Network goes, stays gone.
         call!("connman", QString::from("offline"));
     });
 
@@ -181,7 +173,7 @@ fn io_stops_only_for_a_lasting_loss_of_network_and_starts_again_with_it() {
                 .into(),
         );
         common::record(&lost, "paused", call!("paused").into());
-        // And it comes back.
+        // Comes back.
         call!("connman", QString::from("online"));
     });
 

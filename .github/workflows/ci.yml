@@ -1,15 +1,15 @@
 name: ci
 
-# `main` only: a bare `push:` beside `pull_request:` runs everything twice.
+# `main` only: bare `push:` beside `pull_request:` runs everything twice.
 on:
   push:
     branches: [main]
   pull_request:
   workflow_dispatch:
 
-# A new push supersedes the run in flight. `github.ref`, not `run_id`:
-# `head_ref` is set only for pull_request, so on a push the old fallback
-# gave every run a group of its own and nothing was ever cancelled.
+# New push supersedes in-flight run. Fallback `github.ref`, not `run_id`:
+# head_ref is PR-only, so `run_id` gave each push its own group, never
+# cancelled.
 concurrency:
   group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.head_ref || github.ref }}
   cancel-in-progress: true
@@ -19,70 +19,52 @@ permissions:
 
 env:
   CARGO_TERM_COLOR: always
-  # A runner compiles once and throws the machine away, so incremental
-  # state is written, cached and never read. Off, it is smaller to cache
-  # and slightly faster to produce.
+  # Runner discards machine: incremental state never read. Off = smaller cache.
   CARGO_INCREMENTAL: 0
 
 jobs:
-  # Lints, unit tests, and the Qt event-loop tests. The toolchain comes from
-  # rust-toolchain.toml.
+  # Lints, unit and Qt event-loop tests. Toolchain from rust-toolchain.toml.
   test:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        # FFmpeg and x264, which piirit-video builds (docs/BUILDING.md).
+        # Submodules: FFmpeg, x264 for piirit-video (docs/BUILDING.md).
         with:
-          # Nothing here pushes with git, so the token is not left behind in
-          # .git/config for a later step to find. Every checkout in this file.
+          # Token not left in .git/config (nothing pushes).
           persist-credentials: false
           submodules: true
-      # qml-module-qtquick2 is the QtQuick runtime plugin, which the -dev
-      # packages do not pull in. qttools5-dev-tools is lrelease, which the
-      # app's translation test compiles a catalog with. qtmultimedia5-dev
-      # is QAudioRecorder, which the shim's voice recorder is built on.
-      # qml-module-qtquick-window2 is QtQuick.Window, which the chat search
-      # test shows a window through; nothing else here pulls it in.
-      # libpulse-dev for the microphone watch; pulseaudio and its tools for
-      # the test that runs it against a sound server of its own.
+      # QtQuick runtime plugin (-dev omits it), lrelease (translation test),
+      # QAudioRecorder (voice recorder), QtQuick.Window (chat search test),
+      # libpulse (mic watch), pulseaudio + utils (its test's sound server).
       - run: ./ci/apt-install.sh qtbase5-dev qtdeclarative5-dev qtmultimedia5-dev qtdeclarative5-dev-tools qml-module-qtquick2 qml-module-qtquick-window2 qttools5-dev-tools libpulse-dev pulseaudio pulseaudio-utils
       - uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
         with:
           workspaces: rust
       - run: rustc --version && cargo --version
       - run: cd rust && cargo fmt --all --check
-      # `--locked` on every cargo call that resolves dependencies: the
-      # lockfile is committed, so a manifest change without it fails here
-      # instead of cargo quietly rewriting the lock the build then uses.
+      # `--locked`: lockfile committed; a manifest change without it fails here.
       - run: cd rust && cargo clippy --locked --workspace --all-targets -- -D warnings
-      # nextest runs each test in its own process instead of one test
-      # binary at a time. This suite is over a hundred binaries that mostly
-      # wait on Qt timers, so the step went from about ten minutes to about
-      # two and a half. rust/.config/nextest.toml says the rest, including
-      # what the `ci` profile changes.
+      # nextest: one process per test, ~10 min down to ~2.5 (Qt timers).
+      # Profiles: rust/.config/nextest.toml.
       - uses: taiki-e/install-action@f7e5d7c961414b23f5b25b2da9294395d08513ad # v2.87.26
         with:
           tool: cargo-nextest
-      # Also set by the tests; here so a failure is never a missing
-      # display.
+      # Also set by tests; here so failure is never a missing display.
       - run: cd rust && cargo nextest run --locked --workspace --profile ci
         env:
           QT_QPA_PLATFORM: offscreen
-      # nextest does not run doctests. There are none today, which is
-      # exactly how one would get added and never run again.
+      # nextest skips doctests; none today, so one added would never run.
       - run: cd rust && cargo test --locked --workspace --doc
       # Broken intra-doc links are errors.
       - run: cd rust && RUSTDOCFLAGS="-D warnings" cargo doc --locked --workspace --no-deps
 
-  # The device toolchain floor: Sailfish ships Rust 1.75.0 and does not get
-  # to pick a newer one.
+  # Device toolchain floor: Sailfish ships Rust 1.75.0; no newer available.
   msrv:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        # FFmpeg and x264, which piirit-video builds (docs/BUILDING.md).
         with:
           persist-credentials: false
           submodules: true
@@ -91,33 +73,29 @@ jobs:
       - uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
         with:
           workspaces: rust
-          # rust-cache keys on the DEFAULT toolchain, and this job builds
-          # with `+1.75.0`. Without a key of its own the entry would collide
-          # with the stable jobs' and neither would ever hit.
+          # Own key: rust-cache keys on default toolchain, job uses `+1.75.0`;
+          # shared key would collide with stable jobs, neither hits.
           key: msrv-1.75.0
-      # Warnings are denied by the workspace lints table, not RUSTFLAGS:
-      # see rust/Cargo.toml.
+      # Denied by workspace lints table (rust/Cargo.toml), not RUSTFLAGS.
       - run: cd rust && cargo +1.75.0 check --locked --workspace --all-targets
-      # Checked here, next to the toolchain it constrains.
+      # Checked next to the toolchain it constrains.
       - run: ./ci/check-lockfile.sh
 
-  # What no fake server can prove: that our shapes are the real core's.
-  # Offline, against the pinned binary.
+  # What no fake server proves: our shapes match the real core. Pinned binary.
   integration:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        # FFmpeg and x264, which piirit-video builds (docs/BUILDING.md).
         with:
           persist-credentials: false
           submodules: true
-      # real_core drives the shim through a QML probe.
+      # real_core drives shim through a QML probe.
       - run: ./ci/apt-install.sh qtbase5-dev qtdeclarative5-dev qtmultimedia5-dev qml-module-qtquick2 libpulse-dev
       - uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
         with:
           workspaces: rust
-      # Checksum-pinned on the wheel and the extracted binary.
+      # Checksum-pinned: wheel and extracted binary.
       - run: ./scripts/fetch-rpc-server.sh
       - run: cd rust && cargo test --locked -p deltachat-jsonrpc --test real_server
         env:
@@ -127,8 +105,7 @@ jobs:
           DELTACHAT_RPC_SERVER: vendor/deltachat-rpc-server/x86_64/deltachat-rpc-server
           QT_QPA_PLATFORM: offscreen
 
-  # What decides whether the RPM installs and the launcher works; none of it
-  # is reachable from `cargo test`.
+  # What decides RPM install and launcher; none reachable from `cargo test`.
   packaging:
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -138,59 +115,46 @@ jobs:
           persist-credentials: false
       - run: ./ci/apt-install.sh qtdeclarative5-dev-tools qttools5-dev-tools rpm desktop-file-utils shellcheck
       - run: ./ci/qml-lint.sh
-      # Strict: a checker that is not installed fails here, so the job
-      # cannot quietly stop checking when the apt line above changes.
+      # Strict: missing checker fails; job can't quietly stop.
       - run: ./ci/packaging-lint.sh
         env:
           PACKAGING_LINT_STRICT: 1
-      # scripts/sonar-report.sh talks to a service no test can reach, so it
-      # is proved against a stub server instead. It runs here rather than in
-      # `test` because it is a shell script with no cargo in it.
+      # sonar-report.sh: stub-tested (service unreachable). Here: no cargo.
       - run: ./ci/sonar-report-selftest.sh
-      # ci/apt-install.sh decides which apt sources every other job keeps.
-      # Getting that wrong deletes the archive and fails everything, so the
-      # rule is proved on a directory of the test's own.
+      # ci/apt-install.sh: wrong rule deletes the archive; proved on own dir.
       - run: ./ci/apt-install-selftest.sh
 
-  # What Harbour would reject, caught before it is written rather than at
-  # intake. `sfdk check -s harbour` on the real RPM is the authority and
-  # runs in rpm.yml; this asks the same questions of the sources, and is
-  # mandatory because the answers only get more expensive to change.
+  # Harbour rejects, caught from sources before intake. Authority: `sfdk check
+  # -s harbour` on real RPM (rpm.yml). Mandatory: fixes only get dearer.
   # docs/HARBOUR.md.
   harbour:
     runs-on: ubuntu-latest
     timeout-minutes: 25
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        # FFmpeg and x264, which piirit-video builds (docs/BUILDING.md).
         with:
           persist-credentials: false
           submodules: true
-      # rpm for rpmspec (the %files layout), file for the icons, binutils
-      # for the binary's symbols.
+      # rpm (%files layout), file (icons), binutils (binary symbols).
       - run: ./ci/apt-install.sh rpm file binutils qtbase5-dev qtdeclarative5-dev qtmultimedia5-dev libpulse-dev
       - uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
         with:
           workspaces: rust
-      # The bundled server is one of the files the package installs, so
-      # the layout check cannot judge it while it is absent.
+      # Bundled server is installed; layout check can't judge it absent.
       - run: ./scripts/fetch-rpc-server.sh
-      # 1.7 reads the linked binary: that main() is exported, and that it
-      # survives the strip rpmbuild does. Debug is enough -- both are
-      # settled by the link, not the optimisation level.
+      # 1.7 reads linked binary: main() exported, survives rpmbuild strip.
+      # Debug enough: both settled by link, not opt level.
       - run: cd rust && cargo build --locked -p piirit-app
-      # The gate itself, then the proof that the gate still bites.
+      # The gate, then proof it still bites.
       - run: ./ci/harbour-check.sh
         env:
           HARBOUR_CHECK_STRICT: 1
       - run: ./ci/harbour-check-selftest.sh
-      # The vendored qmetaobject is what keeps QtWidgets out of the binary,
-      # so what it contains is a Harbour question too.
+      # Vendored qmetaobject keeps QtWidgets out of binary (a Harbour question).
       - run: ./ci/vendor-check.sh
 
-  # Licences matter here: Piirit is GPLv3+ and ships beside an MPL-2.0
-  # core binary, so an incompatible dependency is a distribution problem
-  # (docs/PROJECT.md).
+  # Licences: GPLv3+ beside MPL-2.0 core; incompatible dep = distribution
+  # problem (docs/PROJECT.md).
   deny:
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -198,22 +162,16 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      # cargo-deny as a prebuilt binary, not EmbarkStudios/cargo-deny-action:
-      # that action builds a Docker image from Docker Hub on every run, and
-      # Docker Hub's anonymous pull limit failed the job for every pull
-      # request at once. By commit, as the other actions are; Dependabot
-      # moves the pin.
+      # cargo-deny prebuilt binary: the action's Docker Hub pull limit failed
+      # every PR.
       - uses: taiki-e/install-action@f7e5d7c961414b23f5b25b2da9294395d08513ad # v2.87.26
         with:
           tool: cargo-deny
       - run: cd rust && cargo deny check
 
-  # The workflows themselves: a `${{ }}` pasted into a script, a token left
-  # in .git/config, a cache a release build trusts. Offline, so it judges
-  # only what is in the tree; the weekly run in scheduled.yml adds the
-  # audits that ask GitHub (actions with known advisories, pins that are
-  # not on the action's own repository). Findings it should not raise are
-  # ignored where they occur, with the reason beside them.
+  # Workflows: `${{ }}` in scripts, tokens in .git/config, cache trust.
+  # Offline: tree only; scheduled.yml adds weekly online audits. Wrongly
+  # raised findings: ignored in place, reason beside.
   zizmor:
     runs-on: ubuntu-latest
     timeout-minutes: 10

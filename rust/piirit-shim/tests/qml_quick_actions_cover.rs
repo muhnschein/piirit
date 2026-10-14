@@ -1,16 +1,11 @@
-//! The cover's quick actions: what the home screen is handed, and what the
-//! grid does to make room for them.
+//! Cover quick actions: what home screen is handed, and what grid does to make room.
 //!
-//! None, one or two, whichever the settings hold: a list for two, a list
-//! for one, and the one that fits switched on. Each action's picture is a
-//! file the home screen reads for itself, so it has to be a whole path to
-//! a file that is there, at the size and in the ink the ambience wants. A
-//! tap only says which side it was; what it does is the window's
-//! (`qml_quick_actions_window.rs`).
+//! None, one or two, per settings. Each picture is a file home screen reads: whole path,
+//! file present, size and ink as ambience wants. Tap says only which side; action is
+//! window's (`qml_quick_actions_window.rs`).
 //!
-//! With actions on, the grid fades out into their strip -- each face told
-//! where the band crosses it -- and the faces that matter stay above it.
-//! Nothing on the cover is drawn by a shader of its own while it does.
+//! Actions on: grid fades into their strip (each face told where band crosses it); faces
+//! that matter stay above. Nothing on cover drawn by its own shader meanwhile.
 
 // Qt harness: see qml_cover.rs.
 #![allow(
@@ -28,8 +23,7 @@ use qmetaobject::*;
 
 mod common;
 
-/// The probe, with the components directory filled in so it can write the
-/// `Settings` the cover reads.
+/// Probe, components dir filled in so it can write the `Settings` cover reads.
 fn probe_qml() -> String {
     let components =
         std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../qml/components");
@@ -163,8 +157,7 @@ fn the_cover_offers_the_actions_that_are_set_and_makes_room_for_them() {
     let temp = std::env::temp_dir().join(format!("piirit-qml-quick-cover-{}", std::process::id()));
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
 
-    // SAFETY: single-threaded test binary; set before Qt starts and before
-    // the server inherits them. Two profiles, so both have a face lit.
+    // SAFETY: single-threaded; set before Qt and server start. Two profiles: both faces lit.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_ACCOUNTS_DIR", temp.join("accounts"));
@@ -220,10 +213,9 @@ fn the_cover_offers_the_actions_that_are_set_and_makes_room_for_them() {
         };
     }
 
-    // SAFETY: the callbacks fire only while `exec()` runs on this thread.
+    // SAFETY: callbacks run only inside `exec()` on this thread.
     single_shot(Duration::from_secs(1), move || unsafe {
-        // dconf outlives a run on a phone, and the stub's values outlive
-        // nothing, but say it anyway: nothing is set to start with.
+        // dconf outlives a phone run; stub values don't, but clear anyway: nothing set at start.
         record!("clear-left", set!("left", "", 0, 0, ""));
         record!("clear-right", set!("right", "", 0, 0, ""));
         record!("room-for-two", call!("count", 2));
@@ -232,7 +224,7 @@ fn the_cover_offers_the_actions_that_are_set_and_makes_room_for_them() {
         record!("none-fade", call!("fade"));
         record!("none-floor", call!("floor"));
 
-        // One action: the list for one, holding it.
+        // One action: list for one, holding it.
         record!("set-left", set!("left", "search", 0, 0, ""));
         record!("one-lists", call!("lists"));
         record!("one-icon", call!("icon", QString::from("oneAction"), 0));
@@ -248,7 +240,7 @@ fn the_cover_offers_the_actions_that_are_set_and_makes_room_for_them() {
         record!("two-right", call!("icon", QString::from("twoActions"), 1));
         record!("two-tap", call!("tap", QString::from("twoActions"), 1));
 
-        // Room for one: the left alone, the right kept but not offered.
+        // Room for one: left alone; right kept, not offered.
         record!("room-for-one", call!("count", 1));
         record!("held-right-lists", call!("lists"));
         record!(
@@ -258,8 +250,7 @@ fn the_cover_offers_the_actions_that_are_set_and_makes_room_for_them() {
         record!("back-to-two", call!("count", 2));
         record!("both-again", call!("lists"));
 
-        // An icon this version does not know is the first one; a kind it
-        // does not know is no action at all, which leaves the other alone.
+        // Unknown icon: first one. Unknown kind: no action at all, other left alone.
         record!("set-odd-icon", set!("right", "chat", 1, 2, "teapot"));
         record!("odd-icon", call!("icon", QString::from("twoActions"), 1));
         record!("set-odd-kind", set!("left", "teapot", 0, 0, ""));
@@ -267,13 +258,12 @@ fn the_cover_offers_the_actions_that_are_set_and_makes_room_for_them() {
         record!("odd-only", call!("icon", QString::from("oneAction"), 0));
         record!("odd-tap", call!("tap", QString::from("oneAction"), 0));
 
-        // A light ambience gets the black ink.
+        // Light ambience gets black ink.
         record!("light", call!("ink", QString::from("#000000")));
         record!("light-icon", call!("icon", QString::from("oneAction"), 0));
         record!("dark", call!("ink", QString::from("#ffffff")));
 
-        // The window takes them away while it cannot act on one; the room
-        // made for them goes with them.
+        // Window takes actions away when it cannot act on one; room goes too.
         record!("disallow", call!("allow", QString::from("false")));
         record!("held-lists", call!("lists"));
         record!("held-fade", call!("fade"));
@@ -284,7 +274,7 @@ fn the_cover_offers_the_actions_that_are_set_and_makes_room_for_them() {
         record!("set-both", set!("left", "qr", 0, 0, ""));
     });
 
-    // Once the lists are in, someone writes under each profile.
+    // Once lists are in, someone writes under each profile.
     single_shot(Duration::from_secs(4), move || unsafe {
         record!("mark-first", call!("markUnread", 0, 1));
         record!("mark-second", call!("markUnread", 1, 2));
@@ -335,11 +325,8 @@ fn the_cover_offers_the_actions_that_are_set_and_makes_room_for_them() {
         "true",
         "the grid runs on under the action strip. {context}"
     );
-    // The fade used to be one ShaderEffect over the whole grid. On Qt 5.6
-    // a ShaderEffect made after the cover has once been hidden can be
-    // drawn with another one's program, and the cover is hidden and its
-    // faces made again all day: new faces came out as white squares of
-    // their whole picture, drawn through this fade's program.
+    // Fade was one ShaderEffect over the grid. On Qt 5.6 a ShaderEffect made after the cover
+    // was hidden can draw with another's program: new faces came out as white squares.
     for state in ["one-shaders", "lit-shaders"] {
         assert_eq!(
             value(state),
@@ -349,7 +336,7 @@ fn the_cover_offers_the_actions_that_are_set_and_makes_room_for_them() {
              has been hidden. {context}"
         );
     }
-    // The stub's small item is 60 high.
+    // Stub's small item is 60 high.
     assert_eq!(
         value("one-floor"),
         "300",
@@ -416,8 +403,7 @@ fn the_cover_offers_the_actions_that_are_set_and_makes_room_for_them() {
         "a lit face was put in the fading strip rather than above it. {context}"
     );
 
-    // Each picture is a whole path to a file that is there, at the stub's
-    // small icon size and in the ink for its ambience.
+    // Each picture: whole path to a present file, stub small size, ambience ink.
     for (label, file) in [
         ("one-icon", "search-32-white.png"),
         ("two-left", "search-32-white.png"),
@@ -441,8 +427,7 @@ fn the_cover_offers_the_actions_that_are_set_and_makes_room_for_them() {
     }
 }
 
-/// The strings or numbers in the JavaScript array literal that a line
-/// starting `var <name> = [` opens, however many lines it runs to.
+/// Strings or numbers in the JS array literal a line `var <name> = [` opens.
 fn listed(script: &str, name: &str) -> Vec<String> {
     let start = format!("\nvar {name} = [");
     let at = script
@@ -458,11 +443,8 @@ fn listed(script: &str, name: &str) -> Vec<String> {
         .collect()
 }
 
-/// Every icon an action can wear -- the reader's, and the microphone the
-/// cover offers during a call -- is drawn at every size the cover picks
-/// from, in both inks, as the square RGBA picture the home screen is
-/// handed -- and every icon drawn is one of those, from a source that is
-/// there. The lists are the ones the cover reads.
+/// Every icon an action can wear (reader's, call microphone) drawn at every cover size, both
+/// inks, as square RGBA. Every icon drawn is one of those, from a present source.
 #[test]
 fn every_quick_action_icon_is_drawn_at_every_size_in_both_inks() {
     let root = std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../..");
@@ -473,7 +455,7 @@ fn every_quick_action_icon_is_drawn_at_every_size_in_both_inks() {
         .filter(|kind| kind != "chat")
         .collect();
     icons.extend(listed(&script, "chatIcons"));
-    // And the microphone the cover offers during a call, both ways.
+    // Call microphone cover offers, both ways.
     let call_icons = listed(&script, "callIcons");
     assert_eq!(
         call_icons,

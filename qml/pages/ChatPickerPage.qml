@@ -4,22 +4,12 @@ import "../components"
 import Piirit 1.0
 
 /*
- * Pick a chat to send something into, or for a quick action on the cover
- * to open.
+ * Pick a chat to send into, or for a quick action to open.
+ * Core list (DC_GCL_FOR_FORWARDING): no chats a forward would refuse.
+ * Answers by signal; caller acts.
  *
- * The list comes from the core with DC_GCL_FOR_FORWARDING, so it leaves
- * out the chats a forward would be refused by rather than offering them
- * and failing afterwards.
- *
- * Reports its answer with a signal rather than acting itself: what happens
- * to the chosen chat is the caller's business, and a picker that forwarded
- * on its own could not be reused for anything else.
- *
- * The chats are one profile's, `accountId`. A caller whose chat can be any
- * profile's -- a quick action -- lets the reader turn the list to another
- * with `profileChoice`, and reads `accountId` back for whose chat was
- * picked. Forwarding and sharing do not: they send from the profile they
- * were started in.
+ * One profile's chats (`accountId`). Quick action: `profileChoice` switches
+ * profile. Forward and share send from start profile.
  */
 Page {
     id: page
@@ -27,12 +17,10 @@ Page {
     property int accountId
     property string errorMessage: ""
 
-    /// Whether the reader may turn the list to another profile's chats,
-    /// with a choice of profile over it. Offered only while there is more
-    /// than one profile to choose from.
+    /// Offer other profiles' chats. Only with 2+ profiles.
     property bool profileChoice: false
 
-    /// How many profiles the list could be turned to: the configured ones.
+    /// Profiles to turn to: configured ones.
     readonly property int profileCount: {
         var count = 0
         for (var i = 0; i < profiles.count; i++) {
@@ -44,16 +32,13 @@ Page {
         return count
     }
 
-    /// The profile to turn the list to when `accountId` is none of the
-    /// profiles there are -- a quick action's, whose chat was in a
-    /// profile deleted since. 0 for the first there is.
+    /// Turn-to profile when accountId is gone (deleted quick-action profile). 0
+    /// for first.
     property int fallbackAccountId: 0
 
-    /// A list opened on a profile that has gone is a list of nothing but
-    /// "account not found", and with one profile left there is no choice
-    /// over it to turn it by: it is turned to a profile there is. Only
-    /// with a choice of profile; a picker without one sends from the
-    /// profile it was started in, which is there.
+    /// Gone profile lists only "account not found": turn to an existing one.
+    /// Only with `profileChoice`; without, picker sends from start profile,
+    /// which exists.
     function settleProfile() {
         if (!page.profileChoice || profiles.count === 0
                 || page.profileName(page.accountId) !== "") {
@@ -78,16 +63,14 @@ Page {
         }
     }
 
-    // Once the profiles are all in, however many there are: they arrive
-    // one item at a time.
+    // Profiles arrive one at a time: wait for all.
     Timer {
         id: settle
         interval: 0
         onTriggered: page.settleProfile()
     }
 
-    /// What a profile goes by in the choice: its name, or its address
-    /// without one.
+    /// Profile label: name, else address.
     function profileName(accountId) {
         for (var i = 0; i < profiles.count; i++) {
             var item = profiles.itemAt(i)
@@ -98,28 +81,21 @@ Page {
         return ""
     }
 
-    // Another profile's chats are no answer yet either, and what the last
-    // one's said is not about these.
+    // Other profile's chats: no answer yet, and last profile's error is stale.
     onAccountIdChanged: {
         page.chatsLoaded = false
         page.errorMessage = ""
     }
 
-    /// Whether picking a chat closes this page.
-    ///
-    /// True for forwarding, which stays where it was and sends from
-    /// there. False for a share, which puts the chosen chat in this
-    /// page's place -- and a page that popped itself first would take
-    /// the chat with it.
+    /// Closes page when picked? True for forward (sends from here). False for
+    /// share: chat takes this page's place; popping first would drop it.
     property bool closeOnPick: true
 
-    /// What the header says the chat is being picked for, and what the
-    /// list says when there is nothing in it. Forwarding's words unless
-    /// the page is opened for something else.
+    /// Header and empty-list words: forward's by default.
     property string title: qsTr("Forward to")
     property string emptyText: qsTr("No chats to forward to")
 
-    /// The reader picked this chat.
+    /// Reader picked this chat.
     signal chatPicked(int chatId, string chatName)
 
     Timer {
@@ -128,8 +104,7 @@ Page {
         onTriggered: chats.query = searchField.text
     }
 
-    // The core has said which chats there are, whatever that was. An
-    // empty list before then is no answer rather than no chats: see
+    // Core answered, however empty. Empty before is no answer: see
     // ChatListPage.
     property bool chatsLoaded: false
 
@@ -139,8 +114,6 @@ Page {
         account_id: page.accountId
         for_forwarding: true
         onError: page.errorMessage = message
-        // Emitted once the rows have been set, whether there turned out
-        // to be any or none.
         onRows_changed: page.chatsLoaded = true
     }
 
@@ -149,10 +122,8 @@ Page {
         onCore_event: chats.handle_event(context_id, kind, payload_json)
     }
 
-    // Outside the list for the reason ChatListPage documents: a field in
-    // a view's `header` lives inside the flickable, and its id does not
-    // resolve from the page -- so the debounce below was reading an
-    // undefined name and this search did nothing at all.
+    // Outside list (see ChatListPage): header field's id won't resolve from
+    // page, so debounce read undefined and search did nothing.
     Column {
         id: heading
         anchors {
@@ -165,8 +136,7 @@ Page {
             title: page.title
         }
 
-        // Whose chats these are, when there is a choice: every configured
-        // profile, the way the profiles page names it.
+        // Whose chats, when a choice exists: profile names as on profiles page.
         ComboBox {
             objectName: "pickerProfileCombo"
             width: parent.width
@@ -174,8 +144,7 @@ Page {
             //: Over a list of chats to pick from: which profile's chats
             //: they are.
             label: qsTr("Profile")
-            // The profile the list is on, whichever item Silica last moved
-            // the choice to.
+            // Profile list is on, whatever item Silica last moved choice to.
             value: page.profileName(page.accountId)
 
             menu: ContextMenu {
@@ -217,7 +186,7 @@ Page {
         clip: true
         model: chats.rows
 
-        // No context menu: choosing is the only thing to do with a row.
+        // No context menu: choosing is the only row action.
         delegate: ListItem {
             objectName: "pickerRow"
             contentHeight: body.height
@@ -234,7 +203,7 @@ Page {
                 isMuted: model.is_muted
                 chatColor: model.color
                 avatarPath: model.avatar_path
-                // Not a chat being read: an unread badge here is noise.
+                // Unread badge is noise: not a chat being read.
                 unreadCount: 0
             }
 
@@ -248,7 +217,7 @@ Page {
 
         ViewPlaceholder {
             objectName: "chatsPlaceholder"
-            // Not until the core has answered: see `chatsLoaded`.
+            // Not until core answered: see chatsLoaded.
             enabled: page.chatsLoaded && chats.count === 0
             text: page.emptyText
         }

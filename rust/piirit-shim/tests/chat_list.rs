@@ -1,12 +1,6 @@
-//! The chat-list model: what a message arriving in one chat costs.
-//!
-//! A chat list reorders on every message, so the question is whether the
-//! model moves one row or rebuilds itself.
+//! Chat-list model: cost of a message arriving in one chat. One row moves, or rebuild?
 
-// Qt harness: needs `unsafe` for `env::set_var` before Qt starts
-// (`unused_unsafe` because it is only unsafe from edition 2024 on),
-// `borrow_as_ptr` for the engine pointer, and `single_shot` with
-// whole-second Durations.
+// Qt harness allows: unsafe `env::set_var`, borrow_as_ptr, whole-second single_shot.
 #![allow(
     unsafe_code,
     unused_unsafe,
@@ -23,9 +17,7 @@ use serde_json::Value;
 
 mod common;
 
-/// The `Repeater` is how the test reads the row order: a `QAbstractListModel`
-/// hands nothing to JavaScript directly, and driving it through a real view
-/// also proves the model works as one.
+/// `Repeater` reads row order: `QAbstractListModel` gives JS nothing; a real view proves it.
 const PROBE_QML: &str = r"
     import QtQuick 2.0
     import Piirit 1.0
@@ -61,8 +53,7 @@ fn a_message_moves_one_row_instead_of_rebuilding_the_list() {
     let journal = common::fresh_journal(&temp);
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
 
-    // SAFETY: single-threaded test binary; set before Qt starts and before
-    // the server inherits them.
+    // SAFETY: single-threaded; set before Qt starts and before server inherits env.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_FAKE_JOURNAL", &journal);
@@ -86,8 +77,7 @@ fn a_message_moves_one_row_instead_of_rebuilding_the_list() {
     let mut second_order = String::new();
     let second_ptr: *mut String = std::ptr::addr_of_mut!(second_order);
 
-    // SAFETY for every block below: these callbacks fire only while `exec()`
-    // is running on this thread, and `engine` outlives it.
+    // SAFETY for every block: fire only inside `exec()`; `engine` outlives it.
     single_shot(Duration::from_secs(1), move || unsafe {
         (*engine_ptr).load_data(QByteArray::from(PROBE_QML));
     });
@@ -97,7 +87,7 @@ fn a_message_moves_one_row_instead_of_rebuilding_the_list() {
         *first_ptr = QString::from_qvariant(value)
             .map(|text| text.to_string())
             .unwrap_or_default();
-        // A message in chat 2 moves it to the top.
+        // Message in chat 2 moves it to top.
         (*engine_ptr).invoke_method("bump".into(), &[]);
     });
 
@@ -127,8 +117,7 @@ fn a_message_moves_one_row_instead_of_rebuilding_the_list() {
         "a message in chat 2 did not move it to the top. Calls were: {names:?}"
     );
 
-    // The reorder refetched only the chat that changed. Rebuilding would
-    // have asked for both.
+    // Reorder refetched only changed chat; rebuild would ask for both.
     let fetches: Vec<usize> = calls
         .iter()
         .filter(|(name, _)| name == "get_chatlist_items_by_entries")
@@ -150,8 +139,7 @@ fn a_message_moves_one_row_instead_of_rebuilding_the_list() {
         "the reorder refetched more than the chat that changed: {fetches:?}"
     );
 
-    // A bare `ChatlistChanged` listed the chats again and read none of
-    // them: every row was already held, and none had changed.
+    // Bare `ChatlistChanged` relisted chats, read none: rows held, none changed.
     let last_listing = names
         .iter()
         .rposition(|name| *name == "get_chatlist_entries");

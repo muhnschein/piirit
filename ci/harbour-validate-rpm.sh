@@ -1,23 +1,19 @@
 #!/bin/bash
-# Run Jolla's own validator against a built RPM, and judge the result
-# against ci/harbour/waivers.conf.
+# Runs Jolla's validator on a built RPM; judges result against
+# ci/harbour/waivers.conf.
 #
-# This is the authority `ci/harbour-check.sh` stands in for: only a built
-# package shows the Requires and Provides rpm generated, the stripped
-# binary's symbols, and the real file modes. It needs an RPM, so it runs in
-# .github/workflows/rpm.yml rather than on every pull request.
+# Authority that harbour-check.sh stands in for: only built package shows
+# generated Requires/Provides, stripped symbols, real modes. Needs an RPM, so
+# runs in rpm.yml, not per PR.
 #
-# Known blockers do not fail it. They are already recorded in
-# ci/harbour/waivers.conf, the source check already reports them, and a
-# workflow that is red for a reason nobody intends to fix this week is a
-# workflow people stop reading. Anything *not* waived fails.
+# Known blockers (waivers.conf, also reported by source check) don't fail it:
+# a workflow red for unfixed reasons stops being read. Anything not waived
+# fails.
 #
 #     ci/harbour-validate-rpm.sh <rpm>
 #     ci/harbour-validate-rpm.sh --log <saved validation log>
 #
-# The validator is upstream's, cloned rather than vendored: ci/harbour/
-# carries the rules it reads, and this is the code that reads them.
-# $HARBOUR_VALIDATOR points at an existing clone.
+# Validator: upstream's clone, not vendored. $HARBOUR_VALIDATOR points at it.
 set -u
 shopt -s extglob
 
@@ -30,18 +26,11 @@ usage() {
     exit 2
 }
 
-# Run a command with SIGPIPE handled the way a terminal would handle it.
+# Run command with SIGPIPE default.
 #
-# GitHub starts a job step from a Node process, which ignores SIGPIPE, and
-# an ignored disposition survives exec -- so inside the validator every
-# write into a pipe whose reader has already gone returns EPIPE instead of
-# killing the writer, and bash reports it. One `readelf | c++filt | while
-# read` feeding a reader that stops early printed 4945 lines of "echo:
-# write error: Broken pipe" into the last run's log, which is most of what
-# the job recorded and enough to push the verdict past what the logs API
-# will return. bash cannot undo an inherited ignore -- `trap - PIPE` does
-# not, POSIX keeps SIG_IGN across exec -- so the reset has to happen in a
-# process that execs the validator afterwards.
+# GitHub's Node parent ignores SIGPIPE; ignore survives exec, so dead-pipe
+# writes return EPIPE (4945 "Broken pipe" lines once). bash can't undo it (`trap
+# - PIPE` doesn't), so reset must happen in a process that execs the validator.
 sigpipe_default() {
     if command -v python3 >/dev/null 2>&1; then
         python3 -c 'import os, signal, sys
@@ -54,7 +43,7 @@ os.execvp(sys.argv[1], sys.argv[1:])' "$@"
              "the validator's log may carry broken-pipe noise" >&2
         "$@"
     fi
-    # Whatever the command exited with, which is what the caller judges.
+    # Exit status passed through; caller judges.
     return
 }
 
@@ -69,10 +58,8 @@ esac
 if [[ -n "$rpm" ]]; then
     [[ -f "$rpm" ]] || { echo "harbour-rpm: FAIL no such RPM: $rpm" >&2; exit 1; }
     if [[ ! -x "$validator/rpmvalidation.sh" ]]; then
-        # The commit ci/harbour/UPSTREAM names, so the rules vendored here
-        # and the code that reads them are the same Harbour -- and so CI
-        # is not executing whatever that repository's HEAD is today.
-        # scripts/update-harbour-rules.sh moves both together.
+        # Commit from ci/harbour/UPSTREAM: same Harbour as vendored rules, and
+        # CI never runs repo HEAD. scripts/update-harbour-rules.sh moves both.
         commit=$(sed -n 's/^at commit \([0-9a-f]\{40\}\).*/\1/p' \
             "$root/ci/harbour/UPSTREAM" | head -1)
         if [[ -z "$commit" ]]; then
@@ -88,9 +75,7 @@ if [[ -n "$rpm" ]]; then
         fi
     fi
 
-    # The vendored rules and the validator's own must be the same Harbour,
-    # or the two checks disagree about what is allowed. Same commit, so a
-    # difference is a vendored file edited by hand.
+    # Vendored rules must equal validator's own; difference = hand-edited file.
     for conf in "$root"/ci/harbour/*.conf; do
         name=$(basename "$conf")
         [[ "$name" = waivers.conf ]] && continue
@@ -104,18 +89,15 @@ if [[ -n "$rpm" ]]; then
 
     log=$(mktemp)
     trap 'rm -f "$log"' EXIT
-    # BATCHERBATCHERBATCHER makes it emit `KIND|subject|message` without
-    # colour. It exits non-zero for warnings too, so the markers decide,
-    # not the status.
+    # BATCHERBATCHERBATCHER: `KIND|subject|message`, no colour. Exit status
+    # unused: markers decide.
     BATCHERBATCHERBATCHER=1 sigpipe_default "$validator/rpmvalidation.sh" \
         -g "$validator" "$rpm" > "$log" 2>&1 || true
 fi
 
 [[ -f "$log" ]] || { echo "harbour-rpm: FAIL no validation log: $log" >&2; exit 1; }
 
-# Shown without any broken-pipe noise the reset did not catch, and counted
-# rather than dropped silently, so a reset that stops working says so
-# instead of quietly costing the log again.
+# Strip leftover broken-pipe noise, but count it: broken reset must say so.
 noise=$(grep -c 'write error: Broken pipe' "$log" || true)
 if [[ "$noise" -gt 0 ]]; then
     echo "harbour-rpm: note: hid $noise broken-pipe line(s) from the" \
@@ -128,13 +110,9 @@ if ! grep -q '^!END!' "$log"; then
     exit 1
 fi
 
-# An error is waived when one waiver's subject pattern matches the
-# validator's subject field *and* its message pattern matches the message.
-# Both, deliberately. The subject alone waived every error the validator
-# could ever raise about the bundled server -- a setuid bit, an RPATH, a
-# dynamic link if it ever stopped being static -- when only the errors the
-# file names are known and accepted. The patterns are bash globs, as
-# upstream's own allow-list matching is.
+# Waived = subject glob AND message glob both match (bash globs, as upstream).
+# Subject alone waived every error about the bundled server (setuid, RPATH...),
+# not just the known ones.
 waived_line() {
     local subject=$1 message=$2 entry wid wsubject wmessage
     [[ -f "$waivers" ]] || return 1

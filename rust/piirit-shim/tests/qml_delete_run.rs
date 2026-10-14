@@ -1,25 +1,14 @@
-//! Deleting several messages, one after another.
+//! Several deletes, one after another; each waits before going so reader can take it back.
 //!
-//! Each one waits a moment before it goes, so the reader can say they did
-//! not mean it. That wait belongs beside the list, not to the row, where
-//! `ListItem.remorseAction` would put it: deleting out of a list destroys
-//! rows, and a wait beside the list cannot be lost that way. (Silica's
-//! `RemorseItem` runs its callback rather than dropping it when the
-//! countdown is cut short, so "the row went and took the wait with it" is
-//! not the mechanism -- but a wait living somewhere that volatile has to
-//! be proved every release.)
+//! Wait belongs to list (outlives every row), not row where `ListItem.remorseAction` would put it:
+//! deleting out of a list destroys rows. (Silica's `RemorseItem` runs its callback rather than
+//! dropping it when cut short, so "row took the wait with it" is not the mechanism -- but a wait
+//! living somewhere that volatile would need proving every release.)
 //!
-//! So the wait belongs to the list, which outlives every row in it, and
-//! what this pins is that nothing happening to the rows can lose a
-//! delete: a row destroyed mid-countdown, a delete asked for while
-//! others are already waiting, and the reader leaving the chat before
-//! the wait is up.
-//!
-//! What draws the wait is Silica's own `RemorseItem` -- the bar, the
-//! seconds, "Tap to cancel" -- raised by the row and handed a callback
-//! that does nothing, because the deletion is the list's. So the way
-//! back is a tap on the platform's countdown, and it puts back only the
-//! one it covers.
+//! Pinned: nothing done to rows loses a delete -- row destroyed mid-countdown, delete asked while
+//! others wait, reader leaving chat before wait ends. Silica `RemorseItem` draws wait (bar,
+//! seconds, "Tap to cancel"), raised by row with a no-op callback since deletion is list's; a tap
+//! on it puts back only the one it covers.
 
 // Qt harness: see qml_reactions.rs.
 #![allow(
@@ -196,7 +185,7 @@ const PROBE_QML: &str = r"
 #[test]
 #[allow(clippy::too_many_lines)]
 fn every_delete_in_a_run_arrives() {
-    // SAFETY: single-threaded test binary; set before Qt starts.
+    // SAFETY: single thread; pre-Qt.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
     }
@@ -239,9 +228,8 @@ fn every_delete_in_a_run_arrives() {
         );
     });
 
-    // A run: three deletes inside one wait, with the list changing under
-    // them in the middle -- which is what the first delete of a run does
-    // to the rows the rest are waiting on.
+    // Run: three deletes in one wait, list changing mid-way: what first delete does to rows
+    // rest wait on.
     single_shot(Duration::from_secs(2), move || unsafe {
         record!("box-1-before", call!("rowBox", 1));
         record!("box-2-before", call!("rowBox", 2));
@@ -261,19 +249,18 @@ fn every_delete_in_a_run_arrives() {
     single_shot(Duration::from_secs(3), move || unsafe {
         record!("after-removal", call!("sentSoFar"));
         record!("delete-3", call!("deleteRow", 3));
-        // And one the reader changes their mind about, in the same run.
+        // One the reader changes mind about, same run.
         record!("delete-4", call!("deleteRow", 4));
         record!("spare-4", call!("tapRemorse", 4));
         record!("spared-4", call!("goingOut", 4));
         record!("still-going-3", call!("goingOut", 3));
     });
 
-    // Past the wait: everything asked for has gone, and only that.
+    // Past wait: all asked for gone, only that.
     single_shot(Duration::from_secs(6), move || unsafe {
         record!("sent", call!("sentSoFar"));
         record!("back-4", call!("goingOut", 4));
-        // The reader asks for one more and leaves the chat before the
-        // wait is up.
+        // Reader asks one more, leaves chat before wait ends.
         record!("delete-5", call!("deleteRow", 5));
         record!("leaving", call!("sentSoFar"));
         call!("leaveChat");
@@ -320,12 +307,9 @@ fn every_delete_in_a_run_arrives() {
         "asking for one message to go put a countdown over another. \
          {context}"
     );
-    // The height a row had, kept: what replaces the message is centred in
-    // it, and a row that collapses draws its label over its neighbours'.
-    // Two of them waiting at once is where that shows.
-    // Rounded to whole pixels on the way out of QML, so the boxes
-    // compare as text: `y:height`, and both halves matter -- a row that
-    // moved is as wrong as one that shrank.
+    // Row's height kept: replacement message centred in it; collapsed row draws label over
+    // neighbours. Shows with two waiting. Rounded to whole pixels, compared as text
+    // `y:height`: moved is as wrong as shrunk.
     let height = |label: &str| -> i64 {
         value(label)
             .rsplit(':')
@@ -391,8 +375,7 @@ fn every_delete_in_a_run_arrives() {
         "putting one message back put another one back with it. {context}"
     );
 
-    // The run: three asked for, one taken back, and a row destroyed in
-    // the middle of all of it.
+    // Run: three asked, one taken back, one row destroyed mid-run.
     let sent_text = value("sent");
     let sent: Vec<&str> = sent_text
         .split(';')

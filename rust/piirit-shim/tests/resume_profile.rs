@@ -1,11 +1,8 @@
-//! The app comes back to the profile it was closed on.
+//! Resume last-shown profile on restart.
 //!
-//! The chat list tells the core which profile it is showing, the core
-//! keeps that on disk, and the account list read at the next start names
-//! it as the one to resume -- rather than whichever configured profile
-//! the core happens to list first, which is what always came back before.
-//! A selection that no longer points at a usable profile falls back to
-//! the first that is.
+//! Chat list tells core shown profile; core saves it to disk; next start's account
+//! list names it. Not first configured (old behavior). Stale selection falls back
+//! to first usable.
 
 // Qt harness: see qml_chat_list.rs.
 #![allow(
@@ -48,13 +45,12 @@ fn the_list_names_the_selected_profile_as_the_one_to_resume() {
     let journal = common::fresh_journal(&temp);
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
 
-    // SAFETY: single-threaded test binary; set before Qt starts and before
-    // the server inherits them.
+    // SAFETY: single-threaded; set before Qt and server.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_FAKE_JOURNAL", &journal);
         std::env::set_var("PIIRIT_ACCOUNTS_DIR", temp.join("accounts"));
-        // Two configured profiles, neither selected yet.
+        // Two profiles, none selected.
         std::env::set_var("PIIRIT_FAKE_ACCOUNTS", "1,2");
     }
 
@@ -84,12 +80,11 @@ fn the_list_names_the_selected_profile_as_the_one_to_resume() {
         }};
     }
 
-    // Nothing selected: the first configured profile.
+    // None selected: first profile.
     single_shot(Duration::from_secs(2), move || unsafe {
         call!("refresh");
     });
-    // The chat list opened on the second profile, and the app was
-    // started again.
+    // Chat list on profile 2; app restarted.
     single_shot(Duration::from_secs(4), move || unsafe {
         call!("select", 2);
         call!("resumeAll");
@@ -97,7 +92,7 @@ fn the_list_names_the_selected_profile_as_the_one_to_resume() {
     single_shot(Duration::from_secs(6), move || unsafe {
         call!("refresh");
     });
-    // A selection the core no longer has a profile for.
+    // Selection core has no profile for.
     single_shot(Duration::from_secs(8), move || unsafe {
         call!("select", 7);
     });

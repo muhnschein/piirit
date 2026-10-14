@@ -4,66 +4,46 @@ import "../components"
 import Piirit 1.0
 
 /*
- * One profile, written out to a file: the other half of taking a profile
- * over from one (RestoreProfilePage.qml).
+ * One profile written to a file: other half of taking a profile over
+ * (RestoreProfilePage.qml).
  *
- * A backup is the core's export and the core's export is per profile --
- * it takes an account and writes that account's messages, contacts and
- * key into one .tar. So this is reached from the profile's own row on the
- * profiles page rather than from the settings that belong to no profile,
- * and the profile is drawn at the top the way the invite code's page
- * draws it: a phone with three profiles on it makes three backups, and
- * which one this is is the first thing to be sure of.
+ * Export is per profile: takes an account, writes its messages, contacts and
+ * key into one .tar. Reached from the profile's own row; three profiles, three
+ * backups.
  *
- * The file goes to Documents under the name the core gives it -- the
- * core names a backup itself, and a reader who has to type a path on a
- * phone is a reader who does not make a backup. Where it landed is said
- * afterwards, in full, because the next thing to do with it is to copy
- * it off the phone.
+ * File goes to Documents under core's name; readers don't type paths. Path
+ * shown in full after: next step is copying it off phone.
  *
- * The write is the core's and reports itself in progress events the shim
- * passes on (`backup.rs`), so the middle of this page is a bar and a way
- * to stop. What went wrong, when something does, is a strip along the
- * bottom: unlike a transfer that failed after a minute of bar, the way
- * to try again is the button that is still there.
+ * Write is core's, progress via shim (`backup.rs`): bar and stop. Error = strip
+ * at bottom; retry is the button still there.
  *
- * Once a backup has been written there is nothing more to do here, so the
- * button goes and the chats are attached to the right instead: the page
- * ends in a swipe on rather than in an offer to write the same profile
- * out again. The chats attached are the ones the app is on, which is not
- * necessarily this profile -- backing a profile up is not switching to
- * it.
+ * Once written: button goes; chats attach right (the app's current profile,
+ * not necessarily this one).
  */
 Page {
     id: page
 
-    /// The cover offers no quick actions while a backup is being
-    /// written, and a tapped notification waits: a jump away would leave
-    /// it halfway written. See piirit.qml. Not before or after, when there
-    /// is nothing here to drop.
+    /// No quick actions, tapped notification waits, while writing: jump away
+    /// leaves it half-written. See piirit.qml.
     readonly property bool pausesQuickActions: backup.running
 
-    /// Whose backup. The core's export takes an account, and this is it.
+    /// Account backed up: export takes one.
     property int accountId
 
-    /// The profile the chat list is on, where the forward swipe goes.
-    /// Not [[accountId]]: any profile can be backed up from the profiles
-    /// page without the chats leaving the one they are on.
+    /// Chat list's profile, where forward swipe goes. Not [[accountId]]:
+    /// any profile backs up without leaving its chats.
     property int currentAccountId: 0
 
-    /// Where the file went, once one has been written.
+    /// Where file went, once written.
     property string writtenPath: ""
     property string errorMessage: ""
-    /// The chats are attached to the right, so there is a swipe to offer.
+    /// Chats on the right: a swipe to offer.
     property bool chatsAttached: false
 
-    // Nothing to go back to mid-write: leaving would drop the page that
-    // is listening for the answer, and the core would carry on writing.
+    // No going back mid-write: would drop answer listener; core keeps writing.
     backNavigation: !backup.running
 
-    // Whose backup this is, for the row at the top: the name, the
-    // picture and the address, as the profiles page and the invite code
-    // draw them.
+    // Row at top: name, picture, address, as profiles page draws them.
     Profile {
         id: profile
         objectName: "profile"
@@ -82,9 +62,8 @@ Page {
         onError: page.errorMessage = message
     }
 
-    // The core reports an export the way it reports an import, and says
-    // nothing in the event about which it is; the object only listens
-    // while it is the one that asked. See backup.rs.
+    // Export reports like import, event doesn't say which; object listens only
+    // while it asked. See backup.rs.
     Connections {
         target: core
         onCore_event: backup.handle_event(context_id, kind, payload_json)
@@ -96,10 +75,9 @@ Page {
         backup.write(StandardPaths.documents)
     }
 
-    /// Put the chats to the right of this page, so a swipe on leaves it.
+    /// Chats to the right of this page, so a swipe leaves it.
     ///
-    /// Attached rather than pushed: the reader is done here, and the
-    /// page indicator saying there is somewhere to go is the offer.
+    /// Attached, not pushed: reader is done here; page indicator is the offer.
     function offerTheChats() {
         if (page.currentAccountId <= 0 || page.chatsAttached) {
             return
@@ -123,9 +101,7 @@ Page {
                 title: qsTr("Back up profile")
             }
 
-            // Whose backup, drawn as the profiles page draws a profile:
-            // the picture, the name, and under it the address, which is
-            // what tells two profiles apart.
+            // Row like profiles page: picture, name, address.
             ContactRow {
                 objectName: "profileRow"
                 width: parent.width
@@ -153,9 +129,7 @@ Page {
             Button {
                 objectName: "writeButton"
                 anchors.horizontalCenter: parent.horizontalCenter
-                // Gone once there is a backup: writing the same profile
-                // out twice in a row is not what anybody came here for,
-                // and the swipe below is what is left to do.
+                // Gone once written: a second backup is pointless.
                 visible: !backup.running && page.writtenPath.length === 0
                 text: qsTr("Start backup")
                 onClicked: page.begin()
@@ -182,17 +156,14 @@ Page {
                 }
             }
 
-            // Where it went, once it has gone somewhere: the whole path,
-            // because the reader is about to go looking for it with a
-            // file manager or a cable.
+            // Whole path: reader goes looking with file manager or cable.
             Label {
                 objectName: "writtenLabel"
                 visible: page.writtenPath.length > 0
                 x: Theme.horizontalPageMargin
                 width: parent.width - 2 * Theme.horizontalPageMargin
                 wrapMode: Text.WrapAnywhere
-                // A path off the phone's own filesystem, pinned like
-                // everything else this app did not write.
+                // Path from filesystem: plain text, like all text app didn't write.
                 textFormat: Text.PlainText
                 color: Theme.highlightColor
                 //: Said once the backup is written. %1 is the full path
@@ -200,8 +171,7 @@ Page {
                 text: qsTr("Saved to %1").arg(page.writtenPath)
             }
 
-            // The way on, said in words as well as by the indicator:
-            // only when there really is a page to the right.
+            // The way on, in words: only when a page is really there.
             Label {
                 objectName: "onwardHint"
                 visible: page.writtenPath.length > 0 && page.chatsAttached
@@ -216,9 +186,7 @@ Page {
         }
     }
 
-    // What went wrong, when something did: the core refusing the export,
-    // or a folder it could not write into. The button is still there, so
-    // this is a strip rather than a page of its own.
+    // Error: export refused, or folder unwritable. Strip: button stays.
     Banner {
         objectName: "errorBanner"
         anchors {

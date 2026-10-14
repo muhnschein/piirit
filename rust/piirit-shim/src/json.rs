@@ -1,19 +1,13 @@
-//! Reading fields off the core's JSON objects.
+//! Field readers for core JSON: no typed structs (`docs/PROJECT.md`).
 //!
-//! The core's answers are `serde_json::Value`s read field by field rather
-//! than deserialised into structs: typing its several dozen shapes would be
-//! the protocol reimplementation `docs/PROJECT.md` rules out, and a field
-//! that is absent or null is the ordinary case, not an error. So "absent
-//! means empty, zero or false" is decided here, once, rather than
-//! separately in every model.
+//! Absent or null means empty, zero or false; decided here, once.
 //!
-//! `path` is either a bare field name (`"chatId"`) or a JSON pointer
-//! (`"/quote/text"`) for a field inside a nested object.
+//! `path`: bare name, or JSON pointer (`/quote/text`).
 
 use qmetaobject::QString;
 use serde_json::Value;
 
-/// The field itself, whichever way it was named.
+/// Field at `path`.
 fn field<'a>(value: &'a Value, path: &str) -> Option<&'a Value> {
     if path.starts_with('/') {
         value.pointer(path)
@@ -22,34 +16,31 @@ fn field<'a>(value: &'a Value, path: &str) -> Option<&'a Value> {
     }
 }
 
-/// A string field as a `&str`, `""` when absent or not a string. For
-/// callers that want to look at the text before storing it.
+/// String field as `&str`; `""` if absent.
 pub(crate) fn str_at<'a>(value: &'a Value, path: &str) -> &'a str {
     field(value, path)
         .and_then(Value::as_str)
         .unwrap_or_default()
 }
 
-/// A string field for a model row, empty when absent or not a string.
+/// String field for a model row; empty if absent.
 pub(crate) fn text(value: &Value, path: &str) -> QString {
     str_at(value, path).into()
 }
 
-/// An unsigned field that has to be there -- an id -- or `None`. Out of
-/// `u32` range counts as absent: nothing the core numbers goes that high.
+/// Id field, or `None`. Above `u32` counts as absent.
 pub(crate) fn u32_opt(value: &Value, path: &str) -> Option<u32> {
     field(value, path)
         .and_then(Value::as_u64)
         .and_then(|number| u32::try_from(number).ok())
 }
 
-/// An unsigned field where 0 is a fine answer: a counter, a state.
+/// Counter or state; 0 is valid.
 pub(crate) fn u32_at(value: &Value, path: &str) -> u32 {
     u32_opt(value, path).unwrap_or(0)
 }
 
-/// A whole number that may be absent often enough for 0 to be the normal
-/// case: pixel dimensions, durations.
+/// Whole number, 0 if absent.
 pub(crate) fn i32_at(value: &Value, path: &str) -> i32 {
     field(value, path)
         .and_then(Value::as_i64)
@@ -57,24 +48,21 @@ pub(crate) fn i32_at(value: &Value, path: &str) -> i32 {
         .unwrap_or(0)
 }
 
-/// A timestamp, 0 when absent.
+/// Timestamp, 0 if absent.
 pub(crate) fn i64_at(value: &Value, path: &str) -> i64 {
     field(value, path).and_then(Value::as_i64).unwrap_or(0)
 }
 
-/// The payload of a core event, when the event is about one chat: an
-/// event names its chat in `chatId`, except that `MsgsChanged` carries 0
-/// for "several chats" and an overflow carries none at all, and both of
-/// those are every chat's. `None` for another chat's event, so a model
-/// that holds one chat can drop it in a line. Every model that listens to
-/// a chat asks this rather than each reading the field for itself.
+/// Event payload if about this chat, else `None`.
+///
+/// `MsgsChanged` has `chatId` 0 (several chats); overflow has none. Both are every chat's.
 pub(crate) fn chat_event(payload_json: &str, chat_id: u32) -> Option<Value> {
     let payload: Value = serde_json::from_str(payload_json).unwrap_or_default();
     let event_chat = u32_at(&payload, "chatId");
     (event_chat == 0 || event_chat == chat_id).then_some(payload)
 }
 
-/// A flag, false when absent.
+/// Flag, false if absent.
 pub(crate) fn flag(value: &Value, path: &str) -> bool {
     field(value, path).and_then(Value::as_bool).unwrap_or(false)
 }
@@ -109,10 +97,10 @@ mod tests {
         assert_eq!(str_at(&message, "text"), "");
         assert_eq!(str_at(&message, "missing"), "");
         assert_eq!(text(&message, "/quote/text").to_string(), "");
-        // A string where a number belongs is not a number.
+        // Not a number.
         assert_eq!(u32_opt(&message, "chatId"), None);
         assert_eq!(u32_at(&message, "chatId"), 0);
-        // Out of range is absent, not truncated.
+        // Out of range: absent.
         assert_eq!(u32_opt(&message, "big"), None);
         assert_eq!(u32_opt(&message, "neg"), None);
         assert_eq!(i32_at(&message, "neg"), -5);
@@ -124,11 +112,10 @@ mod tests {
     fn an_event_is_the_chats_own_when_it_names_it_or_names_none() {
         assert!(chat_event(r#"{"chatId":7,"msgId":3}"#, 7).is_some());
         assert!(chat_event(r#"{"chatId":8,"msgId":3}"#, 7).is_none());
-        // MsgsChanged for several chats, and an overflow with no chat.
+        // Several chats, or no chat.
         assert!(chat_event(r#"{"chatId":0}"#, 7).is_some());
         assert!(chat_event("{}", 7).is_some());
-        // Not JSON at all reads as an empty object: every chat's, and
-        // every field of it absent.
+        // Not JSON: empty object.
         let payload = chat_event("nonsense", 7);
         assert_eq!(
             payload.as_ref().map(|value| u32_at(value, "msgId")),

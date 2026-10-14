@@ -1,17 +1,8 @@
-//! Picking an app from the store.
-//!
-//! The store is a website the `WebView` loads, so what is worth testing
-//! is the part that is not the website: that a tapped `.xdc` link is
-//! taken out of the engine's hands and fetched through the core, that
-//! what lands is a file on the phone with the store's own name on it,
-//! and that the page reports it the way a picker reports a chosen file.
-//!
-//! The view is a stub, so nothing here says the store draws. What it
-//! fakes is how the tap arrives: the frame script the page loads into the
-//! engine stops the click and sends the address back as a message, which
-//! is the route that works on a phone -- a .xdc is downloaded rather than
-//! navigated to, so watching the view's address never hears about it.
-//! A navigation is faked too, to prove the same app is not taken twice.
+//! Picking an app from store (a website in `WebView`). Tested: tapped `.xdc` link taken from
+//! engine and fetched via core; lands as phone file with store's name; page reports it as a
+//! picker reports a chosen file. View is a stub. Tap faked as on phone: frame script stops
+//! click, sends address as message (`.xdc` downloads, never navigates, so watching address
+//! hears nothing). Faked navigation too: same app not taken twice.
 
 // Qt harness: see qml_pages.rs.
 #![allow(
@@ -30,8 +21,7 @@ use qmetaobject::*;
 
 mod common;
 
-/// Silica's `pageStack`, recorded rather than performed: the page pops
-/// itself once an app has been taken.
+/// Silica's `pageStack`, recorded. Pops itself after taking app.
 #[derive(QObject, Default)]
 struct StackProbe {
     base: qt_base_class!(trait QObject),
@@ -48,8 +38,7 @@ impl StackProbe {
         self.log_changed();
     }
 
-    // The page pushes the file browser from here; nothing is loaded for
-    // it, which the page survives by checking what it got back.
+    // Pushes file browser: nothing loaded; page checks what came back.
     fn push(&mut self, page: QString, _properties: QVariantMap) -> QVariant {
         let page = page.to_string();
         let name = page.rsplit('/').next().unwrap_or(&page).to_string();
@@ -124,7 +113,7 @@ fn a_tapped_app_is_fetched_by_the_core_and_reported_as_a_file() {
     let cache = temp.join("cache");
     std::fs::create_dir_all(&cache).expect("create cache dir");
 
-    // SAFETY: single-threaded test binary; set before Qt starts.
+    // SAFETY: single-threaded test; set before Qt starts.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_FAKE_JOURNAL", &journal);
@@ -212,8 +201,7 @@ fn a_tapped_app_is_fetched_by_the_core_and_reported_as_a_file() {
                 QString::from("frameScripts")
             )
         );
-        // A link to an app, tapped: the frame script stopped it and said
-        // where it went.
+        // Tapped app link: frame script stopped it and said where it went.
         record!(
             "tapped",
             call!(
@@ -231,8 +219,7 @@ fn a_tapped_app_is_fetched_by_the_core_and_reported_as_a_file() {
             "banner",
             call!("get", QString::from("errorBanner"), QString::from("text"))
         );
-        // The same tap, arriving again the other way. One app was taken;
-        // this is not a second one.
+        // Same tap arriving other way (navigation): one app taken, not two.
         record!(
             "follow",
             call!(
@@ -240,7 +227,7 @@ fn a_tapped_app_is_fetched_by_the_core_and_reported_as_a_file() {
                 QString::from("https://webxdc.org/apps/checkers.xdc?v=2")
             )
         );
-        // The way out when the store cannot be reached: the file browser.
+        // Store unreachable: file browser.
         record!("tap-phone", call!("tap", QString::from("fromPhoneButton")));
     });
 
@@ -335,8 +322,7 @@ fn a_tapped_app_is_fetched_by_the_core_and_reported_as_a_file() {
         "the button did not open the file browser. {context}"
     );
 
-    // The download went through the core, which is the whole point: the
-    // engine would have put it somewhere this app cannot reach.
+    // Download via core: engine would put it where app can't reach.
     let calls = common::calls(&journal);
     let fetched: Vec<&(String, serde_json::Value)> = calls
         .iter()

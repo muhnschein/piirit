@@ -55,9 +55,8 @@ TWEMOJI_TAG = "v17.0.3"
 TWEMOJI_COMMIT = "b6b55fef1e8636b540a6d016a4729ca8cdf2e60b"
 TWEMOJI_REPO = "https://github.com/jdecked/twemoji.git"
 
-# emojibase's group numbers, in the order the picker shows them. Group 2
-# is the skin-tone and hair components, which are not emoji anyone
-# reacts with on their own.
+# emojibase group numbers, in picker order. Group 2 (skin-tone and hair
+# components) is never reacted with alone.
 GROUPS = [0, 1, 3, 4, 5, 6, 7, 8, 9]
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -203,15 +202,13 @@ def pictures_js(rows):
         if first <= 0xFFFF:
             if first not in bmp_starts:
                 bmp_starts.append(first)
-            # One character and the selector: text without it.
+            # One char plus selector: text-style without it.
             if len(bare) == 1 and emoji[1:2] == "\ufe0f" and bare not in text_style:
                 text_style.append(bare)
 
-    # One code unit out of every key, so that a text with none of them in
-    # it cannot hold an emoji a picture is shipped for. The first, which
-    # above the Basic Multilingual Plane is the high half of a surrogate
-    # pair -- except for a keycap: its digit, # or * is in far more text
-    # than the keycap mark after it.
+    # One code unit per key: text without any cannot hold an emoji shipped as a
+    # picture. The first (above BMP: surrogate's high half), except keycap: its
+    # digit, # or * is in far more text than the keycap mark after it, so mark.
     marks = []
     for bare in by_key:
         units = utf16(bare)

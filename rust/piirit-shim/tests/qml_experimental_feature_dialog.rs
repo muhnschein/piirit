@@ -1,11 +1,7 @@
-//! The page that asks before a switch worth stopping for is turned on.
-//!
-//! It says the one thing worth stopping for: by default that an
-//! experimental feature may not hold up, and otherwise what the switch
-//! that opened it says -- a camera quick action's "Send right away",
-//! that a chat tapped by mistake gets the photo too. What it does when
-//! accepted is the opener's business (`qml_general_settings.rs`,
-//! `qml_quick_actions_settings.rs`); this is the page on its own.
+//! Confirm page before a switch worth stopping for. Says one thing: by default that an
+//! experimental feature may not hold up; otherwise what the opening switch says (camera quick
+//! action's "Send right away": a chat tapped by mistake gets the photo too). What accepting does
+//! is opener's (`qml_general_settings.rs`, `qml_quick_actions_settings.rs`); this is page alone.
 
 // Qt harness: see qml_pages.rs.
 #![allow(
@@ -50,7 +46,7 @@ const PROBE_QML: &str = r"
 
 #[test]
 fn the_dialog_says_the_one_thing_worth_stopping_for() {
-    // SAFETY: single-threaded test binary; set before Qt starts.
+    // SAFETY: single thread; pre-Qt.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
     }

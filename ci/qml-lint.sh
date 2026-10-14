@@ -1,13 +1,11 @@
 #!/bin/sh
-# Parse every .qml file, and every .js the package ships beside them.
+# Parse every .qml and .js shipped beside them.
 #
-# Syntax only: qmllint cannot resolve `Sailfish.Silica`. The Qt 5.6 dialect
-# rules it cannot express live in rust/piirit-shim/tests/qml_syntax.rs.
+# Syntax only: qmllint can't resolve `Sailfish.Silica`. Qt 5.6 rules:
+# rust/piirit-shim/tests/qml_syntax.rs.
 #
-# The .js files are not QML imports -- qml/webxdc/catch.js is a frame
-# script for the browser engine -- but they are shipped, they are parsed
-# by something on the phone, and a typo in one fails there and nowhere
-# else. qmllint parses JavaScript too.
+# .js aren't all QML imports (qml/webxdc/catch.js: browser frame script), but
+# all are parsed on phone; typo fails only there. qmllint parses JS too.
 set -eu
 
 root=$(CDPATH='' cd -- "$(dirname -- "$0")/.." && pwd)
@@ -19,8 +17,7 @@ fi
 
 count=0
 status=0
-# Read rather than word-split: a path with a space in it would otherwise
-# arrive as two arguments and neither would exist.
+# Read, not word-split: spaces in path.
 while IFS= read -r file; do
     [ -n "$file" ] || continue
     count=$((count + 1))

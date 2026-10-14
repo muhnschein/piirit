@@ -1,9 +1,7 @@
-//! A core that comes back is handed the reader's words again.
+//! Restarted core is handed the reader's words again.
 //!
-//! The core keeps stock strings only for as long as it runs. When it dies
-//! and the shim spawns another, the new one starts with English, so the
-//! table goes to it before it is asked anything else -- the same as the
-//! first one, and without the window having to notice.
+//! Core keeps stock strings only while running. Shim respawns after death; new
+//! server starts in English, so the table goes first, as to the first one.
 
 // Qt harness: see qml_share.rs.
 #![allow(
@@ -25,7 +23,7 @@ mod common;
 const PROBE_QML: &str = r#"
     import QtQuick 2.0
     Item {
-        // Handed over before the core is started, as the window does.
+        // Handed over before core is started, as the window does.
         Component.onCompleted: core.set_stock_strings('{"3": "Entwurf"}')
     }
 "#;
@@ -39,14 +37,12 @@ fn every_server_is_handed_the_stock_strings_before_anything_else() {
     let journal = common::fresh_journal(&temp);
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
 
-    // SAFETY: single-threaded test binary; set before Qt starts and before
-    // the server inherits them.
+    // SAFETY: single-threaded; set before Qt and server.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_FAKE_JOURNAL", &journal);
         std::env::set_var("PIIRIT_ACCOUNTS_DIR", temp.join("accounts"));
-        // Every server dies a moment after it starts, and the shim spawns
-        // the next one a second and then two seconds later.
+        // Servers die soon after start; respawn after 1s, then 2s.
         std::env::set_var("PIIRIT_FAKE_EXIT_AFTER_MS", "500");
     }
 
@@ -63,14 +59,13 @@ fn every_server_is_handed_the_stock_strings_before_anything_else() {
         .start(QString::from(env!("CARGO_BIN_EXE_fake-core-server")));
 
     let engine_ptr = std::ptr::addr_of_mut!(engine);
-    // SAFETY: fires only while `exec()` runs on this thread.
+    // SAFETY: fires only while `exec()` runs.
     single_shot(Duration::from_secs(5), move || unsafe {
         (*engine_ptr).quit();
     });
     engine.exec();
 
-    // Nothing else is asked of any of them, so each server's one call
-    // is the table: one per server, and more than one server.
+    // Each server's one call is the table: one per server, >1 server.
     let calls = common::calls(&journal);
     assert!(
         calls.len() >= 2,

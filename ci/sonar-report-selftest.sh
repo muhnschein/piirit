@@ -1,16 +1,8 @@
 #!/usr/bin/env bash
-# Prove that scripts/sonar-report.sh still reports what it claims to report.
-#
-# The script's whole job is to fetch four things from SonarQube Cloud and
-# render them, and it cannot be run against the real service from here: the
-# analysis it would read does not exist yet when the tests run, and this
-# project's network policy does not reach sonarcloud.io in the first place --
-# which is the very reason the script exists. So it is run against a stub
-# server that answers the four endpoints, and each case below asserts one
-# thing the script got wrong once.
-#
-# Everything the script needs comes out of the scanner's report-task.txt, so
-# a stub server plus a hand-written report-task.txt is the whole harness.
+# Prove scripts/sonar-report.sh reports what it claims. Real SonarQube Cloud is
+# unreachable here, so this runs against a stub server answering the four
+# endpoints. Each case asserts one past bug. Script reads everything from the
+# scanner's report-task.txt, so stub + hand-written task file is the harness.
 set -u
 
 root=$(CDPATH='' cd -- "$(dirname -- "$0")/.." && pwd)
@@ -18,8 +10,7 @@ script="$root/scripts/sonar-report.sh"
 work=$(mktemp -d)
 
 server_pid=""
-# Inline rather than a cleanup function: shellcheck cannot see that a trap
-# calls one, and reports every line of it as unreachable code (SC2317).
+# Inline, not cleanup fn: shellcheck calls trap body unreachable (SC2317).
 trap 'if [[ -n "$server_pid" ]]; then kill "$server_pid" 2>/dev/null; wait "$server_pid" 2>/dev/null; fi; rm -rf "$work"' EXIT
 
 if [[ ! -x "$script" ]]; then
@@ -33,12 +24,10 @@ for tool in python3 jq curl; do
     fi
 done
 
-# ---------------------------------------------------------------- the stub
+# ---- the stub
 #
-# Answers the four endpoints the script reads, records every path it was
-# asked for, and can be told to demand credentials. It refuses with 404
-# rather than 403 when it does, because that is what SonarQube Cloud does
-# and what the script had to learn to retry through.
+# Answers four endpoints, records paths, can demand credentials. Refuses with
+# 404, not 403, as SonarQube Cloud does (script must retry through it).
 cat >"$work/stub.py" <<'PY'
 import json, os, sys
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -196,8 +185,7 @@ EOF
 expect() {
     local what=$1 needle=$2 where=$3
     cases=$((cases + 1))
-    # `--` because a needle beginning with a dash is an option to grep,
-    # and every measure line begins with one.
+    # `--`: a needle starting with a dash would be a grep option.
     if grep -qF -- "$needle" "$where"; then
         echo "selftest: ok   $what"
     else
@@ -221,13 +209,11 @@ reject() {
     return 0
 }
 
-# ------------------------------------------------- everything, anonymous
+# ---- everything, anonymous
 #
-# A public project the token need not be presented for. This is also the
-# case that catches the jq bug that once killed the whole program: `|` binds
-# looser than `,`, so an unparenthesised pipe was applied to the heading
-# strings too and jq died on "Cannot index string with string". If the
-# heading and a condition line are both here, that is fixed.
+# Public project, no token. Also catches jq bug (`|` binds looser than `,`;
+# died on "Cannot index string with string"): heading + condition line present
+# = fixed.
 start_stub SUCCESS 0 || exit 1
 write_task ""
 env -u SONAR_TOKEN -u GITHUB_STEP_SUMMARY \
@@ -248,30 +234,27 @@ expect "a passing condition is listed" "OK  new_coverage LT 80 (actual: 91.4)" "
 expect "a failing condition is listed" "ERROR  new_violations GT 0 (actual: 2)" "$work/out"
 expect "measures are rendered" "- coverage: 73.1" "$work/out"
 expect "a new-code measure reads its period value" "- new_coverage: 91.4" "$work/out"
-# SonarQube Cloud answers with `periods`, an array, where Server answers
-# with `period`. The first real run printed "-" for every new_* measure.
+# Cloud answers `periods` (array), Server answers `period`. First real run
+# printed "-" for every new_* measure.
 expect "and one in Cloud's periods shape too" "- new_lines_to_cover: 1" "$work/out"
 expect "issues are counted" "### Open issues: 2" "$work/out"
 expect "an issue names its file and line" "rust/piirit-shim/src/lib.rs:42" "$work/out"
 expect "an issue with only impacts still has a severity" "LOW  shell:S5678" "$work/out"
 expect "the dashboard link is printed" "/dashboard?id=muhnschein_piirit" "$work/out"
 
-# The first real run had 115 issues and the script asked for 100, so the
-# report ended in "15 more not listed". A page is the most the API gives.
+# Real run had 115 issues; page cap 100 gave "15 more not listed".
 expect "the issue list asks for a whole page" "resolved=false&ps=500" "$work/seen"
 
-# A rating is 1..5 on the wire. Printed as a number it is unreadable, and
-# worse, it reads like a score out of five with the polarity reversed.
+# Ratings are 1..5 on the wire: unreadable as numbers, and look like a score out
+# of five with polarity reversed.
 expect "a rating is a letter" "- security_rating: A" "$work/out"
 expect "the other rating is a letter too" "- sqale_rating: B" "$work/out"
 reject "no raw rating survives" "security_rating: 1.0" "$work/out"
 
-# ------------------------------------------------------- the scope is passed
+# ---- the scope is passed
 #
-# The slice comes out of the dashboard URL the scanner wrote, and it has to
-# reach the measures and issues queries: without it they answer for the
-# default branch, which is not what was analysed and looks entirely
-# plausible.
+# Slice from dashboard URL must reach measures and issues queries, or they
+# answer for the default branch (wrong, but plausible-looking).
 start_stub SUCCESS 0 || exit 1
 write_task "pullRequest=45"
 env -u SONAR_TOKEN -u GITHUB_STEP_SUMMARY \
@@ -285,11 +268,10 @@ expect "the issues query carries the scope" \
     "/api/issues/search?componentKeys=muhnschein_piirit&pullRequest=45&" \
     "$work/seen"
 
-# --------------------------------------------------------- the token first
+# ---- the token first
 #
-# SonarQube Cloud answers 404, not 403, for something the caller may not
-# read. The first version of this script asked anonymously, took the 404 for
-# "no such thing", and reported nothing at all. So the token goes first.
+# Cloud answers 404, not 403, for unreadable things; asking anonymously first
+# read that 404 as "no such thing" and reported nothing.
 start_stub SUCCESS 1 || exit 1
 write_task ""
 SONAR_TOKEN=squ_stub \
@@ -300,8 +282,7 @@ expect "a project that needs the token is still reported" \
     "### Quality gate: OK" "$work/out"
 expect "and its measures with it" "- coverage: 73.1" "$work/out"
 
-# Without a token, the same server must fail loudly rather than print an
-# empty report that looks like a clean bill of health.
+# No token: fail loudly, not an empty report that looks clean.
 start_stub SUCCESS 1 || exit 1
 write_task ""
 env -u SONAR_TOKEN -u GITHUB_STEP_SUMMARY \
@@ -317,10 +298,9 @@ else
 fi
 reject "and prints no gate" "Quality gate" "$work/out"
 
-# ------------------------------------------------------ the step summary
+# ---- the step summary
 #
-# The job log scrolls; the step summary is what a reviewer opens. The same
-# text has to land in both.
+# Log scrolls; step summary is what reviewer opens. Same text in both.
 start_stub SUCCESS 0 || exit 1
 write_task ""
 GITHUB_STEP_SUMMARY="$work/summary" \
@@ -330,12 +310,10 @@ GITHUB_STEP_SUMMARY="$work/summary" \
 expect "the step summary gets the report" "### Quality gate: OK" "$work/summary"
 expect "the step summary gets the measures" "- coverage: 73.1" "$work/summary"
 
-# ------------------------------------------------------- what went wrong
+# ---- what went wrong
 #
-# A report the server never finished processing must not be rendered from
-# whatever the previous run left behind. Asking for measures too early
-# returns the PREVIOUS analysis's numbers, which is worse than none: they
-# look right.
+# Report server never finished processing must not be rendered: early measures
+# are previous analysis's numbers, which look right.
 start_stub FAILED 0 || exit 1
 write_task ""
 env -u SONAR_TOKEN -u GITHUB_STEP_SUMMARY \
@@ -352,8 +330,8 @@ fi
 expect "and says so" "status: FAILED" "$work/err"
 reject "and prints no measures" "### Measures" "$work/out"
 
-# A run where the scanner never uploaded has nothing to report on, and the
-# workflow marks this step continue-on-error, so failing here is a warning.
+# No upload = nothing to report; step is continue-on-error, so failing here
+# warns.
 cases=$((cases + 1))
 if "$script" "$work/nothing-here.txt" >"$work/out" 2>"$work/err"; then
     echo "selftest: FAIL a missing report-task.txt should not exit 0" >&2

@@ -2,35 +2,27 @@ import QtQuick 2.0
 import Sailfish.Silica 1.0
 
 /*
- * A strip along the page saying what just happened -- a failure, or a
- * confirmation. Transient: a message the reader cannot act on should not
- * sit there forever, and the page clears its own state on `dismissed`
- * rather than having this write to it.
+ * Status strip: failure or confirm. Transient; page clears on `dismissed`.
  */
 Item {
     id: root
 
     property string text: ""
-    // "error" or "info": what happened, and how loudly to say it.
+    // "error" or "info": severity.
     property string tone: "error"
-    // What the label inside is called, for a test looking it up. A page
-    // with two of these -- a failure and a confirmation -- would otherwise
-    // have two nodes by the same name and find whichever came first.
+    // objectName for tests; 2 per page would clash.
     property string labelObjectName: "errorLabel"
-    // Seconds before the message clears itself; 0 keeps it.
+    // Auto-clear seconds; 0 keeps.
     property int timeout: 8
     signal dismissed()
 
     readonly property color toneColor: root.tone === "error" ? Theme.errorColor
                                                              : Theme.highlightColor
 
-    /// Say something for a while. For the cases the page has no state for.
+    /// Show briefly. For cases lacking page state.
     function show(message) {
         root.text = message
-        // Restarted here rather than left to `onTextChanged`, which does
-        // not fire when the message is the one already showing -- so a
-        // second copy would have inherited the rest of the first one's
-        // four seconds and vanished almost at once.
+        // Restart here: onTextChanged skips repeats; else they vanish at once.
         if (root.text.length > 0 && root.timeout > 0) {
             fade.restart()
         }

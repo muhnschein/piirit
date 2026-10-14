@@ -1,11 +1,7 @@
-//! A profile made with no relay named is left to the core's own
-//! onboarding, which is what puts it on several relays.
+//! Profile with no relay named is left to core's onboarding, which puts it on several relays.
 //!
-//! Since core 2.61 `init_transports` is the one way in that does: it
-//! makes the profile on whichever of the core's relays answers first and
-//! turns its background additions on. `add_transport_from_qr` with a
-//! relay named is that relay alone, so an empty payload must not become
-//! one -- neither a default relay nor a refusal.
+//! Since core 2.61, `init_transports` is the one way in that does. `add_transport_from_qr` with
+//! relay named is that relay alone: empty payload must become neither default nor refusal.
 
 // Qt harness: see onboarding.rs.
 #![allow(
@@ -50,8 +46,7 @@ fn no_relay_named_leaves_the_relays_to_the_core() {
     let accounts = temp.join("accounts");
     std::fs::create_dir_all(&accounts).expect("create temp dirs");
 
-    // SAFETY: single-threaded test binary, set before Qt initialises and
-    // before the shim spawns the server that inherits them.
+    // SAFETY: single-threaded; set pre-Qt.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_FAKE_JOURNAL", &journal);
@@ -76,8 +71,7 @@ fn no_relay_named_leaves_the_relays_to_the_core() {
 
     let engine_ptr: *const QmlEngine = &engine;
     single_shot(Duration::from_secs(3), move || {
-        // SAFETY: see tests/smoke.rs -- the callback only fires while
-        // `exec()` is still running on this thread.
+        // SAFETY: see tests/smoke.rs; callback fires only while `exec()` runs.
         unsafe {
             (*engine_ptr).quit();
         }

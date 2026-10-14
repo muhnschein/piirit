@@ -1,17 +1,7 @@
-//! A conversation hidden under another page keeps its rows as they were.
-//!
-//! The platform hides a page while another is over it, and `visible` on
-//! everything in it reads the *effective* visibility -- false. A part of a
-//! message row measuring itself as `visible ? implicitHeight : 0` would
-//! therefore collapse to nothing the moment a page covered it, leaving the
-//! list to build a hundred rows to fill the void and undo all of it on the
-//! way back: a stall of a few hundred milliseconds right as the reader
-//! begins to swipe. The same goes for pictures, posters and sound players
-//! loading their files.
-//!
-//! What is pinned here is that hiding the list changes neither what its
-//! content measures nor how many rows it holds, and showing it again
-//! changes nothing either.
+//! Hidden page keeps rows. Platform hides covered page; `visible` reads effective
+//! visibility (false). `visible ? implicitHeight : 0` collapses covered rows, list
+//! rebuilds ~100 rows, stalls few hundred ms on swipe. Same for pictures, sound.
+//! Pinned: hiding changes neither content measure nor row count.
 
 // Qt harness: see qml_conversation_list.rs.
 #![allow(
@@ -28,9 +18,8 @@ use qmetaobject::*;
 
 mod common;
 
-/// The list over rows that are filled in -- `loaded` -- so their height is
-/// their message's, with a quote and a sender name so the parts that can
-/// be there are there.
+/// Rows filled in (`loaded`), so height is message's; with quote and sender name so every part
+/// that can be there is.
 const PROBE_QML: &str = r"
     import QtQuick 2.0
     Item {
@@ -84,7 +73,7 @@ const PROBE_QML: &str = r"
 
 #[test]
 fn hiding_the_list_leaves_its_rows_as_they_were() {
-    // SAFETY: single-threaded test binary; set before Qt starts.
+    // SAFETY: single-threaded; set pre-Qt.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
     }
@@ -156,8 +145,7 @@ fn hiding_the_list_leaves_its_rows_as_they_were() {
          run says nothing about hiding them. {context}"
     );
 
-    // The content measures the same and holds the same rows, hidden or
-    // not: a page under another neither empties nor refills its list.
+    // Measures and rows same, hidden or not.
     assert_eq!(
         value("hidden"),
         before,

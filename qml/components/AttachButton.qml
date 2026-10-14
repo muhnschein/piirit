@@ -2,48 +2,30 @@ import QtQuick 2.0
 import Sailfish.Silica 1.0
 
 /*
- * The "+" beside the message field, and the tray it opens.
+ * "+" beside message field; opens tray of choices above it.
  *
- * The shape is Whisperfish's (qml/components/ChatTextInput.qml): a plus
- * that turns into a cross and lifts a small column of choices above itself,
- * rather than a row of buttons permanently crowding the field. It gets the
- * one-handed reach right -- the choices appear directly under the thumb
- * that opened them.
+ * Shape from Whisperfish (qml/components/ChatTextInput.qml). Choices appear under the thumb that opened them.
  *
- * Four choices, nearest the thumb first: the camera, for a picture or
- * a video taken now; the paper clip, which is the platform's own picker
- * over everything the phone has indexed -- pictures, videos, music,
- * documents -- rather than one entry per kind; the microphone, for
- * a voice message, offered only where something can record one; and the
- * grid of squares that means "apps", for sending a webxdc one, offered
- * only where the reader has asked for those.
+ * Choices, nearest thumb first: camera (take now); paper clip (platform picker over all indexed media and documents, not one entry per kind); mic (voice message, only where recording works); apps grid (send webxdc, only if reader enabled).
  *
- * Nothing is opened here. The page that owns the pageStack pushes the
- * pickers and starts the recording, the way ConversationPage already
- * handles forwarding -- which keeps this component loadable, and
- * testable, on its own. The page also closes the tray: a tap anywhere
- * else on it is a tap that did not mean the tray.
+ * Nothing opened here: owning page pushes pickers and starts recording, as ConversationPage does for forwarding. Keeps this loadable and testable alone. Page also closes tray on tap elsewhere.
  */
 Item {
     id: root
 
-    /// Whether the tray is showing.
+    /// Tray showing.
     property bool open: false
-    /// Whether a voice message can be recorded here. Without it the
-    /// microphone is not offered at all.
+    /// Mic offered at all, else hidden.
     property bool voiceAvailable: false
-    /// Whether webxdc apps are on. Without it the grid of squares is not
-    /// offered at all, the way the microphone is not where nothing can
-    /// record. The page binds it from the reader's setting.
+    /// Apps grid offered at all. Page binds from reader setting.
     property bool appsAvailable: false
-    /// A picture or a video, taken now.
+    /// Take picture or video now.
     signal cameraRequested()
-    /// Something the phone has indexed: a picture, a video, a song, a
-    /// document.
+    /// Indexed picture, video, song or document.
     signal libraryRequested()
-    /// A voice message, recorded now.
+    /// Record voice message now.
     signal voiceRequested()
-    /// A webxdc app: a .xdc file off the phone, to play in the chat.
+    /// .xdc app file off phone, to play in chat.
     signal appRequested()
 
     function close() {
@@ -58,17 +40,16 @@ Item {
         objectName: "attachToggle"
         anchors.bottom: parent.bottom
         icon.source: "image://theme/icon-m-add"
-        // Animated through a plain property: a Behavior cannot be attached
-        // to a member of a grouped property, which `icon.rotation` is.
+        // Animated via plain property: Behavior can't attach to a grouped
+        // property member like `icon.rotation`.
         property real turn: root.open ? 45 : 0
         Behavior on turn { NumberAnimation { duration: 150 } }
         icon.rotation: toggle.turn
         onClicked: root.open = !root.open
     }
 
-    // Drawn outside this item's bounds, above the button. Nothing in the
-    // input row clips, and the row is declared after the message list, so
-    // it paints over the conversation.
+    // Drawn outside bounds, above button. Nothing in input row clips; row
+    // declared after message list, paints over conversation.
     Rectangle {
         id: tray
         objectName: "attachTray"
@@ -81,10 +62,8 @@ Item {
         radius: width / 4
         color: Theme.rgba(Theme.highlightDimmerColor, 0.9)
 
-        // `enabled` follows the button rather than the fade, so a tray on
-        // its way out stops taking taps at once instead of a frame before
-        // it disappears. `visible` follows the fade, so it is gone rather
-        // than transparent once it has.
+        // `enabled` follows button, not fade: tray on way out stops taking taps
+        // at once. `visible` follows fade: gone, not transparent.
         opacity: root.open ? 1.0 : 0.0
         visible: opacity > 0.0
         enabled: root.open
@@ -123,8 +102,7 @@ Item {
                 }
             }
 
-            // Drawn rather than named: see AppMark for why this one
-            // cannot be a theme icon.
+            // Drawn, not named: see AppMark.
             BackgroundItem {
                 id: appChoice
                 objectName: "attachApp"

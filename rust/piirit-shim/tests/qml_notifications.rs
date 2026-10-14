@@ -1,11 +1,7 @@
-//! Who gets told about an arriving message, what they are told, and what
-//! a tap on the telling does.
+//! Who is told of an arrival, what they see, and where a tap goes.
 //!
-//! A notification for a chat the reader is already looking at is noise; a
-//! notification that outlives the reader arriving is worse, because it
-//! trains them to ignore the next one. What one says is the reader's
-//! choice, since the lock screen shows it to whoever is looking; and a
-//! tap on it has to come back to the chat it stands for.
+//! Open chat: no notice. Stale notice trains reader to ignore the next. Detail is
+//! reader's choice (lock screen shows it). Tap returns to its chat.
 
 // Qt harness: see qml_chat_row.rs.
 #![allow(
@@ -98,7 +94,7 @@ const PROBE_QML: &str = r"
 #[test]
 #[allow(clippy::too_many_lines)]
 fn a_message_is_announced_unless_the_reader_is_already_in_that_chat() {
-    // SAFETY: single-threaded test binary; set before Qt starts.
+    // SAFETY: single-threaded; set pre-Qt.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
     }
@@ -150,8 +146,7 @@ fn a_message_is_announced_unless_the_reader_is_already_in_that_chat() {
         call!("set", QString::from("viewingChatId"), 0);
         call!("set", QString::from("detail"), 0);
 
-        // Nobody is reading anything: both chats speak up. In the group
-        // the message is Bob's, and the notification says so.
+        // Nobody reading: both chats notify. Group names sender.
         arrived!(7, "Ada", "", "see you there");
         arrived!(9, "Hikers", "Bob", "ping");
         record!("two-chats", call!("published"));
@@ -160,32 +155,27 @@ fn a_message_is_announced_unless_the_reader_is_already_in_that_chat() {
         record!("identity", call!("identity", 7));
         record!("one-counted", call!("counted", 7));
 
-        // A second message in the same chat counts up on the one
-        // notification rather than raising another.
+        // Second message counts up on same notice.
         arrived!(7, "Ada", "", "and another");
         record!("still-two-chats", call!("published"));
         record!("two-counted", call!("counted", 7));
 
-        // Walking into Ada's chat takes Ada's notification down, and
-        // leaves Bob's alone. The count starts over with it.
+        // Into Ada's chat drops Ada's notice, not Bob's. Count restarts.
         call!("set", QString::from("viewingChatId"), 7);
         record!("after-opening-ada", call!("published"));
 
-        // A second message from Ada, while Ada is on screen, is not news.
+        // Second Ada message on screen: not news.
         arrived!(7, "Ada", "", "still here");
         record!("while-reading-ada", call!("published"));
 
-        // The same message with the app in the background is news again:
-        // on screen is not the same as seen. And it is the first since
-        // the notification came down.
+        // Same with app in background: news again (on screen is not seen), first since notice
+        // came down.
         call!("set", QString::from("appActive"), false);
         arrived!(7, "Ada", "", "and again");
         record!("while-backgrounded", call!("published"));
         record!("counted-again", call!("counted", 7));
 
-        // Less said, by the reader's choice: the chat only, then only
-        // that something arrived. The name is kept aside either way, for
-        // the page to open the chat under.
+        // Detail less: chat only, or "something arrived". Name kept aside for page.
         call!("set", QString::from("detail"), 1);
         arrived!(11, "Grace", "", "the secret is");
         record!("name-only", call!("saying", 11));
@@ -194,12 +184,10 @@ fn a_message_is_announced_unless_the_reader_is_already_in_that_chat() {
         record!("arrival-only", call!("saying", 13));
         record!("name-kept", call!("nameOf", 13));
 
-        // A tap comes back to the chat, through the name the adaptor owns.
+        // Tap returns to chat via name adaptor owns.
         record!("tap", call!("tap", 13));
 
-        // Notifications off: whatever is up comes down, and nothing
-        // arriving goes up, however loudly. On again, arrivals are news
-        // as before.
+        // Off: pending drop, arrivals silent. On: news again.
         record!("before-off", call!("published"));
         call!("set", QString::from("enabled"), false);
         record!("after-off", call!("published"));
@@ -219,8 +207,7 @@ fn a_message_is_announced_unless_the_reader_is_already_in_that_chat() {
     assert_outcome(&steps);
 }
 
-/// Who was told, who was spared, what they were told, and where a tap
-/// went.
+/// Who notified, what said, where tap went.
 #[allow(clippy::too_many_lines)]
 fn assert_outcome(steps: &[(&str, String)]) {
     let value = |label: &str| {
@@ -331,8 +318,7 @@ fn assert_outcome(steps: &[(&str, String)]) {
         ("0".to_string(), "none".to_string()),
         "a message arriving with notifications off was announced. {context}"
     );
-    // Said the way the detail setting left it: only that something
-    // arrived.
+    // Detail setting "something arrived" only.
     assert_eq!(
         (value("after-on"), value("said-again")),
         ("1".to_string(), "1 new message(s)/".to_string()),

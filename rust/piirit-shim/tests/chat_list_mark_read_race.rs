@@ -1,18 +1,8 @@
-//! Marking a chat read from the list has to stick, whatever else the core
-//! says while the answer is on its way.
+//! Mark-read from list sticks, whatever core says meanwhile.
 //!
-//! A refresh reads the rows it is not refetching out of the model as it
-//! stood when the refresh started, and an answer to an older question is
-//! dropped on arrival (`generation`) so a slow one cannot land on top of a
-//! newer one. Together those two lose a change: mark a chat read, and
-//! while that chat is being re-read a message lands in *another* chat.
-//! The newer refresh carries a copy of the chat that was marked read from
-//! before it was, the older refresh -- the one that would have brought the
-//! cleared badge -- is thrown away for being stale, and nothing asks
-//! about that chat again. The badge comes back and stays.
-//!
-//! The fake core answers the listing slowly, so the two questions are
-//! certainly in flight together rather than by luck.
+//! Refresh reads unfetched rows as they were at start; old answers dropped (`generation`).
+//! So: mark read, message lands in another chat, newer refresh has pre-mark copy, older one
+//! with cleared badge discarded; badge returns. Fake answers listing slowly so both are in flight.
 
 // Qt harness: see qml_chat_list.rs.
 #![allow(
@@ -59,18 +49,13 @@ fn a_chat_marked_read_stays_read_when_another_chat_changes() {
     let journal = common::fresh_journal(&temp);
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
 
-    // SAFETY: single-threaded test binary; set before Qt starts and before
-    // the server inherits them.
+    // SAFETY: single-threaded; set before Qt starts and before server inherits env.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_ACCOUNTS_DIR", temp.join("accounts"));
         std::env::set_var("PIIRIT_FAKE_JOURNAL", &journal);
-        // Longer than the gap between marking the chat read and the other
-        // chat changing, so the first answer is certainly still in flight
-        // when the second question is asked -- and short enough that both
-        // have landed well before the count is read back. `single_shot`
-        // counts in whole seconds (it drops what is under one), so the
-        // gap it has to fit inside is a second.
+        // Longer than mark-read-to-other-change gap, so first answer is still in flight at the
+        // second question; short enough both land first. `single_shot` counts whole seconds.
         std::env::set_var("PIIRIT_FAKE_CHATLIST_DELAY_MS", "1500");
     }
 
@@ -110,7 +95,7 @@ fn a_chat_marked_read_stays_read_when_another_chat_changes() {
         call!("markRead");
     });
 
-    // While the re-read of the chat that was marked is still out.
+    // While re-read of marked chat is still out.
     single_shot(Duration::from_secs(6), move || unsafe {
         call!("otherChatChanged");
     });
@@ -131,9 +116,7 @@ fn a_chat_marked_read_stays_read_when_another_chat_changes() {
     };
     let records = common::records(&journal);
     let names: Vec<String> = common::methods(&journal);
-    // When each call reached the fake core, in milliseconds since it came
-    // up: what says whether the two questions were really in flight
-    // together, which a Qt timer on this side is too coarse to show.
+    // Call times at fake core (ms since up): shows whether questions overlapped.
     let at = |call: &Value| call.get("at").and_then(Value::as_u64).unwrap_or_default();
     let method = |call: &Value| {
         call.get("method")
@@ -153,10 +136,7 @@ fn a_chat_marked_read_stays_read_when_another_chat_changes() {
         .collect();
     let context = format!("steps: {steps:?}, calls: {names:?}, listings: {listings:?}");
 
-    // The second question has to be asked while the first is still being
-    // answered, or there is no race here to survive and this test would
-    // pass on the broken code too. The fake core holds each listing back
-    // by the delay set above, counted from when it arrived.
+    // Second question must come while first in flight: fake holds listings back by delay.
     assert!(
         listings.len() >= 2 && listings[listings.len() - 1] < listings[0] + 1500,
         "the refresh for the other chat was not asked for while the one \
@@ -164,7 +144,7 @@ fn a_chat_marked_read_stays_read_when_another_chat_changes() {
          tested. {context}"
     );
 
-    // Nothing unread to clear means nothing is being tested here.
+    // Nothing unread to clear: nothing tested.
     assert_eq!(
         value("unread"),
         "1",

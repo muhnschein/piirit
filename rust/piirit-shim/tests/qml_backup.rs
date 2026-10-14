@@ -1,40 +1,24 @@
-//! Writing a profile out to a backup file, from the page that offers it.
+//! Export of a profile to a backup file, from the page offering it.
 //!
-//! The core's export is per profile -- it takes an account id -- so the
-//! page is reached from the profile's own page and names the account it
-//! was given. What is pinned here is the whole of what the page does
-//! around that call:
+//! Core export takes account id: page reached from profile page. Pinned: export to `export_backup`
+//! with this account and Documents; file there is the one page names. Write reports progress and
+//! can't be left mid-write (leaving drops page listening for answer while core carries on).
+//! Refused folder: core's words shown, button stays. Reader-stopped write reports nothing (core
+//! refuses stopped export; reader's own doing, not news). Written backup ends page: button gone,
+//! chats attached right, so way on is a swipe.
 //!
-//! - the export goes to `export_backup` with this profile's account and
-//!   the folder the platform calls Documents, and the file that appears
-//!   there is the one the page names;
-//! - the write reports itself while it runs, and the page cannot be left
-//!   mid-write -- leaving would drop the page listening for the answer
-//!   while the core carried on;
-//! - a folder the core refuses says so in the core's own words, with the
-//!   button still there to try again;
-//! - a write the reader stops reports nothing: the core refuses the
-//!   export it was told to stop, and that refusal is the reader's own
-//!   doing rather than news;
-//! - a backup that was written ends the page: the button goes, and the
-//!   chats are attached to the right so the way on is a swipe rather
-//!   than an offer to write the same profile out again.
-//!
-//! The three writes run in that order -- refused, stopped, written --
-//! because the last one is the end of the page: after it there is no
-//! button left to start another with, which is the point.
+//! Writes run refused, stopped, written: written one ends page, so button asks come first.
 
 // Qt harness: see qml_chat_list.rs.
 #![allow(
     unsafe_code,
     unused_unsafe,
-    // `pushAttached` is Silica's own name; the probe has to answer to it.
+    // `pushAttached` is Silica's own name; probe answers to it.
     non_snake_case,
     clippy::borrow_as_ptr,
     clippy::disallowed_methods,
     clippy::expect_used,
-    // qt_method! declarations must match the generated dispatcher's
-    // by-value parameters; see piirit-shim/src/lib.rs.
+    // `qt_method!` decls must match dispatcher's by-value params; see piirit-shim/src/lib.rs.
     clippy::needless_pass_by_value
 )]
 
@@ -46,9 +30,8 @@ use serde_json::Value;
 
 mod common;
 
-/// Silica's `pageStack`, recorded rather than performed: Cancel pops the
-/// page, and the page has to still be there for the test to read what it
-/// did afterwards.
+/// Silica's `pageStack`, recorded not performed: Cancel pops page, which must exist for test to
+/// read it.
 #[derive(QObject, Default)]
 struct PageStackProbe {
     base: qt_base_class!(trait QObject),
@@ -56,7 +39,7 @@ struct PageStackProbe {
     log: qt_property!(QString; NOTIFY log_changed),
     log_changed: qt_signal!(),
     push: qt_method!(fn(&mut self, page: QString, properties: QVariantMap)),
-    /// Silica's own name for putting a page to the right of this one.
+    /// Silica's name for a page to the right of this one.
     pushAttached: qt_method!(fn(&mut self, page: QString, properties: QVariantMap)),
     pop: qt_method!(fn(&mut self)),
 }
@@ -157,21 +140,17 @@ fn the_backup_page_writes_one_profile_out_and_says_where() {
     let temp = std::env::temp_dir().join(format!("piirit-backup-page-{}", std::process::id()));
     let journal = common::fresh_journal(&temp);
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
-    // The folder the page is pointed at for each of the three writes.
-    // The fake core is keyed on what it is handed, as it is for an
-    // import: `fail` refuses, `slow` waits long enough to be stopped.
+    // Folder per write. Fake core keyed on it: `fail` refuses, `slow` waits to be stopped.
     let good = temp.join("Documents");
     let refused = temp.join("fail-Documents");
     let slow = temp.join("slow-Documents");
 
-    // SAFETY: single-threaded test binary, and all of these have to be
-    // set before Qt initialises and before the shim spawns the server
-    // that inherits them.
+    // SAFETY: single-threaded; all set pre-Qt and before shim spawns server.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_FAKE_JOURNAL", &journal);
         std::env::set_var("PIIRIT_ACCOUNTS_DIR", temp.join("accounts"));
-        // The slow write answers after the reader has given up on it.
+        // Slow write answers after reader gave up.
         std::env::set_var("PIIRIT_FAKE_SLOW_MS", "2500");
     }
 
@@ -218,9 +197,7 @@ fn the_backup_page_writes_one_profile_out_and_says_where() {
         };
     }
 
-    // Refused first, then stopped, then written: the written one is the
-    // end of the page, so anything asked of a button has to be asked
-    // before it.
+    // Refused, stopped, then written: written one ends page, so button asks come first.
     let refused_path = refused.to_string_lossy().into_owned();
     single_shot(Duration::from_secs(1), move || unsafe {
         record!(
@@ -229,8 +206,7 @@ fn the_backup_page_writes_one_profile_out_and_says_where() {
                 "load",
                 QString::from(common::page_url("BackupPage.qml")),
                 1,
-                // The chats are on another profile: backing this one up
-                // is not switching to it.
+                // Chats on another profile: backing this one up isn't switching to it.
                 2
             )
         );
@@ -250,10 +226,8 @@ fn the_backup_page_writes_one_profile_out_and_says_where() {
 
     let slow_path = slow.to_string_lossy().into_owned();
     single_shot(Duration::from_secs(3), move || unsafe {
-        // Whose backup: the profile itself, drawn the way the invite
-        // code's page draws it, in the colour the core gives it. The
-        // address is not asked for -- an account the fake core has not
-        // configured has none, the same as on the profile page.
+        // Whose backup: profile drawn as invite page draws it. Address not asked: unconfigured
+        // account has none.
         record!("colour", call!("profileShows", QString::from("ownColor")));
         record!("failure", get!("errorLabel", "text"));
         record!(
@@ -261,7 +235,7 @@ fn the_backup_page_writes_one_profile_out_and_says_where() {
             call!("pageProperty", QString::from("writtenPath"))
         );
         record!("button-after-failure", get!("writeButton", "visible"));
-        // A write that takes its time, and the reader giving up on it.
+        // Write that takes its time, and reader giving up on it.
         record!(
             "documents-slow",
             call!("setDocuments", QString::from(slow_path.clone()))
@@ -270,11 +244,8 @@ fn the_backup_page_writes_one_profile_out_and_says_where() {
     });
 
     single_shot(Duration::from_secs(4), move || unsafe {
-        // Mid-write: the bar is up, the button is gone, and there is no
-        // way off the page. Asked of the slow write because it is the
-        // only one with a middle -- the core reports an export as it
-        // goes, and a write that is over before the first event has been
-        // polled for says nothing.
+        // Mid-write: bar up, button gone, no way off. Asked of slow write: only one with a
+        // middle (core reports export as it goes; write done before first poll says nothing).
         record!("running", get!("backup", "running"));
         record!("bar", get!("writeProgress", "visible"));
         record!("button", get!("writeButton", "visible"));
@@ -286,7 +257,7 @@ fn the_backup_page_writes_one_profile_out_and_says_where() {
         record!("cancel", call!("click", QString::from("cancelButton")));
     });
 
-    // Past the slow write's own answer, which arrives after the cancel.
+    // Past slow write's answer, which arrives after cancel.
     let good_path = good.to_string_lossy().into_owned();
     single_shot(Duration::from_secs(8), move || unsafe {
         record!("after-cancel", get!("errorLabel", "text"));
@@ -313,8 +284,7 @@ fn the_backup_page_writes_one_profile_out_and_says_where() {
             "leavable-after",
             call!("pageProperty", QString::from("backNavigation"))
         );
-        // Nothing left to do here: the button is gone and the way on is
-        // a swipe to the chats.
+        // Nothing left: button gone, way on is a swipe to chats.
         record!("button-after", get!("writeButton", "visible"));
         record!("onward", get!("onwardHint", "visible"));
         (*engine_ptr).quit();
@@ -334,9 +304,7 @@ fn the_backup_page_writes_one_profile_out_and_says_where() {
     };
 
     assert_eq!(value("load"), "ok", "the page did not load. {context}");
-    // The profile itself at the top, not a line of address: drawn in the
-    // colour the core gives this account, which is what says the row is
-    // really bound to the profile.
+    // Profile at top, drawn in account's colour: row bound to profile.
     assert_eq!(
         value("colour"),
         "#00875a",
@@ -366,9 +334,8 @@ fn the_backup_page_writes_one_profile_out_and_says_where() {
         "true",
         "the page is still pinned once the write is done. {context}"
     );
-    // The end of the page: nothing to write again with, and the chats
-    // are to the right -- the ones the app is on, not the profile that
-    // was just backed up.
+    // End of page: nothing to write; chats to right are current app's, not the profile just
+    // backed up.
     assert_eq!(
         value("button-after"),
         "false",
@@ -434,9 +401,8 @@ fn the_backup_page_writes_one_profile_out_and_says_where() {
     assert_exports(&calls, &good, &refused, &slow, &context);
 }
 
-/// The file the page names is a `.tar` in the folder it was pointed at,
-/// and it is really there -- the core names a backup itself, so the page
-/// finds it by what appeared in the folder.
+/// File page names: a `.tar` in the folder, really there. Core names backups itself; page finds
+/// it by what appeared.
 fn assert_written(path: &str, said: &str, folder: &std::path::Path, context: &str) {
     let folder = folder.to_string_lossy().into_owned();
     assert!(
@@ -456,9 +422,8 @@ fn assert_written(path: &str, said: &str, folder: &std::path::Path, context: &st
     );
 }
 
-/// Every write went to `export_backup` on this profile's account, with
-/// the folder the page was pointed at, and the one the reader gave up on
-/// was stopped in the core rather than left running.
+/// Every write went to `export_backup` on this account, in folder pointed at; the abandoned one
+/// was stopped in core.
 fn assert_exports(
     calls: &[(String, Value)],
     good: &std::path::Path,

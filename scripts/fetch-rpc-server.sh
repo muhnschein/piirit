@@ -1,25 +1,18 @@
 #!/bin/sh
-# Fetch upstream deltachat-rpc-server binaries for the architectures
-# Piirit packages, and place them where rpm/harbour-piirit.spec expects
+# Fetches upstream deltachat-rpc-server binaries for Piirit's archs, to where
+# rpm/harbour-piirit.spec expects:
+# vendor/deltachat-rpc-server/<sailfish-arch>/deltachat-rpc-server.
 #
-#     vendor/deltachat-rpc-server/<sailfish-arch>/deltachat-rpc-server
+# Upstream (chatmail/core) links static against musl ("to avoid glibc version
+# incompatibility", per its CI): needs only the kernel. Runs on Sailfish as is.
 #
-# Upstream (chatmail/core) builds these statically against musl libc
-# ("to avoid problems with glibc version incompatibility", per their CI
-# workflow), so a binary depends only on the kernel -- this is why a
-# generic upstream build is expected to run on Sailfish unmodified.
+# Source: PyPI wheels, holding the same binaries upstream attaches to its GitHub
+# release (both nix `result/bin/deltachat-rpc-server`, per upstream
+# .github/workflows/deltachat-rpc-server.yml). PyPI: plain HTTPS, wheel is a zip.
 #
-# Source: the exact same binaries upstream attaches to its GitHub release
-# are also published inside its PyPI wheels (see
-# .github/workflows/deltachat-rpc-server.yml upstream: both are the nix
-# build's `result/bin/deltachat-rpc-server`). PyPI is used here because
-# it's fetchable with plain HTTPS and the wheel is just a zip.
-#
-# Everything is pinned: bump VERSION *and* refresh all checksums together
-# (fetch the new wheels, run `sha256sum`, update below), then update
-# vendor/deltachat-rpc-server/SOURCE.md to match -- the MPL-2.0
-# source-availability notice must always describe the binaries actually
-# bundled (see vendor/deltachat-rpc-server/SOURCE.md).
+# All pinned: bump VERSION and every checksum together (fetch new wheels, run
+# `sha256sum`, update below), then vendor/deltachat-rpc-server/SOURCE.md: its
+# MPL-2.0 source notice must describe the binaries actually bundled.
 
 set -eu
 
@@ -43,13 +36,10 @@ fetch_one() {
     wheel="deltachat_rpc_server-$VERSION-$wheel_tag.whl"
 
     echo ">> $sfos_arch (upstream $upstream_arch)"
-    # pip resolves PyPI's hash-addressed file URL; --no-deps and the exact
-    # version pin keep it honest, and the sha256 check below keeps it
-    # honest even if the index were tampered with. --isolated and the
-    # explicit index: a PIP_INDEX_URL or pip.conf on the machine running
-    # this would otherwise point it at a mirror without anyone knowing --
-    # the hashes would still catch a substitution, but as a puzzling
-    # failure rather than a named one.
+    # pip fetches PyPI's hash URL. --no-deps, exact pin and the sha256 check
+    # below keep it honest, even with a tampered index. --isolated and explicit
+    # index: a PIP_INDEX_URL or pip.conf would silently point at a mirror (hashes
+    # catch it, but as a puzzling failure, not a named one).
     pip download "deltachat-rpc-server==$VERSION" --no-deps \
         --isolated --index-url https://pypi.org/simple --no-cache-dir \
         --platform "musllinux_1_1_$upstream_arch" --only-binary=:all: \

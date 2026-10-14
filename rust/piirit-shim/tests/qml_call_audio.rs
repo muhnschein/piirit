@@ -1,35 +1,23 @@
-//! Where a call's sound comes out (`CallAudio.qml`): the earpiece for a
-//! voice call, the loudspeaker for a video call, the reader's switch over
-//! both -- and the sound never moved while a microphone of the call's may
-//! be open.
+//! Call sound route (`CallAudio.qml`): earpiece for voice, loudspeaker for video, reader's switch
+//! over both; sound never moved while a call's mic may be open.
 //!
-//! On Sailfish, moving the sound while the browser engine's microphone is
-//! open aborts PulseAudio, and a few of those in a row leave the phone
-//! with no sound at all. So what is checked first is when things are
-//! sent: the set had before the call's page may come up (`ready`);
-//! nothing sent while a microphone may be open (`open`) -- not for the
-//! switch, not for pictures, not for a refusal that comes late, not on
-//! the way out; a switch that has the page shut the microphone
-//! (`micWanted`) and moves the sound only once the watcher says PulseAudio
-//! has no recording stream of the app's left (`micKnown`, `micOpen`), then
-//! lets the microphone back; and the set given back once the call is over
-//! the same way -- or, with no watcher to tell, a while after.
+//! Sailfish: moving sound while browser engine's mic is open aborts `PulseAudio`; a few in a row
+//! leave phone with no sound. So timing checked first: set had before call page may come up
+//! (`ready`); nothing sent while mic may be open (`open`) -- not for switch, pictures, late
+//! refusal, or way out. Switch has page shut mic (`micWanted`), moves sound only once watcher says
+//! `PulseAudio` has no app recording stream left (`micKnown`, `micOpen`), then lets mic back. Set
+//! given back after call the same way, or with no watcher, a while after.
 //!
-//! And what is sent, in libresource's own message layout: a set of class
-//! `aliencall` registered, its streams named by the app's id, acquired,
-//! with video playback for the loudspeaker (the policy's own loudspeaker
-//! for a call); updated for a switch; given back when the manager refuses
-//! any of it, or is not there; and nothing asked for without the app's
-//! id, which would leave the call's own streams held back. One message at
-//! a time, each once the last is answered, as libresource's own clients
-//! send them: the manager answers a register only after asking the bus who
-//! sent it, and refuses anything else about the set that comes before.
+//! Content, in libresource's message layout: set of class `aliencall` registered, streams named by
+//! app id, acquired, with video playback for loudspeaker (policy's call loudspeaker); updated for
+//! switch; given back when manager refuses any of it or is absent. Nothing asked without app id
+//! (would hold back call's own streams). One message at a time, each once last is answered, as
+//! libresource clients do: manager answers register only after asking bus who sent it, and refuses
+//! anything about the set sent before.
 //!
-//! And while a call rings, a set of class `ringtone`, which other apps'
-//! music gives way to: sound alone, naming no streams; given back once
-//! the ringing stops, and for a call answered only after the call's own
-//! set is had, so the music does not come back in between; not asked for
-//! again for a ring the manager refused.
+//! Ringing: set of class `ringtone` (other apps' music gives way), sound alone, no streams. Given
+//! back once ringing stops; for answered call only after call's own set is had, so music doesn't
+//! return in between. Not asked again for a ring manager refused.
 
 // Qt harness: see qml_chat_list.rs.
 #![allow(
@@ -154,8 +142,7 @@ const PROBE_QML: &str = r"
     }
 ";
 
-/// A whole set asked for: set `id`, its requests numbered from `first`,
-/// for the loudspeaker or not.
+/// Whole call set asked: set `id`, requests numbered from `first`, loudspeaker or not.
 fn asked(id: u32, first: u32, loud: bool) -> String {
     let all = if loud { 3 } else { 1 };
     format!(
@@ -167,8 +154,7 @@ fn asked(id: u32, first: u32, loud: bool) -> String {
     )
 }
 
-/// A ringing call's set asked for: set `id`, its requests numbered from
-/// `first`. Sound alone, and no streams named.
+/// Ringing set asked: set `id`, requests numbered from `first`. Sound alone, no streams.
 fn rung(id: u32, first: u32) -> String {
     format!(
         "register 0 {id} {first} 1 0 0 0 1234 ringtone 0;acquire 3 {id} {}",
@@ -176,7 +162,7 @@ fn rung(id: u32, first: u32) -> String {
     )
 }
 
-/// A set turned the other way out: updated, and acquired again.
+/// Set switched route: updated, acquired again.
 fn changed(id: u32, first: u32, loud: bool) -> String {
     let all = if loud { 3 } else { 1 };
     format!(
@@ -185,7 +171,7 @@ fn changed(id: u32, first: u32, loud: bool) -> String {
     )
 }
 
-/// A set given back: set `id`, its requests numbered from `first`.
+/// Set given back: set `id`, requests numbered from `first`.
 fn given_back(id: u32, first: u32) -> String {
     format!("release 4 {id} {first};unregister 1 {id} {}", first + 1)
 }
@@ -243,19 +229,18 @@ fn a_call_moves_its_sound_only_with_the_microphone_shut() {
 
     let url = common::component_url("CallAudio.qml");
 
-    // SAFETY for every block: these fire only while `exec()` runs on this
-    // thread, and everything they point at outlives it.
+    // SAFETY for every block: fire only while `exec()` runs on this thread; all they point at
+    // outlives it.
     single_shot(Duration::from_millis(300), move || unsafe {
         let load = |app: &str| call!("load", QString::from(url.as_str()), QString::from(app));
         record!("load", load("1234"));
         record!("start", call!("said"));
         record!("intervals", call!("intervals"));
-        // The watcher is connected, and no microphone is open.
+        // Watcher connected, no mic open.
         set!("micKnown", true);
 
-        // A voice call, with a manager that answers when told to: the
-        // register alone, then each of the rest once the last is
-        // answered; the page held back all the while.
+        // Voice call, manager answering on command: register alone, then each rest once last is
+        // answered; page held back throughout.
         call!("defer");
         record!("voice", set!("talking", true));
         record!("voice-state", call!("state"));
@@ -266,18 +251,16 @@ fn a_call_moves_its_sound_only_with_the_microphone_shut() {
         record!("voice-had", call!("flush"));
         record!("voice-had-state", call!("state"));
         record!("voice-had-settling", running!("settling"));
-        // The policy's moment to move the sound: then the page comes up
-        // and may open the microphone.
+        // Policy's moment to move sound; then page comes up and may open mic.
         record!("voice-in", fire!("settling"));
         record!("voice-in-state", call!("state"));
         record!("voice-in-patience", running!("patience"));
-        // The page has yet to open it: that is not a microphone shut.
+        // Page has yet to open mic: that is not a mic shut.
         record!("voice-in-quieting", running!("quieting"));
         call!("heal");
         record!("voice-mic", set!("micOpen", true));
 
-        // A headset: the switch is dimmed; the loudspeaker does not dim
-        // it.
+        // Headset: switch dimmed; loudspeaker does not dim it.
         record!(
             "headset",
             call!("route", QString::from("headset"), 1 | 8 | 256 | (1 << 27))
@@ -290,40 +273,37 @@ fn a_call_moves_its_sound_only_with_the_microphone_shut() {
         );
         record!("speaker-route-state", call!("state"));
 
-        // The loudspeaker, tapped: nothing moves while the microphone is
-        // open; the page is told to shut it, and the switch is busy.
+        // Loudspeaker tapped, mic open: nothing moves; page told to shut mic, switch busy.
         record!("loud-tap", call!("choose", true));
         record!("loud-tap-state", call!("state"));
         record!("loud-tap-stalled", running!("stalled"));
         record!("loud-tap-again", call!("choose", false));
         record!("loud-tap-again-state", call!("state"));
-        // Nothing that keeps time moves the sound or lets the microphone
-        // back early.
+        // Timers: no move, no early mic.
         fire!("settling");
         fire!("shutting");
         fire!("patience");
         record!("loud-early", fire!("quieting"));
         record!("loud-early-state", call!("state"));
-        // Shut for a moment, then not: not shut at all.
+        // Shut for a moment, then open again: not shut at all.
         set!("micOpen", false);
         record!("loud-flicker", running!("quieting"));
         set!("micOpen", true);
         record!("loud-flicker-quieting", running!("quieting"));
         record!("loud-flicker-state", call!("state"));
-        // PulseAudio says it has shut, and still does a moment later: the
-        // set turned for the loudspeaker.
+        // `PulseAudio` says shut, still does a moment later: set turned for loudspeaker.
         record!("loud-shut", set!("micOpen", false));
         record!("loud-shut-quieting", running!("quieting"));
         record!("loud-moved", fire!("quieting"));
         record!("loud-moved-state", call!("state"));
-        // The policy's moment, and the microphone back.
+        // Policy's moment, and mic back.
         record!("loud-in", fire!("settling"));
         record!("loud-in-state", call!("state"));
         record!("loud-back", set!("micOpen", true));
         record!("loud-back-state", call!("state"));
         record!("loud-back-stalled", running!("stalled"));
 
-        // Over: nothing until the microphone has shut, then given back.
+        // Over: nothing until mic shut, then given back.
         record!("over", set!("talking", false));
         record!("over-state", call!("state"));
         record!("over-quieting", running!("quieting"));
@@ -331,8 +311,7 @@ fn a_call_moves_its_sound_only_with_the_microphone_shut() {
         record!("over-shut", fire!("quieting"));
         record!("over-shut-state", call!("state"));
 
-        // A video call: the loudspeaker from the start, video playback in
-        // the set; switched to the earpiece.
+        // Video call: loudspeaker from start, video playback in set; switched to earpiece.
         set!("video", true);
         record!("video", set!("talking", true));
         record!("video-state", call!("state"));
@@ -343,10 +322,10 @@ fn a_call_moves_its_sound_only_with_the_microphone_shut() {
         record!("video-ear", fire!("quieting"));
         fire!("settling");
         set!("micOpen", true);
-        // Over, with the watcher gone: given back a while after.
+        // Over with watcher gone: given back a while after.
         set!("talking", false);
         record!("blind-over", set!("micKnown", false));
-        // A watcher that cannot tell says no microphone is open.
+        // Watcher that can't tell says no mic open.
         set!("micOpen", false);
         record!("blind-over-shutting", running!("shutting"));
         record!("blind-over-quieting", running!("quieting"));
@@ -355,8 +334,7 @@ fn a_call_moves_its_sound_only_with_the_microphone_shut() {
         set!("micKnown", true);
         set!("video", false);
 
-        // No watcher, a microphone open: the switch is dimmed, and
-        // pictures do not move the sound either.
+        // No watcher, mic open: switch dimmed, and pictures don't move sound either.
         record!("blind", set!("talking", true));
         fire!("settling");
         set!("micOpen", true);
@@ -368,13 +346,11 @@ fn a_call_moves_its_sound_only_with_the_microphone_shut() {
         set!("watching", false);
         set!("micKnown", true);
 
-        // A microphone that does not shut: given up on, back on, the
-        // sound where it was.
+        // Mic never shuts: given up on, mic back on, sound where it was.
         call!("choose", true);
         record!("stuck", fire!("stalled"));
         record!("stuck-state", call!("state"));
-        // A policy that does not answer the switch: given up on, the
-        // microphone back, and the rest not sent while it is open.
+        // Policy doesn't answer switch: given up on, mic back, rest not sent while it's open.
         call!("defer");
         call!("choose", true);
         set!("micOpen", false);
@@ -389,8 +365,7 @@ fn a_call_moves_its_sound_only_with_the_microphone_shut() {
         record!("silent-switch-rest", call!("drain"));
         call!("heal");
 
-        // Pictures coming put a voice call on the loudspeaker, unless the
-        // reader has switched it.
+        // Pictures: loudspeaker unless switched.
         record!("pictures-call", set!("talking", true));
         fire!("settling");
         set!("micOpen", true);
@@ -413,15 +388,15 @@ fn a_call_moves_its_sound_only_with_the_microphone_shut() {
         set!("micOpen", false);
         record!("pictures-over", fire!("quieting"));
 
-        // A call that starts while the last one's microphone is still
-        // open waits for it to shut; one like it keeps the set.
+        // Call starting while last one's mic is still open waits for it to shut; one like it keeps
+        // the set.
         record!("first-call", set!("talking", true));
         fire!("settling");
         set!("micOpen", true);
         set!("talking", false);
         record!("next-call", set!("talking", true));
         record!("next-call-state", call!("state"));
-        // Tapped meanwhile: nothing is open of this call's to shut.
+        // Tapped meanwhile: nothing of this call's open to shut.
         call!("choose", true);
         record!("next-call-tap", call!("state"));
         call!("choose", false);
@@ -435,9 +410,8 @@ fn a_call_moves_its_sound_only_with_the_microphone_shut() {
         set!("micOpen", false);
         record!("next-call-over", fire!("quieting"));
 
-        // The manager refuses the earpiece: the rest of the set is not
-        // sent, it is given back, and the call is on the loudspeaker for
-        // good, with the switch dimmed.
+        // Manager refuses earpiece: rest of set not sent, set given back, call on loudspeaker for
+        // good, switch dimmed.
         call!("defer");
         call!("answer", 13);
         record!("refused-sent", set!("talking", true));
@@ -450,16 +424,15 @@ fn a_call_moves_its_sound_only_with_the_microphone_shut() {
         set!("talking", false);
         set!("micOpen", false);
         record!("refused-over", fire!("quieting"));
-        // The refusal was that call's. Over before the microphone ever
-        // opened: given back once the moment is up.
+        // Refusal was that call's alone. This one, over before mic ever opened: given back
+        // once moment is up.
         record!("after-refusal", set!("talking", true));
         fire!("settling");
         set!("talking", false);
         record!("after-refusal-quieting", running!("quieting"));
         record!("after-refusal-over", fire!("quieting"));
 
-        // Refused mid-switch: given back with the microphone shut, and
-        // the microphone back on the loudspeaker.
+        // Refused mid-switch: given back with mic shut, mic back on loudspeaker.
         record!("mid-call", set!("talking", true));
         fire!("settling");
         set!("micOpen", true);
@@ -477,7 +450,7 @@ fn a_call_moves_its_sound_only_with_the_microphone_shut() {
         set!("micOpen", false);
         record!("mid-over", fire!("quieting"));
 
-        // No manager on the bus: let go of once that is known.
+        // No manager: let go once known.
         call!("defer");
         call!("fail");
         record!("absent-sent", set!("talking", true));
@@ -488,9 +461,8 @@ fn a_call_moves_its_sound_only_with_the_microphone_shut() {
         record!("absent-over", fire!("quieting"));
         call!("heal");
 
-        // A manager that does not answer the call's set at all: the page
-        // comes up without it, and the rest waits for the call to be
-        // over and its microphone shut.
+        // Manager never answers call's set: page comes up without it; rest waits for call over and
+        // mic shut.
         call!("defer");
         record!("silent-sent", set!("talking", true));
         record!("silent-in", fire!("patience"));
@@ -501,8 +473,7 @@ fn a_call_moves_its_sound_only_with_the_microphone_shut() {
         record!("silent-rest", call!("drain"));
         call!("heal");
 
-        // A refusal that comes late, for a call already over: the next
-        // call's set is kept.
+        // Late refusal, for a call already over: next call's set kept.
         call!("defer");
         call!("answer", 13);
         set!("talking", true);
@@ -517,8 +488,8 @@ fn a_call_moves_its_sound_only_with_the_microphone_shut() {
         set!("talking", false);
         record!("late-over", fire!("quieting"));
 
-        // A call ringing: the ring's set, given back a moment after the
-        // ringing stops -- declined, missed, or taken elsewhere.
+        // Ringing: ring's set, given back a moment after ringing stops (declined, missed, or taken
+        // elsewhere).
         record!("ring", set!("ringing", true));
         record!("ring-state", call!("state"));
         record!("ring-held", call!("ringHeld"));
@@ -527,16 +498,14 @@ fn a_call_moves_its_sound_only_with_the_microphone_shut() {
         record!("ring-gone", fire!("ringOver"));
         record!("ring-gone-held", call!("ringHeld"));
 
-        // Answered, with a manager that answers when told to: no longer
-        // ringing, then carrying sound, as an answer changes the call.
-        // The call's set is had before the ring's goes, one message at a
-        // time, and the page's moment comes only after both.
+        // Answered, manager on command: not ringing, then carrying sound. Call's set had before
+        // ring's goes, one message at a time; page's moment only after both.
         call!("defer");
         record!("answer-ring", set!("ringing", true));
         record!("answer-ring-acquire", call!("flush"));
         record!("answer-ring-had", call!("flush"));
         set!("ringing", false);
-        // Looked at in between, the ring's set still stays.
+        // Looked at in between: ring's set still stays.
         record!("answered-between", set!("speaker", true));
         record!("answered", set!("talking", true));
         record!("answered-turn", fire!("ringOver"));
@@ -550,7 +519,7 @@ fn a_call_moves_its_sound_only_with_the_microphone_shut() {
         set!("micOpen", false);
         record!("answered-over", fire!("quieting"));
 
-        // The other way round: carrying sound, then no longer ringing.
+        // Other order: carrying sound, then no longer ringing.
         record!("again-ring", set!("ringing", true));
         record!("again-answered", set!("talking", true));
         record!("again-unrung", set!("ringing", false));
@@ -562,8 +531,8 @@ fn a_call_moves_its_sound_only_with_the_microphone_shut() {
         set!("micOpen", false);
         record!("again-over", fire!("quieting"));
 
-        // A ring the manager refuses: given back, and not asked for
-        // again while that call rings; the next call's ring asks anew.
+        // Ring refused: given back, not asked again while that call rings; next call's ring asks
+        // anew.
         call!("defer");
         call!("answer", 13);
         record!("ring-refused-sent", set!("ringing", true));
@@ -578,16 +547,15 @@ fn a_call_moves_its_sound_only_with_the_microphone_shut() {
         set!("ringing", false);
         record!("next-ring-over", fire!("ringOver"));
 
-        // Gone mid-call, the microphone open: nothing sent on the way out.
+        // Gone mid-call, mic open: nothing sent on way out.
         set!("talking", true);
         fire!("settling");
         set!("micOpen", true);
         call!("said");
         record!("left-open", call!("unload"));
 
-        // Gone with the register not answered yet, before the page could
-        // come up: given back on the way out, without waiting for an
-        // answer that would come to nobody.
+        // Gone with register unanswered, before page could come up: given back on way out, not
+        // waiting for an answer that would reach nobody.
         load("1234");
         set!("micKnown", true);
         call!("defer");
@@ -595,15 +563,13 @@ fn a_call_moves_its_sound_only_with_the_microphone_shut() {
         call!("said");
         record!("left", call!("unload"));
 
-        // Gone while a call rings: the ring's set given back on the way
-        // out.
+        // Gone while ringing: ring's set given back on way out.
         load("1234");
         set!("ringing", true);
         call!("said");
         record!("left-ringing", call!("unload"));
 
-        // Without the app's id, nothing is asked for: the loudspeaker,
-        // for good, and the page need not wait for the policy.
+        // No app id: nothing asked; loudspeaker for good, page needn't wait for policy.
         load("");
         record!("no-id-ring", set!("ringing", true));
         set!("ringing", false);

@@ -1,12 +1,9 @@
-//! The scanner's camera controls: a pinch or the zoom button brings a
-//! small code closer, never past what the camera can do; the torch lights
-//! a code on paper; the rings and the switch change cameras, which starts
-//! the zoom over and puts the torch out on the front; and a tap focuses on
-//! its point, with the ring the camera page has. The rings wear the
-//! platform's lens labels, and on a page turned with the phone the picture
-//! is turned back.
+//! Scanner camera controls: pinch or zoom button brings small code closer, never past
+//! camera's max; torch lights code on paper; rings and switch change cameras, restarting
+//! zoom and putting torch out on front; tap focuses on its point with camera page's ring.
+//! Rings wear platform lens labels; on page turned with phone, picture is turned back.
 //!
-//! The decoding itself is `qml_scan.rs`'s. This is what is around it.
+//! Decoding itself: `qml_scan.rs`. This is what is around it.
 
 // Qt harness: see qml_chat_list.rs.
 #![allow(
@@ -177,7 +174,7 @@ fn the_scanner_zooms_lights_and_switches_cameras() {
     let temp = std::env::temp_dir().join(format!("piirit-scan-controls-{}", std::process::id()));
     std::fs::create_dir_all(&temp).expect("create temp dir");
 
-    // SAFETY: single-threaded test binary; set before Qt starts.
+    // SAFETY: single-threaded; set before Qt starts.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("XDG_CACHE_HOME", &temp);

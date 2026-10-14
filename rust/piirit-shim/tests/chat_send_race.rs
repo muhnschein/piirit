@@ -1,10 +1,6 @@
-//! A sent row must land once even when the core announces the message
-//! before it answers the send.
+//! Sent row lands once, even if core announces it before send reply.
 
-// Qt harness: needs `unsafe` for `env::set_var` before Qt starts
-// (`unused_unsafe` because it is only unsafe from edition 2024 on),
-// `borrow_as_ptr` for the engine pointer, and `single_shot` with
-// whole-second Durations.
+// Qt harness: unsafe set_var pre-Qt; borrow_as_ptr; whole-second single_shot.
 #![allow(
     unsafe_code,
     unused_unsafe,
@@ -41,13 +37,12 @@ fn a_send_announced_before_it_is_answered_lands_once() {
     let journal = common::fresh_journal(&temp);
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
 
-    // SAFETY: single-threaded test binary; set before Qt starts and before
-    // the server inherits them.
+    // SAFETY: single-threaded; set before Qt starts and before server inherits env.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_FAKE_JOURNAL", &journal);
         std::env::set_var("PIIRIT_ACCOUNTS_DIR", temp.join("accounts"));
-        // Long enough for the queued event to be polled first.
+        // Long enough for queued event to poll first.
         std::env::set_var("PIIRIT_FAKE_SEND_DELAY_MS", "300");
     }
 
@@ -84,8 +79,7 @@ fn a_send_announced_before_it_is_answered_lands_once() {
     let calls = common::calls(&journal);
     let names: Vec<&str> = calls.iter().map(|(name, _)| name.as_str()).collect();
 
-    // The point of the test: the event won, so the model fetched the new
-    // message itself before the send's reply carried it.
+    // Event won: model fetched new msg before send reply.
     let fetched_after_send = calls
         .iter()
         .skip_while(|(name, _)| name != "misc_send_msg")
@@ -101,7 +95,7 @@ fn a_send_announced_before_it_is_answered_lands_once() {
         "the send's reply won the race, so the duplicate path was never taken: {names:?}"
     );
 
-    // Two seeded messages plus the one just sent.
+    // Two seeded + one sent.
     assert_eq!(
         count_after_send, 3,
         "the sent message was added twice: {names:?}"

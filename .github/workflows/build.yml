@@ -1,19 +1,13 @@
-# Sends the tree to SonarQube Cloud, which reads it and reports back on
-# the pull request.
+# Sends tree to SonarQube Cloud, reports on the PR.
 #
-# Its own workflow rather than a job in `ci.yml`: it needs the whole
-# history (`fetch-depth: 0`) so the analysis can tell new code from old,
-# and it is the one job here that talks to a service outside GitHub. What
-# it analyses and what it leaves alone is `sonar-project.properties`.
+# Own workflow: needs full history (`fetch-depth: 0`); only job using a
+# non-GitHub service. Scope: sonar-project.properties.
 #
-# ci.yml is the GATE; this is a REPORT. It cannot fail a change on its own
-# findings, and the quality gate it publishes is advice, not intake. That
-# boundary is why the two are separate files: folding this into the gate
-# would quietly make a hosted service part of the rule that a green
-# `make check` on a laptop is a green CI.
+# ci.yml is the GATE; this is a REPORT that can't fail a change (quality gate is
+# advice). Kept apart so a hosted service never joins "green make check = green
+# CI".
 #
-# Every action is pinned to a commit rather than a tag: a tag can be
-# moved, and this job is handed a token.
+# Actions pinned to commit, not tag: tags move; this job gets a token.
 name: Build
 on:
   push:
@@ -22,11 +16,9 @@ on:
   pull_request:
     types: [opened, synchronize, reopened]
 
-# Reading the tree is all this needs. The scanner authenticates to
-# SonarQube with its own token, not with the job's, and SonarQube writes
-# back to the pull request as its own GitHub App. `ci.yml` and `rpm.yml`
-# say the same; a workflow with no block at all gets whatever the
-# repository's default is, which is what CodeQL objects to.
+# Tree read only. Scanner uses its own SonarQube token; SonarQube posts to the
+# PR as its own App. Explicit block (as ci.yml, rpm.yml): none = repo default,
+# which CodeQL flags.
 permissions:
   contents: read
 
@@ -42,31 +34,25 @@ jobs:
   sonarqube:
     name: SonarQube
     runs-on: ubuntu-latest
-    # A pull request from a fork gets no secrets, so SONAR_TOKEN would be
-    # empty and the scan would fail on every such PR with an authentication
-    # error that looks like a broken setup. Skip it instead; the analysis of
-    # the merge lands when the branch reaches main.
+    # Fork PRs have no secrets: SONAR_TOKEN empty, auth error. Skip; main's
+    # analysis runs on merge.
     if: >-
       github.event_name != 'pull_request' ||
       github.event.pull_request.head.repo.full_name == github.repository
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          # Nothing here pushes with git, so the token is not left behind in
-          # .git/config for a later step to find. Every checkout in this file.
+          # Nothing pushes with git: token not left in .git/config.
           persist-credentials: false
           fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
 
-      # FFmpeg and x264, which piirit-video builds. Not `submodules: true`
-      # on the checkout above: with fetch-depth 0 that would fetch both
-      # projects' whole history too, which the analysis never reads --
-      # third_party/ is excluded from it.
+      # FFmpeg, x264. Not `submodules: true`: fetch-depth 0 would pull unread
+      # history.
       - name: Fetch the submodules
         run: git submodule update --init --depth 1
 
-      # The same set ci.yml's `test` job installs: the coverage run below
-      # runs the whole suite, and the shim's tests drive a real QtQuick
-      # engine. The -dev packages omit the QtQuick runtime plugin.
+      # Same packages as ci.yml's test: coverage runs whole suite, shim tests
+      # drive real QtQuick (runtime plugin not in -dev packages).
       - name: Install Qt and PulseAudio
         run: |
           ./ci/apt-install.sh \
@@ -81,13 +67,10 @@ jobs:
             pulseaudio \
             pulseaudio-utils
 
-      # `toolchain` is passed explicitly because dtolnay/rust-toolchain takes
-      # it from the REF NAME it was called with, and a SHA has no name. The
-      # pin is the `v1` tag, not the `stable` branch: that branch is rebuilt
-      # on top of master with each release, so a commit pinned from it
-      # stops belonging to the repository at the next one -- zizmor's
-      # online audit calls that an impostor commit, and it is right that
-      # nothing then vouches for it. v1 only moves forward.
+      # `toolchain` passed explicitly: the action reads it from the ref name,
+      # and a SHA has none. Pin the `v1` tag, not `stable` (rebuilt each
+      # release; a commit from it stops belonging to the repo). v1 only moves
+      # forward.
       - uses: dtolnay/rust-toolchain@e2a55d2ffb04f378e9626c28d38b36d230d1e12f # v1
         with:
           toolchain: stable
@@ -97,19 +80,14 @@ jobs:
         with:
           workspaces: rust
 
-      # nextest beside it, for the reason ci.yml's `test` job has it: the
-      # Makefile runs the coverage suite under nextest when it finds one
-      # and falls back to `cargo test` -- one binary at a time, over a
-      # hundred of them, each waiting on Qt timers -- when it does not.
-      # That fallback is what the step below took ten minutes on.
+      # nextest as ci.yml's test: Makefile uses it when found, else falls back
+      # to `cargo test` (~10 min here).
       - name: Install cargo-llvm-cov and cargo-nextest
         uses: taiki-e/install-action@f7e5d7c961414b23f5b25b2da9294395d08513ad # v2.87.26
         with:
           tool: cargo-llvm-cov,cargo-nextest
 
-      # The scanner imports coverage; it does not measure it. Without this
-      # step there is no report to import and the coverage reading is a
-      # confident 0.0%.
+      # Scanner imports coverage, doesn't measure it. Without this: 0.0%.
       - name: make sonar-reports
         run: make sonar-reports
 
@@ -118,19 +96,13 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
-      # The scan uploads a report and exits. The server processes it
-      # afterwards, so without this the run finishes knowing nothing about
-      # its own result -- the gate, the ratings and the issue list stay on a
-      # dashboard, which neither the job log, nor a reviewer, nor anything
-      # whose network policy stops at sonarcloud.io can reach.
-      #
-      # continue-on-error, and never `sonar.qualitygate.wait`: this reports
-      # and does not gate. A Sonar outage costs a warning here, not a build.
+      # Server processes report after upload; without this the run can't see its
+      # result. Never `sonar.qualitygate.wait`: reports, doesn't gate.
+      # continue-on-error: outage = warning.
       - name: What SonarQube made of it
         if: always()
         continue-on-error: true
         env:
-          # Only used if the project is private; the endpoints are readable
-          # without it on a public one. See the script.
+          # Only for private projects. See the script.
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: ./scripts/sonar-report.sh

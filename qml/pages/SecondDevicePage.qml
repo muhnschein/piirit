@@ -4,97 +4,56 @@ import "../components"
 import Piirit 1.0
 
 /*
- * This phone offering one of its profiles to another device: the other
- * end of RestoreProfilePage's `from: "device"`, and the end Piirit did
- * not have. A Piirit could be added to a setup somebody else's Delta
- * Chat was holding, but could not be the one holding it -- so a phone
- * with nothing else in the house had a profile no second device could
- * ever join.
+ * This phone offers one of its profiles to another device: far end of
+ * RestoreProfilePage's `from: "device"`. Core transfer, both ways.
  *
- * The transfer is the core's, both ways round: the provider offers
- * itself on the local network and shows a code, the other device reads
- * it and takes a copy, and both end up with the profile. So this page is
- * the code, and the bar the transfer draws once somebody reads it.
+ * Code behind a button: nothing tells a second device from a camera over the
+ * shoulder, and code gives whole profile (messages, contacts, key), so reader
+ * says when it goes up; line above says what. Not started on entry: page
+ * opened by mistake shows nothing. Button: "Show code", then "Show code
+ * again". Cancel takes code down, keeps reader on button.
  *
- * The code waits behind a button. Nothing on the phone can tell a
- * second device of the reader's own from a camera over their shoulder,
- * and what this page shows is the profile -- messages, contacts and key
- * -- so the reader is the one who says when it goes up, with the line
- * above the button saying what it is they are putting on screen. That
- * is also why the button does not start the offer on the way in: a page
- * opened by mistake shows nothing worth reading.
+ * Leaving ends offer: a left provider holds profile out, IO paused. Only a
+ * running transfer pins page.
  *
- * The button says what it is about to do: "Show code" before there has
- * been one, "Show code again" once the reader has seen one -- after
- * Cancel, after the app has been away, or after an offer nobody came
- * for. Cancel takes the code down and leaves the reader here, on the
- * button, rather than off the page: that is what stopping the code
- * means when the page is a place of its own.
- *
- * Leaving the page ends the offer. A provider left running behind a
- * page that is gone holds the profile out with nobody watching and with
- * its IO paused, so going back does what Cancel does. Only a transfer
- * actually under way pins the page: a bar that is filling is a second
- * device part-way through copying the profile, and a stray swipe should
- * not drop that -- Cancel, which says what it is, still can.
- *
- * One thing about the core is said here rather than left to be found
- * out: the profile stops fetching mail while the offer is up, because
- * the core pauses its IO for as long as the provider runs and resumes
- * it when the provider ends.
- *
- * The code is drawn from an Image the shim writes, not a Canvas, for
- * the reason QrPage.qml gives: a Canvas is drawn into the window's GL
- * context, which the platform takes away from an app in the background,
- * and it came back blank.
+ * Profile stops fetching mail while offer up (core pauses IO). Code is
+ * shim-written Image, not Canvas (see QrPage.qml).
  */
 Page {
     id: page
 
-    /// The cover offers no quick actions while an offer is up, and a
-    /// tapped notification waits: a jump away would leave the other
-    /// device halfway through taking the profile. See piirit.qml. Not
-    /// once it is over, when the chats are attached and nothing is left
-    /// here to drop.
+    /// No quick actions, tapped notification waits, while offer up: jump away
+    /// leaves other device half-copied. See piirit.qml. Not once over.
     readonly property bool pausesQuickActions: device.running
 
-    /// Whose profile is offered. The core's provider takes an account,
-    /// and this is it.
+    /// Profile offered: core provider's account.
     property int accountId
 
-    /// The profile the chat list is on, where the forward swipe goes
-    /// once a device has taken this one. Not [[accountId]]: any profile
-    /// can be offered from the profiles page without the chats leaving
-    /// the one they are on.
+    /// Chat list's profile: forward swipe goes here after a device takes this
+    /// one. Not [[accountId]]: any profile offers without leaving its chats.
     property int currentAccountId: 0
 
     property string errorMessage: ""
-    /// A device read the code and has the profile now.
+    /// A device read the code and has the profile.
     property bool taken: false
-    /// The chats are attached to the right, so there is a swipe to offer.
+    /// Chats attached right: a swipe to offer.
     property bool chatsAttached: false
-    /// A code has been on screen at least once. Until then there is
-    /// nothing to show *again*, so the button says what it means: a
-    /// start that never got as far as a code does not count.
+    /// Code shown once. A start that never reached a code does not count.
     property bool shown: false
 
-    /// The core is preparing the provider and there is nothing to show
-    /// yet.
+    /// Core preparing provider; nothing to show.
     readonly property bool preparing: device.running && device.code.length === 0
-    /// The code is up and nobody has read it yet.
+    /// Code up; nobody has read it.
     readonly property bool showing: device.running && device.code.length > 0
                                     && device.permille === 0
-    /// A device is reading the profile off this one.
+    /// Device reading profile off this one.
     readonly property bool transferring: device.running && device.permille > 0
 
-    // The code can always be walked away from; a transfer that is
-    // already running cannot, because a swipe is too easy a way to drop
-    // a second device half-way through copying the profile. Cancel is
-    // the way out of that one, and says so.
+    // Code always walkable away from; running transfer not (half-copied
+    // device). Cancel is the way out.
     backNavigation: !page.transferring
 
-    // Whose profile, for the row at the top: the name, the picture and
-    // the address, as the profiles page and the backup page draw them.
+    // Top row: profile name, picture, address, as profiles page draws.
     Profile {
         id: profile
         objectName: "profile"
@@ -110,16 +69,11 @@ Page {
             page.taken = true
             page.offerTheChats()
         }
-        // The provider ended and nothing went over: the core has no
-        // words for that, so they are here. Same shape as the restore
-        // page's "stalled", and for the same reason -- both ends of one
-        // transfer, both giving up on the same silence.
+        // Provider ended, nothing went over: core has no words. As restore's
+        // "stalled": both ends give up on same silence.
         onStalled: page.errorMessage = qsTr("No device copied the profile. Both devices must stay on the same network with this page open.")
         onError: page.errorMessage = message
-        // What the button says next time depends on whether there has
-        // ever been a code to look at, rather than on whether an offer
-        // was started: a provider that failed before it had one showed
-        // the reader nothing.
+        // Button text depends on a code ever shown, not offer started.
         onCode_changed: {
             if (device.code.length > 0) {
                 page.shown = true
@@ -127,39 +81,26 @@ Page {
         }
     }
 
-    // The core reports the transfer the way it reports an import or an
-    // export, and says nothing in the event about which it is; the
-    // object only listens while it is the one that asked. See
-    // second_device.rs.
+    // Core reports transfer like import/export, without saying which; listens
+    // only while asked. See second_device.rs.
     Connections {
         target: core
         onCore_event: device.handle_event(context_id, kind, payload_json)
     }
 
-    // The code as a picture, for the other phone's camera.
+    // Code as picture, for other phone's camera.
     QrCode {
         id: qr
         objectName: "qr"
         text: device.code
     }
 
-    // Ended when the page is left, whichever way. The provider is the
-    // core's and outlives this page; left running it would hold the
-    // profile out to whoever asks, with nothing on screen to say so and
-    // nothing left to stop it. Cancel stops it without leaving; this is
-    // the swipe.
-    //
-    // Left, not covered: a page pushed over this one -- a call's, which
-    // comes in whatever is on screen -- is not the reader walking away,
-    // and ending the offer then dropped a second device part-way through
-    // copying the profile. A page left is a page gone.
+    // Ended on any page leave: left provider holds profile out unseen. Cancel
+    // stops without leaving. Covered (call page pushed over) is not leaving.
     Component.onDestruction: device.cancel()
 
-    /// Start the offer, on the reader's word.
-    ///
-    /// No check on the core being up: a core that is not there answers
-    /// this with "not started" on `error`, which is a banner the reader
-    /// can read, and a button that quietly does nothing is not.
+    /// Start offer, on reader's word. No core check: absent core answers "not
+    /// started" on `error`, a banner; better than a silent button.
     function begin() {
         if (device.running) {
             return
@@ -169,10 +110,7 @@ Page {
         device.offer()
     }
 
-    /// Put the chats to the right of this page, so a swipe on leaves it.
-    ///
-    /// Attached rather than pushed: the reader is done here, and the
-    /// page indicator saying there is somewhere to go is the offer.
+    /// Chats right of this page: swipe leaves it. Attached, not pushed.
     function offerTheChats() {
         if (page.currentAccountId <= 0 || page.chatsAttached) {
             return
@@ -196,9 +134,7 @@ Page {
                 title: qsTr("Add a second device")
             }
 
-            // Which profile the other device is about to get, drawn as
-            // the profiles page draws a profile: the picture, the name,
-            // and under it the address that tells two profiles apart.
+            // Profile other device gets, as profiles page draws it.
             ContactRow {
                 objectName: "profileRow"
                 width: parent.width
@@ -211,8 +147,8 @@ Page {
                 isKeyContact: true
             }
 
-            // What to do on the other device, which is the only thing
-            // the reader cannot work out from this page.
+            // What to do on other device: only thing reader cannot work out
+            // here.
             Label {
                 objectName: "instructions"
                 visible: !page.taken
@@ -225,9 +161,8 @@ Page {
                 text: qsTr("On the other device, choose \"Add as second device\" and scan this code. Both devices must be on the same network.")
             }
 
-            // What pressing the button puts on screen, said before it
-            // is pressed: this is the last moment the reader can decide
-            // who is in the room.
+            // What button puts on screen, said before press: last chance to
+            // check who is in the room.
             Label {
                 objectName: "caution"
                 visible: !page.taken
@@ -240,8 +175,7 @@ Page {
                 text: qsTr("Make sure no unwanted observer or camera can see this code. This profile does not receive messages while the code is shown.")
             }
 
-            // While the core is getting the provider up there is no code
-            // to draw and nothing to report.
+            // No code to draw or report while core starts provider.
             BusyIndicator {
                 objectName: "preparing"
                 anchors.horizontalCenter: parent.horizontalCenter
@@ -250,8 +184,7 @@ Page {
                 size: BusyIndicatorSize.Medium
             }
 
-            // Drawn on white whatever the ambience, and not smoothed:
-            // see QrPage.qml for both.
+            // White whatever ambience, not smoothed: see QrPage.qml.
             Image {
                 objectName: "deviceQr"
                 anchors.horizontalCenter: parent.horizontalCenter
@@ -264,17 +197,15 @@ Page {
                 fillMode: Image.PreserveAspectFit
             }
 
-            // The same string the code carries, for a camera on the
-            // other device that will not read it: RestoreProfilePage
-            // takes one typed or pasted in.
+            // Same string as code, for a camera that will not read it:
+            // RestoreProfilePage takes it typed or pasted.
             Label {
                 objectName: "codeLabel"
                 visible: page.showing
                 x: Theme.horizontalPageMargin
                 width: parent.width - 2 * Theme.horizontalPageMargin
                 wrapMode: Text.WrapAnywhere
-                // The core's own payload, pinned like everything else
-                // this app did not write.
+                // Core's own payload, pinned plain.
                 textFormat: Text.PlainText
                 font.pixelSize: Theme.fontSizeExtraSmall
                 color: Theme.secondaryColor
@@ -289,9 +220,7 @@ Page {
                 onClicked: Clipboard.text = device.code
             }
 
-            // Once a device is reading the profile off this one there is
-            // a transfer to report, and the code is no longer what the
-            // page is about.
+            // Device reading profile: transfer shown, code no longer subject.
             ProgressBar {
                 objectName: "transferProgress"
                 width: parent.width
@@ -302,11 +231,8 @@ Page {
                 label: qsTr("Transferring…")
             }
 
-            // Stops the offer and stays: the page is where the button
-            // is, and taking the code down is what Cancel means here.
-            // What is left is the button again, saying "Show code
-            // again". Leaving the page is the swipe, which ends the
-            // offer too.
+            // Stops offer, stays on page: Cancel. Button then reads "Show code
+            // again". Leaving page also ends offer.
             Button {
                 objectName: "cancelButton"
                 anchors.horizontalCenter: parent.horizontalCenter
@@ -315,10 +241,8 @@ Page {
                 onClicked: device.cancel()
             }
 
-            // The only thing this page does on its own account: put the
-            // code up, and put it up again afterwards. Gone while an
-            // offer is running, because Cancel is what that state is
-            // answered with, and gone once a device has the profile.
+            // Only action on its own: code up, again later. Gone while offer
+            // runs or once device has profile.
             Button {
                 objectName: "showButton"
                 anchors.horizontalCenter: parent.horizontalCenter
@@ -327,8 +251,7 @@ Page {
                 onClicked: page.begin()
             }
 
-            // Done: the profile is on the other device too, and both
-            // will get everything new from here on.
+            // Done: other device has profile too.
             Label {
                 objectName: "takenLabel"
                 visible: page.taken
@@ -340,8 +263,7 @@ Page {
                 text: qsTr("The profile was transferred to your second device. Both devices now receive all new messages.")
             }
 
-            // The way on, said in words as well as by the indicator:
-            // only when there really is a page to the right.
+            // Way on, in words and indicator: only when a page exists right.
             Label {
                 objectName: "onwardHint"
                 visible: page.taken && page.chatsAttached
@@ -356,10 +278,8 @@ Page {
         }
     }
 
-    // What went wrong, when something did: the core refusing to offer
-    // the profile, or a code it could not produce. The button that
-    // tries again is still there, so this is a strip rather than a page
-    // of its own.
+    // Errors: core refused offer, or code failed. Retry stays: a strip, not a
+    // page.
     Banner {
         objectName: "errorBanner"
         anchors {

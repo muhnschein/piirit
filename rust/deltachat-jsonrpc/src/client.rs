@@ -17,22 +17,17 @@ use crate::protocol::{RequestEnvelope, ResponseEnvelope};
 
 type PendingMap = Arc<Mutex<HashMap<u64, oneshot::Sender<Result<serde_json::Value, RpcError>>>>>;
 
-/// Lock a mutex, recovering the guard if a previous holder panicked.
-///
-/// These mutexes guard plain collections, which a panic leaves structurally
-/// intact. Killing the transport over a fault that happened elsewhere is
-/// the worse outcome.
+/// Lock, ignoring poison. Plain collections survive a panic intact.
 fn lock<T>(mutex: &Mutex<T>) -> std::sync::MutexGuard<'_, T> {
     mutex
         .lock()
         .unwrap_or_else(std::sync::PoisonError::into_inner)
 }
 
-/// A running `deltachat-rpc-server` subprocess, addressable via JSON-RPC 2.0
-/// over its stdio.
+/// Running `deltachat-rpc-server` over stdio.
 ///
-/// Transport only: correlation, framing, process lifecycle. Method names and
-/// payloads pass through uninterpreted.
+/// Transport only: correlation, framing, process lifecycle. Methods and payloads pass through
+/// uninterpreted.
 pub struct RpcClient {
     stdin_tx: mpsc::UnboundedSender<String>,
     pending: PendingMap,
@@ -40,23 +35,17 @@ pub struct RpcClient {
     child: Mutex<Option<Child>>,
     reader_task: Mutex<Option<JoinHandle<()>>>,
     writer_task: Mutex<Option<JoinHandle<()>>>,
-    /// Lines the server wrote to stderr, most recent last, capped to a
-    /// small ring so a misbehaving server can't grow this unbounded.
+    /// Last stderr lines, capped.
     stderr_tail: Arc<Mutex<Vec<String>>>,
 }
 
 const STDERR_TAIL_CAPACITY: usize = 200;
 
-/// How long an ordinary call waits for its answer. Generous: the core does
-/// real work behind some of these, and a slow phone is not a broken one.
-/// Without any bound at all, a request the server accepts and never answers
-/// -- a panic in the task handling it leaves the process up and its stdout
-/// open -- hangs the caller for the life of the app, with no error and
-/// nothing to cancel.
+/// Call timeout: generous; core does real work, slow phone isn't broken. Unbounded, an accepted,
+/// never-answered request (task panic, process and stdout still up) hangs caller forever.
 const CALL_TIMEOUT: Duration = Duration::from_secs(60);
 
-/// Feed the server's stdin from the request channel, one line per request,
-/// until the channel closes or a write fails.
+/// Write request lines to stdin until closed or failed.
 async fn write_requests(mut stdin: ChildStdin, mut requests: mpsc::UnboundedReceiver<String>) {
     while let Some(line) = requests.recv().await {
         if write_line(&mut stdin, &line).await.is_err() {
@@ -65,20 +54,16 @@ async fn write_requests(mut stdin: ChildStdin, mut requests: mpsc::UnboundedRece
     }
 }
 
-/// One request, newline-terminated and flushed, so the server reads it now.
+/// Write one request line, flushed.
 async fn write_line(stdin: &mut ChildStdin, line: &str) -> std::io::Result<()> {
     stdin.write_all(line.as_bytes()).await?;
     stdin.write_all(b"\n").await?;
     stdin.flush().await
 }
 
-/// Match the server's stdout to the calls waiting on it, and wake anyone
-/// still waiting once the stream ends.
+/// Match stdout answers to waiters; wake them at end.
 ///
-/// Ends on end-of-stdout or a failed read: the server is gone either way.
-/// A line that is not UTF-8 is neither -- it is one answer nobody can
-/// read, and the call it answered times out -- so the stream carries on
-/// past it rather than reporting a live server as closed.
+/// EOF or read error: server gone. Bad UTF-8 line: skip, its call times out.
 async fn read_responses(stdout: ChildStdout, pending: &PendingMap) {
     let mut lines = BufReader::new(stdout).lines();
     loop {
@@ -90,32 +75,26 @@ async fn read_responses(stdout: ChildStdout, pending: &PendingMap) {
         let Some((id, outcome)) = parse_response(&line) else {
             continue;
         };
-        // Out of the map first, so the lock is not held while the answer
-        // is handed over.
+        // Remove first: no lock while sending.
         let waiting = lock(pending).remove(&id);
         if let Some(sender) = waiting {
-            // A closed receiver is a caller that stopped waiting (its
-            // timeout ran out); there is no one left to tell.
+            // Closed receiver: caller timed out; nobody to tell.
             sender.send(outcome).ok();
         }
     }
-    // Transport is gone: wake up anyone still waiting rather than leaving
-    // them hanging forever.
+    // Transport gone: wake waiters.
     for (_, sender) in lock(pending).drain() {
         sender.send(Err(RpcError::TransportClosed)).ok();
     }
 }
 
-/// One line of stdout as the answer it carries, or nothing for a line that
-/// is not a JSON-RPC response -- skipped rather than tearing down a live
-/// transport.
+/// Answer on one stdout line, None if not a response.
 fn parse_response(line: &str) -> Option<(u64, Result<serde_json::Value, RpcError>)> {
     if line.trim().is_empty() {
         return None;
     }
     let envelope = serde_json::from_str::<ResponseEnvelope>(line).ok()?;
-    // The core delivers events by polling, not by notification, so an
-    // answer without an id should not happen.
+    // Id-less answer unexpected: events come by polling.
     let id = envelope.id?;
     let outcome = match (envelope.result, envelope.error) {
         (_, Some(err)) => Err(RpcError::Remote(err)),
@@ -125,8 +104,7 @@ fn parse_response(line: &str) -> Option<(u64, Result<serde_json::Value, RpcError
     Some((id, outcome))
 }
 
-/// Keep the last few lines the server wrote to stderr, for the message
-/// shown when it dies.
+/// Last stderr lines, for death message.
 async fn keep_stderr_tail(stderr: ChildStderr, tail: &Mutex<Vec<String>>) {
     let mut lines = BufReader::new(stderr).lines();
     while let Ok(Some(line)) = lines.next_line().await {
@@ -138,14 +116,11 @@ async fn keep_stderr_tail(stderr: ChildStderr, tail: &Mutex<Vec<String>>) {
 }
 
 impl RpcClient {
-    /// Spawn `program` (typically the path to a bundled
-    /// `deltachat-rpc-server` binary) with `args` and set up the
-    /// request/response machinery over its stdio.
+    /// Spawn `program` with `args`, wire up stdio.
     ///
     /// # Errors
     ///
-    /// Fails if the process cannot be executed, or if the spawned child
-    /// does not expose the stdio pipes we asked for.
+    /// Exec failed or stdio pipe missing.
     pub async fn spawn<S, I, A>(program: S, args: I) -> Result<Self, SpawnError>
     where
         S: AsRef<OsStr>,
@@ -155,18 +130,15 @@ impl RpcClient {
         Self::spawn_with_env(program, args, std::iter::empty::<(&OsStr, &OsStr)>()).await
     }
 
-    /// Like [`RpcClient::spawn`], with extra environment variables on the
-    /// child. `DC_ACCOUNTS_PATH` is the one that matters: without it the
-    /// server stores account state under `./accounts`, relative to its
-    /// working directory.
+    /// Like [`RpcClient::spawn`], plus child env. `DC_ACCOUNTS_PATH` matters: without it server
+    /// stores accounts in `./accounts`, relative to its cwd.
     ///
     /// # Errors
     ///
     /// Same as [`RpcClient::spawn`].
-    // Stays `async` though nothing awaits: `Command::spawn` needs an active
-    // reactor, and an `async fn` can only run inside one. Clippy 1.99 says
-    // the same thing again as `unused_async_trait_impl`; `unknown_lints`
-    // is for the pinned 1.94.1, which has not heard of it yet.
+    // Stays async though nothing awaits: `Command::spawn` needs active reactor, which an async fn
+    // guarantees. Clippy 1.99 repeats it as `unused_async_trait_impl`; `unknown_lints` because
+    // pinned 1.94.1 lacks that lint.
     #[allow(unknown_lints, clippy::unused_async, clippy::unused_async_trait_impl)]
     pub async fn spawn_with_env<S, I, A, E, K, V>(
         program: S,
@@ -218,18 +190,14 @@ impl RpcClient {
         })
     }
 
-    /// Call an RPC method, serializing `params` and deserializing the
-    /// result as `R`.
+    /// Call RPC method: serialize params, deserialize result as `R`.
     ///
-    /// Method names and shapes come from the core's API (`--openrpc`); this
-    /// crate neither hardcodes nor validates them.
+    /// Method names from core API (`--openrpc`); not validated.
     ///
     /// # Errors
     ///
-    /// Returns [`RpcError::Encode`] if `params` cannot be serialized,
-    /// [`RpcError::Remote`] if the server answered with an error object,
-    /// [`RpcError::Decode`] if the result does not fit `R`, and
-    /// [`RpcError::TransportClosed`] if the server went away.
+    /// [`RpcError::Encode`]: params unserializable. [`RpcError::Remote`]: server error object.
+    /// [`RpcError::Decode`]: result doesn't fit `R`. [`RpcError::TransportClosed`]: server gone.
     pub async fn call<P, R>(&self, method: &str, params: P) -> Result<R, RpcError>
     where
         P: Serialize,
@@ -242,7 +210,7 @@ impl RpcClient {
         })
     }
 
-    /// Call a method that takes no params.
+    /// Call method, no params.
     ///
     /// # Errors
     ///
@@ -254,8 +222,7 @@ impl RpcClient {
         self.call(method, ()).await
     }
 
-    /// Call a method that blocks server-side until it has something to say,
-    /// such as `get_next_event_batch`. No timeout: waiting is the point.
+    /// Blocks server-side until output. No timeout.
     ///
     /// # Errors
     ///
@@ -305,8 +272,7 @@ impl RpcClient {
             return rx.await.unwrap_or(Err(RpcError::TransportClosed));
         };
         let Ok(answer) = tokio::time::timeout(limit, rx).await else {
-            // Nothing will read this now, and the reader would only find a
-            // sender nobody is waiting on.
+            // Nobody reads it now; drop sender.
             lock(&self.pending).remove(&id);
             return Err(RpcError::Timeout {
                 method: method.to_string(),
@@ -316,37 +282,32 @@ impl RpcClient {
         answer.unwrap_or(Err(RpcError::TransportClosed))
     }
 
-    /// The last `STDERR_TAIL_CAPACITY` lines of the server's stderr, oldest
-    /// first. Diagnostics for a failed call or an unexpected exit.
+    /// Last `STDERR_TAIL_CAPACITY` stderr lines, oldest first.
     pub fn stderr_tail(&self) -> Vec<String> {
         lock(&self.stderr_tail).clone()
     }
 
-    /// The server's process id, while it is running. What a memory
-    /// profile of the core reads `/proc/<pid>` by.
+    /// Server pid while running (`/proc/<pid>` profiling).
     #[must_use]
     pub fn pid(&self) -> Option<u32> {
         lock(&self.child).as_ref().and_then(Child::id)
     }
 
-    /// Terminate the child process and wait for the reader/writer tasks to
-    /// finish. Safe to call even if the process has already exited.
+    /// Kill child, wait for tasks. Safe if child already exited.
     ///
     /// # Errors
     ///
-    /// Propagates the I/O error from waiting on the child, if any.
+    /// I/O error from waiting on child.
     pub async fn shutdown(&self) -> std::io::Result<()> {
         let child = lock(&self.child).take();
         if let Some(mut child) = child {
-            // Fails only for a child that has already exited, which is
-            // what this is for; the wait below says how it went.
+            // Fails only if child already exited: expected.
             child.start_kill().ok();
             child.wait().await?;
         }
         let reader_task = lock(&self.reader_task).take();
         if let Some(task) = reader_task {
-            // Its only result is whether it panicked or was cancelled, and
-            // either way it has stopped, which is all shutdown waits for.
+            // Panicked or cancelled; either way stopped.
             task.await.ok();
         }
         let writer_task = lock(&self.writer_task).take();

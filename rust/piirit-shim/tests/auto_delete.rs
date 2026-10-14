@@ -1,13 +1,7 @@
-//! The deletion period reaches every account the core has, and the core
-//! says first how many messages it would take.
+//! Deletion period for all accounts; core counts affected messages first.
 //!
-//! It is one setting for the whole app, held in dconf, and the core's
-//! `delete_device_after` is per account: so the core object writes it to
-//! each account when it is set, and again whenever the account list is
-//! read -- which is how a profile added later gets it too, the way the
-//! download limit does. Before the settings page writes it, it asks the
-//! core how many messages are already older than the period, across
-//! every account, so the reader agrees to a number rather than an idea.
+//! dconf setting. Core `delete_device_after` is per account: written on set and on each
+//! account-list read, so later profiles get it (as download limit).
 
 // Qt harness: see download_limit.rs.
 #![allow(
@@ -59,8 +53,7 @@ fn the_period_is_written_to_each_account_and_the_core_counts_first() {
     let journal = common::fresh_journal(&temp);
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
 
-    // SAFETY: single-threaded test binary; set before Qt starts and before
-    // the server inherits them.
+    // SAFETY: single-threaded; set before Qt starts and before server inherits env.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_FAKE_JOURNAL", &journal);
@@ -129,7 +122,7 @@ fn the_period_is_written_to_each_account_and_the_core_counts_first() {
          again when it changed: {calls:?}"
     );
     // estimate_auto_deletion_count params: account, from_server, seconds.
-    // From the device, since that is whose setting this is.
+    // From device.
     let estimates: Vec<Value> = calls
         .iter()
         .filter(|(method, _)| method == "estimate_auto_deletion_count")
@@ -140,7 +133,7 @@ fn the_period_is_written_to_each_account_and_the_core_counts_first() {
         vec![serde_json::json!([1, false, 3600])],
         "the count was not asked for in the shape the core takes: {calls:?}"
     );
-    // The fake counts every seeded message as older than an hour.
+    // Fake: every seeded message older than an hour.
     assert_eq!(
         heard, "3600:4;",
         "the count did not come back with the period it was asked for: {calls:?}"

@@ -6,72 +6,46 @@ import "../js/Calls.js" as Calls
 import "../js/Emoji.js" as Emoji
 
 /*
- * One message. Its own component so it can be loaded and measured on its
- * own, a row at a time, without the page and the model a conversation
- * needs around it.
+ * One message: loads and measures alone, no page.
  *
- * Every string here comes from whoever sent the message, so each one
- * that shows it is pinned to PlainText: the default detects markup and
- * switches to rich text, which would let a message body fetch a remote
- * image the moment its row is drawn. The one exception is deliberate: with
- * Markdown drawn, the body is the shim's own rendering of it
- * (markdown.rs), in which every character of the message is escaped and
- * the only tags are the ones the shim wrote -- and it is shown as
- * StyledText, never RichText, so nothing in it can load anything. The
- * other: a body or a quote with an emoji in it is StyledText too, so its
- * emoji are the same pictures the reactions are -- escaped first, and
- * with no tag added but an <img> of a picture the app ships (Emoji.js).
+ * Sender's strings pinned to PlainText (default goes rich: remote images on draw).
+ * Deliberate exceptions, StyledText, never RichText (nothing can load): Markdown body
+ * is shim's rendering (markdown.rs), every message char escaped, only shim's tags; body
+ * or quote with emoji is escaped, only tag added an <img> of a shipped picture
+ * (Emoji.js).
  *
- * Laid out by bindings rather than by a Column: a positioner sizes itself in
- * a polish pass, which never runs headlessly, so a row built from one cannot
- * be measured in a test.
+ * Bindings, not Column: positioners size in a polish pass, which never runs headless.
  */
 Item {
     id: root
 
-    /// The reader asked to open the attachment. The URL rather than the
-    /// path: the encoding it needs is already done once, in the preview.
-    /// `previewWidth` is how wide the picture was drawn here, so a page
-    /// opening it full screen can start from the same decode.
+    /// Attachment open asked: URL, not path (encoding done in preview).
+    /// `previewWidth`: picture width here, so full view decodes the same.
     signal openRequested(url fileUrl, string fileName, string viewType,
                          real previewWidth)
-    /// The reader asked to read the message on a page of its own.
+    /// Read the message on its own page.
     signal fullTextRequested()
-    /// The reader asked for the rest of a message the core holds only
-    /// the header of.
+    /// Rest of a message the core holds only the header of.
     signal downloadRequested()
-    /// The reader tapped a webxdc app. Running one is a page of its own,
-    /// which is the conversation's to push.
+    /// Webxdc app tapped; the page runs it.
     signal appRequested()
-    /// The reader tapped a reaction chip: put that emoji on the message,
-    /// or take it off again when it is already theirs. The model decides
-    /// which; the row only says what was tapped.
+    /// Reaction chip tapped: model decides add or remove.
     signal reactionRequested(string emoji)
-    /// The reader tapped a call. What that means -- going back to one
-    /// that is still ringing, or calling back -- is the page's to decide:
-    /// it knows whether a call is up and whether this chat can take one.
+    /// Call tapped: page decides ringing or call back.
     signal callRequested()
-    /// A long press landed on a control that takes presses for itself --
-    /// a chip, the download offer, the play button -- and the row's menu
-    /// is what a long press means anywhere on a message.
+    /// Long press on a control: the row menu, anywhere on the message.
     signal menuRequested()
 
-    /// What a tap on the message does. The row's own tap, not one of the
-    /// attachment's: a picture with a tap area of its own took the press
-    /// away from the row, so a long press on it never reached the menu,
-    /// and a tap just off it did nothing. The whole message is one
-    /// surface now -- a tap opens what there is to open, a long press
-    /// opens the menu -- and the two cannot fight over a pixel.
+    /// One surface: tap opens, long press opens the menu. Attachments take no tap of their own.
     function tapped() {
         if (root.isCall) {
             root.callRequested()
             return
         }
-        // Null for a message with no file, which has nothing to open.
+        // Null for no file: nothing to open.
         var preview = attachment.item
         if (preview && preview.isApp) {
-            // An app is run here rather than handed to whatever the
-            // system thinks opens a .xdc, which is nothing.
+            // Apps run here; a .xdc handed to the system opens nothing.
             root.appRequested()
         } else if (preview && preview.openable) {
             root.openRequested(preview.fileUrl, root.fileName, root.viewType,
@@ -82,29 +56,24 @@ Item {
     }
 
     property string messageText: ""
-    /// The reactions on this message, as the shim hands them over: a JSON
-    /// array of {emoji, count, self}, most frequent first. Empty for none.
+    /// Reactions JSON from the shim: {emoji, count, self}, most frequent first.
     property string reactions: ""
-    /// The same, parsed once per change rather than once per chip.
+    /// Parsed once per change, not per chip.
     readonly property var reactionList: root.reactions.length > 0
                                         ? JSON.parse(root.reactions) : []
-    /// The same text rendered as StyledText by the shim. Empty for a row
-    /// that has no rendering, which is shown as written.
+    /// Shim StyledText rendering; empty: show as written.
     property string styledText: ""
-    /// 0 draws Markdown; anything else shows the message as written.
+    /// 0 draws Markdown; anything else shows as written.
     property int markdownMode: 1
-    /// The sender changed the text after sending it. Said in the footer,
-    /// as the reference clients say it, so a reader who remembers the
-    /// first wording knows why it is not there.
+    /// Sender edited the text: footer says so.
     property bool isEdited: false
-    /// `downloadState` upstream: Done, Available, InProgress, Failure or
-    /// Undecipherable. Anything but Done and empty is a message the core
-    /// has only the header of.
+    /// downloadState: Done, Available, InProgress, Failure, Undecipherable.
+    /// Else (not Done, not empty): header only.
     property string downloadState: ""
     property bool isOutgoing: false
     property bool isInfo: false
     property bool isForwarded: false
-    /// This is the message a search sent the reader here for.
+    /// Search sent the reader here: flash it.
     property bool isFound: false
     property bool showPadlock: true
     // DC_STATE_*: 20 pending, 24 failed, 26 delivered, 28 read.
@@ -120,21 +89,17 @@ Item {
     property string filePath: ""
     property string fileName: ""
     property string fileMime: ""
-    // A real, not an int: QML has no 64-bit integer to hold a file size in.
+    // A real: QML has no 64-bit int for file size.
     property real fileBytes: 0
-    /// How long a sound is, in milliseconds, 0 when the core does not say.
+    /// Sound length in ms; 0 when the core does not say.
     property int durationMs: 0
-    // Text, Image, Gif, Sticker, Audio, Voice, Video, File, Call, Webxdc,
-    // Vcard. What the attachment is drawn as; AttachmentPreview decides.
+    // Text, Image, Gif, Sticker, Audio, Voice, Video, File, Call, Webxdc, Vcard.
     property string viewType: "Text"
     property int imageWidth: 0
     property int imageHeight: 0
-    /// A message the reader has not seen before; see AttachmentPreview.
+    /// Not seen before; see AttachmentPreview.
     property bool isNew: false
-    /// `hasHtml` upstream: the text shown here is not the whole of what
-    /// arrived, and an HTML part holds the rest -- which the page can
-    /// fetch from the core and this row cannot. Being cut is only one of
-    /// the things it means; see `wasCut`.
+    /// `hasHtml`: text shown is partial; the rest is an HTML part only the core can fetch.
     property bool hasHtml: false
     // A shared contact, parsed by the core.
     property string vcardName: ""
@@ -145,17 +110,12 @@ Item {
     property string webxdcDocument: ""
     property string webxdcSummary: ""
     property string webxdcIcon: ""
-    /// Whether webxdc apps are on. Handed down to the attachment, which
-    /// decides from it whether this row holds an app or a file; `tapped`
-    /// asks the attachment rather than reading this itself, so there is
-    /// one answer rather than two.
+    /// Webxdc apps on. Attachment decides app or file; `tapped` asks it, so one answer.
     property bool appsEnabled: false
     /// The list is being dragged or flicked; see AttachmentPreview.
     property bool scrolling: false
-    /// Where a call stands, as the core names it: Alerting, Active,
-    /// Completed, Missed, Declined or Canceled. Empty for anything that
-    /// is not a call, and for a call the core would say nothing about --
-    /// which then draws as its text, the core's own sentence.
+    /// Call state from the core (Alerting, Active, Completed, Missed, Declined, Canceled).
+    /// Empty or unknown: the core's own sentence draws.
     property string callState: ""
     property bool callHasVideo: false
     /// Seconds, for a completed call.
@@ -164,31 +124,26 @@ Item {
     /// This row is a call, drawn as one.
     readonly property bool isCall: root.viewType === "Call"
                                    && root.callState.length > 0
-    /// What a call row says first, and the line under it; see Calls.js.
+    /// Call row headline and sub-line; see Calls.js.
     readonly property string callTitle: Calls.title(root.callState, root.callHasVideo)
     readonly property string callDetail: Calls.detail(root.callState, root.callDuration,
                                                       root.isOutgoing)
-    /// A call that did not happen, drawn in the colour that says so.
+    /// Missed, declined or canceled: drawn in the "bad" colour.
     readonly property bool callFailed: Calls.failed(root.callState)
 
     property bool hasFile: filePath.length > 0
-    // A sticker is a picture with no bubble behind it, which is the whole
-    // of what makes it one.
+    // Sticker: a picture with no bubble.
     readonly property bool isSticker: root.viewType === "Sticker" && root.hasFile
 
-    /// Whether the body is drawn from the shim's rendering. Only with a
-    /// rendering to draw: the raw text as StyledText would be the very
-    /// thing the plain-text pinning is for.
+    /// Body from the shim rendering, if any. Raw text as StyledText is what pinning prevents.
     readonly property bool drawsStyled: root.markdownMode === 0
                                         && root.styledText.length > 0
-    /// The body as the setting wants it shown.
+    /// Body as the setting wants it shown.
     readonly property string shownText: root.drawsStyled
                                         ? root.styledText
                                         : root.messageText
 
-    /// The body with its emoji as the pictures the app ships, as they
-    /// are on the reactions (see EmojiGlyph), or "" when it has none to
-    /// draw and is shown as it was.
+    /// Body with emoji as pictures (EmojiGlyph), or "" to show as written.
     readonly property string emojiBody: !root.isCall
                                         ? Emoji.inText(root.shownText, root.drawsStyled,
                                                        messageLabel.font.pixelSize)
@@ -197,108 +152,57 @@ Item {
     readonly property string bodyText: root.emojiBody.length > 0
                                        ? root.emojiBody : root.shownText
     readonly property bool bodyStyled: root.drawsStyled || root.emojiBody.length > 0
-    /// The same for the quote, which is always the text as written.
+    /// Quote: always as written.
     readonly property string emojiQuote: Emoji.inText(root.quoteText, false,
                                                       Theme.fontSizeExtraSmall)
-    /// A message the core has only the header of, or is fetching, or
-    /// could not fetch: something to say, and mostly something to tap.
+    /// Header only, fetching, or failed: something to tap.
     readonly property bool heldBack: root.downloadState.length > 0
                                      && root.downloadState !== "Done"
-    /// The two states the rest of a message can be asked for in.
+    /// Download states that offer the rest.
     readonly property bool canDownload: root.downloadState === "Available"
                                         || root.downloadState === "Failure"
 
-    /// What the offer says. Here rather than only in the label because
-    /// the bubble is sized from it: a bubble made narrow by short lines
-    /// has to widen to hold it, or the offer hangs out of it.
+    /// Offer text, here: the bubble is sized from it.
     //: Opens the whole message on a page of its own.
     readonly property string fullText: qsTr("View full message")
 
-    /// How wide the offer wants to be. Nothing when there is none, so an
-    /// ordinary bubble is not held open by two words it does not show.
+    /// Offer width; none when absent.
     readonly property real actionsWidth: root.showsFull
                                          ? fullMetric.implicitWidth : 0
 
-    /// The footer's line: that the text was edited, whether it went
-    /// unencrypted, the time, and for our own messages how far it got.
-    /// Built once here, for the label and for the copy that measures it.
+    /// Footer: edited, unencrypted, time, progress. Built once.
     readonly property string footerText: (root.isEdited ? qsTr("Edited") + " · " : "")
                                          + (root.showPadlock ? "" : "✉ ")
                                          + Qt.formatTime(new Date(root.sentAt * 1000), "hh:mm")
                                          + (root.isOutgoing
                                             ? " " + Format.stateMark(root.deliveryState) : "")
 
-    /// How many lines of a body the bubble shows before sending the
-    /// reader to the page. Enough for a paragraph, which is what most
-    /// messages are.
+    /// Body lines shown before the page takes over (enough for a paragraph).
     ///
-    /// The cap does not lift here any more. Opening a body out in place
-    /// was a second way to read the same words, and the worse of the
-    /// two: it made one row taller than the view, which is a row that
-    /// cannot be scrolled past, and folding it again had to put the
-    /// reader back where they were by hand. The page shows the whole
-    /// message and nothing else, and leaving it puts them back.
+    /// Not lifted in place: an open body made the row taller than the view, unscrollable.
     property int collapsedLines: 12
-    /// Whether this row is showing words at all, and has all of them to
-    /// show.
-    ///
-    /// The offer is about a long body and nothing else. A picture or a
-    /// document with no caption has no body to read on a page, and a
-    /// message the core is still holding back has none of it yet -- what
-    /// that row needs is Download, which it already offers. Neither was
-    /// excluded before, and an attachment arriving in an open chat grew
-    /// a View full message it had no use for.
+    /// Offer for long bodies only; not captionless pictures, nor messages still held back.
     readonly property bool hasBody: root.messageText.length > 0 && !root.heldBack
                                     && !root.isCall
-    /// Whether the sending core cut this message, leaving the rest of it
-    /// in an HTML part and off this phone.
+    /// Whether the core cut this message: the rest is in an HTML part, off this phone.
     ///
-    /// `hasHtml` alone does not say that, though the name reads as if it
-    /// does. The core raises it for any message whose text is not the
-    /// whole of what arrived: an ordinary mail with an HTML alternative
-    /// beside its plain part, a mail written only in HTML, a reply whose
-    /// quoted history was stripped, a forward. That is very nearly
-    /// everything written in a mail client rather than a chat app, and
-    /// reading it as "cut" put a View full message under most of a
-    /// mailbox -- two-word replies included -- each one offering a page
-    /// with the same words already in the bubble.
-    ///
-    /// A message the core really did cut ends in the marker it writes,
-    /// `[...]`, and only a cut one does: that marker goes on in the one
-    /// place upstream shortens a body. So both are asked for. The flag
-    /// says there is an HTML part to fetch the rest out of, and the
-    /// marker says the rest is what is missing rather than a second
-    /// rendering of what is here.
+    /// `hasHtml` alone is not enough: core sets it whenever text isn't all that arrived
+    /// (HTML alternative, HTML-only, stripped quote, forward), i.e. most mail. Only a real
+    /// cut ends in core's `[...]` marker. Flag: HTML part holds the rest; marker: rest is
+    /// missing, not a second rendering.
     readonly property bool wasCut: root.hasHtml
                                    && root.messageText.slice(-5) === "[...]"
-    /// Whether to offer the page: anything the bubble is not showing
-    /// whole, and every message the sending core cut -- for those the
-    /// rest is not on this phone at all, and the page is the only thing
-    /// that can go and get it.
+    /// Offer the page: anything not shown whole, and every cut message.
     readonly property bool showsFull: root.hasBody
                                       && (root.wasCut || messageLabel.truncated)
 
-    // A bubble is as wide as its content, up to most of the screen. The
-    // widths come off unconstrained copies of the text: measuring the real
-    // labels, whose width comes back from the bubble, is a binding loop.
+    // Bubble as wide as content. Widths come off unconstrained copies (a real label would loop).
     property real maxWidth: root.width * 0.78 - 2 * Theme.paddingMedium
-    /// How wide everything but the offer wants the bubble, and the width
-    /// the body is wrapped at.
+    /// Width everything but the offer wants, and what the body wraps at.
     ///
-    /// Held apart from the bubble's own width because the offer is
-    /// decided from whether the body fits. Wrap the body at a width the
-    /// offer has already widened, and the offer's appearing changes the
-    /// wrapping that decides whether it appears: the body fits, so the
-    /// offer goes, so the bubble narrows, so the body no longer fits.
-    /// QML answers a circle like that by dropping a binding where it
-    /// stands, which leaves a bubble at a width nothing on it asked for,
-    /// and leaves it there until the row is built again -- so what a
-    /// message looked like came down to the order its properties
-    /// happened to arrive in, and looked different after leaving the
-    /// chat and coming back.
-    ///
-    /// The offer cannot reach this width. The bubble's is this one
-    /// widened to hold the offer, below.
+    /// Wrapping at a width the offer widened loops (fits, offer goes, bubble narrows, no
+    /// longer fits); QML drops a binding, leaving width up to property arrival order. The
+    /// offer never reaches this width; bubble's is this widened for it.
     property real bodyWidth: Math.min(
         root.maxWidth,
         Math.max(textMetric.implicitWidth,
@@ -308,13 +212,9 @@ Item {
                  footerMetric.implicitWidth,
                  root.attachmentFillsBubble ? root.maxWidth : 0,
                  Theme.itemSizeSmall))
-    /// Whether the attachment reads better filling the bubble: the
-    /// preview's own `wantsFullWidth`, worked out here from what it is
-    /// worked out from there. The preview is null for as long as the
-    /// loader is building it, so asking it sized a picture -- and started
-    /// its decode -- at the width of its caption first, and then again
-    /// at the bubble's. Keep the two in step; qml_bubble_width.rs holds
-    /// them to each other.
+    /// Attachment fills the bubble: the preview's `wantsFullWidth`, computed here (preview is null
+    /// while loading, so asking it sized and decoded a picture twice). Keep the two in step;
+    /// qml_bubble_width.rs checks.
     readonly property bool attachmentFillsBubble: root.hasFile
         && (root.viewType === "Image" || root.viewType === "Sticker"
             || root.viewType === "Gif" || root.viewType === "Video"
@@ -322,27 +222,21 @@ Item {
             || root.viewType === "Vcard"
             || (root.viewType === "Webxdc" && root.appsEnabled
                 && root.webxdcName.length > 0))
-    /// How wide the bubble is: what its content wants, widened to hold
-    /// the offer when there is one. A long message of short lines makes
-    /// a narrow bubble, and the offer under it would hang out of one
-    /// sized from the lines alone.
+    /// Bubble width: content, widened to hold the offer (short lines would hang it out).
     property real contentWidth: Math.min(root.maxWidth,
                                          Math.max(root.bodyWidth,
                                                   root.actionsWidth))
 
-    // The chips hang below the bubble, and what hangs is the row's to
-    // make room for: without it they draw over the next message.
+    // Chips hang below the bubble; the row makes room, or they draw over the next message.
     height: (root.isInfo ? infoLabel.height : bubble.height)
             + (reactionRow.shown ? reactionRow.height - root.chipOverlap : 0)
             + 2 * Theme.paddingSmall
 
-    /// How far the chips reach up over the bubble's bottom edge: enough
-    /// to read as hung on it, and no more, since the footer's time sits
-    /// in that corner and the chips went over it at half their height.
+    /// How far chips reach up the bottom edge: enough to read as hung on it, no more (footer
+    /// time sits in that corner).
     readonly property real chipOverlap: Theme.paddingMedium - Theme.paddingSmall / 2
 
-    // Where the next part goes: right below the last one that is there,
-    // with a gap only when both are.
+    // Next part goes right below the last one there; gap only when both are there.
     function below(previous, mine) {
         return previous.y + previous.height
                + (mine && previous.height > 0 ? Theme.paddingSmall : 0)
@@ -356,14 +250,8 @@ Item {
         textFormat: root.bodyStyled ? Text.StyledText : Text.PlainText
         // A call's text is not drawn, so it does not size the bubble.
         text: root.isCall ? "" : root.bodyText
-        // Each line of the body unwrapped, and only as many as the label
-        // shows: the widest of them is the width the body wants. The
-        // whole of a long message used to be laid out here, on every row
-        // built, for lines below the fold. Unwrapped, so that a line
-        // wider than the bubble still says so and the bubble takes its
-        // whole width, as it did. The label's dozen lines come from at
-        // most a dozen of these, so nothing it shows is left out; a wider
-        // line further down, which it does not show, no longer widens it.
+        // Body lines unwrapped, as many as the label shows: the widest sets the body width.
+        // Unwrapped, so a line wider than the bubble still widens it.
         maximumLineCount: root.collapsedLines
     }
 
@@ -372,15 +260,11 @@ Item {
         visible: false
         font.pixelSize: Theme.fontSizeMedium
         textFormat: Text.PlainText
-        // Asked of the preview rather than read off its label: what the
-        // fallback row says is the preview's business, and the bubble only
-        // needs to know how wide it comes out.
+        // Asked of the preview, not its label.
         text: attachment.item ? attachment.item.genericText : ""
     }
 
-    // The offer, measured where nothing constrains it: reading a width
-    // off the label itself would come back through the bubble it is
-    // sizing.
+    // Offer measured unconstrained, or its label width would loop through the bubble.
     Text {
         id: fullMetric
         visible: false
@@ -389,8 +273,7 @@ Item {
         text: root.fullText
     }
 
-    // The footer, measured the same way: a one-word message with
-    // "Edited" in its footer is a bubble the footer has to widen.
+    // Footer measured the same way: "Edited" can widen a one-word bubble.
     Text {
         id: footerMetric
         visible: false
@@ -399,10 +282,7 @@ Item {
         text: root.footerText
     }
 
-    // The chips' counts end to end, for how wide the strip wants to be.
-    // The chips themselves are measured one by one below; this, with an
-    // emoji's square for each, is the sum the bubble's width is decided
-    // from before any of them exists.
+    // Chip counts end to end, for the strip width (an emoji square each).
     Text {
         id: reactionMetric
         visible: false
@@ -417,8 +297,7 @@ Item {
         }
     }
 
-    // One line of the chip font, for how tall a chip is: the emoji is
-    // drawn a line high, whether it is a picture or text.
+    // One line of chip font: chip height; the emoji is a line high, picture or text.
     Text {
         id: chipLineMetric
         visible: false
@@ -427,8 +306,7 @@ Item {
         text: "0"
     }
 
-    /// How many put the emoji on, when it is more than one person. "👍"
-    /// reads as one; "👍 1" reads as a score.
+    /// Count shown for more than one person only: "👍" alone, not "👍 1".
     function chipCount(reaction) {
         return reaction.count > 1 ? "" + reaction.count : ""
     }
@@ -437,14 +315,8 @@ Item {
     Label {
         id: infoLabel
         objectName: "infoLabel"
-        // Every part of a message that may or may not be there sizes
-        // itself by its own reason to be, never by `visible`. That reads
-        // the *effective* visibility, which goes false for everything on
-        // a page the moment the platform hides the page under another --
-        // and a row whose parts all measured `visible ? implicitHeight
-        // : 0` collapsed to nothing while the page was away, so the list
-        // rebuilt itself twice on every return: once to fill the void it
-        // suddenly had, and again, on the way back, to undo that. See
+        // Optional parts size by their own reason, never `visible` (effective visibility goes false
+        // for a whole covered page). Rows that measured it collapsed while away. See
         // qml_hidden_rows.rs.
         readonly property bool shown: root.isInfo
         visible: infoLabel.shown
@@ -470,12 +342,10 @@ Item {
         width: root.contentWidth + 2 * Theme.paddingMedium
         height: bubble.shown ? footerLabel.y + footerLabel.height + Theme.paddingMedium : 0
         radius: Theme.paddingMedium
-        // A found message is lit rather than outlined: a border would
-        // change the bubble's size, and every row below it would move.
+        // Found message lit, not outlined: a border would resize it and move the rows.
         color: root.isFound
                ? Theme.rgba(Theme.highlightColor, 0.5)
-               // A sticker is meant to sit on the conversation rather than
-               // in a bubble; the rest of the row still lays out the same.
+               // Sticker sits on the conversation, not in a bubble.
                : root.isSticker ? "transparent"
                : root.isOutgoing ? Theme.rgba(Theme.highlightBackgroundColor, 0.25)
                                  : Theme.rgba(Theme.secondaryColor, 0.12)
@@ -498,10 +368,8 @@ Item {
             text: root.senderName
         }
 
-        // Marked the way the reference client marks it, and above the
-        // quote: it describes the whole message, not the quoted part.
-        // Not remote-supplied text, so it needs no PlainText pinning --
-        // but it must not be folded into messageText, which is.
+        // Marked as the reference client does, above the quote (describes the whole message).
+        // No PlainText pinning needed (not remote text), but kept out of messageText.
         Label {
             id: forwardedLabel
             objectName: "forwardedLabel"
@@ -564,17 +432,8 @@ Item {
             }
         }
 
-        // Whatever kind of attachment this is, drawn by the one component
-        // that knows the difference. Reports rather than acts, so opening
-        // stays the page's decision.
-        //
-        // Built only for a message that has a file. The preview held a
-        // renderer for every kind there is -- a picture and its animation,
-        // the thumbnailer's poster, a sound player -- and a text message
-        // carried all of them, unseen, for the height of one line. A
-        // conversation is mostly text, and what a row costs to build is
-        // what a flick costs per frame. The loader takes the preview's
-        // size, so the rows below it sit where they did.
+        // Any attachment kind, drawn by the one component that knows the difference. Reports, never
+        // acts. Built only for a message with a file, so text messages do not carry every renderer.
         Loader {
             id: attachment
             x: Theme.paddingMedium
@@ -606,9 +465,7 @@ Item {
             }
         }
 
-        // A call: what kind, or what became of it, and how long it
-        // lasted. In place of the text, which is the same thing said by
-        // the core in English.
+        // Call: kind, outcome and length, in place of the text.
         Item {
             id: callRow
             objectName: "callRow"
@@ -689,24 +546,14 @@ Item {
             visible: messageLabel.shown
             height: messageLabel.shown ? implicitHeight : 0
             x: Theme.paddingMedium
-            // Under the call when there is one -- nothing is, since a
-            // call's text is not drawn, but the rows below chain from
-            // here -- and under the attachment otherwise, which is what
-            // the gap between the two is measured from.
+            // Under the call if there is one, else the attachment; rows below chain from here.
             y: root.below(callRow.shown ? callRow : attachment, messageLabel.shown)
-            // The body's width, not the bubble's: see `bodyWidth`. The
-            // two differ only when the offer widened the bubble, and the
-            // body is left-aligned in it either way.
+            // Body width, not the bubble's: they differ only when the offer widened it.
             width: root.bodyWidth
             wrapMode: Text.Wrap
-            // A bubble is a shape for a remark, not for a document. A
-            // long body is cut to a readable few lines and the rest is
-            // read on a page: a to-do list somebody sent otherwise fills
-            // the screen and pushes the whole conversation out of it,
-            // and a row taller than the view is one that cannot be
-            // scrolled past. A cap on the lines rather than a cut in the
-            // text, so nothing has to slice a rendering in half and
-            // leave a tag open.
+            // Bubble is for a remark, not a document: a long body is cut to a few lines; the rest
+            // is on a page (a row taller than the view cannot be scrolled past). Line cap, not
+            // text cut: slicing a rendering could leave a tag open.
             maximumLineCount: root.collapsedLines
             truncationMode: TruncationMode.Elide
             color: Theme.primaryColor
@@ -718,10 +565,7 @@ Item {
             onLinkActivated: Qt.openUrlExternally(link)
         }
 
-        // What to do about a body that does not fit: read it on a page of
-        // its own. Two words rather than a button, in the highlight
-        // colour the download offer uses -- Silica's Button inside a
-        // bubble would be a box inside a box.
+        // Body that does not fit: two-word tap in the download offer's colour.
         Item {
             id: bodyActions
             objectName: "bodyActions"
@@ -736,9 +580,7 @@ Item {
                 id: fullLabel
                 objectName: "fullButton"
                 visible: root.showsFull
-                // At the far end of the row. Placed rather than
-                // anchored, as it was when it had something beside it to
-                // be placed against.
+                // Far end of the row. Placed, not anchored.
                 x: parent.width - width
                 font.pixelSize: Theme.fontSizeSmall
                 color: Theme.highlightColor
@@ -753,8 +595,7 @@ Item {
             }
         }
 
-        // A message the download limit held back: the core has its
-        // header and this is where the rest is asked for.
+        // Held back by the download limit: header here; rest is asked for.
         Label {
             id: downloadLabel
             objectName: "downloadButton"
@@ -786,9 +627,7 @@ Item {
             }
         }
 
-        // Time, and for our own messages how far it got. A mail icon marks
-        // anything that was not encrypted and signed, and "Edited" a text
-        // the sender changed afterwards.
+        // Time; own messages: progress. Mail icon: not encrypted. "Edited": changed later.
         Label {
             id: footerLabel
             objectName: "footerLabel"
@@ -803,30 +642,19 @@ Item {
         }
     }
 
-    // Who reacted with what, one chip per emoji, ours lit. Hung off the
-    // bubble's bottom corner rather than laid out inside it -- the
-    // inside corner, towards the middle of the screen, the way the
-    // reference clients hang theirs: just over the bubble's edge and
-    // mostly below it, so a reaction reads as something put on the
-    // message rather than a line of it, and the time in that corner
-    // stays readable. Laid out by hand rather than in a Row,
-    // for the reason at the top of the file: each chip sits after the
-    // ones before it, and reads their widths so a chip that grows
-    // pushes the rest along. One line, clipped: a message with more
-    // distinct reactions than fit is rare enough that the last of them
-    // can go unseen.
+    // One chip per emoji, ours lit, hung off the bubble's inside corner, mostly below its edge
+    // so the time there stays readable. Hand-laid: each chip reads the widths before it. One line,
+    // clipped: the last of many reactions can go unseen.
     Item {
         id: reactionRow
         objectName: "reactionRow"
         readonly property bool shown: !root.isInfo && root.reactionList.length > 0
         visible: reactionRow.shown
-        // Inside the bubble's own padding, at the corner nearest the
-        // middle of the screen.
+        // Inside bubble padding, at the corner nearest screen middle.
         x: root.isOutgoing ? bubble.x + Theme.paddingMedium
                            : bubble.x + bubble.width - width - Theme.paddingMedium
         y: bubble.height - root.chipOverlap
-        // Never wider than the bubble, which sizes itself to fit the
-        // chips where it can.
+        // Never wider than the bubble.
         width: Math.min(wantedWidth, root.contentWidth)
         // A line of the chip font plus the chip's own padding.
         height: reactionRow.shown ? chipLineMetric.height + 2 * Theme.paddingSmall : 0
@@ -835,9 +663,7 @@ Item {
         /// How big an emoji is drawn on a chip: a line of its text.
         readonly property real glyphSize: chipLineMetric.height
 
-        /// The room the chips take in a row: an emoji each, their counts,
-        /// the gap before each count, each chip's padding, and the gaps
-        /// between them.
+        /// Room the chips take in a row: emoji, counts, gaps and padding.
         readonly property real wantedWidth: {
             var n = root.reactionList.length
             if (n === 0) {
@@ -866,9 +692,7 @@ Item {
                 readonly property bool mine: modelData.self === true
                 /// The emoji, for the tap to name.
                 readonly property string emoji: modelData.emoji
-                // After every chip before it. Reading their widths is
-                // what makes this follow them: the repeater builds
-                // chips in order, so each one it asks for is there.
+                // After the chips before it: the repeater builds in order.
                 x: {
                     var at = 0
                     for (var i = 0; i < index; i++) {
@@ -885,15 +709,13 @@ Item {
                        + 2 * Theme.paddingMedium
                 height: reactionRow.height
                 radius: height / 2
-                // Nearly solid: a chip straddles the bubble's edge, and
-                // a translucent one would change colour halfway down.
+                // Nearly solid: a chip straddles the bubble edge; translucent would change colour
+                // mid-way.
                 color: mine ? Theme.rgba(Theme.highlightBackgroundColor, 0.9)
                             : Theme.rgba(Theme.highlightDimmerColor, 0.9)
 
-                // A picture where one is shipped: Sailfish draws few
-                // emoji itself. The emoji is whatever the other end
-                // sent, and the core does not check that it is one;
-                // EmojiGlyph draws anything else as plain text.
+                // Picture where shipped (Sailfish draws few emoji). Other end's text is not
+                // checked; EmojiGlyph draws non-emoji as plain text.
                 EmojiGlyph {
                     id: chipEmoji
                     objectName: "chipEmoji"

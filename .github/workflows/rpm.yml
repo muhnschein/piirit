@@ -1,22 +1,14 @@
-# Builds a device RPM inside the Sailfish SDK.
+# Device RPM built in the Sailfish SDK.
 #
-# Not part of `ci.yml`: it cross-compiles the whole workspace inside a
-# multi-gigabyte SDK image, which is minutes of runner time nobody wants on
-# every push. Run it from the Actions tab when a package is wanted, or on a
+# Not in ci.yml: minutes per push in a multi-GB image. Run from Actions or on a
 # tag.
 #
-# The SDK is what makes the result runnable on a phone: the app links
-# against the target's Qt 5.6 and glibc, and a host-built binary has
-# neither. See docs/BUILDING.md.
+# SDK needed for a runnable phone build: target's Qt 5.6 and glibc
+# (docs/BUILDING.md).
 #
-# aarch64 only, which is what this project targets (see the README): the
-# SDK image below carries that architecture and no other, and nothing here
-# has ever built a second one.
-#
-# Two things keep it short, each explained where it happens: the SDK image
-# is one this repository derives and publishes rather than upstream's
-# three-architecture one (`sdk-image.yml`), and `rust/target` and the
-# crates are carried between runs.
+# aarch64 only (project target; SDK image carries no other arch). Kept short
+# by: own derived one-arch SDK image (sdk-image.yml); rust/target and crates
+# carried between runs.
 name: rpm
 
 on:
@@ -41,13 +33,11 @@ on:
         type: string
         default: ""
   push:
-    # `v*` for a release. `build-*` is a throwaway handle for running this
-    # before it reaches the default branch, since workflow_dispatch only
-    # becomes available once a workflow is on main.
+    # `v*` for release. `build-*`: throwaway; dispatch needs workflow on main.
     tags: ["v*", "build-*"]
 
-# Reading the tree is all the workflow as a whole needs; each job says what
-# more it holds, so neither holds the other's.
+# Workflow needs tree read only; each job adds its own extra permissions, so
+# neither holds the other's.
 permissions:
   contents: read
 
@@ -57,32 +47,29 @@ jobs:
     timeout-minutes: 120
     permissions:
       contents: read
-      # The derived SDK image lives in this repository's registry, and a
-      # run that finds none there publishes the one it had to build.
+      # Derived image: this repo's registry; published when a run finds none.
       packages: write
     env:
       ARCH: aarch64
       SFOS: ${{ inputs.sfos_version || '5.2.0.15' }}
       RELEASE: ${{ inputs.release || '' }}
-      # One cargo job inside scratchbox2, on every run. At two or four the
-      # build stalls there often enough to cost more than the parallelism
-      # saves, so this is no longer a dispatch input. See docs/BUILDING.md.
+      # One cargo job, always (not a dispatch input): at 2+ the build stalls in
+      # scratchbox2 often enough to cost more than parallelism saves.
+      # docs/BUILDING.md.
       CARGO_JOBS: "1"
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        # FFmpeg and x264, which piirit-video builds (docs/BUILDING.md).
+        # Submodules: FFmpeg, x264 for piirit-video (docs/BUILDING.md).
         with:
-          # Nothing here pushes with git, so the token is not left behind in
-          # .git/config for a later step to find. Every checkout in this file.
+          # Token not left in .git/config (nothing pushes).
           persist-credentials: false
           submodules: true
 
-      # Bundled beside the app; checksum-pinned by the script itself.
+      # Bundled beside app; checksum-pinned by script.
       - name: Fetch deltachat-rpc-server
         run: ./scripts/fetch-rpc-server.sh
 
-      # The version is free text from the dispatch form, and it is spliced
-      # into an image tag below.
+      # Version is free text from dispatch form, spliced into image tag below.
       - name: Name the SDK image this build wants
         run: |
           [[ $SFOS =~ ^[0-9]+(\.[0-9]+){3}$ ]] || {
@@ -90,8 +77,7 @@ jobs:
           owner=$(echo "$GITHUB_REPOSITORY_OWNER" | tr 'A-Z' 'a-z')
           echo "SDK_IMAGE=ghcr.io/$owner/piirit-sdk:$SFOS-$ARCH" >> "$GITHUB_ENV"
 
-      # Through the environment, not spliced into the script: a `${{ }}`
-      # in `run:` is pasted in as shell text before the shell reads it.
+      # Via env, not spliced into `run:`: `${{ }}` becomes shell text first.
       - name: Sign in to the registry
         env:
           TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -99,20 +85,17 @@ jobs:
           echo "$TOKEN" |
             docker login ghcr.io -u "$GITHUB_ACTOR" --password-stdin
 
-      # ci/build-sdk-image.sh says what this image is and why it is not
-      # upstream's. Deriving one takes about as long as this whole workflow,
-      # so it is done once and published; a run that finds none does it
-      # rather than failing, and publishes it for the next.
+      # What/why: ci/build-sdk-image.sh. Deriving takes ~a whole run, so done
+      # once and published; a run finding none derives it (not fail) and
+      # publishes for the next.
       - name: Get the SDK image
         run: |
           if docker pull -q "$SDK_IMAGE"; then
             echo "using $SDK_IMAGE"
           else
             echo "::notice::no $SDK_IMAGE published yet; deriving one, which makes this run slower"
-            # Room for the upstream image and the flattened one at once.
-            # Defaulted rather than bare: `rm -rf ""` is an error, and it
-            # would fail this step for the sake of a variable the runner
-            # happens to set.
+            # Room for upstream and flattened images at once. Defaulted:
+            # `rm -rf ""` errors and would fail the step.
             sudo rm -rf /usr/local/lib/android /usr/share/dotnet \
                         "${AGENT_TOOLSDIRECTORY:-/opt/hostedtoolcache}"
             ./ci/build-sdk-image.sh "$SFOS" "$ARCH" "$SDK_IMAGE"
@@ -122,28 +105,16 @@ jobs:
           id=$(docker image inspect --format '{{.Id}}' "$SDK_IMAGE")
           echo "SDK_IMAGE_ID=${id#sha256:}" >> "$GITHUB_ENV"
 
-      # Every build used to produce harbour-piirit-0.1.0-1.aarch64.rpm,
-      # because the spec pins both fields and mb2 runs with -X so nothing derives
-      # them from git. Same name, same NEVRA, every time -- so `rpm -U`
-      # and `pkcon install-local` saw a package that was already installed
-      # and did nothing at all. A phone kept whatever build it had while
-      # the file said it was new.
+      # Version/Release pinned in spec; mb2 -X: no git stamp. Without one every
+      # build was harbour-piirit-0.1.0-1 and `rpm -U` did nothing.
       #
-      # The run number is monotonic, so each build is an upgrade of the
-      # last. The spec keeps Release: 1 in the tree, and a release builds
-      # exactly that: the package a release page offers is the spec as
-      # committed, not stamped with a run number nobody can find again.
+      # Run number is monotonic: each build upgrades the last. Releases build
+      # the spec as committed (Release: 1).
       #
-      # A release is a `v*` tag, or a dispatch on main with the version in
-      # `release`. Either has to say what the spec says, or the package
-      # would carry one version and the release another; a tag pushed or
-      # a version typed before the bump stops here. A dispatch is held to
-      # main because the job below tags the commit it runs on, and a tag
-      # on a branch is a release of something main may never carry.
-      #
-      # Digits and periods only: Harbour rejects any other character in
-      # Release, so the short SHA that used to be appended here would have
-      # failed intake. It identifies the artifact below instead.
+      # Release = `v*` tag, or dispatch on main with `release`; must match spec
+      # version. Dispatch held to main: release job tags the commit it runs on.
+      # Digits and periods only: Harbour rejects other Release chars, so short
+      # SHA goes in artifact name instead.
       - name: Stamp the build so each one is its own package
         run: |
           short=$(git rev-parse --short HEAD)
@@ -169,20 +140,10 @@ jobs:
           echo "SHORT_SHA=$short" >> "$GITHUB_ENV"
           echo "RPM_RELEASE=$release" >> "$GITHUB_ENV"
 
-      # What the build spends its time on, after the pull: compiling 56
-      # crates, of which this project wrote four. The rest depend on the
-      # lockfile and the toolchain in the image and on nothing else, so
-      # they are worth carrying between runs -- with a cold cache the
-      # compile is about four minutes, with a warm one about one.
-      #
-      # Keyed on the image as well as the lockfile: these are artifacts for
-      # one target triple, built by the rust that image ships.
-      #
-      # Not for a release, here or for the crates below. What a cache holds
-      # was written by some earlier run, and a release is the one build
-      # whose binary should come from nothing but the commit it is tagged
-      # on; it pays the cold compile for that. zizmor cannot read the `if`,
-      # which is why its cache-poisoning finding is ignored on both.
+      # ~56 crates (4 ours); deps rely only on lockfile + image toolchain: ~4
+      # min cold, ~1 warm. Keyed on image too (one target triple, its rust).
+      # Not for release (binary from tagged commit only), here and crates below;
+      # zizmor can't read `if`, so its cache-poisoning finding ignored on both.
       - name: Restore the cross-compiled dependencies
         if: env.RELEASE == '' && !startsWith(github.ref, 'refs/tags/v')  # zizmor: ignore[cache-poisoning]
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
@@ -193,10 +154,7 @@ jobs:
             rpm-target-${{ env.ARCH }}-${{ env.SDK_IMAGE_ID }}-
             rpm-target-${{ env.ARCH }}-
 
-      # The crate sources themselves, which the build would otherwise
-      # download from crates.io inside the container every time. Worth
-      # little in seconds and a great deal in not depending on crates.io
-      # being up while a release is being cut.
+      # Crate sources: no crates.io dependency at release time.
       - name: Restore the crates
         if: env.RELEASE == '' && !startsWith(github.ref, 'refs/tags/v')  # zizmor: ignore[cache-poisoning]
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
@@ -205,19 +163,15 @@ jobs:
           key: rpm-cargo-${{ hashFiles('rust/Cargo.lock') }}
           restore-keys: rpm-cargo-
 
-      # The steps a local build runs too, so the two cannot drift: the
-      # script resolves the target, hands the tree to the SDK's build user
-      # and back, and runs mb2. Its comments say why each of those is done
-      # the way it is. The image is the one named above, and the crates go
-      # where the cache above keeps them.
+      # Same script as local build, so the two can't drift (its comments say
+      # why). Image named above; crates go where cache keeps them.
       - name: Build the RPM
         env:
           PIIRIT_SDK_IMAGE: ${{ env.SDK_IMAGE }}
           PIIRIT_CARGO_JOBS: ${{ env.CARGO_JOBS }}
         run: PIIRIT_CARGO_HOME=~/.cache/piirit-cargo ./scripts/build-in-docker.sh "$SFOS"
 
-      # `|| true` on both: the step runs under `bash -e`, and a missing
-      # .mb2 would end it before the logs were shown.
+      # `|| true`: runs under `bash -e`; missing .mb2 would hide logs.
       - name: Show mb2's state
         if: failure()
         run: ls -la .mb2 2>/dev/null || true; tail -60 .mb2/*.log 2>/dev/null || true
@@ -236,17 +190,11 @@ jobs:
           if-no-files-found: error
           retention-days: 30
 
-      # The authority. ci/harbour-check.sh answers the same questions from
-      # the sources on every pull request, but only this sees the built
-      # package -- the Requires and Provides rpm generated, the stripped
-      # binary's symbols, the real file modes.
-      #
-      # After the upload, deliberately: a package that Harbour would reject
-      # is still a package worth having on a phone, and this step failing
-      # must not be what stops you installing it.
-      #
-      # Known blockers do not fail it; ci/harbour/waivers.conf says which,
-      # and docs/HARBOUR.md says why. Anything else does.
+      # Authority: harbour-check.sh sees sources; only this sees the built
+      # package (generated Requires/Provides, stripped symbols, real modes).
+      # After upload: a rejected package is still worth installing, so this
+      # must not block install. Known blockers waived (ci/harbour/waivers.conf,
+      # why: docs/HARBOUR.md); anything else fails.
       - name: Validate the RPM against Harbour's rules
         run: |
           ./ci/apt-install.sh binutils rpm cpio file
@@ -256,17 +204,13 @@ jobs:
           echo "Validating $rpm"
           ./ci/harbour-validate-rpm.sh "$rpm"
 
-  # A release: the package the job above built goes on a GitHub release
-  # named v<version>, with that version's section of CHANGELOG.md as its
-  # text. Its own job so that `contents: write` is held only here, by
-  # three commands, and never by the build running an SDK image with
-  # `--privileged`.
+  # Release: package to GitHub release `v<version>`, CHANGELOG.md section as
+  # notes. Own job so `contents: write` is held only here, never by the
+  # --privileged SDK build.
   #
-  # From a `v*` tag the tag is there already and `--verify-tag` refuses to
-  # invent one; from a dispatch the release is what makes the tag, on the
-  # commit this run checked out. A version whose changelog section is
-  # missing fails in scripts/release-notes.sh before anything is published.
-  # `gh` is the runner's own; the token is the job's.
+  # `v*` tag: `--verify-tag` refuses to invent one. Dispatch: release creates
+  # the tag. Missing changelog section fails before publish
+  # (scripts/release-notes.sh).
   release:
     needs: rpm
     if: startsWith(github.ref, 'refs/tags/v') || inputs.release != ''
@@ -287,8 +231,8 @@ jobs:
       - name: Fetch the package this run built
         run: gh run download "$GITHUB_RUN_ID" --dir rpms
 
-      # The device package and its checksum, and nothing else: the debug
-      # and source RPMs are for a developer with the tree, not a phone.
+      # Device package and checksum only; debug and source RPMs are for
+      # developers.
       - name: Gather the assets
         run: |
           mkdir -p assets

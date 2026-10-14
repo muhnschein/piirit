@@ -1,16 +1,10 @@
-//! Every kind of attachment the core can hand back, drawn by the one
-//! component that knows the difference.
+//! Every attachment kind, drawn by the one component that knows the difference.
 //!
-//! The core classifies an attachment and nothing here does, so what is
-//! worth testing is that each `viewType` reaches the renderer meant for it
-//! and no other -- and that the two cases the core leaves blank do not
-//! collapse the row. `real_server.rs` pins that the core really does leave
-//! them blank: no dimensions for a GIF, no duration for a sound file.
+//! Core classifies; test each `viewType` reaches its renderer and no other, and the two cases core
+//! leaves blank don't collapse the row (`real_server.rs`: no GIF dimensions, no sound duration).
 //!
-//! A real 1x1 PNG and a real two-frame GIF are written to disk, because
-//! the fallback under test is "size the picture from the loaded image", and
-//! an image that does not load has no size to fall back to -- and because
-//! the GIF policy counts the movie going round, which takes a movie.
+//! Real 1x1 PNG and two-frame GIF on disk: fallback sizes picture from loaded image; GIF policy
+//! counts movie going round.
 
 // Qt harness: see qml_chat_list.rs.
 #![allow(
@@ -27,8 +21,8 @@ use qmetaobject::*;
 
 mod common;
 
-/// A 1x1 PNG, as `real_server.rs` sends to the core, and a 2x2 GIF of two
-/// frames, 40 ms each, looping for ever: one colour, then the other.
+/// 1x1 PNG as `real_server.rs` sends; 2x2 GIF, two 40 ms frames, looping: one colour then the
+/// other.
 const ONE_PIXEL_PNG: &[u8] = &[
     0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0x00, 0x00, 0x00, 0x0d, 0x49, 0x48, 0x44, 0x52,
     0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01, 0x08, 0x02, 0x00, 0x00, 0x00, 0x90, 0x77, 0x53,
@@ -135,7 +129,7 @@ fn each_view_type_reaches_the_renderer_meant_for_it() {
     let png = png.to_string_lossy().into_owned();
     let gif = gif.to_string_lossy().into_owned();
 
-    // SAFETY: single-threaded test binary; set before Qt starts.
+    // SAFETY: single-threaded; set pre-Qt.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
     }
@@ -181,8 +175,7 @@ fn each_view_type_reaches_the_renderer_meant_for_it() {
                 QString::from(common::component_url("AttachmentPreview.qml"))
             ),
         ));
-        // Nothing attached: the preview must take no room at all, or every
-        // text message gains a gap.
+        // Nothing attached: preview takes no room, or every text message gains a gap.
         (*steps_ptr).push(("empty-showing", call!("showing")));
         (*steps_ptr).push(("empty-height", call!("get", QString::from("height"))));
         (*steps_ptr).push(("png", show!("Image", png_for_load.as_str(), "dot.png")));
@@ -194,20 +187,20 @@ fn each_view_type_reaches_the_renderer_meant_for_it() {
         (*steps_ptr).push(("image-height", call!("get", QString::from("height"))));
         (*steps_ptr).push(("image-wide", call!("get", QString::from("wantsFullWidth"))));
         (*steps_ptr).push(("image-built", call!("built")));
-        // A GIF, for which the core reports no dimensions at all.
+        // GIF: core reports no dimensions.
         (*steps_ptr).push(("gif", show!("Gif", gif_for_show.as_str(), "dot.gif")));
     });
 
     single_shot(Duration::from_secs(3), move || unsafe {
-        // An old GIF: the still and the mark, and no movie.
+        // Old GIF: still and mark, no movie.
         (*steps_ptr).push(("gif-showing", call!("showing")));
         (*steps_ptr).push(("gif-marked", call!("marked")));
         (*steps_ptr).push(("gif-height", call!("get", QString::from("height"))));
-        // The mark tapped: the movie, over the still, and the mark gone.
+        // Mark tapped: movie over still, mark gone.
         (*steps_ptr).push(("gif-replay", call!("replay")));
         (*steps_ptr).push(("gif-replayed", call!("showing")));
         (*steps_ptr).push(("gif-replayed-marked", call!("marked")));
-        // Each frame decoded as it comes round, not the whole movie kept.
+        // Each frame decoded as it comes round; movie not kept whole.
         (*steps_ptr).push((
             "gif-cache",
             call!(
@@ -216,7 +209,7 @@ fn each_view_type_reaches_the_renderer_meant_for_it() {
                 QString::from("cache")
             ),
         ));
-        // Held while the list moves, and carried on when it stops.
+        // Held while list moves, carried on when it stops.
         call!("set", QString::from("scrolling"), true);
         (*steps_ptr).push((
             "gif-scrolling-paused",
@@ -238,8 +231,7 @@ fn each_view_type_reaches_the_renderer_meant_for_it() {
     });
 
     single_shot(Duration::from_secs(4), move || unsafe {
-        // Three runs of 80 ms are long over: the movie has gone, and the
-        // mark is back.
+        // Three 80 ms runs long over: movie gone, mark back.
         (*steps_ptr).push(("gif-ran-showing", call!("showing")));
         (*steps_ptr).push(("gif-ran-marked", call!("marked")));
         (*steps_ptr).push(("video", show!("Video", "/tmp/clip.mp4", "clip.mp4")));
@@ -248,7 +240,7 @@ fn each_view_type_reaches_the_renderer_meant_for_it() {
     single_shot(Duration::from_secs(5), move || unsafe {
         (*steps_ptr).push(("video-showing", call!("showing")));
         (*steps_ptr).push(("video-height", call!("get", QString::from("height"))));
-        // Told the video's shape -- taken upright -- the box stands up.
+        // Video's shape (taken upright) given: box stands up.
         call!("set", QString::from("imageWidth"), 720);
         call!("set", QString::from("imageHeight"), 1280);
         (*steps_ptr).push((
@@ -265,21 +257,20 @@ fn each_view_type_reaches_the_renderer_meant_for_it() {
             "voice-name",
             call!("textOf", QString::from("audioLabel"), QString::from("text")),
         ));
-        // No duration until the player has one; a zero length is a claim.
+        // No duration until player has one: zero is a claim.
         (*steps_ptr).push((
             "voice-time",
             call!("textOf", QString::from("audioTime"), QString::from("text")),
         ));
-        // And no player until play is pressed.
+        // No player until play pressed.
         (*steps_ptr).push(("voice-built", call!("built")));
-        // The length the message carries, said without one.
+        // Length message carries, said without one.
         call!("set", QString::from("durationMs"), 65_000);
         (*steps_ptr).push((
             "voice-known-time",
             call!("textOf", QString::from("audioTime"), QString::from("text")),
         ));
-        // Play: the player is made, loaded by the press rather than by
-        // being made, and playing.
+        // Play: player made and loaded by press, then playing.
         (*steps_ptr).push((
             "voice-play",
             call!("click", QString::from("audioPlayButton")),
@@ -340,10 +331,8 @@ fn each_view_type_reaches_the_renderer_meant_for_it() {
         (*steps_ptr).push(("sizes-mb", call!("sizeOf", 2_400_000)));
         (*steps_ptr).push(("sizes-none", call!("sizeOf", 0)));
 
-        // A picture the core sized and nothing has decoded -- the file is
-        // not even there -- takes its shape from the core's answer, so
-        // the row is the right height before the decode and does not
-        // move when it lands.
+        // Picture core sized, nothing decoded: takes shape from core's answer, so row is right
+        // height before decode.
         call!("set", QString::from("imageWidth"), 4);
         call!("set", QString::from("imageHeight"), 3);
         (*steps_ptr).push((
@@ -352,7 +341,7 @@ fn each_view_type_reaches_the_renderer_meant_for_it() {
         ));
         (*steps_ptr).push(("reserved-height", call!("get", QString::from("height"))));
 
-        // A GIF that has just arrived plays by itself.
+        // GIF just arrived plays by itself.
         call!("set", QString::from("isNew"), true);
         (*steps_ptr).push(("new-gif", show!("Gif", gif_for_new.as_str(), "dot.gif")));
         (*steps_ptr).push(("new-gif-showing", call!("showing")));
@@ -364,11 +353,8 @@ fn each_view_type_reaches_the_renderer_meant_for_it() {
         (*steps_ptr).push(("new-gif-ran-showing", call!("showing")));
         (*steps_ptr).push(("new-gif-ran-marked", call!("marked")));
 
-        // The same .xdc once the core has read the app inside it: its own
-        // card rather than the paperclip row, with the name and the line
-        // the app keeps about itself. Only where apps are on, though --
-        // off, an app the core read perfectly well is still a file, and
-        // the row it draws is the paperclip one above.
+        // Same .xdc after core read app: own card, app's name and self-description. Only where
+        // apps are on; off, it's a file with the paperclip row above.
         (*steps_ptr).push(("app", show!("Webxdc", "/tmp/game.xdc", "game.xdc")));
         call!(
             "set",
@@ -402,7 +388,7 @@ fn each_view_type_reaches_the_renderer_meant_for_it() {
                 QString::from("text")
             ),
         ));
-        // A tap runs it rather than handing the file to another app.
+        // Tap runs it, not handing file to another app.
         (*steps_ptr).push(("app-is-app", call!("get", QString::from("isApp"))));
         (*engine_ptr).quit();
     });
@@ -412,9 +398,8 @@ fn each_view_type_reaches_the_renderer_meant_for_it() {
     assert_outcome(&steps);
 }
 
-/// What the run has to show for itself, out of the test body: what a Qt
-/// harness can do in one function is bounded.
-// One assertion per thing checked, in the order the steps ran.
+/// What run shows, out of test body: Qt harness bounds what one fn can do.
+// One assertion per thing checked, in step order.
 #[allow(clippy::too_many_lines)]
 fn assert_outcome(steps: &[(&str, String)]) {
     let value = |label: &str| {
@@ -440,9 +425,8 @@ fn assert_outcome(steps: &[(&str, String)]) {
          message gains a gap. {context}"
     );
 
-    // Exactly one renderer per kind. Two at once is the bug this is for.
-    // A GIF is the still alone until it is playing, and the movie is laid
-    // over the still while it is: the still is what sizes the row.
+    // One renderer per kind; two at once is the bug. GIF is the still alone until playing, then
+    // movie over still; the still sizes the row.
     for (label, expected) in [
         ("image-showing", "attachmentImage"),
         ("gif-showing", "attachmentImage"),
@@ -464,8 +448,7 @@ fn assert_outcome(steps: &[(&str, String)]) {
         );
     }
 
-    // The app card is the core's answer drawn: its name, and what it says
-    // about itself now.
+    // App card: core's answer drawn: name and self-description.
     assert_eq!(
         value("app-name"),
         "Checkers",
@@ -498,18 +481,14 @@ fn assert_outcome(steps: &[(&str, String)]) {
         "true",
         "a picture did not ask the bubble for the full width. {context}"
     );
-    // The core reports no dimensions for a GIF and AnimatedImage reports
-    // none either until its movie decodes, so this height can only have
-    // come from the still poster or from the square fallback. Zero here is
-    // an attachment the reader cannot see.
+    // Core gives no GIF dimensions; AnimatedImage none until movie decodes: height can only come
+    // from still poster or square fallback. Zero = attachment reader can't see.
     assert!(
         height("gif-height") > 0.0,
         "a GIF measured nothing, so a picture the core gave no dimensions \
          for collapses the row. {context}"
     );
-    // A GIF from before plays only when asked; one that has just come in
-    // plays by itself. The mark is the ask, so it is up exactly when the
-    // movie is not.
+    // GIF from before plays only when asked; just-arrived plays by itself. Mark is the ask.
     assert_eq!(
         value("gif-marked"),
         "true",
@@ -541,7 +520,7 @@ fn assert_outcome(steps: &[(&str, String)]) {
         "false",
         "a GIF that has just arrived was left waiting for a tap. {context}"
     );
-    // Three runs and no more, counted from the movie going round.
+    // Three runs and no more, counted from movie going round.
     for label in ["gif-ran-marked", "new-gif-ran-marked"] {
         assert_eq!(
             value(label),
@@ -550,8 +529,7 @@ fn assert_outcome(steps: &[(&str, String)]) {
              come back when it stopped ({label}). {context}"
         );
     }
-    // 540 wide at 4:3 is 405 high, from the core's dimensions alone: the
-    // file is not there to decode.
+    // 540 wide at 4:3 is 405 high, from core's dimensions alone: file not there to decode.
     assert_eq!(value("reserved"), "ok", "no reserved picture. {context}");
     assert!(
         (height("reserved-height") - 405.0).abs() < 0.5,
@@ -589,10 +567,8 @@ fn assert_outcome(steps: &[(&str, String)]) {
          it was played. {context}"
     );
 
-    // Each kind's renderer is built for that kind and no other, and the
-    // sound player not until it is asked to play: a player is a media
-    // pipeline on the device, and a row is built for every message
-    // scrolled past.
+    // Each kind's renderer built for that kind only; sound player not until asked: it's a device
+    // media pipeline, and a row is built for every message scrolled past.
     assert_eq!(
         value("image-built"),
         "attachmentImage",
@@ -616,7 +592,7 @@ fn assert_outcome(steps: &[(&str, String)]) {
         "the player loads its file by being made rather than by the press \
          of play. {context}"
     );
-    // 1 is QMediaPlayer's PlayingState, 2 its PausedState.
+    // 1 is QMediaPlayer's PlayingState, 2 PausedState.
     assert_eq!(
         value("voice-state"),
         "1",

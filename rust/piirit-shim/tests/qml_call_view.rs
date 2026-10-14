@@ -1,16 +1,11 @@
-//! The call's page waits for the browser engine before anything is asked
-//! of it.
+//! Call page waits for browser engine before anything is asked of it.
 //!
-//! The engine starts on the event loop after its module is first
-//! imported -- on the first call of a run, that is when the call's page
-//! comes up -- and until it has, it drops what it is told. A microphone
-//! grant sent then is lost, and the call opens on the engine's own
-//! prompt. So the view holds both the grant and the page until the engine
-//! says it is up, and then grants first.
+//! Engine starts on event loop after its module is first imported (first call of a run: when call
+//! page comes up), and drops what it's told until up. Mic grant sent then is lost; call opens on
+//! engine's own prompt. So view holds grant and page until engine says it's up, then grants first.
 //!
-//! Nor does the page come up before the call's sound has its way out
-//! (`allowed`): a microphone opened before the sound is moved brings the
-//! phone's sound server down when it is.
+//! Nor does page come up before call's sound has its way out (`allowed`): mic opened before sound
+//! is moved brings phone's sound server down when it is.
 
 // Qt harness: see qml_chat_list.rs.
 #![allow(
@@ -59,7 +54,7 @@ const PROBE_QML: &str = r"
 
 #[test]
 fn the_page_waits_for_the_engine_and_is_granted_first() {
-    // SAFETY: single-threaded test binary; set before Qt starts.
+    // SAFETY: single-threaded; set pre-Qt.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
     }
@@ -86,8 +81,9 @@ fn the_page_waits_for_the_engine_and_is_granted_first() {
         }};
     }
 
-    // SAFETY for every block: these fire only while `exec()` runs on this
-    // thread, and everything they point at outlives it.
+    // SAFETY for every block: fire only while `exec()` runs on this thread; all they
+
+    // point at outlives it.
     single_shot(Duration::from_millis(500), move || unsafe {
         (*steps_ptr).push((
             "load",

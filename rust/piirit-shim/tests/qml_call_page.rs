@@ -1,15 +1,10 @@
-//! A call ringing in, answered on its page, and ended -- as the phone
-//! would show it, and as the platform is told.
+//! Call ringing, answered, ended: what phone shows, what platform is told.
 //!
-//! `CallCenter.qml` is the window's: it holds the one call, pushes the
-//! call page over whatever is on screen, and tells the platform what the
-//! call is doing. None of the platform is here -- ngfd, which rings; mce,
-//! which lights the screen; the notification service; the browser engine
-//! -- so each is a stub that records what it was asked, and what is
-//! checked is that each was asked the right thing at the right moment:
-//! ringing while it rings and not after, the microphone granted to the
-//! call's own page and taken back, the phone kept awake exactly while a
-//! call is up, and a call that rang out left behind as a missed one.
+//! `CallCenter.qml` is the window's: holds the one call, pushes call page over whatever is on
+//! screen, tells platform what call is doing. Platform (ngfd rings, mce lights screen, notification
+//! service, browser engine) is stubs recording asks. Checked: each asked right thing at right
+//! moment -- ringing while it rings and not after, mic granted to call's own page and taken back,
+//! phone kept awake exactly while a call is up, rung-out call left as a missed one.
 
 // Qt harness: see qml_pages.rs.
 #![allow(
@@ -193,7 +188,7 @@ fn a_call_rings_is_answered_on_its_page_and_ends_with_the_platform_told() {
     let journal = common::fresh_journal(&temp);
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
 
-    // SAFETY: single-threaded test binary; set before Qt starts.
+    // SAFETY: single-threaded; set pre-Qt.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_FAKE_JOURNAL", &journal);
@@ -243,8 +238,9 @@ fn a_call_rings_is_answered_on_its_page_and_ends_with_the_platform_told() {
         };
     }
 
-    // SAFETY for every block: these fire only while `exec()` runs on this
-    // thread, and everything they point at outlives it.
+    // SAFETY for every block: fire only while `exec()` runs on this thread; all they
+
+    // point at outlives it.
     single_shot(Duration::from_secs(1), move || unsafe {
         record!(
             "load",
@@ -253,13 +249,11 @@ fn a_call_rings_is_answered_on_its_page_and_ends_with_the_platform_told() {
                 QString::from(common::component_url("CallCenter.qml"))
             )
         );
-        // Nothing yet: nothing rings, nothing is kept awake, and mce is
-        // not told about a call that is not there.
+        // Nothing yet: no ring, no wake lock, mce not told of a call not there.
         record!("idle-awake", get!("callKeepAlive", "enabled"));
         record!("idle-mce", get!("mce", "called"));
     });
 
-    // Ringing.
     single_shot(Duration::from_secs(3), move || unsafe {
         record!("pushes", call!("pushes"));
         record!("status", get!("callStatus", "text"));
@@ -280,7 +274,7 @@ fn a_call_rings_is_answered_on_its_page_and_ends_with_the_platform_told() {
         record!("answer", call!("tap", QString::from("answerButton")));
     });
 
-    // Answered: the page is up, granted the microphone, and nothing rings.
+    // Answered: page up, mic granted, nothing rings.
     single_shot(Duration::from_secs(4), move || unsafe {
         record!("answered", call!("callState"));
         record!("view", get!("callView", "url"));
@@ -295,8 +289,7 @@ fn a_call_rings_is_answered_on_its_page_and_ends_with_the_platform_told() {
         record!("mute-answered", get!("muteSwitch", "visible"));
         record!("mute-tap", call!("tap", QString::from("muteSwitch")));
         record!("muted", get!("muteSwitch", "checked"));
-        // Unseen, and under a shield: a stray tap reaches none of the
-        // call page's own controls.
+        // Unseen, under a shield: stray tap reaches none of call page's controls.
         record!("view-opacity", get!("callViewLoader", "opacity"));
     });
 
@@ -316,7 +309,7 @@ fn a_call_rings_is_answered_on_its_page_and_ends_with_the_platform_told() {
         call!("dropPage");
     });
 
-    // A call that rings out, once the last page has gone.
+    // Rings out after last page gone.
     single_shot(Duration::from_secs(8), move || unsafe {
         record!("ring-again", call!("ring", 9100));
     });
@@ -339,21 +332,19 @@ fn a_call_rings_is_answered_on_its_page_and_ends_with_the_platform_told() {
         call!("dropPage");
     });
 
-    // A third call, straight after the last page was taken away, while it
-    // may still be on its way out: shown once it has gone.
+    // Third call right after last page taken away, maybe still leaving: shown once gone.
     single_shot(Duration::from_millis(10_100), move || unsafe {
         record!("ring-third", call!("ring", 9200));
     });
 
-    // It rings out too, and its page pops itself -- recorded, and so
-    // still there, as a page is while the stack animates it away.
+    // Rings out too; page pops itself -- recorded, so still there, as while stack animates it
+    // away.
     single_shot(Duration::from_secs(11), move || unsafe {
         record!("pushes-third", call!("pushes"));
         call!("endRinging", 9200);
     });
 
-    // A fourth rings while that page is on its way out, and the page goes:
-    // not the fourth call's page, which gets one of its own.
+    // Fourth rings while that page leaves: that page goes, not fourth's, which gets its own.
     single_shot(Duration::from_secs(13), move || unsafe {
         record!("popped-third", call!("popped"));
         record!("ring-fourth", call!("ring", 9300));
@@ -375,17 +366,15 @@ fn a_call_rings_is_answered_on_its_page_and_ends_with_the_platform_told() {
         call!("dropPage");
     });
 
-    // A fifth rings and is declined before its page is up -- from the
-    // notification, while the stack is still busy: the page still comes,
-    // says so, and goes.
+    // Fifth declined from notification before page up, stack still busy: page still comes, says
+    // so, goes.
     single_shot(Duration::from_secs(18), move || unsafe {
         call!("ring", 9400);
         record!("declined-fifth", call!("decline"));
     });
 
-    // Read a second later than it could be: the single-shots here fire
-    // late and back to back on a loaded machine, ahead of the page's own
-    // push. What the page said is what it said as it came up.
+    // Read a second late: single-shots fire late and back to back on loaded machine, ahead of
+    // page's own push. What page said is what it said as it came up.
     single_shot(Duration::from_secs(20), move || unsafe {
         record!("pushes-fifth", call!("pushes"));
         record!("fifth-status", call!("saidOnPush", 4));
@@ -394,17 +383,15 @@ fn a_call_rings_is_answered_on_its_page_and_ends_with_the_platform_told() {
     single_shot(Duration::from_secs(21), move || unsafe {
         record!("popped-fifth", call!("popped"));
         record!("after-fifth", call!("callState"));
-        // A sixth rings while the fifth's page is still on its way out --
-        // popped, and not yet gone -- and is declined before that page
-        // goes (#110). Held here rather than raced: the page is dropped
-        // only once the call is over.
+        // Sixth rings while fifth's page is popped but not yet gone, declined before it goes
+        // (#110). Held, not raced: page dropped only once call is over.
         record!("ring-sixth", call!("ring", 9500));
         record!("pushes-sixth-ringing", call!("pushes"));
         record!("declined-sixth", call!("decline"));
         call!("dropPage");
     });
 
-    // Its page comes once the old one has gone, says so, and goes.
+    // Its page comes once old one gone, says so, goes.
     single_shot(Duration::from_secs(23), move || unsafe {
         record!("pushes-sixth", call!("pushes"));
         record!("sixth-status", call!("saidOnPush", 5));
@@ -416,9 +403,8 @@ fn a_call_rings_is_answered_on_its_page_and_ends_with_the_platform_told() {
         call!("dropPage");
     });
 
-    // A seventh rings with ngfd not answering (#98, #99). mce is told it
-    // rings only once ngfd has picked the ringtone, or has been given a
-    // second to: told first, ngfd plays the call-waiting beep instead.
+    // Seventh, ngfd not answering (#98, #99): mce told it rings only once ngfd picked ringtone
+    // or had 1 s to; told first, ngfd plays call-waiting beep instead.
     single_shot(Duration::from_secs(26), move || unsafe {
         call!("ngfdReplies", QString::from("none"));
         call!("mark");
@@ -427,9 +413,8 @@ fn a_call_rings_is_answered_on_its_page_and_ends_with_the_platform_told() {
         record!("seventh-mce-early", get!("mce", "called"));
     });
 
-    // Told by now -- three seconds on, the timers here being loose -- and
-    // the screen coming on takes the lock screen off, once, and brings
-    // the app forward.
+    // Told by now (3 s; timers loose). Screen coming on lifts lock screen once, brings app
+    // forward.
     single_shot(Duration::from_secs(29), move || unsafe {
         record!("seventh-mce-late", get!("mce", "called"));
         let before: i32 = call!("raised").parse().unwrap_or(-1);
@@ -439,7 +424,7 @@ fn a_call_rings_is_answered_on_its_page_and_ends_with_the_platform_told() {
         record!("seventh-raises", (after - before).to_string());
         record!("seventh-unlocked", get!("mce", "called"));
         call!("decline");
-        // Not for a call that is not ringing.
+        // Not for non-ringing call.
         call!("mark");
         call!("displayOn");
         record!("declined-seventh-mce", get!("mce", "called"));
@@ -449,8 +434,7 @@ fn a_call_rings_is_answered_on_its_page_and_ends_with_the_platform_told() {
         call!("dropPage");
     });
 
-    // An eighth, whose VoIP ringtone ngfd says has failed: the phone's
-    // own ringtone instead, once.
+    // Eighth: VoIP ringtone failed: phone's own, once.
     single_shot(Duration::from_secs(32), move || unsafe {
         call!("ngfdReplies", QString::from("77"));
         call!("mark");

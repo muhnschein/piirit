@@ -1,17 +1,9 @@
-//! A muted group stays quiet, except for a reply to the reader.
+//! Muted group stays quiet, except a reply to reader.
 //!
-//! Muting a chat is what stops its arrivals being announced. The
-//! reference clients make one exception, when the reader asks for it: a
-//! message in a muted *group* that quotes one of the reader's own is for
-//! them, and is announced all the same. A plain message in the muted
-//! group is not, nor is anything with the setting off, nor a reply in a
-//! muted one-to-one chat -- that chat was muted with the one person in
-//! it in mind.
+//! Mute stops arrival announcements. Exception: message in muted *group* quoting reader's own is
+//! announced. Plain message there: not. Setting off: nothing. Reply in muted one-to-one: not.
 //!
-//! The fake core reads a message sent from here as the account's own
-//! under `PIIRIT_FAKE_SELF_SENT`, which is what makes a reply to it a
-//! reply to the reader; and it announces every send as an arrival, which
-//! is how the reply can land without a network.
+//! `PIIRIT_FAKE_SELF_SENT` makes sends the account's own; every send announced as arrival.
 
 // Qt harness: see chat_list_announces.rs.
 #![allow(
@@ -84,8 +76,7 @@ fn a_reply_to_the_reader_is_announced_from_a_muted_group_and_nothing_else_is() {
     let temp = std::env::temp_dir().join(format!("piirit-mentions-{}", std::process::id()));
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
 
-    // SAFETY: single-threaded test binary; set before Qt starts and before
-    // the server inherits them.
+    // SAFETY: single-threaded; set before Qt starts and before server inherits env.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_ACCOUNTS_DIR", temp.join("accounts"));
@@ -138,7 +129,7 @@ fn a_reply_to_the_reader_is_announced_from_a_muted_group_and_nothing_else_is() {
         record!("heard-loud", call!("heard"));
         record!("mute", call!("mute", 2u32));
     });
-    // Muted: a reply to the reader gets through, a plain message does not.
+    // Muted: reply gets through, plain message doesn't.
     single_shot(Duration::from_secs(6), move || unsafe {
         record!("reply", call!("replyTo", QString::from("answering you")));
     });
@@ -146,7 +137,7 @@ fn a_reply_to_the_reader_is_announced_from_a_muted_group_and_nothing_else_is() {
         record!("heard-reply", call!("heard"));
         record!("plain", call!("say", QString::from("to everyone")));
     });
-    // With the setting off, not even the reply.
+    // Setting off: not even the reply.
     single_shot(Duration::from_secs(10), move || unsafe {
         record!("heard-plain", call!("heard"));
         record!("mentions-off", call!("setMentions", false));
@@ -155,7 +146,7 @@ fn a_reply_to_the_reader_is_announced_from_a_muted_group_and_nothing_else_is() {
             call!("replyTo", QString::from("answering again"))
         );
     });
-    // And a one-to-one chat is not a group: muted is muted.
+    // One-to-one isn't a group: muted is muted.
     single_shot(Duration::from_secs(12), move || unsafe {
         record!("heard-off", call!("heard"));
         record!("mentions-on", call!("setMentions", true));
@@ -192,7 +183,7 @@ fn a_reply_to_the_reader_is_announced_from_a_muted_group_and_nothing_else_is() {
         "2/1/2",
         "the list and the chats did not load, so this proves nothing. {context}"
     );
-    // The fake's row summary is "last in <chat>" whatever was sent.
+    // Fake row summary is "last in <chat>" whatever was sent.
     assert_eq!(
         value("heard-loud"),
         "2:last in 2|",

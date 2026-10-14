@@ -1,23 +1,12 @@
-//! A row that says how long ago something happened keeps saying it as
-//! time passes, rather than what was true when the row was drawn.
+//! Relative time keeps following the clock, not frozen at draw time.
 //!
-//! Issue 108: the chat list said "now" for a chat whose last message was
-//! days old. `Format.timeLabel` read `Date.now()` inside a binding, which
-//! QML evaluates once and never again unless the row's own timestamp
-//! changes, so a row drawn as a message arrived said "now" for as long as
-//! its delegate lived. Nothing on the page rebuilt it -- pinning the chat
-//! or reading it changed the row's other roles and left the time as it
-//! was -- and only a restart did.
-//!
-//! The present is now `Clock.now`, a singleton that ticks while the app
-//! is on screen. This drives the clock forward by hand rather than
-//! waiting out a minute of real time, and checks every row that shows a
-//! relative time follows it.
+//! Issue 108: chat list said "now" for days-old chat. `Format.timeLabel` read `Date.now()` in a
+//! binding, which QML re-evaluates only when row's own timestamp changes; pinning or reading
+//! changed other roles, so only a restart fixed it. Now present is `Clock.now`, a singleton
+//! ticking while app is on screen. Test drives it by hand and checks every relative-time row.
 
-// Qt harness: needs `unsafe` for `env::set_var` before Qt starts
-// (`unused_unsafe` because it is only unsafe from edition 2024 on),
-// `borrow_as_ptr` for the engine pointer, and `single_shot` with
-// whole-second Durations.
+// Qt harness: `unsafe` `env::set_var` before Qt starts (`unused_unsafe`: unsafe only from
+// edition 2024), `borrow_as_ptr` for engine pointer, `single_shot` with whole-second Durations.
 #![allow(
     unsafe_code,
     unused_unsafe,
@@ -32,11 +21,9 @@ use qmetaobject::*;
 
 mod common;
 
-/// The probe with the components directory filled in, so it can reach
-/// the `Clock` singleton the way a page does.
+/// Probe with components dir filled in, so it reaches `Clock` singleton as a page does.
 fn probe_qml() -> String {
-    // Canonical, so the probe and the rows name one directory and so get
-    // one singleton between them.
+    // Canonical: probe and rows name one dir, so share one singleton.
     let components = std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR"))
         .join("../../qml/components")
         .canonicalize()
@@ -102,7 +89,7 @@ const PROBE_QML: &str = r"
 
 #[test]
 fn a_time_label_follows_the_clock_rather_than_the_moment_it_was_drawn() {
-    // SAFETY: single-threaded test binary; set before Qt starts.
+    // SAFETY: single-threaded test; set before Qt starts.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("TZ", "UTC");
@@ -138,8 +125,7 @@ fn a_time_label_follows_the_clock_rather_than_the_moment_it_was_drawn() {
 
     single_shot(Duration::from_secs(1), move || unsafe {
         record!("load", call!("load"));
-        // Off screen, so nothing ticks while the labels are read: what
-        // moves the clock below is the test, and only the test.
+        // Off screen: only the test moves the clock.
         call!("shown", false);
         call!("arrived");
         record!("chat-fresh", call!("chatTime"));
@@ -148,23 +134,22 @@ fn a_time_label_follows_the_clock_rather_than_the_moment_it_was_drawn() {
         record!("chat-later", call!("chatTime"));
         record!("search-later", call!("searchTime"));
 
-        // Now the clock on its own: a fast tick, left stale, on screen.
+        // Now clock alone: fast tick, left stale, on screen.
         call!("quick");
         call!("stale");
         call!("shown", true);
-        // Coming on screen reads the time at once, not a tick later.
+        // On screen: reads time now, not next tick.
         record!("on-screen", call!("behind"));
         call!("shown", false);
         call!("stale");
     });
 
-    // Off screen for a second at a fifty-millisecond tick: twenty ticks,
-    // had it been running.
+    // Off screen 1s: would be 20 ticks at 50ms.
     single_shot(Duration::from_secs(2), move || unsafe {
         record!("off-screen", call!("behind"));
         call!("shown", true);
         call!("stale");
-        // Set stale *after* coming on screen, so only the timer can move it.
+        // Stale after on-screen: only timer moves it.
     });
 
     single_shot(Duration::from_secs(3), move || unsafe {
@@ -194,7 +179,7 @@ fn a_time_label_follows_the_clock_rather_than_the_moment_it_was_drawn() {
         "now",
         "a search result does not say a message from moments ago is new. {context}"
     );
-    // The bug itself: two hours on and the row still said "now".
+    // The bug: two hours on, row still said "now".
     assert_eq!(
         value("chat-later"),
         "2 h",
@@ -210,7 +195,7 @@ fn a_time_label_follows_the_clock_rather_than_the_moment_it_was_drawn() {
         "0",
         "coming back on screen left the clock where it was. {context}"
     );
-    // Stale by the whole epoch: nothing read the time while off screen.
+    // Stale by whole epoch: nothing read time off screen.
     assert!(
         value("off-screen").parse::<i64>().unwrap_or_default() > 1_000_000,
         "the clock ticked with nothing on screen to need it. {context}"

@@ -1,13 +1,9 @@
-//! A `PulseAudio` daemon of a test's own, and recording streams in it.
+//! Test's own `PulseAudio` daemon and recording streams.
 //!
-//! The daemon listens on a socket in a directory of its own, takes anyone
-//! who connects (`auth-anonymous`), and has one null sink, whose monitor
-//! is a source `parec` can record from. Nothing of the machine's own
-//! sound is touched: no default script, no D-Bus, no shared memory.
+//! Own socket dir, `auth-anonymous`, one null sink; machine's sound untouched.
 
-// Not every test uses every helper; and a helper that cannot set the
-// daemon up fails the test that asked, saying what it could not do,
-// which clippy allows of a test function but not of one it calls.
+// Not all tests use all helpers. Setup failure fails asking test (clippy: `expect_used` only in
+// test fns).
 #![allow(dead_code, clippy::expect_used)]
 
 use std::path::{Path, PathBuf};
@@ -15,9 +11,7 @@ use std::process::{Child, Command, Stdio};
 use std::sync::atomic::{AtomicU32, Ordering};
 use std::time::{Duration, Instant};
 
-/// Whether `pulseaudio` and `parec` are there to test with. Missing is a
-/// skip on a developer's machine and a failure under CI, which must
-/// never pass by not running.
+/// Whether `pulseaudio` and `parec` exist. Missing: skip locally, fail on CI.
 pub fn tools_present() -> bool {
     let missing: Vec<&str> = ["pulseaudio", "parec"]
         .into_iter()
@@ -46,8 +40,7 @@ pub fn tools_present() -> bool {
     false
 }
 
-/// A directory of the test's own, short enough for a socket path (108
-/// bytes on Linux), removed on drop.
+/// Own dir, short for socket path (108 bytes on Linux). Removed on drop.
 pub struct Scratch {
     pub dir: PathBuf,
 }
@@ -72,15 +65,14 @@ impl Drop for Scratch {
     }
 }
 
-/// A running daemon. Killed on drop.
+/// Running daemon. Killed on drop.
 pub struct Daemon {
     dir: PathBuf,
     child: Option<Child>,
 }
 
 impl Daemon {
-    /// Start a daemon in `dir`, and wait until its socket takes
-    /// connections.
+    /// Start daemon in `dir`; wait for socket.
     pub fn start(dir: &Path) -> Self {
         let mut daemon = Self {
             dir: dir.to_path_buf(),
@@ -90,7 +82,7 @@ impl Daemon {
         daemon
     }
 
-    /// The server string clients reach it by.
+    /// Server string clients connect to.
     pub fn server(&self) -> String {
         format!("unix:{}", self.socket().display())
     }
@@ -99,8 +91,7 @@ impl Daemon {
         self.dir.join("native")
     }
 
-    /// Kill it the way a crash would: no goodbye to its clients beyond
-    /// the socket closing.
+    /// Kill like a crash: clients see socket close only.
     pub fn kill(&mut self) {
         if let Some(mut child) = self.child.take() {
             drop(child.kill());
@@ -108,8 +99,7 @@ impl Daemon {
         }
     }
 
-    /// Start it again, on the same socket, as systemd would after a
-    /// crash.
+    /// Start again on same socket, as systemd does after crash.
     pub fn restart(&mut self) {
         self.kill();
         let runtime = self.dir.join("runtime");
@@ -169,14 +159,13 @@ impl Daemon {
         }
     }
 
-    /// What the daemon said, for a failure message.
+    /// Daemon's log, for failure messages.
     pub fn log(&self) -> String {
         std::fs::read_to_string(self.dir.join("daemon.log")).unwrap_or_default()
     }
 
-    /// Record from the null sink's monitor, as the process `pid` when one
-    /// is given -- `PULSE_PROP` sets the client's properties, which its
-    /// streams carry -- or as `parec` itself.
+    /// Record from null sink monitor, as process `pid` if given (`PULSE_PROP` sets client
+    /// props), else as `parec`.
     pub fn record(&self, pid: Option<u32>) -> Recording {
         let mut command = Command::new("parec");
         command
@@ -201,18 +190,18 @@ impl Drop for Daemon {
     }
 }
 
-/// A `parec` recording. Killed on drop.
+/// `parec` recording. Killed on drop.
 pub struct Recording {
     child: Child,
 }
 
 impl Recording {
-    /// The recording process's own id.
+    /// Recording process id.
     pub fn pid(&self) -> u32 {
         self.child.id()
     }
 
-    /// Stop recording, as a crash would.
+    /// Stop recording, like a crash.
     pub fn kill(mut self) {
         self.stop();
     }

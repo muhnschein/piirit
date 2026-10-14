@@ -1,18 +1,12 @@
 /*
- * The call page's bridge, run: `call_video.js` and `calls.js` together,
- * as the call host serves them, in front of a stand-in for the page and
- * the browser engine.
+ * Call page bridge (`call_video.js` + `calls.js`, as call host serves them)
+ * before stand-in page and engine. Engine's camera/peer behaviour is a phone
+ * question; here: everything the bridge decides (what page gets for camera,
+ * which camera and limits, sender tracks, which page switch is pressed, host
+ * reports, where pictures go).
  *
- * What the engine does with a camera or a peer connection is a phone's
- * question. What is answered here is everything the bridge decides: what
- * the page is handed when it asks for the camera, which camera is opened
- * and with what limits, what goes on the peer connection's senders, which
- * of the page's switches is pressed, what is reported to the host, and
- * where the pictures are drawn.
- *
- * Run by `node --test tests/js/`, which rust/piirit-shim/tests/call_bridge_js.rs
- * does as part of the suite. Each test gets a fresh context, and runs the
- * two files in it under their own names, so coverage is measured on them.
+ * Run by `node --test tests/js/`, via rust/piirit-shim/tests/call_bridge_js.rs.
+ * Fresh context per test; both files run under own names so coverage counts.
  */
 "use strict";
 
@@ -28,7 +22,7 @@ const FILES = ["call_video.js", "calls.js"].map((name) => {
     return { file, code: fs.readFileSync(file, "utf8") };
 });
 
-/* ---- the engine's side ------------------------------------------------ */
+/* ---- engine's side */
 
 class Track {
     constructor(kind, label, settings) {
@@ -112,7 +106,7 @@ class Element {
     }
 }
 
-/* Everything a test reads afterwards. */
+/* World: everything a test reads afterwards. */
 function makeWorld(search, options) {
     const opts = options || {};
     const log = [];
@@ -132,10 +126,9 @@ function makeWorld(search, options) {
         cameraDelay: null
     };
 
-    // The phone's cameras, as the engine lists them. By default as
-    // Gecko on a phone was seen to: names that say nothing of which way
-    // a camera faces, a facingMode weighed at nothing (the first camera
-    // opens whatever is asked), and no facingMode in a track's settings.
+    // Phone cameras as engine lists them. Default as Gecko on phone: names
+    // say nothing of facing, facingMode weighed at nothing (first camera
+    // opens whatever asked), no facingMode in track settings.
     const cameras = opts.cameras || [
         { deviceId: "cam-a", label: "camera 0", facing: "user" },
         { deviceId: "cam-b", label: "camera 1", facing: "environment" },
@@ -158,9 +151,8 @@ function makeWorld(search, options) {
         return facing || cameras[0];
     }
 
-    // What a phone camera can do, as Gecko weighs it: a mode's size, and
-    // the most frames it runs at. A required value -- min, max, exact --
-    // that no mode meets opens nothing.
+    // Camera modes as Gecko weighs them: size, max frame rate. Required value
+    // (min, max, exact) no mode meets: opens nothing.
     const MODES = [
         { width: 640, height: 480, frameRate: 30 },
         { width: 1280, height: 720, frameRate: 30 },
@@ -337,8 +329,8 @@ function makeWorld(search, options) {
         send(body) {
             this.body = body;
             requests.push(this);
-            // A POST is answered at once, unless the test holds the host
-            // back; a GET waits for the test to answer it.
+            // POST answered at once unless test holds host back; GET waits
+            // for test.
             if (this.method === "POST" && !world.holdPosts) {
                 this.done();
             }
@@ -351,8 +343,7 @@ function makeWorld(search, options) {
         }
     }
 
-    // An engine's media element, whose srcObject is an accessor on its
-    // prototype, as Gecko's is.
+    // Media element: srcObject accessor on prototype.
     function HTMLMediaElement() {}
     Object.defineProperty(HTMLMediaElement.prototype, "srcObject", {
         configurable: true,
@@ -383,7 +374,7 @@ function makeWorld(search, options) {
             error(...words) { world.console.push(["error", ...words]); }
         },
         setTimeout(fn, delay) {
-            // Run when the test says, whatever the delay; which is kept.
+            // Runs when test says, whatever delay; delay kept.
             const timer = () => fn();
             timer.delay = delay;
             timers.push(timer);
@@ -414,13 +405,13 @@ async function settleAll() {
     }
 }
 
-/* Run what is waiting on a timer, once round. */
+/* Run waiting timers, once. */
 function runTimers(world) {
     const due = world.timers.splice(0);
     due.forEach((fn) => fn());
 }
 
-/* What the bridge posted to `path`, parsed. */
+/* Bridge's posts to `path`, parsed. */
 function posts(world, route) {
     return world.requests
         .filter((r) => r.method === "POST" && r.url.endsWith(route))
@@ -432,7 +423,7 @@ function lastVideo(world) {
     return all[all.length - 1];
 }
 
-/* Hand the bridge commands, as the host answers its long poll. */
+/* Feed commands as host answers long poll. */
 async function command(world, ...commands) {
     const waiting = world.requests.filter(
         (r) => r.method === "GET" && r.url.endsWith("/commands") && !r.answered
@@ -447,10 +438,8 @@ async function command(world, ...commands) {
 }
 
 /*
- * The page, as far as the bridge sees it: it asks for the camera and the
- * microphone, puts its stream on a peer connection and on its own picture,
- * and draws the camera switch, which acts on its stream's video tracks as
- * the page's own does.
+ * Page as bridge sees it: asks camera and mic, puts stream on peer connection
+ * and own picture, draws camera switch acting on video tracks as page's does.
  */
 async function page(world) {
     const connection = new world.window.RTCPeerConnection({ iceServers: [] });
@@ -472,7 +461,7 @@ async function page(world) {
     function draw() {
         delete world.buttons["Start camera"];
         delete world.buttons["Stop camera"];
-        // The page draws its switch only over a stream with video.
+        // Switch drawn only over stream with video.
         if (stream.getVideoTracks().length === 0) {
             return;
         }
@@ -488,8 +477,7 @@ async function page(world) {
     }
     draw();
     stream.getVideoTracks().forEach((t) => (t.enabled = pageSwitch.on));
-    // A moment later: what the bridge looked for before the page had
-    // drawn it, it looks for again.
+    // Moment later: bridge looks again for what it missed before page drew it.
     runTimers(world);
     await settleAll();
     return { connection, stream, picture, box, frame, pageSwitch };
@@ -502,7 +490,7 @@ function videoSender(connection) {
 const VOICE = "?noOutgoingVideoInitially&key=ab12";
 const VIDEO = "?&key=ab12";
 
-/* ---- the tests -------------------------------------------------------- */
+/* tests */
 
 test("a voice call opens no camera, and the page still has a video track", async () => {
     const world = makeWorld(VOICE);
@@ -679,7 +667,7 @@ test("the other end's picture is reported while it comes and they have it on", a
     connection.channels.mutedState.say(JSON.stringify({ audioEnabled: true, videoEnabled: true }));
     assert.equal(lastVideo(world).remote, true);
 
-    // Half a word, which the page itself rejects: not taken here either.
+    // Half a word: page rejects it, not taken.
     connection.channels.mutedState.say(JSON.stringify({ videoEnabled: false }));
     assert.equal(lastVideo(world).remote, true, "a word the page rejects was taken");
     assert.deepEqual(posts(world, "/log").filter((line) => line.startsWith("their camera:")),
@@ -724,7 +712,7 @@ test("what the page says of the pictures and its commands is logged, and nothing
     assert.equal(world.console.length, 9, "the page's console no longer says what it is told");
     assert.deepEqual(world.console[1].slice(0, 2), ["log", "sending ICE candidate to remote peer"]);
 
-    // Where the call stands, in order with the rest.
+    // Call state, in order.
     connection.signalingState = "have-local-offer";
     connection.fire("signalingstatechange");
     assert.equal(posts(world, "/log").at(-1), "signalling: have-local-offer");
@@ -757,7 +745,7 @@ test("this end's picture fills the screen until theirs comes, then a corner", as
     assert.deepEqual([box.style.left, box.style.top, box.style.right], ["auto", "10vh", "4vw"],
         "the picture is not 4% in from the right and 10% down");
 
-    // Theirs gone: the whole screen. Back: the same corner.
+    // Theirs gone: full screen. Back: same corner.
     theirs.muted = true;
     theirs.fire("mute");
     assert.deepEqual([box.style.left, box.style.top, box.style.right, box.style.width],
@@ -822,11 +810,11 @@ test("without a canvas to stand in, a voice call goes ahead without video", asyn
     assert.equal(stream.getVideoTracks().length, 0);
     assert.deepEqual(lastVideo(world),
         { local: false, remote: false, localPainted: false, remotePainted: false, front: true, failed: false });
-    // No switch drawn, and none ever will be: nothing keeps looking.
+    // No switch drawn, ever: nothing keeps looking.
     world.timers.length = 0;
     await command(world, "camera-off");
     assert.equal(world.timers.length, 0, "the bridge looks forever for a switch");
-    // Not asked for the camera: the page's own audio-only retry.
+    // Not asked for camera: audio-only retry.
     const audio = await world.window.navigator.mediaDevices.getUserMedia({ audio: true });
     assert.equal(audio.getVideoTracks().length, 0);
 });
@@ -834,8 +822,8 @@ test("without a canvas to stand in, a voice call goes ahead without video", asyn
 test("a call placed here offers VP8 first, its retransmissions beside it", async () => {
     const world = makeWorld(VIDEO);
     await page(world);
-    // As Sailfish's Gecko writes an offer with hardware H264 on: H264
-    // first, VP8 after, each with its retransmission type.
+    // As Sailfish Gecko writes offer with hardware H264 on: H264 first, VP8
+    // after, each with its retransmission type.
     const offer = [
         "v=0",
         "m=audio 9 UDP/TLS/RTP/SAVPF 109 9 0 8 101",
@@ -873,7 +861,7 @@ test("a call placed here offers VP8 first, its retransmissions beside it", async
         offer.split("\r\n").filter((line) => !line.startsWith("m=")),
         "more of the offer changed than the order of its picture's codecs");
 
-    // An offer with no VP8 in it goes as it is.
+    // No VP8 in offer: goes as is.
     const noVp8 = "v=0\r\nm=video 9 UDP/TLS/RTP/SAVPF 126 97\r\na=rtpmap:126 H264/90000\r\n";
     world.window.calls.startCall(noVp8);
     assert.equal(posts(world, "/start")[1], noVp8);
@@ -903,7 +891,7 @@ test("a turn logs how long the other camera took to open, and to be drawn", asyn
     const { picture } = await page(world);
     assert.ok(posts(world, "/log").some((line) => line === "camera open: camera-user 640x480@30"),
         "the camera the call opened with is timed as a turn: " + posts(world, "/log"));
-    // The page's picture loading its first stream is not a turn either.
+    // Picture loading first stream: not a turn.
     picture.fire("loadeddata");
     assert.ok(!posts(world, "/log").some((line) => line.startsWith("camera drawn")),
         "a picture drawn with no turn was timed: " + posts(world, "/log"));
@@ -918,7 +906,7 @@ test("a turn logs how long the other camera took to open, and to be drawn", asyn
     assert.equal(drawn.length, 1, "its first picture is not timed, once: " + drawn);
     assert.match(drawn[0], /^camera drawn: \d+ ms after the turn$/);
 
-    // Switched on after being off, the camera has not been turned.
+    // On after off: camera not turned.
     await command(world, "camera-off");
     await command(world, "camera-on");
     picture.fire("loadeddata");
@@ -998,7 +986,7 @@ test("the back camera opened is the one the host names, and the log says which",
     assert.match(opens(told)[2], /^camera open: camera-user 640x480@30, \d+ ms after the turn$/,
         "the back lens's number was said of the front camera");
 
-    // The host's lens is a back one: the front camera is the first.
+    // Host lens is back: front camera first.
     const fronts = makeWorld(VIDEO, { cameras: [
         { deviceId: "cam-f", label: "Droid front camera", facing: "user" },
         { deviceId: "cam-g", label: "Droid front camera", facing: "user" },
@@ -1008,8 +996,7 @@ test("the back camera opened is the one the host names, and the log says which",
     await command(fronts, "back-camera-1", "camera-off", "camera-on");
     assert.equal(opened(fronts).at(-1), "cam-f");
 
-    // Told nothing, the first the engine lists; told of one past the
-    // last, the last.
+    // No lens told: first. Past last: last.
     const untold = makeWorld(VIDEO, { cameras });
     await page(untold);
     await command(untold, "facing-environment");
@@ -1021,8 +1008,7 @@ test("the back camera opened is the one the host names, and the log says which",
     assert.equal(opened(past)[1], "cam-m");
 });
 
-/* How their picture is laid out: its size, and where, against the box
- * the page gives it. */
+/* Their picture's layout: size and position vs page's box. */
 function zoomOf(picture) {
     const { position, width, height, left, top } = picture.style;
     return [position, width, height, left, top].join(" ");
@@ -1039,12 +1025,11 @@ test("their picture is enlarged towards filling the screen, by no more than a th
     Object.assign(holder, { clientWidth: 540, clientHeight: 1200 });
     world.videos.push(picture);
 
-    // No frame yet, so no size to go by.
+    // No frame yet: no size.
     connection.fire("track", { track: theirs, streams: [picture.srcObject] });
     assert.equal(zoomOf(picture), "relative 100.0% 100.0% 0.0% 0.0%");
 
-    // An upright phone's picture on a taller screen: filled, as ours is,
-    // around its middle.
+    // Upright phone, taller screen: filled, cropped.
     Object.assign(picture, { videoWidth: 720, videoHeight: 1280 });
     picture.fire("resize");
     assert.equal(zoomOf(picture), "relative 125.0% 125.0% -12.5% -12.5%");
@@ -1054,22 +1039,22 @@ test("their picture is enlarged towards filling the screen, by no more than a th
     assert.equal(ours.style.transform, "scaleX(-1)", "our own picture was fitted as theirs");
     assert.equal(ours.style.width, undefined, "our own picture was fitted as theirs");
 
-    // Held sideways: some of its bars go, not half of it.
+    // Held sideways: some bars go, not half.
     Object.assign(picture, { videoWidth: 1280, videoHeight: 720 });
     picture.fire("resize");
     assert.equal(zoomOf(picture), "relative 135.0% 135.0% -17.5% -17.5%");
 
-    // The screen's own shape: nothing to enlarge.
+    // Screen's own shape: nothing to enlarge.
     Object.assign(picture, { videoWidth: 540, videoHeight: 1200 });
     picture.fire("resize");
     assert.equal(zoomOf(picture), "relative 100.0% 100.0% 0.0% 0.0%");
 
-    // Nearly the screen's shape: not enlarged by a pixel's worth either.
+    // Near screen shape: not enlarged by a pixel.
     Object.assign(picture, { videoWidth: 1079, videoHeight: 2400 });
     picture.fire("resize");
     assert.equal(zoomOf(picture), "relative 100.0% 100.0% 0.0% 0.0%");
 
-    // The phone turned to landscape, with an upright picture.
+    // Phone landscape, upright picture.
     Object.assign(picture, { videoWidth: 720, videoHeight: 1280 });
     Object.assign(holder, { clientWidth: 1200, clientHeight: 540 });
     world.windowListeners.resize.forEach((fn) => fn());
@@ -1090,8 +1075,7 @@ test("their picture is fitted the moment the page gives it its stream", async ()
 });
 
 test("what the camera says it faces is what is mirrored and reported", async () => {
-    // One camera, on the back, that says so: asked for the front, the
-    // back is what there is.
+    // One back camera: front asked, back given.
     const world = makeWorld(VIDEO, {
         reportsFacing: true,
         cameras: [{ deviceId: "cam-x", label: "camera 0", facing: "environment" }],
@@ -1110,9 +1094,8 @@ test("a picture the page draws late is placed, however often it was looked for",
     });
     stream.getTracks().forEach((track) => connection.addTrack(track, stream));
     await settleAll();
-    // The other end says things about its camera while this end's camera
-    // is still on its way to the page's picture: each is a report, and
-    // each report looks for the picture.
+    // Their camera reports while ours is still loading: each report looks for
+    // the picture.
     for (let i = 0; i < 8; i++) {
         channel.say(JSON.stringify({ audioEnabled: true, videoEnabled: i % 2 === 0 }));
     }
@@ -1137,7 +1120,7 @@ test("the moment the page puts the stream on its picture, it is placed", async (
     });
     stream.getTracks().forEach((track) => connection.addTrack(track, stream));
     await settleAll();
-    // Long after every look has been spent.
+    // Long after: every look spent.
     for (let round = 0; round < 60; round++) {
         runTimers(world);
     }
@@ -1190,13 +1173,12 @@ test("what only a phone shows is written to the app's log", async () => {
     assert.ok(lines.includes("their picture: track muted, in no stream"), String(lines));
     assert.ok(lines.includes("their picture: frames"), String(lines));
 
-    // An engine with no stats to give: connected, and nothing logged of them.
+    // No stats: connected, nothing logged.
     await connect(world, connection, "connected");
     assert.equal(statLines(world).length, 0);
 });
 
-/* What Gecko's getStats gives for a call: RTP stats each way, and the
- * codecs they name. */
+/* Gecko getStats: RTP each way, codecs. */
 function callStats(extra) {
     return new Map([
         ["c1", { id: "c1", type: "codec", mimeType: "video/VP8" }],
@@ -1232,8 +1214,7 @@ test("once the call connects, what goes each way is logged, and again when the c
     picture.videoWidth = 480;
     picture.videoHeight = 640;
     picture.mozPaintedFrames = 240;
-    // Theirs, which the page holds hidden, from an engine that does not
-    // count what it paints.
+    // Theirs hidden by page; engine counts no paint.
     const holder = new Element("div");
     const theirs = holder.appendChild(new Element("video"));
     theirs.srcObject = new Stream([new Track("video", "theirs")]);
@@ -1245,7 +1226,7 @@ test("once the call connects, what goes each way is logged, and again when the c
         + " (camera on live; ours playing 480x640 painted 240; theirs hidden playing 352x640 painted ?)"
         + " | got: H264 50 frames 2000 B/frame PLI 0 FIR 0 NACK 0 lost 3";
 
-    // Turned while the call is still connecting: nothing goes yet.
+    // Turned while connecting: nothing goes yet.
     await command(world, "facing-environment");
     runTimers(world);
     await settleAll();
@@ -1255,11 +1236,11 @@ test("once the call connects, what goes each way is logged, and again when the c
     await connect(world, connection, "connected");
     assert.deepEqual(statLines(world), [line, line, line]);
 
-    // Connected again is not a new call: nothing more.
+    // Reconnected: not a new call.
     await connect(world, connection, "completed");
     assert.equal(statLines(world).length, 3, "logged again for the same connection");
 
-    // Turned twice before anything was logged: one round, the last.
+    // Turned twice before logged: one round, last.
     await command(world, "facing-user");
     await command(world, "facing-environment");
     runTimers(world);
@@ -1276,8 +1257,7 @@ test("what a sender sends is told apart, and stats that say little say what they
     ]));
     connection.iceConnectionState = "completed";
     connection.fire("iceconnectionstatechange");
-    // The first sample with the blank track on the sender, the others
-    // with none.
+    // First sample: blank track; others none.
     const due = world.timers.splice(0);
     due.slice(0, -2).forEach((fn) => fn());
     videoSender(connection).track = null;
@@ -1300,7 +1280,7 @@ test("this end's picture, left paused, is asked to play until it does", async ()
     const { connection, picture } = await page(world);
     let plays = 0;
     picture.paused = true;
-    // Refused, as an engine refuses a play it will not allow yet.
+    // Refused, as engine refuses early play.
     picture.play = () => {
         plays += 1;
         return Promise.reject(new Error("NotAllowedError"));
@@ -1330,7 +1310,7 @@ test("a picture that never plays is asked a bounded number of times, and logged"
     for (let round = 0; round < 60; round++) {
         runTimers(world);
     }
-    // Laid out again afterwards: the looks stay spent, and said once.
+    // Laid out again: looks stay spent.
     connection.channels.mutedState.say(JSON.stringify({ audioEnabled: true, videoEnabled: true }));
     runTimers(world);
     assert.ok(plays > 10 && plays <= 42, "asked to play " + plays + " times");
@@ -1346,7 +1326,7 @@ test("what goes to the host goes one request at a time, in the order it was said
     assert.equal(sent().length, 1, "a request went before the one ahead of it was answered");
     assert.ok(sent()[0].timeout > 0, "a request never answered would hold the rest for good");
 
-    // Answered, or failed, or given up on: each lets the next go.
+    // Answered, failed, or given up: next goes.
     while (sent().some((r) => r.status === undefined)) {
         const waiting = sent().filter((r) => r.status === undefined);
         assert.equal(waiting.length, 1, "two requests in flight at once");
@@ -1357,16 +1337,16 @@ test("what goes to the host goes one request at a time, in the order it was said
     assert.equal(said[said.length - 2], '/log reported: {"local":true,"remote":false,"localPainted":false,"remotePainted":false,"front":true,"failed":false}');
     assert.equal(said[said.length - 1], '/video {"local":true,"remote":false,"localPainted":false,"remotePainted":false,"front":true,"failed":false}');
 
-    // Nothing waiting: the next is sent at once.
+    // Nothing waiting: next sent at once.
     world.holdPosts = false;
     world.window.console.warn("later");
     assert.equal(sent().at(-1).body, "page warn: later");
 });
 
-/* A picture of the other end, shown by the page: in a box of its own,
- * playing, with a size, and as many frames painted as `painted` says --
- * none said where it is undefined. Each time its stream is given to it
- * is counted. */
+/*
+ * Their picture: own box, playing, sized, `painted` frames painted (undefined:
+ * none said). Each time stream given to it is counted.
+ */
 function theirPicture(world, connection, painted) {
     const holder = new Element("div");
     const picture = holder.appendChild(new Element("video"));
@@ -1415,28 +1395,28 @@ test("a picture on the screen that paints nothing is put back, and only so often
     };
     // Theirs paints all along.
     const { picture, seen } = theirPicture(world, connection, 10);
-    // Said of again and again before the look: still one look a round.
+    // Said again before look: still one look a round.
     for (let i = 0; i < 4; i++) {
         connection.channels.mutedState.say(JSON.stringify({ audioEnabled: true, videoEnabled: i % 2 === 0 }));
     }
     connection.channels.mutedState.say(JSON.stringify({ audioEnabled: true, videoEnabled: true }));
 
-    // A look to see where each stands, and the next finds ours unpainted.
+    // One look to see where each stands; next finds ours unpainted.
     runTimers(world);
     picture.mozPaintedFrames += 24;
     assert.equal(paintLines(world).length, 0, "put back before it had a look's time to paint");
     runTimers(world);
-    // Looked at soon while it has yet to show.
+    // Looked at soon while yet to show.
     assert.deepEqual(paintLines(world), ["our picture put back: nothing painted in 0.5 s"]);
     assert.deepEqual(moves, ["off:camera-user"], "our picture's frames were not taken off and put on");
     assert.deepEqual(stream.getVideoTracks().map((t) => t.label), ["camera-user"]);
     assert.equal(ours.srcObject, stream);
-    // Put back, it has a look's time of its own to paint.
+    // Put back: own look's time to paint.
     picture.mozPaintedFrames += 24;
     runTimers(world);
     assert.equal(paintLines(world).length, 1, "put back again without a look's time to paint");
 
-    // Painting again after that: left as it is.
+    // Painting again: left as is.
     for (let round = 0; round < 4; round++) {
         ours.mozPaintedFrames += 24;
         picture.mozPaintedFrames += 24;
@@ -1444,12 +1424,12 @@ test("a picture on the screen that paints nothing is put back, and only so often
     }
     assert.equal(paintLines(world).length, 1, String(paintLines(world)));
 
-    // Never painting: three times in all, then said once, then left.
+    // Never paints: put back three times in all, said once, then left.
     for (let round = 0; round < 20; round++) {
         picture.mozPaintedFrames += 24;
         runTimers(world);
     }
-    // Once it has shown, it is looked at less often.
+    // Once shown, looked at less often.
     assert.deepEqual(paintLines(world), [
         "our picture put back: nothing painted in 0.5 s",
         "our picture put back: nothing painted in 2 s",
@@ -1458,7 +1438,7 @@ test("a picture on the screen that paints nothing is put back, and only so often
     ]);
     assert.equal(seen.given, 0, "their picture, painting, was put back");
 
-    // Theirs stops painting: counted on its own.
+    // Theirs stops painting: counted on own.
     for (let round = 0; round < 20; round++) {
         runTimers(world);
     }
@@ -1476,15 +1456,13 @@ test("a picture hidden, paused, or with no frame yet is not put back", async () 
     const { connection, box, picture: ours } = await page(world);
     Object.assign(ours, { paused: true, videoWidth: 480, videoHeight: 640, mozPaintedFrames: 0 });
     const { picture, holder, seen } = theirPicture(world, connection, 0);
-    // Seen once with a frame, then none for a while: the look's time
-    // starts again once it has one.
+    // Frame, then none: look time restarts on next.
     runTimers(world);
     picture.videoWidth = 0;
     for (let round = 0; round < 6; round++) {
         runTimers(world);
     }
-    // The page draws their picture anew: the new one has a look's time
-    // of its own.
+    // New picture: own look's time.
     picture.videoWidth = 352;
     runTimers(world);
     const again = theirPicture(world, connection, 0);
@@ -1527,7 +1505,7 @@ test("a picture put back is asked to play until it does: it carries their voice"
         plays += 1;
         return Promise.reject(new Error("NotAllowedError"));
     };
-    // Given its stream again, a picture starts paused.
+    // Given stream again: starts paused.
     seen.onGiven = () => {
         picture.paused = true;
     };
@@ -1564,7 +1542,7 @@ test("in the background, or with the page held hidden, the pictures are not look
     runTimers(world);
     assert.equal(paintLines(world).length, 2, String(paintLines(world)));
 
-    // The engine holds the page hidden: said, and not looked at.
+    // Engine holds page hidden: said, not looked at.
     world.window.document.visibilityState = "hidden";
     world.documentListeners.visibilitychange.forEach((one) => one.fn());
     assert.equal(posts(world, "/log").at(-1), "visibility: hidden");
@@ -1600,8 +1578,7 @@ test("a picture is said to show once it paints a frame, and black until then", a
     const world = makeWorld(VIDEO);
     const { connection, picture: ours } = await page(world);
     Object.assign(ours, { paused: false, videoWidth: 480, videoHeight: 640, mozPaintedFrames: 7 });
-    // Turned: the picture is given the other camera, which it has yet to
-    // show, whatever it painted of the one before.
+    // Turned: other camera given, yet to show, whatever it painted before.
     await command(world, "facing-environment");
     assert.equal(lastVideo(world).localPainted, false);
     runTimers(world);
@@ -1609,14 +1586,14 @@ test("a picture is said to show once it paints a frame, and black until then", a
     ours.mozPaintedFrames += 1;
     runTimers(world);
     assert.equal(lastVideo(world).localPainted, true, "a picture that painted is still said to be black");
-    // Turned back: black again until it paints.
+    // Turned back: black until paints.
     await command(world, "facing-user");
     assert.equal(lastVideo(world).localPainted, false, "turned, the picture is still said to show");
     ours.mozPaintedFrames += 1;
     runTimers(world);
     assert.equal(lastVideo(world).localPainted, true);
 
-    // Theirs comes, black at first.
+    // Theirs comes: black first.
     const { picture } = theirPicture(world, connection, 3);
     assert.equal(lastVideo(world).remote, true);
     assert.equal(lastVideo(world).remotePainted, false);
@@ -1627,7 +1604,7 @@ test("a picture is said to show once it paints a frame, and black until then", a
     assert.equal(lastVideo(world).remotePainted, true);
     assert.equal(lastVideo(world).localPainted, true, "theirs coming made ours black");
 
-    // Hidden, it shows nothing; back, it has a frame to paint again.
+    // Hidden: nothing shown; back: paints again.
     picture.parentElement.style.display = "none";
     runTimers(world);
     assert.equal(lastVideo(world).remotePainted, false, "a hidden picture is said to show");
@@ -1640,7 +1617,7 @@ test("a picture is said to show once it paints a frame, and black until then", a
     runTimers(world);
     assert.equal(lastVideo(world).remotePainted, true);
 
-    // Drawn anew, on another picture: black until that one paints.
+    // Drawn anew: black until it paints.
     world.videos.splice(world.videos.indexOf(picture), 1);
     const again = theirPicture(world, connection, 9).picture;
     assert.equal(lastVideo(world).remotePainted, false, "a picture drawn anew is said to show");
@@ -1657,15 +1634,14 @@ test("a picture yet to show is looked at sooner than one that shows", async () =
     ours.mozPaintedFrames += 1;
     runTimers(world);
     assert.equal(lastVideo(world).localPainted, true);
-    // Said of again and again: still the one look to come.
+    // Said again: still one look to come.
     const timers = world.timers.length;
     for (let i = 0; i < 4; i++) {
         connection.channels.mutedState.say(JSON.stringify({ audioEnabled: true, videoEnabled: true }));
     }
     assert.equal(world.timers.length, timers, "each report started a look of its own");
 
-    // Theirs comes, and never paints: looked at sooner, in place of the
-    // look that was due, and put back a look's time after it came.
+    // Theirs never paints: looked at sooner, put back after a look.
     const { picture } = theirPicture(world, connection, 0);
     assert.equal(world.timers.at(-1).delay, 500, "the look due was left to come in its own time");
     ours.mozPaintedFrames += 1;
@@ -1675,8 +1651,7 @@ test("a picture yet to show is looked at sooner than one that shows", async () =
     runTimers(world);
     assert.deepEqual(paintLines(world), ["their picture put back: nothing painted in 0.5 s"]);
 
-    // Theirs gone, and ours, which shows, stops painting: looked at as
-    // often as a picture that shows.
+    // Theirs gone, ours stops: looked at as shown ones.
     world.videos.splice(world.videos.indexOf(picture), 1);
     ours.mozPaintedFrames += 1;
     runTimers(world);
@@ -1693,14 +1668,14 @@ test("turned, this end's picture is black from the turn until the other camera p
     ours.mozPaintedFrames += 1;
     runTimers(world);
     assert.equal(lastVideo(world).localPainted, true);
-    // Theirs, which paints nothing while this camera turns.
+    // Theirs paints nothing while camera turns.
     theirPicture(world, connection, 3);
 
     world.cameraDelay = true;
     await command(world, "facing-user");
     assert.equal(lastVideo(world).localPainted, false,
         "said to show from the turn until the other camera is given");
-    // Seconds of looks, the camera still on its way, the last frame held.
+    // Looks while camera loads; last frame held.
     for (let i = 0; i < 10; i++) {
         runTimers(world);
     }
@@ -1727,7 +1702,7 @@ test("a picture that never shows is given up on, rather than waited for", async 
     const { picture: ours } = await page(world);
     Object.assign(ours, { paused: false, videoWidth: 480, videoHeight: 640, mozPaintedFrames: 0 });
     await command(world, "shown");
-    // Put back three times, a look apart; looked at, and said, once more.
+    // Put back 3 times, a look apart; looked at once more.
     for (let round = 0; round < 7; round++) {
         runTimers(world);
     }
@@ -1769,20 +1744,20 @@ test("their picture given a new stream has yet to show it, and given the same on
     runTimers(world);
     assert.equal(lastVideo(world).remotePainted, true);
 
-    // Given it again, as a picture put back is: still showing.
+    // Given again, as a put-back picture is: still showing.
     const reports = posts(world, "/video").length;
     picture.srcObject = first;
     runTimers(world);
     assert.equal(lastVideo(world).remotePainted, true, "the same stream given again is said to be black");
     assert.equal(posts(world, "/video").length, reports);
 
-    // This end's stream put on a picture is nothing to do with theirs.
+    // Our stream on picture: unrelated to theirs.
     const mine = world.newVideo();
     mine.srcObject = stream;
     runTimers(world);
     assert.equal(lastVideo(world).remotePainted, true, "our stream given made their picture black");
 
-    // A new stream: black until it paints, the engine counting afresh.
+    // New stream: black until paints.
     picture.srcObject = new Stream([new Track("video", "theirs-again")]);
     runTimers(world);
     assert.equal(lastVideo(world).remotePainted, false, "a new stream is said to show before it painted");
@@ -1793,7 +1768,7 @@ test("their picture given a new stream has yet to show it, and given the same on
     assert.equal(lastVideo(world).remotePainted, true, "a picture counted afresh is never said to show");
 });
 
-/* ---- the microphone, shut while the call's sound moves ---------------- */
+/* ---- microphone, shut while call's sound moves */
 
 function audioSender(connection) {
     return connection.transceivers.find((t) => t.receiver.track.kind === "audio").sender;
@@ -1819,8 +1794,7 @@ test("shut for the sound to move, the microphone is stopped and taken off its se
         assert.deepEqual(stream.getAudioTracks(), [mic],
             "the page's own switch has no microphone left to turn");
         assert.equal(asks(world), 1, "the microphone was asked for while shut");
-        // The reader mutes while it is shut: the page's switch acts on the
-        // track it has.
+        // Reader mutes while shut: page switch acts on track it holds.
         mic.enabled = false;
 
         await command(world, "microphone-on");
@@ -1867,7 +1841,7 @@ test("the page asking while the microphone is shut waits until it opens", async 
     assert.ok(given, "the page's ask never went on");
     assert.equal(asks(world), 1);
 
-    // Its microphone is the one shut the next time.
+    // Its mic is the one shut next time.
     await command(world, "microphone-off");
     assert.equal(given.getAudioTracks()[0].readyState, "ended",
         "a microphone asked for alone is not the one shut");

@@ -1,50 +1,37 @@
 #!/usr/bin/env bash
-# What SonarQube Cloud made of an analysis, printed where it can be read.
+# SonarQube Cloud analysis, readable.
 #
-# The scanner uploads a report and exits; the server processes it afterwards,
-# so the run that produced the analysis finishes knowing nothing about its
-# result. Everything -- the quality gate, the ratings, the issue list -- lives
-# on a dashboard behind a login. That is fine for a person with a browser and
-# useless to anything else: CI cannot act on it, and neither can a reviewer
-# reading the job log, or an agent whose network policy does not reach
-# sonarcloud.io.
+# Scanner uploads, exits; server processes later. Results sit on a dashboard
+# behind login: CI, job-log readers and agents not reaching sonarcloud.io
+# can't see them.
 #
-# So this asks the server, from the runner that just fed it, and prints the
-# answer into the job log and the step summary. The numbers land beside the
-# commit that earned them.
+# Asks server from the runner; prints to job log and step summary.
 #
-# It reports and never gates: ci.yml decides what is allowed in, and nothing
-# here can turn a red build green or a green build red. The workflow marks
-# the step continue-on-error, so a Sonar outage costs a warning, not a build.
+# Reports, never gates: ci.yml decides. continue-on-error: Sonar outage =
+# warning.
 #
 # Usage:  scripts/sonar-report.sh [path/to/report-task.txt]
 #
-# The scanner writes that file at the end of a run. Everything needed is in
-# it -- server, project, task, and which branch or pull request was analysed
-# -- which is also what makes this testable against a stub server, as
-# ci/sonar-report-selftest.sh does.
+# Scanner's task file: server, project, task, branch/PR. All needed is there,
+# so testable with a stub server (ci/sonar-report-selftest.sh).
 #
-# Taken from the sibling project vuo.
+# From sibling project vuo.
 set -euo pipefail
 
-# `${1:-default}` and `${VAR:+...}` are avoided throughout. Not taste:
-# SonarQube's own shell analyser cannot parse them and gives up on the whole
-# file. A script that turns off the checker it ships beside is not clever.
+# No `${1:-default}` or `${VAR:+...}`: SonarQube shell analyser can't parse
+# them and gives up on the whole file.
 if [[ "$#" -ge 1 ]]; then
     TASK_FILE=$1
 else
     TASK_FILE=.scannerwork/report-task.txt
 fi
 
-# printenv rather than ${VAR:-}, for the same reason, and `|| true` because
-# `set -u` would otherwise make an absent variable fatal.
+# printenv, not ${VAR:-}: same reason. `|| true`: `set -u` makes absent var
+# fatal.
 SONAR_TOKEN=$(printenv SONAR_TOKEN || true)
 SUMMARY=$(printenv GITHUB_STEP_SUMMARY || true)
 
-# How many issues to list. 500 is the most the API hands over in one page.
-# The first real run had 115 and this asked for 100, so the report ended
-# in "15 more not listed" -- which is precisely the reading this script
-# exists to replace.
+# 500 = API max per page. 100 left 15 of 115 issues unlisted.
 PAGE=500
 
 if [[ ! -f "$TASK_FILE" ]]; then
@@ -62,8 +49,7 @@ KEY=$(field projectKey)
 TASK_URL=$(field ceTaskUrl)
 DASHBOARD=$(field dashboardUrl)
 
-# Which slice was analysed. Taken from the dashboard URL the scanner wrote
-# rather than passed in, so this cannot disagree with what was uploaded.
+# Slice from dashboard URL scanner wrote: matches what uploaded.
 SCOPE=$(printf '%s' "$DASHBOARD" | sed -n 's/.*[?&]\(pullRequest=[^&]*\).*/\1/p')
 if [[ -z "$SCOPE" ]]; then
     SCOPE=$(printf '%s' "$DASHBOARD" | sed -n 's/.*[?&]\(branch=[^&]*\).*/\1/p')
@@ -75,17 +61,13 @@ if [[ -n "$SCOPE" ]]; then
     SCOPE_LABEL=$SCOPE
 fi
 
-# Where every response body lands, so nothing has to survive a shell variable.
+# Response bodies to file.
 BODY=$(mktemp)
 
-# Ask, with credentials when there are any.
-#
-# SonarQube Cloud answers 404 -- not 403 -- for a resource the caller may not
-# read, so a 404 taken at face value reads as "no such thing" and nothing is
-# ever reported. The token therefore goes FIRST. The scanner itself reads these
-# same endpoints with the analysis token when `sonar.qualitygate.wait` is set,
-# which makes it the likelier of the two to be allowed; anonymous is the
-# fallback, for a public project where the token lacks browse rights.
+# Token first: Cloud answers 404 (not 403) for unreadable resources, so an
+# anonymous 404 reads as "no such thing". Scanner reads these endpoints with
+# the analysis token, so token is likelier allowed. Anonymous = fallback for
+# public project where token lacks browse rights.
 code=""
 fetch() {
     local url=$1
@@ -110,17 +92,16 @@ api() {
     return 1
 }
 
-# A rating is 1..5 on the wire and A..E everywhere a person reads it.
+# Rating 1..5 on wire, A..E for people.
 letter() {
     local rating=$1
     echo "$rating" | sed 's/^1.*/A/; s/^2.*/B/; s/^3.*/C/; s/^4.*/D/; s/^5.*/E/'
 }
 
-# ------------------------------------------------------------ wait for it
+# ---- wait
 #
-# Analysis is asynchronous. Asking for measures before the server has finished
-# processing returns the PREVIOUS run's numbers, which is worse than no
-# numbers at all: they look right.
+# Analysis is async. Early reads return previous run's numbers: worse than
+# none, they look right.
 status=""
 analysis=""
 misses=0
@@ -136,9 +117,8 @@ for _ in $(seq 60); do
             break
         fi
     else
-        # A task can be briefly invisible right after upload, so one bad
-        # answer is not a verdict -- but a permanent one must not cost five
-        # minutes of runner time either.
+        # Task can be briefly invisible after upload: one miss is no verdict.
+        # Permanent miss must not cost five minutes.
         misses=$((misses + 1))
         if [[ "$misses" -ge 5 ]]; then
             echo "the compute task cannot be read; giving up" >&2
@@ -168,9 +148,8 @@ trap 'rm -f "$out" "$BODY"' EXIT
 
 # ------------------------------------------------------------ quality gate
 if api "$SERVER/api/qualitygates/project_status?analysisId=$analysis"; then
-    # The parentheses are load-bearing: `|` binds looser than `,` in jq, so
-    # without them the pipe is applied to the two heading strings as well and
-    # the whole program dies on "Cannot index string with string".
+    # Parens needed: `|` binds looser than `,` in jq; else "Cannot index string
+    # with string".
     jq -r '
         "### Quality gate: \(.projectStatus.status)", "",
         ((.projectStatus.conditions // [])[]
@@ -180,19 +159,14 @@ if api "$SERVER/api/qualitygates/project_status?analysisId=$analysis"; then
 fi
 
 # ------------------------------------------------------------ measures
-# new_lines_to_cover is what turns "new_coverage: 0.0" from a verdict into
-# a reading: 0.0% of one line is a file no coverage tool can reach, not a
-# change nobody tested.
+# new_lines_to_cover: 0.0% of one line = unreachable file, not untested change.
 metrics=ncloc,coverage,line_coverage,duplicated_lines_density,violations,security_hotspots,security_rating,reliability_rating,sqale_rating,new_coverage,new_lines_to_cover,new_violations
 if api "$SERVER/api/measures/component?component=$KEY&${SCOPE_Q}metricKeys=$metrics"; then
     {
         echo "### Measures"
         echo
-        # A new-code measure carries its value under `period` on SonarQube
-        # Server and under `periods` (an array of one) on SonarQube Cloud.
-        # Read either: with only the first, every new_* line printed "-"
-        # while the gate two sections up quoted a number for the same
-        # metric.
+        # Cloud: new-code value under `periods`, Server under `period`. Read
+        # either.
         jq -r '
             (.component.measures // [])[]
             | "\(.metric)=\(.value // .period.value // (.periods // [])[0].value // "-")"

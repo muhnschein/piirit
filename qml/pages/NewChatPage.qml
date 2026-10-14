@@ -4,20 +4,15 @@ import "../components"
 import Piirit 1.0
 
 /*
- * Pick someone to talk to: the known contacts, and a search over them.
- *
- * Nothing here adds a contact. An address alone produces a chat that
- * cannot be encrypted, and an invite is how a Delta Chat contact is
- * actually added -- the other person's code held up to the camera, or
- * their link typed -- which is the QR code page, in the chat list's
- * pull-down beside this one. A group is made from there too.
+ * Pick contact: known contacts plus search.
+ * Adds no contact: address alone gives unencryptable chat.
+ * Contacts come from invites (QR page, chat list pull-down); groups too.
  */
 Page {
     id: page
 
-    // A move the core asked for, held until this page is the one on
-    // screen: a call's page may be over it, and a move made then would
-    // take that page instead (PendingNavigation.qml).
+    // Core move held until on screen: call page may cover it.
+    // See PendingNavigation.qml.
     PendingNavigation {
         id: navigation
         stack: pageStack
@@ -27,17 +22,13 @@ Page {
     property int accountId
     property string errorMessage: ""
 
-    // The core has said who is in this profile, whatever that was.
+    // Core has said who is in profile.
     //
-    // An empty model means one of two things and they are opposite: no
-    // contacts, or no answer yet. For the first moment after the page
-    // opens the second is what is true, and "No contacts yet" over a
-    // list about to fill is the app telling the reader something it
-    // does not know. It flashed under the rows on every visit.
+    // Empty model: no contacts or no answer yet. Right after open, the
+    // latter; "No contacts yet" flashed under rows every visit.
     property bool contactsLoaded: false
 
-    // Not bound straight to the field: a round trip per keystroke asks the
-    // core four times to type "anna", and only the last answer is wanted.
+    // Not bound to field: round trip per keystroke, only last answer used.
     Timer {
         id: searchDebounce
         interval: 250
@@ -49,11 +40,9 @@ Page {
         objectName: "contacts"
         account_id: page.accountId
         onError: page.errorMessage = message
-        // Emitted once the rows have been set, whether there turned out
-        // to be any or none.
+        // Emitted once rows set.
         onRows_changed: page.contactsLoaded = true
-        // Open the chat that now exists, above the page that opened this
-        // one: this page has done its job.
+        // Open new chat above this page: job done.
         onChat_ready: navigation.replaceAbove(pageStack.previousPage(page),
                                               Qt.resolvedUrl("ConversationPage.qml"), {
             accountId: page.accountId,
@@ -64,7 +53,7 @@ Page {
 
     Connections {
         target: core
-        // A model created before the core is up has nothing to load from.
+        // Model made before core up: nothing to load.
         onStatus_changed: {
             if (core.status === "ready") {
                 contacts.reload()
@@ -72,10 +61,8 @@ Page {
         }
     }
 
-    // The search field outside the list, for the reason ChatListPage
-    // documents: a field in a view's `header` lives inside the flickable
-    // and moves on every keystroke, which is what took the keyboard away
-    // mid-search. A flickable that does not scroll holds the two.
+    // Search outside list (see ChatListPage): in header it moves per keystroke,
+    // dropping keyboard. Non-scrolling flickable holds both.
     SilicaFlickable {
         id: host
         anchors.fill: parent
@@ -118,14 +105,12 @@ Page {
                 right: parent.right
                 bottom: parent.bottom
             }
-            // Rows draw outside the list's own box otherwise, and the
-            // box starts under the search field: without this a flick
-            // ran the contacts up over the field.
+            // Rows otherwise draw outside list box, which starts under search:
+            // flick ran contacts over field.
             clip: true
             model: contacts.rows
 
-            // No context menu: picking a contact is the only thing to do
-            // with one here.
+            // No context menu: picking is the only action.
             delegate: ListItem {
                 objectName: "contactRow"
                 contentHeight: body.height
@@ -144,7 +129,7 @@ Page {
 
             ViewPlaceholder {
                 objectName: "contactsPlaceholder"
-                // Not until the core has answered: see `contactsLoaded`.
+                // Not until core answered: see `contactsLoaded`.
                 enabled: page.contactsLoaded && contacts.count === 0
                 text: qsTr("No contacts yet")
                 hintText: qsTr("Use \"QR code\" in the chat list to add a contact.")

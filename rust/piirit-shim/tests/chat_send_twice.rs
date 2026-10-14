@@ -1,14 +1,9 @@
-//! An impatient thumb must not send the message twice.
+//! Double tap must not send twice.
 //!
-//! The compose state is cleared when the core answers, not when the button
-//! is tapped, so that a send which fails leaves the reader holding what
-//! they chose. That leaves a window in which the field still holds the text
-//! and the bar still holds the file -- seconds wide for a large video the
-//! core has to copy into its blob directory -- and a second tap in that
-//! window must not send the whole thing again.
+//! Compose clears on core answer, not tap: failed send keeps text. Window with text+file still set
+//! (seconds, big video copy): second tap must not resend.
 //!
-//! The fake server is told to take its time answering, which is what makes
-//! that window reproducible rather than a race.
+//! Slow fake server makes window reproducible.
 
 // Qt harness: see qml_chat_list.rs.
 #![allow(
@@ -59,14 +54,12 @@ fn a_second_tap_while_the_first_send_is_in_flight_sends_nothing() {
     let journal = common::fresh_journal(&temp);
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
 
-    // SAFETY: single-threaded test binary; set before Qt starts and before
-    // the server inherits them.
+    // SAFETY: single-threaded; set before Qt starts and before server inherits env.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_FAKE_JOURNAL", &journal);
         std::env::set_var("PIIRIT_ACCOUNTS_DIR", temp.join("accounts"));
-        // Long enough that every tap in one callback lands inside one
-        // send, and short enough to be answered before the next read.
+        // Long: all taps hit one send. Short: answered before next read.
         std::env::set_var("PIIRIT_FAKE_SEND_DELAY_MS", "1500");
     }
 
@@ -100,7 +93,7 @@ fn a_second_tap_while_the_first_send_is_in_flight_sends_nothing() {
     single_shot(Duration::from_secs(3), move || unsafe {
         (*steps_ptr).push(("text-taps", call!("hammerText")));
     });
-    // Still inside the first send, which the server has not answered.
+    // Still in first send.
     single_shot(Duration::from_secs(4), move || unsafe {
         (*steps_ptr).push(("busy-during", call!("busy")));
     });
@@ -124,8 +117,7 @@ fn a_second_tap_while_the_first_send_is_in_flight_sends_nothing() {
     };
     let context = format!("steps: {steps:?}");
 
-    // Both sends the app makes: text goes through one, a picture through
-    // the other. See `media.rs`.
+    // Text and picture sends, one each. See `media.rs`.
     let sends = common::calls(&journal)
         .into_iter()
         .filter(|(method, _)| method == "misc_send_msg" || method == "send_msg")
@@ -153,8 +145,7 @@ fn a_second_tap_while_the_first_send_is_in_flight_sends_nothing() {
         "the model is still busy after the send was answered, so the button \
          never comes back. {context}"
     );
-    // Twice each way, and never twice in a row: a stuck flag and a flag
-    // that never rises both fail this.
+    // Twice each way, never twice in a row: stuck or never-rising flag fails.
     assert_eq!(
         value("trail"),
         "busy free busy free ",

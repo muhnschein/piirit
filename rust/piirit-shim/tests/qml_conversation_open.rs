@@ -1,24 +1,17 @@
-//! Opening a chat puts the messages on the page before it arrives.
+//! Chat opens with messages already on page.
 //!
-//! Two failure modes bound this. Starting the fetch as the page is created
-//! builds rows on the Qt thread while the page is still transitioning in,
-//! which stutters the transition; deferring the handover to
-//! `PageStatus.Active` trades that stutter for a wait, with the page
-//! arriving empty and filling in behind itself.
+//! Two failure modes bound this. Fetch started on page create builds rows on Qt thread during
+//! transition: stutter. Deferring handover to `PageStatus.Active` trades that for a wait: page
+//! arrives empty, fills in behind itself.
 //!
-//! Neither applies now. A chat opens on one page of fifty rather than on
-//! all of it, and `ChatPrefetch` has usually built
-//! those rows before the push. So the handover goes back to the page's own
-//! construction, where a prefetch hit makes it a move rather than a fetch,
-//! and the page comes in already full.
+//! Neither applies now: chat opens on one page of fifty, not all of it, and `ChatPrefetch` has
+//! usually built those rows before the push. So handover is back at page construction, where a
+//! prefetch hit makes it a move, not a fetch, and page comes in full.
 //!
-//! What is pinned below is that last part, in the only terms that mean
-//! anything: the rows are there in the same turn the page is built, before
-//! anything could have run a transition, let alone finished one.
+//! Pinned: rows there in the same turn page is built, before any transition could run.
 //!
-//! The page is loaded from a copy of the QML tree with `EnterKey` taken
-//! out; see `common::qml_tree_without_enter_key` for why the shipped file
-//! cannot be loaded headlessly as it stands.
+//! Page loaded from QML tree copy with `EnterKey` taken out; see
+//! `common::qml_tree_without_enter_key` for why shipped file can't load headlessly.
 
 // Qt harness: see qml_chat_list.rs.
 #![allow(
@@ -99,7 +92,7 @@ const PROBE_QML: &str = r"
     }
 ";
 
-/// What the fake server seeds chat 1 with.
+/// Fake server's chat 1 seed.
 const SEEDED: &str = "2";
 
 #[test]
@@ -108,7 +101,7 @@ fn a_chat_is_on_its_page_before_the_page_arrives() {
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
     let tree = common::qml_tree_without_enter_key();
 
-    // SAFETY: single-threaded test binary; set before Qt starts.
+    // SAFETY: single-threaded; set pre-Qt.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_ACCOUNTS_DIR", temp.join("accounts"));
@@ -145,7 +138,7 @@ fn a_chat_is_on_its_page_before_the_page_arrives() {
         }};
     }
 
-    // The tap on the chat list: load the chat, then push the page.
+    // Tap: load chat, then push page.
     single_shot(Duration::from_secs(1), move || unsafe {
         (*steps_ptr).push(("prefetch", call!("prefetchChat", 1)));
     });
@@ -161,9 +154,8 @@ fn a_chat_is_on_its_page_before_the_page_arrives() {
                 1
             ),
         ));
-        // Read in the same callback as the load, on purpose: nothing has
-        // had a turn in between, so whatever is here was put here by the
-        // page building itself.
+        // Read in same callback as load, on purpose: nothing had a turn in between, so what's here
+        // was put here by page building itself.
         (*steps_ptr).push(("chat-while-arriving", call!("chatOfModel")));
         (*steps_ptr).push(("rows-while-arriving", call!("rowsOfModel")));
         (*steps_ptr).push(("reading-history", call!("readingHistory")));
@@ -180,7 +172,7 @@ fn a_chat_is_on_its_page_before_the_page_arrives() {
     assert_outcome(&steps);
 }
 
-/// What the run has to show for itself, out of the test body.
+/// What run shows.
 fn assert_outcome(steps: &[(&str, String)]) {
     let value = |label: &str| {
         steps
@@ -208,7 +200,7 @@ fn assert_outcome(steps: &[(&str, String)]) {
         "the page was built without being told which chat it is showing, so \
          it can only start loading one once it has arrived. {context}"
     );
-    // The point of all of it.
+    // The point.
     assert_eq!(
         value("rows-while-arriving"),
         SEEDED,

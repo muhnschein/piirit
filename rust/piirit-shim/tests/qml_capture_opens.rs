@@ -1,12 +1,8 @@
-//! The camera page opens the way it is asked to: in video rather than a
-//! still, on the front camera rather than the back, and -- for a caller
-//! that puts its next page in the camera's place -- without taking itself
-//! down once it has answered. A camera quick action on the cover asks for
-//! all three (`ChatListPage.capture`). While a video records, the page
-//! says that a quick action must not take the stack out from under it.
+//! Camera page opens as asked: video or still, front or back; stays up after answer when caller
+//! puts next page in place. Cover quick action asks all three (`ChatListPage.capture`). While
+//! recording, page says a quick action must not pull stack from under it.
 //!
-//! Driven through the `QtMultimedia` stubs, as `qml_capture.rs` is: two
-//! cameras on the back and one on the front.
+//! Via `QtMultimedia` stubs, as `qml_capture.rs`: two back cameras, one front.
 
 // Qt harness: see qml_chat_list.rs.
 #![allow(
@@ -82,7 +78,7 @@ fn the_camera_opens_in_the_mode_and_on_the_side_it_is_asked_for() {
     let temp = std::env::temp_dir().join(format!("piirit-capture-opens-{}", std::process::id()));
     std::fs::create_dir_all(&temp).expect("create temp dir");
 
-    // SAFETY: single-threaded test binary; set before Qt starts.
+    // SAFETY: single-threaded; set pre-Qt.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("XDG_CACHE_HOME", &temp);
@@ -127,12 +123,12 @@ fn the_camera_opens_in_the_mode_and_on_the_side_it_is_asked_for() {
     }
 
     single_shot(Duration::from_secs(1), move || unsafe {
-        // As the conversation opens it: a still, on the back camera.
+        // From conversation: still, back camera.
         record!("plain", load!("{}"));
         record!("plain-opened", call!("opened"));
         record!("plain-facing", call!("page", QString::from("facing")));
 
-        // A video on the back camera, as the Video action asks.
+        // Video, back camera (Video action).
         record!("video", load!(r#"{"mode": 1, "closeOnPick": false}"#));
         record!("video-opened", call!("opened"));
         record!("video-mode", call!("page", QString::from("mode")));
@@ -159,11 +155,11 @@ fn the_camera_opens_in_the_mode_and_on_the_side_it_is_asked_for() {
             call!("page", QString::from("pausesQuickActions"))
         );
 
-        // A still on the front camera, as Selfie asks.
+        // Still, front camera (Selfie).
         record!("selfie", load!(r#"{"front": true, "closeOnPick": false}"#));
         record!("selfie-opened", call!("opened"));
         record!("selfie-facing", call!("page", QString::from("facing")));
-        // The switch goes back to the back camera from there.
+        // Switch goes back to back camera.
         record!("switch", call!("tap", QString::from("flipButton")));
         record!("switched-opened", call!("opened"));
         record!("pops-before-still", call!("pops"));
@@ -172,14 +168,14 @@ fn the_camera_opens_in_the_mode_and_on_the_side_it_is_asked_for() {
         record!("still-picked", call!("pickedPath"));
         record!("pops-after-still", call!("pops"));
 
-        // A video on the front camera, as Selfie video asks.
+        // Video, front camera (Selfie video).
         record!(
             "selfie-video",
             load!(r#"{"mode": 1, "front": true, "closeOnPick": false}"#)
         );
         record!("selfie-video-opened", call!("opened"));
 
-        // Left at its default, the page still takes itself down.
+        // Default: page still takes itself down.
         record!("closing", load!("{}"));
         record!("pops-before-close", call!("pops"));
         record!("close-shutter", call!("tap", QString::from("shutter")));
@@ -206,8 +202,7 @@ fn the_camera_opens_in_the_mode_and_on_the_side_it_is_asked_for() {
             "the page did not load for {step}. {context}"
         );
     }
-    // QCamera's own values: a still 1, a video 2. The stub's Camera.FrontFace
-    // reads as 2, as Viewfinder.js names it.
+    // QCamera: still 1, video 2; stub `Camera.FrontFace` reads 2.
     assert_eq!(
         value("plain-opened"),
         "1|back-0|true",

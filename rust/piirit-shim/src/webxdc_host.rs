@@ -1,45 +1,21 @@
-//! The loopback host one webxdc app is served from while it is open.
+//! Loopback host for one webxdc app, while open.
 //!
-//! A webxdc app is a zip file, and the `WebView` needs its files as a
-//! website: an index.html that can pull in its own scripts, styles and
-//! pictures. Nothing here opens the zip. Every file comes from the core,
-//! which reads the archive itself (`get_webxdc_blob`) -- so the app is
-//! served rather than unpacked, and no archive format is parsed in this
-//! repository.
+//! `WebView` needs the zip as a website. Files come from core (`get_webxdc_blob`): served, not
+//! unpacked; no archive parsed here. HTTP also gives the way back: `webxdc.js` POSTs updates and
+//! long-polls, held until core pokes (`Host::poke`). Needs nothing of `WebView` but the URL; quiet
+//! app costs one request per [`UPDATE_WAIT`]. Alternative, Gecko frame script, is chrome-privileged
+//! ground this app can't test.
 //!
-//! Serving it over HTTP is also what gives the app a way back: the API in
-//! `webxdc.js` sends an update with a POST and collects the others with a
-//! long poll, which the host holds until the core says there is something
-//! new (`Host::poke`). So the bridge needs nothing of the `WebView` beyond
-//! the URL it is pointed at, and a quiet app costs a request every
-//! [`UPDATE_WAIT`] rather than one every few hundred milliseconds. The
-//! alternative -- a Gecko frame script -- would put the bridge on
-//! chrome-privileged ground this app cannot test.
+//! Served from root, as other clients: bundler-default apps ask `/assets/index-1a2b.js`; a
+//! prefixed host blanks half the store.
 //!
-//! The app is served from the root of that address, as every other
-//! client serves one. It has to be: an app built with a bundler's
-//! default settings asks for `/assets/index-1a2b.js`, and a host that
-//! keeps its files under a prefix answers nothing to that -- which is a
-//! blank screen for half the apps in the store and a working one for the
-//! half that happens to use relative paths.
-//!
-//! What keeps that from being a hole in the phone:
-//!
-//! - the listener is bound to 127.0.0.1 on a port the kernel picks, so
-//!   nothing off the device can reach it at all;
-//! - a request whose `Host:` is not the address the app was given is
-//!   refused, so a name that resolves to 127.0.0.1 is not a way in;
-//! - the chat is behind an unguessable token: the two API paths -- what
-//!   everyone else in the chat has said, and saying something to them --
-//!   are under `/webxdc-api/<token>/`, which the app is told and nothing
-//!   else can guess. A page that found the port could ask for the app's
-//!   own files, which its reader was sent anyway; it cannot read the
-//!   chat or write to it.
-//! - it exists only while the app is open, and answers nothing once the
-//!   page is closed;
-//! - the app itself is confined by a content-security-policy that permits
-//!   this origin and nothing else, so a webxdc cannot reach the network
-//!   even though it is on one.
+//! Guards:
+//! - 127.0.0.1 on kernel port: unreachable off device;
+//! - `Host:` must match: no DNS trick;
+//! - chat API under unguessable `/webxdc-api/<token>/`: a page finding the port gets only the
+//!   app's files, never chat read/write;
+//! - exists only while app open;
+//! - CSP: this origin only, no network.
 
 use std::io::Read;
 use std::net::{Ipv4Addr, SocketAddr};
@@ -53,18 +29,11 @@ use tokio::net::{TcpListener, TcpStream};
 use tokio::sync::Notify;
 use tokio::task::JoinHandle;
 
-/// The API the app sees, as JavaScript. Compiled in rather than installed
-/// beside the QML: it is served, not loaded by the engine, and a file the
-/// package could lose is a bridge that fails on a phone and nowhere else.
+/// API JS, compiled in: served, not engine-loaded; a packaged file could go missing on phone only.
 const BRIDGE: &str = include_str!("webxdc.js");
 
-/// What an app may do from inside the `WebView`. `'self'` is this host,
-/// which is where its own files and the two API paths are; nothing else
-/// is reachable, so an app cannot phone home whatever it asks for.
-/// `unsafe-inline` and `unsafe-eval` are for the app's own code -- webxdc
-/// apps are single files full of inline script, and the isolation here
-/// comes from the origin having nowhere to go rather than from what the
-/// app is allowed to run.
+/// `'self'`: this host only. `unsafe-inline`/`unsafe-eval`: app's inline script; origin has
+/// nowhere to go.
 const POLICY: &str = "default-src 'self'; \
      script-src 'self' 'unsafe-inline' 'unsafe-eval' blob:; \
      style-src 'self' 'unsafe-inline' blob:; \
@@ -75,90 +44,67 @@ const POLICY: &str = "default-src 'self'; \
      form-action 'none'; \
      frame-ancestors 'none'";
 
-/// Milliseconds the bridge waits before asking for updates again after
-/// a request for them failed. One that was answered is followed at once:
-/// the host holds it until there is something to say.
+/// Ms before re-asking after failed update request.
 const RETRY_INTERVAL: u32 = 300;
 
-/// How long a request for updates waits for one before answering with
-/// none. The bridge asks again at once, so this only decides how often a
-/// quiet app costs a request. The same as the call page's commands wait
-/// (`call_host.rs`).
+/// Max wait for update before empty answer; bridge re-asks at once, so sets how often quiet app
+/// asks. Same as call page's command wait (`call_host.rs`).
 const UPDATE_WAIT: Duration = Duration::from_secs(20);
 
-/// The most a request head may be. A webxdc's own requests are short;
-/// anything longer is not one of them.
+/// Max request head: webxdc's own are short; longer is not one of them.
 const MAX_HEAD: usize = 16 * 1024;
 
-/// The most a `POST`ed update may be. The core's own soft limit is 100 KiB
-/// and it rejects what is over its own; this is the point at which the
-/// body is not read at all.
+/// Max `POST`ed update. Core soft limit 100 KiB; larger body unread.
 const MAX_BODY: usize = 512 * 1024;
 
-/// The most of a refused body to read before answering.
-///
-/// A request whose body is not going to be read still has to be listened
-/// to: answering and closing while the other end is still writing resets
-/// the connection, and a reset is not an answer -- the app sees a host it
-/// could not reach and has no idea why. So the body is read and dropped
-/// first, up to this, which is generous enough for any refusal that is
-/// really an app's mistake and small enough not to sit here forever.
+/// Max refused body read before answering. Closing while client writes resets connection, and
+/// app sees unreachable host, not an answer.
 const MAX_DRAIN: usize = 256 * 1024 * 1024;
 
-/// Which app is being served, and what it is told about itself.
+/// Served app and what it is told.
 pub(crate) struct Instance {
-    /// The account the message belongs to.
+    /// Account of message.
     pub(crate) account_id: u32,
-    /// The message the webxdc arrived as, which is also the instance the
-    /// core keeps status updates for.
+    /// Message webxdc arrived as; status-update key.
     pub(crate) message_id: u32,
-    /// `window.webxdc.selfAddr`: what other members of the chat see this
-    /// app's updates as coming from. The core's own answer, not the
+    /// `window.webxdc.selfAddr`: what other members see updates from; core's answer, not
     /// account address.
     pub(crate) self_addr: String,
-    /// `window.webxdc.selfName`: the profile's display name.
+    /// `window.webxdc.selfName`: profile name.
     pub(crate) self_name: String,
-    /// `window.webxdc.sendUpdateInterval`, in milliseconds.
+    /// `window.webxdc.sendUpdateInterval`, ms.
     pub(crate) send_update_interval: u64,
-    /// `window.webxdc.sendUpdateMaxSize`, in bytes.
+    /// `window.webxdc.sendUpdateMaxSize`, bytes.
     pub(crate) send_update_max_size: u64,
 }
 
-/// What the host does with a file an app hands over: give it to the page,
-/// which asks the reader what they want done with it.
+/// Passes handed-over file to page, which asks reader. Callback, not core call: API says
+/// `sendToChat`, but destination is reader's (a download means the phone).
 ///
-/// A callback rather than a core call, because this one is not the
-/// host's to make. The API's own word for it is `sendToChat`, but the
-/// destination is the reader's and a chat is not the one they mean by a
-/// download -- so what the app hands over reaches the page, and the page
-/// is on the Qt thread, where a `queued_callback` puts it.
+/// Page is on Qt thread; `queued_callback` puts it there.
 pub(crate) type HandedOver = Arc<dyn Fn(String, String) + Send + Sync>;
 
-/// Everything a connection needs, shared by every one of them.
+/// Shared by all connections.
 struct Shared {
     rpc: Arc<RpcClient>,
     instance: Instance,
-    /// Where a file the app hands over goes; see [`HandedOver`].
+    /// Handed-over file sink.
     to_chat: HandedOver,
-    /// `/webxdc-api/<token>`: where the chat is, and the one part of
-    /// this host that cannot be guessed. The app's own files are at the
-    /// root beside it.
+    /// `/webxdc-api/<token>`: chat; app files at root.
     api: String,
-    /// The `Host:` a request must carry: the address the app was given.
+    /// Required `Host:`.
     authority: String,
-    /// Cleared when the app is closed. A connection accepted just before
-    /// that stops rather than reaching the core.
+    /// Cleared on close; late connections stop.
     running: Arc<AtomicBool>,
-    /// Woken when the chat may have something new for the app, and when
-    /// the host goes.
+    /// Woken on chat news and host stop.
     changed: Arc<Notify>,
 }
 
-/// A served app: the URL to point a `WebView` at, and the task serving it.
+/// Served app: URL for `WebView`, serving task.
 ///
-/// Dropping it stops the host, which is what closing the page does.
+/// Drop stops host (closing page does).
 pub(crate) struct Host {
-    /// Where the app is. What `WebxdcApp.url` hands to QML.
+    /// App URL, for `WebxdcApp.url`.
     url: String,
     running: Arc<AtomicBool>,
     changed: Arc<Notify>,
@@ -166,13 +112,12 @@ pub(crate) struct Host {
 }
 
 impl Host {
-    /// Where the app is being served.
+    /// Where app is served.
     pub(crate) fn url(&self) -> &str {
         &self.url
     }
 
-    /// The chat may have something new for the app: a request for
-    /// updates that is waiting asks the core again.
+    /// Chat news: waiting update request re-asks core.
     pub(crate) fn poke(&self) {
         self.changed.notify_waiters();
     }
@@ -180,22 +125,19 @@ impl Host {
 
 impl Drop for Host {
     fn drop(&mut self) {
-        // Both: the flag stops a connection already accepted, and the
-        // abort closes the listener so no more arrive.
+        // Flag stops accepted connections; abort closes listener.
         self.running.store(false, Ordering::SeqCst);
         self.task.abort();
-        // A request waiting for an update answers now rather than holding
-        // its connection open for a page that has gone.
+        // Waiting update answers now: its page is gone.
         self.changed.notify_waiters();
     }
 }
 
-/// Serve `instance` on the loopback interface until the [`Host`] is
-/// dropped.
+/// Serve `instance` on loopback until [`Host`] dropped.
 ///
 /// # Errors
 ///
-/// Fails when the loopback port cannot be bound.
+/// Fails if port can't bind.
 pub(crate) async fn start(
     rpc: Arc<RpcClient>,
     instance: Instance,
@@ -209,12 +151,11 @@ pub(crate) async fn start(
         .map_err(|err| format!("cannot serve the app: {err}"))?;
     let token = token();
     let authority = format!("127.0.0.1:{}", address.port());
-    // The app's front page, at the root: what it asks for next is its
-    // own business, and half of what apps ask for is absolute.
+    // Front page at root.
     let url = format!("http://{authority}/index.html");
     let running = Arc::new(AtomicBool::new(true));
     let changed = Arc::new(Notify::new());
-    // Whatever the last run left behind; see `empty_outbox`.
+    // Last run's leftovers; see `empty_outbox`.
     empty_outbox(instance.message_id);
     let shared = Arc::new(Shared {
         rpc,
@@ -234,33 +175,27 @@ pub(crate) async fn start(
     })
 }
 
-/// One connection at a time is not enough: a page loads its script, its
-/// style and its pictures at once, and a blob the core is still reading
-/// would hold up the rest.
+/// Concurrent: one connection at a time is too few. Page loads script, style, pictures at once;
+/// a blob core is still reading would hold up the rest.
 async fn accept(listener: TcpListener, shared: Arc<Shared>) {
     while shared.running.load(Ordering::SeqCst) {
-        // A listener that cannot accept is not going to start: this is
-        // the socket being gone, not one bad connection.
+        // Listener can't accept: socket gone.
         let Ok((stream, _)) = listener.accept().await else {
             return;
         };
         let shared = Arc::clone(&shared);
         tokio::spawn(async move {
-            // A connection that fails is one the page has given up on, and
-            // there is nobody left on it to answer.
+            // Failed connection: page gave up.
             answer(stream, shared).await.ok();
         });
     }
 }
 
-/// Read one request, answer it, and close. No keep-alive: every answer
-/// says so, and a page load is a handful of short connections.
+/// One request, answer, close. No keep-alive.
 async fn answer(mut stream: TcpStream, shared: Arc<Shared>) -> std::io::Result<()> {
     let mut response = match read_head(&mut stream).await? {
         None => Response::empty("400 Bad Request"),
-        // A file an app is handing over is written out as it arrives:
-        // the point of the route is files, and a file this host held
-        // whole would be a file the phone has to find room for twice.
+        // Handover streams to disk: held whole = room needed twice.
         Some(head) if handover_asked(&shared, &head) => {
             take_handover(&shared, &mut stream, head).await?
         }
@@ -287,20 +222,16 @@ async fn answer(mut stream: TcpStream, shared: Arc<Shared>) -> std::io::Result<(
     };
     let after = response.after.take();
     let written = write_response(&mut stream, &response).await;
-    // After the answer, never before it: what this sets off opens a page
-    // over the app, and an app whose request is still outstanding when
-    // that happens is an app that never hears back.
+    // Answer first: a picker opened over app hangs it if request still out.
     //
-    // And only if the answer arrived. A write that failed is a page that
-    // is no longer there to have asked, and a picker pushed for it would
-    // land over whatever the reader is looking at instead.
+    // Only if answer arrived: failed write means page gone.
     if let (Ok(()), Some(after)) = (&written, after) {
         after();
     }
     written
 }
 
-/// One request, as much of it as anything here reads.
+/// Request fields this host reads.
 struct Request {
     method: String,
     target: String,
@@ -308,14 +239,12 @@ struct Request {
     body: Vec<u8>,
 }
 
-/// What goes back.
+/// Response.
 struct Response {
     status: &'static str,
     content_type: String,
     body: Vec<u8>,
-    /// What to do once this answer is on the wire, for the one route
-    /// whose answer has to arrive before what it sets off does. See
-    /// `to_chat`.
+    /// Runs after answer is on wire. See `to_chat`.
     after: Option<Box<dyn FnOnce() + Send + Sync>>,
 }
 
@@ -329,9 +258,7 @@ impl Response {
         }
     }
 
-    /// A refusal, carrying its own reason. An answer with nothing in it
-    /// draws as a blank page, and a blank page in a `WebView` cannot be
-    /// told apart from an app that came up and did nothing.
+    /// Refusal with reason: blank page looks like hung app.
     fn empty(status: &'static str) -> Self {
         Self {
             status,
@@ -341,8 +268,7 @@ impl Response {
         }
     }
 
-    /// The app itself could not be read. This fills the view in its
-    /// place, so a reader is told what happened rather than shown grey.
+    /// App unreadable: shown to reader.
     fn failed(status: &'static str, reason: &str) -> Self {
         let body = format!(
             "<!doctype html><html><head><meta charset=\"utf-8\">\
@@ -361,30 +287,27 @@ impl Response {
     }
 }
 
-/// The core's own words, put in a page as text rather than as markup.
+/// Core's words as page text.
 fn escape(text: &str) -> String {
     text.replace('&', "&amp;")
         .replace('<', "&lt;")
         .replace('>', "&gt;")
 }
 
-/// The head of one request: everything before its body. Shared with the
-/// call host (`call_host.rs`), which reads requests the same way.
+/// Request head: all before body. Shared with `call_host.rs`.
 pub(crate) struct Head {
     pub(crate) method: String,
     pub(crate) target: String,
     pub(crate) host: String,
-    /// What `Content-Length` said, or 0 when it said nothing.
+    /// `Content-Length`, 0 if absent.
     pub(crate) length: usize,
-    /// The body's first bytes, which arrived with the head.
+    /// Body bytes already read with head.
     pub(crate) started: Vec<u8>,
 }
 
-/// Read the head, or `None` for something that does not parse as one.
+/// Read head; `None` if unparseable.
 ///
-/// The body is left on the socket. What it is for decides how it is
-/// read: a file an app is handing over is written out as it arrives and
-/// never held, and everything else on this host is short enough to keep.
+/// Body left on socket: handover streams it, rest kept.
 pub(crate) async fn read_head(stream: &mut TcpStream) -> std::io::Result<Option<Head>> {
     let mut head = Vec::new();
     let mut chunk = [0_u8; 2048];
@@ -438,12 +361,9 @@ pub(crate) async fn read_head(stream: &mut TcpStream) -> std::io::Result<Option<
     }))
 }
 
-/// The rest of a body this host is going to keep, or `None` past the cap.
+/// Rest of kept body; `None` past cap.
 ///
-/// Past it the body is still read, and dropped as it comes: answering and
-/// closing on a client that is still writing resets the connection, and a
-/// reset is not an answer -- the app sees a host it could not reach and
-/// has no idea why.
+/// Past cap: body still read and dropped (closing on a writing client resets it).
 pub(crate) async fn read_body(
     stream: &mut TcpStream,
     head: Head,
@@ -472,19 +392,16 @@ pub(crate) async fn read_body(
     Ok(Some(body))
 }
 
-/// Where the needle starts in the haystack.
+/// Where needle starts in haystack.
 fn find(haystack: &[u8], needle: &[u8]) -> Option<usize> {
     haystack
         .windows(needle.len())
         .position(|window| window == needle)
 }
 
-/// Pick the answer. Everything this host does not itself answer is a file
-/// inside the archive, which the core reads.
+/// Pick answer: unhandled paths are archive files.
 async fn route(shared: &Shared, request: &Request) -> Response {
-    // A page in the browser can reach 127.0.0.1 too, and a name that
-    // resolves there would arrive with its own Host. Only the address the
-    // app was handed is served.
+    // Browser reaches 127.0.0.1 too: only given address served.
     if !shared.running.load(Ordering::SeqCst) || request.host != shared.authority {
         return Response::empty("404 Not Found");
     }
@@ -492,25 +409,19 @@ async fn route(shared: &Shared, request: &Request) -> Response {
         Some((path, query)) => (path, query),
         None => (request.target.as_str(), ""),
     };
-    // The chat, behind the token. Checked before anything else and
-    // answered by nothing else: a request under this prefix that does not
-    // carry the token is refused rather than looked for in the archive,
-    // so guessing is told nothing.
+    // Chat behind token: checked first; missing token refused, not searched.
     if path.starts_with("/webxdc-api") {
         let Some(rest) = path.strip_prefix(&shared.api) else {
             return Response::empty("404 Not Found");
         };
-        // `/to-chat` is not here: a handover is answered before its body
-        // is read, so it never reaches this (see `handover_asked`).
+        // `/to-chat` answered before body read (see `handover_asked`).
         return match (request.method.as_str(), rest) {
             ("GET", "/updates") => updates(shared, query).await,
             ("POST", "/send") => send(shared, &request.body).await,
             _ => Response::empty("404 Not Found"),
         };
     }
-    // The bridge is answered before anything is looked for in the
-    // archive, so an app that ships a `webxdc.js` of its own -- some do,
-    // to run outside a messenger -- gets this one.
+    // Bridge answered before archive: app's own `webxdc.js` is shadowed.
     match (request.method.as_str(), path) {
         ("GET", "" | "/" | "/index.html") => index(shared).await,
         ("GET", "/webxdc.js") => Response::new(
@@ -522,21 +433,19 @@ async fn route(shared: &Shared, request: &Request) -> Response {
     }
 }
 
-/// The app's own front page, with the API put in front of it.
+/// App's front page, API put first.
 async fn index(shared: &Shared) -> Response {
     match file(shared, "index.html").await {
         Ok(bytes) => {
             let html = String::from_utf8_lossy(&bytes);
             Response::new("text/html; charset=utf-8", inject(&html).into_bytes())
         }
-        // The one refusal worth spelling out: without index.html there
-        // is no app, and the core's reason is the only thing anybody can
-        // act on. A blank page here reads as a broken app.
+        // No index.html = no app: core's reason is the useful one.
         Err(reason) => Response::failed("502 Bad Gateway", &reason),
     }
 }
 
-/// One file out of the archive, named as the app asked for it.
+/// One archive file, named as asked.
 async fn blob(shared: &Shared, path: &str) -> Response {
     let Some(name) = archive_path(path) else {
         return Response::empty("404 Not Found");
@@ -547,15 +456,10 @@ async fn blob(shared: &Shared, path: &str) -> Response {
     }
 }
 
-/// Everything the chat has said about this app since `serial`, as the
-/// core hands it over: a JSON array, passed through unread.
+/// Chat updates since `serial`: core JSON, unread.
 ///
-/// With `wait=1` a long poll: when there is nothing new this holds on
-/// until the core says there may be ([`Host::poke`]) or [`UPDATE_WAIT`]
-/// has passed, then asks once more and answers with that. Without it the
-/// answer is the core's first one, which is what the bridge needs while
-/// it catches up: an app waits on that before it draws. A 404 once the
-/// app is closed, as for any other request.
+/// `wait=1`: long poll; nothing new holds until core pokes or [`UPDATE_WAIT`], then re-asks.
+/// Without it: core's first answer (bridge catching up; app waits on it to draw). 404 once closed.
 async fn updates(shared: &Shared, query: &str) -> Response {
     let serial = query
         .split('&')
@@ -565,16 +469,14 @@ async fn updates(shared: &Shared, query: &str) -> Response {
     let wait = query.split('&').any(|pair| pair == "wait=1");
     let now = tokio::time::Instant::now();
     let deadline = now.checked_add(UPDATE_WAIT).unwrap_or(now);
-    // Listening before looking, so an update that lands between the two
-    // still wakes this.
+    // Listen before look: update landing between still wakes.
     let changed = shared.changed.notified();
     let mut changed = std::pin::pin!(changed);
     changed.as_mut().enable();
     let mut answer = status_updates(shared, serial).await;
     if wait && answer.as_deref().is_some_and(nothing_new) {
-        // Woken or out of time, the core is asked again either way: what
-        // woke this may not have been an update after all -- an overflow
-        // wakes every app -- and a quiet stretch is answered too.
+        // Woken or timed out: ask core either way. Wake may not be an update (overflow wakes all
+        // apps); quiet stretch gets answered too.
         tokio::time::timeout_at(deadline, changed).await.ok();
         if !shared.running.load(Ordering::SeqCst) {
             return Response::empty("404 Not Found");
@@ -587,8 +489,7 @@ async fn updates(shared: &Shared, query: &str) -> Response {
     }
 }
 
-/// The core's answer for this app's updates since `serial`, or `None`
-/// when it gave none.
+/// Core's answer since `serial`; `None` if none.
 async fn status_updates(shared: &Shared, serial: u32) -> Option<String> {
     let answer: Result<String, _> = shared
         .rpc
@@ -604,26 +505,18 @@ async fn status_updates(shared: &Shared, serial: u32) -> Option<String> {
     answer.ok()
 }
 
-/// Whether the core's answer holds no update: nothing to hand over yet.
-///
-/// Every update is an object, so an answer without a brace in it has
-/// none -- the core's `[]`, or anything else a page could make nothing
-/// of. Either is waited on rather than answered at once: the bridge asks
-/// again as soon as it is answered, and an answer it cannot use would
-/// have it asking in a loop.
+/// No update in answer: no brace (`[]`, or anything unusable). Waited on, not answered: bridge
+/// re-asks at once and would loop.
 fn nothing_new(updates: &str) -> bool {
     !updates.contains('{')
 }
 
-/// One update from the app, on its way to everyone else in the chat.
+/// One update from app, to chat.
 async fn send(shared: &Shared, body: &[u8]) -> Response {
     let Ok(update) = std::str::from_utf8(body) else {
         return Response::empty("400 Bad Request");
     };
-    // Read here rather than passed on as text: an update the core cannot
-    // parse is the app's mistake, and it should hear about it from the
-    // host it is talking to rather than through a core error nothing in
-    // the page can see.
+    // Parsed here: bad update is app's mistake, reported to page.
     if serde_json::from_str::<serde_json::Value>(update).is_err() {
         return Response::empty("400 Bad Request");
     }
@@ -645,11 +538,7 @@ async fn send(shared: &Shared, body: &[u8]) -> Response {
     }
 }
 
-/// Whether this request is an app handing something over.
-///
-/// Answered from the head alone, because the body has not been read yet
-/// and for this one route it never will be as a whole: what the app
-/// sends goes to the disk as it arrives.
+/// Handover request, decided from head: this route never reads body whole.
 fn handover_asked(shared: &Shared, head: &Head) -> bool {
     if !shared.running.load(Ordering::SeqCst) || head.host != shared.authority {
         return false;
@@ -658,28 +547,15 @@ fn handover_asked(shared: &Shared, head: &Head) -> bool {
     head.method == "POST" && path == format!("{}/to-chat", shared.api)
 }
 
-/// A file, a piece of text, or both, on their way out of the app.
+/// File, text, or both, leaving app. File is raw body (no base64/JSON): streamed to cache, never
+/// held. Name and text ride in query.
 ///
-/// The file *is* the request body -- no base64, no JSON around it -- so
-/// it is copied from the socket into the cache a chunk at a time and
-/// never held. What it is called and what goes with it are in the query,
-/// which the head already carried.
+/// No size limit: streaming keeps it off heap; copy removed once saved, outbox emptied at start.
+/// Full disk: `500`, an answer app can show.
 ///
-/// There is no size limit. The one there was existed to keep the file
-/// out of the heap, and streaming keeps it out already; what was left of
-/// it was a number standing in for a cleanup that did not exist. The
-/// cleanup exists now -- the copy goes as soon as it is saved, and the
-/// outbox is emptied when the app starts -- and the disk answers for
-/// itself: a write with no room left for it is a `500`, which is the
-/// truth and is an answer the app can show.
+/// Path handed on, not bytes: page takes files by path, as pickers do. Nothing opened here.
 ///
-/// The *path* is handed on, not the bytes: what receives it is a page,
-/// and a page takes a file by path the way every other picker in this app
-/// hands one over. Nothing is opened or saved from here.
-///
-/// The name is the app's, so it is taken apart and only its last
-/// component kept: an app that asks to write `../../../etc/passwd` gets
-/// a file called `passwd` in the cache.
+/// Name: last component only (`../../../etc/passwd` becomes `passwd` in cache).
 async fn take_handover(
     shared: &Shared,
     stream: &mut TcpStream,
@@ -689,7 +565,7 @@ async fn take_handover(
     let name = field(query, "name");
     let message = field(query, "text");
 
-    // Text with no file: nothing to write, and nothing to read either.
+    // Text, no file: nothing to write.
     if name.is_empty() {
         drain(stream, head.started.len(), head.length).await?;
         if message.is_empty() {
@@ -715,34 +591,30 @@ async fn take_handover(
     }
 }
 
-/// How a streamed body ended.
+/// How streamed body ended.
 enum Written {
     Done,
     Failed,
 }
 
-/// Copy the body onto the disk as it arrives, or say why not.
+/// Copy body to disk as it arrives.
 async fn write_streamed(
     stream: &mut TcpStream,
     path: &std::path::Path,
     head: &Head,
 ) -> std::io::Result<Written> {
-    // tokio's file rather than std's: this runs on the runtime the
-    // JSON-RPC client shares, and a write to a full or slow disk would
-    // otherwise hold one of its threads for the duration.
+    // tokio file: JSON-RPC runtime must not block on slow disk.
     let Ok(mut file) = tokio::fs::File::create(path).await else {
         drain(stream, head.started.len(), head.length).await?;
         return Ok(Written::Failed);
     };
 
-    // What has come off the socket, which is what a drain must not ask
-    // for again -- not the same as what has reached the file.
+    // Bytes off socket: drain must not re-ask.
     let mut taken = head.started.len();
     let mut chunk = vec![0_u8; 64 * 1024];
     let mut rest: &[u8] = &head.started;
     loop {
-        // A write that fails is the disk being full as often as not,
-        // which is the only ceiling this route has left.
+        // Failed write usually full disk.
         if !rest.is_empty() && file.write_all(rest).await.is_err() {
             drain(stream, taken, head.length).await?;
             return Ok(Written::Failed);
@@ -763,15 +635,9 @@ async fn write_streamed(
     Ok(Written::Done)
 }
 
-/// Read whatever is left of a body and drop it.
+/// Read rest of body and drop: closing on a writing client resets it, app sees no answer.
 ///
-/// `taken` is how much of it has already come off the socket, so that a
-/// body half-read is not waited on twice over -- which is a wait for
-/// bytes the other end has already sent and will not send again.
-///
-/// Answering and closing on a client that is still writing resets the
-/// connection, and a reset is not an answer: the app sees a host it could
-/// not reach and has no idea why.
+/// `taken`: bytes already off socket, so they aren't awaited again.
 async fn drain(stream: &mut TcpStream, taken: usize, length: usize) -> std::io::Result<()> {
     let mut dropped = taken;
     let mut chunk = [0_u8; 8192];
@@ -785,7 +651,7 @@ async fn drain(stream: &mut TcpStream, taken: usize, length: usize) -> std::io::
     Ok(())
 }
 
-/// The answer to a handover, with the page told once it is on the wire.
+/// Handover answer; page told once on wire.
 fn handed_over(shared: &Shared, path: String, message: String) -> Response {
     let to_chat = Arc::clone(&shared.to_chat);
     let mut response = Response::empty("204 No Content");
@@ -793,7 +659,7 @@ fn handed_over(shared: &Shared, path: String, message: String) -> Response {
     response
 }
 
-/// One field out of a query string, percent-decoded.
+/// One query field, percent-decoded.
 fn field(query: &str, name: &str) -> String {
     query
         .split('&')
@@ -803,11 +669,9 @@ fn field(query: &str, name: &str) -> String {
         .unwrap_or_default()
 }
 
-/// Where a file an app is handing over is written, under a name of its
-/// own choosing but nowhere of its own choosing.
+/// Handover file location in cache: app's name, cache-only.
 ///
-/// The directory is made here and the file is opened by the caller, which
-/// then writes it as it arrives.
+/// Caller writes.
 fn outgoing_path(shared: &Shared, name: &str) -> Result<std::path::PathBuf, String> {
     let name = std::path::Path::new(name)
         .file_name()
@@ -817,15 +681,12 @@ fn outgoing_path(shared: &Shared, name: &str) -> Result<std::path::PathBuf, Stri
     Ok(outbox_dir(shared.instance.message_id)?.join(name))
 }
 
-/// Where under the cache a file an app hands over waits for the page to
-/// save it: one directory per app instance, and the only directory
-/// anything here will delete from.
+/// Waiting dir per instance: only dir anything here deletes.
 pub(crate) const OUTBOX_DIR: &str = "webxdc/outbox";
 
-/// This instance's outbox, made if it is not there yet.
+/// Instance outbox, created if absent.
 fn outbox_dir(message_id: u32) -> Result<std::path::PathBuf, String> {
-    // `cache_file` makes the parent of whatever it is asked for, so
-    // asking it for a file in the outbox is what makes the outbox.
+    // `cache_file` creates parent: asking makes outbox.
     let inside = crate::qr::cache_file(&format!("{OUTBOX_DIR}/{message_id}/file"))?;
     inside
         .parent()
@@ -833,16 +694,11 @@ fn outbox_dir(message_id: u32) -> Result<std::path::PathBuf, String> {
         .ok_or_else(|| "the outbox has no directory of its own".to_string())
 }
 
-/// Delete a file this app handed over, now that it has been saved.
+/// Delete handed-over file once saved.
 ///
-/// What the page saves is a copy, so once it is saved the cache holds
-/// the same bytes a second time and nothing will ever ask for them. On a
-/// phone that second copy is the whole cost of the feature, and it is
-/// this call that stops it being permanent.
+/// Saved copy duplicates bytes; this removes the cache one.
 ///
-/// The path comes back from the page rather than being remembered here,
-/// so it is checked rather than trusted: anything that is not a file
-/// directly in this instance's own outbox is left where it is.
+/// Path from page: checked; must be directly in own outbox.
 pub(crate) fn discard_outgoing(message_id: u32, path: &str) -> bool {
     let Ok(dir) = outbox_dir(message_id) else {
         return false;
@@ -854,32 +710,21 @@ pub(crate) fn discard_outgoing(message_id: u32, path: &str) -> bool {
     std::fs::remove_file(path).is_ok()
 }
 
-/// Whether `path` names a file the outbox itself holds.
-///
-/// Directly in it, so a directory below it does not count and neither
-/// does a `..` climbing back out: this is the whole of what stands
-/// between a path the page passed on and `remove_file`, so it compares
-/// rather than searches.
+/// Whether `path` is directly in outbox. Guards `remove_file`; compares, doesn't search.
 fn in_outbox(dir: &std::path::Path, path: &std::path::Path) -> bool {
     !dir.as_os_str().is_empty() && path.parent() == Some(dir)
 }
 
-/// Empty this instance's outbox.
+/// Empty outbox.
 ///
-/// What is left in it is a handover nothing ever saved -- the app was
-/// closed with one in flight, or the copy failed -- and it would sit
-/// there for as long as the phone did. An app starting is the moment to
-/// clear it: it is the one point at which none of its own handovers can
-/// be in flight.
+/// Leftovers from closed or failed handovers. Cleared at start: none in flight then.
 pub(crate) fn empty_outbox(message_id: u32) {
     if let Ok(dir) = outbox_dir(message_id) {
         drop(std::fs::remove_dir_all(dir));
     }
 }
 
-/// One file from the archive, through the core. The error is the core's
-/// own words: the message is gone, the archive holds no such name, or the
-/// attachment was never downloaded.
+/// One archive file via core; error is core's words.
 async fn file(shared: &Shared, name: &str) -> Result<Vec<u8>, String> {
     let answer: Result<String, _> = shared
         .rpc
@@ -892,13 +737,12 @@ async fn file(shared: &Shared, name: &str) -> Result<Vec<u8>, String> {
     decode_base64(&encoded).ok_or_else(|| format!("{name} came back as something unreadable"))
 }
 
-/// The bridge with this instance's own values in it.
+/// Bridge with instance values.
 fn bridge(shared: &Shared) -> String {
     fill(BRIDGE, shared)
 }
 
-/// The placeholders in `webxdc.js`, as JSON literals: a name with a quote
-/// in it is a string either way rather than the end of one.
+/// Placeholders as JSON literals: quotes in names stay strings.
 fn fill(script: &str, shared: &Shared) -> String {
     let text = |value: &str| serde_json::to_string(value).unwrap_or_else(|_| "\"\"".to_string());
     script
@@ -916,17 +760,12 @@ fn fill(script: &str, shared: &Shared) -> String {
         .replace("__RETRY__", &RETRY_INTERVAL.to_string())
 }
 
-/// The app's index.html with the API loaded before any of its own code.
+/// index.html with API loaded before its code.
 ///
-/// Inside `<head>` where there is one, since that is where a document's
-/// scripts are expected and where anything the app runs on load comes
-/// after it. A document without a head gets it at the front, which is
-/// still before every script in the body.
+/// Inside `<head>`; no head = front.
 fn inject(html: &str) -> String {
     const TAG: &str = "<script src=\"webxdc.js\"></script>";
-    // ASCII only, so that every offset in `lower` is the same offset in
-    // `html`: full lowercasing changes the length of some characters ("İ"
-    // grows a byte), and the cut below would then miss.
+    // ASCII only: offsets must match `html`; full lowercase changes length.
     let lower = html.to_ascii_lowercase();
     let at = lower
         .find("<head")
@@ -946,17 +785,13 @@ fn inject(html: &str) -> String {
     out
 }
 
-/// The name of a file inside the archive, from the path a request asked
-/// for: percent-decoded, without its leading slash, and without a way
-/// out of the archive.
+/// Archive entry from request path: decoded, no leading slash, no escape.
 fn archive_path(path: &str) -> Option<String> {
     let path = percent_decode(path.strip_prefix('/').unwrap_or(path));
     if path.is_empty() || path.starts_with('/') {
         return None;
     }
-    // A zip may name an entry anything at all, and the core looks up what
-    // it is given: "../" is refused here rather than trusted to mean
-    // nothing there.
+    // Zip names anything; `../` refused here.
     if path
         .split('/')
         .any(|segment| segment == ".." || segment == ".")
@@ -966,9 +801,7 @@ fn archive_path(path: &str) -> Option<String> {
     Some(path)
 }
 
-/// `%20` and the rest. A byte that is not valid UTF-8 once decoded
-/// leaves the path as it was written, which then simply does not name
-/// anything in the archive.
+/// `%20` etc. Undecodable UTF-8 kept as written.
 fn percent_decode(text: &str) -> String {
     let mut out = Vec::with_capacity(text.len());
     let mut rest = text.as_bytes();
@@ -991,8 +824,7 @@ fn percent_decode(text: &str) -> String {
     String::from_utf8(out).unwrap_or_else(|_| text.to_string())
 }
 
-/// What to call a file, by its extension. Only what a page is built from;
-/// anything else is handed over as bytes, which is what a download is.
+/// Content type by extension; rest downloads as bytes.
 pub(crate) fn content_type(name: &str) -> &'static str {
     let extension = name
         .rsplit_once('.')
@@ -1025,17 +857,13 @@ pub(crate) fn content_type(name: &str) -> &'static str {
     }
 }
 
-/// Standard base64, with or without its padding: what the core encodes a
-/// blob as (`STANDARD_NO_PAD`). Whitespace is skipped; anything else that
-/// is not in the alphabet is a blob this cannot read.
+/// Standard base64, padding optional (`STANDARD_NO_PAD`). Whitespace skipped.
 pub(crate) fn decode_base64(text: &str) -> Option<Vec<u8>> {
     let mut out = Vec::with_capacity((text.len() / 4).saturating_mul(3));
     let mut buffer = 0_u32;
     let mut bits = 0_u32;
     for byte in text.bytes() {
-        // Each range counts on from where the one before it stopped: the
-        // lower case from 26, the digits from 52. None of these can fail
-        // inside the range its arm matched.
+        // Ranges count on: lower from 26, digits from 52.
         let value = match byte {
             b'A'..=b'Z' => byte.checked_sub(b'A')?,
             b'a'..=b'z' => byte.checked_sub(b'a' - 26)?,
@@ -1047,12 +875,11 @@ pub(crate) fn decode_base64(text: &str) -> Option<Vec<u8>> {
             _ => return None,
         };
         buffer = (buffer << 6) | u32::from(value);
-        // Never past 13: eight come off as soon as there are eight.
+        // Never past 13: eight come off at eight.
         bits = bits.saturating_add(6);
         if let Some(left) = bits.checked_sub(8) {
             bits = left;
-            // The byte that just completed, dropping the bits that are
-            // still only part of the next one.
+            // Completed byte; drop bits of next.
             let shifted = buffer >> bits;
             out.push(u8::try_from(shifted & 0xff).ok()?);
         }
@@ -1060,15 +887,10 @@ pub(crate) fn decode_base64(text: &str) -> Option<Vec<u8>> {
     Some(out)
 }
 
-/// The digits a token is written in.
+/// Digits a token is written in.
 const HEX: &[u8; 16] = b"0123456789abcdef";
 
-/// The unguessable part of every path.
-///
-/// From `/dev/urandom`, which is there on every phone this runs on. The
-/// fallback is not a secret worth relying on, and does not have to be:
-/// what it guards is one app's files on a socket only this device can
-/// reach, and the app is open for as long as somebody is looking at it.
+/// Unguessable part of every path, from `/dev/urandom`. Fallback fine: device-only reach.
 pub(crate) fn token() -> String {
     let mut bytes = [0_u8; 16];
     let read = std::fs::File::open("/dev/urandom")
@@ -1083,8 +905,7 @@ pub(crate) fn token() -> String {
     }
     let mut out = String::with_capacity(bytes.len().saturating_mul(2));
     for byte in bytes {
-        // Two hex digits, written rather than formatted: `format!` per
-        // byte builds sixteen little strings to throw away.
+        // Hex by hand: `format!` per byte is needless allocation.
         for nibble in [byte >> 4, byte & 0x0f] {
             if let Some(&digit) = HEX.get(usize::from(nibble)) {
                 out.push(char::from(digit));
@@ -1094,8 +915,7 @@ pub(crate) fn token() -> String {
     out
 }
 
-/// Write the answer out. Every one of them carries the policy: the app is
-/// on an origin of its own, and this is what it may do from there.
+/// Writes answer with policy: own origin, what it may do.
 async fn write_response(stream: &mut TcpStream, response: &Response) -> std::io::Result<()> {
     let head = format!(
         "HTTP/1.1 {}\r\n\
@@ -1127,8 +947,7 @@ mod tests {
         assert!(nothing_new("[]"));
         assert!(nothing_new(" [ ]\n"));
         assert!(!nothing_new("[{\"payload\":1,\"serial\":1}]"));
-        // Nothing a page could use either: answered at once, the bridge
-        // would ask again at once, and again.
+        // Nothing usable: answered at once, bridge re-asks at once.
         assert!(nothing_new(""));
         assert!(nothing_new("null"));
     }
@@ -1139,17 +958,17 @@ mod tests {
         let inside = |name: &str| in_outbox(dir, std::path::Path::new(name));
 
         assert!(inside("/cache/piirit/webxdc/outbox/5/notes.txt"));
-        // A name the app chose is kept whole, quirks and all.
+        // Name kept whole, quirks and all.
         assert!(inside("/cache/piirit/webxdc/outbox/5/two words.mp4"));
 
-        // Another app's outbox, which is another app's business.
+        // Other app's outbox.
         assert!(!inside("/cache/piirit/webxdc/outbox/6/notes.txt"));
-        // The outbox itself, and the cache around it.
+        // Outbox and cache around it.
         assert!(!inside("/cache/piirit/webxdc/outbox/5"));
         assert!(!inside("/cache/piirit/webxdc/outbox"));
-        // Below it rather than in it.
+        // Below it, not in it.
         assert!(!inside("/cache/piirit/webxdc/outbox/5/deeper/notes.txt"));
-        // The reader's own files, however the path is written.
+        // Reader's own files.
         assert!(!inside("/elsewhere/Downloads/notes.txt"));
         assert!(!inside(
             "/cache/piirit/webxdc/outbox/5/../../../../etc/passwd"
@@ -1164,16 +983,14 @@ mod tests {
         assert_eq!(decode_base64("aGk=").as_deref(), Some(&b"hi"[..]));
         assert_eq!(decode_base64("aGVsbG8=").as_deref(), Some(&b"hello"[..]));
         assert_eq!(decode_base64("").as_deref(), Some(&b""[..]));
-        // The core wraps nothing, but a blob that arrived wrapped is
-        // still the blob.
+        // Core wraps nothing; wrapped blob is still a blob.
         assert_eq!(decode_base64("aGVs\r\nbG8").as_deref(), Some(&b"hello"[..]));
         assert_eq!(decode_base64("not base64!"), None);
     }
 
     #[test]
     fn base64_round_trips_every_byte() {
-        // Encoded by hand, so the decoder is checked against the
-        // alphabet rather than against itself.
+        // Hand-encoded: decoder checked against alphabet.
         let bytes: Vec<u8> = (0..=255).collect();
         let alphabet = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
         let mut encoded = String::new();
@@ -1198,23 +1015,21 @@ mod tests {
             "<html><head><script src=\"webxdc.js\"></script><title>x</title></head>\
              <body></body></html>"
         );
-        // A head that carries attributes is still a head.
+        // Head with attributes is still a head.
         assert!(inject("<HEAD lang=\"en\">a")
             .starts_with("<HEAD lang=\"en\"><script src=\"webxdc.js\"></script>"));
-        // And a document without one gets the API first of all.
+        // Document without one gets API first.
         assert!(inject("<p>hi</p>").starts_with("<script src=\"webxdc.js\"></script>"));
     }
 
     #[test]
     fn text_that_lowercases_longer_does_not_move_the_cut() {
-        // "İ" is two bytes and lowercases to three: found in a fully
-        // lowercased copy, the head ended a byte past the end of the page,
-        // and the cut panicked.
+        // "İ" lowercases to three bytes; cut panicked in lowercased copy.
         assert_eq!(
             inject("İ<head>"),
             "İ<head><script src=\"webxdc.js\"></script>"
         );
-        // With more after it, the same shift lands inside a character.
+        // Same shift, inside a character.
         assert_eq!(
             inject("İ<head>é"),
             "İ<head><script src=\"webxdc.js\"></script>é"
@@ -1252,13 +1067,11 @@ mod tests {
 
     #[test]
     fn a_refusal_says_what_happened_rather_than_drawing_blank() {
-        // Every refusal carries its reason: a body with nothing in it is
-        // a blank page, and that is what a broken app looks like too.
+        // Every refusal has reason: empty body = blank page.
         let refused = Response::empty("404 Not Found");
         assert_eq!(refused.body, b"404 Not Found");
 
-        // The app's own page is the one worth a sentence, and the core's
-        // words go in it as text.
+        // App's page worth a sentence; core words go in as text.
         let failed = Response::failed("502 Bad Gateway", "no <b>file</b> & no message");
         let page = String::from_utf8_lossy(&failed.body);
         assert!(

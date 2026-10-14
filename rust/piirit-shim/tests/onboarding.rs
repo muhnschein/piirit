@@ -1,14 +1,9 @@
-//! What the onboarding actions say to the core.
+//! Onboarding actions as seen by core.
 //!
-//! Contract tests: they drive a Qt event loop against the recording double
-//! (`src/bin/fake_core_server.rs`) and assert on its journal of JSON-RPC
-//! calls. One process and one event loop, because Qt allows only one
-//! `QGuiApplication`.
+//! Contract tests: Qt event loop vs recording double (`src/bin/fake_core_server.rs`), asserting on
+//! its JSON-RPC journal. One process: Qt allows one `QGuiApplication`.
 
-// Qt harness: needs `unsafe` for `env::set_var` before Qt starts
-// (`unused_unsafe` because it is only unsafe from edition 2024 on),
-// `borrow_as_ptr` for the engine pointer, and `single_shot` with
-// whole-second Durations.
+// Qt harness: unsafe set_var pre-Qt; borrow_as_ptr; whole-second single_shot.
 #![allow(
     unsafe_code,
     unused_unsafe,
@@ -26,9 +21,8 @@ use qmetaobject::*;
 mod common;
 use serde_json::Value;
 
-/// Records what the shim signalled, the half of the contract the journal
-/// cannot show. In the Qt 5.6 dialect with `snake_case` names, so a rename
-/// fails here rather than on a phone.
+/// Records shim's signals, the half journal can't show. Qt 5.6 dialect, `snake_case` names:
+/// rename fails here, not on phone.
 const PROBE_QML: &str = r"
         import QtQuick 2.0
         Item {
@@ -94,14 +88,11 @@ fn onboarding_speaks_the_current_transport_api() {
     let accounts = temp.join("accounts");
     std::fs::create_dir_all(&accounts).expect("create temp dirs");
 
-    // SAFETY: single-threaded test binary, and all three have to be set
-    // before Qt initialises and before the shim spawns the server that
-    // inherits them.
+    // SAFETY: single-threaded; all three set before Qt and before shim spawns server.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_FAKE_JOURNAL", &journal);
-        // Keeps the shim's accounts directory out of the developer's real
-        // XDG data dir.
+        // Keeps shim's accounts dir out of developer's real XDG data dir.
         std::env::set_var("PIIRIT_ACCOUNTS_DIR", &accounts);
     }
 
@@ -109,9 +100,8 @@ fn onboarding_speaks_the_current_transport_api() {
     let mut engine = QmlEngine::new();
     engine.set_object_property("core".into(), core_box.pinned());
 
-    // The QML is part of the assertion: it records what the shim signalled,
-    // which is the half of the contract the journal cannot show. Written in
-    // the Qt 5.6 dialect the device needs, with the shim's snake_case names.
+    // QML is part of the assertion: the signals half of contract. Qt 5.6 dialect the device
+    // needs.
     engine.load_data(QByteArray::from(PROBE_QML));
 
     let server = QString::from(env!("CARGO_BIN_EXE_fake-core-server"));
@@ -132,7 +122,7 @@ fn onboarding_speaks_the_current_transport_api() {
     let failing = core_ptr.clone();
     single_shot(Duration::from_secs(3), move || {
         if let Some(this) = failing.as_pinned() {
-            // The double treats `fail` as an unreachable server.
+            // Double treats `fail` as unreachable server.
             this.borrow_mut().create_profile(
                 QString::from("Ada"),
                 QString::from("dcaccount:fail.invalid"),
@@ -153,8 +143,7 @@ fn onboarding_speaks_the_current_transport_api() {
 
     let engine_ptr: *const QmlEngine = &engine;
     single_shot(Duration::from_secs(7), move || {
-        // SAFETY: see tests/smoke.rs -- the callback only fires while
-        // `exec()` is still running on this thread.
+        // SAFETY: see tests/smoke.rs; callback fires only while `exec()` runs.
         unsafe {
             (*engine_ptr).quit();
         }
@@ -168,7 +157,7 @@ fn onboarding_speaks_the_current_transport_api() {
     assert_email_profile(&calls);
     assert_failed_attempt_left_no_orphan(&calls);
 
-    // The signals QML binds to fired, with the values it binds to.
+    // Signals QML binds to, with their values.
     let summary = QString::from_qvariant(engine.invoke_method("summary".into(), &[]))
         .map(|value| value.to_string())
         .unwrap_or_default();
@@ -201,7 +190,7 @@ fn onboarding_speaks_the_current_transport_api() {
     );
 }
 
-/// The deprecated `set_config(mail_pw)` + `configure` path must stay gone.
+/// Deprecated `set_config(mail_pw)` + `configure` path must stay gone.
 fn assert_current_transport_api(calls: &[Call]) {
     let names = methods(calls);
     assert!(
@@ -230,7 +219,7 @@ fn assert_current_transport_api(calls: &[Call]) {
     }
 }
 
-/// A display name, then the provider payload.
+/// Display name, then provider payload.
 fn assert_chatmail_profile(calls: &[Call]) {
     let names = methods(calls);
     let display_name = calls
@@ -253,8 +242,7 @@ fn assert_chatmail_profile(calls: &[Call]) {
         "the default provider payload changed"
     );
 
-    // Before the transport call, so it is in place when the core announces
-    // the account.
+    // Before transport call, so in place when core announces account.
     let name_index = names.iter().position(|method| *method == "set_config");
     let transport_index = names
         .iter()
@@ -265,7 +253,7 @@ fn assert_chatmail_profile(calls: &[Call]) {
     );
 }
 
-/// The two required fields of `EnteredLoginParam`, as an object.
+/// Two required fields of `EnteredLoginParam`, as object.
 fn assert_email_profile(calls: &[Call]) {
     let transport = find(calls, "add_or_update_transport")
         .expect("create_profile_with_email must go through add_or_update_transport");
@@ -280,7 +268,7 @@ fn assert_email_profile(calls: &[Call]) {
     );
 }
 
-/// A failed attempt must not strand an account.
+/// Failed attempt must not strand an account.
 fn assert_failed_attempt_left_no_orphan(calls: &[Call]) {
     let names = methods(calls);
     let added = names

@@ -5,35 +5,24 @@ import "../js/Media.js" as Media
 import Piirit 1.0
 
 /*
- * Who a one-to-one chat is with: their picture, their name, the line they
- * wrote about themselves, and whether the connection is encrypted.
- * Reached by swiping left from the conversation, the way the group page
- * is from a group. A tap on the picture shows it larger.
+ * One-to-one chat: picture, name, status, encryption. Swipe left from
+ * conversation, as group page. Tap picture: larger.
  *
- * Nothing here is an address. A reader of a chatmail app has no use for
- * one, and the core's own words for a contact are the name, the picture
- * and the status line.
+ * No address shown: core's contact words only.
  *
- * The name can be the reader's own for them: the name under the picture
- * wears an edit badge, a tap on it turns the name into a field, and what
- * is typed there is what the contact is called here. Leaving it blank
- * goes back to theirs -- the core's own rule for an empty name -- and the
- * name stands there again the next time the page is seen. Applied a
- * pause after typing stops and again on the way out, the way the group
- * page renames a group.
+ * Name overridable (edit badge -> field); blank reverts to theirs (core's
+ * rule). Saved after pause and on leave, as group page renames.
  *
- * The same ChatInfo as the group page: a one-to-one chat has one member,
- * the contact, so the model that lists a group's members lists them. The
- * row is read into properties of the page rather than drawn from, so a
- * reload -- every save is one -- does not rebuild what the reader is
- * looking at, or the field under their thumb.
+ * Same ChatInfo as group page: one-to-one has one member, the contact. Row
+ * read into properties: reloads on save must not rebuild the field under the
+ * thumb.
  */
 Page {
     id: page
 
     property int accountId
     property int chatId
-    /// The name the conversation page showed, until the core answers.
+    /// Name shown until core answers.
     property string chatName
     property string errorMessage: ""
 
@@ -48,8 +37,7 @@ Page {
 
     Connections {
         target: core
-        // A changed name or picture reaches here through the contact,
-        // which the model reloads on.
+        // Name/picture changes arrive via contact; model reloads.
         onCore_event: chat.handle_event(context_id, kind, payload_json)
         onStatus_changed: {
             if (core.status === "ready") {
@@ -58,29 +46,28 @@ Page {
         }
     }
 
-    /// The one member, lifted out of the row that reads it.
+    /// The one member, lifted from row.
     property int contactId: 0
-    /// The name given here, empty when none was.
+    /// Given name, empty if none.
     property string givenName: ""
-    /// The name they chose for themselves.
+    /// Name they chose.
     property string ownName: ""
-    /// The name the core shows them under: the given one, else theirs.
+    /// Name shown: given, else theirs.
     property string displayName: ""
     property string contactColor: ""
     property string avatarPath: ""
-    /// What they wrote about themselves, when they did.
+    /// Their status line.
     property string statusLine: ""
     property bool isKeyContact: true
-    /// Not seen for a long time, or never: the core's word for it.
+    /// Not seen long, or never.
     property bool seenLongAgo: false
 
-    /// Someone has typed since the load. Guards the refill below.
+    /// Typed since load: guards refill.
     property bool edited: false
-    /// The refill is writing to the field, so the change is not an edit.
+    /// Refill writing field: not an edit.
     property bool filling: false
 
-    // Filled from the core, never re-filled from it while someone is
-    // typing: every save reloads, and that would reset the cursor.
+    // Filled from core. Not refilled while typing: reload resets cursor.
     onGivenNameChanged: {
         if (!page.edited) {
             page.filling = true
@@ -89,8 +76,7 @@ Page {
         }
     }
 
-    // A pause, not a keystroke: a round trip per letter would be three
-    // calls to write "Ada".
+    // Pause, not per keystroke: a round trip per letter.
     Timer {
         id: autosave
         objectName: "autosave"
@@ -113,10 +99,8 @@ Page {
         }
     }
 
-    // Leaving is the other moment worth saving at: a back-swipe within
-    // the pause above would otherwise drop what was typed. The cursor
-    // leaves the field on the way out, so the keyboard does not follow
-    // the page.
+    // Leaving saves too: back-swipe inside pause would drop text. Cursor
+    // leaves first.
     onStatusChanged: {
         if (status === PageStatus.Deactivating) {
             page.applyEdits()
@@ -124,9 +108,7 @@ Page {
         }
     }
 
-    // Every kind of thing the chat holds, on a page of its own: pushed
-    // by name, as every page is, and the tile says which kind. Calls have
-    // a page of their own, which is also where a call is placed from.
+    // Each content kind on own page, pushed by name.
     function openMedia(kind) {
         if (kind === "calls") {
             pageStack.push(Qt.resolvedUrl("CallsPage.qml"), {
@@ -143,9 +125,7 @@ Page {
         })
     }
 
-    // Their picture, as big as the screen will show it, on the page a
-    // picture in the chat opens on. Nothing to show for a contact who has
-    // none: the disc with their initial is not a picture.
+    // Picture, full size. None if no picture: initial disc is not one.
     function showPicture() {
         if (page.avatarPath.length === 0) {
             return
@@ -156,10 +136,8 @@ Page {
         })
     }
 
-    // One row, the contact, read into the page: a Repeater is how a model
-    // row is read from QML, and the one here has exactly one. Nothing is
-    // drawn in here, so the reload behind every save rebuilds nothing on
-    // screen.
+    // One row, the contact, read into page. Repeater is how QML reads rows.
+    // Draws nothing, so reload after save rebuilds nothing on screen.
     Repeater {
         model: chat.members
 
@@ -215,9 +193,8 @@ Page {
                 }
             }
 
-            // What to call them here. The field holds only what was
-            // given; the name they chose for themselves stands in the
-            // empty field, and is what a blank field goes back to.
+            // Name to call them here. Field holds only given name; theirs
+            // shows in empty field and is what blank goes back to.
             EditableName {
                 id: nameField
                 objectName: "contactNameControl"
@@ -229,9 +206,7 @@ Page {
                 onTextChanged: page.noteEdit()
             }
 
-            // What they wrote about themselves, when they did: their own
-            // words, under their name, before anything this app has to
-            // say about them. Pinned to plain text, being theirs.
+            // Their own words about themselves. Plain text, as theirs.
             Label {
                 objectName: "statusLabel"
                 visible: page.statusLine.length > 0
@@ -244,9 +219,8 @@ Page {
                 text: page.statusLine
             }
 
-            // Under the name, as the core asks: someone not seen for a
-            // long time may not read a message soon, or at all. Delta
-            // Chat's own words, for their translations.
+            // Core asks: long-unseen contact may not read soon. Delta Chat's
+            // words, for translations.
             Label {
                 objectName: "seenLabel"
                 visible: page.seenLongAgo
@@ -261,9 +235,7 @@ Page {
                 text: qsTr("Seen a long time ago")
             }
 
-            // The fact the chat list marks a row with, said in words:
-            // whether the connection is encrypted. A caption under the
-            // person, in the size and colour a caption is drawn in.
+            // Encryption caption under the person, in caption style.
             Label {
                 objectName: "encryptionLabel"
                 anchors.horizontalCenter: parent.horizontalCenter
@@ -272,22 +244,18 @@ Page {
                 wrapMode: Text.Wrap
                 font.pixelSize: Theme.fontSizeSmall
                 color: Theme.secondaryHighlightColor
-                // Translated literals, but pinned all the same: the
-                // binding reads the page to choose one.
+                // Translated literals, pinned: binding reads page to choose
+                // one.
                 textFormat: Text.PlainText
                 text: page.isKeyContact
                       ? qsTr("End-to-end encrypted")
                       : qsTr("Not encrypted: a plain email contact")
             }
 
-            // What the chat holds besides words, a tile per kind, each a
-            // way into the page that lists it. The row keeps its own room
-            // above and below, between who they are and what the chat
-            // does.
+            // Tiles per kind, each a way into its listing page.
             MediaKinds {
                 objectName: "mediaKinds"
-                // `=== true` because dconf hands back `undefined` before it
-                // has read the key.
+                // `=== true`: dconf gives undefined before read.
                 appsAvailable: Settings.webxdcEnabled === true
                 callsAvailable: chat.can_call
                 onKindRequested: page.openMedia(kind)

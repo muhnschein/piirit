@@ -1,12 +1,8 @@
-//! A message that lands is announced, whatever else the core says about
-//! the list in the same breath.
+//! Landed message is announced, whatever else core says about list in same breath.
 //!
-//! The real core follows every `IncomingMsg` with a `ChatlistItemChanged`
-//! within the same millisecond (and a `ChatlistChanged` besides when the
-//! order changed), each starting a refresh of its own. An announcement
-//! riding on the refresh the first event started is made stale by the one
-//! behind it before it lands, so nothing reaches the reader at all. The
-//! fake core sends the pair, which is what makes this test see it.
+//! Core follows `IncomingMsg` with `ChatlistItemChanged` in same ms (plus
+//! `ChatlistChanged` if order moved). Announcement riding first refresh goes stale:
+//! reader sees nothing. Fake sends pair.
 
 // Qt harness: see qml_chat_list.rs.
 #![allow(
@@ -24,8 +20,7 @@ use qmetaobject::*;
 
 mod common;
 
-// The fake core announces a sent message as an arrival (the real one does
-// not), which is how a message can be made to land without a network.
+// Fake announces sent message as arrival (real core doesn't): lands without network.
 const PROBE_QML: &str = r"
     import QtQuick 2.0
     import Piirit 1.0
@@ -64,8 +59,7 @@ fn an_arrival_is_announced_once_the_list_has_settled() {
     let temp = std::env::temp_dir().join(format!("piirit-list-announces-{}", std::process::id()));
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
 
-    // SAFETY: single-threaded test binary; set before Qt starts and before
-    // the server inherits them.
+    // SAFETY: single-threaded; set before Qt starts and before server inherits env.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_ACCOUNTS_DIR", temp.join("accounts"));
@@ -132,8 +126,7 @@ fn an_arrival_is_announced_once_the_list_has_settled() {
         "something was announced before anything arrived. {context}"
     );
     assert_eq!(value("land"), "ok", "sending failed. {context}");
-    // The fake's row summary is "last in <chat>" whatever was sent; the
-    // real core's is the message text, pinned in real_server.rs.
+    // Fake row summary is "last in <chat>"; real core's is message text.
     assert_eq!(
         value("heard"),
         "2:chat 2::last in 2|",

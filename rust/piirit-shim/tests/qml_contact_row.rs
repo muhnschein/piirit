@@ -1,6 +1,5 @@
-//! What a contact row shows. The contact lists sit one tap from the chat
-//! list, so this pins the marks the two share rather than letting them
-//! drift into looking like different applications.
+//! Contact row. Contact lists sit one tap from chat list, so marks the two share are pinned here,
+//! lest they drift into looking like different apps.
 
 // Qt harness: see qml_chat_row.rs.
 #![allow(
@@ -50,7 +49,7 @@ const PROBE_QML: &str = r"
 
 #[test]
 fn a_contact_row_marks_who_can_be_written_to_encrypted() {
-    // SAFETY: single-threaded test binary; set before Qt starts.
+    // SAFETY: single-threaded; set pre-Qt.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
     }
@@ -101,9 +100,8 @@ fn a_contact_row_marks_who_can_be_written_to_encrypted() {
             "key-name",
             call!("get", QString::from("contactName"), QString::from("text"))
         );
-        // Addresses mean nothing to a reader of a chatmail app, so a row
-        // shows one only where asked to -- the profiles page, where it
-        // is the reader's own.
+        // Addresses mean nothing to a chatmail reader: shown only where asked (profiles page, where
+        // it's reader's own).
         record!(
             "address-hidden",
             call!(
@@ -121,16 +119,14 @@ fn a_contact_row_marks_who_can_be_written_to_encrypted() {
                 QString::from("text")
             )
         );
-        // The initial stands in until there is a picture, and it is the
-        // shared Avatar doing it.
+        // Initial stands in until picture, drawn by shared Avatar.
         record!(
             "initial",
             call!("get", QString::from("avatarInitial"), QString::from("text"))
         );
 
-        // Someone the core cannot encrypt to wears the mail mark. A
-        // contact checked in person wears nothing: a tick in a list is a
-        // pick, so the row has no way to be told to draw one.
+        // Core can't encrypt to them: mail mark. Checked in person: nothing (a tick in a list is a
+        // pick, so row can't be told to draw one).
         call!("set", QString::from("isKeyContact"), false);
         record!(
             "plain-name",
@@ -149,7 +145,7 @@ fn a_contact_row_marks_who_can_be_written_to_encrypted() {
     assert_outcome(&steps);
 }
 
-/// The marks a row carries, and the ones it must not.
+/// Marks a row carries, and ones it must not.
 fn assert_outcome(steps: &[(&str, String)]) {
     let value = |label: &str| {
         steps

@@ -1,17 +1,13 @@
-//! Does the real core accept the shapes this shim sends?
+//! Does real core accept the shapes this shim sends?
 //!
-//! The double in `tests/onboarding.rs` is written from the same reading of
-//! the API as the code, so a wrong reading passes both. This drives the shim
-//! against the pinned binary and distinguishes a request the core could not
-//! decode from one it could not deliver. Offline: every address is in a
-//! reserved TLD.
+//! `tests/onboarding.rs`'s double shares the author's reading of the API, so a
+//! wrong reading passes both. This drives shim vs pinned binary; separates a
+//! request core can't decode from one it can't deliver. Offline: reserved TLD.
 //!
 //! Gated on `DELTACHAT_RPC_SERVER`.
 
-// Qt harness: needs `unsafe` for `env::set_var` before Qt starts
-// (`unused_unsafe` because it is only unsafe from edition 2024 on),
-// `borrow_as_ptr` for the engine pointer, and `single_shot` with
-// whole-second Durations.
+// Qt harness: `unsafe` `set_var` pre-Qt (`unused_unsafe`: edition 2024 only);
+// `borrow_as_ptr`; whole-second `single_shot`.
 #![allow(
     unsafe_code,
     unused_unsafe,
@@ -24,7 +20,7 @@ use std::time::Duration;
 use piirit_shim::DeltaChatCore;
 use qmetaobject::*;
 
-/// Serde's vocabulary for a wrong param shape.
+/// Serde's message for wrong param shape.
 const SHAPE_ERRORS: &[&str] = &[
     "invalid type",
     "missing field",
@@ -35,16 +31,11 @@ const SHAPE_ERRORS: &[&str] = &[
     "Invalid params",
 ];
 
-/// Resolve the gate's value, treating a relative path as relative to the
-/// repository root rather than to the process's working directory.
+/// Resolve gate value; relative path is relative to repo root, not working dir.
 ///
-/// Cargo runs an integration test with its working directory set to the
-/// *package* root, not the workspace or repository root, so the obvious
-/// `DELTACHAT_RPC_SERVER=../vendor/...` -- which is what the README, the
-/// Makefile and CI all naturally write -- would otherwise look for the
-/// binary under `rust/`. That failure only shows up where the variable is
-/// actually set, which is CI, and reads as a missing download rather than a
-/// wrong path.
+/// Cargo runs tests from the package root, so `DELTACHAT_RPC_SERVER=../vendor/...`
+/// (as README, Makefile, CI write) would look under `rust/`. Failure shows only
+/// where the var is set (CI) and reads as a missing download, not a wrong path.
 fn resolve(path: &str) -> String {
     let path = std::path::Path::new(path);
     if path.is_absolute() {
@@ -77,28 +68,24 @@ fn the_real_core_accepts_the_shapes_we_send() {
     };
 
     let temp = std::env::temp_dir().join(format!("piirit-real-core-{}", std::process::id()));
-    // Removed first: the directory is keyed by process id, and a recycled
-    // one otherwise hands the real core an account database from an
-    // earlier run.
+    // Removed first: dir keyed by pid; a recycled one hands core an old account db.
     let _ = std::fs::remove_dir_all(&temp);
     std::fs::create_dir_all(&temp).expect("create temp accounts dir");
 
-    // SAFETY: single-threaded test binary; both must be set before Qt starts
-    // and before the shim spawns the server that inherits them.
+    // SAFETY: single-threaded; both set before Qt and before server inherits.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_ACCOUNTS_DIR", &temp);
     }
 
-    // The offer to a second device is an object of its own rather than a
-    // method on the core, so the QML below has to be able to make one.
+    // Second-device offer is its own object, not a core method; QML makes one.
     piirit_shim::register_qml_types();
 
     let core_box = QObjectBox::new(DeltaChatCore::default());
     let mut engine = QmlEngine::new();
     engine.set_object_property("core".into(), core_box.pinned());
 
-    // Errors reported, plus how the core classified a `dcaccount:` payload.
+    // Errors reported; plus how core classified a `dcaccount:` payload.
     let qml = r"
         import QtQuick 2.0
         import Piirit 1.0
@@ -111,23 +98,21 @@ fn the_real_core_accepts_the_shapes_we_send() {
                 onProfile_error: errors = errors + '|' + message
                 onProfile_created: created = created + 1
                 onQr_checked: qrKind = kind
-                // Taking a profile over goes through the same reading of
-                // the API, so its failures belong in the same report.
+                // Taking a profile over uses the same API reading; its failures
+                // belong in the same report.
                 onRestore_failed: errors = errors + '|' + message
                 onRestore_refused: errors = errors + '|refused=' + reason
-                // Adding a relay to a profile is the same transport call
-                // on an account that exists, so its failure belongs here
-                // too.
+                // Adding a relay is the same transport call on an existing
+                // account, so its failure belongs here too.
                 onRelay_error: errors = errors + '|relay=' + message
                 onRelay_added: created = created + 1
-                // In the report too: 'not started' from every call says
-                // only that the core never came up; the status says why.
+                // 'not started' from every call says only that core never came
+                // up; the status says why.
                 onStatus_changed: errors = errors + '|status=' + core.status
             }
-            // The other end of taking a profile over: this phone
-            // offering one. Two calls of its own (`provide_backup` and
-            // `get_backup_qr`), so their shapes belong in this report
-            // like every other.
+            // The other end of taking a profile over: this phone offering one.
+            // Two calls of its own (`provide_backup`, `get_backup_qr`), so their
+            // shapes belong in this report too.
             SecondDevice {
                 id: device
                 account_id: 1
@@ -144,13 +129,13 @@ fn the_real_core_accepts_the_shapes_we_send() {
     core_box.pinned().borrow_mut().start(QString::from(server));
     let core_ptr: QPointer<DeltaChatCore> = QPointer::from(core_box.pinned().borrow());
 
-    // Whole seconds only (qmetaobject 0.2.10; see clippy.toml).
+    // Whole seconds only (qmetaobject 0.2.10; clippy.toml).
     let email = core_ptr.clone();
     single_shot(Duration::from_secs(1), move || {
         if let Some(this) = email.as_pinned() {
             this.borrow_mut().create_profile_with_email(
                 QString::from("Ada"),
-                // RFC 2606 reserved: fails at connect time, not parse time.
+                // RFC 2606 reserved: fails at connect, not parse.
                 QString::from("ada@piirit-test.invalid"),
                 QString::from("not-a-real-password"),
             );
@@ -166,13 +151,10 @@ fn the_real_core_accepts_the_shapes_we_send() {
         }
     });
 
-    // The import's own shape, on a file that is not there: the core
-    // answers that it cannot read it, which is a delivery failure like
-    // the unreachable server above and not a complaint about params.
-    // Its sibling `get_backup` cannot be reached without a second device
-    // offering a profile, so what stands behind that one is the fake
-    // core, written from the same reading of the API, and the code check
-    // in front of it.
+    // Import shape on missing file: core says it can't read it, a delivery
+    // failure like the unreachable server, not a params complaint. `get_backup`
+    // needs a second device offering a profile, so fake core and the code check
+    // cover it.
     let backup = core_ptr.clone();
     single_shot(Duration::from_secs(11), move || {
         if let Some(this) = backup.as_pinned() {
@@ -181,8 +163,8 @@ fn the_real_core_accepts_the_shapes_we_send() {
         }
     });
 
-    // One more relay for account 1, on the same unreachable host: the
-    // core fails to reach it rather than complaining about the shape.
+    // Another relay for account 1, same unreachable host: core fails to reach
+    // it, not complaining about shape.
     let relay = core_ptr;
     single_shot(Duration::from_secs(13), move || {
         if let Some(this) = relay.as_pinned() {
@@ -191,13 +173,10 @@ fn the_real_core_accepts_the_shapes_we_send() {
         }
     });
 
-    // Offering account 1 to a second device. The core cannot: an account
-    // whose configure failed has no key to offer a backup of, which it
-    // says in its own words -- a delivery failure like the unreachable
-    // server above, and not a complaint about the params. What a
-    // provider a device really turns up for does is the fake core's to
-    // say (`qml_second_device.rs`); what the real one makes of the call
-    // is this.
+    // Offer account 1 to second device. Core can't: account whose configure
+    // failed has no key to back up; delivery failure, not params. Real provider's
+    // behavior is fake core's (`qml_second_device.rs`); this checks what real core
+    // makes of the call.
     let offer_ptr = std::ptr::addr_of_mut!(engine);
     single_shot(Duration::from_secs(15), move || {
         // SAFETY: see tests/smoke.rs.
@@ -250,9 +229,8 @@ fn the_real_core_accepts_the_shapes_we_send() {
          budget. Report: {report:?}"
     );
 
-    // Without this the shape check above would pass an offer the core
-    // never answered at all: the provider's two calls would go out, say
-    // nothing, and nothing would notice.
+    // Without this, the shape check would pass an offer core never answered:
+    // provider's two calls go out, say nothing, nothing notices.
     assert!(
         errors.contains("|offer="),
         "offering the profile to a second device answered nothing within \
@@ -260,8 +238,7 @@ fn the_real_core_accepts_the_shapes_we_send() {
          `provide_backup`. Report: {report:?}"
     );
 
-    // A wrong `check_qr` shape would land in `qr_error` and leave this
-    // empty.
+    // Wrong `check_qr` shape would land in `qr_error`, leaving this empty.
     assert_eq!(
         qr_kind, "account",
         "check_qr did not classify a dcaccount: payload as an account \

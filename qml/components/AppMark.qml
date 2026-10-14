@@ -2,27 +2,18 @@ import QtQuick 2.0
 import Sailfish.Silica 1.0
 
 /*
- * What an app is drawn as: nine squares in a grid, which is the mark
- * every phone uses for "apps".
+ * App mark: nine squares in a grid, the phone "apps" mark.
  *
- * Drawn rather than named. Silica's theme has an icon for most things and
- * this app asks it only for names it has been seen to have -- an icon
- * that is not there is a button nobody can see -- and a webxdc is new
- * enough that no such name can be relied on. Nine rectangles cost
- * nothing, scale with whatever size they are given, and take the colour
- * of whatever they are put in.
+ * Drawn, not named: app asks theme only for icon names seen on devices (missing icon = invisible button), and no webxdc icon name can be relied on. Rects scale with size, take host colour.
  *
- * Laid out by bindings rather than a Grid: a positioner sizes itself in a
- * polish pass, which never runs headlessly, so a mark built from one
- * measures as nothing in a test.
+ * Bindings, not Grid: positioner sizes in a polish pass, which never runs headless. Mark would measure zero in tests.
  */
 Item {
     id: root
 
-    /// How big the whole mark is. The squares divide it: three of them
-    /// and two gaps make exactly this.
+    /// Whole mark size. Squares divide it: three squares, two gaps.
     property real size: Theme.iconSizeSmall
-    /// What colour to draw it in.
+    /// Colour.
     property color color: Theme.primaryColor
 
     readonly property real cell: root.size / 4

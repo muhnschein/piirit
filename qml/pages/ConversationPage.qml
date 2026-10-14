@@ -6,8 +6,8 @@ import "../js/Emoji.js" as Emoji
 import Piirit 1.0
 
 /*
- * One conversation. The messages come from a ChatMessages instance owned by
- * this page, so a second open conversation cannot reset this one's model.
+ * One conversation. Messages come from this page's own ChatMessages, so a
+ * second open conversation cannot reset this one's model.
  */
 Page {
     id: page
@@ -15,84 +15,64 @@ Page {
     property int accountId
     property int chatId
     property string chatName
-    /// A message a search found in this chat, to open at rather than at
-    /// the newest. 0 opens the chat normally.
+    /// Search-found message to open at. 0: newest.
     property int findMessageId: 0
 
     ChatMessages {
         id: messages
         objectName: "messages"
         account_id: page.accountId
-        // What the reader can actually see decides what counts as read.
+        // Visible messages decide read.
         reading_history: !page.readerIsLooking
-        // The reader's setting, from the settings page: known tracking
-        // parameters come out of links on the way out.
+        // Reader setting: strip tracking params from links.
         clean_links: Settings.cleanLinks === true
-        // And the outgoing media quality, which a picked video is made
-        // smaller to before it is sent.
+        // Outgoing media quality: video shrunk to this before send.
         media_quality: Settings.mediaQuality === 1 ? 1 : 0
-        // What is waiting on the attachment bar, so the model can weigh
-        // it against the size the core recommends. Put aside with the
-        // bar itself while a message is being edited, since an edit
-        // carries no file.
+        // File on attachment bar, for model to weigh against core's
+        // recommended size. Set aside while editing (edits have no file).
         pending_file: page.editing ? "" : page.attachmentPath
         onError: {
             page.errorMessage = message
-            // A voice message that could not be sent is still on the
-            // phone for nothing.
+            // Unsent voice message: discard, else lingers on phone for nothing.
             page.dropVoice()
-            // Nor is a file the core refused tried again on its own: it
-            // stays on the bar for the reader to send.
+            // Refused file stays on bar; not retried on its own.
             if (page.sendingOnItsOwn) {
                 page.sendingOnItsOwn = false
                 page.sendWhenReady = false
             }
         }
-        // Sending is its own answer to "have I read this": go to the
-        // message just sent rather than counting it as one that was missed.
+        // Sending means read: go to message just sent, not missed.
         onSent: {
-            // A file sent on its own (`sendWhenReady`) carried none of
-            // the field, the reply or the draft: they stay.
+            // File sent alone (`sendWhenReady`) keeps field, reply, draft.
             var onItsOwn = page.sendingOnItsOwn
             page.sendingOnItsOwn = false
             if (!onItsOwn) {
                 textField.text = ""
-                // Now, not a second from now: the chat list would
-                // otherwise show the message as a draft it is still
-                // holding, next to the same message as the one just sent.
+                // Now: chat list would show sent message as still-held draft.
                 page.storeDraft()
                 page.replyBody = ""
                 page.replyAuthor = ""
             }
-            // A capture -- a picture taken here, a voice message -- has
-            // been copied by the core and is not needed any more. A
-            // file picked from a library is not a capture, and is left
-            // where it was.
+            // Capture is copied by core; library file stays where it was.
             captures.discard(page.attachmentPath)
             page.attachmentPath = ""
             page.dropVoice()
             page.sendWhenReady = false
             listView.jumpToNewest()
         }
-        // The core has said how large an attachment it recommends, or
-        // that it will not say, and what a video on the bar is to be made
-        // smaller to is settled; or a video has been made smaller; or the
-        // chat's rows are in. Each can be what a file sent at once waits
-        // for: see `sendWhenReady`.
+        // Core size limit, video shrink target, rows loaded: `sendWhenReady`
+        // waits on these.
         onAttachment_limit_changed: sharedSend.restart()
         onPreparing_changed: sharedSend.restart()
         onLoaded_changed: sharedSend.restart()
-        // An edit is not a send: the row shows the new text, and the
-        // field goes back to whatever was in it before the edit began.
+        // Edit is not a send: field restored after.
         onEdited: page.finishEdit()
         onArrived: listView.noteArrivals(count)
-        // The chat's unsent text, once the core has answered with it.
+        // Unsent text, once core answers.
         //
-        // `draftApplied` is set only when something is actually put in the
-        // field. Handing the chat over clears the draft and says so, and
-        // treating that as the answer would mark the field filled before
-        // the core had replied -- which is how this first went in and why
-        // nothing came back.
+        // `draftApplied` set only when text lands in field. Chat handover
+        // clears draft and signals it; taking that as the answer marked field
+        // filled before core replied, so draft never came back.
         onDraft_changed: {
             if (!page.draftApplied && messages.draft.length > 0
                     && textField.text.length === 0) {
@@ -102,39 +82,28 @@ Page {
         }
     }
 
-    // The chat is handed over as the page is built, so a prefetched one is
-    // already in the model before the transition starts and the page comes
-    // in with its messages rather than filling in behind itself.
+    // Handed over as page is built: prefetched chat arrives with messages.
     //
-    // Not deferred to PageStatus.Active: a chat opens on one page of fifty
-    // rather than whole, so there is no long history to build on the Qt
-    // thread and freeze the transition with. The prefetch has usually built
-    // those rows already, leaving the handover a move with no core round
-    // trip in it at all.
+    // Not deferred to Active: chat opens on one page of fifty, so no long
+    // history built on Qt thread to freeze transition; prefetch usually built
+    // rows already (no core round trip).
     //
-    // In `Component.onCompleted` rather than a binding on the declaration
-    // above, because the order matters: this must run after
-    // `reading_history` has been bound, or the model would see the default
-    // `false`, take it for a reader looking at the screen, and mark the
-    // chat read before the page is even on it.
-    /// What a share handed this chat, when the page was opened from one:
-    /// a file to put on the attachment bar, text to put in the field.
-    /// See qml/share/ShareTarget.qml. A camera quick action hands one
-    /// over the same way (ChatListPage.capture).
+    // In `Component.onCompleted`, not a binding: must run after
+    // `reading_history` bound, else model sees default `false` as reader
+    // looking and marks chat read before page shows.
+    /// Share that opened this chat: file for bar, text for field. See
+    /// qml/share/ShareTarget.qml.
+    /// Camera quick action does the same (ChatListPage.capture).
     property string sharedFile: ""
     property string sharedText: ""
-    /// Whether the shared file goes without waiting for the send button:
-    /// a camera quick action set to send at once. Read as the page is
-    /// made.
+    /// Shared file sent without send button (camera quick action set to send at
+    /// once). Read at creation.
     property bool sendShared: false
 
     Component.onCompleted: {
         messages.chat_id = page.chatId
-        // A share opens the chat with what was shared already in it,
-        // for the reader to add a caption or a word to and send. Before
-        // the draft arrives, which only fills a field that is empty --
-        // so a chat holding a draft keeps it under what was shared
-        // rather than over it.
+        // Share fills chat with shared content for caption and send. Before
+        // draft arrives, which only fills an empty field: existing draft kept.
         if (page.sharedFile.length > 0) {
             page.attach(page.sharedFile)
             page.sendWhenReady = page.sendShared
@@ -144,32 +113,19 @@ Page {
         }
     }
 
-    /// The shared file is to be sent as soon as it can be: once the core
-    /// has said how large an attachment it recommends, and once a video
-    /// is no longer being made smaller to fit that. Sending before either
-    /// would send a video as it was taken however large it is, so only
-    /// those two, as the model announces them, try it. And once the
-    /// chat's rows are in: a send answered while they are being read
-    /// lands on rows the read then replaces with what the chat held
-    /// before it, and the message is not on the page until the chat is
-    /// opened again -- a video, slow to copy into the core, did just
-    /// that. Cleared once it
-    /// has gone, once the core has refused it, and once the reader takes
-    /// it over: puts something else on the bar, stops a video being made
-    /// smaller, starts a reply or an edit, or sends it themselves.
+    /// Shared file sent once core's size limit is known and any video shrink
+    /// done (else video goes full size), and rows are in: a send during the
+    /// read lands on rows the read replaces, message missing until reopen.
+    /// Cleared once sent, refused, or taken over (other file, shrink stopped,
+    /// reply/edit begun, reader sends).
     property bool sendWhenReady: false
-    /// The send under way is that one, not the reader's.
+    /// Send under way is that one, not reader's.
     property bool sendingOnItsOwn: false
 
-    // A turn of the event loop after the model has said something moved,
-    // not inside its signal: the model is still in the middle of the
-    // change it is announcing, and cannot take a send there.
+    // One event turn after model moved: model mid-change can't take send.
     //
-    // The file alone, without the field: whatever is in it is the
-    // reader's draft for this chat, not a caption they chose for this.
-    // A reply or an edit begun meanwhile is the reader writing: the
-    // file waits for them, rather than going as a reply they had not
-    // finished or under an edit.
+    // File alone: field text is draft, not caption. Reply or edit begun
+    // meanwhile: file waits.
     Timer {
         id: sharedSend
         interval: 0
@@ -188,41 +144,30 @@ Page {
         }
     }
 
-    // The list's place is remembered as a page goes over this one, held
-    // while it is away, and put back -- to the pixel, so that a view
-    // nothing has moved does not move -- when this one is active again.
-    // Opening a picture full screen and coming back is the way most
-    // readers meet that.
+    // List place held while page is away, restored to the pixel.
     onStatusChanged: {
         if (page.status === PageStatus.Deactivating) {
             listView.rememberPlace()
-            // Written now rather than a second from now: leaving the chat
-            // is exactly when the debounce below has not fired yet, and
-            // that was the whole complaint.
+            // Written now: leaving is when debounce hasn't fired.
             page.storeDraft()
-            // A tray left open under a picker is open again on the way
-            // back, over the file just picked.
+            // Close tray: left open under picker, it reopens on return over
+            // picked file.
             attachButton.close()
-            // And messages the reader asked to delete go now, for the
-            // same reason the draft is written now: a reader who asked
-            // for one to go and then left the chat asked for it to go.
+            // Deletes asked for go now, same reason as draft.
             listView.flushDeletes()
         } else if (page.status === PageStatus.Active) {
             listView.restorePlace()
-            // A message asked for while the page was away -- from a
-            // media page over the contact's, on its way back here --
-            // lands on top of the place just put back, not under it.
+            // Asked for while page away (media page): lands on top of restored
+            // place, not under it.
             page.revealIfAsked()
             page.attachInfo()
         }
     }
 
-    /// Go to one message: what a search result asks for as the chat
-    /// opens, and what a media page over this one asks for on the way
-    /// back (ChatMediaPage.showInChat). Acted on now if this is the page
-    /// on screen; kept until it is otherwise, since coming back puts
-    /// the view where the reader left it and the message has to land
-    /// over that.
+    /// Go to one message: search result, or media page's ask on return
+    /// (ChatMediaPage.showInChat).
+    /// Acted on now if on screen, else kept: return restores place, and
+    /// message must land over that.
     function showMessage(messageId) {
         page.findMessageId = messageId
         if (page.status === PageStatus.Active) {
@@ -230,58 +175,47 @@ Page {
         }
     }
 
-    /// Ask the model where the message that was asked for is, once
-    /// there is one and the rows are in. Where it answers is
-    /// `onRevealed` below.
+    /// Ask model where message is, once rows are in. Answer in `onRevealed`.
     function revealIfAsked() {
         if (page.findMessageId !== 0 && messages.loaded) {
             messages.reveal(page.findMessageId)
         }
     }
 
-    /// Whether the chat's own draft has been put in the field yet.
-    ///
-    /// The answer comes back from the core a moment after the page opens,
-    /// and a reader who started typing in that moment must not have it
-    /// written over them.
+    /// Chat's own draft in field yet. Core answers late; typing reader must not
+    /// be overwritten.
     property bool draftApplied: false
 
     function storeDraft() {
         draftDebounce.stop()
-        // Not while the field holds a message already sent: what the
-        // core is keeping is the reader's own unsent words, put aside
-        // for the edit and put back after it.
+        // Not while field holds sent message: core's copy is reader's unsent
+        // words.
         if (page.editing) {
             return
         }
         messages.save_draft(textField.text)
     }
 
-    // Not on every keystroke: that is one call to the core per character.
+    // Not per keystroke: one core call per character.
     Timer {
         id: draftDebounce
         interval: 1000
         onTriggered: page.storeDraft()
     }
 
-    /// The message of the reader's own whose text is in the field to be
-    /// changed, 0 for none. Editing is a mode of the field: while it is
-    /// on, the field holds that message's text, the bar above it says
-    /// so, the attachment tray is out of reach, and send means "send the
-    /// change" -- the shape deltachat-android and deltachat-ios give it.
+    /// Reader's own message being edited; 0 for none. Edit is a field mode:
+    /// field holds its text, bar says so, tray out of reach, send means "send
+    /// the change" (as deltachat-android/ios).
     property int editingMessageId: 0
-    /// The text as it was sent, for the bar to show.
+    /// Text as sent, for bar.
     property string editingBody: ""
-    /// What the field held before the edit began: the reader's unsent
-    /// draft, put back when the edit is sent or cancelled. The reference
-    /// clients throw it away, which is a loss with no reason behind it.
+    /// Field content before edit (unsent draft), restored on send or cancel.
+    /// Reference clients discard it; deliberate.
     property string stashedDraft: ""
     readonly property bool editing: page.editingMessageId !== 0
 
     function beginEdit(messageId, body) {
-        // A second Edit while one is under way keeps the first stash:
-        // what is in the field now is the first message's text, not
-        // anything the reader wants back.
+        // Second Edit keeps first stash: field now holds first message's text.
         if (!page.editing) {
             page.stashedDraft = textField.text
         }
@@ -298,18 +232,13 @@ Page {
         page.stashedDraft = ""
     }
 
-    /// The edit reached the core: the same as cancelling, as far as the
-    /// field is concerned.
+    /// Edit reached core: as cancel, for the field.
     function finishEdit() {
         page.cancelEdit()
     }
 
-    // Where a search result lands. The row cannot be looked up until the
-    // fetch has finished, so this waits for the model to say so rather
-    // than for the page: the two are not the same moment. And a chat opens
-    // on its newest page, so the message a search found may not be loaded
-    // at all -- `reveal` steps back until it is and then says where it
-    // went, which is why this is two handlers rather than one lookup.
+    // Search result lands here: waits for model, not page. Found message may be
+    // unloaded: `reveal` steps back until it is.
     Connections {
         target: messages
         onLoaded_changed: {
@@ -320,46 +249,35 @@ Page {
         onRevealed: {
             if (row >= 0) {
                 listView.foundMessageId = message_id
-                // Held rather than jumped to: the page is still arriving
-                // and its rows still being measured, and one jump lands
-                // the reader wherever the measuring has got to.
+                // Held, not jumped to: page still arriving, rows still being
+                // measured; one jump lands wherever measuring got to.
                 listView.holdAt(row)
                 foundFlash.restart()
             }
-            // Once is enough, found or not: a later reload must not drag
-            // the reader back off whatever they have scrolled to since.
+            // Once only: a later reload must not pull reader back.
             page.findMessageId = 0
         }
-        // A fill takes at most a page at a time, and a screenful of a chat
-        // with big rows in it can want more than that. Asking again when
-        // one finishes is what covers the rest. It stops on its own: the
-        // ask is dropped when there is nothing left to fill, so nothing
-        // comes back to prompt another.
+        // Fill takes a page at a time; asks again on finish until nothing left.
         onHydrating_changed: if (!messages.hydrating) listView.askForRows()
     }
 
-    // The flash says "this one" and then gets out of the way.
+    // Flash: "this one", then out of the way.
     Timer {
         id: foundFlash
         interval: 4000
         onTriggered: listView.foundMessageId = 0
     }
 
-    // Everything that has to hold for an arriving message to count as seen:
-    // the app is in front, this page is the one on screen, and the view is
-    // at the newest message and not mid-gesture. `following` rather than
-    // `stickToBottom` because the latter is only recomputed when a drag
-    // ends, so it still reads true throughout a drag away from the bottom.
-    // Any one of these false means a read receipt would be a lie.
+    // Message counts as seen only if app in front, page on screen, view at
+    // newest, no drag. Any false: read receipt would lie.
+    // `following` not `stickToBottom`: latter is stale during drag.
     readonly property bool readerIsLooking:
         Qt.application.state === Qt.ApplicationActive
         && page.status === PageStatus.Active
         && listView.following
 
     property string errorMessage: ""
-    // Three states, not two: the core going away is now something the app
-    // does something about, and a banner that says "restart Piirit"
-    // while Piirit is already fixing it is worse than none.
+    // Three states: core going away is handled; no restart banner.
     readonly property string coreStatusMessage:
         core.status === "reconnecting"
         ? qsTr("Lost the connection to the Delta Chat core. Reconnecting…")
@@ -370,9 +288,9 @@ Page {
     // Qt 5.6 handler syntax; see WelcomePage.qml.
     Connections {
         target: core
-        // The model ignores events for other accounts and chats itself.
+        // Model ignores other accounts' and chats' events.
         onCore_event: messages.handle_event(context_id, kind, payload_json)
-        // A model created before the core is up has nothing to load from.
+        // Model made before core is up has nothing to load.
         onStatus_changed: {
             if (core.status === "ready") {
                 messages.reload()
@@ -381,8 +299,7 @@ Page {
         onCore_error: page.errorMessage = message
     }
 
-    // What the reader picked Reply on, for the bar above the field. The id
-    // itself lives on the model, which is what the send reads.
+    // Reply target for bar; id lives on model.
     property string replyBody: ""
     property string replyAuthor: ""
 
@@ -392,15 +309,12 @@ Page {
         page.replyAuthor = ""
     }
 
-    // The file the next send will carry, empty for none. One per message,
-    // which is the core's own shape -- see ChatMessages.send_file.
+    // File next send carries; one per message (ChatMessages.send_file).
     property string attachmentPath: ""
     readonly property string attachmentName: page.displayName(page.attachmentPath)
 
-    // Decoded for the same reason the shim decodes the path it sends: a
-    // picker that hands back a URL escapes the spaces, and the bar should
-    // name the file the way the reader does. An escape that does not decode
-    // is a name with a literal '%' in it.
+    // Decoded as shim decodes sent path: picker URLs escape spaces; bar names
+    // file as reader does. Undecodable escape means literal '%' in name.
     function displayName(path) {
         var name = path.substring(path.lastIndexOf('/') + 1)
         try {
@@ -410,37 +324,33 @@ Page {
         }
     }
 
-    // Both pickers report back here rather than sending, so a picked file
-    // can still be cancelled, and so a caption can be typed after choosing.
+    // Pickers report back, not send: picked file stays cancellable, caption
+    // can follow.
     function attach(path) {
         if (path && path.length > 0) {
-            // A capture that is replaced before it is sent is not going
-            // anywhere.
+            // Capture replaced before send goes nowhere.
             captures.discard(page.attachmentPath)
             page.attachmentPath = path
-            // Only the shared file was ever to go on its own.
+            // Only shared file goes on its own.
             page.sendWhenReady = false
         }
     }
 
-    // Where a picture taken here, or a voice message, waits to be sent;
-    // this page is what takes it back afterwards.
+    // Where photos taken here and voice messages wait to send; this page
+    // discards them after.
     Captures {
         id: captures
         objectName: "captures"
     }
 
-    // Cancelling a capture throws the file away; cancelling a picked
-    // file leaves it where it was.
+    // Cancel discards capture; cancel of picked file leaves it.
     function dropAttachment() {
         captures.discard(page.attachmentPath)
         page.attachmentPath = ""
     }
 
-    /// The voice message on its way to the core, until the core has
-    /// answered: it goes straight from the recorder to the send, never
-    /// through the attachment bar, so it is remembered here to be
-    /// discarded afterwards.
+    /// Voice message on its way to core, until answered. Goes recorder -> send,
+    /// never via bar, so kept here to discard after.
     property string pendingVoice: ""
 
     function dropVoice() {
@@ -448,11 +358,10 @@ Page {
         page.pendingVoice = ""
     }
 
-    // A capture left on the bar when the chat is closed, or a voice
-    // message the core never answered for, is not going anywhere now:
-    // nothing else knows it is there. Unless a send is still under way,
-    // which may be reading it; what that leaves behind is the sweep's
-    // (capture.rs). A recoded video is the model's to put away.
+    // Capture left on bar at close, or voice message core never answered, goes
+    // nowhere now: nothing else knows of it. Unless a send is in flight (may
+    // still read it): sweep (capture.rs) handles that. Recoded video is the
+    // model's to put away.
     Component.onDestruction: {
         if (!messages.sending) {
             page.dropAttachment()
@@ -460,52 +369,38 @@ Page {
         }
     }
 
-    // Pushed by URL and connected to, the way forwarding pushes
-    // ChatPickerPage: the picker pages are the only files that name a
-    // `Sailfish.Pickers` type, and the capture page and the scanner the
-    // only ones that name a Camera, so a type that is not there costs one
-    // button rather than the whole conversation.
+    // Pushed by URL like ChatPickerPage: only picker pages name
+    // `Sailfish.Pickers`, only capture page and scanner name Camera, so a
+    // missing type costs one button, not the chat.
     function pickWith(pageName) {
         var picker = pageStack.push(Qt.resolvedUrl(pageName))
-        // Null when the page could not be loaded, which is the case the
-        // comment above is about; connecting to it would throw.
+        // Null when page failed to load: connecting would throw.
         if (picker) {
             picker.picked.connect(page.attach)
         }
     }
 
-    // Outside the list rather than its `header`, so it stays put: a
-    // header scrolls with the content, and in a long conversation the
-    // name of whoever you are talking to disappears off the top. Not
-    // Silica's PageHeader: the name is the other end's to choose, and
-    // that header cannot be told to show it as plain text.
+    // Outside list: header scrolls off top in long chats. Not PageHeader: name
+    // is other end's to choose, and that header can't show it as plain text.
     ConversationHeader {
         id: conversationHeader
         objectName: "conversationHeader"
         title: page.chatName
-        // Under a group's name, where PageHeader puts a description:
-        // how many people are in it. Nothing under a one-to-one chat's
-        // name, where the count would say "2" about a conversation with
-        // one other person, and nothing until the chat's shape has
-        // arrived -- a "0 members" that turns into seven reads as the
-        // group having been empty a moment ago.
+        // Group member count under name. None for one-to-one ("2" for one
+        // person), or before chat shape arrives ("0 members" flicker).
         //: Under a group's name, over its messages. %n is how many
         //: people are in the group.
         subtitle: messages.is_group && messages.member_count > 0
                   ? qsTr("%n member(s)", "", messages.member_count)
                   : ""
-        // White once the info page is attached, as a PageHeader is on a
-        // page that can navigate forward.
+        // White once info page attached, as PageHeader is when navigable.
         interactive: page.canNavigateForward
-        // The name goes the same way the swipe does.
+        // Name goes the same way the swipe does.
         onClicked: page.openInfo()
     }
 
-    /// Call this chat, or go back to the call there is.
-    ///
-    /// One call at a time, as both reference clients have it: asking for
-    /// a second brings the first back to the front, which is where the
-    /// reader can see that it is still going.
+    /// Call this chat, or go back to the call there is. One call at a time (as
+    /// reference clients): asking again brings first one to front.
     function placeCall(video) {
         if (typeof appWindow === "undefined") {
             return
@@ -515,10 +410,9 @@ Page {
         }
     }
 
-    /// A call's row was tapped. One still ringing is answered from here,
-    /// as the reference clients have it -- it may have rung while nothing
-    /// here was listening -- and any other is called back, the way it was
-    /// made: a video call with the camera on.
+    /// Call row tapped: ringing call answered here (may have rung while nothing
+    /// listened), as reference clients; any other called back as made (video
+    /// with camera on).
     function callFromRow(messageId, outgoing, callState, hasVideo) {
         if (typeof appWindow === "undefined") {
             return
@@ -532,11 +426,9 @@ Page {
         }
     }
 
-    // What this chat is -- the group, or the contact -- sits to the right,
-    // attached rather than pushed: the page indicator says it is there,
-    // and a swipe reaches it. Which page depends on the kind of chat, so
-    // it waits for the load; and it is attached again on every return,
-    // since a page pushed over this one takes the attached one with it.
+    // Group or contact info, to the right; which depends on chat kind, so waits
+    // for load. Attached, not pushed: indicator and swipe reach it. Reattached
+    // each return: a pushed page takes it along.
     function attachInfo() {
         if (!messages.loaded || page.status !== PageStatus.Active) {
             return
@@ -561,10 +453,8 @@ Page {
     Connections {
         target: messages
         onLoaded_changed: page.attachInfo()
-        // The name the list handed over, until the core says otherwise:
-        // a rename on the page beside this one, or on another device,
-        // reaches the header through the model rather than through
-        // whichever page did it.
+        // Name from list until core says; renames elsewhere reach header via
+        // model.
         onChat_name_changed: {
             if (messages.chat_name.length > 0) {
                 page.chatName = messages.chat_name
@@ -583,26 +473,22 @@ Page {
             bottom: banner.top
         }
         model: messages.rows
-        // The model's own count, which changes when a row arrives rather
-        // than when the view gets round to showing it.
+        // Model count: changes when row arrives, not when view shows it.
         messageCount: messages.count
-        // The model holds a row for every message and fills in the ones on
-        // screen; this is what tells it which those are.
+        // Model fills rows on screen; this says which those are.
         onHydrateRequested: messages.hydrate(first, last)
         showSender: messages.is_group
-        // Where the reader left off, which the model asked the core for
-        // when the chat was opened.
+        // Reader's last-read place, asked of core on open.
         unreadFrom: messages.unread_from
         markdownMode: Settings.markdownMode
-        // Off until the reader asks for it, so a `.xdc` in the chat is a
-        // file until then. `=== true` because dconf hands back
-        // `undefined` before it has read the key.
+        // Off until asked: `.xdc` is a file until then. `=== true`: dconf
+        // undefined before read.
         appsEnabled: Settings.webxdcEnabled === true
-        // What the core would take an edit in: see the model.
+        // What core takes an edit in: see model.
         canEdit: messages.can_send && messages.is_encrypted
         placeholderText: qsTr("No messages yet")
 
-        // Reaching the newest message is what marks what is there read.
+        // Reaching newest marks what is there read.
         onArrivedAtNewest: messages.mark_seen_all()
         onReplyRequested: {
             messages.quoted_message_id = messageId
@@ -626,11 +512,10 @@ Page {
         onAppRequested: page.openApp(messageId)
         onCallRequested: page.callFromRow(messageId, outgoing, callState, hasVideo)
         onDownloadRequested: messages.download_full(messageId)
-        // On or off is the model's call: it knows what the reader already
-        // sent, and the core takes the whole list either way.
+        // On/off is model's call: it knows what reader sent; core takes whole
+        // list either way.
         onReactionRequested: messages.react(messageId, emoji)
-        // Every other emoji is a page. The id is captured now, as
-        // Forward's is: the row may be gone when the answer comes back.
+        // Other emoji opens a page; id captured now (row may be gone).
         onReactionPickerRequested: {
             var reactingTo = messageId
             var mine = current
@@ -640,8 +525,7 @@ Page {
             if (picker) {
                 picker.picked.connect(function(emoji) {
                     messages.react(reactingTo, emoji)
-                    // Taking one's reaction off is not a pick to offer
-                    // again.
+                    // Removing own reaction is not offered again.
                     if (emoji !== mine) {
                         Settings.recentReactions = Emoji.remember(
                             Settings.recentReactions, emoji)
@@ -649,9 +533,8 @@ Page {
                 })
             }
         }
-        // Which kind of delete was picked on the page the menu led to,
-        // and the wait is up: the message goes from this account's
-        // devices, or from everybody's.
+        // Delete kind picked on menu's page, wait over: from this account or
+        // everybody's.
         onDeleteRequested: {
             if (forEveryone) {
                 messages.delete_message_for_all(messageId)
@@ -659,14 +542,11 @@ Page {
                 messages.delete_message(messageId)
             }
         }
-        // The menu asks for a deletion; which kind is a dialog, and
-        // pushing it is the page's business rather than the list's.
-        // Nothing is deleted until that dialog is accepted and the wait
-        // after it is up, so leaving by the back edge deletes nothing.
+        // Menu asks for delete; dialog pushed by page. Nothing deleted until
+        // dialog accepted and wait done: back edge deletes nothing.
         onDeleteChoiceRequested: {
-            // Taken now rather than in the callback: choosing takes a
-            // page push, and the row may be gone by the time the answer
-            // comes back -- the same reason Forward hoists its id.
+            // Taken now, not in callback: row may be gone (as Forward hoists
+            // its id).
             var doomed = messageId
             var chooser = pageStack.push(
                 Qt.resolvedUrl("DeleteMessageDialog.qml"),
@@ -679,8 +559,7 @@ Page {
         }
         onResendRequested: messages.resend_message(messageId)
         onForwardRequested: {
-            // The picker reports back rather than acting, so the
-            // message id is captured here where it is still valid.
+            // Picker reports back; message id captured here.
             var travelling = messageId
             var picker = pageStack.push(
                 Qt.resolvedUrl("ChatPickerPage.qml"),
@@ -693,9 +572,7 @@ Page {
         }
     }
 
-    // Only up when the reader has scrolled away from the newest message
-    // and something has arrived below them meanwhile: a reader browsing
-    // the history knows where the end is.
+    // Only when scrolled from newest with arrivals below.
     JumpButton {
         objectName: "jumpButton"
         visible: !listView.stickToBottom && listView.missedCount > 0
@@ -709,8 +586,7 @@ Page {
         onClicked: listView.jumpToNewest()
     }
 
-    // Between the list and the field rather than over the list: it is
-    // translucent, and the messages behind it showed through.
+    // Between list and field: translucent, messages would show through.
     Banner {
         id: banner
         objectName: "errorBanner"
@@ -719,22 +595,17 @@ Page {
             right: parent.right
             bottom: notice.top
         }
-        // The core's own state outranks whatever failed before it, and a
-        // page opened after it went away never saw the transition -- so
-        // read the status rather than waiting for it to change.
+        // Core state outranks earlier failure: read status, don't wait for
+        // change.
         text: page.coreStatusMessage.length > 0
               ? page.coreStatusMessage : page.errorMessage
-        // Neither clears itself: reconnecting ends when the status says so,
-        // and stopped does not end at all.
+        // Reconnect ends when status says; stopped never does.
         timeout: page.coreStatusMessage.length > 0 ? 0 : 8
         onDismissed: page.errorMessage = ""
     }
 
-    // What the next send replies to, and a way out of replying -- or,
-    // while a message is being edited, which one, and a way out of that.
-    // One bar for both: the two cannot be wanted at once, since an edit
-    // is not a send, and the reply comes back into view when the edit is
-    // done.
+    // Reply or edit bar, one for both: can't want both (edit isn't a send);
+    // reply returns once edit done.
     ReplyBar {
         id: replyBar
         objectName: "replyBar"
@@ -755,9 +626,7 @@ Page {
         }
     }
 
-    // Directly above the field, below the reply bar: reading downwards,
-    // the two bars are the message about to be sent, in the order its
-    // parts appear in it.
+    // Directly above field: reads as the message about to be sent.
     AttachmentBar {
         id: attachmentBar
         objectName: "attachmentBar"
@@ -766,47 +635,37 @@ Page {
             right: parent.right
             bottom: largeFileBar.top
         }
-        // Put aside with the draft while a message is edited: an edit
-        // carries no file, and a bar saying one is about to be sent would
-        // be saying something untrue. The file is still here afterwards.
+        // Set aside while editing: edit has no file. File still here after.
         filePath: page.editing ? "" : page.attachmentPath
         fileName: page.attachmentName
-        // A picked video is made smaller as soon as it is picked; the bar
-        // says so, and its button stops that and keeps the file as it is.
-        // Tapped again, it drops the file.
+        // Picked video shrinks as picked; its button stops shrink, keeps file;
+        // tap again drops file.
         preparing: messages.preparing
         progress: messages.preparing_progress
-        // How much smaller it went, or is planned to go while it is made.
+        // How much smaller it went or will go.
         originalBytes: page.editing ? 0 : messages.original_bytes
         bytes: messages.attachment_bytes
         onCancelled: page.dropAttachment()
-        // Stopped, the video goes as it is -- when the reader sends it,
-        // even from a chat that was to send it at once: a large file was
-        // what that was waiting to avoid.
+        // Stopped video goes as is, even if set to send at once.
         onStopped: {
             page.sendWhenReady = false
             messages.cancel_preparing()
         }
     }
 
-    // Under the file it is about: this one is bigger than the core
-    // recommends, which some relays refuse. A warning and not a refusal:
-    // the size is the core's one recommendation for every relay, and many
-    // take more (issue #101), so the send button stays on. Said before
-    // the upload rather than only after a send that failed -- a picture
-    // is never this, since the core shrinks those on the way out, and a
-    // video is weighed at the size it will be made smaller to. See
+    // File over core's recommended size (some relays refuse): warning, not
+    // refusal, send stays on (one size for all relays, many take more, issue
+    // #101). Said before upload, not after failed send. Never a picture (core
+    // shrinks those); videos weighed at shrink size. See
     // rust/piirit-shim/src/media.rs and video.rs.
     Banner {
         id: largeFileBar
         objectName: "largeFileBar"
         labelObjectName: "largeFileLabel"
         tone: "info"
-        // Not transient: it is true for as long as the file is on the
-        // bar.
+        // Not transient: true while file on bar.
         timeout: 0
-        // For a video sent smaller, the size it was picked at no longer
-        // matters here: the bar above says both.
+        // Video sent smaller: picked size irrelevant; bar says both.
         text: !messages.attachment_large ? ""
               : messages.original_bytes > 0
               //: Shown above the message field when a video is being
@@ -829,8 +688,7 @@ Page {
         }
     }
 
-    // Says what just happened where the page has no state for it, such as
-    // a message going to the clipboard.
+    // Says what happened where page has no state (e.g. clipboard).
     Banner {
         id: notice
         objectName: "notice"
@@ -845,20 +703,16 @@ Page {
         onDismissed: notice.text = ""
     }
 
-    /// The file on the bar is a video still being made smaller, which
-    /// holds the send until it is ready. Not while a message is edited:
-    /// that carries no file.
+    /// File on bar still shrinking: holds send. Not while editing.
     readonly property bool videoPreparing: messages.preparing && !page.editing
 
-    /// The text and the file: what send has to send. While a message is
-    /// being edited the file is put aside, and only the text counts.
+    /// Text and file: what send sends. Editing: text only.
     readonly property bool hasSomethingToSend:
         textField.text.trim().length > 0
         || (!page.editing && page.attachmentPath.length > 0)
 
-    // A tap anywhere but the tray closes the tray: over everything
-    // declared above -- the list, the bars -- and under the input row,
-    // which is declared after it. Silica's own menus close the same way.
+    // Tap outside tray closes it, as Silica menus do. Declared here: over list
+    // and bars above, under input row declared after.
     MouseArea {
         objectName: "trayDismiss"
         anchors.fill: parent
@@ -872,33 +726,23 @@ Page {
         anchors {
             left: parent.left
             right: parent.right
-            // The field carries its own inset on the left; without the
-            // same on this side the send button sits nearer the edge.
+            // Mirrors field's own left inset; else send button hugs edge.
             rightMargin: Theme.horizontalPageMargin
             bottom: parent.bottom
-            // Off the edge of the screen rather than on it: a TextArea
-            // carries no room under its text the way a TextField does,
-            // and the recording strip carries less still.
+            // Off screen edge: TextArea has no room under text; recording strip
+            // less still.
             bottomMargin: Theme.paddingLarge
         }
         spacing: Theme.paddingSmall
 
-        // Tall enough for the field, and never too short for the buttons
-        // to sit in with the lift below: a Row sizes itself to its
-        // tallest child and takes no account of what a child's anchors
-        // ask for, so a button lifted off the bottom of a short row
-        // would be drawn above the row and over the bar above it.
+        // Tall enough for field and lifted buttons: Row ignores child anchors.
         height: Math.max(textField.visible ? textField.height : 0,
                          voiceBar.visible ? voiceBar.height : 0,
                          sendButton.height + inputRow.buttonLift)
 
-        /// How much higher than the field the buttons sit.
-        ///
-        /// Nothing: a Silica field keeps room under its line for what
-        /// hangs below a letter, so a button level with the field's
-        /// bottom edge already sits a little above its underline. Lifted
-        /// by a padding on top of that, as this was first written, they
-        /// read as floating over the row rather than belonging to it.
+        /// How much higher than the field the buttons sit. None: Silica field
+        /// keeps descender room, so level button already sits above underline;
+        /// padding lift made them float.
         readonly property real buttonLift: 0
 
         // The recording, where the field was, while there is one.
@@ -907,10 +751,8 @@ Page {
             objectName: "voiceBar"
             width: parent.width - sendButton.width
             anchors.verticalCenter: sendButton.verticalCenter
-            // A recording stops at the size the core recommends -- the
-            // one a file on the attachment bar is warned about, and over
-            // an hour of speech -- and is made at the bit rate the
-            // reader's outgoing media quality says.
+            // Recording stops at core's recommended size (as large-file warning;
+            // over an hour of speech), at media-quality bit rate.
             limitBytes: messages.attachment_limit
             mediaQuality: Settings.mediaQuality === 1 ? 1 : 0
             onRecorded: {
@@ -921,59 +763,40 @@ Page {
             onFailed: page.errorMessage = message
         }
 
-        // Both step aside while a voice message records: a Row lays out
-        // only what is visible, so the strip takes their room.
-        //
-        // A field of one line could not hold a paragraph and could not
-        // hold a line break at all: the return key sent the message, so
-        // a message written here was one line by construction, however
-        // long. This is an area: return puts in a newline, the field
-        // grows as the message does, and send is the button -- which is
-        // what every other client on this phone does with a message
-        // longer than a remark, and the only way both reference clients
-        // offer.
+        // Both step aside while recording (Row lays out visible only). Field is
+        // multi-line: return inserts newline; send is the button.
         TextArea {
             id: textField
             objectName: "messageField"
             visible: !voiceBar.recording
-            // Only the buttons that are there: a Row lays out what is
-            // visible, and the tray steps aside while a message is
-            // edited.
+            // Only visible buttons: Row lays out visible; tray steps aside on
+            // edit.
             width: parent.width - (attachButton.visible ? attachButton.width : 0)
                    - sendButton.width
-            // Against the bottom of the row, as the buttons are: a Row
-            // lays its children out from the top, so a field left there
-            // would rise with the row whenever the row grew for the
-            // buttons' lift -- and the lift would come to nothing.
+            // Against row bottom: Row lays from top, so field would rise with
+            // lifted buttons.
             anchors.bottom: parent.bottom
             //: Message field placeholder. Also the prompt for the caption
             //: on a message that is carrying a file.
             placeholderText: page.attachmentPath.length > 0
                              ? qsTr("Caption") : qsTr("Message")
-            // Silica's own label sits above the text and says the same
-            // thing the placeholder does.
+            // Silica label says same as placeholder.
             labelVisible: false
-            // It grows with what is in it, up to a point: past a third
-            // of the screen the conversation it is written in would be
-            // gone, so the area keeps that height and scrolls inside it.
+            // Grows to a third of screen, then scrolls.
             height: Math.min(implicitHeight, page.height / 3)
-            // Kept in the core, so it is still here after the app has been
-            // closed and reopened, and so the chat list can say which
-            // chats are holding one.
+            // Kept in core across restarts; chat list shows which chats hold
+            // one.
             onTextChanged: draftDebounce.restart()
-            // Typing is not a tap on the tray either.
+            // Typing is not a tap on tray.
             onActiveFocusChanged: if (activeFocus) attachButton.close()
         }
 
-        // Both buttons sit against the bottom of the row rather than the
-        // top of it, so that a draft grown to several lines leaves them
-        // beside its last line -- where the text being written is --
-        // rather than beside its first.
+        // Buttons at row bottom: beside draft's last line, where writing
+        // happens.
         AttachButton {
             id: attachButton
             objectName: "attachButton"
-            // Nor while a message is being edited: an edit changes the
-            // words and nothing else, so there is nothing to attach to it.
+            // Not while editing: edit has nothing to attach.
             visible: !voiceBar.recording && !page.editing
             anchors.bottom: parent.bottom
             anchors.bottomMargin: inputRow.buttonLift
@@ -982,9 +805,7 @@ Page {
             onCameraRequested: page.pickWith("CapturePage.qml")
             onLibraryRequested: page.pickWith("AttachLibraryPage.qml")
             onVoiceRequested: voiceBar.start()
-            // A .xdc goes out as any other file does: the core sees what
-            // it is and sends it as an app. Where one comes from is the
-            // store's business.
+            // `.xdc` sent as any file; core sends it as an app.
             onAppRequested: page.pickApp()
         }
 
@@ -993,22 +814,15 @@ Page {
             objectName: "sendButton"
             anchors.bottom: parent.bottom
             anchors.bottomMargin: inputRow.buttonLift
-            // Hidden rather than greyed while a send is in flight: the
-            // indicator takes its place, so the row keeps its shape. A
-            // tick while a message is being edited, since what the tap
-            // does then is keep a change rather than send a message.
+            // Hidden, not greyed, while sending: keeps row shape. While
+            // editing: tick keeps change.
             icon.source: messages.sending ? ""
                          : page.editing ? "image://theme/icon-m-accept"
                                         : "image://theme/icon-m-send"
-            // A file on its own is a message; an empty field with nothing
-            // attached is not, and neither is one holding only spaces. A
-            // recording under way is what send stops and sends. And
-            // nothing is sendable twice: copying a large video into the
-            // core's blob directory takes long enough for a second tap to
-            // land, and that sent the whole thing again. Nor is a video
-            // still being made smaller: it goes once it is ready and the
-            // reader says so, never on its own -- unless a camera quick
-            // action said so first (`sendWhenReady`).
+            // File alone is a message; empty or blank is not. Recording: send
+            // stops and sends it. No double send (large video copy into core
+            // lets a second tap through). Shrinking video: not until ready and
+            // reader sends, unless `sendWhenReady`.
             enabled: !messages.sending
                      && (!page.videoPreparing || voiceBar.recording)
                      && (page.hasSomethingToSend || voiceBar.recording)
@@ -1023,15 +837,9 @@ Page {
         }
     }
 
-    // Which kinds Piirit shows itself, and which it hands on. Handing a
-    // picture or a video to the system took the reader out of the app to
-    // something that then failed to play it; everything else is still
-    // somebody else's file to open, and a page here that could only say
-    // "cannot show this" would be worse than the handover.
-    //
-    // No page of its own for a file: a page for reading belongs to a long
-    // message rather than to an attachment. What a file needs and a tap
-    // cannot give is a copy, and that is on the row's menu.
+    // Pictures and videos shown here: system handover failed to play them.
+    // Rest handed on: a "cannot show" page is worse. No file page: copy is on
+    // row menu.
     function openAttachment(fileUrl, fileName, viewType, previewWidth) {
         if (viewType === "Image" || viewType === "Gif"
                 || viewType === "Sticker") {
@@ -1052,8 +860,8 @@ Page {
         }
     }
 
-    // A copy of an attachment, in Piirit's folder in Downloads -- no
-    // setting, as tuuli has none. See AttachmentSaver.
+    // Copy to Piirit's Downloads folder. No setting (tuuli has none). See
+    // AttachmentSaver.
     AttachmentSaver {
         id: attachmentSaver
         objectName: "attachmentSaver"
@@ -1061,15 +869,10 @@ Page {
         onError: page.errorMessage = message
     }
 
-    // Where an app comes from: the store, which reports the file it put
-    // on the phone the way a picker reports the file that was chosen.
-    // Pushed by URL like the pickers, since it names a `Sailfish.WebView`
-    // type and should cost this button rather than the conversation.
-    //
-    // Neither this nor `openApp` checks whether apps are on: what calls
-    // them is a tray entry and a row that are bound to the setting, so
-    // with apps off there is nothing to tap. A check here would be a
-    // second answer to the same question, and dead either way.
+    // Apps from store, which reports file it put on phone. Pushed by URL:
+    // names `Sailfish.WebView`, so missing type costs this button only.
+    // Apps-on not checked here or in `openApp`: tray and row already bound to
+    // setting.
     function pickApp() {
         var store = pageStack.push(Qt.resolvedUrl("WebxdcStorePage.qml"),
                                    { accountId: page.accountId })
@@ -1078,10 +881,8 @@ Page {
         }
     }
 
-    // A webxdc app, run here. Pushed by URL and given the message rather
-    // than the file: the app's files come from the core, which knows it
-    // by the message it arrived as, and the page needs a `Sailfish.WebView`
-    // that costs itself rather than the conversation if it is missing.
+    // Webxdc app, run here. Pushed by URL (`Sailfish.WebView`) with message,
+    // not file: core knows app files by message.
     function openApp(messageId) {
         pageStack.push(Qt.resolvedUrl("WebxdcPage.qml"), {
             accountId: page.accountId,
@@ -1090,10 +891,8 @@ Page {
     }
 
     function sendCurrentText() {
-        // The model refuses a second send while one is outstanding and the
-        // button is disabled meanwhile; this says so a third time,
-        // cheaply, since a double send is a message the reader cannot
-        // take back.
+        // Model refuses and button is off too; cheap third check: a double
+        // send can't be taken back.
         if (messages.sending) {
             return
         }
@@ -1102,14 +901,12 @@ Page {
             voiceBar.send()
             return
         }
-        // The picked video is still being made smaller: the button waits
-        // for it, and so does the keyboard's.
+        // Shrinking video: button and keyboard wait.
         if (page.videoPreparing) {
             return
         }
-        // A message being edited: the change goes to the core, and the
-        // field is put back once it has taken it. The reply and the
-        // file, put aside for the edit, are not part of it.
+        // Editing: change goes to core, field restored after. Reply and file
+        // aren't part of it.
         if (page.editing) {
             var changed = textField.text.trim()
             if (changed.length > 0) {
@@ -1118,12 +915,8 @@ Page {
             }
             return
         }
-        // The bars are cleared from `onSent`, with the model's own copy:
-        // clearing them here would drop the reply and the file the reader
-        // chose on a send that never happened.
-        //
-        // Trimmed: a message of nothing but whitespace is not a message,
-        // and a trailing newline from the keyboard is not part of one.
+        // Bars cleared in `onSent` with model's copy: else lost on failed send.
+        // Whitespace-only is no message.
         var text = textField.text.trim()
         // The reader is sending it themselves, with whatever they typed.
         page.sendWhenReady = false

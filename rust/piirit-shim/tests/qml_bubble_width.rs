@@ -1,24 +1,14 @@
-//! How wide a message's bubble is, worked out without measuring more
-//! than the bubble shows.
+//! Bubble width, worked out without measuring more than bubble shows.
 //!
-//! A bubble is as wide as its widest line, up to most of the screen. The
-//! body used to be measured whole -- every line of a pasted log laid out
-//! once more, off screen, for each row built -- when the bubble shows a
-//! dozen. What this pins is that measuring only those leaves the bubble
-//! the width it had: a remark, a paragraph that wraps, a few lines of
-//! different lengths, one of them wrapping, a dozen with the widest last,
-//! the shim's rendering, and a body with an emoji picture in it. Each is
-//! held against a copy of the body measured whole, as before.
+//! Bubble is as wide as widest line, up to most of screen. Body used to be measured whole (every
+//! line of a pasted log, per row) though bubble shows a dozen. Pinned: measuring only those keeps
+//! width, across remark, wrapping paragraph, mixed lengths, dozen with widest last, shim rendering,
+//! emoji picture. Each held against whole-body copy.
 //!
-//! And that a picture's bubble is the full width from the start. The
-//! row asked the attachment whether it wanted the full width, and the
-//! attachment is built by a loader after the row: until it was, the
-//! answer was no, so a picture was first sized for the width of its
-//! caption and then again for the bubble's. The row answers for itself
-//! now, from what the attachment answers from -- and the two must agree
-//! for every kind there is.
-//!
-//! The delegate is loaded on its own, as the other QML tests load it.
+//! Picture bubble is full width from start. Row used to ask attachment if it wants full width, but
+//! attachment's loader builds it after row: answer was no until then, so picture sized twice
+//! (caption width, then bubble). Row now answers from what attachment answers from; must agree for
+//! every kind.
 
 // Qt harness: see qml_reactions.rs.
 #![allow(
@@ -96,7 +86,7 @@ fn words(count: usize, word: &str) -> String {
     vec![word; count].join(" ")
 }
 
-/// `count` lines, the one at `widest` much longer than the rest.
+/// `count` lines, the one at `widest` much longer than rest.
 fn lines(count: usize, widest: usize) -> String {
     (0..count)
         .map(|line| {
@@ -113,7 +103,7 @@ fn lines(count: usize, widest: usize) -> String {
 #[test]
 #[allow(clippy::too_many_lines)]
 fn bubbles_measure_what_they_show_and_pictures_fill_them_from_the_start() {
-    // SAFETY: single-threaded test binary; set before Qt starts.
+    // SAFETY: single-threaded; set pre-Qt.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
     }
@@ -180,8 +170,8 @@ fn bubbles_measure_what_they_show_and_pictures_fill_them_from_the_start() {
     ];
     let bodies_ptr = std::ptr::addr_of!(bodies);
 
-    // Every kind of attachment, and the two webxdc rows that are not
-    // drawn as an app: apps turned off, and one the core could not read.
+    // Every attachment kind, plus two webxdc rows not drawn as app: apps off, and one core
+    // couldn't read.
     let attachments: Vec<(&'static str, Value)> = vec![
         ("image", json!({ "viewType": "Image" })),
         ("sticker", json!({ "viewType": "Sticker" })),
@@ -234,7 +224,7 @@ fn bubbles_measure_what_they_show_and_pictures_fill_them_from_the_start() {
                 )
             );
             record!(*label, call!("fills"));
-            // The same kind with no file: nothing to fill the bubble.
+            // Same kind with no file: nothing to fill bubble.
             record!(
                 format!("{label}-bare-load"),
                 call!(

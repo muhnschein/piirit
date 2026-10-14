@@ -3,24 +3,20 @@ import Sailfish.Silica 1.0
 import "../js/Viewfinder.js" as Viewfinder
 
 /*
- * The back cameras, one ring each, the one in use lit: the platform
- * camera's lens toggle. Shown only on a phone with more than one camera
- * on the back. A row beside the shutter in portrait, a column in
- * landscape, as the platform camera has it.
+ * Back cameras, one ring each, lit = in use. Lens toggle. Shown
+ * if 2+ back cameras. Beside shutter (portrait), column (landscape).
  *
- * Each ring wears the lens's zoom ("1.0", "0.5") from the labels the
- * phone's adaptation gives the platform camera, which QtMultimedia has
- * no word for: what it says about a camera is its side and an id. A
- * phone whose adaptation gives none gets the rings numbered in the order
- * the platform lists the cameras.
+ * Ring shows lens zoom ("1.0", "0.5") from labels phone adaptation gives the
+ * platform camera; QtMultimedia knows only side and id.
+ * No labels: numbered in platform order.
  */
 Grid {
     id: toggle
 
-    /// The device ids, as Viewfinder.camerasFacing lists them.
+    /// Ids from Viewfinder.camerasFacing.
     property var cameras: []
     property string current: ""
-    /// The platform's label for each, in the same order.
+    /// Platform label per camera.
     property var labels: []
     property bool vertical: false
 

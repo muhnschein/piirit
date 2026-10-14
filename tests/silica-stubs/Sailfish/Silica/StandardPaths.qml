@@ -1,8 +1,8 @@
 pragma Singleton
 import QtQuick 2.0
 
-// Silica's StandardPaths singleton names the user's folders on a device.
-// Writable here, so a test can point a page at a directory of its own.
+// Silica StandardPaths: user's folders on device. Writable here: test points
+// page at own directory.
 QtObject {
     property string documents: "/tmp/piirit-stub-standardpaths/Documents"
     property string music: "/tmp/piirit-stub-standardpaths/Music"

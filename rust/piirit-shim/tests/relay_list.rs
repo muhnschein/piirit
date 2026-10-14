@@ -1,17 +1,14 @@
-//! The list of public relays the two relay pages offer.
+//! Relay list the pages offer.
 //!
-//! `qml/js/Relays.js` is copied by hand from chatmail.at/relays, which
-//! publishes no list a build could read, so what can drift is checked
-//! here: every row is a relay the core could be pointed at, no relay is
-//! offered twice, and the list starts at the relay the app sets profiles
-//! up on by default.
+//! `qml/js/Relays.js` copied by hand from chatmail.at/relays (no list a build could read).
+//! Drift checks: every row a relay core can use, none twice, first = app's default relay.
 
 use std::fs;
 use std::path::PathBuf;
 
 use piirit_shim::DEFAULT_PROVIDER_QR;
 
-/// The `(domain, location)` of every row, in the file's order.
+/// `(domain, location)` per row.
 fn relays() -> Vec<(String, String)> {
     let path = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../qml/js/Relays.js");
     let text = fs::read_to_string(&path).unwrap_or_else(|err| panic!("read Relays.js: {err}"));

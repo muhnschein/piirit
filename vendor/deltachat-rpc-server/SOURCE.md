@@ -1,28 +1,13 @@
 # `deltachat-rpc-server` provenance
 
-The `deltachat-rpc-server` binaries bundled by Piirit's RPM (installed to
-`/usr/libexec/harbour-piirit/deltachat-rpc-server`) are **unmodified
-upstream builds**:
+Binaries bundled by Piirit's RPM (installed to `/usr/libexec/harbour-piirit/deltachat-rpc-server`) = **unmodified upstream builds**:
 
 - **Project:** Delta Chat core (chatmail core library)
-- **Source code:** https://github.com/chatmail/core
+- **Source:** https://github.com/chatmail/core
 - **Version / tag:** `v2.63.0`
-- **License:** MPL-2.0. Piirit itself is GPL-3.0-or-later; the two sit
-  side by side in the RPM as separate works, and this file is installed
-  with the package to satisfy MPL-2.0 §3.2(a)'s requirement that recipients
-  of the Executable Form be told how to obtain the corresponding Source
-  Code Form.
-- **Build:** upstream's own release builds, produced by their
-  `.github/workflows/deltachat-rpc-server.yml` nix builds, **statically
-  linked against musl libc** ("to avoid problems with glibc version
-  incompatibility", per that workflow). Target triples:
-  `aarch64-unknown-linux-musl`, `armv7-unknown-linux-musleabihf`
-  (hard-float, matching Sailfish `armv7hl`), `x86_64-unknown-linux-musl`.
-- **Distribution channel used:** the PyPI `deltachat-rpc-server==2.63.0`
-  wheels, which contain the same binaries upstream attaches to its GitHub
-  release (both are the nix build output). Fetched, checksum-verified, and
-  placed here by `scripts/fetch-rpc-server.sh` — that script pins the
-  exact sha256 of every wheel *and* every extracted binary.
+- **License:** MPL-2.0. Piirit GPL-3.0-or-later; the two sit side by side in RPM as separate works. This file installed with package for MPL-2.0 §3.2(a): recipients told how to get Source Code Form.
+- **Build:** upstream release builds from `.github/workflows/deltachat-rpc-server.yml` nix builds, **statically linked against musl libc** ("to avoid problems with glibc version incompatibility", per that workflow). Triples: `aarch64-unknown-linux-musl`, `armv7-unknown-linux-musleabihf` (hard-float, matches Sailfish `armv7hl`), `x86_64-unknown-linux-musl`.
+- **Channel:** PyPI `deltachat-rpc-server==2.63.0` wheels = same binaries as upstream GitHub release (both nix output). Fetched, checksum-verified, placed by `scripts/fetch-rpc-server.sh`, which pins sha256 of every wheel *and* every extracted binary.
 
 ## Layout
 
@@ -33,30 +18,16 @@ vendor/deltachat-rpc-server/
   x86_64/deltachat-rpc-server    sha256 57cab3291ecc55736f97964b3a2979e5e23a70abcc270f1ed515e995f540d517
 ```
 
-Directory names are Sailfish's architecture names (`%{_target_cpu}` in
-rpm's terms -- not `%{_arch}`, which canonicalises every armv7h* to
-`arm`), which is what `rpm/harbour-piirit.spec` keys its `%install`
-step on. Binaries are not
-committed to git (see `.gitignore`); run the fetch script to populate.
+Dir names = Sailfish arch names (`%{_target_cpu}`, not `%{_arch}`, which maps every armv7h* to `arm`). `rpm/harbour-piirit.spec` `%install` keys on them.
+
+Binaries not committed (see `.gitignore`). Run fetch script to populate.
 
 ## Verified so far / still open
 
-- [x] All three binaries confirmed statically linked and stripped
-      (`file`, `ldd`).
-- [x] The x86_64 binary runs and answers over stdio: the gated integration
-      test `rust/deltachat-jsonrpc/tests/real_server.rs` (run with
-      `DELTACHAT_RPC_SERVER=<path> cargo test -p deltachat-jsonrpc`)
-      passes against it — `get_system_info` health check, account
-      creation, config round trip, a transport added against a stub mail
-      server on 127.0.0.1, real event delivery, and the chat/message list
-      wire shapes the UI depends on.
-- [ ] `aarch64`/`armv7hl` binaries exercised on an actual Sailfish device
-      or emulator (static musl linking means only the kernel ABI matters,
-      so these are expected to run as-is — but this is the one claim that
-      can only be proven on hardware).
+- [x] All three binaries statically linked and stripped (`file`, `ldd`).
+- [x] x86_64 binary runs, answers over stdio. Gated test `rust/deltachat-jsonrpc/tests/real_server.rs` (`DELTACHAT_RPC_SERVER=<path> cargo test -p deltachat-jsonrpc`) passes: `get_system_info` health check, account creation, config round trip, transport added against stub mail server on 127.0.0.1, real event delivery, chat/message list wire shapes UI depends on.
+- [ ] `aarch64`/`armv7hl` binaries on real Sailfish device or emulator. Static musl = only kernel ABI matters, so expected to run as-is. Only provable on hardware.
 
 ## Updating
 
-Bump `VERSION` and all sha256 pins in `scripts/fetch-rpc-server.sh`
-together, re-run it, and update this file to match. The version bundled
-and the version stated here must never drift apart.
+Bump `VERSION` and all sha256 pins in `scripts/fetch-rpc-server.sh` together, re-run, update this file. Bundled version and version stated here must never drift apart.

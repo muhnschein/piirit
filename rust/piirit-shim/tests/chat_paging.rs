@@ -1,14 +1,6 @@
-//! A long chat is addressable end to end from the moment it opens.
+//! Long chat addressable from open: row per message, fill only what is viewed.
 //!
-//! The ids are cheap and the messages are not, so the model holds a row for
-//! every message in the chat and fills in only the ones somebody is looking
-//! at. What that buys is the thing three attempts at a moving window never
-//! managed: the first message is row 0 and stays there, so going to the
-//! beginning is a scroll rather than a fetch, and a search result's row is
-//! known without loading anything.
-//!
-//! What is worth pinning is that both halves hold at once -- every message
-//! has a row, and no single fetch is the size of the chat.
+//! First message is row 0 always: going to start is a scroll, not a fetch.
 
 // Qt harness: see qml_chat_list.rs.
 #![allow(
@@ -27,7 +19,7 @@ use serde_json::Value;
 
 mod common;
 
-/// More than a page, so filling in is something that has to happen.
+/// More than a page, so filling in must happen.
 const MESSAGES: u32 = 130;
 
 const PROBE_QML: &str = r"
@@ -99,8 +91,7 @@ fn every_message_has_a_row_and_only_what_is_looked_at_is_fetched() {
     let journal = common::fresh_journal(&temp);
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
 
-    // SAFETY: single-threaded test binary; set before Qt starts and before
-    // the server inherits them.
+    // SAFETY: single-threaded; set before Qt starts and before server inherits env.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_FAKE_JOURNAL", &journal);
@@ -142,18 +133,17 @@ fn every_message_has_a_row_and_only_what_is_looked_at_is_fetched() {
         (*steps_ptr).push(("opened", call!("count")));
         (*steps_ptr).push(("opened-edges", call!("edges")));
         (*steps_ptr).push(("opened-filled", call!("filled")));
-        // The first message is row 0 from the start: nothing has to be
-        // fetched to know where the beginning is.
+        // Row 0 from start: no fetch to find the beginning.
         (*steps_ptr).push(("first-empty", call!("filledAt", 0)));
-        // And it knows which day it is under before it knows anything else.
+        // Knows its day before anything else.
         (*steps_ptr).push(("epoch-rows", call!("epochRows")));
         (*steps_ptr).push(("day-empty", call!("dayAt", 0)));
-        // A search result, which is a lookup rather than a fetch.
+        // Search result: lookup, not fetch.
         (*steps_ptr).push(("reveal", call!("reveal", 3)));
     });
     single_shot(Duration::from_secs(4), move || unsafe {
         (*steps_ptr).push(("revealed", call!("revealed")));
-        // Scrolled to the top: fill in what is there now.
+        // Scrolled to top: fill in what is there.
         (*steps_ptr).push(("scrolled", call!("hydrate", 0, 20)));
     });
     single_shot(Duration::from_secs(6), move || unsafe {
@@ -174,7 +164,7 @@ fn every_message_has_a_row_and_only_what_is_looked_at_is_fetched() {
     assert_outcome(&steps, &journal);
 }
 
-/// What the run has to show for itself, out of the test body.
+/// What run shows, out of test body.
 fn assert_outcome(steps: &[(&str, String)], journal: &std::path::Path) {
     let value = |label: &str| {
         steps
@@ -186,7 +176,7 @@ fn assert_outcome(steps: &[(&str, String)], journal: &std::path::Path) {
     let number = |label: &str| value(label).parse::<u32>().unwrap_or(0);
     let context = format!("steps: {steps:?}");
 
-    // The whole chat, addressable, from the moment it opens.
+    // Whole chat addressable from open.
     assert_eq!(
         number("opened"),
         MESSAGES,
@@ -198,7 +188,7 @@ fn assert_outcome(steps: &[(&str, String)], journal: &std::path::Path) {
         format!("1..{MESSAGES}"),
         "the rows do not run from the first message to the last. {context}"
     );
-    // And only one page of them actually fetched.
+    // Only one page fetched.
     assert_eq!(
         number("opened-filled"),
         50,
@@ -215,7 +205,7 @@ fn assert_outcome(steps: &[(&str, String)], journal: &std::path::Path) {
 
     assert_days(steps);
 
-    // A search result needs no fetch to be found.
+    // Search result needs no fetch.
     assert_eq!(
         value("revealed"),
         "3@2",
@@ -223,7 +213,7 @@ fn assert_outcome(steps: &[(&str, String)], journal: &std::path::Path) {
          {context}"
     );
 
-    // Scrolling there fills it in, and changes nothing else.
+    // Scrolling fills in, changes nothing else.
     assert_eq!(
         value("first-filled"),
         "true",
@@ -242,7 +232,7 @@ fn assert_outcome(steps: &[(&str, String)], journal: &std::path::Path) {
         "filling rows in moved the ends of the chat. {context}"
     );
 
-    // An arrival is one more row at the end, and nothing else moves.
+    // Arrival: one more row at end.
     assert_eq!(
         number("arrived"),
         MESSAGES + 1,
@@ -254,7 +244,7 @@ fn assert_outcome(steps: &[(&str, String)], journal: &std::path::Path) {
         "a message arriving moved the beginning of the chat. {context}"
     );
 
-    // The point of all of it: never the whole chat in one go.
+    // Never whole chat in one go.
     let biggest = common::calls(journal)
         .into_iter()
         .filter(|(method, _)| method == "get_messages")
@@ -274,13 +264,10 @@ fn assert_outcome(steps: &[(&str, String)], journal: &std::path::Path) {
     );
 }
 
-/// Every row knows its day before it knows its message, and keeps it.
+/// Row knows its day before its message, and keeps it.
 ///
-/// The list is sectioned by day. Without the core's day markers the rows
-/// waiting to be filled in share one section under the epoch -- a heading
-/// reading 1 January 1970 -- and each moves to its real day as it arrives,
-/// which resizes a heading the view has already laid out and leaves it drawn
-/// over the row beneath.
+/// Unfilled rows sit under epoch heading (1 Jan 1970); each moves to real day on arrival,
+/// resizing a laid-out heading over the row beneath.
 fn assert_days(steps: &[(&str, String)]) {
     let value = |label: &str| {
         steps

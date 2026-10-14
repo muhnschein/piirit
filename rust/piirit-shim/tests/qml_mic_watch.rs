@@ -1,17 +1,10 @@
-//! `MicWatch` as QML has it: the watch on the app's own process, its
-//! answers brought over to the Qt thread.
-//!
-//! What a page will bind to is `known && !open` -- the route is free to
-//! move -- so that is what is followed here, every change of it, while a
-//! stream of this process's comes and goes in a private sound server.
-//! Free must never be true while the stream is open, not even between
-//! two property changes: `known` and `open` change together or not at
-//! all, as far as a binding over them can tell.
+//! `MicWatch` in QML: watch on own process, answers sent to Qt thread. Pages bind
+//! `known && !open`; followed on every change as own streams come and go in private
+//! sound server. Free never true with stream open, even between two property changes: `known`
+//! and `open` change together or not at all, as far as a binding can tell.
 
-// Qt harness: needs `unsafe` for `env::set_var` before Qt starts and
-// libpulse looks for a server (`unused_unsafe` because it is only unsafe
-// from edition 2024 on), `borrow_as_ptr` for the engine pointer, and
-// `single_shot` with whole-second Durations.
+// Qt harness: needs `unsafe` for `env::set_var` pre-Qt and libpulse server lookup
+// (`unused_unsafe`: edition 2024+), `borrow_as_ptr`, `single_shot` whole secs.
 #![allow(
     unsafe_code,
     unused_unsafe,
@@ -57,8 +50,7 @@ fn the_route_is_free_only_while_it_is_known_that_nothing_of_ours_records() {
     }
     let scratch = pulse::Scratch::new();
     let daemon = pulse::Daemon::start(&scratch.dir);
-    // SAFETY: nothing else runs yet in this test's process; set before Qt
-    // starts and before libpulse looks for a server.
+    // SAFETY: nothing else runs yet; set pre-Qt and pre-libpulse lookup.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PULSE_SERVER", daemon.server());
@@ -112,10 +104,8 @@ fn the_route_is_free_only_while_it_is_known_that_nothing_of_ours_records() {
         *r.borrow_mut() = Some(d.record(Some(std::process::id())));
     });
 
-    // A report on its way from a watcher that has since been stopped must
-    // not be taken for the next one's. Here it is the stream's end, held
-    // up behind a busy Qt thread while the watch is restarted on another
-    // stream: taken, it would say "free" with that stream open.
+    // Stale report from stopped watcher must not count. Stream's end held behind busy
+    // Qt thread during restart: taken, says "free" with stream open.
     let (s, d, r) = (Rc::clone(&steps), Rc::clone(&daemon), Rc::clone(&recording));
     single_shot(Duration::from_secs(8), move || unsafe {
         s.borrow_mut().push(("recording-again", call!("state")));
@@ -192,10 +182,8 @@ fn the_route_is_free_only_while_it_is_known_that_nothing_of_ours_records() {
         "known|open",
         "the restarted watch did not see the stream open when it started"
     );
-    // Free once known; held from the first stream's first event until its
-    // end was listed; free again; held from the second stream on, through
-    // the restart, to the end. Anything more is a moment of "free" with a
-    // stream of ours open.
+    // Free once known; held from first event to its end; free; held from second through
+    // restart to end. Any extra: "free" with our stream open.
     assert_eq!(
         value("changes"),
         "free held free held",

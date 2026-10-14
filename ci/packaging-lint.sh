@@ -1,20 +1,16 @@
 #!/bin/sh
-# Static checks on what decides whether the RPM installs and the launcher
-# works. Resolving BuildRequires or running mb2 needs the SDK
-# (docs/BUILDING.md); this checks what is checkable anywhere.
+# Static checks on what decides RPM install and launcher. BuildRequires need the
+# SDK (docs/BUILDING.md).
 set -eu
 
 root=$(CDPATH='' cd -- "$(dirname -- "$0")/.." && pwd)
 status=0
 ran=0
 
-# PACKAGING_LINT_STRICT=1 turns "the tool for this check is missing" into
-# a failure. CI sets it, so the job cannot quietly stop checking when the
-# apt line that installs the tools changes.
+# PACKAGING_LINT_STRICT=1: missing tool fails. CI sets it.
 strict=${PACKAGING_LINT_STRICT:-0}
 skip() {
-    # Plain assignments: this is POSIX sh, which has no `local`, and
-    # nothing else in the file uses these names.
+    # POSIX sh: no `local`; these names are unique in file.
     tool=$1
     hint=$2
     if [ "$strict" = 1 ]; then
@@ -28,7 +24,7 @@ skip() {
 
 if command -v rpmspec >/dev/null 2>&1; then
     ran=$((ran + 1))
-    # -P expands and parses only; BuildRequires are the SDK's job.
+    # -P expands and parses only; BuildRequires are SDK's.
     if rpmspec -P "$root/rpm/harbour-piirit.spec" >/dev/null; then
         echo "packaging-lint: rpm/harbour-piirit.spec parses"
     else
@@ -39,11 +35,9 @@ else
     skip rpmspec "install rpm"
 fi
 
-# rpm expands macros inside comments, and the SDK's rpm still does even
-# where a newer host rpm has stopped. `%build` there expands to the whole
-# build preamble, whose first line is `LANG=C`, which rpm then reads as a
-# tag: "error: line 91: Unknown tag: LANG=C". A host rpmspec parses the
-# same file happily, so only a direct check catches it.
+# SDK's rpm expands macros in comments (newer host rpm doesn't): `%build`
+# becomes the build preamble, starting `LANG=C`, read as a tag ("Unknown tag").
+# Host rpmspec parses it fine; only a direct check catches it.
 ran=$((ran + 1))
 bare=$(awk '/^[[:space:]]*#/ {
         stripped = $0
@@ -60,8 +54,8 @@ fi
 
 if command -v desktop-file-validate >/dev/null 2>&1; then
     ran=$((ran + 1))
-    # Sailfish's own keys are not in the freedesktop spec; each expected
-    # warning is named, and anything else still fails.
+    # Sailfish keys are not freedesktop: each expected warning named;
+    # anything else fails.
     out=$(desktop-file-validate "$root/harbour-piirit.desktop" 2>&1 |
         grep -v 'value "silica-qt5" for key "X-Nemo-Application-Type"' |
         grep -v 'key "X-Nemo-Application-Type" .* is not known' || true)
@@ -76,13 +70,9 @@ else
     skip desktop-file-validate "install desktop-file-utils"
 fi
 
-# Every build has to be a distinguishable package.
-#
-# The spec pins Version and Release, and mb2 runs with -X so nothing
-# derives them from git -- so without a stamp in the workflow every build
-# is harbour-piirit-0.1.0-1 and `rpm -U` refuses it as already
-# installed. A phone then keeps the build it has while the file claims to
-# be new, which is exactly what happened.
+# Build must be distinguishable: spec pins Version/Release, mb2 -X means no git.
+# Without a stamp every build is harbour-piirit-0.1.0-1, and `rpm -U` refuses
+# it.
 ran=$((ran + 1))
 if grep -q '^Release:' "$root/rpm/harbour-piirit.spec" &&
     ! grep -q 'sed -i "s/\^Release:' "$root/.github/workflows/rpm.yml"; then
@@ -94,18 +84,9 @@ else
     echo "packaging-lint: the rpm workflow stamps a unique Release"
 fi
 
-# cargo-nextest does not run doctests. It says so, and it is not a bug --
-# but it means that swapping `cargo test` for `cargo nextest run` silently
-# stops running a kind of test, and there is nothing to notice: this
-# workspace has no doctests today, so the count does not change. The first
-# one written after that would never run again, and would look like it did.
-#
-# So wherever nextest runs the suite, `cargo test --doc` runs beside it.
-#
-# Comment lines are stripped before either half is looked for, and that is
-# not tidiness: the Makefile comment explaining this rule says "--doc"
-# itself, so reading the whole file would let the comment satisfy the check
-# with the actual command deleted.
+# nextest skips doctests silently, so `cargo test --doc` runs beside it.
+# Comments are stripped first: a Makefile comment saying "--doc" would satisfy
+# the check.
 ran=$((ran + 1))
 doc_missing=""
 for file in .github/workflows/ci.yml Makefile; do
@@ -124,10 +105,9 @@ else
     echo "packaging-lint: doctests run wherever nextest does"
 fi
 
-# mb2 derives the package it is building from the directory it is run in,
-# and then looks for rpm/<that>.spec. scripts/build-in-docker.sh mounts the
-# checkout at a path it chooses, so that name and the spec's have to agree
-# or the build stops before rpmbuild starts.
+# mb2 takes package name from dir (rpm/<that>.spec). build-in-docker.sh mounts
+# checkout at a path it chooses: that name and spec's must agree, or build
+# stops before rpmbuild.
 ran=$((ran + 1))
 spec_base=$(basename "$(find "$root/rpm" -maxdepth 1 -name '*.spec' | sort | head -1)" .spec)
 # shellcheck disable=SC2016 # $home is the script's text, not ours.
@@ -141,16 +121,11 @@ else
     status=1
 fi
 
-# The catalogs are generated from source, so they are only right if they
-# match what the source currently says. Checked by regenerating a copy
-# rather than by eye: a qsTr() added without a catalog entry is invisible
-# until someone tries to translate the app -- and with forty languages, a
-# string missing from one of them is invisible until someone reads the app
-# in that language.
+# Catalogs regenerated and compared, not eyeballed: a missing qsTr() entry is
+# invisible until someone translates.
 if command -v lupdate >/dev/null 2>&1 || command -v lupdate-qt5 >/dev/null 2>&1; then
     ran=$((ran + 1))
-    # Only the .ts files: a `make translations` leaves .qm files beside
-    # them, and those are not lupdate's to regenerate.
+    # .ts only: `make translations` leaves .qm beside them, not lupdate's.
     fresh_dir=$(mktemp -d)
     cp "$root"/translations/*.ts "$fresh_dir/"
     stale=""
@@ -173,11 +148,8 @@ else
     skip lupdate "install qttools5-dev-tools"
 fi
 
-# And they compile: lrelease is what the RPM runs on them, and a numerus
-# form missing from one language, or a tag out of place, fails there --
-# on the SDK, minutes into a build nobody watches. Every warning counts:
-# lrelease's are exactly the catalog faults that reach the phone as an
-# untranslated string.
+# Must compile: lrelease runs on SDK minutes into build. Every warning is an
+# untranslated string on the phone.
 if command -v lrelease >/dev/null 2>&1 || command -v lrelease-qt5 >/dev/null 2>&1; then
     ran=$((ran + 1))
     qm_dir=$(mktemp -d)
@@ -194,9 +166,7 @@ else
     skip lrelease "install qttools5-dev-tools"
 fi
 
-# Every docs/<name>.md that a comment, a script or a document points at
-# has to exist. Seven of them went in a tidy-up and left thirty-odd
-# references behind, each sending a reader to a file that was not there.
+# Every docs/<name>.md a comment or doc points at must exist.
 ran=$((ran + 1))
 missing=$(grep -rhoE 'docs/[A-Za-z0-9_-]+\.md' "$root" \
         --include='*.rs' --include='*.qml' --include='*.js' --include='*.sh' \

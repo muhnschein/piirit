@@ -1,14 +1,11 @@
-//! Qt/QML integration layer over `deltachat-jsonrpc`: [`DeltaChatCore`] as a
-//! `QObject`, chat and message lists as `QAbstractListModel`s.
+//! Qt/QML layer over `deltachat-jsonrpc`: [`DeltaChatCore`] is a `QObject`,
+//! chat and message lists are `QAbstractListModel`s.
 //!
 //! Needs Qt5 dev headers to build.
 
-// What a phone runs, held to more than tests are: a panic there ends a
-// Qt callback or a tokio task with nobody to see it, and overflow wraps
-// silently in a release build. Not in Cargo.toml's lints table because
-// that table cannot leave tests out, and a test indexing into what it just
-// built is fine. Tests, build scripts and the fake servers in src/bin are
-// all other crates, or this one compiled with `cfg(test)`.
+// Phone code: a panic ends a Qt callback or tokio task silently; release overflow wraps.
+// Not Cargo.toml lints: those cannot exempt tests. Tests, build scripts, src/bin fakes are other
+// crates or `cfg(test)`.
 #![cfg_attr(
     not(test),
     deny(
@@ -22,20 +19,14 @@
         clippy::get_unwrap
     )
 )]
-// All four are forced by qmetaobject's derive macros, not by code here:
-// the macros expand to a wide, unstable set of items from that crate
-// (`wildcard_imports`), generate the `QObject` impl and dispatcher
-// (`useless_transmute`, `type_complexity`), and require by-value `QString`
-// parameters (`needless_pass_by_value`).
+// Forced by qmetaobject macros: wildcard imports, generated QObject impl, by-value QString.
 #![allow(
     clippy::wildcard_imports,
     clippy::useless_transmute,
     clippy::type_complexity,
     clippy::needless_pass_by_value
 )]
-// The macro that reads a `cpp!` block recurses once per token, past the
-// default 128 for the provider in src/pictures.rs and past 1024 for the
-// microphone watch in src/mic_watch.rs, which is longer.
+// cpp! macro recursion: default 128 too low for pictures.rs; mic_watch.rs needs >1024.
 #![recursion_limit = "2048"]
 
 mod backup;
@@ -99,11 +90,9 @@ pub use crate::second_device::SecondDevice;
 pub use crate::transports::Transports;
 pub use crate::webxdc::{WebxdcApp, WebxdcStore};
 
-/// Register the shim's QML-instantiable types. The app and the tests share
-/// this so a page cannot work in one and not the other.
+/// Register the shim's QML types. App and tests share it.
 pub fn register_qml_types() {
-    // Nul-terminated literals; `c"..."` would be neater but arrived in Rust
-    // 1.77, past the 1.75 floor Sailfish sets.
+    // `c"..."` literals need Rust 1.77; Sailfish floor is 1.75.
     let (Ok(uri), Ok(messages), Ok(list)) = (
         std::ffi::CStr::from_bytes_with_nul(b"Piirit\0"),
         std::ffi::CStr::from_bytes_with_nul(b"ChatMessages\0"),

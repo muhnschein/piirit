@@ -1,20 +1,13 @@
-//! Calls: what the core says about one, and making one.
+//! Calls: what core says about one, and making one.
 //!
-//! A call is a message -- `Viewtype::Call` -- and the core keeps its whole
-//! state: ringing, accepted, ended, and how long it lasted. It also does
-//! all of the signalling, which is that message and two hidden ones after
-//! it. What it does not do is the media: the SDP it carries is opaque to
-//! it, and producing one is the job of a WebRTC stack. Here that is the
-//! browser engine, running upstream's calls-webapp page, which the call
-//! host serves (`call_host.rs`).
+//! Call is a message (`Viewtype::Call`). Core keeps whole state (ringing, accepted, ended,
+//! duration) and all signalling (that message plus two hidden ones). Not media: SDP opaque
+//! to core; made by `WebRTC` stack, here browser engine running upstream calls-webapp,
+//! served by `call_host.rs`.
 //!
-//! Two things live here:
-//!
-//! - [`summary`], which a message row reads so that a call draws as one
-//!   rather than as the sentence the core writes into its text, which is
-//!   English whatever the phone's language is;
-//! - [`Call`], the one call the app can be in: ringing, answered, placed,
-//!   and ended, with the page it runs in.
+//! - [`summary`]: message row reads it so call draws as call, not as core's text (English
+//!   whatever phone language).
+//! - [`Call`]: the one call app can be in (ringing, answered, placed, ended), with its page.
 
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
@@ -26,25 +19,21 @@ use crate::call_host::{self, Host, Report, Setup};
 use crate::core::connection;
 use crate::json;
 
-/// What the core says about one call message (`call_info`).
+/// Core's view of call message (`call_info`).
 #[derive(Default, Debug, Clone, PartialEq, Eq)]
 pub(crate) struct Summary {
-    /// The core's name for where the call stands: `Alerting`, `Active`,
-    /// `Completed`, `Missed`, `Declined` or `Canceled`.
+    /// State: `Alerting`, `Active`, `Completed`, `Missed`, `Declined`, `Canceled`.
     pub(crate) state: String,
-    /// The call was started as a video call.
+    /// Started as video call.
     pub(crate) has_video: bool,
-    /// Seconds, for a completed call; 0 for any other.
+    /// Seconds if completed; 0 otherwise.
     pub(crate) duration: i32,
-    /// The caller's SDP offer, which is what answering a call starts
-    /// from. Opaque here: the core carries it and never reads it, and so
-    /// does this.
+    /// Caller's SDP offer; answering starts from it. Opaque: core and this carry, never read.
     pub(crate) sdp_offer: String,
 }
 
 impl Summary {
-    /// Read the core's `CallInfo`. Its state is an object tagged by
-    /// `kind`, and only `Completed` carries anything beside the tag.
+    /// Read `CallInfo`; state is object tagged `kind`, only `Completed` carries more.
     pub(crate) fn from_json(info: &serde_json::Value) -> Self {
         Self {
             state: json::str_at(info, "/state/kind").to_string(),
@@ -55,8 +44,7 @@ impl Summary {
     }
 }
 
-/// What the core says about the call `message_id` is. An error for a
-/// message that is not a call, in the core's own words.
+/// Core's view of call `message_id`. Error if not call.
 pub(crate) async fn summary(
     rpc: &RpcClient,
     account_id: u32,
@@ -69,11 +57,8 @@ pub(crate) async fn summary(
     Ok(Summary::from_json(&answer))
 }
 
-/// The page's own option a call's page is loaded with: whether its
-/// camera starts on. Never `disableVideoCompletely`, which would drop the
-/// other end's picture too: a voice call is one whose camera starts off,
-/// and the bridge (`call_video.js`) keeps the camera closed until it is
-/// switched on.
+/// Page load option: whether camera starts on. Never `disableVideoCompletely`: drops other
+/// end's picture too. Voice call = camera starts off; `call_video.js` keeps it closed until on.
 fn page_options(camera: bool) -> &'static str {
     if camera {
         ""
@@ -82,11 +67,9 @@ fn page_options(camera: bool) -> &'static str {
     }
 }
 
-/// Which of the phone's back cameras is the main lens, as its place
-/// among them: the label nearest "1.0" in what the platform camera
-/// writes on its back cameras' rings, given in their order ("1.0,0.5"),
-/// or the first camera where there are none to go by. The engine names
-/// every back camera alike, and the first it lists may be the wide one.
+/// Main back camera's index among back cameras: label nearest "1.0" in platform camera's
+/// ring labels, in order ("1.0,0.5"); else first. Engine names back cameras alike, and
+/// first listed may be wide one.
 fn main_back_camera(labels: &str) -> usize {
     labels
         .split(',')
@@ -109,20 +92,16 @@ fn main_back_camera(labels: &str) -> usize {
         .map_or(0, |(place, _)| place)
 }
 
-/// The id the phone's audio policy knows this process's sound by, from
-/// the process's own line in `/proc/<pid>/stat`: the 22nd field, its
-/// start time in clock ticks since boot, in lower-case hex. Sailfish's
-/// libpulse puts this on every stream the process opens
-/// (`policy.application.id`), and libresource sends the same for a
-/// resource set's streams; both split the line at single spaces, and so
-/// does this, so the three agree on any line. None for a line too short
-/// or a field that is not a number.
+/// Audio policy id: 22nd field of `/proc/<pid>/stat` (start time, clock ticks since boot),
+/// lower-case hex. Sailfish libpulse puts it on every stream (`policy.application.id`),
+/// libresource sends same for resource set's streams; both split at single spaces, as does
+/// this, so all three agree on any line. None if line short or field not a number.
 fn audio_app_id(stat: &str) -> Option<String> {
     let ticks: u64 = stat.split(' ').nth(21)?.parse().ok()?;
     Some(format!("{ticks:x}"))
 }
 
-/// What one call's page needs before the host can come up.
+/// What page needs before host comes up.
 struct Prepared {
     ice_servers: String,
     avatar_path: String,
@@ -137,204 +116,160 @@ struct Prepared {
 /// WebView { url: call.url }
 /// ```
 ///
-/// One object for the whole window, because a call belongs to no page:
-/// one can come in whatever is on screen, and a page the reader leaves is
-/// not a call the reader has hung up. It moves through `state`:
+/// One object for window: belongs to no page. Leaving page is not hang-up.
+/// Moves through `state`:
 ///
 /// - `""`: no call.
-/// - `ringing`: a call came in, and nobody here has answered it yet.
-/// - `starting`: the page is coming up, and asking for the microphone.
-/// - `calling`: the core has placed the call, and the other end is
-///   ringing.
-/// - `connecting`: both ends have agreed to talk, and the media has not
-///   come through yet.
-/// - `connected`: the two ends can hear each other.
-/// - `reconnecting`: the connection dropped, and may come back.
-/// - `ended`: over, for the reason in `end_reason`, until `reset`.
-// One flag per Qt property: QML binds each on its own.
+/// - `ringing`: came in, not answered.
+/// - `starting`: page coming up, asking for mic.
+/// - `calling`: placed, other end ringing.
+/// - `connecting`: both agreed, media not through.
+/// - `connected`: both hear each other.
+/// - `reconnecting`: dropped, may return.
+/// - `ended`: over, reason in `end_reason`, until `reset`.
+// One flag per Qt property: QML binds each.
 #[allow(clippy::struct_excessive_bools)]
 #[derive(QObject, Default)]
 pub struct Call {
     base: qt_base_class!(trait QObject),
 
-    /// The account the call belongs to. 0 without a call.
+    /// Account. 0 without call.
     pub account_id: qt_property!(u32; NOTIFY call_changed),
-    /// The chat the call is in.
+    /// Chat of call.
     pub chat_id: qt_property!(u32; NOTIFY call_changed),
-    /// The call's message: what the core knows the call as. 0 for an
-    /// outgoing call the core has not placed yet.
+    /// Call's message. 0 until placed.
     pub message_id: qt_property!(u32; NOTIFY call_changed),
-    /// The call came in, rather than being made here.
+    /// Came in, not made here.
     pub incoming: qt_property!(bool; NOTIFY call_changed),
-    /// The call was started as a video call, at whichever end.
+    /// Video call, either end.
     pub has_video: qt_property!(bool; NOTIFY call_changed),
-    /// Who is at the other end, as the chat is named.
+    /// Other end's name.
     pub peer_name: qt_property!(QString; NOTIFY call_changed),
-    /// Their picture, a file the core keeps; empty for none.
+    /// Their picture file, or empty.
     pub peer_avatar: qt_property!(QString; NOTIFY call_changed),
-    /// The core's colour for them, `#rrggbb`.
+    /// Their colour, `#rrggbb`.
     pub peer_color: qt_property!(QString; NOTIFY call_changed),
-    /// Emitted when any of the above changes.
+    /// Emitted on any of above.
     pub call_changed: qt_signal!(),
 
-    /// Where the call is; see the list above.
+    /// State; see list above.
     pub state: qt_property!(QString; NOTIFY state_changed),
-    /// Why an ended call ended: `hung-up` from here, `declined` here
-    /// while it rang, `remote` by the other end, `answered-elsewhere` on
-    /// another of this account's devices, `missed` after ringing here
-    /// unanswered, `failed` when the connection or the core gave up.
+    /// Why ended: `hung-up` (here), `declined` (here, ringing), `remote` (other end),
+    /// `answered-elsewhere` (other device), `missed` (unanswered), `failed` (gave up).
     pub end_reason: qt_property!(QString; NOTIFY state_changed),
-    /// When the two ends first heard each other, in Unix seconds; 0
-    /// until then. What a running clock on the call screen counts from.
+    /// Unix secs both ends first heard each other; 0 until then. Clock runs from it.
     pub connected_at: qt_property!(f64; NOTIFY state_changed),
-    /// Emitted when the state, its reason or its clock changes.
+    /// Emitted on state, reason or clock change.
     pub state_changed: qt_signal!(),
 
-    /// The microphone is off: the other end hears nothing from here.
-    /// On again for every new call.
+    /// Mic off: other end hears nothing. Reset to on for each new call.
     pub muted: qt_property!(bool; NOTIFY muted_changed),
-    /// Emitted when the microphone goes off or on.
+    /// Emitted on mic change.
     pub muted_changed: qt_signal!(),
 
-    /// The reader wants the camera on: from the start of a video call,
-    /// and whenever it is switched on. Kept while the app is in the
-    /// background, where the camera itself is let go; see
-    /// `set_background`. Off again by itself when the camera will not
-    /// open.
+    /// Reader wants camera on: from start of video call, and when switched on. Kept in
+    /// background, where camera itself is let go (`set_background`). Self-clears when
+    /// camera will not open.
     pub camera: qt_property!(bool; NOTIFY video_changed),
-    /// The camera faces away from the reader: the back one. The front
-    /// one again for every new call.
+    /// Back camera. Front again each call.
     pub rear_camera: qt_property!(bool; NOTIFY video_changed),
-    /// The camera is open and sending, as the page says.
+    /// Camera open and sending, per page.
     pub local_video: qt_property!(bool; NOTIFY video_changed),
-    /// The other end's picture is being drawn, as the page says: they
-    /// are sending one and have not switched it off.
+    /// Other end's picture drawn, per page: sent, not switched off.
     pub remote_video: qt_property!(bool; NOTIFY video_changed),
-    /// The camera's picture shows: it has painted a frame since it was
-    /// last given one, as the page says. Black on the screen until then.
+    /// Camera painted a frame since last given one, per page. Black until then.
     pub local_painted: qt_property!(bool; NOTIFY video_changed),
-    /// The same, of the other end's picture.
+    /// Same, for other end's picture.
     pub remote_painted: qt_property!(bool; NOTIFY video_changed),
-    /// Emitted when any of the six above changes.
+    /// Emitted on any of six above.
     pub video_changed: qt_signal!(),
 
-    /// Where the call's page is, with the command it opens on. Empty
-    /// until the host is up, and again once the call is over. What a
-    /// `WebView` is pointed at.
+    /// Page URL with opening command; what `WebView` points at. Empty until host up and after call.
     pub url: qt_property!(QString; NOTIFY url_changed),
-    /// Emitted when the page comes or goes.
+    /// Emitted when page comes or goes.
     pub url_changed: qt_signal!(),
 
-    /// A call came in and is ringing here.
+    /// Ringing here.
     pub ringing: qt_signal!(),
-    /// The call is over; `end_reason` says why.
+    /// Call over; `end_reason` says why.
     pub ended: qt_signal!(reason: QString),
-    /// Something failed. The message is the core's own.
+    /// Failed. Message is core's own.
     pub error: qt_signal!(message: QString),
 
-    /// Place a call into a chat. False, and nothing done, when the app is
-    /// already in one.
+    /// Place call. False if already in one.
     pub place: qt_method!(fn(&mut self, account_id: u32, chat_id: u32, video: bool) -> bool),
-    /// Take up a call that is ringing from its row in the chat: one that
-    /// rang while nothing here was listening -- the app was starting, or
-    /// the event came and went -- but that the core still has ringing.
-    /// Answers on `state`, which becomes `ringing` without the `ringing`
-    /// signal: the reader is already looking at it, and nothing need ring.
+    /// Take up call core still has ringing, from its chat row: rang while nothing here
+    /// listened (app starting, event missed). Answers on `state` -> `ringing`, without
+    /// `ringing` signal: reader already looking at it.
     pub pick_up: qt_method!(fn(&mut self, account_id: u32, chat_id: u32, message_id: u32)),
-    /// Answer the call that is ringing.
+    /// Answer ringing call.
     pub answer: qt_method!(fn(&mut self)),
-    /// Decline the call that is ringing, or end the one in progress.
+    /// Decline ringing, or end call.
     pub hang_up: qt_method!(fn(&mut self)),
-    /// Forget an ended call, so the next one can start.
+    /// Forget ended call.
     pub reset: qt_method!(fn(&mut self)),
-    /// Turn the microphone off, or back on, for the call under way.
+    /// Mic off or on, call under way.
     pub mute: qt_method!(fn(&mut self, on: bool)),
-    /// Switch the camera on or off: for the call under way, or for the
-    /// call ringing, which is then answered with it or without it.
+    /// Camera on or off, call under way or ringing.
     pub set_camera: qt_method!(fn(&mut self, on: bool)),
-    /// Turn the camera to face the other way.
+    /// Flip camera facing.
     pub flip_camera: qt_method!(fn(&mut self)),
-    /// Let the page have the microphone, or have it shut it and keep it
-    /// shut: while the call's sound moves (CallAudio.qml), which must not
-    /// happen with it open. Not muting: the page's own switch, and what
-    /// the other end is told, stay as they are.
+    /// Let page have mic, or shut it and keep it shut while call's sound moves
+    /// (`CallAudio.qml`); must not move with mic open. Not mute: page's switch and what
+    /// other end is told stay.
     pub set_microphone: qt_method!(fn(&mut self, on: bool)),
-    /// The app has gone to the background, or come back: the camera is
-    /// let go while it is away -- nobody is looking at what it shows,
-    /// and the other end is told it is off -- and the pictures are not
-    /// drawn. Back in front, the camera is opened again if it was on.
+    /// App away or back: camera let go while away (other end told it is off), pictures not
+    /// drawn. Back in front, camera reopens if on.
     pub set_background: qt_method!(fn(&mut self, away: bool)),
-    /// The id the phone's audio policy knows this app's sound by: what
-    /// a call's resource set names its streams with (CallAudio.qml).
-    /// Empty where `/proc` does not say.
+    /// Audio policy id for app sound: call's resource set names streams with it
+    /// (`CallAudio.qml`). Empty if `/proc` lacks it.
     pub audio_id: qt_method!(fn(&self) -> QString),
-    /// Apply one core event. Only the four call events are acted on.
+    /// Apply core event (four call kinds).
     pub handle_event:
         qt_method!(fn(&mut self, context_id: u32, kind: QString, payload_json: QString)),
 
-    /// How long a call may ring here before it is taken to have rung
-    /// out, in milliseconds; 0 for the app's own limit, a little over the
-    /// core's 120 seconds. Only a test sets it.
+    /// Ring limit ms; 0: app's own, a little over core's 120 s. Tests only.
     pub ring_limit_ms: qt_property!(u32),
 
-    /// What the platform camera writes on the phone's back cameras'
-    /// rings, in their order, comma-separated ("1.0,0.5"): how the page
-    /// is told which back camera is the main lens. Empty on a phone whose
-    /// adaptation gives none.
+    /// Platform back-camera ring labels ("1.0,0.5"). Empty if none.
     pub back_lenses: qt_property!(QString),
 
-    /// The loopback host the page is served from, while there is a page.
+    /// Loopback host serving page, if any.
     host: Option<Host>,
-    /// The caller's offer, for a call that came in: what answering it
-    /// starts from.
+    /// Offer for incoming call.
     offer: String,
-    /// Counts calls, so an answer meant for an earlier one -- a host that
-    /// came up after it ended, the other end's picture -- lands nowhere.
+    /// Counts calls: late answer for old call lands nowhere.
     generation: u64,
-    /// Call events for this account that arrived while an outgoing call
-    /// had no message yet: the core's event can overtake the host's
-    /// report of the id it placed the call as, and an answer dropped for
-    /// not naming a known call is a call that never connects. Read again
-    /// once the id is known; see `take_report`.
+    /// Call events for account while outgoing call has no message yet: core's event can
+    /// overtake host's report of placed id, and answer dropped for unknown call = call
+    /// never connects. Replayed once id known; see `take_report`.
     early: Vec<(String, String)>,
-    /// Set once the core needs telling nothing more about this call: it
-    /// ended the call itself, or another of this account's devices took
-    /// it. A host let go after that -- the one up now, or one still
-    /// coming up -- goes without `end_call`, which for a call answered
-    /// elsewhere would end it on the device that answered. One per call,
-    /// so a host coming up late reads the flag of the call it was for.
+    /// Core needs nothing more (it ended call, or other device took it). Host let go after
+    /// (up now or still coming up) goes without `end_call`, which would end call on device
+    /// that answered. One per call, so late host reads its own call's flag.
     settled: Arc<AtomicBool>,
-    /// The app is in the background; see `set_background`.
+    /// App in background.
     away: bool,
-    /// The page is to keep the microphone shut; see `set_microphone`.
+    /// Page keeps mic shut.
     mic_shut: bool,
 }
 
-/// Whether a call in `state` is one the phone is in: placed or answered,
-/// and not over. Its sound is a call's for that long, as CallAudio.qml's
-/// `talking` holds the audio policy's set for it; see
-/// `call_host::label_call_audio`.
+/// Placed or answered, not over: sound is a call's that long (`CallAudio.qml`'s `talking`
+/// holds audio policy set); see `call_host::label_call_audio`.
 fn talking(state: &str) -> bool {
     !matches!(state, "" | "ringing" | "ended")
 }
 
-/// How long a call may ring here before it is taken to have rung out
-/// without the core saying so. The core rings a call for 120 seconds from
-/// when it was sent, and says `CallEnded` when that is up -- once, from a
-/// timer that lives only in the server that heard the call. An event
-/// channel that overflowed, or a server that died and was started again,
-/// loses it, and without this the phone would ring until somebody
-/// declined. A little over the core's own, so that when the core does
-/// say it, its word is the one taken.
+/// Ring time before rung out with no word from core. Core rings 120 s from send, then says
+/// `CallEnded` once, from timer only in server that heard call. Overflowed event channel or
+/// restarted server loses it: would ring until declined. A little over core's, so its word wins.
 const RING_LIMIT: std::time::Duration = std::time::Duration::from_secs(125);
 
-/// The most early events kept for one call. They are for a moment that
-/// lasts as long as one round trip to the core, and anything past this
-/// is not about the call being placed.
+/// Max early events kept per call. Window is one core round trip; more aren't about placing.
 const EARLY_EVENTS: usize = 16;
 
 impl Call {
-    /// Whether a call is under way, in any state short of over.
+    /// Under way: any state short of over.
     fn busy(&self) -> bool {
         !matches!(self.state.to_string().as_str(), "" | "ended")
     }
@@ -350,8 +285,7 @@ impl Call {
         }
     }
 
-    /// A new call, whichever way it came: everything about the last one
-    /// forgotten, and answers meant for it turned away.
+    /// New call: last forgotten, its answers turned away.
     fn begin(&mut self, account_id: u32, chat_id: u32, message_id: u32, incoming: bool) {
         self.generation = self.generation.wrapping_add(1);
         self.host = None;
@@ -397,7 +331,7 @@ impl Call {
         true
     }
 
-    /// Take up a ringing call from its row.
+    /// Take up ringing call from row.
     pub fn pick_up(&mut self, account_id: u32, chat_id: u32, message_id: u32) {
         if self.busy() || account_id == 0 || message_id == 0 {
             return;
@@ -405,9 +339,7 @@ impl Call {
         let Some((rpc, runtime)) = connection() else {
             return;
         };
-        // Asked of the core rather than taken from the row: the offer is
-        // not on a row, and the call may have stopped ringing since the
-        // row was drawn.
+        // Ask core: row lacks offer, may have stopped ringing.
         let ptr: QPointer<Self> = QPointer::from(&*self);
         let done = queued_callback(move |found: Result<Summary, String>| {
             let Some(this) = ptr.as_pinned() else { return };
@@ -430,7 +362,7 @@ impl Call {
         });
     }
 
-    /// Answer the ringing call.
+    /// Answer ringing call.
     pub fn answer(&mut self) {
         if self.state.to_string() != "ringing" {
             return;
@@ -444,22 +376,19 @@ impl Call {
     pub fn hang_up(&mut self) {
         match self.state.to_string().as_str() {
             "" | "ended" => {}
-            // Declined here: the core tells the caller, and this
-            // account's other devices, and says `CallEnded` -- which,
-            // arriving at an ended call, is not acted on twice.
+            // Core tells caller and other devices, says `CallEnded`;
+            // arriving at ended call, not acted on twice.
             "ringing" => {
                 self.end_call();
                 self.finish("declined");
             }
-            // Dropping the host is what tells the core; see its `Drop`.
+            // Dropping host tells core (its `Drop`).
             _ => self.finish("hung-up"),
         }
     }
 
-    /// The microphone, off or on. The page has a switch of its own for
-    /// it, and is told to press it: it is the page that keeps whether the
-    /// microphone is on, and tells the other end. A page not up yet is
-    /// told once it is; see `serve`.
+    /// Mic off or on. Page keeps mic state and tells other end, so it is told to press own
+    /// switch. Page not up yet told once up (`serve`).
     pub fn mute(&mut self, on: bool) {
         if !self.busy() || self.muted == on {
             return;
@@ -471,9 +400,8 @@ impl Call {
         }
     }
 
-    /// The microphone, let have or shut. Kept from call to call, as
-    /// CallAudio.qml last said; a page not up yet is told once it is,
-    /// see `serve`.
+    /// Mic allowed or shut; kept across calls, as `CallAudio.qml` last said. Page not up yet
+    /// told once up (see `serve`).
     pub fn set_microphone(&mut self, on: bool) {
         if self.mic_shut != on {
             return;
@@ -482,21 +410,19 @@ impl Call {
         self.tell(call_host::microphone_command(on));
     }
 
-    /// Whether the camera is to be open now: wanted, and the app in
-    /// front.
+    /// Camera wanted, app in front.
     fn camera_live(&self) -> bool {
         self.camera && !self.away
     }
 
-    /// Hand the page a command, if it is up. A page still coming up is
-    /// given the state as it then is; see `serve`.
+    /// Command to page if up. Page still coming up gets state as it then is (`serve`).
     fn tell(&self, command: String) {
         if let Some(host) = &self.host {
             host.command(command);
         }
     }
 
-    /// The camera, on or off.
+    /// Camera on or off.
     pub fn set_camera(&mut self, on: bool) {
         if !self.busy() || self.camera == on {
             return;
@@ -509,7 +435,7 @@ impl Call {
         }
     }
 
-    /// The camera, the other way round.
+    /// Flip camera.
     pub fn flip_camera(&mut self) {
         if !self.busy() {
             return;
@@ -519,8 +445,7 @@ impl Call {
         self.tell(call_host::facing_command(!self.rear_camera));
     }
 
-    /// This process's id with the audio policy, from its own
-    /// `/proc/self/stat`: see `audio_app_id`.
+    /// Audio policy id from `/proc/self/stat`.
     #[must_use]
     pub fn audio_id(&self) -> QString {
         std::fs::read_to_string("/proc/self/stat")
@@ -530,7 +455,7 @@ impl Call {
             .into()
     }
 
-    /// The app away, or back.
+    /// App away or back.
     pub fn set_background(&mut self, away: bool) {
         if self.away == away {
             return;
@@ -543,7 +468,7 @@ impl Call {
         }
     }
 
-    /// What the page says of its pictures.
+    /// Page's picture state.
     fn take_video(&mut self, video: call_host::Video) {
         if !self.busy() {
             return;
@@ -557,13 +482,11 @@ impl Call {
         self.remote_video = video.remote;
         self.local_painted = video.local_painted;
         self.remote_painted = video.remote_painted;
-        // The page turns back to the camera it had when the other one
-        // will not open: what it faces is what it says.
+        // Facing as page says: page turns back when other camera won't open.
         self.rear_camera = !video.front;
-        // A camera that will not open is switched off, as the reader
-        // would see it -- not one that was let go for the background.
+        // Camera that won't open switched off, as reader sees; not one let go for background.
         if video.failed && self.camera_live() {
-            // What only a phone can say: written where its log is read.
+            // Phone-only: written where log is read.
             eprintln!(
                 "piirit: the camera would not open: {}",
                 if video.error.is_empty() {
@@ -588,16 +511,14 @@ impl Call {
         }
     }
 
-    /// The call is over: the page goes, and the reason is said.
+    /// Call over: page goes, reason said.
     fn finish(&mut self, reason: &str) {
         if self.close() {
             self.say_ended(reason);
         }
     }
 
-    /// Everything about ending but the reason: the page goes, and answers
-    /// still on their way are turned away. False when there was no call
-    /// to end.
+    /// Ending: page goes, answers turned away. False if no call.
     fn close(&mut self) -> bool {
         if !self.busy() {
             return false;
@@ -620,15 +541,14 @@ impl Call {
         true
     }
 
-    /// Say why the call ended.
+    /// Say why call ended.
     fn say_ended(&mut self, reason: &str) {
         self.end_reason = reason.into();
         self.state_changed();
         self.ended(reason.into());
     }
 
-    /// The core needs telling nothing more about this call; see
-    /// `settled`.
+    /// Core needs nothing more; see `settled`.
     fn settle(&self) {
         self.settled.store(true, Ordering::SeqCst);
         if let Some(host) = &self.host {
@@ -636,7 +556,7 @@ impl Call {
         }
     }
 
-    /// Tell the core to end the call, without waiting for it.
+    /// Tell core to end call, no wait.
     fn end_call(&self) {
         let (account_id, message_id) = (self.account_id, self.message_id);
         if message_id == 0 {
@@ -646,16 +566,14 @@ impl Call {
             return;
         };
         runtime.spawn(async move {
-            // Without waiting means without an answer to act on: the call
-            // ending reaches this page as the core's own event.
+            // No wait, no answer to act on: ending reaches page as core's own event.
             rpc.call::<_, serde_json::Value>("end_call", (account_id, message_id))
                 .await
                 .ok();
         });
     }
 
-    /// Read who is at the other end: the chat's name and picture, which
-    /// in a one-to-one chat are theirs.
+    /// Other end's name and picture: chat's, which in 1:1 chat are theirs.
     fn load_peer(&mut self) {
         let (account_id, chat_id) = (self.account_id, self.chat_id);
         let Some((rpc, runtime)) = connection() else {
@@ -694,7 +612,7 @@ impl Call {
         });
     }
 
-    /// Bring the page up, opening on `command`.
+    /// Bring page up on `command`.
     fn serve(&mut self, command: String) {
         let Some((rpc, runtime)) = connection() else {
             self.error(QString::from("not started"));
@@ -709,7 +627,7 @@ impl Call {
         );
         let generation = self.generation;
 
-        // Reports from the host, raised on the Qt thread.
+        // Host reports, raised on Qt thread.
         let report_ptr: QPointer<Self> = QPointer::from(&*self);
         let raise = queued_callback(move |report: Report| {
             let Some(this) = report_ptr.as_pinned() else {
@@ -726,9 +644,8 @@ impl Call {
         let ptr: QPointer<Self> = QPointer::from(&*self);
         let done = queued_callback(move |result: Result<Host, String>| {
             let Some(this) = ptr.as_pinned() else { return };
-            // A call hung up while its page was coming up: dropping the
-            // host here is what lets it go -- quietly, for a call the
-            // core has nothing more to hear about.
+            // Hung up while page coming up: dropping host lets it go, quietly (settled) if
+            // core needs nothing more.
             if this.borrow().generation != generation {
                 if let (Ok(host), true) = (&result, settled.load(Ordering::SeqCst)) {
                     host.settle();
@@ -739,15 +656,14 @@ impl Call {
                 Ok(host) => {
                     {
                         let mut this_mut = this.borrow_mut();
-                        // The camera as it is now, switched on or off
-                        // while the page was coming up or not.
+                        // Camera as now: may have switched while page came up.
                         let camera = this_mut.camera_live();
                         this_mut.url = host.url(page_options(camera), &command).into();
-                        // Muted before there was a page to tell.
+                        // Muted before page.
                         if this_mut.muted {
                             host.command(call_host::mute_command(true));
                         }
-                        // And the microphone to be kept shut.
+                        // Mic shut.
                         if this_mut.mic_shut {
                             host.command(call_host::microphone_command(false));
                         }
@@ -755,7 +671,7 @@ impl Call {
                         if back > 0 {
                             host.command(call_host::back_camera_command(back));
                         }
-                        // Turned, or away, before there was a page to tell.
+                        // Turned or away before page.
                         if this_mut.rear_camera {
                             host.command(call_host::facing_command(false));
                         }
@@ -793,7 +709,7 @@ impl Call {
         });
     }
 
-    /// What the host says, applied.
+    /// Apply host's report.
     fn take_report(&mut self, report: Report) {
         match report {
             Report::Placed(message_id) => {
@@ -814,7 +730,7 @@ impl Call {
             }
             Report::Connection(ice) => self.take_connection(&ice),
             Report::Video(video) => self.take_video(video),
-            // The core has already been told, by the host.
+            // Host told core.
             Report::EndedByPage => self.finish("hung-up"),
             Report::Failed(message) => {
                 self.error(message.into());
@@ -823,7 +739,7 @@ impl Call {
         }
     }
 
-    /// The peer connection's own word for how it is doing.
+    /// Peer connection's ICE state.
     fn take_connection(&mut self, ice: &str) {
         if !self.busy() || self.state.to_string() == "ringing" {
             return;
@@ -836,8 +752,7 @@ impl Call {
                 }
                 self.set_state("connected");
             }
-            // ICE may find its way back by itself; "failed" is when it
-            // has stopped trying.
+            // ICE may recover; "failed" gave up.
             "disconnected" if self.state.to_string() == "connected" => {
                 self.set_state("reconnecting");
             }
@@ -846,7 +761,7 @@ impl Call {
         }
     }
 
-    /// Apply one core event.
+    /// Apply core event.
     pub fn handle_event(&mut self, context_id: u32, kind: QString, payload_json: QString) {
         let kind = kind.to_string();
         if !matches!(
@@ -855,8 +770,7 @@ impl Call {
         ) {
             return;
         }
-        // About a call this end is placing, before the core has said what
-        // it placed it as: kept for when it has.
+        // Placing call, before core names it.
         if kind != "IncomingCall"
             && context_id == self.account_id
             && !self.incoming
@@ -870,17 +784,15 @@ impl Call {
         }
         let payload: serde_json::Value =
             serde_json::from_str(&payload_json.to_string()).unwrap_or_default();
-        // The call events are the one part of the core's stream written
-        // in snake_case: `msg_id`, not `msgId` (docs/CALLS.md).
+        // Call events only snake_case part of core stream: `msg_id`, not `msgId` (docs/CALLS.md).
         let Some(message_id) = json::u32_opt(&payload, "msg_id") else {
             return;
         };
         let ours = context_id == self.account_id && message_id == self.message_id;
         match kind.as_str() {
             "IncomingCall" => {
-                // One call at a time, as both reference clients have it:
-                // a second one rings nowhere, and is a missed call once
-                // the core gives up on it.
+                // One at a time, as both reference clients: second rings nowhere, becomes
+                // missed once core gives up.
                 if self.busy() {
                     return;
                 }
@@ -895,21 +807,16 @@ impl Call {
                 self.watch_ringing();
                 self.ringing();
             }
-            // Answered: here, which the host has reported already, or on
-            // another device. The core says the latter only of a call
-            // this device has not accepted itself, and turns this
-            // device's own accept into nothing once it has -- so from any
-            // state short of over, answered here or not, the call is that
-            // device's now, and letting it go must not end it there.
+            // Answered here (host already reported) or on other device. Core says latter only
+            // for call this device hasn't accepted, and voids own accept after; so short of
+            // over, call is that device's: letting go must not end it there.
             "IncomingCallAccepted" if ours => {
                 if !json::flag(&payload, "from_this_device") && self.busy() {
                     self.settle();
                     self.finish("answered-elsewhere");
                 }
             }
-            // The other end answered: its answer goes to the page. Every
-            // one of this account's devices hears it, and only the one
-            // that placed the call has a page to give it to.
+            // Other end's answer to page. All account's devices hear it; only placer has page.
             "OutgoingCallAccepted" if ours && !self.incoming => {
                 if let Some(host) = &self.host {
                     let answer = json::str_at(&payload, "accept_call_info");
@@ -920,7 +827,7 @@ impl Call {
                 }
             }
             "CallEnded" if ours && self.busy() => {
-                // Nothing to tell the core: it is the one saying so.
+                // Core said so.
                 self.settle();
                 if self.state.to_string() == "ringing" {
                     self.finish_unanswered();
@@ -932,11 +839,9 @@ impl Call {
         }
     }
 
-    /// Stop a call ringing that has rung past [`RING_LIMIT`] with nothing
-    /// from the core. By then the core counts it as over whatever became
-    /// of its own timer -- a ringing call goes stale 120 seconds after it
-    /// was sent, and `call_info` says so -- so it is ended as one that
-    /// rang out, and the core is asked, as ever, which way.
+    /// Stop call ringing past [`RING_LIMIT`] with no word from core. Core counts it over by
+    /// then whatever its timer did (stale 120 s after send, `call_info` says so): end as
+    /// rung out, core asked which way.
     fn watch_ringing(&self) {
         let Some((_, runtime)) = connection() else {
             return;
@@ -949,8 +854,7 @@ impl Call {
         let ptr: QPointer<Self> = QPointer::from(self);
         let done = queued_callback(move |()| {
             let Some(this) = ptr.as_pinned() else { return };
-            // Answered, declined or ended meanwhile: answering keeps the
-            // call, ending it starts another count.
+            // Answered, declined, ended meanwhile: answering keeps call, ending starts new count.
             if this.borrow().generation != generation
                 || this.borrow().state.to_string() != "ringing"
             {
@@ -964,10 +868,8 @@ impl Call {
         });
     }
 
-    /// A call that rang here and ended unanswered: missed, or declined on
-    /// another of this account's devices. The core knows which, and the
-    /// difference is whether it is worth a notification -- so the ringing
-    /// stops at once, and only the reason waits for the core's answer.
+    /// Ended unanswered: missed, or declined on other device. Core knows which; matters for
+    /// notification. Ringing stops now, only reason waits for core.
     fn finish_unanswered(&mut self) {
         let (account_id, message_id) = (self.account_id, self.message_id);
         if !self.close() {
@@ -981,8 +883,7 @@ impl Call {
         let generation = self.generation;
         let done = queued_callback(move |state: String| {
             let Some(this) = ptr.as_pinned() else { return };
-            // Another call has begun since, and this one's reason is
-            // nobody's business any more.
+            // Newer call: reason moot.
             if this.borrow().generation != generation {
                 return;
             }
@@ -1003,9 +904,8 @@ impl Call {
     }
 }
 
-/// What the host needs that only the core knows: the ICE servers, and
-/// the other end's picture. Neither is worth failing a call over, so a
-/// question the core will not answer is answered with nothing.
+/// Host needs from core: ICE servers, other end's picture. Neither worth failing call:
+/// unanswered question answered with nothing.
 async fn prepare(rpc: &RpcClient, account_id: u32, chat_id: u32) -> Prepared {
     let ice_servers: String = rpc
         .call("ice_servers", (account_id,))
@@ -1037,17 +937,14 @@ mod tests {
 
     #[test]
     fn the_main_back_camera_is_the_one_labelled_nearest_one() {
-        // As the platform camera has them, in the order it lists them.
         assert_eq!(main_back_camera("1.0,0.5"), 0);
         assert_eq!(main_back_camera("0.5,1.0"), 1);
         assert_eq!(main_back_camera("0.6, 1.0, 2.0"), 1);
         assert_eq!(main_back_camera("0.5x,1x"), 1);
-        // No main one: the nearest, and the first of two as near.
         assert_eq!(main_back_camera("0.6,3.0"), 0);
         assert_eq!(main_back_camera("3.0,0.6"), 1);
         assert_eq!(main_back_camera("2.0,0.5"), 1);
         assert_eq!(main_back_camera("0.5,1.5"), 0);
-        // Nothing to go by: the first, as the engine lists them.
         assert_eq!(main_back_camera(""), 0);
         assert_eq!(main_back_camera("wide,main"), 0);
         assert_eq!(main_back_camera("wide,1.0"), 1);
@@ -1071,17 +968,14 @@ mod tests {
 
     #[test]
     fn the_audio_id_is_the_start_time_in_hex() {
-        // A line as the kernel writes it: the start time is the 22nd
-        // field, 4660 ticks, 0x1234.
         let stat = "4242 (harbour-piirit) S 1 4242 4242 0 -1 4194560 2915 0 \
                     0 0 12 4 0 0 20 0 9 0 4660 917504000 9000 18446744073709551615 \
                     1 1 0 0 0 0 0 4096 17663 0 0 0 17 3 0 0 0 0 0\n";
         assert_eq!(audio_app_id(stat).as_deref(), Some("1234"));
-        // Split at single spaces, as libpulse and libresource split it:
-        // a name with a space in it moves the field along for all three.
+        // Single-space split, as libpulse and libresource:
+        // name with space shifts field for all three.
         let spaced = stat.replace("(harbour-piirit)", "(harbour piirit)");
         assert_eq!(audio_app_id(&spaced).as_deref(), Some("0"));
-        // Too short, or not a number there: none, not a wrong id.
         assert_eq!(audio_app_id("4242 (piirit) S 1"), None);
         let garbled = stat.replace(" 4660 ", " x4660 ");
         assert_eq!(audio_app_id(&garbled), None);
@@ -1089,8 +983,7 @@ mod tests {
 
     #[test]
     fn a_call_reads_as_the_core_serialises_it() {
-        // Shapes taken from deltachat-rpc-server 2.62 itself: camelCase,
-        // the state tagged by `kind`.
+        // Shapes from deltachat-rpc-server 2.62: camelCase, state tagged by `kind`.
         let ringing = Summary::from_json(&json!({
             "hasVideo": true,
             "sdpOffer": "v=0",

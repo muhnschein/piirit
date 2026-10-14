@@ -1,21 +1,9 @@
-//! A long press on a message leaves the view where the reader put it.
-//!
-//! The conversation's list moves itself: it follows the newest message
-//! while the reader is down there, and it holds the row they came back to
-//! while the rows around it settle. Both watch the content's height, and
-//! both were watching when a context menu unfolded -- which grows a row by
-//! a menu's worth in exactly the way a picture decoding does.
-//!
-//! So the view was thrown at the newest message the moment a menu finished
-//! opening, and a menu opened on a held row was put back under the bottom
-//! of the screen with the reader looking at the half of it that fit. The
-//! chat list has neither the follow nor the hold, and its menus were fine;
-//! this is what the conversation had that it did not.
-//!
-//! Pinned here: nothing in the view moves it while a menu is open -- not
-//! the follow, not a message arriving, not a hold armed over it -- and a
-//! view that was following goes back to the newest message once the menu
-//! is closed again.
+//! Long press keeps view where reader put it. Conversation follows newest and holds returned-to
+//! row; both watch content height, which an unfolding menu grows like a decoding picture. So view
+//! was thrown to newest once a menu opened, and a menu on a held row was pushed under the screen's
+//! bottom. Chat list has neither follow nor hold; its menus were fine. Pinned: nothing moves view
+//! while menu open (not follow, not arrival, not a hold armed over it); a following view returns
+//! to newest after close.
 
 // Qt harness: see qml_conversation_list.rs.
 #![allow(
@@ -32,9 +20,7 @@ use qmetaobject::*;
 
 mod common;
 
-/// The list over rows that are filled in, so each is its message's own
-/// height -- and, in the stub, so each grows by a menu's height when one
-/// of its menus is opened.
+/// Rows filled in: each its message's height; in stub, grows by a menu's height when one opens.
 const PROBE_QML: &str = r"
     import QtQuick 2.0
     Item {
@@ -159,7 +145,7 @@ const PROBE_QML: &str = r"
 #[test]
 #[allow(clippy::too_many_lines)]
 fn a_context_menu_does_not_move_the_view_under_the_reader() {
-    // SAFETY: single-threaded test binary; set before Qt starts.
+    // SAFETY: single thread; pre-Qt.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
     }
@@ -196,17 +182,14 @@ fn a_context_menu_does_not_move_the_view_under_the_reader() {
             ),
         ));
     });
-    // Down at the newest message, following it: the state the follow
-    // moves the view from.
+    // Down at newest, following: start state.
     single_shot(Duration::from_secs(2), move || unsafe {
         (*steps_ptr).push(("following", call!("settleAtEnd")));
     });
     single_shot(Duration::from_secs(3), move || unsafe {
         (*steps_ptr).push(("pressed", call!("topIndex")));
     });
-    // The row the reader pressed, read back out of the steps: which row
-    // is at the top of the view depends on how the rows measured, so it
-    // is not known until the run is under way.
+    // Pressed row read from steps: top row known only mid-run.
     macro_rules! pressed {
         () => {
             (*steps_ptr)
@@ -221,29 +204,26 @@ fn a_context_menu_does_not_move_the_view_under_the_reader() {
         (*steps_ptr).push(("before", call!("place", index)));
         (*steps_ptr).push(("opened", call!("openMenu", index)));
     });
-    // The grown row measured, and a whole event loop after that: the
-    // follow runs off a zero-length timer, so if it is going to throw
-    // the view at the newest message it has by now.
+    // Grown row measured, then a whole event loop: follow runs off a zero-length timer, so if it
+    // would throw view to newest, it has by now.
     single_shot(Duration::from_secs(5), move || unsafe {
         call!("settle");
     });
     single_shot(Duration::from_secs(6), move || unsafe {
         (*steps_ptr).push(("after-opening", call!("place", pressed!())));
-        // And a message arrives while the menu is up, which is the other
-        // way the follow moves the view.
+        // Message arrives while menu up: other follow mover.
         (*steps_ptr).push(("arrival", call!("append", 1)));
     });
     single_shot(Duration::from_secs(7), move || unsafe {
         (*steps_ptr).push(("after-arrival", call!("place", pressed!())));
         (*steps_ptr).push(("still-open", call!("closeMenu", pressed!())));
     });
-    // Closed again: a view that was following the newest message is back
-    // on it, arrival and all.
+    // Closed: following view back on newest, arrivals included.
     single_shot(Duration::from_secs(8), move || unsafe {
         (*steps_ptr).push(("closed-at-end", call!("ended")));
         (*steps_ptr).push(("closed-following", call!("following")));
-        // Now the other mover: a row held where it is, as coming back
-        // from a picture leaves it, with a menu opened on it.
+        // Other mover: row held in place, as coming back from a picture leaves it, menu opened on
+        // it.
         (*steps_ptr).push(("held", call!("hold", 12.0, 40.0)));
     });
     single_shot(Duration::from_secs(9), move || unsafe {
@@ -256,9 +236,8 @@ fn a_context_menu_does_not_move_the_view_under_the_reader() {
     single_shot(Duration::from_secs(11), move || unsafe {
         (*steps_ptr).push(("hold-let-go", call!("holding")));
         (*steps_ptr).push(("held-after", call!("place", 12.0)));
-        // With that menu still up, the button back to the newest
-        // message. It is over the list, so the tap never reaches the row
-        // and Silica leaves the menu open.
+        // Menu still up, tap newest button: it's over list, so tap never reaches row and Silica
+        // leaves menu open.
         (*steps_ptr).push(("jumped", call!("jump")));
     });
     single_shot(Duration::from_secs(12), move || unsafe {
@@ -276,9 +255,7 @@ fn a_context_menu_does_not_move_the_view_under_the_reader() {
             .and_then(|(_, value)| value.parse::<f64>().ok())
             .unwrap_or(-1.0);
         (*steps_ptr).push(("opened-again", call!("openMenu", index)));
-        // And the row goes while its menu is open on it. Nothing will
-        // ever say the menu closed, because there is nothing left to
-        // say it.
+        // Row goes while menu open: nothing says menu closed.
         (*steps_ptr).push(("row-gone", call!("removeRow", index)));
     });
     single_shot(Duration::from_secs(15), move || unsafe {
@@ -319,8 +296,7 @@ fn a_context_menu_does_not_move_the_view_under_the_reader() {
          opening one does to the view. {context}"
     );
 
-    // The reader long-pressed a row and is looking at it. Whatever the
-    // menu's unfold does to the content's height, that row does not move.
+    // Long-pressed row stays put while menu unfolds.
     assert_eq!(
         value("after-opening"),
         value("before"),
@@ -339,8 +315,7 @@ fn a_context_menu_does_not_move_the_view_under_the_reader() {
         "the row's menu did not close. {context}"
     );
 
-    // Closed, and the reader is back where following means: at the newest
-    // message, with what arrived while the menu was up on screen.
+    // Closed: back at newest, with arrivals while menu up.
     assert_eq!(
         (
             value("closed-at-end").as_str(),
@@ -351,10 +326,8 @@ fn a_context_menu_does_not_move_the_view_under_the_reader() {
          message short of it. {context}"
     );
 
-    // The other mover. A held row is let go of when a menu opens on it,
-    // exactly as it is when a drag takes the view over -- otherwise the
-    // hold re-pins the row's top through the whole unfold and the menu
-    // grows off the bottom of the screen.
+    // Held row released when menu opens, like a drag; else hold re-pins top, menu grows off
+    // bottom.
     assert_ne!(
         value("held"),
         "-1",
@@ -379,9 +352,8 @@ fn a_context_menu_does_not_move_the_view_under_the_reader() {
         "opening a context menu on a held row moved it. {context}"
     );
 
-    // The button back to the newest message is over the list, so a tap
-    // on it never reaches the row a menu is open on: left waiting on a
-    // menu Silica is never going to close, the jump did nothing at all.
+    // Newest button over list: tap never reaches menu'd row. Jump used to wait on a menu Silica
+    // never closes, doing nothing at all.
     assert_eq!(
         (value("jumped-end").as_str(), value("jumped-menu").as_str()),
         ("true", "false"),
@@ -389,9 +361,8 @@ fn a_context_menu_does_not_move_the_view_under_the_reader() {
          context menu was open. {context}"
     );
 
-    // And the way out of the state, for a menu that never gets to say it
-    // closed: the row it was on is gone. A view that still believes a
-    // menu is up never follows the newest message again.
+    // Way out for a menu that never says it closed: its row is gone. View still believing a menu
+    // is up would never follow newest again.
     assert_ne!(
         value("row-gone"),
         "",

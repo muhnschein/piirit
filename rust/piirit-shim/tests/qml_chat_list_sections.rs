@@ -1,17 +1,10 @@
-//! Pinned chats get a heading, and so do the rest -- but only when both
-//! kinds are there.
+//! Pinned and rest get headings, only when both kinds present (one heading says nothing; "Pinned"
+//! over nothing pinned is a lie). Hiding `SectionHeader` in place not enough: Silica keeps its size
+//! and label is its child, so text stayed drawn over first row. Plain Item collapses and clips.
 //!
-//! One heading over the whole list says nothing, and "Pinned" over a list
-//! with nothing pinned is a lie. Hiding the `SectionHeader` in place was
-//! not enough: Silica keeps its own size and its label is a child of it,
-//! so the text stayed drawn over the first row. A plain Item collapses
-//! around it instead, and clips.
-//!
-//! Two lists, two cases, in one process: the ordinary list holds a pinned
-//! chat and an unpinned one, and the archived list holds a single
-//! unpinned chat. Nothing here sets `PIIRIT_FAKE_NO_ARCHIVED`, because a
-//! list with no rows in it has no headings either way and would prove
-//! nothing.
+//! Two lists, one process: ordinary list has a pinned and an unpinned chat; archived list a single
+//! unpinned one. Nothing sets `PIIRIT_FAKE_NO_ARCHIVED`: list with no rows has no headings either
+//! way, proving nothing.
 
 // Qt harness: see qml_chat_list.rs.
 #![allow(
@@ -85,8 +78,7 @@ fn a_category_is_only_headed_when_there_is_another_one() {
     let temp = std::env::temp_dir().join(format!("piirit-sections-{}", std::process::id()));
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
 
-    // SAFETY: single-threaded test binary; set before Qt starts and before
-    // the server inherits them.
+    // SAFETY: single-threaded; set pre-Qt and before server inherits.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_ACCOUNTS_DIR", temp.join("accounts"));
@@ -190,8 +182,7 @@ fn a_category_is_only_headed_when_there_is_another_one() {
         "ok",
         "the chat list did not load. {context}"
     );
-    // The fake pins chat 1 and leaves chat 2 alone, so this list has both
-    // kinds in it and the headings are worth showing.
+    // Fake pins chat 1, not chat 2: both kinds, headings worth showing.
     assert_eq!(
         value("both-kinds-heading"),
         "true",
@@ -205,13 +196,9 @@ fn a_category_is_only_headed_when_there_is_another_one() {
          draws over the chat below it. {context}"
     );
 
-    // And it has to fit in that row. Silica's SectionHeader sits at the
-    // left page margin and is a margin narrower than its parent on each
-    // side, with its text right-aligned against its right edge -- so a
-    // page that assigns it the full parent width keeps the inset x and
-    // pushes the text one whole margin off the screen. That is what a
-    // device screenshot showed: the last two characters of both headings
-    // cut off at the edge.
+    // Must fit row. Silica's `SectionHeader` sits at left page margin, a margin narrower than
+    // parent each side, text right-aligned: assigning full parent width keeps inset x, pushes text
+    // a margin off screen (device screenshot: last two chars of both headings cut off).
     let number = |label: &str| value(label).parse::<f64>().unwrap_or(f64::NAN);
     assert!(
         number("slot-width") > 0.0,
@@ -235,8 +222,7 @@ fn a_category_is_only_headed_when_there_is_another_one() {
         "ok",
         "the archived list did not load. {context}"
     );
-    // The guard: an empty list has no headings either way, and this test
-    // would prove nothing about hiding them.
+    // Guard: empty list has no headings either way.
     assert_ne!(
         value("archived-count"),
         "0",

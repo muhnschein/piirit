@@ -1,14 +1,6 @@
-//! The contact page shows who a one-to-one chat is with, and no address.
-//!
-//! Loaded headlessly against the stub Silica module and the recording
-//! double: the one member of chat 1 comes up with their name, their line
-//! about themselves and the state of the connection, and nothing on the
-//! page is an email address.
-//!
-//! The name can be the reader's own for them: typing one and leaving
-//! writes it to the core, which then shows it everywhere; blanking it
-//! writes an empty name, which is the core's own way back to what the
-//! contact calls themselves.
+//! Contact page of one-to-one chat: name, about line, connection state; never an email address.
+//! Name can be reader's own for them: typed and left, it's written to core (shown everywhere);
+//! blank writes empty name, core's way back to what contact calls themselves.
 
 // Qt harness: see qml_chat_list.rs.
 #![allow(
@@ -107,7 +99,7 @@ fn the_contact_page_names_the_contact_and_no_address() {
     let journal = common::fresh_journal(&temp);
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
 
-    // SAFETY: single-threaded test binary; set before Qt starts.
+    // SAFETY: single-threaded; set pre-Qt.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_FAKE_JOURNAL", &journal);
@@ -155,7 +147,7 @@ fn the_contact_page_names_the_contact_and_no_address() {
         };
     }
 
-    // Chat 1 is with Ada, who has written a line.
+    // Chat 1 is with Ada, who has written an about line.
     single_shot(Duration::from_secs(1), move || unsafe {
         record!(
             "load",
@@ -178,12 +170,10 @@ fn the_contact_page_names_the_contact_and_no_address() {
         record!("encryption", get!("encryptionLabel", "text"));
         record!("timer", get!("disappearingCombo", "currentIndex"));
         record!("texts", call!("texts"));
-        // No name given yet: the field is empty, and what they call
-        // themselves stands in it.
+        // No name given yet: field empty, what they call themselves as placeholder.
         record!("given", get!("contactNameField", "text"));
         record!("own", get!("contactNameField", "placeholderText"));
-        // A field from the start, with the hint under it once the
-        // cursor is in it and not before.
+        // A field from start; hint under it once cursor is in it, not before.
         record!("hint-before", get!("nameHint", "visible"));
         record!("field-before", get!("contactNameField", "visible"));
         record!("edit", call!("edit", QString::from("contactNameControl")));
@@ -201,8 +191,7 @@ fn the_contact_page_names_the_contact_and_no_address() {
     });
 
     single_shot(Duration::from_secs(5), move || unsafe {
-        // The core reloaded behind the save, so the name in the field is
-        // the one given.
+        // Core reloaded behind save: field shows given name.
         record!("renamed", get!("contactNameField", "text"));
         record!("hint-after-leave", get!("nameHint", "visible"));
         record!("field-kept", get!("contactNameField", "text"));
@@ -228,8 +217,7 @@ fn the_contact_page_names_the_contact_and_no_address() {
     assert_rename(&steps, &common::calls(&journal));
 }
 
-/// A typed name reaches the core as the contact's, and a blank one
-/// reaches it as empty -- which is the core's own way back to theirs.
+/// Typed name reaches core as contact's; blank as empty (core's way back to theirs).
 fn assert_rename(steps: &[(&str, String)], calls: &[(String, Value)]) {
     let context = format!("steps: {steps:?}");
     let value = |label: &str| {
@@ -314,8 +302,7 @@ fn assert_rename(steps: &[(&str, String)], calls: &[(String, Value)]) {
     );
 }
 
-/// The contact's own words and picture, the state of the connection, and
-/// nothing that looks like an address.
+/// Contact's words, picture, connection state; no address text.
 fn assert_page(steps: &[(&str, String)]) {
     let context = format!("steps: {steps:?}");
     let value = |label: &str| {
@@ -361,7 +348,7 @@ fn assert_page(steps: &[(&str, String)]) {
         !value("texts").contains('@'),
         "an email address is drawn on the contact page. {context}"
     );
-    // Ada has never been seen (`lastSeen` 0), which the core calls "Old".
+    // Ada never seen: core says "Old".
     assert_eq!(
         (value("seen-shown").as_str(), value("seen").as_str()),
         ("true", "Seen a long time ago"),

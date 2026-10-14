@@ -4,43 +4,27 @@ import QtSensors 5.0
 import "../components"
 
 /*
- * The one call the app is in: ringing, being set up, in progress, and
- * over.
+ * Call the app is in: ringing, setting up, in progress, over.
  *
- * The call itself is the window's (`CallCenter.qml`), not this page's --
- * a call comes in whatever is on screen -- and this is where it is shown.
- * Laid out as the phone's own call screen lays out a call: who, at the
- * top on the left, and the time on the right; how long, large, under
- * them; the switches under that; and the red button at the foot. Their
- * picture, where they have one of their own, fills the screen behind it
- * all, out of focus.
+ * Call is the window's (`CallCenter.qml`). Layout as phone call screen: who
+ * top left, time right, duration large, switches, red button at foot. Their
+ * picture fills behind, blurred.
  *
- * The media runs in the browser engine, in upstream's call page
- * (`CallView.qml`), which draws controls of its own. They are not shown:
- * the page is kept running unseen, and what its controls did is done
- * from here -- the microphone through the call, which has the page press
- * its own switch, and hanging up through the call as it always was.
+ * Media runs in upstream's `CallView.qml`, kept running unseen; its controls
+ * drawn here instead (mic via call, which presses page's own switch; hang up
+ * via call).
  *
- * Pictures are the exception. While the camera is on, or the other end
- * is sending a picture, the page is shown -- its pictures and nothing
- * else of it (call_video.js) -- with this page's lines and switches over
- * it, which a tap puts away and brings back. The time of day gives way
- * to how long, and the large clock goes. The camera switch is there in
- * every call, so a voice call can become a video call, and on the
- * ringing screen of a video call, so it can be answered without one.
- * This end's picture, once the other end's is drawn, sits in the top
- * right corner, as the reference clients have it, and carries the button
- * that turns the camera; a picture still black has a spinner over it
- * until it shows.
+ * Pictures on: page shows pictures only (call_video.js), lines and switches
+ * over; tap hides/shows them. Duration replaces time of day; large clock goes.
+ * Camera switch in every call (voice can become video) and on ringing video
+ * call (answer without camera). Own picture: top right once theirs drawn, with
+ * camera-turn button; spinner over black picture until it shows.
  *
- * That page is loaded rather than declared, so a phone without the
- * browser engine loses the call and keeps this page -- a call that rings
- * there can still be seen, and declined.
+ * Loaded, not declared: no browser engine = call lost, page kept (ringing call
+ * still declinable).
  *
- * The page cannot be swiped away while the call is up. Leaving it would
- * take the call's page with it, and the call with that: a call the
- * reader has not hung up that has stopped carrying sound. Hanging up is
- * how it is left, and the page goes by itself once the call is over.
+ * Not swipeable while call up: leaving drops media. Hang up to leave; page
+ * goes itself once call over.
  */
 Page {
     id: page
@@ -48,54 +32,44 @@ Page {
     /// The window's call.
     property QtObject call: null
 
-    /// Where the call's sound comes out (CallAudio), when the window has
-    /// it to hand over: the call's page comes up once it is ready.
+    /// Call sound output (CallAudio), handed over when ready.
     property QtObject audio: null
 
-    /// A call is under way: anything short of over.
+    /// Under way: anything short of over.
     readonly property bool busy: page.call !== null && page.call.state !== ""
                                  && page.call.state !== "ended"
-    /// The two ends have agreed to talk: the call's page is where it
-    /// goes on.
+    /// Both ends agreed to talk: call page takes over.
     readonly property bool inCall: page.busy && page.call.state !== "ringing"
 
-    /// A video call is ringing here: the camera can be switched off
-    /// before it is answered.
+    /// Video call ringing: camera can be switched off before answer.
     readonly property bool ringingVideo: page.call !== null && page.call.state === "ringing"
                                          && page.call.has_video
-    /// Pictures are on screen: this end's camera, or the other end's.
+    /// Pictures on screen: this end's camera, or other end's.
     readonly property bool video: page.inCall
                                   && (page.call.local_video || page.call.remote_video)
-    /// Over the pictures, the lines and the switches are shown: put away
-    /// by a tap, and by themselves once both ends are seen; back with a
-    /// tap.
+    /// Lines and switches over pictures: tap toggles; auto-hide when both seen.
     property bool controlsShown: true
-    /// What is drawn over the call, now.
+    /// Drawn over call, now.
     readonly property bool overlay: !page.video || page.controlsShown
-    /// The camera is turning: from the press until the other camera's
-    /// first frame shows, which on a phone can take a second or two. Its
-    /// button stays where it was, dimmed, so that nothing moves under the
-    /// finger, and a spinner says the picture is on its way, from the
-    /// press on.
+    /// Camera turning: until other camera's first frame (1-2 s). Button dims in
+    /// place (nothing moves under finger); spinner from press.
     property bool turning: false
 
-    /// The app is the one in front. Not read-only: a test, which has no
-    /// app in front, says it is.
+    /// App in front. Not read-only: tests (no app in front) set it.
     property bool appActive: Qt.application.state === Qt.ApplicationActive
 
-    /// Now, moved on once a second while the clock is shown.
+    /// Now, ticked each second while clock shown.
     property real now: Date.now()
 
-    /// What the cover's quick actions must not jump away from.
+    /// Quick actions on cover must not jump away from this.
     readonly property bool pausesQuickActions: page.busy
 
     backNavigation: !page.busy
 
-    /// The call is connected, and its clock is running.
+    /// Connected; clock running.
     readonly property bool connected: page.call !== null && page.call.state === "connected"
 
-    /// How long the call has been connected, as the phone app shows it:
-    /// hours, minutes and seconds, two digits each.
+    /// Connected duration: h, m, s, two digits each.
     function elapsed() {
         if (!page.call || page.call.connected_at <= 0) {
             return ""
@@ -105,8 +79,7 @@ Page {
         return parts.map(function (part) { return (part < 10 ? "0" : "") + part }).join(":")
     }
 
-    /// The same, with the groups that are still nothing but zeros drawn
-    /// quieter, as the phone app draws them: what is counting stands out.
+    /// As phone app: zero groups drawn quieter; counting stands out.
     function elapsedMarkup() {
         var text = page.elapsed()
         var lead = /^(00:){0,2}/.exec(text)[0]
@@ -117,9 +90,7 @@ Page {
                 + text.substring(lead.length)
     }
 
-    /// How the call stands, in words. Delta Chat's own wherever it has
-    /// them, so its translations apply. Not `status`, which is the
-    /// page's own.
+    /// Call state in words: Delta Chat's strings. Not `status` (page's own).
     function describe() {
         if (!page.call) {
             return ""
@@ -159,9 +130,8 @@ Page {
         return ""
     }
 
-    // The lines and switches go by themselves while both ends' pictures
-    // are up and the reader has done nothing for a while, and come back
-    // with the first tap. Shown again whenever the pictures go.
+    // Lines/switches hide when both pictures up and reader idle.
+    // Back on tap; shown again whenever pictures go.
     Timer {
         id: tuck
         objectName: "tuck"
@@ -177,15 +147,14 @@ Page {
         }
     }
 
-    /// The reader touched something: the lines stay a while longer.
+    /// Reader touched something: lines stay longer.
     function touched() {
         page.controlsShown = true
         tuck.restart()
     }
 
-    /// Turn the camera. Turning is said after the call is told, which
-    /// says at once which way it faces: what the page says next is about
-    /// the turn.
+    /// Turn camera. `turning` set after `flip_camera`: call reports facing at
+    /// once, so later updates are about the turn.
     function turn() {
         page.touched()
         page.call.flip_camera()
@@ -193,16 +162,14 @@ Page {
         turnLimit.restart()
     }
 
-    /// The turn is over: the other camera's picture shows, or there is
-    /// no camera to wait for.
+    /// Turn over: other camera's picture shows, or no camera to wait for.
     function lookAtTurn() {
         if (page.call === null || page.call.local_painted || !page.call.camera) {
             page.turning = false
         }
     }
 
-    // A turn the page never says more of is not waited for for ever:
-    // the button is not left dimmed.
+    // Cap on turn wait: button not left dimmed if no frame ever comes.
     Timer {
         id: turnLimit
         objectName: "turnLimit"
@@ -210,7 +177,7 @@ Page {
         onTriggered: page.turning = false
     }
 
-    /// A tap on the pictures: the lines and switches away, or back.
+    /// Tap on pictures: lines and switches away, or back.
     function toggleControls() {
         if (!page.video) {
             return
@@ -222,11 +189,9 @@ Page {
         }
     }
 
-    // For the call's clock and the time of day, both. Only while the app
-    // is in front: nobody sees this page from the background, and a timer
-    // that ran on there would wake the phone once a second for nothing.
-    // Started again, it reads the time at once (`triggeredOnStart`), so
-    // a page come back to does not say the time it went away.
+    // Clock and time: only while app in front; background timer would wake
+    // phone each second.
+    // Restarted: reads time at once (`triggeredOnStart`).
     Timer {
         objectName: "clock"
         interval: 1000
@@ -236,14 +201,12 @@ Page {
         onTriggered: page.now = Date.now()
     }
 
-    // Over: said for a moment, then the page goes. From the page on
-    // screen only -- a permission prompt still over it goes first -- so
-    // the pop takes this page and nothing the reader is looking at.
+    // Over: said briefly, then page goes. Only when on screen (permission prompt
+    // over it goes first), so pop takes this page, not what reader sees.
     property bool closeWhenActive: false
 
-    /// On its way out: popped by itself, or swiped away once its call was
-    /// over. A call that comes in now is not this page's to keep -- it
-    /// gets a page of its own once this one has gone (CallCenter.qml).
+    /// Going out: popped, or swiped after call over. Call arriving now gets own
+    /// page once this one gone (CallCenter.qml).
     property bool leaving: false
 
     Timer {
@@ -276,14 +239,13 @@ Page {
                 page.close()
             }
         } else if (page.status === PageStatus.Deactivating && !page.busy) {
-            // Nothing but an ended call can be swiped away.
+            // Only an ended call can be swiped away.
             page.leaving = true
         }
     }
 
-    // A call that comes in while the last one is still being said to be
-    // over keeps the page: it is this call's now. Not once the page is
-    // leaving, which would take the call with it.
+    // Call arriving while last one still shown as over keeps page, unless page
+    // is leaving (would take call with it).
     onBusyChanged: {
         if (page.busy && !page.leaving) {
             leave.stop()
@@ -298,42 +260,33 @@ Page {
         onVideo_changed: page.lookAtTurn()
     }
 
-    // Pushed for a call that was over before the page was up -- one that
-    // failed as it was placed, or rang and ended while the stack was busy:
-    // said, and then gone, as if it had ended while the page was up.
+    // Call already over when pushed (failed, or ended while stack busy):
+    // said, then gone.
     Component.onCompleted: {
         if (page.call && page.call.state === "ended") {
             leave.restart()
         }
     }
 
-    // A page that goes while its call is up -- the stack replaced under it
-    // -- takes the call's media with it. Hanging up then is the honest
-    // end: the other side stops talking to nobody. Only a call whose media
-    // is here, and only from a page that is not already leaving: a call
-    // that rings as the last one's page goes has nothing on this page,
-    // and is shown on a page of its own once this one has gone.
+    // Going while call up drops its media: hang up is the honest end. Only with
+    // media here, from a page not already leaving.
     Component.onDestruction: {
         if (page.inCall && !page.leaving) {
             page.call.hang_up()
         }
     }
 
-    // Their picture, when they have one of their own: the whole screen,
-    // out of focus, and dimmed under what is drawn over it. Nothing where
-    // they have none, and the ambience shows through as on every page.
+    // Their picture: whole screen, blurred, dimmed. None if they have none.
     Item {
         id: backdrop
         objectName: "callBackdrop"
         anchors.fill: parent
         visible: picture.status === Image.Ready && !page.video
 
-        // Blurred off the main thread, small, and drawn large and smooth
-        // (src/pictures.rs) -- a blur this wide keeps nothing a small
-        // copy has not got. Not a FastBlur: that is a shader, and one made
-        // after the window had once been hidden, as a call's page
-        // is when the call rings in the background, could be drawn on the
-        // phone's Qt with another one's program (Avatar.qml says how).
+        // Blurred small off main thread, drawn large and smooth
+        // (src/pictures.rs). Not FastBlur: shader made after window was hidden
+        // (call ringing in background) can draw with another shader's program
+        // on phone's Qt. See Avatar.qml.
         Image {
             id: picture
             anchors.fill: parent
@@ -352,10 +305,8 @@ Page {
         }
     }
 
-    // The call's page: the media, and nothing on screen but its pictures,
-    // when there are any. Its own controls are this page's to draw, so it
-    // runs unseen otherwise -- running, not hidden, which the engine would
-    // pause -- under what is drawn here.
+    // Call page: media, and only its pictures shown. Controls drawn here; runs
+    // unseen, not hidden (hidden would pause engine).
     Loader {
         id: view
         objectName: "callViewLoader"
@@ -364,8 +315,7 @@ Page {
         active: page.call !== null && page.call.url.length > 0
         source: Qt.resolvedUrl("../components/CallView.qml")
         onLoaded: {
-            // Before the page's address: it comes up once the call's
-            // sound has its way out, not before.
+            // Set before `url`: page loads only once call sound has its output.
             view.item.allowed = Qt.binding(function () {
                 return page.audio === null || page.audio.ready
             })
@@ -382,20 +332,16 @@ Page {
         }
     }
 
-    // Unseen is not untouchable: a tap anywhere the page's own buttons
-    // are not would land on one of that page's, drawn or not. Taken here.
-    // Over the pictures, a tap puts the lines and switches away, or
-    // brings them back.
+    // Unseen page still takes taps on its undrawn buttons: shield catches them.
+    // Over pictures, tap toggles lines and switches.
     MouseArea {
         objectName: "callViewShield"
         anchors.fill: parent
         onClicked: page.toggleControls()
     }
 
-    // A picture that has yet to show its first frame is black, and the
-    // engine can take a moment over it (call_video.js): a spinner says
-    // nothing is broken. The other end's fills the screen; this end's
-    // does until theirs comes, and has its corner after.
+    // Black picture before first frame: spinner. Other end fills screen;
+    // this end does until theirs comes.
     BusyIndicator {
         objectName: "theirSpinner"
         anchors.centerIn: parent
@@ -411,31 +357,26 @@ Page {
                  && (!page.call.local_painted || page.turning)
     }
 
-    // Where this end's picture is while the other end's is drawn: the
-    // top right corner, where the page draws it (call_video.js), the
-    // size the page gives it. What it carries is laid out on it; a tap
-    // on it is a tap on the pictures, and falls through to the shield.
+    // This end's picture: top right, size from call_video.js. Taps fall
+    // through to shield.
     Item {
         id: ownPicture
         objectName: "ownPicture"
 
-        /// The picture is in a corner rather than the whole screen.
+        /// In corner, not full screen.
         readonly property bool cornered: page.video && page.call.local_video
                                          && page.call.remote_video
 
         visible: ownPicture.cornered
-        // The page's corner (call_video.js): 27% of the screen's width
-        // by 36%, 4% in from its right and 10% down from its top.
+        // Corner (call_video.js): 27% wide, 36% tall, 4% right, 10% down.
         width: page.width * 0.27
         height: page.width * 0.36
         x: page.width * 0.69
         y: page.height * 0.1
 
-        // Which way the camera faces, on the picture it turns: small, in
-        // its lower left corner, nearer the middle of the screen, and
-        // with the lines and switches. The only one: nothing turns the
-        // camera while its picture fills the screen, or before it shows.
-        // What takes the press is larger than the disc drawn.
+        // Camera-turn button: small, lower-left of picture.
+        // Only one: none while picture fills screen or before shown.
+        // Hit area larger than drawn disc.
         Rectangle {
             objectName: "pictureFlip"
             visible: ownPicture.cornered && page.overlay && page.call.camera
@@ -467,8 +408,8 @@ Page {
         }
     }
 
-    // Shade at the top and the foot, so the lines read over a picture.
-    // A gradient, not a blur: see the backdrop.
+    // Top and foot shade so lines read over pictures. Gradient, not blur: see
+    // backdrop.
     Rectangle {
         objectName: "topShade"
         anchors {
@@ -499,8 +440,7 @@ Page {
         }
     }
 
-    // Who, on the left, and the time of day, on the right: the line the
-    // phone's own call screen opens with.
+    // Who (left) and time of day (right): as phone's call screen.
     Item {
         id: who
         objectName: "callWho"
@@ -534,17 +474,14 @@ Page {
             font.pixelSize: Theme.fontSizeLarge
             color: Theme.secondaryColor
             textFormat: Text.PlainText
-            // The same form as a message's time. Over pictures, how long
-            // the call has gone on instead: the large clock is not drawn
-            // over a face.
+            // Message-time form; over pictures, duration instead.
             text: page.video && page.connected ? page.elapsed()
                                                : Qt.formatTime(new Date(page.now), "hh:mm")
         }
     }
 
-    // How long, once the two can hear each other; how it stands until
-    // then, and once it is over. On a line as tall as the clock's
-    // whatever it says, so the switches under it stay where they are.
+    // Duration once both hear; before, call state; after, over.
+    // Line as tall as the clock, so switches stay put.
     Item {
         id: statusLine
         anchors {
@@ -574,18 +511,15 @@ Page {
             font.family: Theme.fontFamilyHeading
             font.pixelSize: page.connected ? Theme.fontSizeHuge : Theme.fontSizeLarge
             color: Theme.highlightColor
-            // Markup only for the clock, which is made here of digits.
+            // Markup only for clock digits made here.
             textFormat: page.connected ? Text.StyledText : Text.PlainText
             text: page.connected ? page.elapsedMarkup() : page.describe()
         }
     }
 
-    // The switches, under the clock; over pictures, just above the red
-    // button, out of the way of a face. The microphone, the loudspeaker
-    // and the camera are what a call here has: the phone's own screen
-    // also has the keypad and recording, which belong to a phone call.
-    // While a video call rings, the camera alone, so it can be answered
-    // without one.
+    // Switches under clock; over pictures, just above red button. Mic, speaker,
+    // camera (no keypad or recording: phone calls only). Ringing video call:
+    // camera alone.
     Row {
         id: switches
         objectName: "callSwitches"
@@ -608,11 +542,8 @@ Page {
             }
         }
 
-        // The loudspeaker, or the earpiece. Busy from the tap until the
-        // sound has moved and the microphone is back, which takes a
-        // moment (CallAudio.qml). Dimmed while the sound is on something
-        // plugged in or paired, which it does not move it from, and for
-        // good once the phone's audio policy did not take the call.
+        // Speaker or earpiece. Busy until sound moved (CallAudio.qml).
+        // Dimmed if plugged or paired; for good if audio policy refused.
         Switch {
             objectName: "speakerSwitch"
             visible: page.inCall && page.audio !== null
@@ -639,9 +570,7 @@ Page {
         }
     }
 
-    // Answering and declining, while it rings. Declining is on the left
-    // and answering on the right, where the phone's own call screen has
-    // them.
+    // Decline left, answer right while ringing, as phone's call screen.
     Row {
         objectName: "ringingButtons"
         visible: page.call !== null && page.call.state === "ringing"
@@ -683,12 +612,9 @@ Page {
         onClicked: page.call.hang_up()
     }
 
-    // Held to the ear, the screen is a cheek's to press. The phone app
-    // has the display switched off for it; an app cannot, so what is
-    // under the cheek is black and takes no touch. Only for a call the
-    // phone is held to: while it rings the reader is looking at it, and
-    // through a video call -- pictures, or the camera on -- it is held
-    // in front of the face, where a hand over the sensor is not a cheek.
+    // Held to ear: cheek must not touch. App can't blank display, so
+    // black shield takes no touch. Not while ringing or in video (phone held
+    // in front of face).
     ProximitySensor {
         id: proximity
         objectName: "proximity"

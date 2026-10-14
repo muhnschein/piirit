@@ -1,8 +1,4 @@
-//! Exercises `RpcClient` against `fake-rpc-test-server` (see
-//! `src/bin/fake_rpc_test_server.rs`) instead of a real
-//! `deltachat-rpc-server` binary, since this crate has no dependency on the
-//! Delta Chat core itself -- it only needs *some* process speaking
-//! newline-delimited JSON-RPC 2.0 on stdio to prove the transport works.
+//! `RpcClient` vs `fake-rpc-test-server`. Any stdio JSON-RPC 2.0 peer proves transport.
 
 use std::collections::HashMap;
 use std::sync::Arc;
@@ -51,10 +47,7 @@ async fn echoes_arbitrary_json_params() {
     client.shutdown().await.expect("shutdown");
 }
 
-/// A line the reader cannot decode is one bad line, not the transport
-/// closing: the answer that follows it, and every call after that, still
-/// arrive. A reader ending on it would report every pending call as
-/// `TransportClosed` while the server was still running.
+/// Bad line is not transport close: later answers still arrive.
 #[tokio::test]
 async fn an_undecodable_line_does_not_end_the_transport() {
     let client = RpcClient::spawn(fake_server_path(), Vec::<&str>::new())
@@ -109,9 +102,7 @@ async fn unknown_method_reports_method_not_found() {
     client.shutdown().await.expect("shutdown");
 }
 
-/// Two concurrent calls must be correlated by id independently of send
-/// order: a fast call issued *after* a slow one should still complete
-/// first, proving requests aren't serialized behind each other.
+/// Calls matched by id, not send order: fast after slow completes first.
 #[tokio::test]
 async fn concurrent_calls_are_correlated_independently_of_order() {
     let client = Arc::new(
@@ -120,10 +111,7 @@ async fn concurrent_calls_are_correlated_independently_of_order() {
             .expect("spawn fake server"),
     );
 
-    // Generous margins: the slow call blocks for 1.5s and the fast call
-    // only has to beat 1s, so scheduler jitter on a loaded test machine
-    // can't produce false failures the way a tight 250ms-vs-300ms window
-    // did. What's actually asserted is the ordering property, not speed.
+    // Wide margins: jitter must not fail. Asserts order, not speed.
     let slow_client = client.clone();
     let slow_handle = tokio::spawn(async move {
         let start = Instant::now();
@@ -135,7 +123,7 @@ async fn concurrent_calls_are_correlated_independently_of_order() {
         start.elapsed()
     });
 
-    // Give the slow request time to be in flight before firing the fast one.
+    // Let slow request get in flight first.
     tokio::time::sleep(Duration::from_millis(50)).await;
 
     let echo_start = Instant::now();
@@ -167,20 +155,16 @@ async fn event_loop_streams_batches_in_order() {
     assert_eq!(first.context_id, 1);
     assert_eq!(first.event["msg"], json!("batch 1"));
 
-    // The server answers the next six polls with an error object. Each is
-    // one bad answer, not the transport going away, and the stream has to
-    // carry on past every one of them: a loop giving up after five ends the
-    // stream, the shim reads that as the core having died, and the app
-    // kills a running core to start another. The wait between attempts
-    // backs off, so this takes a few seconds by design.
+    // Six polls answer with errors; stream must survive all. Loop quitting after five ended stream;
+    // shim read that as core dead, and app killed it to start another.
+    // Backoff: takes seconds.
     let eighth = events
         .recv()
         .await
         .expect("the loop stopped on a run of errors");
     assert_eq!(eighth.event["msg"], json!("batch 8"));
 
-    // The fake server now simulates an indefinite long-poll with no new
-    // events; stopping the handle must not hang the test.
+    // Long-poll with no events; stop must not hang.
     handle.stop();
     client.shutdown().await.expect("shutdown");
 }

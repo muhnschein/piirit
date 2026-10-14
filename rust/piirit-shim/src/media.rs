@@ -1,58 +1,30 @@
-//! What a picture or a video costs to send, and what most relays take.
+//! Attachment size and picture naming for outgoing files.
 //!
-//! Two questions the conversation asks about a file before it hands it
-//! over, and both are the core's own answers rather than rules of ours.
+//! `misc_send_msg` names attachment `File`, which core sends uncompressed on purpose (how clients
+//! offer "send uncompressed"). Picked/taken pictures named `Image` instead (suffixes core reads
+//! as `Image`, `guess_msgtype_from_path_suffix`), so core recodes per media quality setting and
+//! sends as `image_<date>.jpg`. Both pinned by `deltachat-jsonrpc/tests/real_server.rs`.
 //!
-//! The first is what to call the file. A message composed here goes
-//! through `misc_send_msg`, which names its attachment `File`, and the
-//! core leaves a `File` at its original size on purpose -- that is how
-//! every client offers "send this picture uncompressed". A picture the
-//! reader picked out of the gallery or took a moment ago is not that, so
-//! it is named `Image` instead, which is what puts it through the core's
-//! own recoding and so through the outgoing media quality setting. The
-//! suffixes here are the ones the core itself reads as `Image`
-//! (`guess_msgtype_from_path_suffix`); anything else it either
-//! recognises on its own -- a video, a sound, an app -- or sends as it
-//! is.
-//!
-//! Naming a picture costs its name: the core sends one as
-//! `image_<date>.jpg` rather than as whatever it was called, on purpose,
-//! since a camera's own filename is a timestamp and a running number.
-//! That and the recoding are what every other client's pictures already
-//! do, and both are pinned against the real core by
-//! `deltachat-jsonrpc/tests/real_server.rs`.
-//!
-//! The second is whether the file might not go at all. The core answers
-//! that with `sys.msgsize_max_recommended`, the largest attachment it
-//! recommends. It is the core's own constant (`RECOMMENDED_FILE_SIZE`,
-//! about 22 MB), sized for what most relays and mail servers take, and
-//! the same whichever relay mail leaves through. So it is a warning and
-//! never a ceiling: a relay that takes more is common (issue #101 is one
-//! taking 200 MB), and neither Delta Chat Desktop nor iOS looks at it at
-//! all. A file past it is said to be large and is still sent; a relay
-//! that refuses one fails that message the way it fails any other.
-//! Nothing here warns about a picture: the core is about to shrink it,
-//! and the size on the phone says nothing about the size that leaves.
+//! `sys.msgsize_max_recommended` (`RECOMMENDED_FILE_SIZE`, ~22 MB, same for every relay) is a
+//! warning, never a ceiling: relays take more (issue #101: 200 MB); Desktop and iOS ignore it.
+//! Large files still sent; a refusing relay fails that message. Pictures never warn: core shrinks
+//! them.
 
 use deltachat_jsonrpc::RpcClient;
 
-/// The config key the core answers its recommended attachment size
-/// with, in bytes.
+/// Config key: core's recommended attachment size, bytes.
 const LIMIT_KEY: &str = "sys.msgsize_max_recommended";
 
-/// The suffixes the core reads as a picture, and so the files it recodes
-/// on the way out. Deliberately not every image format: `heic`, `tiff`
-/// and `avif` are files to the core, and a `gif` is an animation it
-/// would spoil by recoding.
+/// Suffixes the core recodes. `heic`, `tiff`, `avif` are plain files
+/// to it; `gif` would be spoiled by recoding.
 const PICTURES: [&str; 5] = ["jpg", "jpeg", "jpe", "png", "webp"];
 
-/// What the core should call this attachment, or `None` to let it decide
-/// from the file itself.
+/// Viewtype for core; `None` to let it decide.
 pub(crate) fn outgoing_viewtype(path: &str) -> Option<&'static str> {
     is_picture(path).then_some("Image")
 }
 
-/// Whether the core will recode this file on its way out.
+/// Whether the core recodes this file.
 pub(crate) fn is_picture(path: &str) -> bool {
     let suffix = std::path::Path::new(path)
         .extension()
@@ -61,7 +33,7 @@ pub(crate) fn is_picture(path: &str) -> bool {
     PICTURES.contains(&suffix.as_str())
 }
 
-/// What this file weighs on the phone, 0 when it cannot be measured.
+/// File size on the phone; 0 if unmeasurable.
 pub(crate) fn file_bytes(path: &str) -> u64 {
     if path.is_empty() {
         return 0;
@@ -69,13 +41,10 @@ pub(crate) fn file_bytes(path: &str) -> u64 {
     std::fs::metadata(path).map_or(0, |file| file.len())
 }
 
-/// Whether this file is bigger than the core recommends, and so bigger
-/// than some relays take. A warning only; see the module doc.
+/// Bigger than the core recommends, so bigger than some relays take. Warning only.
 ///
-/// False for a picture, whatever it weighs: the core recodes those, and
-/// what it sends is not what is on the phone. False as well when the
-/// limit is not known yet, or the file cannot be measured -- a question
-/// that cannot be answered is not an answer of "large".
+/// False for pictures (core recodes). False too when limit unknown (0)
+/// or the file cannot be measured.
 pub(crate) fn exceeds_limit(path: &str, limit: u64) -> bool {
     if limit == 0 || is_picture(path) {
         return false;
@@ -83,8 +52,7 @@ pub(crate) fn exceeds_limit(path: &str, limit: u64) -> bool {
     file_bytes(path) > limit
 }
 
-/// The largest attachment the core recommends, in bytes; 0 when the
-/// core would not say. The same for every relay; see the module doc.
+/// Recommended size in bytes; 0 if core does not say.
 pub(crate) async fn attachment_limit(rpc: &RpcClient, account_id: u32) -> u64 {
     rpc.call::<_, Option<String>>("get_config", (account_id, LIMIT_KEY))
         .await
@@ -116,16 +84,15 @@ mod tests {
     #[test]
     fn everything_else_is_left_for_the_core_to_name() {
         for path in [
-            // A video, a sound and an app: the core reads all three off
-            // the suffix itself.
+            // Video, sound, app: core reads the suffix itself.
             "video-20260904-151212.mp4",
             "voice-20260904-151212.ogg",
             "game.xdc",
-            // Images the core does not recode, animation and all.
+            // Images core does not recode, animation included.
             "party.gif",
             "photo.heic",
             "scan.tiff",
-            // No suffix at all.
+            // No suffix.
             "/home/user/Documents/notes",
             "",
         ] {
@@ -146,10 +113,10 @@ mod tests {
         assert!(exceeds_limit(&path, 1024));
         assert!(!exceeds_limit(&path, 2048), "the limit itself still fits");
         assert!(!exceeds_limit(&path, 4096));
-        // Not known yet, so nothing is refused on the strength of it.
+        // Limit unknown: nothing refused.
         assert!(!exceeds_limit(&path, 0));
 
-        // A picture of the same size is the core's to shrink.
+        // Same-size picture: core shrinks it.
         let picture = dir.join("photo.jpg");
         std::fs::write(&picture, vec![0_u8; 2048]).expect("write the picture");
         assert!(!exceeds_limit(&picture.to_string_lossy(), 1024));

@@ -1,10 +1,6 @@
-//! With the setting on, a link goes out without its tracking parameters.
+//! Clean-links on: sent link drops tracking params.
 //!
-//! The setting is the reader's and lives in dconf; the page hands it to
-//! the model, and the model rewrites the text on the way out -- so what
-//! reaches the core, and so the other end, is the cleaned link, and the
-//! reader sees the same in their own bubble. With it off, the text goes
-//! as typed.
+//! Dconf setting. Model rewrites text before core; peer and own bubble show cleaned link.
 
 // Qt harness: see qml_chat_list.rs.
 #![allow(
@@ -50,8 +46,7 @@ fn links_are_cleaned_on_the_way_out_only_when_asked() {
     let journal = common::fresh_journal(&temp);
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
 
-    // SAFETY: single-threaded test binary; set before Qt starts and before
-    // the server inherits them.
+    // SAFETY: single-threaded; set before Qt starts and before server inherits env.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_FAKE_JOURNAL", &journal);

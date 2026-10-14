@@ -1,6 +1,6 @@
-//! Reading back what the fake core was asked.
+//! Read back what fake core was asked.
 
-// Not every test uses every helper.
+// Not all tests use all helpers.
 #![allow(dead_code)]
 
 pub mod http;
@@ -14,10 +14,8 @@ use std::sync::Once;
 use qmetaobject::{qml_register_enum, QEnum, QString};
 use serde_json::Value;
 
-/// `DBus.SystemBus`, which `NetworkWatch.qml` names and a `.qml` stub
-/// cannot express: QML forbids capitalised property names, and a
-/// registered enum is how the other stub namespaces do it (see the two in
-/// `qml_pages.rs`).
+/// `DBus.SystemBus`, named by `NetworkWatch.qml`. Stub `.qml` can't say it; registered enum
+/// instead (see `qml_pages.rs`).
 #[derive(QEnum)]
 #[repr(u8)]
 pub enum DBus {
@@ -25,9 +23,8 @@ pub enum DBus {
     SystemBus = 1,
 }
 
-/// Register the stub `Nemo.DBus` enum, once per process. Every test that
-/// loads the window needs it: the window holds a `NetworkWatch`, and a
-/// component whose `bus:` does not resolve takes the window down with it.
+/// Register stub `Nemo.DBus` enum once per process. Needed by any test loading window (holds
+/// `NetworkWatch`; unresolved `bus:` takes window down).
 pub fn register_dbus_enum() {
     static ONCE: Once = Once::new();
     ONCE.call_once(|| {
@@ -41,12 +38,9 @@ pub fn register_dbus_enum() {
     });
 }
 
-/// `Cover.Active` and the rest, which `CoverPage.qml` compares its own
-/// `status` against. A registered enum for the same reason as `DBus`
-/// above: QML before 5.10 cannot declare one, and the device floor is
-/// Qt 5.6. The numbering is Silica's own order; only that both sides of
-/// the comparison come from here matters, since on a device both come
-/// from Silica.
+/// `Cover.Active` etc., compared by `CoverPage.qml`. Registered enum: QML before 5.10 can't
+/// declare one; device floor Qt 5.6. Numbers follow Silica; only both sides coming from here
+/// matters.
 #[derive(QEnum)]
 #[repr(u8)]
 pub enum Cover {
@@ -56,8 +50,7 @@ pub enum Cover {
     Deactivating = 3,
 }
 
-/// Register the stub `Cover` enum, once per process. Needed by anything
-/// that loads `qml/cover/CoverPage.qml`.
+/// Register stub `Cover` enum once per process. Needed by anything loading `CoverPage.qml`.
 pub fn register_cover_enum() {
     static ONCE: Once = Once::new();
     ONCE.call_once(|| {
@@ -105,21 +98,19 @@ pub fn methods(journal: &Path) -> Vec<String> {
     calls(journal).into_iter().map(|(name, _)| name).collect()
 }
 
-/// A journal path with nothing in it yet. The temp directory is keyed by
-/// process id, and a recycled one otherwise leaves the last run's calls in
-/// place -- which reads as this run having made them.
+/// Journal path, empty. Temp dir keyed by pid: recycled one keeps last run's calls.
 pub fn fresh_journal(temp: &Path) -> PathBuf {
     let journal = temp.join("journal.jsonl");
     let _ = std::fs::remove_file(&journal);
     journal
 }
 
-/// The stub Silica module tree, for `QmlEngine::add_import_path`.
+/// Stub Silica module tree, for `QmlEngine::add_import_path`.
 pub fn stubs_dir() -> PathBuf {
     PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../tests/silica-stubs")
 }
 
-/// A `file://` URL for one of the app's shared components.
+/// `file://` URL for app shared component.
 pub fn component_url(name: &str) -> String {
     format!(
         "file://{}",
@@ -130,7 +121,7 @@ pub fn component_url(name: &str) -> String {
     )
 }
 
-/// A `file://` URL for one of the app's pages.
+/// `file://` URL for app page.
 pub fn page_url(name: &str) -> String {
     format!(
         "file://{}",
@@ -141,20 +132,13 @@ pub fn page_url(name: &str) -> String {
     )
 }
 
-/// A copy of the app's QML tree with Silica's `EnterKey` attached property
-/// stripped out of it.
+/// Copy of app QML tree with Silica's `EnterKey` attached property stripped.
 ///
-/// `EnterKey` is what decides which key the virtual keyboard shows instead
-/// of Return, and it has no stub: attached types cannot be written in QML,
-/// and `qmetaobject` passes a null attached-properties function for every
-/// type it registers. A page that uses one therefore cannot be loaded
-/// headlessly at all -- the engine reports "Non-existent attached object"
-/// and hands back nothing. Dropping the two lines that mention it leaves
-/// the rest of the page exactly as shipped, which is what a test loading
-/// this copy is asserting about.
+/// `EnterKey` picks keyboard return key. No stub possible (attached types can't be written in QML;
+/// `qmetaobject` passes null attached-properties fn). Page using it fails headless: "Non-existent
+/// attached object". Dropping its two lines leaves page as shipped.
 ///
-/// The copy is keyed by process id and rebuilt each time, so it never
-/// serves a stale page from an earlier run.
+/// Copy keyed by pid, rebuilt each run: never stale.
 pub fn qml_tree_without_enter_key() -> PathBuf {
     let source = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../qml");
     let target = std::env::temp_dir().join(format!("piirit-qml-{}", std::process::id()));
@@ -184,18 +168,18 @@ fn copy_qml_without_enter_key(source: &Path, target: &Path) {
     }
 }
 
-/// A `file://` URL for a page inside a copied tree.
+/// `file://` URL for page in copied tree.
 pub fn page_url_in(tree: &Path, name: &str) -> String {
     format!("file://{}", tree.join("pages").join(name).display())
 }
 
-/// The committed art, which the intro and welcome pages draw from.
+/// Committed art, used by intro and welcome pages.
 pub fn art_dir() -> PathBuf {
     PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../qml/art")
 }
 
-/// Width, height, bit depth, colour type and interlace byte of a committed
-/// PNG, read straight out of its IHDR rather than through an image crate.
+/// Width, height, bit depth, colour type, interlace byte of committed PNG, from IHDR (no image
+/// crate).
 pub fn png_header(file: &str) -> (u32, u32, u8, u8, u8) {
     let bytes = std::fs::read(art_dir().join(file))
         .unwrap_or_else(|err| panic!("qml/art/{file} is missing ({err}); it is committed art"));
@@ -220,8 +204,7 @@ pub fn png_header(file: &str) -> (u32, u32, u8, u8, u8) {
     (at(16), at(20), bytes[24], bytes[25], bytes[28])
 }
 
-/// A picture that really is one, so an `Image` can reach `Ready`. Any
-/// committed PNG would do; this is the one that is certainly there.
+/// Real picture so `Image` reaches `Ready`.
 pub fn a_real_picture() -> String {
     art_dir()
         .join("logo.png")
@@ -231,14 +214,12 @@ pub fn a_real_picture() -> String {
         .to_string()
 }
 
-/// Each step and what it recorded. One step per tick: the shim answers
-/// asynchronously and `single_shot` only handles whole seconds.
+/// Each step's recorded result. One step per tick: shim answers async; `single_shot` is whole
+/// seconds.
 pub type Steps = Rc<RefCell<Vec<(String, String)>>>;
 
 /// Push one step's result onto [`Steps`].
-// By value rather than by reference: every call site hands over a `QString`
-// the `call!` macro has just built, and asking each of them to borrow it
-// buys nothing.
+// By value: `call!` builds each `QString`; borrowing buys nothing.
 #[allow(clippy::needless_pass_by_value)]
 pub fn record(steps: &Steps, label: &str, value: QString) {
     steps
@@ -246,8 +227,7 @@ pub fn record(steps: &Steps, label: &str, value: QString) {
         .push((label.to_string(), value.to_string()));
 }
 
-/// What one labelled step recorded, or a legible stand-in when the step
-/// never ran at all.
+/// What one labelled step recorded, or stand-in if it never ran.
 pub fn value_of<'a>(steps: &'a [(String, String)], label: &str) -> &'a str {
     steps
         .iter()

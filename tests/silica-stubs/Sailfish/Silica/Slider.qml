@@ -1,8 +1,7 @@
 import QtQuick 2.0
 
-// Silica's slider, cut down to what the video page uses. `down` is true
-// while the handle is held, which is what keeps the position binding off
-// the value the reader is dragging.
+// Silica slider, cut to video page's needs. `down` true while handle held:
+// keeps position binding off reader's drag value.
 Item {
     id: root
 

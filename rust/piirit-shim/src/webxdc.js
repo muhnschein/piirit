@@ -1,45 +1,27 @@
 /*
- * `window.webxdc`, as the app running inside the WebView sees it.
- *
- * Served by the shim's own loopback host (webxdc_host.rs), which injects a
- * script tag for it into the app's index.html before anything of the app's
- * own runs -- the API has to be there when the first line of the app
- * executes, and `selfAddr` has to be readable without waiting.
- *
- * The placeholders are filled in by the host as JSON literals.
- *
- * Updates travel over the same host: sending is a POST, receiving is a
- * long poll, which the host holds until the chat has something new for
- * the app. Nothing here talks to Qt -- a page cannot -- and nothing here
- * knows the core; both are on the other side of those two requests.
- *
- * XMLHttpRequest rather than fetch: Gecko has both, and this one is
- * older than every release this could run on.
+ * `window.webxdc` in the app's WebView, injected by webxdc_host.rs before app code: API must
+ * exist at app's first line, `selfAddr` readable without waiting. Placeholders filled by host
+ * as JSON literals. Sends are POSTs, receives long polls held until chat has news. Nothing here
+ * talks to Qt or the core. XMLHttpRequest, not fetch: Gecko has both; XHR predates any release
+ * this runs on.
  */
 (function () {
     "use strict";
 
-    /* Where the chat is: `/webxdc-api/<token>`, which the host fills
-     * in. The app's own files are at the root; this is the part of
-     * the host nothing but the app is told about. */
+    /* Chat URL, `/webxdc-api/<token>`, filled in by host. App files at root. */
     var API = __API__;
     var SELF_ADDR = __SELF_ADDR__;
     var SELF_NAME = __SELF_NAME__;
     var MAX_SIZE = __MAX_SIZE__;
-    /* Milliseconds to wait before asking for updates again after a
-     * request for them failed. One that was answered is followed at
-     * once: the host holds it until there is something new. */
+    /* Ms to wait before re-asking after a failed request. Answered: follow at once. */
     var RETRY = __RETRY__;
 
-    /* What setUpdateListener was given, and how far it has been fed. */
+    /* Listener, and how far it has been fed. */
     var listener = null;
     var lastSerial = 0;
-    /* Resolves the promise setUpdateListener returned, once the updates
-     * that existed when it was called have all been delivered. */
+    /* Resolves setUpdateListener's promise once existing updates are delivered. */
     var caughtUp = null;
-    /* The request for updates in flight, if any. One at a time: a send
-     * asks for one immediately, and that must not race the one already
-     * waiting. */
+    /* Update request in flight. One at a time: a send must not race the waiting one. */
     var current = null;
     var timer = null;
 
@@ -84,9 +66,7 @@
                 try {
                     listener(update);
                 } catch (err) {
-                    /* The app's own handler threw. Its problem, not the
-                     * next update's: one that stopped the loop would
-                     * leave the app frozen at the update it choked on. */
+                    /* App handler threw: its problem; stopping the loop would freeze app. */
                     if (window.console) {
                         window.console.error(err);
                     }
@@ -108,9 +88,7 @@
         if (current !== null) {
             return;
         }
-        /* Held by the host until there is something new -- except while
-         * catching up, which setUpdateListener's promise waits on: that
-         * one is answered with what there is now. */
+        /* Held by host until new updates, except while catching up: answered now. */
         var path = "/updates?serial=" + lastSerial + (caughtUp ? "" : "&wait=1");
         var mine = request("GET", path, null,
             function (text) {
@@ -126,15 +104,12 @@
                 }
                 deliver(updates);
                 settle();
-                /* And straight back to waiting for the next. */
+                /* Back to waiting for the next. */
                 poll();
             },
             function () {
-                /* The host is gone -- the app was closed, or the shim
-                 * stopped it. Keep asking: nothing else here can tell
-                 * the difference between that and a lost connection,
-                 * and an app left running with a dead listener is
-                 * worse than a request that fails every RETRY ms. */
+                /* Host gone (app closed, or shim stopped it). Keep asking: a dead
+                 * listener is worse than a request failing every RETRY ms. */
                 if (current !== mine) {
                     return;
                 }
@@ -148,17 +123,14 @@
     window.webxdc = {
         selfAddr: SELF_ADDR,
         selfName: SELF_NAME,
-        /* The core's own limits, which apps are expected to respect. */
+        /* Core's limits; apps should respect them. */
         sendUpdateInterval: __INTERVAL__,
         sendUpdateMaxSize: MAX_SIZE,
 
         /*
-         * Send one update to everyone in the chat, including this app's
-         * own listener -- the core echoes it back with a serial.
+         * Send update to whole chat, incl. own listener (core echoes it with serial).
          *
-         * `description` is accepted and ignored: the core dropped it, and
-         * an app that passes one is not wrong for having been written
-         * against the older API.
+         * `description` accepted and ignored: core dropped it.
          */
         sendUpdate: function (update, description) {
             var body = JSON.stringify(update);
@@ -167,10 +139,8 @@
             }
             request("POST", "/send", body,
                 function () {
-                    /* The core has it, and says so to the host, which
-                     * wakes the request waiting for updates: the app
-                     * sees its own move at once. Asked for here too, for
-                     * when none is waiting -- after a failed one. */
+                    /* Core has it: host wakes waiting request, app sees own move at once.
+                     * Polls here too, for when none is waiting. */
                     poll();
                 },
                 function (err) {
@@ -181,17 +151,14 @@
         },
 
         /*
-         * Take every update from `serial` on, and every one after.
-         * Resolves once the updates that already existed have been
-         * handed over, which is what apps wait on before drawing.
+         * Updates from `serial` on. Resolves once existing ones are handed over.
          */
         setUpdateListener: function (callback, serial) {
             listener = callback;
             lastSerial = typeof serial === "number" ? serial : 0;
             return new Promise(function (resolve) {
                 caughtUp = resolve;
-                /* A request already waiting asked from the old serial,
-                 * and may wait a while yet: this one is asked now. */
+                /* Request waiting from old serial may wait long: abort, ask now. */
                 if (current !== null) {
                     var waiting = current;
                     current = null;
@@ -202,22 +169,12 @@
         },
 
         /*
-         * Hand a file, a piece of text, or both out of the app.
+         * Hand a file and/or text out of the app. Spec says `sendToChat` (and warns app may not
+         * come back), but app draws a download and reader means their phone: host writes file,
+         * page keeps it. Settles once host has it: last moment anything here knows the outcome.
          *
-         * The specification calls this `sendToChat` and warns the app
-         * that it may not come back. What the reader is asked is not
-         * which chat, though: an app draws a *download* over this, and
-         * what they mean by it is the file on their phone. So the host
-         * writes the file out and the page keeps it. The promise settles
-         * once the host has it, which is the last moment anything here
-         * still knows what happened.
-         *
-         * A file arrives in one of three shapes and leaves as the
-         * request body itself: base64 and text are turned into a Blob
-         * here, and a Blob is sent as it is. Nothing is encoded on the
-         * way out: reading the file into a base64 string and wrapping it
-         * in JSON would hold the whole of it at both ends, and a file
-         * worth exporting is exactly the size that cannot afford that.
+         * Body is the file itself: base64 and text become a Blob here, Blob sent as is. No
+         * base64-in-JSON: would hold whole file at both ends.
          */
         sendToChat: function (message) {
             return new Promise(function (resolve, reject) {
@@ -258,11 +215,8 @@
         }
     };
 
-    /* Hand one over to the host, which writes it out and tells the page.
-     *
-     * The name and the words go in the query, so the body is the file and
-     * only the file: the host copies it onto the disk as it arrives and
-     * never holds it. */
+    /* Hand one over to host, which writes it out and tells the page.
+     * Name and words go in query; body is only the file, copied to disk as it arrives. */
     function handOver(name, body, words, resolve, reject) {
         var path = "/to-chat?name=" + encodeURIComponent(name)
                    + "&text=" + encodeURIComponent(words);
@@ -272,8 +226,7 @@
                 "application/octet-stream");
     }
 
-    /* base64 as the bytes it stands for. `atob` gives one character per
-     * byte, and a Uint8Array of those is what a Blob takes. */
+    /* base64 as bytes. `atob` gives one char per byte; Uint8Array feeds Blob. */
     function fromBase64(encoded) {
         var binary = window.atob(encoded);
         var bytes = new Uint8Array(binary.length);
@@ -283,7 +236,5 @@
         return new Blob([bytes]);
     }
 
-    /* Nothing else is offered: importFiles and joinRealtimeChannel are
-     * absent rather than present and failing, so an app that
-     * feature-tests for them takes its own other path. */
+    /* No importFiles or joinRealtimeChannel: absent, not failing, so feature tests fall back. */
 }());

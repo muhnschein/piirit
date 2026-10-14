@@ -1,14 +1,9 @@
 #!/usr/bin/env bash
-# Prove that ci/apt-install.sh drops the right apt lists and keeps the
-# rest.
+# Prove ci/apt-install.sh drops the right apt lists, keeps the rest.
 #
-# The rule it applies has one way of being catastrophically wrong: delete
-# the Ubuntu archive along with the third-party repositories, and every job
-# fails to install anything, which is the failure it exists to prevent.
-# Runner images differ in where they put the archive -- /etc/apt/sources.list
-# on some, a .sources file under sources.list.d on others -- so the cases
-# below cover both, and each one is a file this has to get right on some
-# image somebody will run it on.
+# Catastrophic failure: delete Ubuntu archive with third-party repos, every job
+# installs nothing. Runner images put archive in /etc/apt/sources.list or a
+# .sources file under sources.list.d: cases cover both.
 set -u
 
 root=$(CDPATH='' cd -- "$(dirname -- "$0")/.." && pwd)
@@ -28,15 +23,15 @@ stage() {
     rm -rf "$work/sources"
     mkdir -p "$work/sources"
 
-    # What GitHub's image ships beside Ubuntu's own, in the one-line format.
+    # GitHub image's extras beside Ubuntu's, one-line format.
     cat >"$work/sources/google-chrome.list" <<'EOF'
 deb [arch=amd64] https://dl.google.com/linux/chrome/deb/ stable main
 EOF
     cat >"$work/sources/microsoft-prod.list" <<'EOF'
 deb [arch=amd64] https://packages.microsoft.com/ubuntu/22.04/prod jammy main
 EOF
-    # Ubuntu's archive in the deb822 format, which is where a current
-    # image puts it. Dropping this one is the mistake that matters.
+    # Ubuntu archive, deb822 (current image). Dropping it is the mistake that
+    # matters.
     cat >"$work/sources/ubuntu.sources" <<'EOF'
 Types: deb
 URIs: http://azure.archive.ubuntu.com/ubuntu/
@@ -44,12 +39,12 @@ Suites: noble noble-updates noble-backports
 Components: main universe restricted multiverse
 Signed-By: /usr/share/keyrings/ubuntu-archive-keyring.gpg
 EOF
-    # And in the one-line format, which is where an older one puts it.
+    # One-line format (older image).
     cat >"$work/sources/archive.list" <<'EOF'
 deb http://archive.ubuntu.com/ubuntu jammy main
 EOF
-    # Not a source list at all. apt ignores anything without the two
-    # extensions, and so must this.
+    # Not a source list. apt ignores anything without the two extensions; so
+    # must this.
     cat >"$work/sources/google-chrome.list.save" <<'EOF'
 deb [arch=amd64] https://dl.google.com/linux/chrome/deb/ stable main
 EOF
@@ -92,8 +87,8 @@ survives ubuntu.sources yes "the archive in deb822 form is kept"
 survives archive.list yes "the archive in one-line form is kept"
 survives google-chrome.list.save yes "a file apt would not read is left alone"
 
-# The log is what a reader has when a job installs the wrong thing, so it
-# has to name what happened to each file rather than only doing it.
+# Log is what reader sees when job installs wrong thing: name each file acted
+# on.
 cases=$((cases + 1))
 if grep -q "dropping google-chrome.list" <<<"$out" &&
     grep -q "keeping ubuntu.sources" <<<"$out"; then
@@ -104,11 +99,9 @@ else
     status=1
 fi
 
-# A directory with nothing in it, and one that is not there at all: an
-# image that keeps every source in /etc/apt/sources.list has both, and
-# both are fine. The two "ok" lines say "accepted" rather than "not an
-# error" because Sonar's shell analyser reads any message carrying the
-# word as an error message, and asks for it on stderr (S7677).
+# Empty and missing dir both fine (image keeps sources in
+# /etc/apt/sources.list). "accepted", not "not an error": Sonar S7677 reads any
+# message with "error" as an error.
 rm -rf "$work/sources"
 mkdir -p "$work/sources"
 cases=$((cases + 1))
@@ -127,9 +120,8 @@ else
     status=1
 fi
 
-# Called with nothing to install and no --prune-only, this is a workflow
-# step that lost its package list. Refusing beats a silent no-op that lets
-# the next step fail with "command not found".
+# No packages, no --prune-only: workflow lost its list. Refuse, not silent no-op
+# (next step would fail with "command not found").
 stage
 cases=$((cases + 1))
 if APT_SOURCES_DIR="$work/sources" "$script" >/dev/null 2>&1; then

@@ -1,19 +1,8 @@
-//! Deleting a message for everybody in the chat, from the row's menu to
-//! the core.
-//!
-//! The whole of the new half, driven through the real conversation page
-//! against the fake core: a long press on a message of this account's
-//! own, Delete, the page that asks which kind of delete this is, the
-//! answer, the wait -- and then the one call that means "and on the
-//! other ends too", `delete_messages_for_all`.
-//!
-//! The two ways differ in what nobody can take back, so the plumbing
-//! between them is worth pinning end to end: an answer that arrived as
-//! the other kind would quietly delete a message everywhere the reader
-//! meant to delete it here, or leave it everywhere they meant it gone.
-//! Which messages the page offers the second way for is
-//! `qml_delete_choice`; what the wait does with either is
-//! `qml_delete_run`.
+//! Delete for everybody, row menu to core. Real conversation page, fake core: long press
+//! own message, Delete, kind page, answer, wait, `delete_messages_for_all`. Two ways differ in
+//! what nobody can undo, so plumbing pinned end to end: answer arriving as the other kind would
+//! quietly delete everywhere a message meant gone here only, or leave it everywhere meant gone.
+//! Which messages get the offer: `qml_delete_choice`. What the wait does: `qml_delete_run`.
 
 // Qt harness: see qml_conversation_open.rs.
 #![allow(
@@ -31,8 +20,7 @@ use qmetaobject::*;
 
 mod common;
 
-/// The message sent here and then deleted again. The fake core numbers
-/// what it is sent from 101, above the ids it seeds a chat with.
+/// Sent here, then deleted. Fake core numbers sends from 101, above seeded chat ids.
 const SENT_ID: u32 = 101;
 
 const PROBE_QML: &str = r"
@@ -173,14 +161,12 @@ fn a_message_the_reader_deletes_for_everyone_reaches_the_core_as_that() {
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
     let tree = common::qml_tree_without_enter_key();
 
-    // SAFETY: single-threaded test binary; set before Qt starts and before
-    // the server inherits them.
+    // SAFETY: single thread; pre-Qt, pre-fork.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_FAKE_JOURNAL", &journal);
         std::env::set_var("PIIRIT_ACCOUNTS_DIR", temp.join("accounts"));
-        // A message sent from here comes back as this account's own,
-        // which is what the core takes a deletion for everyone of.
+        // Sent from here comes back as own: what core needs to delete for everyone.
         std::env::set_var("PIIRIT_FAKE_SELF_SENT", "1");
     }
 
@@ -193,7 +179,7 @@ fn a_message_the_reader_deletes_for_everyone_reaches_the_core_as_that() {
     ));
     engine.set_object_property("core".into(), core_box.pinned());
     engine.load_data(QByteArray::from(PROBE_QML));
-    // Named for the page before it is loaded, as Silica names its own.
+    // Named for page before load, as Silica does.
     let stack = engine.invoke_method("stackObject".into(), &[]);
     engine.set_property("pageStack".into(), stack);
 
@@ -237,7 +223,7 @@ fn a_message_the_reader_deletes_for_everyone_reaches_the_core_as_that() {
     single_shot(Duration::from_secs(6), move || unsafe {
         record!("count-before", call!("count"));
         record!("delete", call!("deleteRow", SENT_ID));
-        // The tap asks; nothing is waiting to go until the page answers.
+        // Tap asks; nothing waits until page answers.
         record!("pushed", call!("pushedPage"));
         record!("countdown-before-pick", call!("goingOut", SENT_ID));
         record!("pick", call!("pick", true));

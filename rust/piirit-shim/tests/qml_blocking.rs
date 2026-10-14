@@ -1,12 +1,8 @@
-//! The way into the block list, and the two pages behind it.
+//! Way into block list, and the two pages behind it.
 //!
-//! The settings page carries the only row on it that opens a page rather
-//! than setting something, and hands it the profile: the core keeps a
-//! block list per account. Behind it are the blocked contacts, the
-//! picker its plus opens, and the question each of them asks before
-//! anything is sent. This drives the whole of that against the fake core,
-//! with a page stack that hands each page a dialog to connect to and lets
-//! the test accept it -- the arrangement `qml_auto_delete_flow` uses.
+//! Settings page's only page-opening row hands it the profile (core keeps block list per account).
+//! Behind it: blocked contacts, the picker its plus opens, and the question each asks before
+//! anything is sent. Drives all vs fake core; test accepts dialogs (as `qml_auto_delete_flow`).
 
 // Qt harness: see qml_pages.rs.
 #![allow(
@@ -25,15 +21,12 @@ use qmetaobject::*;
 
 mod common;
 
-/// The probe imports the app's components by absolute URL: the settings
-/// page reads the `Settings` singleton, and it is loaded from data, which
-/// has no directory of its own to resolve a relative import against.
+/// Imports app components by absolute URL: settings page reads `Settings` singleton, and probe is
+/// loaded from data (no dir to resolve relative import against).
 ///
-/// The page stack is a QML object handed to the page as a context
-/// property rather than a Rust one, for the reason
-/// `qml_auto_delete_flow` gives: an object a method hands to QML is
-/// QML's to delete. A fresh dialog per push, so accepting one cannot
-/// fire a handler another page connected earlier.
+/// Page stack is a QML object (context property), not Rust: object a method hands to QML is QML's
+/// to delete (as `qml_auto_delete_flow`). Fresh dialog per push: accepting one can't fire a handler
+/// another page connected earlier.
 fn probe_qml() -> String {
     let components = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../qml/components");
     format!(
@@ -139,13 +132,12 @@ fn a_contact_is_blocked_and_let_back_in_from_the_settings() {
     let journal = common::fresh_journal(&temp);
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
 
-    // SAFETY: single-threaded test binary; set before Qt starts and before
-    // the server inherits them.
+    // SAFETY: single-threaded; set pre-Qt and before server inherits.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_FAKE_JOURNAL", &journal);
         std::env::set_var("PIIRIT_ACCOUNTS_DIR", temp.join("accounts"));
-        // A profile whose block list the core will not read.
+        // Profile whose block list core won't read.
         std::env::set_var("PIIRIT_FAKE_BLOCKED_FAIL", "7");
     }
 
@@ -158,7 +150,7 @@ fn a_contact_is_blocked_and_let_back_in_from_the_settings() {
     ));
     engine.set_object_property("core".into(), core_box.pinned());
     engine.load_data(QByteArray::from(probe_qml()));
-    // Named for the page before it is loaded, as Silica names its own.
+    // Named for the page before load, as Silica names its own.
     let stack = engine.invoke_method("stackObject".into(), &[]);
     engine.set_property("pageStack".into(), stack);
 
@@ -215,9 +207,8 @@ fn a_contact_is_blocked_and_let_back_in_from_the_settings() {
         record!("pushed-blocked", call!("pushed"));
     });
 
-    // Nobody is blocked yet, and the plus is the way to change that --
-    // once the core has said so, and not while the list is still empty
-    // for want of an answer.
+    // Nobody blocked yet. Plus is the way to change that, once core has answered (not while list
+    // is empty for want of an answer).
     single_shot(Duration::from_secs(4), move || unsafe {
         record!(
             "load-blocked",
@@ -269,8 +260,7 @@ fn a_contact_is_blocked_and_let_back_in_from_the_settings() {
         );
     });
 
-    // A tap asks first, and nothing is sent until the question is
-    // answered.
+    // Tap asks first; nothing sent until answered.
     single_shot(Duration::from_secs(8), move || unsafe {
         record!(
             "contacts-before",
@@ -285,8 +275,7 @@ fn a_contact_is_blocked_and_let_back_in_from_the_settings() {
         record!("accept-block", call!("acceptDialog"));
     });
     single_shot(Duration::from_secs(10), move || unsafe {
-        // The core keeps a blocked contact out of this list, so the row
-        // goes by itself once the block lands.
+        // Core keeps blocked contact out of list: row goes by itself once block lands.
         record!(
             "contacts-after",
             call!("get", QString::from("contacts"), QString::from("count"))
@@ -300,9 +289,8 @@ fn a_contact_is_blocked_and_let_back_in_from_the_settings() {
             )
         );
     });
-    // The plus stays under the last row once there is one, and reading
-    // the list again leaves the rows where they are: rebuilt, they would
-    // take the view back to its top, away from the plus.
+    // Plus stays under last row. Rereading list leaves rows put: rebuilt rows would jump view to
+    // top, away from plus.
     single_shot(Duration::from_secs(12), move || unsafe {
         record!(
             "blocked-count",
@@ -342,7 +330,7 @@ fn a_contact_is_blocked_and_let_back_in_from_the_settings() {
             "error",
             call!("get", QString::from("errorBanner"), QString::from("text"))
         );
-        // The block list the core will not read.
+        // Block list core won't read.
         record!(
             "load-unreadable",
             call!(
@@ -520,7 +508,7 @@ fn a_contact_is_blocked_and_let_back_in_from_the_settings() {
     );
 }
 
-/// How many blocks the core has been asked for so far.
+/// Blocks core has been asked for so far.
 fn blocked_calls(journal: &std::path::Path) -> usize {
     common::calls(journal)
         .iter()

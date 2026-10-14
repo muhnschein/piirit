@@ -1,6 +1,6 @@
 #!/bin/sh
-# Sailfish's cargo 1.75.0 cannot read a v4 lockfile (v4 arrived in 1.78),
-# and `cargo update` on a modern host rewrites it silently.
+# Sailfish cargo 1.75 can't read v4 lockfile (v4 from 1.78). Modern `cargo
+# update` rewrites it.
 set -eu
 
 root=$(CDPATH='' cd -- "$(dirname -- "$0")/.." && pwd)

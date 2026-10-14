@@ -1,14 +1,8 @@
-//! The two picker pages, loaded on their own.
+//! Two picker pages, loaded alone.
 //!
-//! They are pages rather than Components inside `ConversationPage`, precisely
-//! so that a `Sailfish.Pickers` type that is not there costs one button
-//! instead of the whole conversation -- which also means nothing else loads
-//! them, and without this nothing would notice them breaking.
-//!
-//! What can be checked here is our half: that each page reports the chosen
-//! path on `picked`, and reports nothing when the picker was left without a
-//! choice. That the Silica types themselves exist is a device question, and
-//! `tests/silica-stubs` cannot answer it.
+//! Pages, not Components in `ConversationPage`: a missing `Sailfish.Pickers` type costs
+//! one button, not the conversation. Checked: each reports path on `picked`, nothing when
+//! left without choice. Silica types existing is a device question.
 
 // Qt harness: see qml_chat_list.rs.
 #![allow(
@@ -47,12 +41,8 @@ const PROBE_QML: &str = r"
     }
 ";
 
-/// Each picker page, and the file a test hands it. The photo picker is
-/// the profile and group pages' (a picture, and nothing else); the
-/// library picker is the attach tray's paper clip, and takes a document
-/// or a video as readily as a picture; the app picker is the tray's
-/// webxdc entry, which browses for a .xdc rather than listing what the
-/// media index knows.
+/// Each picker page and its test file. Photo: profile and group pages. Library: attach
+/// tray (documents, videos too). App: tray's webxdc entry (`.xdc`, not media index).
 const PICKERS: [(&str, &str); 3] = [
     (
         "AttachPhotoPage.qml",
@@ -64,9 +54,8 @@ const PICKERS: [(&str, &str); 3] = [
 
 #[test]
 fn each_picker_reports_the_file_that_was_chosen() {
-    // No core here: these pages talk to nothing but their caller, so there
-    // is no server to spawn and no accounts directory to point it at.
-    // SAFETY: single-threaded test binary; set before Qt starts.
+    // No core: pages talk only to caller.
+    // SAFETY: single-threaded; set before Qt starts.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
     }

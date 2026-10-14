@@ -1,22 +1,12 @@
-//! What sending an attachment puts on the wire, and what the sender then
-//! sees.
+//! Attachment send: wire shape, sender view.
 //!
-//! Two shapes, because the core treats one file differently from the
-//! rest: a picture is named `Image` through `send_msg`, which is what
-//! puts it through the core's own recoding, and everything else goes
-//! through `misc_send_msg` for the core to name from the file itself.
-//! See `media.rs`.
+//! Pictures: `send_msg` as `Image` (core recodes). Other files: `misc_send_msg` (core names from
+//! file). See `media.rs`.
 //!
-//! The parameter shape is pinned against the real core by
-//! `deltachat-jsonrpc/tests/real_server.rs`, which sends one message with a
-//! file and one without. This asserts the shim fills those slots from what
-//! a picker handed it -- including the `file://` form, which is what a URL
-//! property produces and what the core cannot open.
+//! Pinned vs real core: `deltachat-jsonrpc/tests/real_server.rs`. Here: shim fills slots from
+//! picker, incl. `file://` (URL property core can't open).
 
-// Qt harness: needs `unsafe` for `env::set_var` before Qt starts
-// (`unused_unsafe` because it is only unsafe from edition 2024 on),
-// `borrow_as_ptr` for the engine pointer, and `single_shot` with
-// whole-second Durations.
+// Qt harness: unsafe set_var pre-Qt; borrow_as_ptr; whole-second single_shot.
 #![allow(
     unsafe_code,
     unused_unsafe,
@@ -33,8 +23,7 @@ use serde_json::Value;
 
 mod common;
 
-/// The `Repeater` is how the test reads the rows: a `QAbstractListModel`
-/// hands nothing to JavaScript directly.
+/// `Repeater` reads rows; `QAbstractListModel` gives JS nothing.
 const PROBE_QML: &str = r"
     import QtQuick 2.0
     import Piirit 1.0
@@ -70,8 +59,7 @@ fn a_picked_file_reaches_the_core_and_comes_back_on_the_row() {
     let journal = common::fresh_journal(&temp);
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
 
-    // SAFETY: single-threaded test binary; set before Qt starts and before
-    // the server inherits them.
+    // SAFETY: single-threaded; set before Qt starts and before server inherits env.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_FAKE_JOURNAL", &journal);
@@ -126,8 +114,7 @@ fn a_picked_file_reaches_the_core_and_comes_back_on_the_row() {
         .filter(|(method, _)| method == "misc_send_msg" || method == "send_msg")
         .collect();
 
-    // account, chat, MessageData: a picture is named, so that the core
-    // recodes it rather than leaving a `File` at its original size.
+    // Picture named: core recodes it, not `File` at original size.
     assert_eq!(
         sends.first(),
         Some(&(
@@ -147,11 +134,8 @@ fn a_picked_file_reaches_the_core_and_comes_back_on_the_row() {
         "a picked photo did not reach the core as a picture. Sends: {sends:?}"
     );
 
-    // Everything else is the core's to name, through the other send.
-    //
-    // A URL is what a `url` property hands back, and the core takes a path:
-    // the scheme has to go and the escapes have to be decoded, or the file
-    // does not exist as far as the core is concerned.
+    // Other files: core names via other send. URL: strip `file://`, decode escapes, or core says
+    // no such file.
     assert_eq!(
         sends.get(1),
         Some(&(
@@ -180,8 +164,7 @@ fn a_picked_file_reaches_the_core_and_comes_back_on_the_row() {
         "sending with no file picked said nothing about it"
     );
 
-    // The sender sees their own attachment straight away: the row is built
-    // from the reply, not waiting on the event.
+    // Sender sees own attachment at once: row built from reply.
     assert_eq!(
         photo_row, "Image|holiday photo.png|/tmp/piirit-fake/holiday photo.png|look at this",
         "the sent row did not carry the attachment"

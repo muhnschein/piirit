@@ -1,16 +1,10 @@
-//! A profile's row on the profiles page: its own picture and colour, the
-//! way to its page, and a row that survives another profile's deletion.
+//! Profile row on profiles page: own picture and colour, way to its page, survives
+//! another profile's deletion.
 //!
-//! The last was reported from a device: deleting two profiles in one go
-//! deleted the first. Its deletion reloaded the list, the reload rebuilt
-//! every row, and the second row's countdown -- Silica's remorse timer
-//! lives on the row -- went with it. Two things answer that now and both
-//! are worth keeping. The wait is no longer on the row at all
-//! (`PendingRemoval`, and `qml_delete_run.rs` for the run of them). And
-//! the list is still refreshed in place rather than rebuilt, which
-//! is what stops every row flickering when one profile goes, and what
-//! this file measures: the second row is the same object after the first
-//! deletion as before it.
+//! Device bug: deleting two at once deleted the first; reload rebuilt rows and the second
+//! row's countdown (Silica remorse timer lives on row) went with it. Now: wait is not on
+//! row (`PendingRemoval`); list still refreshed in place, not rebuilt (no row flicker when one
+//! goes). Measured here: second row is same object after first deletion.
 
 // Qt harness: see qml_pages.rs.
 #![allow(
@@ -31,7 +25,7 @@ use serde_json::Value;
 
 mod common;
 
-/// Silica's `pageStack`, recorded rather than performed.
+/// Silica `pageStack`, recorded not performed.
 #[derive(QObject, Default)]
 struct StackProbe {
     base: qt_base_class!(trait QObject),
@@ -181,7 +175,7 @@ fn a_profile_row_has_its_picture_leads_to_its_page_and_outlives_a_neighbour() {
     let journal = common::fresh_journal(&temp);
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
 
-    // SAFETY: single-threaded test binary; set before Qt starts.
+    // SAFETY: single-threaded; set before Qt starts.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_FAKE_JOURNAL", &journal);
@@ -246,8 +240,7 @@ fn a_profile_row_has_its_picture_leads_to_its_page_and_outlives_a_neighbour() {
         );
     });
     single_shot(Duration::from_secs(8), move || unsafe {
-        // Nothing unread yet; then a chat marked unread from the list,
-        // which the core announces and the row follows.
+        // Nothing unread; then chat marked unread: core announces, row follows.
         record!("badge-before", call!("badgeOf", 1));
         record!("mark-unread", call!("markUnread"));
     });
@@ -265,15 +258,13 @@ fn a_profile_row_has_its_picture_leads_to_its_page_and_outlives_a_neighbour() {
             "settings",
             call!("clickIn", 1, QString::from("profileSettingsItem"))
         );
-        // Two deletions in one go: the second row must outlive the first
-        // profile's going.
+        // Two deletions at once: second row outlives first profile's going.
         record!("remember", call!("remember", 2));
         record!(
             "delete-1",
             call!("clickIn", 1, QString::from("deleteProfileItem"))
         );
-        // Read while it is waiting, not after: this is the state the
-        // reader is looking at for those seconds.
+        // Read while waiting: the state reader sees for those seconds.
         record!("going-1", call!("goingOut", 1));
     });
     single_shot(Duration::from_secs(12), move || unsafe {
@@ -294,9 +285,8 @@ fn a_profile_row_has_its_picture_leads_to_its_page_and_outlives_a_neighbour() {
     assert_rows(&steps, &navigation, &common::calls(&journal));
 }
 
-/// The picture and colour are the core's, the badge follows what is
-/// unread, the menu leads to the profile's page, and the second row is
-/// the same object after the first deletion.
+/// Picture, colour from core; badge follows unread; menu opens page; second row same object
+/// after first deletion.
 fn assert_rows(steps: &[(&str, String)], navigation: &str, calls: &[(String, Value)]) {
     let context = format!("steps: {steps:?}\nnavigation: {navigation}");
     let value = |label: &str| {

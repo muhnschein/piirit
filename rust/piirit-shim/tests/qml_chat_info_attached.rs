@@ -1,27 +1,19 @@
-//! What a chat is sits to the right of the conversation, attached.
+//! Chat info attached right of conversation: page indicator shows it, swipe reaches it (platform's
+//! "more this way"). Was header-tap only, which nothing signalled. Page depends on chat kind, so
+//! conversation waits for load; header tap now goes the way the swipe does.
 //!
-//! The group page was reachable only by tapping the header, and nothing
-//! said the header could be tapped. An attached page is announced by the
-//! page indicator and reached by a swipe, which is the platform's way of
-//! saying "there is more this way". Which page is attached depends on the
-//! kind of chat, so the conversation waits for the load; and the header
-//! tap now goes the same way the swipe does.
-//!
-//! The page is loaded from a copy of the QML tree with `EnterKey` taken
-//! out; see `common::qml_tree_without_enter_key`.
+//! Page loaded from QML tree copy with `EnterKey` taken out; see
+//! `common::qml_tree_without_enter_key`.
 
-// Qt harness: needs `unsafe` for `env::set_var` before Qt starts
-// (`unused_unsafe` because it is only unsafe from edition 2024 on),
-// `borrow_as_ptr` for the engine pointer, and `single_shot` with
-// whole-second Durations.
+// Qt harness: `unsafe` env::set_var pre-Qt (`unused_unsafe`: unsafe only from edition 2024),
+// `borrow_as_ptr` for engine pointer, `single_shot` with whole-second Durations.
 #![allow(
     unsafe_code,
     unused_unsafe,
     clippy::borrow_as_ptr,
     clippy::disallowed_methods,
     clippy::expect_used,
-    // qt_method! declarations must match the generated dispatcher's
-    // by-value parameters; see piirit-shim/src/lib.rs.
+    // `qt_method!` params match dispatcher (`piirit-shim/src/lib.rs`).
     clippy::needless_pass_by_value
 )]
 
@@ -32,10 +24,8 @@ use qmetaobject::*;
 
 mod common;
 
-/// Silica's `pageStack`, recorded rather than performed: what was
-/// attached, and whether the forward navigation was taken.
-// Named as QML calls them: qmetaobject exposes a method under its Rust
-// name, and Silica's are camel-cased.
+/// Silica's `pageStack`, recorded not performed: what was attached, whether forward nav was taken.
+// Named as QML calls them: qmetaobject exposes methods under Rust name; Silica's are camel-cased.
 #[allow(non_snake_case)]
 #[derive(QObject, Default)]
 struct PageStackProbe {
@@ -43,7 +33,7 @@ struct PageStackProbe {
     /// `attach:GroupPage.qml|forward|...`
     log: qt_property!(QString; NOTIFY log_changed),
     log_changed: qt_signal!(),
-    /// The page named by the last `pushAttached`, empty until one.
+    /// Page named by last `pushAttached`; empty until one.
     attached: qt_property!(QString; NOTIFY log_changed),
 
     push: qt_method!(fn(&mut self, page: QString, properties: QVariantMap)),
@@ -71,14 +61,12 @@ impl PageStackProbe {
         let name = page.rsplit('/').next().unwrap_or(&page).to_string();
         self.attached = name.clone().into();
         self.note(&format!("attach:{name}"));
-        // No page to hand back: the conversation only connects to a
-        // group's `renamed`, and a null here says there is nothing to
-        // connect to, as Silica does for a page that failed to load.
+        // No page handed back: conversation only connects to a group's `renamed`; null says nothing
+        // to connect to, as Silica does for a page that failed to load.
         QVariant::default()
     }
 
-    /// Whether something is attached. Silica answers with the page; the
-    /// conversation only asks whether there is one.
+    /// Whether something is attached. Silica answers with the page; conversation only asks if any.
     fn nextPage(&self, _page: QVariant) -> QVariant {
         if self.attached.to_string().is_empty() {
             QVariant::default()
@@ -142,7 +130,7 @@ fn the_chat_info_page_is_attached_to_the_right() {
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
     let tree = common::qml_tree_without_enter_key();
 
-    // SAFETY: single-threaded test binary; set before Qt starts.
+    // SAFETY: single-threaded; set pre-Qt.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_ACCOUNTS_DIR", temp.join("accounts"));
@@ -166,8 +154,7 @@ fn the_chat_info_page_is_attached_to_the_right() {
         .start(QString::from(env!("CARGO_BIN_EXE_fake-core-server")));
 
     let engine_ptr = std::ptr::addr_of_mut!(engine);
-    // Read from inside the steps the way the engine is: the box outlives
-    // `exec()`, and the closures fire only while it runs.
+    // Read from steps like engine: box outlives `exec()`; closures fire only while it runs.
     let stack_ptr: *const QObjectBox<PageStackProbe> = std::ptr::addr_of!(stack_box);
     let mut steps: Vec<(&str, String)> = Vec::new();
     let steps_ptr: *mut Vec<(&str, String)> = std::ptr::addr_of_mut!(steps);
@@ -189,8 +176,7 @@ fn the_chat_info_page_is_attached_to_the_right() {
         };
     }
 
-    // A group, chat 2. Loaded while still arriving, so nothing can be
-    // attached yet however fast the core answers.
+    // Group, chat 2, loaded while arriving: nothing attachable yet.
     let group_url = common::page_url_in(&tree, "ConversationPage.qml");
     single_shot(Duration::from_secs(2), move || unsafe {
         record!(
@@ -211,11 +197,11 @@ fn the_chat_info_page_is_attached_to_the_right() {
             "group-attached",
             (*stack_ptr).pinned().borrow().attached.to_string()
         );
-        // Settling again must not attach a second one.
+        // Settling again must not attach a second.
         record!("resettle", call!("settle"));
         record!("tap", call!("tapHeader"));
         record!("group-log", (*stack_ptr).pinned().borrow().log.to_string());
-        // Now a one-to-one chat, chat 1, on a fresh stack.
+        // Now one-to-one chat (chat 1), fresh stack.
         (*stack_ptr).pinned().borrow_mut().attached = QString::default();
     });
     let single_url = common::page_url_in(&tree, "ConversationPage.qml");
@@ -241,8 +227,7 @@ fn the_chat_info_page_is_attached_to_the_right() {
     assert_attached(&steps);
 }
 
-/// The right page for the kind of chat, attached once the page is there,
-/// only once, and reached by the header tap as well.
+/// Right page for chat kind: attached once; header tap too.
 fn assert_attached(steps: &[(&str, String)]) {
     let context = format!("steps: {steps:?}");
     let value = |label: &str| {

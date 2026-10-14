@@ -1,9 +1,6 @@
-//! The cover with nobody in it.
-//!
-//! The chat with oneself and the core's own device chat are chats, but
-//! not people: a cover with only those is a grid of empty circles, with
-//! no pill, rather than the reader's own face drawn again and again. Seeded so through the
-//! fake core, which is why this is its own binary.
+//! Cover with only self and device chats (chats, not people): empty circles, no pill, not reader's
+//! own face drawn again and again.
+//! Seeded via fake core, so own binary.
 
 // Qt harness: see qml_cover.rs.
 #![allow(
@@ -77,9 +74,7 @@ fn a_cover_with_only_oneself_and_the_device_is_a_grid_of_empty_circles() {
     let temp = std::env::temp_dir().join(format!("piirit-qml-cover-empty-{}", std::process::id()));
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
 
-    // SAFETY: single-threaded test binary; set before Qt starts and before
-    // the server inherits them. One configured profile, whose two chats
-    // are made the chat with oneself and the device chat.
+    // SAFETY: single thread; pre-Qt, pre-fork. Chats = self and device.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_ACCOUNTS_DIR", temp.join("accounts"));

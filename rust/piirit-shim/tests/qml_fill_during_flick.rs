@@ -1,15 +1,8 @@
-//! The rows in front of a flicking reader are asked for while they move.
-//!
-//! The ask was debounced by a timer restarted on every change to
-//! `contentY`, and a flick changes it every frame: the timer did not fire
-//! until the flick had stopped, so nothing was fetched for as long as the
-//! reader was moving, and a fast scroll up into the history ended on a
-//! screen of blanks that filled in a moment later. Reported from a phone as
-//! an empty screen for a second.
-//!
-//! What is pinned here is that a view moving frame after frame for half a
-//! second asks for rows several times over while it moves, and once more
-//! for where it stops.
+//! Rows ahead of flicking reader fetched while moving. Debounce timer was restarted per
+//! `contentY` change, which a flick makes every frame: it never fired until flick stopped, so a
+//! fast scroll up ended on a screen of blanks (reported from phone as a second of empty screen).
+//! Pinned: view moving frame by frame for half a second fetches several times mid-flick, once more
+//! at stop.
 
 // Qt harness: see qml_conversation_list.rs.
 #![allow(
@@ -26,8 +19,7 @@ use qmetaobject::*;
 
 mod common;
 
-/// The list over a plain `ListModel` of rows that have not been fetched:
-/// no `loaded` role reads as false, which is a placeholder.
+/// List over plain `ListModel` of unfetched rows: no `loaded` role reads false, a placeholder.
 const PROBE_QML: &str = r"
     import QtQuick 2.0
     Item {
@@ -106,7 +98,7 @@ const PROBE_QML: &str = r"
 
 #[test]
 fn a_flicking_view_asks_for_rows_while_it_moves() {
-    // SAFETY: single-threaded test binary; set before Qt starts.
+    // SAFETY: single thread; pre-Qt.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
     }
@@ -172,9 +164,7 @@ fn a_flicking_view_asks_for_rows_while_it_moves() {
     assert_eq!(value("load"), "ok", "the list did not load. {context}");
     assert_eq!(value("rows"), "300", "the rows were not added. {context}");
 
-    // Half a second of movement is several sixty-millisecond waits: the
-    // rows in front of the reader were asked for while they were still on
-    // their way there.
+    // Half second = several 60 ms waits; rows ahead asked mid-way.
     assert!(
         number("during") >= 3,
         "the view asked for rows {} times during half a second of flicking: \
@@ -182,7 +172,7 @@ fn a_flicking_view_asks_for_rows_while_it_moves() {
          screen of blanks. {context}",
         value("during")
     );
-    // And once it stops, where it stopped.
+    // Once it stops, where it stopped.
     assert!(
         number("after") >= 1,
         "the view did not ask for the rows where the flick ended. {context}"

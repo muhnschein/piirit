@@ -1,12 +1,8 @@
-//! Picking a deletion period, from the tap to the core.
+//! Picking a deletion period, from tap to core.
 //!
-//! The settings page does not write the period on the tap. It asks the
-//! core how many messages are already older than it, puts that number
-//! to the reader on a page of its own, and writes the setting only when
-//! that page is accepted -- after which the core object writes it to
-//! every account, as the app's root binds it to. This drives the whole
-//! of that against the fake core, with a page stack that hands the page
-//! a dialog to connect to and lets the test accept it.
+//! Settings page writes nothing on tap: asks core how many messages are older, shows that count on
+//! its own page, writes setting only on accept. Core object then writes it to every account. Test
+//! accepts the page's dialog.
 
 // Qt harness: see qml_pages.rs.
 #![allow(
@@ -26,13 +22,11 @@ use serde_json::Value;
 
 mod common;
 
-/// The probe imports the app's components by absolute URL, for the
-/// `Settings` singleton the page writes -- and binds the core's period
-/// to it, as the app's root does, so a setting written reaches the core.
+/// Imports app components by absolute URL, for `Settings` singleton page writes. Binds core's
+/// period to it, as app root does, so a written setting reaches core.
 ///
-/// The page stack is a QML object handed to the page as a context
-/// property, rather than a Rust one: an object a method hands to QML is
-/// QML's to delete, and one owned from Rust as well was deleted twice.
+/// Page stack is a QML object passed as context property, not a Rust one: QML deletes what a
+/// method hands it, and one also owned from Rust was deleted twice.
 fn probe_qml() -> String {
     let components = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../qml/components");
     format!(
@@ -131,8 +125,7 @@ fn a_period_is_counted_confirmed_and_then_written_to_every_account() {
     let journal = common::fresh_journal(&temp);
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
 
-    // SAFETY: single-threaded test binary; set before Qt starts and before
-    // the server inherits them.
+    // SAFETY: single-threaded; set pre-Qt and before server inherits.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_FAKE_JOURNAL", &journal);
@@ -148,7 +141,7 @@ fn a_period_is_counted_confirmed_and_then_written_to_every_account() {
     ));
     engine.set_object_property("core".into(), core_box.pinned());
     engine.load_data(QByteArray::from(probe_qml()));
-    // Named for the page before it is loaded, as Silica names its own.
+    // Named for the page before load, as Silica names its own.
     let stack = engine.invoke_method("stackObject".into(), &[]);
     engine.set_property("pageStack".into(), stack);
 
@@ -186,7 +179,7 @@ fn a_period_is_counted_confirmed_and_then_written_to_every_account() {
             call!("load", QString::from(common::page_url("SettingsPage.qml")))
         );
         record!("pick", call!("click", QString::from("deletionOption3600")));
-        // Straight after the tap: nothing written, nothing pushed yet.
+        // Straight after tap: nothing written or pushed.
         record!("period-on-tap", call!("period"));
         record!("pushed-on-tap", call!("pushed"));
     });

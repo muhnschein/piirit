@@ -1,15 +1,8 @@
-//! The other end answers before this end knows what it placed.
+//! Other end answers before this end knows its message.
 //!
-//! The core sends the call and then says which message it placed it as;
-//! the other end's answer is an event, and nothing orders the two. The
-//! answer can come first -- while the call has no message to be matched
-//! against -- and a call that dropped it would ring on, answered, until
-//! the core gave up on it. So the answer is kept, and applied once the
-//! call knows its message.
-//!
-//! Forced here in that order: the answer is fed to the call while the
-//! page is still up and has sent no offer, and only then does the page
-//! send one.
+//! Answer is an unordered event; may come before message is known. Dropped, it rings on until
+//! core gives up. So kept and applied once call knows its message. Forced: answer fed while
+//! page is up, no offer sent yet.
 
 // Qt harness: see qml_pages.rs.
 #![allow(
@@ -29,8 +22,7 @@ mod common;
 
 use common::http::{api_of, authority_of, body_of, get, payload_of, post, status_of};
 
-/// The fake core numbers its messages from above what it seeds, and a
-/// call is the first message this test adds.
+/// Fake core numbers messages above its seeds; call is first message added.
 const PLACED_AS: u32 = 101;
 
 const PROBE_QML: &str = r"
@@ -73,7 +65,7 @@ fn an_answer_that_comes_before_the_call_is_placed_is_not_lost() {
     let journal = common::fresh_journal(&temp);
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
 
-    // SAFETY: single-threaded test binary; set before Qt starts.
+    // SAFETY: single-threaded; set before Qt starts.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_FAKE_JOURNAL", &journal);
@@ -115,15 +107,13 @@ fn an_answer_that_comes_before_the_call_is_placed_is_not_lost() {
         };
     }
 
-    // SAFETY for every block: these fire only while `exec()` runs on this
-    // thread, and everything they point at outlives it.
+    // SAFETY for every block: fire only inside `exec()`; pointees outlive it.
     single_shot(Duration::from_secs(2), move || unsafe {
         record!("place", call!("place"));
     });
 
     single_shot(Duration::from_secs(3), move || unsafe {
-        // The page is up and has not sent its offer: the call has no
-        // message yet, and the answer arrives anyway.
+        // Page up, no offer: call has no message yet, answer arrives anyway.
         record!("before", call!("state"));
         record!("early", call!("answeredEarly", PLACED_AS));
         record!("other", call!("otherEnded"));
@@ -131,8 +121,7 @@ fn an_answer_that_comes_before_the_call_is_placed_is_not_lost() {
         *url_ptr = url.clone();
         let authority = authority_of(&url);
         let api = api_of(&url);
-        // An offer the fake core's other end does not answer by itself:
-        // the only answer there is is the early one.
+        // Offer the fake's other end does not answer itself: only early answer exists.
         record!(
             "start",
             status_of(&post(&authority, &format!("{api}/start"), "v=0 test-offer")).to_string()

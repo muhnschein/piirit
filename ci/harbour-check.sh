@@ -1,20 +1,15 @@
 #!/bin/bash
-# Harbour listing rules, checked against the source tree.
+# Harbour listing rules, from the source tree.
 #
-# `sfdk check -s harbour` is the authority, and it needs a built RPM and
-# the Sailfish SDK -- minutes of runner time and a multi-gigabyte image
-# (.github/workflows/rpm.yml). This answers the same questions from the
-# sources instead, so a change that would fail intake fails the pull
-# request that introduces it.
+# Authority: `sfdk check -s harbour` (needs built RPM, rpm.yml). This reads
+# sources, so intake failures fail the PR.
 #
-# The rules come from the vendored copies of the validator's own
-# allow-lists (ci/harbour/, refreshed by scripts/update-harbour-rules.sh);
-# only the logic around them is reimplemented, from rpmvalidation.sh. Check
-# IDs are docs/HARBOUR.md's, which follow Jolla's own numbering.
+# Rules: vendored validator allow-lists (ci/harbour/, refreshed by
+# scripts/update-harbour-rules.sh); only logic reimplemented, from
+# rpmvalidation.sh. IDs: docs/HARBOUR.md (Jolla's numbering).
 #
-# bash, not sh, and deliberately: the .conf files are written as bash
-# extglob patterns (`libcrypto.so.3?((OPENSSL_3.*))`), and matching them
-# with anything else would silently accept what Harbour rejects.
+# bash, not sh: .conf files are extglob patterns; other matchers accept what
+# Harbour rejects.
 set -u
 shopt -s extglob
 
@@ -22,17 +17,14 @@ root=$(CDPATH='' cd -- "$(dirname -- "$0")/.." && pwd)
 rules="$root/ci/harbour"
 waivers="$rules/waivers.conf"
 
-# Found rather than named, so that everything below follows the package's
-# own idea of what it is called: rename the spec and the .desktop file,
-# and the check renames with them.
+# Found, not named: names follow the package (rename spec, check follows).
 spec=$(find "$root/rpm" -maxdepth 1 -name '*.spec' | sort | head -1)
 if [[ -z "$spec" ]]; then
     echo "harbour-check: FAIL no .spec file in rpm/" >&2
     exit 1
 fi
 
-# Both device architectures: the spec's %ifarch blocks mean the file list
-# is not the same for each, and Harbour validates every uploaded RPM.
+# Both arches: %ifarch changes file list; Harbour checks every RPM.
 ARCHES="aarch64 armv7hl"
 
 # rpmvalidation.conf's ICON_SIZES.
@@ -43,8 +35,7 @@ findings=0
 skipped=0
 declare -A waiver_used=()
 
-# HARBOUR_CHECK_STRICT=1 turns "the tool for this check is missing" into a
-# failure. CI sets it, so a check can never quietly stop running there.
+# HARBOUR_CHECK_STRICT=1: missing tool fails. CI sets it.
 strict=${HARBOUR_CHECK_STRICT:-0}
 
 note() { echo "harbour-check: $*"; return 0; }
@@ -61,9 +52,7 @@ skip() {
     return 0
 }
 
-# A finding is (check id, subject, message). The subject is what the
-# waiver file matches on, so it has to be the stable part -- a path, a
-# dependency, an import -- and never the prose.
+# Finding = (check id, subject, message). Waivers match the stable subject part.
 fail() {
     local id=$1 subject=$2 message=$3
     local key
@@ -78,8 +67,8 @@ fail() {
     return 0
 }
 
-# ci/harbour/waivers.conf: `<check id> <subject pattern> # why`. Returns
-# the matched line's key so a waiver that stops matching can be reported.
+# waivers.conf: `<check id> <subject pattern> # why`. Returns key for stale
+# reports.
 waived() {
     local id=$1 subject=$2 line wid wsubject
     [[ -f "$waivers" ]] || return 1
@@ -90,8 +79,7 @@ waived() {
         [[ $# -ge 2 ]] || continue
         wid=$1
         wsubject=$2
-        # Unquoted on purpose: the pattern is a glob, as upstream's own
-        # allow-list matching is.
+        # Glob, like upstream's allow-list.
         # shellcheck disable=SC2053
         if [[ "$id" = "$wid" ]] && [[ $subject == $wsubject ]]; then
             echo "$wid $wsubject"
@@ -101,8 +89,7 @@ waived() {
     return 1
 }
 
-# rpmvalidation.sh's check_contained_in: match a query against the
-# patterns in one or more .conf files, comments and blank lines ignored.
+# rpmvalidation.sh's check_contained_in: query vs .conf patterns.
 contained_in() {
     local query=$1 pat
     shift
@@ -128,8 +115,7 @@ if [[ -z "$name" ]]; then
     exit 1
 fi
 
-# 1.3.3 wants Icon=<NAME> and 1.2.2 wants the file installed as
-# <NAME>.desktop, so the source file is named for the package too.
+# 1.3.3 wants Icon=<NAME>; 1.2.2 wants <NAME>.desktop: source named for package.
 desktop="$root/$name.desktop"
 
 if [[ $name =~ ^harbour-[-a-z0-9_.]+$ ]]; then
@@ -145,8 +131,7 @@ else
     fail 1.1.3 "$version" "Version may contain only digits and periods"
 fi
 
-# The tree's own Release. What a built package actually carries is what
-# rpm.yml stamps, checked separately below.
+# Tree Release; built package gets rpm.yml's stamp (below).
 if [[ $release =~ ^[0-9._]+$ ]]; then
     note "[1.1.4] Release '$release' is digits, underscores and periods"
 else
@@ -154,9 +139,8 @@ else
         "Release may contain only digits, underscores and periods"
 fi
 
-# 1.1.2 is the built file's name, which follows from Name/Version/Release
-# and the arch, and 1.1.5 is that arch. Both are decided by whatever the
-# rpm workflow can be asked to build.
+# 1.1.2 (file name) and 1.1.5 (arch) follow from Name/Version/Release/arch,
+# so decided by what the rpm workflow can be asked to build.
 if [[ -f "$root/.github/workflows/rpm.yml" ]]; then
     while read -r arch; do
         case "$arch" in
@@ -171,12 +155,10 @@ if [[ -f "$root/.github/workflows/rpm.yml" ]]; then
         "$root/.github/workflows/rpm.yml" | tr ',' '\n' | tr -d '[:space:]')
     note "[1.1.5] the rpm workflow offers only Harbour architectures"
 
-    # The Release the workflow stamps is what reaches an RPM, so it is the
-    # one Harbour sees.
+    # Stamped Release is the one reaching the RPM.
     stamped=$(sed -n 's/.*release="\(.*\)".*/\1/p' "$root/.github/workflows/rpm.yml" | head -1)
     if [[ -n "$stamped" ]]; then
-        # Substitute a plausible value for each shell expansion, then
-        # judge the shape that leaves.
+        # Plausible value per expansion, then judge shape.
         # shellcheck disable=SC2016 # the patterns are the literal text.
         shape=$(echo "$stamped" | sed -e 's/\${GITHUB_RUN_NUMBER}/17/g' -e 's/\${short}/abc1234/g')
         if [[ $shape =~ ^[0-9._]+$ ]]; then
@@ -189,7 +171,7 @@ if [[ -f "$root/.github/workflows/rpm.yml" ]]; then
 fi
 
 #
-# 1.2 Installed file layout, and 1.6.7/1.8.x, all read off the spec
+# 1.2 File layout; 1.6.7/1.8.x: read off spec
 #
 if ! command -v rpmspec >/dev/null 2>&1; then
     skip 1.2.1 "rpmspec not found (install rpm)"
@@ -201,8 +183,7 @@ else
             continue
         fi
 
-        # %files, minus the directives and attributes that decorate an
-        # entry rather than name a path.
+        # %files entries, minus directives and attributes.
         files=$(echo "$expanded" | sed -n '/^%files/,/^%[a-z]*$/p' |
             grep -v '^%files' | grep -v '^%defattr' | grep -v '^%changelog' |
             sed -e 's/^%dir[[:space:]]*//' -e 's/^%attr([^)]*)[[:space:]]*//' \
@@ -238,8 +219,7 @@ else
                 "the .desktop file is not in %files ($arch)"
         fi
 
-        # 1.2.3: this is not a sailfish-qml app (see 1.3.2 below), so the
-        # binary has to be there.
+        # 1.2.3: not sailfish-qml app (see 1.3.2): binary must exist.
         if echo "$files" | grep -qx "/usr/bin/$name"; then
             note "[1.2.3] $arch packages /usr/bin/$name"
         else
@@ -247,19 +227,16 @@ else
                 "a C++/QML app must install its binary as /usr/bin/$name ($arch)"
         fi
 
-        # %install's install(1) calls: the mode and the destination of
-        # every file the package will contain. Continuation lines are
-        # joined first, so that a call split across two lines is still one
-        # source and one destination, and rpm's expanded %{buildroot}
-        # prefix comes off the destination.
+        # install(1) calls: mode and destination of every packaged file.
+        # Continuation lines joined (split call = one src, one dst);
+        # expanded %{buildroot} prefix stripped from destination.
         install_section=$(echo "$expanded" | sed -n '/^%install/,/^%files/p' |
             sed -e ':a' -e '/\\$/{N;s/\\\n[[:space:]]*/ /;ta' -e '}' |
             sed -E 's#[^ ]*/BUILDROOT/[^/ ]+##g')
         while read -r line; do
             mode=$(echo "$line" | sed -n 's/.*-D\{0,1\}m[[:space:]]*\([0-7]\{3,4\}\).*/\1/p')
             [[ -n "$mode" ]] || continue
-            # Pad to four digits so the setuid/setgid/sticky digit is
-            # always in the same place.
+            # Pad to 4 digits: setuid/setgid/sticky digit in fixed place.
             [[ ${#mode} -eq 3 ]] && mode="0$mode"
             dst=$(echo "$line" | awk '{print $NF}')
             case "${mode:0:1}" in
@@ -270,20 +247,17 @@ else
             [[ ${mode:2:1} == [2367] ]] && fail 1.2.7 "$dst" "group-writable (mode $mode)"
         done <<< "$install_section"
 
-        # 1.6.7: an ELF file may only be /usr/bin/<NAME> or a private
-        # shared library under /usr/share/<NAME>/lib/. Read from the
-        # install(1) calls, since that is where a source file in the tree
-        # is paired with the path it lands on.
+        # 1.6.7: ELF only at /usr/bin/<NAME> or /usr/share/<NAME>/lib/. Read
+        # from install(1) calls: where tree source pairs with landing path.
         while read -r line; do
             case "$line" in install*) ;; *) continue ;; esac
             src=$(echo "$line" | awk '{print $(NF-1)}')
             dst=$(echo "$line" | awk '{print $NF}')
             dst=${dst//\"/}
             src=${src//\"/}
-            # The app's own binary is built rather than checked out, and
-            # 1.7 covers it. Anything else the spec installs from the tree
-            # has to be there, or this check is reading half a package --
-            # `scripts/fetch-rpc-server.sh` puts the bundled ones in place.
+            # App binary is built, not checked out (1.7 covers it). Other
+            # tree files must exist, else check reads half a package;
+            # `scripts/fetch-rpc-server.sh` places the bundled ones.
             if [[ ! -f "$root/$src" ]]; then
                 # shellcheck disable=SC2016 # '$builddir' is literal text.
                 case "$src" in
@@ -319,9 +293,8 @@ else
     note "[1.2.x] file layout checked for: $ARCHES"
 
     #
-    # 1.8 RPM metadata. Only the tags the spec states: rpm generates
-    # Requires and Provides from the built binary too, and those are the
-    # real validator's to judge (.github/workflows/rpm.yml).
+    # 1.8 RPM metadata: spec-stated tags only; rpm-generated Requires/Provides
+    # are the real validator's (.github/workflows/rpm.yml).
     #
     expanded=$(rpmspec -P --target aarch64 "$spec" 2>/dev/null)
 
@@ -339,14 +312,11 @@ else
     done
     note "[1.8.2] no Provides:/Obsoletes:/Conflicts:/Recommends:/Suggests:/Supplements:/Enhances:"
 
-    # BuildRequires are the SDK's business and are not shipped, so only
-    # runtime Requires are judged.
+    # BuildRequires not shipped: runtime Requires only.
     requires=$(sed -n 's/^Requires:[[:space:]]*//p' <<< "$expanded")
     while read -r req; do
         [[ -n "$req" ]] || continue
-        # rpm hands the validator each whitespace-separated token, so a
-        # versioned dependency arrives as three of them and the operator
-        # and the version are both rejected.
+        # Versioned dep = three tokens; operator and version both rejected.
         if [[ $req == *[[:space:]]* ]]; then
             fail 1.8.4 "$req" \
                 "Requires: must not be versioned -- Harbour derives its own compatibility range"
@@ -385,11 +355,11 @@ while IFS= read -r qml; do
     qml_files=$((qml_files + 1))
     relative=${qml#"$root"/}
     while IFS= read -r line; do
-        # One line can carry several statements: `import a 1.0; import b 1.0`.
+        # One line, several statements: `import a 1.0; import b 1.0`.
         while IFS= read -r statement; do
             [[ -n "$statement" ]] || continue
-            # rpmvalidation.sh's normalisation: drop `as Foo`, collapse
-            # whitespace, keep the module and its version.
+            # As rpmvalidation.sh: drop `as Foo`, collapse spaces, keep
+            # module+version.
             import=$(sed -e 's/^[[:space:]]*import/import/' -e 's/[[:space:]]\+/ /g' \
                 -e 's/ as .*$//' -e 's/;$//' <<< "$statement" | cut -f2-3 -d' ')
             [[ -n "$import" ]] || continue
@@ -405,9 +375,8 @@ while IFS= read -r qml; do
                     "QML import is deprecated and will stop being accepted ($relative)"
                 continue
             fi
-            # Named as dropped rather than caught by the blocked-prefix
-            # patterns below, which happened to cover the one entry so
-            # far and would say "not at this version" about it.
+            # Named, not left to blocked-prefix patterns: those would say
+            # "not at this version" about it.
             if contained_in "$import" "$rules/dropped_qmlimports.conf"; then
                 fail 1.6.4 "$import" \
                     "QML import was dropped from the platform and is no longer accepted ($relative)"
@@ -416,8 +385,7 @@ while IFS= read -r qml; do
 
             case "$import" in
                 [\"\']*)
-                    # A path import. Strip the quotes; the version field
-                    # cut(1) leaves is not part of a path.
+                    # Path import: strip quotes; cut(1)'s version is not path.
                     path=${import%%[[:space:]]*}
                     path=${path//[\"\']/}
                     case "$path" in
@@ -428,12 +396,9 @@ while IFS= read -r qml; do
                         qrc:/*)
                             ;;
                         *)
-                            # The source qml/ tree installs as
-                            # /usr/share/<NAME>/qml, so staying inside it
-                            # is what keeps the import inside the package.
-                            # A script import names a file rather than a
-                            # directory; it is the file's directory that
-                            # has to be inside the tree.
+                            # qml/ installs as /usr/share/<NAME>/qml: staying
+                            # inside it keeps import in package. Script import
+                            # names a file: its directory must be inside.
                             if [[ $path == *.js ]]; then
                                 target=$(cd "$(dirname "$qml")" 2>/dev/null &&
                                     [[ -f "$path" ]] &&
@@ -453,8 +418,7 @@ while IFS= read -r qml; do
                     esac
                     ;;
                 *)
-                    # Everything not explicitly blocked is allowed, which
-                    # is what lets the app register its own QML module.
+                    # Unblocked = allowed: app registers its own QML module.
                     if contained_in "$import" "$rules/disallowed_qmlimport_patterns.conf"; then
                         fail 1.6.4 "$import" \
                             "QML import is not allowed at this version; see ci/harbour/allowed_qmlimports.conf ($relative)"
@@ -472,7 +436,7 @@ else
 fi
 
 #
-# 1.3 The .desktop file, and 1.4 its [X-Sailjail] section
+# 1.3 .desktop file, 1.4 [X-Sailjail]
 #
 uses_sailfish_qml=0
 if [[ ! -f "$desktop" ]]; then
@@ -484,9 +448,8 @@ else
         fail 1.3.1 "Name" "a non-empty Name= is required"
     fi
 
-    # Which of the two launch forms is used decides three later checks:
-    # whether /usr/bin/<NAME> must exist, whether libsailfishapp-launcher
-    # must be required, and what ExecDBus may say.
+    # Launch form decides three later checks: /usr/bin/<NAME> required,
+    # libsailfishapp-launcher required, what ExecDBus may say.
     if grep -qE "^Exec=sailfish-qml[[:space:]]+${name}[[:space:]]*$" "$desktop"; then
         uses_sailfish_qml=1
         note "[1.3.2] Exec=sailfish-qml $name (QML-only app)"
@@ -510,9 +473,7 @@ else
         fail 1.3.4 "Type" "must be exactly 'Type=Application'"
     fi
 
-    # Graded by what the QML pass above found: for an app importing
-    # Sailfish.Silica, anything but silica-qt5 means the booster does not
-    # start it.
+    # Silica import needs silica-qt5, else booster won't start it.
     if grep -qE '^X-Nemo-Application-Type=silica-qt5[[:space:]]*$' "$desktop"; then
         note "[1.3.5] X-Nemo-Application-Type=silica-qt5"
     elif [[ "$uses_silica" = 1 ]]; then
@@ -592,16 +553,14 @@ else
                             "ExecDBus must be the Exec value, optionally plus one argument"
                     fi
                     ;;
-                # Any other key on the allow-list has nothing to check.
+                # Other allowed keys: nothing to check.
                 *) ;;
             esac
         done <<< "$sailjail"
         note "[1.4.x] [X-Sailjail] keys, OrganizationName, ApplicationName and Permissions checked"
 
-        # 2.5: the sandbox grants write access to
-        # $XDG_DATA_HOME/<Org>/<App>, so the path the app builds has to be
-        # spelled the same way. A rename on one side only is silent until
-        # the app is confined on a device.
+        # 2.5: sandbox grants $XDG_DATA_HOME/<Org>/<App>; app path must match.
+        # One-side rename is silent until app is confined on device.
         if [[ -n "$org" ]] && [[ -n "$app" ]]; then
             if grep -rqF --exclude-dir=target "\"$org/$app/" "$root/rust"; then
                 note "[2.5] the app's data path uses OrganizationName/ApplicationName ($org/$app)"
@@ -617,9 +576,7 @@ if command -v desktop-file-validate >/dev/null 2>&1; then
     note "[1.3.x] desktop entry syntax is ci/packaging-lint.sh's"
 fi
 
-# 1.8.6/1.8.7: two Requires the validator derives from what the app is
-# rather than from what the spec says. After both the QML pass and the
-# .desktop file, since it reads a conclusion from each.
+# 1.8.6/1.8.7: Requires derived from app; runs after QML and .desktop passes.
 if [[ -n "${expanded:-}" ]]; then
     if [[ "$uses_xmllistmodel" = 1 ]] &&
         ! grep -qE '^Requires:[[:space:]]*qt5-qtdeclarative-import-xmllistmodel' <<< "$expanded"; then
@@ -670,8 +627,7 @@ fi
 #
 # 1.7 The binary
 #
-# The cargo bin has to be named for the package, since %install copies it
-# straight to /usr/bin/<NAME>.
+# cargo bin named for package: %install copies it to /usr/bin/<NAME>.
 cargo_bin=$(sed -n '/^\[\[bin\]\]/,/^\[/p' "$root/rust/piirit-app/Cargo.toml" |
     sed -n 's/^name = "\(.*\)"/\1/p' | head -1)
 if [[ "$cargo_bin" = "$name" ]]; then
@@ -698,10 +654,8 @@ else
             "the binary must link __libc_start_main"
     fi
 
-    # --dyn-syms, not --syms: mapplauncherd's booster dlopen()s the binary
-    # and looks main() up dynamically, and rpmbuild strips .symtab on the
-    # way into the package, so only a dynamic symbol is still there when
-    # Harbour looks.
+    # --dyn-syms: booster dlopen()s, looks up main() dynamically; rpmbuild
+    # strips .symtab, so only a dynamic symbol survives.
     if readelf --wide --dyn-syms "$binary" 2>/dev/null |
         awk '$4 == "FUNC" && $8 == "main"' | grep -q .; then
         note "[1.7.3] the binary exports main() as a dynamic symbol"
@@ -710,10 +664,8 @@ else
             "a Silica app must export main() for the mapplauncherd booster; a plain Rust 'fn main' is a local symbol that stripping removes"
     fi
 
-    # 1.6.1: every NEEDED entry against the allowed list. This is a host
-    # binary, so the loader it names is the host's -- the device build's is
-    # on the list either way, and the Qt and C++ libraries, which are what
-    # this is really asking about, are the same on both.
+    # 1.6.1: NEEDED vs allow-list. Host binary names host loader (device's is
+    # listed too); Qt/C++ libs, the real question, same on both.
     if ! command -v objdump >/dev/null 2>&1; then
         skip 1.6.1 "objdump not found (install binutils)"
     else
@@ -756,10 +708,7 @@ fi
 #
 # 2.6 Nothing the package installs is written at runtime
 #
-# A line that both names an installed path and calls a writing API. That
-# is narrow -- it cannot follow a path through a variable -- but it is
-# exact, and the broad version of this question is answered by §10's
-# on-device run, not by grep.
+# Narrow (no variable tracking) but exact; broad check is §10 on-device run.
 writes='create_dir_all|create_dir|File::create|fs::write|fs::copy|fs::rename|remove_file|remove_dir|OpenOptions'
 if hits=$(grep -rnE "\"(/usr/(share|bin|libexec)/$name)" --include='*.rs' \
         --exclude-dir=target "$root/rust" |
@@ -773,8 +722,7 @@ else
 fi
 
 #
-# Stale waivers. A waiver that no longer matches anything is a rule that
-# was fixed and a licence that outlived it.
+# Waiver matching nothing: stale.
 #
 if [[ -f "$waivers" ]]; then
     while IFS= read -r line; do

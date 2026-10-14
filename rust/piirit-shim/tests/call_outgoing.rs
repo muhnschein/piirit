@@ -1,18 +1,6 @@
-//! Placing a call: the page it runs in, what the page is told, and what
-//! the core is asked -- from the button to the hang-up.
-//!
-//! The page is upstream's calls-webapp, and the media is the browser
-//! engine's, so neither runs here. What does run is everything between
-//! them and the core: the `Call` object a window holds, the loopback host
-//! it serves the page from, and the bridge the page talks to that host
-//! through. The page's side of the conversation is played over a real
-//! socket, request for request, the way `calls.js` makes it: the offer it
-//! has gathered, the answer it waits for, the connection it reports.
-//!
-//! The call's row is watched too, since the row is what is left of a
-//! call afterwards: a call placed here is a message in its chat, and its
-//! state -- ringing, then over -- is read off the core rather than off
-//! the English sentence the core writes into it.
+//! Placing a call, button to hang-up. Page and media are upstream/engine: not run here.
+//! Here: `Call` object, loopback host, bridge. Page side played over real socket, as `calls.js`.
+//! Call row watched too: state read off core.
 
 // Qt harness: see qml_pages.rs.
 #![allow(
@@ -88,7 +76,7 @@ fn a_call_is_placed_answered_connected_and_hung_up() {
     let journal = common::fresh_journal(&temp);
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
 
-    // SAFETY: single-threaded test binary; set before Qt starts.
+    // SAFETY: single-threaded; set before Qt starts.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_FAKE_JOURNAL", &journal);
@@ -131,26 +119,25 @@ fn a_call_is_placed_answered_connected_and_hung_up() {
         };
     }
 
-    // SAFETY for every block: these fire only while `exec()` runs on this
-    // thread, and everything they point at outlives it.
+    // SAFETY for every block: fire only inside `exec()`; pointees outlive it.
     single_shot(Duration::from_secs(1), move || unsafe {
         (*engine_ptr).load_data(QByteArray::from(PROBE_QML));
     });
 
     single_shot(Duration::from_secs(2), move || unsafe {
-        // No call, no microphone to switch.
+        // No call, no mic to switch.
         record!("mute-idle", call!("mute", true));
         record!("place", call!("place"));
         record!("placing", call!("state"));
-        // Switched off before the page is up to be told.
+        // Switched off before page is told.
         record!("mute-early", call!("mute", true));
-        // And the microphone to be kept shut, while the sound moves.
+        // Mic shut while sound moves.
         call!("microphone", false);
         // One call at a time.
         record!("again", call!("again"));
     });
 
-    // The page is up: what it is served, and what it may reach.
+    // Page up: what it is served, what it may reach.
     single_shot(Duration::from_secs(3), move || unsafe {
         let url = call!("url");
         record!("url", url.clone());
@@ -174,8 +161,7 @@ fn a_call_is_placed_answered_connected_and_hung_up() {
         record!("bridge-status", status_of(&bridge).to_string());
         let api = api_of(&url);
         record!("api", api.clone());
-        // The key is in the page's own address and nowhere the host
-        // serves: a page elsewhere that loads the bridge learns nothing.
+        // Key only in page's address: page elsewhere loading bridge learns nothing.
         let key = api.trim_start_matches("/call-api/").to_string();
         record!(
             "bridge-secret",
@@ -191,18 +177,17 @@ fn a_call_is_placed_answered_connected_and_hung_up() {
             "webxdc-js",
             status_of(&get(&authority, "/webxdc.js")).to_string()
         );
-        // A name that resolves to the same address is not the address.
+        // Same address under another name is not the address.
         record!(
             "wrong-host",
             status_of(&get_as(&authority, "localhost", "/index.html")).to_string()
         );
-        // Guessing is told nothing.
+        // Guessing told nothing.
         record!(
             "wrong-token",
             status_of(&post(&authority, "/call-api/0000/start", "v=0")).to_string()
         );
-        // The page has its offer: the core places the call. The fake
-        // core's other end answers an offer that asks it to at once.
+        // Offer in: core places call; fake's other end answers it at once.
         record!(
             "start",
             status_of(&post(
@@ -212,14 +197,14 @@ fn a_call_is_placed_answered_connected_and_hung_up() {
             ))
             .to_string()
         );
-        // And a second offer from the same page is not a second call.
+        // Second offer from same page: not second call.
         record!(
             "start-again",
             status_of(&post(&authority, &format!("{api}/start"), "v=0 other")).to_string()
         );
     });
 
-    // The other end's answer, delivered to the page as its hash command.
+    // Other end's answer, delivered to page as hash command.
     single_shot(Duration::from_secs(5), move || unsafe {
         record!("answered", call!("state"));
         record!("row-ringing", call!("lastRow"));
@@ -238,14 +223,13 @@ fn a_call_is_placed_answered_connected_and_hung_up() {
                     |command| payload_of(command, "onAnswer")
                 )
         );
-        // And on again, told at once now that the page is up.
+        // On again: told at once.
         record!("unmute", call!("mute", false));
         record!(
             "page-unmuted",
             body_of(&get(&authority, &format!("{api}/commands"))).to_string()
         );
-        // The microphone let have, once however often it is said, and
-        // shut again.
+        // Mic granted once however often asked; shut again.
         call!("microphone", true);
         call!("microphone", true);
         call!("microphone", false);
@@ -254,7 +238,7 @@ fn a_call_is_placed_answered_connected_and_hung_up() {
             body_of(&get(&authority, &format!("{api}/commands"))).to_string()
         );
         call!("microphone", true);
-        // The peer connection says it is through.
+        // Peer connection says through.
         record!(
             "connected",
             status_of(&post(&authority, &format!("{api}/state"), "connected")).to_string()

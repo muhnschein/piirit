@@ -3,11 +3,8 @@ import Sailfish.Silica 1.0
 import "../js/Viewfinder.js" as Viewfinder
 
 /*
- * How far the camera is zoomed: the platform camera's indicator, a line
- * across the viewfinder with a dot on it, shown while the zoom moves and
- * for two seconds after. The ends say one and the camera's most, and the
- * dot says where it is now -- in numbers rather than the platform's "min"
- * and "max", which say less and would need translating.
+ * Zoom line with dot, shown while zooming and 2 s after. Ends: 1 and camera
+ * max. Numbers, not "min"/"max" (translation).
  */
 Item {
     id: indicator
@@ -15,7 +12,7 @@ Item {
     property real zoom: 1
     property real maximumZoom: 1
 
-    /// Shown while this is running, and faded out once it stops.
+    /// Shown while running, fades on stop.
     readonly property bool shown: hold.running
 
     function show() {

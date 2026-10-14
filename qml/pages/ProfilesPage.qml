@@ -3,53 +3,33 @@ import Sailfish.Silica 1.0
 import "../components"
 
 /*
- * Which profile the chat list is showing, and the way to each one's own
- * page.
+ * Profile the chat list shows, and the way to each profile's page.
  *
- * The core keeps every configured account open at once, with IO running
- * on all of them, so switching is a matter of pointing the chat list at a
- * different one rather than starting anything up; the chat list tells the
- * core which it is on, and that is the profile the app opens on next
- * time. Picking the profile already shown does nothing. A row's menu is
- * everything to do with that profile: its own page -- picture, name,
- * address, the rest -- its invite code, writing it out to a backup file,
- * and deleting it. The code and the backup are here, where the profile is
- * picked, rather than on the profile's own page: a reader who wants to
- * show their code does not want to read a settings page first.
+ * Core keeps all accounts open: switching points chat list at another, no
+ * startup. Chat list tells core which is current (opened next time); picking
+ * current does nothing. Row menu: own page, invite code, backup, delete. Code
+ * and backup here, not on profile page: showing code shouldn't need settings.
  *
- * Another profile is added from the plus under the last row, where the
- * group pages put "add members". One plus, not three: the three ways in
- * -- a new profile, a backup file, another device -- are the question the
- * page behind it asks (AddProfilePage.qml), and three pluses under a
- * list of profiles read as three more profiles.
+ * Add: one plus under last row. Not three (would read as three profiles): the
+ * three ways are asked on the next page (AddProfilePage.qml).
  *
- * Deleting counts down beside the list rather than on the row
- * (PendingRemoval): the row goes whenever the list reloads, and it used
- * to take the countdown with it, so the second of two profiles deleted
- * in the same breath was never deleted at all. The list is also
- * refreshed in place rather than rebuilt when a deletion lands
- * (core.rs), which is worth keeping for its own sake -- it is what stops
- * every row flickering -- but the countdown no longer depends on it.
+ * Delete countdown beside list (PendingRemoval): rows go on every reload and
+ * took the countdown with them (second of two quick deletes never ran). List
+ * also refreshed in place (core.rs): no flicker.
  */
 Page {
     id: page
 
-    /// The profile the chat list is currently on.
+    /// Profile the chat list is on.
     property int currentAccountId: 0
 
-    // Deleting the last profile leaves the app with nothing to show, and
-    // the way back to where a first profile is made belongs to the window
-    // (piirit.qml) rather than to this page: this page is destroyed by
-    // the same swipe that asks for the deletion, so a move made from here
-    // would be a move by a page that is no longer there.
+    // Deleting last profile: window (piirit.qml) owns first-profile setup; this
+    // page dies in the same swipe.
     Connections {
         target: core
         onAccount_error: page.errorMessage = message
-        // A row names its profile's own address, which is on one of its
-        // relays and moves when that relay goes. The core says when a
-        // profile's relays change -- from its page over this one,
-        // or from another device the profile is on -- and the rows are
-        // read again.
+        // Row names profile's address, which moves when its relay goes; re-read
+        // on relay change.
         onCore_event: {
             if (kind === "TransportsModified") {
                 core.refresh_accounts()
@@ -59,33 +39,26 @@ Page {
 
     property string errorMessage: ""
 
-    /// How long a profile waits before it goes, in milliseconds.
-    /// Nothing sets it; a test turns it down rather than waiting.
+    /// Profile wait before removal, ms; tests lower it.
     property alias pendingDelay: doomedProfiles.delay
 
-    /// The profiles the reader has asked to delete, waiting out the
-    /// moment in which they can say they did not mean it.
+    /// Profiles asked to delete, undo window.
     PendingRemoval {
         id: doomedProfiles
         onRemove: core.remove_account(id)
     }
 
-    // A profile page pushed over this one, or a swipe back to the chats:
-    // either way, anything still waiting goes now. Leaving is exactly
-    // when a timer has not fired yet.
+    // Page pushed over or swipe back: anything waiting goes now (timer may
+    // not have fired).
     onStatusChanged: {
         if (page.status === PageStatus.Deactivating) {
             doomedProfiles.flush()
         }
     }
 
-    // And again as the page is actually destroyed, because "leaving" and
-    // "told it is leaving" are not the same moment. A profile tapped for
-    // deletion while the back gesture is already under way is asked for
-    // after this page has had its `Deactivating`, and the wait it armed
-    // then dies with the page and the timer on it: the reader asked for
-    // a profile to go and it quietly stayed. Flushing twice costs
-    // nothing -- the first one leaves nothing behind.
+    // Again on actual destroy: "leaving" and "told it is leaving" differ. A
+    // delete tapped during back gesture comes after `Deactivating`; its wait
+    // would die with page. Flushing twice is harmless.
     Component.onDestruction: doomedProfiles.flush()
 
     SilicaListView {
@@ -100,18 +73,15 @@ Page {
 
         delegate: ListItem {
             id: profileDelegate
-            // Named per profile, so a test can find the one it means.
+            // Named per profile for tests.
             objectName: "profileRow" + model.account_id
             contentHeight: body.height
 
-            /// This profile is on its way out.
+            /// Profile on its way out.
             readonly property bool doomed: doomedProfiles.pending(model.account_id)
 
-            /// Silica's own countdown, drawn over the profile. The
-            /// deletion is not its business -- that belongs to
-            /// `doomedProfiles`, because a remorse item lives in the row
-            /// it covers and the row goes whenever the list reloads. So
-            /// it draws, and reports the tap.
+            /// Silica countdown over profile. Removal in `doomedProfiles`: row
+            /// goes on reload. Draws, reports tap.
             function raiseRemorse() {
                 remorse.active = true
                 //: What Silica's countdown says it is doing, over a
@@ -121,8 +91,7 @@ Page {
                     doomedProfiles.countdownFor(model.account_id))
             }
 
-            // Built the first time a delete is asked for, not with the
-            // row, as the conversation and the chat list do.
+            // Built on first delete request, not with row.
             Loader {
                 id: remorse
                 active: false
@@ -132,16 +101,14 @@ Page {
                 }
             }
 
-            // A row rebuilt mid-wait comes back with no countdown on it.
+            // Row rebuilt mid-wait comes back with no countdown.
             Component.onCompleted: {
                 if (profileDelegate.doomed) {
                     profileDelegate.raiseRemorse()
                 }
             }
 
-            // A Component, which Silica builds the first time the menu is
-            // opened, rather than five items built with every row; see
-            // ConversationList.
+            // Component, built on first menu open; see ConversationList.
             menu: Component {
                 ContextMenu {
                     MenuItem {
@@ -150,12 +117,9 @@ Page {
                         onClicked: pageStack.push(Qt.resolvedUrl("ProfilePage.qml"),
                                                   { accountId: model.account_id })
                     }
-                    // The invite code, the second device and the backup
-                    // are about this profile and nothing else, so they
-                    // are on the profile rather than a page deeper in.
-                    // All three take the row's own account: the core's
-                    // invite, its provider and its export are each per
-                    // account.
+                    // Invite code, second device, backup: per profile, take
+                    // row's account (core invite, provider, export are per
+                    // account).
                     MenuItem {
                         objectName: "inviteItem"
                         text: qsTr("Invite code")
@@ -168,10 +132,8 @@ Page {
                         onClicked: pageStack.push(
                             Qt.resolvedUrl("SecondDevicePage.qml"), {
                                 accountId: model.account_id,
-                                // Where the forward swipe goes once a
-                                // device has taken the profile: the chats
-                                // the app is on, which is not necessarily
-                                // the profile being offered.
+                                // Forward swipe after device takes profile:
+                                // chats the app is on (not necessarily this).
                                 currentAccountId: page.currentAccountId
                             })
                     }
@@ -180,20 +142,15 @@ Page {
                         text: qsTr("Back up profile")
                         onClicked: pageStack.push(Qt.resolvedUrl("BackupPage.qml"), {
                             accountId: model.account_id,
-                            // Where the forward swipe goes once the
-                            // backup is written: the chats the app is on,
-                            // which is not necessarily the profile being
-                            // backed up.
+                            // Forward swipe after backup: chats the app is on
+                            // (not necessarily this).
                             currentAccountId: page.currentAccountId
                         })
                     }
                     MenuItem {
                         objectName: "deleteProfileItem"
                         text: qsTr("Delete profile")
-                        // The page is told, not this row: the row is
-                        // destroyed whenever the list reloads, and a wait
-                        // living on it would go too. Same as the chat
-                        // list and the conversation.
+                        // Page told, not row: row dies on reload.
                         onClicked: {
                             doomedProfiles.ask(model.account_id)
                             profileDelegate.raiseRemorse()
@@ -204,30 +161,26 @@ Page {
 
             ContactRow {
                 id: body
-                // The remorse covering this does the fading, with its
-                // own `opacity: 0.0` on what it was handed.
+                // Remorse fades via own `opacity: 0.0`.
                 enabled: !profileDelegate.doomed
                 width: parent.width
                 displayName: model.display_name.length > 0
                              ? model.display_name : model.addr
                 address: model.addr
-                // The profile's own picture and colour, as the core lists
-                // them with the account: the same row the chat list draws
-                // for everyone else, drawn for oneself.
+                // Profile's own picture and colour, as core lists.
                 ownColor: model.color
                 picturePath: model.avatar_path
-                // The reader's own, and what tells two profiles apart.
+                // Reader's own; tells two profiles apart.
                 showAddress: true
                 isKeyContact: true
-                // Room for the badge and the mark, so a long name fades
-                // before them rather than running under them.
+                // Room for badge and mark: long name fades before them.
                 trailingSpace: marks.width + Theme.paddingMedium
             }
 
             Row {
                 id: marks
-                // Beside the row rather than in it, so the remorse does
-                // not cover it: faded to match.
+                // Beside row, not in it: remorse doesn't cover it, so faded
+                // to match.
                 opacity: profileDelegate.doomed ? 0 : 1
                 anchors {
                     right: parent.right
@@ -236,9 +189,7 @@ Page {
                 }
                 spacing: Theme.paddingMedium
 
-                // Waiting to be read in this profile: the badge the chat
-                // list draws on a chat, drawn on the profile. The core's
-                // own count, which leaves muted chats out.
+                // Unread in this profile: core count, muted chats excluded.
                 Rectangle {
                     objectName: "profileUnreadBadge"
                     anchors.verticalCenter: parent.verticalCenter
@@ -256,15 +207,13 @@ Page {
                         anchors.centerIn: parent
                         font.pixelSize: Theme.fontSizeExtraSmall
                         color: Theme.primaryColor
-                        // A number, but pinned like everything read off
-                        // a model.
+                        // A number, pinned like all model reads.
                         textFormat: Text.PlainText
                         text: model.unread_count > 99 ? "99+" : model.unread_count
                     }
                 }
 
-                // The one being shown, marked the way a chosen group
-                // member is.
+                // Current profile, marked as chosen group member is.
                 Label {
                     objectName: "currentMark"
                     anchors.verticalCenter: parent.verticalCenter
@@ -275,16 +224,12 @@ Page {
                 }
             }
 
-            // A profile waiting to go is covered by the remorse, which
-            // takes the tap itself and calls the deletion off.
+            // Profile waiting to go: remorse takes tap and calls deletion off.
             onClicked: {
                 if (model.account_id !== page.currentAccountId) {
-                    // The whole stack, not just this page. `replace`
-                    // swapped out the accounts page and left the previous
-                    // account's chat list underneath it -- one swipe back
-                    // into the profile just left. A null target replaces
-                    // everything, which is what the onboarding pages do
-                    // when they hand over to the chat list.
+                    // Whole stack: `replace` alone left previous chat list
+                    // under accounts page (one swipe back to old profile). Null
+                    // target replaces all, as onboarding does.
                     pageStack.replaceAbove(null,
                                            Qt.resolvedUrl("ChatListPage.qml"),
                                            { accountId: model.account_id })
@@ -294,10 +239,7 @@ Page {
             }
         }
 
-        // The way to another profile. One row, and the three ways in are
-        // behind it. Three pluses in a column -- make one, read a backup
-        // file, join from another device -- would put three answers under
-        // a list of profiles before the reader had been asked anything.
+        // One row for another profile; three ways behind it, not three pluses.
         footer: PlusRow {
             objectName: "addProfileButton"
             width: listView.width
@@ -305,9 +247,7 @@ Page {
             onClicked: pageStack.push(Qt.resolvedUrl("AddProfilePage.qml"), {})
         }
 
-        // Counted off the model, not off what is drawn: the plus is the
-        // view's own row rather than a profile, so a list with nothing
-        // in it still has a row on it.
+        // Counted off model: plus is view's own row; empty list keeps it.
         ViewPlaceholder {
             enabled: listView.count === 0
             text: qsTr("No profiles")

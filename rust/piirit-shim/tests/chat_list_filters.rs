@@ -1,9 +1,6 @@
-//! Searching the chat list, and the archived list.
+//! Searching chat list and archived list. Both must reach core.
 //!
-//! Both have to reach the core. Filtering the rows already loaded would
-//! only ever find chats that happened to be on screen, and the archived
-//! chats are a disjoint list rather than a subset of the ordinary one --
-//! there is nothing on screen to filter down to.
+//! Filtering loaded rows finds only on-screen chats; archived is a disjoint list.
 
 // Qt harness: see chat_list.rs.
 #![allow(
@@ -34,7 +31,7 @@ const PROBE_QML: &str = r"
     }
 ";
 
-/// Parameters are (accountId, listFlags, query, contactId).
+/// Parameters: (`accountId`, `listFlags`, `query`, `contactId`).
 fn query_of(params: &Value) -> Option<&str> {
     params.get(2).and_then(Value::as_str)
 }
@@ -59,7 +56,7 @@ fn a_search_and_the_archived_list_are_asked_of_the_core() {
     let journal = common::fresh_journal(&temp);
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
 
-    // SAFETY: single-threaded test binary; set before Qt starts.
+    // SAFETY: single-threaded; set before Qt starts.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_FAKE_JOURNAL", &journal);
@@ -116,7 +113,7 @@ fn a_search_and_the_archived_list_are_asked_of_the_core() {
         "the archived list was never asked for with DC_GCL_ARCHIVED_ONLY, \
          so it would show the ordinary chats again. calls: {entries:?}"
     );
-    // The first load is neither a search nor the archive.
+    // First load: neither search nor archive.
     let first = entries.first().cloned().unwrap_or(Value::Null);
     assert_eq!(
         query_of(&first),

@@ -1,11 +1,8 @@
-//! Searching the archived list has to return archived chats.
+//! Searching archived list must return archived chats.
 //!
-//! The core has no single call meaning "archived chats matching this".
-//! Verified against the pinned binary: with `DC_GCL_ARCHIVED_ONLY` set it
-//! never looks at the query -- asking for archived chats matching "Beta"
-//! returns the archived "Alpha group" all the same -- while a plain query
-//! searches every chat and does include archived ones. So the model asks
-//! twice and intersects, and this pins that it does.
+//! No core call means "archived matching this". With `DC_GCL_ARCHIVED_ONLY` the query is
+//! ignored (archived "Beta" returns "Alpha group"); plain query searches all, incl. archived.
+//! So model asks twice and intersects; this pins that.
 
 // Qt harness: see qml_chat_list.rs.
 #![allow(
@@ -43,7 +40,7 @@ fn searching_the_archived_list_finds_archived_chats() {
     let journal = common::fresh_journal(&temp);
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
 
-    // SAFETY: single-threaded test binary; set before Qt starts.
+    // SAFETY: single-threaded; set before Qt starts.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_FAKE_JOURNAL", &journal);
@@ -84,20 +81,19 @@ fn searching_the_archived_list_finds_archived_chats() {
         (*engine_ptr).invoke_method("open".into(), &[]);
     });
 
-    // The archived list holds chat 3, and nothing else.
+    // Archived list holds chat 3 only.
     single_shot(Duration::from_secs(3), move || unsafe {
         (*steps_ptr).push(("archived", call!("count")));
         call!("search", QString::from("chat 3"));
     });
 
-    // A term that matches the archived chat keeps it.
+    // Term matching archived chat keeps it.
     single_shot(Duration::from_secs(5), move || unsafe {
         (*steps_ptr).push(("hit", call!("count")));
         call!("search", QString::from("chat 1"));
     });
 
-    // A term that matches only an *ordinary* chat must empty the list --
-    // the archived page must not start showing unarchived hits.
+    // Term matching only ordinary chat empties list: archived page must not show it.
     single_shot(Duration::from_secs(7), move || unsafe {
         (*steps_ptr).push(("miss", call!("count")));
         (*engine_ptr).quit();

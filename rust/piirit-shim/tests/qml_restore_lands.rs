@@ -1,26 +1,17 @@
-//! A profile taken over from a backup file lands, whenever the core
-//! finishes reading it.
+//! Profile taken over from backup file lands, whenever core finishes reading it.
 //!
-//! Silica's page stack runs one transition at a time and refuses a move
-//! asked for during another -- on stderr, and nowhere a reader will ever
-//! look. The file browser is still animating away while the import runs,
-//! and a small backup is read in before it has finished, so the page's
-//! hand-over to the new profile's chats was asked for mid-transition and
-//! dropped. What the reader saw was the progress bar for a second and
-//! then "Restore from a backup" again, as though nothing had happened --
-//! with the profile imported behind it, which they found out about by
-//! restarting the app.
+//! Silica's page stack runs one transition at a time and refuses a move asked during
+//! another (stderr only). File browser still animating away during import; small
+//! backup read in before it finished. So hand-over to new profile's chats was dropped
+//! mid-transition: reader saw progress bar, then "Restore from a backup" again, with
+//! profile imported behind it (found by restarting app).
 //!
-//! So the move is held until the stack can make it
-//! (components/PendingNavigation.qml), and that is what this pins: the
-//! stack is busy the whole time the core is working, and the profile is
-//! still handed over once it is not.
+//! So move is held until stack can make it (components/`PendingNavigation.qml`).
+//! Pinned: stack busy whole time core works; profile still handed over after.
 //!
-//! The file browser is here for a second reason. It reports what was
-//! chosen by property change, which it can do more than once for one
-//! choice, and every import is an account of its own: two of them is the
-//! duplicate profile `restore_duplicate.rs` is about, arrived at without
-//! the reader ever asking twice.
+//! Browser here for a second reason: reports choice by property change, possibly more
+//! than once; each import is its own account. Two imports: duplicate profile
+//! (`restore_duplicate.rs`), without reader asking twice.
 
 // Qt harness: see qml_restore.rs.
 #![allow(
@@ -94,16 +85,14 @@ const PROBE_QML: &str = r"
     }
 ";
 
-// The engine, the QObject boxes and every step share one scope: all of
-// them have to outlive `exec()`.
+// Engine, QObject boxes, steps: one scope, must outlive `exec()`.
 #[test]
 #[allow(clippy::too_many_lines)]
 fn the_profile_that_arrived_is_handed_over_once_the_stack_is_free() {
     let temp = std::env::temp_dir().join(format!("piirit-qml-lands-{}", std::process::id()));
     let journal = common::fresh_journal(&temp);
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
-    // SAFETY: single-threaded, and set before Qt starts and before the
-    // server inherits them.
+    // SAFETY: single-threaded; set before Qt and server start.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_FAKE_JOURNAL", &journal);
@@ -127,8 +116,7 @@ fn the_profile_that_arrived_is_handed_over_once_the_stack_is_free() {
         .start(QString::from(env!("CARGO_BIN_EXE_fake-core-server")));
 
     let engine_ptr = std::ptr::addr_of_mut!(engine);
-    // SAFETY: these callbacks fire only while `exec()` is running on this
-    // thread, and `engine` outlives it.
+    // SAFETY: callbacks fire only while `exec()` runs; `engine` outlives it.
     macro_rules! call {
         ($name:expr $(, $arg:expr)*) => {{
             let result = unsafe {
@@ -143,9 +131,8 @@ fn the_profile_that_arrived_is_handed_over_once_the_stack_is_free() {
 
     let steps: common::Steps = Rc::new(RefCell::new(Vec::new()));
 
-    // 1s: the page, and a file chosen on it -- with the browser that
-    // chose it still animating away, which is what the stack being busy
-    // is. Chosen twice, as a picker reporting one choice twice would.
+    // 1s: page, and file chosen on it, browser still animating away (stack busy). Chosen
+    // twice, as a picker reporting one choice twice would.
     let s = steps.clone();
     single_shot(Duration::from_secs(1), move || {
         common::record(
@@ -163,8 +150,7 @@ fn the_profile_that_arrived_is_handed_over_once_the_stack_is_free() {
         common::record(&s, "busy", call!("pageProperty", "busy"));
     });
 
-    // 3s: the core has answered. The transfer is over, the move is not
-    // made yet, and the page holds its back gesture over it.
+    // 3s: core answered. Transfer over; move not made yet; page holds back gesture over it.
     let s = steps.clone();
     single_shot(Duration::from_secs(3), move || {
         common::record(&s, "transferring", call!("pageProperty", "busy"));
@@ -178,7 +164,7 @@ fn the_profile_that_arrived_is_handed_over_once_the_stack_is_free() {
         common::record(&s, "settled", call!("transition", "false"));
     });
 
-    // 4s: the stack is free, so the move it was holding is made.
+    // 4s: stack free: held move made.
     let s = steps.clone();
     single_shot(Duration::from_secs(4), move || {
         common::record(&s, "landed", call!("stackLog"));

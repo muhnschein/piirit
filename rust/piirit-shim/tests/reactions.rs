@@ -1,15 +1,8 @@
-//! Reacting to a message: what the tap sends, and what the row shows once
-//! the core has answered.
-//!
-//! A second tap on the same emoji takes the reaction off, and a different
-//! emoji replaces it -- one reaction per person, as the reference clients
-//! have it. The other end's reaction is seeded by the fake, so a chip that
-//! is not ours and the count our own adds to it are both on show.
+//! Reacting to a message: tap sends; row shows core's answer.
+//! Same emoji removes; other replaces (one per person). Fake seeds other end's reaction.
 
-// Qt harness: needs `unsafe` for `env::set_var` before Qt starts
-// (`unused_unsafe` because it is only unsafe from edition 2024 on),
-// `borrow_as_ptr` for the engine pointer, and `single_shot` with
-// whole-second Durations.
+// Qt harness: `unsafe` `env::set_var` before Qt starts (`unused_unsafe`: unsafe only from
+// edition 2024), `borrow_as_ptr` for engine pointer, `single_shot` with whole-second Durations.
 #![allow(
     unsafe_code,
     unused_unsafe,
@@ -70,13 +63,12 @@ fn a_tap_reacts_a_second_takes_it_off_and_another_emoji_replaces_it() {
     let journal = common::fresh_journal(&temp);
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
 
-    // SAFETY: single-threaded test binary; set before Qt starts and before
-    // the server inherits them.
+    // SAFETY: single-threaded; set before Qt and server.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_FAKE_JOURNAL", &journal);
         std::env::set_var("PIIRIT_ACCOUNTS_DIR", temp.join("accounts"));
-        // Ada has already reacted to the first message.
+        // Ada already reacted to first message.
         std::env::set_var("PIIRIT_FAKE_REACTED", "1");
     }
 
@@ -126,7 +118,7 @@ fn a_tap_reacts_a_second_takes_it_off_and_another_emoji_replaces_it() {
     single_shot(Duration::from_secs(5), move || unsafe {
         record!("joined", call!("chipsOf", 0));
         record!("mine-after", call!("mineOn", 0));
-        // The same emoji again.
+        // Same emoji again.
         call!("thumbsUp");
     });
     single_shot(Duration::from_secs(7), move || unsafe {
@@ -208,9 +200,7 @@ fn assert_outcome(calls: &[(String, Value)], steps: &[(&str, String)]) {
         "a second tap on the same emoji did not take ours off. {context}"
     );
     assert_eq!(value("mine-gone"), "", "{context}");
-    // Most frequent first, and equal counts by emoji: the core's own
-    // order, which the fake keeps, and in which the heart sorts before
-    // the thumb.
+    // Most frequent first, ties by emoji: core's order, fake keeps it; heart before thumb.
     assert_eq!(
         chips("replaced"),
         vec![
@@ -221,8 +211,7 @@ fn assert_outcome(calls: &[(String, Value)], steps: &[(&str, String)]) {
     );
     assert_eq!(value("mine-heart"), "❤️", "{context}");
 
-    // The row is re-read after each answer, so the tap shows at once
-    // rather than when the event gets round to it.
+    // Re-read after answer: instant tap feedback.
     let refetches = calls
         .iter()
         .filter(|(name, params)| {

@@ -1,11 +1,6 @@
-//! What the chat list's context menu sends: the exact calls, with the
-//! parameter shapes the core actually accepts (pinned by
-//! `deltachat-jsonrpc/tests/real_server.rs`).
+//! Chat-list context menu calls, with parameter shapes core accepts (pinned by `real_server.rs`).
 
-// Qt harness: needs `unsafe` for `env::set_var` before Qt starts
-// (`unused_unsafe` because it is only unsafe from edition 2024 on),
-// `borrow_as_ptr` for the engine pointer, and `single_shot` with
-// whole-second Durations.
+// Qt harness allows: unsafe `env::set_var`, borrow_as_ptr, whole-second single_shot.
 #![allow(
     unsafe_code,
     unused_unsafe,
@@ -51,8 +46,7 @@ fn the_context_menu_sends_what_the_core_expects() {
     let journal = common::fresh_journal(&temp);
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
 
-    // SAFETY: single-threaded test binary; set before Qt starts and before
-    // the server inherits them.
+    // SAFETY: single-threaded; set before Qt starts and before server inherits env.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_FAKE_JOURNAL", &journal);
@@ -111,8 +105,7 @@ fn the_context_menu_sends_what_the_core_expects() {
     assert_outcome(&common::calls(&journal), &before_delete, &report);
 }
 
-/// Every action reached the core in the shape it takes, and a deleted chat
-/// leaves the list.
+/// Every action reaches core in its shape; deleted chat leaves list.
 fn assert_outcome(calls: &[(String, Value)], before_delete: &str, report: &str) {
     let params_of = |method: &str| -> Vec<Value> {
         calls
@@ -132,8 +125,7 @@ fn assert_outcome(calls: &[(String, Value)], before_delete: &str, report: &str) 
         params_of("markfresh_chat").contains(&serde_json::json!([1, 2])),
         "mark_unread did not reach the core as markfresh_chat(1, 2). {context}"
     );
-    // Visibility is one method with a variant name, not one method each.
-    // The four actions are fired together and race, so assert on the set.
+    // One method with variant name; four actions race, so assert on the set.
     let visibility = params_of("set_chat_visibility");
     assert!(
         visibility.contains(&serde_json::json!([1, 1, "Pinned"]))

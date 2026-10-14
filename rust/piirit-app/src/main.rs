@@ -1,8 +1,6 @@
-//! Locates the server binary, the `qml/` directory and the translations,
-//! registers the context properties, and hands off to the QML engine.
+//! Find server, `qml/`, translations; run QML.
 
-// Shipped code is held to more than tests are; piirit-shim/src/lib.rs
-// says the rest.
+// Stricter lints for shipped code. See piirit-shim/src/lib.rs.
 #![cfg_attr(
     not(test),
     deny(
@@ -16,8 +14,7 @@
         clippy::get_unwrap
     )
 )]
-// See piirit-shim/src/lib.rs: qmetaobject's macros expand to references
-// across that crate, and upstream's own examples use the glob.
+// qmetaobject macros: glob imports. See piirit-shim/src/lib.rs.
 #![allow(clippy::wildcard_imports)]
 
 use std::path::PathBuf;
@@ -28,7 +25,7 @@ use qmetaobject::*;
 mod memory_log;
 mod translations;
 
-/// `PIIRIT_QML_DIR`, then the installed path, then the source tree.
+/// `PIIRIT_QML_DIR`, installed path, source tree.
 fn qml_dir() -> PathBuf {
     if let Ok(env) = std::env::var("PIIRIT_QML_DIR") {
         return PathBuf::from(env);
@@ -40,9 +37,7 @@ fn qml_dir() -> PathBuf {
     PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../qml")
 }
 
-/// Where the compiled catalogs are: `PIIRIT_TRANSLATIONS_DIR`, then
-/// the installed path, then the source tree -- where `make translations`
-/// puts them, beside the `.ts` files they are built from.
+/// Compiled catalogs: `PIIRIT_TRANSLATIONS_DIR`, installed, source tree.
 fn translations_dir() -> PathBuf {
     if let Ok(env) = std::env::var("PIIRIT_TRANSLATIONS_DIR") {
         return PathBuf::from(env);
@@ -55,40 +50,32 @@ fn translations_dir() -> PathBuf {
 }
 
 fn main() {
-    // First, while this is the only thread: the environment the browser
-    // engine reads when a call starts it, and passes on to the H.264
-    // encoder it starts for a call to an iPhone.
+    // First, while single-threaded: sets env the browser engine reads at call start and passes
+    // to the H.264 encoder (calls to iPhones).
     piirit_shim::prepare_media_plugins();
 
-    // `PIIRIT_MEMORY_LOG=<seconds>`: what the app and the core weigh,
-    // on stderr, for profiling on a device. See docs/BUILDING.md.
+    // `PIIRIT_MEMORY_LOG=<seconds>`: RSS to stderr. See docs/BUILDING.md.
     memory_log::start_from_env();
 
-    // Types QML instantiates itself, notably the per-chat message model.
+    // Types QML instantiates itself.
     piirit_shim::register_qml_types();
 
     let core = QObjectBox::new(DeltaChatCore::default());
 
-    // A `QQuickView`, not a bare `QmlEngine`: Silica's `ApplicationWindow`
-    // must be hosted in a view and shown, as `SailfishApp::createView()`
-    // does. An engine alone loads the QML but never creates a window.
+    // QQuickView, not bare engine: Silica `ApplicationWindow` must be hosted and shown, as
+    // `SailfishApp::createView()` does; engine alone never makes a window.
     let mut view = QQuickView::new();
 
-    // After the view, which is what makes the application object the
-    // translator hangs off; before the QML, which is translated as it is
-    // built and not again. A language with no catalog gets the English
-    // one, for its plural forms; every other string is English already.
+    // After view (makes app object translator hangs off), before QML (translated once, at
+    // build). Language without catalog gets English one, for plural forms.
     translations::install(&translations_dir().to_string_lossy(), "");
 
-    // Must exist before the QML is sourced, or bindings see undefined.
+    // Before QML sourced, or bindings see undefined.
     view.engine()
         .set_object_property("core".into(), core.pinned());
-    // `--rpc-server <path>`, then `PIIRIT_RPC_SERVER`, then the bundled
-    // binary -- and never `PATH`; see `piirit_shim::server_path`.
-    // Resolved here rather than set by the desktop entry: Sailfish
-    // launches `silica-qt5` apps through the invoker, which executes the
-    // binary itself, so an `Exec=env FOO=bar app` wrapper is not reliably
-    // honoured.
+    // `--rpc-server <path>`, then `PIIRIT_RPC_SERVER`, then bundled binary; never PATH.
+    // Resolved here, not desktop entry: Sailfish invoker execs binary itself, so `Exec=env`
+    // wrappers aren't reliably honoured. See `piirit_shim::server_path`.
     let server = piirit_shim::server_path(
         std::env::args().skip(1),
         std::env::var("PIIRIT_RPC_SERVER").ok(),
@@ -96,8 +83,7 @@ fn main() {
     view.engine()
         .set_property("rpcServerPath".into(), QString::from(server).into());
 
-    // Avatars, the introduction's drawings and a call's backdrop are made
-    // by the shim and drawn as plain images (piirit-shim/src/pictures.rs).
+    // Avatars, intro drawings, call backdrop: plain images from shim.
     piirit_shim::install_pictures(view.engine());
 
     let main_qml = qml_dir().join("piirit.qml");
@@ -105,7 +91,6 @@ fn main() {
     view.show();
     view.engine().exec();
 
-    // The window is gone; so should the server be, by our hand rather
-    // than by its own reaction to a closed pipe.
+    // Stop server by our hand, not on closed pipe.
     piirit_shim::shutdown();
 }

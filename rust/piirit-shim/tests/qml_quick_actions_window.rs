@@ -1,12 +1,9 @@
-//! The window's half of the cover's quick actions: whether the cover may
-//! offer them, and where a tap goes.
+//! Window's half of cover quick actions: whether cover may offer them, and where a tap goes.
 //!
-//! Not before there is a chat list to land on, and not while a page is up
-//! that must not be jumped away from -- a backup, a restore, a code being
-//! shown or read, anywhere in the stack. A tap is read against the
-//! settings and handed to the chat list with what it needs -- for a
-//! camera's action, whether that side sends what it takes at once; one of
-//! a kind this version does not know goes nowhere.
+//! Not before a chat list exists, nor while a page that must not be jumped away from is up
+//! (backup, restore, code shown or read), anywhere in stack. Tap is read against settings
+//! and handed to chat list with what it needs (camera action: whether that side sends at
+//! once). Unknown kind: goes nowhere.
 
 // Qt harness: see qml_startup.rs.
 #![allow(
@@ -24,8 +21,7 @@ use qmetaobject::*;
 
 mod common;
 
-/// The window, loaded the way `qml_last_profile` loads it, with the
-/// components directory imported so the probe can write the settings.
+/// Window, loaded as `qml_last_profile` loads it, components dir imported for settings.
 fn probe_qml(components: &std::path::Path) -> String {
     PROBE_QML.replace("__COMPONENTS__", &components.display().to_string())
 }
@@ -129,7 +125,7 @@ fn the_window_offers_quick_actions_when_it_can_take_them_and_passes_them_on() {
     // `EnterKey` has no stub; see common::qml_tree_without_enter_key.
     let tree = common::qml_tree_without_enter_key();
 
-    // SAFETY: single-threaded test binary; set before Qt starts.
+    // SAFETY: single-threaded; set before Qt starts.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_ACCOUNTS_DIR", temp.join("accounts"));
@@ -145,8 +141,7 @@ fn the_window_offers_quick_actions_when_it_can_take_them_and_passes_them_on() {
         common::stubs_dir().to_string_lossy().into_owned(),
     ));
     engine.set_object_property("core".into(), core_box.pinned());
-    // The real one is handed in by main.rs; the window starts the core
-    // with it.
+    // Real one handed in by main.rs; window starts core with it.
     engine.set_property(
         "rpcServerPath".into(),
         QString::from(env!("CARGO_BIN_EXE_fake-core-server")).into(),
@@ -189,7 +184,7 @@ fn the_window_offers_quick_actions_when_it_can_take_them_and_passes_them_on() {
 
     let root = format!("file://{}", tree.join("piirit.qml").display());
 
-    // SAFETY: the callbacks fire only while `exec()` runs on this thread.
+    // SAFETY: callbacks run only inside `exec()` on this thread.
     single_shot(Duration::from_secs(1), move || unsafe {
         record!("room-for-two", call!("count", 2));
         record!("set-left", set!("left", "search", 0, 0));
@@ -197,7 +192,7 @@ fn the_window_offers_quick_actions_when_it_can_take_them_and_passes_them_on() {
         record!("load", call!("load", QString::from(root.clone())));
         record!("call-wired", call!("callWired"));
 
-        // Nothing to land on yet: a phone still on its way to a profile.
+        // Nothing to land on yet: phone still on way to profile.
         record!("no-list", call!("allowed"));
         record!("no-list-tap", call!("tap", QString::from("left")));
 
@@ -207,17 +202,17 @@ fn the_window_offers_quick_actions_when_it_can_take_them_and_passes_them_on() {
         record!("tap-right", call!("tap", QString::from("right")));
         record!("tap-cover", call!("tapCover", QString::from("left")));
 
-        // With room for one, the right one is not there to be tapped.
+        // Room for one: right one not there to tap.
         record!("room-for-one", call!("count", 1));
         record!("tap-held", call!("tap", QString::from("right")));
         record!("back-to-two", call!("count", 2));
 
-        // A kind this version does not know goes nowhere.
+        // Unknown kind: goes nowhere.
         record!("set-odd", set!("left", "teapot", 0, 0));
         record!("tap-odd", call!("tap", QString::from("left")));
 
-        // A camera's action, handed over with whether it sends at once;
-        // the other side's setting is not this side's.
+        // Camera action handed over with whether it sends at once;
+        // other side's setting is not this side's.
         record!("set-camera", set!("left", "selfie-video", 0, 0));
         record!("tap-camera", call!("tap", QString::from("left")));
         record!(
@@ -228,7 +223,7 @@ fn the_window_offers_quick_actions_when_it_can_take_them_and_passes_them_on() {
         record!("set-right-camera", set!("right", "photo", 0, 0));
         record!("tap-right-not-now", call!("tap", QString::from("right")));
 
-        // The stack decides, wherever in it the page that pauses is.
+        // Stack decides, wherever the pausing page is.
         record!("plain", call!("stack", QString::from("conversation,chats")));
         record!("paused-top", call!("stack", QString::from("backup,chats")));
         record!(
@@ -237,7 +232,7 @@ fn the_window_offers_quick_actions_when_it_can_take_them_and_passes_them_on() {
         );
         record!("resumed", call!("stack", QString::from("chats")));
 
-        // And the list going takes the actions with it.
+        // List going takes actions with it.
         record!("unland", call!("land", QString::from("false")));
         record!("unlisted", call!("allowed"));
         (*engine_ptr).quit();

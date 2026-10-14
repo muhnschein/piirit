@@ -1,15 +1,8 @@
-//! A group after it has been made: renamed, given a picture, added to,
-//! removed from, and left -- and a one-to-one chat read the same way.
-//!
-//! Until this existed a group could be created and then never touched:
-//! `add_contact_to_chat` was reachable only from `create_group`. Each call
-//! here is asserted on the wire, and the model is watched to read back what
-//! the core then says.
+//! Group after creation: renamed, picture, members, leaving. 1:1 too.
+//! Was untouchable once made: `add_contact_to_chat` reachable only from `create_group`.
+//! Each call asserted on wire; model reads back core state.
 
-// Qt harness: needs `unsafe` for `env::set_var` before Qt starts
-// (`unused_unsafe` because it is only unsafe from edition 2024 on),
-// `borrow_as_ptr` for the engine pointer, and `single_shot` with
-// whole-second Durations.
+// Qt harness allows: unsafe `env::set_var`, borrow_as_ptr, whole-second single_shot.
 #![allow(
     unsafe_code,
     unused_unsafe,
@@ -26,8 +19,7 @@ use serde_json::Value;
 
 mod common;
 
-// Driven off the model answering rather than off a clock: each step waits
-// for the last one's reload to land, which is the thing being tested.
+// Model answers, not clock: each step waits for last reload.
 const PROBE_QML: &str = r"
     import QtQuick 2.0
     import Piirit 1.0
@@ -154,8 +146,7 @@ fn a_group_can_be_changed_after_it_is_made() {
     let journal = common::fresh_journal(&temp);
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
 
-    // SAFETY: single-threaded test binary; set before Qt starts and before
-    // the server inherits them.
+    // SAFETY: single-threaded; set before Qt starts and before server inherits env.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_FAKE_JOURNAL", &journal);
@@ -178,13 +169,12 @@ fn a_group_can_be_changed_after_it_is_made() {
     let mut report = String::new();
     let report_ptr: *mut String = std::ptr::addr_of_mut!(report);
 
-    // SAFETY for every block: these fire only while `exec()` runs on this
-    // thread, and `engine` outlives it.
+    // SAFETY for every block: fire only inside `exec()`; `engine` outlives it.
     single_shot(Duration::from_secs(1), move || unsafe {
         (*engine_ptr).load_data(QByteArray::from(PROBE_QML));
     });
 
-    // The backstop: reads whatever the steps got to and quits.
+    // Backstop: reads reached steps, quits.
     single_shot(Duration::from_secs(12), move || unsafe {
         let value = (*engine_ptr).invoke_method("report".into(), &[]);
         *report_ptr = QString::from_qvariant(value)
@@ -198,8 +188,7 @@ fn a_group_can_be_changed_after_it_is_made() {
     assert_changes(&common::calls(&journal), &report);
 }
 
-/// Every change went to the core as the one call it is, and the model read
-/// back what the core then held.
+/// One core call per change; model reads state back.
 #[allow(clippy::too_many_lines)]
 fn assert_changes(calls: &[(String, Value)], report: &str) {
     let names: Vec<&str> = calls.iter().map(|(name, _)| name.as_str()).collect();
@@ -219,8 +208,7 @@ fn assert_changes(calls: &[(String, Value)], report: &str) {
 
     assert_eq!(step, "11", "the scenario did not run to the end. {context}");
 
-    // The members came from the id list, with the account's own contact
-    // marked, and in the core's order.
+    // Members from id list, own contact marked, in core's order.
     assert!(
         names.contains(&"get_full_chat_by_id") && names.contains(&"get_contacts_by_ids"),
         "the group was never read from the core. {context}"
@@ -236,10 +224,7 @@ fn assert_changes(calls: &[(String, Value)], report: &str) {
         "the members were not looked up by the ids the chat named. {context}"
     );
 
-    // Every reload -- after the rename, the add and the removal, and on
-    // each event the core sent about them -- changed the rows in place.
-    // A reset would have rebuilt every member's row each time, and the
-    // two rows marked at the first load would be gone.
+    // Reloads change rows in place; reset drops first-load marks.
     assert_eq!(
         kept_after_add, "2",
         "a member joining rebuilt the rows of the members already there. {context}"
@@ -249,8 +234,7 @@ fn assert_changes(calls: &[(String, Value)], report: &str) {
         "a member leaving rebuilt the rows of the members who stayed. {context}"
     );
 
-    // Renaming: refused before the core for an empty name, skipped for the
-    // name it already has, and sent once for a real change.
+    // Rename: empty refused, same skipped, real sent once.
     let renames: Vec<&Value> = calls
         .iter()
         .filter(|(name, _)| name == "set_chat_name")
@@ -279,7 +263,6 @@ fn assert_changes(calls: &[(String, Value)], report: &str) {
         "the rename was not announced. {context}"
     );
 
-    // Adding and removing, each as the one call the core has for it.
     let added = calls
         .iter()
         .find(|(name, _)| name == "add_contact_to_chat")
@@ -301,8 +284,7 @@ fn assert_changes(calls: &[(String, Value)], report: &str) {
         "the member was not removed from this group. {context}"
     );
 
-    // The picture: a picker's URL unwrapped to the path the core wants,
-    // and null to clear it.
+    // Picture: picker URL to core path; null clears.
     let pictures: Vec<Value> = calls
         .iter()
         .filter(|(name, _)| name == "set_chat_profile_image")
@@ -318,8 +300,7 @@ fn assert_changes(calls: &[(String, Value)], report: &str) {
         "the cleared picture is still showing. {context}"
     );
 
-    // Disappearing messages: seconds to the core, and the model reads
-    // the timer back off the chat.
+    // Disappearing: seconds to core; timer read back.
     let timer = calls
         .iter()
         .find(|(name, _)| name == "set_chat_ephemeral_timer")
@@ -331,7 +312,6 @@ fn assert_changes(calls: &[(String, Value)], report: &str) {
         "the timer was not set on this chat. {context}"
     );
 
-    // The description comes from its own call, line breaks and all.
     assert!(
         names.contains(&"get_chat_description"),
         "the description was never read from the core. {context}"
@@ -340,8 +320,7 @@ fn assert_changes(calls: &[(String, Value)], report: &str) {
         first_description, "Walks\nBring boots",
         "the model did not load the description. {context}"
     );
-    // Setting: trimmed, multi-line kept, nothing for the text it already
-    // had, an empty text to clear, and the core's refusal said aloud.
+    // Setting: trimmed, multi-line kept, no-op if same, empty clears, refusal shown.
     let described: Vec<&Value> = calls
         .iter()
         .filter(|(name, _)| name == "set_chat_description")
@@ -366,8 +345,7 @@ fn assert_changes(calls: &[(String, Value)], report: &str) {
         "a group that has been left still offers a description edit. {context}"
     );
 
-    // Leaving is its own call, after which the core allows no edits and
-    // the model says so.
+    // Leaving: own call; core then refuses edits.
     assert!(
         names.contains(&"leave_group"),
         "leaving did not reach the core. {context}"
@@ -380,7 +358,7 @@ fn assert_changes(calls: &[(String, Value)], report: &str) {
         can_edit, "false",
         "a group that has been left still offers edits. {context}"
     );
-    // Grace stayed; Ada was removed and the account itself left.
+    // Grace stayed; Ada removed, account itself left.
     assert_eq!(
         members, "11,",
         "the members did not end up as the calls should have left them. {context}"

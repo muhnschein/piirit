@@ -1,17 +1,9 @@
-//! The row of tiles the onboarding pages ask their questions with.
-//!
-//! What is checked here is the row on its own: that every choice becomes
-//! a tile named after it, drawn with the theme icon and the words it was
-//! given, that a choice with nothing more to say draws no second line,
-//! that the tiles stand side by side at one height however much each of
-//! them says, that a choice that is off is off, and that tapping one
-//! says which was tapped. Where the tiles go is each page's business and
-//! is checked with the page (`qml_pages.rs`, `qml_restore.rs`).
+//! Onboarding choice tiles. Checked: tile per choice, named, icon and words; no second line without
+//! words; same height side by side; off choice off; tap says which. Placement tested per page
+//! (`qml_pages.rs`, `qml_restore.rs`).
 
-// Qt harness: needs `unsafe` for `env::set_var` before Qt starts
-// (`unused_unsafe` because it is only unsafe from edition 2024 on),
-// `borrow_as_ptr` for the engine pointer, and `single_shot` with
-// whole-second Durations.
+// Qt harness: `unsafe` env::set_var pre-Qt (`unused_unsafe`: unsafe only from edition 2024),
+// `borrow_as_ptr` for engine pointer, `single_shot` with whole-second Durations.
 #![allow(
     unsafe_code,
     unused_unsafe,
@@ -28,9 +20,8 @@ use qmetaobject::*;
 
 mod common;
 
-/// The row, loaded at a phone's width. The Loader is given a width and
-/// not a height: the row is as tall as its tiles need, and that is one
-/// of the things being read back.
+/// Loaded at phone width; Loader given width, not height: row is as tall as its tiles need, and
+/// that is read back.
 const PROBE_QML: &str = r"
     import QtQuick 2.0
     Item {
@@ -104,8 +95,7 @@ const PROBE_QML: &str = r"
     }
 ";
 
-/// Two ways on, as a page writes them: one of them with a second line
-/// and the other without, one of them off.
+/// Two ways on: one with second line, one without; one off.
 const CHOICES: &str = r#"[
     { "name": "about", "icon": "icon-m-about", "text": "About Delta Chat" },
     { "name": "setup", "mark": "account", "text": "Set up your profile",
@@ -113,8 +103,7 @@ const CHOICES: &str = r#"[
       "enabled": false }
 ]"#;
 
-/// Three ways in, as the page behind the profiles plus writes them: too
-/// many to stand side by side on a phone.
+/// Three ways in: too many side by side on phone.
 const THREE: &str = r#"[
     { "name": "createProfile", "icon": "icon-m-add", "text": "Create a profile",
       "hint": "An address made on this phone." },
@@ -126,13 +115,12 @@ const THREE: &str = r#"[
 
 type Steps = Rc<RefCell<Vec<(String, String)>>>;
 
-// A script of timed steps, in the order they happen, the way
-// qml_components.rs runs its own: splitting it would hide that order for
-// no gain -- what each tick reads depends on what the tick before it set.
+// Timed steps in order, as qml_components.rs: splitting hides order; each tick reads what prior
+// set.
 #[allow(clippy::too_many_lines)]
 #[test]
 fn a_row_of_tiles_is_named_drawn_and_answered_for() {
-    // SAFETY: single-threaded test binary; set before Qt starts.
+    // SAFETY: single-threaded; set pre-Qt.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
     }
@@ -144,8 +132,7 @@ fn a_row_of_tiles_is_named_drawn_and_answered_for() {
     engine.load_data(QByteArray::from(PROBE_QML));
 
     let engine_ptr = std::ptr::addr_of_mut!(engine);
-    // SAFETY: these callbacks fire only while `exec()` is running on this
-    // thread, and `engine` outlives it.
+    // SAFETY: runs only in `exec()`; `engine` outlives it.
     macro_rules! call {
         ($name:expr $(, $arg:expr)*) => {{
             let result = unsafe {
@@ -177,8 +164,7 @@ fn a_row_of_tiles_is_named_drawn_and_answered_for() {
         r("offer", call!("offer", CHOICES));
     });
 
-    // A tick later: the tiles are built, and each of them has measured
-    // what it needs.
+    // Tick later: tiles measured.
     let r = record.clone();
     single_shot(Duration::from_secs(2), move || {
         r(
@@ -225,7 +211,7 @@ fn a_row_of_tiles_is_named_drawn_and_answered_for() {
         r("picked", call!("pickedSoFar"));
     });
 
-    // 3s: the same row with three choices in it, stacked.
+    // 3s: three choices, stacked.
     let r = record.clone();
     single_shot(Duration::from_secs(3), move || {
         r("three", call!("offer", THREE));
@@ -275,11 +261,8 @@ fn a_row_of_tiles_is_named_drawn_and_answered_for() {
     assert_stack(&steps.borrow());
 }
 
-/// Three choices stand one under another, the full width of the row.
-///
-/// Side by side each of them had a third of the screen, which crowds a
-/// line of words with a second line under it -- the phone showed it on
-/// the page behind the profiles plus.
+/// Three stack, full row width: side by side, a third of screen each crowds a second line (seen
+/// on phone, page behind profiles plus).
 fn assert_stack(steps: &[(String, String)]) {
     let value = |label: &str| -> &str {
         steps
@@ -305,8 +288,7 @@ fn assert_stack(steps: &[(String, String)]) {
     };
     let boxes = ["first-box", "second-box", "third-box"];
     for label in boxes {
-        // The stub's margin is 24 and the row is 1080 across, so a
-        // stacked tile is the whole 1032 between the margins.
+        // Margin 24, row 1080: stacked tile 1032 wide.
         assert_eq!(
             (part(label, 0), part(label, 2)),
             (24.0, 1032.0),
@@ -339,10 +321,7 @@ fn assert_stack(steps: &[(String, String)]) {
          them. {context}"
     );
 
-    // And a stacked tile is a row: the icon at the left where an avatar
-    // would be, the words beside it rather than under it and ranged
-    // left (Text.AlignLeft is 1), with the quiet line squared up to the
-    // one above it.
+    // Stacked tile is a row: icon left, words beside, left-aligned (`Text.AlignLeft` = 1).
     let number = |label: &str| -> f64 { value(label).parse().unwrap_or_default() };
     assert!(
         number("row-icon-x") > 0.0 && number("row-icon-x") < 1032.0 / 4.0,
@@ -369,7 +348,7 @@ fn assert_stack(steps: &[(String, String)]) {
     );
 }
 
-/// What the step with this label reported, or a marker that it never ran.
+/// Step's report, or marker it never ran.
 fn step<'a>(steps: &'a [(String, String)], label: &str) -> &'a str {
     steps
         .iter()
@@ -377,22 +356,19 @@ fn step<'a>(steps: &'a [(String, String)], label: &str) -> &'a str {
         .map_or("<step did not run>", |(_, value)| value.as_str())
 }
 
-/// The row loaded and each tile shows what it was given: the theme icon
-/// or the drawn mark, the words, the quiet line only where there is one.
+/// Each tile: given icon or mark, words, quiet line if any.
 fn assert_row(steps: &[(String, String)]) {
     let value = |label: &str| step(steps, label);
     let context = format!("steps: {steps:?}");
     assert_eq!(value("load"), "ok", "the row did not load. {context}");
     assert_eq!(value("offer"), "ok", "the choices were refused. {context}");
 
-    // The icon a choice asked for, in the theme's colours: an icon named
-    // anything else is a tile with nothing on it.
+    // Icon the choice asked for, in theme colours: any other name is a tile with nothing on it.
     assert!(
         value("about-icon").starts_with("image://theme/icon-m-about?"),
         "the tile does not draw the theme icon it was given. {context}"
     );
-    // A choice that names a drawn mark gets the mark, and asks the theme
-    // for nothing; one that names an icon gets no mark.
+    // Named mark: mark, theme not asked; icon: no mark.
     assert_eq!(
         value("setup-mark"),
         "true",
@@ -414,16 +390,14 @@ fn assert_row(steps: &[(String, String)]) {
         "the tile does not say what it was given to say. {context}"
     );
 
-    // Side by side, the words are centred under the icon, which is
-    // Text.AlignHCenter -- 4.
+    // Side by side: words centred (`Text.AlignHCenter` = 4).
     assert_eq!(
         value("about-align"),
         "4",
         "the words under a side-by-side tile's icon are not centred. {context}"
     );
 
-    // The quiet line is there for a choice that has one and gone for a
-    // choice that has not -- not an empty line holding the row open.
+    // Quiet line only when choice has one.
     assert_eq!(
         value("about-hint"),
         "false",
@@ -438,14 +412,12 @@ fn assert_row(steps: &[(String, String)]) {
     assert_row_layout(steps);
 }
 
-/// Side by side inside the margins, both as tall as the one that needs
-/// most, off where a choice is off, and a tap says which tile it was.
+/// Side by side in margins, as tall as tallest; off choice off; tap says which tile.
 fn assert_row_layout(steps: &[(String, String)]) {
     let value = |label: &str| step(steps, label);
     let context = format!("steps: {steps:?}");
 
-    // The stub's margin is 24 and the row is 1080 across, so a tile is
-    // 516 wide and the second starts at 540.
+    // Stub margin 24, row 1080: tile 516 wide, second starts at 540.
     let part = |label: &str, index: usize| -> String {
         value(label)
             .split(',')
@@ -473,9 +445,7 @@ fn assert_row_layout(steps: &[(String, String)]) {
         "the tiles are of two heights: the row reads as blocks rather \
          than as a row. {context}"
     );
-    // And as tall as the tile that needs most: the one with a second
-    // line needs more than the one without, and that is what both are
-    // drawn at.
+    // As tall as tallest tile.
     let needed = |label: &str| -> f64 { value(label).parse().unwrap_or_default() };
     assert!(
         needed("setup-needed") > needed("about-needed"),
@@ -493,7 +463,7 @@ fn assert_row_layout(steps: &[(String, String)]) {
          than the row's. {context}"
     );
 
-    // A choice that is off is off, and one that never mentioned it is on.
+    // Off choice is off; one that never mentioned it is on.
     assert_eq!(
         value("setup-enabled"),
         "false",

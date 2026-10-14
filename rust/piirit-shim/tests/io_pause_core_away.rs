@@ -1,17 +1,9 @@
-//! A loss of network that the core was not there to hear about still
-//! stops IO once it is.
+//! Network loss core missed still stops IO once core is back.
 //!
-//! `io_pause.rs` is the ordinary case: the core is up, the network goes,
-//! IO stops. This is the other order. The core dies and is being restarted
-//! when the network goes; the loss is announced to a window whose core is
-//! away, and the shim resumes whatever IO was asked for under every core it
-//! restarts. Left alone, that core comes back with IO running against a
-//! network that is still not there and stays that way until connman next
-//! changes its mind -- the outage the stop exists to prevent, in full.
+//! `io_pause.rs` is the ordinary order. Here core dies and restarts while network goes. Restarted
+//! core would run IO on dead network: the outage the stop prevents.
 //!
-//! What has to happen instead: the window asks for the stop anyway, the
-//! shim forgets the IO it was asked for, and the restarted core starts
-//! none.
+//! Required: window stop still asked; shim forgets IO; restarted core starts none.
 
 // Qt harness: see qml_share.rs.
 #![allow(
@@ -29,7 +21,7 @@ use qmetaobject::*;
 
 mod common;
 
-/// Silica's `pageStack`; see `network_hint.rs`. Nothing here navigates.
+/// Silica's `pageStack`; see `network_hint.rs`. Never navigated.
 #[derive(QObject, Default)]
 struct StackProbe {
     base: qt_base_class!(trait QObject),
@@ -72,7 +64,7 @@ const PROBE_QML: &str = r"
     }
 ";
 
-/// How many times the core has been asked `name` so far.
+/// How many times core was asked `name`.
 fn count(journal: &std::path::Path, name: &str) -> String {
     common::methods(journal)
         .into_iter()
@@ -87,20 +79,16 @@ fn a_loss_the_core_was_away_for_still_stops_io_when_it_is_back() {
     let temp = std::env::temp_dir().join(format!("piirit-io-pause-away-{}", std::process::id()));
     let journal = common::fresh_journal(&temp);
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
-    // `EnterKey` has no stub; the window reaches pages that use it.
+    // `EnterKey` has no stub; window reaches pages using it.
     let tree = common::qml_tree_without_enter_key();
 
-    // SAFETY: single-threaded test binary; set before Qt starts and before
-    // the server inherits them.
+    // SAFETY: single-threaded; set before Qt starts and before server inherits env.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_FAKE_JOURNAL", &journal);
         std::env::set_var("PIIRIT_ACCOUNTS_DIR", temp.join("accounts"));
-        // Every server, including each replacement, dies a moment after it
-        // starts. The window's restarts then come one, two and four
-        // seconds apart, and the loss below is announced inside the
-        // four-second gap: after the third replacement has died, before
-        // the fourth is spawned. See `qml_core_gone.rs` for the same clock.
+        // Every server dies shortly after start. Restarts 1, 2, 4s apart; loss announced in 4s
+        // gap after third replacement dies. Same clock as `qml_core_gone.rs`.
         std::env::set_var("PIIRIT_FAKE_EXIT_AFTER_MS", "300");
     }
 
@@ -138,9 +126,7 @@ fn a_loss_the_core_was_away_for_still_stops_io_when_it_is_back() {
 
     let steps: common::Steps = common::Steps::default();
 
-    // t=1: the first server is spawned and IO is asked for. Each server
-    // dies a moment after it is up; the replacements come up at about
-    // 2.8, 4.8 and 9 seconds, so from about 5.1 to 9 the core is away.
+    // t=1: first server up, IO asked. Replacements up ~2.8, 4.8, 9s: core away ~5.1 to 9.
     let loading = steps.clone();
     single_shot(Duration::from_secs(1), move || unsafe {
         common::record(
@@ -150,7 +136,7 @@ fn a_loss_the_core_was_away_for_still_stops_io_when_it_is_back() {
         );
     });
 
-    // t=6.5: the core is away. The network goes, and stays gone.
+    // t=6.5: core away; network goes, stays gone.
     let away = steps.clone();
     let away_journal = journal.clone();
     single_shot(Duration::from_millis(6500), move || unsafe {
@@ -164,8 +150,7 @@ fn a_loss_the_core_was_away_for_still_stops_io_when_it_is_back() {
         call!("connman", QString::from("offline"));
     });
 
-    // t=7.8: the loss has been announced (at about 6.9) to a window
-    // whose core is still away.
+    // t=7.8: loss announced (~6.9) to window, core still away.
     let heard = steps.clone();
     let heard_journal = journal.clone();
     single_shot(Duration::from_millis(7800), move || unsafe {
@@ -178,8 +163,7 @@ fn a_loss_the_core_was_away_for_still_stops_io_when_it_is_back() {
         );
     });
 
-    // t=10.5: the fourth server came up at about 9 -- and must not have
-    // resumed IO.
+    // t=10.5: fourth server up ~9; must not resume IO.
     let back = steps.clone();
     let back_journal = journal;
     single_shot(Duration::from_millis(10_500), move || unsafe {

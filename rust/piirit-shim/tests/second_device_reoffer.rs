@@ -1,13 +1,10 @@
-//! An offer stopped and made again at once is the second offer's own.
+//! Stopped offer, offered again at once, is the second offer's own.
 //!
-//! A stopped provider answers `Ok`, and that answer is held for a second
-//! (`second_device.rs`'s `SETTLE`) in case the progress that says how it
-//! ended is still on its way. The reader can ask for the code again in
-//! that second. The held answer then ended the new offer on the page --
-//! "No device copied the profile", Cancel gone -- while the new provider
-//! went on running in the core, with the profile's IO paused and a live
-//! code on the network, and nothing left that could stop it: `cancel`
-//! saw an offer that was not running.
+//! Stopped provider's `Ok` is held a second (`second_device.rs`'s `SETTLE`) in
+//! case progress says how it ended. Re-ask within that second: the held answer
+//! ended the new offer on the page ("No device copied the profile", Cancel gone)
+//! while the provider kept running (profile IO paused, live code). Nothing could
+//! stop it: `cancel` saw no running offer.
 
 // Qt harness: see qml_pages.rs.
 #![allow(
@@ -41,9 +38,8 @@ const PROBE_QML: &str = r"
             target: core
             onCore_event: device.handle_event(context_id, kind, payload_json)
         }
-        // Asked for again a moment after Cancel: after the stopped
-        // provider has answered, and well inside the second its answer
-        // is held for.
+        // Asked again just after Cancel: after the stopped provider has
+        // answered, well inside the second its answer is held for.
         Timer {
             id: again
             interval: 300
@@ -63,7 +59,7 @@ fn an_offer_made_again_straight_after_cancel_is_not_ended_by_the_first() {
     let journal = common::fresh_journal(&temp);
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
 
-    // SAFETY: single-threaded test binary; set before Qt starts.
+    // SAFETY: single-threaded; set before Qt.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_FAKE_JOURNAL", &journal);
@@ -101,8 +97,7 @@ fn an_offer_made_again_straight_after_cancel_is_not_ended_by_the_first() {
         };
     }
 
-    // SAFETY for every block: these fire only while `exec()` runs on this
-    // thread, and everything they point at outlives it.
+    // SAFETY: fire only while `exec()` runs; all they point at outlives it.
     single_shot(Duration::from_secs(2), move || unsafe {
         record!("offer", call!("offer"));
     });
@@ -112,11 +107,11 @@ fn an_offer_made_again_straight_after_cancel_is_not_ended_by_the_first() {
         record!("cancel", call!("cancelAndAgain"));
     });
 
-    // Past the second the stopped provider's answer was held for.
+    // Past the held second.
     single_shot(Duration::from_secs(5), move || unsafe {
         record!("second", call!("state"));
         record!("said", call!("said"));
-        // And the second offer can still be stopped.
+        // Second offer still stoppable.
         record!("cancel-second", call!("cancel"));
     });
 

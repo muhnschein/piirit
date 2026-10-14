@@ -1,11 +1,7 @@
-//! The async round trip, end to end: a `qt_method` starts work on the
-//! background runtime and the result returns through `queued_callback` to
-//! mutate `qt_property`s on the Qt thread.
+//! Round trip: `qt_method` runs on background runtime; `queued_callback` sets
+//! `qt_property`s on the Qt thread.
 
-// Qt harness: needs `unsafe` for `env::set_var` before Qt starts
-// (`unused_unsafe` because it is only unsafe from edition 2024 on),
-// `borrow_as_ptr` for the engine pointer, and `single_shot` with
-// whole-second Durations.
+// Qt harness: `unsafe` `set_var` pre-Qt; `borrow_as_ptr`; whole-second timers.
 #![allow(
     unsafe_code,
     unused_unsafe,
@@ -20,8 +16,7 @@ use qmetaobject::*;
 
 #[test]
 fn health_check_round_trips_through_qt_event_loop() {
-    // SAFETY: single-threaded test binary, and Qt needs its platform before
-    // the first QGuiApplication.
+    // SAFETY: single-threaded; platform set before Qt.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
     }
@@ -29,7 +24,7 @@ fn health_check_round_trips_through_qt_event_loop() {
     let core_box = QObjectBox::new(DeltaChatCore::default());
 
     let mut engine = QmlEngine::new();
-    // Creates the backing C++ QObject, which `QPointer::from` requires.
+    // Backing C++ QObject; `QPointer::from` needs it.
     engine.set_object_property("core".into(), core_box.pinned());
     let core_ptr: QPointer<DeltaChatCore> = QPointer::from(core_box.pinned().borrow());
 
@@ -37,7 +32,7 @@ fn health_check_round_trips_through_qt_event_loop() {
     core_box.pinned().borrow_mut().start(server_path);
 
     let health_check_ptr = core_ptr;
-    // Whole seconds only; see clippy.toml.
+    // Whole seconds only (clippy.toml).
     single_shot(Duration::from_secs(1), move || {
         if let Some(this) = health_check_ptr.as_pinned() {
             this.borrow_mut().check_health();
@@ -46,8 +41,7 @@ fn health_check_round_trips_through_qt_event_loop() {
 
     let engine_ptr: *const QmlEngine = &engine;
     single_shot(Duration::from_secs(3), move || {
-        // SAFETY: fires only while `exec()` is running on this thread, and
-        // `engine` outlives it.
+        // SAFETY: fires only in `exec()`; `engine` outlives it.
         unsafe {
             (*engine_ptr).quit();
         }

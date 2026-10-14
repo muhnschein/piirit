@@ -1,10 +1,7 @@
-//! The "new messages" line: one row carries it, and it is the row the
-//! model pointed at.
+//! "New messages" line: one row carries it, the row the model points at.
 //!
-//! Drawn inside the row rather than as a section delegate, for the reason
-//! the day heading is (see `ConversationList.qml`), so what has to be
-//! shown is that the row it lands on grows by it -- a line drawn over the
-//! message under it would be worse than none.
+//! Drawn inside row, not as section delegate, as day heading is (`ConversationList.qml`):
+//! row it lands on must grow by it. Line drawn over message below is worse than none.
 
 // Qt harness: see qml_conversation_list.rs.
 #![allow(
@@ -21,7 +18,7 @@ use qmetaobject::*;
 
 mod common;
 
-/// The list, over a plain `ListModel` carrying the roles the real one has.
+/// Plain `ListModel` with real roles.
 const PROBE_QML: &str = r"
     import QtQuick 2.0
     Item {
@@ -111,7 +108,7 @@ const PROBE_QML: &str = r"
 #[test]
 #[allow(clippy::too_many_lines)]
 fn one_row_carries_the_line_and_makes_room_for_it() {
-    // SAFETY: single-threaded test binary; set before Qt starts.
+    // SAFETY: single-threaded; set before Qt starts.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
     }
@@ -146,7 +143,7 @@ fn one_row_carries_the_line_and_makes_room_for_it() {
     let list = common::component_url("ConversationList.qml");
     single_shot(Duration::from_secs(1), move || unsafe {
         record!("load", call!("load", QString::from(list.clone()), 3));
-        // Nothing unread: no line anywhere, and every row the same height.
+        // Nothing unread: no line, every row same height.
         record!("quiet", call!("pattern"));
         record!("quiet-heights", call!("heights"));
         record!("mark", call!("setMark", 2));
@@ -156,8 +153,7 @@ fn one_row_carries_the_line_and_makes_room_for_it() {
         record!("marked", call!("pattern"));
         record!("marked-heights", call!("heights"));
         record!("said", call!("said"));
-        // The line moves with the mark rather than staying where it was
-        // drawn.
+        // Line moves with mark.
         call!("setMark", 3);
     });
 
@@ -200,8 +196,7 @@ fn one_row_carries_the_line_and_makes_room_for_it() {
         value("said")
     );
 
-    // The row that carries it is taller by the line, and the others are
-    // untouched: drawn inside the row rather than over the message.
+    // Carrying row taller by the line; others untouched.
     let heights = |label: &str| -> Vec<f64> {
         value(label)
             .split(',')

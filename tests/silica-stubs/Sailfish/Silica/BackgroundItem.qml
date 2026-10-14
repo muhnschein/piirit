@@ -1,7 +1,7 @@
 import QtQuick 2.0
 
-// Silica's tappable row background: an Item with a press state and a
-// clicked() signal. `down` is what a label reads to highlight itself.
+// Silica row background: press state, clicked(). `down` lets label highlight
+// itself.
 Item {
     id: root
 

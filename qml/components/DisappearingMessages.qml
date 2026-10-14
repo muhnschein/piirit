@@ -2,38 +2,29 @@ import QtQuick 2.0
 import Sailfish.Silica 1.0
 
 /*
- * How long messages in a chat live: the same nine choices the reference
- * clients offer, from off to a year.
+ * Message lifetime: nine reference-client values, off to a year.
  *
- * The core is what decides. The chosen index is bound from it rather than
- * held here, and a tap asks the core for the other value; the binding then
- * shows whatever the core says -- the same arrangement as the read-receipt
- * switch, and for the same reason. Silica's ComboBox writes currentIndex
- * itself on a tap, which detaches the binding, so the page puts it back on
- * every load.
+ * Core decides; tap asks core. Silica ComboBox detaches binding on tap,
+ * so page restores it on every load.
  *
- * A duration another client set that is not on the list is said in the
- * largest unit that fits it, so it reads as "After 1 year" rather than as
- * a count of seconds.
+ * Off-list duration: largest unit that fits.
  */
 Column {
     id: root
 
-    /// Seconds, as the core holds them. 0 is off.
+    /// Seconds from core. 0 is off.
     property int seconds: 0
-    /// Whether a choice is offered at all.
+    /// Choice offered.
     property bool canChange: true
 
-    /// The reader picked a duration, in seconds.
+    /// Reader picked seconds.
     signal chosen(int seconds)
 
-    // In the reference clients' order.
+    // Reference clients' order.
     readonly property var choices: [0, 60, 300, 1800, 3600, 86400, 604800, 3024000, 31536000]
 
-    /// A duration in words: the largest unit it is at least one of, with
-    /// a decimal only when it is not a whole number of them. Two forms by
-    /// hand rather than qsTr's %n: without a loaded translation %n shows
-    /// the source text as it stands, "(s)" and all.
+    /// Duration as words, largest unit it fits.
+    /// Hand forms: untranslated qsTr %n shows raw "(s)".
     function words(value) {
         if (value <= 0) {
             return qsTr("Off")
@@ -72,7 +63,7 @@ Column {
         return -1
     }
 
-    /// Put the choice back to what the core holds.
+    /// Reset to core value.
     function refresh() {
         combo.currentIndex = root.indexOf(root.seconds)
     }
@@ -88,7 +79,7 @@ Column {
         width: parent.width
         label: qsTr("Disappearing messages")
         enabled: root.canChange
-        // On the list or not, the duration is said the same way.
+        // Same wording on or off list.
         value: root.words(root.seconds)
 
         menu: ContextMenu {

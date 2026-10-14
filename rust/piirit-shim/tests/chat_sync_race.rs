@@ -1,11 +1,7 @@
-//! The reverse of `chat_send_race`: the send's reply lands while the event's
-//! own reconciliation is still in flight, so that reconciliation must not
-//! append the row again.
+//! Reverse of `chat_send_race`: send reply lands during event's reconciliation; must not append row
+//! twice.
 
-// Qt harness: needs `unsafe` for `env::set_var` before Qt starts
-// (`unused_unsafe` because it is only unsafe from edition 2024 on),
-// `borrow_as_ptr` for the engine pointer, and `single_shot` with
-// whole-second Durations.
+// Qt harness: unsafe set_var pre-Qt; borrow_as_ptr; whole-second single_shot.
 #![allow(
     unsafe_code,
     unused_unsafe,
@@ -40,14 +36,12 @@ fn a_send_answered_mid_fetch_lands_once() {
     let journal = common::fresh_journal(&temp);
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
 
-    // SAFETY: single-threaded test binary; set before Qt starts and before
-    // the server inherits them.
+    // SAFETY: single-threaded; set before Qt starts and before server inherits env.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_FAKE_JOURNAL", &journal);
         std::env::set_var("PIIRIT_ACCOUNTS_DIR", temp.join("accounts"));
-        // The event goes out first, the send's reply lands next, and the
-        // fetch that event triggered comes back last.
+        // Event out first, send reply next, event's fetch last.
         std::env::set_var("PIIRIT_FAKE_SEND_DELAY_MS", "150");
         std::env::set_var("PIIRIT_FAKE_FETCH_DELAY_MS", "400");
     }
@@ -84,12 +78,8 @@ fn a_send_answered_mid_fetch_lands_once() {
 
     let names = common::methods(&journal);
 
-    // The event's reconciliation has to have run, or the ordering under
-    // test never happened. It is the id list that has to have been read,
-    // not the message: the send's own reply put the row in, so the
-    // reconciliation finds it already there and fetches nothing. That *is*
-    // the duplicate not being made, rather than a fetch noticing one step
-    // later that the row it asked for was already present.
+    // Reconciliation must run or ordering untested. Id list read, not message: reply already put
+    // row in, so nothing fetched.
     assert!(
         names
             .iter()
@@ -98,7 +88,7 @@ fn a_send_answered_mid_fetch_lands_once() {
         "the event never reconciled after the send: {names:?}"
     );
 
-    // Two seeded messages plus the one just sent.
+    // Two seeded + one sent.
     assert_eq!(
         count_after_send, 3,
         "the sent message was added twice: {names:?}"

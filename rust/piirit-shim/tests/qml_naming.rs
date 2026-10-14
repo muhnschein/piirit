@@ -1,11 +1,8 @@
-//! `qmetaobject` exposes Rust identifiers to QML verbatim, `snake_case` and
-//! all. Every `.qml` file depends on that, so it is pinned with a real load
-//! rather than assumed.
+//! `qmetaobject` exposes Rust names to QML verbatim, `snake_case` too. Every `.qml` file depends
+//! on it, so pinned with a real load, not assumed.
 
-// Qt harness: needs `unsafe` for `env::set_var` before Qt starts
-// (`unused_unsafe` because it is only unsafe from edition 2024 on),
-// `borrow_as_ptr` for the engine pointer, and `single_shot` with
-// whole-second Durations.
+// Qt harness: `unsafe` for `env::set_var` pre-Qt. Lints: `unused_unsafe`
+// (edition 2024+), `borrow_as_ptr`, `single_shot` whole secs.
 #![allow(
     unsafe_code,
     unused_unsafe,
@@ -20,7 +17,7 @@ use qmetaobject::*;
 
 #[test]
 fn methods_properties_and_signals_are_exposed_verbatim_snake_case() {
-    // SAFETY: see the same justification in tests/smoke.rs.
+    // SAFETY: same justification as tests/smoke.rs.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
     }
@@ -32,7 +29,7 @@ fn methods_properties_and_signals_are_exposed_verbatim_snake_case() {
     let server_path = QString::from(env!("CARGO_BIN_EXE_fake-health-server"));
     core_box.pinned().borrow_mut().start(server_path);
 
-    // A wrong method, property or handler name leaves this QML unbound.
+    // Wrong name: QML unbound.
     let qml = r"
         import QtQuick 2.0
         Item {
@@ -58,7 +55,7 @@ fn methods_properties_and_signals_are_exposed_verbatim_snake_case() {
 
     let engine_ptr: *const QmlEngine = &engine;
     single_shot(Duration::from_secs(8), move || {
-        // SAFETY: see tests/smoke.rs -- same lifetime argument.
+        // SAFETY: same lifetime argument as tests/smoke.rs.
         unsafe {
             (*engine_ptr).quit();
         }

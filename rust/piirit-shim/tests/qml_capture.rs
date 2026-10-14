@@ -1,12 +1,8 @@
-//! The camera page: a still is reported once it is written, a video once
-//! the recorder has finished with it, and the page takes itself down
-//! with either.
+//! Camera page: still reported once written, video once recorder done; page pops after either.
 //!
-//! Driven through the `QtMultimedia` stubs, which record what the page
-//! asked for and let the test answer the way the backend does: a still
-//! lands where it was asked to go, a video is finalised after it is
-//! stopped and only then has a location -- and a recorder that ignores
-//! its stop, which a phone's did, is finished by stopping the camera.
+//! Via `QtMultimedia` stubs recording asks and answering as backend does: still lands where asked,
+//! video finalised after stop and only then has a location. Recorder ignoring stop (a phone's did)
+//! is finished by stopping camera.
 
 // Qt harness: see qml_chat_list.rs.
 #![allow(
@@ -15,8 +11,7 @@
     clippy::borrow_as_ptr,
     clippy::disallowed_methods,
     clippy::expect_used,
-    // qt_method! declarations must match the generated dispatcher's
-    // by-value parameters; see piirit-shim/src/lib.rs.
+    // `qt_method!` params match dispatcher (`piirit-shim/src/lib.rs`).
     clippy::needless_pass_by_value
 )]
 
@@ -26,8 +21,7 @@ use qmetaobject::*;
 
 mod common;
 
-/// Silica's `pageStack`, recorded rather than performed: the page pops
-/// itself once it has answered.
+/// Silica's `pageStack`, recorded not performed: page pops itself once it has answered.
 #[derive(QObject, Default)]
 struct StackProbe {
     base: qt_base_class!(trait QObject),
@@ -119,8 +113,7 @@ fn a_still_and_a_video_are_reported_once_written_and_the_page_leaves() {
     let temp = std::env::temp_dir().join(format!("piirit-capture-{}", std::process::id()));
     std::fs::create_dir_all(&temp).expect("create temp dir");
 
-    // SAFETY: single-threaded test binary; set before Qt starts. The
-    // captures go under the cache directory, pointed at this test's own.
+    // SAFETY: single thread. Captures under this test's cache dir.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("XDG_CACHE_HOME", &temp);
@@ -171,23 +164,21 @@ fn a_still_and_a_video_are_reported_once_written_and_the_page_leaves() {
             "load",
             call!("load", QString::from(common::page_url("CapturePage.qml")))
         );
-        // A page loaded on its own is the one on screen, so the camera
-        // runs from the start.
+        // Page alone on screen: camera runs.
         record!("running", call!("running"));
         probe!("mode", "modeColumn", "enabled");
         record!("still-face", call!("shutterIcon"));
-        // Held upright, the sensor's landscape frame needs a quarter turn;
-        // on its left side, none; on its right, a half. The stub's sensor
-        // is mounted at 90 degrees, as a phone's back camera is.
+        // Sensor's landscape frame: quarter turn held upright; none on left side, half on right.
+        // Stub sensor mounted at 90 degrees, as a phone's back camera.
         record!("turn-upright", call!("turn", 1));
         record!("turn-left", call!("turn", 3));
         record!("turn-right", call!("turn", 4));
         record!("turn-upside-down", call!("turn", 2));
-        // Face down says nothing about the turn: the last one stays.
+        // Face down: turn unchanged.
         record!("turn-face-down", call!("turn", 6));
         record!("shutter", call!("tap", QString::from("shutter")));
         record!("still-asked", call!("requestedStill"));
-        // Nothing reported until the file is on disk.
+        // Nothing reported until file on disk.
         record!("still-early", call!("pickedPath"));
         record!("still-written", call!("stillWritten"));
         record!("still-picked", call!("pickedPath"));
@@ -203,20 +194,19 @@ fn a_still_and_a_video_are_reported_once_written_and_the_page_leaves() {
             "reload",
             call!("load", QString::from(common::page_url("CapturePage.qml")))
         );
-        // The mode is switched from the stacked buttons, and the camera
-        // is running again afterwards.
+        // Mode switched from stacked buttons; camera runs after.
         record!("video-mode", call!("tap", QString::from("modeOption1")));
         record!("running-in-video-mode", call!("running"));
         record!("record", call!("tap", QString::from("shutter")));
-        // What the page shows is the recorder's state, not its own.
+        // Page shows recorder's state.
         record!("recording", call!("shutterIcon"));
         probe!("time-shown", "recordingIndicator", "visible");
         record!("video-asked", call!("requestedVideo"));
-        // The mode cannot be switched under a running recording.
+        // No mode switch under recording.
         probe!("mode-locked", "modeColumn", "enabled");
         record!("stop", call!("tap", QString::from("shutter")));
         record!("stopped-state", call!("recorderState"));
-        // Stopped is not finished: nothing is reported yet.
+        // Stopped is not finished.
         record!("video-early", call!("pickedPath"));
         record!("video-finished", call!("videoFinished"));
         record!("video-picked", call!("pickedPath"));
@@ -227,8 +217,7 @@ fn a_still_and_a_video_are_reported_once_written_and_the_page_leaves() {
     });
 
     single_shot(Duration::from_secs(3), move || unsafe {
-        // A recorder that does not act on its stop: the page stops the
-        // camera a moment later, which finishes the file.
+        // Recorder ignoring stop: camera stop finishes file.
         record!(
             "reload-stubborn",
             call!("load", QString::from(common::page_url("CapturePage.qml")))
@@ -248,21 +237,20 @@ fn a_still_and_a_video_are_reported_once_written_and_the_page_leaves() {
             "stubborn-pops",
             (*stack_ptr).pinned().borrow().pops.to_string()
         );
-        // Leaving the page stops the camera.
+        // Leaving page stops camera.
         record!(
             "reload-again",
             call!("load", QString::from(common::page_url("CapturePage.qml")))
         );
         record!("before-leaving", call!("running"));
-        // In the background the camera and the sensor stop, and come
-        // back with the app.
+        // Background: camera, sensor stop; back with app.
         record!("away", call!("background", true));
         record!("away-running", call!("running"));
         probe!("away-sensor", "orientationSensor", "active");
         record!("back", call!("background", false));
         record!("back-running", call!("running"));
         probe!("back-sensor", "orientationSensor", "active");
-        // But a video being recorded goes on there.
+        // Recording goes on in background.
         record!(
             "away-video-mode",
             call!("tap", QString::from("modeOption1"))
@@ -315,8 +303,7 @@ fn a_still_and_a_video_are_reported_once_written_and_the_page_leaves() {
         ["90", "0", "180", "270", "270"],
         "the turn written into a capture does not follow the phone. {context}"
     );
-    // What the page asks for is the exact name, extension and all: it is
-    // what the other end sees the file called.
+    // Asked name exact, extension included: it's what the other end sees the file called.
     let still = value("still-asked");
     assert!(
         still.contains("/captures/photo-") && still.rsplit('.').next() == Some("jpg"),

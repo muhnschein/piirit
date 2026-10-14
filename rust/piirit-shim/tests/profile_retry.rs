@@ -1,24 +1,13 @@
-//! Giving up on a relay, and trying another one.
+//! Giving up on a relay, and trying another.
 //!
-//! The double's `slow` relay holds the transport call the way a relay
-//! that is down holds the real core: for longer than anyone waits. What
-//! is pinned here is what the shim does around that (`src/signup.rs`):
+//! Double's `slow` relay holds transport call as a down relay holds real core. Pinned
+//! (`src/signup.rs`): cancelled attempt answers nobody, and retry doesn't take the account core
+//! still configures (core refuses "There is already another ongoing process running"). Attempt past
+//! deadline: process stopped, page told how long it waited, late profile removed.
 //!
-//! - a cancelled attempt answers nobody, and the retry after it does not
-//!   pick up the account the core is still configuring -- which the real
-//!   core refuses with "There is already another ongoing process
-//!   running", and which the double refuses in the same words;
-//! - an attempt that outlives its deadline is given up on: the process
-//!   is stopped, the page is told how long it waited, and a profile the
-//!   relay makes after all is removed rather than kept.
-//!
-//! Contract tests, as `onboarding.rs`: one Qt event loop against the
-//! recording double, then its journal.
+//! Contract tests as `onboarding.rs`.
 
-// Qt harness: needs `unsafe` for `env::set_var` before Qt starts
-// (`unused_unsafe` because it is only unsafe from edition 2024 on),
-// `borrow_as_ptr` for the engine pointer, and `single_shot` with
-// whole-second Durations.
+// Qt harness: unsafe set_var pre-Qt; borrow_as_ptr; whole-second single_shot.
 #![allow(
     unsafe_code,
     unused_unsafe,
@@ -35,8 +24,7 @@ use serde_json::Value;
 
 mod common;
 
-/// Records what the shim signalled, in the Qt 5.6 dialect with the
-/// shim's `snake_case` names.
+/// Records shim's signals, Qt 5.6 dialect, `snake_case` names.
 const PROBE_QML: &str = r"
         import QtQuick 2.0
         Item {
@@ -71,15 +59,12 @@ fn a_relay_given_up_on_is_neither_reused_nor_kept() {
     let accounts = temp.join("accounts");
     std::fs::create_dir_all(&accounts).expect("create temp dirs");
 
-    // SAFETY: single-threaded test binary, and all of these have to be
-    // set before Qt initialises and before the shim spawns the server
-    // that inherits them.
+    // SAFETY: single-threaded; all set pre-Qt and before shim spawns server.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_FAKE_JOURNAL", &journal);
         std::env::set_var("PIIRIT_ACCOUNTS_DIR", &accounts);
-        // The slow relay answers three and a half seconds after it is
-        // asked: between the ticks below, never on one.
+        // Slow relay answers 3.5s after asked: between ticks, never on one.
         std::env::set_var("PIIRIT_FAKE_SLOW_MS", "3500");
     }
 
@@ -105,7 +90,7 @@ fn a_relay_given_up_on_is_neither_reused_nor_kept() {
         }
     });
 
-    // 2s: the reader gives up on it.
+    // 2s: reader gives up on it.
     let cancel = core_ptr.clone();
     single_shot(Duration::from_secs(2), move || {
         if let Some(this) = cancel.as_pinned() {
@@ -113,7 +98,7 @@ fn a_relay_given_up_on_is_neither_reused_nor_kept() {
         }
     });
 
-    // 3s: and tries another, while the core is still on the first.
+    // 3s: tries another, while core still on first.
     let retry = core_ptr.clone();
     single_shot(Duration::from_secs(3), move || {
         if let Some(this) = retry.as_pinned() {
@@ -123,8 +108,7 @@ fn a_relay_given_up_on_is_neither_reused_nor_kept() {
         }
     });
 
-    // 6s: a relay that answers late -- after the two seconds it is
-    // given here, and deaf to the stop that comes at the end of them.
+    // 6s: relay answers late, after the two seconds given, deaf to the stop.
     let deaf = core_ptr;
     single_shot(Duration::from_secs(6), move || {
         if let Some(this) = deaf.as_pinned() {
@@ -138,8 +122,7 @@ fn a_relay_given_up_on_is_neither_reused_nor_kept() {
 
     let engine_ptr: *const QmlEngine = &engine;
     single_shot(Duration::from_secs(11), move || {
-        // SAFETY: see tests/smoke.rs -- the callback only fires while
-        // `exec()` is still running on this thread.
+        // SAFETY: see tests/smoke.rs; callback fires only while `exec()` runs.
         unsafe {
             (*engine_ptr).quit();
         }
@@ -158,8 +141,7 @@ fn a_relay_given_up_on_is_neither_reused_nor_kept() {
     assert_late_profile_was_removed(&calls, &context);
 }
 
-/// One profile, on the retry's account; no error for the cancelled
-/// attempt; one time-out, saying how long it waited.
+/// One profile, on retry's account; no error for cancelled attempt; one time-out with its wait.
 fn assert_signals(summary: &str, context: &str) {
     assert!(!summary.is_empty(), "the probe QML never loaded. {context}");
     assert_eq!(
@@ -168,9 +150,8 @@ fn assert_signals(summary: &str, context: &str) {
     );
 }
 
-/// The retry did not pick up the account the core was still holding:
-/// the transport calls went to accounts 1, 2 and then -- once the first
-/// was let go of -- 1 again, and the first was stopped when cancelled.
+/// Retry didn't take account core still held: transport calls went to accounts 1, 2, then 1
+/// again once let go; first stopped when cancelled.
 fn assert_retry_took_a_fresh_account(calls: &[(String, Value)], context: &str) {
     let transports: Vec<(u64, String)> = calls
         .iter()
@@ -208,9 +189,7 @@ fn assert_retry_took_a_fresh_account(calls: &[(String, Value)], context: &str) {
     );
 }
 
-/// The relay that answered after its time was up made a profile nobody
-/// was waiting for, and the shim removed it -- after the answer, not
-/// before.
+/// Late relay's profile removed after answer, not before.
 fn assert_late_profile_was_removed(calls: &[(String, Value)], context: &str) {
     let last_transport = calls
         .iter()

@@ -1,84 +1,55 @@
 import QtQuick 2.0
 
 /*
- * One move of the page stack, held until the stack can actually make it.
+ * Page-stack move, held until stack can make it.
  *
- * Silica's PageStack runs one transition at a time. A push or a replace
- * asked for while another is still running is refused, and it says so on
- * stderr and nowhere a reader will ever look -- the app simply stays
- * where it was. That is fine for a move a tap asked for, because a tap
- * lands between transitions; it is not fine for a move the *core* asked
- * for, because the core answers whenever it answers.
+ * Silica's PageStack refuses push/replace mid-transition, logging only to
+ * stderr. Fine for taps, not core moves (backup import, last-profile delete
+ * lost moves on phone).
  *
- * Both of the ones that matter were met on a phone. A backup finishes
- * importing while the file browser that chose it is still animating
- * away, so the page that was to hand over to the new profile's chats
- * asked while the stack was busy, was refused, and dropped back to
- * "Restore from a backup" with the profile imported behind it. And the
- * last profile is deleted as the profiles page is leaving, so the move
- * back to the welcome page is asked for mid-pop and refused, leaving a
- * chat list open on an account that no longer exists.
- *
- * So the move is kept here and tried again until it goes. `busy` is
- * Silica's own property; a stack that declares none -- the test
- * harness's probe -- is never busy, and the move is made at once.
- * `ready` is the owner's own condition, which a page sets to "I am the
- * page on screen": a page with a picker over it is not one Silica will
- * move from either.
- *
- * And a page with a call over it must not move at all. A call's page
- * is pushed over whatever is on screen (CallCenter.qml), and every move
- * here acts on the top of the stack -- a pop takes the top page, and a
- * replace everything above its target -- so a move made then takes the
- * call's page, and the call with it. So a move waits for `ready` for as
- * long as it takes, and `patience` only bounds the wait on a stack that
- * is busy: the page being on screen again is what makes the move its own.
+ * So retry until done. `busy`: Silica's property (absent in test probe: never
+ * busy). `ready`: owner's own condition, page on screen with nothing over it
+ * (Silica won't move from under a picker either). Call page over owner must
+ * not move: moves act on stack top, taking call page and call with it
+ * (CallCenter.qml). So waits for `ready` indefinitely; `patience` only bounds
+ * busy waits.
  */
 QtObject {
     id: root
 
-    /// The stack to move. Handed over by whoever owns one of these: a
-    /// `pageStack` is a context property, and this cannot reach it.
+    /// Stack to move. Owner passes it: `pageStack` is unreachable here.
     property var stack: null
 
-    /// Whether the owner is in a position to move at all. A page sets
-    /// `page.status === PageStatus.Active`: the page on screen, with
-    /// nothing over it.
+    /// Owner can move: page sets `page.status === PageStatus.Active` (on screen,
+    /// nothing over it).
     property bool ready: true
 
-    /// Whether a move is waiting to be made. A page with one waiting
-    /// closes its back gesture over it: swiping away would take the
-    /// page, and the move with it.
+    /// Move waiting. Page with one closes back gesture (swipe takes move too).
     readonly property bool pending: root._move !== null
 
-    /// How often to look again while the stack is mid-transition.
+    /// Retry period mid-transition, ms.
     property int retryInterval: 50
 
-    /// How long to keep trying while the stack is busy, in
-    /// milliseconds. A page transition is a few hundred of them; this is
-    /// well past any of them, and it is here so that a stack which never
-    /// goes quiet leaves a timer running for a few seconds rather than
-    /// for the rest of the day.
+    /// Max wait on busy stack, ms. Stops never-quiet stack leaving timer alive.
     property int patience: 5000
 
-    /// The move waiting, as `{ kind, target, page, properties }`, or null.
+    /// Move waiting: `{ kind, target, page, properties }`, or null.
     property var _move: null
-    /// Milliseconds spent waiting for this one.
+    /// Ms spent waiting on it.
     property int _waited: 0
 
-    /// Replace everything above `target` with `page` -- now, or as soon
-    /// as the stack is finished with whatever it is doing.
+    /// Replace all above `target` with `page`, now or once stack idle.
     function replaceAbove(target, page, properties) {
         root._hold({ kind: "replaceAbove", target: target, page: page,
                      properties: properties })
     }
 
-    /// Replace the owner with `page`, once the owner is on top.
+    /// Replace owner with `page`, once owner on top.
     function replace(page, properties) {
         root._hold({ kind: "replace", page: page, properties: properties })
     }
 
-    /// Take the owner off the stack, once it is on top.
+    /// Pop owner, once on top.
     function pop() {
         root._hold({ kind: "pop" })
     }
@@ -89,26 +60,23 @@ QtObject {
         root._go()
     }
 
-    /// Drop a move not yet made. Nothing in the app calls this; it is
-    /// here so that a page which changes its mind has a way to say so.
+    /// Drop move not yet made. Unused in app; lets page change its mind.
     function forget() {
         root._move = null
         root._retry.stop()
     }
 
-    /// Make the move, or arrange to look again.
+    /// Make move, or retry later.
     function _go() {
         if (!root._move || !root.stack) {
             return
         }
-        // Not until the owner is on screen, however long: looked at
-        // again when it is (`onReadyChanged`).
+        // Wait until owner on screen. `onReadyChanged` retries.
         if (!root.ready) {
             root._retry.stop()
             return
         }
-        // `=== true` rather than a plain test: a stack without the
-        // property hands back undefined, which is not "busy".
+        // `=== true`: stack without property gives undefined, not busy.
         if (root.stack.busy === true && root._waited < root.patience) {
             root._waited += root.retryInterval
             root._retry.restart()

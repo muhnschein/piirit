@@ -1,16 +1,11 @@
-//! The relays on the profile page, and what can be done with them.
+//! Relays on profile page: listed, removed, added.
 //!
-//! A profile can be reached through several relays at once, one of them
-//! carrying the profile's own address. The page lists them with that one
-//! first, and reports on each by itself -- the core's own words about its
-//! connection, and its mailbox off the core's report; a row's menu
-//! removes that relay after Silica's countdown, and removing the one with
-//! the profile's own address on it moves the address to another; the
-//! last relay cannot be removed; and the plus under the rows opens the
-//! page that adds one, whose answer lands back in the list. The core's
-//! refusals reach the page in the core's own words. No row says which
-//! relay mail leaves through: the core picks that each time it connects,
-//! and does not say.
+//! Profile may use several relays; one carries its own address. That one listed first; each
+//! row reports itself (core's connection words, mailbox off core's report). Row menu removes
+//! after Silica countdown; removing the address holder moves address on; last
+//! relay can't go; plus opens add-relay page, answer lands in list. Core refusals
+//! in core's words. No row says which relay mail leaves through: core picks per connect,
+//! unsaid.
 
 // Qt harness: see qml_chat_list.rs.
 #![allow(
@@ -29,23 +24,20 @@ use serde_json::Value;
 
 mod common;
 
-/// The address `misname` asks the core to remove, which no relay of the
-/// profile's has.
+/// Address `misname` asks core to remove; no relay has it.
 const MISNAMED: &str = "nobody@nowhere.example";
 
-/// Two loaders: the profile page, and the page that adds a relay over
-/// it, so that what the second does can be seen landing on the first.
+/// Profile page and add-relay page over it, to see answer land.
 const PROBE_QML: &str = r"
     import QtQuick 2.0
     import Sailfish.Silica 1.0
     Item {
         id: probe
 
-        // Silica's `pageStack`, recorded rather than performed: which
-        // page the plus opens and with which profile, and that the page
-        // that adds a relay goes away once it has. In QML rather than as
-        // a QObject on the Rust side, since a page loaded by a Loader
-        // reads `pageStack` off the file the Loader was declared in.
+        // Silica's `pageStack`, recorded not performed: which page the plus
+        // opens, with which profile, and that the add-relay page goes away
+        // once it has. In QML, not a QObject: a Loader-loaded page reads
+        // `pageStack` off the file the Loader was declared in.
         property QtObject pageStack: QtObject {
             // `push:AddRelayPage.qml|pop|...`
             property string log: ''
@@ -72,10 +64,8 @@ const PROBE_QML: &str = r"
             sub.setSource(url, { accountId: accountId })
             return sub.status === Loader.Ready ? 'ok' : 'load-failed'
         }
-        // `data` rather than `children`: the shim objects are plain
-        // QObjects, so they are not among an Item's visual children.
-        // A row's ContextMenu is held in a property, so it is in neither
-        // list even though it is instantiated.
+        // `data`, not `children`: shim objects are plain QObjects, not visual
+        // children. A row's ContextMenu lives in a property: in neither list.
         function findIn(node, name) {
             if (!node) { return null }
             if (node.objectName === name) { return node }
@@ -103,8 +93,7 @@ const PROBE_QML: &str = r"
             if (!item) { return 'missing:' + name }
             return '' + item[property]
         }
-        // Something inside a row: the labels, the menu's items, the
-        // countdown.
+        // Something inside a row: labels, menu items, countdown.
         function getIn(row, name, property) {
             var item = findIn(findIn(loader.item, row), name)
             if (!item) { return 'missing:' + row + '/' + name }
@@ -135,15 +124,14 @@ const PROBE_QML: &str = r"
             remorse.tap()
             return 'ok'
         }
-        // What Silica's ComboBox does on a tap of one of its items.
+        // What Silica's ComboBox does on a tap of an item.
         function pickSub(name, index) {
             var item = findIn(sub.item, name)
             if (!item) { return 'missing:' + name }
             item.currentIndex = parseInt(index)
             return 'ok'
         }
-        // The phone without a network long enough for the window to
-        // stop IO, and the relays read again.
+        // No network long enough for the window to stop IO; relays read again.
         function offline() {
             core.stop_all_account_io()
             findIn(loader.item, 'transports').reload()
@@ -153,12 +141,11 @@ const PROBE_QML: &str = r"
         function subProperty(property) { return '' + sub.item[property] }
         function navigation() { return probe.pageStack.log }
         function pushedAccount() { return '' + probe.pageStack.pushedAccount }
-        // The wait before a relay goes, turned down from the four
-        // seconds a reader gets.
+        // Wait before a relay goes, turned down from the four seconds a reader
+        // gets.
         function hurry() { loader.item.pendingDelay = 100; return 'ok' }
-        // An address the profile has no relay for, straight at the
-        // object: no row offers it, and the core's refusal is what the
-        // page has to show.
+        // Address with no relay, straight at the object: no row offers it; the
+        // core's refusal is what the page shows.
         function misname() {
             var transports = findIn(loader.item, 'transports')
             if (!transports) { return 'missing:transports' }
@@ -175,15 +162,13 @@ fn the_relays_are_listed_removed_and_added() {
     let journal = common::fresh_journal(&temp);
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
 
-    // SAFETY: single-threaded test binary; set before Qt starts and before
-    // the server inherits them.
+    // SAFETY: single-threaded; set before Qt and server.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_FAKE_JOURNAL", &journal);
         std::env::set_var("PIIRIT_ACCOUNTS_DIR", temp.join("accounts"));
         std::env::set_var("PIIRIT_FAKE_ACCOUNTS", "1");
-        // A profile on two relays: the one it was set up on first, and
-        // the one with its own address on it now.
+        // Two relays: first set up, and the one holding address now.
         std::env::set_var("PIIRIT_FAKE_OLDER_RELAY", "ada@old.example.net");
     }
 
@@ -250,15 +235,14 @@ fn the_relays_are_listed_removed_and_added() {
         record!("hurry", call!("hurry"));
     });
 
-    // The list as the core has it: the relay with the profile's own
-    // address first, whatever the core's order, each with its own
-    // mailbox. Nothing on a row claims mail leaves through it.
+    // List as core has it: address holder first, own mailbox each. No row
+    // claims mail leaves through it.
     single_shot(Duration::from_secs(3), move || unsafe {
         record!("count", get!("transports", "count"));
         record!("first", get!("relayRow0", "addr"));
         record!("first-detail", get!("relayDetail", "objectName"));
         record!("send-from", get!("sendFromItem", "objectName"));
-        // The same search does reach into a row's menu.
+        // Same search reaches row menus.
         record!("menu-found", get!("removeRelayItem", "objectName"));
         record!("second", get!("relayRow1", "addr"));
         record!("second-domain", get_in!("relayRow1", "relayDomain", "text"));
@@ -271,8 +255,7 @@ fn the_relays_are_listed_removed_and_added() {
             get_in!("relayRow1", "removeRelayItem", "enabled")
         );
         record!("address", get!("profile", "address"));
-        // Reported on in the same order, each relay by itself: the
-        // core's dot and words for its connection, and its own mailbox.
+        // Per relay: core's dot and words, own mailbox.
         record!(
             "first-report",
             get_in!("relayReport0", "reportDomain", "text")
@@ -298,13 +281,11 @@ fn the_relays_are_listed_removed_and_added() {
             "second-words",
             get_in!("relayReport1", "reportQuota", "label")
         );
-        // A removal of an address the profile has no relay for, which
-        // the core refuses.
+        // Remove address with no relay; core refuses.
         record!("misname", call!("misname"));
     });
 
-    // The refusal on the page. Then the relay with the profile's own
-    // address on it is asked to go, and the reader thinks better of it.
+    // Refusal shown. Address holder asked to go; reader thinks better.
     single_shot(Duration::from_secs(5), move || unsafe {
         record!(
             "refused",
@@ -324,7 +305,7 @@ fn the_relays_are_listed_removed_and_added() {
         record!("spared", get!("relayRow0", "doomed"));
     });
 
-    // Still two; asked again, and this time let go.
+    // Still two; asked again, let go.
     single_shot(Duration::from_secs(6), move || unsafe {
         record!("spared-count", get!("transports", "count"));
         record!(
@@ -337,9 +318,8 @@ fn the_relays_are_listed_removed_and_added() {
         );
     });
 
-    // One relay, which cannot be removed. The profile's own address went
-    // with the relay it was on, to the one left, and the page and its
-    // report follow.
+    // One relay, can't go. Address moved with its relay to the one left; page
+    // and report follow.
     single_shot(Duration::from_secs(8), move || unsafe {
         record!("removed-count", get!("transports", "count"));
         record!("remaining", get!("relayRow0", "addr"));
@@ -358,8 +338,7 @@ fn the_relays_are_listed_removed_and_added() {
         );
     });
 
-    // The plus, and the page it opens: nothing to add until a relay is
-    // picked, and then the core is asked.
+    // Plus: nothing to add until a relay is picked, then core is asked.
     single_shot(Duration::from_secs(10), move || unsafe {
         record!("plus", call!("click", QString::from("addRelayButton")));
         record!(
@@ -397,9 +376,7 @@ fn the_relays_are_listed_removed_and_added() {
         record!("sub-add", call!("clickSub", QString::from("addButton")));
     });
 
-    // The relay is on the profile: the page that added it is gone, and
-    // the list under it has the new row, with the mailbox the new relay
-    // reports.
+    // Relay on profile: add page gone; list has new row with new relay's mailbox.
     single_shot(Duration::from_secs(12), move || unsafe {
         record!("sub-busy", call!("subProperty", QString::from("busy")));
         record!("added-count", get!("transports", "count"));
@@ -418,7 +395,7 @@ fn the_relays_are_listed_removed_and_added() {
         record!("offline", call!("offline"));
     });
 
-    // Not connected at all: the core's report has no relay in it.
+    // Offline: core's report has no relay.
     single_shot(Duration::from_secs(13), move || unsafe {
         record!(
             "offline-status",
@@ -448,8 +425,7 @@ fn the_relays_are_listed_removed_and_added() {
         "the profile page did not load. {context}"
     );
     assert_listed(&value, &context);
-    // The core's words, behind the transport's own prefix, as every
-    // page shows a refusal.
+    // Core's words behind the transport prefix, as pages show refusals.
     assert_eq!(value("misname"), "ok", "{context}");
     assert!(
         value("refused").ends_with("Transport does not exist"),
@@ -475,9 +451,8 @@ fn the_relays_are_listed_removed_and_added() {
     );
 }
 
-/// The relay with the profile's own address first, the other with its
-/// own mailbox; either may go while there are two; and no row says mail
-/// leaves through it, nor offers to make it.
+/// Address holder first, other own mailbox; either may go while two. No row says
+/// mail leaves through it, nor offers to make it.
 fn assert_listed(value: &dyn Fn(&str) -> String, context: &str) {
     assert_eq!(value("count"), "2", "{context}");
     assert_eq!(
@@ -527,9 +502,8 @@ fn assert_listed(value: &dyn Fn(&str) -> String, context: &str) {
     );
 }
 
-/// The countdown, called off once and let run once; then one relay,
-/// which the menu no longer offers to remove, and which the profile's
-/// own address has moved to.
+/// Countdown called off once, let run once; then one relay, no longer removable,
+/// address moved to it.
 fn assert_removed(value: &dyn Fn(&str) -> String, calls: &[(String, Value)], context: &str) {
     assert_eq!(value("remove"), "ok", "{context}");
     assert_eq!(
@@ -573,8 +547,7 @@ fn assert_removed(value: &dyn Fn(&str) -> String, calls: &[(String, Value)], con
         "false",
         "the last relay is offered for removal, which the core refuses. {context}"
     );
-    // The address no relay has went to the core too, to be refused; the
-    // rest are what the menu asked for.
+    // Address no relay has goes to core too, refused; rest are menu asks.
     let deletions: Vec<&Value> = calls
         .iter()
         .filter(|(name, _)| name == "delete_transport")
@@ -594,8 +567,7 @@ fn assert_removed(value: &dyn Fn(&str) -> String, calls: &[(String, Value)], con
     );
 }
 
-/// The plus opens the page for this profile; the page adds the picked
-/// relay and goes; the list under it has the new row.
+/// Plus opens page for profile; page adds picked relay, then goes; list shows it.
 fn assert_added(
     value: &dyn Fn(&str) -> String,
     calls: &[(String, Value)],

@@ -1,11 +1,7 @@
-//! The arithmetic both viewfinders share (`qml/js/Viewfinder.js`): which
-//! camera the switch goes to, how far a pinch zooms, which flash modes a
-//! camera offers, the scanner's zoom steps, the exposure slider's travel,
-//! where a tap lands in the camera's frame, how far the picture is turned
-//! back on a turned page, and what each lens's ring says.
-//!
-//! Run in a real QML engine, because that is where the library runs: a
-//! JavaScript port of it here would test the port.
+//! Arithmetic both viewfinders share (`qml/js/Viewfinder.js`): switch target camera, pinch
+//! zoom, flash modes offered, scanner zoom steps, exposure slider travel, tap point in camera
+//! frame, turn-back on turned page, lens ring labels. Run in real QML engine, where it runs.
+//! A JS port would test the port.
 
 // Qt harness: see qml_chat_list.rs.
 #![allow(
@@ -24,8 +20,7 @@ use serde_json::Value;
 
 mod common;
 
-/// Every case as `label: result`, worked out in one go and handed back as
-/// JSON so that each can be asserted on its own.
+/// Every case as `label: result`, in one go, as JSON so each is asserted on its own.
 fn probe(library: &str) -> String {
     format!(
         r#"
@@ -107,7 +102,7 @@ fn probe(library: &str) -> String {
 #[test]
 #[allow(clippy::too_many_lines)]
 fn the_viewfinder_arithmetic_agrees_with_the_platform_camera() {
-    // SAFETY: single-threaded test binary; set before Qt starts.
+    // SAFETY: single-threaded; set before Qt starts.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
     }
@@ -167,7 +162,7 @@ fn the_viewfinder_arithmetic_agrees_with_the_platform_camera() {
         "a phone with one side offers a switch to nothing"
     );
 
-    // The platform's pinch: the change in scale times the whole range.
+    // Platform pinch: scale change times range.
     assert!(
         close(number("pinchOut"), 4.0),
         "a doubling pinch on 1-4x: {}",

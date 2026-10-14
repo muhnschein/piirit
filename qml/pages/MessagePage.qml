@@ -5,41 +5,29 @@ import "../components"
 import "../js/Emoji.js" as Emoji
 
 /*
- * One message, whole, with nothing else on the screen.
- *
- * A conversation is a column of bubbles, and a bubble is the wrong shape
- * for a page of prose: the row collapses a long body so the chat stays
- * scrollable, and the rest of it is here. A message the sending core cut
- * in two is here as well -- what the bubble holds is only its beginning,
- * and the whole of it comes from the core (`full_text.rs`).
- *
- * The reader's Markdown setting applies as it does in the conversation,
- * and for the same reason the body is pinned to plain text unless the
- * shim rendered it: see the note at the top of MessageDelegate.qml.
- *
- * A Label cannot be selected in, so "Select text" in the pull-down puts
- * the message as written in a field that can, and copies each selection
- * as it is made. The label stays until then because the formatting and
- * the links are its own, and a field draws neither.
+ * One message, whole: bubble collapses long bodies, and a message the sender's
+ * core cut holds only its start. Full text from core (`full_text.rs`).
+ * Markdown per setting; plain unless shim rendered it (MessageDelegate.qml).
+ * Label not selectable: "Select text" swaps in selectable field. Label
+ * stays until then: owns formatting and links.
  */
 Page {
     id: page
 
-    /// Which account the message belongs to.
+    /// Owning account.
     property int accountId: 0
-    /// Which message to show whole.
+    /// Message to show.
     property int messageId: 0
-    /// Who wrote it, for under the heading.
+    /// Author, under heading.
     property string senderName: ""
-    /// 0 draws Markdown; anything else shows the message as written.
+    /// 0 draws Markdown; else as written.
     property int markdownMode: 1
 
-    /// What went wrong, when something did. Kept on the screen rather
-    /// than shown and cleared: a page with nothing on it and no reason
-    /// for it is the very thing this page exists to stop being.
+    /// Error, kept on screen, not cleared: blank page with no reason is what
+    /// this page avoids.
     property string errorMessage: ""
 
-    /// Whether the body is the selectable field rather than the label.
+    /// Body is selectable field.
     property bool selecting: false
 
     allowedOrientations: Orientation.All
@@ -52,25 +40,20 @@ Page {
         onError: page.errorMessage = message
     }
 
-    /// Whether the body is drawn from the shim's rendering; see
-    /// MessageDelegate.
+    /// Body from shim rendering; see MessageDelegate.
     readonly property bool drawsStyled: page.markdownMode === 0
                                         && whole.styled_text.length > 0
-    /// The body as the setting wants it shown.
+    /// Body as setting wants.
     readonly property string shownText: page.drawsStyled
                                         ? whole.styled_text
                                         : whole.text
-    /// The same with its emoji drawn as pictures, as in the bubble, or
-    /// "" when there are none to draw.
+    /// Same, emoji as pictures; "" if none.
     readonly property string emojiText: Emoji.inText(page.shownText, page.drawsStyled,
                                                      bodyLabel.font.pixelSize)
 
-    /// Swap the label for the selectable field, focused and with all of
-    /// it selected, so the handles are there to be moved.
+    /// Swap label for selectable field, focused, all selected.
     ///
-    /// Selected from the end back to the start, which leaves the cursor
-    /// at the start: a focused field keeps its cursor in view, and one at
-    /// the end of a long message would scroll the page down to it.
+    /// Select end to start: cursor at start, no scroll to end.
     function beginSelecting() {
         page.selecting = true
         selectableBody.forceActiveFocus()
@@ -86,7 +69,7 @@ Page {
         PullDownMenu {
             MenuItem {
                 objectName: "selectItem"
-                // Once the field is up there is nothing left to switch.
+                // Field up: nothing to switch.
                 visible: !page.selecting
                 enabled: whole.text.length > 0
                 //: Pull-down entry on the page showing one whole message:
@@ -100,8 +83,7 @@ Page {
                 enabled: whole.text.length > 0
                 text: qsTr("Copy")
                 onClicked: {
-                    // The text as written, never the rendering: what is
-                    // pasted elsewhere should be what was typed here.
+                    // As written, not rendered.
                     Clipboard.text = whole.text
                     notice.show(qsTr("Copied"))
                 }
@@ -121,9 +103,8 @@ Page {
                 title: qsTr("Message")
             }
 
-            // Who wrote it. Its own label rather than the header's
-            // `description`, which draws whatever it is given as markup:
-            // see ConversationHeader.
+            // Author. Own label: header `description` draws input as markup (see
+            // ConversationHeader).
             Label {
                 objectName: "senderLabel"
                 visible: page.senderName.length > 0
@@ -153,19 +134,15 @@ Page {
                 wrapMode: Text.Wrap
                 color: Theme.primaryColor
                 linkColor: Theme.highlightColor
-                // Plain, unless the shim rendered it or it has emoji to
-                // draw: see MessageDelegate.
+                // Plain unless shim rendered it or emoji.
                 textFormat: page.drawsStyled || page.emojiText.length > 0
                             ? Text.StyledText : Text.PlainText
                 text: page.emojiText.length > 0 ? page.emojiText : page.shownText
                 onLinkActivated: Qt.openUrlExternally(link)
             }
 
-            // The message as written, as Copy copies it, in a field whose
-            // text can be selected. Silica's read-only field takes no
-            // focus and cannot be selected in without it: `focusOnClick`
-            // is its own gallery's "read only, but focusable". Plain text,
-            // since a TextEdit reads no markup unless told to.
+            // As written, as Copy copies. Read-only field takes no focus;
+            // focusOnClick makes it focusable.
             TextArea {
                 id: selectableBody
                 objectName: "selectableBody"
@@ -175,12 +152,9 @@ Page {
                 focusOnClick: true
                 labelVisible: false
                 color: Theme.primaryColor
-                // Empty until it is shown: a field lays out all of its
-                // text whether it is visible or not, and the label is
-                // already laying out the same message.
+                // Empty until shown: field lays out text even hidden.
                 text: page.selecting ? whole.text : ""
-                // Each selection goes on the clipboard as it is made, as
-                // Silica does with one, and the notice says so.
+                // Each selection copied as made.
                 onSelectedTextChanged: {
                     if (selectableBody.selectedText.length > 0) {
                         Clipboard.text = selectableBody.selectedText
@@ -205,7 +179,7 @@ Page {
         }
     }
 
-    // Why there is nothing to read, or that the text was copied.
+    // Why nothing to read, or copied.
     Banner {
         id: notice
         objectName: "notice"
@@ -220,8 +194,7 @@ Page {
         onDismissed: notice.text = ""
     }
 
-    // A failure stays until the page is left: it is the reason the page
-    // is empty, and four seconds is not long enough to explain that.
+    // Failure stays until left: 4 s toast too short to explain empty page.
     Banner {
         objectName: "failure"
         labelObjectName: "errorLabel"

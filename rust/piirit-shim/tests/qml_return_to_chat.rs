@@ -1,26 +1,17 @@
 //! Coming back to a conversation from a page opened over it.
 //!
-//! Reported from a device: opening a picture full screen and going back
-//! landed at the oldest loaded message rather than where the reader had
-//! been. A page with another pushed over it is torn down far enough that
-//! its list forgets where it was, and what a list forgets it replaces with
-//! the beginning.
+//! Device report: opening a picture full screen and going back landed at oldest
+//! loaded message. Page with another pushed over is torn down far enough that its
+//! list forgets its place; forgotten, it resets to the beginning.
 //!
-//! Putting the place back when the page returns was not enough, and the
-//! second report said exactly why: the reader saw the top of the chat and
-//! was *then* yanked back. The list is reset while the page is away, and a
-//! frame showing the wrong rows is painted before anything gets round to
-//! correcting it. So the row is held from the moment the page goes rather
-//! than restored when it comes back, and the reset is undone in the same
-//! turn it happens.
+//! Restoring place on return was not enough: second report, reader saw chat top then
+//! yanked back. List reset while away, and a wrong-rows frame painted before
+//! correction. So row is held from the moment page goes, not restored on return;
+//! reset undone in same turn.
 //!
-//! What this covers is that the reader comes back to their place at all:
-//! without remembering and restoring it they land at message 6 instead of
-//! 20. What it does not cover is the difference between holding the row
-//! from the moment the page leaves and putting it back when the page
-//! returns, because that difference is one frame -- and offscreen Qt has no
-//! render loop to paint it. That half was confirmed on a device, which is
-//! also where it was reported.
+//! Covers: reader returns to their place at all (without it: message 6, not 20).
+//! Not covered: holding from page-leave vs restoring on return, a one-frame
+//! difference that offscreen Qt cannot paint. That half confirmed on device, where reported.
 
 // Qt harness: see qml_conversation_open.rs.
 #![allow(
@@ -139,8 +130,7 @@ fn a_page_opened_over_a_conversation_gives_the_reader_their_place_back() {
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
     let tree = common::qml_tree_without_enter_key();
 
-    // SAFETY: single-threaded test binary; set before Qt starts and before
-    // the server inherits them.
+    // SAFETY: single-threaded; set before Qt and server start.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_ACCOUNTS_DIR", temp.join("accounts"));
@@ -193,13 +183,12 @@ fn a_page_opened_over_a_conversation_gives_the_reader_their_place_back() {
         (*steps_ptr).push(("active", call!("setStatus", 2)));
     });
     single_shot(Duration::from_secs(5), move || unsafe {
-        // Back up the history, which is where a picture worth opening is.
+        // Back up history, where a picture worth opening is.
         (*steps_ptr).push(("scrolled", call!("scrollTo", 20)));
     });
     single_shot(Duration::from_millis(6000), move || unsafe {
         (*steps_ptr).push(("before", call!("middleId")));
-        // A page goes over this one: Deactivating, then the view loses its
-        // place, then Active again on the way back.
+        // Page goes over this one: Deactivating, view loses place, Active again on return.
         (*steps_ptr).push(("leaving", call!("setStatus", 3)));
         (*steps_ptr).push((
             "remembered-row",
@@ -210,9 +199,8 @@ fn a_page_opened_over_a_conversation_gives_the_reader_their_place_back() {
         (*steps_ptr).push(("straight-back", call!("middleId")));
     });
     single_shot(Duration::from_millis(6300), move || unsafe {
-        // The rows are laid out again as the page settles, which is what
-        // moves a reader off wherever they were just put -- and what the
-        // hold answers, in the same turn.
+        // Rows laid out again as page settles: moves reader off where put; hold answers it
+        // in same turn.
         (*steps_ptr).push(("relayout", call!("relayout")));
         (*steps_ptr).push(("after", call!("middleId")));
         (*engine_ptr).quit();
@@ -223,7 +211,7 @@ fn a_page_opened_over_a_conversation_gives_the_reader_their_place_back() {
     assert_outcome(&steps);
 }
 
-/// What the run has to show for itself, out of the test body.
+/// Run's outcome, out of test body.
 fn assert_outcome(steps: &[(&str, String)]) {
     let value = |label: &str| {
         steps
@@ -241,16 +229,12 @@ fn assert_outcome(steps: &[(&str, String)]) {
         "the test never established where the reader was, so it proved \
          nothing. {context}"
     );
-    // The whole point. Not "it comes back right in the end" -- the reader
-    // must never be shown anywhere else, because every moment they are is a
-    // frame. The check is on the first look after the page returns, with no
-    // pass in between for anything to correct it: with the place merely
-    // remembered rather than held, this reports the top of the chat.
+    // The point. Not "right in the end": reader must never be shown elsewhere, every moment
+    // is a frame. Check is first look after return, no pass between to correct: place
+    // merely remembered (not held) reports chat top.
     //
-    // The instant *during* the interruption is not asserted on. It is the
-    // right moment in principle and the wrong one to measure: the view is
-    // put back within the same turn it is knocked, so a probe there finds
-    // a view mid-move rather than either state.
+    // Instant *during* interruption not asserted: view is restored in the turn it is knocked,
+    // so probe finds mid-move view, neither state.
     assert_eq!(
         value("straight-back"),
         value("before"),

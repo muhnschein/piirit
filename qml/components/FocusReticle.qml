@@ -2,16 +2,15 @@ import QtQuick 2.0
 import Sailfish.Silica 1.0
 
 /*
- * Where a tap asked the camera to focus: the platform camera's ring, white
- * while the lens is searching and lit once it has locked. It stays while
- * the tap's focus is held, and goes with it.
+ * Tap focus ring: white while searching, lit when locked. Stays while the tap's
+ * focus is held, goes with it.
  */
 Rectangle {
     id: reticle
 
-    /// Where the tap landed, in the parent's coordinates.
+    /// Tap point, parent coords.
     property point at
-    /// The camera says it has found focus.
+    /// Camera has focus.
     property bool locked: false
 
     x: at.x - width / 2

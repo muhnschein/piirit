@@ -1,21 +1,11 @@
-// What the two viewfinders -- the camera page and the code scanner -- work
-// out about the camera without drawing anything: which cameras the phone
-// has and which comes next, how far a pinch zooms, which flash modes and
-// self-timer delays are offered, and where a tap lands in the camera's
-// own frame.
+// Viewfinder math, shared by camera page and scanner. Draws nothing.
+// Tested alone: tests/qml_viewfinder_math.rs.
 //
-// A library rather than functions on each view, so the two agree and the
-// arithmetic is tested on its own (tests/qml_viewfinder_math.rs).
+// Layout from jolla-camera, zoom from RAWfish (BSD). Nothing copied: plugins
+// not importable by Harbour.
 //
-// Layout and choices follow the platform's camera app (jolla-camera, BSD);
-// the eased zoom steps follow RAWfish's ZoomController (BSD). Neither's
-// code is copied: both lean on a camera plugin of their own that a
-// Harbour app cannot import, so what is here is the part that QtMultimedia
-// alone can do.
-//
-// QtMultimedia's enums are written as their values: a library cannot
-// import the module that declares them, and the headless stubs the tests
-// run on cannot declare a property of one. The values are QCamera's own.
+// Enums as values (QCamera's own): library can't import QtMultimedia, test
+// stubs can't declare them.
 .pragma library
 
 /// `Camera.Position`: BackFace 1, FrontFace 2.
@@ -38,36 +28,29 @@ var whiteBalanceFluorescent = 6
 /// `Camera.LockStatus`: Unlocked 0, Searching 1, Locked 2.
 var lockLocked = 2
 
-/// Silica's `Orientation`: Portrait 1, Landscape 2, PortraitInverted 4,
-/// LandscapeInverted 8, and All of them, 15.
+/// Silica `Orientation` bit flags, All = 15.
 var portrait = 1
 var landscape = 2
 var portraitInverted = 4
 var landscapeInverted = 8
 var allOrientations = 15
 
-/// The white balance modes offered, in the platform camera's order.
+/// White balance modes offered, platform order.
 var whiteBalanceModes = [whiteBalanceAuto, whiteBalanceSunlight, whiteBalanceCloudy,
                          whiteBalanceFluorescent, whiteBalanceTungsten]
 
-/// The self-timer's delays in seconds, the platform camera's four.
+/// Self-timer delays, seconds.
 var timerDelays = [0, 3, 10, 15]
 
-/// Exposure compensation in EV, half a stop at a time either side of
-/// none: the platform camera's range.
+/// Exposure compensation, EV, half-stop steps.
 var exposureSteps = [-2, -1.5, -1, -0.5, 0, 0.5, 1, 1.5, 2]
 
-/// The zoom presets the scanner's button steps through. A code across the
-/// room is the case it is for: two and four times bring it to where a
-/// decoder has a few pixels a module again.
+/// Scanner zoom steps: 2x and 4x reach far codes (few pixels per module).
 var zoomPresets = [1, 2, 4]
 
-/// The cameras on one side of the phone, in the order the platform lists
-/// them, as their device ids.
+/// Device ids on one side, platform order.
 ///
-/// `cameras` is `QtMultimedia.availableCameras`: a list of objects with a
-/// `deviceId` and a `position`. A camera with no position is taken to be
-/// on the back, where the platform's own app puts it.
+/// `cameras`: `QtMultimedia.availableCameras`. No position = back.
 function camerasFacing(cameras, position) {
     var ids = []
     if (!cameras) {
@@ -86,9 +69,9 @@ function camerasFacing(cameras, position) {
     return ids
 }
 
-/// The camera the switch button goes to: the first front camera from the
-/// back, the last back camera used from the front. Empty when the phone
-/// has no camera on the other side, which hides the button.
+/// Switch-button target: from back, first front camera; from front, last back
+/// camera used.
+/// Empty if none: hides button.
 function otherSide(cameras, currentPosition, lastBackId) {
     if (currentPosition === frontFace) {
         var backs = camerasFacing(cameras, backFace)
@@ -101,13 +84,9 @@ function otherSide(cameras, currentPosition, lastBackId) {
     return fronts.length > 0 ? fronts[0] : ""
 }
 
-/// What the back cameras' rings say: the platform's label for each lens
-/// ("1.0" for the main one, "0.5" or "0.6" for the wide one, "2.0" for a
-/// telephoto) where the phone's adaptation gives one, and its place in
-/// the list where it does not.
+/// Back-camera ring labels ("1.0", "0.5", "2.0") or list index.
 ///
-/// `labels` is that list, in the order the platform lists the back
-/// cameras -- the order `camerasFacing` keeps.
+/// `labels` in same order as `camerasFacing`.
 function lensLabel(labels, index) {
     var label = labels && index < labels.length ? labels[index] : undefined
     if (label === undefined || label === null || ("" + label).length === 0) {
@@ -116,14 +95,9 @@ function lensLabel(labels, index) {
     return "" + label
 }
 
-/// How far, in degrees clockwise, Silica turns a page held in
-/// `orientation`: none upright, a quarter for landscape, half for upside
-/// down, three quarters for the other landscape -- the turn the platform
-/// camera reads off the page.
+/// Silica page turn, degrees clockwise: 0/90/180/270 by orientation.
 ///
-/// The viewfinder is turned back by as much: the camera's frame is fixed
-/// to the phone, and a page that turns with the phone would take the
-/// picture round with it.
+/// Viewfinder turned back by same: camera frame fixed to phone.
 function pageTurn(orientation) {
     switch (orientation) {
     case landscape: return 90
@@ -133,10 +107,7 @@ function pageTurn(orientation) {
     }
 }
 
-/// The zoom a pinch leads to: the platform camera's rule, which moves the
-/// zoom by the pinch's change in scale times the whole range, so one
-/// spread of the fingers covers it whatever the camera's maximum is.
-/// Never below one, never past the maximum.
+/// Pinch zoom: scale change times whole range. Clamped to [1, maximum].
 function pinchZoom(current, maximum, scale, previousScale) {
     var top = Math.max(1, maximum || 1)
     var previous = Math.abs(previousScale) > 0 ? Math.abs(previousScale) : 1
@@ -144,7 +115,7 @@ function pinchZoom(current, maximum, scale, previousScale) {
     return clampZoom(next, top)
 }
 
-/// A zoom kept inside what the camera can do.
+/// Zoom clamped to camera range.
 function clampZoom(value, maximum) {
     var top = Math.max(1, maximum || 1)
     if (!isFinite(value)) {
@@ -153,8 +124,7 @@ function clampZoom(value, maximum) {
     return Math.max(1, Math.min(top, value))
 }
 
-/// The preset after `current`, among those the camera can reach, back to
-/// one after the last. A zoom between presets goes to the next one up.
+/// Next reachable preset above `current`, wrapping to 1.
 function nextZoomPreset(current, maximum) {
     var top = Math.max(1, maximum || 1)
     for (var i = 0; i < zoomPresets.length; i++) {
@@ -166,16 +136,13 @@ function nextZoomPreset(current, maximum) {
     return 1
 }
 
-/// How a zoom is written beside the indicator: one decimal, the "x" the
-/// platform's lens labels wear.
+/// Zoom text: at most one decimal, with "×" as lens labels.
 function zoomText(zoom) {
     var rounded = Math.round(zoom * 10) / 10
     return (rounded % 1 === 0 ? rounded.toFixed(0) : rounded.toFixed(1)) + "×"
 }
 
-/// Where the dot sits on the indicator's line, from 0 at no zoom to 1 at
-/// the camera's most. Halfway when the camera cannot zoom at all, as the
-/// platform's indicator has it.
+/// Indicator dot: 0 at no zoom, 1 at max. Halfway if camera can't zoom.
 function zoomFraction(zoom, maximum) {
     if (!(maximum > 1)) {
         return 0.5
@@ -183,9 +150,7 @@ function zoomFraction(zoom, maximum) {
     return Math.max(0, Math.min(1, (zoom - 1) / (maximum - 1)))
 }
 
-/// The flash modes offered: auto, off and on for a picture; off and the
-/// torch for a video, since a flash fired once does nothing for one; and
-/// none on the front, which has no flash to fire.
+/// Flash modes: photo auto/off/on; video off/torch; none on front.
 function flashModes(video, position) {
     if (position === frontFace) {
         return []
@@ -193,9 +158,7 @@ function flashModes(video, position) {
     return video ? [flashOff, flashTorch] : [flashAuto, flashOff, flashOn]
 }
 
-/// The flash mode to run with: the one asked for when it is on offer here,
-/// off otherwise -- the torch left on from a video is not a flash for a
-/// picture.
+/// Flash to run: `wanted` if offered, else off (video torch: no photo flash).
 function effectiveFlash(wanted, video, position) {
     var modes = flashModes(video, position)
     if (modes.indexOf(wanted) >= 0) {
@@ -208,8 +171,7 @@ function effectiveFlash(wanted, video, position) {
 function flashIcon(mode) {
     switch (mode) {
     case flashAuto: return "image://theme/icon-camera-flash-automatic"
-    // The torch wears the flash's own "on": the platform has no icon of
-    // its own for it, and its camera does the same.
+    // Torch uses flash's "on" icon: platform has none, its camera does same.
     case flashOn:
     case flashTorch: return "image://theme/icon-camera-flash-on"
     default: return "image://theme/icon-camera-flash-off"
@@ -238,8 +200,7 @@ function gridIcon(on) {
     return on ? "image://theme/icon-camera-grid-thirds" : "image://theme/icon-camera-grid-none"
 }
 
-/// An exposure step as the slider shows it: signed, no unit, as the
-/// platform's slider writes it.
+/// Exposure step as slider shows: signed, unitless.
 function exposureText(value) {
     if (value === 0) {
         return "0"
@@ -247,8 +208,7 @@ function exposureText(value) {
     return (value > 0 ? "+" : "−") + Math.abs(value)
 }
 
-/// The step nearest a fraction of the slider's travel, 0 at the top.
-/// The top is the brightest, as the platform's slider has it.
+/// Step nearest a slider fraction, 0 at top (brightest).
 function exposureAt(fraction) {
     var last = exposureSteps.length - 1
     var index = Math.round(Math.max(0, Math.min(1, fraction)) * last)
@@ -265,9 +225,7 @@ function exposureFraction(value) {
     return (last - index) / last
 }
 
-/// How tall the viewfinder is for its width in portrait: the source's
-/// long side over its short one, or four by three -- the platform
-/// camera's default -- while the camera has not said.
+/// Portrait height/width: long over short side, 4:3 until camera reports.
 function frameRatio(width, height) {
     if (!(width > 0) || !(height > 0)) {
         return 4 / 3
@@ -275,16 +233,13 @@ function frameRatio(width, height) {
     return Math.max(width, height) / Math.min(width, height)
 }
 
-/// The seconds left of a self-timer, as the shutter shows them: whole
-/// seconds, rounded up, so it reads 3, 2, 1 and never 0.
+/// Self-timer seconds left, rounded up: 3, 2, 1, never 0.
 function countdownText(remaining) {
     return "" + Math.max(1, Math.ceil(remaining))
 }
 
-/// A tap on the viewfinder as the focus point the camera wants: a
-/// fraction of the frame, inside it. `mapped` is what the VideoOutput made
-/// of the tap, when it could say; a tap outside the picture -- in a bar
-/// beside a fitted frame -- comes back null and asks for no focus.
+/// Tap as focus point: fraction of frame. `mapped`: VideoOutput's tap mapping.
+/// Tap outside picture (bar beside fitted frame): null, no focus.
 function focusPoint(mapped, x, y, width, height) {
     var point = mapped
     if (!point || !isFinite(point.x) || !isFinite(point.y)) {

@@ -1,15 +1,12 @@
-//! Coming back to a conversation puts the reader exactly where they were.
+//! Coming back to a conversation puts reader exactly where they were.
 //!
-//! The place is remembered as a row when the page goes under another and
-//! held while it is away, because a list torn down under a pushed page
-//! comes back at the top of whatever it had loaded. Holding the row to the
-//! *centre* of the view is not enough: the reader had stopped wherever they
-//! stopped, half a row above the centre or a line below it, so every return
-//! would move the rows that far the moment the swipe back finished.
+//! Place is remembered as a row when page goes under another, and held while away:
+//! a list torn down under a pushed page comes back at top of what it loaded. Holding
+//! row to view *centre* is not enough: reader stopped anywhere (half a row above
+//! centre, or a line below), so every return moved rows that far when swipe back ended.
 //!
-//! Pinned here: a view that has not moved while away does not move on the
-//! way back, and one that lost its place while away is put back to the
-//! pixel, not to the nearest row's centre.
+//! Pinned: view unmoved while away does not move on return; one that lost place is
+//! put back to the pixel, not nearest row's centre.
 
 // Qt harness: see qml_conversation_list.rs.
 #![allow(
@@ -26,8 +23,7 @@ use qmetaobject::*;
 
 mod common;
 
-/// The list over rows that are filled in, so each is its message's own
-/// height and no two rows are quite alike.
+/// List over filled-in rows: each its message's own height, no two alike.
 const PROBE_QML: &str = r"
     import QtQuick 2.0
     Item {
@@ -136,7 +132,7 @@ const PROBE_QML: &str = r"
 #[test]
 #[allow(clippy::too_many_lines)]
 fn coming_back_puts_the_view_where_it_was_to_the_pixel() {
-    // SAFETY: single-threaded test binary; set before Qt starts.
+    // SAFETY: single-threaded; set before Qt starts.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
     }
@@ -176,7 +172,7 @@ fn coming_back_puts_the_view_where_it_was_to_the_pixel() {
     single_shot(Duration::from_secs(2), move || unsafe {
         (*steps_ptr).push(("settle", call!("settleMidway")));
     });
-    // Away and back with nothing having moved: the plain swipe back.
+    // Away and back, nothing moved: plain swipe back.
     single_shot(Duration::from_secs(3), move || unsafe {
         (*steps_ptr).push(("before", call!("position")));
         (*steps_ptr).push(("leave", call!("leave")));
@@ -186,8 +182,7 @@ fn coming_back_puts_the_view_where_it_was_to_the_pixel() {
     });
     single_shot(Duration::from_secs(5), move || unsafe {
         (*steps_ptr).push(("after", call!("position")));
-        // Away again, and this time the list loses its place while under
-        // the other page.
+        // Away again; list loses place while under the other page.
         (*steps_ptr).push(("leave-again", call!("leave")));
     });
     single_shot(Duration::from_secs(6), move || unsafe {
@@ -199,13 +194,12 @@ fn coming_back_puts_the_view_where_it_was_to_the_pixel() {
     });
     single_shot(Duration::from_secs(8), move || unsafe {
         (*steps_ptr).push(("after-losing", call!("position")));
-        // Down to the newest message, which lets go of the held row.
+        // Down to newest message: lets go of held row.
         call!("jump");
     });
-    // Twice, a moment apart. The first stop short brings one more row
-    // into the view's buffer above, which changes what the content
-    // measures, and a following view is taken back to the end for that;
-    // the second finds those rows already there and stays where it is.
+    // Twice, a moment apart. First stop short brings one more row into view's buffer above,
+    // changing content measure; following view is taken back to end for that. Second finds
+    // those rows there and stays.
     single_shot(Duration::from_secs(9), move || unsafe {
         call!("stopJustShort", 12.0);
     });
@@ -222,7 +216,7 @@ fn coming_back_puts_the_view_where_it_was_to_the_pixel() {
     });
     single_shot(Duration::from_secs(13), move || unsafe {
         (*steps_ptr).push(("short-after", call!("position")));
-        // Away once more, and a message arrives meanwhile.
+        // Away once more; a message arrives meanwhile.
         (*steps_ptr).push(("leave-following", call!("leave")));
         (*steps_ptr).push(("arrival", call!("append", 1)));
     });
@@ -254,8 +248,7 @@ fn coming_back_puts_the_view_where_it_was_to_the_pixel() {
          run says nothing about coming back to it. {context}"
     );
 
-    // Nothing moved while away, so nothing moves on the way back: not the
-    // view, and not the row under the reader's eye.
+    // Nothing moved while away, so nothing moves on return: not view, not row under eye.
     assert_eq!(
         value("after"),
         before,
@@ -263,12 +256,9 @@ fn coming_back_puts_the_view_where_it_was_to_the_pixel() {
          the moment the swipe back finishes. {context}"
     );
 
-    // The list lost its place while away and was put back at once, and
-    // coming back changed nothing more. Judged by the row at the top of
-    // the view and where its top is, not by the view's position: a list
-    // that has jumped to its beginning and back has re-estimated where
-    // its content begins, and reads a different position for the same
-    // rows in the same place.
+    // Lost place while away, put back at once; coming back changed nothing more. Judged by
+    // top row and its top, not view position: a list jumped to beginning and back
+    // re-estimates content start, reads different position for same rows.
     let row_at_top = |label: &str| {
         value(label)
             .split_once(' ')
@@ -288,8 +278,8 @@ fn coming_back_puts_the_view_where_it_was_to_the_pixel() {
          back where they were, to the pixel. {context}"
     );
 
-    // A reader a line short of the end is following, and must not be sent
-    // to the end on the way back: that is the same jump, always downwards.
+    // Reader a line short of end, following: must not be sent to end on return (same jump,
+    // always downwards).
     assert_eq!(
         (value("following").as_str(), value("short-ended").as_str()),
         ("true", "false"),
@@ -303,8 +293,7 @@ fn coming_back_puts_the_view_where_it_was_to_the_pixel() {
         "coming back while following, a line short of the end, moved the \
          view. {context}"
     );
-    // Following still means following: what arrives while away is on
-    // screen when the reader is back.
+    // Following still means following: what arrives while away is on screen on return.
     assert_eq!(
         value("at-end"),
         "true",

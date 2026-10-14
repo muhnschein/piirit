@@ -1,15 +1,11 @@
-//! The call page's bridge, run in Node: `tests/js/*.test.js`.
+//! Call page bridge, tested in Node: `tests/js/*.test.js`.
 //!
-//! The bridge is JavaScript that runs in the browser engine, beside a
-//! page that is upstream's, so nothing in Rust can run it. Node can, in
-//! front of a stand-in for the page and the engine, and that is where
-//! what it decides about the camera -- which one is opened, what goes on
-//! the peer connection, what the page is told, what the host is told --
-//! is tested. This runs those tests as part of the suite.
+//! Bridge is JS run in browser engine beside upstream page; Rust can't run it.
+//! Node runs it against stand-ins for page and engine: camera, peer connection,
+//! page and host messages.
 //!
-//! Node is on every CI runner. Without it on a laptop this says so and
-//! passes; in CI (`CI` set, as GitHub Actions sets it) a missing Node is a
-//! failure, so the tests cannot quietly stop running.
+//! Node on every CI runner. No Node on laptop: says so, passes. In CI (`CI` set)
+//! missing Node fails.
 
 #![allow(clippy::expect_used)]
 

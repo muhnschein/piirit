@@ -1,15 +1,10 @@
-//! Export `main()` as a dynamic symbol, and compile the C++ side of the
-//! `cpp!` block in `src/translations.rs`.
+//! Export `main()` as dynamic symbol; compile C++ of `cpp!` in src/translations.rs.
 //!
-//! Rust emits `main` as an ordinary global symbol, which lives only in
-//! `.symtab` and is gone once rpmbuild strips the binary. The
-//! `silica-qt5` booster looks it up in `.dynsym`, and Harbour's validator
-//! rejects a Silica app where it is missing (`ci/harbour-check.sh`, check
-//! 1.7.3).
+//! `main` in `.symtab` only, stripped by rpmbuild. `silica-qt5` booster reads `.dynsym`;
+//! Harbour checks it (`ci/harbour-check.sh` 1.7.3).
 //!
-//! `--dynamic-list` rather than `--export-dynamic-symbol`, which needs
-//! binutils 2.35, or `--export-dynamic`, which would export every symbol
-//! in the binary.
+//! `--dynamic-list`, not `--export-dynamic-symbol` (needs binutils 2.35) or `--export-dynamic`
+//! (exports every symbol).
 
 fn main() {
     let list = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("main.dynlist");
@@ -19,19 +14,13 @@ fn main() {
         list.display()
     );
 
-    // qttypes links Qt5Widgets unconditionally, with no feature to turn it
-    // off. Once the vendored qmetaobject stops using QApplication nothing
-    // refers to it, and --as-needed drops the DT_NEEDED entry that would
-    // otherwise fail Harbour's allowed-libraries check. It prunes only
-    // libraries no symbol needs, so it is right for the others too.
+    // qttypes links Qt5Widgets always. Unused once qmetaobject drops QApplication.
+    // --as-needed drops its DT_NEEDED, else Harbour allowed-libraries check fails. Prunes only
+    // libraries no symbol needs, so safe for the rest.
     println!("cargo:rustc-link-arg-bins=-Wl,--as-needed");
 
-    // The C++ in src/translations.rs, compiled against the Qt that qttypes
-    // found -- the same Qt everything else links, since qttypes tells its
-    // dependents about exactly one. Under the Sailfish SDK's scratchbox
-    // that is the target's, through the QT_INCLUDE_PATH the spec sets;
-    // here it is whatever qmake answers for. The same arrangement as the
-    // vendored qmetaobject's own build.rs.
+    // C++ built against Qt qttypes found (same Qt as all links). Sailfish SDK scratchbox: target's,
+    // via spec's QT_INCLUDE_PATH; here: qmake's. As vendored qmetaobject's build.rs.
     let Ok(include) = std::env::var("DEP_QT_INCLUDE_PATH") else {
         panic!("qttypes found no Qt; its build script says why above");
     };

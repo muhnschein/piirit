@@ -1,15 +1,8 @@
-//! The root QML loads, and so does everything it reaches on the way up,
-//! and it opens on the right page.
+//! Root QML and all it reaches load, opening on right page.
 //!
-//! Nothing covered this before, and a white screen was the result: the
-//! cover's `showChats` signal was removed while the root file still
-//! handled it, and `Cannot assign to non-existent property "onShowChats"`
-//! takes the whole window down with it.
-//!
-//! Grep could not have caught it. A QML handler capitalises the signal it
-//! answers, so `showChats` becomes `onShowChats` and a search for the
-//! signal's own name never finds the thing that uses it. Loading the file
-//! is what finds it.
+//! Regression: cover's `showChats` signal removed while root still handled it; `Cannot assign
+//! to non-existent property "onShowChats"` took window down (white screen). Grep can't catch
+//! it: handler capitalises signal (`onShowChats`). Loading the file does.
 
 // Qt harness: see qml_chat_list.rs.
 #![allow(
@@ -27,10 +20,8 @@ use qmetaobject::*;
 
 mod common;
 
-/// The probe, with the window's own components directory filled in: a
-/// probe loaded from data has no directory to resolve a relative import
-/// against, and what this asks about is a dconf key the window reads
-/// through its `Settings` singleton.
+/// Probe with window's components dir filled in: data-loaded probe has no dir for relative
+/// imports, and this reads a dconf key via window's `Settings` singleton.
 fn probe_qml(components: &std::path::Path) -> String {
     PROBE_QML.replace("__COMPONENTS__", &components.display().to_string())
 }
@@ -89,11 +80,10 @@ const PROBE_QML: &str = r"
 fn the_application_window_and_what_it_holds_all_load() {
     let temp = std::env::temp_dir().join(format!("piirit-startup-{}", std::process::id()));
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
-    // `EnterKey` has no stub, and ConversationPage is not reached from
-    // here anyway; the copy keeps this test to one reason to fail.
+    // No `EnterKey` stub; `ConversationPage` not reached anyway: copy keeps one reason to fail.
     let tree = common::qml_tree_without_enter_key();
 
-    // SAFETY: single-threaded test binary; set before Qt starts.
+    // SAFETY: single-threaded; before Qt.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_ACCOUNTS_DIR", temp.join("accounts"));
@@ -107,7 +97,7 @@ fn the_application_window_and_what_it_holds_all_load() {
         common::stubs_dir().to_string_lossy().into_owned(),
     ));
     engine.set_object_property("core".into(), core_box.pinned());
-    // The real one is handed in by main.rs; the value is never read here.
+    // Real one handed in by main.rs; never read here.
     engine.set_property(
         "rpcServerPath".into(),
         QString::from(env!("CARGO_BIN_EXE_fake-core-server")).into(),
@@ -140,12 +130,11 @@ fn the_application_window_and_what_it_holds_all_load() {
     let root = format!("file://{}", tree.join("piirit.qml").display());
 
     single_shot(Duration::from_secs(1), move || unsafe {
-        // A phone that has been used. dconf outlives the test binary, so
-        // both cases are set here rather than assumed.
+        // Used phone. dconf outlives test binary: both cases set, not assumed.
         (*steps_ptr).push(("remember", call!("remember", QString::from("7"))));
         (*steps_ptr).push(("resumed-load", call!("load", QString::from(root.clone()))));
         (*steps_ptr).push(("resumed-choice", call!("chosenPage")));
-        // A phone that has not.
+        // Unused phone.
         (*steps_ptr).push(("forget", call!("remember", QString::from("0"))));
         (*steps_ptr).push(("load", call!("load", QString::from(root.clone()))));
         (*steps_ptr).push(("fresh-choice", call!("chosenPage")));
@@ -183,9 +172,7 @@ fn the_application_window_and_what_it_holds_all_load() {
         "the first page the app shows does not build. {context}"
     );
 
-    // What the window opens on, which is the difference between landing
-    // on the chat list and watching the first screen be drawn and taken
-    // away again.
+    // What window opens on: chat list, vs first screen drawn and taken away again.
     assert_eq!(
         value("resumed-load"),
         "ok",

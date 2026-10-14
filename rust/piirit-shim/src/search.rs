@@ -1,10 +1,7 @@
-//! One search over everything, grouped the way the reference clients show
-//! it: chats, then contacts, then messages, each under a counted heading.
+//! Search results: chats, contacts, messages, each counted.
 //!
-//! The three kinds arrive from three different core calls but land in one
-//! flat model. QML's `section` groups a flat model and a view takes one
-//! model, so three lists stacked in a flickable would be the alternative --
-//! and nested flickables on Silica fight each other for the drag.
+//! Three core calls, one flat model: QML `section` groups a flat model and a view takes one.
+//! Alternative, three lists in a flickable, nests flickables that fight for drag on Silica.
 
 use std::cell::RefCell;
 use std::collections::HashMap;
@@ -18,17 +15,13 @@ use crate::core::connection;
 use crate::json;
 use crate::models::{SearchItem, SearchListModel};
 
-/// How many message hits become rows.
+/// Max message rows.
 ///
-/// A common word matches thousands of messages, and every one of them
-/// costs a row to build and a delegate to draw. `message_total` says how
-/// many there really were, so the heading can be honest about the cut.
-///
-/// Not a link from the properties above: it is private, and rustdoc
-/// refuses a public item that points at one.
+/// Common words match thousands. `message_total` keeps true count.
+/// Private: rustdoc bars public links to it.
 const MESSAGE_LIMIT: usize = 50;
 
-/// Everything one query found, in one model.
+/// One query's results.
 ///
 /// ```qml
 /// SearchResults { id: search; account_id: page.accountId; query: field.text }
@@ -38,68 +31,58 @@ const MESSAGE_LIMIT: usize = 50;
 pub struct SearchResults {
     base: qt_base_class!(trait QObject),
 
-    /// Which account to search. Setting it re-runs the query.
+    /// Account to search; setting re-runs query.
     pub account_id: qt_property!(u32; WRITE set_account_id NOTIFY account_changed),
-    /// Emitted when the account changes.
+    /// Emitted on account change.
     pub account_changed: qt_signal!(),
 
-    /// What to look for. Empty empties the model rather than listing
-    /// everything: an empty search is not a search.
+    /// Query text. Empty clears model (not "list everything").
     pub query: qt_property!(QString; WRITE set_query NOTIFY query_changed),
-    /// Emitted when the query changes.
+    /// Emitted on query change.
     pub query_changed: qt_signal!(),
 
-    /// The rows, for a `SilicaListView`'s `model`.
+    /// Rows for `SilicaListView` `model`.
     pub rows: qt_property!(RefCell<SearchListModel>; CONST),
 
-    // The counts are stored rather than counted out of the model on
-    // demand. A section heading binds to them, so QML reads them from
-    // inside the model reset that sets the rows -- and a reader that
-    // borrowed the row list there would find it already mutably borrowed
-    // and take the process down with it.
-    /// How many rows there are, across all three kinds.
+    // Stored, not counted from model: heading bindings read them inside the reset that sets
+    // rows, where borrowing rows finds them mutably borrowed and aborts the process.
+    /// Rows, all kinds.
     pub count: qt_property!(u32; NOTIFY rows_changed),
-    /// Chats found, for the heading.
+    /// Chats found.
     pub chat_count: qt_property!(u32; NOTIFY rows_changed),
-    /// Contacts found, for the heading.
+    /// Contacts found.
     pub contact_count: qt_property!(u32; NOTIFY rows_changed),
-    /// Messages listed, which the model caps -- see `message_total`
-    /// for how many there really were.
+    /// Messages listed, capped.
     pub message_count: qt_property!(u32; NOTIFY rows_changed),
-    /// Messages that matched, which can be more than are listed.
+    /// Messages matched; may exceed listed.
     pub message_total: qt_property!(u32; NOTIFY rows_changed),
-    /// Emitted after any change to `rows`.
+    /// Emitted after `rows` change.
     pub rows_changed: qt_signal!(),
 
-    /// True once an answer to the current query has landed.
+    /// True once current query answered.
     ///
-    /// Without it a list with nothing in it yet is indistinguishable from
-    /// one that found nothing, and "Nothing found" flashes up between
-    /// every keystroke and its answer.
+    /// Else empty list looks like no match: "Nothing found" flashes.
     pub loaded: qt_property!(bool; NOTIFY loaded_changed),
-    /// Emitted when `loaded` changes.
+    /// Emitted on `loaded` change.
     pub loaded_changed: qt_signal!(),
 
-    /// Searching failed. The message is the core's own.
+    /// Failure; message from core.
     pub error: qt_signal!(message: QString),
 
-    /// Run the query again.
+    /// Run query again.
     pub reload: qt_method!(fn(&mut self)),
 
-    /// Open the one-to-one chat with a contact, creating it if needed.
-    /// Answers on `chat_ready`. A contact result has no chat until this.
+    /// Open 1:1 chat with contact, creating it. Answers `chat_ready`.
     pub open_chat_with: qt_method!(fn(&mut self, contact_id: u32)),
-    /// A chat is ready to be shown.
+    /// Chat ready to show.
     pub chat_ready: qt_signal!(chat_id: u32),
 
-    /// Counts searches, so a slow answer to an older query cannot land on
-    /// top of a newer one. Typing "anna" starts four of these and they are
-    /// not answered in the order they were asked.
+    /// Drops stale answers: answers arrive out of order.
     generation: u64,
 }
 
 impl SearchResults {
-    /// Take the counts from a set of rows, before they become the model.
+    /// Counts from rows, before they become model.
     fn recount(&mut self, rows: &[SearchItem]) {
         let of = |kind: &str| {
             u32::try_from(
@@ -115,7 +98,7 @@ impl SearchResults {
         self.message_count = of("message");
     }
 
-    /// Set the account and search again if it changed.
+    /// Set account; re-search on change.
     pub fn set_account_id(&mut self, account_id: u32) {
         if self.account_id != account_id {
             self.account_id = account_id;
@@ -124,7 +107,7 @@ impl SearchResults {
         }
     }
 
-    /// Set the query and search again if it changed.
+    /// Set query; re-search on change.
     pub fn set_query(&mut self, query: QString) {
         if self.query.to_string() != query.to_string() {
             self.query = query;
@@ -133,7 +116,7 @@ impl SearchResults {
         }
     }
 
-    /// Empty the model, and say that nothing has been searched for.
+    /// Empty model; nothing searched.
     fn clear(&mut self) {
         self.recount(&[]);
         self.message_total = 0;
@@ -145,22 +128,19 @@ impl SearchResults {
         }
     }
 
-    /// Run the query.
+    /// Run query.
     pub fn reload(&mut self) {
         let account_id = self.account_id;
-        // A query of nothing but spaces is rejected by the core outright,
-        // so it counts as no query rather than as an error banner.
+        // Spaces-only: core rejects; treat as no query.
         let query = self.query.to_string().trim().to_string();
         if account_id == 0 || query.is_empty() {
-            // Still a new generation: an answer to the last query must not
-            // land after the reader has cleared the field.
+            // Late answer must not land after clear.
             self.generation = self.generation.wrapping_add(1);
             self.clear();
             return;
         }
-        // Silent, not an error: the core comes up after the first page
-        // does, and a banner per keystroke until it does is noise. The
-        // page runs this again when the core reports ready.
+        // Silent: core not up yet; banner per keystroke is noise.
+        // Page reruns on core ready.
         let Some((rpc, runtime)) = connection() else {
             return;
         };
@@ -171,8 +151,7 @@ impl SearchResults {
         let ptr: QPointer<Self> = QPointer::from(&*self);
         let done = queued_callback(move |result: Result<(Vec<SearchItem>, u32), String>| {
             let Some(this) = ptr.as_pinned() else { return };
-            // Answered after something newer was asked: these are results
-            // for a query the reader has already typed past.
+            // Answer for a query already typed past.
             if this.borrow().generation != generation {
                 return;
             }
@@ -181,8 +160,7 @@ impl SearchResults {
                     {
                         let mut this_mut = this.borrow_mut();
                         this_mut.message_total = total;
-                        // Counted first: setting the rows is what makes
-                        // QML read the counts back.
+                        // Count first: QML reads counts once rows set.
                         this_mut.recount(&rows);
                         this_mut.rows.borrow_mut().reset_data(rows);
                     }
@@ -198,9 +176,7 @@ impl SearchResults {
 
         runtime.spawn(async move {
             let result = async {
-                // In the order they are shown. Sequential rather than
-                // joined: the core answers one call at a time anyway, and
-                // three concurrent ones only reorder the waiting.
+                // Display order; sequential: core does one call at a time.
                 let mut rows = matching_chats(&rpc, account_id, &query).await?;
                 rows.extend(matching_contacts(&rpc, account_id, &query).await?);
                 let (messages, total) = matching_messages(&rpc, account_id, &query).await?;
@@ -212,7 +188,7 @@ impl SearchResults {
         });
     }
 
-    /// Open the one-to-one chat with a contact.
+    /// Open 1:1 chat with contact.
     pub fn open_chat_with(&mut self, contact_id: u32) {
         let account_id = self.account_id;
         if account_id == 0 || contact_id == 0 {
@@ -242,14 +218,13 @@ impl SearchResults {
     }
 }
 
-/// Chats whose name matches, in the core's own order.
+/// Chats matching name, core order.
 async fn matching_chats(
     rpc: &RpcClient,
     account_id: u32,
     query: &str,
 ) -> Result<Vec<SearchItem>, String> {
-    // No flags: a plain query searches every chat, archived ones included,
-    // which is what a search from the chat list should reach.
+    // No flags: searches archived chats too.
     let entries: Vec<u32> = rpc
         .call(
             "get_chatlist_entries",
@@ -283,13 +258,13 @@ async fn matching_chats(
         .collect())
 }
 
-/// Contacts whose name or address matches.
+/// Contacts matching name or address.
 async fn matching_contacts(
     rpc: &RpcClient,
     account_id: u32,
     query: &str,
 ) -> Result<Vec<SearchItem>, String> {
-    // listFlags 0, as the contact list uses: known, unblocked contacts.
+    // listFlags 0: known, unblocked, as contact list.
     let contacts: Vec<serde_json::Value> = rpc
         .call("get_contacts", (account_id, 0, Some(query.to_string())))
         .await
@@ -311,15 +286,13 @@ async fn matching_contacts(
         .collect())
 }
 
-/// Messages whose text matches, newest first as the core returns them, and
-/// how many there were before the cut.
+/// Messages matching text, newest first; total before cut.
 async fn matching_messages(
     rpc: &RpcClient,
     account_id: u32,
     query: &str,
 ) -> Result<(Vec<SearchItem>, u32), String> {
-    // Three arguments: the last is the chat to search within, and null
-    // means every chat. Two is rejected outright.
+    // Three args, last is chat to search in; null: every chat. Two args rejected.
     let hits: Vec<u32> = rpc
         .call(
             "search_messages",
@@ -338,9 +311,7 @@ async fn matching_messages(
         .await
         .map_err(|err| err.to_string())?;
 
-    // Which chat each hit is in, named in one call rather than one per
-    // message: a search across a busy account otherwise costs fifty round
-    // trips before the first row can be drawn.
+    // Chats of all hits named in one call: one per message is fifty round trips before first row.
     let mut chat_ids: Vec<u32> = Vec::new();
     for message_id in &shown {
         let Some(chat_id) = chat_of(messages.get(message_id)) else {
@@ -360,8 +331,7 @@ async fn matching_messages(
         .into_iter()
         .filter_map(|message_id| {
             let message = messages.get(&message_id)?;
-            // A message the core could not load comes back as
-            // `{kind: "loadingError"}`; skip it rather than show a blank.
+            // Core load failure: skip, not blank row.
             if json::str_at(message, "kind") == "loadingError" {
                 return None;
             }
@@ -385,7 +355,7 @@ async fn matching_messages(
     Ok((rows, total))
 }
 
-/// The chat a message object says it is in.
+/// Chat a message is in.
 fn chat_of(message: Option<&serde_json::Value>) -> Option<u32> {
     json::u32_opt(message?, "chatId").filter(|id| *id != 0)
 }

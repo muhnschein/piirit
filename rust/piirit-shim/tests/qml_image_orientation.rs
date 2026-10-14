@@ -1,23 +1,11 @@
-//! A photo is shown the way it was taken.
+//! Photo shown the way taken. Device report: sent image arrived upright for receiver, on its
+//! side in our view. Sensor reads out landscape however phone is held; EXIF tag, not pixels, says
+//! how to turn it. Other clients honour tag; `Image` doesn't unless asked. Pinned: `autoTransform`
+//! makes decoded size the seen size (8x16 for stored 16x8 marked rotate 90); row measured from
+//! that, not core's header dims (stored ones) -- else turned picture leaves bubble mostly empty.
 //!
-//! Reported from a device: an image sent from Piirit arrived the right
-//! way up for the person receiving it and lay on its side in our own
-//! message view. Cameras do that -- the sensor reads out landscape however
-//! the phone is held, and the file says which way to turn it afterwards, in
-//! an EXIF tag rather than in the pixels. Every other client honours the
-//! tag. `Image` does not, unless it is asked to.
-//!
-//! Two things follow from asking it, and this pins both. `autoTransform`
-//! makes the decoded image the size it is meant to be seen at -- eight
-//! wide by sixteen high, for a file stored sixteen by eight and marked
-//! "rotate 90". And the row has to be measured from *that* rather than from
-//! the dimensions the core read out of the file's header, which are the
-//! stored ones: a picture turned a quarter turn in a box shaped for the
-//! other orientation is a picture with most of its bubble empty.
-//!
-//! The fixture below is a whole baseline JPEG, written out by hand, because
-//! nothing in the tree can encode one and the only honest way to test what
-//! a decoder does with a tag is to hand it a file carrying the tag.
+//! Fixture: hand-written baseline JPEG: nothing in tree can encode one, and only honest way to
+//! test a tag is a file carrying it.
 
 // Qt harness: see qml_chat_list.rs.
 #![allow(
@@ -34,12 +22,10 @@ use qmetaobject::*;
 
 mod common;
 
-/// 16x8, one grey block, EXIF orientation 6 -- "rotate 90 clockwise", so it
-/// is meant to be seen 8 wide and 16 high. Minimal on purpose: a single
-/// Huffman code per table, a flat quantisation table, and two bits of scan
-/// data per block. `file(1)` reads it as
-/// "JPEG image data, Exif standard: [TIFF image data, big-endian,
-/// direntries=1, orientation=upper-right], baseline, precision 8, 16x8".
+/// 16x8 grey block, EXIF orientation 6 (rotate 90 clockwise): seen 8 wide, 16 high. Minimal:
+/// one Huffman code per table, flat quantisation, two bits of scan per block. `file(1)`:
+/// "JPEG image data, Exif standard: [TIFF image data, big-endian, direntries=1,
+/// orientation=upper-right], baseline, precision 8, 16x8".
 const SIDEWAYS_JPEG: &[u8] = &[
     0xff, 0xd8, 0xff, 0xe1, 0x00, 0x22, 0x45, 0x78, 0x69, 0x66, 0x00, 0x00, 0x4d, 0x4d, 0x00, 0x2a,
     0x00, 0x00, 0x00, 0x08, 0x00, 0x01, 0x01, 0x12, 0x00, 0x03, 0x00, 0x00, 0x00, 0x01, 0x00, 0x06,
@@ -55,7 +41,7 @@ const SIDEWAYS_JPEG: &[u8] = &[
     0xd9,
 ];
 
-/// What the bubble gives the picture to fill.
+/// What bubble gives picture to fill.
 const BUBBLE: i32 = 160;
 
 const PROBE_QML: &str = r"
@@ -102,7 +88,7 @@ fn a_photo_with_an_orientation_tag_is_shown_turned_and_measured_turned() {
     std::fs::write(&jpeg, SIDEWAYS_JPEG).expect("write jpeg");
     let jpeg = jpeg.to_string_lossy().into_owned();
 
-    // SAFETY: single-threaded test binary; set before Qt starts.
+    // SAFETY: single thread; pre-Qt.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
     }
@@ -139,8 +125,7 @@ fn a_photo_with_an_orientation_tag_is_shown_turned_and_measured_turned() {
             ),
         ));
     });
-    // The image is decoded off the Qt thread, so its own size is not known
-    // in the pass that asks for it.
+    // Decoded off Qt thread: own size unknown in the asking pass.
     single_shot(Duration::from_secs(2), move || unsafe {
         (*steps_ptr).push((
             "status",
@@ -175,7 +160,7 @@ fn a_photo_with_an_orientation_tag_is_shown_turned_and_measured_turned() {
     assert_outcome(&steps);
 }
 
-/// What the run has to show for itself, out of the test body.
+/// What run must show, out of test body.
 fn assert_outcome(steps: &[(&str, String)]) {
     let value = |label: &str| {
         steps
@@ -187,8 +172,7 @@ fn assert_outcome(steps: &[(&str, String)]) {
     let context = format!("steps: {steps:?}");
 
     assert_eq!(value("load"), "ok", "the preview did not load. {context}");
-    // Image.Ready is 1. Anything else and the rest of this proves nothing:
-    // an image that failed to decode reports no size either.
+    // Image.Ready is 1; else rest proves nothing: failed decode reports no size either.
     assert_eq!(
         value("status"),
         "1",
@@ -196,11 +180,8 @@ fn assert_outcome(steps: &[(&str, String)]) {
          {context}"
     );
 
-    // Twice as high as it is wide, whatever the size: the row bounds the
-    // decode with `sourceSize`, and the host's Qt (5.15) scales a picture
-    // to fit that bound in both directions, where the device's (5.6) only
-    // ever scales down. The turn is what is being checked, and it shows
-    // in the shape either way.
+    // Twice as high as wide, any size: row bounds decode with `sourceSize`; Qt 5.15 scales to fit
+    // both ways, device Qt 5.6 only down. Turn is what's checked; shape shows it either way.
     let width: f64 = value("decoded-width").parse().unwrap_or(0.0);
     let height: f64 = value("decoded-height").parse().unwrap_or(0.0);
     assert!(
@@ -211,7 +192,7 @@ fn assert_outcome(steps: &[(&str, String)]) {
          its side. {context}"
     );
 
-    // 160 wide, twice as high as it is wide once turned.
+    // 160 wide, twice as high once turned.
     assert_eq!(
         value("row-height"),
         (BUBBLE * 2).to_string(),

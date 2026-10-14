@@ -3,50 +3,34 @@ import Sailfish.Silica 1.0
 import "../components"
 
 /*
- * The work behind AddProfileDialog: the core asks the relay for an
- * account, stores what it answers, and starts IO; this page shows the
- * progress meanwhile and lands in the chat list when it is done. Cancel
- * and a failure both go back to the dialog, which still has what was
- * typed.
- *
- * Silica makes a dialog's accept destination the moment the dialog comes
- * on screen, so that it can be peeked at, and the dialog fills the name
- * and relay in on accept. So nothing happens here on creation: the work
- * starts when the page is the one on screen, which is after both.
- *
- * A relay is somebody's spare-time server, and one that is down holds
- * the core for minutes. So the page says as much once the wait has gone
- * past four seconds, under the Cancel button that has been there all
- * along; and the shim gives up on the relay for the reader at thirty
- * (signup.rs), which lands here as a time-out with the way back.
+ * Work behind AddProfileDialog: core gets account from relay, stores it,
+ * starts IO; page shows progress, then lands in chat list. Cancel or failure:
+ * back to dialog, which keeps input.
+ * Silica makes accept destination when dialog shows; dialog fills name and
+ * relay on accept. So work starts once on screen, not at creation.
+ * Relay past 4 s: say so under Cancel. Shim gives up at 30 s (signup.rs).
  */
 Page {
     id: page
 
-    /// The cover offers no quick actions while this is up: a jump away
-    /// would leave a profile halfway made. See piirit.qml.
+    /// No quick actions: jump away leaves profile half made. See piirit.qml.
     readonly property bool pausesQuickActions: true
 
     property string displayName
     property string providerQr
-    /// The relay's name, for the page to say. Empty when the core picks
-    /// the relays (AddProfileDialog.qml), and there is none to name.
+    /// Relay name to show. Empty when core picks relays (AddProfileDialog.qml).
     readonly property string relay: page.providerQr.replace("dcaccount:", "")
 
-    // True while the core is working.
+    // True while core works.
     property bool busy: false
-    // Set once the core has been asked, so a second activation -- coming
-    // back from a page pushed on top -- does not ask again.
+    // Set once core asked: re-activation must not re-ask.
     property bool started: false
     property int permille: 0
     property string errorMessage: ""
-    // Set once the relay has taken longer than four seconds, and kept:
-    // the reason to try another relay does not go away with the error
-    // that may follow.
+    // Set once relay past 4 s; outlives the error.
     property bool slowRelay: false
 
-    // The four seconds. Counted only while the core is working, and
-    // from the start of it: the page is made before it is on screen.
+    // The 4 s, counted only while core works.
     Timer {
         id: patience
         interval: 4000
@@ -54,14 +38,12 @@ Page {
         onTriggered: page.slowRelay = true
     }
 
-    // Cancel is the way back while the core is working: a swipe back
-    // would drop this page, and with it the handler that opens the chat
-    // list, leaving a profile made and nothing shown for it.
+    // Cancel is way back while core works: swipe-back would drop handler that
+    // opens chat list, leaving profile made, nothing shown.
     backNavigation: !busy
 
-    // A move the core asked for, held until this page is the one on
-    // screen: a call's page may be over it, and a move made then would
-    // take that page instead (PendingNavigation.qml).
+    // Core move held until on screen: call page may cover it, and move then
+    // would take that page (PendingNavigation.qml).
     PendingNavigation {
         id: navigation
         stack: pageStack
@@ -84,8 +66,7 @@ Page {
             page.begin()
         }
     }
-    // Pushed straight to the top, the page is active before the handler
-    // above exists.
+    // Pushed to top: active before handler above exists.
     Component.onCompleted: {
         if (page.status === PageStatus.Active) {
             page.begin()
@@ -97,8 +78,7 @@ Page {
         target: core
 
         onProfile_created: {
-            // Only while this page is waiting: an answer after cancel is
-            // not this page's to act on.
+            // Only while waiting: answer after cancel is not ours.
             if (!page.busy) {
                 return
             }
@@ -115,9 +95,8 @@ Page {
             page.errorMessage = message
         }
 
-        // The shim gave up on the relay. Worded here rather than in the
-        // shim: it is the one failure the app decides on itself, so it
-        // is the one the app can say in the reader's language.
+        // Shim gave up on relay. Worded here: the one failure app decides
+        // itself, so it can say it in reader's language.
         onProfile_timed_out: {
             if (!page.busy) {
                 return
@@ -129,8 +108,7 @@ Page {
                     : qsTr("No relay answered within %1 seconds.").arg(seconds)
         }
 
-        // Not gated on `busy`: the core's last progress events can arrive
-        // after the call that started them has already been answered.
+        // Not gated on `busy`: late progress events arrive after the call.
         onConfigure_progress: page.permille = permille
     }
 
@@ -167,11 +145,9 @@ Page {
             }
         }
 
-        // Under the Cancel button, once the relay has kept the reader
-        // waiting: what a relay is, and what to do about one that does
-        // not answer. Stays through the error that may follow, since
-        // the Back button under it is the way it points. Not while the
-        // core picks the relays: trying another is what it is doing.
+        // Under Cancel once relay past 4 s: what relay is, what if silent.
+        // Stays through error (Back below is where it points). Not when core
+        // picks relays: trying others is what it does.
         Label {
             objectName: "slowHint"
             x: Theme.horizontalPageMargin

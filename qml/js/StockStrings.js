@@ -1,23 +1,15 @@
-// The text the core writes itself, in the reader's language: what a chat
-// list says of a draft, the line a group shows when someone joins it, the
-// errors it reports. The core has its own English for every one of these
-// and takes a translation for each by number (its `StockMessage` ids,
-// chatmail/core src/stock_str.rs); DeltaChatCore.set_stock_strings hands
-// this table over.
+// Strings core writes itself, in reader's language (drafts, joins, errors).
+// Fed via DeltaChatCore.set_stock_strings. Core English per `StockMessage` id
+// (chatmail/core src/stock_str.rs).
 //
-// The English is Delta Chat's own, string for string, so the catalogs
-// carry Delta Chat's translations of it (docs/PROJECT.md, "The words on
-// screen"). Which string answers which id is Delta Chat Android's choice,
-// in DcHelper.setStockTranslations, and so are its departures from the
-// core's English. Where Android says "Tap to learn more", which nothing
-// here offers, the plain string is used (170), or none at all (174).
-// The calls (232 to 235) keep their direction, which the core's own
-// English has and Android's shorter one does not.
+// Text and translations: Delta Chat's (docs/PROJECT.md, "The words on screen").
+// Id-to-string map: Delta Chat Android's (DcHelper.setStockTranslations).
+// 170: plain string (Android's "Tap to learn more" not offered). 174: none.
+// 232-235: core's direction (Android's shorter one drops it).
 //
-// No `.pragma library`: qsTr() needs the context of a component, as in
-// Format.js.
+// No `.pragma library`: qsTr() needs component context (Format.js).
 
-/// Every stock string, by the core's id.
+/// All stock strings, by core id.
 function all() {
     return {
         //: Written by the core: Delta Chat's "chat_no_messages".

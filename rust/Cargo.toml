@@ -10,35 +10,21 @@ members = [
 [workspace.package]
 edition = "2021"
 license = "GPL-3.0-or-later"
-# Sailfish OS ships Rust 1.75.0 (sailfishos/rust). Declaring it here keeps
-# `cargo update` on a newer host from resolving dependencies that no longer
-# build on the toolchain the device target actually has -- together with
-# .cargo/config.toml at the top of the tree, without which resolver "2"
-# ignores this line. Clippy reads it too: `incompatible_msrv` flags a std
-# API newer than this on the pinned stable toolchain.
+# Sailfish ships Rust 1.75.0. Pin stops newer hosts resolving deps device can't build.
+# Needs .cargo/config.toml (resolver "2") too. Clippy `incompatible_msrv` checks it.
 rust-version = "1.75"
-# Never published: these are workspace-internal crates wired by path, and an
-# application, not a library. Saying so is also what lets cargo-deny treat the
-# internal path deps as private rather than wildcard dependencies (deny.toml,
-# `allow-wildcard-paths`) -- that allowance does not apply to publishable
-# crates, because crates.io forbids path deps in the first place.
+# Never published: internal path crates, app not lib. cargo-deny treats path deps as private
+# (deny.toml `allow-wildcard-paths`); crates.io bans path deps.
 publish = false
 
-# Lints live at the workspace level so a bare `cargo clippy` fails the same
-# way CI's `-D warnings` does, instead of only warning locally.
+# Workspace lints: bare `cargo clippy` fails like CI `-D warnings`.
 [workspace.lints.rust]
-# Denied here rather than through RUSTFLAGS, which reaches the whole
-# dependency graph: cargo caps lints for crates it fetches, but not for the
-# vendored qmetaobject, whose own warnings would then fail our build.
-# This table applies to workspace members, which is what the rule is about.
+# Denied here, not RUSTFLAGS (would hit vendored qmetaobject warnings).
 warnings = "deny"
 unsafe_code = "deny"
 missing_docs = "deny"
-# A path spelled out where a `use` already brought the name in, and casts
-# to the type the value already has: noise that hides the casts that
-# matter. Not `trivial_numeric_casts`: whether `x as c_char` is trivial
-# depends on the target (c_char is i8 on the x86_64 CI, u8 on the phone),
-# so it could pass CI and fail the device build.
+# Ban redundant path prefixes and identity casts. Not `trivial_numeric_casts`:
+# `x as c_char` is i8 on CI, u8 on phone.
 unused_qualifications = "deny"
 trivial_casts = "deny"
 
@@ -48,22 +34,15 @@ pedantic = { level = "deny", priority = -1 }
 unwrap_used = "deny"
 expect_used = "deny"
 disallowed_methods = "deny"
-# Picked from nursery and restriction by running them over this tree, not
-# taken as groups: those move between releases and many of their lints are
-# taste. Each of these is a bug class or a lost diagnosis.
-#
-# A lock guard living through an `if let`/`match` body. A std Mutex held
-# that long is how a Qt callback and a tokio task deadlock each other.
+# Bug classes only, picked by running on tree. Lock guard held over `if let`/`match`
+# deadlocks Qt callback vs tokio.
 significant_drop_in_scrutinee = "deny"
 redundant_clone = "deny"
 needless_collect = "deny"
 derive_partial_eq_without_eq = "deny"
-# `assert!(r.is_ok())` fails without saying what the error was; with over
-# a hundred Qt test binaries that are slow to rerun, the message is the
-# diagnosis.
+# `assert!(r.is_ok())` hides the error; the message is the diagnosis.
 assertions_on_result_states = "deny"
-# `.map_err(|_| ...)` throws the cause away, which on a phone is often all
-# there was to go on.
+# `.map_err(|_| ...)` drops the cause; often the only clue on a phone.
 map_err_ignore = "deny"
 mem_forget = "deny"
 # Debugging leftovers.
@@ -71,37 +50,21 @@ dbg_macro = "deny"
 todo = "deny"
 unimplemented = "deny"
 print_stdout = "deny"
-# The panic-freedom lints -- `indexing_slicing`, `string_slice`,
-# `arithmetic_side_effects`, `panic` and the rest -- are not here: they
-# apply to shipped code only, and this table cannot say that. Each crate
-# root denies them under `cfg_attr(not(test), ...)` instead.
+# Panic-freedom lints not here: shipped code only. Crate roots deny them under
+# `cfg_attr(not(test), ...)`.
 
-# How the packaged binary is built. Each setting is paid for in build
-# time and was measured on the aarch64 package (docs/BUILDING.md, "What a
-# package weighs"):
+# Packaged binary; each costs build time (docs/BUILDING.md, "What a package weighs"):
 #
-# `strip` first, because the assumption it corrects is written down
-# elsewhere in this tree: the SDK's rpmbuild does *not* strip what it
-# packages -- Harbour's own validator says "file is not stripped!" of
-# every build so far -- and the symbol tables were 2.08 MB of a 5.83 MB
-# binary, none of it read on a phone. `main` is not lost with them: it is
-# exported through `--dynamic-list` (piirit-app/build.rs) into `.dynsym`,
-# which `--strip-all` does not touch, and the booster looks it up there.
-# See docs/HARBOUR.md, "Exporting main()".
+# `strip`: SDK rpmbuild does NOT strip; symbols were 2.08 of 5.83 MB. `main` survives in
+# `.dynsym` via `--dynamic-list` (piirit-app/build.rs). docs/HARBOUR.md, "Exporting main()".
 #
-# `lto` and `codegen-units` then let rustc inline across crates and stop
-# splitting the work into sixteen units it cannot optimise between. Thin
-# LTO rather than fat: the same shape of win for a fraction of the link
-# time, which under scratchbox2 is the part that hurts.
+# `lto`, `codegen-units`: cross-crate inlining; thin LTO for less link time (slow in sb2).
 [profile.release]
 strip = "symbols"
 lto = "thin"
 codegen-units = 1
 
-# qmetaobject builds its QML engine on QApplication, from QtWidgets, which
-# Harbour does not allow (docs/HARBOUR.md). The vendored copy is upstream
-# 0.2.10 plus third_party/qmetaobject.patch, three lines swapping it for
-# QGuiApplication; ci/vendor-check.sh proves it is exactly that and nothing
-# more.
+# qmetaobject needs QtWidgets QApplication, which Harbour bans (docs/HARBOUR.md).
+# Vendored copy: upstream 0.2.10 + third_party/qmetaobject.patch. ci/vendor-check.sh checks.
 [patch.crates-io]
 qmetaobject = { path = "../third_party/qmetaobject" }

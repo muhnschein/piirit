@@ -1,14 +1,9 @@
-//! The page that adds a relay, against a relay that keeps the reader
-//! waiting.
+//! Add-relay page vs a relay that keeps reader waiting.
 //!
-//! `relays.rs` drives it against a relay that answers at once. This is
-//! the other case, against the double's `slow` relay: the hint about
-//! volunteers' relays appears under Cancel at the fourth second and not
-//! before; at the deadline the page shows the time-out with the relay's
-//! name and the fields back; a second attempt while the core is still on
-//! the first is refused in the core's own words, since a profile has one
-//! ongoing process at a time; and a relay that cannot be reached is
-//! refused in the core's words too.
+//! `relays.rs` covers instant relay. Here the double's `slow` relay: hint under
+//! Cancel from 4s, not before; at deadline, time-out with relay name, fields
+//! back; second attempt while core busy refused (one process per profile);
+//! unreachable relay refused in core's words.
 
 // Qt harness: see qml_chat_list.rs.
 #![allow(
@@ -32,11 +27,9 @@ const PROBE_QML: &str = r"
     Item {
         id: probe
 
-        // Silica's `pageStack`, recorded rather than performed. The page
-        // pops on success only, which nothing here reaches. In QML rather
-        // than as a QObject on the Rust side, since a page loaded by a
-        // Loader reads `pageStack` off the file the Loader was declared
-        // in.
+        // Silica's `pageStack`, recorded not performed. Page pops on success
+        // only, which nothing here reaches. In QML, not a QObject: a
+        // Loader-loaded page reads `pageStack` off the file it was declared in.
         property QtObject pageStack: QtObject {
             property string log: ''
             function pop() { log = log + 'pop|' }
@@ -90,14 +83,13 @@ fn a_slow_relay_is_explained_and_given_up_on() {
     let journal = common::fresh_journal(&temp);
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
 
-    // SAFETY: single-threaded test binary; set before Qt starts and before
-    // the server inherits them.
+    // SAFETY: single-threaded; set before Qt and server.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_FAKE_JOURNAL", &journal);
         std::env::set_var("PIIRIT_ACCOUNTS_DIR", temp.join("accounts"));
         std::env::set_var("PIIRIT_FAKE_ACCOUNTS", "1");
-        // A relay that does not answer while anyone here is watching.
+        // Does not answer while watched.
         std::env::set_var("PIIRIT_FAKE_SLOW_MS", "20000");
     }
 
@@ -111,8 +103,7 @@ fn a_slow_relay_is_explained_and_given_up_on() {
     engine.set_object_property("core".into(), core_box.pinned());
     engine.load_data(QByteArray::from(PROBE_QML));
 
-    // Six seconds rather than the built-in thirty; the page is what is
-    // under test, not the wait.
+    // 6s, not built-in 30s: the page is under test, not the wait.
     core_box.pinned().borrow_mut().profile_timeout = 6;
     core_box
         .pinned()
@@ -145,7 +136,7 @@ fn a_slow_relay_is_explained_and_given_up_on() {
         };
     }
 
-    // 1s: a typed relay, and the core asked for it.
+    // 1s: typed relay; core asked.
     single_shot(Duration::from_secs(1), move || unsafe {
         record!(
             "load",
@@ -172,20 +163,20 @@ fn a_slow_relay_is_explained_and_given_up_on() {
         record!("add-hidden", get!("addButton", "visible"));
     });
 
-    // 2s: waiting, with nothing said yet.
+    // 2s: waiting, nothing said yet.
     single_shot(Duration::from_secs(2), move || unsafe {
         record!("early-hint", get!("slowHint", "visible"));
         record!("early-label", get!("progressBar", "label"));
         record!("early-cancel", get!("cancelButton", "visible"));
     });
 
-    // 6s: the fourth second has passed.
+    // 6s: fourth second passed.
     single_shot(Duration::from_secs(6), move || unsafe {
         record!("hint", get!("slowHint", "visible"));
         record!("still-busy", call!("pageProperty", QString::from("busy")));
     });
 
-    // 8s: the deadline passed at seven.
+    // 8s: deadline passed at 7s.
     single_shot(Duration::from_secs(8), move || unsafe {
         record!("late-busy", call!("pageProperty", QString::from("busy")));
         record!(
@@ -195,12 +186,11 @@ fn a_slow_relay_is_explained_and_given_up_on() {
         record!("late-hint", get!("slowHint", "visible"));
         record!("late-add", get!("addButton", "visible"));
         record!("late-field", get!("customField", "readOnly"));
-        // A second attempt, while the core is still on the first.
+        // Second attempt while core busy.
         record!("again", call!("click", QString::from("addButton")));
     });
 
-    // 10s: refused, since the core allows one process per profile; then
-    // a relay that cannot be reached.
+    // 10s: refused (one process per profile); then unreachable relay.
     single_shot(Duration::from_secs(10), move || unsafe {
         record!("again-busy", call!("pageProperty", QString::from("busy")));
         record!(
@@ -307,8 +297,7 @@ fn a_slow_relay_is_explained_and_given_up_on() {
     );
     assert_eq!(value("again"), "ok", "{context}");
     assert_eq!(value("again-busy"), "false", "{context}");
-    // The core's words, behind the transport's own prefix, as every
-    // page shows a refusal.
+    // Core's words behind the transport prefix, as pages show refusals.
     assert!(
         value("again-error").ends_with("There is already another ongoing process running."),
         "a second attempt while the core is still on the first was not \

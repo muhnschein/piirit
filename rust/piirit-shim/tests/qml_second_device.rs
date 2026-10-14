@@ -1,57 +1,32 @@
-//! Offering one profile to a second device, from the page that does it.
+//! Offer one profile to a second device, from its page (other end of `qml_restore.rs`:
+//! that reads a code, this shows it). Core provider is per profile (takes account id), so
+//! page is reached from profile's row. Pinned:
 //!
-//! The other end of `qml_restore.rs`: that one reads a code another
-//! device is showing, this one is the device showing it. The core's
-//! provider is per profile -- it takes an account id -- so the page is
-//! reached from the profile's own row and names the account it was
-//! given. What is pinned here is the whole of what the page does around
-//! those two calls:
+//! - offer is `provide_backup` on this account, `get_backup_qr` for code text; code drawn
+//!   and printed is core's answer;
+//! - nothing goes up alone: code waits behind button, "Show code" then "Show code again";
+//! - going back ends offer in core; only a transfer under way pins page. A page pushed
+//!   over (a call's) is not leaving: offer stays up;
+//! - Cancel stops provider in core, reader stays on page with button back;
+//! - offer reader stops reports nothing (core refuses provider it was told to stop);
+//! - core without code: offer stopped, reason in core's words;
+//! - no taker is not a hand-over: both `Ok`, only progress differs (`second_device.rs`);
+//! - device taking profile ends page: code goes, chats attached right (way on is a swipe).
 //!
-//! - the offer goes out as `provide_backup` on this profile's account,
-//!   with `get_backup_qr` beside it for the text of the code, and the
-//!   code the page draws and prints is the one the core answered with;
-//! - nothing goes up on its own: the code waits behind a button, which
-//!   says "Show code" until the reader has seen one and "Show code
-//!   again" after that;
-//! - the page can be walked away from, and going back ends the offer in
-//!   the core rather than leaving a provider running behind a page that
-//!   is gone; only a transfer already under way pins it -- and a page
-//!   pushed over this one, a call's, is not the reader leaving, and
-//!   leaves the offer up;
-//! - Cancel stops the provider in the core and leaves the reader on the
-//!   page, with the button back;
-//! - an offer the reader stops reports nothing: the core refuses the
-//!   provider it was told to stop, which is the reader's own doing;
-//! - a core that cannot produce a code does not leave a provider
-//!   running behind a page with nothing on it: the offer is stopped,
-//!   and the reason is the core's own words;
-//! - an offer that ends with nobody having taken the profile is said as
-//!   such rather than reported as a hand-over: the provider answers the
-//!   same `Ok` either way, and only the progress the core reports tells
-//!   the two apart (`second_device.rs`);
-//! - a device that takes the profile ends the page: the code goes, and
-//!   the chats are attached to the right so the way on is a swipe.
-//!
-//! The five offers run on five profiles rather than one, because the
-//! only thing the core's provider is keyed on is the account -- so that
-//! is what the fake server is keyed on too (`fake_core_server.rs`):
-//! account 3 is the one it will not show a code for, 2 the one it
-//! refuses outright, 4 and 6 the ones nobody ever comes for -- given up
-//! on with Cancel and by going back -- 1 the one a device turns up to
-//! and stays for, and 5 the one whose device starts and goes away
-//! again.
+//! One profile per offer: provider and fake server keyed only on account
+//! (`fake_core_server.rs`): 3 no code, 2 refused, 4/6 nobody comes (Cancel / back),
+//! 1 device stays, 5 device starts and leaves.
 
 // Qt harness: see qml_chat_list.rs.
 #![allow(
     unsafe_code,
     unused_unsafe,
-    // `pushAttached` is Silica's own name; the probe has to answer to it.
+    // `pushAttached` is Silica's name; probe must answer to it.
     non_snake_case,
     clippy::borrow_as_ptr,
     clippy::disallowed_methods,
     clippy::expect_used,
-    // qt_method! declarations must match the generated dispatcher's
-    // by-value parameters; see piirit-shim/src/lib.rs.
+    // Must match dispatcher's by-value params (piirit-shim/src/lib.rs).
     clippy::needless_pass_by_value
 )]
 
@@ -63,10 +38,7 @@ use serde_json::Value;
 
 mod common;
 
-/// Silica's `pageStack`, recorded rather than performed: what the page
-/// does to the stack is read off this afterwards -- the chats attached
-/// to the right of a hand-over, and nothing at all from Cancel, which
-/// stops the code without leaving.
+/// Silica's `pageStack`, recorded. Chats attached right; Cancel leaves none.
 #[derive(QObject, Default)]
 struct PageStackProbe {
     base: qt_base_class!(trait QObject),
@@ -74,7 +46,7 @@ struct PageStackProbe {
     log: qt_property!(QString; NOTIFY log_changed),
     log_changed: qt_signal!(),
     push: qt_method!(fn(&mut self, page: QString, properties: QVariantMap)),
-    /// Silica's own name for putting a page to the right of this one.
+    /// Silica's name for pushing right.
     pushAttached: qt_method!(fn(&mut self, page: QString, properties: QVariantMap)),
     pop: qt_method!(fn(&mut self)),
 }
@@ -181,26 +153,20 @@ fn the_second_device_page_offers_one_profile_and_hands_it_over() {
     let journal = common::fresh_journal(&temp);
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
 
-    // SAFETY: single-threaded test binary, and all of these have to be
-    // set before Qt initialises and before the shim spawns the server
-    // that inherits them.
+    // SAFETY: single-threaded; set before Qt init and server spawn.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_FAKE_JOURNAL", &journal);
         std::env::set_var("PIIRIT_ACCOUNTS_DIR", temp.join("accounts"));
-        // Six profiles, because the provider is keyed on nothing else.
+        // Six profiles: provider keyed by account.
         std::env::set_var("PIIRIT_FAKE_ACCOUNTS", "1,2,3,4,5,6");
-        // The one a device turns up for, and how long it takes: a step
-        // of progress after the first wait, the profile taken after the
-        // second.
+        // Device turns up: progress step after first wait, taken after second.
         std::env::set_var("PIIRIT_FAKE_TAKEN", "1");
         std::env::set_var("PIIRIT_FAKE_SLOW_MS", "4000");
-        // The one the core refuses to offer at all, and the one it
-        // offers without ever producing a code.
+        // Refused at offer, or offered with no code ever.
         std::env::set_var("PIIRIT_FAKE_PROVIDE_FAIL", "2");
         std::env::set_var("PIIRIT_FAKE_NO_QR", "3");
-        // And the one a device starts on and then goes away from, which
-        // the core ends exactly as it ends a hand-over.
+        // Device starts, leaves: ends like hand-over.
         std::env::set_var("PIIRIT_FAKE_STALLED", "5");
     }
 
@@ -247,12 +213,8 @@ fn the_second_device_page_offers_one_profile_and_hands_it_over() {
         };
     }
 
-    // The profile the core will not show a code for. The chats are on
-    // another profile throughout: offering one is not switching to it.
-    //
-    // Every offer in this test starts with a press: the page puts
-    // nothing up on its own, and the button says so before it is
-    // pressed the first time.
+    // No code; chats on other profile: offering isn't switching.
+    // Offers start with a press; nothing goes up alone.
     single_shot(Duration::from_secs(1), move || unsafe {
         record!(
             "load-no-code",
@@ -276,9 +238,9 @@ fn the_second_device_page_offers_one_profile_and_hands_it_over() {
         );
         record!("no-code-idle", get!("device", "running"));
         record!("no-code-button", get!("showButton", "visible"));
-        // No code ever went up, so there is nothing to show *again*.
+        // No code went up: nothing to show again.
         record!("no-code-label", get!("showButton", "text"));
-        // The profile the core refuses to offer at all.
+        // Core refuses to offer.
         record!(
             "load-refused",
             call!(
@@ -298,8 +260,7 @@ fn the_second_device_page_offers_one_profile_and_hands_it_over() {
         );
         record!("refused-idle", get!("device", "running"));
         record!("refused-code", get!("device", "code"));
-        // The profile nobody ever comes for, which is the code left up
-        // on the page until the reader gives up on it.
+        // Nobody comes: code left up until given up.
         record!(
             "load-waiting",
             call!(
@@ -313,8 +274,7 @@ fn the_second_device_page_offers_one_profile_and_hands_it_over() {
     });
 
     single_shot(Duration::from_secs(7), move || unsafe {
-        // Whose profile: drawn the way the invite code's page draws it,
-        // in the colour the core gives this account.
+        // Drawn like invite code, account colour.
         record!("colour", call!("profileShows", QString::from("ownColor")));
         record!("waiting-code", get!("device", "code"));
         record!("waiting-shown", get!("deviceQr", "visible"));
@@ -341,10 +301,9 @@ fn the_second_device_page_offers_one_profile_and_hands_it_over() {
             call!("pageProperty", QString::from("backNavigation"))
         );
         record!("cancelled-button", get!("showButton", "visible"));
-        // A code has been on screen now, so the button says so.
+        // Code on screen: button says so.
         record!("cancelled-label", get!("showButton", "text"));
-        // The same give-up, by going back instead of by Cancel: the
-        // provider has to end in the core either way.
+        // Back, not Cancel: provider must end either way.
         record!(
             "load-leaving",
             call!(
@@ -359,7 +318,7 @@ fn the_second_device_page_offers_one_profile_and_hands_it_over() {
 
     single_shot(Duration::from_secs(11), move || unsafe {
         record!("leaving-code", get!("device", "code"));
-        // Covered, not left: the offer stays up under the page on top.
+        // Covered, not left: offer stays up under page.
         call!("cover", true);
         record!("covered-running", get!("device", "running"));
         record!("covered-code", get!("device", "code"));
@@ -368,7 +327,7 @@ fn the_second_device_page_offers_one_profile_and_hands_it_over() {
     });
 
     single_shot(Duration::from_secs(13), move || unsafe {
-        // And the profile a device really turns up for and stays for.
+        // Device turns up and stays.
         record!(
             "load-taken",
             call!(
@@ -382,8 +341,7 @@ fn the_second_device_page_offers_one_profile_and_hands_it_over() {
     });
 
     single_shot(Duration::from_secs(17), move || unsafe {
-        // Mid-transfer: the bar is up, the code is no longer what the
-        // page is about, and there is no way off it.
+        // Mid-transfer: bar up, no way off.
         record!("transfer-permille", get!("device", "permille"));
         record!("transfer-bar", get!("transferProgress", "visible"));
         record!("transfer-code-shown", get!("deviceQr", "visible"));
@@ -404,10 +362,7 @@ fn the_second_device_page_offers_one_profile_and_hands_it_over() {
             "taken-leavable",
             call!("pageProperty", QString::from("backNavigation"))
         );
-        // Last, because it only has an end state to read: the profile a
-        // device starts on and then goes away from. The provider ends
-        // the way a hand-over ends, and only the progress says it was
-        // not one.
+        // Device starts, leaves: only progress tells apart.
         record!(
             "load-stalled",
             call!(
@@ -473,9 +428,7 @@ fn the_second_device_page_offers_one_profile_and_hands_it_over() {
         "an offer was not started by the button. {context}"
     );
 
-    // Nothing goes up on the way in: the page opened by mistake shows
-    // nothing worth reading, and the button says what it is about to do
-    // before it has ever done it.
+    // Going in: nothing goes up; button says what it does.
     assert_eq!(
         (value("idle-code").as_str(), value("idle-running").as_str()),
         ("", "false"),
@@ -495,8 +448,7 @@ fn the_second_device_page_offers_one_profile_and_hands_it_over() {
         "the page does not say whose profile is being offered. {context}"
     );
 
-    // A core that cannot produce a code: the reason in the core's own
-    // words, nothing left running, and the button to try again.
+    // Core can't make code: reason in core's words, nothing left running, button to retry.
     assert!(
         value("no-code-said").contains("no backup provider is running"),
         "a core that would not show a code did not say so in its own \
@@ -519,7 +471,7 @@ fn the_second_device_page_offers_one_profile_and_hands_it_over() {
          offering to show one again. {context}"
     );
 
-    // A provider the core refuses outright.
+    // Provider core refuses.
     assert!(
         value("refused-said").contains("backup could not be offered"),
         "a refused offer did not say so in the core's words. {context}"
@@ -534,8 +486,7 @@ fn the_second_device_page_offers_one_profile_and_hands_it_over() {
          {context}"
     );
 
-    // The code, up and waiting: drawn, printed, and the page pinned
-    // behind it.
+    // Code up: drawn, printed, page pinned behind.
     assert!(
         value("waiting-code").starts_with("DCBACKUP"),
         "the page is not showing the code the core answered with: {}. \
@@ -569,9 +520,8 @@ fn the_second_device_page_offers_one_profile_and_hands_it_over() {
          to walk away from their own code. {context}"
     );
 
-    // Going back is the other way to give up on an offer, and has to
-    // end it in the core as Cancel does: a provider left running holds
-    // the profile out with nothing on screen to stop it.
+    // Going back ends offer in core, like Cancel: provider left running holds profile out
+    // with nothing on screen to stop it.
     assert!(
         value("leaving-code").starts_with("DCBACKUP"),
         "there was no offer up to leave: {}. {context}",
@@ -586,10 +536,10 @@ fn the_second_device_page_offers_one_profile_and_hands_it_over() {
         "a page pushed over the offer -- a call's -- ended it, which drops \
          a second device part-way through copying the profile. {context}"
     );
-    // That going back stopped it in the core is `assert_offers`'s.
+    // Going back stopped it: `assert_offers`'s job.
     assert_eq!(value("leave"), "ok", "nothing left the page. {context}");
 
-    // Stopped by the reader: nothing reported, nothing left up.
+    // Reader stop: nothing reported, nothing left up.
     assert_eq!(value("cancel"), "ok", "nothing cancelled. {context}");
     assert!(
         !popped.contains("pop:"),
@@ -607,8 +557,7 @@ fn the_second_device_page_offers_one_profile_and_hands_it_over() {
         "an offer the reader stopped was reported back to them, or left \
          a code up, or left the page pinned. {context}"
     );
-    // Cancel takes the code down and leaves the reader here, on the
-    // button -- which now has a code behind it to show again.
+    // Cancel takes code down; reader stays on button, now "Show code again".
     assert_eq!(
         (
             value("cancelled-button").as_str(),
@@ -619,8 +568,7 @@ fn the_second_device_page_offers_one_profile_and_hands_it_over() {
          button back, saying it can show the code again. {context}"
     );
 
-    // A device that starts and goes away: the same `Ok` a hand-over
-    // ends with, and none of the words a hand-over earns.
+    // Device leaves: `Ok`, none of hand-over's words.
     assert_eq!(
         value("stalled-taken"),
         "false",
@@ -647,8 +595,7 @@ fn the_second_device_page_offers_one_profile_and_hands_it_over() {
          with. {context}"
     );
 
-    // A device taking the profile: the transfer reported while it runs,
-    // and the page over once it is done.
+    // Device takes profile: transfer reported; page over.
     assert!(
         value("transfer-permille").parse::<u32>().unwrap_or(0) >= 300,
         "the transfer never reported itself, so the bar sat at nothing \
@@ -701,11 +648,8 @@ fn the_second_device_page_offers_one_profile_and_hands_it_over() {
     assert_offers(&calls, &context);
 }
 
-/// Every offer went out as `provide_backup` on the profile the page was
-/// given, with `get_backup_qr` beside it for the code, and the three
-/// that ended here -- the one with no code to show, the one the reader
-/// cancelled and the one they walked away from -- were stopped in the
-/// core rather than left running.
+/// Offers: `provide_backup` on page's profile, `get_backup_qr` beside.
+/// No-code, cancelled, walked-away offers stopped in core, not left running.
 fn assert_offers(calls: &[(String, Value)], context: &str) {
     let accounts = |method: &str| -> Vec<u64> {
         calls

@@ -1,21 +1,14 @@
-//! Making a group: named, pictured and peopled on one page, and handed to
-//! the core in one go.
+//! Group making: name, picture, members, one core call.
 //!
-//! The page mirrors the group's own (`qml_group_page.rs`), so what is
-//! checked is the same shape: the reader among the members from the
-//! start, whoever the picker hands back drawn as a member, and creating
-//! refused until there is a name -- which needs `nameField` to be reachable
-//! from the page's own scope, not buried in the list's header where the
-//! Create button cannot see it.
+//! Page mirrors group's own (`qml_group_page.rs`), so same shape checked: reader among members
+//! from start, whoever picker hands back drawn as member, create refused until named -- needs
+//! `nameField` reachable from page scope, not buried in list header where Create can't see it.
 //!
-//! "Drawn as a member" is asked as `shown`, not as `visible`: the rows
-//! are the ones `picked_rows` hands back, so a contact nobody picked has
-//! no row at all rather than a hidden one.
+//! "Drawn as member" = `shown`, not `visible`: rows are what `picked_rows` hands back, so unpicked
+//! contact has no row at all rather than a hidden one.
 
-// Qt harness: needs `unsafe` for `env::set_var` before Qt starts
-// (`unused_unsafe` because it is only unsafe from edition 2024 on),
-// `borrow_as_ptr` for the engine pointer, and `single_shot` with
-// whole-second Durations.
+// Qt harness: `unsafe` env::set_var pre-Qt (`unused_unsafe`: unsafe only from edition 2024),
+// `borrow_as_ptr` for engine pointer, `single_shot` with whole-second Durations.
 #![allow(
     unsafe_code,
     unused_unsafe,
@@ -32,12 +25,9 @@ use serde_json::Value;
 
 mod common;
 
-// Silica's `pageStack`, recorded rather than performed -- in QML rather
-// than as a QObject of the test's own. The page resolves the bare name
-// through the component that instantiated it, which is this one, so a
-// property of the root suffices; and a QObject derived here would carry
-// the generated dispatcher's pointer juggling into a file that only
-// reads back.
+// Silica `pageStack`, recorded not performed, in QML not a test QObject: page resolves the bare
+// name through its instantiating component (this one), so a root property suffices; a QObject here
+// would bring dispatcher pointer juggling into a file that only reads back.
 const PROBE_QML: &str = r"
     import QtQuick 2.0
     Item {
@@ -127,8 +117,7 @@ fn the_new_group_page_makes_the_group_it_shows() {
     let journal = common::fresh_journal(&temp);
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
 
-    // SAFETY: single-threaded test binary; set before Qt starts and before
-    // the server inherits them.
+    // SAFETY: single-threaded test; set before Qt and server start.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_FAKE_JOURNAL", &journal);
@@ -188,9 +177,9 @@ fn the_new_group_page_makes_the_group_it_shows() {
     });
 
     single_shot(Duration::from_secs(3), move || unsafe {
-        // Nothing typed: creating must be refused.
+        // Nothing typed: create refused.
         record!("empty", get!("createButton", "enabled"));
-        // The reader is a member from the start; nobody else is yet.
+        // Reader is member from start.
         record!("self-row", call!("shown", QString::from("memberRow1")));
         record!("ada-before", call!("shown", QString::from("memberRow10")));
         record!("heading-before", get!("membersHeader", "text"));
@@ -204,12 +193,12 @@ fn the_new_group_page_makes_the_group_it_shows() {
                 QString::from("Walking group")
             )
         );
-        // The picker hands Ada back; the same again is not twice.
+        // Ada picked again: not added twice.
         record!("pick-ada", call!("pick", 10));
         record!("pick-ada-again", call!("pick", 10));
         record!("ada-after", call!("shown", QString::from("memberRow10")));
         record!("heading-after", get!("membersHeader", "text"));
-        // Grace comes and goes again.
+        // Grace added, then removed again.
         record!("pick-grace", call!("pick", 11));
         record!("unpick-grace", call!("unpick", 11));
         record!("grace-after", call!("shown", QString::from("memberRow11")));
@@ -239,8 +228,7 @@ fn the_new_group_page_makes_the_group_it_shows() {
     assert_outcome(&steps, &common::calls(&journal));
 }
 
-/// The page refused an unnamed group, showed the members it was handed,
-/// and made the group with its name, its members and its picture.
+/// Unnamed group refused; members shown; group made with name, members, picture.
 #[allow(clippy::too_many_lines)]
 fn assert_outcome(steps: &[(&str, String)], calls: &[(String, Value)]) {
     let names: Vec<&str> = calls.iter().map(|(name, _)| name.as_str()).collect();

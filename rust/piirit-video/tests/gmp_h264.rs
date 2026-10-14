@@ -1,22 +1,18 @@
-//! The H.264 encoder video calls send through (`csrc/gmp_h264.cpp`), as
-//! Gecko sees it: loaded from the directory build.rs lays out, handed
-//! pictures by `gmp-check` (`tests/gmp_check.cpp`) the way Gecko's plugin
-//! process hands them, and read back the way Gecko's packetizer reads
-//! them. Each test is one scenario of the harness's; what it printed is
-//! checked here.
+//! H.264 encoder for calls (`csrc/gmp_h264.cpp`) as Gecko sees it: loaded from
+//! build.rs's dir, fed by `gmp-check` (`tests/gmp_check.cpp`), read as Gecko's
+//! packetizer reads. Each test is one scenario.
 
 #![allow(clippy::expect_used, clippy::unwrap_used)]
 
 use std::path::{Path, PathBuf};
 use std::process::Command;
 
-/// The plugin's directory, `gmp-piirit/<version>`, as build.rs made it.
+/// Plugin dir, `gmp-piirit/<version>`, as build.rs made it.
 fn plugin_dir() -> PathBuf {
     PathBuf::from(env!("PIIRIT_GMP_PLUGIN"))
 }
 
-/// What `gmp-check` printed for a scenario, with the call log at `log`
-/// when there is one.
+/// `gmp-check` output for scenario; `log`: call log, if any.
 fn run(scenario: &str, log: Option<&Path>) -> Vec<String> {
     let mut command = Command::new(env!("PIIRIT_GMP_CHECK"));
     command
@@ -32,7 +28,7 @@ fn run(scenario: &str, log: Option<&Path>) -> Vec<String> {
     text.lines().map(str::to_owned).collect()
 }
 
-/// One encoded picture, from a `frame ...` line.
+/// One encoded picture, from `frame` line.
 #[derive(Debug)]
 struct Frame {
     timestamp: u64,
@@ -40,7 +36,7 @@ struct Frame {
     bytes: u64,
     size: String,
     line: String,
-    /// NAL unit types and sizes, in order.
+    /// NAL types and sizes, in order.
     units: Vec<(u8, u32)>,
     sps: String,
 }
@@ -84,13 +80,12 @@ fn frames(lines: &[String]) -> Vec<Frame> {
         .collect()
 }
 
-/// Kilobits a second over `frames`, from their sizes and timestamps:
-/// every picture but the last, over the time until the last.
+/// Kbit/s over `frames`: all but last picture, over time to last.
 fn kbps(frames: &[Frame]) -> u64 {
     let first = frames.first().unwrap().timestamp;
     let last = frames.last().unwrap().timestamp;
     let bits: u64 = frames[..frames.len() - 1].iter().map(|f| f.bytes * 8).sum();
-    // Bits per microsecond, times a thousand, is kilobits a second.
+    // Bits/us x 1000 = kbit/s.
     bits * 1000 / (last - first)
 }
 
@@ -108,8 +103,7 @@ const GMP_ENCODE_ERR: &str = "error 8";
 #[test]
 fn gecko_finds_an_h264_encoder_in_the_plugin_directory() {
     let dir = plugin_dir();
-    // Gecko takes the plugin's name from the directory above the
-    // version, less "gmp-", and loads lib<name>.so and <name>.info.
+    // Plugin name = dir above version, less "gmp-"; loads lib<name>.so, <name>.info.
     assert_eq!(dir.parent().unwrap().file_name().unwrap(), "gmp-piirit");
     assert!(dir.join("libpiirit.so").is_file());
     let info = std::fs::read_to_string(dir.join("piirit.info")).unwrap();
@@ -119,7 +113,7 @@ fn gecko_finds_an_h264_encoder_in_the_plugin_directory() {
         .collect();
     let names: Vec<&str> = fields.iter().map(|&(name, _)| name).collect();
     assert_eq!(names, ["Name", "Description", "Version", "APIs"]);
-    // Encoding only: decoding H.264 is the phone's own decoder's.
+    // Encoding only: H.264 decode is the phone's.
     assert_eq!(fields[3].1, "encode-video[h264]");
 }
 
@@ -131,8 +125,7 @@ fn only_the_entry_points_are_there_to_find() {
         "{:?}",
         &lines[..3]
     );
-    // 4 is GMPNotImplementedErr: no decoder, and no encoder without a
-    // host to make its pictures with.
+    // 4 = GMPNotImplementedErr: no decoder; no encoder without host.
     assert!(lines.contains(&"decode-video 4".to_owned()), "{lines:?}");
     assert!(
         lines.contains(&"encode-video without host 4".to_owned()),
@@ -158,7 +151,7 @@ fn a_call_starts_on_a_keyframe_and_makes_another_when_asked() {
         "{lines:?}"
     );
     for (i, frame) in frames.iter().enumerate() {
-        // Each picture as soon as it went in, under its own timestamp.
+        // Each picture out as it went in, own timestamp.
         assert_eq!(
             frame.timestamp,
             1_000_000 + i as u64 * FRAME_US,
@@ -166,16 +159,15 @@ fn a_call_starts_on_a_keyframe_and_makes_another_when_asked() {
             frame.line
         );
         assert_eq!(frame.size, "320x240");
-        // Four-byte sizes, a whole picture, and H.264 said in the info.
+        // 4-byte sizes, whole picture, H.264 in info.
         assert_eq!(field(&frame.line, "buffer"), "4");
         assert_eq!(field(&frame.line, "complete"), "1");
         assert_eq!(field(&frame.line, "info"), "1/4");
         if i == 0 || i == 30 {
-            // A receiver can start at either: SPS and PPS come with it.
+            // Receiver can start at either: SPS and PPS come with it.
             assert!(frame.key, "{}", frame.line);
             assert_eq!(types(frame)[..3], [SPS, PPS, IDR], "{}", frame.line);
-            // Constrained Baseline (profile 66 with constraint_set1),
-            // level 3.1: what Gecko offers.
+            // Constrained Baseline (profile 66, constraint_set1), level 3.1.
             let sps = u32::from_str_radix(&frame.sps, 16).unwrap();
             assert_eq!(sps >> 16, 0x42, "{}", frame.line);
             assert_ne!(sps & 0x4000, 0, "{}", frame.line);
@@ -191,8 +183,7 @@ fn a_call_starts_on_a_keyframe_and_makes_another_when_asked() {
 fn the_bit_rate_follows_what_gecko_asks_for() {
     let frames = frames(&run("rates", None));
     assert_eq!(frames.len(), 120);
-    // 1000 kbps for two seconds, then a tenth of that. The first
-    // pictures fill the buffer, and the last carry what is left of it.
+    // 1000 kbps for 2 s, then a tenth. First pictures fill buffer; last carry rest.
     let before = kbps(&frames[10..60]);
     let after = kbps(&frames[90..]);
     assert!((750..1250).contains(&before), "{before} kbps of 1000");
@@ -203,8 +194,8 @@ fn the_bit_rate_follows_what_gecko_asks_for() {
 fn half_the_frame_rate_still_gets_the_bit_rate() {
     let frames = frames(&run("slow", None));
     assert_eq!(frames.len(), 90);
-    // Set up for 30 pictures a second and given 15: each must carry
-    // twice as much, or the call goes out at half its rate.
+    // Set up for 30 fps, given 15: each picture carries twice as much, or the
+    // call runs at half rate.
     let rate = kbps(&frames[30..]);
     assert!((480..720).contains(&rate), "{rate} kbps of 600");
 }
@@ -258,7 +249,7 @@ fn an_encoder_that_cannot_start_says_so_and_takes_every_picture_back() {
     );
 }
 
-/// A call log, as the call host leaves one: made, and empty.
+/// Call log as call host leaves it: made, empty.
 struct Log(PathBuf);
 
 impl Log {
@@ -295,7 +286,7 @@ fn what_encoding_costs_goes_in_the_call_log() {
     );
     assert!(lines[1].starts_with("encoder first picture: "), "{lines:?}");
     assert!(lines[1].ends_with(" bytes, key"), "{lines:?}");
-    // Every thirty seconds of the call, and once at its end.
+    // Every thirty seconds, and at the end.
     let summaries: Vec<&String> = lines[2..].iter().collect();
     assert_eq!(summaries.len(), 3, "{lines:?}");
     assert!(

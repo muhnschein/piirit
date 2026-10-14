@@ -1,18 +1,8 @@
-//! A line break in a message is drawn as a line break.
-//!
-//! The bubble draws the shim's rendering of a body as `Text.StyledText`,
-//! and in that format a newline is *whitespace*: a body joined with
-//! newlines comes out as one running paragraph however it was typed. Two
-//! whole features were quietly broken by it -- a to-do list somebody
-//! sent arrived as a sentence, and the fold never offered to open it out,
-//! because a message that Qt lays out as one line has nothing to
-//! truncate.
-//!
-//! So this measures what Qt does rather than trusting a reading of it:
-//! each shape the renderer can emit goes through a `Text` in the same
-//! format the bubble uses, and the lines it comes out as are counted.
-//! `markdown.rs` has the other half -- that the renderer emits these
-//! shapes -- and the two together are the whole chain.
+//! Line break drawn as line break. Bubble's `Text.StyledText` treats newline as
+//! whitespace: newline-joined body became one paragraph. Broke to-do lists (arrived as a
+//! sentence) and fold (one laid-out line has nothing to truncate). Measures Qt directly: each
+//! renderer shape through same-format `Text`, lines counted. `markdown.rs` pins other half
+//! (renderer emits these shapes); together, whole chain.
 
 // Qt harness: see qml_reactions.rs.
 #![allow(
@@ -76,7 +66,7 @@ const PROBE_QML: &str = r"
     }
 ";
 
-/// Forty lines, rendered the way the shim renders them.
+/// Forty lines, rendered as shim renders them.
 fn a_long_styled_body() -> String {
     use std::fmt::Write as _;
 
@@ -93,7 +83,7 @@ fn a_long_styled_body() -> String {
 #[test]
 #[allow(clippy::too_many_lines)]
 fn the_renderings_line_breaks_are_line_breaks_on_the_screen() {
-    // SAFETY: single-threaded test binary; set before Qt starts.
+    // SAFETY: single thread; pre-Qt.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
     }
@@ -128,17 +118,15 @@ fn the_renderings_line_breaks_are_line_breaks_on_the_screen() {
     let long = a_long_styled_body();
 
     single_shot(Duration::from_secs(1), move || unsafe {
-        // A body joined with newlines, and the same body joined with `<br>`.
+        // Newline-joined body and `<br>`-joined body.
         record!("newlines", call!("lines", QString::from("one\ntwo\nthree")));
         record!(
             "breaks",
             call!("lines", QString::from("one<br>two<br>three"))
         );
-        // A blank line between two paragraphs.
+        // Blank line between paragraphs.
         record!("blank", call!("lines", QString::from("one<br><br>three")));
-        // A code block: `<pre>` keeps the newlines in it, and its own
-        // tags start and end a line -- which is why the renderer puts no
-        // `<br>` at either edge of one.
+        // Code block: `<pre>` keeps newlines; its tags start and end a line, so no `<br>` at edges.
         record!("block", call!("lines", QString::from("a<pre>x\ny</pre>b")));
         record!(
             "block-with-breaks",
@@ -154,8 +142,7 @@ fn the_renderings_line_breaks_are_line_breaks_on_the_screen() {
     });
 
     single_shot(Duration::from_secs(2), move || unsafe {
-        // A forty-line body, drawn from the rendering: the fold has to
-        // see it as forty lines rather than one.
+        // Forty-line body from rendering: fold must see forty lines.
         call!("set", QString::from("markdownMode"), 0);
         call!(
             "set",
@@ -209,9 +196,8 @@ fn the_renderings_line_breaks_are_line_breaks_on_the_screen() {
     let number = |label: &str| value(label).parse::<f64>().unwrap_or(-1.0);
     let context = format!("steps: {steps:?}");
 
-    // The measurement the fix rests on. If this ever comes back as 3,
-    // Qt has started treating a newline as a break and `join_styled`
-    // could be simpler -- but nothing is broken by the `<br>`.
+    // Measurement fix rests on. If it returns 3, Qt breaks on newline and `join_styled`
+    // could be simpler; `<br>` harmless.
     assert_eq!(
         value("newlines"),
         "1",
@@ -230,7 +216,7 @@ fn the_renderings_line_breaks_are_line_breaks_on_the_screen() {
         "3",
         "a blank line between two paragraphs was collapsed. {context}"
     );
-    // a / x / y / b, with the block's own tags doing the breaking.
+    // a / x / y / b; block's own tags do the breaking.
     assert_eq!(
         value("block"),
         "4",

@@ -1,14 +1,8 @@
-//! Closing the app mid-call ends the call, and the other end hears it.
+//! Closing app mid-call ends call; other end hears.
 //!
-//! The app stops the core as soon as its window has closed, and the call's
-//! host -- whose going is what tells the core a call is over -- goes only
-//! after that, with the window. So the core used to hear nothing: the
-//! other end rang on until its own timeout, or sat in a silent call. Now
-//! stopping the core ends every call still hosted first, and waits for the
-//! core to have sent the message that says so.
-//!
-//! A call that only rings is left alone: closing the app is not a
-//! decline, and another of the account's devices may yet answer it.
+//! Core stops on window close, before call host goes, so core heard nothing: other end rang on.
+//! Now stop ends hosted calls first, waits for core's end message. Ringing call left alone:
+//! closing isn't a decline; another device may answer.
 
 // Qt harness: see qml_pages.rs.
 #![allow(
@@ -58,7 +52,7 @@ fn a_call_up_when_the_app_closes_is_ended_before_the_core_goes() {
     let journal = common::fresh_journal(&temp);
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
 
-    // SAFETY: single-threaded test binary; set before Qt starts.
+    // SAFETY: single-threaded; set before Qt starts.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_FAKE_JOURNAL", &journal);
@@ -96,15 +90,15 @@ fn a_call_up_when_the_app_closes_is_ended_before_the_core_goes() {
         };
     }
 
-    // SAFETY for every block: these fire only while `exec()` runs on this
-    // thread, and everything they point at outlives it.
+    // SAFETY for every block: fire only inside `exec()` on this
+    // thread; pointees outlive it.
     single_shot(Duration::from_secs(2), move || unsafe {
         record!("ringing", call!("state"));
         record!("answer", call!("answer"));
         record!("other", call!("ring"));
     });
 
-    // The page is up, and the reader closes the app.
+    // Page up, reader closes app.
     single_shot(Duration::from_secs(3), move || unsafe {
         record!("url", call!("url"));
         (*engine_ptr).quit();
@@ -112,7 +106,7 @@ fn a_call_up_when_the_app_closes_is_ended_before_the_core_goes() {
 
     engine.exec();
 
-    // What the app does once its window has closed.
+    // What app does on window close.
     let stopping = Instant::now();
     piirit_shim::shutdown();
     let stopped_in = stopping.elapsed();
@@ -152,8 +146,7 @@ fn a_call_up_when_the_app_closes_is_ended_before_the_core_goes() {
          the one only ringing, which another device may yet answer. \
          {context}"
     );
-    // The core said it had sent the message ending the call, and the app
-    // stopped it then rather than at the end of its wait.
+    // Core sent end message; app stopped then, not at end of wait.
     assert!(
         stopped_in < Duration::from_secs(2),
         "the app did not stop the core once the call's end was sent. \

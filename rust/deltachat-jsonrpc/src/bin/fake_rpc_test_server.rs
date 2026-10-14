@@ -1,7 +1,5 @@
-//! Stand-in for `deltachat-rpc-server`, for this crate's tests.
-//!
-//! Same wire format, one task per request, so the suite can exercise
-//! correlation, out-of-order replies, errors, and the event long poll.
+//! Stand-in for `deltachat-rpc-server` in tests.
+//! Same wire format: correlation, out-of-order replies, errors, long poll.
 
 use std::sync::Arc;
 
@@ -10,8 +8,7 @@ use tokio::io::{AsyncBufReadExt, AsyncWriteExt, BufReader};
 use tokio::sync::Mutex;
 
 fn main() {
-    // By hand rather than `#[tokio::main]`, which is the `macros` feature
-    // and a proc-macro crate the app's own build does not need.
+    // Not `#[tokio::main]`: needs `macros`, a proc-macro crate.
     let runtime = match tokio::runtime::Builder::new_multi_thread()
         .enable_all()
         .build()
@@ -62,9 +59,7 @@ async fn serve() {
                     ok(id, &json!(sum))
                 }
                 "fail" => err(id, -32000, "boom"),
-                // A line the client cannot decode, before the real answer.
-                // Stands in for a server writing something that is not
-                // UTF-8 to its stdout: one bad line, not a closed pipe.
+                // Non-UTF-8 line: one bad line, not closed pipe.
                 "garbage" => {
                     let mut out = stdout.lock().await;
                     let _ = out.write_all(b"\xff\xfe this is not text\n").await;
@@ -84,12 +79,8 @@ async fn serve() {
                 "get_next_event_batch" => {
                     let mut count = batch_counter.lock().await;
                     *count += 1;
-                    // A run of answers the client cannot use. The real
-                    // core would do this by changing an event's shape
-                    // across a version; here an error object does the same
-                    // job. Six in a row, none of them the transport
-                    // closing, so the stream has to carry on past all of
-                    // them rather than treat them as a dead core.
+                    // Unusable answers, like core changing event shape across versions.
+                    // Six in a row: stream must survive.
                     if (2..=7).contains(&*count) {
                         err(id, -32000, "no events for you")
                     } else if *count <= 8 {
@@ -102,8 +93,7 @@ async fn serve() {
                             }]),
                         )
                     } else {
-                        // Blocks forever, like the real long poll with no
-                        // events.
+                        // Blocks forever, like real long poll.
                         drop(count);
                         std::future::pending::<()>().await;
                         unreachable!("pending future never resolves")

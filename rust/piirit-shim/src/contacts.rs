@@ -1,7 +1,4 @@
-//! Contacts, and the ways a chat gets started.
-//!
-//! Until this existed the app could only show conversations that arrived on
-//! their own: nothing created one.
+//! Contacts; ways to start a chat.
 
 use std::cell::RefCell;
 
@@ -12,11 +9,9 @@ use crate::core::{connection, reconcile_rows};
 use crate::json;
 use crate::models::{ContactItem, ContactListModel};
 
-/// Known, unblocked contacts, and the calls that turn one into a chat.
+/// Known unblocked contacts; calls that start chats.
 ///
-/// With `blocked` set it lists the account's blocked contacts instead,
-/// which is the other list the core keeps and the one the blocked
-/// contacts page shows.
+/// `blocked`: blocked list instead.
 ///
 /// ```qml
 /// ContactList { id: contacts; account_id: page.accountId }
@@ -26,140 +21,106 @@ use crate::models::{ContactItem, ContactListModel};
 pub struct ContactList {
     base: qt_base_class!(trait QObject),
 
-    /// Whose contacts these are. Setting it reloads.
+    /// Account. Setting reloads.
     pub account_id: qt_property!(u32; WRITE set_account_id NOTIFY account_changed),
-    /// Emitted when the account changes.
+    /// Account changed.
     pub account_changed: qt_signal!(),
 
-    /// Filter, matched by the core against name and address. Setting it
-    /// reloads.
+    /// Filter; core matches name and address.
     pub query: qt_property!(QString; WRITE set_query NOTIFY query_changed),
-    /// Emitted when the query changes.
+    /// Query changed.
     pub query_changed: qt_signal!(),
 
-    /// List the account's own contact too, after everyone else. Off by
-    /// default: a picker offers other people, and the one page that
-    /// draws the reader among the members is the one that asks.
+    /// Include own contact, last. Off: pickers skip it.
     pub include_self: qt_property!(bool; WRITE set_include_self NOTIFY include_self_changed),
-    /// Emitted when `include_self` changes.
+    /// `include_self` changed.
     pub include_self_changed: qt_signal!(),
 
-    /// List the contacts this account has blocked rather than the ones
-    /// it can write to. The core keeps the two apart -- a blocked
-    /// contact is in neither `get_contacts` nor any picker -- so this is
-    /// a different list, not a filter over the one above. `query` and
-    /// `include_self` say nothing here: the core's call takes neither,
-    /// and a blocked list is short enough to read.
+    /// Blocked contacts: separate core list (blocked ones are in neither `get_contacts` nor
+    /// pickers), not a filter. `query`, `include_self` ignored: core call takes neither.
     pub blocked: qt_property!(bool; WRITE set_blocked NOTIFY blocked_changed),
-    /// Emitted when `blocked` changes.
+    /// `blocked` changed.
     pub blocked_changed: qt_signal!(),
 
-    /// The rows, for a `SilicaListView`'s `model`.
+    /// Rows for `SilicaListView`.
     pub rows: qt_property!(RefCell<ContactListModel>; CONST),
 
-    /// How many rows there are.
+    /// Row count.
     pub count: qt_property!(u32; READ count NOTIFY rows_changed),
-    /// Emitted after any change to `rows`.
+    /// Emitted after `rows` change.
     pub rows_changed: qt_signal!(),
 
-    /// Something failed. The message is the core's own.
+    /// Failed; core's message.
     pub error: qt_signal!(message: QString),
 
-    /// Reload the list.
+    /// Reload list.
     pub reload: qt_method!(fn(&mut self)),
 
-    /// Open the one-to-one chat with a contact, creating it if needed.
-    /// Answers on `chat_ready`.
+    /// One-to-one chat, created if needed. Answers `chat_ready`.
     pub open_chat_with: qt_method!(fn(&mut self, contact_id: u32)),
 
-    /// Create a group with the given name, members and picture, and open
-    /// it. The picture is a path, or empty for none: the core takes one
-    /// only on a chat that exists, so it is set once the group does.
-    /// Answers on `chat_ready`.
+    /// Create group, open it. Picture set after: core takes one only on existing chat. Answers
+    /// `chat_ready`.
     pub create_group:
         qt_method!(fn(&mut self, name: QString, member_ids: QVariantList, picture_path: QString)),
 
-    /// Follow an invite -- a scanned QR payload or a pasted
-    /// `https://i.delta.chat/...` link -- and open the chat it leads to.
-    /// This is how a Delta Chat contact is normally added: an address alone
-    /// cannot be encrypted to (docs/PROJECT.md). Answers on `chat_ready`,
-    /// or on `relay_offered` for a relay's code.
+    /// Follow invite (QR or `https://i.delta.chat/...`) and open chat: normal way to add contact,
+    /// as address alone can't be encrypted to (docs/PROJECT.md). Answers `chat_ready`, or
+    /// `relay_offered` for relay code.
     pub join_by_invite: qt_method!(fn(&mut self, qr_content: QString)),
-    /// What `join_by_invite` was handed is a relay's code, `dcaccount:` or
-    /// `dclogin:`, rather than an invite: one to add to this profile
-    /// rather than a profile of its own, as the reference clients take it
-    /// since 2.61. `relay` is the relay's name, or the address on it, as
-    /// the core read it off the code.
+    /// `join_by_invite` got relay code (`dcaccount:`, `dclogin:`): add to this profile, not new
+    /// profile, as reference clients since 2.61. `relay`: relay name or address, per core.
     pub relay_offered: qt_signal!(qr_content: QString, relay: QString),
 
-    /// The rows a group being put together draws: this account's own
-    /// contact first, when the list holds it, then the contacts named
-    /// by `contact_ids`, in the order they were picked. An id the list
-    /// does not hold is left out.
+    /// Group rows: own contact first (if list holds it), then `contact_ids` in pick order. Ids
+    /// not in list skipped.
     ///
-    /// A list of maps rather than a filter over the model: a page that
-    /// drew the members by hiding everybody else built a row -- and an
-    /// avatar, and the two effects behind it -- for every contact the
-    /// reader has, twice over, and built them again on every pick. What
-    /// it cost to open that page was the size of an address book that
-    /// had nothing to do with the group.
+    /// List of maps, not model filter: hiding non-members still built row and avatar per contact,
+    /// on every pick.
     pub picked_rows: qt_method!(fn(&self, contact_ids: QVariantList) -> QVariantList),
 
-    /// Stop hearing from a contact: nothing they send arrives, and they
-    /// are not offered by anything that picks a contact. Blocking is the
-    /// account's, as the core keeps it -- one profile's block list says
-    /// nothing about another's.
+    /// Stop hearing from contact: nothing they send arrives; no picker offers them. Per account.
     pub block: qt_method!(fn(&mut self, contact_id: u32)),
 
-    /// Hear from a contact again.
+    /// Hear from contact again.
     pub unblock: qt_method!(fn(&mut self, contact_id: u32)),
 
-    /// A block was applied, and this list has been asked again. `blocked`
-    /// is which way it went, for a page that says so.
+    /// Block applied; list re-asked. `blocked`: which way.
     pub blocking_applied: qt_signal!(contact_id: u32, blocked: bool),
 
-    /// Feed a `core_event` in. Events for other accounts are ignored.
-    ///
-    /// Blocking from another device lands here as a `ContactsChanged`,
-    /// and so does the core's own answer to a block made on this one.
+    /// Feed `core_event`; other accounts ignored. Blocks (other device, or core's answer to one
+    /// here) arrive as `ContactsChanged`.
     pub handle_event:
         qt_method!(fn(&mut self, context_id: u32, kind: QString, payload_json: QString)),
 
-    /// Fetch this account's own invite, the one to hand out. Answers on
-    /// `invite_ready`.
+    /// Fetch own invite. Answers `invite_ready`.
     pub fetch_invite: qt_method!(fn(&mut self)),
-    /// This account's invite link.
+    /// Account's invite link.
     pub invite_ready: qt_signal!(link: QString),
 
-    /// A chat is ready to be shown.
+    /// Chat ready to show.
     pub chat_ready: qt_signal!(chat_id: u32),
 
-    /// Counts loads, so a slow answer to an old query cannot land on top of
-    /// a newer one. Typing "anna" starts four of these and they are not
-    /// answered in the order they were asked.
+    /// Counts loads: stale answer must not land on newer. Answers arrive out of order.
     generation: u64,
 }
 
-/// How an answer from the core lands in the rows.
+/// How an answer lands in `rows`.
 #[derive(Clone, Copy)]
 enum Fill {
-    /// Another list -- another account, query or kind -- so the rows are
-    /// replaced, and the view starts again from its top.
+    /// New list: rows replaced, view to top.
     Replace,
-    /// The same list read again, after the core said it changed or a page
-    /// asked: only the rows that changed are touched, so the view stays
-    /// where the reader left it. Replacing them would take it back to its
-    /// top, away from whatever the reader had scrolled to.
+    /// Same list re-read: changed rows only; view keeps scroll.
     InPlace,
 }
 
 impl ContactList {
-    /// How many rows there are.
+    /// Row count.
     pub fn count(&self) -> u32 {
         u32::try_from(self.rows.borrow().iter().count()).unwrap_or(u32::MAX)
     }
 
-    /// Set the account and reload if it changed.
+    /// Set account; reload if changed.
     pub fn set_account_id(&mut self, account_id: u32) {
         if self.account_id != account_id {
             self.account_id = account_id;
@@ -168,7 +129,7 @@ impl ContactList {
         }
     }
 
-    /// Set the filter and reload if it changed.
+    /// Set filter; reload if changed.
     pub fn set_query(&mut self, query: QString) {
         if self.query.to_string() != query.to_string() {
             self.query = query;
@@ -177,7 +138,7 @@ impl ContactList {
         }
     }
 
-    /// List the account's own contact as well, or stop doing so.
+    /// Include own contact, or not.
     pub fn set_include_self(&mut self, include_self: bool) {
         if self.include_self != include_self {
             self.include_self = include_self;
@@ -186,7 +147,7 @@ impl ContactList {
         }
     }
 
-    /// Show the blocked contacts, or the ones that can be written to.
+    /// Blocked or writable contacts.
     pub fn set_blocked(&mut self, blocked: bool) {
         if self.blocked != blocked {
             self.blocked = blocked;
@@ -195,12 +156,12 @@ impl ContactList {
         }
     }
 
-    /// Reload the list.
+    /// Reload list.
     pub fn reload(&mut self) {
         self.load(Fill::InPlace);
     }
 
-    /// Ask the core for the list, and put what it answers in `rows`.
+    /// Ask core for list; answer into `rows`.
     fn load(&mut self, fill: Fill) {
         let account_id = self.account_id;
         if account_id == 0 {
@@ -210,8 +171,7 @@ impl ContactList {
             return;
         };
         let query = self.query.to_string();
-        // listFlags: 0 is known, unblocked contacts; DC_GCL_ADD_SELF (2)
-        // puts the account's own contact at the end of them.
+        // listFlags: 0 known unblocked; DC_GCL_ADD_SELF (2) adds own contact last.
         let list_flags: u32 = if self.include_self { 2 } else { 0 };
         let blocked = self.blocked;
         self.generation = self.generation.wrapping_add(1);
@@ -220,8 +180,7 @@ impl ContactList {
         let ptr: QPointer<Self> = QPointer::from(&*self);
         let done = queued_callback(move |result: Result<Vec<ContactItem>, String>| {
             let Some(this) = ptr.as_pinned() else { return };
-            // Answered after something newer was asked: these are results
-            // for a query the reader has already typed past.
+            // Stale: answered after newer query asked.
             if this.borrow().generation != generation {
                 return;
             }
@@ -244,9 +203,7 @@ impl ContactList {
         });
 
         runtime.spawn(async move {
-            // Two calls rather than a flag on one: the core lists the
-            // blocked contacts through a method of its own, which takes
-            // neither the flags nor the query.
+            // Blocked list has own core method; no flags or query.
             let contacts = if blocked {
                 rpc.call::<_, Vec<serde_json::Value>>("get_blocked_contacts", (account_id,))
                     .await
@@ -265,22 +222,17 @@ impl ContactList {
         });
     }
 
-    /// Stop hearing from a contact.
+    /// Stop hearing from contact.
     pub fn block(&mut self, contact_id: u32) {
         self.set_blocking(contact_id, true);
     }
 
-    /// Hear from a contact again.
+    /// Hear from contact again.
     pub fn unblock(&mut self, contact_id: u32) {
         self.set_blocking(contact_id, false);
     }
 
-    /// Block or unblock, then read the list back.
-    ///
-    /// Read back rather than edited in place: a block takes the contact
-    /// out of one of these lists and puts it into the other, and which
-    /// list this one is deciding that is the core's business, not a row
-    /// removal guessed at here.
+    /// Block or unblock, re-read list. Core decides where contact lands.
     fn set_blocking(&mut self, contact_id: u32, blocked: bool) {
         let account_id = self.account_id;
         if account_id == 0 || contact_id == 0 {
@@ -322,9 +274,7 @@ impl ContactList {
         if context_id != self.account_id || self.account_id == 0 {
             return;
         }
-        // A contact added, renamed, blocked or unblocked -- from here or
-        // from another device -- and the overflow that says events were
-        // dropped, which is answered by reading everything again.
+        // Added, renamed, (un)blocked, or overflow: re-read all.
         if matches!(
             kind.to_string().as_str(),
             "ContactsChanged" | "EventChannelOverflow"
@@ -333,15 +283,14 @@ impl ContactList {
         }
     }
 
-    /// The reader's own row, then the picked ones. See the declaration.
+    /// Own row, then picked ones.
     pub fn picked_rows(&self, contact_ids: QVariantList) -> QVariantList {
         let rows = self.rows.borrow();
         let mut picked = QVariantList::default();
         if let Some(own) = rows.iter().find(|item| item.is_self) {
             picked.push(QVariant::from(row_map(own)));
         }
-        // Read back the way `create_group` reads the same list: what
-        // QML hands over is a list of variants, not of numbers.
+        // Read back as `create_group` does: QML passes variants.
         let wanted = contact_ids
             .into_iter()
             .filter_map(|value| i32::from_qvariant(value.clone()))
@@ -357,7 +306,7 @@ impl ContactList {
         picked
     }
 
-    /// Open the one-to-one chat with a contact.
+    /// One-to-one chat with contact.
     pub fn open_chat_with(&mut self, contact_id: u32) {
         let account_id = self.account_id;
         let Some((rpc, runtime)) = connection() else {
@@ -375,7 +324,7 @@ impl ContactList {
         });
     }
 
-    /// Create a group, add the given members, and give it its picture.
+    /// Create group, add members, set picture.
     pub fn create_group(&mut self, name: QString, member_ids: QVariantList, picture_path: QString) {
         let account_id = self.account_id;
         let Some((rpc, runtime)) = connection() else {
@@ -387,9 +336,7 @@ impl ContactList {
             let Some(this) = ptr.as_pinned() else { return };
             match result {
                 Ok((chat_id, refused)) => {
-                    // Said first, then opened anyway: the group is real,
-                    // and leaving the reader on the picker with an error is
-                    // how one ends up stranded with no way back to it.
+                    // Said first, then opened: group is real; picker error strands reader.
                     if !refused.is_empty() {
                         this.borrow().error(
                             format!(
@@ -419,20 +366,13 @@ impl ContactList {
         };
         runtime.spawn(async move {
             let result = async {
-                // Encrypted, of key-contacts, which is what the reference
-                // client's "New Group" makes. It is the method that decides
-                // that -- `create_group_chat_unencrypted` is the other one.
-                // The third argument is upstream's deprecated `protect`,
-                // which its own docs say to pass `false`; it is bound as
-                // `_protect` there and read by nothing.
+                // Encrypted key-contacts, as reference "New Group"; method decides that.
+                // Third arg: deprecated, unread `protect`; upstream says pass `false`.
                 let chat_id: u32 = rpc
                     .call("create_group_chat", (account_id, name, false))
                     .await
                     .map_err(|err| err.to_string())?;
-                // Every member attempted, and the chat handed back either
-                // way: it exists on the core from the call above, so
-                // failing out of here left a half-built group the reader
-                // was never shown and could not find.
+                // Every member attempted; chat returned anyway, no half-built group.
                 let mut refused = Vec::new();
                 for member in members {
                     if let Err(err) = rpc
@@ -442,9 +382,7 @@ impl ContactList {
                         refused.push(format!("{member}: {err}"));
                     }
                 }
-                // The picture last, on the group that now exists. A
-                // refusal here is reported like a member's: the group is
-                // still made and still opened.
+                // Picture last, on existing group; refusal reported like member's.
                 if let Some(path) = picture {
                     if let Err(err) = rpc
                         .call::<_, ()>("set_chat_profile_image", (account_id, chat_id, Some(path)))
@@ -460,7 +398,7 @@ impl ContactList {
         });
     }
 
-    /// Follow an invite and open the chat it leads to.
+    /// Follow invite and open chat.
     pub fn join_by_invite(&mut self, qr_content: QString) {
         let account_id = self.account_id;
         let Some((rpc, runtime)) = connection() else {
@@ -482,16 +420,10 @@ impl ContactList {
         let qr_content = qr_content.to_string();
         runtime.spawn(async move {
             let result = async {
-                // Ask the core what the payload is before acting on it: it
-                // knows the formats, and guessing at them here would be the
-                // protocol work docs/PROJECT.md rules out.
+                // Core decides payload kind: guessing is protocol work (docs/PROJECT.md).
                 //
-                // A payload the core will not read is not an invite either,
-                // and is said so in the same words. Since 2.61 that is how
-                // it answers a fingerprint code with no invite in it and a
-                // key it knows no one by, which had a kind of its own
-                // before. A lost connection is not an answer, and is passed
-                // on as it is.
+                // Unreadable payload: not an invite, same words. Since 2.61 that covers
+                // fingerprint code without invite and unknown key. Lost connection passed on.
                 let qr: serde_json::Value = rpc
                     .call("check_qr", (account_id, qr_content.clone()))
                     .await
@@ -500,9 +432,7 @@ impl ContactList {
                         err => err.to_string(),
                     })?;
                 let kind = json::str_at(&qr, "kind");
-                // A relay's code is offered to the page, which asks before
-                // anything is added: the core's own `add_transport_from_qr`
-                // then, the way the relay page adds one.
+                // Relay code goes to page, which asks before adding.
                 let relay = match kind {
                     "account" => Some(json::str_at(&qr, "domain")),
                     "login" => Some(json::str_at(&qr, "address")),
@@ -514,8 +444,7 @@ impl ContactList {
                 if !matches!(kind, "askVerifyContact" | "askVerifyGroup") {
                     return Err(not_an_invite(kind));
                 }
-                // Returns as soon as the chat exists; the handshake itself
-                // finishes in the background.
+                // Returns once chat exists; handshake in background.
                 rpc.call::<_, u32>("secure_join", (account_id, qr_content))
                     .await
                     .map(Followed::Chat)
@@ -526,7 +455,7 @@ impl ContactList {
         });
     }
 
-    /// Fetch this account's own invite link.
+    /// Fetch own invite link.
     pub fn fetch_invite(&mut self) {
         let account_id = self.account_id;
         let Some((rpc, runtime)) = connection() else {
@@ -543,8 +472,7 @@ impl ContactList {
         });
 
         runtime.spawn(async move {
-            // A null chat gives the account's own contact invite; a chat id
-            // would give that group's.
+            // Null chat: own invite. Chat id: that group's.
             let result = rpc
                 .call::<_, String>(
                     "get_chat_securejoin_qr_code",
@@ -556,7 +484,7 @@ impl ContactList {
         });
     }
 
-    /// The shared completion path of the three chat-opening methods.
+    /// Shared completion of the three chat-opening methods.
     fn chat_callback(&self) -> impl Fn(Result<u32, String>) {
         let ptr: QPointer<Self> = QPointer::from(self);
         queued_callback(move |result: Result<u32, String>| {
@@ -569,29 +497,23 @@ impl ContactList {
     }
 }
 
-/// Where a scanned code led: a chat, or a relay to ask about adding.
+/// Scan result: chat, or relay.
 enum Followed {
-    /// The chat the invite opened.
+    /// Chat the invite opened.
     Chat(u32),
-    /// The code, and the relay it names.
+    /// Code and its relay.
     Relay(String, String),
 }
 
-/// Why a payload was not followed: it is not an invite. The core's own
-/// word on it goes in brackets -- the kind it named, or why it would not
-/// read it.
+/// Payload not followed: not an invite. Core's word in brackets.
 fn not_an_invite(what: &str) -> String {
     format!("that link is not a contact or group invite ({what})")
 }
 
-/// `DC_CONTACT_ID_SELF`: the account's own contact. Never listed by
-/// `get_contacts`, but a member of every group the account is in.
+/// `DC_CONTACT_ID_SELF`: own contact. Not in `get_contacts`, in every group.
 pub(crate) const SELF_CONTACT_ID: u32 = 1;
 
-/// One row from the core's contact object.
-/// One contact as a map QML reads properties off, with the same names
-/// the model's roles have -- so a row drawn from this and a row drawn
-/// from the model are written the same way.
+/// One contact as map for QML, keys = model role names, so both rows read alike.
 fn row_map(item: &ContactItem) -> QVariantMap {
     let mut row = QVariantMap::default();
     row.insert("contact_id".into(), QVariant::from(item.contact_id));
@@ -604,6 +526,7 @@ fn row_map(item: &ContactItem) -> QVariantMap {
     row
 }
 
+/// One row from core's contact object.
 pub(crate) fn contact_row(contact: &serde_json::Value) -> ContactItem {
     let address = json::str_at(contact, "address");
     let display_name = match json::str_at(contact, "displayName") {
@@ -620,14 +543,10 @@ pub(crate) fn contact_row(contact: &serde_json::Value) -> ContactItem {
         is_key_contact: json::flag(contact, "isKeyContact"),
         is_self: contact_id == SELF_CONTACT_ID,
         status: json::text(contact, "status"),
-        // `color` is pinned by the integration test, which checks it on a
-        // message's sender -- the same shape as a contact. The picture key
-        // is not pinned, so a rename upstream shows up as a contact
-        // falling back to its initial rather than as a failure.
+        // `color` pinned by integration test. Picture key unpinned: rename falls back to initial.
         color: json::text(contact, "color"),
         avatar_path: json::text(contact, "profileImage"),
-        // Since 2.61, in place of `wasSeenRecently`. "RecentlySeen" and
-        // "Normal" say nothing worth a line here.
+        // Since 2.61, in place of `wasSeenRecently`.
         seen_long_ago: json::str_at(contact, "freshness") == "Old",
     }
 }
@@ -637,8 +556,7 @@ mod tests {
     use super::contact_row;
     use serde_json::json;
 
-    /// Only the core's "Old" is a contact not seen for a long time; the
-    /// other two, and a core that does not say, are not.
+    /// Only core's "Old" means not seen for long.
     #[test]
     fn only_old_freshness_is_seen_long_ago() {
         let seen = |freshness: serde_json::Value| {

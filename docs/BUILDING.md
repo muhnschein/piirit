@@ -1,161 +1,62 @@
 # Building, testing, and packaging
 
-Engineering standards and the build procedure. The reference for the former
-is [clove](https://github.com/muhnschein/clove)'s §9: pinned toolchain,
-pedantic lints, CI-parity `make` targets, tests that drive the real
-binaries.
+Standard: [clove](https://github.com/muhnschein/clove) §9: pinned toolchain, pedantic lints, CI-parity `make` targets, tests driving real binaries.
 
 ## Toolchains
 
-`rust-toolchain.toml` pins 1.94.1 so lint results are reproducible; the
-device floor is **1.75.0**, enforced by CI's `msrv` job with warnings
-denied. It is a rustup mechanism, and the Sailfish SDK's cargo ignores it.
-
-FFmpeg and x264 are git submodules under `third_party/`, built from
-source by `rust/piirit-video`'s build script. A fresh clone needs them
-before anything builds:
+- `rust-toolchain.toml` pins 1.94.1 (reproducible lints). Device floor **1.75.0** (CI `msrv`, warnings denied). rustup only; SDK cargo ignores pin.
+- FFmpeg, x264 = submodules `third_party/`, built by `rust/piirit-video` build.rs. Fresh clone needs them before anything builds:
 
 ```sh
 git submodule update --init --depth 1
 ```
 
-`rust/Cargo.lock` stays at **v3**: cargo learned v4 in 1.78 and the SDK's
-cargo 1.75 cannot read it, while a `cargo update` on a modern host rewrites
-it silently. `ci/check-lockfile.sh` catches that.
+- `rust/Cargo.lock` stays **v3**: v4 since cargo 1.78; SDK cargo 1.75 can't read it. `cargo update` on modern host rewrites silently; `ci/check-lockfile.sh` catches it.
 
 ## Lints
 
-Workspace-level, so a bare `cargo clippy` fails the way CI does:
-`clippy::all` and `pedantic` at deny, `unwrap_used`/`expect_used` denied
-outside tests, `missing_docs` and `unsafe_code` denied.
-
-`unsafe_code` is deny rather than forbid because the Qt harness tests need
-`env::set_var` before Qt initialises, and because two things the app does
-have no safe binding: installing a `QTranslator`, recording a voice
-message through `QAudioRecorder`, handing QML pictures through a
-`QQuickImageProvider`, and watching the call's microphone through
-libpulse, none of which qmetaobject wraps. Those are the four `cpp!`
-files in the tree, `piirit-app/src/translations.rs`,
-`piirit-shim/src/recorder.rs`, `piirit-shim/src/pictures.rs` and
-`piirit-shim/src/mic_watch.rs`, and the C++ build step in each
-crate's `build.rs` exists for them alone. Every exception is at the
-narrowest scope and says why, and every block is short enough to be
-checked by reading.
-
-The recorder is also why the host build needs `qtmultimedia5-dev` (the
-`Makefile` lists the packages) and the spec `pkgconfig(Qt5Multimedia)`:
-the shim links `libQt5Multimedia`, which Harbour allows. The microphone
-watch is why it needs `libpulse-dev` and the spec `pkgconfig(libpulse)`:
-the shim links `libpulse.so.0`, which Harbour allows too. Its test runs
-it against a sound server of its own, which is `pulseaudio` and
-`pulseaudio-utils`; without them it is skipped, except under CI, where
-it fails.
-
-`rust/clippy.toml` bans two methods that have already caused device-only
-failures: `tokio::runtime::Runtime::new` (must go through `CoreRuntime`) and
-`qmetaobject::single_shot` (truncates sub-second `Duration`s).
+- Workspace-level; bare `cargo clippy` fails like CI. Deny: `clippy::all`, `pedantic`, `unwrap_used`/`expect_used` (non-test), `missing_docs`, `unsafe_code`.
+- `unsafe_code` deny, not forbid: Qt harness tests need `env::set_var` before Qt init; no safe binding (qmetaobject wraps none) for installing `QTranslator`, voice recording via `QAudioRecorder`, QML pictures via `QQuickImageProvider`, call mic watch via libpulse.
+- Those = the four `cpp!` files: `piirit-app/src/translations.rs`, `piirit-shim/src/recorder.rs`, `piirit-shim/src/pictures.rs`, `piirit-shim/src/mic_watch.rs`. Each crate's `build.rs` C++ step exists for them alone. Each exception: narrowest scope, reason stated, short enough to check by reading.
+- Recorder: host `qtmultimedia5-dev` (`Makefile` lists packages), spec `pkgconfig(Qt5Multimedia)`; shim links `libQt5Multimedia` (Harbour allows). Mic watch: host `libpulse-dev`, spec `pkgconfig(libpulse)`; links `libpulse.so.0` (Harbour allows). Its test runs own sound server: needs `pulseaudio`, `pulseaudio-utils`; skipped if absent, except CI fails.
+- `rust/clippy.toml` bans (both caused device-only failures):
+  - `tokio::runtime::Runtime::new`: use `CoreRuntime`
+  - `qmetaobject::single_shot`: truncates sub-second `Duration`s
 
 ## Testing
 
-Piirit parses almost nothing — protocol and crypto are the core's, and
-the subprocess we talk to is one we spawned. The failure mode is misreading
-the core's JSON, or calling it wrongly, with nothing noticing until the app
-is on a phone. The tests aim at that.
+Piirit parses almost nothing; protocol, crypto = core's; subprocess is ours. Failure mode: misreading core JSON or calling it wrong, unnoticed until on phone. Tests aim there.
 
-`make check` runs all of it from a clean checkout: no phone, account or
-Sailfish SDK. Not quite offline — `msrv` fetches the 1.75 toolchain the
-first time, and `deny` wants the advisory database.
-
-**How the suite is run.** Through `cargo nextest`, which puts each test in
-its own process rather than running one test binary at a time. That matters
-here more than in most workspaces: there are over a hundred test binaries,
-almost every one starts a Qt engine and then waits on real timers, so under
-`cargo test` the suite spent about ten minutes mostly idle and serialised.
-The same 207 tests take about two and a half minutes on four cores. Nothing
-is shared between them — the webxdc and call hosts bind port 0 and let
-the kernel choose, and the QML probes copy the tree into a directory named
-for their own pid — which is what makes running them at once safe.
+- `make check`: everything from clean checkout, no phone/account/SDK. Not quite offline: `msrv` fetches 1.75 toolchain first time; `deny` wants advisory DB.
+- **Runner: `cargo nextest`**, process per test. 100+ test binaries, most start Qt engine and wait on real timers: `cargo test` ~10 min, mostly idle, serialised; nextest 207 tests ~2.5 min on 4 cores. Parallel-safe, nothing shared: webxdc and call hosts bind port 0; QML probes copy tree into pid-named dir.
 
 ```
 cargo install --locked cargo-nextest
 ```
 
-Without it `make test` still runs everything, the slow way, because
-`make check` has to work on a laptop that has installed nothing extra.
-`rust/.config/nextest.toml` carries the rest: a 30-second slow warning and
-a two-minute kill, so a Qt test waiting on a signal that never arrives is
-reported against its own name instead of hanging until the job's timeout;
-and no retries, because a test that passes on the second attempt is a
-defect this project wants to see.
+- Without it `make test` still runs all, slow: `make check` must work on laptop with nothing extra installed.
+- `rust/.config/nextest.toml`: 30 s slow warn, 2 min kill (Qt test stuck on signal reported by name, not job timeout). No retries: pass on second attempt = defect to see.
+- nextest skips doctests: `cargo test --doc` beside it (`Makefile`, `ci.yml`); `ci/packaging-lint.sh` fails tree with one but not other. No doctests today, so first would silently never run.
 
-nextest does not run doctests. `cargo test --doc` runs beside it in both
-the Makefile and `ci.yml`, and `ci/packaging-lint.sh` fails a tree where
-one is there without the other — there are no doctests today, so nothing
-would notice the first one silently never running.
-
-1. **Transport unit tests** against a fake stdio server.
-2. **Protocol-contract tests** against a recording double that journals
-   every request, pinning the call sequence of each onboarding action.
-3. **Qt event-loop tests** under `QT_QPA_PLATFORM=offscreen`.
-4. **QML load tests** against stub Silica components (`tests/silica-stubs/`):
-   the real page files, driven by `objectName`. The stubs imitate no layout,
-   so nothing here says a page *looks* right. Silica's `EnterKey` attached
-   property cannot be stubbed — QML forbids capitalised property names and
-   `qmetaobject` cannot register attached types — so pages using it cannot
-   be loaded. Put what such a page shows in a component that can be, and lay
-   that component out with bindings rather than a `Column`: a positioner
-   sizes itself in a polish pass, which never runs without a window, so its
-   geometry reads as zero.
-5. **Static QML tests** (`tests/qml_syntax.rs`) for what no host-Qt run
-   can see: Qt 5.6 rules that Qt 5.15 accepts silently, and the rules the
-   tree holds itself to -- every string the other end chose is drawn as
-   plain text (Silica's own headers cannot be, so `ConversationHeader`
-   exists), file URLs are encoded a segment at a time, only the picker
-   pages import `Sailfish.Pickers`, and every `model.<role>` a delegate
-   binds is one its model has.
-6. **Real-core integration** (`real_server`, `real_core`), gated on
-   `DELTACHAT_RPC_SERVER`, offline. `real_core.rs` distinguishes a request
-   the real core could not decode from one it could not deliver.
-7. **Packaging checks** (`ci/packaging-lint.sh`): spec parses, desktop
-   entry validates, shell scripts clean, every translation catalog
-   current and compiling cleanly with `lrelease`, every `docs/*.md` a
-   comment points at exists. Locally a missing tool is
-   a SKIP; CI sets `PACKAGING_LINT_STRICT=1` so it is a failure there, as
-   `HARBOUR_CHECK_STRICT=1` already does for the Harbour check.
-
-8. **Report-script tests** (`ci/sonar-report-selftest.sh`): the one script
-   here that talks to a service outside GitHub, run against a stub server
-   that answers SonarQube's four endpoints. It cannot be tested any other
-   way -- the analysis it reads does not exist when the tests run, and this
-   project's CI cannot reach `sonarcloud.io`, which is the reason the script
-   exists at all.
-
-9. **Runner-setup tests** (`ci/apt-install-selftest.sh`): the rule deciding
-   which apt sources every CI job keeps, proved on a directory of the
-   test's own. Getting it backwards deletes the archive the jobs install
-   from, which fails everything.
+1. **Transport unit**: fake stdio server.
+2. **Protocol-contract**: recording double journals every request; pins call sequence per onboarding action.
+3. **Qt event-loop**: `QT_QPA_PLATFORM=offscreen`.
+4. **QML load**: stub Silica (`tests/silica-stubs/`), real page files, driven by `objectName`. Stubs imitate no layout: nothing proves page *looks* right.
+   - Silica `EnterKey` attached prop unstubbable (QML forbids capitalised property names; `qmetaobject` can't register attached types): pages using it can't load. Put shown content in loadable component.
+   - Lay that out with bindings, not `Column`: positioner sizes in polish pass, never runs without window, geometry reads zero.
+5. **Static QML** (`tests/qml_syntax.rs`), what no host-Qt run sees: Qt 5.6 rules Qt 5.15 accepts silently, plus tree rules: every string other end chose drawn as plain text (Silica headers can't be, hence `ConversationHeader`); file URLs encoded per segment; only picker pages import `Sailfish.Pickers`; every delegate `model.<role>` exists in its model.
+6. **Real-core integration** (`real_server`, `real_core`): gated on `DELTACHAT_RPC_SERVER`, offline. `real_core.rs` tells request real core couldn't decode from one it couldn't deliver.
+7. **Packaging** (`ci/packaging-lint.sh`): spec parses, desktop entry validates, shell scripts clean, every catalog current and `lrelease`-clean, every `docs/*.md` a comment points at exists. Missing tool = SKIP locally; CI `PACKAGING_LINT_STRICT=1` = fail, as `HARBOUR_CHECK_STRICT=1` for Harbour check.
+8. **Report-script** (`ci/sonar-report-selftest.sh`): only script talking to service outside GitHub; run vs stub answering SonarQube's four endpoints. No other way: analysis absent at test time, and CI can't reach `sonarcloud.io` (why script exists).
+9. **Runner-setup** (`ci/apt-install-selftest.sh`): rule for which apt sources every CI job keeps, proved on test's own dir. Backwards = deletes install archive, fails everything.
 
 Aspiration, tracked not gated: test volume exceeds source volume.
 
 ## Static analysis
 
-SonarQube Cloud reads the tree on every pull request
-(`.github/workflows/build.yml`, configured by `sonar-project.properties`).
-It is a **report, not a gate**: `ci.yml` decides what is allowed in, and
-nothing Sonar says can turn a red build green or a green build red. Keeping
-that boundary is why it is a separate workflow -- folding it into the gate
-would make a hosted service part of the rule that a green `make check` on a
-laptop is a green CI.
+SonarQube Cloud reads tree every PR (`.github/workflows/build.yml`, `sonar-project.properties`). **Report, not gate**: `ci.yml` decides; Sonar can't flip build red/green. Separate workflow so hosted service never part of rule "green `make check` on laptop = green CI".
 
-The scanner **imports** coverage; it does not measure it. `make
-sonar-reports` writes `rust/target/sonar/lcov.info` with `cargo llvm-cov`
-over the whole workspace, and the workflow runs it before the scan. Without
-it the reading is a confident 0.0% rather than "no data". The target needs
-`cargo-llvm-cov`, so it is opt-in rather than part of `make check`. It runs
-the suite under `cargo-nextest` when that is installed too, for the reason
-`make test` does: cargo-llvm-cov's own runner is `cargo test`, one binary at
-a time, which instrumented costs the scan job about ten minutes. Without
-nextest the report is still written, the slow way.
+- Coverage **imported**, not measured: `make sonar-reports` writes `rust/target/sonar/lcov.info` (`cargo llvm-cov`, whole workspace); workflow runs it before scan. Without: confident 0.0%, not "no data". Needs `cargo-llvm-cov`, so opt-in, not in `make check`. Uses nextest if installed (llvm-cov's own runner = `cargo test`, ~10 min instrumented in scan job); without, still written, slow.
 
 ```
 rustup component add llvm-tools-preview
@@ -163,203 +64,76 @@ cargo install --locked cargo-llvm-cov cargo-nextest
 make sonar-reports
 ```
 
-Clippy findings are **not** handed over, and Sonar's own Clippy pass is off
-(`sonar.rust.clippy.enabled=false`), for two different reasons. Sonar's pass
-invokes cargo where it finds the project, and this workspace is under
-`rust/`, not at the root, so it would run a different clippy from the one
-that gates this project -- or none. And a report of our own would be empty:
-`make lint` denies warnings, so a warning in this project's code fails the
-gate and never reaches a branch Sonar analyses, leaving only findings in
-`third_party/qmetaobject`, which is excluded anyway. Producing one costs a
-`cargo clean` and a full recompile inside the scan job.
-
-`sonar.tests` separates the fixtures from the application, so coverage and
-duplication are measured on what ships. That matters more here than in most
-trees, because test volume exceeds source volume: indexed as main sources,
-the fixtures would be most of what every ratio was computed over.
-`sonar.exclusions` drops the vendored crates, the patched
-qmetaobject, the rendered icons, and `translations/` -- a Qt catalog is
-named `.ts`, so the scanner reads thirty-nine of them as TypeScript.
-`sonar.coverage.exclusions` keeps `qml/` out of the coverage arithmetic
-alone: nothing there can produce a report, and one changed line of QML
-JavaScript otherwise reads as 0% coverage on new code and fails the gate.
-`sonar.issue.ignore.multicriteria` closes the findings the project has
-decided against, one rule on one path each, with the reason beside it:
-qmetaobject's glob import, cognitive complexity in tests and in the fake
-servers, and a character-class name Sonar took for a repeated literal.
-
-The scanner uploads a report and exits; the server processes it afterwards,
-so the run that produced an analysis finishes knowing nothing about its
-result. `scripts/sonar-report.sh` asks the server from the runner that just
-fed it and prints the quality gate, the measures and the open issues into
-the job log and the step summary. It reports and never gates: the step is
-`continue-on-error`, so a Sonar outage costs a warning, not a build.
+- Clippy findings **not** handed over; Sonar's own pass off (`sonar.rust.clippy.enabled=false`). Two reasons: Sonar invokes cargo where it finds project, workspace is under `rust/` not root, so different clippy from gate's, or none. Own report would be empty: `make lint` denies warnings, so only findings left are in excluded `third_party/qmetaobject`; and costs `cargo clean` + full recompile in scan job.
+- `sonar.tests`: fixtures apart from app, so coverage/duplication measured on what ships; test volume > source, fixtures would dominate every ratio.
+- `sonar.exclusions`: vendored crates, patched qmetaobject, rendered icons, `translations/` (Qt catalog named `.ts`: scanner reads 39 as TypeScript).
+- `sonar.coverage.exclusions`: `qml/` out of coverage only. Can't produce report; one changed QML JS line = 0% new-code coverage, fails gate.
+- `sonar.issue.ignore.multicriteria`: findings decided against, one rule on one path each, reason beside: qmetaobject glob import, cognitive complexity in tests and fake servers, char-class name taken for repeated literal.
+- Scanner uploads, exits; server processes after, so producing run knows nothing of result. `scripts/sonar-report.sh` asks server from same runner, prints quality gate, measures, open issues to job log + step summary. Reports, never gates: step `continue-on-error`, outage = warning, not build.
 
 ## CI
 
-`ci.yml` is the gate and runs what `make check` runs. Three things about
-the runners are worth knowing.
+`ci.yml` = gate; runs what `make check` runs. Runner facts:
 
-**Packages come through `ci/apt-install.sh`**, not a bare `apt-get`.
-`apt-get update` exits non-zero when *any* configured repository fails, and
-the runner image ships several this project never installs from -- so one
-of them serving a bad index kills every job before a test runs, with
-nothing in this repository having changed. The script drops the
-third-party lists first, keeping Ubuntu's wherever the image puts them --
-a list survives only if something in it names an `ubuntu.com` host, which
-is what stops it deleting the archive it is about to install from.
-
-**The Rust jobs cache their `target/`** (`Swatinem/rust-cache`, scoped to
-the `rust` workspace); without it every job compiles the whole dependency
-graph from nothing on every push. `msrv` carries a cache key of its own
-because it builds with `+1.75.0` while the action keys on the default
-toolchain, and without it the two would share a slot and neither would
-ever hit. `CARGO_INCREMENTAL: 0` because a runner compiles once and throws
-the machine away, so incremental state is written, cached and never read.
-
-Caching is worth less than it looks: with a warm cache clippy compiles the
-workspace in about twenty seconds, but the `test` job barely moves, because
-compilation is not its cost -- most of its time is the suite waiting on
-timers, which is what nextest addresses above.
-
-**The test job installs `cargo-nextest`** and runs the suite under the
-`ci` profile, which differs from a laptop's in two ways: `fail-fast` is
-off, because CI is asked once and should report everything it knows; and
-failures are printed where they happen and again at the end, because in a
-two-hundred-line log the summary is what anyone reads.
+- **Packages via `ci/apt-install.sh`**, not bare `apt-get`. `apt-get update` exits non-zero if *any* configured repo fails; runner image ships several never used, so one bad index kills every job with nothing here changed. Script drops third-party lists first, keeps Ubuntu's wherever image puts them: list survives only if it names `ubuntu.com` host. Stops it deleting archive it installs from.
+- **Rust jobs cache `target/`** (`Swatinem/rust-cache`, `rust` workspace); else every job compiles full dep graph every push. `msrv` own cache key: builds `+1.75.0`, action keys on default toolchain; shared slot = neither hits. `CARGO_INCREMENTAL: 0`: runner compiles once, discarded; incremental state written, cached, never read.
+- Cache worth less than looks: warm clippy ~20 s, but `test` barely moves. Its cost = suite waiting on timers (nextest addresses), not compile.
+- **Test job installs `cargo-nextest`**, `ci` profile. Vs laptop: `fail-fast` off (CI asked once, report all); failures printed inline and again at end (in 200-line log summary is what's read).
 
 ## Translations
 
-The strings are the `qsTr()` calls in `qml/`; `translations/piirit.ts`
-is the untranslated source catalog and `translations/piirit-<lang>.ts`
-one catalog per language Sailfish ships in. `scripts/update-translations.sh`
-regenerates all of them from the source in one `lupdate` run, so a new
-string turns up as `unfinished` in every language at once, and
-`ci/packaging-lint.sh` fails when a committed catalog differs from what
-that run produces. `tests/translation_catalogs.rs` fails when a string in
-any language is left untranslated, so a new string is not done until every
-catalog has it.
-
-The app loads `piirit-<lang>.qm`, which `scripts/release-translations.sh`
-compiles with `lrelease` -- in the RPM's `%build`, and locally with
-`make translations`, which leaves them beside the `.ts` files where a
-source-tree run finds them. `lupdate` and `lrelease` are Debian's
-`qttools5-dev-tools`, and the SDK's `qt5-qttools-linguist`; the app's own
-test compiles the German catalog, so the package is a test dependency too.
-
-`<lang>` is what `QTranslator` matches against the reader's locale from
-the most specific form down: `de` serves every German locale, `pt_BR`
-only Brazil, and a language with no catalog gets the English one -- the
-strings are English already, and that catalog holds their plural forms.
-To add one, write the three-line header `update-translations.sh` documents to
-`translations/piirit-<lang>.ts` and run the script; `lupdate` fills in
-every string with as many plural forms as that language has.
+- Strings = `qsTr()` in `qml/`. `translations/piirit.ts` = untranslated source catalog; `translations/piirit-<lang>.ts` = one per language Sailfish ships in.
+- `scripts/update-translations.sh`: one `lupdate` run regenerates all; new string = `unfinished` in every language at once. `ci/packaging-lint.sh` fails if committed catalog differs from that run. `tests/translation_catalogs.rs` fails on any untranslated string: new string not done until every catalog has it.
+- App loads `piirit-<lang>.qm`, compiled by `scripts/release-translations.sh` (`lrelease`): RPM `%build`; locally `make translations`, leaves them beside `.ts` where source-tree run finds them. Tools: Debian `qttools5-dev-tools`, SDK `qt5-qttools-linguist`; also test dep (app's test compiles German catalog).
+- `<lang>` = what `QTranslator` matches vs reader locale, most specific first: `de` serves all German; `pt_BR` only Brazil; no catalog = English one (strings already English; catalog holds plural forms).
+- New language: write three-line header (`update-translations.sh` documents) to `translations/piirit-<lang>.ts`, run script; `lupdate` fills every string with that language's plural forms.
 
 ## Dependencies
 
-Few, and each for a reason. `cargo tree` on the app is the list; this is
-why each entry is there, so that a proposal to drop one starts from what
-it would cost.
+Few, each for a reason. `cargo tree` on app = list; table = why each stays, so drop proposal starts from cost.
 
-| Crate | What it is for | Why it stays |
+| Crate | Use | Why it stays |
 |---|---|---|
-| `tokio` | the server subprocess, its pipes, the event loop | the transport is async; `process` is what reaps the child |
-| `serde`, `serde_json` | the JSON on the wire | the contract with the core is JSON-RPC |
-| `qmetaobject` (vendored), `qttypes`, `cpp`, `cpp_build` | Qt from Rust | the whole UI hangs off them; `default-features = false` keeps its `log` bridge out |
-| `chrono` | the viewer's timezone, for the day headings | `std` has none, and the alternative is `localtime_r`, which `unsafe_code` denies |
-| `qrcode` | an invite drawn as a code | one crate, no dependencies |
-| `rqrr` (+ `g2p`, `lru`) | a code read off the camera | a QR decoder is not a small thing to vendor |
-| `mp3lame-encoder` (+ `mp3lame-sys`, `autotools`) | a voice message as MP3 (`voice.rs`) | the phone's recorder offers no encoder the iOS client plays as a voice message; LAME is what the desktop client encodes with, and the pure-Rust encoders want a Rust past the 1.75 floor or are ports of shine, which has no psychoacoustic model |
+| `tokio` | server subprocess, pipes, event loop | async transport; `process` reaps child |
+| `serde`, `serde_json` | wire JSON | core contract is JSON-RPC |
+| `qmetaobject` (vendored), `qttypes`, `cpp`, `cpp_build` | Qt from Rust | whole UI hangs off them; `default-features = false` keeps `log` bridge out |
+| `chrono` | viewer timezone, for day headings | `std` lacks; alternative `localtime_r` needs `unsafe`, which `unsafe_code` denies |
+| `qrcode` | invite drawn as code | one crate, no deps |
+| `rqrr` (+ `g2p`, `lru`) | code read off camera | QR decoder not small to vendor |
+| `mp3lame-encoder` (+ `mp3lame-sys`, `autotools`) | voice message as MP3 (`voice.rs`) | phone recorder offers no encoder iOS client plays as voice message; LAME = desktop client's encoder; pure-Rust encoders need Rust past 1.75 floor or are shine ports (no psychoacoustic model) |
 
-`mp3lame-sys` carries LAME 3.100's C source and builds it with LAME's own
-`configure` and `make`, so a host build needs both, which a machine that
-builds the C++ above already has. It is the one C dependency in the tree
-that is not Qt, and the reason `rust/deny.toml` allows LGPL-3.0 for its
-two crates and nothing else: LGPL code may be conveyed as part of a GPLv3
-work.
+- `mp3lame-sys` carries LAME 3.100 C source, builds via LAME's `configure` + `make` (host needs both; C++ build machine has them). Only non-Qt C dep; why `rust/deny.toml` allows LGPL-3.0 for its two crates only: LGPL code may be conveyed as part of GPLv3 work.
 
 ### Making a video smaller
 
-A video picked to send is recoded, as soon as it is picked and before the
-reader sends it, when it comes near the core's
-recommended message size (four fifths of it), or whenever the outgoing
-media quality is set to worse (`rust/piirit-shim/src/video.rs`,
-`plan` in `rust/piirit-video`, issue #111): the phone's recorder writes
-several times what the core recommends for a message, and the core sends
-a video as it is. Nothing on a
-Sailfish phone that Harbour lets an app link can do that -- GStreamer is
-not on the allowed list, and neither is any codec library -- so
-`rust/piirit-video` builds the codecs into the binary, as `mp3lame-sys`
-does LAME:
+Picked video recoded on pick, before send, when near core's recommended message size (4/5 of it) or outgoing media quality set worse (`rust/piirit-shim/src/video.rs`, `plan` in `rust/piirit-video`, issue #111). Phone recorder writes several times recommended size; core sends video as-is. Nothing Harbour lets app link can recode (GStreamer, codec libs not on allowed list), so `rust/piirit-video` builds codecs into binary, as `mp3lame-sys` does LAME:
 
-- **FFmpeg 7.1** (LGPL-2.1-or-later), `third_party/ffmpeg`, on its
-  `release/7.1` branch. Configured with `--disable-everything` and then
-  only what the job reads and writes: the `mov` demuxer, the H.264, HEVC
-  and AAC decoders and parsers, the AAC encoder, the `mp4` muxer,
-  swscale and swresample. No network, no devices, no filters, no
-  autodetected system library. That trimming is most of the security
-  story too: the code that parses a picked file is a few demuxers and
-  decoders, not FFmpeg's hundreds.
-- **x264** (GPL-2.0-or-later), `third_party/x264`, on its `stable`
-  branch, 8-bit 4:2:0 only. FFmpeg's own H.264 encoders are wrappers
-  around external libraries, and openh264, the other candidate, has no
-  B-frames: at the same bit rate it looked visibly worse.
+- **FFmpeg 7.1** (LGPL-2.1-or-later), `third_party/ffmpeg`, `release/7.1` branch. `--disable-everything` plus only: `mov` demuxer; H.264, HEVC, AAC decoders + parsers; AAC encoder; `mp4` muxer; swscale; swresample. No network, devices, filters, autodetected system libs. Trimming = most of security story: picked-file parsing = few demuxers/decoders, not FFmpeg's hundreds.
+- **x264** (GPL-2.0-or-later), `third_party/x264`, `stable` branch, 8-bit 4:2:0 only. FFmpeg's own H.264 encoders wrap external libs; openh264 (other candidate) has no B-frames, looked visibly worse at same bit rate.
 
-Both are compatible with Piirit's GPL-3.0-or-later, and both come in as
-source, so they are code in one executable like the rest, not another
-bundled binary like the core. `build.rs` runs each project's own
-`configure` with the compiler cargo uses for the target, which under
-scratchbox2 is the target's own, so the device build is a native build
-as LAME's is. Hand-written assembly is on for ARM and off for x86, where
-it would need nasm and x86 is only ever the test host.
+Both GPL-3.0-or-later compatible; both come as source: code in one executable, not another bundled binary like core. `build.rs` runs each project's own `configure` with cargo's target compiler (under scratchbox2 = target's own: device build native, as LAME's). Hand-written asm on for ARM, off for x86 (needs nasm; x86 only ever test host).
 
-The same x264 is linked a second time, into the H.264 encoder video
-calls send through: Gecko encodes H.264 only through a media plugin it
-loads from disk, never through the app's binary (docs/CALLS.md). `build.rs`
-builds `csrc/gmp_h264.cpp` into `libpiirit.so` with the target's C++
-compiler, against Gecko's plugin headers in `third_party/gmp-api`
-(BSD and Apache-2.0, `SOURCE.md` there), and lays it out as Gecko looks
-for one: `gmp-piirit/1.0/libpiirit.so` beside `piirit.info`, in
-`OUT_DIR` and again beside the binary, where the spec installs it from.
-Only its three entry points are visible; x264 is inside it, hidden. For
-the tests it also builds `gmp-check` (`tests/gmp_check.cpp`), a stand-in
-for Gecko's side of the plugin interface, which `tests/gmp_h264.rs`
-runs.
+Same x264 linked second time, into H.264 encoder video calls send through: Gecko encodes H.264 only via media plugin loaded from disk, never via app binary (docs/CALLS.md).
 
-What it costs: the binary is a few megabytes heavier, the plugin weighs
-what x264 does, and a clean build spends a couple of minutes configuring
-and compiling the two (cargo keeps the result in `target/` after that). The C between them and Rust
-is `rust/piirit-video/csrc`, small enough to read; its tests are in Rust
-(`rust/piirit-video/tests`), against clips made by the same libraries
-rather than binary fixtures. Dependabot moves the submodules along their
-branches.
+- `build.rs` builds `csrc/gmp_h264.cpp` into `libpiirit.so` with target C++ compiler, vs Gecko plugin headers `third_party/gmp-api` (BSD, Apache-2.0; `SOURCE.md` there).
+- Laid out as Gecko looks: `gmp-piirit/1.0/libpiirit.so` beside `piirit.info`, in `OUT_DIR` and again beside binary (spec installs from there).
+- Only three entry points visible; x264 inside, hidden. Tests: `gmp-check` (`tests/gmp_check.cpp`) = Gecko-side stand-in, run by `tests/gmp_h264.rs`.
 
-`tokio`'s `net` feature is what the webxdc host binds its loopback socket
-with, and it brings `socket2` -- tokio's own platform layer for sockets,
-and the only crate the whole feature adds. The alternative was a zip
-reader and an inflate implementation, to unpack an app the core can
-already read. The call host (`call_host.rs`) is the same socket again,
-and adds nothing: the page a call runs in is upstream's calls-webapp,
-committed as the one file it is released as and compiled in
-(`vendor/calls-webapp/`), so no node toolchain comes anywhere near this
-build.
+Cost: binary few MB heavier; plugin weighs what x264 does; clean build +couple min configure/compile (cargo keeps result in `target/`). C glue `rust/piirit-video/csrc`, small enough to read; tests in Rust (`rust/piirit-video/tests`) vs clips made by same libs, no binary fixtures. Dependabot moves submodules along branches.
+
+`tokio` `net` feature: webxdc host's loopback socket; adds only `socket2` (tokio's socket platform layer). Alternative: zip reader + inflate to unpack app core already reads. Call host (`call_host.rs`) = same socket, adds nothing: page = upstream calls-webapp, committed as its one released file, compiled in (`vendor/calls-webapp/`); no node toolchain near build.
 
 ## Comments
 
-One sentence where one will do. A comment states what is true now and why.
-It is not a changelog, a bug report, or a story about how the code got here
-— that belongs in git history. Delete a comment rather than update it into a
-history of its own subject.
+House style, comments and docs: caveman-full.
+
+- Terse fragments. State what is true now and why; keep constraints.
+- No changelog, bug report, history or story (git's job). Delete comment rather than update it into history of its subject.
+- Identifiers, paths, flags exact. Doc comments on items stay (`missing_docs` denied).
 
 ## Packaging: the supported path
 
-`.github/workflows/rpm.yml` builds a device RPM unattended on an
-`ubuntu-latest` runner, from a `docker run` of the Sailfish SDK, through
-`scripts/build-in-docker.sh` -- which anyone with Docker can run to build
-the same way. Dispatch
-it from the Actions tab (the SDK version and cargo's job count are inputs)
-or push a `v*` tag. It builds **aarch64**, which is the only architecture
-this project targets and the only one it has ever built.
+`.github/workflows/rpm.yml` builds device RPM unattended on `ubuntu-latest`, `docker run` of Sailfish SDK, via `scripts/build-in-docker.sh` (anyone with Docker can build same way). Dispatch from Actions tab (SDK version, cargo job count = inputs) or push `v*` tag. Builds **aarch64**: only arch targeted, only one ever built.
 
 ```sh
 ./scripts/fetch-rpc-server.sh                        # bundled server binaries
@@ -367,163 +141,79 @@ mb2 -t SailfishOS-<ver>-<arch> -X build-init
 mb2 -t SailfishOS-<ver>-<arch> -X build --no-check
 ```
 
-- `-X` (`--no-fix-version`) uses the spec's `Version:` rather than deriving
-  one from git tags. It is needed **by `build-init`** too: without it that
-  step gives up at version-fixing and never writes `.mb2/spec`, so `build`
-  fails identically and the flag looks innocent.
-- `build-init` must precede `build`, which queries `.mb2/spec` within a
-  second of starting.
-- `--no-check`: the tests are host-oriented, and the spec has no `%check`.
+- `-X` (`--no-fix-version`): spec `Version:`, not git tags. Needed **by `build-init`** too: without it step gives up at version-fixing, never writes `.mb2/spec`; `build` fails identically, flag looks innocent.
+- `build-init` before `build` (`build` queries `.mb2/spec` within 1 s of start).
+- `--no-check`: tests host-oriented; spec has no `%check`.
 
-Environment requirements, each of which cost an attempt:
+Env requirements, each cost an attempt:
 
-- **Mount the tree inside the SDK user's home** (`/home/mersdk/<name>`), not
-  `/build` or `/share`. rpm runs under scratchbox2, which redirects
-  unrecognised absolute paths into the target rootfs; with the tree
-  elsewhere `mb2` writes `.mb2/spec` outside and rpm reads inside. A file
-  that exists and cannot be opened is the signature. The directory must keep
-  the package's name — `mb2` derives the package from it.
-- **The i686 rustlib at the SDK's own `/usr/lib/rustlib`.** `mb2` installs
-  rust into the *target*, but build-script links run in sb2's host mode
-  where `/usr` maps to the SDK filesystem. Copy it from the tooling.
-  `ci/build-sdk-image.sh` does this once, into the image, so a build no
-  longer carries it; a build against upstream's image still has to.
-- **Not root.** `sdk-manage` refuses ("Cannot determine Mer SDK user") and
-  the target snapshot never initialises. Chown the checkout to the
-  container's `mersdk` uid — read it from the image, don't assume it — and
-  hand it back so the artifact upload can read the result. The script does
-  both as root inside the container, so the host needs no sudo.
+- **Tree inside SDK user's home** (`/home/mersdk/<name>`), not `/build`/`/share`. rpm runs under scratchbox2, redirects unrecognised absolute paths into target rootfs; tree elsewhere = `mb2` writes `.mb2/spec` outside, rpm reads inside. Signature: file exists, can't open. Dir keeps package name (`mb2` derives package from it).
+- **i686 rustlib at SDK's own `/usr/lib/rustlib`.** `mb2` installs rust into *target*, but build-script links run in sb2 host mode, `/usr` = SDK filesystem. Copy from tooling. `ci/build-sdk-image.sh` does it once, into image; build on upstream image still must.
+- **Not root.** `sdk-manage` refuses ("Cannot determine Mer SDK user"); target snapshot never initialises. Chown checkout to container's `mersdk` uid (read from image, don't assume); hand back so artifact upload reads result. Script does both as root in container; host needs no sudo.
 
-`scripts/build-rpm.sh` wraps the ordinary developer path, `sfdk build`.
+`scripts/build-rpm.sh` wraps ordinary dev path, `sfdk build`.
 
 ## Cutting a release
 
-A release is `rpm.yml` run for a version, on `main`:
+Release = `rpm.yml` run for a version, on `main`:
 
-1. Put the version in `rpm/harbour-piirit.spec` (`Version:`) and in the
-   three crates' `Cargo.toml`, refresh `Cargo.lock` (`cargo check`), and
-   write the version's section in `CHANGELOG.md`. Merge that.
-2. Either dispatch `rpm.yml` on `main` from the Actions tab with the
-   version in its `release` input, which tags the commit `v<version>`
-   itself; or tag the merge commit `v<version>` by hand and push the tag,
-   which runs the same workflow.
+1. Version in `rpm/harbour-piirit.spec` (`Version:`) + three crates' `Cargo.toml`; refresh `Cargo.lock` (`cargo check`); write version's `CHANGELOG.md` section. Merge.
+2. Dispatch `rpm.yml` on `main` from Actions tab, version in `release` input (tags commit `v<version>` itself); or tag merge commit `v<version>` by hand, push tag (same workflow).
 
-The workflow builds the package with the spec's own `Release: 1` rather
-than the run-number stamp an ordinary build gets, refuses a version that
-is not what the spec says (and a dispatch that is not on `main`), and then
-publishes a GitHub release named `v<version>`: the device RPM, a
-`SHA256SUMS`, and that version's section of `CHANGELOG.md` as the text
-(`scripts/release-notes.sh`, which fails the run if the section is
-missing). The debug and source RPMs stay on the run's artifact.
+Workflow builds with spec's own `Release: 1`, not run-number stamp. Refuses version != spec, and dispatch off `main`. Publishes GitHub release `v<version>`: device RPM, `SHA256SUMS`, version's `CHANGELOG.md` section as text (`scripts/release-notes.sh`, fails run if missing). Debug/source RPMs stay on run artifact.
 
-Harbour intake is by hand: the RPM on the release page is the one to
-upload, and `docs/HARBOUR.md` says what the validator will say about it.
+Harbour intake by hand: upload release-page RPM; `docs/HARBOUR.md` = what validator will say.
 
 ## What a device build costs
 
 | Step | One job | Four jobs |
 |---|---|---|
 | Pull the SDK image | 105 s | 80 s |
-| Build the RPM |142 s | 82 s |
+| Build the RPM | 142 s | 82 s |
 | Validate against Harbour | 10 s | 10 s |
 | **The whole run** | **284 s** | **190 s** |
 
-`rpm.yml` runs one job. Four is faster when it finishes, but at two or
-four cargo stalls inside scratchbox2 often enough that the waiting costs
-more than the parallelism saves (see Spec constraints below).
+`rpm.yml` runs one job. Four faster when it finishes, but at 2 or 4 cargo stalls in scratchbox2 often enough that waiting costs more than parallelism saves (Spec constraints).
 
-Two changes, in the order they pay:
+Changes, in order they pay:
 
-- **The SDK image is derived, not upstream's.** `ci/build-sdk-image.sh` takes
-`coderus/sailfishos-platform-sdk` by digest and produces an image with one
-architecture instead of three, this package's `BuildRequires` already
-installed, and the i686 rustlib already at `/usr/lib/rustlib`. It has to
-flatten the result rather than layer it, because files deleted in a new
-layer still weigh what they weighed. 5.04 GB of pull becomes about 2.3 GB,
-and `zypper` leaves the critical path.
-- `rust/target` and the crates are carried between runs.
+- **SDK image derived, not upstream's.** `ci/build-sdk-image.sh`: `coderus/sailfishos-platform-sdk` by digest -> one arch not three, package `BuildRequires` preinstalled, i686 rustlib at `/usr/lib/rustlib`. Flattens, not layers (files deleted in new layer still weigh). 5.04 GB pull -> ~2.3 GB; `zypper` off critical path.
+- `rust/target` and crates carried between runs.
 
 ## What a package weighs
 
-The aarch64 package, built against SDK 5.2.0.15. "In the package" is what
-a file costs inside the zstd payload, which is the number that matters for
-a download; raw is what it costs on the phone.
-
-Taken apart at 1.0.0 (`rpm/harbour-piirit.spec` 1.0.0-1, run 152):
+aarch64, SDK 5.2.0.15. "In the package" = cost in zstd payload (download); raw = cost on phone. Taken apart at 1.0.0 (`rpm/harbour-piirit.spec` 1.0.0-1, run 152):
 
 | raw | in the package | what |
 |---|---|---|
 | 20.42 MB | 9.38 MB | `%{_libexecdir}/%{name}/deltachat-rpc-server` |
 | 5.83 MB | 1.46 MB | `%{_bindir}/%{name}` |
 | 3.05 MB | 3.01 MB | `qml/art/intro-*.png` |
-| 1.42 MB | ~0.1 MB | the 41 `.qm` catalogs |
-| ~0.7 MB | ~0.6 MB | the rest of `qml/`, the icons, `LICENSE`, `SOURCE.md` |
+| 1.42 MB | ~0.1 MB | 41 `.qm` catalogs |
+| ~0.7 MB | ~0.6 MB | rest of `qml/`, icons, `LICENSE`, `SOURCE.md` |
 
-The bundled server is a fixed cost: upstream's stripped static-musl build,
-and Harbour leaves nowhere else to put the core (`HARBOUR.md`). The other
-rows are this tree's to answer for, and two of them were answered:
+- Bundled server = fixed cost: upstream stripped static-musl build; Harbour leaves nowhere else for core (`HARBOUR.md`). Other rows = this tree's; two answered:
+- **Pictures painted at draw size.** `IntroPage` shows one at `min(width * 0.42, height * 0.30)`: 453 px tallest phone, 614 px Jolla Tablet. PNG already compressed, so 1254 px master went whole into download, scaled away on device. At 640 px five = 0.75 MB, not 3.05 MB. `the_intro_pictures_are_the_shape_the_shader_reads` pins both ends of range: no regrowth without failing test.
+- **Binary stripped by `[profile.release]`, not rpmbuild.** rpmbuild here doesn't strip: validator said `file is not stripped!` of every build to 1.0.0, 2.08 MB symbol tables. `strip = "symbols"` removes them; `main` reachable since `build.rs` exports it into `.dynsym` (`HARBOUR.md`). `lto = "thin"`, `codegen-units = 1` same block.
 
-- **The pictures are painted at the size a phone draws them.** `IntroPage`
-shows one at `min(width * 0.42, height * 0.30)` -- 453 px on the tallest
-phone, 614 px on the Jolla Tablet -- and PNG is already compressed, so a
-1254 px master was carried whole into the download and scaled away on the
-device. At 640 px the five of them are 0.75 MB instead of 3.05 MB.
-`the_intro_pictures_are_the_shape_the_shader_reads` pins both ends of that
-range now, so they cannot regrow without a test saying so.
-- **The binary is stripped by `[profile.release]`, not by rpmbuild.**
-rpmbuild here does not strip what it packages -- the validator said `file
-is not stripped!` of every build up to 1.0.0, which carried 2.08 MB of
-symbol tables. `strip = "symbols"` removes them; `main` stays reachable
-because `build.rs` exports it into `.dynsym` (`HARBOUR.md`). `lto = "thin"`
-and `codegen-units = 1` are in the same block.
-
-Measured either side of those three settings, on `main` and on the branch
-that introduced them:
+Either side of those three settings, `main` vs introducing branch:
 
 | | before (run 160) | after (run 161) |
 |---|---|---|
 | Download | 15,027,710 B (14.33 MiB) | 12,254,749 B (11.69 MiB) |
 | Installed | 65126 blocks (31.80 MiB) | 55270 blocks (26.99 MiB) |
 
-The build pays about a minute for the LTO: five and a half minutes became
-six and a half at one cargo job.
+LTO costs build ~1 min: 5.5 -> 6.5 min at one cargo job.
 
 ## Spec constraints
 
-Constraints encoded in `rpm/harbour-piirit.spec`:
+Encoded in `rpm/harbour-piirit.spec`:
 
-- **The cargo job count under sb2 is a define, and it is one.** At `-j2`
-  or `-j4` cargo stalls under sb2 -- it has been seen to futex-wait
-  forever on an unreaped child while qmetaobject's C++ glue compiles --
-  so `%{jobs}` defaults to **1**, and `rpm.yml` passes
-  `mb2 build --define "jobs 1"` on every run rather than offering a
-  choice. It applies only inside sb2; a native OBS worker lets cargo
-  pick. The same spec also keeps the build's temporaries in the build
-  directory, because a parallel link through the shared `/tmp` under sb2
-  can lose an object file it has just written. `--define "jobs N"` is
-  still there for a local build that wants to try more.
-- **No `--target` for cargo.** Jolla's cargo pins build scripts to the
-  tooling's host triple; `--target` on top makes cargo treat the whole build
-  as a cross build. `SB2_RUST_TARGET_TRIPLE` already tells the accelerated
-  rustc what to emit. Whisperfish's spec passes none either.
-- **`CARGO_TARGET_<HOST>_LINKER=host-gcc` inside sb2.** rustc links build
-  scripts by calling plain `cc`, which sb2 rewrites to the *cross* compiler
-  (`aarch64-meego-linux-gnu-cc: unrecognized option '-m32'`). scratchbox2
-  exposes the native compiler as `host-gcc`. Pointing at the tooling's gcc
-  by absolute path is not enough — sb2 still rewrites the `ld` that gcc
-  invokes, giving `cannot find /lib/libgcc_s.so.1`.
-- **`QT_INCLUDE_PATH`/`QT_LIBRARY_PATH` exported in `%build`**: qttypes
-  cannot exec the target `qmake` under sb2. `QT_LIBRARY_PATH` uses
-  `%{_libdir}` — Qt is in `/usr/lib64` on aarch64, not `/usr/lib`.
-- **`%{_target_cpu}`, not `%{_arch}`**, for the bundled server path.
-- **`Exec=harbour-piirit`** in the desktop file: the invoker does not
-  honour an `Exec=env FOO=bar` wrapper, so the bundled server path is a
-  fallback inside the binary.
-- **Harbour constrains the name, the paths and every `Requires:`.**
-  `ci/harbour-check.sh` fails a build that breaks one; `HARBOUR.md` is
-  the map, including the two rules this package still breaks.
-- **No bare `%` in a spec comment.** rpm expands macros inside comments, and
-  on the SDK's older rpm a comment mentioning `%build` expands to a preamble
-  starting `LANG=C`, which rpm reads as a tag. Host rpm 4.18 leaves comments
-  alone, so such a spec parses locally and fails only on the SDK.
-  `ci/packaging-lint.sh` checks for this directly.
+- **Cargo job count under sb2 = define, value 1.** At `-j2`/`-j4` cargo stalls under sb2 (seen futex-waiting forever on unreaped child while qmetaobject C++ glue compiles), so `%{jobs}` defaults **1**; `rpm.yml` passes `mb2 build --define "jobs 1"` every run, no choice. Only inside sb2; native OBS worker lets cargo pick. Spec also keeps build temporaries in build dir: parallel link via shared `/tmp` under sb2 can lose just-written object file. `--define "jobs N"` remains for local trial.
+- **No `--target` for cargo.** Jolla's cargo pins build scripts to tooling host triple; `--target` on top makes cargo treat whole build as cross. `SB2_RUST_TARGET_TRIPLE` already tells accelerated rustc what to emit. Whisperfish's spec passes none either.
+- **`CARGO_TARGET_<HOST>_LINKER=host-gcc` inside sb2.** rustc links build scripts via plain `cc`, which sb2 rewrites to *cross* compiler (`aarch64-meego-linux-gnu-cc: unrecognized option '-m32'`). scratchbox2 exposes native compiler as `host-gcc`. Tooling gcc by absolute path not enough: sb2 still rewrites `ld` gcc invokes (`cannot find /lib/libgcc_s.so.1`).
+- **`QT_INCLUDE_PATH`/`QT_LIBRARY_PATH` exported in `%build`**: qttypes can't exec target `qmake` under sb2. `QT_LIBRARY_PATH` uses `%{_libdir}`: Qt in `/usr/lib64` on aarch64, not `/usr/lib`.
+- **`%{_target_cpu}`, not `%{_arch}`**, for bundled server path.
+- **`Exec=harbour-piirit`** in desktop file: invoker ignores `Exec=env FOO=bar` wrapper, so bundled server path = fallback inside binary.
+- **Harbour constrains name, paths, every `Requires:`.** `ci/harbour-check.sh` fails build breaking one; `HARBOUR.md` = map, incl. two rules package still breaks.
+- **No bare `%` in spec comment.** rpm expands macros in comments; on SDK's older rpm, comment mentioning `%build` expands to preamble starting `LANG=C`, read as tag. Host rpm 4.18 leaves comments alone: parses locally, fails only on SDK. `ci/packaging-lint.sh` checks directly.

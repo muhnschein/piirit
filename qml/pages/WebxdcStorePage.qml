@@ -5,55 +5,30 @@ import "../components"
 import Piirit 1.0
 
 /*
- * Where an app comes from: the webxdc store, as a page.
- *
- * A file browser filtered to *.xdc was the first answer, and it is the
- * wrong one for the common case -- somebody who wants to play a game with
- * a friend has no .xdc on their phone yet and no idea where to get one.
- * deltachat-android opens the store instead, and so does this.
- *
- * The store is an ordinary website. What is not ordinary is what happens
- * when a link to an app is followed: a .xdc is a download to the engine,
- * which would save it into the browser's world where this app cannot
- * reach it -- and a download is not a navigation, so watching where the
- * view goes never hears about it at all. That was this page's first
- * answer and it did nothing on a phone.
- *
- * deltachat-android decides every navigation itself
- * (`shouldOverrideUrlLoading`) and fetches an .xdc through the core.
- * There is no such hook here, so the tap is caught where it happens: a
- * frame script in the engine's own world (qml/webxdc/catch.js) stops a
- * click on a link to an app and sends the address back over the message
- * channel, and the file is fetched through the core (`WebxdcStore`).
- * Everything else is left alone, so the store browses as a website.
- *
- * Three ways in, because only the first is certain: the frame script's
- * message, the view's own `linkClicked`, and a navigation that does
- * commit. An app is taken once however it arrives.
- *
- * Pushed by URL and reporting on `picked`, as the picker pages are and
- * for the same reason: `Sailfish.WebView` resolves only where the browser
- * engine is installed, and here that costs this page rather than the
- * conversation it was opened from.
+ * Webxdc app store, as a page, as deltachat-android does; a .xdc file browser
+ * fails the common case (no .xdc yet).
+ * Engine would download an app link into its own world (out of app's reach),
+ * and a download is no navigation, so watching the view never sees it. No
+ * `shouldOverrideUrlLoading` hook here: frame script (qml/webxdc/catch.js)
+ * catches clicks on app links and sends the address back; core fetches the
+ * .xdc (`WebxdcStore`). Rest browses as a normal site.
+ * Three ways in (frame script, `linkClicked`, committed navigation); app taken once.
+ * Pushed by URL: `Sailfish.WebView` resolves only where engine installed.
  */
 Page {
     id: page
 
     property int accountId
 
-    /// An app was chosen and is on the phone at this path.
+    /// App chosen, at this path.
     signal picked(string path)
 
-    /// Where the apps are. Delta Chat's own default store, which is what
-    /// deltachat-android opens; it is not a setting here because there is
-    /// nowhere yet to put one.
+    /// Store URL: Delta Chat default. Not a setting yet.
     readonly property string storeUrl: "https://webxdc.org/apps/"
 
     property string errorMessage: ""
 
-    /// An app has been taken and the page is on its way out. The same tap
-    /// can arrive by more than one route, and the second one is not a
-    /// second app.
+    /// App taken; page leaving. Second arrival of same tap is no second app.
     property bool taken: false
 
     WebxdcStore {
@@ -65,18 +40,15 @@ Page {
             pageStack.pop()
         }
         onError: {
-            // Nothing was taken after all, so the next tap is a real one.
+            // Nothing taken: next tap is real.
             page.taken = false
             page.errorMessage = message
         }
     }
 
-    /// Take the app at `where` rather than letting the engine download
-    /// it.
+    /// Take app at `where` instead of engine download.
     ///
-    /// Called for every address the page hears about -- a click the frame
-    /// script stopped, a link the view reports, a navigation that
-    /// happened -- and it is this that decides which of them is an app.
+    /// Called for every address heard; decides which is an app.
     function catchApp(where) {
         var here = "" + where
         var path = here.split("#")[0].split("?")[0]
@@ -85,20 +57,16 @@ Page {
             return
         }
         page.taken = true
-        // For the navigation that got as far as starting: a click the
-        // frame script stopped never began one.
+        // Stops a navigation that did start (a click frame script caught never
+        // began one).
         view.stop()
         store.fetch(here)
     }
 
-    /// An app already on the phone: sent by somebody, or downloaded
-    /// before. The store is where one is found, not the only place one
-    /// can be.
+    /// App already on phone. Store is not the only source.
     function pickFromPhone() {
-        // The empty properties are passed rather than left out: a stack
-        // that declares both takes two, and the one-argument form does
-        // not reach it. ProfilesPage learned the same thing about
-        // replaceAbove.
+        // Pass `{}`: a stack declaring both args takes two; one-arg form
+        // doesn't reach it (ProfilesPage hit same with replaceAbove).
         var picker = pageStack.push(Qt.resolvedUrl("AttachAppPage.qml"), {})
         if (picker) {
             picker.picked.connect(function (path) {
@@ -108,9 +76,8 @@ Page {
         }
     }
 
-    // Not a PageHeader: the title is the store's own text. Empty until
-    // the page says what it is called, which is why it has a name of its
-    // own to fall back on.
+    // Not a PageHeader: title is store's own. Empty until page names itself,
+    // hence own fallback name.
     ConversationHeader {
         id: header
         objectName: "storeHeader"
@@ -128,28 +95,20 @@ Page {
             bottom: fromPhone.top
         }
         url: page.storeUrl
-        // A navigation that commits. Not how an app arrives -- a .xdc is
-        // downloaded rather than navigated to -- but a redirect that ends
-        // on one would come this way.
+        // Committed navigation: downloads don't land here, redirects to .xdc do.
         onUrlChanged: page.catchApp(view.url)
-        // The view's own account of a tapped link, before the engine has
-        // decided what the link is. `url` here is the signal's, not the
-        // view's.
+        // View's tapped link, before engine decides. `url` is the signal's.
         onLinkClicked: page.catchApp(url)
     }
 
-    // The frame script, and the message it sends back. Registered from
-    // the page rather than on the view: a `Component.onCompleted` written
-    // on the view would replace WebView.qml's own, which is where it
-    // registers the messages it needs to work at all.
+    // Frame script and reply. Registered here: view's `Component.onCompleted` would replace
+    // WebView.qml's.
     Component.onCompleted: {
         view.addMessageListener("piirit:app")
         view.loadFrameScript(Qt.resolvedUrl("../webxdc/catch.js"))
     }
 
-    // Connections rather than a handler on the view, for the same reason:
-    // this listens beside WebView.qml's own handler instead of taking its
-    // place.
+    // Connections: listens beside WebView.qml's handler.
     Connections {
         target: view
         onRecvAsyncMessage: {
@@ -159,10 +118,8 @@ Page {
         }
     }
 
-    // Below the store rather than in a pulley: a pulley wants a
-    // SilicaFlickable around it, and a flickable around a WebView takes
-    // the drags the page itself needs. It is also the way out when the
-    // store cannot be reached at all.
+    // Below store: pulley wants SilicaFlickable, which takes the page's drags.
+    // Also the way out when store is unreachable.
     Button {
         id: fromPhone
         objectName: "fromPhoneButton"

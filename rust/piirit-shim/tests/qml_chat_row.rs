@@ -1,10 +1,7 @@
-//! What a chat-list row shows: the unread badge, when the last message
-//! landed, who wrote it, and how the chat is filed.
+//! Chat-list row: unread badge, last message time, sender, filing.
 
-// Qt harness: needs `unsafe` for `env::set_var` before Qt starts
-// (`unused_unsafe` because it is only unsafe from edition 2024 on),
-// `borrow_as_ptr` for the engine pointer, and `single_shot` with
-// whole-second Durations.
+// Qt harness: `unsafe` env::set_var pre-Qt (`unused_unsafe`: unsafe only from edition 2024),
+// `borrow_as_ptr` for engine pointer, `single_shot` with whole-second Durations.
 #![allow(
     unsafe_code,
     unused_unsafe,
@@ -55,11 +52,11 @@ const PROBE_QML: &str = r"
 
 #[test]
 fn a_chat_row_shows_its_unread_count_time_and_marks() {
-    // SAFETY: single-threaded test binary; set before Qt starts.
+    // SAFETY: single-threaded; set pre-Qt.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("TZ", "UTC");
-        // Fixes what the weekday and date formats render as.
+        // Fixes weekday and date format rendering.
         std::env::set_var("LC_ALL", "C");
     }
 
@@ -112,7 +109,7 @@ fn a_chat_row_shows_its_unread_count_time_and_marks() {
         set!("preview", QString::from("see you there"));
         set!("previewSender", QString::from("Ada"));
         set!("chatColor", QString::from("#00875a"));
-        // A message from earlier today.
+        // Message from earlier today.
         let today = call!("ago", 0.0);
         set!("lastUpdated", today.parse::<f64>().unwrap_or_default());
     });
@@ -124,7 +121,7 @@ fn a_chat_row_shows_its_unread_count_time_and_marks() {
         record!("name", get!("nameLabel", "text"));
 
         set!("unreadCount", 3.0);
-        // Older than today but inside the week.
+        // Older than today, within week.
         let recent = call!("ago", 3.0);
         set!("lastUpdated", recent.parse::<f64>().unwrap_or_default());
     });
@@ -150,8 +147,7 @@ fn a_chat_row_shows_its_unread_count_time_and_marks() {
         record!("muted-mark", get!("muteMark", "visible"));
         record!("ours", get!("previewLabel", "text"));
 
-        // Older than a week: a date, not a weekday that would read as one
-        // of the last seven days.
+        // Older than week: date, not a weekday that would read as one of last seven days.
         let old = call!("ago", 30.0);
         set!("lastUpdated", old.parse::<f64>().unwrap_or_default());
     });
@@ -166,7 +162,7 @@ fn a_chat_row_shows_its_unread_count_time_and_marks() {
     assert_outcome(&steps);
 }
 
-/// Everything a row has to say at a glance.
+/// Everything a row says at a glance.
 fn assert_outcome(steps: &[(&str, String)]) {
     let value = |label: &str| {
         steps
@@ -183,9 +179,7 @@ fn assert_outcome(steps: &[(&str, String)]) {
         "false",
         "a chat with nothing unread wore a badge. {context}"
     );
-    // Relative, not a clock time: the question a chat list answers is
-    // "how recently", and "now" answers it without the reader having to
-    // know what time it is.
+    // Relative: "now" answers "how recently".
     assert_eq!(
         value("today"),
         "now",
@@ -207,10 +201,8 @@ fn assert_outcome(steps: &[(&str, String)]) {
         "unread messages went unbadged. {context}"
     );
     assert_eq!(value("badge-text"), "3", "the badge miscounts. {context}");
-    // The source form: this loads no catalog, and "%n day(s)" is what
-    // the source says. The app always has one -- the reader's language,
-    // or the English catalog for its plural forms -- and
-    // piirit-app's translation test is what proves the word comes out.
+    // Source form "%n day(s)": no catalog loaded here. App always has one (reader's language, or
+    // English for plural forms); piirit-app's translation test proves the word comes out.
     assert_eq!(
         value("this-week"),
         "3 day(s)",
@@ -226,9 +218,8 @@ fn assert_outcome(steps: &[(&str, String)]) {
         "99+",
         "a large unread count is not capped. {context}"
     );
-    // The name is a name. Pinned and muted say where the chat sits and
-    // how it behaves, so they live on the right with the time; only the
-    // mail icon, which is about the chat itself, stays on the name.
+    // Pinned/muted say where chat sits and how it behaves: right, with time. Only mail icon (about
+    // the chat itself) stays on name.
     assert_eq!(
         value("marked-name"),
         "✉ Ada Lovelace",

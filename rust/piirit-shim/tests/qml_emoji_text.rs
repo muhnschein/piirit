@@ -1,17 +1,7 @@
-//! Emoji in a message drawn as the same pictures the reactions are.
-//!
-//! Sailfish draws few emoji itself, so a message body or a quote with one
-//! in it becomes `StyledText` with the emoji as `<img>` of a shipped picture
-//! (Emoji.js's `inText`). What this pins is what counts as an emoji --
-//! not a digit, not a "©" sent as text -- and that nothing the sender
-//! wrote can become markup on the way.
-//!
-//! And what it costs. Drawing reads tables built ahead of time from the
-//! picker's list (EmojiPictures.js), not the list with every emoji's
-//! search words in it, which is the picker's alone; so the tables have to
-//! agree with the list for every emoji in it. And a text with no
-//! character of any emoji in it is passed over at a glance rather than
-//! read through.
+//! Emoji drawn as picker pictures: `StyledText` with `<img>` per emoji (Emoji.js
+//! `inText`); Sailfish draws few itself. Pinned: what counts as emoji (not digit, not
+//! text ©); sender markup never becomes markup. Tables prebuilt in EmojiPictures.js
+//! must match picker list. Plain text skipped fast.
 
 // Qt harness: see qml_pages.rs.
 #![allow(
@@ -29,8 +19,7 @@ use qmetaobject::*;
 
 mod common;
 
-/// The probe imports the app's script and components by absolute URL: it
-/// is loaded from data, which has no directory to resolve one against.
+/// Probe imports script by absolute URL: data has no dir to resolve.
 fn probe_qml() -> String {
     let qml = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../qml");
     format!(
@@ -107,8 +96,7 @@ fn probe_qml() -> String {
     )
 }
 
-/// The <img> `inText` writes for a picture under `base`, for a font of
-/// 18 pixels, after checking the picture is there to be drawn.
+/// `<img>` from `inText` for picture under `base`, 18 px font, if picture exists.
 fn img(base: &str, picture: &str) -> String {
     let file = format!("{}{picture}.png", base.trim_start_matches("file://"));
     assert!(
@@ -121,7 +109,7 @@ fn img(base: &str, picture: &str) -> String {
 #[test]
 #[allow(clippy::too_many_lines)]
 fn messages_draw_their_emoji_as_the_reactions_do() {
-    // SAFETY: single-threaded test binary; set before Qt starts.
+    // SAFETY: single thread; pre-Qt.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
     }
@@ -170,10 +158,8 @@ fn messages_draw_their_emoji_as_the_reactions_do() {
     ];
     let texts_ptr = std::ptr::addr_of!(texts);
 
-    // Text with nothing to draw, which is most of what anyone writes: a
-    // message without a character of any emoji in it is not read
-    // through a character at a time. A digit, # and * among them: they
-    // start the keycaps, and are in far more text than any keycap is.
+    // Plain text, no char of any emoji: not read char by char. Digit, #, * among them: they start
+    // keycaps, but are in far more text than any keycap is.
     let plain: Vec<&'static str> = vec![
         "no emoji at all, 1 # * 2",
         "Täällä on lunta -- 3 cm, ja \"pakkasta\" (10°C) <b>&amp;</b>\n  OK?",
@@ -254,8 +240,7 @@ fn messages_draw_their_emoji_as_the_reactions_do() {
     for (label, expected) in [
         ("thumb", format!("hi {}", img("1f44d"))),
         ("none", String::new()),
-        // The sender's markup is text, their line break a <br> and their
-        // runs of spaces kept, which StyledText would fold.
+        // Sender's markup as text; line break `<br>`, spaces kept (StyledText folds them).
         (
             "escaped",
             format!(
@@ -271,7 +256,7 @@ fn messages_draw_their_emoji_as_the_reactions_do() {
         ("flag", format!("{}!", img("1f1eb-1f1ee"))),
         ("family", img("1f468-200d-1f469-200d-1f467")),
         ("toned", img("1f44d")),
-        // The shim's rendering is markup already: left as it is.
+        // Shim's rendering already markup: left as is.
         (
             "styled",
             format!("<b>bold</b> {}<br>&lt;i&gt;", img("1f525")),
@@ -301,10 +286,8 @@ fn messages_draw_their_emoji_as_the_reactions_do() {
     assert_eq!(value("glyph-on"), "picture", "{context}");
 }
 
-/// Only the picker loads the whole list. Every chat opened draws its
-/// messages through Emoji.js, and the list -- each emoji's name and search
-/// words -- is nearly three times what drawing needs, and is parsed again on
-/// every launch: on Qt 5.6 nothing keeps a compiled copy of a script.
+/// Only picker loads whole list. Chat drawing needs a third of it; reparsed each launch,
+/// Qt 5.6 keeps no compiled script.
 #[test]
 fn only_the_picker_loads_the_list_with_search_words() {
     let qml = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../qml");

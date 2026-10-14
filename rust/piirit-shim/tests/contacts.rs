@@ -1,12 +1,8 @@
 //! Starting a conversation: the three ways in.
 //!
-//! Until this existed nothing in the app created a chat, so these assertions
-//! are about calls that had no caller before.
+//! Calls had no caller before: app never created chats.
 
-// Qt harness: needs `unsafe` for `env::set_var` before Qt starts
-// (`unused_unsafe` because it is only unsafe from edition 2024 on),
-// `borrow_as_ptr` for the engine pointer, and `single_shot` with
-// whole-second Durations.
+// Qt harness: unsafe set_var pre-Qt; borrow_as_ptr; whole-second single_shot.
 #![allow(
     unsafe_code,
     unused_unsafe,
@@ -86,8 +82,7 @@ fn a_chat_can_be_started_three_ways() {
     let journal = common::fresh_journal(&temp);
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
 
-    // SAFETY: single-threaded test binary; set before Qt starts and before
-    // the server inherits them.
+    // SAFETY: single-threaded; set before Qt starts and before server inherits env.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_FAKE_JOURNAL", &journal);
@@ -134,7 +129,7 @@ fn a_chat_can_be_started_three_ways() {
     assert_routes(&common::calls(&journal), &listed, &report);
 }
 
-/// Each way in produced the calls it should, and no others.
+/// Each way in made its calls, no others.
 fn assert_routes(calls: &[(String, Value)], listed: &str, report: &str) {
     let names: Vec<&str> = calls.iter().map(|(name, _)| name.as_str()).collect();
 
@@ -146,7 +141,7 @@ fn assert_routes(calls: &[(String, Value)], listed: &str, report: &str) {
     let mut parts = report.splitn(4, '#');
     let opened = parts.next().unwrap_or_default();
     let errors = parts.next().unwrap_or_default();
-    // Last: the invite has a `#` of its own.
+    // Last: invite has its own `#`.
     let relays = parts.next().unwrap_or_default();
     let invite = parts.next().unwrap_or_default();
     assert_eq!(
@@ -155,10 +150,8 @@ fn assert_routes(calls: &[(String, Value)], listed: &str, report: &str) {
         "expected a chat from each of the three ways in, got {opened:?}"
     );
 
-    // Following an invite: classified first, then joined. Plain text is
-    // refused before any join is attempted, and so is a fingerprint code
-    // with no invite in it, which the core will not read at all. Both are
-    // refused in the same words.
+    // Invite flow: classify, then join. Plain text and invite-less fingerprint codes refused
+    // before join, same words.
     assert!(
         names.contains(&"secure_join"),
         "the invite link was never followed: {names:?}"
@@ -180,10 +173,8 @@ fn assert_routes(calls: &[(String, Value)], listed: &str, report: &str) {
             .all(|refusal| refusal.starts_with("that link is not a contact or group invite")),
         "a refusal did not say that what was pasted is not an invite, got {refusals:?}"
     );
-    // A relay's code is neither an invite nor refused as one: it is
-    // offered back, with the relay it names, as one to add to this
-    // profile. Nothing is added until the reader says so. The two are
-    // asked about at once, so they answer in either order.
+    // Relay code: neither invite nor refused. Offered back with its relay; added only when
+    // reader says so. Both asked at once: either order.
     let mut offered: Vec<&str> = relays.split(';').filter(|part| !part.is_empty()).collect();
     offered.sort_unstable();
     assert_eq!(
@@ -203,16 +194,14 @@ fn assert_routes(calls: &[(String, Value)], listed: &str, report: &str) {
         "the account's own invite link was not fetched, got {invite:?}"
     );
 
-    // Contact tapped: straight to a chat, no contact created.
+    // Contact tapped: straight to chat, no contact created.
     assert!(
         names.contains(&"create_chat_by_contact_id"),
         "tapping a contact did not open a chat: {names:?}"
     );
 
-    // Group: created encrypted, then both members added. Encrypted because
-    // of which method this is, not because of any argument to it -- the
-    // third one is upstream's deprecated `protect`, which it says to pass
-    // `false` and then reads not at all.
+    // Group encrypted (method's choice). Third arg: deprecated `protect`; upstream says pass
+    // `false`, ignores it.
     let group = calls
         .iter()
         .find(|(name, _)| name == "create_group_chat")

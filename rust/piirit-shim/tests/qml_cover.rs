@@ -1,17 +1,10 @@
-//! The cover, with people in it, across two profiles.
-//!
-//! Two of its three states: the staggered grid of everyone in grey,
-//! once each, with empty circles for the cells left over and no pill,
-//! while nothing is new; and whoever wrote lit up in the ambience's own
-//! highlight -- in the cells worth having, under the pill that counts --
-//! once something is; counted and drawn across both profiles the fake
-//! core is told to have. The third state -- nobody yet -- is
-//! `qml_cover_empty.rs`, since it takes a core seeded differently.
+//! Cover with people, two profiles. Two of three states: nothing new -- staggered grid of everyone
+//! grey, once each, empty circles for leftover cells, no pill; something new -- writers lit in
+//! ambience highlight, in the best cells, under counting pill. Counted and drawn across both
+//! profiles. Third state (nobody yet) is `qml_cover_empty.rs`: needs a core seeded differently.
 
-// Qt harness: needs `unsafe` for `env::set_var` before Qt starts
-// (`unused_unsafe` because it is only unsafe from edition 2024 on),
-// `borrow_as_ptr` for the engine pointer, and `single_shot` with
-// whole-second Durations.
+// Qt harness: `unsafe` env::set_var pre-Qt (`unused_unsafe`: unsafe only from edition 2024),
+// `borrow_as_ptr` for engine pointer, `single_shot` with whole-second Durations.
 #![allow(
     unsafe_code,
     unused_unsafe,
@@ -27,8 +20,7 @@ use qmetaobject::*;
 
 mod common;
 
-/// Loads the cover at a size, since the stub `CoverBackground` has none of
-/// its own, and reads it back.
+/// Loads cover at a size (stub `CoverBackground` has none) and reads it back.
 pub const PROBE_QML: &str = r"
     import QtQuick 2.0
     Item {
@@ -244,9 +236,8 @@ fn the_cover_draws_everyone_and_lights_whoever_wrote() {
     let temp = std::env::temp_dir().join(format!("piirit-qml-cover-{}", std::process::id()));
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
 
-    // SAFETY: single-threaded test binary; set before Qt starts and before
-    // the server inherits them. Two configured profiles, each with the
-    // fake's two chats.
+    // SAFETY: single-threaded; set pre-Qt and before server inherits. Two configured profiles,
+    // each with fake's two chats.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_ACCOUNTS_DIR", temp.join("accounts"));
@@ -402,8 +393,7 @@ fn the_cover_draws_everyone_and_lights_whoever_wrote() {
         planned.to_string(),
         "the grid is not drawn cell for cell. {context}"
     );
-    // Four people, each drawn once; every other cell is an empty circle
-    // rather than someone drawn again.
+    // Four people, each drawn once; other cells empty.
     for label in ["placed-quiet", "placed-loud"] {
         assert_eq!(
             value(label),
@@ -454,9 +444,8 @@ fn the_cover_draws_everyone_and_lights_whoever_wrote() {
         "the two who wrote are not the two lit, once each, in the grid. \
          {context}"
     );
-    // Nobody is ever drawn in their own colour here: a cover belongs to
-    // the phone, so the two who wrote wear the ambience's highlight and
-    // everyone else is grey.
+    // Nobody in own colour: cover belongs to phone, so writers wear ambience highlight, others
+    // grey.
     for label in ["own-quiet", "own-loud"] {
         assert_eq!(
             value(label),
@@ -480,8 +469,7 @@ fn the_cover_draws_everyone_and_lights_whoever_wrote() {
                 quiet.parse::<f64>().unwrap_or(0.0),
             )
         });
-    // Not strictly: the top row's two outer cells are as good as each
-    // other, and a second lit face takes one of them.
+    // Not strict: top row's two outer cells are equally good, and second lit face takes one.
     assert!(
         worst_lit <= best_quiet,
         "a grey face was given a better place than a lit one ({order}). \

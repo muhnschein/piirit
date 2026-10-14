@@ -1,14 +1,9 @@
-//! `HANDLED_EVENT_KINDS` is the whole of what the app reads.
+//! `HANDLED_EVENT_KINDS` is all the app reads.
 //!
-//! `DeltaChatCore::relay` fires `core_event` only for the kinds on that
-//! list, because everything it fires reaches every page still on the stack
-//! and one chat list per profile on the cover, each of which parses the
-//! payload again -- work done with the screen off for events nothing reads.
+//! `DeltaChatCore::relay` fires `core_event` only for listed kinds: each is re-parsed by every page
+//! and cover list, even screen-off.
 //!
-//! The risk that buys is silence: a page that starts reading a new kind and
-//! is not added to the list never sees one, and nothing about that looks
-//! like a bug until someone notices a chat that does not update. So the
-//! list is checked here against the code that reads it, both ways round.
+//! Unlisted kind a page reads: silent miss. Test checks list vs reading code, both ways.
 
 use std::collections::BTreeSet;
 use std::path::{Path, PathBuf};
@@ -23,11 +18,10 @@ fn qml_dir() -> PathBuf {
     crate_dir().join("../../qml")
 }
 
-/// The `{ ... }` body of every `fn handle_event` in a source file.
+/// Body `{ ... }` of every `fn handle_event` in source.
 ///
-/// Brace-matched rather than read to the next line that looks like the end,
-/// so a nested block cannot cut a body short. String literals are stepped
-/// over; a brace inside one would otherwise unbalance the count.
+/// Brace-matched, so a nested block can't cut a body short. String literals skipped: a brace in
+/// one would unbalance the count.
 fn handle_event_bodies(source: &str) -> Vec<String> {
     let mut bodies = Vec::new();
     let bytes: Vec<char> = source.chars().collect();
@@ -35,7 +29,7 @@ fn handle_event_bodies(source: &str) -> Vec<String> {
     while let Some(found) = source[from..].find("fn handle_event") {
         let at = from + found;
         from = at + "fn handle_event".len();
-        // The character offset of the signature, then its opening brace.
+        // Char offset of signature, then its opening brace.
         let head = source[..at].chars().count();
         let Some(open) = (head..bytes.len()).find(|&i| bytes[i] == '{') else {
             continue;
@@ -75,18 +69,16 @@ fn handle_event_bodies(source: &str) -> Vec<String> {
     bodies
 }
 
-/// Whether a string is shaped like a core event kind.
+/// Whether string looks like a core event kind.
 ///
-/// Every one of them is CamelCase and nothing else: `IncomingMsg`,
-/// `ChatlistItemChanged`, `Info`. The app has variables called `kind` that
-/// hold something else entirely -- the sort of thing a gallery shows, say
-/// -- and they are lower case, which is what tells them apart from these.
+/// Kinds are `CamelCase`: `IncomingMsg`, `ChatlistItemChanged`, `Info`. App's `kind` vars hold
+/// other things (e.g. gallery kinds) and are lower case, which tells them apart.
 fn looks_like_a_kind(literal: &str) -> bool {
     literal.chars().next().is_some_and(char::is_uppercase)
         && literal.chars().all(char::is_alphanumeric)
 }
 
-/// Every literal in a piece of source that is shaped like a kind.
+/// Every literal in source shaped like a kind.
 fn camel_case_literals(text: &str) -> BTreeSet<String> {
     let mut found = BTreeSet::new();
     let mut rest = text;
@@ -102,7 +94,7 @@ fn camel_case_literals(text: &str) -> BTreeSet<String> {
     found
 }
 
-/// Every kind named in a `kind === "X"` or `kind !== "X"` in QML.
+/// Every kind named by `kind === "X"` or `kind !== "X"` in QML.
 fn qml_kinds(text: &str) -> BTreeSet<String> {
     let mut found = BTreeSet::new();
     for marker in ["kind ===", "kind !=="] {
@@ -126,7 +118,7 @@ fn read(path: &Path) -> String {
         .unwrap_or_else(|err| panic!("cannot read {}: {err}", path.display()))
 }
 
-/// Every kind anything in the app reads, from the code that reads it.
+/// Every kind the app reads, from reading code.
 fn kinds_read() -> BTreeSet<String> {
     let mut found = BTreeSet::new();
 

@@ -1,13 +1,7 @@
-//! Opening the archived list must not show the ordinary chats.
+//! Archived list must not show ordinary chats.
 //!
-//! Pushing the page sets `account_id` and `archived` in whatever order QML
-//! chooses, and each of them starts its own fetch -- one for the ordinary
-//! listing, one for the archived. Both were applied on arrival, so the
-//! slower answer won: the archived page showed ordinary chats until it was
-//! backed out of and opened again.
-//!
-//! The fake core is told to answer the ordinary listing slowly, which
-//! makes that ordering certain rather than a coin toss.
+//! QML sets `account_id` and `archived` in any order, each starting a fetch; slower answer wins.
+//! Fake answers ordinary listing slowly to make that order certain.
 
 // Qt harness: see qml_chat_list.rs.
 #![allow(
@@ -25,11 +19,8 @@ use qmetaobject::*;
 
 mod common;
 
-// The order matters, and it is not arbitrary: `pageStack.push` applies
-// its initial properties from a key-sorted map, so `accountId` reaches the
-// page before `archived` does. The model therefore learns its account
-// while still set to the ordinary listing, asks for that, and only then
-// hears which list was actually wanted.
+// `pageStack.push` sets properties from key-sorted map: `accountId` before `archived`.
+// Model fetches account's ordinary list first, then hears archived was wanted.
 const PROBE_QML: &str = r"
     import QtQuick 2.0
     import Piirit 1.0
@@ -50,13 +41,12 @@ fn the_archived_list_is_not_overwritten_by_a_slow_ordinary_one() {
     let temp = std::env::temp_dir().join(format!("piirit-archived-race-{}", std::process::id()));
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
 
-    // SAFETY: single-threaded test binary; set before Qt starts and before
-    // the server inherits them.
+    // SAFETY: single-threaded; set before Qt starts and before server inherits env.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_ACCOUNTS_DIR", temp.join("accounts"));
         std::env::set_var("PIIRIT_FAKE_JOURNAL", temp.join("journal.ndjson"));
-        // Long enough to land well after the archived answer.
+        // Long enough to land after archived answer.
         std::env::set_var("PIIRIT_FAKE_CHATLIST_DELAY_MS", "1500");
     }
 
@@ -91,12 +81,12 @@ fn the_archived_list_is_not_overwritten_by_a_slow_ordinary_one() {
         (*engine_ptr).invoke_method("open".into(), &[]);
     });
 
-    // The archived answer is back; the ordinary one is still in flight.
+    // Archived answer back; ordinary still in flight.
     single_shot(Duration::from_secs(3), move || unsafe {
         (*steps_ptr).push(("early", call!("count")));
     });
 
-    // Well after the slow one has landed.
+    // Well after slow one landed.
     single_shot(Duration::from_secs(6), move || unsafe {
         (*steps_ptr).push(("late", call!("count")));
         (*engine_ptr).quit();
@@ -118,8 +108,7 @@ fn the_archived_list_is_not_overwritten_by_a_slow_ordinary_one() {
         .collect();
     let context = format!("steps: {steps:?}, listings: {listings:?}");
 
-    // Without both requests in flight there is no race to survive, and
-    // this test would pass on the broken code too.
+    // No overlap, no race: test would pass on broken code.
     assert_eq!(
         listings.len(),
         2,

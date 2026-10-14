@@ -1,14 +1,10 @@
-//! A video call on its page: rung, answered with the camera or without
-//! it, and the pictures shown under the page's own lines and switches.
+//! Video call on its page: rung, answered with/without camera, pictures shown under page's own
+//! lines and switches.
 //!
-//! The window's `CallCenter.qml` and the call page, with the platform
-//! stubbed as `qml_call_page.rs` stubs it. The page the media runs in is
-//! not run; its side of the conversation -- what it reports about the
-//! pictures -- is played over a real socket, as the bridge plays it. What
-//! is checked is what the reader would see: the camera switch where a
-//! video call can be answered without the camera, the pictures shown
-//! only while there are any, the lines over them put away by a tap, the
-//! screen kept lit and the ear shield kept off while they are up.
+//! Window's `CallCenter.qml` and call page, platform stubbed as `qml_call_page.rs`. Media page not
+//! run; its reports about pictures played over a real socket, as bridge plays them. Checked what
+//! reader sees: camera switch where video call can be answered without camera, pictures shown only
+//! while there are any, lines over them put away by a tap, screen lit and ear shield off while up.
 
 // Qt harness: see qml_pages.rs.
 #![allow(
@@ -180,8 +176,7 @@ const PROBE_QML: &str = r"
     }
 ";
 
-/// Run `steps` one after another: the first `first` from now, each of the
-/// rest `gap` after the one before has finished.
+/// Run `steps` in order: first after `first`, rest `gap` apart.
 fn run_steps(mut steps: Vec<Box<dyn FnMut()>>, first: Duration, gap: Duration) {
     if steps.is_empty() {
         return;
@@ -205,7 +200,7 @@ fn a_video_call_shows_its_pictures_under_lines_a_tap_puts_away() {
     let journal = common::fresh_journal(&temp);
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
 
-    // SAFETY: single-threaded test binary; set before Qt starts.
+    // SAFETY: single-threaded; set pre-Qt.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_FAKE_JOURNAL", &journal);
@@ -268,8 +263,8 @@ fn a_video_call_shows_its_pictures_under_lines_a_tap_puts_away() {
     }
 
     let script: Vec<Box<dyn FnMut()>> = vec![
-        // SAFETY for every step: these run only while `exec()` runs on
-        // this thread, and everything they point at outlives it.
+        // SAFETY for every step: fire only while `exec()` runs on this thread; all they
+        // point at outlives it.
         Box::new(move || unsafe {
             record!(
                 "load",
@@ -281,17 +276,15 @@ fn a_video_call_shows_its_pictures_under_lines_a_tap_puts_away() {
             record!("lenses", call!("lenses"));
             record!("ring", call!("ring", 9200, true));
         }),
-        // A video call rings: said so, and the camera can be switched off
-        // before it is answered.
+        // Rings: camera switchable before answer.
         Box::new(move || unsafe {
             record!("status", get!("callStatus", "text"));
             record!("ring-body", get!("ringNote", "body"));
             record!("switches-ringing", get!("callSwitches", "visible"));
             record!("mute-ringing", get!("muteSwitch", "visible"));
             record!("camera-ringing", get!("cameraSwitch", "checked"));
-            // While it rings, no switch for the sound, which is the
-            // phone's ringtone; only the ring's set with the policy, sound
-            // alone, for other apps' music to give way to.
+            // Ringing: no sound switch (sound is phone's ringtone); only ring's set with policy,
+            // sound alone, for other apps' music to give way to.
             record!("speaker-ringing", get!("speakerSwitch", "visible"));
             record!("audio-ringing", call!("audioSaid"));
             record!("front", call!("front"));
@@ -299,19 +292,16 @@ fn a_video_call_shows_its_pictures_under_lines_a_tap_puts_away() {
             record!("camera-off-ringing", get!("cameraSwitch", "checked"));
             tap!("cameraSwitch");
             record!("camera-back", call!("call"));
-            // The policy slow to answer: the call's page waits for it.
+            // Slow policy: page waits.
             call!("audioHolds", true);
             record!("answer", tap!("answerButton"));
         }),
-        // Answered with the camera: the page is granted the camera too,
-        // and says the camera is live.
+        // Answered with camera: granted, live.
         Box::new(move || unsafe {
             let url = call!("url");
             *url_ptr = url.clone();
             record!("url", url);
-            // Answered: the call's sound is being held with the policy,
-            // and until it is, the page is not brought up -- it could
-            // open the microphone before the sound has its way out.
+            // Sound held before page up (mic could open early).
             record!("audio-answered", call!("audioSaid"));
             record!("engine-held", call!("engine"));
             record!("view-held", call!("viewTarget"));
@@ -324,8 +314,7 @@ fn a_video_call_shows_its_pictures_under_lines_a_tap_puts_away() {
             record!("engine", call!("engine"));
             record!("view", call!("viewTarget"));
             record!("hidden-before", get!("callViewLoader", "opacity"));
-            // No picture yet, but the camera is on: held in front of the
-            // face, not to the ear.
+            // No picture yet, camera on: face, not ear.
             record!("ear-camera", get!("proximity", "active"));
             record!(
                 "report",
@@ -336,7 +325,7 @@ fn a_video_call_shows_its_pictures_under_lines_a_tap_puts_away() {
                 )
             );
         }),
-        // The camera is open, and its picture still black.
+        // Camera open, picture black.
         Box::new(move || unsafe {
             record!("our-spinner-black", get!("ourSpinner", "running"));
             record!("their-spinner-none", get!("theirSpinner", "running"));
@@ -357,12 +346,10 @@ fn a_video_call_shows_its_pictures_under_lines_a_tap_puts_away() {
             record!("top-shade", get!("topShade", "visible"));
             record!("foot-shade", get!("footShade", "visible"));
             record!("mute-video", get!("muteSwitch", "visible"));
-            // Nothing turns the camera while its picture fills the
-            // screen: no button in the row, none on the picture.
+            // Nothing turns camera while its picture fills screen: no button in row or on picture.
             record!("flip-row", get!("flipButton", "visible"));
             record!("flip-picture", get!("pictureFlip", "visible"));
-            // Their picture comes, black at first, and the two ends hear
-            // each other.
+            // Their picture comes, black at first; both ends hear each other.
             report(&url, "/state", "connected");
             report(
                 &url,
@@ -373,7 +360,7 @@ fn a_video_call_shows_its_pictures_under_lines_a_tap_puts_away() {
         Box::new(move || unsafe {
             record!("their-spinner-black", get!("theirSpinner", "running"));
             record!("our-spinner-corner", get!("ourSpinner", "running"));
-            // Told nothing of where its corner is: the page has it.
+            // Corner not told: page has it.
             let url = (*url_ptr).clone();
             record!(
                 "told-corner",
@@ -405,8 +392,7 @@ fn a_video_call_shows_its_pictures_under_lines_a_tap_puts_away() {
                     get!("pictureFlipButton", "width")
                 )
             );
-            // A video call is on the loudspeaker. The page has the
-            // microphone open; the switch has it shut first, and is busy.
+            // Video call on loudspeaker. Page has mic open: switch shuts it first, is busy.
             record!(
                 "speaker-video",
                 format!(
@@ -441,8 +427,7 @@ fn a_video_call_shows_its_pictures_under_lines_a_tap_puts_away() {
         }),
         Box::new(move || unsafe {
             let url = (*url_ptr).clone();
-            // The sound moved with the microphone shut, and the page told
-            // to open it again; once it has, the switch is done.
+            // Sound moved with mic shut, page told to reopen it; once it has, switch is done.
             record!("audio-earpiece", call!("audioSaid"));
             record!(
                 "told-open",
@@ -465,7 +450,7 @@ fn a_video_call_shows_its_pictures_under_lines_a_tap_puts_away() {
             record!("clock", get!("callClock", "text"));
             record!("status-video", get!("callStatus", "visible"));
             record!("tuck", get!("tuck", "running"));
-            // A tap puts the lines away, and another brings them back.
+            // Tap hides lines; another shows.
             record!("tap-away", call!("tapPictures"));
             record!("who-away", get!("callWho", "visible"));
             record!("hang-up-away", get!("hangUpButton", "visible"));
@@ -482,15 +467,14 @@ fn a_video_call_shows_its_pictures_under_lines_a_tap_puts_away() {
         }),
         Box::new(move || unsafe {
             let url = (*url_ptr).clone();
-            // Turned on the picture: the button dimmed where it was, from
-            // the press on, until the other camera's picture shows.
+            // Turned on picture: button dimmed from press on, until other camera's picture shows.
             record!("turn", tap!("pictureFlipButton"));
             record!("our-spinner-turning", get!("ourSpinner", "running"));
             record!("turning", call!("turning"));
             record!("turn-limit", get!("turnLimit", "running"));
             record!("flip-turning-dim", get!("pictureFlip", "opacity"));
             record!("flip-turning-enabled", get!("pictureFlipButton", "enabled"));
-            // Theirs shows; ours, given the other camera, is black again.
+            // Theirs shows; ours, given other camera, black again.
             report(
                 &url,
                 "/video",
@@ -511,7 +495,7 @@ fn a_video_call_shows_its_pictures_under_lines_a_tap_puts_away() {
                 )
             );
             record!("our-spinner-size", get!("ourSpinner", "size"));
-            // The other camera's picture shows: turned.
+            // Other camera's picture shows: turned.
             let url = (*url_ptr).clone();
             report(
                 &url,
@@ -523,7 +507,7 @@ fn a_video_call_shows_its_pictures_under_lines_a_tap_puts_away() {
             record!("turned", call!("turning"));
             record!("flip-turned-dim", get!("pictureFlip", "opacity"));
             record!("flip-turned-enabled", get!("pictureFlipButton", "enabled"));
-            // Black again with no turn: nothing to turn.
+            // Black, no turn: nothing to turn.
             let url = (*url_ptr).clone();
             report(
                 &url,
@@ -541,7 +525,7 @@ fn a_video_call_shows_its_pictures_under_lines_a_tap_puts_away() {
             );
         }),
         Box::new(move || unsafe {
-            // Turned back, and switched off: no turn left to wait for.
+            // Turned back, off: no turn to wait for.
             record!("flip", tap!("pictureFlipButton"));
             record!("camera-off", tap!("cameraSwitch"));
             record!("turning-off", call!("turning"));
@@ -555,7 +539,7 @@ fn a_video_call_shows_its_pictures_under_lines_a_tap_puts_away() {
                 ))
                 .to_string()
             );
-            // Only their picture now.
+            // Only their picture.
             report(
                 &url,
                 "/video",
@@ -563,12 +547,10 @@ fn a_video_call_shows_its_pictures_under_lines_a_tap_puts_away() {
             );
         }),
         Box::new(move || unsafe {
-            // Their picture is watched with the camera off: still not
-            // a call held to the ear.
+            // Camera off: still not held to ear.
             record!("ear-watching", get!("proximity", "active"));
-            // Their picture keeps the screen lit, but not from the
-            // background, where nothing draws it.
-            // The same for the page's clock, which nobody sees there.
+            // Their picture keeps screen lit, but not from background, where nothing draws it.
+            // Same for page's clock, which nobody sees there.
             record!("lit-watching", get!("callDisplay", "preventBlanking"));
             record!("ticking", get!("clock", "running"));
             call!("away", true);
@@ -577,7 +559,7 @@ fn a_video_call_shows_its_pictures_under_lines_a_tap_puts_away() {
             call!("away", false);
             record!("lit-back", get!("callDisplay", "preventBlanking"));
             record!("ticking-back", get!("clock", "running"));
-            // No pictures any more: the page is unseen again.
+            // No pictures: page unseen.
             let url = (*url_ptr).clone();
             report(
                 &url,
@@ -593,8 +575,7 @@ fn a_video_call_shows_its_pictures_under_lines_a_tap_puts_away() {
             record!("who-voice", get!("callWho", "visible"));
             record!("ear-voice", get!("proximity", "active"));
             call!("hangUp");
-            // Over: nothing given back while the microphone is open; once
-            // it has shut, the set is.
+            // Over: nothing given back while mic open; once shut, set is.
             record!("audio-over", call!("audioSaid"));
             record!("audio-talking-over", get!("callAudio", "talking"));
             call!("micOpen", false);
@@ -605,7 +586,7 @@ fn a_video_call_shows_its_pictures_under_lines_a_tap_puts_away() {
         Box::new(move || unsafe {
             call!("dropPage");
             call!("reset");
-            // A voice call rings with no camera to switch.
+            // Voice call: no camera to switch.
             record!("ring-voice", call!("ring", 9201, false));
         }),
         Box::new(move || unsafe {
@@ -616,7 +597,7 @@ fn a_video_call_shows_its_pictures_under_lines_a_tap_puts_away() {
             (*engine_ptr).quit();
         }),
     ];
-    // Whole seconds: the vendored `single_shot` drops the fraction.
+    // Whole seconds: vendored `single_shot` drops fraction.
     run_steps(script, Duration::from_secs(2), Duration::from_secs(1));
 
     engine.exec();
@@ -779,8 +760,7 @@ fn a_video_call_shows_its_pictures_under_lines_a_tap_puts_away() {
         "true",
         "this end's picture in its corner has nothing on it. {context}"
     );
-    // The page's own corner: 27% of 540 by 36%, 4% in from the right,
-    // 10% of 960 down.
+    // Corner: 27% of 540 by 36%, 4% from right, 10% of 960 down.
     let place: Vec<f64> = value("own-picture-place")
         .split(',')
         .map(|part| part.parse().unwrap_or(f64::NAN))
@@ -873,7 +853,7 @@ fn a_video_call_shows_its_pictures_under_lines_a_tap_puts_away() {
         "true",
         "the spinner is not over this end's picture in its corner. {context}"
     );
-    // BusyIndicatorSize.Medium: the corner is no place for a large one.
+    // BusyIndicatorSize.Medium: corner too small for large.
     assert_eq!(value("our-spinner-size"), "2", "{context}");
 
     let clock = value("clock");

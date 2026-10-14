@@ -6,27 +6,18 @@ import "../js/Calls.js" as Calls
 import Piirit 1.0
 
 /*
- * The calls with one contact, and the way to call them: behind the Calls
- * tile on the contact's page (components/MediaKinds.qml).
+ * Calls with one contact, behind Calls tile (components/MediaKinds.qml).
  *
- * A call is a message in its chat, so the chat's own index lists them
- * (chat_media.rs, kind `calls`), newest first. A row says which way the
- * call went, what became of it -- how long it lasted, or that it was
- * missed -- and when, in the chat's own words for a call (Calls.js). A
- * tap calls back, as a tap on the call's row in the chat does; one still
- * ringing here is taken up instead.
- *
- * Calling is the first row, above the calls, laid out as the phone's
- * contact card lays out its own actions: the reader who came here to
- * call does not have to read the list first.
+ * Calls are chat messages (chat_media.rs, kind `calls`), newest first; row
+ * wording from Calls.js. Tap calls back; one ringing here is answered. Calling
+ * row first.
  */
 Page {
     id: page
 
     property int accountId
     property int chatId
-    /// Who the calls are with, as the contact's page names them. Theirs
-    /// to choose, so drawn as plain text.
+    /// Calls' contact, as contact page names them. Plain text: name is theirs.
     property string contactName
     property string errorMessage: ""
 
@@ -39,9 +30,7 @@ Page {
         onError: page.errorMessage = message
     }
 
-    // Whether a call can be placed here, asked of the core as the
-    // contact's page asks it: a contact request, or a chat that has
-    // stopped being encrypted, is one the core would refuse a call in.
+    // Core refuses calls to requests and unencrypted chats.
     ChatInfo {
         id: chat
         objectName: "chat"
@@ -52,13 +41,12 @@ Page {
 
     Connections {
         target: core
-        // A call placed, answered or ended changes its message, which
-        // the model reads again.
+        // Call changes its message: reread.
         onCore_event: {
             media.handle_event(context_id, kind, payload_json)
             chat.handle_event(context_id, kind, payload_json)
         }
-        // A model created before the core is up has nothing to load from.
+        // Model made before core up: nothing to load.
         onStatus_changed: {
             if (core.status === "ready") {
                 media.reload()
@@ -70,8 +58,7 @@ Page {
     /// A call can be placed from here now.
     readonly property bool canCall: chat.can_call
 
-    /// Call them, with the camera on for a video call, or go back to the
-    /// call there is: one call at a time.
+    /// Call back; camera on for video; or open the live call.
     function call(video) {
         if (typeof appWindow === "undefined") {
             return
@@ -81,8 +68,7 @@ Page {
         }
     }
 
-    /// A row was tapped. As in the chat: one still ringing here is
-    /// answered, and any other is called back, the way it was made.
+    /// Tap: answer ringing one here, else call back.
     function callFromRow(messageId, outgoing, callState, hasVideo) {
         if (typeof appWindow === "undefined") {
             return
@@ -96,8 +82,7 @@ Page {
         }
     }
 
-    /// What a row says first: which way the call went, or -- for one
-    /// that did not happen -- what became of it.
+    /// Row line 1: direction, or what became of a failed call.
     function rowTitle(callState, outgoing) {
         if (Calls.failed(callState)) {
             return Calls.title(callState, false)
@@ -106,7 +91,7 @@ Page {
         return outgoing ? qsTr("Outgoing call") : qsTr("Incoming call")
     }
 
-    /// The line under it: how long it lasted, or that it is ringing.
+    /// Row line 2: duration, or ringing.
     function rowDetail(callState, duration, outgoing) {
         if (callState === "Alerting") {
             return qsTr("Ringing…")
@@ -122,8 +107,7 @@ Page {
 
         header: Item {
             width: list.width
-            // A clear gap under calling, so the row to call from does not
-            // read as the first of the calls.
+            // Gap: call row must not read as first call.
             height: header.height + callAction.height + videoAction.height
                     + 3 * Theme.paddingLarge
 
@@ -132,8 +116,7 @@ Page {
                 title: Media.kindName("calls")
             }
 
-            // The contact card's own shape for an action: the icon, and
-            // what it does to whom.
+            // Contact card action: icon and effect.
             BackgroundItem {
                 id: callAction
                 objectName: "callAction"
@@ -177,7 +160,7 @@ Page {
                 }
             }
 
-            // The same, with the camera on from the start.
+            // Same, camera on.
             BackgroundItem {
                 id: videoAction
                 objectName: "videoCallAction"
@@ -285,7 +268,7 @@ Page {
                 text: row.detail
             }
 
-            // When: the day, and the time of day on it.
+            // When: day, time of day.
             Label {
                 id: when
                 objectName: "callWhen"

@@ -9,15 +9,11 @@ description = "Binary that wires DeltaChatCore + the chat/message list models in
 
 [dependencies]
 piirit-shim = { path = "../piirit-shim" }
-# Without its `log` bridge; see piirit-shim/Cargo.toml.
+# No log bridge. See piirit-shim/Cargo.toml.
 qmetaobject = { version = "0.2", default-features = false }
-# The one `cpp!` block in the tree: src/translations.rs, which installs a
-# QTranslator, a class qmetaobject does not bind. Same versions as the
-# vendored qmetaobject's, so nothing new reaches Cargo.lock.
+# cpp! QTranslator (src/translations.rs). Same versions as vendored qmetaobject.
 cpp = "0.5"
-# Not used from Rust. qttypes' build script is what finds Qt, and it tells
-# only its direct dependents where: build.rs reads the DEP_QT_* variables
-# it exports, which is how the C++ above finds <QtCore/QTranslator>.
+# Not Rust-used. build.rs reads DEP_QT_* from qttypes.
 qttypes = "0.2"
 
 [build-dependencies]

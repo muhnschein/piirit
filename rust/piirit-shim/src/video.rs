@@ -1,20 +1,11 @@
-//! A picked video, made small enough to send before it is sent.
+//! Picked video, recoded smaller before send.
 //!
-//! The core recodes a picture on its way out and sends a video as it is
-//! (`media.rs`), so a video from the gallery goes out at whatever the
-//! phone recorded it at -- commonly several times what the core
-//! recommends, and so past what some relays take (issue #111). This asks
-//! `piirit-video` what the file holds as it is picked, plans a smaller
-//! one at the outgoing media quality's rates, and makes it on a thread of
-//! its own straight away, while the reader writes the caption. It is sent
-//! when the reader sends it, never before.
-//!
-//! What is made goes in the app's cache, beside the captures, and is
-//! gone once the core has copied it into its blob directory, or once the
-//! reader puts the file away; one whose chat closed while it was being
-//! sent is swept a day later (`capture.rs`). The reader
-//! sees the file named as they picked it, with the suffix of what it now
-//! is.
+//! Core recodes pictures but sends video as is (`media.rs`); gallery video often exceeds
+//! recommended size and some relays (issue #111). On pick: `piirit-video` reads it, plans a
+//! smaller one at media quality's rates, recodes on own thread while caption is written; sent
+//! only on send. Output in cache beside captures, removed once core copies it or reader drops it;
+//! one whose chat closed mid-send swept a day later (`capture.rs`). Shown as picked name with new
+//! suffix.
 
 use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicBool, Ordering};
@@ -24,17 +15,13 @@ use piirit_video::{Outcome, Target};
 
 use crate::qr::cache_file;
 
-/// The directory under the cache a recoded video waits in.
+/// Cache subdir for recoded videos.
 pub(crate) const RECODED_DIR: &str = "recoded";
 
-/// The suffixes of the files FFmpeg is built to read here: MP4 and
-/// QuickTime, which are what phones record. A video in anything else is
-/// sent as it is.
+/// Suffixes FFmpeg reads here: MP4 and QuickTime. Others sent as is.
 const VIDEOS: [&str; 5] = ["mp4", "m4v", "mov", "3gp", "3g2"];
 
-/// Whether `path` is a video this can read, by its suffix -- which is
-/// all a picker says about a file, and enough to not open every
-/// document to look.
+/// Whether `path` is a video, by suffix; a picker says no more.
 pub(crate) fn is_video(path: &str) -> bool {
     let suffix = Path::new(path)
         .extension()
@@ -43,12 +30,10 @@ pub(crate) fn is_video(path: &str) -> bool {
     VIDEOS.contains(&suffix.as_str())
 }
 
-/// How to make the video at `path` smaller, or `None` to send it as it
-/// is: not a video this reads, already small, or not readable at all --
-/// which the core is then left to make of it, as before.
+/// Smaller encode plan for `path`, or `None` to send as is: not a readable video, already
+/// small, or unreadable (left to core, as before).
 ///
-/// Reads only the file's header, so it is cheap enough to ask as a file
-/// is picked.
+/// Header only, cheap enough to ask on pick.
 pub(crate) fn plan(path: &str, media_quality: u32, limit: u64) -> Option<Target> {
     if !is_video(path) {
         return None;
@@ -63,8 +48,7 @@ pub(crate) fn plan(path: &str, media_quality: u32, limit: u64) -> Option<Target>
     )
 }
 
-/// What the recipient sees the recoded file called: the picked file's
-/// name with the suffix of what it now is.
+/// Recipient's name: picked name with new suffix.
 pub(crate) fn recoded_name(name: &str) -> String {
     let stem = Path::new(name)
         .file_stem()
@@ -74,11 +58,10 @@ pub(crate) fn recoded_name(name: &str) -> String {
     format!("{stem}.mp4")
 }
 
-/// Numbers the recoded files, with the process: two chats can each be
-/// making one.
+/// Numbers recoded files, process-wide: two chats can each make one.
 static NEXT: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(0);
 
-/// A fresh path to write a recoded video to, in the cache.
+/// Fresh cache path for a recoded video.
 fn recoded_path() -> Result<PathBuf, String> {
     let dir = cache_file(&format!("{RECODED_DIR}/.keep"))?
         .parent()
@@ -88,9 +71,7 @@ fn recoded_path() -> Result<PathBuf, String> {
     Ok(dir.join(format!("video-{}-{number}.mp4", std::process::id())))
 }
 
-/// Remove a recoded video once nothing needs it. Bounded to the recoded
-/// directory, so it cannot take a picked file with it whatever it is
-/// handed.
+/// Remove a recoded video. Limited to recoded dir.
 pub(crate) fn discard(path: &str) {
     let Ok(dir) = cache_file(&format!("{RECODED_DIR}/.keep")) else {
         return;
@@ -103,26 +84,24 @@ pub(crate) fn discard(path: &str) {
     }
 }
 
-/// How a recoding came out, for the conversation to act on.
+/// How a recoding came out.
 pub(crate) enum Prepared {
-    /// Here is the smaller file.
+    /// Smaller file.
     Made(String),
-    /// The reader stopped it; nothing is sent.
+    /// Reader stopped it; nothing sent.
     Cancelled,
-    /// It could not be made, and why; the original is sent instead.
+    /// Could not be made; original sent instead.
     Failed(String),
 }
 
-/// Start making `input` smaller on a thread of its own.
+/// Start recoding `input` smaller on own thread.
 ///
-/// `progress` hears how far along it is, as whole percents only so the
-/// interface is not woken for every frame; `done` hears how it came
-/// out. Both are called on that thread, so both should be
-/// `queued_callback`s. `cancel` stops it.
+/// `progress` gets whole percents (UI not woken per frame), `done` the outcome; both run on
+/// that thread, so pass `queued_callback`s. `cancel` stops it.
 ///
 /// # Errors
 ///
-/// When no thread could be started, in which case neither is called.
+/// When no thread could start; neither is called.
 pub(crate) fn start<P, D>(
     input: String,
     target: Target,
@@ -141,7 +120,7 @@ where
         };
         let mut last = -1;
         let result = piirit_video::recode(Path::new(&input), &output, &target, |fraction| {
-            // Whole percents: there is nothing finer to show.
+            // Whole percents only.
             #[allow(clippy::cast_possible_truncation)]
             let percent = (fraction * 100.0) as i32;
             if percent != last {

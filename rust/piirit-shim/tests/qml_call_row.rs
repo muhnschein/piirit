@@ -1,12 +1,9 @@
-//! A call in a chat is a call's row: what kind of call, or what became of
-//! it, and how long it lasted -- and a tap on it is the page's to act on.
+//! Call row in chat: call kind or outcome, duration; tap is the page's to act on.
 //!
-//! The core writes a sentence into a call's text, in English whatever the
-//! phone's language, and rewrites it as the call moves. The row reads the
-//! call's state instead (`call_info`, through the model's `call_state`),
-//! and says it in Delta Chat's own words, whose translations come with
-//! them. Where the core would not say what state a call is in, the row
-//! falls back to showing the sentence, which is still true.
+//! Core writes an English sentence into call's text whatever phone language, rewriting it as call
+//! moves. Row reads call state instead (`call_info`, via model's `call_state`) and says it in Delta
+//! Chat's own translated words. Where core won't say state, row falls back to sentence (still
+//! true).
 
 // Qt harness: see qml_chat_list.rs.
 #![allow(
@@ -101,7 +98,7 @@ const PROBE_QML: &str = r"
 #[test]
 #[allow(clippy::too_many_lines)]
 fn a_call_draws_as_what_became_of_it_and_a_tap_goes_to_the_page() {
-    // SAFETY: single-threaded test binary; set before Qt starts.
+    // SAFETY: single-threaded; set pre-Qt.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
     }
@@ -138,8 +135,9 @@ fn a_call_draws_as_what_became_of_it_and_a_tap_goes_to_the_page() {
         };
     }
 
-    // SAFETY for every block: these fire only while `exec()` runs on this
-    // thread, and everything they point at outlives it.
+    // SAFETY for every block: fire only while `exec()` runs on this thread; all they
+
+    // point at outlives it.
     single_shot(Duration::from_secs(1), move || unsafe {
         record!(
             "load",
@@ -178,7 +176,7 @@ fn a_call_draws_as_what_became_of_it_and_a_tap_goes_to_the_page() {
     });
     single_shot(Duration::from_secs(8), move || unsafe {
         record!("canceled", call!("says"));
-        // The core would not say: the sentence it wrote stands.
+        // No state from core: sentence stands.
         show!(true, "", false, 0);
     });
     single_shot(Duration::from_secs(9), move || unsafe {
@@ -199,7 +197,7 @@ fn a_call_draws_as_what_became_of_it_and_a_tap_goes_to_the_page() {
     let context = format!("steps: {steps:?}");
 
     assert_eq!(value("load"), "ok", "the list did not load. {context}");
-    // The source forms: this loads no catalog.
+    // Source forms: no catalog.
     assert_eq!(
         value("completed"),
         "true|Audio call|3 minute(s) duration|false|call|true",

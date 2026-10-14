@@ -1,15 +1,9 @@
-//! Each message deleted goes when its own wait is up, not when the last
-//! one's is.
+//! Each delete goes at its own deadline, not the last one's. One shared countdown, restarted per
+//! delete: first's platform countdown runs out, platform puts that message back, both go when the
+//! second ends. A single delete never shows it.
 //!
-//! One countdown kept for everything waiting would have to be restarted on
-//! each new delete, so the first message's countdown runs out, the platform
-//! puts that message back, and both go together when the second countdown
-//! ends. A single delete never shows the difference.
-//!
-//! Every id carries its own deadline, and the timer is armed for
-//! whichever is soonest. What this pins is the shape a shared countdown
-//! cannot produce: asked a second apart, the first is gone while the
-//! second is still waiting.
+//! Each id has own deadline; timer armed for soonest. Pinned: asked a second apart, first gone
+//! while second still waits -- shape a shared countdown can't produce.
 
 // Qt harness: see qml_reactions.rs.
 #![allow(
@@ -121,12 +115,11 @@ const PROBE_QML: &str = r"
     }
 ";
 
-// A script of timed steps and the assertions that read them; splitting
-// it would hide the order the steps run in, which is the whole point.
+// Timed script: splitting hides step order, the point.
 #[test]
 #[allow(clippy::too_many_lines)]
 fn a_delete_goes_when_its_own_wait_is_up() {
-    // SAFETY: single-threaded test binary; set before Qt starts.
+    // SAFETY: single thread; pre-Qt.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
     }
@@ -158,8 +151,7 @@ fn a_delete_goes_when_its_own_wait_is_up() {
         };
     }
 
-    // A second and a half, so that a delete asked for a second after
-    // another lands squarely between the two deadlines.
+    // 1.5 s: a delete a second after another lands between the two deadlines.
     single_shot(Duration::from_secs(1), move || unsafe {
         record!(
             "load",
@@ -172,29 +164,27 @@ fn a_delete_goes_when_its_own_wait_is_up() {
         );
     });
 
-    // The first, due at 3.5s.
+    // First, due at 3.5 s.
     single_shot(Duration::from_secs(2), move || unsafe {
         record!("ask-first", call!("deleteRow", 1));
         record!("waiting-after-first", call!("stillWaiting"));
     });
 
-    // The second, a second later, due at 4.5s. Asking for it must not
-    // touch the first one's deadline.
+    // Second, 1 s later, due at 4.5 s. Must not touch first's deadline.
     single_shot(Duration::from_secs(3), move || unsafe {
         record!("nothing-sent-yet", call!("sentSoFar"));
         record!("ask-second", call!("deleteRow", 2));
         record!("waiting-after-second", call!("stillWaiting"));
     });
 
-    // Between the two deadlines: the first has gone, the second has not.
-    // One shared countdown restarted on the second ask would have sent
-    // neither by now, and both at 4.5s.
+    // Between deadlines: first gone, second not. Shared countdown restarted on second ask would
+    // send neither yet, both at 4.5 s.
     single_shot(Duration::from_secs(4), move || unsafe {
         record!("between", call!("sentSoFar"));
         record!("waiting-between", call!("stillWaiting"));
     });
 
-    // And past the second deadline, both.
+    // Past second deadline: both.
     single_shot(Duration::from_secs(6), move || unsafe {
         record!("after-both", call!("sentSoFar"));
         record!("waiting-after-both", call!("stillWaiting"));

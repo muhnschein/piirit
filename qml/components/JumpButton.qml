@@ -2,9 +2,7 @@ import QtQuick 2.0
 import Sailfish.Silica 1.0
 
 /*
- * Back to the newest message, from further up the history. A round button
- * rather than a labelled one: it sits over the conversation, and a chevron
- * needs no translating.
+ * Back to newest message. Round, unlabelled.
  */
 Item {
     id: root
@@ -20,12 +18,10 @@ Item {
         objectName: "jumpDisc"
         anchors.fill: parent
         radius: width / 2
-        // The theme's own highlight carries transparency of its own, which
-        // let the messages through; this sets the amount deliberately.
+        // Theme highlight is transparent: set amount here.
         color: Theme.rgba(Theme.highlightBackgroundColor, 0.5)
 
-        // Drawn rather than themed: `icon-m-down` is itself a disc with a
-        // chevron on it, which read as two circles stacked.
+        // Drawn: icon-m-down reads as two circles.
         Item {
             id: chevron
             objectName: "jumpChevron"
@@ -39,10 +35,7 @@ Item {
             readonly property real slope:
                 Math.atan2(height, width / 2) * 180 / Math.PI
 
-            // Turned about the middle of the left edge, not the corner:
-            // about the corner it is the stroke's top edge that follows
-            // the line, so each half shifts by half its thickness and the
-            // two no longer meet squarely.
+            // Pivot at left-edge middle: corner pivot misaligns the halves.
             Rectangle {
                 objectName: "chevronLeft"
                 x: 0
@@ -76,7 +69,7 @@ Item {
         }
     }
 
-    // How many arrived while the reader was away.
+    // Arrived while away.
     Rectangle {
         id: badge
         objectName: "jumpBadge"

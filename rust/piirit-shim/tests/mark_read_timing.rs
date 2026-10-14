@@ -1,14 +1,8 @@
-//! Opening a chat has to clear its unread badge, even when the page was
-//! not yet on screen at the moment the messages arrived.
+//! Opening chat clears unread badge, even if page wasn't on screen at arrival.
 //!
-//! `reading_history` exists so a reader scrolled up in history, or an app
-//! sitting in the background, does not send read receipts for messages
-//! nobody has looked at. It is driven from `readerIsLooking`, which is
-//! false until the page transition finishes -- and a local fetch can
-//! easily finish first. Checking it once, when the load returns, means a
-//! chat opened that way is never marked read at all: the badge stays
-//! forever, because everything afterwards only marks messages that
-//! *arrive*.
+//! `reading_history` stops receipts for unseen messages. Driven by `readerIsLooking`, false until
+//! page transition ends; a local fetch can finish first. Checked once at load, chat was never
+//! marked read: badge stayed, as later code marks only arriving messages.
 
 // Qt harness: see chat_actions.rs.
 #![allow(
@@ -50,7 +44,7 @@ fn a_chat_opened_before_its_page_settles_is_still_marked_read() {
     let journal = common::fresh_journal(&temp);
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
 
-    // SAFETY: single-threaded test binary; set before Qt starts.
+    // SAFETY: single-threaded; set pre-Qt.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_FAKE_JOURNAL", &journal);
@@ -81,7 +75,7 @@ fn a_chat_opened_before_its_page_settles_is_still_marked_read() {
         *during_ptr = common::methods(std::path::Path::new(
             &std::env::var("PIIRIT_FAKE_JOURNAL").unwrap_or_default(),
         ));
-        // The page finishes its transition: the reader is now looking.
+        // Page finishes transition: reader now looking.
         (*engine_ptr).invoke_method("arrive".into(), &[]);
     });
 

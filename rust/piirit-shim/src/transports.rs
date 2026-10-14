@@ -1,23 +1,12 @@
-//! The relays a profile is reached through.
+//! Relays a profile is reached through.
 //!
-//! The core lets a profile have several transports at once
-//! (`list_transports`): each is a relay with an address on it, and mail
-//! to any of them arrives. Which one mail leaves through is the core's
-//! own choice, made each time it connects -- the newest relay that
-//! answers, since 2.61 -- and nothing over JSON-RPC names it or picks
-//! it. What one of them does still carry is the profile's own address,
-//! `configured_addr`: the one its invite link and its own contact
-//! carry. That row comes first. Removing one is `delete_transport`,
-//! which the core refuses for the last transport and, for the one with
-//! the profile's own address on it, answers by picking another. So the
-//! list is read back after each removal, rather than edited here: which
-//! address is the profile's own afterwards is the core's answer, not
-//! this object's guess.
+//! Mail arrives on any transport (`list_transports`); core picks outgoing one per connect (newest
+//! answering since 2.61), unnamed over JSON-RPC. Own-address relay (`configured_addr`) listed
+//! first. `delete_transport`: core refuses last; removing own-address relay makes core pick
+//! another. So rows read back after removal: own address is core's answer, not a guess here.
 //!
-//! Each row also carries what the core's connectivity report says about
-//! that relay -- the dot it drew, its own words, the mailbox -- read off
-//! the same page the profile's own quota is (`connectivity.rs`): the
-//! report covers every transport, and one parse of it fills every row.
+//! Rows also carry connectivity report dot, status, mailbox (`connectivity.rs`): one parse fills
+//! every row.
 
 use std::cell::RefCell;
 
@@ -28,7 +17,7 @@ use crate::core::connection;
 use crate::json;
 use crate::models::{TransportItem, TransportListModel};
 
-/// One profile's relays, the one with its own address first.
+/// Profile's relays, own-address relay first.
 ///
 /// ```qml
 /// Transports { id: transports; account_id: page.accountId }
@@ -38,63 +27,45 @@ use crate::models::{TransportItem, TransportListModel};
 pub struct Transports {
     base: qt_base_class!(trait QObject),
 
-    /// Whose relays these are. Setting it reloads.
+    /// Account whose relays these are; setting reloads.
     pub account_id: qt_property!(u32; WRITE set_account_id NOTIFY account_changed),
     /// Emitted when the account changes.
     pub account_changed: qt_signal!(),
 
-    /// The rows: the relay with the profile's own address first, the
-    /// rest in the order the core lists them, which is the order they
-    /// were added.
-    /// Reset whole on each load, as a `Repeater`'s model is elsewhere
-    /// (`chat_info.rs`): the rows are few, and a row counting down to
-    /// its removal keeps its countdown beside the list rather than on
-    /// the row (`PendingRemoval.qml`), so the rebuild costs it nothing.
+    /// Own-address relay first, rest in core (add) order.
+    /// Reset whole per load: few rows, and removal countdown lives beside list, not on row
+    /// (`PendingRemoval.qml`), so rebuild costs nothing.
     pub rows: qt_property!(RefCell<TransportListModel>; CONST),
 
-    /// How many rows there are. What decides whether the last one may be
-    /// removed: the core refuses that, and a menu item that asks anyway
-    /// is a menu item that fails. A field rather than a count of `rows`:
-    /// a row's bindings read it while the rows are being rebuilt.
+    /// Row count; gates removing last (core refuses).
+    /// Field, not `rows.len()`: bindings read it mid-rebuild.
     pub count: qt_property!(u32; NOTIFY rows_changed),
-    /// The profile's own address (`configured_addr`), empty until
-    /// loaded.
+    /// Own address (`configured_addr`); empty until loaded.
     pub primary: qt_property!(QString; NOTIFY rows_changed),
     /// Emitted after any change to `rows`.
     pub rows_changed: qt_signal!(),
 
-    /// Something failed. The message is the core's own -- "Cannot remove
-    /// the last transport", "Transport does not exist".
+    /// Core's words, e.g. "Cannot remove the last transport".
     pub error: qt_signal!(message: QString),
-    /// A relay was removed and the rows read back. The page re-reads
-    /// the profile on it, whose own address may have gone with the
-    /// relay.
+    /// Relay removed, rows read back; page re-reads profile.
     pub changed: qt_signal!(),
 
     /// Read the relays from the core.
     pub reload: qt_method!(fn(&mut self)),
-    /// Remove the relay `addr` is on. Refused by the core for the last
-    /// one. Removing the relay with the profile's own address on it
-    /// leaves the core to pick another, and the rows say which once they
-    /// are read back.
+    /// Remove relay `addr` is on. Core refuses last; picks another own address if needed.
     pub remove: qt_method!(fn(&mut self, addr: QString)),
     /// Feed a `core_event` in. Events for other accounts are ignored.
     pub handle_event:
         qt_method!(fn(&mut self, context_id: u32, kind: QString, payload_json: QString)),
 
-    /// Counts loads, so a slow answer to an older question cannot land on
-    /// top of a newer one: removing a relay reloads, and the core's
-    /// `TransportsModified` for the same removal reloads again.
+    /// Stale loads dropped: removal reloads, and core's `TransportsModified` for it reloads again.
     generation: u64,
 }
 
-/// What one load brings back: the transports as the core lists them, the
-/// profile's own address, the connectivity report, and the connectivity
-/// band (`connectivity.rs`).
+/// Load result: transports, own address, report, band.
 type Listed = (Vec<serde_json::Value>, String, String, u32);
 
-/// The core's `get_connectivity` band at and above which it is at least
-/// trying to connect; below it, it is not connected at all.
+/// Band at or above which core is connecting; below: not connected.
 const CONNECTING: u32 = 2000;
 
 impl Transports {
@@ -152,15 +123,12 @@ impl Transports {
                     .await
                     .map(Option::unwrap_or_default)
                     .map_err(|err| err.to_string())?;
-                // Nice to have rather than needed: a relay whose mailbox
-                // cannot be read is still a relay to list.
+                // Nice to have: relay listed even if report unreadable.
                 let report: String = rpc
                     .call("get_connectivity_html", (account_id,))
                     .await
                     .unwrap_or_default();
-                // What the report leaves unsaid while the profile is not
-                // connected: see `TransportItem::offline`. 0, "unknown",
-                // when it will not say.
+                // Band: see `TransportItem::offline`; 0 if core won't say.
                 let band: u32 = rpc
                     .call("get_connectivity", (account_id,))
                     .await
@@ -193,9 +161,7 @@ impl Transports {
         });
     }
 
-    /// Apply one core event: the transports changed, from here or from
-    /// another device the profile is on, and the overflow that says
-    /// events were dropped.
+    /// Core event: transports changed here or on other device, or overflow.
     pub fn handle_event(&mut self, context_id: u32, kind: QString, _payload_json: QString) {
         if context_id != self.account_id || self.account_id == 0 {
             return;
@@ -208,8 +174,7 @@ impl Transports {
         }
     }
 
-    /// Report a removal applied, and read the rows back: which address
-    /// is the profile's own after it is the core's decision.
+    /// Removal applied: read rows back.
     fn applied_callback(&self) -> impl Fn(Result<(), String>) {
         let ptr: QPointer<Self> = QPointer::from(self);
         queued_callback(move |result: Result<(), String>| {
@@ -225,10 +190,8 @@ impl Transports {
     }
 }
 
-/// The rows for what the core listed: the relay with the profile's own
-/// address first, the rest in the core's order, each with its mailbox
-/// off the report -- or, for a profile that is not connected at all
-/// (`band`), as a relay that is not connected.
+/// Rows: own-address relay first, mailbox from report.
+/// Not connected (`band`): relays shown so.
 fn rows_from(
     transports: &[serde_json::Value],
     primary: &str,
@@ -248,7 +211,7 @@ fn rows_from(
                 .find(|reported| reported.domain.eq_ignore_ascii_case(domain));
             let quota = reported.and_then(|reported| reported.quota.as_ref());
             let offline = reported.is_none() && not_connected;
-            // Exact to 2^53 bytes, which no mailbox holds.
+            // Exact to 2^53 bytes.
             #[allow(clippy::cast_precision_loss)]
             TransportItem {
                 id: row_id(addr),
@@ -276,12 +239,8 @@ fn rows_from(
     rows
 }
 
-/// A number for an address, the same every time it is asked: FNV-1a over
-/// the bytes, with the top bit dropped so that QML's `int` holds it.
-/// What the countdown before a removal is keyed by, since it waits on
-/// numbers. Two addresses of one profile landing on the same number is
-/// as likely as a hash collision ever is, and costs one countdown drawn
-/// on the wrong row.
+/// Stable number per address: FNV-1a, top bit dropped for QML `int`. Keys removal countdown.
+/// Collision: one countdown on wrong row.
 fn row_id(addr: &str) -> u32 {
     let hash = addr.bytes().fold(0x811c_9dc5_u32, |hash, byte| {
         (hash ^ u32::from(byte)).wrapping_mul(0x0100_0193)
@@ -325,8 +284,7 @@ mod tests {
             .collect()
     }
 
-    /// The relay with the profile's own address comes first whatever
-    /// the core's order, and each row's mailbox is its own relay's.
+    /// Own-address relay first; each row has its own mailbox.
     #[test]
     fn the_profiles_own_relay_is_first_and_each_has_its_own_mailbox() {
         let rows = rows_from(
@@ -341,8 +299,7 @@ mod tests {
         );
         assert_eq!(rows[0].addr.to_string(), "ada@nine.testrun.org");
         assert_eq!(rows[0].quota_text.to_string(), "1.34 GiB of 2 GiB used");
-        // Whole bytes through f64, exact at this size: compared as the
-        // integers they are.
+        // Whole bytes exact through f64.
         #[allow(clippy::cast_possible_truncation, clippy::cast_sign_loss)]
         let bytes = (
             rows[0].quota_used_bytes as u64,
@@ -353,8 +310,7 @@ mod tests {
         assert_eq!(rows[0].status.to_string(), "Connected");
         assert_eq!(rows[1].dot.to_string(), "red");
         assert_eq!(rows[1].status.to_string(), "Not connected: timed out");
-        // The core lowercases what it stores; what it was configured
-        // with need not match its case.
+        // Core lowercases stored addresses.
         let rows = rows_from(
             &listed(&["ada@old.example.net", "Ada@Nine.Testrun.ORG"]),
             "ada@nine.testrun.org",
@@ -367,8 +323,7 @@ mod tests {
         );
     }
 
-    /// No address of its own, nothing reported: still the relays, in
-    /// the core's order, with no mailbox to show.
+    /// No primary, no report: relays, no mailbox.
     #[test]
     fn rows_stand_without_a_primary_or_a_report() {
         let rows = rows_from(
@@ -386,11 +341,7 @@ mod tests {
         assert!(rows_from(&[], "ada@nine.testrun.org", REPORT, 4000).is_empty());
     }
 
-    /// A profile that is not connected at all -- IO stopped -- gets a
-    /// report with no relays in it: each relay is not connected, rather
-    /// than a check still to come. A relay the report does cover keeps
-    /// the core's own word, and a profile still connecting is still
-    /// being checked.
+    /// Not connected at all: each relay shown not connected.
     #[test]
     fn a_profile_not_connected_at_all_has_relays_not_connected() {
         let relays = listed(&["ada@old.example.net", "ada@nine.testrun.org"]);
@@ -421,8 +372,7 @@ mod tests {
         }
     }
 
-    /// The number a row is known by to the countdown is the address's
-    /// own, whatever else changes around it, and never negative.
+    /// Countdown key: stable, never negative.
     #[test]
     fn a_row_keeps_its_number_across_reloads() {
         let before = rows_from(

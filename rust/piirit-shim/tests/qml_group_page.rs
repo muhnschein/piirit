@@ -1,15 +1,9 @@
-//! The group page shows what the core holds and writes the name back.
+//! Group page shows what core holds, writes name back. Members shown; name filled from core, not
+//! from opening page; typed name saved on leave; blanked one reverts to group's, not sent to core
+//! empty. Leaving group asked on own page. Non-group chat: no edits.
 //!
-//! Loaded headlessly against the stub Silica module and the recording
-//! double: the members come up, the name is filled in from the core rather
-//! than the page that opened it, typing a new one and leaving saves it, a
-//! blanked one goes back to the group's rather than to the core, leaving
-//! the group is asked about on a page of its own, and a chat that is not
-//! a group offers no edits at all.
-//!
-//! The member rows wait for the page to come onto the screen: the page is
-//! made attached to its conversation as soon as that loads, and most of
-//! the time nobody swipes across to it.
+//! Member rows wait for page to come on screen: page is attached to its conversation as soon as
+//! that loads, and mostly nobody swipes to it.
 
 // Qt harness: see qml_chat_list.rs.
 #![allow(
@@ -18,8 +12,7 @@
     clippy::borrow_as_ptr,
     clippy::disallowed_methods,
     clippy::expect_used,
-    // qt_method! declarations must match the generated dispatcher's
-    // by-value parameters; see piirit-shim/src/lib.rs.
+    // `qt_method!` params match dispatcher: piirit-shim/src/lib.rs.
     clippy::needless_pass_by_value
 )]
 
@@ -31,8 +24,7 @@ use serde_json::Value;
 
 mod common;
 
-/// Silica's `pageStack`, recorded rather than performed: only which page
-/// leaving the group opens is asked about.
+/// Silica `pageStack`, recorded: only which page leaving opens.
 #[derive(QObject, Default)]
 struct PageStackProbe {
     base: qt_base_class!(trait QObject),
@@ -143,7 +135,7 @@ fn the_group_page_shows_the_group_and_renames_it() {
     let journal = common::fresh_journal(&temp);
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
 
-    // SAFETY: single-threaded test binary; set before Qt starts.
+    // SAFETY: single thread; pre-Qt.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_FAKE_JOURNAL", &journal);
@@ -194,8 +186,7 @@ fn the_group_page_shows_the_group_and_renames_it() {
         };
     }
 
-    // The group: chat 2, with the account itself and one contact in it,
-    // made off the screen as the conversation makes it.
+    // Group: chat 2, account and one contact, off-screen.
     single_shot(Duration::from_secs(1), move || unsafe {
         record!(
             "load",
@@ -209,8 +200,7 @@ fn the_group_page_shows_the_group_and_renames_it() {
 
     single_shot(Duration::from_secs(3), move || unsafe {
         record!("loaded", get!("chat", "loaded"));
-        // Loaded, and counted in the heading, but no row built for
-        // anyone until the page is on its way in.
+        // Loaded, counted in heading; no rows until page on way in.
         record!("unseen-members", get!("membersHeader", "text"));
         record!("unseen-row", get!("memberRow10", "objectName"));
         record!("show", call!("show"));
@@ -224,20 +214,18 @@ fn the_group_page_shows_the_group_and_renames_it() {
         record!("menu-offered", get!("groupMenu", "visible"));
         record!("change-picture", get!("changePicture", "visible"));
         record!("remove-picture", get!("removePicture", "visible"));
-        // Disappearing messages: off, as the core holds it, and a tap on
-        // a duration goes to the core.
+        // Disappearing messages: off per core; duration tap goes to core.
         record!("timer-off", get!("disappearingCombo", "currentIndex"));
         record!("timer-offered", get!("disappearingCombo", "enabled"));
         record!(
             "timer-pick",
             call!("click", QString::from("timerOption86400"))
         );
-        // The description, as the core holds it: shown with its line
-        // break, and a field on a group the account is in.
+        // Description: line break shown; editable on a group account is in.
         record!("desc-visible", get!("descriptionField", "visible"));
         record!("desc-text", get!("descriptionField", "text"));
         record!("desc-readonly", get!("descriptionField", "readOnly"));
-        // A new one, applied on the way out with the name.
+        // New one applied on way out, with name.
         record!(
             "desc-typed",
             call!(
@@ -246,7 +234,7 @@ fn the_group_page_shows_the_group_and_renames_it() {
                 QString::from("  Bring water\nand boots \n")
             )
         );
-        // A new name, applied on the way out rather than a pause later.
+        // New name applied on way out, not a pause later.
         record!(
             "typed",
             call!(
@@ -259,9 +247,9 @@ fn the_group_page_shows_the_group_and_renames_it() {
     });
 
     single_shot(Duration::from_secs(5), move || unsafe {
-        // What went out came back trimmed, and is what the field shows.
+        // Sent value comes back trimmed; field shows that.
         record!("desc-saved", get!("descriptionField", "text"));
-        // Cleared again: the field is blanked and the page left.
+        // Cleared: field blanked, page left.
         record!(
             "desc-cleared",
             call!(
@@ -270,8 +258,7 @@ fn the_group_page_shows_the_group_and_renames_it() {
                 QString::from("")
             )
         );
-        // A blanked name goes back to the group's rather than to the
-        // core as nothing.
+        // Blanked name reverts to group's, not sent to core as nothing.
         record!(
             "blanked",
             call!(
@@ -282,13 +269,12 @@ fn the_group_page_shows_the_group_and_renames_it() {
         );
         record!("leave-blank", call!("leave"));
         record!("refilled", get!("groupNameField", "text"));
-        // Leaving is asked about on a page of its own.
+        // Leave asked on own page.
         record!(
             "confirm-leave",
             call!("click", QString::from("leaveButton"))
         );
-        // A one-to-one chat: shown, but nothing about it can be changed
-        // here.
+        // One-to-one chat: shown, nothing changeable.
         record!(
             "load-single",
             call!("load", QString::from(common::page_url("GroupPage.qml")), 1)
@@ -300,11 +286,10 @@ fn the_group_page_shows_the_group_and_renames_it() {
         record!("single-readonly", get!("groupNameField", "readOnly"));
         record!("single-add", get!("addMembersButton", "visible"));
         record!("single-leave", get!("leaveButton", "visible"));
-        // Nothing on the menu applies, so the menu itself is not there:
-        // an empty pull-down is a pull that does nothing.
+        // Nothing applies: menu absent (empty pull-down does nothing).
         record!("single-menu", get!("groupMenu", "visible"));
         record!("single-change-picture", get!("changePicture", "visible"));
-        // Nothing to show and nothing to add: no field at all.
+        // Nothing to show or add: no field.
         record!("single-desc", get!("descriptionField", "visible"));
         record!("single-desc-edit", get!("chat", "can_edit_description"));
         record!(
@@ -314,8 +299,7 @@ fn the_group_page_shows_the_group_and_renames_it() {
     });
 
     single_shot(Duration::from_secs(9), move || unsafe {
-        // The group again, its description now empty: the field is
-        // there, to write one in.
+        // Group again, description empty: field present to write one.
         record!("empty-visible", get!("descriptionField", "visible"));
         record!("empty-text", get!("descriptionField", "text"));
         record!("empty-readonly", get!("descriptionField", "readOnly"));
@@ -331,8 +315,7 @@ fn the_group_page_shows_the_group_and_renames_it() {
     });
 
     single_shot(Duration::from_secs(11), move || unsafe {
-        // Once the account has left, the description stays readable and
-        // cannot be written to.
+        // After leaving, description readable, not writable.
         record!(
             "leave-group",
             call!("ask", QString::from("chat"), QString::from("leave"))
@@ -352,7 +335,7 @@ fn the_group_page_shows_the_group_and_renames_it() {
     assert_page(&steps, &navigation, &common::calls(&journal));
 }
 
-/// What was shown came from the core, and what was typed went back to it.
+/// Shown from core; typed value sent back to it.
 #[allow(clippy::too_many_lines)]
 fn assert_page(steps: &[(&str, String)], navigation: &str, calls: &[(String, Value)]) {
     let names: Vec<&str> = calls.iter().map(|(name, _)| name.as_str()).collect();
@@ -423,10 +406,9 @@ fn assert_page(steps: &[(&str, String)], navigation: &str, calls: &[(String, Val
     );
     assert_eq!(value("loaded"), "true", "the group never loaded. {context}");
 
-    // The description: shown as the core holds it, line break kept, in a
-    // field the account can write to; what it wrote went out trimmed and
-    // came back; cleared it is still a field, and gone from a chat that
-    // has none to show or to add; left, it reads but does not write.
+    // Description: shown as core holds it, line break kept, writable in group; sent trimmed and
+    // came back; cleared still a field; gone from chat with nothing to show or add; read-only
+    // after leaving.
     assert_eq!(
         value("desc-visible"),
         "true",

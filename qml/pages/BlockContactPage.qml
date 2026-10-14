@@ -4,14 +4,10 @@ import "../components"
 import Piirit 1.0
 
 /*
- * Pick somebody to block: this profile's contacts, and a search over
- * them. Reached from the plus on the blocked contacts page, which
- * is where the reader ends up again once someone is picked.
+ * Pick someone to block: profile's contacts, with search. Reached from plus
+ * on blocked contacts page, where reader lands after picking.
  *
- * Only the contacts that are not blocked already are here -- that is the
- * list the core gives, and the blocked ones are on the page that opened
- * this. A tap asks first: blocking is done on purpose, and a tap in a
- * list of names is easy to make by accident.
+ * Core lists unblocked contacts only. Tap asks first: blocking is deliberate.
  */
 Page {
     id: page
@@ -19,9 +15,7 @@ Page {
     property int accountId
     property string errorMessage: ""
 
-    // The core has said who is in this profile, whatever that was. An
-    // empty list before then is no answer rather than no contacts: see
-    // NewChatPage.
+    // Empty list before core answers = unknown: see NewChatPage.
     property bool contactsLoaded: false
 
     ContactList {
@@ -29,13 +23,11 @@ Page {
         objectName: "contacts"
         account_id: page.accountId
         onError: page.errorMessage = message
-        // Emitted once the rows have been set, whether there turned out
-        // to be any or none.
+        // Emitted after rows set.
         onRows_changed: page.contactsLoaded = true
     }
 
-    // A keystroke's worth of quiet before the core is asked, so typing a
-    // name is one search rather than one per letter.
+    // Debounce: one search per pause.
     Timer {
         id: searchDebounce
         objectName: "searchDebounce"
@@ -46,7 +38,7 @@ Page {
     Connections {
         target: core
         onCore_event: contacts.handle_event(context_id, kind, payload_json)
-        // A model made before the core is up has nothing to load from.
+        // Model made before core up: nothing to load.
         onStatus_changed: {
             if (core.status === "ready") {
                 contacts.reload()
@@ -54,13 +46,10 @@ Page {
         }
     }
 
-    /// Ask about blocking someone, and block them if the reader agrees.
+    /// Ask to block, and block if reader agrees.
     ///
-    /// The page stays where it is afterwards: the row goes -- the core
-    /// keeps a blocked contact out of this list -- which says it took,
-    /// and a reader blocking two people in a row does not have to come
-    /// back in for the second. The list behind this one has them by then,
-    /// since the core announces the change.
+    /// Page stays for next block; core hides blocked, so row goes. List behind
+    /// updates from core event.
     function block(contactId, contactName) {
         var dialog = pageStack.push(Qt.resolvedUrl("BlockContactDialog.qml"), {
             contactName: contactName,
@@ -73,9 +62,7 @@ Page {
         }
     }
 
-    // The search field outside the list, for the reason NewChatPage
-    // documents: a field in a view's header lives inside the flickable
-    // and moves on every keystroke.
+    // Search field outside list: header field would move with keystrokes.
     SilicaFlickable {
         id: host
         anchors.fill: parent
@@ -118,8 +105,7 @@ Page {
                 right: parent.right
                 bottom: parent.bottom
             }
-            // Rows draw outside the list's own box otherwise, and the box
-            // starts under the search field; see NewChatPage.
+            // Rows otherwise draw outside the box: see NewChatPage.
             clip: true
             model: contacts.rows
 
@@ -141,7 +127,7 @@ Page {
 
             ViewPlaceholder {
                 objectName: "contactsPlaceholder"
-                // Not until the core has answered: see `contactsLoaded`.
+                // Not until core answered: see `contactsLoaded`.
                 enabled: page.contactsLoaded && contacts.count === 0
                 text: searchField.text.trim().length > 0 ? qsTr("Nobody matches")
                                                          : qsTr("No contacts yet")

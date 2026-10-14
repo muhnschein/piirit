@@ -1,676 +1,196 @@
 # Calls
 
-*How a call works in Piirit, how much of the phone's own call handling
-an app can have, and what only a phone can still answer.*
+**Voice calls on for everybody**, as in reference clients since Delta Chat 2.51 (experimental behind *Settings → Advanced* until #119 call bugs fixed). Whether call rings here: *Settings → Notifications → Calls*, reference clients' own switch. Video calls built on same page, not yet made on phone. Voice calls made on phone, Sailfish OS 5.2. Closing questions = ones source tree can't answer; open ones say so.
 
-**Voice calls are on for everybody**, as they are in the reference
-clients since Delta Chat 2.51: they were experimental, behind a switch
-under *Settings → Advanced*, until the call bugs in #119 were fixed.
-Whether a call rings here is *Settings → Notifications → Calls*, the
-reference clients' own switch. Video calls are
-built on the same page, and have not yet been made on a phone. Voice
-calls have been made on a phone, Sailfish OS 5.2; the questions at the
-end are the ones a source tree cannot answer, and the ones still open
-say so.
-
-The shape of it: **the core does the call, Gecko does the media, and
-Piirit is the glue.** The core places, rings, accepts and ends a call, and
-times one out. The browser engine the platform already ships has the peer
-connection, the codecs and the echo cancellation. Upstream's calls-webapp
-is the page that drives them. What is written here is the page's host,
-the call's screen, and the phone's side of a call: the ringtone, the
-screen, the notification.
+Shape: **core does call, Gecko does media, Piirit is glue.** Core places, rings, accepts, ends, times out. Platform's browser engine: peer connection, codecs, echo cancellation. Upstream calls-webapp = page driving them. Written here: page host, call screen, phone side (ringtone, screen, notification).
 
 ## What the core does
 
-`deltachat-rpc-server` 2.62, the binary this package bundles
-(`vendor/deltachat-rpc-server/SOURCE.md`), carries the whole call
-protocol. `rust/deltachat-jsonrpc/tests/real_server.rs` pins the parts
-of it the app reads against the binary itself.
+`deltachat-rpc-server` 2.62, bundled binary (`vendor/deltachat-rpc-server/SOURCE.md`), carries whole call protocol. `rust/deltachat-jsonrpc/tests/real_server.rs` pins app-read parts against binary itself.
 
-- **Five methods.** `place_outgoing_call(account, chat, offer, has_video)`
-  answers with the message id that *is* the call. `accept_incoming_call(
-  account, message, answer)`. `end_call(account, message)` is decline,
-  cancel and hang-up all three, and a second one is not an error.
-  `call_info(account, message)` answers `{sdpOffer, hasVideo, state}`,
-  the state tagged by `kind`: `Alerting`, `Active`, `Completed` with a
-  `duration` in seconds, `Missed`, `Declined`, `Canceled`.
-  `ice_servers(account)` answers a JSON *string* holding the TURN
-  servers, which the bridge hands to the page as it is.
-- **Four events**, and the one trap in them: `IncomingCall`,
-  `IncomingCallAccepted`, `OutgoingCallAccepted` and `CallEnded` are
-  serialised **snake_case** -- `msg_id`, `chat_id`, `place_call_info`,
-  `has_video`, `from_this_device`, `accept_call_info` -- where the rest of
-  the stream is camelCase. A reader asking for `msgId` gets nothing and
-  says nothing. `calls.rs` reads them as they are, and the tests feed
-  them in that shape.
-- **The chat is the signalling channel.** A call is a `Viewtype::Call`
-  message with the offer in a header; accepting and ending are hidden
-  messages quoting it. The core never reads the SDP, which is what makes
-  the media the client's problem and nothing else.
-- **A call rings for 120 seconds**, then goes stale at both ends. The
-  core's own timer ends it: incoming as Missed, outgoing as Declined.
-  That timer lives only in the server that heard the call, and says
-  `CallEnded` once; a restarted server or an overflowed event channel
-  loses it, so a call ringing here also stops by itself after 125
-  seconds (`calls.rs`, `RING_LIMIT`), by when the core counts it stale.
-- **A ringing call raises no `IncomingMsg`**, and one that rings out
-  says only `MsgsChanged` and `CallEnded`. A missed call's notification
-  is the client's to raise; the chat list's message notifications never
-  see one.
-- **One-to-one only**, and encrypted: the core refuses a group ("Can
-  only place calls in single chats") and Saved messages ("Cannot call
-  self"), and a chat without the other end's key cannot send.
-- **`who_can_call_me`**, per device, not synced: 0 everybody, 1
-  contacts (the default), 2 nobody. A call from somebody who may not ring
-  is still stored, and can still be answered from its chat. Not synced,
-  but kept in the profile's database, so a backup or a second device
-  takes it along: Piirit writes 2 only when the reader switches ringing
-  off, and leaves the default otherwise.
+- **Five methods.** `place_outgoing_call(account, chat, offer, has_video)` → message id that *is* the call. `accept_incoming_call(account, message, answer)`. `end_call(account, message)` = decline, cancel, hang-up; second one not error. `call_info(account, message)` → `{sdpOffer, hasVideo, state}`, state tagged by `kind`: `Alerting`, `Active`, `Completed` (+ `duration` s), `Missed`, `Declined`, `Canceled`. `ice_servers(account)` → JSON *string* of TURN servers; bridge hands to page as is.
+- **Four events**, one trap: `IncomingCall`, `IncomingCallAccepted`, `OutgoingCallAccepted`, `CallEnded` serialised **snake_case** (`msg_id`, `chat_id`, `place_call_info`, `has_video`, `from_this_device`, `accept_call_info`); rest of stream camelCase. Reader asking `msgId` gets nothing, silently. `calls.rs` reads as-is; tests feed that shape.
+- **Chat = signalling channel.** Call = `Viewtype::Call` message, offer in header; accept/end = hidden messages quoting it. Core never reads SDP: media is client's problem only.
+- **Rings 120 s**, then stale both ends. Core timer ends it: incoming Missed, outgoing Declined. Timer lives only in server that heard call, says `CallEnded` once; restarted server or overflowed event channel loses it. So ringing here also stops itself at 125 s (`calls.rs`, `RING_LIMIT`), by when core counts it stale.
+- **Ringing call raises no `IncomingMsg`**; one ringing out says only `MsgsChanged`, `CallEnded`. Missed-call notification = client's; chat list's message notifications never see one.
+- **One-to-one only**, encrypted: core refuses group ("Can only place calls in single chats") and Saved messages ("Cannot call self"); chat without other end's key can't send.
+- **`who_can_call_me`**, per device, not synced: 0 everybody, 1 contacts (default), 2 nobody. Call from someone not allowed to ring still stored, answerable from chat. Unsynced but in profile DB: backup or second device takes it along. Piirit writes 2 only when reader switches ringing off; else leaves default.
 
 ## How a call works here
 
 ### The row
 
-A call is drawn as one (`MessageDelegate.qml`): what kind, or what
-became of it -- *Missed call*, *Declined call*, *Canceled call* -- and
-how long it lasted, in Delta Chat's own words so its translations apply.
-The row reads the call's state (`calls::summary`, filled in by
-`chat.rs` the way a webxdc row is); the core's own text for a call is an
-English sentence, and is shown only when the core will not say what
-state a call is in. A tap on a call still ringing here takes it up; a tap
-on any other calls back -- deltachat-android's rule.
+- One row (`MessageDelegate.qml`): kind or outcome (*Missed call*, *Declined call*, *Canceled call*), duration, in Delta Chat's words so its translations apply.
+- Row reads call state (`calls::summary`, filled by `chat.rs` like webxdc row). Core's own call text = English sentence; shown only when core won't say state.
+- Tap on call ringing here takes it up; tap on any other calls back (deltachat-android's rule).
 
 ### Placing one
 
-From the contact: their page's tiles (`MediaKinds.qml`) have a **Calls**
-tile while the chat is one a call can be placed in --
-one-to-one, encrypted, taking messages, the core's own conditions asked
-in advance (`chat.rs`'s `takes_calls`). Behind it, `CallsPage.qml`
-lists the chat's calls from the chat's own media index (`chat_media.rs`,
-kind `calls`, the core's `Call` view type), newest first -- which way
-each went, what became of it, when -- under a first row, *Call Ada*, to
-place one from. A tap on a listed call does what a tap on its row in the
-chat does. The chat's header has no call button: both ends of that line
-are taken, the left by the back gesture and the right by the way to the
-contact's page.
+- Contact page tiles (`MediaKinds.qml`) have **Calls** tile while chat can take call: one-to-one, encrypted, taking messages; core's conditions asked in advance (`chat.rs` `takes_calls`).
+- Behind it `CallsPage.qml`: chat's calls from chat's media index (`chat_media.rs`, kind `calls`, core's `Call` view type), newest first: direction, outcome, when. First row *Call Ada* places one. Tap on listed call = tap on its chat row.
+- No call button in chat header: both ends taken (left = back gesture, right = way to contact page).
 
 ### The call
 
-One `Call` object (`calls.rs`) for the whole window, held by
-`CallCenter.qml`, because a call belongs to no page: one comes in
-whatever is on screen, and a page the reader leaves is not a call they
-have hung up. It moves through `ringing`, `starting`, `calling`,
-`connecting`, `connected`, `reconnecting` and `ended`, and says why a
-call ended: hung up here, declined here, ended there, answered on
-another device, missed, failed. One call at a time, as both reference
-clients have it: a second rings nowhere and is a missed call once the
-core gives up on it.
-
-`CallPage.qml` shows it: who, and how it stands, in the phone's language;
-Decline and Answer while it rings; then the call's page. The page cannot
-be swiped away while a call is up -- that would take the call's sound
-with it -- and a tap on a notification or a cover quick action brings
-the call back to the front rather than popping it.
-
-While a call is up the app's cover is the call's: the other end's
-picture behind, faint and enlarged (their avatar instead where they
-have none), their name, how long, and a note for a microphone that is
-off and for a camera paused while the app is away. Its one quick action
-is the microphone: hanging up from the home screen would be too easy
-to do by mistake, and the camera is let go in the background anyway.
+- One `Call` object (`calls.rs`) per window, held by `CallCenter.qml`: call belongs to no page; comes in whatever is on screen; leaving page ≠ hanging up.
+- States: `ringing`, `starting`, `calling`, `connecting`, `connected`, `reconnecting`, `ended`. Says why ended: hung up here, declined here, ended there, answered on another device, missed, failed.
+- One call at a time, as both reference clients: second rings nowhere, missed once core gives up.
+- `CallPage.qml`: who, state, in phone's language; Decline, Answer while ringing; then call's page. Not swipeable away while call up (would take call's sound). Notification tap or cover quick action brings call to front, not pop.
+- Cover during call: other end's picture behind, faint, enlarged (avatar if none); name; duration; note for mic off and for camera paused while app away. One quick action = mic: hang-up from home screen too easy by mistake; camera let go in background anyway.
 
 ### The page
 
-The media is upstream's [`calls-webapp`][calls-webapp] v0.12.1: WebRTC
-"for integration into Delta Chat clients", in its own words, and the page
-deltachat-android ran its calls in until it went native in v2.47. It is
-one self-contained `.html` release asset, committed
-(`vendor/calls-webapp/`, `scripts/fetch-calls-webapp.sh`, checked by
-`ci/vendor-check.sh`) and compiled into the app.
+- Media = upstream [`calls-webapp`][calls-webapp] v0.12.1: WebRTC "for integration into Delta Chat clients"; deltachat-android's call page until it went native in v2.47. One self-contained `.html` release asset, committed (`vendor/calls-webapp/`, `scripts/fetch-calls-webapp.sh`, checked by `ci/vendor-check.sh`), compiled into app.
+- `call_host.rs` serves it from own loopback address, as `webxdc_host.rs`: kernel-picked port, `Host:` must be one page was given, everything reaching core behind unguessable token, nothing served after call.
+- Page loads classic `calls.js` before own code; host answers with Piirit bridge (`rust/piirit-shim/src/calls.js`). Bridge static, no secret: token in page's address (`?key=`), handed only to app's own WebView. Page elsewhere including script (browsers allow cross-origin) finds no key, reaches nothing.
 
-`call_host.rs` serves it from a loopback address of its own -- the
-arrangement `webxdc_host.rs` is: a port the kernel picks, a `Host:`
-that must be the one the page was given, everything that reaches the
-core behind an unguessable token, nothing served once the call is over.
-The page loads a classic `calls.js` before its own code, and the host
-answers with Piirit's bridge (`rust/piirit-shim/src/calls.js`). The
-bridge is static and holds no secret: the token is in the page's own
-address (`?key=`), which the app hands its own WebView and nothing else,
-so a page elsewhere that includes the script -- which a browser allows
-across origins -- finds no key and reaches nothing. What the bridge does:
+Bridge:
 
-- `startCall(offer)`, `acceptCall(answer)` and `endCall()` are requests
-  back to the host, which places, accepts or ends the call;
-- `getIceServers()` asks the host for the core's servers -- asked for,
-  not written into the script, because a TURN server's credentials are
-  the account's -- and `getAvatar()` names the other end's picture,
-  served from the host;
-- the other end's answer arrives as the page's own hash command,
-  `#onAnswer=`, which the bridge collects with a long poll;
-- the app's microphone switch arrives on the same poll, as `mute` or
-  `unmute`, and the bridge presses the page's own switch -- found by its
-  label -- rather than turning the track off behind it: the page keeps
-  whether its microphone is on, and tells the other end;
-- the page says nothing about how its connection is doing, so the bridge
-  watches the peer connection and reports ICE's own states -- which is
-  where *Connected* and the clock come from, and what ends a call whose
-  connection has failed;
-- what the bridge sends the host goes one request at a time, in the
-  order it was said: each reaches the host on a connection of its own,
-  and two in flight together were seen taken the wrong way round, which
-  for `/video` would leave the call screen with the older report;
-- Gecko before 126 has no `RTCIceCandidate.type`, which the page reads
-  to send its offer as soon as it has a relay candidate; without it the
-  offer would wait for gathering to finish. The bridge reads the type
-  out of the candidate line.
+- `startCall(offer)`, `acceptCall(answer)`, `endCall()` = requests to host: place, accept, end.
+- `getIceServers()` asks host for core's servers (not written into script: TURN credentials are account's). `getAvatar()` names other end's picture, served from host.
+- Other end's answer arrives as page's own hash command `#onAnswer=`, collected by long poll.
+- App mic switch arrives on same poll (`mute`/`unmute`); bridge presses page's own switch (found by label), not track off behind it: page keeps mic state, tells other end.
+- Page says nothing of connection health: bridge watches peer connection, reports ICE states. Source of *Connected* and clock; failed connection ends call.
+- Bridge → host one request at a time, in order said: each on own connection; two in flight seen taken reversed, which for `/video` would leave call screen with older report.
+- Gecko < 126 has no `RTCIceCandidate.type`, which page reads to send offer once it has relay candidate (else offer waits for gathering to finish). Bridge reads type from candidate line.
 
-The page is opened on `#startCall` or `#acceptCall=<offer>`, with
-`?noOutgoingVideoInitially` unless the camera is to start on (Video,
-below). Never `?disableVideoCompletely`, which would drop the other
-end's picture as well as never opening the camera. Its policy
-keeps every fetch on its own origin; the peer connection is not a fetch,
-and is not governed by one. The offer goes to the core only once the page
-has gathered enough ICE, and a call hung up while the core was still
-placing it is ended as soon as it lands. Nothing orders the core's
-answer to "place this" against the other end's answer to the call, so
-an answer that arrives before the call knows its message is kept and
-applied once it does (`tests/call_early_answer.rs`).
+Page opened on `#startCall` or `#acceptCall=<offer>`, with `?noOutgoingVideoInitially` unless camera starts on (Video, below). Never `?disableVideoCompletely`: drops other end's picture too, not just camera. Page's policy keeps every fetch on own origin; peer connection not a fetch, not governed. Offer goes to core only once page gathered enough ICE. Call hung up while core still placing it ends as soon as it lands. Nothing orders core's reply to "place this" vs other end's answer, so answer arriving before call knows its message is kept, applied once it does (`tests/call_early_answer.rs`).
 
-The same page speaks the protocol the native Android and iOS clients
-reimplemented -- the same negotiated data channels, the same "enough ICE,
-then trickle" -- so a call from here reaches either of them.
+Same page speaks protocol native Android and iOS reimplemented (same negotiated data channels, same "enough ICE, then trickle"): call from here reaches either.
 
 ### The screen
 
-The call page (`qml/pages/CallPage.qml`) is laid out as the phone's own
-call screen: who, top left, and the time of day, top right; how long, in
-hours, minutes and seconds, large, under them; the switches under that;
-and *End call* at the foot. The other end's picture, where they have one
-of their own, fills the screen behind it, blurred and dimmed. Of the
-phone screen's four switches a call here has the microphone and the
-loudspeaker ("Earpiece and loudspeaker", below), and the camera besides:
-the keypad and recording are a phone call's.
-
-The page the media runs in draws controls of its own, in English. It is
-kept running under the call screen, unseen and behind a catch that takes
-every tap, and what its controls did is done from the screen.
+- Call page (`qml/pages/CallPage.qml`) laid out as phone's own call screen: who top left, time of day top right; duration (h:m:s) large under them; switches under that; *End call* at foot. Other end's picture, if they have own, fills screen behind, blurred, dimmed.
+- Of phone screen's four switches: mic, loudspeaker ("Earpiece and loudspeaker", below), plus camera. Keypad, recording = phone call's.
+- Media page draws own controls, in English. Kept running under call screen, unseen, behind catch taking every tap; its controls' jobs done from call screen.
 
 ### Video
 
-A video call is the same call with the camera on: the same page, the
-same peer connection -- the page negotiates a video track for every
-call, voice or not -- and the same five methods, the core told
-`has_video` when it is placed. The engine encodes and decodes; nothing
-of FFmpeg's or anybody else's is linked for it.
+Video call = same call with camera on: same page, same peer connection (page negotiates video track every call, voice or not), same five methods, core told `has_video` on place. Engine encodes, decodes; no FFmpeg or other lib linked for it.
 
-The camera is the bridge's (`rust/piirit-shim/src/call_video.js`,
-served ahead of `calls.js`):
+Camera = bridge's (`rust/piirit-shim/src/call_video.js`, served ahead of `calls.js`):
 
-- **Closed until it is wanted.** The page asks for the camera and the
-  microphone once, as the call starts, and would keep the camera open
-  behind a disabled track for the whole call. It is handed the
-  microphone and, for a voice call, a blank video track -- a canvas never
-  asked for a frame -- so its camera switch is still drawn and a voice
-  call can become a video call. Switched on, the camera's track replaces
-  the blank one on the page's stream and on the peer connection's sender
-  (`replaceTrack`, no renegotiation, which the page cannot do); switched
-  off, it is stopped and the blank one goes back.
-- **The page's switch pressed, not bypassed.** The page tells the other
-  end whether its camera is on, over its own data channel, and the other
-  end hides a picture that has been switched off rather than freezing
-  its last frame. So the bridge presses the page's own *Start camera* or
-  *Stop camera*, as it presses the microphone's.
-- **One camera at a time.** Turned, the open camera is stopped before
-  the other is asked for; a phone opens one at a time. The other is asked
-  for by its device id -- the camera whose name says it faces that way,
-  or else any that is not the one just open -- because a `facingMode` is
-  only a preference, and on the phone Gecko gave the same camera back.
-  What the camera's own settings say it faces is what is mirrored and
-  reported; through a turn the old camera's mirroring stays until the
-  new camera is in place, so its last frame does not flip round first. Gecko calls every back camera alike, and a phone with a wide
-  lens as well may list that one first; so the back camera opened is the
-  one at the place of the label nearest `1.0` among those the platform
-  camera writes on its back cameras' rings
-  (`/apps/jolla-camera/backCameraLabels`, read and never written), the
-  first where there are none, and the log says which (`(2 of 2)`). That
-  the two list the cameras in the same order is inferred, not checked
-  against the platform's sources. If the other will
-  not open, the first is opened again; if neither will, the camera is
-  reported as failed, with what the engine said -- written to the app's
-  log as `piirit: the camera would not open: …` -- and the app switches
-  it off.
-- **Held to what a phone needs.** Asked for at 640×480, 24 frames, and
-  every video sender capped at 700 kbit/s and 24 frames once negotiated.
-  Every pixel not captured is battery kept. The camera is only ever
-  asked for preferences: a required value (a `max`, a `min`, an `exact`)
-  is one some mode must meet or Gecko opens nothing, and it weighs a
-  frame rate against the most a mode can do -- a phone camera that runs
-  at 30 fails `max: 24` in every mode. The cap is the sender's instead.
-- **VP8 first.** On the phone, a call answered here showed the other
-  end's picture and a call placed here did not. Sailfish's Gecko turns
-  hardware H264 on for WebRTC (`media.webrtc.hw.h264.enabled`), and an
-  engine with it lists H264 ahead of VP8 in the offers it makes; the
-  other end answers in the offer's order. So a call placed here would be
-  sent H264, where a call answered here is sent what the other end's
-  offer puts first. The offer the other end is sent lists VP8 first
-  (`calls.js`); nothing else in it changes, so the answer is still one
-  this end offered. Against an iPhone that is moot: Delta Chat on iOS
-  offers and answers H264 alone (seen in a log).
-- **An H264 encoder of its own.** Gecko decodes H264 with the phone's
-  decoder but encodes it only through a media plugin, a library it loads
-  in a process of its own from the directories `MOZ_GMP_PATH` names. On
-  Sailfish that is gmp-droid, the phone's hardware encoder, and it is
-  not on every phone -- nor installable on every one -- so a call to an
-  iPhone sent no frames at all. The package carries one:
-  `/usr/share/harbour-piirit/lib/gmp-piirit/1.0/`, x264 behind Gecko's
-  plugin interface (`rust/piirit-video/csrc/gmp_h264.cpp`), built from
-  the same x264 as the app (docs/BUILDING.md). The app points Gecko at it
-  before anything starts (`prepare_media_plugins`, `call_host.rs`), after
-  whatever `MOZ_GMP_PATH` already holds -- and not at all when a plugin
-  there already encodes H264, which is gmp-droid on a phone whose
-  hardware can, and cheaper than software. It is set up to cost little
-  for as long as a picture goes out: Constrained Baseline, which every
-  receiver decodes, at x264's fastest preset that keeps the deblocking
-  filter, one thread and no lookahead, so no picture waits for the next;
-  the camera's own buffers read in place; the bit rate Gecko's
-  congestion control asks for, made good per second when the camera
-  gives fewer pictures than the call was set up for; and a keyframe,
-  with SPS and PPS before it, when the far end asks for one. Android
-  ends answer VP8 and never start it. The plugin writes to the call log
-  itself, named by `PIIRIT_CALL_LOG`: the size and rate it started at,
-  its first picture, and every half minute and at the end the pictures,
-  keyframes, CPU time each and bit rate sent. `rust/piirit-video/tests/
-  gmp_h264.rs` drives it as Gecko does, through `tests/gmp_check.cpp`.
-- **Let go in the background.** With the app away the camera is
-  stopped -- the other end is told it is off -- and the pictures are not
-  drawn; back in front, it is opened again if it was on.
-- **Reported.** Whether the camera is live and whether the other end's
-  picture is being drawn (a video track with frames, not switched off at
-  their end) goes back on `/video`, which is what `Call`'s
-  `local_video` and `remote_video` are.
-- **Logged.** What only a phone shows about a call goes through `/log`:
-  which camera opened and at what size, a camera that would not open or
-  turn and why, how long a turn took to open the other camera and to
-  draw its first picture, each step of the negotiation, the picture
-  sections both ends agreed and their codecs in order, whether the other
-  end's picture has frames and what the other end says of its camera,
-  and -- a few seconds, then a quarter and three quarters of a minute
-  after the call connects or the camera changes -- what goes each way:
-  frames, bytes a frame (a black frame is a few dozen, a picture
-  thousands), keyframes asked for (a receiver that cannot decode asks over
-  and over), which track the sender has, and whether each picture is
-  hidden, plays, at what size, and how many of its frames Gecko has
-  painted (`mozPaintedFrames`). Every `/video` report is logged as it
-  goes, and so are whether the engine holds the page hidden, every press
-  of one of its buttons and whether it was a touch or the bridge, and a
-  picture put back (below). The page's own console is read too:
-  its warnings and errors, failures nothing caught, and what it says of
-  the other end's picture and its own commands, but none of its
-  candidates or descriptions, which carry addresses. Each line goes to stderr as
-  `piirit: call: …`, and to `~/.cache/piirit/piirit/call.log`, begun
-  afresh with every call and each line stamped with the seconds since;
-  the H264 encoder's lines are in the same file, marked `encoder`.
-  The file is what to read on the phone: the launcher sends the app's
-  stderr nowhere, and the journal has none of it.
+- **Closed until wanted.** Page asks camera + mic once at start, would keep camera open behind disabled track whole call. Handed mic and, for voice call, blank video track (canvas never asked for frame): camera switch still drawn, voice call can become video. On: camera track replaces blank on page's stream and on peer connection's sender (`replaceTrack`, no renegotiation, which page can't do). Off: stopped, blank back.
+- **Page's switch pressed, not bypassed.** Page tells other end camera on/off over own data channel; other end hides switched-off picture, not freeze last frame. So bridge presses page's *Start camera* / *Stop camera*, as for mic.
+- **One camera at a time.** Turn: open camera stopped before other asked (phone opens one at a time). Other asked by device id (camera whose name says it faces that way, else any not just open): `facingMode` only preference; on phone Gecko gave same camera back. Camera's own settings' facing = what's mirrored and reported; through turn old mirroring stays until new camera in place, so last frame doesn't flip first.
+- Gecko names every back camera alike; phone with wide lens may list it first. So back camera opened = one at place of label nearest `1.0` among those platform camera writes on back cameras' rings (`/apps/jolla-camera/backCameraLabels`, read, never written); first if none; log says which (`(2 of 2)`). Same order in both lists = inferred, not checked vs platform sources.
+- Other won't open → first reopened. Neither → camera reported failed with engine's words, logged `piirit: the camera would not open: …`; app switches it off.
+- **Held to phone needs.** Asked 640×480, 24 frames; every video sender capped 700 kbit/s, 24 frames once negotiated. Every pixel not captured = battery kept. Camera only ever asked preferences: required value (`max`, `min`, `exact`) must be met by some mode or Gecko opens nothing, weighed vs mode's most: phone camera running at 30 fails `max: 24` in every mode. Cap is sender's instead.
+- **VP8 first.** On phone, call answered here showed other end's picture; call placed here didn't. Sailfish Gecko turns hardware H264 on for WebRTC (`media.webrtc.hw.h264.enabled`); engine with it lists H264 before VP8 in own offers; other end answers in offer order. So placed call would be sent H264; answered call gets what other end's offer puts first. Offer sent lists VP8 first (`calls.js`); nothing else changes, answer still one this end offered. iPhone moot: Delta Chat iOS offers and answers H264 only (seen in log).
+- **Own H264 encoder.** Gecko decodes H264 with phone's decoder but encodes only via media plugin, lib loaded in own process from dirs `MOZ_GMP_PATH` names. On Sailfish = gmp-droid (hardware encoder), not on every phone, not installable on every one: call to iPhone sent no frames. Package carries one: `/usr/share/harbour-piirit/lib/gmp-piirit/1.0/`, x264 behind Gecko plugin interface (`rust/piirit-video/csrc/gmp_h264.cpp`), same x264 as app (docs/BUILDING.md).
+  - App points Gecko at it before anything starts (`prepare_media_plugins`, `call_host.rs`), after whatever `MOZ_GMP_PATH` holds; not at all when plugin there already encodes H264 (gmp-droid on phone whose hardware can; cheaper than software).
+  - Cheap while picture goes out: Constrained Baseline (every receiver decodes), x264 fastest preset keeping deblocking filter, 1 thread, no lookahead (no picture waits for next); camera buffers read in place; bit rate Gecko congestion control asks, made good per second when camera gives fewer pictures than call set up for; keyframe with SPS + PPS when far end asks. Android ends answer VP8, never start it.
+  - Plugin writes call log itself, named by `PIIRIT_CALL_LOG`: start size and rate, first picture, every 30 s and at end pictures, keyframes, CPU time each, bit rate sent. `rust/piirit-video/tests/gmp_h264.rs` drives it as Gecko does, via `tests/gmp_check.cpp`.
+- **Let go in background.** App away: camera stopped (other end told off), pictures not drawn. Front again: reopened if was on.
+- **Reported.** Camera live? Other end's picture drawn (video track with frames, not switched off their end)? Sent on `/video` = `Call`'s `local_video`, `remote_video`.
+- **Logged** via `/log`, what only phone shows: which camera opened at what size; camera that wouldn't open or turn, why; turn time to open other camera and to draw first picture; each negotiation step; picture sections both ends agreed, codecs in order; other end's picture has frames?, what other end says of its camera. Few seconds, then 15 s and 45 s after connect or camera change, each way: frames, bytes/frame (black frame few dozen, picture thousands), keyframes asked (receiver that can't decode asks repeatedly), sender's track, each picture hidden?/plays?/size, frames Gecko painted (`mozPaintedFrames`). Also: every `/video` report as sent, whether engine holds page hidden, every press of its buttons and whether touch or bridge, picture put back (below). Page console read too: warnings, errors, uncaught failures, what it says of other end's picture and own commands; none of its candidates or descriptions (carry addresses).
+- Each line → stderr `piirit: call: …` and `~/.cache/piirit/piirit/call.log`, fresh each call, stamped with seconds since; H264 encoder lines same file, marked `encoder`. On phone read file: launcher sends app stderr nowhere, journal has none.
 
-The call screen shows the page while there are pictures -- its pictures
-and nothing else of it: the bridge hides every element but the two
-videos -- with its own lines and switches over them, on a shade. This
-end's picture fills the screen until the other end's comes, then sits
-in the top right corner, mirrored only from the front camera, and stays
-there, as the reference clients have it. An invisible item on the call
-screen, over the same corner, carries the button that turns the camera:
-the only one, so nothing turns it while its picture fills the screen.
-Dragging it was tried and dropped: the picture trailed the finger on a
-phone, even moved on a layer of its own. The other end's is
-enlarged towards filling the screen too, but by no more than 1.35
-times: an upright phone's picture fills a taller screen, and one held
-sideways loses some of its bars rather than half of itself. It is laid
-out larger, not scaled with a transform, which would be one more layer
-for the engine to put together. A picture meant to be seen -- not
-hidden, playing, with frames, the page in front -- that Gecko has
-painted none of in two seconds is put back: its frames taken off its
-stream and put on again, and the stream given to it again, which is
-what turning the camera does, and was seen to draw this end's picture
-where on a phone nothing had been drawn. Until a picture has painted
-its first frame -- since it came on the screen, or was given a stream
-it had not had -- it is black, and it is looked at every half second
-rather than every two, so one the engine leaves unpainted is put back
-within a second of having frames. Three times a call at most, then
-logged; where the engine does not count what it paints, once, a look
-after it first shows. One put back paused is asked to play until it
-does, since the other end's picture carries their voice too. Whether
-each picture shows yet goes with every `/video` report
-(`localPainted`, `remotePainted`), and the call screen draws a spinner
-over a picture that does not: the whole screen, or this end's corner. A
-picture given up on -- put back three times, still nothing -- is said
-to show, so the spinner does not turn for ever over it. Turning the
-camera makes this end's picture black from the press until the other
-camera's first frame is drawn, which on a phone can take a second or
-two: the spinner shows, and the picture is not looked at while the
-other camera is opening -- waited for, not put back or given up on.
-A tap puts the lines
-away, and they go by themselves once both ends are seen; the time of day
-gives way to how long, and the large clock goes. The camera switch is
-there in every call, and on the ringing screen of a video call, so it
-can be answered without the camera; turning it is a button beside it
-while this end's picture fills the screen, and in the picture's lower
-corner nearer the middle of the screen once it has its corner, going
-with the lines and switches -- either only once the picture shows. On
-the picture it is small, a disc a little larger than its icon, with
-room round it to press. Pressed, it stays where it is, dimmed and not
-pressable, until the other camera's picture shows, so nothing moves
-under the finger; ten seconds at most. A video call is answered with the front
-camera. This end's picture plays by itself, muted, when the engine lets
-it; one that sits paused is asked to play until it does.
-While there are pictures the screen is kept lit and the ear shield is
-off: a video call is held in front of the face, not to the ear.
+Call screen shows page while there are pictures: pictures only (bridge hides every element but two videos), own lines and switches over them on a shade.
 
-Placing one is the contact's Calls page, *Video call Ada*, under *Call
-Ada*; a tap on a video call's row calls back with the camera on, as the
-reference clients do.
+- This end's picture fills screen until other end's comes, then top right corner (mirrored only from front camera), stays there, as reference clients. Invisible item on call screen over same corner carries camera-turn button: only one, so nothing turns it while its picture fills screen. Dragging tried, dropped: picture trailed finger on phone, even on own layer.
+- Other end's picture enlarged toward filling screen, max 1.35×: upright phone's picture fills taller screen; one held sideways loses some bars, not half itself. Laid out larger, not transform-scaled (one more layer for engine to compose).
+- **Put back.** Picture meant seen (not hidden, playing, with frames, page in front) Gecko painted none of in 2 s → put back: frames taken off stream and on again, stream given again (= what turning camera does; seen to draw this end's picture on phone where nothing had). Until first frame painted (since on screen, or given new stream): black, checked every 0.5 s not 2 s, so unpainted one put back within 1 s of having frames. Max three per call, then logged. Where engine doesn't count what it paints: once, one look after it first shows. Paused one put back → asked to play until it does (other end's picture carries their voice too).
+- `/video` reports carry whether each picture shows yet (`localPainted`, `remotePainted`); call screen draws spinner over one that doesn't: whole screen or this end's corner. Picture given up on (three put-backs, still nothing) reported as showing, so spinner doesn't turn forever.
+- Turning camera: this end's picture black from press until other camera's first frame (1–2 s on phone). Spinner shows; picture not checked while other camera opens: waited for, not put back or given up on.
+- Tap puts lines away; they go by themselves once both ends seen; time of day gives way to duration, large clock goes.
+- Camera switch in every call, and on ringing screen of video call (answer without camera). Turn = button beside it while this end's picture fills screen; once picture has corner, in its lower corner nearer screen middle, going with lines and switches; either only once picture shows. On picture: small disc, little larger than icon, room round it to press. Pressed: stays put, dimmed, not pressable, until other camera's picture shows (nothing moves under finger); 10 s max.
+- Video call answered with front camera. This end's picture plays itself, muted, when engine lets it; one sitting paused asked to play until it does.
+- While there are pictures: screen kept lit, ear shield off (video call held in front of face, not to ear).
+
+Placing: contact's Calls page, *Video call Ada* under *Call Ada*. Tap on video call's row calls back camera on, as reference clients.
 
 ## What the phone gives a call
 
-What a phone call has that an app's call cannot is the system call screen,
-the call history and the lock-screen call window. On Sailfish those are
-voicecall's, and the way in is a voicecall provider plugin -- a `.so` in
-`/usr/lib/voicecall/plugins`, outside anything Harbour lets a package
-install, running unconfined inside voicecall-manager, with the `Phone`
-permission Harbour does not allow. The apps that have done it (a WhatsApp
-client, RooTelegram) ship outside Harbour. `Sailfish.Telephony` is SIM
-selection and nothing else. So none of that is here.
+Phone call has, app call can't: system call screen, call history, lock-screen call window. On Sailfish = voicecall's; way in = voicecall provider plugin, `.so` in `/usr/lib/voicecall/plugins`: outside anything Harbour lets package install, runs unconfined in voicecall-manager, needs `Phone` permission Harbour disallows. Apps that did it (a WhatsApp client, RooTelegram) ship outside Harbour. `Sailfish.Telephony` = SIM selection only. None here.
 
-What is here is the rest of it:
+Here = rest of it:
 
 | | How | Allowed |
 |---|---|---|
-| **Ringtone** | ngfd, the daemon that makes every sound the phone makes, plays `voip_ringtone`: the phone's own tone for a call that is not a phone call -- the profile's `voip.alert.tone`, and silent when its `voip.alert.enabled` is off -- at the ringing volume, silenced by the silent profile, repeating until stopped. Should ngfd refuse it, or say it failed, the phone's own `ringtone` with `type` `voip` instead, as voicecall plays it for a call that is not a SIM call | ngfd's system-bus interface, which sailjail opens to every app; not a listed Harbour API |
-| **Music held off** | while a call rings, a resource set of class `ringtone` with ohm's resource manager, as for a phone ringing: other apps' music pauses, and plays on again if the call is not answered ("Earpiece and loudspeaker") | ohm's resource manager, which the Audio permission opens; not a listed Harbour API |
-| **Screen and call state** | mce is told `ringing`, then `active`, then `none`: it lights the screen for a ringing call and treats the phone as being in one. It forgets by itself if the app goes. `ringing` only once ngfd has answered the ringtone's Play, or a second has passed: ngfd follows mce's call state, and the event set's `voip_ringtone` plays a call-waiting beep instead of the ringtone while mce says a call is on, ringing included -- which is what told it first did (#98) | mce's request interface, open to every app; not a listed Harbour API |
-| **Lock screen** | once mce says the screen is on, `req_tklock_mode_change("unlocked")` and the app brought forward, so the call's page is what is on screen; raised behind the lock screen, it showed for a moment and was covered again (#99). mce turns the screen on for a ringing call only when it would for a phone call -- not in a pocket -- and puts the lock back when the call is over. A device lock, a code or a fingerprint, is left alone: the call's page is behind it. A Critical notification with Decline and Answer on it besides, which the lock screen shows | mce's request interface; `Nemo.Notifications` |
-| **Missed calls** | left in the notification area in the phone's own category for one, `x-nemo.call.missed`, with Call back on it | `Nemo.Notifications` |
-| **Staying awake** | the CPU kept up while a call is up: a phone that suspends takes the call's sound with it | `Nemo.KeepAlive` |
-| **At the ear** | the proximity sensor puts a black screen that takes no touch over the call while it is held there -- an app cannot switch the display off | `QtSensors` |
-| **In the background** | the call's `WebView` is held active once its page is up: an inactive view is a hidden document, and the engine pauses a hidden document's media | `Sailfish.WebView` |
-| **Microphone and camera** | granted to the call's own page, for the session, before it asks -- the engine's prompt would otherwise open every call, since the origin is a new port each time. Never engine-wide: that would grant them to every webxdc app too | `Sailfish.WebEngine` |
-| **Screen on** | kept lit while a call shows pictures, and while one rings | `Nemo.KeepAlive` |
+| **Ringtone** | ngfd (daemon making every phone sound) plays `voip_ringtone`: phone's own tone for non-phone call (profile `voip.alert.tone`; silent if `voip.alert.enabled` off), ringing volume, silenced by silent profile, repeats until stopped. ngfd refuses or reports failure: phone's own `ringtone` with `type` `voip`, as voicecall plays for non-SIM call | ngfd system-bus interface, sailjail opens to every app; not listed Harbour API |
+| **Music held off** | while ringing, resource set class `ringtone` with ohm resource manager, as phone ringing: other apps' music pauses, resumes if unanswered ("Earpiece and loudspeaker") | ohm resource manager, opened by Audio permission; not listed Harbour API |
+| **Screen and call state** | mce told `ringing`, `active`, `none`: lights screen for ringing call, treats phone as in call. Forgets by itself if app goes. `ringing` only once ngfd answered ringtone's Play, or 1 s passed: ngfd follows mce call state; event set's `voip_ringtone` plays call-waiting beep instead of ringtone while mce says call on, ringing included. Telling mce first did that (#98) | mce request interface, open to every app; not listed Harbour API |
+| **Lock screen** | once mce says screen on: `req_tklock_mode_change("unlocked")`, app brought forward, call page on screen (raised behind lock screen it showed a moment, then covered, #99). mce turns screen on for ringing call only when it would for phone call (not in pocket); restores lock after call. Device lock (code, fingerprint) left alone: call page behind it. Plus Critical notification with Decline, Answer, shown by lock screen | mce request interface; `Nemo.Notifications` |
+| **Missed calls** | left in notification area, phone's own category `x-nemo.call.missed`, with Call back | `Nemo.Notifications` |
+| **Staying awake** | CPU kept up during call: suspending phone takes call's sound with it | `Nemo.KeepAlive` |
+| **At the ear** | proximity sensor puts black, touch-proof screen over call while held there (app can't switch display off) | `QtSensors` |
+| **In the background** | call's `WebView` held active once page up: inactive view = hidden document; engine pauses hidden document's media | `Sailfish.WebView` |
+| **Microphone and camera** | granted to call's own page, for session, before it asks: else engine prompt every call (origin = new port each time). Never engine-wide: would grant every webxdc app too | `Sailfish.WebEngine` |
+| **Screen on** | kept lit while call shows pictures, and while ringing | `Nemo.KeepAlive` |
 
 Left out on purpose:
 
-- **ohm's route preference.** `Route.Manager.Prefer("earpiece")` is open
-  to an app with the Audio permission, but it holds for every sound the
-  phone makes and ohm does not know who asked for it: a crash mid-call
-  would leave the phone on the earpiece until the next phone call or
-  restart. The Phone app's own loudspeaker button,
-  `Playback.Manager.RequestPrivacyOverride`, is the same kind of global.
-  Neither is used; the next section is what is.
-- **The `call` resource class**, which is voicecall's, needs the
-  Cellular credential and drives the modem's call paths.
-  `libaudioresource`, the resource library Harbour lists, offers only
-  `player` and `game`, neither of which reaches the earpiece.
-- **`Nemo.Ngf`**, which would ring from QML: not on Harbour's list, hence
-  the bus.
+- **ohm route preference.** `Route.Manager.Prefer("earpiece")` open to app with Audio permission, but holds for every phone sound and ohm doesn't know who asked: crash mid-call leaves phone on earpiece until next phone call or restart. Phone app's loudspeaker button, `Playback.Manager.RequestPrivacyOverride`, same kind of global. Neither used; next section = what is.
+- **`call` resource class**: voicecall's, needs Cellular credential, drives modem call paths. `libaudioresource` (Harbour-listed resource lib) offers only `player`, `game`; neither reaches earpiece.
+- **`Nemo.Ngf`** (ring from QML): not on Harbour's list, hence bus.
 
 ### Earpiece and loudspeaker
 
-A voice call is on the earpiece, as a phone call is; a video call on the
-loudspeaker, as the reference clients have it, being held in front of
-the face. A voice call whose pictures come on goes to the loudspeaker
-too, unless the reader has switched this call. The loudspeaker switch on
-the call page goes between the two at any time, and holds for the rest of
-the call. Switching takes about a second, during which this end's
-microphone is off; the switch shows that it is busy until the microphone
-is back. A headset, headphones or a Bluetooth device takes the sound by
-itself; the switch is dimmed then, having nothing to move it from. When
-the policy does not take the call, it is on the loudspeaker for good and
-the switch dimmed.
+- Voice call on earpiece, as phone call. Video call on loudspeaker, as reference clients (held in front of face). Voice call whose pictures come on → loudspeaker too, unless reader switched this call.
+- Call page loudspeaker switch toggles any time, holds rest of call. Switch takes ~1 s, this end's mic off meanwhile; switch shows busy until mic back. Headset, headphones or Bluetooth device takes sound itself; switch dimmed then (nothing to move from). Policy doesn't take call → loudspeaker for good, switch dimmed.
 
-How (`CallAudio.qml`): for the whole of a call the app holds a resource
-set of class `aliencall` with ohm's resource manager
-(`org.maemo.resource.manager`, system bus; the Audio permission opens
-it). `aliencall` is the class Sailfish has for calls that are not phone
-calls, the one Android App Support's VoIP apps get. ohm routes the sound
-of whichever set owns audio playback by that set's class: for
-`aliencall`, a Bluetooth or USB device, then a wired headset or
-headphones, then the earpiece (`earpieceforalien`). A set that owns
-video playback as well is kept off the earpiece and routed to the
-loudspeaker (`ihfforalien`). So the earpiece is the set with audio
-playback alone, the loudspeaker the same set with video playback added,
-and switching is updating that one set. Either way other apps' music
-pauses for the call. Nothing global is touched.
+How (`CallAudio.qml`): whole call, app holds resource set class `aliencall` with ohm resource manager (`org.maemo.resource.manager`, system bus; Audio permission opens it). `aliencall` = Sailfish class for non-phone calls (Android App Support VoIP apps get it). ohm routes sound of whichever set owns audio playback by set's class; for `aliencall`: Bluetooth or USB device, then wired headset/headphones, then earpiece (`earpieceforalien`). Set also owning video playback kept off earpiece, routed to loudspeaker (`ihfforalien`). So earpiece = set with audio playback alone; loudspeaker = same set + video playback; switching = updating one set. Either way other apps' music pauses. Nothing global touched.
 
-Before any of that, while a call rings, the app holds a second set, of
-class `ringtone`: the policy's class for a phone ringing, which outranks
-a media player's (`resource_classes.pl`), so other apps' music pauses
-for the ring as it does for a phone call, and plays on again if the call
-is not answered. It asks for audio playback alone and names no streams:
-ngfd plays the ringtone, and the policy files a ringtone's streams by
-themselves, so the set moves nothing of the app's, and no microphone is
-open for a move to break. Answered, the call's own set is had before the
-ring's is given back, one message after the other, so the music does not
-come back in between. A ring's set the manager refuses is let go of, and
-the music plays through the ring, as it did before. *(From the policy's
-rules; not yet heard on a phone.)*
+Before that, while ringing, second set, class `ringtone`: policy class for phone ringing, outranks media player's (`resource_classes.pl`), so music pauses for ring as for phone call, resumes if unanswered. Asks audio playback alone, names no streams: ngfd plays ringtone, policy files ringtone streams separately, so set moves nothing of app's; no mic open for move to break. Answered: call's set acquired before ring's given back, one message after other, so music doesn't return in between. Ring set refused by manager → let go; music plays through ring, as before. *(From policy rules; not yet heard on phone.)*
 
-The microphone is what makes this delicate. Moving the call's sound
-while its microphone is open brings the phone's sound server down. The
-policy's PulseAudio module moves every stream of the call's group to the
-new route and asserts that each one moved (`policy-group.c`,
-`pa_policy_group_start_move_all`). The browser engine opens the
-microphone on a named device, and cubeb's PulseAudio backend marks such
-a stream as not to be moved (`PA_STREAM_DONT_MOVE`). The move fails, the
-assertion aborts PulseAudio, and systemd restarts it. The restarted one
-has forgotten which streams were the call's, so the call goes silent; a
-few aborts in a row and systemd stops restarting it, and the phone has no
-sound at all until someone who knows how starts it again. That was what
-the first builds' loudspeaker did (#146), and what giving the set back
-at the end of an earpiece call with the microphone still open did too
-*(inferred from the captures: the abort at hang-up is in them)*. A
-headset plugged in mid-call does the same. Nothing in the app can stop
-that one; it is the platform's to fix.
+Mic makes this delicate. Moving call's sound while its mic open brings phone's sound server down. Policy's PulseAudio module moves every stream of call's group to new route, asserts each moved (`policy-group.c`, `pa_policy_group_start_move_all`). Engine opens mic on named device; cubeb's PulseAudio backend marks such stream not-to-move (`PA_STREAM_DONT_MOVE`). Move fails, assertion aborts PulseAudio, systemd restarts it. Restarted one forgot which streams were call's → call silent; few aborts in a row → systemd stops restarting, phone has no sound until someone who knows starts it. First builds' loudspeaker did that (#146); so did giving set back at end of earpiece call with mic still open *(inferred from captures: abort at hang-up in them)*. Headset plugged in mid-call does same: nothing in app can stop that one; platform's to fix.
 
-So the app never moves the sound while a microphone of its may be open:
+So app never moves sound while its mic may be open:
 
-- **Before it opens.** The set is had, and the policy has had half a
-  second to act on it, before the call's page comes up at all
-  (`CallView.allowed`): ohm answers the acquire a few milliseconds before
-  it tells PulseAudio where the sound goes.
-- **To switch**, the page is told to stop the microphone (the host's
-  `microphone-off`). The bridge stops the track and takes it off the
-  connection's sender; the page's own stream keeps it, so the page's
-  mute switch still has something to act on. Once PulseAudio itself has
-  had no recording stream of the app's for 300 ms, the set is updated;
-  half a second after the policy answers, the page is told
-  `microphone-on`, and the bridge opens a new track in the old one's
-  place, on or off as the page last had it. A switch that has not
-  finished in 5 seconds is given up on: the microphone is back, and the
-  sound where it was.
-- **Once the call is over**, the set is given back only after the
-  microphone has shut.
+- **Before it opens.** Set acquired, policy given 0.5 s to act, before call page comes up at all (`CallView.allowed`): ohm answers acquire few ms before telling PulseAudio where sound goes.
+- **To switch**, page told to stop mic (host's `microphone-off`). Bridge stops track, takes it off connection's sender; page's own stream keeps it, so page's mute switch still has something to act on. Once PulseAudio itself has had no recording stream of app's for 300 ms, set updated; 0.5 s after policy answers, page told `microphone-on`, bridge opens new track in old one's place, on/off as page last had. Switch unfinished in 5 s → given up: mic back, sound where it was.
+- **Once call over**, set given back only after mic shut.
 
-What PulseAudio has open comes from `MicWatch`, which watches the app's
-own recording streams with PulseAudio's client library (on Harbour's
-list): every stream whose client is the app's process. On a phone the
-stream that would not move was the engine's, from the app's own process
-(`AudioCallbackDriver`, `application.process.binary` `harbour-piirit`).
-The process id is the one inside the app's sandbox, which another
-sandboxed app can have as well; its recording then reads as the app's,
-which is the safe way round: the switch gives up, and the set is held
-until that recording ends. When the watch cannot tell -- PulseAudio
-down, or not letting the app see -- the switch is dimmed while the
-microphone is open, and a call's set is given back 3 seconds after its
-page was told to stop it.
+What PulseAudio has open comes from `MicWatch`: watches app's own recording streams via PulseAudio client lib (on Harbour's list), every stream whose client is app's process. On phone, stream that wouldn't move was engine's, from app's own process (`AudioCallbackDriver`, `application.process.binary` `harbour-piirit`). Process id = one inside app's sandbox; another sandboxed app can have it too, its recording then reads as app's. Safe way round: switch gives up, set held until that recording ends. Watch can't tell (PulseAudio down, or not letting app see): switch dimmed while mic open; call's set given back 3 s after page told to stop mic.
 
-The set is spoken to over the bus in libresource's own message layout
-(`register`, `audio`, `update`, `acquire`, `release`, `unregister`;
-`dbus-msg.c`), since no library for it is on Harbour's list, and in its
-order: one message at a time, each once the last is answered. The
-manager needs that. It answers a register only after asking the bus
-whose connection sent it, and refuses anything else about the set that
-comes in before then, as `EUCLEAN` (ohm's `manager.c`). Sent all at
-once, as the first build sent them, the `audio` and `acquire` were
-refused on a phone every time, and the set let go of. Its `audio`
-message names the app's streams: every stream whose client carries the
-app's `policy.application.id` -- the process's start time from
-`/proc/self/stat`, in hex, which Sailfish's libpulse puts on every
-stream it opens and `Call.audio_id` reads the same way -- joins group
-`aliencall`, including streams already playing. Without that the call
-would be worse off than with no set at all: while an `aliencall` set is
-active the policy corks the catch-all group Gecko's streams otherwise
-fall in. So with no id nothing is asked for, and a set the manager
-refuses any part of, or that has no manager to answer, is let go of at
-once.
+Set spoken to over bus in libresource's own message layout (`register`, `audio`, `update`, `acquire`, `release`, `unregister`; `dbus-msg.c`), since no lib for it is on Harbour's list, and in its order: one message at a time, each once last answered. Manager needs that: answers register only after asking bus whose connection sent it; refuses anything else about set arriving before then as `EUCLEAN` (ohm `manager.c`). Sent all at once (first build): `audio`, `acquire` refused on phone every time, set let go.
 
-What makes it safe is where the set lives. ohm watches each client's
-bus connection and drops every set of a client whose connection goes:
-a crash, a kill, the OOM killer, or closing the app puts the sound back
-where it was with nobody doing anything. Nothing is written that
-outlives the app, so there is nothing for a next run to clean up. While
-the app runs, the set is held exactly while a call is on, and given back
-on the way out besides -- unless the microphone may still be open, when
-nothing is sent and the set goes with the bus connection, which is after
-the process's streams have gone *(inferred: PulseAudio sees its client's
-socket close at once, while ohm's word about it comes over the bus)*.
+`audio` message names app's streams: every stream whose client carries app's `policy.application.id` (process start time from `/proc/self/stat`, hex; Sailfish libpulse puts it on every stream it opens; `Call.audio_id` reads it same way) joins group `aliencall`, streams already playing included. Without that call worse off than no set: while `aliencall` set active, policy corks catch-all group Gecko's streams otherwise fall in. So no id → nothing asked; set manager refuses any part of, or with no manager to answer, let go at once.
 
-Read-only besides: ohm's `Route.Manager.ActiveRoutes` and its
-`AudioRouteChanged` signal, for whether the sound is on something
-plugged in or paired.
+Safety = where set lives. ohm watches each client's bus connection, drops every set of client whose connection goes: crash, kill, OOM killer, closing app → sound back, nobody acting. Nothing written outlives app; nothing for next run to clean. While app runs: set held exactly while call on, also given back on way out, unless mic may still be open: then nothing sent, set goes with bus connection, after process's streams gone *(inferred: PulseAudio sees client socket close at once; ohm's word comes over bus)*.
 
-The volume is the other half. While a call is on -- one the policy knows
-of, `aliencall` included -- the volume keys set the call volume, not the
-media volume: the volume of streams whose role is `voip` (nemo's
-`mainvolume`). The engine gives its streams no role, and PulseAudio
-gives a stream without one the media role, `x-maemo`
-(`x-maemo-match.table`). So on a phone the first builds' calls played at
-whatever the media volume happened to be, which on the earpiece starts
-lower still, and the keys did nothing for them: quiet at full volume,
-and barely to be heard on the earpiece. Now, while a call is on (from
-placed or answered until it is over; `calls.rs`, `talking`), the app's
-`PULSE_PROP` has `media.role=voip` in it, and afterwards is as the app
-found it (`call_host::label_call_audio`). PulseAudio's client library
-adds what that variable says to a connection to the sound server as it
-is opened, and the server adds it to every stream on the connection
-before the table is read; the table does not write over a role a stream
-already has. The engine opens one connection, the first time it plays
-anything, and keeps it for the run: in a run that has played nothing
-before, the call's page, which comes up only once the call is on. The
-variable is made before the app has a second thread, which is what lets
-it be changed while others run (the comment on `label_call_audio` says
-why). *(From the sources and a capture of the media role on the call's
-stream; not yet heard on a phone.)*
+Read-only besides: ohm `Route.Manager.ActiveRoutes` and `AudioRouteChanged` signal, for whether sound is on something plugged in or paired.
 
-What that leaves: the engine's connection keeps the role it was opened
-with, until the sound server is restarted and the engine opens another
-the next time it plays (cubeb's `pulse_stream_init`). So a webxdc app
-that played sound before the run's first call opened it as media, and
-the calls of that run play at the media volume, as before; one that
-plays sound after a call plays it at the call volume.
+Volume = other half. While call on (one policy knows, `aliencall` included), volume keys set call volume, not media: volume of streams with role `voip` (nemo `mainvolume`). Engine gives its streams no role; PulseAudio gives role-less stream media role `x-maemo` (`x-maemo-match.table`). So first builds' calls played at whatever media volume was (lower still on earpiece), keys did nothing: quiet at full volume, barely audible on earpiece.
+
+Now, while call on (placed or answered until over; `calls.rs`, `talking`), app's `PULSE_PROP` holds `media.role=voip`; after, as app found it (`call_host::label_call_audio`). PulseAudio client lib adds that variable's props to sound-server connection as opened; server adds them to every stream on connection before table read; table doesn't overwrite role stream already has. Engine opens one connection first time it plays anything, keeps it for run: in run that played nothing before, call's page (comes up only once call on). Variable made before app has second thread, which is what lets it change while others run (comment on `label_call_audio` says why). *(From sources and capture of media role on call's stream; not yet heard on phone.)*
+
+Leaves: engine's connection keeps role it opened with until sound server restarts and engine opens another next time it plays (cubeb `pulse_stream_init`). So webxdc app that played sound before run's first call opened it as media; that run's calls play at media volume, as before. One playing sound after a call plays it at call volume.
 
 ## What only a phone can answer
 
-Ranked by what would sink the feature. None of them needs another line
-of Piirit: two phones and an afternoon.
+Ranked by what would sink feature. None needs another line of Piirit: two phones and an afternoon.
 
-1. **Does a peer connection complete on the device, with the
-   microphone?** Yes: calls have gone through on 5.2.
-2. **Does the other end's voice keep playing with the app in the
-   background?** The view is held active for it; that this is enough is
-   the claim.
-3. **Do the call's streams join the call group?** The `aliencall` set
-   names them by the app's process; that the engine's audio streams are
-   opened by the app's own process (ESR 91 runs the engine in it), and
-   so carry its id, is the claim. On a phone they do carry it: the
-   engine's client is the app's process, with the `policy.application.id`
-   `Call.audio_id` reads. Outside a call they are in group `player`:
-   some library in the process holds a set of that class for the same
-   id *(inferred; which one is not known)*, and the `aliencall` set,
-   naming the id the same way, takes its place for the call. Silence in
-   a call would say they are not. `pactl list sink-inputs` shows each stream's `policy.group` and
-   `application.process.id`; `pactl list sinks` the active port. ESR
-   153 moves a page's audio into a process of its own, which will want
-   this looked at again.
-4. **Does the earpiece route play from the earpiece alone?** Yes: on a
-   phone a voice call played from the earpiece only, with the Media
-   app's music paused. Music itself plays from the earpiece and the
-   loudspeaker both (#100): the phone's loudspeaker output drives the
-   two. What the policy's own loudspeaker for the call did to the sound
-   was PulseAudio aborting over the open microphone ("Earpiece and
-   loudspeaker"); whether it plays from the loudspeaker once the
-   microphone is out of the way is the claim.
-5. **Does the app see its own microphone in PulseAudio?** The app runs
-   sandboxed; that PulseAudio lists its recording streams to it is the
-   claim. If it does not, the loudspeaker switch stays dimmed while the
-   microphone is open.
-6. **What it sounds like.** Echo on speakerphone, and what a call costs
-   in battery.
-7. **Does the camera open in the engine, and turn?** Gecko reaches the
-   phone's cameras through `gecko-camera`; that `facingMode` picks the
-   back one, and that the engine lets one go before the next opens, is
-   the claim. What a video call costs in battery and heat at VGA, 24
-   frames, is the other half of it.
+1. **Peer connection completes on device, with mic?** Yes: calls went through on 5.2.
+2. **Other end's voice keeps playing with app in background?** View held active for it; claim: enough.
+3. **Call's streams join call group?** `aliencall` set names them by app's process. Claim: engine audio streams opened by app's own process (ESR 91 runs engine in it), so carry its id. On phone they do: engine's client = app's process, with `policy.application.id` `Call.audio_id` reads. Outside call they're in group `player`: some lib in process holds set of that class for same id *(inferred; which unknown)*; `aliencall` set, naming id same way, takes its place for call. Silence in call → they don't. `pactl list sink-inputs` shows each stream's `policy.group`, `application.process.id`; `pactl list sinks` active port. ESR 153 moves page audio into own process: recheck then.
+4. **Earpiece route plays from earpiece alone?** Yes: on phone voice call played from earpiece only, Media app's music paused. Music itself plays from earpiece and loudspeaker both (#100): phone's loudspeaker output drives the two. Policy's own loudspeaker for call = PulseAudio aborting over open mic ("Earpiece and loudspeaker"); claim: plays from loudspeaker once mic out of way.
+5. **App sees own mic in PulseAudio?** App sandboxed; claim: PulseAudio lists its recording streams to it. If not, loudspeaker switch stays dimmed while mic open.
+6. **What it sounds like.** Speakerphone echo; call's battery cost.
+7. **Camera opens in engine, and turns?** Gecko reaches phone cameras via `gecko-camera`; claim: `facingMode` picks back one, engine lets one go before next opens. Other half: battery and heat of video call at VGA, 24 frames.
 
 ## What would not change
 
-- **A call rings only while the app is running.** No push notification
-  service is open to a third-party client (`docs/PROJECT.md`), so a call
-  is heard only if the app is alive to receive its message, minimised
-  included, inside the core's 120 seconds. Anything else is a missed
-  call's row.
-- **The camera's focus.** Gecko opens the phone's camera through
-  `gecko-camera`, which sets one parameter on it, `video-size`: no focus
-  mode, and no focus search is ever started, so the lens stays wherever
-  the camera's own default leaves it. The QR scanner and the in-app
-  camera set continuous focus and focus on a tap, through QtMultimedia;
-  a page has no such control (Gecko ESR 91 has no focus constraint), and
-  `gecko-camera` loads its plugins from a directory fixed when it was
-  built, so an app cannot put its own in front. The fix is upstream: a
-  `focus-mode` of `continuous-video` where the camera offers one.
-- **Harbour.** Calls add no executable, no library off the list and no
-  permission that was not already asked for. They add system-bus
-  services Harbour does not list -- ngfd, mce, and ohm's resource and
-  route managers -- which its validator cannot see and its QA may or may
-  not accept; each is a `DBusInterface` in `CallCenter.qml` or
-  `CallAudio.qml`, and a call works without any of them, on the
-  loudspeaker. PulseAudio's client library, which watches the app's own
-  microphone, is on the list. And they promote the browser engine, a separate package on
-  this platform, from a webxdc feature to the load-bearing part of a
-  headline one.
+- **Call rings only while app runs.** No push service open to third-party client (`docs/PROJECT.md`): call heard only if app alive (minimised included) to receive its message within core's 120 s. Else missed call's row.
+- **Camera focus.** Gecko opens phone camera via `gecko-camera`, which sets one parameter, `video-size`: no focus mode, no focus search ever started; lens stays at camera default. QR scanner and in-app camera set continuous focus and tap focus via QtMultimedia; page has no such control (Gecko ESR 91 has no focus constraint); `gecko-camera` loads plugins from dir fixed at its build, so app can't put own in front. Fix upstream: `focus-mode` `continuous-video` where camera offers one.
+- **Harbour.** Calls add no executable, no off-list library, no permission not already asked. They add system-bus services Harbour doesn't list (ngfd, mce, ohm resource and route managers): validator can't see; QA may or may not accept. Each a `DBusInterface` in `CallCenter.qml` or `CallAudio.qml`; call works without any, on loudspeaker. PulseAudio client lib (mic watch) is on list. And browser engine, separate package here, promoted from webxdc feature to load-bearing part of headline one.
 
 ## Next
 
-1. **The phone questions above**, before anything else.
-2. **The chat list's preview** of a call is still the core's English
-   sentence (`📞 Outgoing audio call`). The reference clients hand the
-   core translations of its call strings (`set_stock_strings`); Piirit
-   hands it none of any kind yet.
+1. **Phone questions above**, before anything else.
+2. **Chat list preview** of call still core's English sentence (`📞 Outgoing audio call`). Reference clients hand core translations of its call strings (`set_stock_strings`); Piirit hands none of any kind yet.
 
 ## Sources
 
-Read rather than remembered, at these versions:
+Read, not remembered, at these versions:
 
-- [`chatmail/core` v2.62.0][core] -- `src/calls.rs`,
-  `deltachat-jsonrpc/src/api.rs`, `.../api/types/calls.rs`,
-  `.../api/types/events.rs`.
-- [`deltachat/calls-webapp` v0.12.1][calls-webapp] -- `src/lib/calls.ts`,
-  `src/vite-env.d.ts`, `calls.js`, its CI and its licence.
-- [`deltachat/deltachat-android`][android] -- v2.43.0's `CallActivity`
-  and `CallUtil`, the last WebView-based client; master's
-  `CallCoordinator`, `CallItemView` and strings, for the behaviour and
-  the words.
-- [`deltachat/deltachat-ios`][ios] -- `CallManager`, `CallViewController`.
-- Sailfish OS: [`ngfd`][ngfd] and [`mce`][mce] (their D-Bus interfaces),
-  [`lipstick`][lipstick] (`notificationfeedbackplayer.cpp`),
-  [`nemo-qml-plugin-notifications`][notifications],
-  [`sailjail-permissions`][sailjail] (`Base`, `Audio`, `Phone`),
-  [`voicecall`][voicecall], [`ohm-plugins-misc`][ohm] (the route
-  manager), [`embedlite-components`][embedlite]
-  (`EmbedLiteWebrtcUI.js`, `ContentPermissionManager.js`),
-  [`sailfish-components-webview`][webview] (`WebView.qml`) and
-  `gecko-dev`'s Sailfish patches.
-- The two device reports linked above, still the only public evidence
-  either way about WebRTC on a Sailfish phone.
+- [`chatmail/core` v2.62.0][core]: `src/calls.rs`, `deltachat-jsonrpc/src/api.rs`, `.../api/types/calls.rs`, `.../api/types/events.rs`.
+- [`deltachat/calls-webapp` v0.12.1][calls-webapp]: `src/lib/calls.ts`, `src/vite-env.d.ts`, `calls.js`, its CI, its licence.
+- [`deltachat/deltachat-android`][android]: v2.43.0 `CallActivity`, `CallUtil` (last WebView-based client); master `CallCoordinator`, `CallItemView`, strings, for behaviour and words.
+- [`deltachat/deltachat-ios`][ios]: `CallManager`, `CallViewController`.
+- Sailfish OS: [`ngfd`][ngfd] and [`mce`][mce] (D-Bus interfaces), [`lipstick`][lipstick] (`notificationfeedbackplayer.cpp`), [`nemo-qml-plugin-notifications`][notifications], [`sailjail-permissions`][sailjail] (`Base`, `Audio`, `Phone`), [`voicecall`][voicecall], [`ohm-plugins-misc`][ohm] (route manager), [`embedlite-components`][embedlite] (`EmbedLiteWebrtcUI.js`, `ContentPermissionManager.js`), [`sailfish-components-webview`][webview] (`WebView.qml`), `gecko-dev`'s Sailfish patches.
+- Two device reports linked above: still only public evidence either way on WebRTC on Sailfish phone.
 
 [core]: https://github.com/chatmail/core
 [calls-webapp]: https://github.com/deltachat/calls-webapp

@@ -1,11 +1,7 @@
 import QtQuick 2.0
 
-// The camera. Nothing is captured here; what a test can check is that a
-// page starts and stops it with its own status, wires it to a viewfinder,
-// asks it to focus, and drives its still and video capture through the
-// two objects below. The capture and focus enums carry QCamera's own
-// values, so a test can check which mode a page asked for; the rest the
-// pages name (Camera.FrontFace and the like) read as undefined here.
+// Stub: captures nothing. Test checks start/stop, viewfinder, focus, capture.
+// Enums = QCamera values; other names (Camera.FrontFace...) undefined.
 QtObject {
     enum CaptureMode { CaptureViewfinder = 0, CaptureStillImage = 1, CaptureVideo = 2 }
     enum FocusMode {
@@ -18,23 +14,17 @@ QtObject {
     }
     property bool running: false
     property var captureMode
-    // QCamera::Position's own values: BackFace 1, FrontFace 2. The enum
-    // reads as undefined here, and a page comparing against it must not
-    // be handed undefined on this side too.
+    // QCamera::Position: BackFace 1, FrontFace 2. Keep `position` a number.
     property var position: 1
-    // The sensor's mounting, in degrees, as a phone's back camera reports
-    // it: its frame is the phone's landscape.
+    // Sensor mount, degrees: landscape.
     property int orientation: 90
-    // Which camera this is: QtMultimedia's own default until a page
-    // picks one out of `QtMultimedia.availableCameras`.
+    // Default id until page picks one.
     property string deviceId: "back-0"
-    // A camera that zooms four times, digitally, as a phone's does. The
-    // real one clamps a zoom past its maximum; a test checks that a page
-    // never asks for one.
+    // Digital zoom x4. Real one clamps; test checks page never asks past max.
     property real digitalZoom: 1
     property real maximumDigitalZoom: 4
-    // QCamera::LockStatus: Unlocked 0, Searching 1, Locked 2. A test sets
-    // it to say the lens has found focus.
+    // QCamera::LockStatus: Unlocked 0, Searching 1, Locked 2. Test sets: focus
+    // found.
     property int lockStatus: 0
     property CameraFocus focus: CameraFocus {}
     property CameraFlash flash: CameraFlash {}
@@ -43,26 +33,21 @@ QtObject {
     property CameraMetaData metaData: CameraMetaData {}
     property CameraCapture imageCapture: CameraCapture {}
     property CameraRecorder videoRecorder: CameraRecorder {}
-    /// How many focus searches were asked for, and how many locks taken
-    /// off.
+    /// Focus searches and lock releases asked for.
     property int searches: 0
     property int unlocks: 0
-    // What the camera can run its viewfinder at, and what it was asked
-    // for. A real camera answers this only once it is loaded, and some
-    // answer with nothing at all, so a test can empty the list to check
-    // that the view carries on regardless.
+    // Viewfinder resolutions, asked for. Test empties list: view must carry on.
     property var viewfinderResolutions: [
         Qt.size(640, 480),
         Qt.size(1280, 960),
         Qt.size(1920, 1440)
     ]
     property CameraViewfinder viewfinder: CameraViewfinder {}
-    // QCamera::Status values: UnloadedStatus 1, LoadedStatus 3.
+    // QCamera::Status: UnloadedStatus 1, LoadedStatus 3.
     property int cameraStatus: 3
     function supportedViewfinderResolutions() { return viewfinderResolutions }
     function start() { running = true }
-    // Stopping the camera stops a recording with it, finished or not: what
-    // the page falls back on when the recorder ignores its own stop.
+    // Stop also ends recording: page's fallback.
     function stop() {
         running = false
         if (videoRecorder.recorderState === 1) {

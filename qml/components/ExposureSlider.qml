@@ -3,20 +3,17 @@ import Sailfish.Silica 1.0
 import "../js/Viewfinder.js" as Viewfinder
 
 /*
- * Exposure compensation: the platform camera's slider, a thin track
- * standing at the side of the viewfinder with the exposure icon riding
- * on it. Brighter is up. The value shows beside the handle while it is
- * moved and for two seconds after; a double tap puts it back to none.
+ * Exposure slider beside viewfinder. Brighter up. Shows value while moved
+ * and 2 s after; double tap resets.
  *
- * Half a stop at a time from two under to two over, which is the
- * platform camera's range; a camera that cannot go as far clamps it.
+ * Half-stop steps, -2..+2 EV; less camera range clamps.
  */
 Item {
     id: slider
 
-    /// The compensation in EV, one of Viewfinder.exposureSteps.
+    /// EV, one of Viewfinder.exposureSteps.
     property real value: 0
-    /// Which side the value is written on.
+    /// Value label side.
     property bool labelOnLeft: true
 
     signal moved(real value)
@@ -41,7 +38,7 @@ Item {
         color: "white"
         opacity: 0.6
 
-        // The mark at none.
+        // Mark at none.
         Rectangle {
             anchors.centerIn: parent
             width: Theme.paddingLarge

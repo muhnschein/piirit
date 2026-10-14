@@ -1,13 +1,9 @@
-//! A capture sent at once (`sendShared`) shows in the chat it went to,
-//! even when the chat takes its time to load and the send takes its time
-//! to be answered -- a video being copied into the core, say.
+//! Capture sent at once (`sendShared`) shows in its chat, even with slow chat load and slow
+//! send answer (e.g. video copied into core).
 //!
-//! The chat's rows are read from the core as it opens. A send answered
-//! while that read is in the air put its message on a row the read then
-//! replaced with what the core had before the send: the message was in
-//! the chat, and not on the page, until the chat was opened again. So
-//! nothing goes on its own until the chat has loaded, and what is sent
-//! lands on the rows the page shows.
+//! Rows read from core on open. Send answered mid-read put its message on a row the read then
+//! replaced with pre-send state: in chat, not on page, until reopened. So nothing goes alone
+//! until chat loaded, and sent message lands on rows page shows.
 
 // Qt harness: see qml_send_file.rs.
 #![allow(
@@ -72,15 +68,14 @@ fn a_capture_sent_at_once_shows_in_a_chat_that_was_still_loading() {
     let photo = captures.join("photo-20261013-070707.png");
     std::fs::copy(common::a_real_picture(), &photo).expect("copy a picture");
 
-    // SAFETY: single-threaded test binary; set before Qt starts.
+    // SAFETY: single-threaded; set before Qt starts.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_FAKE_JOURNAL", &journal);
         std::env::set_var("PIIRIT_ACCOUNTS_DIR", temp.join("accounts"));
         std::env::set_var("XDG_CACHE_HOME", &cache);
-        // The chat's first page two seconds in coming, and the send
-        // answered after half of one: after the chat's message list has
-        // been read, and long before the page of it has.
+        // Chat's first page 2s coming; send answered after 0.5s: after message list read, long
+        // before its page.
         std::env::set_var("PIIRIT_FAKE_PAGE_DELAY_MS", "2000");
         std::env::set_var("PIIRIT_FAKE_SEND_DELAY_MS", "500");
     }
@@ -147,7 +142,7 @@ fn a_capture_sent_at_once_shows_in_a_chat_that_was_still_loading() {
         ));
     });
 
-    // Loaded, sent and answered by now, with room to spare.
+    // Sent and answered by now.
     single_shot(Duration::from_secs(8), move || unsafe {
         probe!("loaded", "messages", "loaded");
         probe!("rows", "messages", "count");
@@ -181,7 +176,7 @@ fn a_capture_sent_at_once_shows_in_a_chat_that_was_still_loading() {
         ("true", "false"),
         "the chat did not load, or the picture is still on the bar. {context}"
     );
-    // The two messages the chat holds, and the one sent.
+    // Two chat messages, plus the sent one.
     assert_eq!(
         value("rows"),
         "3",

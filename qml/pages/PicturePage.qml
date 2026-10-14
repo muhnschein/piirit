@@ -1,71 +1,51 @@
-// 2.5 rather than 2.0 for Image.autoTransform; see AttachmentPreview.qml.
+// 2.5, not 2.0: Image.autoTransform; see AttachmentPreview.qml.
 import QtQuick 2.5
 import Sailfish.Silica 1.0
 import "../components"
 
 /*
- * One picture, as big as the screen will show it.
+ * One picture, as big as screen allows. Shown here: a system handler leaves
+ * Piirit and fails on some devices; pull-down keeps way out to other apps.
+ * Fit at zoom 1, scaled from there; content is the larger of picture and view,
+ * so no pan until something to pan, centred meanwhile.
  *
- * Shown here rather than handed to whatever the system thinks handles the
- * type, which leaves Piirit and fails on a device. A page and a
- * Flickable; the way out to another app stays in the pull-down for the
- * cases this cannot do anything with.
+ * Two steps: tapped row's decode is a cache hit, drawn first, nothing decoding
+ * during transition. Full decode and GIF movie start once in place (decoding
+ * during transition was the reported stutter).
  *
- * The picture is fitted at zoom 1 and multiplied from there, and the
- * flickable's content is the larger of the picture and the view -- so
- * panning does nothing until there is something to pan, and the picture
- * stays centred while there is not.
- *
- * It arrives in two steps. The row that was tapped has already decoded
- * the picture at its own width, and that decode is what this page draws
- * first: a cache hit, so the page comes in with the picture on it and
- * nothing decoding behind the transition. The full-size decode, and a
- * GIF's movie, start once the page is in place. Decoding during the
- * transition was the stutter reported on opening a picture.
- *
- * Saving copies the file into Piirit's folder in Downloads, where every
- * copy goes (AttachmentSaver): what the chat holds lives in the core's
- * own directory and goes with the app.
+ * Save copies to Piirit's Downloads (AttachmentSaver): chat files live in
+ * core's dir and go with the app.
  */
 Page {
     id: page
 
-    /// The file, already encoded: see AttachmentPreview.fileUrl for why the
-    /// path is not concatenated into one here.
+    /// File, already encoded: see AttachmentPreview.fileUrl.
     property url fileUrl
     property string fileName
-    /// Image, Gif or Sticker -- the core's own enum, as everywhere else.
+    /// Image, Gif or Sticker: core enum.
     property string viewType: "Image"
 
     readonly property bool isAnimated: page.viewType === "Gif"
-    /// How wide the conversation drew this picture, 0 when it did not
-    /// come from there. The row's decode at that width is still in Qt's
-    /// cache -- the row is on the page underneath -- and asking for the
-    /// same size is what makes the first frame here cost nothing.
+    /// Width conversation drew it at; 0 if not from there. Row still under this
+    /// page, so same size is a Qt cache hit: first frame free.
     property real previewWidth: 0
 
-    /// Whether the page is in place: its transition is over, or there was
-    /// none. Until then the reader is watching the transition, and a
-    /// decode and a texture upload in the middle of it are the frames it
-    /// drops. The full picture, and a GIF's movie, wait for this; the
-    /// row's decode carries the page across.
+    /// Page in place (transition over, or none). Until then decode and upload
+    /// drop transition frames: full picture and GIF movie wait; row's decode
+    /// carries page.
     property bool settled: false
     onStatusChanged: if (page.status === PageStatus.Active) page.settled = true
     Component.onCompleted: if (page.status === PageStatus.Active) page.settled = true
 
-    /// The picture whose shape the page is laid out from: the full one
-    /// once it is decoded, the row's until then. Same shape either way.
+    /// Shape layout uses: full picture once decoded, else row's.
     readonly property Item measured:
         picture.implicitWidth > 0 && picture.implicitHeight > 0 ? picture : preview
 
-    /// How much bigger than fitted the picture is drawn. 1 fits it.
+    /// Draw scale vs fitted; 1 fits.
     property real zoom: 1
     readonly property real maximumZoom: 5
 
-    /// The width the picture is drawn at when it is fitted to the page.
-    ///
-    /// Falls back to the page's own width until the picture has been
-    /// decoded, which is also what keeps this from dividing by zero.
+    /// Fitted width. Page width until decoded (no divide by zero).
     readonly property real fittedWidth: {
         if (page.measured.implicitWidth <= 0 || page.measured.implicitHeight <= 0) {
             return page.width
@@ -79,44 +59,29 @@ Page {
         ? page.fittedWidth * page.measured.implicitHeight / page.measured.implicitWidth
         : page.height
 
-    /// The box a picture is decoded to fit in: twice the page's, so a
-    /// zoom of two is still sharp. Beyond that a bigger decode is memory
-    /// and upload time for nothing the eye can see -- and past the GPU's
-    /// texture limit Qt scales it down again on the render thread, which
-    /// is a stall of its own.
+    /// Decode box: twice the page, so zoom 2 stays sharp. Bigger wastes memory
+    /// and upload; past GPU texture limit Qt rescales on render thread (stall).
+    /// Per side, Qt fits keeping shape. One bound of twice long edge on both
+    /// sides let landscape photo through whole (12 MP, 48 MB to draw 1080
+    /// wide). Qt 5.6 fits stored pixels before orientation turn: upright 4:3
+    /// stored sideways gets 1.5x, not 2x.
     ///
-    /// Both sides, and Qt fits the picture inside them keeping its shape,
-    /// which is twice what it is drawn at fitted. One bound of twice the
-    /// screen's long edge on both sides let a landscape photo through
-    /// whole on a tall screen: twelve megapixels, 48 MB, to draw 1080 wide.
-    /// Qt 5.6 fits the picture as it is stored, before the turn its
-    /// orientation tag asks for, so a 4:3 photo taken upright and stored
-    /// on its side comes out at one and a half times its fitted width
-    /// rather than twice.
-    ///
-    /// The screen's own size stands in until the page has one, which in
-    /// portrait is the same size.
+    /// Screen size until page has one.
     readonly property int decodeWidth: 2 * (page.width > 0 ? page.width : Screen.width)
     readonly property int decodeHeight: 2 * (page.height > 0 ? page.height : Screen.height)
 
-    /// Kept inside the content. The flickable would do this itself, but
-    /// only once it has been laid out, and this runs before that.
+    /// Kept inside content; flickable does this after layout, this runs before.
     function within(value, limit) {
         return Math.max(0, Math.min(Math.max(0, limit), value))
     }
 
-    /// Where the picture's left edge sits when it is narrower than the view.
+    /// Left edge when narrower than view.
     function inset(size, viewport) {
         return Math.max(0, (Math.max(size, viewport) - size) / 2)
     }
 
-    /// Change the zoom, keeping whatever is under (`viewX`, `viewY`) under
-    /// it afterwards.
-    ///
-    /// The coordinates are in the view, not in the picture. Without this
-    /// the picture simply grows about its own top-left corner, and zooming
-    /// in on a face in the bottom right takes the reader to the top left
-    /// and leaves them to find their way back.
+    /// Zoom, keeping (`viewX`, `viewY`) point under it. Coordinates in view:
+    /// else zoom grows from top-left.
     function zoomAt(target, viewX, viewY) {
         var next = Math.max(1, Math.min(page.maximumZoom, target))
         var wide = page.fittedWidth * page.zoom
@@ -124,7 +89,7 @@ Page {
         if (wide <= 0 || high <= 0 || next === page.zoom) {
             return
         }
-        // Where that point sits in the picture, 0..1, before the change.
+        // Point's place in picture, 0..1.
         var across = (flick.contentX + viewX - page.inset(wide, flick.width)) / wide
         var down = (flick.contentY + viewY - page.inset(high, flick.height)) / high
 
@@ -132,8 +97,7 @@ Page {
 
         var wideAfter = page.fittedWidth * next
         var highAfter = page.fittedHeight * next
-        // And where it has to be for that point to be under the same place
-        // on the screen.
+        // Where it must sit on screen.
         flick.contentX = page.within(
             page.inset(wideAfter, flick.width) + across * wideAfter - viewX,
             Math.max(wideAfter, flick.width) - flick.width)
@@ -142,14 +106,12 @@ Page {
             Math.max(highAfter, flick.height) - flick.height)
     }
 
-    /// What a double tap does: all the way in on what was tapped, or all
-    /// the way back out.
+    /// Double tap: all the way in on tapped point, or all the way out.
     function toggleZoom(viewX, viewY) {
         page.zoomAt(page.zoom > 1 ? 1 : 3, viewX, viewY)
     }
 
-    // A copy the reader keeps, where every copy goes: see
-    // AttachmentSaver.
+    // Reader's copy: see AttachmentSaver.
     AttachmentSaver {
         id: saver
         objectName: "saver"
@@ -163,9 +125,7 @@ Page {
         }
     }
 
-    // Behind the picture rather than the theme's own background: a photo
-    // with anything light in it reads better against black, and the bars
-    // beside a picture that does not fill the screen are not the page.
+    // Behind picture: photos read better on black.
     Rectangle {
         anchors.fill: parent
         color: "black"
@@ -190,8 +150,7 @@ Page {
             MenuItem {
                 objectName: "saveToDevice"
                 text: qsTr("Save to device")
-                // Not again while the copy is being made: a second pull
-                // would only make a second copy.
+                // No second copy while one is made.
                 enabled: !saver.busy
                 onClicked: saver.keep(page.fileUrl, page.fileName)
             }
@@ -204,20 +163,15 @@ Page {
             pinch.minimumScale: 1
             pinch.maximumScale: page.maximumZoom
 
-            /// Where the zoom was when the fingers went down: a pinch
-            /// reports its scale relative to its own start, not to the
-            /// picture.
+            /// Zoom at finger-down: pinch scale is relative to its start.
             property real startZoom: 1
-            /// And where on the screen they went down, which is the point
-            /// the picture has to stay still under.
+            /// Screen point at finger-down: picture stays still under it.
             property real focusX: 0
             property real focusY: 0
 
             onPinchStarted: {
                 pincher.startZoom = page.zoom
-                // This area is the flickable's content, so its coordinates
-                // are content coordinates; the view's are what zoomAt
-                // wants.
+                // Content coordinates; zoomAt takes view coordinates.
                 pincher.focusX = pinch.startCenter.x - flick.contentX
                 pincher.focusY = pinch.startCenter.y - flick.contentY
             }
@@ -228,16 +182,12 @@ Page {
                 id: frame
                 width: page.fittedWidth * page.zoom
                 height: page.fittedHeight * page.zoom
-                // Centred while the picture is smaller than the view, and
-                // at the origin once it is bigger and the flickable has
-                // taken over.
+                // Centred while smaller than view; origin once bigger.
                 x: Math.max(0, (flick.contentWidth - frame.width) / 2)
                 y: Math.max(0, (flick.contentHeight - frame.height) / 2)
 
-                // The row's decode of the same picture, at the width the
-                // row drew it: a cache hit, so it is on screen from the
-                // first frame of the transition with nothing decoded.
-                // Underneath the full picture, and gone once that is there.
+                // Row's decode at its width: cache hit, on screen from first
+                // frame. Gone once full picture is in.
                 Image {
                     id: preview
                     objectName: "previewPicture"
@@ -250,11 +200,8 @@ Page {
                     visible: picture.status !== Image.Ready
                 }
 
-                // The same layering as the message row: an Image reads the
-                // first frame of a GIF whatever happens to its movie, so it
-                // sizes the page and shows the still, and the animation
-                // covers it when there is one to play. See
-                // AttachmentPreview.
+                // Layering as message row: Image shows GIF's first frame and
+                // sizes page; animation covers it. See AttachmentPreview.
                 Image {
                     id: picture
                     objectName: "fullPicture"
@@ -264,9 +211,8 @@ Page {
                     autoTransform: true
                     sourceSize.width: page.decodeWidth
                     sourceSize.height: page.decodeHeight
-                    // Once the page is in place, when there is a preview
-                    // to carry it there; at once when there is not, since
-                    // an empty page is worse than a dropped frame.
+                    // Once settled if a preview carries page; else at once (empty
+                    // page worse than dropped frame).
                     source: page.settled || page.previewWidth <= 0 ? page.fileUrl : ""
                 }
 
@@ -275,15 +221,11 @@ Page {
                     anchors.fill: parent
                     visible: page.isAnimated
                     fillMode: Image.PreserveAspectFit
-                    // Each frame decoded as it comes round rather than the
-                    // whole movie kept at full size for as long as the page
-                    // is open: see AttachmentPreview.
+                    // Frames decoded as they come, not whole movie kept. See
+                    // AttachmentPreview.
                     cache: false
                     playing: visible
-                    // The movie decodes its frames on the main thread as
-                    // they come round, so it starts once the transition is
-                    // out of the way; the still shows its first frame
-                    // until then.
+                    // Movie decodes on main thread: starts after transition.
                     source: visible && page.settled ? page.fileUrl : ""
                 }
 
@@ -298,9 +240,8 @@ Page {
             }
         }
 
-        // Only while the picture is still coming and nothing stands in
-        // for it: a decode that fails leaves the page black, and a spinner
-        // that never stops would say it was still trying.
+        // Only while picture still coming: failed decode would leave spinner
+        // forever.
         BusyIndicator {
             objectName: "pictureBusy"
             anchors.centerIn: parent
@@ -310,8 +251,7 @@ Page {
         }
     }
 
-    // Where the copy went, or why there is none. Over the picture rather
-    // than in the flickable, so panning does not move it.
+    // Where copy went, or why not. Over picture: pan doesn't move it.
     Banner {
         id: notice
         objectName: "notice"

@@ -1,18 +1,9 @@
-//! Scrolling to the top of a long chat reaches its first message.
+//! Scroll to top of long chat reaches first message.
 //!
-//! The shape is what makes this reliable, not the view: a model holding a
-//! moving window of loaded messages has to have its contents replaced to
-//! get anywhere, and positioning into a model that has just been replaced
-//! is contingent on how fast rows are measured.
-//!
-//! The model holds a row for every message in the chat. The first
-//! message is row 0 from the moment the id list arrives, so reaching it is
-//! scrolling -- there is nothing to fetch, nothing to replace, and nothing
-//! that can put the reader somewhere else. Rows fill in where they stand.
-//!
-//! What is pinned here is exactly that: the top of the view is the first
-//! message in the chat, and filling the rows in around the reader does not
-//! move them.
+//! Shape, not view, makes it reliable: a moving-window model must be replaced to get
+//! anywhere, and positioning into a just-replaced model depends on row-measure speed.
+//! Model holds a row per message; first is row 0 once id list arrives. Reaching it
+//! is scrolling: nothing to fetch or replace. Filling rows around reader moves nothing.
 
 // Qt harness: see qml_conversation_open.rs.
 #![allow(
@@ -30,7 +21,7 @@ use qmetaobject::*;
 
 mod common;
 
-/// Several pages, so the top is nowhere near what the chat opens on.
+/// Several pages: top is far from where chat opens.
 const MESSAGES: u32 = 130;
 
 const PROBE_QML: &str = r"
@@ -149,18 +140,14 @@ fn the_top_of_the_view_is_the_first_message_in_the_chat() {
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
     let tree = common::qml_tree_without_enter_key();
 
-    // SAFETY: single-threaded test binary; set before Qt starts and before
-    // the server inherits them.
+    // SAFETY: single-threaded; set before Qt and server start.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_ACCOUNTS_DIR", temp.join("accounts"));
         std::env::set_var("PIIRIT_FAKE_LONG_CHAT", MESSAGES.to_string());
-        // Messages long enough to wrap, so filling a row in really does
-        // change its height -- which is what can carry the reader off.
+        // Wrapping messages: filling a row changes its height, which can move reader.
         std::env::set_var("PIIRIT_FAKE_WORDY", "1");
-        // And the first row a core notice, as a real chat's is: a date
-        // drawn over "messages are end-to-end encrypted" is the first row
-        // of the first day of every chat there is.
+        // First row a core notice, as in real chats: date over encryption notice.
         std::env::set_var("PIIRIT_FAKE_INFO_FIRST", "1");
     }
 
@@ -211,15 +198,14 @@ fn the_top_of_the_view_is_the_first_message_in_the_chat() {
     });
     single_shot(Duration::from_secs(4), move || unsafe {
         (*steps_ptr).push(("opened-rows", call!("rowCount")));
-        // Straight to the top. No control, no fetch, no window to move.
+        // Straight to top: no control, fetch or window move.
         (*steps_ptr).push(("scrolled", call!("toTop")));
         (*steps_ptr).push(("following", call!("stillFollowing")));
         (*steps_ptr).push(("top", call!("topId")));
         (*steps_ptr).push(("fill", call!("fillTop")));
     });
     single_shot(Duration::from_secs(6), move || unsafe {
-        // The rows the reader is looking at have just gained their text and
-        // grown; they must not have taken the reader with them.
+        // Visible rows gain text and grow; must not take reader with them.
         (*steps_ptr).push(("relayout", call!("relayout")));
         (*steps_ptr).push(("geometry", call!("geometry")));
         (*steps_ptr).push(("top-after", call!("topId")));
@@ -232,7 +218,7 @@ fn the_top_of_the_view_is_the_first_message_in_the_chat() {
     assert_outcome(&steps);
 }
 
-/// What the run has to show for itself, out of the test body.
+/// Run's outcome, out of test body.
 fn assert_outcome(steps: &[(&str, String)]) {
     let value = |label: &str| {
         steps
@@ -259,11 +245,8 @@ fn assert_outcome(steps: &[(&str, String)]) {
          back down again. {context}"
     );
 
-    // The day heading is part of the row, not an item the view has to find
-    // room for above it. That is what makes the overlap reported against the
-    // section delegate -- a date drawn on top of the encryption notice --
-    // impossible rather than merely fixed: a row cannot be drawn over
-    // itself, whatever the view believes about section sizes.
+    // Day heading part of row, not separate section item: date drawn over encryption notice
+    // (reported against section delegate) impossible; row cannot draw over itself.
     assert_eq!(
         value("geometry"),
         "inside",
@@ -272,7 +255,7 @@ fn assert_outcome(steps: &[(&str, String)]) {
         value("geometry")
     );
 
-    // The whole report, in one assertion.
+    // Whole report, one assertion.
     assert_eq!(
         value("top"),
         "1",

@@ -1,16 +1,10 @@
-//! What the app's image provider makes of a picture (`src/pictures.rs`),
-//! through the same C++ that hands it to QML: read off the file, cut and
-//! sized, and baked.
+//! Picture as app image provider makes it (`src/pictures.rs`), via same C++ as QML.
 //!
-//! Everything a shader used to do to a picture is done here now -- an
-//! avatar's circle, grey and tint, the cover's fade, an introduction
-//! drawing's ink, a call's blurred backdrop -- because on Sailfish's Qt
-//! 5.6 a `ShaderEffect` can be drawn with another one's program (see
-//! `qml_avatar_shaders.rs`). So this is what keeps those looking as they
-//! did.
+//! Shader work moved here: avatar circle, grey, tint, cover fade, intro ink, call blur.
+//! Reason: on Sailfish Qt 5.6 a `ShaderEffect` can be drawn with another's program
+//! (`qml_avatar_shaders.rs`). This keeps those looks as they were.
 //!
-//! The picture is made here, opaque all over, so a transparent corner is
-//! one the provider cut and not one the file came with.
+//! Made opaque: transparent corner means provider cut it.
 
 #![allow(clippy::expect_used)]
 
@@ -18,22 +12,21 @@ use std::path::{Path, PathBuf};
 
 use piirit_shim::render_picture;
 
-/// The two colours a test picture is made of: its left half and its right.
+/// Test picture colours: left half, right half.
 const LEFT: (u8, u8, u8) = (200, 40, 40);
 const RIGHT: (u8, u8, u8) = (40, 160, 60);
 
-/// What was made, as `(a, r, g, b)` rows, and its width and height.
+/// Output as `(a, r, g, b)` rows, plus width and height.
 type Made = (Vec<(u8, u8, u8, u8)>, usize, usize);
 
-/// A directory of this test's own, so tests running side by side do not
-/// share a picture.
+/// Own dir per test: parallel tests share no picture.
 fn a_dir(test: &str) -> PathBuf {
     let dir = std::env::temp_dir().join(format!("piirit-pictures-{}-{test}", std::process::id()));
     std::fs::create_dir_all(&dir).expect("a temporary directory");
     dir
 }
 
-/// A wide, opaque picture, written as a PPM, which Qt reads with no plugin.
+/// Wide opaque picture as PPM (Qt reads without plugin).
 fn a_picture(dir: &Path) -> PathBuf {
     a_picture_of(dir, 40, 30)
 }
@@ -51,7 +44,7 @@ fn a_picture_of(dir: &Path, width: usize, height: usize) -> PathBuf {
     path
 }
 
-/// What the provider made for `recipe` from `file`.
+/// Provider output for `recipe` from `file`.
 fn made(recipe: &str, file: &Path, size: i32) -> Made {
     made_from(&format!("{recipe}?file={}", file.display()), size)
 }
@@ -93,17 +86,15 @@ fn a_face_is_the_middle_of_its_picture_cut_to_a_circle_at_its_size() {
             "the face is not whole at ({x}, {y}), inside its circle"
         );
     }
-    // The middle of the picture: its long side cropped evenly, so the
-    // circle's left is the picture's left half and its right its right.
+    // Middle of picture, long side cropped: circle's left is picture's left half.
     let (_, r, g, b) = at(&pixels, width, 3, 12);
     assert_eq!((r, g, b), LEFT, "the face's left is not the picture's");
     let (_, r, g, b) = at(&pixels, width, 20, 12);
     assert_eq!((r, g, b), RIGHT, "the face's right is not the picture's");
 }
 
-/// A picture much larger than its face -- a photo from the gallery, for
-/// a group -- is read no larger than the face needs, and is cut the
-/// same: its middle, at the face's size.
+/// Picture much larger than face (gallery photo for group): read no larger than face
+/// needs, cut same way: its middle, at face size.
 #[test]
 fn a_face_from_a_large_picture_is_still_its_middle_at_its_size() {
     let file = a_picture_of(&a_dir("large"), 400, 300);
@@ -130,9 +121,8 @@ fn a_face_drawn_without_its_colours_is_grey_and_a_lit_one_goes_through_the_tint(
         );
     }
 
-    // Three quarters of the way to the stub ambience's highlight, from
-    // grey: blue above red, as the highlight is, and no channel at the
-    // picture's own.
+    // Three quarters from grey toward stub highlight: blue above red like highlight; no
+    // channel at picture's own.
     let (lit, width, _) = made_from(
         &format!("face?file={}&tint=%2380c0ff&strength=0.75", file.display()),
         24,
@@ -180,8 +170,7 @@ fn a_picture_that_is_not_there_is_nothing_rather_than_a_crash() {
 
 #[test]
 fn a_call_backdrop_is_small_and_soft() {
-    // Larger than the backdrop is blurred at, so what is read is the
-    // blur's and not the scaling's.
+    // Larger than size backdrop is blurred at: softness read is blur's, not scaling's.
     let file = a_picture_of(&a_dir("blur"), 400, 300);
     let (pixels, width, height) = made("blur", &file, -1);
 
@@ -189,8 +178,7 @@ fn a_call_backdrop_is_small_and_soft() {
         width <= 64 && height <= 64 && width > 0,
         "the backdrop is blurred at {width} by {height}, not small"
     );
-    // A few pixels either side of where the two halves meet, each side
-    // has some of the other.
+    // Few px either side of halves' meeting: each side has some of other.
     let middle = width / 2;
     let (_, left, _, _) = at(&pixels, width, middle - 3, height / 2);
     let (_, right, _, _) = at(&pixels, width, middle + 3, height / 2);

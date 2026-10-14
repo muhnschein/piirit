@@ -2,33 +2,24 @@ import QtQuick 2.0
 import Sailfish.Silica 1.0
 
 /*
- * What the next message answers, above the field -- or, while a message
- * of the reader's own is being edited, which one. Its own component so
- * the wrapping can be measured: ConversationPage cannot be loaded
- * headlessly.
+ * Reply/edit bar above field. Own file so wrap is testable (ConversationPage
+ * won't load headless).
  */
 Item {
     id: root
 
     property string author
     property string body
-    /// The field holds a message already sent, for the reader to change:
-    /// the bar names that rather than a message being answered, and the
-    /// cancel puts the field back.
+    /// Editing sent message: bar says so; cancel restores field.
     property bool editing: false
-    // Long enough to recognise the message, short enough not to take the
-    // screen; what does not fit ends in an ellipsis.
+    // Enough to recognise, not crowd screen. Rest ellipsised.
     property int maximumLines: 3
     signal cancelled()
 
-    // By its own reason to be here, not by `visible`, which reads the
-    // effective visibility and goes false for the whole page while
-    // another is over it: see MessageDelegate.
+    // Own flag: `visible` goes false under another page (MessageDelegate).
     readonly property bool shown: root.body.length > 0 || root.author.length > 0
     visible: root.shown
-    // Both, not just the label: the cancel button is an icon's worth tall,
-    // which for a one-line quote is more, and measuring only the label let
-    // it hang out over the message field below.
+    // Measure cancel too: its icon is taller than a one-line quote.
     height: root.shown ? Math.max(quoted.height, cancel.height) + 2 * Theme.paddingSmall : 0
 
     Label {
@@ -44,9 +35,8 @@ Item {
         font.pixelSize: Theme.fontSizeExtraSmall
         color: Theme.secondaryColor
         textFormat: Text.PlainText
-        // One `arg`, then joined on: QML's takes a single argument, and
-        // a second call would rescan what the first produced -- so a
-        // contact named "%2" would get the body put where they belong.
+        // One `arg`, joined: a 2nd call would rescan output (contact "%2"
+        // misplaced).
         text: root.editing
               //: Above the message field while a sent message's text is
               //: being changed; the message's text follows.

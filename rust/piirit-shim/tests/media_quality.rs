@@ -1,15 +1,10 @@
-//! The outgoing media quality reaches every account the core has.
+//! Outgoing media quality reaches every account.
 //!
-//! One setting for the whole app, held in dconf, and the core's
-//! `media_quality` is per account: so the core object writes it to each
-//! account when it is set, and again whenever the account list is read,
-//! which is how a profile added later gets it too. The same arrangement
-//! as the download limit, for the same reason; see `download_limit.rs`.
+//! Per-account in core, written on set and on each account-list read (new profiles). Same as
+//! download limit; see `download_limit.rs`.
 //!
-//! It is the only thing the setting does. The core reads it while
-//! recoding a picture it is about to send, which is the one moment the
-//! app's pictures pass through -- see `media.rs` and the recoding pinned
-//! against the real core in `deltachat-jsonrpc/tests/real_server.rs`.
+//! Core reads it only when recoding an outgoing picture. See `media.rs`; recoding pinned in
+//! `deltachat-jsonrpc/tests/real_server.rs`.
 
 // Qt harness: see qml_chat_list.rs.
 #![allow(
@@ -57,8 +52,7 @@ fn the_quality_is_written_to_each_account_when_set_and_when_the_list_is_read() {
     let journal = common::fresh_journal(&temp);
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
 
-    // SAFETY: single-threaded test binary; set before Qt starts and before
-    // the server inherits them.
+    // SAFETY: single-threaded; set before Qt starts and before server inherits env.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_FAKE_JOURNAL", &journal);

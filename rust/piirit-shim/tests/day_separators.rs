@@ -1,21 +1,15 @@
-//! Which day a message belongs to, across a daylight-saving change.
+//! Message's day across DST change.
 //!
-//! Each timestamp is read in the offset that was in force at its own
-//! instant. Adding the offset in force *now* to every timestamp is right
-//! for most of the year and wrong across a DST boundary, where a message
-//! within an hour of local midnight sits under the wrong heading and moves
-//! as the year turns.
+//! Offset in force at each instant. Offset "now" misfiles messages near midnight across DST.
 
-// `set_var` before the first timezone lookup; only unsafe from edition
-// 2024 on, hence `unused_unsafe`.
+// `set_var` before tz lookup. Unsafe only from edition 2024: `unused_unsafe`.
 #![allow(unsafe_code, unused_unsafe)]
 
 use piirit_shim::local_day_number;
 
-/// Days since the epoch for a date, the same count the model produces.
+/// Days since epoch. Same count as model.
 fn day(year: i32, month: u32, of_month: u32) -> i64 {
-    // Kept deliberately dumb: a second implementation of the thing under
-    // test would just repeat its mistakes.
+    // Dumb on purpose: a second impl of code under test would repeat its mistakes.
     let days_in = |y: i32, m: u32| -> i64 {
         match m {
             1 | 3 | 5 | 7 | 8 | 10 | 12 => 31,
@@ -40,19 +34,16 @@ fn day(year: i32, month: u32, of_month: u32) -> i64 {
 
 #[test]
 fn a_message_near_midnight_lands_on_its_own_local_day_either_side_of_dst() {
-    // SAFETY: set before anything asks for the zone, in a single-threaded
-    // test binary.
+    // SAFETY: set before zone read; single-threaded.
     unsafe {
         std::env::set_var("TZ", "Europe/Berlin");
     }
 
-    // Berlin is UTC+2 in July and UTC+1 in January. Both instants are
-    // within an hour of local midnight, which is where an hour of error
-    // shows up as a whole day.
+    // Berlin: UTC+2 July, UTC+1 January. Near midnight, an hour of error is a day.
     //
-    // 22:30Z on 15 July is 00:30 on the 16th in Berlin.
+    // 22:30Z 15 Jul = 00:30 16 Jul.
     let summer = 1_784_154_600;
-    // 22:30Z on 15 January is 23:30 on the 15th in Berlin.
+    // 22:30Z 15 Jan = 23:30 15 Jan.
     let winter = 1_768_516_200;
 
     let summer_day = local_day_number(summer);
@@ -73,10 +64,7 @@ fn a_message_near_midnight_lands_on_its_own_local_day_either_side_of_dst() {
         day(2026, 1, 15)
     );
 
-    // The point of having both: no single fixed offset satisfies them.
-    // +1h files the summer message a day early, +2h files the winter one a
-    // day late, which is precisely what the old code did depending on the
-    // month it happened to be run in.
+    // No fixed offset passes both: +1h files summer early, +2h winter late (old code, by month).
     for offset in [3600_i64, 7200] {
         let naive_summer = (summer + offset).div_euclid(86_400);
         let naive_winter = (winter + offset).div_euclid(86_400);

@@ -1,18 +1,9 @@
-//! The media pages' model: the messages of one kind in one chat, newest
-//! first, read off the core's own index.
+//! Media pages' model: one kind per chat, newest first, from core's index.
 //!
-//! Driven against the recording double. A gallery asks the core for the
-//! three kinds a gallery holds, in the one call the core takes them in,
-//! and reads the messages behind the ids it answers with in one batch; a
-//! kind the chat has none of is an empty list that says it has loaded,
-//! not one still loading; and a voice message sent while the page is
-//! open lands on the audio list without the gallery reading anything
-//! again.
+//! Gallery asks core for its three kinds in one call. Empty kind = loaded, not loading.
+//! Voice sent while open lands on audio list without re-reading.
 
-// Qt harness: needs `unsafe` for `env::set_var` before Qt starts
-// (`unused_unsafe` because it is only unsafe from edition 2024 on),
-// `borrow_as_ptr` for the engine pointer, and `single_shot` with
-// whole-second Durations.
+// Qt harness allows: unsafe `env::set_var`, borrow_as_ptr, whole-second single_shot.
 #![allow(
     unsafe_code,
     unused_unsafe,
@@ -29,8 +20,7 @@ use serde_json::Value;
 
 mod common;
 
-// Driven off the models answering rather than off a clock: each step
-// waits for the last one's load to land, which is the thing being tested.
+// Model answers, not clock: each step waits for last load.
 const PROBE_QML: &str = r"
     import QtQuick 2.0
     import Piirit 1.0
@@ -139,8 +129,7 @@ fn a_chats_media_is_read_by_kind_newest_first() {
     let journal = common::fresh_journal(&temp);
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
 
-    // SAFETY: single-threaded test binary; set before Qt starts and before
-    // the server inherits them.
+    // SAFETY: single-threaded; set before Qt starts and before server inherits env.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_FAKE_JOURNAL", &journal);
@@ -163,13 +152,12 @@ fn a_chats_media_is_read_by_kind_newest_first() {
     let mut report = String::new();
     let report_ptr: *mut String = std::ptr::addr_of_mut!(report);
 
-    // SAFETY for every block: these fire only while `exec()` runs on this
-    // thread, and `engine` outlives it.
+    // SAFETY for every block: fire only inside `exec()`; `engine` outlives it.
     single_shot(Duration::from_secs(1), move || unsafe {
         (*engine_ptr).load_data(QByteArray::from(PROBE_QML));
     });
 
-    // The backstop: reads whatever the steps got to and quits.
+    // Backstop: reads reached steps, quits.
     single_shot(Duration::from_secs(8), move || unsafe {
         let value = (*engine_ptr).invoke_method("report".into(), &[]);
         *report_ptr = QString::from_qvariant(value)
@@ -183,9 +171,7 @@ fn a_chats_media_is_read_by_kind_newest_first() {
     assert_media(&common::calls(&journal), &report);
 }
 
-/// Each kind asked the core for its own view types in one call, the
-/// rows came back newest first, and a message arriving reached the one
-/// list it belongs on.
+/// Each kind asked for in one core call; rows newest first; arrivals reach their list.
 fn assert_media(calls: &[(String, Value)], report: &str) {
     let names: Vec<&str> = calls.iter().map(|(name, _)| name.as_str()).collect();
     let context = format!("report: {report}\ncalls: {names:?}");
@@ -197,8 +183,7 @@ fn assert_media(calls: &[(String, Value)], report: &str) {
         "a model reported a failure. {context}"
     );
 
-    // The core's index, asked for the kinds a gallery and an audio page
-    // hold, in the shape the core takes: one named, two optional.
+    // Core index: gallery and audio kinds, one named, two optional.
     let asked: Vec<Value> = calls
         .iter()
         .filter(|(name, _)| name == "get_chat_media")
@@ -217,9 +202,7 @@ fn assert_media(calls: &[(String, Value)], report: &str) {
         "the apps page did not ask for the chat's apps. {context}"
     );
 
-    // Newest first, whatever order the core answers in: the video was
-    // sent after the picture, so it stands above it. Both were read in
-    // one batch, in that order.
+    // Newest first, whatever core's order: later video stands above picture.
     assert!(
         log.contains(
             "gallery:15:Video:/tmp/piirit-fake/clip.mp4,10:Image:/tmp/piirit-fake/photo.jpg,;"
@@ -234,15 +217,13 @@ fn assert_media(calls: &[(String, Value)], report: &str) {
         "the gallery's rows were not read in one batch, newest first. {context}"
     );
 
-    // A kind the chat has none of has loaded, with nothing in it: what
-    // lets a page say so rather than wait.
+    // Empty kind loaded: lets a page say so rather than wait.
     assert!(
         log.contains("nothing:0/true;"),
         "an empty kind did not report itself loaded and empty. {context}"
     );
 
-    // The voice message reached the audio list and nowhere else, and the
-    // gallery was left as it was.
+    // Voice reached audio list only; gallery untouched.
     assert!(
         log.contains("audio-before:1;"),
         "the audio page does not hold the chat's voice message. {context}"
@@ -262,8 +243,7 @@ fn assert_media(calls: &[(String, Value)], report: &str) {
         ),
         "a voice message arriving changed the gallery. {context}"
     );
-    // The rows the gallery already held were not read again: the second
-    // batch the audio page asked for is the new message alone.
+    // Gallery rows not re-read: audio's second batch is the new message alone.
     assert!(
         calls.iter().any(
             |(name, params)| name == "get_messages" && *params == serde_json::json!([1, [101]])

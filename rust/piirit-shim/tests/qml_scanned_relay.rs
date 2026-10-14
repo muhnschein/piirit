@@ -1,13 +1,10 @@
-//! A relay's code read on the QR page is a relay to add to this profile,
-//! not an invite and not a profile of its own.
+//! Relay code read on QR page is a relay to add to this profile: not an invite, not a
+//! profile of its own (reference clients treat scanned `dcaccount:`/`dclogin:` so since 2.61).
 //!
-//! The reference clients take a scanned `dcaccount:` or `dclogin:` this
-//! way since 2.61. Here the code is entered on the scanner side, as
-//! `qml_qr_page.rs` enters an invite: the page that adds a relay
-//! replaces the QR page, handed the code and the relay it names, and
-//! nothing is joined or added on the way. That page then shows the
-//! relay under Delta Chat's question in place of its list, and adds it
-//! -- the code as it was read -- only when its button is pressed.
+//! Code entered on scanner side, as `qml_qr_page.rs` enters an invite. Add-relay page replaces
+//! QR page, handed code and relay it names; nothing joined or added on the way. That page
+//! shows relay under Delta Chat's question instead of its list, and adds it (code as read)
+//! only when its button is pressed.
 
 // Qt harness: see qml_qr_page.rs.
 #![allow(
@@ -27,9 +24,7 @@ use qmetaobject::*;
 
 mod common;
 
-/// Silica's `pageStack`, recorded rather than performed.
-///
-/// Method names are camelCase because they stand in for Silica's own API.
+/// Silica `pageStack`, recorded.
 #[allow(non_snake_case)]
 #[derive(QObject, Default)]
 struct PageStackProbe {
@@ -37,7 +32,7 @@ struct PageStackProbe {
     /// `replaceAbove:ConversationPage.qml|...`
     log: qt_property!(QString; NOTIFY log_changed),
     log_changed: qt_signal!(),
-    /// What the last `replaceAbove` handed the page it made, as JSON.
+    /// Last `replaceAbove` page's properties, JSON.
     handed: qt_property!(QString; NOTIFY log_changed),
 
     push: qt_method!(fn(&mut self, page: QString) -> QVariant),
@@ -75,8 +70,7 @@ impl PageStackProbe {
         self.note("replaceAbove", &page);
     }
 
-    /// The page below, which this record does not model. `&mut self` is
-    /// what `qt_method!` dispatches to.
+    /// Page below, not modelled here. `&mut self` is what `qt_method!` dispatches to.
     #[allow(clippy::unused_self)]
     fn previousPage(&mut self, _page: QVariant) -> QVariant {
         QVariant::default()
@@ -152,8 +146,7 @@ fn a_scanned_relay_is_offered_for_this_profile_and_added_when_asked() {
     let journal = common::fresh_journal(&temp);
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
 
-    // SAFETY: single-threaded test binary; set before Qt starts and before
-    // the server inherits them.
+    // SAFETY: single-threaded; set before Qt and server.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_FAKE_JOURNAL", &journal);
@@ -228,7 +221,7 @@ fn a_scanned_relay_is_offered_for_this_profile_and_added_when_asked() {
         record!("connect", call!("click", QString::from("followButton")));
     });
 
-    // The page it was replaced with, made with what it was handed.
+    // Page that replaced QR page, made from what it was handed.
     single_shot(Duration::from_secs(6), move || unsafe {
         let stack = (*stack_ptr).pinned();
         record!("navigation", stack.borrow().log.to_string());

@@ -1,17 +1,10 @@
-//! Integration test against a REAL `deltachat-rpc-server` binary -- the
-//! Milestone 1 acceptance check (`get_system_info` over stdio) plus enough
-//! offline account/chat operations to prove the transport's assumptions
-//! hold against the actual core, not just the in-repo fake.
+//! Integration test vs REAL `deltachat-rpc-server` binary.
 //!
-//! Gated: skipped unless `DELTACHAT_RPC_SERVER` points at a real binary
-//! (e.g. one extracted from upstream's `PyPI` wheel or GitHub release), so
-//! `cargo test` stays green in environments that don't have one.
+//! Milestone 1 check plus offline account/chat ops. Proves transport vs real core.
 //!
-//! Everything here stays on this machine, so it runs without network
-//! access. The one account that sends is configured against a stub mail
-//! server on 127.0.0.1 (`loopback_mailbox`) and has its IO stopped
-//! straight after, and it only ever sends to Saved Messages, which has
-//! no recipient.
+//! Gated on `DELTACHAT_RPC_SERVER`; skipped otherwise.
+//!
+//! Offline: sender's mail is a stub on 127.0.0.1, IO stopped after. Sends to Saved Messages only.
 
 use std::io::{BufRead as _, BufReader, Write as _};
 use std::net::{TcpListener, TcpStream};
@@ -21,9 +14,7 @@ use std::time::Duration;
 use deltachat_jsonrpc::{spawn_event_loop, RpcClient, RpcError};
 use serde_json::Value;
 
-/// A 1x1 PNG, written out so the core reads real pixels rather than
-/// guessing from a name: header, an IHDR saying 1x1 truecolour, one
-/// compressed scanline, IEND.
+/// 1x1 PNG with real pixels, not a name to guess from.
 const ONE_PIXEL_PNG: &[u8] = &[
     0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0x00, 0x00, 0x00, 0x0d, 0x49, 0x48, 0x44, 0x52,
     0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01, 0x08, 0x02, 0x00, 0x00, 0x00, 0x90, 0x77, 0x53,
@@ -32,20 +23,17 @@ const ONE_PIXEL_PNG: &[u8] = &[
     0x44, 0xae, 0x42, 0x60, 0x82,
 ];
 
-/// A 1x1 GIF. The core classifies it as an animation and reports no
-/// dimensions for it, which is the case the conversation has to survive.
+/// 1x1 GIF: core reports no dimensions. Conversation must cope.
 const ONE_PIXEL_GIF: &[u8] = &[
     0x47, 0x49, 0x46, 0x38, 0x39, 0x61, 0x01, 0x00, 0x01, 0x00, 0x80, 0x00, 0x00, 0xff, 0xff, 0xff,
     0x00, 0x00, 0x00, 0x21, 0xf9, 0x04, 0x01, 0x00, 0x00, 0x00, 0x2c, 0x00, 0x00, 0x00, 0x00, 0x01,
     0x00, 0x01, 0x00, 0x00, 0x02, 0x02, 0x44, 0x01, 0x00, 0x3b,
 ];
 
-/// One second of silence as a WAV: PCM, mono, 8 kHz, 8-bit, so the header
-/// alone states the length. Built rather than checked in so the size the
-/// assertions use is arithmetic rather than a magic number.
+/// 8 kHz 8-bit mono silence as WAV. Built, so sizes are arithmetic.
 fn one_second_wav() -> Vec<u8> {
     let (rate, bits, channels) = (8000_u32, 8_u16, 1_u16);
-    // One byte per sample at 8-bit mono, so a second is `rate` bytes.
+    // One byte per sample: a second is `rate` bytes.
     let bytes = rate;
     let samples = vec![0x80_u8; bytes as usize];
     let mut wav = Vec::with_capacity(44 + samples.len());
@@ -65,35 +53,26 @@ fn one_second_wav() -> Vec<u8> {
     wav
 }
 
-/// A second of silence as the recorder's MP3s are made: MPEG-2 layer III,
-/// 16 kHz, one channel, a constant 32 kbit/s -- so every frame is the same
-/// four-byte header and 140 bytes of nothing, 576 samples, and there are
-/// as many frames as a second takes.
+/// One second of silence as recorder MP3: MPEG-2 layer III, 16 kHz, mono, 32 kbit/s CBR. Each
+/// frame: same 4-byte header + 140 zero bytes, 576 samples; as many frames as a second takes.
 fn one_second_mp3() -> Vec<u8> {
     let mut frame = [0_u8; 144];
     frame[..4].copy_from_slice(&[0xFF, 0xF3, 0x48, 0xC0]);
     frame.repeat(16_000_usize.div_ceil(576))
 }
 
-/// A plain PNG `side` pixels square, stored rather than compressed.
+/// Plain PNG, `side` px square, stored uncompressed.
 ///
-/// Big enough that the core has to recode it: past
-/// `BALANCED_IMAGE_BYTES` it re-encodes the picture as JPEG, and that is
-/// the difference the assertions below are about. It scales the picture
-/// down only where a side is past the quality's limit, which since core
-/// 2.61 is 1760 pixels at balanced and 640 at worse, so a 1400-pixel
-/// picture keeps its size at balanced and only shrinks at worse. Built
-/// here for the reason `one_second_wav` is -- the sizes are then
-/// arithmetic -- and stored uncompressed because a deflate
-/// implementation is not worth carrying for a test fixture.
+/// Core recodes past `BALANCED_IMAGE_BYTES` to JPEG, scaling only past quality's side limit (core
+/// 2.61+: 1760 px balanced, 640 worse), so 1400 px keeps size at balanced, shrinks at worse.
+/// Stored uncompressed: no deflate impl worth carrying for a fixture.
 fn plain_png(side: usize) -> Vec<u8> {
-    /// A length as a PNG writes one.
+    /// PNG length field.
     fn span(value: usize) -> u32 {
         u32::try_from(value).unwrap_or(u32::MAX)
     }
 
-    // A gradient rather than noise: what the core re-encodes has to come
-    // out visibly smaller, and noise is what JPEG is worst at.
+    // Gradient: recoded output must shrink; JPEG is worst at noise.
     let mut raw = Vec::with_capacity(side * (side * 3 + 1));
     for row in 0..side {
         raw.push(0); // filter: none
@@ -103,7 +82,7 @@ fn plain_png(side: usize) -> Vec<u8> {
         }
     }
 
-    // zlib: the usual header, then stored deflate blocks, then Adler-32.
+    // zlib: header, stored deflate blocks, Adler-32.
     let mut zlib = vec![0x78, 0x01];
     let mut adler: (u32, u32) = (1, 0);
     for byte in &raw {
@@ -124,8 +103,7 @@ fn plain_png(side: usize) -> Vec<u8> {
     }
     zlib.extend_from_slice(&((adler.1 << 16) | adler.0).to_be_bytes());
 
-    // A PNG chunk: its length, its name, its bytes, and the same CRC-32
-    // a zip entry carries.
+    // PNG chunk: length, name, bytes, CRC-32 (as zip).
     let chunk = |kind: &[u8], data: &[u8]| {
         let mut out = Vec::with_capacity(12 + data.len());
         out.extend_from_slice(&span(data.len()).to_be_bytes());
@@ -139,7 +117,7 @@ fn plain_png(side: usize) -> Vec<u8> {
     let mut header = Vec::with_capacity(13);
     header.extend_from_slice(&span(side).to_be_bytes());
     header.extend_from_slice(&span(side).to_be_bytes());
-    // 8 bits a channel, truecolour, no interlacing.
+    // 8-bit, truecolour, no interlace.
     header.extend_from_slice(&[8, 2, 0, 0, 0]);
 
     let mut png = vec![0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a];
@@ -149,8 +127,7 @@ fn plain_png(side: usize) -> Vec<u8> {
     png
 }
 
-/// Send one file to `chat` and hand back the message the core stored, which
-/// is the shape every row is built from.
+/// Send file to `chat`; return stored message.
 async fn send_file(
     client: &RpcClient,
     account_id: u32,
@@ -180,14 +157,13 @@ async fn send_file(
     messages[&message_id].clone()
 }
 
-/// CRC-32 as zip stores it, so an archive built here is one a reader
-/// will not reject.
+/// CRC-32 as zip stores it, so readers accept the archive.
 fn crc32(bytes: &[u8]) -> u32 {
     let mut crc = 0xffff_ffff_u32;
     for byte in bytes {
         crc ^= u32::from(*byte);
         for _ in 0..8 {
-            // The polynomial, applied only where the low bit was set.
+            // Polynomial where low bit set.
             let mask = (crc & 1).wrapping_neg();
             crc = (crc >> 1) ^ (0xedb8_8320 & mask);
         }
@@ -195,9 +171,7 @@ fn crc32(bytes: &[u8]) -> u32 {
     !crc
 }
 
-/// A length as a zip field. The archive is a few hundred bytes written by
-/// this file, so one that does not fit is a mistake here rather than a
-/// case to carry a `Result` for.
+/// Zip length field: overflow here is a bug, not an error.
 fn field32(value: usize) -> u32 {
     match u32::try_from(value) {
         Ok(value) => value,
@@ -205,7 +179,7 @@ fn field32(value: usize) -> u32 {
     }
 }
 
-/// The same, for the fields that are half as wide.
+/// Same, for half-width fields.
 fn field16(value: usize) -> u16 {
     match u16::try_from(value) {
         Ok(value) => value,
@@ -213,11 +187,7 @@ fn field16(value: usize) -> u16 {
     }
 }
 
-/// A .xdc: a zip of stored entries, which is all a webxdc is. Built here
-/// rather than checked in, so what the core is asked about is readable.
-///
-/// Stored, not deflated: this repository has no compressor and wants
-/// none -- the core reads the archive, and nothing in the app does.
+/// `.xdc`: zip of stored entries. Built, not checked in. Only core reads it.
 fn webxdc(entries: &[(&str, &[u8])]) -> Vec<u8> {
     let mut out = Vec::new();
     let mut directory = Vec::new();
@@ -226,10 +196,10 @@ fn webxdc(entries: &[(&str, &[u8])]) -> Vec<u8> {
         let crc = crc32(body);
         let size = field32(body.len());
         let name_len = field16(name.len());
-        // Local file header, then the bytes themselves.
+        // Local file header, then bytes.
         out.extend_from_slice(&0x0403_4b50_u32.to_le_bytes());
         for field in [20_u16, 0, 0, 0, 0x21] {
-            // version needed, flags, method (stored), time, date
+            // version, flags, method (stored), time, date
             out.extend_from_slice(&field.to_le_bytes());
         }
         out.extend_from_slice(&crc.to_le_bytes());
@@ -240,11 +210,10 @@ fn webxdc(entries: &[(&str, &[u8])]) -> Vec<u8> {
         out.extend_from_slice(name.as_bytes());
         out.extend_from_slice(body);
 
-        // And its entry in the central directory, which is what a reader
-        // looks at first.
+        // Central directory entry: what readers look at first.
         directory.extend_from_slice(&0x0201_4b50_u32.to_le_bytes());
         for field in [20_u16, 20, 0, 0, 0, 0x21] {
-            // made by, version needed, flags, method, time, date
+            // made by, version, flags, method, time, date
             directory.extend_from_slice(&field.to_le_bytes());
         }
         directory.extend_from_slice(&crc.to_le_bytes());
@@ -252,7 +221,7 @@ fn webxdc(entries: &[(&str, &[u8])]) -> Vec<u8> {
         directory.extend_from_slice(&size.to_le_bytes());
         directory.extend_from_slice(&name_len.to_le_bytes());
         for field in [0_u16, 0, 0, 0] {
-            // extra, comment, disk, internal attributes
+            // extra, comment, disk, attributes
             directory.extend_from_slice(&field.to_le_bytes());
         }
         directory.extend_from_slice(&0_u32.to_le_bytes());
@@ -265,7 +234,7 @@ fn webxdc(entries: &[(&str, &[u8])]) -> Vec<u8> {
     out.extend_from_slice(&directory);
     out.extend_from_slice(&0x0605_4b50_u32.to_le_bytes());
     for field in [0_u16, 0, count, count] {
-        // disk, first disk, entries here, entries in total
+        // disk numbers, entry counts
         out.extend_from_slice(&field.to_le_bytes());
     }
     out.extend_from_slice(&directory_size.to_le_bytes());
@@ -274,9 +243,7 @@ fn webxdc(entries: &[(&str, &[u8])]) -> Vec<u8> {
     out
 }
 
-/// Standard base64 without padding, which is how the core hands a blob
-/// over. Written out so a blob can be compared with the bytes it was made
-/// from; the shim reads the same encoding (`webxdc_host.rs`).
+/// Base64 without padding, as core hands blobs over (`webxdc_host.rs`).
 fn base64(bytes: &[u8]) -> String {
     const ALPHABET: &[u8; 64] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
     let mut out = String::new();
@@ -293,21 +260,12 @@ fn base64(bytes: &[u8]) -> String {
     out
 }
 
-/// A mail server that says yes to everything, on two loopback ports:
-/// IMAP's first, then SMTP's.
+/// Mail server that says yes, on two loopback ports: IMAP, then SMTP.
 ///
-/// Since core 2.61 an account can no longer be marked configured by
-/// setting `configured_addr` -- the core refuses an address no transport
-/// has -- and JSON-RPC has no way to add a transport without logging in.
-/// So the account that sends logs in here. Neither side knows its
-/// protocol: IMAP answers every tagged line with `OK`, and SMTP gives
-/// each step the reply that lets it past, which is all the core's login
-/// check asks for. The test stops the account's IO as soon as the
-/// transport is in, so nothing is fetched or sent through either.
+/// Core 2.61+ refuses `configured_addr` without a transport; JSON-RPC cannot add one without
+/// login. IMAP answers each tagged line `OK`, SMTP each step its reply. IO stopped once in.
 ///
-/// The threads are never joined. A connection is dropped after ten
-/// seconds with nothing said on it, and the listeners go when the test
-/// process does.
+/// Threads not joined; listeners die with process.
 fn loopback_mailbox() -> (u16, u16) {
     let imap = listen("* OK ready\r\n", |line| {
         let tag = line.split(' ').next().unwrap_or_default();
@@ -325,9 +283,7 @@ fn loopback_mailbox() -> (u16, u16) {
     (imap, smtp)
 }
 
-/// Take a loopback port and hold a conversation on every connection to
-/// it: `greeting`, then `answer`'s reply to each line, until the other
-/// side hangs up or goes quiet. Hands back the port.
+/// Loopback port: `greeting`, then `answer` per line. Returns port.
 fn listen(greeting: &'static str, answer: fn(&str) -> String) -> u16 {
     let listener = TcpListener::bind("127.0.0.1:0")
         .unwrap_or_else(|err| panic!("no loopback port for the stub mail server: {err}"));
@@ -344,8 +300,7 @@ fn listen(greeting: &'static str, answer: fn(&str) -> String) -> u16 {
     port
 }
 
-/// One connection's worth of `listen`. Any error ends it, the read
-/// timeout among them, and ending it is all an error here is for.
+/// One connection of `listen`. Any error ends it.
 fn converse(stream: &TcpStream, greeting: &str, answer: fn(&str) -> String) -> std::io::Result<()> {
     let quiet = Some(Duration::from_secs(10));
     stream.set_read_timeout(quiet)?;
@@ -358,8 +313,7 @@ fn converse(stream: &TcpStream, greeting: &str, answer: fn(&str) -> String) -> s
     Ok(())
 }
 
-/// The DCLOGIN code for `addr` on the loopback stub: the call the sign-up
-/// page adds a relay with, pointed at `loopback_mailbox`'s two ports.
+/// DCLOGIN code for `addr`, pointed at `loopback_mailbox` ports.
 fn dclogin(addr: &str, (imap_port, smtp_port): (u16, u16)) -> String {
     format!(
         "dclogin:{addr}?p=x&v=1&ih=127.0.0.1&ip={imap_port}\
@@ -367,8 +321,7 @@ fn dclogin(addr: &str, (imap_port, smtp_port): (u16, u16)) -> String {
     )
 }
 
-/// The core's words for refusing a call, which the pages show as they
-/// are. A call it takes instead fails the test.
+/// Core's words for a refused call, as pages show them.
 async fn refusal<P: serde::Serialize>(client: &RpcClient, method: &str, params: P) -> String {
     match client.call::<_, Value>(method, params).await {
         Err(RpcError::Remote(refused)) => refused.message,
@@ -376,16 +329,10 @@ async fn refusal<P: serde::Serialize>(client: &RpcClient, method: &str, params: 
     }
 }
 
-/// Resolve the gate's value, treating a relative path as relative to the
-/// repository root rather than to the process's working directory.
+/// Resolve gate value; relative paths against repo root.
 ///
-/// Cargo runs an integration test with its working directory set to the
-/// *package* root, not the workspace or repository root, so the obvious
-/// `DELTACHAT_RPC_SERVER=../vendor/...` -- which is what the README, the
-/// Makefile and CI all naturally write -- would otherwise look for the
-/// binary under `rust/`. That failure only shows up where the variable is
-/// actually set, which is CI, and reads as a missing download rather than a
-/// wrong path.
+/// Cargo runs tests from *package* root, so `DELTACHAT_RPC_SERVER=../vendor/...` would look
+/// under `rust/`. Fails only in CI, reads as missing download.
 fn resolve(path: &str) -> String {
     let path = std::path::Path::new(path);
     if path.is_absolute() {
@@ -398,8 +345,7 @@ fn resolve(path: &str) -> String {
         .into_owned()
 }
 
-/// The core version `scripts/fetch-rpc-server.sh` pins, from its
-/// `VERSION="..."` line.
+/// Core version pinned in `scripts/fetch-rpc-server.sh`.
 fn pinned_core_version() -> String {
     let script = std::fs::read_to_string(resolve("scripts/fetch-rpc-server.sh"))
         .unwrap_or_else(|err| panic!("read scripts/fetch-rpc-server.sh: {err}"));
@@ -424,10 +370,7 @@ fn real_server() -> Option<String> {
 }
 
 #[tokio::test(flavor = "multi_thread")]
-// One long function on purpose: this walks a single live session through
-// the whole surface the app depends on, in order, against one spawned
-// server. Splitting it into helpers would either respawn the core per step
-// or hide the ordering that is half of what is being pinned.
+// One long fn on purpose: one live session, in order. Splitting respawns core per step.
 #[allow(clippy::too_many_lines)]
 async fn offline_round_trip_against_real_core() {
     let Some(server) = real_server() else {
@@ -448,7 +391,7 @@ async fn offline_round_trip_against_real_core() {
         .expect("spawn real deltachat-rpc-server"),
     );
 
-    // Milestone 1 acceptance check: get_system_info answers over stdio.
+    // Milestone 1 check: get_system_info answers over stdio.
     let info: std::collections::BTreeMap<String, String> = client
         .call_unit("get_system_info")
         .await
@@ -458,10 +401,8 @@ async fn offline_round_trip_against_real_core() {
         "unexpected get_system_info keys: {:?}",
         info.keys().collect::<Vec<_>>()
     );
-    // What this test pins is the core the RPM bundles, so it says which
-    // one that is: the binary under test is the version the fetch script
-    // pins, and SOURCE.md -- the MPL notice shipped beside it -- names
-    // that same tag. A bump that misses one of the three stops here.
+    // Pins the RPM's core: binary version = fetch script's pin = SOURCE.md tag. A bump missing one
+    // stops here.
     let pinned = pinned_core_version();
     assert_eq!(
         info.get("deltachat_core_version").map(String::as_str),
@@ -476,11 +417,10 @@ async fn offline_round_trip_against_real_core() {
         "vendor/deltachat-rpc-server/SOURCE.md does not describe v{pinned}"
     );
 
-    // Account bootstrap, exactly as DeltaChatCore::add_account does it.
+    // Account bootstrap, as DeltaChatCore::add_account.
     let account_id: u32 = client.call_unit("add_account").await.expect("add_account");
 
-    // Config round trip, as configure_account does (without `configure`,
-    // which would need a live mail server).
+    // Config round trip, as configure_account (no `configure`: needs live mail).
     client
         .call::<_, ()>(
             "set_config",
@@ -494,12 +434,10 @@ async fn offline_round_trip_against_real_core() {
         .expect("get_config");
     assert_eq!(name.as_deref(), Some("Piirit Test"));
 
-    // Start the event stream BEFORE doing something that emits an event.
+    // Start event stream before anything emits one.
     let (mut events, handle) = spawn_event_loop(client.clone());
 
-    // Contact + chat + draft: all offline, and setting a draft emits a
-    // MsgsChanged event (documented upstream), which proves real event
-    // delivery end to end.
+    // Draft emits MsgsChanged: proves event delivery end to end.
     let contact_id: u32 = client
         .call(
             "create_contact",
@@ -548,8 +486,7 @@ async fn offline_round_trip_against_real_core() {
         "no MsgsChanged event arrived after setting a draft"
     );
 
-    // The chat list must contain the chat we just created, through the
-    // same two calls DeltaChatCore::fetch_chat_list uses.
+    // Chat list holds the chat just created, via fetch_chat_list's calls.
     let entries: Vec<u32> = client
         .call(
             "get_chatlist_entries",
@@ -577,12 +514,8 @@ async fn offline_round_trip_against_real_core() {
     );
     assert_eq!(item.get("name").and_then(Value::as_str), Some("Testy"));
 
-    // A chat holding a draft says so in its own summary, which is why
-    // nothing in the app builds that text: `summaryText1` is the prefix a
-    // row already shows in front of `summaryText2`, so a draft reads as
-    // "Draft: ..." for free. `summaryStatus` 19 is DC_STATE_OUT_DRAFT, and
-    // being under 20 is what keeps a delivery mark off a message that has
-    // not been sent.
+    // Draft summary: `summaryText1` prefix shows before `summaryText2`. `summaryStatus` 19 =
+    // DC_STATE_OUT_DRAFT; under 20 means no delivery mark.
     assert_eq!(
         item.get("summaryText1").and_then(Value::as_str),
         Some("Draft"),
@@ -601,12 +534,7 @@ async fn offline_round_trip_against_real_core() {
          cannot tell it from something sent: {item:?}"
     );
 
-    // That "Draft" is the core's own English, and the reader's language
-    // replaces it through `set_stock_strings`, keyed by the core's stock
-    // string id -- 3 is `StockMessage::Draft` -- in the shape
-    // DeltaChatCore::set_stock_strings sends: an object whose keys are the
-    // ids written as strings. Put back afterwards, since the core keeps
-    // what it is given for as long as it runs.
+    // Reader's language replaces "Draft" via `set_stock_strings` (id 3). Restored after.
     let stock = |text: &str| std::collections::BTreeMap::from([(3_u32, text.to_string())]);
     client
         .call::<_, ()>("set_stock_strings", (stock("Entwurf"),))
@@ -630,9 +558,7 @@ async fn offline_round_trip_against_real_core() {
         .await
         .expect("set_stock_strings back");
 
-    // Reading one back. The core keeps drafts, so this is what survives
-    // the app being closed -- and it comes back as a whole message object
-    // rather than a string.
+    // Read draft back: survives app close. Comes back as message object.
     let draft: Value = client
         .call("get_draft", (account_id, chat_id))
         .await
@@ -643,9 +569,7 @@ async fn offline_round_trip_against_real_core() {
         "the draft did not come back: {draft:?}"
     );
 
-    // And clearing one. `misc_set_draft` with no text is not the way --
-    // there is a call for it, and it answers null afterwards rather than
-    // an empty message.
+    // Clear: a call for it, answers null, not empty message.
     client
         .call::<_, Value>("remove_draft", (account_id, chat_id))
         .await
@@ -656,11 +580,7 @@ async fn offline_round_trip_against_real_core() {
         .expect("get_draft after remove");
     assert!(gone.is_null(), "a removed draft still reads back: {gone:?}");
 
-    // And the message-list wire shape DeltaChatCore::fetch_messages relies
-    // on: `kind` is "message" and the id field is snake_case `msg_id`
-    // (this exact spelling was a bug once; keep it pinned by a test that
-    // talks to the real core). A draft is not a message-list entry, so
-    // just assert the call works and any entries present have the shape.
+    // Message-list shape: `kind` "message", id `msg_id` (snake_case, was a bug).
     let msg_items: Vec<Value> = client
         .call(
             "get_message_list_items",
@@ -682,10 +602,7 @@ async fn offline_round_trip_against_real_core() {
         }
     }
 
-    // Account listing, as DeltaChatCore::refresh_accounts consumes it:
-    // tagged `kind` with verbatim variant names ("Configured"/
-    // "Unconfigured") and camelCase fields. Our never-configured test
-    // account must show up as Unconfigured.
+    // Account list: `kind` tag, "Configured"/"Unconfigured", camelCase fields.
     let accounts: Vec<Value> = client
         .call_unit("get_all_accounts")
         .await
@@ -700,11 +617,8 @@ async fn offline_round_trip_against_real_core() {
         "unexpected account shape: {ours:?}"
     );
 
-    // Which profile the app comes back to, as DeltaChatCore::refresh_accounts
-    // and select_account speak it: the core selects an account it has just
-    // added on its own, `select_account` takes the id bare, and
-    // `get_selected_account_id` answers with the id or null -- an
-    // `Option<u32>`, which is the shape the shim decodes.
+    // Selected profile: core auto-selects a new account; `select_account` takes bare id;
+    // `get_selected_account_id` gives id or null (`Option<u32>`, as shim decodes).
     let selected: Option<u32> = client
         .call_unit("get_selected_account_id")
         .await
@@ -719,9 +633,7 @@ async fn offline_round_trip_against_real_core() {
         .await
         .expect("select_account");
 
-    // QR classification, as DeltaChatCore::check_qr consumes it. A
-    // DCACCOUNT: code is parsed purely locally (no network): expect
-    // kind "account" (camelCase variant tag) with snake_case fields.
+    // DCACCOUNT: parsed locally: kind "account", snake_case fields.
     let qr: Value = client
         .call(
             "check_qr",
@@ -740,9 +652,7 @@ async fn offline_round_trip_against_real_core() {
         "unexpected qr shape: {qr:?}"
     );
 
-    // Encryption flags, as the chat list / message models consume them.
-    // The email-address contact chat above is an unencrypted
-    // "address-contact" chat; a freshly created group is encrypted.
+    // Encryption flags as models read them: address chat unencrypted, group encrypted.
     assert_eq!(
         items[&chat_id].get("isEncrypted").and_then(Value::as_bool),
         Some(false),
@@ -769,9 +679,7 @@ async fn offline_round_trip_against_real_core() {
         group_items[&group_chat_id]
     );
 
-    // A group after it is made, as ChatInfo reads it. The members are
-    // ids, and the contacts behind them come from a second call keyed by
-    // id -- as strings, JSON having no other kind of key.
+    // Group as ChatInfo reads it. Members are ids; contacts keyed by id.
     let full: Value = client
         .call("get_full_chat_by_id", (account_id, group_chat_id))
         .await
@@ -781,9 +689,7 @@ async fn offline_round_trip_against_real_core() {
         Some("Group"),
         "unexpected chat shape: {full:?}"
     );
-    // The description ChatInfo reads beside the full chat, which does not
-    // carry it, and sets as it was typed less its outer whitespace: the
-    // line break inside is kept, and an empty text clears it.
+    // Description: stored as typed, less outer whitespace; empty clears.
     let description = |text: &'static str| {
         let client = client.clone();
         async move {
@@ -806,9 +712,7 @@ async fn offline_round_trip_against_real_core() {
         "",
         "an empty description does not clear it"
     );
-    // What a contact's page reads, with the chat's kind and `canSend`,
-    // to say whether a call can be placed there (piirit-shim's
-    // `takes_calls`): the same flags `get_basic_chat_info` carries.
+    // `canSend` and kind decide if a call can be placed (`takes_calls`).
     for flag in ["isEncrypted", "isSelfTalk", "isDeviceChat", "canSend"] {
         assert!(
             full.get(flag).is_some_and(Value::is_boolean),
@@ -842,9 +746,7 @@ async fn offline_round_trip_against_real_core() {
         me.get("displayName").is_some() && me.get("address").is_some(),
         "the account's own contact is not shaped like a contact: {me:?}"
     );
-    // The three edits, each its own call. An address contact cannot be
-    // added to an encrypted group, which is why the shim reports a
-    // refused member rather than failing the whole add.
+    // Each edit its own call. Address contact can't join encrypted group: refused member.
     client
         .call::<_, ()>(
             "set_chat_name",
@@ -879,8 +781,7 @@ async fn offline_round_trip_against_real_core() {
         "an address contact went into an encrypted group; the shim's \
          refused-member reporting is built on this being refused"
     );
-    // Disappearing messages: seconds in, and read back on the chat as
-    // `ephemeralTimer`. The core tells the other members itself.
+    // Disappearing messages: seconds, read back as `ephemeralTimer`.
     client
         .call::<_, ()>(
             "set_chat_ephemeral_timer",
@@ -897,8 +798,7 @@ async fn offline_round_trip_against_real_core() {
         Some(3600),
         "the timer did not come back on the chat: {timed:?}"
     );
-    // Removing someone who is not in the group is not an error, and null
-    // is how a picture is cleared -- of a group that never had one too.
+    // Removing non-member: no error. null clears picture, even if none.
     client
         .call::<_, ()>(
             "remove_contact_from_chat",
@@ -914,19 +814,13 @@ async fn offline_round_trip_against_real_core() {
         .await
         .expect("set_chat_profile_image with null");
 
-    // Clearing the unread badge, as DeltaChatCore::open_chat does after
-    // fetching messages. Pins the method name/params against the real
-    // core (its MsgsNoticed side effect only fires when something was
-    // actually fresh, so no event assertion here).
+    // Clear unread badge, as open_chat does. Pins method vs real core.
     client
         .call::<_, ()>("marknoticed_chat", (account_id, chat_id))
         .await
         .expect("marknoticed_chat");
 
-    // Where the reader left off, which is where the conversation draws its
-    // "new messages" line (`ChatMessages::load_unread_mark`). A chat with
-    // nothing unseen in it answers with null rather than an error or a
-    // zero, which is the whole of what the model reads.
+    // Read position for "new messages" line. Nothing unseen: null, not zero.
     let nothing: Option<u32> = client
         .call("get_first_unread_message_of_chat", (account_id, chat_id))
         .await
@@ -936,9 +830,7 @@ async fn offline_round_trip_against_real_core() {
         "a chat with nothing unread named a message to draw the line above"
     );
 
-    // And with something unseen in it. A device message is the one
-    // incoming message a core can be given offline: it lands in the
-    // device chat as fresh, which is exactly the state the line is for.
+    // Device message is the one incoming message core takes offline: fresh.
     let device_message: Option<u32> = client
         .call(
             "add_device_message",
@@ -972,16 +864,9 @@ async fn offline_round_trip_against_real_core() {
         "the core did not name the first unseen message of the chat"
     );
 
-    // The message object, as the conversation view consumes it. Saved
-    // Messages is the one chat that sends offline, so it is where a real
-    // message can be made to look at.
+    // Message as conversation reads it. Saved Messages: only chat sending offline.
     //
-    // A second account to send it from, configured against the loopback
-    // stub with a DCLOGIN code, the call the sign-up page adds a relay
-    // with (signup.rs). Nothing leaves the machine: the stub is on
-    // 127.0.0.1, and Saved Messages has no recipient. `bcc_self` is off,
-    // the core's default and left alone by configuring, so a message
-    // there is not even queued to go out.
+    // Sender configured vs loopback stub (as signup.rs). `bcc_self` off: not queued.
     let sender_id: u32 = client
         .call_unit("add_account")
         .await
@@ -998,15 +883,13 @@ async fn offline_round_trip_against_real_core() {
         )
         .await
         .expect("add_transport_from_qr against the loopback stub");
-    // Adding a transport starts the account's IO, which would otherwise
-    // keep talking to the stub for the rest of the test.
+    // Transport starts account IO; would keep talking to stub for rest of test.
     client
         .call::<_, ()>("stop_io", (sender_id,))
         .await
         .expect("stop_io");
-    // Configuring also leaves the core's welcome messages in the device
-    // chat (DC_CONTACT_ID_DEVICE, 5), fresh. Noticed here, so the unread
-    // counts further down start from nothing.
+    // Configure leaves fresh welcome messages in device chat (contact 5); noticed here so later
+    // unread counts start at zero.
     let welcome: Option<u32> = client
         .call("get_chat_id_by_contact_id", (sender_id, 5))
         .await
@@ -1048,7 +931,7 @@ async fn offline_round_trip_against_real_core() {
                 Some(attachment.to_string_lossy().into_owned()),
                 Some("note.txt".to_string()),
                 Option::<(f64, f64)>::None,
-                // Quoting the first message.
+                // Quote first message.
                 Some(first),
             ),
         )
@@ -1097,12 +980,7 @@ async fn offline_round_trip_against_real_core() {
         "the quote says nothing about its author: {reply:?}"
     );
 
-    // A long message is not sent whole: the core cuts the body and puts
-    // the rest in an HTML part, and everything the app does about that
-    // -- the "view full message" on the row, the page that shows it --
-    // rests on this being true and on `hasHtml` being how it is
-    // announced. The core cuts at 38 lines of up to 100 characters, so
-    // fifty lines is well past it.
+    // Long message: core cuts body, rest in HTML part (`hasHtml`). Cut at 38 lines.
     let mut long_body = String::new();
     for number in 1..=50 {
         use std::fmt::Write as _;
@@ -1152,10 +1030,7 @@ async fn offline_round_trip_against_real_core() {
         whole.contains("line 50"),
         "the message's HTML part does not hold the end of the body, so          there is nowhere left to read it from: {whole:?}"
     );
-    // And the other side of it: a short message is whole where it
-    // stands, and asking for an HTML part it has not got must not be an
-    // error -- the reader page asks only when `hasHtml` says to, and
-    // this is what that flag is worth.
+    // Short message whole. Asking for missing HTML part is no error.
     let short_message: Value = client
         .call("get_message", (sender_id, first))
         .await
@@ -1166,12 +1041,9 @@ async fn offline_round_trip_against_real_core() {
         "a three-word message was marked as one the core had to cut:          {short_message:?}"
     );
 
-    // The core decides the view type from the file, and the conversation
-    // renders a picture inline on the strength of that: nothing in the app
-    // classifies an attachment, and nothing should start.
+    // Core types view from file; app classifies no attachment itself.
     let picture = std::env::temp_dir().join("piirit-real-server-dot.png");
-    // The smallest valid PNG: an 1x1 image, so the core has real pixels to
-    // read rather than a name to guess from.
+    // Smallest valid PNG: real pixels to read.
     std::fs::write(&picture, ONE_PIXEL_PNG).expect("write picture");
     let (third, _): (u32, Value) = client
         .call(
@@ -1208,13 +1080,8 @@ async fn offline_round_trip_against_real_core() {
         );
     }
 
-    // The core leaves a picture sent as a `File` at the size it was given
-    // and recodes one named `Image`. That is the whole reason the app
-    // names a picture before sending it (piirit-shim/src/media.rs):
-    // every message it composes would otherwise go out as a `File`, and
-    // the outgoing media quality setting, which the core reads only while
-    // recoding, would do nothing at all. A picture past
-    // `BALANCED_IMAGE_BYTES` is what makes the difference visible.
+    // Core keeps `File` at size given, recodes `Image`. Pictures named before send
+    // (piirit-shim/src/media.rs), else quality setting does nothing.
     let wide = std::env::temp_dir().join("piirit-real-server-wide.png");
     let wide_bytes = plain_png(1400);
     std::fs::write(&wide, &wide_bytes).expect("write the big picture");
@@ -1259,8 +1126,7 @@ async fn offline_round_trip_against_real_core() {
         }
     };
 
-    // 0 is the core's own default, and what the settings page calls
-    // balanced; 1 is what it calls worse quality.
+    // 0 = "balanced" in settings; 1 = "worse quality".
     let balanced = as_image("0").await;
     let balanced_bytes = balanced
         .get("fileBytes")
@@ -1273,11 +1139,7 @@ async fn offline_round_trip_against_real_core() {
          {balanced:?}",
         wide_bytes.len()
     );
-    // The other half of naming a picture, and the reason the bar's name
-    // and the recipient's differ for one: the core replaces an image's
-    // filename with a dated one of its own, deliberately, because a
-    // camera's own name carries a timestamp and a running number. It is
-    // a JPEG by then whatever went in.
+    // Core renames image to dated name. JPEG by then.
     let recoded_name = balanced
         .get("fileName")
         .and_then(Value::as_str)
@@ -1309,10 +1171,7 @@ async fn offline_round_trip_against_real_core() {
         .expect("put media_quality back");
     let _ = std::fs::remove_file(&wide);
 
-    // What the core recommends as the largest attachment for this
-    // profile's relay, which is what the conversation refuses a bigger
-    // file on the strength of. A computed `sys.` key rather than anything
-    // stored, so it answers on an account that has never been asked.
+    // Largest attachment for relay; conversation refuses bigger.
     let recommended: Option<String> = client
         .call("get_config", (sender_id, "sys.msgsize_max_recommended"))
         .await
@@ -1327,12 +1186,7 @@ async fn offline_round_trip_against_real_core() {
          {recommended:?}"
     );
 
-    // What the core does NOT fill in, which is as much of the contract as
-    // what it does: a GIF gets no dimensions and a sound file gets no
-    // duration, so the conversation must not size or label anything from
-    // them without checking. This is the whole reason AttachmentPreview
-    // falls back to the loaded item's own proportions and lets the audio
-    // player report its own length.
+    // Core leaves GIF dimensions and sound duration empty: don't size from them.
     let animation = std::env::temp_dir().join("piirit-real-server-dot.gif");
     std::fs::write(&animation, ONE_PIXEL_GIF).expect("write gif");
     let sent_gif = send_file(&client, sender_id, saved, &animation, "dot.gif").await;
@@ -1357,11 +1211,8 @@ async fn offline_round_trip_against_real_core() {
     let recording = std::env::temp_dir().join("piirit-real-server-voice.mp3");
     std::fs::write(&recording, one_second_mp3()).expect("write mp3");
 
-    // A voice message, as ChatMessages::send_voice sends one: `send_msg`
-    // with a MessageData naming the view type, since the core would
-    // classify the same file as Audio on its own (below), and an MP3, as
-    // the recorder makes one (piirit-shim/src/voice.rs). Answers with the
-    // id alone, and the row read back carries the type asked for.
+    // Voice message via `send_msg` naming view type; core would call it Audio.
+    // MP3 as recorder makes (piirit-shim/src/voice.rs).
     let voice_id: u32 = client
         .call(
             "send_msg",
@@ -1387,9 +1238,7 @@ async fn offline_round_trip_against_real_core() {
         "the core did not keep the Voice view type send_msg asked for: {:?}",
         voices[&voice_id]
     );
-    // The MIME type is what the other clients decide by, and the core
-    // names it from the file's suffix. The iOS client shows `audio/ogg` as
-    // a file rather than as a voice message; this is the one it plays.
+    // Clients decide by MIME from suffix. iOS shows `audio/ogg` as file.
     assert_eq!(
         voices[&voice_id].get("fileMime").and_then(Value::as_str),
         Some("audio/mpeg"),
@@ -1430,10 +1279,7 @@ async fn offline_round_trip_against_real_core() {
          which is why nothing renders this field: {sent_tone:?}"
     );
 
-    // The chat's own index of what it holds, which the media pages are
-    // built on (piirit-shim/src/chat_media.rs): up to three view types
-    // in one call, the chat optional, and the ids come back oldest first
-    // -- the voice message went before the tone, so it stands before it.
+    // Media index (chat_media.rs): up to three view types. Oldest first.
     let tone_id = sent_tone
         .get("id")
         .and_then(Value::as_u64)
@@ -1469,8 +1315,7 @@ async fn offline_round_trip_against_real_core() {
         !pictures.contains(&tone_id) && !pictures.contains(&voice_id),
         "a sound is listed among the chat's pictures: {pictures:?}"
     );
-    // Calls are a view type of their own, which the index takes like any
-    // other: what the contact page's Calls tile lists. None here.
+    // Calls: own view type in index. None here.
     let calls: Vec<u32> = client
         .call(
             "get_chat_media",
@@ -1489,8 +1334,7 @@ async fn offline_round_trip_against_real_core() {
         "a chat with no calls lists some: {calls:?}"
     );
 
-    // A shared contact. The core parses the card and hands back the pieces
-    // a contact row is built from, so nothing here reads vCard syntax.
+    // Shared contact: core parses vCard, gives row pieces.
     let ada: u32 = client
         .call(
             "create_contact",
@@ -1521,11 +1365,7 @@ async fn offline_round_trip_against_real_core() {
         );
     }
 
-    // A webxdc app, and the four calls running one is made of. Nothing in
-    // this repository opens the archive: the shim serves an app out of
-    // `get_webxdc_blob` (piirit-shim/src/webxdc_host.rs), so a wrong
-    // assumption about any of these is a blank page on a phone and
-    // nothing anywhere else.
+    // Webxdc app: four calls, served via `get_webxdc_blob` (webxdc_host.rs).
     let app_file = std::env::temp_dir().join("piirit-real-server-checkers.xdc");
     let page = b"<html><head></head><body>board</body></html>";
     std::fs::write(
@@ -1540,8 +1380,7 @@ async fn offline_round_trip_against_real_core() {
         ]),
     )
     .expect("write webxdc");
-    // Sent as a plain file, the way the attach tray sends one: the core
-    // is what turns a .xdc into an app.
+    // Sent as plain file, as attach tray does; core turns .xdc into app.
     let (app_id, _): (u32, Value) = client
         .call(
             "misc_send_msg",
@@ -1569,7 +1408,7 @@ async fn offline_round_trip_against_real_core() {
          attach tray would send a paperclip: {sent_app:?}"
     );
 
-    // What the row draws, and what the app is told about itself.
+    // Row draw and app self-info.
     let app_info: Value = client
         .call("get_webxdc_info", (sender_id, app_id))
         .await
@@ -1609,8 +1448,7 @@ async fn offline_round_trip_against_real_core() {
         );
     }
 
-    // The files, as the host serves them: base64 without padding, which
-    // is what the shim's decoder is written for.
+    // Files as host serves: base64 without padding.
     let encoded_page: String = client
         .call("get_webxdc_blob", (sender_id, app_id, "index.html"))
         .await
@@ -1630,8 +1468,7 @@ async fn offline_round_trip_against_real_core() {
         "the icon a row draws is not the one in the archive"
     );
 
-    // Updates both ways: the POST the bridge sends, and the poll it
-    // collects with.
+    // Updates both ways: bridge POST, and poll collecting it.
     let update = "{\"payload\":{\"move\":\"e4\"}}";
     client
         .call::<_, Value>(
@@ -1644,8 +1481,7 @@ async fn offline_round_trip_against_real_core() {
         .call("get_webxdc_status_updates", (sender_id, app_id, 0))
         .await
         .expect("get_webxdc_status_updates");
-    // A JSON *string*, not an array: the host hands it to the app
-    // unread, so its shape is the app's contract rather than ours.
+    // JSON string, not array: host hands it unread.
     let collected: Value =
         serde_json::from_str(&sent_updates).expect("the updates are a JSON array");
     assert_eq!(
@@ -1667,7 +1503,7 @@ async fn offline_round_trip_against_real_core() {
          spelled here: {collected:?}"
     );
 
-    // Chat kind, which decides whether a message names its sender.
+    // Chat kind decides if message names sender.
     let group: u32 = client
         .call("create_group_chat", (sender_id, "Shape Group", false))
         .await
@@ -1682,8 +1518,7 @@ async fn offline_round_trip_against_real_core() {
         "unexpected chat info shape: {info:?}"
     );
 
-    // The chat-list row, as the list consumes it. Every field a row shows
-    // has to be there and spelled the way the core spells it.
+    // Chat-list row as list consumes it: every field, core's spelling.
     let saved_items: std::collections::HashMap<u32, Value> = client
         .call("get_chatlist_items_by_entries", (sender_id, vec![saved]))
         .await
@@ -1708,14 +1543,12 @@ async fn offline_round_trip_against_real_core() {
             "the chat list row lost the {field} field: {row:?}"
         );
     }
-    // Core 2.63 took the thumbnail off the row. The list never drew it,
-    // and the fake core never sent it; this says the real one agrees.
+    // Core 2.63 dropped thumbnail from row. List never drew it.
     assert!(
         row.get("summaryPreviewImage").is_none(),
         "the chat list row has a summaryPreviewImage again: {row:?}"
     );
-    // The chat with oneself says so, which is how the cover keeps it out
-    // of the people it draws; the group is nobody's self.
+    // Self-chat flagged, so cover skips it.
     assert_eq!(
         row.get("isSelfTalk").and_then(Value::as_bool),
         Some(true),
@@ -1734,11 +1567,7 @@ async fn offline_round_trip_against_real_core() {
         group_items[&group]
     );
 
-    // Who `get_contacts` lists. With listFlags 0 the account's own
-    // contact (DC_CONTACT_ID_SELF, 1) is left out; DC_GCL_ADD_SELF (2)
-    // appends it, and a query drops it again. The new-group page draws
-    // the reader among the members from the first, and the pickers from
-    // the second.
+    // get_contacts: listFlags 0 omits self; DC_GCL_ADD_SELF (2) adds it.
     let contacts_plain: Vec<Value> = client
         .call("get_contacts", (sender_id, 0, Option::<String>::None))
         .await
@@ -1770,19 +1599,11 @@ async fn offline_round_trip_against_real_core() {
         "a query still lists the account's own contact: {contacts_searched:?}"
     );
 
-    // Blocking, which the core keeps a list of its own for: a blocked
-    // contact is listed by `get_blocked_contacts` -- which takes the
-    // account and nothing else -- as a whole contact object, the same
-    // shape a row is drawn from, and each way round is announced as a
-    // `ContactsChanged`, which is all an open page is told.
+    // Blocking: `get_blocked_contacts` gives whole contact; each change announces
+    // `ContactsChanged`.
     //
-    // That a blocked contact leaves `get_contacts` is not asserted here
-    // and cannot be: everything this offline session can make is an
-    // address contact, which the core's contact listing leaves out
-    // whether it is blocked or not (`get_contacts` above answers with
-    // the account's own contact and nothing else). The fake core models
-    // the exclusion, and `piirit-shim/tests/blocking.rs` drives this
-    // side of it.
+    // Blocked contact leaving `get_contacts` not asserted: offline session makes address
+    // contacts only. Fake core and `piirit-shim/tests/blocking.rs` cover it.
     client
         .call::<_, ()>("block_contact", (sender_id, ada))
         .await
@@ -1838,8 +1659,7 @@ async fn offline_round_trip_against_real_core() {
         "an unblocked contact is still on the blocked list: {blocked_after:?}"
     );
 
-    // What the row's context menu does. Visibility is one method with the
-    // core's own variant names, and muting takes a tagged duration.
+    // Row menu: visibility is one method; mute takes tagged duration.
     for visibility in ["Pinned", "Archived", "Normal"] {
         client
             .call::<_, ()>("set_chat_visibility", (sender_id, group, visibility))
@@ -1860,9 +1680,7 @@ async fn offline_round_trip_against_real_core() {
         .await
         .expect("delete_chat");
 
-    // What a message's context menu does. Both take a list, not a single
-    // id, and a reply is `misc_send_msg` with the quoted message last --
-    // pinned by the quote assertion above.
+    // Message menu: both take id list. Reply is misc_send_msg, quote last.
     client
         .call::<_, ()>("resend_messages", (sender_id, vec![first]))
         .await
@@ -1872,19 +1690,13 @@ async fn offline_round_trip_against_real_core() {
         .await
         .expect("delete_messages");
 
-    // Read receipts, as ChatMessages sends them when a chat is opened.
+    // Read receipts, as ChatMessages sends on open.
     client
         .call::<_, ()>("markseen_msgs", (sender_id, vec![first]))
         .await
         .expect("markseen_msgs");
 
-    // Reactions, as ChatMessages sends and draws them. The call takes the
-    // whole list of this account's reactions on the message and answers
-    // with the id of the hidden message carrying it; the message object
-    // then carries them counted and sorted, with a flag for our own, and
-    // reads null once an empty list has taken them off again. A reaction
-    // is a message the list does not show, so the chat's id list must not
-    // grow by it.
+    // Reactions: one call, answers hidden reaction id. Counts sorted; null once emptied.
     let listed_before: Vec<Value> = client
         .call("get_message_list_items", (sender_id, saved, false, false))
         .await
@@ -1937,7 +1749,7 @@ async fn offline_round_trip_against_real_core() {
         listed_after.len(),
         "a reaction shows up as a row of its own: {listed_after:?}"
     );
-    // The event the model refreshes the row on, with the message named.
+    // Event model refreshes row on, with message named.
     let mut saw_reactions_changed = false;
     let deadline = tokio::time::Instant::now() + Duration::from_secs(30);
     while tokio::time::Instant::now() < deadline {
@@ -1972,14 +1784,10 @@ async fn offline_round_trip_against_real_core() {
         cleared[&first]
     );
 
-    // What the next round of UI work depends on, pinned here because a
-    // wrong method name or config key fails only on a device -- the fake
-    // core answers to whatever it is asked.
+    // Downstream UI relies on these; wrong method or key fails only on device.
 
-    // Forwarding. `isForwarded` is what marks a forwarded copy for the
-    // sender as well as the recipient, and it is false on the original:
-    // an assertion on the copy alone would pass against a field that was
-    // simply always true.
+    // `isForwarded`: true on copy (sender and recipient), false on original. Copy alone would pass
+    // an always-true field.
     let (original, _): (u32, Value) = client
         .call(
             "misc_send_msg",
@@ -2025,8 +1833,7 @@ async fn offline_round_trip_against_real_core() {
         "every message reports isForwarded, so the field marks nothing: {after:?}"
     );
 
-    // Searching. Three arguments, the last being an optional chat to
-    // search within -- passing two is rejected outright.
+    // Search: three args, last optional chat; two rejected.
     let _: Vec<u32> = client
         .call(
             "search_messages",
@@ -2035,8 +1842,7 @@ async fn offline_round_trip_against_real_core() {
         .await
         .expect("search_messages takes (account, query, chat_id option)");
 
-    // The profile fields a settings page edits. `displayname` is already
-    // pinned above; these are the two it does not cover.
+    // Profile fields a settings page edits; two not covered above.
     client
         .call::<_, ()>("set_config", (sender_id, "selfstatus", "probing"))
         .await
@@ -2051,12 +1857,9 @@ async fn offline_round_trip_against_real_core() {
         "selfstatus did not stick"
     );
 
-    // `selfavatar` is a *path to an image the core copies into its blob
-    // directory*, not a value: an empty string is rejected outright with
-    // "Copying new blobfile failed". A settings page has to hand it a
-    // real file, and clear it with null rather than "".
+    // `selfavatar` is a path to an image core copies. Empty string rejected.
     let avatar = std::env::temp_dir().join("piirit-real-server-avatar.png");
-    // The smallest valid PNG; the core rejects what it cannot decode.
+    // Smallest valid PNG; core rejects undecodable.
     std::fs::write(
         &avatar,
         [
@@ -2085,7 +1888,7 @@ async fn offline_round_trip_against_real_core() {
         stored.as_deref().is_some_and(|path| !path.is_empty()),
         "selfavatar read back empty after being set to an image: {stored:?}"
     );
-    // Null clears it. This is the shape a "remove picture" action needs.
+    // Null clears: the "remove picture" action.
     client
         .call::<_, ()>(
             "set_config",
@@ -2095,11 +1898,7 @@ async fn offline_round_trip_against_real_core() {
         .expect("set_config selfavatar null clears it");
     let _ = std::fs::remove_file(&avatar);
 
-    // The account list, as the profiles page draws it: a configured
-    // account carries its name, its picture and its colour, but not its
-    // address, which core 2.61 took off it. The shim asks each configured
-    // account for `configured_addr` instead (core.rs, `primary_addr`), so
-    // whether the list has one again is not pinned: nothing reads it.
+    // Configured account: name, picture, colour; no address (core 2.61 removed).
     let accounts: Vec<Value> = client
         .call_unit("get_all_accounts")
         .await
@@ -2131,9 +1930,7 @@ async fn offline_round_trip_against_real_core() {
          with, so its row on the profiles page would have none"
     );
 
-    // A name of the reader's own for a contact, and the way back to the
-    // contact's: an empty name. The contact page is built on the empty
-    // name meaning that rather than being refused.
+    // Empty name resets a contact's own name; contact page relies on it.
     client
         .call::<_, ()>("change_contact_name", (sender_id, ada, "Countess"))
         .await
@@ -2173,11 +1970,7 @@ async fn offline_round_trip_against_real_core() {
         "the contact is still shown under the cleared name: {unnamed:?}"
     );
 
-    // What the profile page says about the connection and the mailbox:
-    // a band, a report written for a web view, and the profile's size on
-    // the device. Offline, so the band says so and the report holds no
-    // quota -- what is pinned is that the calls exist and answer in the
-    // shapes connectivity.rs reads.
+    // Connection/mailbox calls: pinned as shapes connectivity.rs reads.
     let band: u32 = client
         .call("get_connectivity", (sender_id,))
         .await
@@ -2203,8 +1996,7 @@ async fn offline_round_trip_against_real_core() {
         "an account with messages in it takes no space: {size}"
     );
 
-    // The download limit, as the settings page writes it to every
-    // account: a config key, in bytes, read back as written.
+    // Download limit: per account, config key in bytes, read back as written.
     client
         .call::<_, ()>("set_config", (sender_id, "download_limit", "1048576"))
         .await
@@ -2218,12 +2010,7 @@ async fn offline_round_trip_against_real_core() {
         Some("1048576"),
         "download_limit did not stick"
     );
-    // Marking a chat unread, and counting what is unread: the calls the
-    // chat list's menu and the badges on the profiles page are built on.
-    // The saved-messages chat holds only outgoing messages, so there is
-    // nothing offline for markfresh_chat to put back to fresh; what is
-    // pinned is that both calls exist and answer in the shapes
-    // chatlist.rs and core.rs read.
+    // Mark/count unread: calls exist and answer shapes chatlist.rs and core.rs read.
     client
         .call::<_, ()>("markfresh_chat", (sender_id, saved))
         .await
@@ -2241,8 +2028,8 @@ async fn offline_round_trip_against_real_core() {
         "a chat of the reader's own messages counts as unread: {fresh:?}, {fresh_here}"
     );
 
-    // And the field a held-back message is told apart by, on one that
-    // is not: the delegate offers the rest on anything but Done.
+    // `downloadState` tells held-back messages apart; this one isn't (Done). Delegate offers the
+    // rest on anything but Done.
     assert_eq!(
         reply.get("downloadState").and_then(Value::as_str),
         Some("Done"),
@@ -2258,15 +2045,10 @@ async fn offline_round_trip_against_real_core() {
     let _ = std::fs::remove_dir_all(&accounts_dir);
 }
 
-/// A profile's relays, as the profile page and the duplicate check read
-/// and change them (transports.rs, signup.rs), and as the fake core
-/// answers for them. On an account of its own, three relays on the
-/// loopback stub, so the sending account above keeps the one it has.
-/// The relays `relays_against` added, as the core reports them back.
+/// Profile relays, as profile page and duplicate check read them. Three loopback relays.
+/// `relays_against` adds them.
 async fn relays_listed_as_added(client: &RpcClient, account: u32, addrs: &[&str]) {
-    // Each relay by the address on it, in the order they were added; the
-    // profile's own address is the first one's, and stays that as more
-    // are added.
+    // Relays by address, in add order; profile's own address stays on first.
     let listed = |transports: &[Value]| -> Vec<String> {
         transports
             .iter()
@@ -2289,10 +2071,7 @@ async fn relays_listed_as_added(client: &RpcClient, account: u32, addrs: &[&str]
         .await
         .unwrap_or_else(|err| panic!("get_config configured_addr: {err}"));
     assert_eq!(own.as_deref(), Some(addrs[0]));
-    // Since core 2.63 adding a relay no longer writes the legacy login
-    // keys: `addr`, `mail_pw` and the rest stay unset, and the relays are
-    // only in `list_transports`. Nothing in the shim reads them, and this
-    // is why nothing may start to.
+    // Core 2.63+: relays don't write legacy keys (`addr`, `mail_pw`); shim must never read them.
     for key in ["addr", "mail_pw", "mail_server", "send_server"] {
         let legacy: Option<String> = client
             .call("get_config", (account, key))
@@ -2329,8 +2108,7 @@ async fn relays_against(client: &RpcClient, mailbox: (u16, u16)) {
 
     relays_listed_as_added(client, account, &addrs).await;
 
-    // The refusals the profile page shows in the core's words, and the
-    // fake core gives in the same ones.
+    // Refusals in core's words, as fake core gives them.
     assert_eq!(
         refusal(
             client,
@@ -2359,9 +2137,7 @@ async fn relays_against(client: &RpcClient, mailbox: (u16, u16)) {
         "Transport does not exist"
     );
 
-    // Removing the relay with the profile's own address on it moves the
-    // address to the newest of the rest -- not the oldest, and not left
-    // naming a relay the profile no longer has.
+    // Removing relay with profile's address moves it to newest remaining.
     client
         .call::<_, ()>("delete_transport", (account, addrs[0]))
         .await
@@ -2383,7 +2159,7 @@ async fn relays_against(client: &RpcClient, mailbox: (u16, u16)) {
         refusal(client, "delete_transport", (account, addrs[2])).await,
         "Cannot remove the last transport"
     );
-    // The last relay is refused before an unknown one is looked for.
+    // Last relay refused before unknown one looked for.
     assert_eq!(
         refusal(
             client,
@@ -2395,15 +2171,8 @@ async fn relays_against(client: &RpcClient, mailbox: (u16, u16)) {
     );
 }
 
-/// A call, as the shim places, reads and ends one (`calls.rs`,
-/// `call_host.rs`), and as the fake core answers for it -- with no media
-/// anywhere: the SDP the core carries is opaque to it, and a sentence
-/// stands in for one here.
-///
-/// Two accounts on the loopback stub, each knowing the other's key from a
-/// vCard, since a call needs an encrypted chat and nothing else. Nothing
-/// is delivered -- the stub drops whatever is sent -- so the other end
-/// never rings; what is pinned is this end's side of the core.
+/// Call as shim places, reads, ends it (`calls.rs`, `call_host.rs`). No media: SDP is a stand-in.
+/// Two accounts on loopback stub; nothing delivered, pins this end.
 async fn calls_against(client: &RpcClient, mailbox: (u16, u16)) {
     let mut accounts = Vec::new();
     for addr in ["caller@example.invalid", "callee@example.invalid"] {
@@ -2422,8 +2191,7 @@ async fn calls_against(client: &RpcClient, mailbox: (u16, u16)) {
         accounts.push(account);
     }
     let (caller, other_end) = (accounts[0], accounts[1]);
-    // DC_CONTACT_ID_SELF: the other end's own contact, as a vCard with its
-    // key.
+    // DC_CONTACT_ID_SELF: other end's contact as vCard with key.
     let card: String = client
         .call("make_vcard", (other_end, vec![1_u32]))
         .await
@@ -2441,10 +2209,9 @@ async fn calls_against(client: &RpcClient, mailbox: (u16, u16)) {
     calls_are_refused_where_the_core_refuses_them(client, caller, chat).await;
 }
 
-/// Placed, read back, and hung up before the other end answered.
+/// Placed, read back, hung up before answer.
 async fn a_call_is_placed_and_hung_up(client: &RpcClient, caller: u32, chat: u32) {
-    // The ICE servers are a JSON string inside the answer, not an array:
-    // the bridge hands the string to the page as it is (calls.js).
+    // ICE servers: JSON string inside answer, passed to page as is.
     let ice: String = client
         .call("ice_servers", (caller,))
         .await
@@ -2454,8 +2221,7 @@ async fn a_call_is_placed_and_hung_up(client: &RpcClient, caller: u32, chat: u32
         "ice_servers is not a JSON array in a string: {ice}"
     );
 
-    // Placed: the call is a message, and its id is what `call_info` and
-    // `end_call` are asked about.
+    // Placed: call is a message; its id is for `call_info` and `end_call`.
     let placed: u32 = client
         .call(
             "place_outgoing_call",
@@ -2488,8 +2254,7 @@ async fn a_call_is_placed_and_hung_up(client: &RpcClient, caller: u32, chat: u32
     );
     assert_eq!(message["fromId"], serde_json::json!(1), "{message:?}");
 
-    // Hung up before the other end answered: canceled, and saying so
-    // twice is not an error.
+    // Hung up unanswered: canceled; saying so twice is no error.
     client
         .call::<_, Value>("end_call", (caller, placed))
         .await
@@ -2509,8 +2274,7 @@ async fn a_call_is_placed_and_hung_up(client: &RpcClient, caller: u32, chat: u32
         .unwrap_or_else(|err| panic!("end_call on an ended call: {err}"));
 }
 
-/// The core's own refusals, which `can_call` and the fake core keep to,
-/// and the one setting.
+/// Core's own refusals, and the one setting.
 async fn calls_are_refused_where_the_core_refuses_them(client: &RpcClient, caller: u32, chat: u32) {
     let text: u32 = client
         .call("misc_send_text_message", (caller, chat, "not a call"))
@@ -2537,7 +2301,7 @@ async fn calls_are_refused_where_the_core_refuses_them(client: &RpcClient, calle
         "Can only place calls in single chats"
     );
 
-    // Whose calls ring here, as the settings write it.
+    // Whose calls ring here: settings value.
     client
         .call::<_, ()>("set_config", (caller, "who_can_call_me", "2"))
         .await

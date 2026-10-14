@@ -2,42 +2,30 @@ import QtQuick 2.0
 import Sailfish.Silica 1.0
 
 /*
- * One thing the cover says about a call it shows: the microphone is off,
- * the camera is paused. A pill with an icon and a few words, on a ground
- * of its own -- dark, in a dark ambience -- so it reads over the other
- * end's face. Small, as a cover's words are, and smaller than the name
- * and the time above it: two of them have to fit under those, and over
- * the action, on a cover a third of the screen wide.
- *
- * What the reader can do something about is drawn loud -- in the
- * ambience's highlight, with a thin outline in it, the way the cover's
- * count of new messages is -- and what is only so is drawn in the
- * primary colour.
+ * Cover note about a call (mic off, camera paused): icon and words on own
+ * ground. Actionable items loud (highlight, thin outline); plain facts primary
+ * colour.
  */
 Rectangle {
     id: note
 
-    /// What it says.
+    /// Text.
     property string text
-    /// The theme's icon beside it, by name.
+    /// Theme icon name.
     property string iconName
-    /// Something the reader can act on, rather than only a fact.
+    /// Actionable, not a fact.
     property bool loud: false
-    /// What it is drawn on: black in a dark ambience, white in a light
-    /// one, so the ambience's own colours read on it.
+    /// Ground: black in dark ambience, else white.
     property color ground: Qt.rgba(0, 0, 0, 1)
-    /// The most it may take across. Its words are shrunk a little to fit,
-    /// and cut short past that.
+    /// Max width; words shrink, then cut.
     property real maximumWidth: Screen.width
-    /// Its sizes, as a share of the theme's: less than one on a cover
-    /// smaller than the large one.
+    /// Sizes as theme share: < 1 on covers smaller than the large one.
     property real ratio: 1
 
     readonly property color ink: note.loud ? Theme.highlightColor : Theme.primaryColor
-    /// The size of its words, and of its icon, which stands as tall as
-    /// they are.
+    /// Word size; icon as tall.
     readonly property real size: Math.round(Theme.fontSizeExtraSmall * note.ratio)
-    /// The room around its icon and words.
+    /// Room around icon and words.
     readonly property real across: Math.round(Theme.paddingMedium * note.ratio)
     readonly property real between: Math.round(Theme.paddingSmall * note.ratio)
 
@@ -78,8 +66,7 @@ Rectangle {
         }
         color: note.ink
         font.pixelSize: note.size
-        // Shrunk a little to fit, as the count of new messages is, and cut
-        // short past that rather than run out of the pill.
+        // Shrink to fit, then cut; never overrun pill.
         fontSizeMode: Text.HorizontalFit
         minimumPixelSize: Math.round(Theme.fontSizeTiny * note.ratio)
         truncationMode: TruncationMode.Elide

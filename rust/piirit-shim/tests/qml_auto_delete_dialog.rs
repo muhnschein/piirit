@@ -1,10 +1,8 @@
-//! The page that asks before old messages start going.
+//! Page asking before old messages start going.
 //!
-//! It says how many go now and for what period, and accept means nothing
-//! until the reader has turned the switch that says they understand --
-//! the checkbox the reference clients put on the same question. What it
-//! does when accepted is the settings page's business (`qml_general_
-//! settings.rs`); this is the page on its own.
+//! Says how many go now and for what period. Accept does nothing until the "understand" switch is
+//! on (reference clients' checkbox). Accept behaviour lives in settings page
+//! (`qml_general_settings.rs`).
 
 // Qt harness: see qml_pages.rs.
 #![allow(
@@ -62,7 +60,7 @@ const PROBE_QML: &str = r"
 
 #[test]
 fn the_dialog_says_what_goes_and_accepts_only_once_the_reader_has_agreed() {
-    // SAFETY: single-threaded test binary; set before Qt starts.
+    // SAFETY: single-threaded; set pre-Qt.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
     }

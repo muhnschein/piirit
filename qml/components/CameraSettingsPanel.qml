@@ -3,21 +3,16 @@ import Sailfish.Silica 1.0
 import "../js/Viewfinder.js" as Viewfinder
 
 /*
- * The camera's settings, the platform camera's way: a row of icons along
- * the top of the viewfinder says what is in force, and a tap on it pulls
- * a panel down over the picture with each setting as a column of
- * choices -- the self-timer, the flash, the white balance, the grid. A
- * tap anywhere else puts the panel away.
- *
- * Which choices there are is the page's to say (`flashModes` is empty on
- * the front camera, which has no flash); what is picked goes out on the
- * signals, and the page decides what it means.
+ * Camera settings, platform camera's way: icons on viewfinder top show what is
+ * in force. Tap pulls panel down, a column per setting (timer, flash, white
+ * balance, grid); tap elsewhere hides it. Page sets choices (`flashModes` empty
+ * on front camera) and decides what picks (signals) mean.
  */
 Item {
     id: panel
 
     property bool open: false
-    /// How far down the top row sits: under the notch, where there is one.
+    /// Top offset: under notch, if any.
     property real topInset: 0
 
     property var flashModes: []
@@ -31,8 +26,7 @@ Item {
     signal whiteBalanceChosen(int mode)
     signal gridChosen(bool on)
 
-    /// The header's words, while a choice is pressed and for a moment
-    /// after.
+    /// Header text while choice pressed, and a moment after.
     property string described: ""
 
     function flashName(mode) {
@@ -91,8 +85,7 @@ Item {
         onTriggered: panel.described = ""
     }
 
-    // Behind the panel, while it is down: a tap here puts it away and
-    // reaches nothing under it.
+    // Behind panel: tap hides it.
     MouseArea {
         objectName: "settingsDismiss"
         anchors.fill: parent
@@ -100,7 +93,7 @@ Item {
         onClicked: panel.open = false
     }
 
-    // What is in force, along the top. Tapped, it pulls the panel down.
+    // In-force icons; tap opens panel.
     MouseArea {
         id: topRow
         objectName: "settingsRow"
@@ -156,7 +149,7 @@ Item {
             opacity: 0.7
         }
 
-        // Taps on the sheet itself stay on it.
+        // Sheet taps stay on sheet.
         MouseArea {
             anchors.fill: parent
         }

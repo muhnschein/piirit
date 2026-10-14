@@ -2,51 +2,32 @@ import QtQuick 2.0
 import Sailfish.Silica 1.0
 
 /*
- * Which kind of delete, asked before anything goes.
+ * Which delete, asked before anything goes. Delete: off this account's
+ * devices, others keep copies. "For everyone" also asks other ends to delete
+ * theirs (`delete_messages_for_all`). Row menu keeps one Delete; this asks.
  *
- * Deleting a message takes it off this account's devices and leaves
- * everybody else's copy where it is; the core will also ask the other
- * ends to delete theirs (`delete_messages_for_all`). Two different
- * things behind one word, and the difference -- who keeps a copy -- is
- * not one a thumb reads off a long-press menu. So the row menu keeps its
- * single Delete and this is where it leads.
- *
- * A Dialog rather than a page of answers: the reader picks one of the
- * two and swipes forward, which is how everything else on the phone is
- * accepted, and the back edge is the way out. Nothing is picked when it
- * opens and the forward swipe is not there until something is
- * (`canAccept`) -- the two are not each other's default, and a dialog
- * that opened with one already set would delete the wrong way for
- * somebody who swiped without reading.
- *
- * Nothing is deleted here. Whoever pushed this connects to `picked`, and
- * what answers it is the wait before the message goes
- * (components/PendingRemoval.qml) -- so a tap on the countdown is still
- * the last word. A dialog left by the back edge deletes nothing at all.
+ * Dialog, not page: nothing preset, so a blind swipe cannot delete the wrong
+ * way. Back edge deletes nothing. Caller connects to `picked`; the wait in
+ * components/PendingRemoval.qml answers it, tap on countdown is last word.
  */
 Dialog {
     id: dialog
 
-    /// Whether the core would take a deletion for everyone: a message
-    /// this account sent, and an encrypted one. The row that asked knows
-    /// both (`is_outgoing`, `show_padlock`); the core refuses the rest,
-    /// and a switch that cannot work is better greyed than answered with
-    /// an error afterwards.
+    /// Core allows delete-for-everyone: own, encrypted messages only (row's
+    /// `is_outgoing`, `show_padlock`).
+    /// Greyed, not error, when not.
     property bool canDeleteForEveryone: false
 
-    /// Which way the reader has picked: "me", "everyone", or nothing
-    /// yet, which is what it opens as.
+    /// "me", "everyone", or "" until picked.
     property string choice: ""
 
-    /// The reader swiped forward on one of the two.
+    /// Reader swiped forward on one.
     signal picked(bool forEveryone)
 
     canAccept: dialog.choice.length > 0
     onAccepted: dialog.picked(dialog.choice === "everyone")
 
-    /// Turn one on, and the other off with it. A second tap on the one
-    /// already on turns it off, which puts the dialog back to the way it
-    /// opened -- with nothing to accept.
+    /// Turn one on, other off. Tap again clears.
     function choose(which) {
         dialog.choice = dialog.choice === which ? "" : which
     }
@@ -55,17 +36,14 @@ Dialog {
         width: parent.width
         spacing: Theme.paddingLarge
 
-        // No title on it: what the dialog wants is the question below,
-        // and a heading saying the same thing in fewer words was saying
-        // it twice. The accept and cancel words are the header's.
+        // No title: the question says it. Accept and cancel come from header.
         DialogHeader {
             objectName: "deleteHeader"
             acceptText: qsTr("Delete")
             cancelText: qsTr("Cancel")
         }
 
-        // The question, and the half neither switch says: that there is
-        // no way back from either of them.
+        // Question, incl. the no-undo part neither switch says.
         Label {
             objectName: "deleteQuestion"
             x: Theme.horizontalPageMargin
@@ -76,10 +54,8 @@ Dialog {
             text: qsTr("How do you want to delete this message? This cannot be undone.")
         }
 
-        // `automaticCheck: false` on both: Silica's own switch flips
-        // itself on a tap, and these two are one answer rather than two
-        // settings -- turning one on turns the other off, which is this
-        // dialog's to decide rather than each switch's.
+        // `automaticCheck: false`: Silica switch flips itself on tap; these are
+        // one answer, so dialog decides (one on turns other off).
         TextSwitch {
             objectName: "forMeSwitch"
             //: One of the two ways to delete a message.
@@ -100,9 +76,7 @@ Dialog {
             onClicked: dialog.choose("everyone")
         }
 
-        // Why the second one is greyed, said where it is rather than
-        // after a failure: the core refuses both cases outright, and
-        // being told afterwards is being told too late.
+        // Why greyed, said up front: telling after a failure is too late.
         Label {
             objectName: "deleteWhyNot"
             visible: !dialog.canDeleteForEveryone

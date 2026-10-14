@@ -1,21 +1,7 @@
-//! What the chat list offers, and what it hides when there is nothing to
-//! offer.
-//!
-//! The pull-down is where every way to something starts: the profiles,
-//! the settings, the archive, a new group, the QR code page and a new
-//! chat. The row's menu offers to mark a read chat unread, and an unread
-//! one read -- one or the other, never both.
-//!
-//! What a page *hides* needs covering as much as what it shows, which is
-//! what this file is for.
-//!
-//! Profiles: showing it only once a second profile exists would hide the
-//! one route to making one.
-//!
-//! The archived search field: an archive with nothing in it has nothing
-//! to search, and a field over an empty list is a control that cannot do
-//! anything. It comes back the moment something is typed, or clearing it
-//! would be impossible.
+//! Chat list offers things, hides what it can't offer. Pull-down: profiles, settings, archive, new
+//! group, QR, new chat. Row menu: mark read or unread, never both. Hiding profiles with one profile
+//! would remove the only route to making one; archive search field over empty archive is dead. It
+//! comes back the moment something is typed, or clearing it would be impossible.
 
 // Qt harness: see qml_chat_list.rs.
 #![allow(
@@ -89,13 +75,11 @@ fn the_list_offers_profiles_and_hides_a_search_with_nothing_to_search() {
     let temp = std::env::temp_dir().join(format!("piirit-chrome-{}", std::process::id()));
     std::fs::create_dir_all(temp.join("accounts")).expect("create temp dirs");
 
-    // SAFETY: single-threaded test binary; set before Qt starts and before
-    // the server inherits them.
+    // SAFETY: single-threaded; set pre-Qt and before server inherits.
     unsafe {
         std::env::set_var("QT_QPA_PLATFORM", "offscreen");
         std::env::set_var("PIIRIT_ACCOUNTS_DIR", temp.join("accounts"));
-        // One profile and an empty archive: the state in which both of
-        // these were wrong on a device.
+        // One profile, empty archive: state in which both were wrong on a device.
         std::env::set_var("PIIRIT_FAKE_NO_ARCHIVED", "1");
     }
 
@@ -158,8 +142,7 @@ fn the_list_offers_profiles_and_hides_a_search_with_nothing_to_search() {
         record!("new-group", get!("newGroupMenuItem", "visible"));
         record!("qr", get!("qrMenuItem", "visible"));
         record!("laid-out", call!("layout", QString::from("chatList")));
-        // The seeded chats have nothing unread, so the first row offers
-        // to be marked unread and not read.
+        // Seeded chats all read: first row offers mark unread.
         record!("mark-unread", get!("markUnreadItem", "visible"));
         record!("mark-read", get!("markReadItem", "visible"));
         record!("ordinary-search", get!("chatSearchPill", "visible"));
@@ -215,10 +198,8 @@ fn the_list_offers_profiles_and_hides_a_search_with_nothing_to_search() {
         "the pulley does not offer Profiles with a single profile, so there \
          is no way to make a second one. {context}"
     );
-    // The settings that belong to no profile are a page of their own,
-    // reached from here; a profile's own are on its row on the profiles
-    // page. Making a group and adding a contact start here too, rather
-    // than a page further in.
+    // Settings belonging to no profile: own page, reached from here (a profile's are on its row on
+    // profiles page). Making group, adding contact start here too, not a page further in.
     for label in ["settings", "new-group", "qr"] {
         assert_eq!(
             value(label),
@@ -246,8 +227,7 @@ fn the_list_offers_profiles_and_hides_a_search_with_nothing_to_search() {
         "ok",
         "the archived list did not load. {context}"
     );
-    // The guard: with something archived the field is shown either way,
-    // and this test would prove nothing.
+    // Guard: with something archived, field shown either way and test proves nothing.
     assert_eq!(
         value("archived-count"),
         "0",
