@@ -222,12 +222,16 @@ Page {
         }
     }
 
-    // For the call's clock and the time of day, both.
+    // For the call's clock and the time of day, both. Only while the app
+    // is in front: nobody sees this page from the background, and a timer
+    // that ran on there would wake the phone once a second for nothing.
+    // Started again, it reads the time at once (`triggeredOnStart`), so
+    // a page come back to does not say the time it went away.
     Timer {
         objectName: "clock"
         interval: 1000
         repeat: true
-        running: page.call !== null && page.call.state !== ""
+        running: page.call !== null && page.call.state !== "" && page.appActive
         triggeredOnStart: true
         onTriggered: page.now = Date.now()
     }

@@ -464,10 +464,11 @@ Item {
     }
 
     // And lit while pictures are on it: nobody touches the screen
-    // through a video call, and it is not held to the ear.
+    // through a video call, and it is not held to the ear. Not while the
+    // app is away: no pictures are drawn then for anyone to watch.
     DisplayBlanking {
         objectName: "callDisplay"
-        preventBlanking: call.state === "ringing" || center.watching
+        preventBlanking: call.state === "ringing" || (center.watching && !center.away)
     }
 
     // A tap on either notification comes back here. On a path of its own
