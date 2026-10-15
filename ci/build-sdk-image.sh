@@ -7,8 +7,13 @@
 # preinstalled, i686 rustlib where sb2's host linker looks. ~2 GB, no installs
 # on build's critical path.
 #
-# Run by sdk-image.yml (SDK version or spec BuildRequires change), and by
-# rpm.yml when the image it wants is unpublished.
+# Run by sdk-image.yml (SDK version or spec BuildRequires change), by rpm.yml
+# for an SDK version ci/sdk-images doesn't pin, and by
+# `build-in-container.sh --upstream-sdk` for anyone not trusting our published
+# image. Podman or Docker (PIIRIT_ENGINE picks; scripts/container-engine.sh).
+#
+# Same upstream digest + this script: same build environment. Image digest
+# differs (export timestamps); packages built in it don't.
 set -euo pipefail
 
 usage() {
@@ -22,6 +27,11 @@ arch=$2
 output=$3
 
 root=$(CDPATH='' cd -- "$(dirname -- "$0")/.." && pwd)
+
+prog=build-sdk-image
+# shellcheck source=scripts/container-engine.sh
+. "$root/scripts/container-engine.sh"
+pick_engine
 
 [[ $sfos =~ ^[0-9]+(\.[0-9]+){3}$ ]] ||
     { echo "build-sdk-image: '$sfos' is not a dotted SDK version" >&2; exit 1; }
@@ -42,7 +52,8 @@ case "$sfos" in
 esac
 
 # Digest pins content, so any mirror is safe (Docker Hub rate-limits).
-upstream="${SDK_UPSTREAM_REPO:-coderus/sailfishos-platform-sdk}@$digest"
+# Fully qualified: Podman refuses short names without a search registry.
+upstream="${SDK_UPSTREAM_REPO:-docker.io/coderus/sailfishos-platform-sdk}@$digest"
 target="SailfishOS-$sfos-$arch"
 
 echo ">> deriving $output"
@@ -50,24 +61,25 @@ echo "   from $upstream"
 echo "   target $target"
 
 # Digest present = right image: skip fetch.
-if docker image inspect "$upstream" >/dev/null 2>&1; then
+if "$engine" image inspect "$upstream" >/dev/null 2>&1; then
     echo ">> $upstream is already here"
 else
-    docker pull "$upstream"
+    "$engine" pull "$upstream"
 fi
 
-cid=$(docker run -d --privileged "$upstream" sleep infinity)
-cleanup() { docker rm -f "$cid" >/dev/null 2>&1 || true; }
+cid=$("$engine" run -d --privileged "$upstream" sleep infinity)
+cleanup() { "$engine" rm -f "$cid" >/dev/null 2>&1 || true; }
 trap cleanup EXIT
 
 # Copied, not bind-mounted: mount point would stay in export.
-docker cp "$root/rpm/harbour-piirit.spec" "$cid:/tmp/harbour-piirit.spec"
+"$engine" cp "$root/rpm/harbour-piirit.spec" "$cid:/tmp/harbour-piirit.spec"
 
 # Two halves, two users: image has no passwordless sudo. mb2 runs as mersdk
 # (sdk-manage refuses root); writes outside its home via
-# `docker exec --user root`.
+# `exec --user root`.
 echo ">> installing what the spec needs, as the build user"
-docker exec -e TARGET="$target" "$cid" bash -euxo pipefail -c '
+# shellcheck disable=SC2016 # expanded by the container's shell.
+"$engine" exec -e TARGET="$target" "$cid" bash -euxo pipefail -c '
     # Dir named for package: mb2 takes package name from it (rpm/<that>.spec).
     mkdir -p ~/harbour-piirit/rpm
     cp /tmp/harbour-piirit.spec ~/harbour-piirit/rpm/
@@ -87,7 +99,8 @@ docker exec -e TARGET="$target" "$cid" bash -euxo pipefail -c '
 '
 
 echo ">> putting the rustlib where the linker looks, and dropping the rest"
-docker exec --user root -e TARGET="$target" "$cid" bash -euxo pipefail -c '
+# shellcheck disable=SC2016 # expanded by the container's shell.
+"$engine" exec --user root -e TARGET="$target" "$cid" bash -euxo pipefail -c '
     # Build scripts/proc-macros link in sb2 host mode (/usr = SDK fs). ld wants
     # i686 rustlib in /usr/lib/rustlib; SDK has it under /srv/mer. Preference
     # order: a glob would hit the build-requires snapshot copy first.
@@ -113,12 +126,35 @@ docker exec --user root -e TARGET="$target" "$cid" bash -euxo pipefail -c '
     # Bake leavings and package cache.
     rm -f /tmp/harbour-piirit.spec
     rm -rf "/srv/mer/targets/$TARGET/var/cache/zypp"/*
+
+    # Rootless Podman: 65536 subordinate ids per user by default. Upstream has
+    # mersdk at 100000, appsupport-* at 500000+: image unpullable there. mersdk
+    # to 1000; appsupport (Android app support, never used to build) dropped.
+    # passwd/group by sed: no shadow-utils assumed.
+    old_uid=$(id -u mersdk)
+    old_gid=$(id -g mersdk)
+    if [ "$old_uid" != 1000 ]; then
+        ! awk -F: "\$3 == 1000 { found = 1 } END { exit !found }" /etc/passwd ||
+            { echo "uid 1000 is taken" >&2; exit 1; }
+        ! awk -F: "\$3 == 1000 { found = 1 } END { exit !found }" /etc/group ||
+            { echo "gid 1000 is taken" >&2; exit 1; }
+        sed -i "s/^mersdk:\([^:]*\):$old_uid:$old_gid:/mersdk:\1:1000:1000:/" /etc/passwd
+        sed -i "s/^mersdk:\([^:]*\):$old_gid:/mersdk:\1:1000:/" /etc/group
+        find / -xdev -uid "$old_uid" -exec chown -h 1000 {} +
+        find / -xdev -gid "$old_gid" -exec chgrp -h 1000 {} +
+    fi
+    for f in /etc/passwd /etc/group /etc/shadow /etc/gshadow; do
+        [ -f "$f" ] && sed -i "/^appsupport-/d" "$f"
+    done
+    rm -rf /home/appsupport-root /var/spool/mail/appsupport-root
+    high=$(find / -xdev \( -uid +65535 -o -gid +65535 \) | head -5)
+    [ -z "$high" ] || { echo "still owned by ids above 65535:" >&2; echo "$high" >&2; exit 1; }
 '
 
-# docker export: deletions are real, not whiteouts (hence export/import, not
+# export: deletions are real, not whiteouts (hence export/import, not
 # `RUN rm`). Config restored by hand.
 echo ">> flattening"
-docker stop "$cid" >/dev/null
+"$engine" stop "$cid" >/dev/null
 
 # GHCR links package to repo by this label; else repo token can't pull it.
 source_url=""
@@ -137,14 +173,15 @@ if [[ -n "$source_url" ]]; then
     changes+=(--change "LABEL org.opencontainers.image.source=$source_url")
 fi
 
-docker export "$cid" |
-    docker import "${changes[@]}" \
+"$engine" export "$cid" |
+    "$engine" import "${changes[@]}" \
         --message "piirit: $target, BuildRequires installed, one architecture" \
         - "$output" >/dev/null
 
 # Gate: an image failing these fails minutes into a build, misleadingly.
 echo ">> checking what came out"
-docker run --rm --privileged -e TARGET="$target" "$output" bash -euo pipefail -c '
+# shellcheck disable=SC2016 # expanded by the container's shell.
+"$engine" run --rm --privileged -e TARGET="$target" "$output" bash -euo pipefail -c '
     # Read into var, not `grep -q` pipe: early exit SIGPIPEs sb2-config;
     # pipefail reads that as a failed check.
     targets=$(sb2-config -l)
@@ -166,6 +203,7 @@ docker run --rm --privileged -e TARGET="$target" "$output" bash -euo pipefail -c
     sb2 -t "$TARGET.default" cargo --version
     ls -d /usr/lib/rustlib/i686-unknown-linux-gnu
     grep "^DEFAULT_TARGET=$TARGET$" "$HOME/.scratchbox2/config"
+    [ "$(id -u):$(id -g)" = 1000:1000 ] || { echo "build user is $(id -u):$(id -g), not 1000:1000" >&2; exit 1; }
 
     # Build dir still inits against a target whose pristine snapshot is
     # removed: next thing rpm.yml does, the one assumption slimming makes.
@@ -175,5 +213,5 @@ docker run --rm --privileged -e TARGET="$target" "$output" bash -euo pipefail -c
     cd ~/verify && mb2 -t "$TARGET" -X build-init
 '
 
-size=$(docker image inspect --format '{{.Size}}' "$output")
+size=$("$engine" image inspect --format '{{.Size}}' "$output")
 echo ">> $output is $((size / 1000 / 1000)) MB unpacked"

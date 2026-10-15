@@ -70,12 +70,20 @@ jobs:
         run: ./scripts/fetch-rpc-server.sh
 
       # Version is free text from dispatch form, spliced into image tag below.
+      # Pinned in ci/sdk-images: that digest, nothing else. Unpinned (trying a
+      # new SDK): a tag, derived if missing.
       - name: Name the SDK image this build wants
         run: |
           [[ $SFOS =~ ^[0-9]+(\.[0-9]+){3}$ ]] || {
             echo "::error::sfos_version '$SFOS' is not a dotted version"; exit 1; }
-          owner=$(echo "$GITHUB_REPOSITORY_OWNER" | tr 'A-Z' 'a-z')
-          echo "SDK_IMAGE=ghcr.io/$owner/piirit-sdk:$SFOS-$ARCH" >> "$GITHUB_ENV"
+          pinned=$(awk -v v="$SFOS" '$1 == v { print $2; exit }' ci/sdk-images)
+          if [ -n "$pinned" ]; then
+            echo "SDK_IMAGE=$pinned" >> "$GITHUB_ENV"
+            echo "SDK_PINNED=1" >> "$GITHUB_ENV"
+          else
+            owner=$(echo "$GITHUB_REPOSITORY_OWNER" | tr 'A-Z' 'a-z')
+            echo "SDK_IMAGE=ghcr.io/$owner/piirit-sdk:$SFOS-$ARCH" >> "$GITHUB_ENV"
+          fi
 
       # Via env, not spliced into `run:`: `${{ }}` becomes shell text first.
       - name: Sign in to the registry
@@ -92,6 +100,9 @@ jobs:
         run: |
           if docker pull -q "$SDK_IMAGE"; then
             echo "using $SDK_IMAGE"
+          elif [ -n "${SDK_PINNED:-}" ]; then
+            echo "::error::$SDK_IMAGE (ci/sdk-images) can't be pulled; a derived one would be a different image"
+            exit 1
           else
             echo "::notice::no $SDK_IMAGE published yet; deriving one, which makes this run slower"
             # Room for upstream and flattened images at once. Defaulted:
@@ -164,12 +175,14 @@ jobs:
           restore-keys: rpm-cargo-
 
       # Same script as local build, so the two can't drift (its comments say
-      # why). Image named above; crates go where cache keeps them.
+      # why). Image named above; crates go where cache keeps them. Docker here;
+      # `reproduce` rebuilds with Podman.
       - name: Build the RPM
         env:
+          PIIRIT_ENGINE: docker
           PIIRIT_SDK_IMAGE: ${{ env.SDK_IMAGE }}
           PIIRIT_CARGO_JOBS: ${{ env.CARGO_JOBS }}
-        run: PIIRIT_CARGO_HOME=~/.cache/piirit-cargo ./scripts/build-in-docker.sh "$SFOS"
+        run: PIIRIT_CARGO_HOME=~/.cache/piirit-cargo ./scripts/build-in-container.sh "$SFOS"
 
       # `|| true`: runs under `bash -e`; missing .mb2 would hide logs.
       - name: Show mb2's state
@@ -204,6 +217,46 @@ jobs:
           echo "Validating $rpm"
           ./ci/harbour-validate-rpm.sh "$rpm"
 
+  # Release gate: fresh clone of the same commit, rebuilt the way
+  # docs/VERIFYING.md tells users (verify-release.sh), on another runner, with
+  # Podman not Docker, another time zone and umask. Not byte-identical: no
+  # release. Users' check is then one CI already passed.
+  reproduce:
+    needs: rpm
+    if: startsWith(github.ref, 'refs/tags/v') || inputs.release != ''
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    permissions:
+      contents: read
+      actions: read
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Make room
+        run: |
+          sudo rm -rf /usr/local/lib/android /usr/share/dotnet \
+                      "${AGENT_TOOLSDIRECTORY:-/opt/hostedtoolcache}"
+
+      - name: Fetch the package the release build made
+        run: gh run download "$GITHUB_RUN_ID" --dir rpms
+
+      - name: Rebuild and compare
+        env:
+          PIIRIT_ENGINE: podman
+          TZ: Pacific/Chatham
+        run: |
+          umask 0002
+          rpm=$(find rpms -name 'harbour-piirit-*.rpm' ! -name '*debug*' \
+                     ! -name '*.src.rpm' | head -1)
+          [ -n "$rpm" ] || { echo "::error::no device RPM to check"; exit 1; }
+          PIIRIT_REPO="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY.git" \
+            ./scripts/verify-release.sh --rpm "$rpm" --ref "$GITHUB_SHA"
+
   # Release: package to GitHub release `v<version>`, CHANGELOG.md section as
   # notes. Own job so `contents: write` is held only here, never by the
   # --privileged SDK build.
@@ -212,7 +265,7 @@ jobs:
   # the tag. Missing changelog section fails before publish
   # (scripts/release-notes.sh).
   release:
-    needs: rpm
+    needs: [rpm, reproduce]
     if: startsWith(github.ref, 'refs/tags/v') || inputs.release != ''
     runs-on: ubuntu-latest
     timeout-minutes: 10

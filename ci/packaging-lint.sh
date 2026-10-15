@@ -105,18 +105,18 @@ else
     echo "packaging-lint: doctests run wherever nextest does"
 fi
 
-# mb2 takes package name from dir (rpm/<that>.spec). build-in-docker.sh mounts
+# mb2 takes package name from dir (rpm/<that>.spec). build-in-container.sh mounts
 # checkout at a path it chooses: that name and spec's must agree, or build
 # stops before rpmbuild.
 ran=$((ran + 1))
 spec_base=$(basename "$(find "$root/rpm" -maxdepth 1 -name '*.spec' | sort | head -1)" .spec)
 # shellcheck disable=SC2016 # $home is the script's text, not ours.
 builddir=$(sed -n 's|^builddir="\$home/\([^"]*\)".*|\1|p' \
-    "$root/scripts/build-in-docker.sh" | head -1)
+    "$root/scripts/build-in-container.sh" | head -1)
 if [ "$spec_base" = "$builddir" ]; then
-    echo "packaging-lint: the docker build runs in a directory named for the spec"
+    echo "packaging-lint: the container build runs in a directory named for the spec"
 else
-    echo "packaging-lint: FAIL scripts/build-in-docker.sh mounts the checkout as" \
+    echo "packaging-lint: FAIL scripts/build-in-container.sh mounts the checkout as" \
          "'$builddir' but the spec is rpm/$spec_base.spec; mb2 would not find it" >&2
     status=1
 fi

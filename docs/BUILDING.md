@@ -127,7 +127,7 @@ Comments, docs: caveman-full.
 
 ## Packaging: the supported path
 
-`.github/workflows/rpm.yml` builds device RPM unattended on `ubuntu-latest`, `docker run` of Sailfish SDK, via `scripts/build-in-docker.sh` (anyone with Docker same way). Dispatch from Actions tab (inputs: SDK version, cargo jobs) or push `v*` tag. **aarch64** only: only arch targeted or built.
+`.github/workflows/rpm.yml` builds device RPM unattended on `ubuntu-latest`, `docker run` of Sailfish SDK, via `scripts/build-in-container.sh` (anyone with Podman or Docker same way). Reproducible: a release rebuilds byte for byte, checked before publishing (`docs/VERIFYING.md`). Dispatch from Actions tab (inputs: SDK version, cargo jobs) or push `v*` tag. **aarch64** only: only arch targeted or built.
 
 ```sh
 ./scripts/fetch-rpc-server.sh                        # bundled server binaries

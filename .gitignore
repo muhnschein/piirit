@@ -41,3 +41,6 @@ build-*/
 
 # Python 3 leaves beside tools/faces/faces.py
 __pycache__/
+
+# mb2 build state
+/.mb2/

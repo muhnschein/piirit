@@ -5,9 +5,8 @@
 # one-arch image with packages in place (~2 GB); this publishes it to the
 # registry.
 #
-# Run on SDK version change or new BuildRequires. Or never: rpm.yml derives and
-# publishes it when none exists. Makes the cost deliberate, not paid by whoever
-# builds first.
+# Run on SDK version change or new BuildRequires; commit the digest it prints to
+# ci/sdk-images. (rpm.yml derives one itself only for an unpinned version.)
 name: sdk-image
 
 on:
@@ -57,16 +56,28 @@ jobs:
           echo "$TOKEN" |
             docker login ghcr.io -u "$GITHUB_ACTOR" --password-stdin
 
+      # Tag per commit, never reused: builds pin a digest (ci/sdk-images), and
+      # an older release must still find the image it was built in.
       - name: Derive the image
+        env:
+          PIIRIT_ENGINE: docker
         run: |
           owner=$(echo "$GITHUB_REPOSITORY_OWNER" | tr 'A-Z' 'a-z')
-          image="ghcr.io/$owner/piirit-sdk:$SFOS-$ARCH"
+          image="ghcr.io/$owner/piirit-sdk:$SFOS-$ARCH-$(git rev-parse --short=12 HEAD)"
           ./ci/build-sdk-image.sh "$SFOS" "$ARCH" "$image"
           echo "IMAGE=$image" >> "$GITHUB_ENV"
 
+      # Not live until its digest is committed to ci/sdk-images.
       - name: Publish it
         run: |
           docker push "$IMAGE"
-          echo "### \`$IMAGE\`" >> "$GITHUB_STEP_SUMMARY"
-          docker image inspect --format \
-            '- unpacked: {{.Size}} bytes' "$IMAGE" >> "$GITHUB_STEP_SUMMARY"
+          ref=$(docker image inspect --format '{{index .RepoDigests 0}}' "$IMAGE")
+          echo "pin: $SFOS $ref"
+          {
+            echo "### \`$IMAGE\`"
+            docker image inspect --format '- unpacked: {{.Size}} bytes' "$IMAGE"
+            echo
+            echo "To build with it, this line in \`ci/sdk-images\`:"
+            echo
+            echo "    $SFOS $ref"
+          } >> "$GITHUB_STEP_SUMMARY"

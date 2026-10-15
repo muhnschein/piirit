@@ -1,0 +1,8 @@
+# SDK image per Sailfish SDK version, by digest: a release's tag names its
+# exact build environment (build-in-container.sh, rpm.yml read this).
+#
+# New or bumped: run sdk-image.yml, paste the ref its summary prints. Never
+# delete a published version: older releases verify against it.
+#
+# <sfos-version> <image@digest>
+5.2.0.15 ghcr.io/muhnschein/piirit-sdk@sha256:842ff7b9ffefb95eabbd31fe1e64cf08e3cfddc4c39ab9cce2184d66653579e8

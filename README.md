@@ -38,18 +38,23 @@ See the non-goals in [`docs/PROJECT.md`](docs/PROJECT.md) for more information.
  and what is missing
 - [`docs/BUILDING.md`](docs/BUILDING.md) — engineering standards, testing, and
 how a device RPM is built
+- [`docs/VERIFYING.md`](docs/VERIFYING.md) — rebuilding a release to check
+it matches its source
 - [`docs/HARBOUR.md`](docs/HARBOUR.md) — our understanding of Jolla's store 
 rules, how CI tries to gate them, and the two that still block submission
 
 ## Building
 
-A device package, built in the Sailfish SDK image releases use (needs Docker):
+A device package, built in the Sailfish SDK image releases use (needs Podman
+or Docker):
 
 ```
 $ git clone --recurse-submodules https://github.com/muhnschein/piirit.git
 $ cd piirit
-$ scripts/build-in-docker.sh
+$ scripts/build-in-container.sh
 ```
+
+To check a release against its source: [`docs/VERIFYING.md`](docs/VERIFYING.md).
 
 Everything else needs no phone or account, and mostly no network (`msrv`
 fetches a toolchain once, `deny` and `vendor-check` fetch what they
