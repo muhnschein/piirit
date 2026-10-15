@@ -6,7 +6,7 @@ of the GitHub release, which `scripts/release-notes.sh` cuts out of this
 file when the release is made (`.github/workflows/rpm.yml`;
 docs/BUILDING.md, "Cutting a release").
 
-## Unreleased
+## 2.2.0 — 2026-10-15
 
 - **Photo and video quick actions.** The cover's quick actions can open the camera for a photo, a video, a selfie or a selfie video; once it is taken, pick the chat to send it to. The chat opens with it ready for a caption, or, with "Send right away" turned on for that action, it goes as soon as the chat is picked. Turning that on asks first, since a chat tapped by mistake gets it too, and it is off again whenever the action is chosen anew. The choice of action is Silica's own drop-down again, which lists the kinds on a page of their own.
 - **A camera like the system's.** The in-app camera now has the system camera's layout and controls: pinch to zoom, a ring per back camera on phones with more than one (labelled 1.0, 0.5 and so on, as in the system camera), front/back switch, flash and self-timer, white balance, exposure, grid, and a focus ring where you tap. It turns to landscape with the phone.
